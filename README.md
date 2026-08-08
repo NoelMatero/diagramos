@@ -1,4 +1,4 @@
-<h1 align="center">DiagramOS</h1>
+<h1 align="center">Diagramos</h1>
 
 <p align="center">
   <b>Diagram-driven development.</b><br/>
