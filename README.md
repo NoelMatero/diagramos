@@ -1,16 +1,8 @@
-<p align="center">
-  <img src="assets/diagramos-logo.svg" alt="DiagramOS" width="380" />
-</p>
+<h1 align="center">DiagramOS</h1>
 
 <p align="center">
   <b>Diagram-driven development.</b><br/>
   Diagrams live in your repo. Claude draws them, reads them back, and writes code from them.
-</p>
-
-<p align="center">
-  <img src="https://img.shields.io/badge/protocol-MCP-4C6EF5" alt="MCP" />
-  <img src="https://img.shields.io/badge/canvas-Excalidraw-2F9E44" alt="canvas" />
-  <img src="https://img.shields.io/badge/layout-ELK-E8590C" alt="layout" />
 </p>
 
 ---
@@ -42,54 +34,11 @@ It is a Claude Code plugin. From inside Claude Code:
 /plugin install diagramos@diagramos
 ```
 
-That brings the eleven diagram tools and a `diagram` skill. Diagrams are written into
-whichever project you are working in, never into the plugin's own directory.
+That brings the eleven diagram tools and a `diagram` skill. Diagrams are written into whichever project you are working in, never into the plugin's own directory.
 
-The server itself comes from npm (`npx -y diagramos`), which npm fetches once and
-caches — the first session after installing takes a few seconds longer to
-connect. Exporting a PNG additionally needs a headless browser; `render_diagram`
-prints the one command to install it the first time you ask for one. Nothing else
-does.
+The server itself comes from npm (`npx -y diagramos`), which npm fetches once and caches — the first session after installing takes a few seconds longer to connect. Exporting a PNG additionally needs a headless browser; `render_diagram` prints the one command to install it the first time you ask for one. Nothing else does.
 
 Then just ask: *"Draw how this project works to docs/diagrams/architecture.excalidraw and open the board."*
-
-## Working on the plugin itself
-
-```bash
-npm install    # builds the headless Excalidraw bundle and the viewer
-npm test
-```
-
-Working inside this repo needs no install: the `.mcp.json` here registers the
-server for this project, so edits to `src/` take effect on the next reconnect.
-
-To exercise the plugin from *another* project without waiting on a release, link
-it into a skills directory — it loads in place rather than being copied:
-
-```bash
-ln -s "$PWD" ~/.claude/skills/diagramos   # loads as diagramos@skills-dir
-```
-
-A marketplace install copies into a version-pinned cache instead, so bump
-`version` in `.claude-plugin/plugin.json` to ship an update; without a bump,
-existing users stay on the version they have.
-
-### Releasing
-
-Three things move together, and a release is broken if they disagree: `version`
-in `package.json`, `version` in `.claude-plugin/plugin.json`, and the pinned
-`diagramos@x.y.z` that plugin's `mcpServers` command runs.
-
-```bash
-npm version patch                      # or minor / major
-# match the new version in .claude-plugin/plugin.json: "version" and the npx arg
-npm publish                            # `prepare` builds the bundles and viewer first
-git push --follow-tags
-```
-
-The pin is deliberate. A plugin install is cached by version, so an unpinned
-`npx -y diagramos` would hand an old plugin a newer server on some future morning
-with nothing in the release notes to explain it.
 
 ## Tools
 
@@ -110,6 +59,8 @@ Every path is confined to the workspace root: symlinks are resolved, and a path 
 
 ## The live board
 
+Ask Claude to open a board, or in this repo:
+
 ```bash
 npm run board docs/diagrams/architecture.excalidraw
 ```
@@ -127,53 +78,22 @@ Conflicts resolve in your favour. A save carrying a stale revision is refused wi
 
 Open two and they stay put — writing one diagram, or asking Claude to open a third, never drags a page onto a different file. That is what makes splitting a large system across diagrams workable rather than a constant flick between them. `open_board` returns the pinned URL for whatever it opened, and `board_status` lists every open board with its own address.
 
-The bare `127.0.0.1:4747` behaves as it always has: it follows whichever board was opened or written last, which is what you want when you are working on one diagram and letting Claude drive.
-
-## Development
-
-```bash
-npm test               # unit tests, plus the MCP server over a real stdio transport
-npm run typecheck
-npm run test:e2e:board # real Chromium: file to canvas and back
-npm run diagram:render docs/diagrams/example.excalidraw out.png
-```
-
-The end-to-end board test asserts against the scene the viewer actually rendered rather than the HTTP response — a weak assertion there is what previously let a sync bug hide.
-
-## Layout of the code
-
-```
-src/engine/   diagrams as data: layout, conversion, determinism, fonts, rendering
-src/mcp/      the MCP server and its path confinement
-src/server/   the live board: HTTP, SSE, file watching, conflict handling
-src/viewer/   the browser page and the sync loop behind it
-```
+The bare `127.0.0.1:4747` follows whichever board was opened or written last, which is what you want when you are working on one diagram and letting Claude drive.
 
 ## Keeping a diagram honest
 
-A node can record what it stands for — `ref: "src/engine/layout.ts"`, or
-`path#symbol` — and `check_drift` compares those claims against the working tree:
+A node can record what it stands for — `ref: "src/engine/layout.ts"`, or `path#symbol` — and `check_drift` compares those claims against the working tree:
 
 ```bash
 npm run check:drift                    # every board in docs/diagrams
 npm run check:drift docs/diagrams/architecture.excalidraw
 ```
 
-Silent when nothing has drifted, exit 1 with a report when a node points at a
-file or symbol that is gone — which is what CI and pre-commit want.
+Silent when nothing has drifted, exit 1 with a report when a node points at a file or symbol that is gone — which is what CI and pre-commit want.
 
-When something has drifted, `/update-diagram` redraws it: Claude re-runs the check,
-repoints the boxes whose code moved, removes the ones whose code is gone, and
-tells you which was which. It asks rather than guesses about hand-drawn boxes,
-whose refs were inferred from their labels.
+When something has drifted, `/update-diagram` redraws it: Claude repoints the boxes whose code moved, removes the ones whose code is gone, and tells you which was which. Nothing is fixed automatically, because a diagram silently rewritten every turn is worse than one you know is stale.
 
-Nothing is fixed automatically. The check reports and stops there, because a
-diagram silently rewritten every turn is worse than one you know is stale —
-regeneration lays the generated part out fresh, so a board someone arranged by
-hand comes back arranged by the engine.
-
-`.claude/settings.json` here also runs it at the end of every turn. To do the
-same in your own project, add this to its `.claude/settings.json`:
+To get the report at the end of every turn, add this to your project's `.claude/settings.json`:
 
 ```json
 { "hooks": { "Stop": [{ "matcher": "*", "hooks": [
@@ -181,9 +101,7 @@ same in your own project, add this to its `.claude/settings.json`:
 ] }] } }
 ```
 
-`--hook` is optional now: the script recognises hook input on stdin and switches by
-itself. Either way a stale diagram arrives as an ordinary notice, four lines, with
-the counts in red and amber:
+A stale diagram then arrives as an ordinary notice, four lines, counts in red and amber:
 
 ```
 ┌─ board-internals.excalidraw  2 gone  1 arrow ─┐
@@ -193,39 +111,15 @@ the counts in red and amber:
 └─ /update-diagram updates the diagram ─────────┘
 ```
 
-Several stale diagrams get a line each with their own counts instead.
-`/expand-report` shows every finding, one box per diagram, and leaves the notice
-that way until `/shrink-report`:
+`/expand-report` lists every finding and leaves the notice that way until `/shrink-report`. The plugin does not install the hook for you, because a project with no diagrams should not pay for a subprocess on every turn.
 
-```
-┌─ board-internals.excalidraw  1 gone ────────────┐
-│ read back as a graph → src/engine/read-graph.ts │
-├─ demo-repo.excalidraw  2 gone  1 arrow ─────────┤
-│ browser bundle config → vite.browser.config.ts  │
-│ font metrics cache → src/engine/font-cache.ts   │
-│ sync loop → PNG render                          │
-└─ /update-diagram updates the diagram ───────────┘
+Deliberately shallow. Missing files and symbols are checked by existence alone, which works in any language; the arrow check resolves imports and understands only TypeScript and JavaScript, so elsewhere every arrow is skipped. Nodes without a `ref` are skipped rather than guessed at. A clean report means nothing checkable disagreed — not that the diagram is correct. Reasoning in [docs/drift-check.md](docs/drift-check.md).
+
+## Working on it
+
+```bash
+npm install    # builds the headless Excalidraw bundle and the viewer
+npm test
 ```
 
-Both commands are also linked into `.claude/commands/` here, because a plugin's
-`commands/` directory is only discovered once the plugin is *installed* — without
-the links this repo cannot use the commands it ships.
-
-Without the notice channel the report still appears, but wrapped in
-`Stop hook error: Failed with non-blocking status code`, which reads as a broken
-tool rather than a finding. Leave the flag off anywhere an exit code is the point —
-CI, a pre-commit hook — where a non-zero exit is exactly what you want, and where
-the output stays plain because escapes in a log are noise.
-
-Point it at a clone instead (`npx tsx /abs/path/to/board/scripts/check-drift.mjs
---hook`) if you are working on this repo; either way the path cannot use
-`${CLAUDE_PLUGIN_ROOT}`, which is only substituted in configuration the plugin
-itself provides, not in yours. The plugin does not install this hook for you
-either, because a project with no diagrams should not pay for a subprocess on
-every turn.
-
-Deliberately shallow: existence only, no import graph, no model. Nodes without a
-`ref` are skipped rather than guessed at and hand-drawn boxes are ignored
-entirely, so a clean report means nothing checkable disagreed — not that the
-diagram is correct. Remaining design, including edge mismatches, in
-[docs/drift-check.md](docs/drift-check.md).
+The `.mcp.json` here registers the server for this project, so edits to `src/` take effect on the next reconnect. Releasing, and the rest of the internals, in [docs/](docs/).
