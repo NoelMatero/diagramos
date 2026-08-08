@@ -15,16 +15,6 @@ Claude gets that file as a first-class artifact. It can draw a diagram, read one
   <img src="assets/board.png" alt="A board holding a generated architecture diagram, a hand-drawn wireframe with its labels filled in, and a screenshot placed beside it" width="920" />
 </p>
 
-## How it works
-
-**Files are the source of truth.** Every tool is a read-modify-write on a `.excalidraw` file. Nothing lives in a session, so a diagram outlives the conversation that produced it.
-
-**You supply meaning, never coordinates.** `create_diagram` takes nodes and edges; ELK decides the geometry, and node sizes come from real Excalifont metrics via `fontkit`, so a label never overflows the box drawn for it.
-
-**Output is deterministic.** Element ids and seeds are derived by hashing stable ids, so regenerating an unchanged diagram produces a byte-identical file. Diagrams diff usefully instead of churning every line.
-
-**Your drawings are never redrawn.** Generated elements carry a `customData` marker; anything without one is yours. Regeneration replaces only what it made before, and `read_diagram` labels every fact `recorded` (drawn by a tool, exact) or `inferred` (hand-drawn, derived from geometry), so a caller knows what to trust.
-
 ## Install
 
 It is a Claude Code plugin. From inside Claude Code:
@@ -123,3 +113,13 @@ npm test
 ```
 
 The `.mcp.json` here registers the server for this project, so edits to `src/` take effect on the next reconnect. Releasing, and the rest of the internals, in [docs/](docs/).
+
+## How it works
+
+**Files are the source of truth.** Every tool is a read-modify-write on a `.excalidraw` file. Nothing lives in a session, so a diagram outlives the conversation that produced it.
+
+**You supply meaning, never coordinates.** `create_diagram` takes nodes and edges; ELK decides the geometry, and node sizes come from real Excalifont metrics via `fontkit`, so a label never overflows the box drawn for it.
+
+**Output is deterministic.** Element ids and seeds are derived by hashing stable ids, so regenerating an unchanged diagram produces a byte-identical file. Diagrams diff usefully instead of churning every line.
+
+**Your drawings are never redrawn.** Generated elements carry a `customData` marker; anything without one is yours. Regeneration replaces only what it made before, and `read_diagram` labels every fact `recorded` (drawn by a tool, exact) or `inferred` (hand-drawn, derived from geometry), so a caller knows what to trust.
