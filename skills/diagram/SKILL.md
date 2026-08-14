@@ -24,9 +24,18 @@ anything you left out, and the live URL if you started a board. Nothing else.
 
 ## Path
 
-Default to `docs/diagrams/<topic>.excalidraw` unless the user names somewhere
-else. One diagram per file — `create_diagram` replaces what it generated last
-time, which is how you update a board.
+Write to `docs/diagrams/<topic>.excalidraw`. `create_diagram` refuses anywhere
+else, because `check_drift` and the board CLI find diagrams by looking in that
+one directory — a board outside it is never checked and never served, and the
+check reports clean rather than admitting it never saw the file.
+
+If the user wants their diagrams somewhere else, that is a property of the
+project rather than of one diagram: write `{"diagrams": "docs/architecture"}`
+into `.diagramos.json` at the repo root, once, and everything reads it
+afterwards. Do not work around a refusal by picking a different path.
+
+One diagram per file — `create_diagram` replaces what it generated last time,
+which is how you update a board.
 
 ## Give meaning, never geometry
 

@@ -86,7 +86,16 @@ npx -y diagramos drift docs/diagrams/architecture.excalidraw
 
 Working inside this repo, `npm run check:drift` is the same command.
 
-Silent when nothing has drifted, exit 1 with a report when a node points at a file or symbol that is gone — which is what CI and pre-commit want.
+Silent when nothing has drifted, exit 1 with a report when a node points at a file or symbol that is gone — which is what CI and pre-commit want. Silent only for that reason: when there was nothing to check it says so, and names any boards it found outside the diagram directory, because a check that goes quiet by looking in the wrong place is worse than one that fails.
+
+**Where diagrams live.** `docs/diagrams`, and `create_diagram` refuses to write anywhere else — a board somewhere else is never discovered, never checked, and never served. To keep them elsewhere, say so once at the repo root and every command follows:
+
+```json
+// .diagramos.json
+{ "diagrams": "docs/architecture" }
+```
+
+Committed on purpose, so you, Claude and CI cannot disagree about it. Reading, serving and checking a board you name by hand still work anywhere in the repo, so nothing that already exists breaks.
 
 When something has drifted, `/update-diagram` redraws it: Claude repoints the boxes whose code moved, removes the ones whose code is gone, and tells you which was which. Nothing is fixed automatically, because a diagram silently rewritten every turn is worse than one you know is stale.
 

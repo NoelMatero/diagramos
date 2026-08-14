@@ -14,7 +14,7 @@ import { Client } from "@modelcontextprotocol/sdk/client/index.js";
 import { StdioClientTransport } from "@modelcontextprotocol/sdk/client/stdio.js";
 
 const REPO = path.resolve(__dirname, "..");
-const BOARD = "diagrams/architecture.excalidraw";
+const BOARD = "docs/diagrams/architecture.excalidraw";
 
 let workspace: string;
 let client: Client;
@@ -208,7 +208,7 @@ describe("board MCP server", () => {
   }, 60_000);
 
   it("keeps edge colours through a regenerate", async () => {
-    const board = "colored.excalidraw";
+    const board = "docs/diagrams/colored.excalidraw";
     const args = {
       path: board,
       title: "Colored",
@@ -242,7 +242,7 @@ describe("board MCP server", () => {
    * edit_diagram. Both are workarounds standing in for a missing feature.
    */
   it("deletes a named diagram without disturbing another on the same board", async () => {
-    const board = "two-diagrams.excalidraw";
+    const board = "docs/diagrams/two-diagrams.excalidraw";
     await call("create_diagram", { path: board, nodes: [{ id: "a", label: "A" }], name: "arch" });
     await call("create_diagram", {
       path: board,
@@ -274,7 +274,7 @@ describe("board MCP server", () => {
   }, 120_000);
 
   it("refuses an unknown diagram name instead of reporting a no-op as success", async () => {
-    const board = "named.excalidraw";
+    const board = "docs/diagrams/named.excalidraw";
     await call("create_diagram", { path: board, nodes: [{ id: "a", label: "A" }], name: "arch" });
     const result = await client.callTool({
       name: "delete_diagram",
@@ -290,7 +290,7 @@ describe("board MCP server", () => {
    * and be what check_drift compares against the real working tree.
    */
   it("carries a node's ref through to check_drift", async () => {
-    const board = "refs.excalidraw";
+    const board = "docs/diagrams/refs.excalidraw";
     await writeFile(path.join(workspace, "kept.ts"), "export function keptSymbol() {}\n");
     await call("create_diagram", {
       path: board,
@@ -339,16 +339,26 @@ describe("board MCP server", () => {
     });
 
     const report = jsonOf(await call("check_drift", {}));
-    expect(report.boards).toEqual(["docs/diagrams/one.excalidraw", "docs/diagrams/two.excalidraw"]);
+    const boards = report.boards as string[];
+    // Containment rather than an exact list: every test in this file shares one
+    // workspace, and since create_diagram confines boards to the diagram
+    // directory they all land here. An exact list only held while the other
+    // tests were writing somewhere check_drift could not see, which is the
+    // blind spot this directory rule exists to close.
+    expect(boards).toEqual(expect.arrayContaining(["docs/diagrams/one.excalidraw", "docs/diagrams/two.excalidraw"]));
+    for (const board of boards) expect(board.startsWith("docs/diagrams/")).toBe(true);
     expect(report.clean).toBe(false);
-    // Only the second board is stale, and the report says which.
-    expect(report.findings).toHaveLength(1);
-    expect(report.findings).toMatchObject([{ board: "docs/diagrams/two.excalidraw", node: "b" }]);
-    expect(report.checked).toBe(2);
+    // Only the second of the two is stale, and the report attributes it there
+    // rather than to the board that is fine.
+    const findings = report.findings as Array<{ board: string; node: string }>;
+    expect(findings.filter((finding) => finding.board.endsWith("two.excalidraw"))).toMatchObject([
+      { board: "docs/diagrams/two.excalidraw", node: "b" },
+    ]);
+    expect(findings.some((finding) => finding.board.endsWith("one.excalidraw"))).toBe(false);
   }, 120_000);
 
   it("says when a clean report checked nothing at all", async () => {
-    const board = "no-refs.excalidraw";
+    const board = "docs/diagrams/no-refs.excalidraw";
     await call("create_diagram", { path: board, nodes: [{ id: "a", label: "Auth" }] });
     const report = jsonOf(await call("check_drift", { path: board }));
     // "clean: true" over zero comparisons would otherwise read as a pass.
@@ -362,7 +372,7 @@ describe("board MCP server", () => {
    * appended a second element carrying an id the first already had.
    */
   it("gives every image its own id and updates in place when re-placed", async () => {
-    const board = "with-images.excalidraw";
+    const board = "docs/diagrams/with-images.excalidraw";
     const png = Buffer.from(
       "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8z8DwHwAFAAH/q842iQAAAABJRU5ErkJggg==",
       "base64",
@@ -399,7 +409,7 @@ describe("board MCP server", () => {
    * 24-node board, most of it seeds, nonces and fill styles nothing can use.
    */
   it("keeps read_diagram lean by default and opt-in when detail is wanted", async () => {
-    const board = "cost.excalidraw";
+    const board = "docs/diagrams/cost.excalidraw";
     const nodes = Array.from({ length: 20 }, (_, index) => ({ id: `n${index}`, label: `Node ${index}` }));
     await call("create_diagram", {
       path: board,
@@ -435,7 +445,7 @@ describe("board MCP server", () => {
   it("returns an error result rather than crashing on a bad graph", async () => {
     const result = await client.callTool({
       name: "create_diagram",
-      arguments: { path: "broken.excalidraw", nodes: [{ id: "a", label: "A" }], edges: [{ from: "a", to: "ghost" }] },
+      arguments: { path: "docs/diagrams/broken.excalidraw", nodes: [{ id: "a", label: "A" }], edges: [{ from: "a", to: "ghost" }] },
     });
     expect((result as { isError?: boolean }).isError).toBe(true);
   }, 60_000);
@@ -453,8 +463,8 @@ describe("board MCP server", () => {
  * exactly like one that works.
  */
 describe("open_board with several boards", () => {
-  const alpha = "diagrams/alpha.excalidraw";
-  const beta = "diagrams/beta.excalidraw";
+  const alpha = "docs/diagrams/alpha.excalidraw";
+  const beta = "docs/diagrams/beta.excalidraw";
 
   /** The board a pinned URL actually serves, asked over HTTP. */
   async function servedBy(pinned: string): Promise<string> {

@@ -24,7 +24,8 @@ import {
   listDiagrams,
 } from "../engine/diagram";
 import { readGraph } from "../engine/graph";
-import { checkDrift, createWorkspace, DEFAULT_DIAGRAM_DIR, findBoards } from "../engine/drift";
+import { CONFIG_FILE, DEFAULT_DIAGRAM_DIR, diagramDir } from "../engine/config";
+import { checkDrift, createWorkspace, findBoards, findStrayBoards } from "../engine/drift";
 import { loadConverter } from "../engine/convert";
 import { renderBoardToPng } from "../engine/render";
 import {
@@ -34,7 +35,13 @@ import {
   startBoardServer,
   type RunningBoardServer,
 } from "../server/board-server";
-import { relativeToWorkspace, resolveBoardPath, resolveInWorkspace, WORKSPACE_ROOT } from "./paths";
+import {
+  relativeToWorkspace,
+  resolveBoardPath,
+  resolveInWorkspace,
+  resolveNewBoardPath,
+  WORKSPACE_ROOT,
+} from "./paths";
 
 const IMAGE_MIME_BY_EXT: Record<string, string> = {
   ".png": "image/png",
@@ -238,7 +245,13 @@ server.registerTool(
       + "this file, keeps hand-drawn elements, so regenerating is the normal way to update a board. "
       + "Use delete_diagram to remove one, not a throwaway graph.",
     inputSchema: {
-      path: z.string().describe("e.g. docs/diagrams/architecture.excalidraw"),
+      path: z
+        .string()
+        .describe(
+          `Inside this project's diagram directory — ${DEFAULT_DIAGRAM_DIR}/architecture.excalidraw, `
+          + `unless ${CONFIG_FILE} names another. A path outside it is refused, because diagrams found `
+          + "anywhere else are never checked for drift.",
+        ),
       title: z.string().optional(),
       nodes: z.array(nodeSchema).min(1),
       edges: z.array(edgeSchema).default([]),
@@ -256,7 +269,9 @@ server.registerTool(
   },
   async ({ path: boardPath, title, nodes, edges, direction, name, append }) =>
     guard(async () => {
-      const file = resolveBoardPath(boardPath);
+      // The one tool that decides where a diagram comes into existence, so the
+      // one that has to be confined to the project's diagram directory.
+      const file = resolveNewBoardPath(boardPath);
       const board = await readBoard(file);
       const result = await createDiagram(board, {
         title,
@@ -369,19 +384,35 @@ server.registerTool(
       path: z
         .string()
         .optional()
-        .describe(`One board to check. Omit to check every board in ${DEFAULT_DIAGRAM_DIR}.`),
+        .describe(
+          `One board to check. Omit to check every board in this project's diagram directory `
+          + `(${DEFAULT_DIAGRAM_DIR} unless ${CONFIG_FILE} says otherwise).`,
+        ),
     },
   },
   async ({ path: boardPath }) =>
     guard(async () => {
+      const directory = diagramDir(WORKSPACE_ROOT);
       const files = boardPath
         ? [resolveBoardPath(boardPath)]
-        : await findBoards(WORKSPACE_ROOT);
+        : await findBoards(WORKSPACE_ROOT, directory);
       if (files.length === 0) {
+        // Nothing checked is not a clean report. Name the boards elsewhere too:
+        // "you have diagrams, just not where I looked" is the likeliest reason
+        // to be here, and the caller cannot guess it from an empty answer.
+        const strays = await findStrayBoards(WORKSPACE_ROOT, directory);
         return text({
-          note:
-            `No .excalidraw files in ${DEFAULT_DIAGRAM_DIR}. Pass path to check a board somewhere `
-            + "else.",
+          checked: 0,
+          note: `No .excalidraw files in ${directory}. Nothing was checked -- this is not a clean report.`,
+          ...(strays.boards.length
+            ? {
+                boardsElsewhere: strays.boards,
+                ...(strays.more ? { andMore: strays.more } : {}),
+                hint:
+                  `Those are outside ${directory}, so they are never checked. Move them there, or set `
+                  + `{"diagrams": "..."} in ${CONFIG_FILE}, or pass path to check one where it is.`,
+              }
+            : {}),
         });
       }
 

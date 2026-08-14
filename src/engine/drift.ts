@@ -495,15 +495,16 @@ export function checkDrift(
   };
 }
 
-/** Where diagrams live unless someone says otherwise. */
-export const DEFAULT_DIAGRAM_DIR = "docs/diagrams";
-
 /**
  * Every board in a directory, sorted so output does not depend on readdir
  * order. A project holds any number of diagrams and none of them is "current",
  * so checking means checking all of them.
+ *
+ * `dir` has no default on purpose. Every caller has to say where it looked, and
+ * the only honest answer comes from the project's config -- a default here is
+ * how the engine and the model came to disagree about where diagrams live.
  */
-export async function findBoards(root: string, dir = DEFAULT_DIAGRAM_DIR): Promise<string[]> {
+export async function findBoards(root: string, dir: string): Promise<string[]> {
   try {
     const entries = await readdir(path.resolve(root, dir));
     return entries
@@ -513,6 +514,65 @@ export async function findBoards(root: string, dir = DEFAULT_DIAGRAM_DIR): Promi
   } catch {
     return [];
   }
+}
+
+/** Never searched: build output, dependencies, and local state, none of which hold diagrams. */
+const NOT_SEARCHED = new Set([
+  "node_modules",
+  ".git",
+  "out",
+  "dist",
+  "build",
+  "vendor",
+  "coverage",
+  ".diagramos",
+  ".next",
+  ".venv",
+  "target",
+]);
+
+/**
+ * Boards sitting outside the project's diagram directory.
+ *
+ * Answers the question a silent check cannot: "you have diagrams, just not where
+ * I looked." Only worth asking when the diagram directory turned up nothing,
+ * because it reads the whole repository — every directory that is not obviously
+ * machinery — and that is far too much work to repeat at the end of every turn.
+ *
+ * Capped rather than complete. The point is to name enough of them to act on,
+ * and a project with two hundred strays has a different problem than a list.
+ */
+export async function findStrayBoards(
+  root: string,
+  dir: string,
+  limit = 10,
+): Promise<{ boards: string[]; more: number }> {
+  const skip = path.resolve(root, dir);
+  const found: string[] = [];
+  let more = 0;
+
+  const walk = async (directory: string): Promise<void> => {
+    let entries;
+    try {
+      entries = await readdir(directory, { withFileTypes: true });
+    } catch {
+      // Unreadable directory: nothing to report and not worth failing over.
+      return;
+    }
+    for (const entry of entries.sort((a, b) => a.name.localeCompare(b.name))) {
+      const absolute = path.join(directory, entry.name);
+      if (entry.isDirectory()) {
+        if (NOT_SEARCHED.has(entry.name) || absolute === skip) continue;
+        await walk(absolute);
+      } else if (entry.name.endsWith(".excalidraw")) {
+        if (found.length < limit) found.push(path.relative(root, absolute));
+        else more += 1;
+      }
+    }
+  };
+
+  await walk(path.resolve(root));
+  return { boards: found, more };
 }
 
 function realOrResolved(target: string): string {

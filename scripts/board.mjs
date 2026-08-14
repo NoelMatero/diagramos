@@ -20,7 +20,8 @@ import { spawn } from "node:child_process";
 import { createServer } from "node:net";
 
 import { readBoard, writeBoard } from "../src/engine/board-file.ts";
-import { DEFAULT_DIAGRAM_DIR, findBoards } from "../src/engine/drift.ts";
+import { CONFIG_FILE, ConfigError, DEFAULT_DIAGRAM_DIR, diagramDir } from "../src/engine/config.ts";
+import { findBoards, findStrayBoards } from "../src/engine/drift.ts";
 import { fileExists, probeBoard, resolveBoardPort, startBoardServer } from "../src/server/board-server.ts";
 
 const root = process.cwd();
@@ -43,7 +44,8 @@ const args = process.argv.slice(2);
 const USAGE = [
   "usage: diagramos board [board.excalidraw ...]",
   "",
-  `  no arguments   serve every board in ${DEFAULT_DIAGRAM_DIR}`,
+  "  no arguments   serve every board in this project's diagram directory",
+  `                 (${DEFAULT_DIAGRAM_DIR}, or "diagrams" in ${CONFIG_FILE})`,
   "  a board path   serve the ones you name, creating any that is not there yet",
   "",
   "  DIAGRAMOS_PORT       port to serve on (default 4747)",
@@ -60,10 +62,31 @@ if (args.includes("--help") || args.includes("-h")) {
 const unknownOption = args.find((arg) => arg.startsWith("-"));
 if (unknownOption) fail(`unknown option ${unknownOption}`, USAGE);
 
-const boards = args.length ? args.map(named) : await findBoards(root);
+// A broken config is fatal rather than a quiet fall back to the default: serving
+// diagrams from somewhere the project did not name is worse than not starting.
+let directory;
+try {
+  directory = diagramDir(root);
+} catch (error) {
+  if (!(error instanceof ConfigError)) throw error;
+  fail(error.message);
+}
+
+const boards = args.length ? args.map(named) : await findBoards(root, directory);
 
 if (!boards.length) {
-  fail(`no boards in ${DEFAULT_DIAGRAM_DIR}/`, USAGE);
+  // Nothing here is the moment to spend a read of the whole repository finding
+  // out whether the boards are simply somewhere else.
+  const strays = await findStrayBoards(root, directory);
+  fail(
+    `no boards in ${directory}/`,
+    ...(strays.boards.length
+      ? [
+          `found ${strays.boards.length + strays.more} elsewhere: ${strays.boards.join(", ")}`,
+          `name one directly, move them into ${directory}/, or set {"diagrams": "..."} in ${CONFIG_FILE}`,
+        ]
+      : [USAGE]),
+  );
 }
 
 // Every board has to sit inside the directory the server is rooted at. That
