@@ -305,7 +305,32 @@ const workspace = createWorkspace(root);
 const stale = [];
 const problems = [];
 
-for (const file of await boardsToCheck(boards)) {
+const checking = await boardsToCheck(boards);
+
+/*
+ * "Nothing drifted" and "nothing was looked at" used to be the same output --
+ * silence and exit 0 -- so a board one directory off the standard place made
+ * this report clean forever, including through the Stop hook, where a project
+ * would go a whole lifetime believing its diagrams were guarded.
+ *
+ * Said only on demand. The hook fires every turn, and a project with no
+ * diagrams must not be told so thirty times an hour; staying quiet there is the
+ * property this check was tuned for. Exit 0 either way: having no diagrams is
+ * not a failure, and CI should not go red over it.
+ */
+if (checking.length === 0) {
+  if (!opts.hook) {
+    const directory = `${DEFAULT_DIAGRAM_DIR}/`;
+    console.error(
+      existsSync(path.resolve(root, DEFAULT_DIAGRAM_DIR))
+        ? `no .excalidraw files in ${directory} — nothing to check`
+        : `${directory} does not exist — nothing to check`,
+    );
+  }
+  process.exit(0);
+}
+
+for (const file of checking) {
   let report;
   try {
     report = checkDrift(await readBoard(file), workspace, { edges: opts.edges });

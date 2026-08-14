@@ -13,7 +13,7 @@ import { mkdtempSync, mkdirSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import path from "node:path";
 import { promisify } from "node:util";
-import { afterAll, beforeAll, describe, expect, it } from "vitest";
+import { afterAll, afterEach, beforeAll, beforeEach, describe, expect, it } from "vitest";
 
 import { emptyBoard, writeBoard } from "../src/engine/board-file";
 import { createDiagram } from "../src/engine/diagram";
@@ -307,7 +307,16 @@ describe("the hook channel", () => {
   it("says nothing in either mode when the diagram is fine", async () => {
     const clean = mkdtempSync(path.join(tmpdir(), "drift-cli-hook-clean-"));
     mkdirSync(path.join(clean, "docs/diagrams"), { recursive: true });
+    mkdirSync(path.join(clean, "src"), { recursive: true });
     try {
+      // A real board pointing at real code. This used to be an empty directory,
+      // which is a different kind of quiet entirely -- and the reason the check
+      // could go blind on a misplaced board while this test stayed green.
+      writeFileSync(path.join(clean, "src/present.ts"), "export const present = true;\n");
+      await writeBoard(
+        path.join(clean, "docs/diagrams/clean.excalidraw"),
+        await board([{ id: "p", label: "Present", ref: "src/present.ts" }]),
+      );
       for (const args of [[], ["--hook"]]) {
         const { stdout, stderr } = await run(TSX, [SCRIPT, ...args], { cwd: clean });
         expect(`${stdout}${stderr}`.trim()).toBe("");
@@ -606,4 +615,68 @@ describe("expand as a mode", () => {
     // The next notice is short again: --details changed nothing.
     expect(run()).toContain("2 diagrams out of date");
   }, 180_000);
+});
+
+/** Runs the check in some other project, with arguments. */
+async function checkDriftIn(
+  cwd: string,
+  args: string[] = [],
+): Promise<{ code: number; stderr: string; stdout: string }> {
+  try {
+    const { stdout, stderr } = await run(TSX, [SCRIPT, ...args], { cwd });
+    return { code: 0, stdout, stderr };
+  } catch (error) {
+    const failure = error as { code?: number; stdout?: string; stderr?: string };
+    return { code: failure.code ?? -1, stdout: failure.stdout ?? "", stderr: failure.stderr ?? "" };
+  }
+}
+
+/**
+ * Silence means "nothing drifted". It used to also mean "nothing was looked at",
+ * and the two are opposite news.
+ */
+describe("nothing to check is not the same as nothing wrong", () => {
+  let project: string;
+
+  beforeEach(() => {
+    project = mkdtempSync(path.join(tmpdir(), "drift-nothing-"));
+  });
+
+  afterEach(() => {
+    rmSync(project, { recursive: true, force: true });
+  });
+
+  it("says the diagram directory is missing rather than exiting silently", async () => {
+    const result = await checkDriftIn(project);
+    expect(result.code).toBe(0);
+    expect(result.stderr).toContain("does not exist");
+  }, 120_000);
+
+  it("says the directory is empty when it exists with no boards in it", async () => {
+    mkdirSync(path.join(project, "docs/diagrams"), { recursive: true });
+    const result = await checkDriftIn(project);
+    expect(result.code).toBe(0);
+    expect(result.stderr).toContain("no .excalidraw files");
+  }, 120_000);
+
+  it("does not report clean when the boards sit one directory off", async () => {
+    // The bug this exists for: a board in diagrams/ rather than docs/diagrams/
+    // produced exit 0 and no output, indistinguishable from every box checking
+    // out. Wired into a Stop hook, that is a project believing it is guarded.
+    mkdirSync(path.join(project, "diagrams"), { recursive: true });
+    await writeBoard(
+      path.join(project, "diagrams/arch.excalidraw"),
+      await board([{ id: "p", label: "Present", ref: "src/present.ts" }]),
+    );
+    const result = await checkDriftIn(project);
+    expect(`${result.stdout}${result.stderr}`.trim()).not.toBe("");
+  }, 120_000);
+
+  it("stays silent through the hook, which fires every turn", async () => {
+    // A project with no diagrams must not be told so once per turn for its
+    // whole life; quiet is what keeps this check switched on.
+    const result = await checkDriftIn(project, ["--hook"]);
+    expect(result.code).toBe(0);
+    expect(`${result.stdout}${result.stderr}`.trim()).toBe("");
+  }, 120_000);
 });
