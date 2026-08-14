@@ -9,6 +9,8 @@
 import { realpathSync } from "node:fs";
 import path from "node:path";
 
+import { CONFIG_FILE, diagramDir } from "../engine/config";
+
 function realOrResolved(target: string): string {
   try {
     return realpathSync(target);
@@ -61,4 +63,34 @@ export function relativeToWorkspace(target: string): string {
 export function resolveBoardPath(candidate: string): string {
   const resolved = resolveInWorkspace(candidate);
   return path.extname(resolved) ? resolved : `${resolved}.excalidraw`;
+}
+
+/**
+ * Where a *new* board may be written: inside the project's diagram directory.
+ *
+ * Only authoring is confined this way. Reading, serving, editing and checking a
+ * board named by hand still work anywhere in the workspace, so nothing that
+ * already exists somewhere else breaks — and no migration is forced by this.
+ *
+ * The restriction is what makes discovery trustworthy. `check_drift` and the
+ * board CLI find boards by looking in one directory; a diagram written outside
+ * it is invisible to both, and they report clean rather than admitting they
+ * never saw it. Refusing here means that board cannot come into being, so there
+ * is nothing to be blind to.
+ */
+export function resolveNewBoardPath(candidate: string): string {
+  const resolved = resolveBoardPath(candidate);
+  const directory = diagramDir(WORKSPACE_ROOT);
+  const allowed = path.resolve(WORKSPACE_ROOT, directory);
+  const relative = path.relative(allowed, resolved);
+  if (relative.startsWith("..") || path.isAbsolute(relative)) {
+    throw new Error(
+      `Diagrams live in ${directory}/ — write this one to ${path.join(directory, path.basename(resolved))} `
+      + `instead of ${relativeToWorkspace(resolved)}. `
+      + `A board outside that directory is invisible to check_drift and to the board CLI, both of which `
+      + `discover diagrams by looking there. To keep this project's diagrams somewhere else, set `
+      + `{"diagrams": "..."} in ${CONFIG_FILE}.`,
+    );
+  }
+  return resolved;
 }

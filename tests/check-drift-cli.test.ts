@@ -15,6 +15,7 @@ import path from "node:path";
 import { promisify } from "node:util";
 import { afterAll, afterEach, beforeAll, beforeEach, describe, expect, it } from "vitest";
 
+import { CONFIG_FILE } from "../src/engine/config";
 import { emptyBoard, writeBoard } from "../src/engine/board-file";
 import { createDiagram } from "../src/engine/diagram";
 import { installExcalifontMeasurer } from "./helpers/excalifont";
@@ -678,5 +679,76 @@ describe("nothing to check is not the same as nothing wrong", () => {
     const result = await checkDriftIn(project, ["--hook"]);
     expect(result.code).toBe(0);
     expect(`${result.stdout}${result.stderr}`.trim()).toBe("");
+  }, 120_000);
+});
+
+/**
+ * A project whose diagrams are not where the check looks, and a project that
+ * says where they are instead.
+ */
+describe("the diagram directory", () => {
+  let project: string;
+
+  beforeEach(() => {
+    project = mkdtempSync(path.join(tmpdir(), "drift-dir-"));
+    mkdirSync(path.join(project, "src"), { recursive: true });
+    writeFileSync(path.join(project, "src/present.ts"), "export const present = true;\n");
+  });
+
+  afterEach(() => {
+    rmSync(project, { recursive: true, force: true });
+  });
+
+  async function boardAt(relative: string) {
+    const file = path.join(project, relative);
+    mkdirSync(path.dirname(file), { recursive: true });
+    await writeBoard(file, await board([{ id: "p", label: "Present", ref: "src/present.ts" }]));
+  }
+
+  it("names the boards it found elsewhere when it had nothing to check", async () => {
+    await boardAt("diagrams/arch.excalidraw");
+    await boardAt("docs/auth.excalidraw");
+    const result = await checkDriftIn(project);
+    expect(result.stderr).toContain("nothing to check");
+    expect(result.stderr).toContain("found 2 elsewhere");
+    expect(result.stderr).toContain(path.join("diagrams", "arch.excalidraw"));
+    expect(result.stderr).toContain(path.join("docs", "auth.excalidraw"));
+    // The way out, or the reader is only told they have a problem.
+    expect(result.stderr).toContain(CONFIG_FILE);
+  }, 120_000);
+
+  it("does not go hunting through the repository when it did have boards", async () => {
+    // The search reads every directory that is not obviously machinery, which is
+    // fine on demand and pointless once there is something to report on.
+    await boardAt("docs/diagrams/clean.excalidraw");
+    await boardAt("diagrams/stray.excalidraw");
+    const result = await checkDriftIn(project);
+    expect(`${result.stdout}${result.stderr}`.trim()).toBe("");
+  }, 120_000);
+
+  it("checks the directory the project asked for", async () => {
+    await boardAt("docs/architecture/system.excalidraw");
+    writeFileSync(path.join(project, CONFIG_FILE), JSON.stringify({ diagrams: "docs/architecture" }));
+    const result = await checkDriftIn(project);
+    // Found and checked: no complaint about there being nothing to look at.
+    expect(`${result.stdout}${result.stderr}`.trim()).toBe("");
+  }, 120_000);
+
+  it("refuses a config it cannot honour instead of quietly using the default", async () => {
+    await boardAt("docs/diagrams/clean.excalidraw");
+    writeFileSync(path.join(project, CONFIG_FILE), "{oops");
+    const result = await checkDriftIn(project);
+    expect(result.code).toBe(1);
+    expect(result.stderr).toContain("not valid JSON");
+  }, 120_000);
+
+  it("sends a broken config through the hook's own channel", async () => {
+    // stderr from a hook is discarded, so a config error reported there would be
+    // a check silently doing nothing -- the failure mode all over again.
+    writeFileSync(path.join(project, CONFIG_FILE), JSON.stringify({ diagrams: "../escape" }));
+    const result = await checkDriftIn(project, ["--hook"]);
+    expect(result.code).toBe(0);
+    const payload = JSON.parse(result.stdout) as { systemMessage?: string };
+    expect(payload.systemMessage).toContain("stay inside the project");
   }, 120_000);
 });

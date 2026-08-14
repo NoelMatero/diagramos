@@ -224,3 +224,47 @@ describe("packaged board CLI", () => {
     }
   }, 30_000);
 });
+
+describe("the diagram directory", () => {
+  it("serves the directory the project asked for", async () => {
+    const project = mkdtempSync(path.join(os.tmpdir(), "board-cli-configured-"));
+    let started: { child: ChildProcess; stdout: string } | undefined;
+    try {
+      writeFileSync(path.join(project, ".diagramos.json"), JSON.stringify({ diagrams: "docs/architecture" }));
+      writeBoardFile(path.join(project, "docs/architecture/system.excalidraw"), "sys");
+      started = await startBoard(project, [], await freePort());
+      expect(started.stdout).toContain(path.join("docs", "architecture", "system.excalidraw"));
+    } finally {
+      started?.child.kill();
+      rmSync(project, { recursive: true, force: true });
+    }
+  }, 30_000);
+
+  it("names the boards it found elsewhere rather than only refusing", async () => {
+    // "no boards" is true and useless when the boards are one directory away.
+    const project = mkdtempSync(path.join(os.tmpdir(), "board-cli-stray-"));
+    try {
+      writeBoardFile(path.join(project, "diagrams/arch.excalidraw"), "arch");
+      const { code, stderr } = await runToExit(project, []);
+      expect(code).toBe(2);
+      expect(stderr).toContain("found 1 elsewhere");
+      expect(stderr).toContain(path.join("diagrams", "arch.excalidraw"));
+      expect(stderr).toContain(".diagramos.json");
+    } finally {
+      rmSync(project, { recursive: true, force: true });
+    }
+  }, 30_000);
+
+  it("refuses a config it cannot honour", async () => {
+    const project = mkdtempSync(path.join(os.tmpdir(), "board-cli-badconfig-"));
+    try {
+      writeBoardFile(path.join(project, "docs/diagrams/arch.excalidraw"), "arch");
+      writeFileSync(path.join(project, ".diagramos.json"), JSON.stringify({ diagrams: "/etc" }));
+      const { code, stderr } = await runToExit(project, []);
+      expect(code).toBe(2);
+      expect(stderr).toContain("relative to the project");
+    } finally {
+      rmSync(project, { recursive: true, force: true });
+    }
+  }, 30_000);
+});

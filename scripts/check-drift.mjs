@@ -39,11 +39,12 @@ import path from "node:path";
 
 import { box, fit, pad } from "./lib/box.mjs";
 import { readBoard } from "../src/engine/board-file.ts";
+import { CONFIG_FILE, ConfigError, DEFAULT_DIAGRAM_DIR, diagramDir } from "../src/engine/config.ts";
 import {
   checkDrift,
   createWorkspace,
-  DEFAULT_DIAGRAM_DIR,
   findBoards,
+  findStrayBoards,
   parseRef,
 } from "../src/engine/drift.ts";
 
@@ -52,7 +53,8 @@ const root = process.cwd();
 const USAGE = [
   "usage: diagramos drift [board.excalidraw ...] [options]",
   "",
-  `  no arguments   check every board in ${DEFAULT_DIAGRAM_DIR}`,
+  `  no arguments   check every board in this project's diagram directory`,
+  `                 (${DEFAULT_DIAGRAM_DIR}, or "diagrams" in ${CONFIG_FILE})`,
   "",
   "  --hook         report as a Claude Code Stop hook and exit 0",
   "  --details      every finding, not the short notice",
@@ -124,8 +126,8 @@ function isExpanded() {
   return existsSync(MODE_FILE);
 }
 
-async function boardsToCheck(boards) {
-  return boards.length > 0 ? boards.map((entry) => path.resolve(root, entry)) : findBoards(root);
+async function boardsToCheck(boards, directory) {
+  return boards.length > 0 ? boards.map((entry) => path.resolve(root, entry)) : findBoards(root, directory);
 }
 
 /** Box name as the reader sees it on the canvas. */
@@ -305,7 +307,29 @@ const workspace = createWorkspace(root);
 const stale = [];
 const problems = [];
 
-const checking = await boardsToCheck(boards);
+/*
+ * A config that exists but cannot be honoured is fatal, and loudly so. Falling
+ * back to the default directory would mean checking somewhere other than where
+ * the project said, silently -- the exact failure this whole area is about.
+ * Through the hook it goes out as a systemMessage, because stderr from a hook is
+ * discarded and a report nobody can read is the same as no report.
+ */
+let directory;
+try {
+  directory = diagramDir(root);
+} catch (error) {
+  if (!(error instanceof ConfigError)) throw error;
+  if (opts.hook) {
+    process.stdout.write(
+      `${JSON.stringify({ continue: true, suppressOutput: false, systemMessage: `\n${error.message}` })}\n`,
+    );
+    process.exit(0);
+  }
+  console.error(error.message);
+  process.exit(1);
+}
+
+const checking = await boardsToCheck(boards, directory);
 
 /*
  * "Nothing drifted" and "nothing was looked at" used to be the same output --
@@ -320,12 +344,24 @@ const checking = await boardsToCheck(boards);
  */
 if (checking.length === 0) {
   if (!opts.hook) {
-    const directory = `${DEFAULT_DIAGRAM_DIR}/`;
-    console.error(
-      existsSync(path.resolve(root, DEFAULT_DIAGRAM_DIR))
-        ? `no .excalidraw files in ${directory} — nothing to check`
-        : `${directory} does not exist — nothing to check`,
-    );
+    const lines = [
+      existsSync(path.resolve(root, directory))
+        ? `no .excalidraw files in ${directory}/ — nothing to check`
+        : `${directory}/ does not exist — nothing to check`,
+    ];
+    // Only here, where the check has already come up empty, is it worth reading
+    // the whole repository to find out whether the diagrams are simply
+    // somewhere else. "You have boards, just not where I looked" is the
+    // likeliest reason to be in this branch and the least guessable.
+    const strays = await findStrayBoards(root, directory);
+    if (strays.boards.length > 0) {
+      const more = strays.more > 0 ? ` (and ${strays.more} more)` : "";
+      lines.push(
+        `found ${strays.boards.length + strays.more} elsewhere${more}: ${strays.boards.join(", ")}`,
+        `move them into ${directory}/, or set {"diagrams": "..."} in ${CONFIG_FILE}`,
+      );
+    }
+    console.error(lines.join("\n"));
   }
   process.exit(0);
 }

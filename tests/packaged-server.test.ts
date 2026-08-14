@@ -26,7 +26,7 @@ import { StdioClientTransport } from "@modelcontextprotocol/sdk/client/stdio.js"
 
 const REPO = path.resolve(__dirname, "..");
 const BUNDLE = path.join(REPO, "out/cli/diagramos.mjs");
-const BOARD = "diagrams/packaged.excalidraw";
+const BOARD = "docs/diagrams/packaged.excalidraw";
 /** Mirrors FALLBACK_CHAR_RATIO in src/engine/font.ts. */
 const FALLBACK_CHAR_RATIO = 0.55;
 
