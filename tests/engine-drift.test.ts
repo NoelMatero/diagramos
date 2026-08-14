@@ -10,6 +10,7 @@ import { afterAll, beforeAll, describe, expect, it } from "vitest";
 import { emptyBoard, type BoardFile } from "../src/engine/board-file";
 import { createDiagram } from "../src/engine/diagram";
 import { checkDrift, createWorkspace, parseRef, refFromLabel, type Workspace } from "../src/engine/drift";
+import { readGraph } from "../src/engine/graph";
 import type { ExcalidrawElement } from "../src/engine/normalize";
 import { installExcalifontMeasurer } from "./helpers/excalifont";
 
@@ -682,5 +683,112 @@ describe("edge checking", () => {
     // The edge a→b must be backed because c.ts (discovered via d.ts import)
     // imports both a and b
     expect(report.edges).toHaveLength(0);
+  });
+});
+
+/**
+ * The arrow check used to refuse any edge it had not drawn itself. That rule read
+ * as "hand-drawn arrows are unreliable" but meant "Claude did not draw it", and
+ * it silently skipped the case this tool exists for: sketching the connection you
+ * want between two components that already exist.
+ *
+ * Measured before shipping, as #17 insisted. Across 12 real boards in two
+ * projects there were 357 arrows and not one hand-drawn — so the change moves
+ * nothing that exists today, and the population it governs had to be built here
+ * to be measured at all.
+ */
+describe("an arrow is trusted for its bindings, not its author", () => {
+  /** Replaces the generated edge with a person's arrow between the same two boxes. */
+  function handDrawnArrow(board: BoardFile, { bound }: { bound: boolean }): BoardFile {
+    const shapes = board.elements.filter((element) => element.type === "rectangle");
+    const [a, b] = shapes as Array<ExcalidrawElement & { x: number; y: number; width: number; height: number }>;
+    const arrow = {
+      id: "hand-arrow",
+      type: "arrow",
+      // Ends land on the two boxes, so the proximity fallback has something to
+      // find when there is no binding to use.
+      x: a.x + a.width,
+      y: a.y + a.height / 2,
+      width: b.x - (a.x + a.width),
+      height: 0,
+      points: [[0, 0], [b.x - (a.x + a.width), 0]],
+      angle: 0,
+      strokeColor: "#1e1e1e",
+      backgroundColor: "transparent",
+      fillStyle: "solid",
+      strokeWidth: 2,
+      strokeStyle: "solid",
+      roughness: 1,
+      opacity: 100,
+      groupIds: [],
+      frameId: null,
+      index: "a99",
+      roundness: null,
+      seed: 1,
+      version: 1,
+      versionNonce: 1,
+      isDeleted: false,
+      boundElements: null,
+      updated: 0,
+      link: null,
+      locked: false,
+      startBinding: bound ? { elementId: a.id, focus: 0, gap: 4 } : null,
+      endBinding: bound ? { elementId: b.id, focus: 0, gap: 4 } : null,
+      // No customData at all: this is the human's arrow, not ours.
+    } as unknown as ExcalidrawElement;
+    return { ...board, elements: [...board.elements.filter((element) => element.type !== "arrow"), arrow] };
+  }
+
+  async function twoBoxes(): Promise<BoardFile> {
+    return boardWith([
+      { id: "a", label: "Left", ref: "left.ts" },
+      { id: "b", label: "Right", ref: "right.ts" },
+    ]);
+  }
+
+  const unconnected = { "left.ts": "export const left = 1;", "right.ts": "export const right = 1;" };
+  const connected = {
+    "left.ts": 'import { right } from "./right";\nexport const left = right;',
+    "right.ts": "export const right = 1;",
+  };
+
+  it("checks a hand-drawn arrow bound at both ends", async () => {
+    const board = handDrawnArrow(await twoBoxes(), { bound: true });
+    const report = checkDrift(board, fakeWorkspace(unconnected));
+    expect(report.edgesChecked).toBe(1);
+    expect(report.edgesSkipped).toBe(0);
+    // Nothing in the code connects these two, and the arrow says something does.
+    expect(report.edges).toHaveLength(1);
+    expect(report.edges[0]).toMatchObject({ kind: "unsupported-edge", fromLabel: "Left", toLabel: "Right" });
+  });
+
+  it("stays quiet about a hand-drawn arrow the code actually supports", async () => {
+    // The half that keeps this usable: once the connection is written, the
+    // sketch stops being a finding. Without this the check would flag every
+    // arrow forever and get switched off.
+    const board = handDrawnArrow(await twoBoxes(), { bound: true });
+    const report = checkDrift(board, fakeWorkspace(connected));
+    expect(report.edgesChecked).toBe(1);
+    expect(report.edges).toHaveLength(0);
+  });
+
+  it("still skips an arrow whose ends were matched by proximity", async () => {
+    // Geometry guesswork, whoever drew it. Both scenarios, so it is clear the
+    // skip is about the endpoints and not about the code.
+    for (const files of [unconnected, connected]) {
+      const board = handDrawnArrow(await twoBoxes(), { bound: false });
+      const report = checkDrift(board, fakeWorkspace(files));
+      expect(report.edgesChecked).toBe(0);
+      expect(report.edgesSkipped).toBe(1);
+      expect(report.edges).toHaveLength(0);
+    }
+  });
+
+  it("does not relabel who drew the arrow in order to check it", async () => {
+    // Provenance stays an honest answer about authorship; trustworthiness moved
+    // to its own field rather than being smuggled into this one.
+    const board = handDrawnArrow(await twoBoxes(), { bound: true });
+    const graph = readGraph(board);
+    expect(graph.edges[0]).toMatchObject({ provenance: "inferred", endpoints: "bound" });
   });
 });

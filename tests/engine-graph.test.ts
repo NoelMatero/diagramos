@@ -88,6 +88,71 @@ describe("reading a hand-drawn board", () => {
     expect(graph.edges[0]).toMatchObject({ from: "a", to: "b" });
   });
 
+  /**
+   * How an arrow's ends were resolved is a different question from who drew it,
+   * and the arrow check needs the former. Keying it on authorship meant "Claude
+   * did not draw this", which silently skipped a hand-drawn arrow bound at both
+   * ends — an exact pointer, and the diagram-driven case.
+   */
+  describe("how an arrow's ends were resolved", () => {
+    it("calls a hand-drawn arrow bound at both ends exact, while still reporting it as inferred", () => {
+      const graph = readGraph(
+        boardOf([
+          drawn({ id: "a", type: "rectangle", x: 0, y: 0, width: 100, height: 60 }),
+          drawn({ id: "b", type: "rectangle", x: 300, y: 0, width: 100, height: 60 }),
+          drawn({
+            id: "arrow",
+            type: "arrow",
+            x: 0,
+            y: 500,
+            width: 10,
+            height: 0,
+            points: [[0, 0], [10, 0]],
+            startBinding: { elementId: "a", focus: 0, gap: 4 },
+            endBinding: { elementId: "b", focus: 0, gap: 4 },
+          }),
+        ]),
+      );
+      // Both facts, neither one standing in for the other: a person drew it, and
+      // its ends are exact.
+      expect(graph.edges[0]).toMatchObject({ provenance: "inferred", endpoints: "bound" });
+    });
+
+    it("calls an arrow matched by proximity a guess", () => {
+      const graph = readGraph(
+        boardOf([
+          drawn({ id: "a", type: "rectangle", x: 0, y: 0, width: 100, height: 60 }),
+          drawn({ id: "b", type: "rectangle", x: 300, y: 0, width: 100, height: 60 }),
+          drawn({ id: "arrow", type: "arrow", x: 105, y: 30, width: 190, height: 0, points: [[0, 0], [190, 0]] }),
+        ]),
+      );
+      expect(graph.edges[0]).toMatchObject({ provenance: "inferred", endpoints: "nearest" });
+    });
+
+    it("calls a half-bound arrow a guess, because half of it is one", () => {
+      const graph = readGraph(
+        boardOf([
+          drawn({ id: "a", type: "rectangle", x: 0, y: 0, width: 100, height: 60 }),
+          drawn({ id: "b", type: "rectangle", x: 300, y: 0, width: 100, height: 60 }),
+          drawn({
+            id: "arrow",
+            type: "arrow",
+            x: 105,
+            y: 30,
+            width: 190,
+            height: 0,
+            points: [[0, 0], [190, 0]],
+            startBinding: { elementId: "a", focus: 0, gap: 4 },
+            endBinding: null,
+          }),
+        ]),
+      );
+      // One end is a pointer, the other is where the line happens to stop. The
+      // edge is only as trustworthy as its weaker end.
+      expect(graph.edges[0]).toMatchObject({ from: "a", to: "b", endpoints: "nearest" });
+    });
+  });
+
   it("attaches a nearby loose label to the arrow it annotates", () => {
     const graph = readGraph(
       boardOf([

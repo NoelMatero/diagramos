@@ -419,8 +419,21 @@ export function checkDrift(
     }
 
     for (const edge of graph.edges) {
-      // Only generated edges
-      if (edge.provenance !== "recorded") {
+      /*
+       * Skip on how the endpoints were resolved, not on who drew the arrow.
+       *
+       * An arrow bound at both ends points at two shapes and keeps pointing at
+       * them when either one moves, whoever drew it -- so a hand-drawn bound
+       * arrow between two generated nodes is exactly as precise a claim as a
+       * generated edge, and that is the diagram-driven-development case: you
+       * sketch the connection you want between components that already exist.
+       * Keying on authorship skipped it silently.
+       *
+       * `nearest` stays skipped. Those endpoints were matched to whichever shape
+       * they landed close to, which is an observation about geometry rather than
+       * a claim about the design.
+       */
+      if (edge.endpoints === "nearest") {
         edgesSkipped += 1;
         continue;
       }

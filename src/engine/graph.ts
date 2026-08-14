@@ -39,12 +39,32 @@ export interface RecoveredNode {
   ref?: string;
 }
 
+/**
+ * How an arrow's two ends were resolved to nodes — a different axis from who
+ * drew it.
+ *
+ * - `declared`: from the arrow's own customData. Exact.
+ * - `bound`: from Excalidraw's startBinding/endBinding on both ends. Also exact:
+ *   the app maintains a binding when either shape moves, so it is a pointer to
+ *   a shape rather than an observation about where the line happens to sit.
+ * - `nearest`: at least one end was matched to whichever shape it landed close
+ *   to. Geometry guesswork, and the only one of the three that can be wrong
+ *   about what the author meant.
+ *
+ * `provenance` cannot express this. It says whether a tool drew the arrow, and a
+ * hand-drawn arrow bound at both ends is as precise a claim as a generated one
+ * while an unbound one is a guess — so anything deciding how much to trust an
+ * edge wants this, not authorship.
+ */
+export type EdgeEndpoints = "declared" | "bound" | "nearest";
+
 export interface RecoveredEdge {
   from: string;
   to: string;
   label?: string;
   elementId: string;
   provenance: Provenance;
+  endpoints: EdgeEndpoints;
 }
 
 export interface RecoveredGraph {
@@ -197,6 +217,7 @@ export function readGraph(board: BoardFile): RecoveredGraph {
     let from: string | undefined;
     let to: string | undefined;
     let provenance: Provenance = "recorded";
+    let endpoints: EdgeEndpoints = "declared";
 
     if (recorded && typeof recorded.from === "string" && typeof recorded.to === "string") {
       from = recorded.from;
@@ -209,6 +230,10 @@ export function readGraph(board: BoardFile): RecoveredGraph {
       from = startId ? nodeIdByElement.get(startId) : undefined;
       to = endId ? nodeIdByElement.get(endId) : undefined;
       provenance = "inferred";
+      // Both ends resolved through a binding: exact. Anything the proximity
+      // fallback below has to supply drops this to a guess, including the case
+      // where one end was bound and the other was not.
+      endpoints = from && to ? "bound" : "nearest";
 
       // Nothing bound: fall back to whichever shapes the ends land on.
       const ends = arrowEndpoints(arrow);
@@ -258,6 +283,7 @@ export function readGraph(board: BoardFile): RecoveredGraph {
       ...(label ? { label } : {}),
       elementId: arrow.id,
       provenance,
+      endpoints,
     });
   }
 
