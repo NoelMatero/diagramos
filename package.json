@@ -19,8 +19,7 @@
   "homepage": "https://github.com/NoelMatero/diagramos#readme",
   "type": "module",
   "bin": {
-    "diagramos": "out/cli/server.mjs",
-    "diagramos-drift": "out/cli/drift.mjs"
+    "diagramos": "out/cli/diagramos.mjs"
   },
   "files": [
     "out/cli/",

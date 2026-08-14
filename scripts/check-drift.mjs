@@ -39,12 +39,36 @@ import path from "node:path";
 
 import { box, fit, pad } from "./lib/box.mjs";
 import { readBoard } from "../src/engine/board-file.ts";
-import { checkDrift, createWorkspace, findBoards, parseRef } from "../src/engine/drift.ts";
+import {
+  checkDrift,
+  createWorkspace,
+  DEFAULT_DIAGRAM_DIR,
+  findBoards,
+  parseRef,
+} from "../src/engine/drift.ts";
 
 const root = process.cwd();
 
+const USAGE = [
+  "usage: diagramos drift [board.excalidraw ...] [options]",
+  "",
+  `  no arguments   check every board in ${DEFAULT_DIAGRAM_DIR}`,
+  "",
+  "  --hook         report as a Claude Code Stop hook and exit 0",
+  "  --details      every finding, not the short notice",
+  "  --expand       keep reporting in full until --shrink",
+  "  --shrink       go back to the short notice",
+  "  --no-edges     skip the arrow check",
+  "",
+  "Silent, exit 0, when nothing has drifted.",
+].join("\n");
+
 function parseArgs() {
   const argv = process.argv.slice(2);
+  if (argv.includes("--help") || argv.includes("-h")) {
+    console.log(USAGE);
+    process.exit(0);
+  }
   const opts = {
     edges: true,
     hook: false,

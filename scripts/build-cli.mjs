@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 /**
- * Bundles the two published entry points into plain JavaScript.
+ * Bundles the published entry points into plain JavaScript.
  *
  *   node scripts/build-cli.mjs
  *
@@ -41,8 +41,12 @@ assert.equal(
 );
 
 const entries = [
+  // The bin. Dispatches to the three below, which stay separate files so one
+  // command does not pay to parse the other two.
+  { entry: "scripts/diagramos.mjs", outfile: `${OUT_DIR}/diagramos.mjs`, label: "dispatcher" },
   { entry: "src/mcp/server.ts", outfile: `${OUT_DIR}/server.mjs`, label: "MCP server" },
   { entry: "scripts/check-drift.mjs", outfile: `${OUT_DIR}/drift.mjs`, label: "drift check" },
+  { entry: "scripts/board.mjs", outfile: `${OUT_DIR}/board.mjs`, label: "live board" },
 ];
 
 for (const target of entries) {
@@ -56,7 +60,7 @@ for (const target of entries) {
     // Bare imports resolve from the installed node_modules at runtime; only our
     // own relative modules get inlined.
     packages: "external",
-    // No shebang banner: both entry points already start with one and esbuild
+    // No shebang banner: every entry point already starts with one and esbuild
     // hoists it. Adding another emits it twice, and the second is a syntax error.
     logLevel: "error",
     metafile: true,

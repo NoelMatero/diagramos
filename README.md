@@ -49,13 +49,16 @@ Every path is confined to the workspace root: symlinks are resolved, and a path 
 
 ## The live board
 
-Ask Claude to open a board, or in this repo:
+Ask Claude to open a board, or start one yourself in any project:
 
 ```bash
-npm run board docs/diagrams/architecture.excalidraw
+npx -y diagramos board                    # every board in docs/diagrams
+npx -y diagramos board docs/diagrams/architecture.excalidraw
 ```
 
-A local page on `127.0.0.1:4747` showing the file. Anything that writes it — a tool, your editor, `git checkout` — appears immediately over SSE, and anything you draw is written straight back. Both sides edit one artifact.
+Working inside this repo, `npm run board` is the same command.
+
+A local page on `127.0.0.1:4747` showing the file. One port serves every project, so if a board from somewhere else already holds it, `diagramos board` says whose it is and moves to a free port rather than failing to start. A board already serving *this* project is shared instead of duplicated. Anything that writes it — a tool, your editor, `git checkout` — appears immediately over SSE, and anything you draw is written straight back. Both sides edit one artifact.
 
 Conflicts resolve in your favour. A save carrying a stale revision is refused with the current board attached, so an agent write cannot discard a stroke you just made.
 
@@ -70,14 +73,18 @@ Open two and they stay put — writing one diagram, or asking Claude to open a t
 
 The bare `127.0.0.1:4747` follows whichever board was opened or written last, which is what you want when you are working on one diagram and letting Claude drive.
 
+**Reading them offline.** `diagramos board` is an ordinary local server and the viewer it serves ships inside the package, fonts and all, so it needs no network and no Claude Code — on a plane, it is the same command. Or skip us entirely: a `.excalidraw` file opens in the [VS Code Excalidraw extension](https://marketplace.visualstudio.com/items?itemName=pomdtr.excalidraw-editor) and in Obsidian's Excalidraw plugin, both offline. That is the advantage of the diagram being a file.
+
 ## Keeping a diagram honest
 
 A node can record what it stands for — `ref: "src/engine/layout.ts"`, or `path#symbol` — and `check_drift` compares those claims against the working tree:
 
 ```bash
-npm run check:drift                    # every board in docs/diagrams
-npm run check:drift docs/diagrams/architecture.excalidraw
+npx -y diagramos drift                 # every board in docs/diagrams
+npx -y diagramos drift docs/diagrams/architecture.excalidraw
 ```
+
+Working inside this repo, `npm run check:drift` is the same command.
 
 Silent when nothing has drifted, exit 1 with a report when a node points at a file or symbol that is gone — which is what CI and pre-commit want.
 
@@ -87,7 +94,7 @@ To get the report at the end of every turn, add this to your project's `.claude/
 
 ```json
 { "hooks": { "Stop": [{ "matcher": "*", "hooks": [
-  { "type": "command", "command": "npx -y -p diagramos@0.1.0 diagramos-drift --hook" }
+  { "type": "command", "command": "npx -y diagramos@0.1.0 drift --hook" }
 ] }] } }
 ```
 

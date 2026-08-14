@@ -1,6 +1,8 @@
 /**
- * Drives the *built* server — out/cli/server.mjs, the file published to npm and
- * the one an installed plugin runs — rather than the TypeScript sources.
+ * Drives the *built* server the way an installed plugin does: `diagramos` with
+ * no arguments, which must speak MCP over stdio and nothing else.
+ * `.claude-plugin/plugin.json` invokes exactly this, so a dispatcher that
+ * printed usage here would break every install with nothing readable to say why.
  *
  * Bundling collapses every module onto one file, so anything that locates an
  * asset relative to its own source file resolves differently there than it does
@@ -11,6 +13,7 @@
  * No graceful skip when the bundle is absent: `npm install` builds it through
  * `prepare`, so a missing bundle is a real regression, not a reason to pass.
  */
+import { spawn } from "node:child_process";
 import { existsSync, mkdtempSync, rmSync } from "node:fs";
 import { readFile } from "node:fs/promises";
 import os from "node:os";
@@ -22,7 +25,7 @@ import { Client } from "@modelcontextprotocol/sdk/client/index.js";
 import { StdioClientTransport } from "@modelcontextprotocol/sdk/client/stdio.js";
 
 const REPO = path.resolve(__dirname, "..");
-const BUNDLE = path.join(REPO, "out/cli/server.mjs");
+const BUNDLE = path.join(REPO, "out/cli/diagramos.mjs");
 const BOARD = "diagrams/packaged.excalidraw";
 /** Mirrors FALLBACK_CHAR_RATIO in src/engine/font.ts. */
 const FALLBACK_CHAR_RATIO = 0.55;
@@ -110,4 +113,34 @@ describe("packaged server", () => {
     const nodes = (graph.nodes ?? []) as Array<{ label?: string }>;
     expect(nodes.map((node) => node.label)).toEqual(expect.arrayContaining(["API", "Database"]));
   });
+});
+
+/** Runs the bin and collects everything it said. */
+function run(args: string[]): Promise<{ code: number | null; stdout: string; stderr: string }> {
+  return new Promise((resolve) => {
+    const child = spawn(process.execPath, [BUNDLE, ...args], { cwd: os.tmpdir() });
+    let stdout = "";
+    let stderr = "";
+    child.stdout.on("data", (chunk) => (stdout += String(chunk)));
+    child.stderr.on("data", (chunk) => (stderr += String(chunk)));
+    child.on("exit", (code) => resolve({ code, stdout, stderr }));
+  });
+}
+
+describe("the diagramos bin", () => {
+  it("routes each subcommand to its own program", async () => {
+    for (const command of ["board", "drift"]) {
+      const { code, stdout } = await run([command, "--help"]);
+      expect(code, command).toBe(0);
+      expect(stdout, command).toContain(`diagramos ${command}`);
+    }
+  }, 60_000);
+
+  it("refuses an unknown command rather than falling through to the MCP server", async () => {
+    // Falling through would read stdin and say nothing, which from the outside
+    // is a hang with no message to explain it.
+    const { code, stderr } = await run(["boad"]);
+    expect(code).toBe(2);
+    expect(stderr).toContain('unknown command "boad"');
+  }, 60_000);
 });
