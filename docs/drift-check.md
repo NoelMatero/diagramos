@@ -2,7 +2,7 @@
 
 Status: **missing files, symbols, and edge mismatches are built** — `src/engine/drift.ts`,
 the `check_drift` tool, `scripts/check-drift.mjs`, and a `Stop` hook in
-`.claude/settings.json`. Unrepresented modules remain design; the rest of this file is the
+`.claude/settings.json`. All three kinds are now built; the rest of this file is the
 reasoning behind the complete picture.
 
 Fixing is a `/update-diagram` command, and deliberately not automatic. See
@@ -146,6 +146,56 @@ Three silences, each load-bearing:
 The cheap path is the common one: `git status --porcelain` on the board runs
 first, and an unmodified board stops there without reading a baseline.
 
+## Code the diagram does not show
+
+Every other check reads a claim and asks whether it still holds. This one asks the
+opposite: what does the code have that the board leaves out?
+
+It was the oldest open question here, and it was stuck on one thing — **without a
+relevance bar, every file in the repository is drift.** Picking a bar (line count,
+export count, directory depth) means inventing a definition of "important" and
+being wrong about it in someone else's project.
+
+The bar is inherited instead of invented:
+
+> A candidate has to be imported by a file the board already points at.
+
+Relevance was decided by whoever drew the diagram. Cost scales with the diagram
+rather than the repository, nothing searches the tree, and the machinery already
+existed — the arrow check builds the same neighbourhood for its shared-importer
+channel.
+
+The frontier moves with the board. Draw a suggested module and its own imports
+become the next candidates, so the check keeps proposing the next ring outward
+instead of emptying once and going quiet. That is also why it stops at one hop:
+following further is the walk this was avoiding.
+
+A directory ref covers everything beneath it, so one box for `src/engine/` excuses
+the subsystem rather than nominating all of it.
+
+**Suggestions, never drift.** They stay out of `clean` and out of the exit code,
+they need `--coverage` on the CLI or `coverage: true` on the tool, and the `Stop`
+hook never passes either. Whether a module deserves a box is a judgement about
+what is worth showing; a check that nagged about it every turn would be switched
+off, and that would take the quiet, correct missing-file check with it.
+
+Measured on `board-internals.excalidraw` — 12 boxes, the only ref'd board here —
+it suggests **7 files in 15 ms**, ranked by how many boxes import them:
+
+| suggested | imported by |
+| --- | --- |
+| `src/engine/normalize.ts` | 4 |
+| `src/engine/config.ts` | 2 |
+| `src/engine/font.ts` | 2 |
+| `src/engine/contrast.ts`, `src/engine/excalidraw-assets.ts`, `src/viewer/reveal.ts`, `src/viewer/sync.ts` | 1 each |
+
+No threshold is applied, and that is a deliberate omission rather than an
+oversight: every one of those seven is a real module (58–256 lines), so there is
+no obvious noise to filter, and any cutoff picked from a single 12-box board would
+be a guess dressed as a rule. Ranking puts the module four boxes depend on first
+and lets the reader stop whenever they like. If a real diagram drowns in these,
+that is the measurement that earns a threshold.
+
 ## Two jobs, deliberately separate
 
 | | Cost | Needs a model | When to run |
@@ -165,7 +215,8 @@ the repository. Three kinds, in descending confidence:
 1. **Missing** — a node names a module, file, or symbol that no longer exists.
    High confidence, almost always actionable.
 2. **Unrepresented** — a significant module exists in the code but appears
-   nowhere on the board. Needs a relevance threshold or it reports every file.
+   nowhere on the board. Built, on demand only; see "Code the diagram does not
+   show" for how the relevance question was answered.
 3. **Edge mismatch** — the diagram draws `A → B` but nothing in `A` imports or
    calls `B`, or a real dependency is undrawn. The most valuable signal and the
    most likely to produce false positives.
@@ -309,8 +360,9 @@ empirically first.
 - ~~Should drift auto-regenerate, or only report?~~ **Report only.** Silent
   redrawing while someone is reading the board is hostile, and regeneration
   discards layout intent.
-- What is the relevance threshold for "unrepresented"? Without one, every new
-  file is drift.
+- ~~What is the relevance threshold for "unrepresented"?~~ **Inherited, not
+  invented.** A candidate has to be imported by a file the board already points
+  at, so relevance was decided by whoever drew the diagram.
 - Should `ref` support globs (`src/engine/*`) so one node can stand for a
   subsystem? Probably yes, and it makes (2) far more useful.
 - How does this interact with hand-drawn nodes? Current answer: ignore them
@@ -326,8 +378,9 @@ empirically first.
 5. ~~Edge mismatches: arrows grounded in four corroboration channels.~~ Done, behind
    its own `edges` flag so a noisy check can be turned off without losing the quiet
    missing-file check.
-6. Next: unrepresented modules, when the relevance threshold is settled.
+6. ~~Unrepresented modules, when the relevance threshold is settled.~~ Done, on
+   demand only, scoped to the diagram's own neighbourhood.
 
-The three checks are now built in descending order of confidence and cost: missing files
+The three checks are built in descending order of confidence and cost: missing files
 (milliseconds, almost always actionable), edge mismatches (import resolution, measurably
-quiet), then unrepresented modules (would need a relevance bar to stay quiet).
+quiet), then unrepresented modules (a suggestion, so it never runs per-turn).

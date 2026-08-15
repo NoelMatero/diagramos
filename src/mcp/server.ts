@@ -431,9 +431,18 @@ server.registerTool(
           `One board to check. Omit to check every board in this project's diagram directory `
           + `(${DEFAULT_DIAGRAM_DIR} unless ${CONFIG_FILE} says otherwise).`,
         ),
+      coverage: z
+        .boolean()
+        .default(false)
+        .describe(
+          "Also answer the opposite question: what does the code have that the diagram does not "
+          + "show? Returns modules the board's own ref'd files import but no box covers, most-imported "
+          + "first. Suggestions, never drift -- they do not affect clean. Off by default because it "
+          + "reads the imports of every ref'd file; ask for it when deciding what a diagram is missing.",
+        ),
     },
   },
-  async ({ path: boardPath }) =>
+  async ({ path: boardPath, coverage }) =>
     guard(async () => {
       const directory = diagramDir(WORKSPACE_ROOT);
       const files = boardPath
@@ -470,12 +479,14 @@ server.registerTool(
       };
       const findings: Array<Record<string, unknown>> = [];
       const deleted: Array<Record<string, unknown>> = [];
+      const unrepresented: Array<Record<string, unknown>> = [];
       const edges: Array<Record<string, unknown>> = [];
       const workItems: Array<Record<string, unknown>> = [];
       const promotions: Array<Record<string, unknown>> = [];
       const conceptBoards: string[] = [];
       for (const file of files) {
         const report = checkDrift(await readBoard(file), workspace, {
+          coverage,
           baseline: createGitBaseline(WORKSPACE_ROOT, file),
         });
         totals.checked += report.checked;
@@ -492,6 +503,9 @@ server.registerTool(
         }
         for (const finding of report.deleted) {
           deleted.push({ board: relativeToWorkspace(file), ...finding });
+        }
+        for (const finding of report.unrepresented) {
+          unrepresented.push({ board: relativeToWorkspace(file), ...finding });
         }
         for (const finding of report.edges) {
           edges.push({ board: relativeToWorkspace(file), ...finding });
@@ -517,6 +531,9 @@ server.registerTool(
         ...(workItems.length ? { workItems } : {}),
         ...(promotions.length ? { promotions } : {}),
         ...(conceptBoards.length ? { conceptBoards } : {}),
+        // What the code has that the diagram does not show. Suggestions about
+        // what might be worth drawing, so deliberately outside clean.
+        ...(unrepresented.length ? { unrepresented } : {}),
         ...totals,
         // "clean: true, checked: 0" reads as a pass when nothing was examined,
         // so say which it was -- and distinguish "nobody annotated these" from

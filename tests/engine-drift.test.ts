@@ -1047,3 +1047,120 @@ describe("a box removed while its code is still there", () => {
     expect(report.deleted).toHaveLength(0);
   });
 });
+
+/**
+ * The other direction: code the diagram does not show.
+ *
+ * The reason this stayed unbuilt for so long is the relevance bar -- without one,
+ * every file in the repo is drift. The bar here is inherited rather than invented,
+ * so the tests that matter are the ones proving it stays inside the diagram's own
+ * neighbourhood and never becomes a repo scan.
+ */
+describe("code the diagram leaves out", () => {
+  const tree = {
+    "src/a.ts": "import { b } from './b';\nimport { deep } from './deep';\nexport const a = b;",
+    "src/b.ts": "export const b = 1;",
+    "src/deep.ts": "import { far } from './far';\nexport const deep = 2;",
+    "src/far.ts": "export const far = 3;",
+    "src/unrelated.ts": "export const unrelated = 4;",
+  };
+
+  async function boardOf(nodes: Array<{ id: string; label: string; ref?: string; state?: "planned" | "built" | "external" }>) {
+    return (await createDiagram(emptyBoard(), { name: "arch", nodes, edges: [] })).board;
+  }
+
+  it("suggests a file the board's own boxes import but no box shows", async () => {
+    const board = await boardOf([{ id: "a", label: "A", ref: "src/a.ts" }]);
+    const report = checkDrift(board, fakeWorkspace(tree), { coverage: true });
+    expect(report.unrepresented.map((entry) => entry.file)).toEqual(["src/b.ts", "src/deep.ts"]);
+    expect(report.unrepresented[0]).toMatchObject({ importedBy: ["src/a.ts"] });
+    // A suggestion is not a defect.
+    expect(report.clean).toBe(true);
+  });
+
+  it("stops at one hop, so it never becomes a repo scan", async () => {
+    // far.ts is imported by deep.ts, which is itself only a suggestion. Following
+    // it would be the walk that made this unbuildable for the whole project.
+    const board = await boardOf([{ id: "a", label: "A", ref: "src/a.ts" }]);
+    const files = checkDrift(board, fakeWorkspace(tree), { coverage: true })
+      .unrepresented.map((entry) => entry.file);
+    expect(files).not.toContain("src/far.ts");
+    // And nothing the board never pointed at can appear at all.
+    expect(files).not.toContain("src/unrelated.ts");
+  });
+
+  it("drops a suggestion once it has a box, and the neighbourhood moves out with it", async () => {
+    // Adding the box both answers the old suggestion and earns a new one: far.ts
+    // is now one hop from something on the board. The frontier follows the
+    // diagram, which is the property that keeps this bounded without a threshold.
+    const board = await boardOf([
+      { id: "a", label: "A", ref: "src/a.ts" },
+      { id: "b", label: "B", ref: "src/b.ts" },
+      { id: "d", label: "D", ref: "src/deep.ts" },
+    ]);
+    const report = checkDrift(board, fakeWorkspace(tree), { coverage: true });
+    expect(report.unrepresented.map((entry) => entry.file)).toEqual(["src/far.ts"]);
+  });
+
+  it("has nothing left to suggest once every reachable file is drawn", async () => {
+    const board = await boardOf([
+      { id: "a", label: "A", ref: "src/a.ts" },
+      { id: "b", label: "B", ref: "src/b.ts" },
+      { id: "d", label: "D", ref: "src/deep.ts" },
+      { id: "f", label: "F", ref: "src/far.ts" },
+    ]);
+    // unrelated.ts stays out of it: nothing on the board imports it, so it was
+    // never a candidate. That is the whole reason this is not a repo scan.
+    expect(checkDrift(board, fakeWorkspace(tree), { coverage: true }).unrepresented).toEqual([]);
+  });
+
+  it("lets one directory box cover everything beneath it", async () => {
+    // Otherwise a box for a subsystem nominates every file in the subsystem.
+    const board = await boardOf([
+      { id: "a", label: "A", ref: "src/a.ts" },
+      { id: "src", label: "Everything", ref: "src" },
+    ]);
+    const report = checkDrift(board, fakeWorkspace({ ...tree, src: "dir" }), { coverage: true });
+    expect(report.unrepresented).toEqual([]);
+  });
+
+  it("ranks the module that several boxes depend on first", async () => {
+    const shared = {
+      "src/one.ts": "import { core } from './core';\nexport const one = core;",
+      "src/two.ts": "import { core } from './core';\nexport const two = core;",
+      "src/three.ts": "import { solo } from './solo';\nexport const three = solo;",
+      "src/core.ts": "export const core = 1;",
+      "src/solo.ts": "export const solo = 2;",
+    };
+    const board = await boardOf([
+      { id: "one", label: "One", ref: "src/one.ts" },
+      { id: "two", label: "Two", ref: "src/two.ts" },
+      { id: "three", label: "Three", ref: "src/three.ts" },
+    ]);
+    const report = checkDrift(board, fakeWorkspace(shared), { coverage: true });
+    expect(report.unrepresented[0]).toMatchObject({
+      file: "src/core.ts",
+      importedBy: ["src/one.ts", "src/two.ts"],
+    });
+    expect(report.unrepresented[1]).toMatchObject({ file: "src/solo.ts" });
+  });
+
+  it("is off unless asked for, because it suggests rather than reports", async () => {
+    const board = await boardOf([{ id: "a", label: "A", ref: "src/a.ts" }]);
+    expect(checkDrift(board, fakeWorkspace(tree)).unrepresented).toEqual([]);
+  });
+
+  it("says nothing on a concept board, and ignores an external box's ref", async () => {
+    const concept = await createDiagram(emptyBoard(), {
+      name: "arch",
+      title: "A protocol",
+      describes: "concept",
+      nodes: [{ id: "a", label: "A", ref: "src/a.ts" }],
+      edges: [],
+    });
+    expect(checkDrift(concept.board, fakeWorkspace(tree), { coverage: true }).unrepresented).toEqual([]);
+
+    const external = await boardOf([{ id: "a", label: "A", ref: "src/a.ts", state: "external" }]);
+    expect(checkDrift(external, fakeWorkspace(tree), { coverage: true }).unrepresented).toEqual([]);
+  });
+});

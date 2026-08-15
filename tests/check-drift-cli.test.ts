@@ -948,3 +948,78 @@ describe("check-drift and a box that was removed", () => {
     expect(result.code).toBe(1);
   });
 });
+
+/**
+ * Coverage on the command line. The engine decides what to suggest; what matters
+ * here is that it never happens on its own — this is the one check that proposes
+ * additions, and the per-turn notice is the thing it must stay out of.
+ */
+describe("check-drift and code the diagram does not show", () => {
+  let project: string;
+
+  async function setup() {
+    project = mkdtempSync(path.join(tmpdir(), "drift-cov-"));
+    mkdirSync(path.join(project, "docs/diagrams"), { recursive: true });
+    mkdirSync(path.join(project, "src"), { recursive: true });
+    writeFileSync(path.join(project, "src/a.ts"), "import { b } from './b';\nexport const a = b;\n");
+    writeFileSync(path.join(project, "src/b.ts"), "export const b = 1;\n");
+    const made = await createDiagram(emptyBoard(), {
+      name: "arch",
+      nodes: [{ id: "a", label: "A", ref: "src/a.ts" }],
+      edges: [],
+    });
+    await writeBoard(path.join(project, "docs/diagrams/arch.excalidraw"), made.board);
+  }
+
+  async function check(...args: string[]) {
+    try {
+      const { stdout, stderr } = await run(TSX, [SCRIPT, ...args], { cwd: project });
+      return { code: 0, stdout, stderr };
+    } catch (error) {
+      const failure = error as { code?: number; stdout?: string; stderr?: string };
+      return { code: failure.code ?? -1, stdout: failure.stdout ?? "", stderr: failure.stderr ?? "" };
+    }
+  }
+
+  beforeEach(setup);
+  afterEach(() => rmSync(project, { recursive: true, force: true }));
+
+  it("never suggests anything unless asked", async () => {
+    // The board is clean and omits src/b.ts. Saying so every turn is how a check
+    // that nags gets switched off, taking the quiet ones with it.
+    const result = await check();
+    expect(result.stderr).toBe("");
+    expect(result.code).toBe(0);
+  });
+
+  it("suggests the missing module with --coverage, and still exits clean", async () => {
+    const result = await check("--coverage");
+    expect(result.stderr).toContain("src/b.ts");
+    expect(result.stderr).toContain("not shown");
+    expect(result.stderr).toContain("suggestions, not drift");
+    // A suggestion must never fail a build.
+    expect(result.code).toBe(0);
+  });
+
+  it("keeps suggestions apart from real drift in the same run", async () => {
+    // A second box pointing at nothing, while src/a.ts stays -- otherwise there
+    // is no neighbourhood left to scan and the suggestion disappears with it.
+    const made = await createDiagram(emptyBoard(), {
+      name: "arch",
+      nodes: [
+        { id: "a", label: "A", ref: "src/a.ts" },
+        { id: "gone", label: "Gone", ref: "src/gone.ts" },
+      ],
+      edges: [],
+    });
+    await writeBoard(path.join(project, "docs/diagrams/arch.excalidraw"), made.board);
+
+    const result = await check("--coverage");
+    // The broken claim sets the exit code; the suggestion rides along beside it,
+    // in its own box, so neither is mistaken for the other.
+    expect(result.code).toBe(1);
+    expect(result.stderr).toContain("Gone");
+    expect(result.stderr).toContain("suggestions, not drift");
+    expect(result.stderr).toContain("src/b.ts");
+  });
+});

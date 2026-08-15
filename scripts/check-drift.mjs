@@ -63,6 +63,7 @@ const USAGE = [
   "  --shrink       go back to the short notice",
   "  --no-edges     skip the arrow check",
   "  --no-deletions skip the removed-box check",
+  "  --coverage     also suggest code the diagram does not show (never automatic)",
   "",
   "Silent, exit 0, when nothing has drifted.",
 ].join("\n");
@@ -76,6 +77,7 @@ function parseArgs() {
   const opts = {
     edges: true,
     deletions: true,
+    coverage: false,
     hook: false,
     details: false,
     expand: false,
@@ -88,6 +90,8 @@ function parseArgs() {
       opts.edges = false;
     } else if (arg === "--no-deletions") {
       opts.deletions = false;
+    } else if (arg === "--coverage") {
+      opts.coverage = true;
     } else if (arg === "--hook") {
       opts.hook = true;
     } else if (arg === "--details" || arg === "--full") {
@@ -348,6 +352,7 @@ if (opts.shrink) setExpanded(false);
 const expanded = opts.details || opts.expand || (!opts.shrink && isExpanded());
 const workspace = createWorkspace(root);
 const stale = [];
+const suggested = [];
 const problems = [];
 
 /*
@@ -414,6 +419,7 @@ for (const file of checking) {
   try {
     report = checkDrift(await readBoard(file), workspace, {
       edges: opts.edges,
+      coverage: opts.coverage,
       // Per board, so the cheap "unmodified" answer short-circuits each one.
       ...(opts.deletions ? { baseline: createGitBaseline(root, file) } : {}),
     });
@@ -423,6 +429,10 @@ for (const file of checking) {
     problems.push(`${path.relative(root, file)}: could not read (${error.message})`);
     continue;
   }
+  // Suggestions are collected apart from drift: they are not a claim going wrong,
+  // and a board with nothing but suggestions is still a clean board.
+  if (report.unrepresented.length > 0) suggested.push({ file, report });
+
   if (report.clean && report.promotions.length === 0 && report.workItems.length === 0) continue;
 
   stale.push({ file, report });
@@ -447,11 +457,42 @@ const worthANotice = stale.filter(
 );
 const showing = expanded ? stale : worthANotice;
 
-if (showing.length > 0 || problems.length > 0) {
+/**
+ * Code the diagram does not show.
+ *
+ * Its own box, not folded into the drift tally: "2 gone" is a claim going wrong,
+ * while this is a suggestion about what might be worth drawing, and mixing them
+ * would let a suggestion read as a defect. Ranked most-imported first by the
+ * engine, so the module several boxes depend on sits at the top.
+ */
+function renderCoverage(entries, colour) {
+  return box({
+    sections: entries.map((entry) => ({
+      label: path.basename(entry.file)
+        + "  "
+        + paint(entry.report.unrepresented.length + " not shown", "dim", colour),
+      rows: entry.report.unrepresented.map((missing) => {
+        const count = missing.importedBy.length;
+        const noun = count === 1 ? "box" : "boxes";
+        return missing.file + "  " + paint("\u2190 " + count + " " + noun, "dim", colour);
+      }),
+    })),
+    foot: "suggestions, not drift \u00b7 add a box or ignore",
+    max: 76,
+  });
+}
+
+const coverageLines =
+  opts.coverage && suggested.length > 0
+    ? renderCoverage(suggested, Boolean(process.stderr.isTTY))
+    : [];
+
+if (showing.length > 0 || problems.length > 0 || coverageLines.length > 0) {
   // Measured: ANSI renders in a systemMessage. Off only when the output is being
   // piped or captured, where escapes would be junk in somebody's log.
   const colour = opts.hook || Boolean(process.stderr.isTTY);
   const lines = [
+    ...coverageLines,
     ...problems,
     ...(showing.length === 0
       ? []

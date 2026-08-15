@@ -86,6 +86,11 @@ A clean report with `checked: 0` means no node had a ref, not that the diagram i
 right. `clean` covers regressions only: `workItems` and `promotions` sit beside it
 because neither is a broken diagram.
 
+To ask the opposite question — what does the code have that this diagram does not
+show? — call `check_drift` with `coverage: true`. It names modules the board's own
+boxes import but no box covers, most-imported first. Suggestions, not drift: worth
+running when deciding what a diagram is missing, not on every pass.
+
 When a box has drifted, work out whether its code *moved* or *went*: repoint the
 first, remove the second. Deleting a box because a path changed loses a real part
 of the picture.
