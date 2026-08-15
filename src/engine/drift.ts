@@ -124,6 +124,30 @@ export interface UnrepresentedFinding {
   importedBy: string[];
 }
 
+/**
+ * Why a node was not checked. Kept apart from `excused`, which is a declaration
+ * that there was nothing to check, and from `handDrawn`, which is a sketch.
+ */
+export type NodeSkipReason = "no-ref" | "ref-outside-repo";
+
+/**
+ * Why an arrow was not checked. Seven reasons, all of which used to arrive as a
+ * single number -- so a reader could see that five arrows went unchecked without
+ * any way to learn that two of them simply had not been snapped to their boxes.
+ */
+export type EdgeSkipReason =
+  | "ends-not-bound"
+  | "endpoint-missing"
+  | "endpoint-external"
+  | "endpoint-has-no-ref"
+  | "endpoint-outside-repo"
+  | "endpoint-file-missing"
+  | "directory-ref"
+  | "not-ts-or-js";
+
+/** Counts by reason, with zeroes omitted so a caller can print what is there. */
+export type SkipBreakdown<Reason extends string> = Partial<Record<Reason, number>>;
+
 export interface DriftReport {
   clean: boolean;
   findings: DriftFinding[];
@@ -143,6 +167,8 @@ export interface DriftReport {
   checked: number;
   /** Generated nodes with no ref to check against. */
   skipped: number;
+  /** The same number, split by reason, so silence can be told from coverage. */
+  skippedWhy: SkipBreakdown<NodeSkipReason>;
   /** Nodes not about this repo: an `external` node, or any node on a concept board. */
   excused: number;
   /** Hand-drawn nodes, ignored by design. */
@@ -154,6 +180,8 @@ export interface DriftReport {
   edgesChecked: number;
   /** Edges skipped (directory refs, non-TS/JS, missing files, hand-drawn, refless). */
   edgesSkipped: number;
+  /** The same number, split by reason. This is the one people ask about. */
+  edgesSkippedWhy: SkipBreakdown<EdgeSkipReason>;
 }
 
 /**
@@ -454,8 +482,20 @@ export function checkDrift(
   const promotions: Promotion[] = [];
   let checked = 0;
   let skipped = 0;
+  let edgesChecked = 0;
+  let edgesSkipped = 0;
   let excused = 0;
   let handDrawn = 0;
+  const skippedWhy: SkipBreakdown<NodeSkipReason> = {};
+  const edgesSkippedWhy: SkipBreakdown<EdgeSkipReason> = {};
+  const skipNode = (reason: NodeSkipReason) => {
+    skipped += 1;
+    skippedWhy[reason] = (skippedWhy[reason] ?? 0) + 1;
+  };
+  const skipEdge = (reason: EdgeSkipReason) => {
+    edgesSkipped += 1;
+    edgesSkippedWhy[reason] = (edgesSkippedWhy[reason] ?? 0) + 1;
+  };
 
   const graph = readGraph(board);
   // A board describing a protocol or another project makes no claims about this
@@ -474,12 +514,12 @@ export function checkDrift(
     const declared = node.ref?.trim();
     const ref = declared || refFromLabel(node.label);
     if (!ref) {
-      skipped += 1;
+      skipNode("no-ref");
       continue;
     }
     const result = inspect(node, ref, declared ? "recorded" : "inferred", workspace);
     if (result === "skip") {
-      skipped += 1;
+      skipNode("ref-outside-repo");
       continue;
     }
     checked += 1;
@@ -550,8 +590,6 @@ export function checkDrift(
 
   // Edge checking: check each generated edge for corroboration
   const edges: EdgeDriftFinding[] = [];
-  let edgesChecked = 0;
-  let edgesSkipped = 0;
 
   const importCache = new Map<string, Array<{ abs: string; rel: string }>>();
 
@@ -600,7 +638,7 @@ export function checkDrift(
        * a claim about the design.
        */
       if (edge.endpoints === "nearest") {
-        edgesSkipped += 1;
+        skipEdge("ends-not-bound");
         continue;
       }
 
@@ -609,21 +647,21 @@ export function checkDrift(
 
       // Both endpoints must exist, be recorded, have refs
       if (!fromNode || !toNode) {
-        edgesSkipped += 1;
+        skipEdge("endpoint-missing");
         continue;
       }
 
       // An arrow into something deliberately outside the repo has nothing to
       // corroborate against, and saying so would be noise, not a finding.
       if (fromNode.state === "external" || toNode.state === "external") {
-        edgesSkipped += 1;
+        skipEdge("endpoint-external");
         continue;
       }
 
       const fromRef = fromNode.ref?.trim();
       const toRef = toNode.ref?.trim();
       if (!fromRef || !toRef) {
-        edgesSkipped += 1;
+        skipEdge("endpoint-has-no-ref");
         continue;
       }
 
@@ -635,19 +673,24 @@ export function checkDrift(
 
       // Skip if either file is missing or is not a file
       if (!fromFile || !toFile) {
-        edgesSkipped += 1;
+        skipEdge("endpoint-outside-repo");
         continue;
       }
       const fromStat = workspace.stat(fromFile);
       const toStat = workspace.stat(toFile);
       if (fromStat !== "file" || toStat !== "file") {
-        edgesSkipped += 1;
+        // Both land here, and they are not the same thing to a reader: one end
+        // standing for a subsystem is a choice, one pointing at a file that is
+        // gone is already reported as drift by the node check.
+        skipEdge(
+          fromStat === "missing" || toStat === "missing" ? "endpoint-file-missing" : "directory-ref",
+        );
         continue;
       }
 
       // Skip if not TS/JS files
       if (!TS_JS.test(fromFile) || !TS_JS.test(toFile)) {
-        edgesSkipped += 1;
+        skipEdge("not-ts-or-js");
         continue;
       }
 
@@ -766,12 +809,14 @@ export function checkDrift(
     promotions,
     checked,
     skipped,
+    skippedWhy,
     excused,
     handDrawn,
     concept,
     edges,
     edgesChecked,
     edgesSkipped,
+    edgesSkippedWhy,
   };
 }
 

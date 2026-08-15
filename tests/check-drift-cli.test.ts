@@ -468,11 +468,17 @@ describe("--details", () => {
     expect(out).toContain("two.excalidraw");
     expect(out).toContain("12 arrows");
     expect(out).toContain("1 gone");
-    // One frame, not two boxes: the second diagram is introduced by a divider, so
-    // there is a single top border and a single bottom one.
-    expect((out.match(/┌/g) ?? []).length).toBe(1);
-    expect((out.match(/├/g) ?? []).length).toBe(1);
-    expect((out.match(/└/g) ?? []).length).toBe(1);
+    // One frame for the findings, not two boxes: the second diagram is introduced
+    // by a divider, so there is a single top border and a single bottom one.
+    //
+    // Sliced from the last top border, because --details now also prints the
+    // audit of what was and was not checked, in its own frame above this one.
+    // They are separate frames on purpose: one lists what is wrong, the other
+    // says how much was read, and folding them together would blur that.
+    const findings = out.slice(out.lastIndexOf("┌"));
+    expect((findings.match(/┌/g) ?? []).length).toBe(1);
+    expect((findings.match(/├/g) ?? []).length).toBe(1);
+    expect((findings.match(/└/g) ?? []).length).toBe(1);
   }, 180_000);
 
   it("names the command once, under everything", () => {
@@ -1021,5 +1027,80 @@ describe("check-drift and code the diagram does not show", () => {
     expect(result.stderr).toContain("Gone");
     expect(result.stderr).toContain("suggestions, not drift");
     expect(result.stderr).toContain("src/b.ts");
+  });
+});
+
+/**
+ * The audit: what was read, and what was not.
+ *
+ * The failure this closes is subtle and was hit three times in one session — a
+ * silent run means either "everything agreed" or "there was nothing here I could
+ * read", and the output was identical. These pin the difference, and pin that it
+ * only ever appears when asked for.
+ */
+describe("check-drift saying what it did not look at", () => {
+  let project: string;
+
+  async function put(name: string, nodes: Array<{ id: string; label: string; ref?: string }>, edges: Array<{ from: string; to: string }> = []) {
+    const made = await createDiagram(emptyBoard(), { name: "arch", nodes, edges });
+    await writeBoard(path.join(project, `docs/diagrams/${name}.excalidraw`), made.board);
+  }
+
+  async function check(...args: string[]) {
+    try {
+      const { stdout, stderr } = await run(TSX, [SCRIPT, ...args], { cwd: project });
+      return { code: 0, stdout, stderr };
+    } catch (error) {
+      const failure = error as { code?: number; stdout?: string; stderr?: string };
+      return { code: failure.code ?? -1, stdout: failure.stdout ?? "", stderr: failure.stderr ?? "" };
+    }
+  }
+
+  beforeEach(() => {
+    project = mkdtempSync(path.join(tmpdir(), "drift-audit-"));
+    mkdirSync(path.join(project, "docs/diagrams"), { recursive: true });
+    mkdirSync(path.join(project, "src"), { recursive: true });
+    writeFileSync(path.join(project, "src/a.ts"), "export const a = 1;\n");
+  });
+
+  afterEach(() => rmSync(project, { recursive: true, force: true }));
+
+  it("stays silent on a board it could not read anything on, unless asked", async () => {
+    // Nothing here is checkable. The per-turn notice must still say nothing.
+    await put("sketch", [{ id: "x", label: "Auth" }, { id: "y", label: "Queue" }], [{ from: "x", to: "y" }]);
+    const quiet = await check();
+    expect(quiet.stderr).toBe("");
+    expect(quiet.code).toBe(0);
+  });
+
+  it("admits how little it read when asked", async () => {
+    await put("sketch", [{ id: "x", label: "Auth" }, { id: "y", label: "Queue" }], [{ from: "x", to: "y" }]);
+    const asked = await check("--details");
+    expect(asked.stderr).toContain("0 refs");
+    expect(asked.stderr).toContain("2 boxes skipped");
+    expect(asked.stderr).toContain("no ref");
+    expect(asked.stderr).toContain("1 arrows skipped");
+    // The line that makes the distinction, spelled out rather than implied.
+    expect(asked.stderr).toContain("silence means these agreed");
+    expect(asked.code).toBe(0);
+  });
+
+  it("says so plainly when a board really was fully checked", async () => {
+    // The other half: a clean board that was genuinely read should not read the
+    // same as one that could not be.
+    await put("real", [{ id: "a", label: "A", ref: "src/a.ts" }]);
+    const asked = await check("--details");
+    expect(asked.stderr).toContain("1 refs");
+    expect(asked.stderr).toContain("everything on this board was checked");
+    expect(asked.stderr).not.toContain("boxes skipped");
+  });
+
+  it("names the reason an arrow went unread, per reason", async () => {
+    await put("mixed", [
+      { id: "a", label: "A", ref: "src/a.ts" },
+      { id: "b", label: "B" },
+    ], [{ from: "a", to: "b" }]);
+    const asked = await check("--details");
+    expect(asked.stderr).toContain("an end has no ref");
   });
 });

@@ -58,7 +58,7 @@ const USAGE = [
   `                 (${DEFAULT_DIAGRAM_DIR}, or "diagrams" in ${CONFIG_FILE})`,
   "",
   "  --hook         report as a Claude Code Stop hook and exit 0",
-  "  --details      every finding, not the short notice",
+  "  --details      every finding, plus what was and was not checked",
   "  --expand       keep reporting in full until --shrink",
   "  --shrink       go back to the short notice",
   "  --no-edges     skip the arrow check",
@@ -352,6 +352,7 @@ if (opts.shrink) setExpanded(false);
 const expanded = opts.details || opts.expand || (!opts.shrink && isExpanded());
 const workspace = createWorkspace(root);
 const stale = [];
+const examined = [];
 const suggested = [];
 const problems = [];
 
@@ -429,6 +430,8 @@ for (const file of checking) {
     problems.push(`${path.relative(root, file)}: could not read (${error.message})`);
     continue;
   }
+  examined.push({ file, report });
+
   // Suggestions are collected apart from drift: they are not a claim going wrong,
   // and a board with nothing but suggestions is still a clean board.
   if (report.unrepresented.length > 0) suggested.push({ file, report });
@@ -482,16 +485,73 @@ function renderCoverage(entries, colour) {
   });
 }
 
+/** Skip reasons in words, since the engine's keys are for callers, not readers. */
+const SKIP_WORDS = {
+  "no-ref": "no ref",
+  "ref-outside-repo": "ref points outside the repo",
+  "ends-not-bound": "ends not snapped to their boxes",
+  "endpoint-missing": "an end points at no box",
+  "endpoint-external": "an end is marked external",
+  "endpoint-has-no-ref": "an end has no ref",
+  "endpoint-outside-repo": "an end points outside the repo",
+  "endpoint-file-missing": "an end's file is missing",
+  "directory-ref": "an end refs a directory",
+  "not-ts-or-js": "not TypeScript or JavaScript",
+};
+
+function skipWords(why) {
+  return Object.entries(why)
+    .sort((a, b) => b[1] - a[1])
+    .map(([reason, count]) => `${count} ${SKIP_WORDS[reason] ?? reason}`)
+    .join(" · ");
+}
+
+/**
+ * What was looked at, and what was not.
+ *
+ * Printed only for --details, and printed even when everything is clean. That is
+ * the whole point: silence had two meanings -- "these agreed" and "there was
+ * nothing here I could read" -- and no way to tell them apart. It stays off the
+ * per-turn notice, which has to remain quiet to stay switched on.
+ */
+function renderCoverageAudit(entries, colour) {
+  return box({
+    sections: entries.map(({ file, report }) => {
+      const rows = [];
+      if (report.concept) rows.push(paint("concept board · not about this repo", "dim", colour));
+      if (report.excused) rows.push(paint(`${report.excused} boxes outside this repo by declaration`, "dim", colour));
+      if (report.handDrawn) rows.push(paint(`${report.handDrawn} hand-drawn boxes, never checked`, "dim", colour));
+      if (report.skipped) rows.push(paint(`${report.skipped} boxes skipped: ${skipWords(report.skippedWhy)}`, "yellow", colour));
+      if (report.edgesSkipped) rows.push(paint(`${report.edgesSkipped} arrows skipped: ${skipWords(report.edgesSkippedWhy)}`, "yellow", colour));
+      if (rows.length === 0) rows.push(paint("everything on this board was checked", "dim", colour));
+      return {
+        label: `${path.basename(file)}  ${paint(`${report.checked} refs · ${report.edgesChecked} arrows checked`, "dim", colour)}`,
+        rows,
+      };
+    }),
+    foot: "silence means these agreed · not that everything was read",
+    max: 76,
+  });
+}
+
 const coverageLines =
   opts.coverage && suggested.length > 0
     ? renderCoverage(suggested, Boolean(process.stderr.isTTY))
     : [];
 
-if (showing.length > 0 || problems.length > 0 || coverageLines.length > 0) {
+// --details is a question, so it always gets an answer -- including on a board
+// with nothing wrong, which is the case the old output could not distinguish.
+const auditLines =
+  opts.details && examined.length > 0
+    ? renderCoverageAudit(examined, Boolean(process.stderr.isTTY))
+    : [];
+
+if (showing.length > 0 || problems.length > 0 || coverageLines.length > 0 || auditLines.length > 0) {
   // Measured: ANSI renders in a systemMessage. Off only when the output is being
   // piped or captured, where escapes would be junk in somebody's log.
   const colour = opts.hook || Boolean(process.stderr.isTTY);
   const lines = [
+    ...auditLines,
     ...coverageLines,
     ...problems,
     ...(showing.length === 0
