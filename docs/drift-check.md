@@ -42,6 +42,15 @@ Hand-drawn elements are reported as `provenance: "inferred"`. They must be
 treated differently: a box you sketched is an *intention*, not a claim about
 current code, and reporting it as drift would be noise.
 
+Arrows are the exception, and the distinction is not authorship. Each edge also
+reports `endpoints`: `declared` (from its own `customData`), `bound` (from
+Excalidraw's bindings on both ends), or `nearest` (at least one end matched to
+whichever shape it landed close to). The first two are exact — a binding keeps
+pointing at a shape when either one moves, whoever drew the arrow — so the arrow
+check trusts them and skips only `nearest`. Keying that decision on `provenance`
+instead meant "Claude didn't draw it", which silently skipped the diagram-driven
+case: a connection you sketched between two components that already exist.
+
 ## Two jobs, deliberately separate
 
 | | Cost | Needs a model | When to run |

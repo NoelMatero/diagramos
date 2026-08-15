@@ -314,7 +314,10 @@ server.registerTool(
     description:
       "Read a board back as a semantic graph: nodes, edges, labels, and anything unattributed. "
       + "Each fact is marked recorded (drawn by this tool, exact) or inferred (hand-drawn, derived "
-      + "from geometry). Use this to treat a diagram as a specification.",
+      + "from geometry). Every edge also says how its ends were resolved: declared or bound are "
+      + "exact pointers to two shapes, nearest means an end was matched to whichever shape it landed "
+      + "close to and may not be the one intended. A hand-drawn arrow bound at both ends is a precise "
+      + "claim despite being inferred. Use this to treat a diagram as a specification.",
     inputSchema: {
       path: z.string(),
       geometry: z

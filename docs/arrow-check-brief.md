@@ -161,8 +161,20 @@ look", never "wrong". Four corroboration channels:
    box's ref.
 
 Directory refs, non-TS/JS files, missing files (already reported as
-`missing-file`), hand-drawn edges, and refless or inferred-ref nodes are skipped
-and counted, never flagged.
+`missing-file`), and refless or inferred-ref nodes are skipped and counted, never
+flagged.
+
+Arrows are skipped on how their ends were resolved rather than on who drew them.
+An arrow bound at both ends (`endpoints: "bound"`) is checked even when a person
+drew it: Excalidraw maintains a binding when either shape moves, so it points at
+two shapes as exactly as a generated edge does, and sketching a connection
+between two components that already exist is the case this whole tool is for. An
+arrow whose ends were matched by proximity (`endpoints: "nearest"`) stays
+skipped — that is an observation about geometry, not a claim about the design.
+
+Since both endpoints must still carry a `ref`, and refs only exist on generated
+nodes, this reaches exactly one new population: hand-drawn arrows between
+generated boxes.
 
 The numbers, per the evaluation rules above:
 
@@ -181,6 +193,43 @@ The numbers, per the evaluation rules above:
 
 A regression test pins the zero: `tests/engine-drift.test.ts` runs the real
 diagram against the real tree and asserts clean.
+
+### Measuring the move from authorship to bindings
+
+Same caution, applied again. The counts before changing the rule, over every
+board in two projects — this repo and one unrelated one:
+
+| | Arrows |
+| --- | --- |
+| `declared` (generated, from `customData`) | 357 |
+| `bound` (hand-drawn, bound at both ends) | 0 |
+| `nearest` (an end matched by proximity) | 0 |
+
+**357 arrows, not one of them hand-drawn.** So the change moves nothing that
+exists today: re-running the census afterwards gives an identical report, 0
+flagged either way. The population the new rule governs is empty in the wild and
+had to be constructed to be measured at all.
+
+On constructed boards, one hand-drawn arrow between two generated boxes whose
+refs both resolve:
+
+| Arrow | Code | Result |
+| --- | --- | --- |
+| bound both ends | no import | checked, **flagged** |
+| bound both ends | imports | checked, quiet |
+| unbound | no import | skipped |
+| unbound | imports | skipped |
+
+The second row is the one that decides whether this is survivable: a sketched
+connection stops being a finding the moment the code carries it, so the notice
+empties out as the work lands rather than nagging forever.
+
+What is still unmeasured, and cannot be from here: how noisy this feels during a
+long design session, where boxes exist and the wiring does not yet. The exposure
+is bounded — both boxes must be generated and carry refs, both refs must resolve
+to existing TS/JS files, and the arrow must be bound at both ends — but nobody
+has run a real sketch through it, because until now there was no reason to draw
+arrows the check would look at.
 
 ## Constraints on the implementation
 
