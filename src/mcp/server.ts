@@ -25,7 +25,13 @@ import {
 } from "../engine/diagram";
 import { readGraph } from "../engine/graph";
 import { CONFIG_FILE, DEFAULT_DIAGRAM_DIR, diagramDir } from "../engine/config";
-import { checkDrift, createWorkspace, findBoards, findStrayBoards } from "../engine/drift";
+import {
+  checkDrift,
+  createGitBaseline,
+  createWorkspace,
+  findBoards,
+  findStrayBoards,
+} from "../engine/drift";
 import { loadConverter } from "../engine/convert";
 import { renderBoardToPng } from "../engine/render";
 import {
@@ -463,12 +469,15 @@ server.registerTool(
         edgesSkipped: 0,
       };
       const findings: Array<Record<string, unknown>> = [];
+      const deleted: Array<Record<string, unknown>> = [];
       const edges: Array<Record<string, unknown>> = [];
       const workItems: Array<Record<string, unknown>> = [];
       const promotions: Array<Record<string, unknown>> = [];
       const conceptBoards: string[] = [];
       for (const file of files) {
-        const report = checkDrift(await readBoard(file), workspace);
+        const report = checkDrift(await readBoard(file), workspace, {
+          baseline: createGitBaseline(WORKSPACE_ROOT, file),
+        });
         totals.checked += report.checked;
         totals.skipped += report.skipped;
         totals.excused += report.excused;
@@ -480,6 +489,9 @@ server.registerTool(
         // know which file to redraw, and flat is cheaper than nesting.
         for (const finding of report.findings) {
           findings.push({ board: relativeToWorkspace(file), ...finding });
+        }
+        for (const finding of report.deleted) {
+          deleted.push({ board: relativeToWorkspace(file), ...finding });
         }
         for (const finding of report.edges) {
           edges.push({ board: relativeToWorkspace(file), ...finding });
@@ -494,9 +506,12 @@ server.registerTool(
 
       return text({
         boards: files.map((file) => relativeToWorkspace(file)),
-        clean: findings.length === 0 && edges.length === 0,
+        clean: findings.length === 0 && edges.length === 0 && deleted.length === 0,
         findings,
         edges,
+        // Boxes the diagram stopped claiming, while their code is still here.
+        // Uncommitted only: committing the board is what says it was deliberate.
+        ...(deleted.length ? { deleted } : {}),
         // Both are separate from `clean` on purpose: a planned box the code has
         // not reached is work, not drift, and a promotion is good news.
         ...(workItems.length ? { workItems } : {}),

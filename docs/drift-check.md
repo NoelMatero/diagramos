@@ -106,6 +106,46 @@ anything kept there is destroyed the first time someone touches the canvas.
 Element `customData` is the only store that survives, which is why a concept
 board needs a title.
 
+## What the board stopped saying
+
+Every check above reads the board as it is, so deleting a box deletes the findings
+about it. Measured: removing one box from `board-internals.excalidraw` — the
+`layout` box, whose file is 23KB and imported by three modules including this
+checker — dropped the refs checked from 12 to 11 and the edges from 13 to 11, and
+reported **nothing**. Taken to its conclusion, the least honest diagram is the
+quietest one, and an empty board is clean forever.
+
+So one finding comes from a comparison against the *committed* board rather than
+against the code: a box that was there, is gone, and whose file is still in the
+tree.
+
+**Committing the diagram is the mute.** There is no flag to remember and no
+per-box suppression, because the act that means "yes, I meant to remove that" is
+one people already perform. It also means CI can never trip this: a fresh checkout
+has nothing uncommitted to find.
+
+Tombstones were the cheaper design and were rejected. Excalidraw soft-deletes, so
+the removed element is still in the file with `isDeleted: true` and its
+`customData` intact — but a tombstone lives forever, so an old deliberate deletion
+and a fresh accidental one look identical, it would need a mute of its own, and
+exporting from another editor prunes them.
+
+Matching is on the semantic node id, never the element id: regeneration writes
+fresh elements and keeps node ids, so anything keyed on elements would report
+every redraw as a mass deletion. A node still present with a different ref is not
+a deletion either — the ordinary checks own that.
+
+Three silences, each load-bearing:
+
+| situation | why nothing is said |
+| --- | --- |
+| the file went with the box | the deletion tracks the code, so the board is telling the truth |
+| no git, untracked board, or board unmodified | nothing to compare against. A project without git is not a broken one |
+| the box was `external` | it never claimed anything about this repo |
+
+The cheap path is the common one: `git status --porcelain` on the board runs
+first, and an unmodified board stops there without reading a baseline.
+
 ## Two jobs, deliberately separate
 
 | | Cost | Needs a model | When to run |

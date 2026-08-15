@@ -42,6 +42,7 @@ import { readBoard } from "../src/engine/board-file.ts";
 import { CONFIG_FILE, ConfigError, DEFAULT_DIAGRAM_DIR, diagramDir } from "../src/engine/config.ts";
 import {
   checkDrift,
+  createGitBaseline,
   createWorkspace,
   findBoards,
   findStrayBoards,
@@ -61,6 +62,7 @@ const USAGE = [
   "  --expand       keep reporting in full until --shrink",
   "  --shrink       go back to the short notice",
   "  --no-edges     skip the arrow check",
+  "  --no-deletions skip the removed-box check",
   "",
   "Silent, exit 0, when nothing has drifted.",
 ].join("\n");
@@ -73,6 +75,7 @@ function parseArgs() {
   }
   const opts = {
     edges: true,
+    deletions: true,
     hook: false,
     details: false,
     expand: false,
@@ -83,6 +86,8 @@ function parseArgs() {
   for (const arg of argv) {
     if (arg === "--no-edges") {
       opts.edges = false;
+    } else if (arg === "--no-deletions") {
+      opts.deletions = false;
     } else if (arg === "--hook") {
       opts.hook = true;
     } else if (arg === "--details" || arg === "--full") {
@@ -183,6 +188,9 @@ const MAX_LISTED = 6;
  */
 function rowsFor({ report }, colour, all = false) {
   return [
+    ...report.deleted.map((finding) =>
+      paint(`${boxName(finding)} removed, ${parseRef(finding.ref).path} still there`, "red", colour),
+    ),
     ...report.findings.map((finding) => paint(`${boxName(finding)} \u2192 ${target(finding)}`, "red", colour)),
     ...report.edges.map((finding) =>
       paint(
@@ -204,9 +212,10 @@ function rowsFor({ report }, colour, all = false) {
 }
 
 /** "2 gone  1 arrow  1 built", each part coloured, empty parts dropped. */
-function tallyCounts(gone, arrows, built, planned, colour) {
+function tallyCounts(gone, removed, arrows, built, planned, colour) {
   return [
     gone ? paint(`${gone} gone`, "red", colour) : "",
+    removed ? paint(`${removed} removed`, "red", colour) : "",
     arrows ? paint(`${arrows} ${arrows === 1 ? "arrow" : "arrows"}`, "yellow", colour) : "",
     built ? paint(`${built} built`, "green", colour) : "",
     planned ? paint(`${planned} planned`, "dim", colour) : "",
@@ -216,6 +225,7 @@ function tallyCounts(gone, arrows, built, planned, colour) {
 function tallyFor(report, colour) {
   return tallyCounts(
     report.findings.length,
+    report.deleted.length,
     report.edges.length,
     report.promotions.length,
     report.workItems.length,
@@ -262,17 +272,18 @@ function render(stale, colour) {
   const totals = stale.reduce(
     (sum, { report }) => ({
       gone: sum.gone + report.findings.length,
+      removed: sum.removed + report.deleted.length,
       arrows: sum.arrows + report.edges.length,
       built: sum.built + report.promotions.length,
       planned: sum.planned + report.workItems.length,
     }),
-    { gone: 0, arrows: 0, built: 0, planned: 0 },
+    { gone: 0, removed: 0, arrows: 0, built: 0, planned: 0 },
   );
 
   // Too many to list: counts per diagram, and a pointer to the view that has room.
   const head = single
-    ? `${path.basename(stale[0].file)}  ${tallyCounts(totals.gone, totals.arrows, totals.built, totals.planned, colour)}`
-    : `${stale.length} diagrams out of date  ${tallyCounts(totals.gone, totals.arrows, totals.built, totals.planned, colour)}`;
+    ? `${path.basename(stale[0].file)}  ${tallyCounts(totals.gone, totals.removed, totals.arrows, totals.built, totals.planned, colour)}`
+    : `${stale.length} diagrams out of date  ${tallyCounts(totals.gone, totals.removed, totals.arrows, totals.built, totals.planned, colour)}`;
 
   const rows = [];
   let hidden = 0;
@@ -401,7 +412,11 @@ if (checking.length === 0) {
 for (const file of checking) {
   let report;
   try {
-    report = checkDrift(await readBoard(file), workspace, { edges: opts.edges });
+    report = checkDrift(await readBoard(file), workspace, {
+      edges: opts.edges,
+      // Per board, so the cheap "unmodified" answer short-circuits each one.
+      ...(opts.deletions ? { baseline: createGitBaseline(root, file) } : {}),
+    });
   } catch (error) {
     // An unreadable board is a problem, but not drift. Say so and keep going
     // rather than failing a commit over a file that may not be a board at all.

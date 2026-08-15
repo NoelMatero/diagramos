@@ -943,3 +943,107 @@ describe("state: what the diagram claims about time", () => {
     expect(report.edges).toHaveLength(0);
   });
 });
+
+/**
+ * What the board stopped saying.
+ *
+ * Deleting a box removes every other finding about it, so this is the check that
+ * cannot be tested by adding something -- only by taking something away. The two
+ * silences below matter as much as the finding: one is the mute, the other is the
+ * deletion being honest.
+ */
+describe("a box removed while its code is still there", () => {
+  /** A baseline over a board held in memory, so no git is involved. */
+  function baselineOf(board: BoardFile | undefined) {
+    return { committed: () => board };
+  }
+
+  async function withBoxes(ids: string[]) {
+    const result = await createDiagram(emptyBoard(), {
+      name: "arch",
+      nodes: ids.map((id) => ({ id, label: id.toUpperCase(), ref: `src/${id}.ts` })),
+      edges: [],
+    });
+    return result.board;
+  }
+
+  it("reports the box that went, naming the file that stayed", async () => {
+    const before = await withBoxes(["layout", "convert"]);
+    const after = await withBoxes(["convert"]);
+    const report = checkDrift(after, fakeWorkspace({ "src/layout.ts": "x", "src/convert.ts": "y" }), {
+      baseline: baselineOf(before),
+    });
+    expect(report.deleted).toHaveLength(1);
+    expect(report.deleted[0]).toMatchObject({ node: "layout", ref: "src/layout.ts", kind: "deleted-claim" });
+    // Loud: this is the one hole where the diagram got quieter by being wrong.
+    expect(report.clean).toBe(false);
+  });
+
+  it("says nothing when the code went with the box", async () => {
+    // The deletion tracks the code, so the board is telling the truth.
+    const before = await withBoxes(["layout", "convert"]);
+    const after = await withBoxes(["convert"]);
+    const report = checkDrift(after, fakeWorkspace({ "src/convert.ts": "y" }), {
+      baseline: baselineOf(before),
+    });
+    expect(report.deleted).toHaveLength(0);
+    expect(report.clean).toBe(true);
+  });
+
+  it("says nothing when there is no baseline to compare against", async () => {
+    // No git, an untracked board, or a board nobody has touched since committing.
+    // layout.ts is present and unmentioned by the board -- exactly the state the
+    // finding is about -- and with nothing to compare against there is no finding.
+    const after = await withBoxes(["convert"]);
+    const report = checkDrift(after, fakeWorkspace({ "src/layout.ts": "x", "src/convert.ts": "y" }), {
+      baseline: baselineOf(undefined),
+    });
+    expect(report.deleted).toHaveLength(0);
+    expect(report.clean).toBe(true);
+  });
+
+  it("does not call a changed ref a deletion", async () => {
+    // The node is still there. The ordinary checks own whether its ref resolves.
+    const before = await withBoxes(["layout"]);
+    const after = await createDiagram(emptyBoard(), {
+      name: "arch",
+      nodes: [{ id: "layout", label: "LAYOUT", ref: "src/engine/layout.ts" }],
+      edges: [],
+    });
+    const report = checkDrift(
+      after.board,
+      fakeWorkspace({ "src/layout.ts": "x", "src/engine/layout.ts": "x" }),
+      { baseline: baselineOf(before) },
+    );
+    expect(report.deleted).toHaveLength(0);
+  });
+
+  it("does not call a regenerated diagram a deletion", async () => {
+    // Regeneration writes fresh element ids and keeps node ids, so anything keyed
+    // on elements would report every redraw as a mass deletion.
+    const before = await withBoxes(["layout", "convert"]);
+    const after = await withBoxes(["layout", "convert"]);
+    const elementIds = (board: BoardFile) => board.elements.map((element) => element.id);
+    expect(elementIds(after)).toEqual(elementIds(before));
+    const report = checkDrift(after, fakeWorkspace({ "src/layout.ts": "x", "src/convert.ts": "y" }), {
+      baseline: baselineOf(before),
+    });
+    expect(report.deleted).toHaveLength(0);
+  });
+
+  it("ignores a removed external box, which never claimed anything", async () => {
+    const before = await createDiagram(emptyBoard(), {
+      name: "arch",
+      nodes: [
+        { id: "browser", label: "Browser", ref: "src/layout.ts", state: "external" },
+        { id: "convert", label: "CONVERT", ref: "src/convert.ts" },
+      ],
+      edges: [],
+    });
+    const after = await withBoxes(["convert"]);
+    const report = checkDrift(after, fakeWorkspace({ "src/layout.ts": "x", "src/convert.ts": "y" }), {
+      baseline: baselineOf(before.board),
+    });
+    expect(report.deleted).toHaveLength(0);
+  });
+});
