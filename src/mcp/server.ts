@@ -25,7 +25,13 @@ import {
 } from "../engine/diagram";
 import { readGraph } from "../engine/graph";
 import { CONFIG_FILE, DEFAULT_DIAGRAM_DIR, diagramDir } from "../engine/config";
-import { checkDrift, createWorkspace, findBoards, findStrayBoards } from "../engine/drift";
+import {
+  checkDrift,
+  createGitBaseline,
+  createWorkspace,
+  findBoards,
+  findStrayBoards,
+} from "../engine/drift";
 import { loadConverter } from "../engine/convert";
 import { renderBoardToPng } from "../engine/render";
 import {
@@ -133,6 +139,16 @@ const nodeSchema = z.object({
       + "Set it when a node is a real file or module so check_drift can tell when it goes stale. "
       + "Leave it off for anything not in this repository.",
     ),
+  state: z
+    .enum(["planned", "built", "external"])
+    .optional()
+    .describe(
+      "Whether this exists yet. Omit for 'built' (the default: it exists now). "
+      + "Use 'planned' for something meant to exist — its ref not resolving is then reported "
+      + "as work to do rather than as drift, and check_drift says so once the code catches up. "
+      + "Use 'external' for something deliberately outside this repo (a browser, a third-party "
+      + "service), which is never checked and is not the same as forgetting a ref.",
+    ),
 });
 
 const edgeSchema = z.object({
@@ -144,6 +160,14 @@ const edgeSchema = z.object({
     .optional()
     // Set here, not patched afterwards: a regenerate would revert a patch.
     .describe("Arrow and edge-label colour, e.g. #1971c2. Set it here, not by patching after."),
+  state: z
+    .enum(["planned", "built", "external"])
+    .optional()
+    .describe(
+      "Whether this connection exists yet. Omit for 'built'. Use 'planned' for a connection "
+      + "that should exist — the wiring to be done — and check_drift reports it as work rather "
+      + "than as an unsupported arrow.",
+    ),
 });
 
 /**
@@ -253,6 +277,15 @@ server.registerTool(
           + "anywhere else are never checked for drift.",
         ),
       title: z.string().optional(),
+      describes: z
+        .enum(["repo", "concept"])
+        .optional()
+        .describe(
+          "What the board is about. Omit for 'repo' (the default: it describes this codebase). "
+          + "Use 'concept' when it describes a protocol, a standard, or another project — every box "
+          + "is then excused from drift checking instead of reported as missing a ref. Needs a title, "
+          + "since that is where it is recorded.",
+        ),
       nodes: z.array(nodeSchema).min(1),
       edges: z.array(edgeSchema).default([]),
       direction: z.enum(["RIGHT", "DOWN"]).optional().describe("Layout flow; RIGHT by default"),
@@ -267,14 +300,21 @@ server.registerTool(
         ),
     },
   },
-  async ({ path: boardPath, title, nodes, edges, direction, name, append }) =>
+  async ({ path: boardPath, title, describes, nodes, edges, direction, name, append }) =>
     guard(async () => {
       // The one tool that decides where a diagram comes into existence, so the
       // one that has to be confined to the project's diagram directory.
       const file = resolveNewBoardPath(boardPath);
+      if (describes === "concept" && !title?.trim()) {
+        throw new Error(
+          "A concept board needs a title: describes is recorded on the title element, which is the "
+          + "only place that survives an edit in the live viewer.",
+        );
+      }
       const board = await readBoard(file);
       const result = await createDiagram(board, {
         title,
+        ...(describes ? { describes } : {}),
         nodes,
         edges,
         name,
@@ -420,39 +460,75 @@ server.registerTool(
       }
 
       const workspace = createWorkspace(WORKSPACE_ROOT);
-      const totals = { checked: 0, skipped: 0, handDrawn: 0, edgesChecked: 0, edgesSkipped: 0 };
+      const totals = {
+        checked: 0,
+        skipped: 0,
+        excused: 0,
+        handDrawn: 0,
+        edgesChecked: 0,
+        edgesSkipped: 0,
+      };
       const findings: Array<Record<string, unknown>> = [];
+      const deleted: Array<Record<string, unknown>> = [];
       const edges: Array<Record<string, unknown>> = [];
+      const workItems: Array<Record<string, unknown>> = [];
+      const promotions: Array<Record<string, unknown>> = [];
+      const conceptBoards: string[] = [];
       for (const file of files) {
-        const report = checkDrift(await readBoard(file), workspace);
+        const report = checkDrift(await readBoard(file), workspace, {
+          baseline: createGitBaseline(WORKSPACE_ROOT, file),
+        });
         totals.checked += report.checked;
         totals.skipped += report.skipped;
+        totals.excused += report.excused;
         totals.handDrawn += report.handDrawn;
         totals.edgesChecked += report.edgesChecked;
         totals.edgesSkipped += report.edgesSkipped;
+        if (report.concept) conceptBoards.push(relativeToWorkspace(file));
         // Named per finding rather than grouped: a caller acting on one needs to
         // know which file to redraw, and flat is cheaper than nesting.
         for (const finding of report.findings) {
           findings.push({ board: relativeToWorkspace(file), ...finding });
         }
+        for (const finding of report.deleted) {
+          deleted.push({ board: relativeToWorkspace(file), ...finding });
+        }
         for (const finding of report.edges) {
           edges.push({ board: relativeToWorkspace(file), ...finding });
+        }
+        for (const item of report.workItems) {
+          workItems.push({ board: relativeToWorkspace(file), ...item });
+        }
+        for (const promotion of report.promotions) {
+          promotions.push({ board: relativeToWorkspace(file), ...promotion });
         }
       }
 
       return text({
         boards: files.map((file) => relativeToWorkspace(file)),
-        clean: findings.length === 0 && edges.length === 0,
+        clean: findings.length === 0 && edges.length === 0 && deleted.length === 0,
         findings,
         edges,
+        // Boxes the diagram stopped claiming, while their code is still here.
+        // Uncommitted only: committing the board is what says it was deliberate.
+        ...(deleted.length ? { deleted } : {}),
+        // Both are separate from `clean` on purpose: a planned box the code has
+        // not reached is work, not drift, and a promotion is good news.
+        ...(workItems.length ? { workItems } : {}),
+        ...(promotions.length ? { promotions } : {}),
+        ...(conceptBoards.length ? { conceptBoards } : {}),
         ...totals,
         // "clean: true, checked: 0" reads as a pass when nothing was examined,
-        // so say which it was.
+        // so say which it was -- and distinguish "nobody annotated these" from
+        // "these boards are not about this repo", which is not a gap to fill.
         ...(totals.checked === 0
           ? {
-              note:
-                "No node carried a ref, so nothing was compared against the code. Set ref on nodes "
-                + "that stand for a file or module when regenerating these diagrams.",
+              note: totals.excused > 0 && totals.skipped === 0
+                ? `Nothing to check: ${totals.excused} nodes are outside this repo by declaration. `
+                  + "This is not drift and needs no action."
+                : "No node carried a ref, so nothing was compared against the code. Set ref on nodes "
+                  + "that stand for a file or module when regenerating these diagrams, or mark the "
+                  + "board describes: \"concept\" if it is not about this codebase.",
             }
           : {}),
       });

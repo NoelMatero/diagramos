@@ -42,6 +42,7 @@ import { readBoard } from "../src/engine/board-file.ts";
 import { CONFIG_FILE, ConfigError, DEFAULT_DIAGRAM_DIR, diagramDir } from "../src/engine/config.ts";
 import {
   checkDrift,
+  createGitBaseline,
   createWorkspace,
   findBoards,
   findStrayBoards,
@@ -61,6 +62,7 @@ const USAGE = [
   "  --expand       keep reporting in full until --shrink",
   "  --shrink       go back to the short notice",
   "  --no-edges     skip the arrow check",
+  "  --no-deletions skip the removed-box check",
   "",
   "Silent, exit 0, when nothing has drifted.",
 ].join("\n");
@@ -73,6 +75,7 @@ function parseArgs() {
   }
   const opts = {
     edges: true,
+    deletions: true,
     hook: false,
     details: false,
     expand: false,
@@ -83,6 +86,8 @@ function parseArgs() {
   for (const arg of argv) {
     if (arg === "--no-edges") {
       opts.edges = false;
+    } else if (arg === "--no-deletions") {
+      opts.deletions = false;
     } else if (arg === "--hook") {
       opts.hook = true;
     } else if (arg === "--details" || arg === "--full") {
@@ -158,7 +163,14 @@ function target(finding) {
 }
 
 /** Colour, applied where it renders: a terminal, and the notice. Never a pipe. */
-const COLOUR = { red: "\u001b[31m", yellow: "\u001b[33m", dim: "\u001b[2m", off: "\u001b[0m" };
+const COLOUR = {
+  red: "\u001b[31m",
+  yellow: "\u001b[33m",
+  green: "\u001b[32m",
+  dim: "\u001b[2m",
+  off: "\u001b[0m",
+};
+
 function paint(text, colour, enabled) {
   return enabled && colour ? `${COLOUR[colour]}${text}${COLOUR.off}` : String(text);
 }
@@ -166,9 +178,19 @@ function paint(text, colour, enabled) {
 /** Rows of findings. Low on purpose: this fires at the end of every turn. */
 const MAX_LISTED = 6;
 
-/** One finding per row: what the box says, and what it points at. */
-function rowsFor({ report }, colour) {
+/**
+ * One finding per row: what the box says, and what it points at.
+ *
+ * Work items are listed only when `all` is set, which the long form does and the
+ * notice does not. A planned box the code has not reached is not a disagreement
+ * with anything -- it is the sketch being ahead on purpose, and it would sit
+ * there unchanged for the whole of a design session.
+ */
+function rowsFor({ report }, colour, all = false) {
   return [
+    ...report.deleted.map((finding) =>
+      paint(`${boxName(finding)} removed, ${parseRef(finding.ref).path} still there`, "red", colour),
+    ),
     ...report.findings.map((finding) => paint(`${boxName(finding)} \u2192 ${target(finding)}`, "red", colour)),
     ...report.edges.map((finding) =>
       paint(
@@ -178,19 +200,37 @@ function rowsFor({ report }, colour) {
         colour,
       ),
     ),
+    // Good news, and the only row here that says the diagram is behind the code
+    // rather than the other way round.
+    ...report.promotions.map((promotion) =>
+      paint(`${boxName(promotion)} is built now`, "green", colour),
+    ),
+    ...(all
+      ? report.workItems.map((item) => paint(`${boxName(item)} not built yet`, "dim", colour))
+      : []),
   ];
 }
 
-/** "2 gone  1 arrow", each part coloured, empty parts dropped. */
-function tallyCounts(gone, arrows, colour) {
+/** "2 gone  1 arrow  1 built", each part coloured, empty parts dropped. */
+function tallyCounts(gone, removed, arrows, built, planned, colour) {
   return [
     gone ? paint(`${gone} gone`, "red", colour) : "",
+    removed ? paint(`${removed} removed`, "red", colour) : "",
     arrows ? paint(`${arrows} ${arrows === 1 ? "arrow" : "arrows"}`, "yellow", colour) : "",
+    built ? paint(`${built} built`, "green", colour) : "",
+    planned ? paint(`${planned} planned`, "dim", colour) : "",
   ].filter(Boolean).join("  ");
 }
 
 function tallyFor(report, colour) {
-  return tallyCounts(report.findings.length, report.edges.length, colour);
+  return tallyCounts(
+    report.findings.length,
+    report.deleted.length,
+    report.edges.length,
+    report.promotions.length,
+    report.workItems.length,
+    colour,
+  );
 }
 
 /**
@@ -205,7 +245,7 @@ function renderDetails(stale, colour, foot = "/update-diagram updates the diagra
   return box({
     sections: stale.map((entry) => ({
       label: `${path.basename(entry.file)}  ${tallyFor(entry.report, colour)}`,
-      rows: rowsFor(entry, colour),
+      rows: rowsFor(entry, colour, true),
     })),
     foot,
     max: 72,
@@ -232,15 +272,18 @@ function render(stale, colour) {
   const totals = stale.reduce(
     (sum, { report }) => ({
       gone: sum.gone + report.findings.length,
+      removed: sum.removed + report.deleted.length,
       arrows: sum.arrows + report.edges.length,
+      built: sum.built + report.promotions.length,
+      planned: sum.planned + report.workItems.length,
     }),
-    { gone: 0, arrows: 0 },
+    { gone: 0, removed: 0, arrows: 0, built: 0, planned: 0 },
   );
 
   // Too many to list: counts per diagram, and a pointer to the view that has room.
   const head = single
-    ? `${path.basename(stale[0].file)}  ${tallyCounts(totals.gone, totals.arrows, colour)}`
-    : `${stale.length} diagrams out of date  ${tallyCounts(totals.gone, totals.arrows, colour)}`;
+    ? `${path.basename(stale[0].file)}  ${tallyCounts(totals.gone, totals.removed, totals.arrows, totals.built, totals.planned, colour)}`
+    : `${stale.length} diagrams out of date  ${tallyCounts(totals.gone, totals.removed, totals.arrows, totals.built, totals.planned, colour)}`;
 
   const rows = [];
   let hidden = 0;
@@ -369,29 +412,52 @@ if (checking.length === 0) {
 for (const file of checking) {
   let report;
   try {
-    report = checkDrift(await readBoard(file), workspace, { edges: opts.edges });
+    report = checkDrift(await readBoard(file), workspace, {
+      edges: opts.edges,
+      // Per board, so the cheap "unmodified" answer short-circuits each one.
+      ...(opts.deletions ? { baseline: createGitBaseline(root, file) } : {}),
+    });
   } catch (error) {
     // An unreadable board is a problem, but not drift. Say so and keep going
     // rather than failing a commit over a file that may not be a board at all.
     problems.push(`${path.relative(root, file)}: could not read (${error.message})`);
     continue;
   }
-  if (report.clean) continue;
+  if (report.clean && report.promotions.length === 0 && report.workItems.length === 0) continue;
 
   stale.push({ file, report });
 }
 
-if (stale.length > 0 || problems.length > 0) {
+/*
+ * A promotion opens the notice; a work item does not, but it is still listed by
+ * anyone who asked for the long form.
+ *
+ * Both come from a `planned` box, and the difference is which side is behind. A
+ * work item means the code has not caught up, which is the sketch doing its job
+ * -- it would sit there unchanged for a whole design session, and a notice
+ * repeating it every turn is one nobody reads. A promotion means the board is
+ * now wrong: it says planned, the code says built. That is drift in the mild
+ * direction, and it is one edit from going away.
+ *
+ * `--details` and /expand-report were asked for, so they show everything. That is
+ * the difference between being quiet and withholding.
+ */
+const worthANotice = stale.filter(
+  ({ report }) => !report.clean || report.promotions.length > 0,
+);
+const showing = expanded ? stale : worthANotice;
+
+if (showing.length > 0 || problems.length > 0) {
   // Measured: ANSI renders in a systemMessage. Off only when the output is being
   // piped or captured, where escapes would be junk in somebody's log.
   const colour = opts.hook || Boolean(process.stderr.isTTY);
   const lines = [
     ...problems,
-    ...(stale.length === 0
+    ...(showing.length === 0
       ? []
       : expanded
         ? renderDetails(
-            stale,
+            showing,
             colour,
             // Never a mode you cannot find your way out of: while it is on, the
             // notice says how to turn it off.
@@ -399,7 +465,7 @@ if (stale.length > 0 || problems.length > 0) {
               ? "/update-diagram updates it · /shrink-report makes this short again"
               : "/update-diagram updates the diagram",
           )
-        : render(stale, colour)),
+        : render(showing, colour)),
   ];
 
   if (opts.hook) {
@@ -412,5 +478,8 @@ if (stale.length > 0 || problems.length > 0) {
   }
 
   console.error(lines.join("\n"));
-  process.exit(1);
+  // Non-zero only for something that has actually regressed. A promotion or an
+  // unbuilt sketch must not fail a build: CI reads this exit code, and a diagram
+  // describing next week's work is not a broken repository.
+  process.exit(stale.some(({ report }) => !report.clean) || problems.length > 0 ? 1 : 0);
 }

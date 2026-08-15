@@ -752,3 +752,199 @@ describe("the diagram directory", () => {
     expect(payload.systemMessage).toContain("stay inside the project");
   }, 120_000);
 });
+
+/**
+ * State on the command line. The engine decides what a planned box means;
+ * what matters here is the thing the engine cannot get right on its own —
+ * whether a design session gets nagged, and whether a build fails over a sketch.
+ */
+describe("check-drift and what a diagram says about time", () => {
+  let project: string;
+
+  async function stateBoard(
+    nodes: Array<{ id: string; label: string; ref?: string; state?: "planned" | "built" | "external" }>,
+  ) {
+    const built = await createDiagram(emptyBoard(), { name: "arch", nodes, edges: [] });
+    await writeBoard(path.join(project, "docs/diagrams/plan.excalidraw"), built.board);
+  }
+
+  async function check(...args: string[]) {
+    try {
+      const { stdout, stderr } = await run(TSX, [SCRIPT, ...args], { cwd: project });
+      return { code: 0, stdout, stderr };
+    } catch (error) {
+      const failure = error as { code?: number; stdout?: string; stderr?: string };
+      return { code: failure.code ?? -1, stdout: failure.stdout ?? "", stderr: failure.stderr ?? "" };
+    }
+  }
+
+  beforeEach(() => {
+    project = mkdtempSync(path.join(tmpdir(), "drift-state-"));
+    mkdirSync(path.join(project, "docs/diagrams"), { recursive: true });
+    mkdirSync(path.join(project, "src"), { recursive: true });
+  });
+
+  afterEach(() => {
+    rmSync(project, { recursive: true, force: true });
+  });
+
+  it("says nothing about a planned box the code has not reached", async () => {
+    // The whole design session would otherwise get the same notice every turn.
+    await stateBoard([{ id: "s", label: "Session store", ref: "src/sessions.ts", state: "planned" }]);
+    const result = await check();
+    expect(result.stderr).toBe("");
+    expect(result.stdout).toBe("");
+    expect(result.code).toBe(0);
+  });
+
+  it("lists that planned box when someone asks for details", async () => {
+    // Being quiet is not the same as withholding: --details was asked for.
+    await stateBoard([{ id: "s", label: "Session store", ref: "src/sessions.ts", state: "planned" }]);
+    const result = await check("--details");
+    expect(result.stderr).toContain("Session store");
+    expect(result.stderr).toContain("not built yet");
+    expect(result.code).toBe(0);
+  });
+
+  it("speaks up once the code catches up, and still does not fail a build", async () => {
+    writeFileSync(path.join(project, "src/sessions.ts"), "export const store = 1;\n");
+    await stateBoard([{ id: "s", label: "Session store", ref: "src/sessions.ts", state: "planned" }]);
+    const result = await check();
+    expect(result.stderr).toContain("Session store is built now");
+    // Good news must not turn CI red.
+    expect(result.code).toBe(0);
+  });
+
+  it("still fails on a built box whose file is gone, and counts the sketch beside it", async () => {
+    await stateBoard([
+      { id: "gone", label: "Deleted module", ref: "src/gone.ts" },
+      { id: "s", label: "Session store", ref: "src/sessions.ts", state: "planned" },
+    ]);
+    const result = await check();
+    expect(result.code).toBe(1);
+    expect(result.stderr).toContain("Deleted module");
+    // Counted so it is discoverable, not listed so it does not nag.
+    expect(result.stderr).toContain("1 planned");
+    expect(result.stderr).not.toContain("Session store");
+  });
+
+  it("says nothing about an external box, which is not the same as a missing ref", async () => {
+    await stateBoard([{ id: "browser", label: "Browser canvas", state: "external" }]);
+    const result = await check();
+    expect(result.stderr).toBe("");
+    expect(result.code).toBe(0);
+  });
+});
+
+/**
+ * The removed-box check, against real git.
+ *
+ * The engine tests inject a baseline, so nothing there exercises git itself. What
+ * is covered here is the part that decides whether this check is liveable: that
+ * committing the diagram is what silences it, and that a project without git is
+ * not broken by it.
+ */
+describe("check-drift and a box that was removed", () => {
+  let project: string;
+
+  function git(...args: string[]) {
+    execFileSync("git", args, {
+      cwd: project,
+      stdio: "ignore",
+      env: {
+        ...process.env,
+        GIT_AUTHOR_NAME: "t",
+        GIT_AUTHOR_EMAIL: "t@example.com",
+        GIT_COMMITTER_NAME: "t",
+        GIT_COMMITTER_EMAIL: "t@example.com",
+      },
+    });
+  }
+
+  async function writeBoardWith(ids: string[]) {
+    const made = await createDiagram(emptyBoard(), {
+      name: "arch",
+      nodes: ids.map((id) => ({ id, label: id.toUpperCase(), ref: `src/${id}.ts` })),
+      edges: [],
+    });
+    await writeBoard(path.join(project, "docs/diagrams/arch.excalidraw"), made.board);
+  }
+
+  async function check(...args: string[]) {
+    try {
+      const { stdout, stderr } = await run(TSX, [SCRIPT, ...args], { cwd: project });
+      return { code: 0, stdout, stderr };
+    } catch (error) {
+      const failure = error as { code?: number; stdout?: string; stderr?: string };
+      return { code: failure.code ?? -1, stdout: failure.stdout ?? "", stderr: failure.stderr ?? "" };
+    }
+  }
+
+  beforeEach(async () => {
+    project = mkdtempSync(path.join(tmpdir(), "drift-deleted-"));
+    mkdirSync(path.join(project, "docs/diagrams"), { recursive: true });
+    mkdirSync(path.join(project, "src"), { recursive: true });
+    writeFileSync(path.join(project, "src/layout.ts"), "export const layout = 1;\n");
+    writeFileSync(path.join(project, "src/convert.ts"), "export const convert = 2;\n");
+  });
+
+  afterEach(() => {
+    rmSync(project, { recursive: true, force: true });
+  });
+
+  /** A committed board with both boxes, then the working copy loses one. */
+  async function commitBothThenRemoveLayout() {
+    git("init", "-q");
+    await writeBoardWith(["layout", "convert"]);
+    git("add", "-A");
+    git("commit", "-qm", "board");
+    await writeBoardWith(["convert"]);
+  }
+
+  it("reports the removed box while the deletion is uncommitted", async () => {
+    await commitBothThenRemoveLayout();
+    const result = await check();
+    expect(result.stderr).toContain("LAYOUT");
+    expect(result.stderr).toContain("src/layout.ts");
+    expect(result.stderr).toContain("1 removed");
+    expect(result.code).toBe(1);
+  });
+
+  it("goes quiet once the deletion is committed", async () => {
+    // The mute, and the reason this check needs no switch of its own: committing
+    // the diagram is the act that says the removal was deliberate.
+    await commitBothThenRemoveLayout();
+    expect((await check()).code).toBe(1);
+    git("add", "-A");
+    git("commit", "-qm", "drop the layout box");
+    const after = await check();
+    expect(after.stderr).toBe("");
+    expect(after.code).toBe(0);
+  });
+
+  it("says nothing when the code was removed along with the box", async () => {
+    await commitBothThenRemoveLayout();
+    rmSync(path.join(project, "src/layout.ts"));
+    const result = await check();
+    expect(result.stderr).toBe("");
+    expect(result.code).toBe(0);
+  });
+
+  it("says nothing in a project with no git at all", async () => {
+    // A repository without git is not a broken one. Silence, never an error.
+    await writeBoardWith(["convert"]);
+    const result = await check();
+    expect(result.stderr).toBe("");
+    expect(result.code).toBe(0);
+  });
+
+  it("can be switched off without losing the other checks", async () => {
+    await commitBothThenRemoveLayout();
+    // Also break something the ordinary check owns, to prove only one went quiet.
+    rmSync(path.join(project, "src/convert.ts"));
+    const result = await check("--no-deletions");
+    expect(result.stderr).not.toContain("removed");
+    expect(result.stderr).toContain("CONVERT");
+    expect(result.code).toBe(1);
+  });
+});
