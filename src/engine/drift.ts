@@ -109,9 +109,30 @@ export interface BoardBaseline {
   committed(): BoardFile | undefined;
 }
 
+/**
+ * A code file the diagram's own boxes import, that no box covers.
+ *
+ * The other direction of drift: not "the board claims something false" but "the
+ * board leaves something out". Only ever a suggestion -- whether a module
+ * deserves a box is a judgement about what is worth showing, and a diagram that
+ * drew everything would be a file listing.
+ */
+export interface UnrepresentedFinding {
+  /** Repo-relative path of the file no box covers. */
+  file: string;
+  /** The board's own ref'd files that import it, which is why it is a candidate. */
+  importedBy: string[];
+}
+
 export interface DriftReport {
   clean: boolean;
   findings: DriftFinding[];
+  /**
+   * Files the board's neighbourhood imports but does not show. Empty unless
+   * `coverage` was asked for: it is the one check here that suggests additions,
+   * so it never runs on the per-turn path.
+   */
+  unrepresented: UnrepresentedFinding[];
   /** Boxes removed from the board while their code is still in the tree. */
   deleted: DeletedClaimFinding[];
   /** `planned` claims the code has not reached yet. Never affects `clean`. */
@@ -155,6 +176,9 @@ export interface Workspace {
 const PATH_LIKE = /^[\w@.-]+(?:\/[\w@.-]+)+\.\w{1,10}$/;
 
 const REGEX_SPECIAL = /[.*+?^${}()|[\]\\]/g;
+
+/** Files whose imports this can parse. Everything else is silent, never wrong. */
+const TS_JS = /\.(ts|tsx|js|jsx|mjs|cjs)$/;
 
 /** Splits `path#symbol`. Either half may be empty; the caller decides. */
 export function parseRef(ref: string): { path: string; symbol?: string } {
@@ -423,7 +447,7 @@ function checkEdgeCorroboration(
 export function checkDrift(
   board: BoardFile,
   workspace: Workspace,
-  options?: { edges?: boolean; baseline?: BoardBaseline },
+  options?: { edges?: boolean; baseline?: BoardBaseline; coverage?: boolean },
 ): DriftReport {
   const findings: DriftFinding[] = [];
   const workItems: WorkItem[] = [];
@@ -529,13 +553,13 @@ export function checkDrift(
   let edgesChecked = 0;
   let edgesSkipped = 0;
 
+  const importCache = new Map<string, Array<{ abs: string; rel: string }>>();
+
   if (options?.edges !== false && !concept) {
     const nodeById = new Map<string, typeof graph.nodes[0]>();
     for (const node of graph.nodes) {
       nodeById.set(node.id, node);
     }
-
-    const importCache = new Map<string, Array<{ abs: string; rel: string }>>();
 
     // Build shared importer candidates once per board:
     // every recorded-ref code file + their direct imports (one hop out)
@@ -622,8 +646,7 @@ export function checkDrift(
       }
 
       // Skip if not TS/JS files
-      const tsJsExt = /\.(ts|tsx|js|jsx|mjs|cjs)$/;
-      if (!tsJsExt.test(fromFile) || !tsJsExt.test(toFile)) {
+      if (!TS_JS.test(fromFile) || !TS_JS.test(toFile)) {
         edgesSkipped += 1;
         continue;
       }
@@ -667,12 +690,77 @@ export function checkDrift(
     }
   }
 
+  /*
+   * The other direction: what the code has that the board does not show.
+   *
+   * This was the open `unrepresented` idea for most of the project's life, and it
+   * was stuck on one thing -- without a relevance bar, every file in the repo is
+   * drift. The bar here is inherited rather than invented: a candidate has to be
+   * imported by a file the board already points at, so relevance was decided by
+   * whoever drew the diagram. Cost scales with the diagram, not the repository,
+   * and it never searches the tree.
+   *
+   * A directory ref covers everything beneath it, so one box for `src/engine/`
+   * excuses the whole subsystem instead of nominating all of it.
+   *
+   * Suggestion only, and off unless asked for. Whether a module deserves a box is
+   * a judgement about what is worth showing, and a check that nagged about it
+   * every turn is one that gets switched off -- taking the quiet, correct
+   * missing-file check with it.
+   */
+  const unrepresented: UnrepresentedFinding[] = [];
+  if (options?.coverage && !concept) {
+    const onBoard = new Map<string, string>();  // absolute -> repo-relative
+    const directories: string[] = [];
+    for (const node of graph.nodes) {
+      if (node.state === "external") continue;
+      const ref = node.ref?.trim();
+      if (!ref) continue;
+      const { path: target } = parseRef(ref);
+      const resolved = workspace.resolve(target);
+      if (!resolved) continue;
+      const kind = workspace.stat(resolved);
+      if (kind === "file") onBoard.set(resolved, target);
+      else if (kind === "directory") directories.push(resolved);
+    }
+
+    const covered = (absolute: string) =>
+      onBoard.has(absolute)
+      || directories.some((directory) => absolute.startsWith(directory.replace(/[\\/]?$/, path.sep)));
+
+    const importers = new Map<string, { file: string; by: Set<string> }>();
+    for (const [absolute, relative] of onBoard) {
+      if (!TS_JS.test(absolute)) continue;
+      for (const imported of getImports(absolute, relative, workspace, importCache)) {
+        if (covered(imported.abs)) continue;
+        // Import resolution keeps the specifier as joined, so a sibling directory
+        // arrives as `src/mcp/../engine/config.ts`. Deduping is by absolute path
+        // and so already correct; this is about what a reader is shown.
+        const shown = path.normalize(imported.rel).split(path.sep).join("/");
+        const entry = importers.get(imported.abs) ?? { file: shown, by: new Set<string>() };
+        entry.by.add(relative);
+        importers.set(imported.abs, entry);
+      }
+    }
+
+    // Most-imported first: the module several boxes depend on is the one most
+    // likely to be worth drawing, and the reader should not have to sort.
+    unrepresented.push(
+      ...[...importers.values()]
+        .map((entry) => ({ file: entry.file, importedBy: [...entry.by].sort() }))
+        .sort((a, b) => b.importedBy.length - a.importedBy.length || a.file.localeCompare(b.file)),
+    );
+  }
+
   return {
     // `clean` means "nothing has regressed". Work items and promotions are both
     // deliberately excluded: they drive the CLI's exit code, and neither an
     // unbuilt sketch nor good news should fail a build.
     clean: findings.length === 0 && edges.length === 0 && deleted.length === 0,
     findings,
+    // A suggestion, never part of `clean`: a diagram that omits a module is a
+    // choice about what is worth showing, not a broken claim.
+    unrepresented,
     deleted,
     workItems,
     promotions,
