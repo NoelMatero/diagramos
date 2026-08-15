@@ -781,6 +781,9 @@ describe("an arrow is trusted for its bindings, not its author", () => {
       expect(report.edgesChecked).toBe(0);
       expect(report.edgesSkipped).toBe(1);
       expect(report.edges).toHaveLength(0);
+      // And it says so. On the canvas this arrow is indistinguishable from a
+      // bound one, so a bare count leaves the reader with no way to find out.
+      expect(report.edgesSkippedWhy).toEqual({ "ends-not-bound": 1 });
     }
   });
 
@@ -1162,5 +1165,112 @@ describe("code the diagram leaves out", () => {
 
     const external = await boardOf([{ id: "a", label: "A", ref: "src/a.ts", state: "external" }]);
     expect(checkDrift(external, fakeWorkspace(tree), { coverage: true }).unrepresented).toEqual([]);
+  });
+});
+
+/**
+ * Why something was not checked.
+ *
+ * "5 arrows skipped" is not usable by anyone: it cannot be told apart from "there
+ * was nothing here I could read", and it never says which of seven reasons
+ * applied. These pin the reason, not the count.
+ */
+describe("saying what was not looked at", () => {
+  async function boardOf(
+    nodes: Array<{ id: string; label: string; ref?: string; state?: "planned" | "built" | "external" }>,
+    edges: Array<{ from: string; to: string }> = [],
+  ) {
+    return (await createDiagram(emptyBoard(), { name: "arch", nodes, edges })).board;
+  }
+
+  it("separates a box with no ref from one whose ref leaves the repo", async () => {
+    const board = await boardOf([
+      { id: "plain", label: "Auth" },
+      { id: "outside", label: "../outside/thing.ts" },
+    ]);
+    const report = checkDrift(board, fakeWorkspace({}));
+    expect(report.skipped).toBe(2);
+    expect(report.skippedWhy).toEqual({ "no-ref": 1, "ref-outside-repo": 1 });
+  });
+
+  it("names the reason an arrow was skipped, for each distinct reason", async () => {
+    const cases: Array<[string, () => Promise<BoardFile>, Record<string, string | "dir">, string]> = [
+      [
+        "an end with no ref",
+        () => boardOf([{ id: "a", label: "A", ref: "src/a.ts" }, { id: "b", label: "B" }], [{ from: "a", to: "b" }]),
+        { "src/a.ts": "x" },
+        "endpoint-has-no-ref",
+      ],
+      [
+        "an end marked external",
+        () => boardOf(
+          [{ id: "a", label: "A", ref: "src/a.ts" }, { id: "b", label: "B", ref: "src/b.ts", state: "external" }],
+          [{ from: "a", to: "b" }],
+        ),
+        { "src/a.ts": "x", "src/b.ts": "y" },
+        "endpoint-external",
+      ],
+      [
+        "an end whose file is gone",
+        () => boardOf(
+          [{ id: "a", label: "A", ref: "src/a.ts" }, { id: "b", label: "B", ref: "src/b.ts" }],
+          [{ from: "a", to: "b" }],
+        ),
+        { "src/a.ts": "x" },
+        "endpoint-file-missing",
+      ],
+      [
+        "an end refing a directory",
+        () => boardOf(
+          [{ id: "a", label: "A", ref: "src/a.ts" }, { id: "b", label: "B", ref: "src/lib" }],
+          [{ from: "a", to: "b" }],
+        ),
+        { "src/a.ts": "x", "src/lib": "dir" },
+        "directory-ref",
+      ],
+      [
+        "an end in another language",
+        () => boardOf(
+          [{ id: "a", label: "A", ref: "src/a.ts" }, { id: "b", label: "B", ref: "src/b.py" }],
+          [{ from: "a", to: "b" }],
+        ),
+        { "src/a.ts": "x", "src/b.py": "y" },
+        "not-ts-or-js",
+      ],
+    ];
+
+    for (const [name, make, files, reason] of cases) {
+      const report = checkDrift(await make(), fakeWorkspace(files));
+      expect(report.edgesSkipped, name).toBe(1);
+      expect(report.edgesSkippedWhy, name).toEqual({ [reason]: 1 });
+    }
+  });
+
+  it("counts the same reason more than once rather than collapsing it", async () => {
+    const board = await boardOf(
+      [
+        { id: "a", label: "A", ref: "src/a.ts" },
+        { id: "b", label: "B" },
+        { id: "c", label: "C" },
+      ],
+      [{ from: "a", to: "b" }, { from: "a", to: "c" }],
+    );
+    const report = checkDrift(board, fakeWorkspace({ "src/a.ts": "x" }));
+    expect(report.edgesSkippedWhy).toEqual({ "endpoint-has-no-ref": 2 });
+  });
+
+  it("leaves the breakdown empty when everything was checked", async () => {
+    const board = await boardOf(
+      [{ id: "a", label: "A", ref: "src/a.ts" }, { id: "b", label: "B", ref: "src/b.ts" }],
+      [{ from: "a", to: "b" }],
+    );
+    const report = checkDrift(board, fakeWorkspace({
+      "src/a.ts": "import { b } from './b';\nexport const a = b;",
+      "src/b.ts": "export const b = 1;",
+    }));
+    expect(report.skippedWhy).toEqual({});
+    expect(report.edgesSkippedWhy).toEqual({});
+    expect(report.checked).toBe(2);
+    expect(report.edgesChecked).toBe(1);
   });
 });

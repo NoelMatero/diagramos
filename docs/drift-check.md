@@ -196,6 +196,53 @@ be a guess dressed as a rule. Ranking puts the module four boxes depend on first
 and lets the reader stop whenever they like. If a real diagram drowns in these,
 that is the measurement that earns a threshold.
 
+## Silence had two meanings
+
+The check is quiet when nothing is wrong, which is what keeps it switched on. But
+it was equally quiet when there was nothing it could read, and the output was
+identical. So a clean report was not evidence of anything: you could not tell a
+verified diagram from an unreadable one.
+
+Measured on this repo, which had been reporting clean every turn for months:
+
+| | |
+| --- | --- |
+| boxes checked | **12 of 117** |
+| arrows checked | **12 of 153** |
+| boards with anything checkable | **1 of 7** |
+
+Every check now records *why* something went unread, not just how many. Two
+reasons for a box (`no-ref`, `ref-outside-repo`) and eight for an arrow — the one
+that matters most being `ends-not-bound`, because an arrow that was never snapped
+to its boxes looks exactly like one that was.
+
+Three things stay separate, because they are not the same claim:
+
+- **skipped** — there was something here and it could not be read.
+- **excused** — declared as not about this repo (`external`, or a concept board).
+- **hand-drawn** — a sketch, never a claim about code.
+
+`--details` prints this even when everything is clean, since a question deserves
+an answer:
+
+```
+┌─ ims.excalidraw  0 refs · 0 arrows checked ───────────────────┐
+│ 19 boxes skipped: 19 no ref                                   │
+│ 25 arrows skipped: 25 an end has no ref                       │
+└─ silence means these agreed · not that everything was read ───┘
+```
+
+**The per-turn notice does not change.** It stays quiet, because a notice that
+reported coverage every turn is one that gets switched off — and that would take
+the quiet, correct missing-file check with it. The audit is a question you ask.
+
+`check_drift` returns `skippedWhy` and `edgesSkippedWhy` alongside the counts, so
+a model deciding whether a diagram is trustworthy has the same information.
+
+Most of the 105 unread boxes are the telecom boards, which describe a protocol
+rather than this repository. Marking them `describes: "concept"` turns them from
+*skipped* into *excused*, which is the honest resolution — see #32.
+
 ## Two jobs, deliberately separate
 
 | | Cost | Needs a model | When to run |

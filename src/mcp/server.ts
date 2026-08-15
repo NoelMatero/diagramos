@@ -422,7 +422,8 @@ server.registerTool(
       + "worth a look, not wrong. Read-only, and cheap "
       + "enough to run whenever module structure changes. Nodes without a ref are skipped, "
       + "hand-drawn ones ignored, and edges touching refless nodes are skipped, so a clean report means "
-      + "nothing checkable disagreed -- not that the diagram is correct.",
+      + "nothing checkable disagreed -- not that the diagram is correct. skippedWhy and edgesSkippedWhy "
+      + "say what went unread, which is how you tell a verified diagram from an unreadable one.",
     inputSchema: {
       path: z
         .string()
@@ -477,6 +478,15 @@ server.registerTool(
         edgesChecked: 0,
         edgesSkipped: 0,
       };
+      // Why, not just how many: a caller cannot act on "5 skipped", and cannot
+      // tell it apart from "nothing here was readable".
+      const skippedWhy: Record<string, number> = {};
+      const edgesSkippedWhy: Record<string, number> = {};
+      const tally = (into: Record<string, number>, from: Record<string, number | undefined>) => {
+        for (const [reason, count] of Object.entries(from)) {
+          if (count) into[reason] = (into[reason] ?? 0) + count;
+        }
+      };
       const findings: Array<Record<string, unknown>> = [];
       const deleted: Array<Record<string, unknown>> = [];
       const unrepresented: Array<Record<string, unknown>> = [];
@@ -495,6 +505,8 @@ server.registerTool(
         totals.handDrawn += report.handDrawn;
         totals.edgesChecked += report.edgesChecked;
         totals.edgesSkipped += report.edgesSkipped;
+        tally(skippedWhy, report.skippedWhy);
+        tally(edgesSkippedWhy, report.edgesSkippedWhy);
         if (report.concept) conceptBoards.push(relativeToWorkspace(file));
         // Named per finding rather than grouped: a caller acting on one needs to
         // know which file to redraw, and flat is cheaper than nesting.
@@ -534,6 +546,8 @@ server.registerTool(
         // What the code has that the diagram does not show. Suggestions about
         // what might be worth drawing, so deliberately outside clean.
         ...(unrepresented.length ? { unrepresented } : {}),
+        ...(Object.keys(skippedWhy).length ? { skippedWhy } : {}),
+        ...(Object.keys(edgesSkippedWhy).length ? { edgesSkippedWhy } : {}),
         ...totals,
         // "clean: true, checked: 0" reads as a pass when nothing was examined,
         // so say which it was -- and distinguish "nobody annotated these" from
