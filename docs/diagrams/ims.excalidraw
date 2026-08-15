@@ -33,7 +33,8 @@
       "customData": {
         "origin": "diagram",
         "diagram": "ims",
-        "role": "title"
+        "role": "title",
+        "describes": "concept"
       },
       "text": "IMS / VoLTE — Registration and Voice Call Setup",
       "fontSize": 24,

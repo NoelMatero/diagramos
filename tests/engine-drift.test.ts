@@ -45,6 +45,20 @@ function fakeWorkspace(files: Record<string, string | "dir">): Workspace {
       if (!normalized) return "";
       return String(files[normalized]);
     },
+    // One level, matching the real workspace: entries directly inside, never a
+    // walk. Derived from the flat map by taking the next path segment.
+    list: (target) => {
+      const normalized = normalize(target);
+      if (!normalized) return [];
+      const prefix = `${normalized.replace(/\/$/, "")}/`;
+      const entries = new Set<string>();
+      for (const key of Object.keys(files)) {
+        if (!key.startsWith(prefix)) continue;
+        const rest = key.slice(prefix.length);
+        if (rest) entries.add(rest.split("/")[0]!);
+      }
+      return [...entries];
+    },
   };
 }
 
@@ -173,16 +187,30 @@ describe("checking a board against the code", () => {
     expect(report.findings[0]).toMatchObject({ kind: "missing-symbol" });
   });
 
-  it("treats a directory ref as satisfied by the directory existing", async () => {
+  it("treats a directory ref as satisfied by the directory having something in it", async () => {
     const board = await boardWith([{ id: "eng", label: "Engine", ref: "src/engine" }]);
-    expect(checkDrift(board, fakeWorkspace({ "src/engine": "dir" })).clean).toBe(true);
+    const files = { "src/engine": "dir" as const, "src/engine/layout.ts": "export const x = 1;" };
+    expect(checkDrift(board, fakeWorkspace(files)).clean).toBe(true);
   });
 
-  it("reports a symbol asked for inside a directory rather than reading it", async () => {
-    const board = await boardWith([{ id: "eng", label: "Engine", ref: "src/engine#foo" }]);
-    const report = checkDrift(board, fakeWorkspace({ "src/engine": "dir" }));
-    expect(report.findings[0]).toMatchObject({ kind: "unresolvable-ref" });
-    expect(report.findings[0].detail).toContain("directory");
+  it("finds a symbol somewhere inside a directory", async () => {
+    // This used to be unresolvable-ref -- "a directory cannot contain a symbol".
+    // It is a reasonable thing to mean, and one listing answers it.
+    const board = await boardWith([{ id: "eng", label: "Engine", ref: "src/engine#planLayout" }]);
+    const files = {
+      "src/engine": "dir" as const,
+      "src/engine/layout.ts": "export function planLayout() {}",
+      "src/engine/other.ts": "export const other = 1;",
+    };
+    expect(checkDrift(board, fakeWorkspace(files)).clean).toBe(true);
+  });
+
+  it("reports a symbol that is in no file directly inside the directory", async () => {
+    const board = await boardWith([{ id: "eng", label: "Engine", ref: "src/engine#gone" }]);
+    const files = { "src/engine": "dir" as const, "src/engine/layout.ts": "export const x = 1;" };
+    const report = checkDrift(board, fakeWorkspace(files));
+    expect(report.findings[0]).toMatchObject({ kind: "missing-symbol" });
+    expect(report.findings[0].detail).toContain("directly in");
   });
 
   it("refuses a recorded ref that leaves the repository, but ignores an inferred one", async () => {
@@ -1272,5 +1300,121 @@ describe("saying what was not looked at", () => {
     expect(report.edgesSkippedWhy).toEqual({});
     expect(report.checked).toBe(2);
     expect(report.edgesChecked).toBe(1);
+  });
+});
+
+/**
+ * What a box is allowed to say.
+ *
+ * The measurement that motivated this: `#symbol` had never been used once in 117
+ * nodes. The check was strongest at the claim people least wanted to make — this
+ * file exists — and had no way to express the ones they actually draw.
+ */
+describe("anchor forms", () => {
+  const engine = {
+    "src/engine": "dir" as const,
+    "src/engine/layout.ts": "export function planLayout() {}",
+    "src/engine/convert.ts": "export const convert = 1;",
+    "src/engine/notes.md": "# notes",
+  };
+
+  async function boardOf(nodes: Array<{ id: string; label: string; ref?: string; refs?: string[] }>) {
+    return (await createDiagram(emptyBoard(), { name: "arch", nodes, edges: [] })).board;
+  }
+
+  it("accepts a trailing slash as saying 'directory', whatever is on disk", async () => {
+    const board = await boardOf([{ id: "e", label: "Engine", ref: "src/engine/" }]);
+    expect(checkDrift(board, fakeWorkspace(engine)).clean).toBe(true);
+  });
+
+  it("reports a trailing slash on something that is a file", async () => {
+    // The point of allowing the slash is that it is a claim, so it can be wrong.
+    const board = await boardOf([{ id: "e", label: "Layout", ref: "src/engine/layout.ts/" }]);
+    const report = checkDrift(board, fakeWorkspace(engine));
+    expect(report.findings[0]).toMatchObject({ kind: "unresolvable-ref" });
+    expect(report.findings[0].detail).toContain("is a file, not a directory");
+  });
+
+  it("reports an empty directory rather than calling it satisfied", async () => {
+    const board = await boardOf([{ id: "e", label: "Engine", ref: "src/empty/" }]);
+    const report = checkDrift(board, fakeWorkspace({ "src/empty": "dir" }));
+    expect(report.findings[0]).toMatchObject({ kind: "empty-ref" });
+    expect(report.clean).toBe(false);
+  });
+
+  it("matches a glob over one directory", async () => {
+    const board = await boardOf([{ id: "e", label: "Engine", ref: "src/engine/*.ts" }]);
+    expect(checkDrift(board, fakeWorkspace(engine)).clean).toBe(true);
+  });
+
+  it("reports a glob that matches nothing", async () => {
+    const board = await boardOf([{ id: "e", label: "Rust", ref: "src/engine/*.rs" }]);
+    const report = checkDrift(board, fakeWorkspace(engine));
+    expect(report.findings[0]).toMatchObject({ kind: "empty-ref" });
+    expect(report.findings[0].detail).toContain("matches no files");
+  });
+
+  it("refuses a star outside the last segment, and refuses **", async () => {
+    // This is the security boundary, not a parser limitation: the directory
+    // prefix stays literal, so a ref lists one directory and never searches.
+    for (const ref of ["src/*/layout.ts", "src/**/*.ts", "**/*.ts"]) {
+      const board = await boardOf([{ id: "e", label: "Wide", ref }]);
+      const report = checkDrift(board, fakeWorkspace(engine));
+      expect(report.findings[0], ref).toMatchObject({ kind: "unresolvable-ref" });
+      expect(report.findings[0].detail, ref).toContain("never searched");
+    }
+  });
+
+  it("finds a symbol across the files a glob matched", async () => {
+    const board = await boardOf([{ id: "e", label: "Engine", ref: "src/engine/*.ts#planLayout" }]);
+    expect(checkDrift(board, fakeWorkspace(engine)).clean).toBe(true);
+  });
+
+  it("does not read a directory bigger than the cap, and says nothing about it", async () => {
+    // A box standing for a thousand files is not making a checkable claim, and
+    // reading them every turn is not a per-turn budget. Skipped, never guessed.
+    const many: Record<string, string | "dir"> = { "src/big": "dir" };
+    for (let i = 0; i < 60; i += 1) many[`src/big/file${i}.ts`] = "export const x = 1;";
+    const board = await boardOf([{ id: "b", label: "Big", ref: "src/big/#nothingHere" }]);
+    const report = checkDrift(board, fakeWorkspace(many));
+    expect(report.findings).toEqual([]);
+    expect(report.skipped).toBe(1);
+  });
+
+  it("checks every anchor a box lists, and names the one that broke", async () => {
+    const board = await boardOf([
+      { id: "log", label: "Logging", ref: "src/engine/layout.ts", refs: ["src/engine/convert.ts", "src/engine/gone.ts"] },
+    ]);
+    const report = checkDrift(board, fakeWorkspace(engine));
+    expect(report.findings).toHaveLength(1);
+    expect(report.findings[0]).toMatchObject({ ref: "src/engine/gone.ts", kind: "missing-file" });
+    // One box is one thing on the diagram, however many anchors it carries.
+    expect(report.checked).toBe(1);
+  });
+
+  it("is clean only when every anchor holds", async () => {
+    const board = await boardOf([
+      { id: "log", label: "Logging", ref: "src/engine/layout.ts", refs: ["src/engine/convert.ts"] },
+    ]);
+    expect(checkDrift(board, fakeWorkspace(engine)).clean).toBe(true);
+  });
+
+  it("survives the round trip through customData", async () => {
+    const board = await boardOf([
+      { id: "log", label: "Logging", ref: "src/a.ts", refs: ["src/b.ts", "src/c.ts"] },
+    ]);
+    expect(readGraph(board).nodes[0]).toMatchObject({
+      ref: "src/a.ts",
+      refs: ["src/b.ts", "src/c.ts"],
+    });
+  });
+
+  it("does not suggest a file that a secondary anchor already covers", async () => {
+    const files = {
+      "src/a.ts": "import { b } from './b';\nexport const a = b;",
+      "src/b.ts": "export const b = 1;",
+    };
+    const board = await boardOf([{ id: "a", label: "A", ref: "src/a.ts", refs: ["src/b.ts"] }]);
+    expect(checkDrift(board, fakeWorkspace(files), { coverage: true }).unrepresented).toEqual([]);
   });
 });

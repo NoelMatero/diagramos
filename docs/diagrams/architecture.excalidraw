@@ -32,7 +32,8 @@
       "locked": false,
       "customData": {
         "origin": "diagram",
-        "role": "title"
+        "role": "title",
+        "describes": "concept"
       },
       "text": "IMS over 5G — VoNR voice and SMS over IMS",
       "fontSize": 24,

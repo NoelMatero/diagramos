@@ -32,7 +32,8 @@
       "locked": false,
       "customData": {
         "origin": "diagram",
-        "role": "title"
+        "role": "title",
+        "describes": "concept"
       },
       "text": "Wiley / board-ai architecture",
       "fontSize": 24,

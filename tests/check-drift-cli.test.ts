@@ -1104,3 +1104,92 @@ describe("check-drift saying what it did not look at", () => {
     expect(asked.stderr).toContain("an end has no ref");
   });
 });
+
+/**
+ * Anchor forms and the concept migration, end to end.
+ *
+ * The engine covers each form. What is covered here is the pair of things a
+ * person actually sees: that a wide glob is refused rather than quietly
+ * searching, and that marking a board concept changes "nobody annotated this"
+ * into "this was never about your code".
+ */
+describe("check-drift and what a box is allowed to say", () => {
+  let project: string;
+
+  async function put(name: string, params: Parameters<typeof createDiagram>[1]) {
+    const made = await createDiagram(emptyBoard(), params);
+    await writeBoard(path.join(project, `docs/diagrams/${name}.excalidraw`), made.board);
+  }
+
+  async function check(...args: string[]) {
+    try {
+      const { stdout, stderr } = await run(TSX, [SCRIPT, ...args], { cwd: project });
+      return { code: 0, stdout, stderr };
+    } catch (error) {
+      const failure = error as { code?: number; stdout?: string; stderr?: string };
+      return { code: failure.code ?? -1, stdout: failure.stdout ?? "", stderr: failure.stderr ?? "" };
+    }
+  }
+
+  beforeEach(() => {
+    project = mkdtempSync(path.join(tmpdir(), "drift-anchors-"));
+    mkdirSync(path.join(project, "docs/diagrams"), { recursive: true });
+    mkdirSync(path.join(project, "src/engine"), { recursive: true });
+    writeFileSync(path.join(project, "src/engine/layout.ts"), "export const layout = 1;\n");
+  });
+
+  afterEach(() => rmSync(project, { recursive: true, force: true }));
+
+  it("accepts a directory and a glob over one directory", async () => {
+    await put("ok", {
+      name: "arch",
+      nodes: [
+        { id: "d", label: "Engine", ref: "src/engine/" },
+        { id: "g", label: "Engine files", ref: "src/engine/*.ts" },
+      ],
+      edges: [],
+    });
+    const result = await check();
+    expect(result.stderr).toBe("");
+    expect(result.code).toBe(0);
+  });
+
+  it("refuses a glob that would search the tree, and says why", async () => {
+    await put("wide", {
+      name: "arch",
+      nodes: [{ id: "w", label: "Everything", ref: "src/**/*.ts" }],
+      edges: [],
+    });
+    const result = await check();
+    expect(result.code).toBe(1);
+    // The notice names the box and the ref, never the reason — that is a
+    // deliberate old decision, since a sentence repeated every turn is noise.
+    // The reason rides on the finding, for check_drift's callers.
+    expect(result.stderr).toContain("Everything");
+    expect(result.stderr).toContain("src/**/*.ts");
+  });
+
+  it("reports a glob that matches nothing", async () => {
+    await put("rust", {
+      name: "arch",
+      nodes: [{ id: "r", label: "Rust bits", ref: "src/engine/*.rs" }],
+      edges: [],
+    });
+    expect((await check()).code).toBe(1);
+  });
+
+  it("turns unannotated boxes into excused ones when the board says concept", async () => {
+    await put("proto", {
+      name: "arch",
+      title: "A protocol",
+      describes: "concept",
+      nodes: [{ id: "a", label: "S-CSCF" }, { id: "b", label: "P-CSCF" }],
+      edges: [{ from: "a", to: "b" }],
+    });
+    const details = await check("--details");
+    // The distinction the migration exists to make: not a gap to fill.
+    expect(details.stderr).toContain("concept board");
+    expect(details.stderr).toContain("outside this repo by declaration");
+    expect(details.stderr).not.toContain("boxes skipped");
+  });
+});

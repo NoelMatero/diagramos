@@ -181,16 +181,22 @@ remain, in order of leverage:
 
 ## Order of work, if this ships
 
-1. Board-level `describes` field + the coverage line in the on-demand command.
-   Zero new loud findings; 89 boxes stop being ambiguous.
-2. Directory/glob/dir-symbol forms (`empty-ref` finding) and the trailing-slash
-   convention. Small, language-agnostic, fixes the known arrow-check hole where
-   a directory ref silently disables edges.
+1. ~~Board-level `describes` field + the coverage line in the on-demand command.~~
+   **Shipped.** The field landed with the intent axis; the coverage line landed
+   with the skip audit. The migration marked five boards, and 100 of the 105
+   unexplained boxes became excused — the estimate here said 89, and was low
+   because it picked boards by filename: `auth.excalidraw` is titled "Wiley /
+   board-ai architecture" and `architecture.excalidraw` is the IMS diagram.
+2. ~~Directory/glob/dir-symbol forms (`empty-ref` finding) and the trailing-slash
+   convention.~~ **Shipped**, together with `refs: string[]`. Directory anchors
+   still disable the arrows around them, which is now visible in the skip
+   breakdown rather than silent.
 3. The symbol declaration tier (on-demand `undeclared-symbol`) and route
-   anchors.
+   anchors. **Next.**
 4. The annotate mode on `/update-diagram`, measured on
    `architecture.excalidraw` first: proposals reviewed by a human, precision
-   recorded here.
+   recorded here. `example.excalidraw` is the other case waiting on this: it is
+   mixed, so no board-level flag can resolve it.
 
 Each step behind the existing flag discipline: anything new that can speak
 per-turn gets its own switch, so a noisy newcomer can be shot without losing
