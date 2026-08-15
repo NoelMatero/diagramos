@@ -9,7 +9,7 @@ import { convertSkeletons } from "./convert";
 import { installNodeFontMeasurer } from "./font";
 import { emptyBoard, type BoardFile } from "./board-file";
 import type { ExcalidrawElement } from "./normalize";
-import { NODE_SHAPES } from "./graph";
+import { NODE_SHAPES, type BoardDescribes } from "./graph";
 import {
   planBounds,
   planDiagramLayout,
@@ -24,6 +24,12 @@ const STACK_GAP = 160;
 
 export interface CreateDiagramParams {
   title?: string;
+  /**
+   * What the board is about. `concept` excuses every box from drift checking --
+   * a protocol or another project makes no claims about this tree. Recorded on
+   * the title element, so a concept board needs a title.
+   */
+  describes?: BoardDescribes;
   nodes: GraphNode[];
   edges: GraphEdge[];
   layout?: DiagramLayoutOptions;
@@ -305,15 +311,39 @@ export async function createDiagram(
   const refByNode = new Map(
     params.nodes.filter((node) => node.ref?.trim()).map((node) => [node.id, node.ref!.trim()]),
   );
+  // `built` is the default everywhere, so it is never written. That keeps a
+  // board that says nothing about state byte-identical to one written before
+  // the field existed, which is what makes this change invisible to every
+  // existing diagram.
+  const stateByNode = new Map(
+    params.nodes
+      .filter((node) => node.state && node.state !== "built")
+      .map((node) => [node.id, node.state!]),
+  );
   for (const [nodeId, elementId] of plan.elementIdByNode) {
     const ref = refByNode.get(nodeId);
-    customData.set(elementId, ref ? { node: nodeId, ref } : { node: nodeId });
+    const state = stateByNode.get(nodeId);
+    customData.set(elementId, {
+      node: nodeId,
+      ...(ref ? { ref } : {}),
+      ...(state ? { state } : {}),
+    });
   }
   (params.edges ?? []).forEach((edge, index) => {
-    customData.set(`${prefix}-edge-${index}`, { edge: { from: edge.from, to: edge.to } });
+    customData.set(`${prefix}-edge-${index}`, {
+      edge: { from: edge.from, to: edge.to },
+      ...(edge.state && edge.state !== "built" ? { state: edge.state } : {}),
+    });
     customData.set(`${prefix}-edgelabel-${index}`, { edgeLabelFor: `${prefix}-edge-${index}` });
   });
-  if (params.title?.trim()) customData.set(`${prefix}-title`, { role: "title" });
+  if (params.title?.trim()) {
+    customData.set(`${prefix}-title`, {
+      role: "title",
+      // Only `concept` is recorded: `repo` is the default reading, and writing
+      // it would churn every existing board for no change in meaning.
+      ...(params.describes === "concept" ? { describes: "concept" } : {}),
+    });
+  }
 
   const created = await convertSkeletons(plan.skeletons as Record<string, unknown>[], {
     customData,

@@ -51,6 +51,61 @@ check trusts them and skips only `nearest`. Keying that decision on `provenance`
 instead meant "Claude didn't draw it", which silently skipped the diagram-driven
 case: a connection you sketched between two components that already exist.
 
+## What the diagram says about time
+
+A ref that does not resolve means one of two opposite things, and the filesystem
+cannot tell them apart: either the code has not caught up yet, or the code moved
+out from under the diagram. Nothing could distinguish them, so everything was
+reported as the second one — which is why a diagram could not be used as a spec.
+
+A node (and an edge) can now declare `state`:
+
+| state | meaning |
+| --- | --- |
+| `built` | it exists now. The default, so every board drawn before this field means exactly what it meant |
+| `planned` | it is meant to exist |
+| `external` | deliberately not code in this repo — a browser, a third-party service, another project |
+
+Crossed with what the filesystem observes, every combination has one honest
+reading:
+
+| declared | observed | report |
+| --- | --- | --- |
+| `planned` | missing | **work item** — go build it |
+| `planned` | exists | **promotion** — the code caught up, the board can be advanced |
+| `built` | missing | **regression** — real drift |
+| `built` | exists | nothing |
+
+The third row is the only one that fails a build. Work items and promotions are
+kept out of `clean` and out of the exit code on purpose: CI reads that code, and
+a repository is not broken because somebody sketched next week's work.
+
+**`missing` is deliberately not a state.** State is declared by whoever draws the
+box; existence is observed, free, every run. Recording "missing" would put a fact
+with a shelf life into a committed file, which is the rot this check exists to
+catch. Never store what you can measure.
+
+**A promotion opens the notice; a work item does not.** Both come from a `planned`
+box, and the difference is which side is behind. A work item is the sketch being
+ahead on purpose — it would sit unchanged for a whole design session, and a notice
+repeating it every turn is one nobody reads. A promotion means the board is now
+wrong: it says planned, the code says built. That is drift in the mild direction,
+and it is one edit from going away. Work items still show up in the tally
+(`1 gone  1 planned`), so they are discoverable, and `--details` lists them in
+full — being quiet is not the same as withholding.
+
+`external` earns its place separately. Measured: 106 of 117 nodes in this repo's
+diagrams carry no ref, and some of that is deliberate — the telecom boards
+describe a protocol, not this repository. Without a way to say so, "not code" and
+"somebody forgot" are the same output.
+
+That distinction is mostly a property of a whole board rather than a box, so a
+board can also carry `describes: "concept"`, recorded on its **title element**.
+Not `appState`: the viewer pushes `appState: {}` on every browser edit, so
+anything kept there is destroyed the first time someone touches the canvas.
+Element `customData` is the only store that survives, which is why a concept
+board needs a title.
+
 ## Two jobs, deliberately separate
 
 | | Cost | Needs a model | When to run |

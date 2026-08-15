@@ -11,6 +11,7 @@
 // which is why the built server was the only place this broke.
 import ELK from "elkjs/lib/elk.bundled.js";
 import { readableInk } from "./contrast";
+import type { NodeState } from "./graph";
 import type { ElkExtendedEdge, ElkNode } from "elkjs/lib/elk-api";
 
 type JsonObject = Record<string, unknown>;
@@ -30,8 +31,20 @@ export type GraphNode = {
    * through to customData; layout ignores it.
    */
   ref?: string;
+  /**
+   * Whether the node claims to exist yet: `built` (default), `planned`, or
+   * `external`. Carried through to customData; layout ignores it.
+   */
+  state?: NodeState;
 };
-export type GraphEdge = { from: string; to: string; label?: string; strokeColor?: string };
+export type GraphEdge = {
+  from: string;
+  to: string;
+  label?: string;
+  strokeColor?: string;
+  /** Same axis as a node's. A `planned` edge is a connection to be built. */
+  state?: NodeState;
+};
 export type DiagramLayoutOptions = {
   direction?: "RIGHT" | "DOWN";
   nodeSpacing?: number;

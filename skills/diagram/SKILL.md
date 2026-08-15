@@ -62,14 +62,29 @@ When a node is a real file or module in this repo, set `ref` on it:
 `ref: "src/engine/layout.ts"`, or `path#symbol` for a single function. That is
 what lets `check_drift` say later that a diagram has gone stale.
 
-Only for things that exist in the repository. A diagram of a protocol, a vendor
-system, or anything you are sketching out has nothing to point at, and inventing
-a path there is worse than leaving it off.
+Only for things that exist in the repository. Inventing a path is worse than
+leaving it off — but say *why* it is off, because a missing ref otherwise reads
+as an oversight:
+
+- **A box for something you are about to build**: keep the ref and set
+  `state: "planned"`. `check_drift` then reports it as work to do rather than as
+  drift, and tells you once the code catches up so you can flip it to `built`.
+- **A box that is not code in this repo** — a browser, a vendor API, another
+  project: `state: "external"`. Never checked, and distinct from a forgotten ref.
+- **A whole board that is not about this codebase** — a protocol, a standard,
+  someone else's system: pass `describes: "concept"` to `create_diagram`. That
+  excuses every box at once, and it needs a title, since that is where it is
+  recorded.
+
+Same field on an edge. A connection you intend but have not wired yet is
+`state: "planned"`, which is the honest way to draw the arrow before the import
+exists.
 
 Run `check_drift` after changing module structure, and regenerate the diagram it
 complains about — `/update-diagram` does exactly that if the user asks for it by name.
 A clean report with `checked: 0` means no node had a ref, not that the diagram is
-right.
+right. `clean` covers regressions only: `workItems` and `promotions` sit beside it
+because neither is a broken diagram.
 
 When a box has drifted, work out whether its code *moved* or *went*: repoint the
 first, remove the second. Deleting a box because a path changed loses a real part

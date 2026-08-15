@@ -792,3 +792,154 @@ describe("an arrow is trusted for its bindings, not its author", () => {
     expect(graph.edges[0]).toMatchObject({ provenance: "inferred", endpoints: "bound" });
   });
 });
+
+describe("state: what the diagram claims about time", () => {
+  /** A board whose nodes carry a state, built through the real pipeline. */
+  async function stateBoard(
+    nodes: Array<{ id: string; label: string; ref?: string; state?: "planned" | "built" | "external" }>,
+    options?: { title?: string; describes?: "repo" | "concept"; edges?: Array<{ from: string; to: string; state?: "planned" | "built" | "external" }> },
+  ): Promise<BoardFile> {
+    const result = await createDiagram(emptyBoard(), {
+      name: "arch",
+      nodes,
+      edges: options?.edges ?? [],
+      ...(options?.title ? { title: options.title } : {}),
+      ...(options?.describes ? { describes: options.describes } : {}),
+    });
+    return result.board;
+  }
+
+  it("defaults to built, so every board drawn before this field means what it meant", async () => {
+    const board = await stateBoard([{ id: "a", label: "A", ref: "src/a.ts" }]);
+    expect(readGraph(board).nodes[0]!.state).toBe("built");
+    // And the default is not written, so a board that says nothing about state
+    // stays byte-identical to one written before the field existed.
+    const shape = board.elements.find((e) => (e.customData as { node?: string })?.node === "a");
+    expect(shape!.customData).toMatchObject({ node: "a", ref: "src/a.ts" });
+    expect(shape!.customData).not.toHaveProperty("state");
+  });
+
+  it("falls back to built on a value it does not recognise", async () => {
+    // A board is user data and can say anything; it must not throw.
+    const board = await stateBoard([{ id: "a", label: "A", ref: "src/a.ts" }]);
+    const shape = board.elements.find((e) => (e.customData as { node?: string })?.node === "a")!;
+    shape.customData = { node: "a", ref: "src/a.ts", state: "wishful" };
+    expect(readGraph(board).nodes[0]!.state).toBe("built");
+  });
+
+  it("reports a planned node whose file is absent as work, not as drift", async () => {
+    const board = await stateBoard([{ id: "a", label: "Auth service", ref: "src/auth.ts", state: "planned" }]);
+    const report = checkDrift(board, fakeWorkspace({}));
+    // The distinction that makes a diagram usable as a spec.
+    expect(report.findings).toHaveLength(0);
+    expect(report.workItems).toHaveLength(1);
+    expect(report.workItems[0]).toMatchObject({ node: "a", ref: "src/auth.ts", kind: "missing-file" });
+    // A build must not fail because somebody sketched next week's work.
+    expect(report.clean).toBe(true);
+  });
+
+  it("reports a planned node whose file arrived as a promotion", async () => {
+    const board = await stateBoard([{ id: "a", label: "Auth service", ref: "src/auth.ts", state: "planned" }]);
+    const report = checkDrift(board, fakeWorkspace({ "src/auth.ts": "export const x = 1;" }));
+    expect(report.promotions).toHaveLength(1);
+    expect(report.promotions[0]).toMatchObject({ node: "a", ref: "src/auth.ts" });
+    expect(report.findings).toHaveLength(0);
+    expect(report.clean).toBe(true);
+  });
+
+  it("still calls a built node's missing file a regression", async () => {
+    // The same detection as the work item above; only the declared state differs.
+    const board = await stateBoard([{ id: "a", label: "Auth service", ref: "src/auth.ts" }]);
+    const report = checkDrift(board, fakeWorkspace({}));
+    expect(report.findings).toHaveLength(1);
+    expect(report.workItems).toHaveLength(0);
+    expect(report.clean).toBe(false);
+  });
+
+  it("keeps a malformed ref loud even when the node is planned", async () => {
+    // Escaping the root is not a thing waiting to be built: writing the code
+    // would never make it resolve.
+    const board = await stateBoard([{ id: "a", label: "A", ref: "../outside.ts", state: "planned" }]);
+    const report = checkDrift(board, fakeWorkspace({}));
+    expect(report.workItems).toHaveLength(0);
+    expect(report.findings[0]).toMatchObject({ kind: "unresolvable-ref" });
+    expect(report.clean).toBe(false);
+  });
+
+  it("excuses an external node instead of counting it as unannotated", async () => {
+    const board = await stateBoard([
+      { id: "browser", label: "Browser canvas", state: "external" },
+      { id: "a", label: "A", ref: "src/a.ts" },
+    ]);
+    const report = checkDrift(board, fakeWorkspace({ "src/a.ts": "x" }));
+    expect(report).toMatchObject({ excused: 1, skipped: 0, checked: 1, clean: true });
+  });
+
+  it("excuses every node on a concept board and checks none of its arrows", async () => {
+    const board = await stateBoard(
+      [
+        { id: "ue", label: "UE" },
+        { id: "cscf", label: "P-CSCF" },
+      ],
+      { title: "IMS registration", describes: "concept", edges: [{ from: "ue", to: "cscf" }] },
+    );
+    expect(readGraph(board).describes).toBe("concept");
+    const report = checkDrift(board, fakeWorkspace({}));
+    expect(report).toMatchObject({ concept: true, excused: 2, skipped: 0, checked: 0, clean: true });
+    expect(report.edgesChecked).toBe(0);
+  });
+
+  it("does not record describes for a repo board, so existing files do not churn", async () => {
+    const board = await stateBoard([{ id: "a", label: "A" }], { title: "How it works", describes: "repo" });
+    const title = board.elements.find((e) => (e.customData as { role?: string })?.role === "title");
+    expect(title!.customData).toMatchObject({ role: "title" });
+    expect(title!.customData).not.toHaveProperty("describes");
+    expect(readGraph(board).describes).toBeUndefined();
+  });
+
+  it("reports a planned edge with no corroboration as work, not as an unsupported arrow", async () => {
+    const board = await stateBoard(
+      [
+        { id: "a", label: "A", ref: "src/a.ts" },
+        { id: "b", label: "B", ref: "src/b.ts" },
+      ],
+      { edges: [{ from: "a", to: "b", state: "planned" }] },
+    );
+    const report = checkDrift(board, fakeWorkspace({ "src/a.ts": "export const a = 1;", "src/b.ts": "export const b = 2;" }));
+    expect(report.edges).toHaveLength(0);
+    expect(report.workItems).toHaveLength(1);
+    expect(report.workItems[0]).toMatchObject({ kind: "unsupported-edge", node: "a -> b" });
+    expect(report.clean).toBe(true);
+  });
+
+  it("promotes a planned edge once the code connects it", async () => {
+    const board = await stateBoard(
+      [
+        { id: "a", label: "A", ref: "src/a.ts" },
+        { id: "b", label: "B", ref: "src/b.ts" },
+      ],
+      { edges: [{ from: "a", to: "b", state: "planned" }] },
+    );
+    const report = checkDrift(board, fakeWorkspace({
+      "src/a.ts": "import { b } from './b';\nexport const a = b;",
+      "src/b.ts": "export const b = 2;",
+    }));
+    expect(report.promotions).toHaveLength(1);
+    expect(report.promotions[0]).toMatchObject({ node: "a -> b" });
+    expect(report.edges).toHaveLength(0);
+  });
+
+  it("skips an arrow that touches an external node", async () => {
+    const board = await stateBoard(
+      [
+        { id: "a", label: "A", ref: "src/a.ts" },
+        { id: "browser", label: "Browser", ref: "src/b.ts", state: "external" },
+      ],
+      { edges: [{ from: "a", to: "browser" }] },
+    );
+    const report = checkDrift(board, fakeWorkspace({ "src/a.ts": "export const a = 1;", "src/b.ts": "export const b = 2;" }));
+    expect(report.edgesChecked).toBe(0);
+    expect(report.edgesSkipped).toBe(1);
+    expect(report.edges).toHaveLength(0);
+  });
+});

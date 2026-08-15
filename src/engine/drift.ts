@@ -49,15 +49,55 @@ export interface EdgeDriftFinding {
   detail: string;
 }
 
+/**
+ * A `planned` claim the code has not caught up with yet. Detected identically to
+ * a regression -- the anchor does not resolve -- and reported as the opposite
+ * thing, because the board said it was describing the future.
+ *
+ * Kept out of `findings` on purpose: `clean` and the CLI's exit code drive CI,
+ * and a build must not fail because somebody sketched next week's work.
+ */
+export interface WorkItem {
+  /** Node id, or `from -> to` when the claim is a connection rather than a box. */
+  node: string;
+  label: string;
+  /** Absent for an edge, where the claim is the connection and not one anchor. */
+  ref?: string;
+  /** Why it is not there yet -- the same distinctions the checks already draw. */
+  kind: DriftKind | "unsupported-edge";
+  detail: string;
+}
+
+/**
+ * A `planned` claim that now resolves: the work landed and the board has not
+ * been told. The only signal here that is good news, and the reason it is worth
+ * recording state at all -- nothing else notices progress.
+ */
+export interface Promotion {
+  node: string;
+  label: string;
+  /** Absent for an edge promotion, where the claim is the connection itself. */
+  ref?: string;
+  detail: string;
+}
+
 export interface DriftReport {
   clean: boolean;
   findings: DriftFinding[];
+  /** `planned` claims the code has not reached yet. Never affects `clean`. */
+  workItems: WorkItem[];
+  /** `planned` claims that now hold, so the board can be advanced. Never affects `clean`. */
+  promotions: Promotion[];
   /** Nodes that had something checkable. */
   checked: number;
   /** Generated nodes with no ref to check against. */
   skipped: number;
+  /** Nodes not about this repo: an `external` node, or any node on a concept board. */
+  excused: number;
   /** Hand-drawn nodes, ignored by design. */
   handDrawn: number;
+  /** True when the board says it describes something other than this repository. */
+  concept: boolean;
   edges: EdgeDriftFinding[];
   /** Edges checked for corroboration. */
   edgesChecked: number;
@@ -356,15 +396,25 @@ export function checkDrift(
   options?: { edges?: boolean },
 ): DriftReport {
   const findings: DriftFinding[] = [];
+  const workItems: WorkItem[] = [];
+  const promotions: Promotion[] = [];
   let checked = 0;
   let skipped = 0;
+  let excused = 0;
   let handDrawn = 0;
 
   const graph = readGraph(board);
+  // A board describing a protocol or another project makes no claims about this
+  // tree, so every box on it is excused rather than reported as unannotated.
+  const concept = graph.describes === "concept";
 
   for (const node of graph.nodes) {
     if (node.provenance !== "recorded") {
       handDrawn += 1;
+      continue;
+    }
+    if (concept || node.state === "external") {
+      excused += 1;
       continue;
     }
     const declared = node.ref?.trim();
@@ -379,6 +429,31 @@ export function checkDrift(
       continue;
     }
     checked += 1;
+
+    if (node.state === "planned") {
+      if (result === "ok") {
+        promotions.push({
+          node: node.id,
+          label: node.label,
+          ref,
+          detail: `${ref} exists now, so this is no longer planned.`,
+        });
+      } else if (result.kind === "unresolvable-ref") {
+        // Not a thing waiting to be built: the ref is malformed or escapes the
+        // root, and writing the code would not make it resolve.
+        findings.push(result);
+      } else {
+        workItems.push({
+          node: node.id,
+          label: node.label,
+          ref,
+          kind: result.kind,
+          detail: result.detail,
+        });
+      }
+      continue;
+    }
+
     if (result !== "ok") findings.push(result);
   }
 
@@ -387,7 +462,7 @@ export function checkDrift(
   let edgesChecked = 0;
   let edgesSkipped = 0;
 
-  if (options?.edges !== false) {
+  if (options?.edges !== false && !concept) {
     const nodeById = new Map<string, typeof graph.nodes[0]>();
     for (const node of graph.nodes) {
       nodeById.set(node.id, node);
@@ -447,6 +522,13 @@ export function checkDrift(
         continue;
       }
 
+      // An arrow into something deliberately outside the repo has nothing to
+      // corroborate against, and saying so would be noise, not a finding.
+      if (fromNode.state === "external" || toNode.state === "external") {
+        edgesSkipped += 1;
+        continue;
+      }
+
       const fromRef = fromNode.ref?.trim();
       const toRef = toNode.ref?.trim();
       if (!fromRef || !toRef) {
@@ -490,6 +572,28 @@ export function checkDrift(
         importCache,
         sharedImporterCandidates,
       );
+      // A `planned` arrow is the connection you want, not one you are claiming
+      // exists. Absent corroboration is then the work, and corroboration is the
+      // news that the work landed.
+      if (edge.state === "planned") {
+        const claim = `${fromNode.label || edge.from} -> ${toNode.label || edge.to}`;
+        if (finding) {
+          workItems.push({
+            node: `${edge.from} -> ${edge.to}`,
+            label: claim,
+            kind: "unsupported-edge",
+            detail: finding.detail,
+          });
+        } else {
+          promotions.push({
+            node: `${edge.from} -> ${edge.to}`,
+            label: claim,
+            detail: "the code now connects these, so this is no longer planned.",
+          });
+        }
+        continue;
+      }
+
       if (finding) {
         edges.push(finding);
       }
@@ -497,11 +601,18 @@ export function checkDrift(
   }
 
   return {
+    // `clean` means "nothing has regressed". Work items and promotions are both
+    // deliberately excluded: they drive the CLI's exit code, and neither an
+    // unbuilt sketch nor good news should fail a build.
     clean: findings.length === 0 && edges.length === 0,
     findings,
+    workItems,
+    promotions,
     checked,
     skipped,
+    excused,
     handDrawn,
+    concept,
     edges,
     edgesChecked,
     edgesSkipped,

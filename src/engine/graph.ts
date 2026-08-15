@@ -21,6 +21,49 @@ export const NODE_SHAPES: readonly string[] = ["rectangle", "ellipse", "diamond"
 /** How confident we are in a recovered fact. */
 export type Provenance = "recorded" | "inferred";
 
+/**
+ * What a node claims about *time*, which is a different axis from provenance
+ * (who drew it) and from whether its ref resolves (what the disk says).
+ *
+ * - `built`: this exists in the code now. The default, so every diagram drawn
+ *   before this field means exactly what it meant before.
+ * - `planned`: this is meant to exist. A ref that does not resolve is then a
+ *   work item, not a regression.
+ * - `external`: deliberately not code in this repository -- a browser, a
+ *   third-party service, another project. Never checked, and distinct from a
+ *   node whose ref someone simply forgot.
+ *
+ * Nothing here records what the filesystem can answer for itself. "Missing" is
+ * observed every run and is deliberately not a state: committing it would put a
+ * fact with a shelf life into a file, which is the rot this check exists to
+ * catch.
+ */
+export type NodeState = "planned" | "built" | "external";
+
+export const NODE_STATES: readonly NodeState[] = ["planned", "built", "external"];
+
+/** Unrecognised values fall back to the default rather than throwing: a board is user data. */
+function stateOf(value: unknown): NodeState {
+  return typeof value === "string" && (NODE_STATES as readonly string[]).includes(value)
+    ? (value as NodeState)
+    : "built";
+}
+
+/**
+ * What a whole board is about, recorded on its title element.
+ *
+ * Measured on this corpus: the forgot-a-ref / deliberately-not-code question
+ * mostly lives at board granularity -- the telecom boards are wholly conceptual
+ * and describe a protocol, not this repository. One field excuses them honestly
+ * instead of reporting dozens of boxes nobody ever intended to annotate.
+ *
+ * It rides on the title element because `customData` on an element is the only
+ * store that survives a round trip through the live viewer: `appState` is pushed
+ * back as `{}` on every browser edit (see `src/viewer/App.tsx`), so anything kept
+ * there is destroyed the first time someone touches the canvas.
+ */
+export type BoardDescribes = "repo" | "concept";
+
 export interface RecoveredNode {
   id: string;
   label: string;
@@ -37,6 +80,8 @@ export interface RecoveredNode {
    * caller supplied one; drift detection compares it against the working tree.
    */
   ref?: string;
+  /** Whether the node claims to exist yet. Defaults to `built`. */
+  state: NodeState;
 }
 
 /**
@@ -65,10 +110,18 @@ export interface RecoveredEdge {
   elementId: string;
   provenance: Provenance;
   endpoints: EdgeEndpoints;
+  /**
+   * Whether the connection claims to exist yet. Defaults to `built`. A `planned`
+   * arrow between two built boxes is "wire these up" -- a work item rather than
+   * either a drift finding or a silent skip.
+   */
+  state: NodeState;
 }
 
 export interface RecoveredGraph {
   title?: string;
+  /** What the board is about, from its title element. Absent means `repo`. */
+  describes?: BoardDescribes;
   nodes: RecoveredNode[];
   edges: RecoveredEdge[];
   /** Elements that are neither node nor edge: annotations, images, strays. */
@@ -188,6 +241,7 @@ export function readGraph(board: BoardFile): RecoveredGraph {
       height: bounds.height,
       provenance: recordedId ? "recorded" : "inferred",
       ...(ref ? { ref } : {}),
+      state: stateOf(custom.state),
     });
     nodeIdByElement.set(shape.id, id);
     consumed.add(shape.id);
@@ -284,10 +338,14 @@ export function readGraph(board: BoardFile): RecoveredGraph {
       elementId: arrow.id,
       provenance,
       endpoints,
+      state: stateOf(custom.state),
     });
   }
 
   const titleElement = elements.find((element) => customOf(element).role === "title");
+  const describesRaw = titleElement ? customOf(titleElement).describes : undefined;
+  const describes: BoardDescribes | undefined =
+    describesRaw === "concept" || describesRaw === "repo" ? describesRaw : undefined;
   const unattributed = elements
     .filter((element) => !consumed.has(element.id) && element.id !== titleElement?.id)
     .map((element) => ({
@@ -300,6 +358,7 @@ export function readGraph(board: BoardFile): RecoveredGraph {
 
   return {
     ...(titleElement ? { title: String(titleElement.text ?? "").trim() } : {}),
+    ...(describes ? { describes } : {}),
     nodes,
     edges,
     unattributed,

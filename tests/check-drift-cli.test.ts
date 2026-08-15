@@ -752,3 +752,86 @@ describe("the diagram directory", () => {
     expect(payload.systemMessage).toContain("stay inside the project");
   }, 120_000);
 });
+
+/**
+ * State on the command line. The engine decides what a planned box means;
+ * what matters here is the thing the engine cannot get right on its own —
+ * whether a design session gets nagged, and whether a build fails over a sketch.
+ */
+describe("check-drift and what a diagram says about time", () => {
+  let project: string;
+
+  async function stateBoard(
+    nodes: Array<{ id: string; label: string; ref?: string; state?: "planned" | "built" | "external" }>,
+  ) {
+    const built = await createDiagram(emptyBoard(), { name: "arch", nodes, edges: [] });
+    await writeBoard(path.join(project, "docs/diagrams/plan.excalidraw"), built.board);
+  }
+
+  async function check(...args: string[]) {
+    try {
+      const { stdout, stderr } = await run(TSX, [SCRIPT, ...args], { cwd: project });
+      return { code: 0, stdout, stderr };
+    } catch (error) {
+      const failure = error as { code?: number; stdout?: string; stderr?: string };
+      return { code: failure.code ?? -1, stdout: failure.stdout ?? "", stderr: failure.stderr ?? "" };
+    }
+  }
+
+  beforeEach(() => {
+    project = mkdtempSync(path.join(tmpdir(), "drift-state-"));
+    mkdirSync(path.join(project, "docs/diagrams"), { recursive: true });
+    mkdirSync(path.join(project, "src"), { recursive: true });
+  });
+
+  afterEach(() => {
+    rmSync(project, { recursive: true, force: true });
+  });
+
+  it("says nothing about a planned box the code has not reached", async () => {
+    // The whole design session would otherwise get the same notice every turn.
+    await stateBoard([{ id: "s", label: "Session store", ref: "src/sessions.ts", state: "planned" }]);
+    const result = await check();
+    expect(result.stderr).toBe("");
+    expect(result.stdout).toBe("");
+    expect(result.code).toBe(0);
+  });
+
+  it("lists that planned box when someone asks for details", async () => {
+    // Being quiet is not the same as withholding: --details was asked for.
+    await stateBoard([{ id: "s", label: "Session store", ref: "src/sessions.ts", state: "planned" }]);
+    const result = await check("--details");
+    expect(result.stderr).toContain("Session store");
+    expect(result.stderr).toContain("not built yet");
+    expect(result.code).toBe(0);
+  });
+
+  it("speaks up once the code catches up, and still does not fail a build", async () => {
+    writeFileSync(path.join(project, "src/sessions.ts"), "export const store = 1;\n");
+    await stateBoard([{ id: "s", label: "Session store", ref: "src/sessions.ts", state: "planned" }]);
+    const result = await check();
+    expect(result.stderr).toContain("Session store is built now");
+    // Good news must not turn CI red.
+    expect(result.code).toBe(0);
+  });
+
+  it("still fails on a built box whose file is gone, and counts the sketch beside it", async () => {
+    await stateBoard([
+      { id: "gone", label: "Deleted module", ref: "src/gone.ts" },
+      { id: "s", label: "Session store", ref: "src/sessions.ts", state: "planned" },
+    ]);
+    const result = await check();
+    expect(result.code).toBe(1);
+    expect(result.stderr).toContain("Deleted module");
+    // Counted so it is discoverable, not listed so it does not nag.
+    expect(result.stderr).toContain("1 planned");
+    expect(result.stderr).not.toContain("Session store");
+  });
+
+  it("says nothing about an external box, which is not the same as a missing ref", async () => {
+    await stateBoard([{ id: "browser", label: "Browser canvas", state: "external" }]);
+    const result = await check();
+    expect(result.stderr).toBe("");
+    expect(result.code).toBe(0);
+  });
+});
