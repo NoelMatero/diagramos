@@ -423,8 +423,47 @@ names a static and the macro using it reads the same file twice. It is never
 persisted between runs -- a stored observation is a fact with a shelf life,
 which is the rot this tool exists to catch.
 
-Still to build: steps 4 through 7 (skill guidance beyond the ref table,
-function-granularity arrows, membership guidance, `via`).
+**Step 5 is built too: function-granularity arrows.** Re-measured against the
+real `~/orangutan/src/lib.rs` (641 lines, 29 `log_line` occurrences), with the
+log box carrying `refs: [#LOGGER, #log_line]`:
+
+| arrow from | logs? | verdict |
+| --- | --- | --- |
+| `handle_request` | yes | quiet |
+| `ready` | yes | quiet |
+| `reset_connection` | yes | quiet |
+| `readable` | yes | quiet |
+| `run` | yes | quiet |
+| `accept` | yes | quiet |
+| `notify` | yes | quiet |
+| `register` | **no** | **flag** |
+| `get_client` | **no** | **flag** |
+| `send` | **no** | **flag** |
+| `receive` | **no** | **flag** |
+
+**11 of 11 correct.** Both channels reproduce: doctoring `readable` so it logs
+only through its call to `self.handle_request` keeps that true arrow quiet, and
+`register` stays flagged despite `ready` calling it and logging — the
+shared-caller whitewash the design refused. **0.36 ms per arrow** on a fresh
+strip of the 640-line file.
+
+Two corrections to the section above, both from measuring against the real
+file rather than a variant of it:
+
+- **The original seven-arrow table was wrong about which functions log.** It
+  listed `handle_request`, `ready` and `reset_connection` as logging and the
+  rest as not. All three do log, and so do `readable`, `run`, `accept` and
+  `notify`; the four that do not are `register`, `get_client`, `send` and
+  `receive`. The conclusion survives — every true arrow quiet, every false one
+  flagged — but the table did not.
+- **The hop reaches through a macro's own body**, which the design did not
+  say. `handle_request` never writes `LOGGER`; it calls `log_line!`, whose body
+  does. So a box anchored on the static alone is still corroborated by a caller
+  of the macro. This is correct and useful, and it is now pinned by a test.
+
+Still to build: step 4 (skill guidance beyond the ref table), step 6
+(membership guidance — the arrow check already accepts any of a box's symbols,
+so this is prose), and step 7 (`via`).
 
 ## Markers in the source, measured and deferred
 
