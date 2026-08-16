@@ -96,8 +96,20 @@ const DECLARATIONS: Record<Language, (name: string) => RegExp[]> = {
 
 const REGEX_SPECIAL = /[.*+?^${}()|[\]\\]/g;
 
-function escape(symbol: string): string {
+export function escapeSymbol(symbol: string): string {
   return symbol.replace(REGEX_SPECIAL, "\\$&");
+}
+
+const escape = escapeSymbol;
+
+/**
+ * Where a language introduces a name, in cost order.
+ *
+ * Exported because the arrow check needs the same answer for a different
+ * question: not "is this declared" but "where does its body start".
+ */
+export function declarationPatterns(language: Language, symbol: string): RegExp[] {
+  return DECLARATIONS[language](escape(symbol));
 }
 
 function count(source: string, pattern: RegExp): number {
