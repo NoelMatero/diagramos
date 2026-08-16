@@ -24,7 +24,7 @@ import { emptyBoard, type BoardFile } from "../src/engine/board-file";
 import { bodyOf, chainBreak, reaches, unsupportedMembers } from "../src/engine/body";
 import { createDiagram } from "../src/engine/diagram";
 import { checkDrift, type Workspace } from "../src/engine/drift";
-import { languageOf, stripCode, type Language } from "../src/engine/strip";
+import { languageOf, type Language } from "../src/engine/parse";
 import { installExcalifontMeasurer } from "./helpers/excalifont";
 
 installExcalifontMeasurer();
@@ -36,7 +36,7 @@ installExcalifontMeasurer();
 interface Fixture {
   /** Repo-relative path the board's refs will use. */
   file: string;
-  /** Undefined for a language with no lexer or declaration table. */
+  /** Undefined for a language with no grammar. */
   language: Language | undefined;
   store: string;
   emitter: string;
@@ -84,7 +84,7 @@ const FIXTURES: Fixture[] = [
   },
   {
     file: "src/logging.py",
-    language: undefined,
+    language: "python",
     store: "LOGGER",
     emitter: "log_line",
     direct: "serve_request",
@@ -94,6 +94,20 @@ const FIXTURES: Fixture[] = [
     top: "handle_fail",
     callSites: /^[ \t]*log_line\([^)]*\)[ \t]*$/gm,
     declaration: /def log_line\(message\):\n(?:[ \t]+.*\n)+/,
+    comment: (line) => `# ${line.trim()}`,
+  },
+  {
+    file: "src/logging.rb",
+    language: undefined,
+    store: "LOGGER",
+    emitter: "log_line",
+    direct: "serve_request",
+    silent: "parse_header",
+    deep: "emit_batch",
+    mid: "handle_logging",
+    top: "handle_fail",
+    callSites: /^[ \t]*log_line\([^)]*\)[ \t]*$/gm,
+    declaration: /def log_line\(message\)\n(?:[ \t]+.*\n)+end\n/,
     comment: (line) => `# ${line.trim()}`,
   },
 ];
@@ -107,7 +121,7 @@ function sourceOf(fixture: Fixture): string {
 
 /** A function's body, for asserting that a mutation landed where it was aimed. */
 function bodyOfIn(source: string, symbol: string, language: Language): string {
-  return bodyOf(stripCode(source, language)!, symbol, language) ?? "";
+  return bodyOf(source, symbol, language) ?? "";
 }
 
 /**
@@ -119,12 +133,11 @@ function bodyOfIn(source: string, symbol: string, language: Language): string {
  */
 function cutDeepestCall(fixture: Fixture, source: string): string {
   const language = fixture.language!;
-  // Stripping blanks content but keeps length, so an offset found in the
-  // stripped text is the same offset in the original. That property is what
-  // makes this surgery possible at all, and it is asserted below.
-  const stripped = stripCode(source, language)!;
-  const body = bodyOf(stripped, fixture.deep, language)!;
-  const start = stripped.indexOf(body);
+  // A body is a slice of the real source, verbatim, so its text can be found
+  // in the original and cut there. That property is what makes this surgery
+  // possible at all, and it is asserted below.
+  const body = bodyOf(source, fixture.deep, language)!;
+  const start = source.indexOf(body);
   const end = start + body.length;
   fixture.callSites.lastIndex = 0;
   return source.slice(0, start)
@@ -355,16 +368,18 @@ describe("across the languages", () => {
     }
   });
 
-  it("strips without moving anything, which other tools here rely on", () => {
-    // Line numbers, offsets, and the surgery in this file all assume a blanked
-    // span keeps its length and its newlines. Cheap to check, expensive to
+  it("returns bodies as verbatim slices of the source, which other tools rely on", () => {
+    // The surgery in this file finds a body by searching the original text for
+    // it. That only works while a body is the exact substring the parser read,
+    // with nothing normalised on the way out. Cheap to check, expensive to
     // discover by hand.
     for (const fixture of FIXTURES) {
       if (!fixture.language) continue;
       const source = sourceOf(fixture);
-      const stripped = stripCode(source, fixture.language)!;
-      expect(stripped, fixture.file).toHaveLength(source.length);
-      expect(stripped.split("\n"), fixture.file).toHaveLength(source.split("\n").length);
+      const body = bodyOf(source, fixture.deep, fixture.language)!;
+      expect(body, fixture.file).toBeDefined();
+      expect(source.indexOf(body), fixture.file).toBeGreaterThanOrEqual(0);
+      expect(source.indexOf(body), fixture.file).toBe(source.lastIndexOf(body));
     }
   });
 

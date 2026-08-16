@@ -1,5 +1,10 @@
 # Brief: is this feature still actually used?
 
+> **2026-08-17:** the strippers and declaration tables this brief measures
+> were superseded by tree-sitter. The measurements below are still what drove
+> the design; the mechanism they describe is gone. See
+> "The strippers were replaced" in `docs/usage-design.md`.
+
 **Status: answered in `docs/usage-design.md` (2026-08-16). Steps 1-3 of that
 design are built — `@declared`, `@used`, both strippers, both declaration
 tables. The measured results are in the design's "What shipped" section, and

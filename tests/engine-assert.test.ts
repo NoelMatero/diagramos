@@ -13,7 +13,7 @@ import { parseSymbol, symbolEvidence } from "../src/engine/assert";
 import { emptyBoard, type BoardFile } from "../src/engine/board-file";
 import { createDiagram } from "../src/engine/diagram";
 import { checkDrift, type Workspace } from "../src/engine/drift";
-import { languageOf, stripCode } from "../src/engine/strip";
+import { languageOf } from "../src/engine/parse";
 import { installExcalifontMeasurer } from "./helpers/excalifont";
 
 installExcalifontMeasurer();
@@ -72,76 +72,64 @@ describe("reading an assertion off an anchor", () => {
   });
 });
 
-describe("stripping TypeScript", () => {
-  const strip = (source: string) => stripCode(source, "ts");
+/**
+ * The property the old lexer existed for, kept after the lexer went away.
+ *
+ * Without it, a file holding nothing but `/// Logs via log_line! and LOGGER.`
+ * satisfies both anchors -- measured, and the worst row in
+ * `docs/usage-brief.md`. There is no stripping pass any more, so these are no
+ * longer tests of a blanking routine; they are tests that a name written in a
+ * comment or a string never counts as a use of it. The parser gives that for
+ * free, and "for free" is exactly the claim worth guarding.
+ */
+describe("a name in a comment or a string is not a use", () => {
+  const uses = (file: string, source: string, name = "LOGGER") =>
+    symbolEvidence(file, source, name)?.used;
 
-  it("blanks comments and string bodies but keeps their shape", () => {
-    const source = 'const a = "LOGGER"; // LOGGER\nconst b = 1;\n';
-    const out = strip(source)!;
-    expect(out).not.toContain("LOGGER");
-    // Same length and same lines, so offsets and line numbers still line up.
-    expect(out).toHaveLength(source.length);
-    expect(out.split("\n")).toHaveLength(source.split("\n").length);
-    expect(out).toContain("const a =");
-    expect(out).toContain("const b = 1;");
+  it("ignores a line comment and a string, in TypeScript", () => {
+    expect(uses("a.ts", 'const a = "LOGGER"; // LOGGER\nconst b = LOGGER;\n')).toBe(1);
   });
 
-  it("keeps template expressions, which are code, and blanks the text around them", () => {
-    const out = strip("const m = `LOGGER ${LOGGER.name} LOGGER`;")!;
-    // One survivor: the one inside ${...}.
-    expect(out.match(/LOGGER/g)).toHaveLength(1);
+  it("keeps template expressions, which are code, and ignores the text around them", () => {
+    expect(uses("a.ts", "const m = `LOGGER ${LOGGER.name} LOGGER`;")).toBe(1);
   });
 
-  it("blanks a regex literal without being fooled by quotes inside it", () => {
+  it("is not fooled by quotes inside a regex literal", () => {
     // drift.ts is full of these, so it is not a hypothetical.
-    const out = strip(`const RE = /["']LOGGER/g;\nconst after = LOGGER;`)!;
-    expect(out.match(/LOGGER/g)).toHaveLength(1);
+    expect(uses("a.ts", 'const RE = /["\']LOGGER/g;\nconst after = LOGGER;')).toBe(1);
   });
 
   it("does not mistake division for a regex", () => {
-    const out = strip("const half = total / 2;\nconst LOGGER = 1;")!;
-    expect(out).toContain("total / 2");
-    expect(out).toContain("LOGGER");
+    expect(uses("a.ts", "const half = total / 2;\nconst LOGGER = 1;")).toBe(0);
   });
 
-  it("survives JSX, where </div> and an apostrophe both look unterminated", () => {
-    // Before this recovery both .tsx files in src/ bailed outright. Bailing is
-    // safe, but it threw away every other line in the file.
-    const out = strip("const v = <div className=\"x\">don't LOGGER</div>;\n");
-    expect(out).toBeDefined();
-    expect(out).toContain("LOGGER");
+  it("reads JSX, where </div> and an apostrophe both look unterminated", () => {
+    // Both .tsx files in src/ used to bail outright here. Bailing was safe, but
+    // it threw away every other line in the file.
+    expect(uses("a.tsx", "const v = <div className=\"x\">don't LOGGER</div>;\nconst u = LOGGER;\n"))
+      .toBe(1);
   });
-
-  it("bails rather than guessing when a block comment never closes", () => {
-    expect(strip("const a = 1; /* LOGGER\nstill inside")).toBeUndefined();
-  });
-});
-
-describe("stripping Rust", () => {
-  const strip = (source: string) => stripCode(source, "rust");
 
   it("handles nested block comments, which Rust has and TypeScript does not", () => {
-    const out = strip("/* outer /* inner LOGGER */ still comment */ let x = LOGGER;")!;
-    expect(out.match(/LOGGER/g)).toHaveLength(1);
+    expect(uses("a.rs", "/* outer /* inner LOGGER */ still comment */ let x = LOGGER;")).toBe(1);
   });
 
-  it("blanks raw strings, including the hashed forms", () => {
-    const out = strip('let a = r#"LOGGER"#; let b = br##"LOGGER"##; let c = LOGGER;')!;
-    expect(out.match(/LOGGER/g)).toHaveLength(1);
+  it("ignores raw strings, including the hashed forms", () => {
+    expect(uses("a.rs", 'let a = r#"LOGGER"#; let b = br##"LOGGER"##; let c = LOGGER;')).toBe(1);
   });
 
   it("tells a char literal from a lifetime", () => {
-    // `'"'` is a char whose body is a quote -- read as a lifetime it would
+    // `\'"\'` is a char whose body is a quote -- read as a lifetime it would
     // swallow the rest of the file into a string.
-    const out = strip("fn f<'a>(q: char) -> &'a str { let c = '\"'; \"LOGGER\" }")!;
-    expect(out).toContain("fn f<'a>");
-    expect(out).toContain("&'a str");
-    expect(out).not.toContain("LOGGER");
+    expect(uses("a.rs", "fn f<\'a>(q: char) -> &\'a str { let c = \'\"\'; \"LOGGER\" }")).toBe(0);
   });
 
   it("allows a string to span lines, which is legal Rust and not legal TypeScript", () => {
-    const out = strip('let s = "first LOGGER\nsecond";\nlet t = LOGGER;')!;
-    expect(out.match(/LOGGER/g)).toHaveLength(1);
+    expect(uses("a.rs", 'let s = "first LOGGER\nsecond";\nlet t = LOGGER;')).toBe(1);
+  });
+
+  it("ignores a docstring, which is how Python writes a comment that is a string", () => {
+    expect(uses("a.py", 'def f():\n    """mentions LOGGER"""\n    return 1\n')).toBe(0);
   });
 });
 
@@ -194,9 +182,23 @@ describe("the declaration tables", () => {
     expect(consumer).toMatchObject({ declared: false, used: 1 });
   });
 
-  it("says nothing at all about a language it has no table for", () => {
-    expect(symbolEvidence("a.py", "def alpha():\n    pass\n", "alpha")).toBeUndefined();
-    expect(languageOf("a.py")).toBeUndefined();
+  it("finds every way Python introduces a name", () => {
+    const source = [
+      "LOGGER = []",
+      "def alpha(x):",
+      "    return x",
+      "class Gamma:",
+      "    def delta(self):",
+      "        pass",
+    ].join("\n");
+    for (const name of ["LOGGER", "alpha", "Gamma", "delta"]) {
+      expect(symbolEvidence("a.py", source, name)?.declared, name).toBe(true);
+    }
+  });
+
+  it("says nothing at all about a language it has no grammar for", () => {
+    expect(symbolEvidence("a.rb", "def alpha\nend\n", "alpha")).toBeUndefined();
+    expect(languageOf("a.rb")).toBeUndefined();
   });
 });
 
@@ -342,11 +344,11 @@ describe("what an assertion does not do", () => {
 
   it("falls back to a mention and counts it when there is no table for the language", async () => {
     const board = await boardWith([
-      { id: "log", label: "logging", ref: "src/app.py#log_line@declared+used" },
+      { id: "log", label: "logging", ref: "src/app.rb#log_line@declared+used" },
     ]);
     const report = checkDrift(
       board,
-      fakeWorkspace({ "src/app.py": "# log_line is mentioned only here\n" }),
+      fakeWorkspace({ "src/app.rb": "# log_line is mentioned only here\n" }),
     );
     expect(report.clean).toBe(true);
     expect(report.assertions).toEqual({ checked: 0, downgraded: 0, unsupportedLanguage: 1 });

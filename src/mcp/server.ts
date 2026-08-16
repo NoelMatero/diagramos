@@ -33,6 +33,7 @@ import {
   findStrayBoards,
 } from "../engine/drift";
 import { loadConverter } from "../engine/convert";
+import { initEngine } from "../engine/parse";
 import { renderBoardToPng } from "../engine/render";
 import {
   probeBoard,
@@ -523,6 +524,8 @@ server.registerTool(
       const workItems: Array<Record<string, unknown>> = [];
       const promotions: Array<Record<string, unknown>> = [];
       const conceptBoards: string[] = [];
+      // Grammars load once per process; everything below this line is synchronous.
+      await initEngine();
       for (const file of files) {
         const report = checkDrift(await readBoard(file), workspace, {
           coverage,

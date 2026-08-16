@@ -6,34 +6,206 @@
  * and every one of them is satisfied -- same file, shared importers, the lot --
  * so the arrow is wrong and nothing says a word.
  *
- * Scoping the search to one function's body answers it, and does so
- * deterministically: find the declaration, take the balanced extent of its
- * body on stripped text (where strings and comments are already blanked, so
- * brace counting cannot be fooled), and look only in there.
+ * Scoping the search to one function's body answers it. The body comes from a
+ * real parse (see `parse.ts`), so there is no brace counting to fool and no
+ * stripping pass to get wrong: a string containing `}` is a string node, and a
+ * name inside a comment is not a token.
  *
- * Two channels, and the second one is the interesting one. A direct hit is the
- * caller's body naming the target. One hop is the caller's body calling a
- * same-file function whose body names the target -- which is what keeps a
- * healthy refactor quiet when someone extracts the logging into a helper.
+ * Everything here is written against tree-sitter's *fields* rather than node
+ * types, which is what makes it work in five languages with no per-language
+ * branches:
  *
- * The hop stops at one, same-file, and always will. Walking further blesses
- * everything, which was measured at file level and is the reason this exists.
- * A shared-caller channel is refused for the same reason: at function level it
- * would bless the very arrow this granularity was built to catch.
+ *   a declaration  has a `name` field
+ *   a function     also has a `body` field
+ *   a call         has a `function` field (or `macro`, which is how Rust logs)
+ *
+ * The search follows calls as far as they go inside one file. That used to
+ * stop after one hop, on the reasoning that going deeper blesses everything.
+ * Measured at function level on a real 640-line Rust file and on this repo's
+ * densest TypeScript, that was false: both saturate at one hop, and unlimited
+ * depth flags exactly as many arrows. What depth buys is the genuine
+ * three-layer chain, which is a true arrow that one hop reports as broken.
+ *
+ * Discrimination survives because the receiver rule does the real work.
+ * `Type::foo()` and `other.foo()` are not followed, so the search stays inside
+ * the code this file owns and cannot wander into everything a library exposes.
  */
 
-import { declarationPatterns, escapeSymbol } from "./assert";
-import { stripCode, type Language } from "./strip";
+import { each, parseSource, type Language, type Node, type Tree } from "./parse";
+
+/**
+ * Node types that mean "this introduces a name", by suffix.
+ *
+ * Needed because a `name` field alone is too generous: Rust parses
+ * `Other::skip()` as a `scoped_identifier` whose `name` is `skip`, and without
+ * this filter every qualified call in a file would read as a declaration of
+ * its own last segment. The list is suffixes, not grammar-specific types, and
+ * covers all five languages -- `function_declaration`, `function_item`,
+ * `function_definition`, `variable_declarator`, `macro_definition`,
+ * `const_item`, `assignment` and the rest all land on one of these.
+ */
+const DECLARES = [
+  "_declaration", "_definition", "_item", "_declarator", "_signature", "assignment",
+];
+
+/**
+ * Where a `left` field is a binding rather than one side of an operator.
+ *
+ * `for (const entry of list)` introduces `entry`, and every grammar puts it in
+ * a `left` field on a statement. `a + b` has a `left` field too, on an
+ * *expression*, and reading that as a declaration of `a` would be nonsense --
+ * which is the whole reason this is a separate list and not one more suffix
+ * above.
+ */
+const BINDS = ["_statement", "_clause"];
+
+/**
+ * Body node types that hold statements rather than members.
+ *
+ * This is the whole `callable` / `data` distinction. A `block` runs; a
+ * `class_body` or a `field_declaration_list` merely contains. The difference
+ * matters in exactly one place -- the self-support rule below -- where a
+ * member that runs is expected to reach the rest of its concept and one that
+ * holds data is the ground the rest reaches *to*.
+ */
+const RUNS = new Set(["block", "statement_block", "token_tree", "expression_statement"]);
+
+/** Value nodes that are a function in disguise: `const f = () => {...}`. */
+const FUNCTIONISH = /function|arrow|lambda|closure/;
+
+export type DeclarationKind = "callable" | "data";
+
+/**
+ * A leaf that is a name rather than prose.
+ *
+ * Every grammar tried calls these something ending in `identifier` --
+ * `identifier`, `type_identifier`, `field_identifier`, `property_identifier`,
+ * `private_property_identifier`. Nothing else qualifies, which is what keeps
+ * `string_fragment` and `comment` out: a symbol written inside a string or a
+ * comment is a mention, and the whole check turns on it not being a use.
+ */
+const IDENTIFIER = /identifier$/;
+
+const isName = (node: Node): boolean => node.childCount === 0 && IDENTIFIER.test(node.type);
+
+/**
+ * Keywords that introduce a name inside a macro body.
+ *
+ * The one place approximation survives, and it is unavoidable: the contents of
+ * a macro invocation are not code, they are tokens waiting for an expansion
+ * that has not happened, so no grammar parses them. `lazy_static! { static ref
+ * LOGGER: ... }` is the case that forced this -- an extremely ordinary way to
+ * declare a Rust global, invisible to the parse and previously matched by a
+ * `static\s+ref\s+` regex doing exactly the same guessing, less precisely.
+ */
+const DECLARING = new Set([
+  "static", "const", "fn", "let", "ref", "struct", "enum", "type", "mod", "trait",
+]);
+
+/**
+ * One place a name is introduced: the declaring node, the identifier it
+ * introduces, and whether it came out of macro soup rather than a real parse.
+ */
+interface Declaration {
+  node: Node;
+  nameNode: Node;
+  soup: boolean;
+}
+
+const declarationCache = new WeakMap<Tree, Map<string, Declaration[]>>();
+
+/** Every name this file introduces, and where. */
+function declarationNodes(tree: Tree): Map<string, Declaration[]> {
+  const hit = declarationCache.get(tree);
+  if (hit) return hit;
+
+  const found = new Map<string, Declaration[]>();
+  declarationCache.set(tree, found);
+  const record = (declaration: Declaration) => {
+    const list = found.get(declaration.nameNode.text) ?? [];
+    list.push(declaration);
+    found.set(declaration.nameNode.text, list);
+  };
+
+  each(tree.rootNode, (node) => {
+    if (node.type === "token_tree") {
+      // Macro soup: a name is whatever follows a declaring keyword.
+      let armed = false;
+      each(node, (leaf) => {
+        if (leaf.childCount > 0) return;
+        if (armed && isName(leaf)) record({ node, nameNode: leaf, soup: true });
+        armed = DECLARING.has(leaf.text);
+      });
+      return;
+    }
+    const declares = DECLARES.some((suffix) => node.type.endsWith(suffix));
+    const binds = declares || BINDS.some((suffix) => node.type.endsWith(suffix));
+    // `left` is what a for-of binding and a Python assignment call their name.
+    const name = (declares ? node.childForFieldName("name") : null)
+      // `parameter` is what `catch (error)` calls the name it introduces.
+      ?? (binds ? node.childForFieldName("left") ?? node.childForFieldName("parameter") : null);
+    if (!name || name.childCount > 0) return; // a destructuring pattern, not a name
+    record({ node, nameNode: name, soup: false });
+  });
+  return found;
+}
+
+/**
+ * The node holding what a declaration *does*.
+ *
+ * Three shapes, in order. A `body` field covers functions, methods, classes
+ * and traits. A `value` field covers everything assigned a name, whether that
+ * is a function (`const f = () => {}`, where the block is what matters) or a
+ * plain value (`const shape = { corner: rounded() }`, where the value itself
+ * is the thing a claim can be about). Failing both, the first block-like node
+ * anywhere inside: that is Rust's `macro_rules!`, whose expansion is a
+ * `token_tree` buried one level down inside a rule.
+ *
+ * A declaration with none of the three -- a trait method, an overload
+ * signature -- has no body, and the caller counts that rather than guessing.
+ */
+function bodyNode(node: Node): Node | undefined {
+  const direct = node.childForFieldName("body");
+  if (direct) return direct;
+
+  const value = node.childForFieldName("value") ?? node.childForFieldName("right");
+  if (value) return FUNCTIONISH.test(value.type) ? value.childForFieldName("body") ?? value : value;
+
+  let found: Node | undefined;
+  each(node, (current) => {
+    if (!found && current !== node && RUNS.has(current.type)) found = current;
+  });
+  return found;
+}
+
+function declarationsIn(
+  tree: Tree,
+  symbol: string,
+): Array<{ kind: DeclarationKind; node: Node; body: Node | undefined }> {
+  return (declarationNodes(tree).get(symbol) ?? []).map(({ node, soup }) => {
+    // A name read out of macro soup is data with no readable body, always. The
+    // tokens around it are a template, not a function: the `{ ... }` after
+    // `static ref LOGGER` is the initialiser, and calling it a body would make
+    // every macro-declared global look like something that ought to run.
+    if (soup) return { kind: "data" as const, node, body: undefined };
+    const body = bodyNode(node);
+    return { kind: (body && RUNS.has(body.type) ? "callable" : "data") as DeclarationKind, node, body };
+  });
+}
+
+function treeOf(source: string, language: Language): Tree | undefined {
+  return parseSource(source, language);
+}
 
 /**
  * The body of a named declaration, as text.
  *
- * `undefined` when there is no declaration, or when there is one with no body
- * at all -- a trait method, an overload signature. The caller counts those and
- * falls back rather than guessing.
+ * `undefined` when there is no declaration, when there is one with no body at
+ * all, or when the language has no grammar. The caller counts those and falls
+ * back rather than guessing.
  */
-export function bodyOf(stripped: string, symbol: string, language: Language): string | undefined {
-  return declarationsOf(stripped, symbol, language)[0]?.body;
+export function bodyOf(source: string, symbol: string, language: Language): string | undefined {
+  return bodiesOf(source, symbol, language)[0];
 }
 
 /**
@@ -45,138 +217,65 @@ export function bodyOf(stripped: string, symbol: string, language: Language): st
  * waiting to happen: a method that logs in the second `impl` and not the first
  * reported as never reaching the logging at all, which is the loud direction.
  */
-export function bodiesOf(stripped: string, symbol: string, language: Language): string[] {
-  return declarationsOf(stripped, symbol, language)
-    .map((declaration) => declaration.body)
+export function bodiesOf(source: string, symbol: string, language: Language): string[] {
+  const tree = treeOf(source, language);
+  if (!tree) return [];
+  return declarationsIn(tree, symbol)
+    .map((declaration) => declaration.body?.text)
     .filter((body): body is string => body !== undefined);
 }
 
-/**
- * Whether a name was introduced as something that runs or something that sits.
- *
- * The difference matters in exactly one place: a member of a concept box that
- * runs is expected to reach the rest of the concept, and one that merely holds
- * data is the ground the rest reaches *to*. Reading the keyword the declaration
- * table already matched costs nothing, and without it the self-support rule
- * flags every `static` and `struct` a box lists.
- */
-export type DeclarationKind = "callable" | "data";
-
-const CALLABLE = /\b(?:fn|function|macro_rules)\b|^\s*[\w$]+\s*(?:<[^\n>]*>)?\s*\(/;
-
+/** Declaration kinds and bodies for one name, for callers that need both. */
 export function declarationsOf(
-  stripped: string,
+  source: string,
   symbol: string,
   language: Language,
 ): Array<{ kind: DeclarationKind; body: string | undefined }> {
-  const found: Array<{ kind: DeclarationKind; body: string | undefined }> = [];
-  for (const pattern of declarationPatterns(language, symbol)) {
-    pattern.lastIndex = 0;
-    let match: RegExpExecArray | null;
-    while ((match = pattern.exec(stripped)) !== null) {
-      const kind: DeclarationKind = CALLABLE.test(match[0]) ? "callable" : "data";
-      const body = extentFrom(stripped, match.index + match[0].length);
-      if (body !== undefined) found.push({ kind, body });
-      // A zero-width match would spin; the patterns cannot produce one, but the
-      // loop should not depend on that.
-      if (match.index === pattern.lastIndex) pattern.lastIndex += 1;
-    }
-    if (found.length > 0) break;
-  }
-  return found;
+  const tree = treeOf(source, language);
+  if (!tree) return [];
+  return declarationsIn(tree, symbol)
+    .map(({ kind, body }) => ({ kind, body: body?.text }));
 }
 
 /**
- * From just past a declaration, the balanced `{...}` that follows.
+ * What a file has to say about one symbol: is it introduced here, and is it
+ * used beyond its own introduction?
  *
- * A `{` inside the parameter list is skipped, so a TypeScript default of
- * `{ a: 1 }` does not get mistaken for the body. An expression statement --
- * `const f = (x) => x + 1;` -- has no braces and runs to its semicolon
- * instead, which is why the `=` test is there: a semicolon with no `=` before
- * it is a signature with no body.
- */
-function extentFrom(text: string, start: number): string | undefined {
-  let parens = 0;
-  // Generic and return-type syntax carries braces of its own:
-  // `Array<{ kind: K; body: B }>` is a type, not a body. Measured against tsc
-  // on this repo, mistaking one for the other was most of a 12.8% false-alarm
-  // rate on real call edges -- the loud direction, and the whole reason to
-  // count these.
-  let angles = 0;
-  let sawAssign = false;
-  for (let index = start; index < text.length; index += 1) {
-    const character = text[index];
-    if (character === "(" || character === "[") parens += 1;
-    else if (character === ")" || character === "]") parens -= 1;
-    else if (parens > 0) continue;
-    else if (character === "<") angles += 1;
-    // `=>` is an arrow, not a closing angle.
-    else if (character === ">" && text[index - 1] !== "=" && angles > 0) angles -= 1;
-    else if (angles > 0) continue;
-    else if (character === "=" && text[index + 1] !== "=" && text[index + 1] !== ">") {
-      sawAssign = true;
-    }
-    else if (character === "{") {
-      const close = matching(text, index);
-      // A brace group is the body unless what comes next continues a type.
-      // `): { at: string } | undefined {` has two, and only the second is code.
-      const after = nextSignificant(text, close + 1);
-      if (after === "{" || TYPE_CONTINUES.has(after)) {
-        index = close;
-        continue;
-      }
-      return text.slice(index + 1, close);
-    }
-    else if (character === ";") {
-      return sawAssign ? text.slice(start, index) : undefined;
-    }
-  }
-  return undefined;
-}
-
-/**
- * What can follow a type literal and still be a type.
+ * Both numbers are exact now rather than counted with a word-boundary regex
+ * over blanked text. A declaration is a declaration node; a use is an
+ * identifier token that is not one of those declarations' own name nodes. That
+ * removes the two approximations the old count carried -- a name in a comment
+ * inflating the total, and `#private` fields defeating the word boundary.
  *
- * Only union and intersection. Everything else that looked like it belonged
- * here is either already handled or actively wrong: `,` follows a method in an
- * object literal, so including it swallowed those bodies whole; `)` and `]`
- * only occur inside parens, which this loop skips; and `;` or `=` end a
- * statement, so a group followed by one was a value -- `const shape = { a: 1 };`
- * -- and calling it a type would lose the body entirely.
+ * `unreadable` reports that the parse hit an error somewhere in the file. It
+ * replaces the old lexer's whole-file bail, and it is strictly better news:
+ * tree-sitter recovers locally, so the rest of the file was still read
+ * properly. It is surfaced anyway, because a claim judged against a file we
+ * could not fully parse deserves to be counted separately.
  */
-const TYPE_CONTINUES = new Set(["|", "&", ">"]);
+export function symbolCounts(
+  source: string,
+  symbol: string,
+  language: Language,
+): { declared: boolean; used: number; unreadable: boolean } | undefined {
+  const tree = treeOf(source, language);
+  if (!tree) return undefined;
 
-function nextSignificant(text: string, from: number): string {
-  for (let index = from; index < text.length; index += 1) {
-    if (!/\s/.test(text[index]!)) return text[index]!;
+  const declaring = new Set<number>();
+  for (const declaration of declarationNodes(tree).get(symbol) ?? []) {
+    declaring.add(declaration.nameNode.id);
   }
-  return "";
-}
 
-/** Index of the `}` matching the `{` at `open`, or the end of the text. */
-function matching(text: string, open: number): number {
-  let depth = 0;
-  for (let index = open; index < text.length; index += 1) {
-    if (text[index] === "{") depth += 1;
-    else if (text[index] === "}") {
-      depth -= 1;
-      if (depth === 0) return index;
-    }
-  }
-  return text.length;
-}
+  let total = 0;
+  each(tree.rootNode, (node) => {
+    if (isName(node) && node.text === symbol) total += 1;
+  });
 
-/** The text between a `{` and its match, or everything left if it never closes. */
-function balanced(text: string, open: number): string {
-  let depth = 0;
-  for (let index = open; index < text.length; index += 1) {
-    if (text[index] === "{") depth += 1;
-    else if (text[index] === "}") {
-      depth -= 1;
-      if (depth === 0) return text.slice(open + 1, index);
-    }
-  }
-  return text.slice(open + 1);
+  return {
+    declared: declaring.size > 0,
+    used: Math.max(0, total - declaring.size),
+    unreadable: tree.rootNode.hasError === true,
+  };
 }
 
 /**
@@ -188,31 +287,88 @@ function balanced(text: string, open: number): string {
  * this blessed two arrows that were plainly false -- a body calling mio's
  * `EventSet::readable()` was read as calling the local `readable`, which does
  * log.
+ *
+ * There is no list of keywords to exclude any more. `if (x)` was only ever
+ * mistaken for a call because a regex cannot see that it is an if-statement.
  */
-const BARE_CALL = /(?<![.:\w$])([A-Za-z_$][\w$]*)\s*!?\s*\(/g;
-const RECEIVER_CALL = /\b(?:self|this)\.([A-Za-z_$][\w$]*)\s*\(/g;
+const RECEIVERS = new Set(["self", "this"]);
 
-/** Control flow that looks like a call and is not one. */
-const NOT_A_CALL = new Set([
-  "if", "while", "for", "switch", "match", "return", "catch", "with",
-  "fn", "function", "await", "typeof", "in", "of", "loop", "unsafe", "move",
-]);
-
-export function callsIn(body: string): Set<string> {
+function calleesOf(node: Node): Set<string> {
   const names = new Set<string>();
-  for (const pattern of [BARE_CALL, RECEIVER_CALL]) {
-    pattern.lastIndex = 0;
-    let match: RegExpExecArray | null;
-    while ((match = pattern.exec(body)) !== null) {
-      const name = match[1]!;
-      if (!NOT_A_CALL.has(name)) names.add(name);
-    }
-  }
+  each(node, (current) => {
+    const callee = current.childForFieldName("function") ?? current.childForFieldName("macro");
+    if (!callee) return;
+    if (callee.childCount === 0) { names.add(callee.text); return; }
+
+    const object = callee.childForFieldName("object") ?? callee.child(0);
+    const member = callee.childForFieldName("property")
+      ?? callee.childForFieldName("attribute")
+      ?? callee.childForFieldName("field");
+    // A qualified path is somebody else's namespace. `scoped_identifier` fails
+    // this test on the receiver, which is the same answer for a different
+    // reason, and both are the answer we want.
+    if (object && member && RECEIVERS.has(object.text)) names.add(member.text);
+  });
   return names;
 }
 
-function names(body: string, symbol: string): boolean {
-  return new RegExp(`\\b${escapeSymbol(symbol)}\\b`).test(body);
+/** The calls in a fragment of code. Parsed, so `if (x)` is not one of them. */
+export function callsIn(code: string, language: Language): Set<string> {
+  const tree = treeOf(code, language);
+  return tree ? calleesOf(tree.rootNode) : new Set<string>();
+}
+
+/**
+ * Every name mentioned under a node, once.
+ *
+ * This is what "the body names the target" means now, and it is stricter than
+ * the substring search it replaces: `log_line` in a comment is not a name, and
+ * neither is `log_line` inside a string. It is also what makes `#private`
+ * class fields work, which the old word-boundary search could not match.
+ */
+const tokenCache = new Map<number, Set<string>>();
+const callCache = new Map<number, Set<string>>();
+
+/**
+ * Node ids belong to a tree, and a tree gets freed when it falls out of the
+ * parse cache -- so these would grow forever inside the long-lived MCP server.
+ * Dropped wholesale rather than tracked per tree: rebuilding a token set is
+ * microseconds, and bookkeeping to save that would cost more than it saves.
+ */
+const NODE_CACHE_LIMIT = 4096;
+
+function bound(cache: Map<number, unknown>): void {
+  if (cache.size > NODE_CACHE_LIMIT) cache.clear();
+}
+
+function tokensOf(node: Node): Set<string> {
+  const hit = tokenCache.get(node.id);
+  if (hit) return hit;
+  bound(tokenCache);
+  const found = new Set<string>();
+  tokenCache.set(node.id, found);
+  each(node, (current) => { if (isName(current)) found.add(current.text); });
+  return found;
+}
+
+function callsCached(node: Node): Set<string> {
+  const hit = callCache.get(node.id);
+  if (hit) return hit;
+  bound(callCache);
+  const found = calleesOf(node);
+  callCache.set(node.id, found);
+  return found;
+}
+
+/** Free the per-node caches. Trees are freed by `resetEngineCache`. */
+export function resetBodyCache(): void {
+  tokenCache.clear();
+  callCache.clear();
+}
+
+function namesAny(body: Node, targets: string[]): boolean {
+  const tokens = tokensOf(body);
+  return targets.some((target) => tokens.has(target));
 }
 
 /**
@@ -235,7 +391,7 @@ export function chainBreak(
   targets: string[],
   language: Language,
 ): { at: string; next: string; unreadable: boolean } | undefined {
-  const stripped = stripCode(source, language);
+  const tree = treeOf(source, language);
   const links = [from, ...via];
 
   for (let index = 0; index < links.length; index += 1) {
@@ -243,13 +399,15 @@ export function chainBreak(
     // The last hop has to land on the box itself, and any one of its symbols
     // will do -- the same any-of-the-members rule the direct check uses.
     const wanted = index + 1 < links.length ? [links[index + 1]!] : targets;
-    const here_bodies = stripped === undefined ? [] : bodiesOf(stripped, here, language);
-    if (here_bodies.length === 0) {
+    const bodies = tree
+      ? declarationsIn(tree, here).map((d) => d.body).filter((b): b is Node => b !== undefined)
+      : [];
+    if (bodies.length === 0) {
       return { at: here, next: wanted.join(" or "), unreadable: true };
     }
     // Any one of this name's declarations carrying the link is enough. A method
     // declared in two impl blocks is one name to the diagram.
-    if (!here_bodies.some((body) => wanted.some((target) => names(body, target)))) {
+    if (!bodies.some((body) => namesAny(body, wanted))) {
       return { at: here, next: wanted.join(" or "), unreadable: false };
     }
   }
@@ -275,19 +433,18 @@ export function unsupportedMembers(
   language: Language,
 ): string[] {
   if (members.length < 2) return [];
-  const stripped = stripCode(source, language);
-  if (stripped === undefined) return [];
+  const tree = treeOf(source, language);
+  if (!tree) return [];
 
   const orphans: string[] = [];
   for (const member of members) {
-    const callable = declarationsOf(stripped, member, language)
+    const callable = declarationsIn(tree, member)
       .filter((declaration) => declaration.kind === "callable" && declaration.body !== undefined);
     if (callable.length === 0) continue;
     const others = members.filter((other) => other !== member);
     // Supported if *any* of its declarations shows a trace. One `impl` block
     // carrying the concept is the name carrying the concept.
-    const supported = callable.some((declaration) =>
-      others.some((other) => names(declaration.body!, other)));
+    const supported = callable.some((declaration) => namesAny(declaration.body!, others));
     if (!supported) orphans.push(member);
   }
   return orphans;
@@ -307,10 +464,11 @@ const VISIT_CAP = 300;
 
 /**
  * Whether a function in `source` reaches any of `targets`, directly or through
- * one same-file call.
+ * calls inside the same file.
  *
- * `undefined` means the question could not be asked -- no readable body for the
- * starting symbol -- which the caller counts rather than treating as a no.
+ * `undefined` means the question could not be asked -- no grammar for the
+ * language, or no readable body for the starting symbol -- which the caller
+ * counts rather than treating as a no.
  */
 export function reaches(
   source: string,
@@ -318,33 +476,23 @@ export function reaches(
   targets: string[],
   language: Language,
 ): boolean | undefined {
-  const stripped = stripCode(source, language);
-  // A bailed lexer would make brace counting unreliable, and an unreliable span
-  // is a loud wrong answer rather than a quiet one. Refuse the question.
-  if (stripped === undefined) return undefined;
+  const tree = treeOf(source, language);
+  // No grammar is no answer. Refusing the question is the quiet direction; a
+  // guess would be the loud one.
+  if (!tree) return undefined;
 
-  const bodies = new Map<string, string[]>();
-  const bodiesFor = (name: string): string[] => {
-    if (!bodies.has(name)) bodies.set(name, bodiesOf(stripped, name, language));
+  const bodies = new Map<string, Node[]>();
+  const bodiesFor = (name: string): Node[] => {
+    if (!bodies.has(name)) {
+      bodies.set(
+        name,
+        declarationsIn(tree, name).map((d) => d.body).filter((b): b is Node => b !== undefined),
+      );
+    }
     return bodies.get(name)!;
   };
   if (bodiesFor(from).length === 0) return undefined;
 
-  /*
-   * Follow the calls as far as they go inside this file.
-   *
-   * This used to stop after one hop, on the reasoning that searching deeper
-   * blesses everything. Measured at function level, on the 640-line Rust file
-   * and on this repo's densest TypeScript, that turned out to be false: both
-   * saturate at one hop and unlimited depth flags exactly as many arrows. What
-   * depth *does* buy is the genuine three-layer chain, which is a true arrow
-   * that one hop reports as broken.
-   *
-   * Discrimination survives because the receiver rule does the real work.
-   * `Type::foo()` and `other.foo()` are not followed, so the search stays
-   * inside the code this file actually owns and cannot wander into everything
-   * a library happens to expose.
-   */
   const seen = new Set<string>([from]);
   let frontier = [from];
   let read = 0;
@@ -353,10 +501,10 @@ export function reaches(
     const next: string[] = [];
     for (const name of frontier) {
       for (const body of bodiesFor(name)) {
-        if (targets.some((target) => names(body, target))) return true;
+        if (namesAny(body, targets)) return true;
         if (read >= VISIT_CAP) return undefined;
         read += 1;
-        for (const callee of callsIn(body)) {
+        for (const callee of callsCached(body)) {
           if (seen.has(callee)) continue;
           seen.add(callee);
           next.push(callee);

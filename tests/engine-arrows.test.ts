@@ -18,7 +18,6 @@ import { emptyBoard, type BoardFile } from "../src/engine/board-file";
 import { bodyOf, callsIn, reaches } from "../src/engine/body";
 import { createDiagram } from "../src/engine/diagram";
 import { checkDrift, type Workspace } from "../src/engine/drift";
-import { stripCode } from "../src/engine/strip";
 import { installExcalifontMeasurer } from "./helpers/excalifont";
 
 installExcalifontMeasurer();
@@ -97,10 +96,8 @@ const RUST = [
 ].join("\n");
 
 describe("finding a function body", () => {
-  const stripped = () => stripCode(RUST, "rust")!;
-
   it("takes the balanced extent of a method in an impl block", () => {
-    const body = bodyOf(stripped(), "handle_request", "rust")!;
+    const body = bodyOf(RUST, "handle_request", "rust")!;
     expect(body).toContain("log_line!");
     expect(body).toContain("self.get_client");
     // Stops at its own closing brace rather than running on into the next one.
@@ -109,29 +106,29 @@ describe("finding a function body", () => {
 
   it("is not fooled by braces in the parameter list", () => {
     const source = "export function f(options = { a: 1 }) {\n  return TARGET;\n}\n";
-    expect(bodyOf(stripCode(source, "ts")!, "f", "ts")).toContain("TARGET");
+    expect(bodyOf(source, "f", "ts")).toContain("TARGET");
   });
 
   it("runs an expression statement to its semicolon", () => {
     const source = "export const f = (x: number) => x + TARGET;\n";
-    expect(bodyOf(stripCode(source, "ts")!, "f", "ts")).toContain("TARGET");
+    expect(bodyOf(source, "f", "ts")).toContain("TARGET");
   });
 
   it("gives nothing for a signature with no body, rather than guessing", () => {
     // A trait method. The caller counts this and falls back; a guessed span
     // would be a loud wrong answer instead of a quiet one.
     const source = "trait Sink {\n    fn emit(&self);\n}\n";
-    expect(bodyOf(stripCode(source, "rust")!, "emit", "rust")).toBeUndefined();
+    expect(bodyOf(source, "emit", "rust")).toBeUndefined();
   });
 
   it("gives nothing for a name that is not declared here at all", () => {
-    expect(bodyOf(stripped(), "nowhere", "rust")).toBeUndefined();
+    expect(bodyOf(RUST, "nowhere", "rust")).toBeUndefined();
   });
 });
 
 describe("which calls a body is followed into", () => {
   it("takes bare calls, macro calls, and explicit self/this", () => {
-    const calls = callsIn("foo(1); log_line!(\"x\"); self.bar(); this.baz();");
+    const calls = callsIn("fn f() { foo(1); log_line!(\"x\"); self.bar(); this.baz(); }", "rust");
     expect([...calls].sort()).toEqual(["bar", "baz", "foo", "log_line"]);
   });
 
@@ -139,12 +136,12 @@ describe("which calls a body is followed into", () => {
     // The measurement that forced this: bodies calling mio's
     // `EventSet::readable()` were read as calling the local `readable`, which
     // logs -- and two false arrows went quiet because of it.
-    const calls = callsIn("EventSet::readable(); other.readable(); set.readable();");
+    const calls = callsIn("fn f() { EventSet::readable(); other.readable(); set.readable(); }", "rust");
     expect(calls.has("readable")).toBe(false);
   });
 
   it("does not mistake control flow for a call", () => {
-    const calls = callsIn("if (x) { while (y) { return f(); } }");
+    const calls = callsIn("function g() { if (x) { while (y) { return f(); } } }", "ts");
     expect([...calls]).toEqual(["f"]);
   });
 });
@@ -314,7 +311,7 @@ describe("reading a body past the signature", () => {
       "}",
       "function extentFrom(s: string) { return s; }",
     ].join("\n");
-    expect(bodyOf(stripCode(source, "ts")!, "declarationsOf", "ts")).toContain("extentFrom");
+    expect(bodyOf(source, "declarationsOf", "ts")).toContain("extentFrom");
     expect(reaches(source, "declarationsOf", ["extentFrom"], "ts")).toBe(true);
   });
 
@@ -329,7 +326,7 @@ describe("reading a body past the signature", () => {
       "}",
       "function names(s: string) { return { at: s, next: s }; }",
     ].join("\n");
-    expect(bodyOf(stripCode(source, "ts")!, "chainBreak", "ts")).toContain("names");
+    expect(bodyOf(source, "chainBreak", "ts")).toContain("names");
     expect(reaches(source, "chainBreak", ["names"], "ts")).toBe(true);
   });
 
@@ -337,7 +334,7 @@ describe("reading a body past the signature", () => {
     // The mirror of the above: here the braces really are the thing, and the
     // `;` after them is what says so.
     const source = "const shape = { corner: rounded() };\nfunction rounded() { return 1; }";
-    expect(bodyOf(stripCode(source, "ts")!, "shape", "ts")).toContain("rounded");
+    expect(bodyOf(source, "shape", "ts")).toContain("rounded");
   });
 
   it("reads a method body past its first statement", () => {
@@ -356,7 +353,7 @@ describe("reading a body past the signature", () => {
       "function prepare() { return 1; }",
       "function parseLater(n: number) { return n; }",
     ].join("\n");
-    const body = bodyOf(stripCode(source, "ts")!, "committed", "ts")!;
+    const body = bodyOf(source, "committed", "ts")!;
     expect(body).toContain("prepare");
     expect(body).toContain("parseLater");
     expect(reaches(source, "committed", ["parseLater"], "ts")).toBe(true);
