@@ -17,6 +17,11 @@ permanently on measurements. The chain problem is solved by membership and
 `via`, both of which live in the diagram file. See "Markers in the source,
 measured and deferred".
 
+**Built 2026-08-16, steps 1-3:** assertions, both strippers, both declaration
+tables. Where the numbers below were re-measured against the shipped code they
+have been replaced and the original is noted — see "What shipped, and what the
+numbers were on the real thing".
+
 ## The finding first
 
 **Usage is deterministically checkable — inside the files the box itself
@@ -378,6 +383,48 @@ machine flags, model claims, machine verifies — is the practical answer to
 "is diagram-driven development possible without a model in the checker": yes,
 because the model's intelligence compiles down to claims the deterministic
 layer holds forever.
+
+## What shipped, and what the numbers were on the real thing
+
+Steps 1-3 are built: assertion parsing, both strippers, both declaration
+tables, and the two findings. Re-measured against the code rather than a
+scratch script, on 2026-08-16. Where a number here contradicts one above, this
+section is the one to trust.
+
+| claim above | re-measured | note |
+| --- | --- | --- |
+| all `src/` TypeScript strips clean, zero bails | **24 files, zero bails** | but only after a fix, below |
+| blind `@used` flags 35 of 121 exports (29%) | **42 of 134 (31%)** | same conclusion, bigger repo |
+| declaration recall | **134 of 134**, no misses | a miss here is a false alarm, so this is the number that matters |
+| two-anchor Rust box, full pipeline | **0.04 ms** | 1.6 ms per anchor on a 1248-line TypeScript file |
+| corpus exposure | **zero**, confirmed by running it | no committed ref contains `@` |
+
+Three things the design did not anticipate, all found by measuring:
+
+- **JSX bails.** `</div>` is indistinguishable from an unterminated regex, and
+  an apostrophe in JSX text from an unterminated string, so both `.tsx` files
+  in `src/` abandoned stripping outright. Bailing is safe but throws away the
+  whole file. Fixed by recovering rather than bailing: with no closing
+  delimiter before the line ends, the character is treated as ordinary code.
+  In TypeScript an unterminated string really is a syntax error, so the
+  recovery cannot be wrong about valid source, and treating text as code only
+  ever makes the check quieter.
+- **Rust strings may span lines and TypeScript strings may not**, so the two
+  lexers cannot share one quote scanner.
+- **Two accidental quadratics**, both caught by timing rather than reading.
+  Scanning the whole emitted output to decide whether `/` opens a regex cost
+  89 ms to strip `src/`, against 15 ms with the lookback bounded to 24
+  characters. And `\s` in the method-declaration pattern let it wander across
+  newlines: 6.2 ms per anchor on a 1248-line file, against 1.6 ms with every
+  gap bounded to `[ \t]`.
+
+Also unplanned, and kept: a per-run cache of stripped text, because a box that
+names a static and the macro using it reads the same file twice. It is never
+persisted between runs -- a stored observation is a fact with a shelf life,
+which is the rot this tool exists to catch.
+
+Still to build: steps 4 through 7 (skill guidance beyond the ref table,
+function-granularity arrows, membership guidance, `via`).
 
 ## Markers in the source, measured and deferred
 

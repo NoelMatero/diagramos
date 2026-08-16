@@ -155,6 +155,8 @@ const REASONS = {
   "missing-symbol": "the file is there, that name in it is not",
   "unresolvable-ref": "that is not a path in this repo at all",
   "empty-ref": "it exists but has nothing in it",
+  "missing-declaration": "the name is in the file, but nothing there declares it",
+  "unused-symbol": "it is declared, and nothing outside its own declaration uses it",
 };
 const EDGE_REASON = "nothing in the code connects them: no import either way, "
   + "no third file importing both, no shared route string";
@@ -163,6 +165,9 @@ const EDGE_REASON = "nothing in the code connects them: no import either way, "
 function target(finding) {
   const { path: file, symbol } = parseRef(finding.ref);
   if (finding.kind === "missing-symbol") return `${symbol} in ${file}`;
+  if (finding.kind === "missing-declaration" || finding.kind === "unused-symbol") {
+    return `${symbol} in ${file}`;
+  }
   if (finding.kind === "unresolvable-ref") return finding.ref;
   return file;
 }
@@ -217,10 +222,13 @@ function rowsFor({ report }, colour, all = false) {
 }
 
 /** "2 gone  1 arrow  1 built", each part coloured, empty parts dropped. */
-function tallyCounts(gone, empty, removed, arrows, built, planned, colour) {
+function tallyCounts(gone, empty, unused, removed, arrows, built, planned, colour) {
   return [
     gone ? paint(`${gone} gone`, "red", colour) : "",
     empty ? paint(`${empty} empty`, "red", colour) : "",
+    // Separate from "gone" because it is a different sentence: the code is
+    // still there, and nothing calls it any more.
+    unused ? paint(`${unused} unused`, "red", colour) : "",
     removed ? paint(`${removed} removed`, "red", colour) : "",
     arrows ? paint(`${arrows} ${arrows === 1 ? "arrow" : "arrows"}`, "yellow", colour) : "",
     built ? paint(`${built} built`, "green", colour) : "",
@@ -229,10 +237,13 @@ function tallyCounts(gone, empty, removed, arrows, built, planned, colour) {
 }
 
 function tallyFor(report, colour) {
-  const empty = report.findings.filter((finding) => finding.kind === "empty-ref").length;
+  const count = (kind) => report.findings.filter((finding) => finding.kind === kind).length;
+  const empty = count("empty-ref");
+  const unused = count("unused-symbol");
   return tallyCounts(
-    report.findings.length - empty,
+    report.findings.length - empty - unused,
     empty,
+    unused,
     report.deleted.length,
     report.edges.length,
     report.promotions.length,
@@ -279,20 +290,23 @@ function render(stale, colour) {
   // one diagram, see what is wrong; several, see where.
   const totals = stale.reduce(
     (sum, { report }) => ({
-      gone: sum.gone + report.findings.filter((finding) => finding.kind !== "empty-ref").length,
+      gone: sum.gone + report.findings.filter(
+        (finding) => finding.kind !== "empty-ref" && finding.kind !== "unused-symbol",
+      ).length,
       empty: sum.empty + report.findings.filter((finding) => finding.kind === "empty-ref").length,
+      unused: sum.unused + report.findings.filter((finding) => finding.kind === "unused-symbol").length,
       removed: sum.removed + report.deleted.length,
       arrows: sum.arrows + report.edges.length,
       built: sum.built + report.promotions.length,
       planned: sum.planned + report.workItems.length,
     }),
-    { gone: 0, empty: 0, removed: 0, arrows: 0, built: 0, planned: 0 },
+    { gone: 0, empty: 0, unused: 0, removed: 0, arrows: 0, built: 0, planned: 0 },
   );
 
   // Too many to list: counts per diagram, and a pointer to the view that has room.
   const head = single
-    ? `${path.basename(stale[0].file)}  ${tallyCounts(totals.gone, totals.empty, totals.removed, totals.arrows, totals.built, totals.planned, colour)}`
-    : `${stale.length} diagrams out of date  ${tallyCounts(totals.gone, totals.empty, totals.removed, totals.arrows, totals.built, totals.planned, colour)}`;
+    ? `${path.basename(stale[0].file)}  ${tallyCounts(totals.gone, totals.empty, totals.unused, totals.removed, totals.arrows, totals.built, totals.planned, colour)}`
+    : `${stale.length} diagrams out of date  ${tallyCounts(totals.gone, totals.empty, totals.unused, totals.removed, totals.arrows, totals.built, totals.planned, colour)}`;
 
   const rows = [];
   let hidden = 0;
@@ -504,6 +518,14 @@ const SKIP_WORDS = {
   "not-ts-or-js": "not TypeScript or JavaScript",
 };
 
+/** Why a `@declared` / `@used` claim was read as a plain mention instead. */
+function assertionWords(assertions) {
+  return [
+    assertions.unsupportedLanguage ? `${assertions.unsupportedLanguage} no reader for that language` : "",
+    assertions.downgraded ? `${assertions.downgraded} could not read the file cleanly` : "",
+  ].filter(Boolean).join(" · ");
+}
+
 function skipWords(why) {
   return Object.entries(why)
     .sort((a, b) => b[1] - a[1])
@@ -528,6 +550,15 @@ function renderCoverageAudit(entries, colour) {
       if (report.handDrawn) rows.push(paint(`${report.handDrawn} hand-drawn boxes, never checked`, "dim", colour));
       if (report.skipped) rows.push(paint(`${report.skipped} boxes skipped: ${skipWords(report.skippedWhy)}`, "yellow", colour));
       if (report.edgesSkipped) rows.push(paint(`${report.edgesSkipped} arrows skipped: ${skipWords(report.edgesSkippedWhy)}`, "yellow", colour));
+      // A weakened assertion still passes the plain mention check, so without
+      // this line an unjudged claim and a satisfied one look identical.
+      const weak = report.assertions.downgraded + report.assertions.unsupportedLanguage;
+      if (report.assertions.checked) {
+        rows.push(paint(`${report.assertions.checked} declared/used claims checked`, "dim", colour));
+      }
+      if (weak) {
+        rows.push(paint(`${weak} declared/used claims read as plain mentions: ${assertionWords(report.assertions)}`, "yellow", colour));
+      }
       if (rows.length === 0) rows.push(paint("everything on this board was checked", "dim", colour));
       return {
         label: `${path.basename(file)}  ${paint(`${report.checked} refs · ${report.edgesChecked} arrows checked`, "dim", colour)}`,

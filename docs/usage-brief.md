@@ -1,6 +1,9 @@
 # Brief: is this feature still actually used?
 
-**Status: design answered in `docs/usage-design.md` (2026-08-16), not yet built.**
+**Status: answered in `docs/usage-design.md` (2026-08-16). Steps 1-3 of that
+design are built — `@declared`, `@used`, both strippers, both declaration
+tables. The measured results are in the design's "What shipped" section, and
+they replace the numbers below where the two disagree.**
 
 A design problem, handed over deliberately unsolved. Same format as
 `docs/arrow-check-brief.md` and `docs/ref-brief.md`, both of which worked.

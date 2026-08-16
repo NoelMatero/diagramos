@@ -74,6 +74,35 @@ and the function using it — add `refs: [...]` beside `ref`. Every anchor is
 checked, and the box is loud when any of them breaks. Pick `ref` for the main one;
 arrows between boxes are checked against it.
 
+### Claiming a symbol is still wired in
+
+A plain `path#symbol` asks only whether the name appears in the file, so a file
+holding nothing but a comment mentioning it passes. Add `@` when the box means
+something stronger:
+
+| you mean | write |
+| --- | --- |
+| this file defines it | `src/lib.rs#log_line@declared` |
+| something here calls it | `src/server.rs#log_line@used` |
+| it lives here and is wired in | `src/lib.rs#log_line@declared+used` |
+
+Those two words are the whole vocabulary; anything else after `@` is a broken
+ref and says so immediately. TypeScript, JavaScript and Rust are read properly;
+in any other language the claim quietly falls back to a plain mention.
+
+**Write `@declared+used` only when the box means "this feature is wired in".**
+For a box that means "this thing exists", leave it off. The distinction is not
+cosmetic: applied blindly to all 134 exports in this repo, "declared and used"
+flags 42 of them, because a module used only by its importers looks unused where
+it is written. Applied where it is actually meant, it is quiet.
+
+For a feature spread across files, name the files — the box carries the graph:
+
+```
+refs: ["src/logging.rs#log_line@declared",
+       "src/server.rs#log_line@used"]
+```
+
 Only for things that exist in the repository. Inventing a path is worse than
 leaving it off — but say *why* it is off, because a missing ref otherwise reads
 as an oversight:
