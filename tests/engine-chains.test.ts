@@ -190,6 +190,44 @@ describe("an arrow carrying via", () => {
     expect(report.edges[0].detail).toContain("worth a look");
   });
 
+  it("separates a stale route from a connection that is really gone", async () => {
+    // Two very different pieces of news, and rendering them the same way
+    // invites someone to delete an arrow that was right. `serve` logs
+    // directly, so the connection holds and only the route is wrong.
+    const withCaller = [
+      INTACT,
+      "",
+      "pub fn serve() {",
+      '    log_line!("serving");',
+      "    unrelated();",
+      "}",
+    ].join("\n");
+    const board = await boardWith(
+      [
+        { id: "a", label: "serve", ref: "src/lib.rs#serve" },
+        { id: "b", label: "logging", ref: "src/lib.rs#LOGGER", refs: ["src/lib.rs#log_line"] },
+      ],
+      [{ from: "a", to: "b", via: ["unrelated"] }],
+    );
+    const report = checkDrift(board, fakeWorkspace({ "src/lib.rs": withCaller }));
+    expect(report.edges).toHaveLength(1);
+    expect(report.edges[0].detail).toContain("still connected, but not by this route");
+    expect(report.edges[0].detail).toContain("unrelated");
+
+    // And the opposite: `unrelated` does not log and neither does anything it
+    // calls, so nothing is softened. Confirmation only ever adds certainty.
+    const absent = await boardWith(
+      [
+        { id: "a", label: "unrelated", ref: "src/lib.rs#unrelated" },
+        { id: "b", label: "logging", ref: "src/lib.rs#LOGGER", refs: ["src/lib.rs#log_line"] },
+      ],
+      [{ from: "a", to: "b", via: ["handle_logging"] }],
+    );
+    const gone = checkDrift(absent, fakeWorkspace({ "src/lib.rs": withCaller }));
+    expect(gone.edges[0].detail).toContain("the route breaks at");
+    expect(gone.edges[0].detail).not.toContain("still connected");
+  });
+
   it("does not quietly fall back to a looser channel when the route fails", async () => {
     // Both ends are in one file, so every file-level channel would say yes.
     // Falling back would throw away the localized message, which is the only

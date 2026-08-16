@@ -276,6 +276,22 @@ describe.each(FIXTURES)("$file", (fixture) => {
       expect(report.edges).toHaveLength(1);
       expect(report.edges[0].kind).toBe("broken-chain");
       expect(report.edges[0].detail).toContain(`breaks at ${fixture.top}`);
+      // `top` reaches the logging only through three layers, so the cheap
+      // confirmation cannot find it -- and must not pretend otherwise.
+      expect(report.edges[0].detail).not.toContain("still connected");
+    });
+
+    it(`${supported ? "says the route is stale" : "says nothing"} when the connection holds anyway`, async () => {
+      // `direct` logs on its own, so a wrong route leaves the arrow true. That
+      // is different news from a missing connection, and it reads differently.
+      const report = await arrow(fixture.direct, [fixture.silent]);
+      if (!supported) {
+        expect(report.edges).toEqual([]);
+        return;
+      }
+      expect(report.edges).toHaveLength(1);
+      expect(report.edges[0].detail).toContain("still connected, but not by this route");
+      expect(report.edges[0].detail).toContain(fixture.silent);
     });
   });
 

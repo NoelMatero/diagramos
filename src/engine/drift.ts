@@ -1124,6 +1124,24 @@ export function checkDrift(
           continue;
         }
         edgesChecked += 1;
+        /*
+         * A broken route and an absent connection are different news.
+         *
+         * "these are not connected" and "these are connected, but not the way
+         * you wrote it down" want different fixes -- redraw the arrow, versus
+         * correct the route -- and rendering them the same way invites someone
+         * to delete an arrow that was right.
+         *
+         * Telling them apart needs no deeper search, because the asymmetry is
+         * in our favour: finding a path proves a connection, while failing to
+         * find one proves nothing. So this only ever *confirms*, at exactly the
+         * evidence standard used everywhere else. Searching deeper for the
+         * confirmation would bless every broken route as "connected anyway",
+         * which is the same whitewash measured at file level, pointed the other
+         * way.
+         */
+        const stillConnected = broken
+          && checkSymbolEdge(fromEnd, toEnd, workspace) === "reached";
         recordEdge(
           edge,
           fromNode,
@@ -1137,9 +1155,11 @@ export function checkDrift(
                 fromRef,
                 toRef,
                 kind: "broken-chain",
-                detail:
-                  `the route breaks at ${broken.at}: nothing in it names ${broken.next} `
-                  + `— worth a look, not necessarily wrong.`,
+                detail: stillConnected
+                  ? `these are still connected, but not by this route: nothing in `
+                    + `${broken.at} names ${broken.next}. Correct the route or drop it.`
+                  : `the route breaks at ${broken.at}: nothing in it names ${broken.next} `
+                    + `— worth a look, not necessarily wrong.`,
               }
             : undefined,
         );

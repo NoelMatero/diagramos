@@ -162,9 +162,19 @@ const REASONS = {
 const EDGE_REASON = "nothing in the code connects them: no import either way, "
   + "no third file importing both, no shared route string";
 
-/** The hop named in a broken-chain detail, so the short row can carry it. */
+/**
+ * The short row's version of a broken route.
+ *
+ * Two sentences the engine can produce, and they are not the same news: one
+ * says the connection is gone, the other says only the route is stale. Reading
+ * them off the detail keeps the notice from turning both into the scarier one.
+ */
 function brokenHop(detail) {
-  return /breaks at ([^:]+):/.exec(detail)?.[1];
+  if (detail.includes("still connected, but not by this route")) {
+    return "connected, but the route is wrong";
+  }
+  const gone = /breaks at ([^:]+):/.exec(detail);
+  return gone ? `breaks at ${gone[1]}` : undefined;
 }
 
 /** What a stale box points at. */
@@ -216,7 +226,7 @@ function rowsFor({ report }, colour, all = false) {
       return paint(
         `${boxName({ label: finding.fromLabel, node: finding.from })}`
         + ` \u2192 ${boxName({ label: finding.toLabel, node: finding.to })}`
-        + (hop ? ` \u00b7 breaks at ${hop}` : ""),
+        + (hop ? ` \u00b7 ${hop}` : ""),
         "yellow",
         colour,
       );
