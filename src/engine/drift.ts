@@ -22,10 +22,19 @@ import { readFileSync, readdirSync, realpathSync, statSync } from "node:fs";
 import { readdir } from "node:fs/promises";
 import path from "node:path";
 
+import { parseSymbol, symbolEvidence, type Assertion, type StripCache } from "./assert";
 import type { BoardFile } from "./board-file";
 import { readGraph, type Provenance } from "./graph";
 
-export type DriftKind = "missing-file" | "missing-symbol" | "unresolvable-ref" | "empty-ref";
+export type DriftKind =
+  | "missing-file"
+  | "missing-symbol"
+  | "unresolvable-ref"
+  | "empty-ref"
+  /** `@declared` claimed, and no declaration of that name is in the file. */
+  | "missing-declaration"
+  /** `@used` claimed, and every occurrence is the declaration itself. */
+  | "unused-symbol";
 
 export interface DriftFinding {
   /** Node id, as edges and edit_diagram refer to it. */
@@ -148,6 +157,22 @@ export type EdgeSkipReason =
 /** Counts by reason, with zeroes omitted so a caller can print what is there. */
 export type SkipBreakdown<Reason extends string> = Partial<Record<Reason, number>>;
 
+/**
+ * What became of the `@declared` / `@used` claims on this board.
+ *
+ * Both weakenings are silent by design -- the anchor still gets the plain
+ * mention check -- so without a count there would be no way to tell a claim
+ * that held from one that was never evaluated.
+ */
+export interface AssertionTally {
+  /** Assertions actually evaluated against stripped source. */
+  checked: number;
+  /** The lexer bailed, so this was judged on raw text: today's mention semantics. */
+  downgraded: number;
+  /** No lexer or declaration table for that file type. */
+  unsupportedLanguage: number;
+}
+
 export interface DriftReport {
   clean: boolean;
   findings: DriftFinding[];
@@ -169,6 +194,8 @@ export interface DriftReport {
   skipped: number;
   /** The same number, split by reason, so silence can be told from coverage. */
   skippedWhy: SkipBreakdown<NodeSkipReason>;
+  /** What became of any `@declared` / `@used` claims. All zeroes on a board with none. */
+  assertions: AssertionTally;
   /** Nodes not about this repo: an `external` node, or any node on a concept board. */
   excused: number;
   /** Hand-drawn nodes, ignored by design. */
@@ -286,17 +313,97 @@ function mentionedIn(files: string[], symbol: string, workspace: Workspace): boo
   return files.some((file) => mentions(workspace.read(file), symbol));
 }
 
+/**
+ * Judge one file against `@declared` / `@used`.
+ *
+ * `"unsupported"` is the language with no table, and `"ok"` covers both a
+ * satisfied claim and a downgrade -- a bailed lexer falls back to the caller's
+ * mention check, which has already run. Every uncertainty here resolves quiet.
+ */
+function judgeAssertion(
+  filePath: string,
+  source: string,
+  symbol: string,
+  assertion: Assertion,
+  tally: AssertionTally,
+  cache: StripCache,
+): "ok" | "unsupported" | { kind: "missing-declaration" | "unused-symbol" } {
+  const evidence = symbolEvidence(filePath, source, symbol, cache);
+  if (!evidence) {
+    tally.unsupportedLanguage += 1;
+    return "unsupported";
+  }
+  if (evidence.downgraded) {
+    tally.downgraded += 1;
+    return "ok";
+  }
+  tally.checked += 1;
+  if (assertion.declared && !evidence.declared) return { kind: "missing-declaration" };
+  if (assertion.used && evidence.used < 1) return { kind: "unused-symbol" };
+  return "ok";
+}
+
+/**
+ * Whether any of these files satisfies the assertion. The set form of the
+ * above: a directory or glob anchor claims the symbol lives somewhere inside,
+ * so one file holding up the claim is enough.
+ */
+function assertedIn(
+  files: string[],
+  symbol: string,
+  assertion: Assertion,
+  workspace: Workspace,
+  tally: AssertionTally,
+  cache: StripCache,
+): "ok" | "unsupported" | { kind: "missing-declaration" | "unused-symbol" } {
+  let worst: "unsupported" | { kind: "missing-declaration" | "unused-symbol" } = "unsupported";
+  for (const file of files) {
+    const verdict = judgeAssertion(file, workspace.read(file), symbol, assertion, tally, cache);
+    if (verdict === "ok") return "ok";
+    if (verdict !== "unsupported") worst = verdict;
+  }
+  return worst;
+}
+
 function inspect(
   node: { id: string; label: string },
   ref: string,
   provenance: Provenance,
   workspace: Workspace,
+  tally: AssertionTally,
+  cache: StripCache,
 ): Inspection {
-  const { path: rawTarget, symbol } = parseRef(ref);
+  const { path: rawTarget, symbol: rawSymbol } = parseRef(ref);
   const base = { node: node.id, label: node.label, ref, provenance };
   if (!rawTarget) {
     return { ...base, kind: "unresolvable-ref", detail: `"${ref}" names a symbol but no file.` };
   }
+
+  // A garbled assertion is loud immediately rather than becoming a claim that
+  // silently checks nothing. It fails the turn it is written, while the author
+  // is still there.
+  const parsed = rawSymbol === undefined ? undefined : parseSymbol(rawSymbol);
+  if (parsed && "garbled" in parsed) {
+    return {
+      ...base,
+      kind: "unresolvable-ref",
+      detail: `"@${parsed.garbled}" is not something a ref can claim. Use @declared, @used, or @declared+used.`,
+    };
+  }
+  const symbol = parsed?.symbol;
+  const assertion = parsed?.assertion;
+  /** The finding an assertion verdict turns into, worded for where it looked. */
+  const failed = (
+    verdict: { kind: "missing-declaration" | "unused-symbol" },
+    where: string,
+  ): DriftFinding => ({
+    ...base,
+    kind: verdict.kind,
+    detail:
+      verdict.kind === "missing-declaration"
+        ? `${where} no longer declares ${symbol}.`
+        : `${where} mentions ${symbol} but never uses it beyond its declaration.`,
+  });
 
   // A trailing slash says "directory" outright. That is the point of allowing
   // it: what `src/engine` means should not depend on what happens to be on disk
@@ -338,9 +445,12 @@ function inspect(
     }
     if (!symbol) return "ok";
     const code = matched.filter((name) => TS_JS.test(name)).map((name) => `${absolute}/${name}`);
-    return mentionedIn(code, symbol, workspace)
-      ? "ok"
-      : { ...base, kind: "missing-symbol", detail: `no file matching ${target} mentions ${symbol}.` };
+    if (!mentionedIn(code, symbol, workspace)) {
+      return { ...base, kind: "missing-symbol", detail: `no file matching ${target} mentions ${symbol}.` };
+    }
+    if (!assertion) return "ok";
+    const verdict = assertedIn(code, symbol, assertion, workspace, tally, cache);
+    return typeof verdict === "object" ? failed(verdict, `no file matching ${target}`) : "ok";
   }
 
   if (found === "directory") {
@@ -361,19 +471,25 @@ function inspect(
         detail: `${target} holds no TypeScript or JavaScript, so ${symbol} cannot be looked for there.`,
       };
     }
-    return mentionedIn(code, symbol, workspace)
-      ? "ok"
-      : { ...base, kind: "missing-symbol", detail: `nothing directly in ${target} mentions ${symbol}.` };
+    if (!mentionedIn(code, symbol, workspace)) {
+      return { ...base, kind: "missing-symbol", detail: `nothing directly in ${target} mentions ${symbol}.` };
+    }
+    if (!assertion) return "ok";
+    const verdict = assertedIn(code, symbol, assertion, workspace, tally, cache);
+    return typeof verdict === "object" ? failed(verdict, `nothing directly in ${target}`) : "ok";
   }
 
   if (explicitDirectory) {
     return { ...base, kind: "unresolvable-ref", detail: `${target}/ is a file, not a directory.` };
   }
   if (!symbol) return "ok";
-  if (!mentions(workspace.read(absolute), symbol)) {
+  const source = workspace.read(absolute);
+  if (!mentions(source, symbol)) {
     return { ...base, kind: "missing-symbol", detail: `${target} no longer mentions ${symbol}.` };
   }
-  return "ok";
+  if (!assertion) return "ok";
+  const verdict = judgeAssertion(target, source, symbol, assertion, tally, cache);
+  return typeof verdict === "object" ? failed(verdict, target) : "ok";
 }
 
 /**
@@ -595,6 +711,8 @@ export function checkDrift(
   let handDrawn = 0;
   const skippedWhy: SkipBreakdown<NodeSkipReason> = {};
   const edgesSkippedWhy: SkipBreakdown<EdgeSkipReason> = {};
+  const assertions: AssertionTally = { checked: 0, downgraded: 0, unsupportedLanguage: 0 };
+  const strips: StripCache = new Map();
   const skipNode = (reason: NodeSkipReason) => {
     skipped += 1;
     skippedWhy[reason] = (skippedWhy[reason] ?? 0) + 1;
@@ -635,7 +753,14 @@ export function checkDrift(
     let anyChecked = false;
     for (const anchor of anchors) {
       const isDeclared = anchor === declared || (node.refs ?? []).includes(anchor);
-      const result = inspect(node, anchor, isDeclared ? "recorded" : "inferred", workspace);
+      const result = inspect(
+        node,
+        anchor,
+        isDeclared ? "recorded" : "inferred",
+        workspace,
+        assertions,
+        strips,
+      );
       if (result === "skip") continue;
       anyChecked = true;
 
@@ -936,6 +1061,7 @@ export function checkDrift(
     checked,
     skipped,
     skippedWhy,
+    assertions,
     excused,
     handDrawn,
     concept,
