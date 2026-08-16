@@ -516,6 +516,7 @@ const SKIP_WORDS = {
   "endpoint-file-missing": "an end's file is missing",
   "directory-ref": "an end refs a directory",
   "not-ts-or-js": "not TypeScript or JavaScript",
+  "no-function-body": "both ends name something with no body to read",
 };
 
 /** Why a `@declared` / `@used` claim was read as a plain mention instead. */
