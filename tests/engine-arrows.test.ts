@@ -293,3 +293,72 @@ describe("what function granularity leaves alone", () => {
     expect(report.edgesSkippedWhy).toEqual({ "not-ts-or-js": 1 });
   });
 });
+
+/**
+ * Signatures that used to swallow the body.
+ *
+ * Both of these came out of running `scripts/audit-arrows.mts`, which checks
+ * our verdicts against what the TypeScript compiler actually parses. Together
+ * they were most of a 12.8% false-alarm rate on real call edges in this repo's
+ * own `src/` -- calls that plainly exist, reported as absent.
+ */
+describe("reading a body past the signature", () => {
+  it("does not mistake a generic return type for the body", () => {
+    // `Array<{ ... }>` is a type. Reading it as the body meant every call in
+    // the real body went unseen.
+    const source = [
+      "export function declarationsOf(",
+      "  symbol: string,",
+      "): Array<{ kind: string; body: string | undefined }> {",
+      "  return [extentFrom(symbol)];",
+      "}",
+      "function extentFrom(s: string) { return s; }",
+    ].join("\n");
+    expect(bodyOf(stripCode(source, "ts")!, "declarationsOf", "ts")).toContain("extentFrom");
+    expect(reaches(source, "declarationsOf", ["extentFrom"], "ts")).toBe(true);
+  });
+
+  it("does not mistake a bare object return type for the body", () => {
+    // `): { at: string } | undefined {` has two brace groups and only the
+    // second is code. A type continues after `|`; a body does not.
+    const source = [
+      "export function chainBreak(",
+      "  from: string,",
+      "): { at: string; next: string } | undefined {",
+      "  return names(from);",
+      "}",
+      "function names(s: string) { return { at: s, next: s }; }",
+    ].join("\n");
+    expect(bodyOf(stripCode(source, "ts")!, "chainBreak", "ts")).toContain("names");
+    expect(reaches(source, "chainBreak", ["names"], "ts")).toBe(true);
+  });
+
+  it("still reads an object literal assigned to a name as its value", () => {
+    // The mirror of the above: here the braces really are the thing, and the
+    // `;` after them is what says so.
+    const source = "const shape = { corner: rounded() };\nfunction rounded() { return 1; }";
+    expect(bodyOf(stripCode(source, "ts")!, "shape", "ts")).toContain("rounded");
+  });
+
+  it("reads a method body past its first statement", () => {
+    // The method pattern used to consume the opening brace, so extraction
+    // began *inside* the body and stopped at the first semicolon. Anything
+    // called on a later line looked absent.
+    const source = [
+      "export function makeWorkspace() {",
+      "  return {",
+      "    committed() {",
+      "      const first = prepare();",
+      "      return parseLater(first);",
+      "    },",
+      "  };",
+      "}",
+      "function prepare() { return 1; }",
+      "function parseLater(n: number) { return n; }",
+    ].join("\n");
+    const body = bodyOf(stripCode(source, "ts")!, "committed", "ts")!;
+    expect(body).toContain("prepare");
+    expect(body).toContain("parseLater");
+    expect(reaches(source, "committed", ["parseLater"], "ts")).toBe(true);
+  });
+});

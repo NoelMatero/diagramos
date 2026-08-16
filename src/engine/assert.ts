@@ -77,9 +77,14 @@ const DECLARATIONS: Record<Language, (name: string) => RegExp[]> = {
     // Every gap here is `[ \t]` and never `\s`. `\s` crosses newlines, and
     // letting this pattern wander between lines cost six milliseconds on a
     // 1200-line file, against microseconds bounded to one line.
+    // The signature is a lookahead so the match ends at the name. Consuming it
+    // put the body extractor *inside* the body, where it read the first
+    // statement as the whole function -- every method-declared symbol had a
+    // truncated body, and any call past the first line went unseen.
     new RegExp(
       "^[ \\t]*(?:(?:public|private|protected|static|readonly|async|get|set|abstract|override)[ \\t]+)*"
-        + `\\*?[ \\t]*${name}[ \\t]*(?:<[^\\n>]*>)?[ \\t]*\\([^\\n]*\\)[^\\n]*\\{[ \\t]*$`,
+        + `\\*?[ \\t]*${name}`
+        + `(?=[ \\t]*(?:<[^\\n>]*>)?[ \\t]*\\([^\\n]*\\)[^\\n]*\\{[ \\t]*$)`,
       "gm",
     ),
   ],
