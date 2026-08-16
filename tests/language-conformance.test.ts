@@ -255,11 +255,13 @@ describe.each(FIXTURES)("$file", (fixture) => {
       }
     });
 
-    it("flags a three-layer chain with no route named", async () => {
+    it("is quiet on a three-layer chain, with no route named", async () => {
+      // This used to flag: the search stopped after one hop, so a true arrow
+      // through two intermediaries looked broken. Measured on two real files,
+      // following the calls all the way costs no discrimination, so it does --
+      // and this row went from "flags" to "quiet" on purpose.
       const report = await arrow(fixture.top);
-      // True arrow, past one hop. This is the false alarm `via` exists to fix,
-      // and it is pinned here so the trade stays visible.
-      expect(report.edges).toHaveLength(supported ? 1 : 0);
+      expect(report.edges).toEqual([]);
     });
 
     it("is quiet once the route is named", async () => {
@@ -275,10 +277,13 @@ describe.each(FIXTURES)("$file", (fixture) => {
       }
       expect(report.edges).toHaveLength(1);
       expect(report.edges[0].kind).toBe("broken-chain");
-      expect(report.edges[0].detail).toContain(`breaks at ${fixture.top}`);
-      // `top` reaches the logging only through three layers, so the cheap
-      // confirmation cannot find it -- and must not pretend otherwise.
-      expect(report.edges[0].detail).not.toContain("still connected");
+      // The failing link, both ends of it, so the reader can find the edit.
+      expect(report.edges[0].detail).toContain(fixture.top);
+      expect(report.edges[0].detail).toContain(fixture.silent);
+      // `top` does reach the logging through its own chain, so the route being
+      // wrong is the only complaint and the wording says exactly that. Before
+      // the search followed depth this read as a missing connection.
+      expect(report.edges[0].detail).toContain("still connected, but not by this route");
     });
 
     it(`${supported ? "says the route is stale" : "says nothing"} when the connection holds anyway`, async () => {

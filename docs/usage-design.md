@@ -499,6 +499,42 @@ Two smaller decisions worth recording:
   `handle_logging`, because that is where the route as written stopped being
   true.
 
+## The one-hop limit, measured and lifted
+
+The design capped the search at one same-file hop, on the reasoning that going
+deeper blesses everything. That reasoning was measured at *file* level and
+carried over to functions without being rechecked. Rechecked on 2026-08-17:
+
+| depth | `orangutan/src/lib.rs` reaches the logging | this repo's `drift.ts` reaches `#mentions` |
+| --- | --- | --- |
+| direct | 7 of 13 | 2 of 23 |
+| 1 hop | 7 of 13 | 3 of 23 |
+| 2 hops | 7 of 13 | 3 of 23 |
+| unlimited | **7 of 13** | **3 of 23** |
+
+Both saturate. Unlimited depth flags exactly as many arrows as one hop, and six
+functions in the Rust file (`new`, `receive`, `send`, `register`, `reregister`,
+`get_client`) never reach the logging at any depth. The whitewash did not
+happen, so the cap was buying nothing — while the false alarm it caused was
+real: a genuine three-layer chain is a true arrow that one hop reports as
+broken.
+
+So the search now follows calls as far as they go inside the file. What keeps
+that safe is not shallowness but the **receiver rule**: `Type::foo()` and
+`other.foo()` are still not followed, so the walk stays inside the code the file
+owns and cannot wander into every same-named method a library exposes. Removing
+that rule fails five tests; capping the depth again fails seven.
+
+Cost is unchanged at **0.37 ms per arrow** on the 640-line file, worst case —
+an arrow that flags, which has to exhaust the search. Cycles terminate on a
+`seen` set, and a search that exceeds 300 bodies returns *unreadable* rather
+than *no path*, because a budget running out is not evidence of absence.
+
+**What this does to `via`:** it is no longer needed for depth, which was most of
+its stated purpose. It keeps the two things nothing else does — naming the hop
+where a route broke, and being a claim about the *path* rather than the
+endpoints, so a stale route on a live connection is reported as exactly that.
+
 ## Markers in the source, measured and deferred
 
 The third chain shape put the name in the code — a comment on the line before

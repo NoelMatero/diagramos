@@ -211,8 +211,17 @@ export function unsupportedMembers(
   return orphans;
 }
 
-/** How many same-file callees one body will be followed into. */
-const HOP_FAN_OUT = 40;
+/**
+ * How many bodies one question will read before giving up.
+ *
+ * A search that cannot finish returns `undefined` rather than `false`: not
+ * finding a path is not evidence there is none, and a budget running out is
+ * the least evidential thing there is. So the arrow is skipped and counted.
+ *
+ * Well past any single file measured -- the densest here has 23 functions --
+ * and it exists so one pathological file cannot make the per-turn check slow.
+ */
+const VISIT_CAP = 300;
 
 /**
  * Whether a function in `source` reaches any of `targets`, directly or through
@@ -232,19 +241,47 @@ export function reaches(
   // is a loud wrong answer rather than a quiet one. Refuse the question.
   if (stripped === undefined) return undefined;
 
-  const body = bodyOf(stripped, from, language);
-  if (body === undefined) return undefined;
+  const bodies = new Map<string, string | undefined>();
+  const bodyFor = (name: string): string | undefined => {
+    if (!bodies.has(name)) bodies.set(name, bodyOf(stripped, name, language));
+    return bodies.get(name);
+  };
+  if (bodyFor(from) === undefined) return undefined;
 
-  if (targets.some((target) => names(body, target))) return true;
+  /*
+   * Follow the calls as far as they go inside this file.
+   *
+   * This used to stop after one hop, on the reasoning that searching deeper
+   * blesses everything. Measured at function level, on the 640-line Rust file
+   * and on this repo's densest TypeScript, that turned out to be false: both
+   * saturate at one hop and unlimited depth flags exactly as many arrows. What
+   * depth *does* buy is the genuine three-layer chain, which is a true arrow
+   * that one hop reports as broken.
+   *
+   * Discrimination survives because the receiver rule does the real work.
+   * `Type::foo()` and `other.foo()` are not followed, so the search stays
+   * inside the code this file actually owns and cannot wander into everything
+   * a library happens to expose.
+   */
+  const seen = new Set<string>([from]);
+  let frontier = [from];
+  let read = 0;
 
-  let followed = 0;
-  for (const callee of callsIn(body)) {
-    if (callee === from) continue;
-    if (followed >= HOP_FAN_OUT) break;
-    const inner = bodyOf(stripped, callee, language);
-    if (inner === undefined) continue;
-    followed += 1;
-    if (targets.some((target) => names(inner, target))) return true;
+  while (frontier.length > 0) {
+    const next: string[] = [];
+    for (const name of frontier) {
+      const body = bodyFor(name);
+      if (body === undefined) continue;
+      if (targets.some((target) => names(body, target))) return true;
+      if (read >= VISIT_CAP) return undefined;
+      read += 1;
+      for (const callee of callsIn(body)) {
+        if (seen.has(callee)) continue;
+        seen.add(callee);
+        next.push(callee);
+      }
+    }
+    frontier = next;
   }
   return false;
 }

@@ -131,28 +131,31 @@ calling a listed name and every arrow stays green while the concept is hollow.
 Data — a `static`, a `struct`, a `const` — is exempt: that is the ground the
 rest of the concept reaches to.
 
-### When the call goes through several layers
+### When the route itself is worth writing down
 
-The body check follows one call. A real chain is often longer:
+The body check follows calls as far as they go inside the file, so a chain like
 
 ```
 handle_fail → handle_logging → emit_batch → log_line!
 ```
 
-That arrow is true and would be flagged, because three layers is past one hop.
-Do not widen the search — name the route on the arrow instead:
+is found on its own. You do **not** need to do anything for depth.
+
+`via` is for when the *path* is part of what the diagram is claiming:
 
 ```
 via: ["handle_logging", "emit_batch"]
 ```
 
-Each consecutive pair is one direct body check, so depth costs nothing and a
-break reports **which hop** stopped holding rather than shrugging at the whole
-arrow. A `via` arrow never falls back to a looser channel; naming the route is
-a stronger claim and it is checked as one.
+That says the connection goes this way, through these names. Each consecutive
+pair is checked inside one body, so a break reports **which hop** stopped
+holding instead of shrugging at the whole arrow — and it is the only shape that
+can say that. It is also a stronger claim than the arrow alone, so a `via`
+arrow never falls back to a looser channel: get the route wrong on a connection
+that is genuinely there and it says so, in those words.
 
-Use `via` when the route matters or the chain is deeper than one call. Use
-membership when only the destination does.
+Use `via` when the route matters — a path you want protected from refactors, or
+a hand-off you want documented. Leave it off when only the destination does.
 
 Only for things that exist in the repository. Inventing a path is worse than
 leaving it off — but say *why* it is off, because a missing ref otherwise reads

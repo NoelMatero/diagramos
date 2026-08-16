@@ -20,7 +20,7 @@
 import { beforeAll, describe, expect, it } from "vitest";
 
 import { emptyBoard, type BoardFile } from "../src/engine/board-file";
-import { chainBreak, unsupportedMembers } from "../src/engine/body";
+import { chainBreak, reaches, unsupportedMembers } from "../src/engine/body";
 import { createDiagram } from "../src/engine/diagram";
 import { checkDrift, type Workspace } from "../src/engine/drift";
 import { installExcalifontMeasurer } from "./helpers/excalifont";
@@ -168,10 +168,11 @@ describe("an arrow carrying via", () => {
     expect(report.edgesChecked).toBe(1);
   });
 
-  it("would have been a false alarm without it", async () => {
-    // The same arrow with no route named: three layers is past one hop, so the
-    // direct check flags a connection that is genuinely there. This is the
-    // false alarm `via` exists to remove, pinned so the trade stays visible.
+  it("is not needed just because the chain is deep, not any more", async () => {
+    // This asserted the opposite until the search was measured: one hop made
+    // a true three-layer arrow look broken, and `via` was the workaround. The
+    // calls are followed all the way now, so the plain arrow is quiet and
+    // `via` is for routes worth writing down rather than for depth.
     const board = await boardWith(
       [
         { id: "a", label: "handle_fail", ref: "src/lib.rs#handle_fail" },
@@ -179,7 +180,18 @@ describe("an arrow carrying via", () => {
       ],
       [{ from: "a", to: "b" }],
     );
-    expect(checkDrift(board, fakeWorkspace(files)).edges).toHaveLength(1);
+    expect(checkDrift(board, fakeWorkspace(files)).edges).toEqual([]);
+
+    // And the arrow still flags when the chain is genuinely cut, which is the
+    // thing that would be lost if depth blessed everything.
+    const cut = await boardWith(
+      [
+        { id: "a", label: "handle_fail", ref: "src/lib.rs#handle_fail" },
+        { id: "b", label: "logging", ref: "src/lib.rs#LOGGER", refs: ["src/lib.rs#log_line"] },
+      ],
+      [{ from: "a", to: "b" }],
+    );
+    expect(checkDrift(cut, fakeWorkspace({ "src/lib.rs": CUT })).edges).toHaveLength(1);
   });
 
   it("flags the broken link and says where", async () => {
@@ -282,5 +294,100 @@ describe("keeping a concept box from going hollow", () => {
     // And an intact board says nothing.
     const intact = checkDrift(board, fakeWorkspace({ "src/lib.rs": INTACT }));
     expect(intact.findings).toEqual([]);
+  });
+});
+
+/**
+ * The search that follows calls all the way down, and the limits it keeps.
+ *
+ * Depth was measured before it was allowed: on the 640-line Rust file and on
+ * this repo's densest TypeScript, reachability saturates after one hop and
+ * unlimited depth flags exactly as many arrows. So the fear that motivated the
+ * one-hop cap -- that deeper searching blesses everything -- did not survive
+ * contact with either corpus, while the false alarm on a genuine three-layer
+ * chain was real. These tests hold the new behaviour in place, and hold on to
+ * the reasons it is still safe.
+ */
+describe("following the calls all the way down", () => {
+  function rust(...lines: string[]): string {
+    return [
+      "lazy_static! { static ref LOGGER: Mutex<u8> = Mutex::new(0); }",
+      "macro_rules! log_line { ($($a:tt)*) => {{ let _ = LOGGER.lock(); }}; }",
+      ...lines,
+    ].join("\n");
+  }
+  const LOG = ["LOGGER", "log_line"];
+
+  it("finds the logging however many layers down it sits", () => {
+    const deep = rust(
+      'pub fn five() { log_line!("x"); }',
+      "pub fn four() { five(); }",
+      "pub fn three() { four(); }",
+      "pub fn two() { three(); }",
+      "pub fn one() { two(); }",
+    );
+    expect(reaches(deep, "one", LOG, "rust")).toBe(true);
+  });
+
+  it("still says no when nothing down there logs", () => {
+    // The property that makes depth safe: it is not that the search is shallow,
+    // it is that it only follows calls this file owns.
+    const deep = rust(
+      "pub fn five() -> usize { 5 }",
+      "pub fn four() { five(); }",
+      "pub fn three() { four(); }",
+      "pub fn two() { three(); }",
+      "pub fn one() { two(); }",
+    );
+    expect(reaches(deep, "one", LOG, "rust")).toBe(false);
+  });
+
+  it("terminates on a cycle instead of chasing it", () => {
+    const looped = rust(
+      "pub fn ping(n: usize) { pong(n); }",
+      "pub fn pong(n: usize) { ping(n); }",
+    );
+    expect(reaches(looped, "ping", LOG, "rust")).toBe(false);
+  });
+
+  it("does not follow a call through a type or another object, at any depth", () => {
+    // The receiver rule is what keeps depth honest. Without it the search
+    // wanders into every same-named method a library happens to expose.
+    const foreign = rust(
+      'pub fn local_helper() { log_line!("x"); }',
+      "pub fn caller(other: Thing) { Helper::local_helper(); other.local_helper(); }",
+    );
+    expect(reaches(foreign, "caller", LOG, "rust")).toBe(false);
+  });
+
+  it("refuses the question rather than guessing when the search runs long", () => {
+    // A budget running out is the least evidential thing there is, so it
+    // cannot come back as "no path" -- that would be a loud wrong answer.
+    const wide = rust(
+      ...Array.from({ length: 400 }, (_, index) =>
+        `pub fn f${index}() { f${index + 1}(); }`),
+      "pub fn f400() -> usize { 0 }",
+    );
+    expect(reaches(wide, "f0", LOG, "rust")).toBeUndefined();
+  });
+
+  it("costs about the same as one hop did, on a real file", () => {
+    // Both ends of the range: an early hit and a full exhaustive miss.
+    const deep = rust(
+      'pub fn five() { log_line!("x"); }',
+      "pub fn four() { five(); }",
+      "pub fn three() { four(); }",
+      "pub fn two() { three(); }",
+      "pub fn one() { two(); }",
+      "pub fn nowhere() -> usize { 1 }",
+    );
+    const start = performance.now();
+    for (let run = 0; run < 50; run += 1) {
+      reaches(deep, "one", LOG, "rust");
+      reaches(deep, "nowhere", LOG, "rust");
+    }
+    // Generous: this is a guard against an accidental quadratic, not a
+    // benchmark. Measured around 0.4 ms per arrow on the 640-line real file.
+    expect((performance.now() - start) / 100).toBeLessThan(20);
   });
 });
