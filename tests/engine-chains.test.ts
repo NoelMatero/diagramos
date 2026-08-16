@@ -391,3 +391,52 @@ describe("following the calls all the way down", () => {
     expect((performance.now() - start) / 100).toBeLessThan(20);
   });
 });
+
+/**
+ * One name, more than one declaration.
+ *
+ * Rust `impl` blocks make this ordinary: the real file declares both `register`
+ * and `reregister` twice. Reading only the first was a false alarm waiting to
+ * happen, and false alarms are the direction that gets a check switched off.
+ */
+describe("a name declared more than once in a file", () => {
+  const TWO_IMPLS = [
+    "lazy_static! { static ref LOGGER: Mutex<u8> = Mutex::new(0); }",
+    "macro_rules! log_line { ($($a:tt)*) => {{ let _ = LOGGER.lock(); }}; }",
+    "impl Client {",
+    "    fn register(&self) -> usize { self.id }",
+    "    fn helper(&self) -> usize { 1 }",
+    "}",
+    "impl Server {",
+    '    fn register(&self) { log_line!("registering"); }',
+    "}",
+  ].join("\n");
+  const LOG = ["LOGGER", "log_line"];
+
+  it("is satisfied by whichever declaration carries the evidence", () => {
+    // The first `register` does not log and the second does. Before this, the
+    // first one won and the arrow was flagged.
+    expect(reaches(TWO_IMPLS, "register", LOG, "rust")).toBe(true);
+  });
+
+  it("still says no when none of the declarations carries it", () => {
+    expect(reaches(TWO_IMPLS, "helper", LOG, "rust")).toBe(false);
+  });
+
+  it("lets a named route pass through whichever declaration holds", () => {
+    const routed = [
+      TWO_IMPLS,
+      "impl Gateway {",
+      "    fn entry(&self) { self.register(); }",
+      "}",
+    ].join("\n");
+    expect(chainBreak(routed, "entry", ["register"], LOG, "rust")).toBeUndefined();
+  });
+
+  it("counts a member as supported if any of its declarations shows the trace", () => {
+    expect(unsupportedMembers(TWO_IMPLS, ["LOGGER", "log_line", "register"], "rust")).toEqual([]);
+    // `helper` genuinely shows nothing, in either block.
+    expect(unsupportedMembers(TWO_IMPLS, ["LOGGER", "log_line", "helper"], "rust"))
+      .toEqual(["helper"]);
+  });
+});

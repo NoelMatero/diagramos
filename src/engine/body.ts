@@ -33,7 +33,22 @@ import { stripCode, type Language } from "./strip";
  * falls back rather than guessing.
  */
 export function bodyOf(stripped: string, symbol: string, language: Language): string | undefined {
-  return declarationOf(stripped, symbol, language)?.body;
+  return declarationsOf(stripped, symbol, language)[0]?.body;
+}
+
+/**
+ * Every body this name has here, not just the first.
+ *
+ * One name can be declared more than once in a file, and Rust `impl` blocks
+ * make that ordinary rather than exotic -- `orangutan/src/lib.rs` declares both
+ * `register` and `reregister` twice. Reading only the first was a false alarm
+ * waiting to happen: a method that logs in the second `impl` and not the first
+ * reported as never reaching the logging at all, which is the loud direction.
+ */
+export function bodiesOf(stripped: string, symbol: string, language: Language): string[] {
+  return declarationsOf(stripped, symbol, language)
+    .map((declaration) => declaration.body)
+    .filter((body): body is string => body !== undefined);
 }
 
 /**
@@ -49,20 +64,26 @@ export type DeclarationKind = "callable" | "data";
 
 const CALLABLE = /\b(?:fn|function|macro_rules)\b|^\s*[\w$]+\s*(?:<[^\n>]*>)?\s*\(/;
 
-export function declarationOf(
+export function declarationsOf(
   stripped: string,
   symbol: string,
   language: Language,
-): { kind: DeclarationKind; body: string | undefined } | undefined {
+): Array<{ kind: DeclarationKind; body: string | undefined }> {
+  const found: Array<{ kind: DeclarationKind; body: string | undefined }> = [];
   for (const pattern of declarationPatterns(language, symbol)) {
     pattern.lastIndex = 0;
-    const match = pattern.exec(stripped);
-    if (!match) continue;
-    const kind: DeclarationKind = CALLABLE.test(match[0]) ? "callable" : "data";
-    const body = extentFrom(stripped, match.index + match[0].length);
-    if (body !== undefined) return { kind, body };
+    let match: RegExpExecArray | null;
+    while ((match = pattern.exec(stripped)) !== null) {
+      const kind: DeclarationKind = CALLABLE.test(match[0]) ? "callable" : "data";
+      const body = extentFrom(stripped, match.index + match[0].length);
+      if (body !== undefined) found.push({ kind, body });
+      // A zero-width match would spin; the patterns cannot produce one, but the
+      // loop should not depend on that.
+      if (match.index === pattern.lastIndex) pattern.lastIndex += 1;
+    }
+    if (found.length > 0) break;
   }
-  return undefined;
+  return found;
 }
 
 /**
@@ -168,11 +189,13 @@ export function chainBreak(
     // The last hop has to land on the box itself, and any one of its symbols
     // will do -- the same any-of-the-members rule the direct check uses.
     const wanted = index + 1 < links.length ? [links[index + 1]!] : targets;
-    const body = stripped === undefined ? undefined : bodyOf(stripped, here, language);
-    if (body === undefined) {
+    const here_bodies = stripped === undefined ? [] : bodiesOf(stripped, here, language);
+    if (here_bodies.length === 0) {
       return { at: here, next: wanted.join(" or "), unreadable: true };
     }
-    if (!wanted.some((target) => names(body, target))) {
+    // Any one of this name's declarations carrying the link is enough. A method
+    // declared in two impl blocks is one name to the diagram.
+    if (!here_bodies.some((body) => wanted.some((target) => names(body, target)))) {
       return { at: here, next: wanted.join(" or "), unreadable: false };
     }
   }
@@ -203,10 +226,15 @@ export function unsupportedMembers(
 
   const orphans: string[] = [];
   for (const member of members) {
-    const declaration = declarationOf(stripped, member, language);
-    if (!declaration || declaration.kind !== "callable" || declaration.body === undefined) continue;
+    const callable = declarationsOf(stripped, member, language)
+      .filter((declaration) => declaration.kind === "callable" && declaration.body !== undefined);
+    if (callable.length === 0) continue;
     const others = members.filter((other) => other !== member);
-    if (!others.some((other) => names(declaration.body!, other))) orphans.push(member);
+    // Supported if *any* of its declarations shows a trace. One `impl` block
+    // carrying the concept is the name carrying the concept.
+    const supported = callable.some((declaration) =>
+      others.some((other) => names(declaration.body!, other)));
+    if (!supported) orphans.push(member);
   }
   return orphans;
 }
@@ -241,12 +269,12 @@ export function reaches(
   // is a loud wrong answer rather than a quiet one. Refuse the question.
   if (stripped === undefined) return undefined;
 
-  const bodies = new Map<string, string | undefined>();
-  const bodyFor = (name: string): string | undefined => {
-    if (!bodies.has(name)) bodies.set(name, bodyOf(stripped, name, language));
-    return bodies.get(name);
+  const bodies = new Map<string, string[]>();
+  const bodiesFor = (name: string): string[] => {
+    if (!bodies.has(name)) bodies.set(name, bodiesOf(stripped, name, language));
+    return bodies.get(name)!;
   };
-  if (bodyFor(from) === undefined) return undefined;
+  if (bodiesFor(from).length === 0) return undefined;
 
   /*
    * Follow the calls as far as they go inside this file.
@@ -270,15 +298,15 @@ export function reaches(
   while (frontier.length > 0) {
     const next: string[] = [];
     for (const name of frontier) {
-      const body = bodyFor(name);
-      if (body === undefined) continue;
-      if (targets.some((target) => names(body, target))) return true;
-      if (read >= VISIT_CAP) return undefined;
-      read += 1;
-      for (const callee of callsIn(body)) {
-        if (seen.has(callee)) continue;
-        seen.add(callee);
-        next.push(callee);
+      for (const body of bodiesFor(name)) {
+        if (targets.some((target) => names(body, target))) return true;
+        if (read >= VISIT_CAP) return undefined;
+        read += 1;
+        for (const callee of callsIn(body)) {
+          if (seen.has(callee)) continue;
+          seen.add(callee);
+          next.push(callee);
+        }
       }
     }
     frontier = next;
