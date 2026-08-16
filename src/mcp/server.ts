@@ -435,7 +435,12 @@ server.registerTool(
       + "enough to run whenever module structure changes. Nodes without a ref are skipped, "
       + "hand-drawn ones ignored, and edges touching refless nodes are skipped, so a clean report means "
       + "nothing checkable disagreed -- not that the diagram is correct. skippedWhy and edgesSkippedWhy "
-      + "say what went unread, which is how you tell a verified diagram from an unreadable one.",
+      + "say what went unread, which is how you tell a verified diagram from an unreadable one. "
+      + "A ref may also claim more than existence: path#symbol@declared asks that the file declare that "
+      + "name, path#symbol@used that something there use it beyond its own declaration, and "
+      + "@declared+used both -- which is how a box standing for a feature notices the feature being "
+      + "gutted rather than deleted. TypeScript, JavaScript and Rust only; elsewhere the claim falls "
+      + "back to a plain mention and is counted in assertions.",
     inputSchema: {
       path: z
         .string()
@@ -494,6 +499,9 @@ server.registerTool(
       // tell it apart from "nothing here was readable".
       const skippedWhy: Record<string, number> = {};
       const edgesSkippedWhy: Record<string, number> = {};
+      // A `@declared` / `@used` claim that could not be judged still passes the
+      // plain mention check, so silence about it would read as a pass.
+      const assertions = { checked: 0, downgraded: 0, unsupportedLanguage: 0 };
       const tally = (into: Record<string, number>, from: Record<string, number | undefined>) => {
         for (const [reason, count] of Object.entries(from)) {
           if (count) into[reason] = (into[reason] ?? 0) + count;
@@ -519,6 +527,9 @@ server.registerTool(
         totals.edgesSkipped += report.edgesSkipped;
         tally(skippedWhy, report.skippedWhy);
         tally(edgesSkippedWhy, report.edgesSkippedWhy);
+        assertions.checked += report.assertions.checked;
+        assertions.downgraded += report.assertions.downgraded;
+        assertions.unsupportedLanguage += report.assertions.unsupportedLanguage;
         if (report.concept) conceptBoards.push(relativeToWorkspace(file));
         // Named per finding rather than grouped: a caller acting on one needs to
         // know which file to redraw, and flat is cheaper than nesting.
@@ -560,6 +571,9 @@ server.registerTool(
         ...(unrepresented.length ? { unrepresented } : {}),
         ...(Object.keys(skippedWhy).length ? { skippedWhy } : {}),
         ...(Object.keys(edgesSkippedWhy).length ? { edgesSkippedWhy } : {}),
+        ...(assertions.checked || assertions.downgraded || assertions.unsupportedLanguage
+          ? { assertions }
+          : {}),
         ...totals,
         // "clean: true, checked: 0" reads as a pass when nothing was examined,
         // so say which it was -- and distinguish "nobody annotated these" from
