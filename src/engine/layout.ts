@@ -32,6 +32,11 @@ export type GraphNode = {
    */
   ref?: string;
   /**
+   * Further anchors for a box that stands for more than one thing. Carried
+   * through to customData; layout ignores them.
+   */
+  refs?: string[];
+  /**
    * Whether the node claims to exist yet: `built` (default), `planned`, or
    * `external`. Carried through to customData; layout ignores it.
    */

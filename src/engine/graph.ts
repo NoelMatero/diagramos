@@ -80,6 +80,15 @@ export interface RecoveredNode {
    * caller supplied one; drift detection compares it against the working tree.
    */
   ref?: string;
+  /**
+   * Further anchors, for a box that stands for more than one thing -- a feature
+   * spread across files, or a static and the macro that uses it. Each is checked
+   * and reported on its own; the box is clean when all of them are.
+   *
+   * `ref` stays the primary: it is what the arrow check uses for an endpoint,
+   * because an arrow connects two points and not two sets.
+   */
+  refs?: string[];
   /** Whether the node claims to exist yet. Defaults to `built`. */
   state: NodeState;
 }
@@ -229,6 +238,10 @@ export function readGraph(board: BoardFile): RecoveredGraph {
     const recordedId = typeof custom.node === "string" ? custom.node : undefined;
     const id = recordedId ?? shape.id;
     const ref = typeof custom.ref === "string" && custom.ref.trim() ? custom.ref.trim() : undefined;
+    const refs = Array.isArray(custom.refs)
+      ? custom.refs.filter((entry): entry is string => typeof entry === "string" && entry.trim() !== "")
+        .map((entry) => entry.trim())
+      : undefined;
     const bounds = box(shape);
     nodes.push({
       id,
@@ -241,6 +254,7 @@ export function readGraph(board: BoardFile): RecoveredGraph {
       height: bounds.height,
       provenance: recordedId ? "recorded" : "inferred",
       ...(ref ? { ref } : {}),
+      ...(refs?.length ? { refs } : {}),
       state: stateOf(custom.state),
     });
     nodeIdByElement.set(shape.id, id);

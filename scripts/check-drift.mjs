@@ -154,6 +154,7 @@ const REASONS = {
   "missing-file": "that file is not in the repo any more",
   "missing-symbol": "the file is there, that name in it is not",
   "unresolvable-ref": "that is not a path in this repo at all",
+  "empty-ref": "it exists but has nothing in it",
 };
 const EDGE_REASON = "nothing in the code connects them: no import either way, "
   + "no third file importing both, no shared route string";
@@ -216,9 +217,10 @@ function rowsFor({ report }, colour, all = false) {
 }
 
 /** "2 gone  1 arrow  1 built", each part coloured, empty parts dropped. */
-function tallyCounts(gone, removed, arrows, built, planned, colour) {
+function tallyCounts(gone, empty, removed, arrows, built, planned, colour) {
   return [
     gone ? paint(`${gone} gone`, "red", colour) : "",
+    empty ? paint(`${empty} empty`, "red", colour) : "",
     removed ? paint(`${removed} removed`, "red", colour) : "",
     arrows ? paint(`${arrows} ${arrows === 1 ? "arrow" : "arrows"}`, "yellow", colour) : "",
     built ? paint(`${built} built`, "green", colour) : "",
@@ -227,8 +229,10 @@ function tallyCounts(gone, removed, arrows, built, planned, colour) {
 }
 
 function tallyFor(report, colour) {
+  const empty = report.findings.filter((finding) => finding.kind === "empty-ref").length;
   return tallyCounts(
-    report.findings.length,
+    report.findings.length - empty,
+    empty,
     report.deleted.length,
     report.edges.length,
     report.promotions.length,
@@ -275,19 +279,20 @@ function render(stale, colour) {
   // one diagram, see what is wrong; several, see where.
   const totals = stale.reduce(
     (sum, { report }) => ({
-      gone: sum.gone + report.findings.length,
+      gone: sum.gone + report.findings.filter((finding) => finding.kind !== "empty-ref").length,
+      empty: sum.empty + report.findings.filter((finding) => finding.kind === "empty-ref").length,
       removed: sum.removed + report.deleted.length,
       arrows: sum.arrows + report.edges.length,
       built: sum.built + report.promotions.length,
       planned: sum.planned + report.workItems.length,
     }),
-    { gone: 0, removed: 0, arrows: 0, built: 0, planned: 0 },
+    { gone: 0, empty: 0, removed: 0, arrows: 0, built: 0, planned: 0 },
   );
 
   // Too many to list: counts per diagram, and a pointer to the view that has room.
   const head = single
-    ? `${path.basename(stale[0].file)}  ${tallyCounts(totals.gone, totals.removed, totals.arrows, totals.built, totals.planned, colour)}`
-    : `${stale.length} diagrams out of date  ${tallyCounts(totals.gone, totals.removed, totals.arrows, totals.built, totals.planned, colour)}`;
+    ? `${path.basename(stale[0].file)}  ${tallyCounts(totals.gone, totals.empty, totals.removed, totals.arrows, totals.built, totals.planned, colour)}`
+    : `${stale.length} diagrams out of date  ${tallyCounts(totals.gone, totals.empty, totals.removed, totals.arrows, totals.built, totals.planned, colour)}`;
 
   const rows = [];
   let hidden = 0;

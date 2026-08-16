@@ -58,9 +58,21 @@ pipeline; the default `RIGHT` suits most architecture.
 
 ## Point nodes at the code they stand for
 
-When a node is a real file or module in this repo, set `ref` on it:
-`ref: "src/engine/layout.ts"`, or `path#symbol` for a single function. That is
-what lets `check_drift` say later that a diagram has gone stale.
+When a node is real code in this repo, set `ref` on it. That is what lets
+`check_drift` say later that a diagram has gone stale.
+
+| you mean | write |
+| --- | --- |
+| a file | `src/engine/layout.ts` |
+| one function in it | `src/engine/layout.ts#planLayout` |
+| a whole directory | `src/engine/` — the trailing slash says so, and it must not be empty |
+| something inside a directory | `src/engine/#Workspace` |
+| some files in one directory | `src/engine/*.ts` — `*` in the last segment only, never `**` |
+
+When one box stands for several things — a feature spread over files, a constant
+and the function using it — add `refs: [...]` beside `ref`. Every anchor is
+checked, and the box is loud when any of them breaks. Pick `ref` for the main one;
+arrows between boxes are checked against it.
 
 Only for things that exist in the repository. Inventing a path is worse than
 leaving it off — but say *why* it is off, because a missing ref otherwise reads

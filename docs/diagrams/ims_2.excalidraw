@@ -33,7 +33,8 @@
       "customData": {
         "origin": "diagram",
         "diagram": "ims-volte-architecture",
-        "role": "title"
+        "role": "title",
+        "describes": "concept"
       },
       "text": "IMS / VoLTE Architecture",
       "fontSize": 24,

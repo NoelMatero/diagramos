@@ -243,6 +243,73 @@ Most of the 105 unread boxes are the telecom boards, which describe a protocol
 rather than this repository. Marking them `describes: "concept"` turns them from
 *skipped* into *excused*, which is the honest resolution — see #32.
 
+## What a box is allowed to say
+
+A ref used to be one of two things: this file exists, or this file mentions this
+name. Measured across the seven committed diagrams, the second had **never been
+used once in 117 nodes** — the check was strongest at the claim people least
+wanted to make, and had nothing to offer for the ones they actually draw.
+
+Six forms now, four of them new:
+
+| form | example | claim |
+| --- | --- | --- |
+| file | `src/engine/drift.ts` | this file exists |
+| symbol | `src/engine/drift.ts#checkDrift` | the file mentions this name |
+| directory | `src/engine/` | this directory exists and is not empty |
+| dir symbol | `src/engine/#Workspace` | some file directly inside mentions it |
+| glob | `src/engine/*.ts` | at least one file matches |
+| several | `refs: ["src/lib.rs#LOGGER", "src/lib.rs#log_line"]` | all of these hold |
+
+A trailing slash **says** directory. That is the point of allowing it: what
+`src/engine` means should not depend on what happens to be on disk the day it is
+read, and `src/engine/layout.ts/` is now a finding rather than a coincidence.
+
+`refs` sits beside `ref`, never replacing it. Each anchor is checked and reported
+on its own, and the box is clean when all of them hold — so #18's real case, one
+box meaning a static *and* the macro that uses it, goes loud when either
+disappears, which neither single-ref option could do. `ref` stays primary because
+the arrow check needs one endpoint per box, not a set.
+
+One new finding: `empty-ref`, for a directory with nothing in it or a glob that
+matches nothing. It is loud, because it is a claim that has stopped being true.
+
+### The glob restriction is the security design
+
+`*` is allowed in the **last segment only**, and `**` never. The directory prefix
+stays literal, so expansion is one listing of one directory, through `Workspace`,
+which confines to the root and re-checks after `realpath`.
+
+Refs are model-authored strings that become filesystem reads. A syntax able to
+express "search the repo" is a disk-probe surface, not merely a cost problem, and
+`src/*/layout.ts` is refused for that reason rather than because it would be hard
+to support.
+
+Directory and glob anchors also stop at **50 entries**. Past that the anchor is
+skipped and counted rather than guessed at: a box standing for a thousand files is
+not making a checkable claim, and reading them on every turn is not a per-turn
+budget.
+
+### The migration, and what it was worth
+
+Five boards were marked `describes: "concept"` — the telecom ones, plus
+`auth.excalidraw`, which despite its name is titled *"Wiley / board-ai
+architecture"* and describes a different software project. They were picked by
+reading titles and node labels, not filenames, which mislead here:
+`architecture.excalidraw` is the IMS diagram.
+
+| | before | after |
+| --- | --- | --- |
+| boxes checked | 12 | 12 |
+| boxes **unexplained** | **105** | **5** |
+| boxes excused by declaration | 0 | 100 |
+
+Nothing new is checked. What changed is that the check no longer implies 105
+boxes are missing annotations someone forgot: 100 of them were never claims about
+this repository. The remaining five are `example.excalidraw`, which is genuinely
+mixed — "Board MCP server" and "ELK layout engine" are this repo, "Claude Code"
+and "You" are not — and needs per-box work rather than a board-level flag.
+
 ## Two jobs, deliberately separate
 
 | | Cost | Needs a model | When to run |

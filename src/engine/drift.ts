@@ -18,14 +18,14 @@
  *   intention, not a claim about code that exists today.
  */
 import { execFileSync } from "node:child_process";
-import { readFileSync, realpathSync, statSync } from "node:fs";
+import { readFileSync, readdirSync, realpathSync, statSync } from "node:fs";
 import { readdir } from "node:fs/promises";
 import path from "node:path";
 
 import type { BoardFile } from "./board-file";
 import { readGraph, type Provenance } from "./graph";
 
-export type DriftKind = "missing-file" | "missing-symbol" | "unresolvable-ref";
+export type DriftKind = "missing-file" | "missing-symbol" | "unresolvable-ref" | "empty-ref";
 
 export interface DriftFinding {
   /** Node id, as edges and edit_diagram refer to it. */
@@ -194,6 +194,14 @@ export interface Workspace {
   stat(absolutePath: string): "file" | "directory" | "missing";
   /** Only called when stat said "file". */
   read(absolutePath: string): string;
+  /**
+   * Entry names directly inside a directory, unsorted, never recursive.
+   *
+   * One level is the whole security design for globs: a ref can name a single
+   * directory's listing and never a search. Only called when stat said
+   * "directory"; an unreadable directory is an empty list, not a throw.
+   */
+  list(absolutePath: string): string[];
 }
 
 /**
@@ -231,38 +239,137 @@ function mentions(source: string, symbol: string): boolean {
 
 type Inspection = DriftFinding | "ok" | "skip";
 
+/**
+ * How many entries a directory or glob anchor will look at.
+ *
+ * Past this the anchor is skipped and counted rather than guessed at: a box
+ * standing for a thousand-file directory is not making a checkable claim, and
+ * reading them on every turn is not a per-turn budget.
+ */
+const ANCHOR_ENTRY_CAP = 50;
+
+/**
+ * A `*` in the last segment, and only there.
+ *
+ * The restriction is the security design rather than a simplification: the
+ * directory prefix stays literal, so expansion is one listing of one directory.
+ * Allowing `**`, or a star mid-path, turns a model-authored string back into a
+ * tree walk.
+ */
+function globOf(target: string): { directory: string; pattern: RegExp } | undefined {
+  if (!target.includes("*")) return undefined;
+  const cut = target.lastIndexOf("/");
+  const directory = cut < 0 ? "." : target.slice(0, cut);
+  const last = target.slice(cut + 1);
+  if (directory.includes("*") || last.includes("**")) return undefined;
+  const body = last.split("*").map((part) => part.replace(REGEX_SPECIAL, "\\$&")).join("[^/]*");
+  return { directory, pattern: new RegExp(`^${body}$`) };
+}
+
+/** Names directly inside a directory that are files. `undefined` past the cap. */
+function filesIn(
+  directoryAbsolute: string,
+  workspace: Workspace,
+  match?: RegExp,
+): string[] | undefined {
+  const entries = workspace.list(directoryAbsolute);
+  if (entries.length > ANCHOR_ENTRY_CAP) return undefined;
+  return entries.filter(
+    (entry) =>
+      (!match || match.test(entry))
+      && workspace.stat(`${directoryAbsolute}/${entry}`) === "file",
+  );
+}
+
+/** Whether any of these files mentions the symbol. Stops at the first hit. */
+function mentionedIn(files: string[], symbol: string, workspace: Workspace): boolean {
+  return files.some((file) => mentions(workspace.read(file), symbol));
+}
+
 function inspect(
   node: { id: string; label: string },
   ref: string,
   provenance: Provenance,
   workspace: Workspace,
 ): Inspection {
-  const { path: target, symbol } = parseRef(ref);
+  const { path: rawTarget, symbol } = parseRef(ref);
   const base = { node: node.id, label: node.label, ref, provenance };
-  if (!target) {
+  if (!rawTarget) {
     return { ...base, kind: "unresolvable-ref", detail: `"${ref}" names a symbol but no file.` };
   }
 
-  const absolute = workspace.resolve(target);
+  // A trailing slash says "directory" outright. That is the point of allowing
+  // it: what `src/engine` means should not depend on what happens to be on disk
+  // the day it is read.
+  const explicitDirectory = rawTarget.endsWith("/");
+  const target = explicitDirectory ? rawTarget.replace(/\/+$/, "") : rawTarget;
+
+  const glob = globOf(target);
+  if (target.includes("*") && !glob) {
+    return {
+      ...base,
+      kind: "unresolvable-ref",
+      detail: `${target} puts * outside the last path segment. One directory can be listed, never searched.`,
+    };
+  }
+
+  const lookup = glob ? glob.directory : target;
+  const absolute = workspace.resolve(lookup);
   if (!absolute) {
     // An inferred ref is a reading of someone's label, not a claim they made.
     // A label pointing outside the repo just is not a code reference.
     if (provenance === "inferred") return "skip";
-    return { ...base, kind: "unresolvable-ref", detail: `${target} is outside the repository.` };
+    return { ...base, kind: "unresolvable-ref", detail: `${lookup} is outside the repository.` };
   }
 
   const found = workspace.stat(absolute);
   if (found === "missing") {
-    return { ...base, kind: "missing-file", detail: `${target} no longer exists.` };
+    return { ...base, kind: "missing-file", detail: `${lookup} no longer exists.` };
+  }
+
+  if (glob) {
+    if (found !== "directory") {
+      return { ...base, kind: "unresolvable-ref", detail: `${glob.directory} is not a directory.` };
+    }
+    const matched = filesIn(absolute, workspace, glob.pattern);
+    if (matched === undefined) return "skip";
+    if (matched.length === 0) {
+      return { ...base, kind: "empty-ref", detail: `${target} matches no files.` };
+    }
+    if (!symbol) return "ok";
+    const code = matched.filter((name) => TS_JS.test(name)).map((name) => `${absolute}/${name}`);
+    return mentionedIn(code, symbol, workspace)
+      ? "ok"
+      : { ...base, kind: "missing-symbol", detail: `no file matching ${target} mentions ${symbol}.` };
+  }
+
+  if (found === "directory") {
+    const inside = filesIn(absolute, workspace);
+    if (inside === undefined) return "skip";
+    if (workspace.list(absolute).length === 0) {
+      return { ...base, kind: "empty-ref", detail: `${target} is empty.` };
+    }
+    if (!symbol) return "ok";
+    // A symbol asked for inside a directory used to be unresolvable. It is a
+    // reasonable thing to mean -- "this lives somewhere in here" -- and one
+    // listing plus that directory's own files answers it.
+    const code = inside.filter((name) => TS_JS.test(name)).map((name) => `${absolute}/${name}`);
+    if (code.length === 0) {
+      return {
+        ...base,
+        kind: "unresolvable-ref",
+        detail: `${target} holds no TypeScript or JavaScript, so ${symbol} cannot be looked for there.`,
+      };
+    }
+    return mentionedIn(code, symbol, workspace)
+      ? "ok"
+      : { ...base, kind: "missing-symbol", detail: `nothing directly in ${target} mentions ${symbol}.` };
+  }
+
+  if (explicitDirectory) {
+    return { ...base, kind: "unresolvable-ref", detail: `${target}/ is a file, not a directory.` };
   }
   if (!symbol) return "ok";
-  if (found === "directory") {
-    return {
-      ...base,
-      kind: "unresolvable-ref",
-      detail: `${target} is a directory, so it cannot contain ${symbol}.`,
-    };
-  }
   if (!mentions(workspace.read(absolute), symbol)) {
     return { ...base, kind: "missing-symbol", detail: `${target} no longer mentions ${symbol}.` };
   }
@@ -512,43 +619,57 @@ export function checkDrift(
       continue;
     }
     const declared = node.ref?.trim();
-    const ref = declared || refFromLabel(node.label);
-    if (!ref) {
+    // Every anchor the box claims, in order, with the primary first. A box that
+    // stands for a feature spread across files is clean only when all of them
+    // hold, and each reports on its own so the reader learns which one broke.
+    const anchors = [declared || refFromLabel(node.label), ...(node.refs ?? [])]
+      .map((entry) => entry?.trim())
+      .filter((entry): entry is string => Boolean(entry));
+    if (anchors.length === 0) {
       skipNode("no-ref");
       continue;
     }
-    const result = inspect(node, ref, declared ? "recorded" : "inferred", workspace);
-    if (result === "skip") {
-      skipNode("ref-outside-repo");
-      continue;
-    }
-    checked += 1;
 
-    if (node.state === "planned") {
-      if (result === "ok") {
-        promotions.push({
-          node: node.id,
-          label: node.label,
-          ref,
-          detail: `${ref} exists now, so this is no longer planned.`,
-        });
-      } else if (result.kind === "unresolvable-ref") {
-        // Not a thing waiting to be built: the ref is malformed or escapes the
-        // root, and writing the code would not make it resolve.
-        findings.push(result);
-      } else {
-        workItems.push({
-          node: node.id,
-          label: node.label,
-          ref,
-          kind: result.kind,
-          detail: result.detail,
-        });
+    // Counted once per box, not once per anchor: the numbers are about how much
+    // of the diagram was read, and a box is one thing on the diagram.
+    let anyChecked = false;
+    for (const anchor of anchors) {
+      const isDeclared = anchor === declared || (node.refs ?? []).includes(anchor);
+      const result = inspect(node, anchor, isDeclared ? "recorded" : "inferred", workspace);
+      if (result === "skip") continue;
+      anyChecked = true;
+
+      if (node.state === "planned") {
+        if (result === "ok") {
+          promotions.push({
+            node: node.id,
+            label: node.label,
+            ref: anchor,
+            detail: `${anchor} exists now, so this is no longer planned.`,
+          });
+        } else if (result.kind === "unresolvable-ref") {
+          // Not a thing waiting to be built: the ref is malformed or escapes the
+          // root, and writing the code would not make it resolve.
+          findings.push(result);
+        } else {
+          workItems.push({
+            node: node.id,
+            label: node.label,
+            ref: anchor,
+            kind: result.kind,
+            detail: result.detail,
+          });
+        }
+        continue;
       }
-      continue;
-    }
 
-    if (result !== "ok") findings.push(result);
+      if (result !== "ok") findings.push(result);
+    }
+    // Every anchor was unreadable -- the only way `inspect` returns "skip" is a
+    // label-derived ref pointing outside the tree, or a directory too large to
+    // read. One box, one count, whichever way it went.
+    if (anyChecked) checked += 1;
+    else skipNode("ref-outside-repo");
   }
 
   /*
@@ -757,14 +878,19 @@ export function checkDrift(
     const directories: string[] = [];
     for (const node of graph.nodes) {
       if (node.state === "external") continue;
-      const ref = node.ref?.trim();
-      if (!ref) continue;
-      const { path: target } = parseRef(ref);
-      const resolved = workspace.resolve(target);
-      if (!resolved) continue;
-      const kind = workspace.stat(resolved);
-      if (kind === "file") onBoard.set(resolved, target);
-      else if (kind === "directory") directories.push(resolved);
+      for (const ref of [node.ref, ...(node.refs ?? [])]) {
+        const anchor = ref?.trim();
+        if (!anchor) continue;
+        const { path: target } = parseRef(anchor);
+        // A glob names a directory's worth of files; treat its directory as
+        // covering them, which is what the box is claiming.
+        const glob = globOf(target);
+        const resolved = workspace.resolve(glob ? glob.directory : target);
+        if (!resolved) continue;
+        const kind = workspace.stat(resolved);
+        if (glob || kind === "directory") directories.push(resolved);
+        else if (kind === "file") onBoard.set(resolved, target);
+      }
     }
 
     const covered = (absolute: string) =>
@@ -942,6 +1068,15 @@ export function createWorkspace(root: string): Workspace {
     },
     read(absolutePath) {
       return readFileSync(absolutePath, "utf8");
+    },
+    list(absolutePath) {
+      try {
+        return readdirSync(absolutePath);
+      } catch {
+        // A directory that cannot be read is empty as far as a check is
+        // concerned. Throwing here would fail a whole run over a permission bit.
+        return [];
+      }
     },
   };
 }

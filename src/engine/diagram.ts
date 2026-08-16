@@ -315,6 +315,11 @@ export async function createDiagram(
   // board that says nothing about state byte-identical to one written before
   // the field existed, which is what makes this change invisible to every
   // existing diagram.
+  const extraRefsByNode = new Map(
+    params.nodes
+      .filter((node) => node.refs?.some((entry) => entry.trim()))
+      .map((node) => [node.id, node.refs!.map((entry) => entry.trim()).filter(Boolean)]),
+  );
   const stateByNode = new Map(
     params.nodes
       .filter((node) => node.state && node.state !== "built")
@@ -323,9 +328,11 @@ export async function createDiagram(
   for (const [nodeId, elementId] of plan.elementIdByNode) {
     const ref = refByNode.get(nodeId);
     const state = stateByNode.get(nodeId);
+    const extra = extraRefsByNode.get(nodeId);
     customData.set(elementId, {
       node: nodeId,
       ...(ref ? { ref } : {}),
+      ...(extra?.length ? { refs: extra } : {}),
       ...(state ? { state } : {}),
     });
   }

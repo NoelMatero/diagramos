@@ -33,7 +33,8 @@
       "customData": {
         "origin": "diagram",
         "diagram": "imsvolte",
-        "role": "title"
+        "role": "title",
+        "describes": "concept"
       },
       "text": "IMS / VoLTE in Mobile Networks",
       "fontSize": 24,

@@ -135,9 +135,21 @@ const nodeSchema = z.object({
     .string()
     .optional()
     .describe(
-      "What this node stands for in the repo: a path, or path#symbol, e.g. src/engine/layout.ts. "
-      + "Set it when a node is a real file or module so check_drift can tell when it goes stale. "
-      + "Leave it off for anything not in this repository.",
+      "What this node stands for in the repo. A file (src/engine/layout.ts), a symbol in one "
+      + "(src/engine/layout.ts#planLayout), a directory (src/engine/ — must not be empty), a symbol "
+      + "somewhere directly inside one (src/engine/#Workspace), or a glob over one directory "
+      + "(src/engine/*.ts — * is allowed in the last segment only, never **). Set it when a node is "
+      + "real code so check_drift can tell when it goes stale. Leave it off for anything not in this "
+      + "repository, and say why with state or the board's describes.",
+    ),
+  refs: z
+    .array(z.string())
+    .optional()
+    .describe(
+      "Further anchors, when one box stands for more than one thing — a feature spread over "
+      + "several files, or a constant and the function that uses it. Each is checked and reported "
+      + "separately; the box is clean when all of them are. ref stays the primary one, and is what "
+      + "arrows between boxes are checked against.",
     ),
   state: z
     .enum(["planned", "built", "external"])
