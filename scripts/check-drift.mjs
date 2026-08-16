@@ -157,9 +157,15 @@ const REASONS = {
   "empty-ref": "it exists but has nothing in it",
   "missing-declaration": "the name is in the file, but nothing there declares it",
   "unused-symbol": "it is declared, and nothing outside its own declaration uses it",
+  "unsupported-member": "the box lists it, and its body shows no trace of the others",
 };
 const EDGE_REASON = "nothing in the code connects them: no import either way, "
   + "no third file importing both, no shared route string";
+
+/** The hop named in a broken-chain detail, so the short row can carry it. */
+function brokenHop(detail) {
+  return /breaks at ([^:]+):/.exec(detail)?.[1];
+}
 
 /** What a stale box points at. */
 function target(finding) {
@@ -202,14 +208,19 @@ function rowsFor({ report }, colour, all = false) {
       paint(`${boxName(finding)} removed, ${parseRef(finding.ref).path} still there`, "red", colour),
     ),
     ...report.findings.map((finding) => paint(`${boxName(finding)} \u2192 ${target(finding)}`, "red", colour)),
-    ...report.edges.map((finding) =>
-      paint(
+    ...report.edges.map((finding) => {
+      // A named route knows where it stopped holding, and that is the only
+      // thing this shape offers over a plain unsupported arrow. Printing just
+      // the endpoints would throw it away.
+      const hop = finding.kind === "broken-chain" ? brokenHop(finding.detail) : undefined;
+      return paint(
         `${boxName({ label: finding.fromLabel, node: finding.from })}`
-        + ` \u2192 ${boxName({ label: finding.toLabel, node: finding.to })}`,
+        + ` \u2192 ${boxName({ label: finding.toLabel, node: finding.to })}`
+        + (hop ? ` \u00b7 breaks at ${hop}` : ""),
         "yellow",
         colour,
-      ),
-    ),
+      );
+    }),
     // Good news, and the only row here that says the diagram is behind the code
     // rather than the other way round.
     ...report.promotions.map((promotion) =>

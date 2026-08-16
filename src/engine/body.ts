@@ -33,12 +33,34 @@ import { stripCode, type Language } from "./strip";
  * falls back rather than guessing.
  */
 export function bodyOf(stripped: string, symbol: string, language: Language): string | undefined {
+  return declarationOf(stripped, symbol, language)?.body;
+}
+
+/**
+ * Whether a name was introduced as something that runs or something that sits.
+ *
+ * The difference matters in exactly one place: a member of a concept box that
+ * runs is expected to reach the rest of the concept, and one that merely holds
+ * data is the ground the rest reaches *to*. Reading the keyword the declaration
+ * table already matched costs nothing, and without it the self-support rule
+ * flags every `static` and `struct` a box lists.
+ */
+export type DeclarationKind = "callable" | "data";
+
+const CALLABLE = /\b(?:fn|function|macro_rules)\b|^\s*[\w$]+\s*(?:<[^\n>]*>)?\s*\(/;
+
+export function declarationOf(
+  stripped: string,
+  symbol: string,
+  language: Language,
+): { kind: DeclarationKind; body: string | undefined } | undefined {
   for (const pattern of declarationPatterns(language, symbol)) {
     pattern.lastIndex = 0;
     const match = pattern.exec(stripped);
     if (!match) continue;
-    const span = extentFrom(stripped, match.index + match[0].length);
-    if (span !== undefined) return span;
+    const kind: DeclarationKind = CALLABLE.test(match[0]) ? "callable" : "data";
+    const body = extentFrom(stripped, match.index + match[0].length);
+    if (body !== undefined) return { kind, body };
   }
   return undefined;
 }
@@ -116,6 +138,77 @@ export function callsIn(body: string): Set<string> {
 
 function names(body: string, symbol: string): boolean {
   return new RegExp(`\\b${escapeSymbol(symbol)}\\b`).test(body);
+}
+
+/**
+ * Walk a route the author named, and say where it stops holding.
+ *
+ * Every link is a plain direct check -- does this body name the next name --
+ * because the path is written down and there is nothing left to infer. That is
+ * the whole trade: naming the hops buys a chain of arbitrary depth out of the
+ * one-hop machinery, and buys a report that can point at the broken link
+ * instead of shrugging at the arrow.
+ *
+ * Returns the hop that failed, or `undefined` when the whole chain holds.
+ * `unreadable` is a link whose body could not be found at all, which is not
+ * evidence of a break.
+ */
+export function chainBreak(
+  source: string,
+  from: string,
+  via: string[],
+  targets: string[],
+  language: Language,
+): { at: string; next: string; unreadable: boolean } | undefined {
+  const stripped = stripCode(source, language);
+  const links = [from, ...via];
+
+  for (let index = 0; index < links.length; index += 1) {
+    const here = links[index]!;
+    // The last hop has to land on the box itself, and any one of its symbols
+    // will do -- the same any-of-the-members rule the direct check uses.
+    const wanted = index + 1 < links.length ? [links[index + 1]!] : targets;
+    const body = stripped === undefined ? undefined : bodyOf(stripped, here, language);
+    if (body === undefined) {
+      return { at: here, next: wanted.join(" or "), unreadable: true };
+    }
+    if (!wanted.some((target) => names(body, target))) {
+      return { at: here, next: wanted.join(" or "), unreadable: false };
+    }
+  }
+  return undefined;
+}
+
+/**
+ * Members of a concept box that show no trace of the concept.
+ *
+ * Membership has a hole: cut the deepest call and every caller still calls a
+ * listed member, so the arrows stay green while the concept is hollow. The rule
+ * that closes it is that a member which *runs* has to name another member --
+ * so a claim is not trusted, it is checked, like everything else here.
+ *
+ * Data members are the ground and are exempt: a `static` holding a file handle
+ * is what the rest of the concept reaches, and asking it to reach back would
+ * flag every well-formed box. A single-member box is exempt too, having
+ * nothing to connect to.
+ */
+export function unsupportedMembers(
+  source: string,
+  members: string[],
+  language: Language,
+): string[] {
+  if (members.length < 2) return [];
+  const stripped = stripCode(source, language);
+  if (stripped === undefined) return [];
+
+  const orphans: string[] = [];
+  for (const member of members) {
+    const declaration = declarationOf(stripped, member, language);
+    if (!declaration || declaration.kind !== "callable" || declaration.body === undefined) continue;
+    const others = members.filter((other) => other !== member);
+    if (!others.some((other) => names(declaration.body!, other))) orphans.push(member);
+  }
+  return orphans;
 }
 
 /** How many same-file callees one body will be followed into. */

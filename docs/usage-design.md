@@ -465,6 +465,40 @@ Still to build: step 4 (skill guidance beyond the ref table), step 6
 (membership guidance — the arrow check already accepts any of a box's symbols,
 so this is prose), and step 7 (`via`).
 
+**Steps 6 and 7 are built. The design is complete.** Membership needed no code,
+as predicted: the arrow check already accepts any of a box's symbols, so step 6
+is guidance in `skills/diagram/SKILL.md`. `via` and the self-support rule are
+measured on the design's own chain experiment, reconstructed as a fixture:
+
+| what was checked | result |
+| --- | --- |
+| the intact three-layer chain, no `via` | **flags** — the false alarm `via` exists to remove |
+| the same chain with `via: ["handle_logging", "emit_batch"]` | quiet |
+| cut the deepest call, same `via` | flags, and names `emit_batch` |
+| a route that is wrong in the middle | flags, and names the middle hop |
+| a hop with no body in this file | unreadable, skipped and counted, not a break |
+| self-support, intact chain, four members | no complaints |
+| self-support, after the cut | `emit_batch` flagged as hollow |
+| self-support on `[LOGGER, log_line]` | quiet, before and after |
+
+That last row is the one that shaped the rule. `LOGGER` is a `static` and never
+names anything; requiring every member to reach another would flag it, and
+flag the equivalent in every well-formed box. So the rule applies to members
+that **run** — a `fn`, a `function`, a `macro_rules!`, a method — and exempts
+data, which is the ground the rest of the concept reaches to. The declaration
+table already matched the keyword, so telling them apart costs nothing.
+
+Two smaller decisions worth recording:
+
+- **A `via` arrow never falls back to a looser channel.** Naming the route is a
+  stronger claim than drawing the arrow, and falling back on failure would
+  throw away the localized message, which is the only thing this shape has that
+  the other two do not.
+- **The walk stops at the first hop that fails**, rather than continuing to
+  find a hop that does not exist. `handle_logging → vanished` reports
+  `handle_logging`, because that is where the route as written stopped being
+  true.
+
 ## Markers in the source, measured and deferred
 
 The third chain shape put the name in the code — a comment on the line before

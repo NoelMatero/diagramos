@@ -340,6 +340,7 @@ export async function createDiagram(
     customData.set(`${prefix}-edge-${index}`, {
       edge: { from: edge.from, to: edge.to },
       ...(edge.state && edge.state !== "built" ? { state: edge.state } : {}),
+      ...(edge.via?.length ? { via: edge.via.map((hop) => hop.trim()).filter(Boolean) } : {}),
     });
     customData.set(`${prefix}-edgelabel-${index}`, { edgeLabelFor: `${prefix}-edge-${index}` });
   });

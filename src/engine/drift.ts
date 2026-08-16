@@ -23,10 +23,10 @@ import { readdir } from "node:fs/promises";
 import path from "node:path";
 
 import { parseSymbol, symbolEvidence, type Assertion, type StripCache } from "./assert";
-import { reaches } from "./body";
+import { chainBreak, reaches, unsupportedMembers } from "./body";
 import type { BoardFile } from "./board-file";
 import { readGraph, type Provenance } from "./graph";
-import { languageOf } from "./strip";
+import { languageOf, type Language } from "./strip";
 
 export type DriftKind =
   | "missing-file"
@@ -36,7 +36,9 @@ export type DriftKind =
   /** `@declared` claimed, and no declaration of that name is in the file. */
   | "missing-declaration"
   /** `@used` claimed, and every occurrence is the declaration itself. */
-  | "unused-symbol";
+  | "unused-symbol"
+  /** A symbol a box lists as part of a concept, whose body shows no trace of it. */
+  | "unsupported-member";
 
 export interface DriftFinding {
   /** Node id, as edges and edit_diagram refer to it. */
@@ -57,7 +59,8 @@ export interface EdgeDriftFinding {
   toLabel: string;
   fromRef: string;
   toRef: string;
-  kind: "unsupported-edge";
+  /** `broken-chain` is a `via` arrow whose named route stopped holding. */
+  kind: "unsupported-edge" | "broken-chain";
   detail: string;
 }
 
@@ -76,7 +79,7 @@ export interface WorkItem {
   /** Absent for an edge, where the claim is the connection and not one anchor. */
   ref?: string;
   /** Why it is not there yet -- the same distinctions the checks already draw. */
-  kind: DriftKind | "unsupported-edge";
+  kind: DriftKind | "unsupported-edge" | "broken-chain";
   detail: string;
 }
 
@@ -644,6 +647,37 @@ function symbolsOf(node: { ref?: string; refs?: string[] }, file: string): strin
   return [...symbols];
 }
 
+/**
+ * The symbols a box lists, grouped by the file they live in.
+ *
+ * Grouped because the self-support rule is a question about one file's text:
+ * a box spanning `logging.rs` and `server.rs` is making two local claims, not
+ * one that spans them.
+ */
+function membersByFile(
+  node: { ref?: string; refs?: string[] },
+  workspace: Workspace,
+): Array<[{ path: string; absolute: string; language: Language }, string[]]> {
+  const byFile = new Map<string, { file: { path: string; absolute: string; language: Language }; symbols: string[] }>();
+  for (const anchor of [node.ref, ...(node.refs ?? [])]) {
+    const raw = anchor?.trim();
+    if (!raw) continue;
+    const { path: target, symbol } = parseRef(raw);
+    if (!symbol) continue;
+    const parsed = parseSymbol(symbol);
+    if ("garbled" in parsed || parsed.symbol.startsWith("/")) continue;
+    const absolute = workspace.resolve(target);
+    if (!absolute || workspace.stat(absolute) !== "file") continue;
+    const language = languageOf(absolute);
+    if (!language) continue;
+    const entry = byFile.get(absolute)
+      ?? { file: { path: target, absolute, language }, symbols: [] };
+    if (!entry.symbols.includes(parsed.symbol)) entry.symbols.push(parsed.symbol);
+    byFile.set(absolute, entry);
+  }
+  return [...byFile.values()].map((entry) => [entry.file, entry.symbols]);
+}
+
 type SymbolEdgeVerdict = "reached" | "unreached" | "unreadable";
 
 /**
@@ -781,6 +815,40 @@ export function checkDrift(
     edgesSkippedWhy[reason] = (edgesSkippedWhy[reason] ?? 0) + 1;
   };
 
+  /**
+   * File one verdict about one arrow.
+   *
+   * A `planned` arrow is the connection you want, not one you are claiming
+   * exists. Absent corroboration is then the work, and corroboration is the
+   * news that the work landed.
+   */
+  const recordEdge = (
+    edge: { from: string; to: string; state: string },
+    fromNode: { label: string },
+    toNode: { label: string },
+    finding: EdgeDriftFinding | undefined,
+  ) => {
+    if (edge.state !== "planned") {
+      if (finding) edges.push(finding);
+      return;
+    }
+    const claim = `${fromNode.label || edge.from} -> ${toNode.label || edge.to}`;
+    if (finding) {
+      workItems.push({
+        node: `${edge.from} -> ${edge.to}`,
+        label: claim,
+        kind: finding.kind,
+        detail: finding.detail,
+      });
+    } else {
+      promotions.push({
+        node: `${edge.from} -> ${edge.to}`,
+        label: claim,
+        detail: "the code now connects these, so this is no longer planned.",
+      });
+    }
+  };
+
   const graph = readGraph(board);
   // A board describing a protocol or another project makes no claims about this
   // tree, so every box on it is excused rather than reported as unannotated.
@@ -854,6 +922,33 @@ export function checkDrift(
     // read. One box, one count, whichever way it went.
     if (anyChecked) checked += 1;
     else skipNode("ref-outside-repo");
+
+    /*
+     * A concept box has to hold together.
+     *
+     * Listing several symbols is how a box says "these are the ways to use
+     * this thing", and it is what lets one arrow into the box be satisfied by
+     * any one member. That generosity has a hole: cut the deepest call and
+     * every caller still calls a listed member, so the arrows stay green while
+     * the concept has been hollowed out.
+     *
+     * So a member that runs has to name another member. The claim is not
+     * trusted, it is checked -- every turn, like everything else.
+     */
+    for (const [file, members] of membersByFile(node, workspace)) {
+      for (const orphan of unsupportedMembers(workspace.read(file.absolute), members, file.language)) {
+        findings.push({
+          node: node.id,
+          label: node.label,
+          ref: `${file.path}#${orphan}`,
+          kind: "unsupported-member",
+          provenance: "recorded",
+          detail:
+            `${orphan} is listed as part of this box, and its body names none of `
+            + `${members.filter((other) => other !== orphan).join(", ")}.`,
+        });
+      }
+    }
   }
 
   /*
@@ -1009,6 +1104,48 @@ export function checkDrift(
       const fromEnd = { file: fromFile, path: fromPath, symbols: symbolsOf(fromNode, fromFile) };
       const toEnd = { file: toFile, path: toPath, symbols: symbolsOf(toNode, toFile) };
       const bothNamed = fromEnd.symbols.length > 0 && toEnd.symbols.length > 0;
+
+      /*
+       * A named route is checked as written, and never falls back.
+       *
+       * `via` says the connection goes this way, through these names. Each
+       * consecutive pair is one plain direct check, so depth costs nothing and
+       * the report can point at the hop that stopped holding -- which is the
+       * one thing no other shape here can say. Falling back to a looser channel
+       * on failure would throw away exactly that.
+       */
+      const via = edge.via;
+      if (bothNamed && via && via.length > 0) {
+        const language = languageOf(fromFile)!;
+        const source = workspace.read(fromFile);
+        const broken = chainBreak(source, fromEnd.symbols[0]!, via, toEnd.symbols, language);
+        if (broken?.unreadable) {
+          skipEdge("no-function-body");
+          continue;
+        }
+        edgesChecked += 1;
+        recordEdge(
+          edge,
+          fromNode,
+          toNode,
+          broken
+            ? {
+                from: fromPath,
+                to: toPath,
+                fromLabel: fromNode.label,
+                toLabel: toNode.label,
+                fromRef,
+                toRef,
+                kind: "broken-chain",
+                detail:
+                  `the route breaks at ${broken.at}: nothing in it names ${broken.next} `
+                  + `— worth a look, not necessarily wrong.`,
+              }
+            : undefined,
+        );
+        continue;
+      }
+
       const verdict = bothNamed ? checkSymbolEdge(fromEnd, toEnd, workspace) : "unreadable";
 
       let finding: EdgeDriftFinding | undefined;
@@ -1047,31 +1184,7 @@ export function checkDrift(
           sharedImporterCandidates,
         );
       }
-      // A `planned` arrow is the connection you want, not one you are claiming
-      // exists. Absent corroboration is then the work, and corroboration is the
-      // news that the work landed.
-      if (edge.state === "planned") {
-        const claim = `${fromNode.label || edge.from} -> ${toNode.label || edge.to}`;
-        if (finding) {
-          workItems.push({
-            node: `${edge.from} -> ${edge.to}`,
-            label: claim,
-            kind: "unsupported-edge",
-            detail: finding.detail,
-          });
-        } else {
-          promotions.push({
-            node: `${edge.from} -> ${edge.to}`,
-            label: claim,
-            detail: "the code now connects these, so this is no longer planned.",
-          });
-        }
-        continue;
-      }
-
-      if (finding) {
-        edges.push(finding);
-      }
+      recordEdge(edge, fromNode, toNode, finding);
     }
   }
 

@@ -1,0 +1,248 @@
+/**
+ * Named routes, and keeping a concept box honest.
+ *
+ * The one-hop limit has an obvious objection: indirection is the most common
+ * thing in programming. `handle_fail -> handle_logging -> emit_batch ->
+ * log_line!` is an ordinary chain, and the true arrow `handle_fail -> log`
+ * flags under direct-plus-one-hop, which is a false alarm.
+ *
+ * Walking deeper is not the fix -- reachability blesses everything, and that
+ * was measured. The fix is a distinction: an unnamed chain is undetectable, a
+ * *named* one is just a list of one-hop checks. So the author writes the route
+ * down and the machine verifies every link of it, forever, and can say which
+ * link broke.
+ *
+ * The second half of this file is the price of membership. Letting any one of
+ * a box's symbols satisfy an arrow opens a hole -- cut the deepest call and
+ * every caller still calls a listed member, so everything stays green while
+ * the concept is hollow. The self-support rule closes it.
+ */
+import { beforeAll, describe, expect, it } from "vitest";
+
+import { emptyBoard, type BoardFile } from "../src/engine/board-file";
+import { chainBreak, unsupportedMembers } from "../src/engine/body";
+import { createDiagram } from "../src/engine/diagram";
+import { checkDrift, type Workspace } from "../src/engine/drift";
+import { installExcalifontMeasurer } from "./helpers/excalifont";
+
+installExcalifontMeasurer();
+
+function fakeWorkspace(files: Record<string, string>): Workspace {
+  return {
+    resolve: (relative) => (relative.startsWith("../") ? undefined : relative),
+    stat: (target) => (files[target] === undefined ? "missing" : "file"),
+    read: (target) => files[target] ?? "",
+    list: () => [],
+  };
+}
+
+async function boardWith(
+  nodes: Array<{ id: string; label: string; ref?: string; refs?: string[] }>,
+  edges: Array<{ from: string; to: string; via?: string[] }>,
+): Promise<BoardFile> {
+  return (await createDiagram(emptyBoard(), { name: "arch", nodes, edges })).board;
+}
+
+beforeAll(async () => {
+  await boardWith([{ id: "warmup", label: "Warm up" }], []);
+}, 60_000);
+
+/**
+ * The chain from the design, three layers deep, in the shape of the real file.
+ * `handle_fail` reaches the logging only through two intermediaries.
+ */
+function chainFile(deepestLogs: boolean): string {
+  return [
+    "lazy_static! {",
+    "    static ref LOGGER: Mutex<std::fs::File> = Mutex::new(open_log());",
+    "}",
+    "",
+    "macro_rules! log_line {",
+    "    ($($arg:tt)*) => {{",
+    "        if let Ok(mut file) = LOGGER.lock() {",
+    '            let _ = writeln!(file, "{}", format!($($arg)*));',
+    "        }",
+    "    }};",
+    "}",
+    "",
+    "pub fn emit_batch(lines: &[String]) {",
+    deepestLogs
+      ? '    for line in lines { log_line!("{}", line); }'
+      : "    for line in lines { let _ = line; }",
+    "}",
+    "",
+    "pub fn handle_logging(msg: &str) {",
+    "    emit_batch(&[msg.to_string()]);",
+    "}",
+    "",
+    "pub fn handle_fail(msg: &str) {",
+    "    handle_logging(msg);",
+    "}",
+    "",
+    "pub fn unrelated() -> usize { 7 }",
+  ].join("\n");
+}
+
+const INTACT = chainFile(true);
+const CUT = chainFile(false);
+const LOG = ["LOGGER", "log_line"];
+
+describe("walking a route the author named", () => {
+  it("holds all the way down an intact chain", () => {
+    expect(chainBreak(INTACT, "handle_fail", ["handle_logging", "emit_batch"], LOG, "rust"))
+      .toBeUndefined();
+  });
+
+  it("names the hop that stopped holding, which is the whole point", () => {
+    // Cut the deepest link only. Every other hop is intact, and a check that
+    // could only say "this arrow looks unsupported" would leave the reader to
+    // find this by hand.
+    const broken = chainBreak(CUT, "handle_fail", ["handle_logging", "emit_batch"], LOG, "rust");
+    expect(broken).toMatchObject({ at: "emit_batch", unreadable: false });
+    expect(broken!.next).toBe("LOGGER or log_line");
+  });
+
+  it("names a hop broken in the middle, not just at the end", () => {
+    const skipped = chainBreak(INTACT, "handle_fail", ["emit_batch"], LOG, "rust");
+    // `handle_fail` calls `handle_logging`, not `emit_batch` -- the route as
+    // written is wrong even though the two ends are genuinely connected.
+    expect(skipped).toMatchObject({ at: "handle_fail", next: "emit_batch" });
+  });
+
+  it("stops at the first hop that fails, not the first one missing", () => {
+    // `handle_logging` calls `emit_batch`, not `vanished`, so the route is
+    // already wrong there -- and it says so rather than running on to report
+    // the name that happens not to exist.
+    const gone = chainBreak(INTACT, "handle_fail", ["handle_logging", "vanished"], LOG, "rust");
+    expect(gone).toMatchObject({ at: "handle_logging", next: "vanished", unreadable: false });
+  });
+
+  it("calls a hop with no body here unreadable, which is not a break", () => {
+    // Every link holds until `writeln`, which is std's macro and declared
+    // nowhere in this file. Not knowing is different from knowing it is wrong.
+    const opaque = chainBreak(
+      INTACT,
+      "handle_fail",
+      ["handle_logging", "emit_batch", "log_line", "writeln"],
+      LOG,
+      "rust",
+    );
+    expect(opaque).toMatchObject({ at: "writeln", unreadable: true });
+  });
+});
+
+describe("an arrow carrying via", () => {
+  const files = { "src/lib.rs": INTACT };
+
+  async function arrow(source: string, via: string[]) {
+    const board = await boardWith(
+      [
+        { id: "a", label: "handle_fail", ref: "src/lib.rs#handle_fail" },
+        { id: "b", label: "logging", ref: "src/lib.rs#LOGGER", refs: ["src/lib.rs#log_line"] },
+      ],
+      [{ from: "a", to: "b", via }],
+    );
+    return checkDrift(board, fakeWorkspace({ "src/lib.rs": source }));
+  }
+
+  it("survives the round trip through customData", async () => {
+    const board = await boardWith(
+      [
+        { id: "a", label: "A", ref: "src/lib.rs#handle_fail" },
+        { id: "b", label: "B", ref: "src/lib.rs#LOGGER" },
+      ],
+      [{ from: "a", to: "b", via: ["handle_logging", "emit_batch"] }],
+    );
+    const stored = board.elements.find(
+      (element) => (element.customData as { edge?: unknown } | undefined)?.edge,
+    );
+    expect((stored?.customData as { via?: string[] }).via).toEqual([
+      "handle_logging",
+      "emit_batch",
+    ]);
+  });
+
+  it("is quiet when the whole route holds", async () => {
+    const report = await arrow(INTACT, ["handle_logging", "emit_batch"]);
+    expect(report.edges).toEqual([]);
+    expect(report.edgesChecked).toBe(1);
+  });
+
+  it("would have been a false alarm without it", async () => {
+    // The same arrow with no route named: three layers is past one hop, so the
+    // direct check flags a connection that is genuinely there. This is the
+    // false alarm `via` exists to remove, pinned so the trade stays visible.
+    const board = await boardWith(
+      [
+        { id: "a", label: "handle_fail", ref: "src/lib.rs#handle_fail" },
+        { id: "b", label: "logging", ref: "src/lib.rs#LOGGER", refs: ["src/lib.rs#log_line"] },
+      ],
+      [{ from: "a", to: "b" }],
+    );
+    expect(checkDrift(board, fakeWorkspace(files)).edges).toHaveLength(1);
+  });
+
+  it("flags the broken link and says where", async () => {
+    const report = await arrow(CUT, ["handle_logging", "emit_batch"]);
+    expect(report.edges).toHaveLength(1);
+    expect(report.edges[0].kind).toBe("broken-chain");
+    expect(report.edges[0].detail).toContain("breaks at emit_batch");
+    expect(report.edges[0].detail).toContain("worth a look");
+  });
+
+  it("does not quietly fall back to a looser channel when the route fails", async () => {
+    // Both ends are in one file, so every file-level channel would say yes.
+    // Falling back would throw away the localized message, which is the only
+    // thing this shape has that the others do not.
+    const report = await arrow(CUT, ["handle_logging", "emit_batch"]);
+    expect(report.clean).toBe(false);
+  });
+});
+
+describe("keeping a concept box from going hollow", () => {
+  const members = ["LOGGER", "log_line", "handle_logging", "emit_batch"];
+
+  it("finds nothing to complain about while the chain is intact", () => {
+    expect(unsupportedMembers(INTACT, members, "rust")).toEqual([]);
+  });
+
+  it("catches the member that no longer shows any trace of the concept", () => {
+    // This is the hole membership opens: after the cut, callers still call
+    // listed members and every arrow stays green, while the concept does
+    // nothing at all. `emit_batch` is where it went hollow.
+    expect(unsupportedMembers(CUT, members, "rust")).toEqual(["emit_batch"]);
+  });
+
+  it("exempts the data a concept is built on", () => {
+    // `LOGGER` is a static: it is the ground the rest of the concept reaches
+    // *to*, and asking it to reach back would flag every well-formed box.
+    expect(unsupportedMembers(INTACT, ["LOGGER", "log_line"], "rust")).toEqual([]);
+    expect(unsupportedMembers(CUT, ["LOGGER", "log_line"], "rust")).toEqual([]);
+  });
+
+  it("says nothing about a box that lists one thing", () => {
+    // A single member has nothing to connect to, so the question is not asked.
+    expect(unsupportedMembers(CUT, ["emit_batch"], "rust")).toEqual([]);
+  });
+
+  it("reports it as a finding against the box that made the claim", async () => {
+    const board = await boardWith(
+      [
+        {
+          id: "log",
+          label: "logging",
+          ref: "src/lib.rs#LOGGER",
+          refs: ["src/lib.rs#log_line", "src/lib.rs#handle_logging", "src/lib.rs#emit_batch"],
+        },
+      ],
+      [],
+    );
+    const report = checkDrift(board, fakeWorkspace({ "src/lib.rs": CUT }));
+    const hollow = report.findings.filter((finding) => finding.kind === "unsupported-member");
+    expect(hollow).toHaveLength(1);
+    expect(hollow[0]).toMatchObject({ node: "log", ref: "src/lib.rs#emit_batch" });
+    // And an intact board says nothing.
+    const intact = checkDrift(board, fakeWorkspace({ "src/lib.rs": INTACT }));
+    expect(intact.findings).toEqual([]);
+  });
+});

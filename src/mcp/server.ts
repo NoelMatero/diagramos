@@ -166,6 +166,15 @@ const nodeSchema = z.object({
 const edgeSchema = z.object({
   from: z.string(),
   to: z.string(),
+  via: z
+    .array(z.string())
+    .optional()
+    .describe(
+      "The route this connection takes, named hop by hop, when it is not a direct call: "
+      + "['handle_logging', 'emit'] for from -> handle_logging -> emit -> to. Each consecutive "
+      + "pair is checked inside one function body, so a chain of any depth is verified and a "
+      + "break names the hop that stopped holding. Only for arrows whose ends both name symbols.",
+    ),
   label: z.string().optional().describe("One or two words; longer crowds the diagram"),
   strokeColor: z
     .string()
@@ -440,7 +449,7 @@ server.registerTool(
       + "name, path#symbol@used that something there use it beyond its own declaration, and "
       + "@declared+used both -- which is how a box standing for a feature notices the feature being "
       + "gutted rather than deleted. TypeScript, JavaScript and Rust only; elsewhere the claim falls "
-      + "back to a plain mention and is counted in assertions.",
+      + "back to a plain mention and is counted in assertions. When both ends of an arrow name symbols, the arrow is checked inside one function body rather than by imports — so an arrow drawn from the wrong function is caught. Give the arrow via: [...] when the call goes through named intermediaries, and a break reports which hop stopped holding.",
     inputSchema: {
       path: z
         .string()
