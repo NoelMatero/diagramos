@@ -23,8 +23,10 @@ import { readdir } from "node:fs/promises";
 import path from "node:path";
 
 import { parseSymbol, symbolEvidence, type Assertion, type StripCache } from "./assert";
+import { reaches } from "./body";
 import type { BoardFile } from "./board-file";
 import { readGraph, type Provenance } from "./graph";
+import { languageOf } from "./strip";
 
 export type DriftKind =
   | "missing-file"
@@ -140,7 +142,7 @@ export interface UnrepresentedFinding {
 export type NodeSkipReason = "no-ref" | "ref-outside-repo";
 
 /**
- * Why an arrow was not checked. Seven reasons, all of which used to arrive as a
+ * Why an arrow was not checked. Nine reasons, all of which used to arrive as a
  * single number -- so a reader could see that five arrows went unchecked without
  * any way to learn that two of them simply had not been snapped to their boxes.
  */
@@ -152,7 +154,9 @@ export type EdgeSkipReason =
   | "endpoint-outside-repo"
   | "endpoint-file-missing"
   | "directory-ref"
-  | "not-ts-or-js";
+  | "not-ts-or-js"
+  /** Both ends named a symbol, and neither one has a body that could be read. */
+  | "no-function-body";
 
 /** Counts by reason, with zeroes omitted so a caller can print what is there. */
 export type SkipBreakdown<Reason extends string> = Partial<Record<Reason, number>>;
@@ -615,6 +619,61 @@ function getRouteLiterals(file: string, workspace: Workspace): Set<string> {
 }
 
 /**
+ * Every symbol a box names, for a language whose bodies can be read.
+ *
+ * A box standing for a feature lists several -- a static and the macro using
+ * it -- and any one of them being reached satisfies the arrow. That is also
+ * the whole of concept membership: a box's `refs` are the symbols whose
+ * invocation counts as using it, and one caller naming any member is enough.
+ */
+function symbolsOf(node: { ref?: string; refs?: string[] }, file: string): string[] {
+  if (!languageOf(file)) return [];
+  const anchors = [node.ref, ...(node.refs ?? [])];
+  const symbols = new Set<string>();
+  for (const anchor of anchors) {
+    const raw = anchor?.trim();
+    if (!raw) continue;
+    const { symbol } = parseRef(raw);
+    if (!symbol) continue;
+    const parsed = parseSymbol(symbol);
+    // A garbled assertion is already reported by the node check; here it is
+    // simply not a symbol worth searching for.
+    if ("garbled" in parsed || parsed.symbol.startsWith("/")) continue;
+    symbols.add(parsed.symbol);
+  }
+  return [...symbols];
+}
+
+type SymbolEdgeVerdict = "reached" | "unreached" | "unreadable";
+
+/**
+ * Does either end's function body reach the other, directly or in one hop?
+ *
+ * Both directions are tried and any evidence is enough: an arrow means these
+ * two are connected, and the diagram's sense of direction is a reading of the
+ * design rather than a claim about who calls whom.
+ */
+function checkSymbolEdge(
+  from: { file: string; path: string; symbols: string[] },
+  to: { file: string; path: string; symbols: string[] },
+  workspace: Workspace,
+): SymbolEdgeVerdict {
+  let asked = false;
+  for (const [start, target] of [[from, to], [to, from]] as const) {
+    const language = languageOf(start.file);
+    if (!language) continue;
+    const source = workspace.read(start.file);
+    for (const symbol of start.symbols) {
+      const verdict = reaches(source, symbol, target.symbols, language);
+      if (verdict === undefined) continue;
+      asked = true;
+      if (verdict) return "reached";
+    }
+  }
+  return asked ? "unreached" : "unreadable";
+}
+
+/**
  * Check if edge A → B is backed by one of the four corroboration channels.
  * Assumes both files are valid TS/JS files; returns a finding if not backed, undefined if backed.
  */
@@ -934,23 +993,60 @@ export function checkDrift(
         continue;
       }
 
-      // Skip if not TS/JS files
-      if (!TS_JS.test(fromFile) || !TS_JS.test(toFile)) {
-        skipEdge("not-ts-or-js");
-        continue;
+      /*
+       * When both ends name symbols, ask the sharper question.
+       *
+       * The anchors already say what a box is: a bare path is a file, a
+       * `path#symbol` is a function, a `refs` list is a feature. So the check
+       * takes its granularity from the claim that was written rather than from
+       * a field somebody has to keep in sync -- both ends symbol-anchored in a
+       * language with a table gets function granularity, anything less falls
+       * through to the file-level channels below.
+       *
+       * This runs before the TypeScript gate on purpose: the case it was built
+       * for is Rust.
+       */
+      const fromEnd = { file: fromFile, path: fromPath, symbols: symbolsOf(fromNode, fromFile) };
+      const toEnd = { file: toFile, path: toPath, symbols: symbolsOf(toNode, toFile) };
+      const bothNamed = fromEnd.symbols.length > 0 && toEnd.symbols.length > 0;
+      const verdict = bothNamed ? checkSymbolEdge(fromEnd, toEnd, workspace) : "unreadable";
+
+      let finding: EdgeDriftFinding | undefined;
+      if (verdict !== "unreadable") {
+        edgesChecked += 1;
+        if (verdict === "unreached") {
+          finding = {
+            from: fromPath,
+            to: toPath,
+            fromLabel: fromNode.label,
+            toLabel: toNode.label,
+            fromRef,
+            toRef,
+            kind: "unsupported-edge",
+            detail:
+              `nothing in ${fromEnd.symbols.join(" or ")} names ${toEnd.symbols.join(" or ")}, `
+              + `directly or through a call in the same file, and nothing the other way either `
+              + `— worth a look, not necessarily wrong.`,
+          };
+        }
+      } else {
+        // Either the ends are not both symbol-anchored, or no body could be
+        // read. Fall back to the file-level channels, which need TypeScript.
+        if (!TS_JS.test(fromFile) || !TS_JS.test(toFile)) {
+          skipEdge(bothNamed ? "no-function-body" : "not-ts-or-js");
+          continue;
+        }
+        edgesChecked += 1;
+        finding = checkEdgeCorroboration(
+          fromRef,
+          toRef,
+          fromNode.label,
+          toNode.label,
+          workspace,
+          importCache,
+          sharedImporterCandidates,
+        );
       }
-
-      edgesChecked += 1;
-
-      const finding = checkEdgeCorroboration(
-        fromRef,
-        toRef,
-        fromNode.label,
-        toNode.label,
-        workspace,
-        importCache,
-        sharedImporterCandidates,
-      );
       // A `planned` arrow is the connection you want, not one you are claiming
       // exists. Absent corroboration is then the work, and corroboration is the
       // news that the work landed.

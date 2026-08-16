@@ -103,6 +103,27 @@ refs: ["src/logging.rs#log_line@declared",
        "src/server.rs#log_line@used"]
 ```
 
+### Arrows get sharper when both ends name a symbol
+
+An arrow between two boxes that both anchor on a **file** is checked by imports
+and shared route strings. When both ends anchor on a **symbol**, the check
+narrows to one function's body: does this function name the other, directly or
+through a call it makes in the same file?
+
+That is how `handle_request → log` gets caught when the logging call actually
+lives in `reset_connection`. It works in Rust as well as TypeScript.
+
+So anchor an arrow's endpoints at the granularity you mean. If the arrow means
+"this function calls that one", give both ends `path#symbol`. If it means
+something looser — orchestration, ownership, "these belong together" — anchor
+at file level and let the import channels answer, because a body-scoped search
+will not find a relationship that was never a call.
+
+When a box stands for a concept rather than one function, list in `refs` **the
+symbols whose invocation counts as using it** — the interface, not just the
+implementation. Any one of them being reached settles the arrow, so fifty
+callers need one claim.
+
 Only for things that exist in the repository. Inventing a path is worse than
 leaving it off — but say *why* it is off, because a missing ref otherwise reads
 as an oversight:
