@@ -33,14 +33,57 @@ import { stripCode, type Language } from "./strip";
  * falls back rather than guessing.
  */
 export function bodyOf(stripped: string, symbol: string, language: Language): string | undefined {
+  return declarationsOf(stripped, symbol, language)[0]?.body;
+}
+
+/**
+ * Every body this name has here, not just the first.
+ *
+ * One name can be declared more than once in a file, and Rust `impl` blocks
+ * make that ordinary rather than exotic -- `orangutan/src/lib.rs` declares both
+ * `register` and `reregister` twice. Reading only the first was a false alarm
+ * waiting to happen: a method that logs in the second `impl` and not the first
+ * reported as never reaching the logging at all, which is the loud direction.
+ */
+export function bodiesOf(stripped: string, symbol: string, language: Language): string[] {
+  return declarationsOf(stripped, symbol, language)
+    .map((declaration) => declaration.body)
+    .filter((body): body is string => body !== undefined);
+}
+
+/**
+ * Whether a name was introduced as something that runs or something that sits.
+ *
+ * The difference matters in exactly one place: a member of a concept box that
+ * runs is expected to reach the rest of the concept, and one that merely holds
+ * data is the ground the rest reaches *to*. Reading the keyword the declaration
+ * table already matched costs nothing, and without it the self-support rule
+ * flags every `static` and `struct` a box lists.
+ */
+export type DeclarationKind = "callable" | "data";
+
+const CALLABLE = /\b(?:fn|function|macro_rules)\b|^\s*[\w$]+\s*(?:<[^\n>]*>)?\s*\(/;
+
+export function declarationsOf(
+  stripped: string,
+  symbol: string,
+  language: Language,
+): Array<{ kind: DeclarationKind; body: string | undefined }> {
+  const found: Array<{ kind: DeclarationKind; body: string | undefined }> = [];
   for (const pattern of declarationPatterns(language, symbol)) {
     pattern.lastIndex = 0;
-    const match = pattern.exec(stripped);
-    if (!match) continue;
-    const span = extentFrom(stripped, match.index + match[0].length);
-    if (span !== undefined) return span;
+    let match: RegExpExecArray | null;
+    while ((match = pattern.exec(stripped)) !== null) {
+      const kind: DeclarationKind = CALLABLE.test(match[0]) ? "callable" : "data";
+      const body = extentFrom(stripped, match.index + match[0].length);
+      if (body !== undefined) found.push({ kind, body });
+      // A zero-width match would spin; the patterns cannot produce one, but the
+      // loop should not depend on that.
+      if (match.index === pattern.lastIndex) pattern.lastIndex += 1;
+    }
+    if (found.length > 0) break;
   }
-  return undefined;
+  return found;
 }
 
 /**
@@ -118,8 +161,95 @@ function names(body: string, symbol: string): boolean {
   return new RegExp(`\\b${escapeSymbol(symbol)}\\b`).test(body);
 }
 
-/** How many same-file callees one body will be followed into. */
-const HOP_FAN_OUT = 40;
+/**
+ * Walk a route the author named, and say where it stops holding.
+ *
+ * Every link is a plain direct check -- does this body name the next name --
+ * because the path is written down and there is nothing left to infer. That is
+ * the whole trade: naming the hops buys a chain of arbitrary depth out of the
+ * one-hop machinery, and buys a report that can point at the broken link
+ * instead of shrugging at the arrow.
+ *
+ * Returns the hop that failed, or `undefined` when the whole chain holds.
+ * `unreadable` is a link whose body could not be found at all, which is not
+ * evidence of a break.
+ */
+export function chainBreak(
+  source: string,
+  from: string,
+  via: string[],
+  targets: string[],
+  language: Language,
+): { at: string; next: string; unreadable: boolean } | undefined {
+  const stripped = stripCode(source, language);
+  const links = [from, ...via];
+
+  for (let index = 0; index < links.length; index += 1) {
+    const here = links[index]!;
+    // The last hop has to land on the box itself, and any one of its symbols
+    // will do -- the same any-of-the-members rule the direct check uses.
+    const wanted = index + 1 < links.length ? [links[index + 1]!] : targets;
+    const here_bodies = stripped === undefined ? [] : bodiesOf(stripped, here, language);
+    if (here_bodies.length === 0) {
+      return { at: here, next: wanted.join(" or "), unreadable: true };
+    }
+    // Any one of this name's declarations carrying the link is enough. A method
+    // declared in two impl blocks is one name to the diagram.
+    if (!here_bodies.some((body) => wanted.some((target) => names(body, target)))) {
+      return { at: here, next: wanted.join(" or "), unreadable: false };
+    }
+  }
+  return undefined;
+}
+
+/**
+ * Members of a concept box that show no trace of the concept.
+ *
+ * Membership has a hole: cut the deepest call and every caller still calls a
+ * listed member, so the arrows stay green while the concept is hollow. The rule
+ * that closes it is that a member which *runs* has to name another member --
+ * so a claim is not trusted, it is checked, like everything else here.
+ *
+ * Data members are the ground and are exempt: a `static` holding a file handle
+ * is what the rest of the concept reaches, and asking it to reach back would
+ * flag every well-formed box. A single-member box is exempt too, having
+ * nothing to connect to.
+ */
+export function unsupportedMembers(
+  source: string,
+  members: string[],
+  language: Language,
+): string[] {
+  if (members.length < 2) return [];
+  const stripped = stripCode(source, language);
+  if (stripped === undefined) return [];
+
+  const orphans: string[] = [];
+  for (const member of members) {
+    const callable = declarationsOf(stripped, member, language)
+      .filter((declaration) => declaration.kind === "callable" && declaration.body !== undefined);
+    if (callable.length === 0) continue;
+    const others = members.filter((other) => other !== member);
+    // Supported if *any* of its declarations shows a trace. One `impl` block
+    // carrying the concept is the name carrying the concept.
+    const supported = callable.some((declaration) =>
+      others.some((other) => names(declaration.body!, other)));
+    if (!supported) orphans.push(member);
+  }
+  return orphans;
+}
+
+/**
+ * How many bodies one question will read before giving up.
+ *
+ * A search that cannot finish returns `undefined` rather than `false`: not
+ * finding a path is not evidence there is none, and a budget running out is
+ * the least evidential thing there is. So the arrow is skipped and counted.
+ *
+ * Well past any single file measured -- the densest here has 23 functions --
+ * and it exists so one pathological file cannot make the per-turn check slow.
+ */
+const VISIT_CAP = 300;
 
 /**
  * Whether a function in `source` reaches any of `targets`, directly or through
@@ -139,19 +269,47 @@ export function reaches(
   // is a loud wrong answer rather than a quiet one. Refuse the question.
   if (stripped === undefined) return undefined;
 
-  const body = bodyOf(stripped, from, language);
-  if (body === undefined) return undefined;
+  const bodies = new Map<string, string[]>();
+  const bodiesFor = (name: string): string[] => {
+    if (!bodies.has(name)) bodies.set(name, bodiesOf(stripped, name, language));
+    return bodies.get(name)!;
+  };
+  if (bodiesFor(from).length === 0) return undefined;
 
-  if (targets.some((target) => names(body, target))) return true;
+  /*
+   * Follow the calls as far as they go inside this file.
+   *
+   * This used to stop after one hop, on the reasoning that searching deeper
+   * blesses everything. Measured at function level, on the 640-line Rust file
+   * and on this repo's densest TypeScript, that turned out to be false: both
+   * saturate at one hop and unlimited depth flags exactly as many arrows. What
+   * depth *does* buy is the genuine three-layer chain, which is a true arrow
+   * that one hop reports as broken.
+   *
+   * Discrimination survives because the receiver rule does the real work.
+   * `Type::foo()` and `other.foo()` are not followed, so the search stays
+   * inside the code this file actually owns and cannot wander into everything
+   * a library happens to expose.
+   */
+  const seen = new Set<string>([from]);
+  let frontier = [from];
+  let read = 0;
 
-  let followed = 0;
-  for (const callee of callsIn(body)) {
-    if (callee === from) continue;
-    if (followed >= HOP_FAN_OUT) break;
-    const inner = bodyOf(stripped, callee, language);
-    if (inner === undefined) continue;
-    followed += 1;
-    if (targets.some((target) => names(inner, target))) return true;
+  while (frontier.length > 0) {
+    const next: string[] = [];
+    for (const name of frontier) {
+      for (const body of bodiesFor(name)) {
+        if (targets.some((target) => names(body, target))) return true;
+        if (read >= VISIT_CAP) return undefined;
+        read += 1;
+        for (const callee of callsIn(body)) {
+          if (seen.has(callee)) continue;
+          seen.add(callee);
+          next.push(callee);
+        }
+      }
+    }
+    frontier = next;
   }
   return false;
 }

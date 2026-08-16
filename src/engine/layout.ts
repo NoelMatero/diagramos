@@ -49,6 +49,8 @@ export type GraphEdge = {
   strokeColor?: string;
   /** Same axis as a node's. A `planned` edge is a connection to be built. */
   state?: NodeState;
+  /** The route this connection takes, named hop by hop. Layout ignores it. */
+  via?: string[];
 };
 export type DiagramLayoutOptions = {
   direction?: "RIGHT" | "DOWN";

@@ -125,6 +125,15 @@ export interface RecoveredEdge {
    * either a drift finding or a silent skip.
    */
   state: NodeState;
+  /**
+   * The route this connection takes, named hop by hop.
+   *
+   * An arrow through three layers of indirection is invisible to a check that
+   * follows one call. Naming the path turns it into a list of one-hop checks,
+   * which is the thing that already works -- and when it breaks, the report can
+   * say *which* hop rather than shrugging at the whole arrow.
+   */
+  via?: string[];
 }
 
 export interface RecoveredGraph {
@@ -282,6 +291,10 @@ export function readGraph(board: BoardFile): RecoveredGraph {
   for (const arrow of arrows) {
     const custom = customOf(arrow);
     const recorded = custom.edge as { from?: string; to?: string } | undefined;
+    const via = Array.isArray(custom.via)
+      ? custom.via.filter((hop): hop is string => typeof hop === "string" && hop.trim() !== "")
+        .map((hop) => hop.trim())
+      : undefined;
     let from: string | undefined;
     let to: string | undefined;
     let provenance: Provenance = "recorded";
@@ -353,6 +366,7 @@ export function readGraph(board: BoardFile): RecoveredGraph {
       provenance,
       endpoints,
       state: stateOf(custom.state),
+      ...(via?.length ? { via } : {}),
     });
   }
 

@@ -465,6 +465,76 @@ Still to build: step 4 (skill guidance beyond the ref table), step 6
 (membership guidance — the arrow check already accepts any of a box's symbols,
 so this is prose), and step 7 (`via`).
 
+**Steps 6 and 7 are built. The design is complete.** Membership needed no code,
+as predicted: the arrow check already accepts any of a box's symbols, so step 6
+is guidance in `skills/diagram/SKILL.md`. `via` and the self-support rule are
+measured on the design's own chain experiment, reconstructed as a fixture:
+
+| what was checked | result |
+| --- | --- |
+| the intact three-layer chain, no `via` | **flags** — the false alarm `via` exists to remove |
+| the same chain with `via: ["handle_logging", "emit_batch"]` | quiet |
+| cut the deepest call, same `via` | flags, and names `emit_batch` |
+| a route that is wrong in the middle | flags, and names the middle hop |
+| a hop with no body in this file | unreadable, skipped and counted, not a break |
+| self-support, intact chain, four members | no complaints |
+| self-support, after the cut | `emit_batch` flagged as hollow |
+| self-support on `[LOGGER, log_line]` | quiet, before and after |
+
+That last row is the one that shaped the rule. `LOGGER` is a `static` and never
+names anything; requiring every member to reach another would flag it, and
+flag the equivalent in every well-formed box. So the rule applies to members
+that **run** — a `fn`, a `function`, a `macro_rules!`, a method — and exempts
+data, which is the ground the rest of the concept reaches to. The declaration
+table already matched the keyword, so telling them apart costs nothing.
+
+Two smaller decisions worth recording:
+
+- **A `via` arrow never falls back to a looser channel.** Naming the route is a
+  stronger claim than drawing the arrow, and falling back on failure would
+  throw away the localized message, which is the only thing this shape has that
+  the other two do not.
+- **The walk stops at the first hop that fails**, rather than continuing to
+  find a hop that does not exist. `handle_logging → vanished` reports
+  `handle_logging`, because that is where the route as written stopped being
+  true.
+
+## The one-hop limit, measured and lifted
+
+The design capped the search at one same-file hop, on the reasoning that going
+deeper blesses everything. That reasoning was measured at *file* level and
+carried over to functions without being rechecked. Rechecked on 2026-08-17:
+
+| depth | `orangutan/src/lib.rs` reaches the logging | this repo's `drift.ts` reaches `#mentions` |
+| --- | --- | --- |
+| direct | 7 of 13 | 2 of 23 |
+| 1 hop | 7 of 13 | 3 of 23 |
+| 2 hops | 7 of 13 | 3 of 23 |
+| unlimited | **7 of 13** | **3 of 23** |
+
+Both saturate. Unlimited depth flags exactly as many arrows as one hop, and six
+functions in the Rust file (`new`, `receive`, `send`, `register`, `reregister`,
+`get_client`) never reach the logging at any depth. The whitewash did not
+happen, so the cap was buying nothing — while the false alarm it caused was
+real: a genuine three-layer chain is a true arrow that one hop reports as
+broken.
+
+So the search now follows calls as far as they go inside the file. What keeps
+that safe is not shallowness but the **receiver rule**: `Type::foo()` and
+`other.foo()` are still not followed, so the walk stays inside the code the file
+owns and cannot wander into every same-named method a library exposes. Removing
+that rule fails five tests; capping the depth again fails seven.
+
+Cost is unchanged at **0.37 ms per arrow** on the 640-line file, worst case —
+an arrow that flags, which has to exhaust the search. Cycles terminate on a
+`seen` set, and a search that exceeds 300 bodies returns *unreadable* rather
+than *no path*, because a budget running out is not evidence of absence.
+
+**What this does to `via`:** it is no longer needed for depth, which was most of
+its stated purpose. It keeps the two things nothing else does — naming the hop
+where a route broke, and being a claim about the *path* rather than the
+endpoints, so a stale route on a live connection is reported as exactly that.
+
 ## Markers in the source, measured and deferred
 
 The third chain shape put the name in the code — a comment on the line before
