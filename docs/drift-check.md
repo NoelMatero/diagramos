@@ -63,11 +63,27 @@ reported as the second one — which is why a diagram could not be used as a spe
 
 A node (and an edge) can now declare `state`:
 
-| state | meaning |
-| --- | --- |
-| `built` | it exists now. The default, so every board drawn before this field means exactly what it meant |
-| `planned` | it is meant to exist |
-| `external` | deliberately not code in this repo — a browser, a third-party service, another project |
+| state | meaning | drawn |
+| --- | --- | --- |
+| `built` | it exists now. The default, so every board drawn before this field means exactly what it meant | solid |
+| `planned` | it is meant to exist | **dashed** |
+| `external` | deliberately not code in this repo — a browser, a third-party service, another project | solid, for now |
+
+`planned` boxes and arrows are drawn dashed, so what exists and what does not can
+be told apart by looking rather than by running the check. Dashed rather than a
+colour: it survives greyscale and colour-blindness, and it is already what "not
+real yet" looks like everywhere else.
+
+![built is solid, planned is dashed, external is solid](../assets/state-legend.png)
+
+That picture is generated, not a screenshot:
+`npm run diagram:render docs/diagrams/state-legend.excalidraw assets/state-legend.png`.
+Regenerate it if the styling ever changes, so the legend cannot quietly start
+lying about what the tool draws.
+
+`external` is drawn like `built` on purpose. It means "real, but not ours" rather
+than "not real yet", so it wants a treatment of its own rather than being folded
+into the same one — an open question, not an oversight.
 
 Crossed with what the filesystem observes, every combination has one honest
 reading:

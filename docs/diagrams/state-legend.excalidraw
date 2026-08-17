@@ -1,0 +1,529 @@
+{
+  "type": "excalidraw",
+  "version": 2,
+  "source": "diagramos",
+  "elements": [
+    {
+      "id": "state-legend-title",
+      "type": "text",
+      "x": 0,
+      "y": -115,
+      "width": 275.04,
+      "height": 30,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a0",
+      "roundness": null,
+      "seed": 1461112450,
+      "version": 1,
+      "versionNonce": 932485366,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "state-legend",
+        "role": "title",
+        "describes": "concept"
+      },
+      "text": "What a state looks like",
+      "fontSize": 24,
+      "fontFamily": 5,
+      "textAlign": "left",
+      "verticalAlign": "middle",
+      "containerId": null,
+      "originalText": "What a state looks like",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "state-legend-node-0",
+      "type": "rectangle",
+      "x": 20,
+      "y": 20,
+      "width": 220,
+      "height": 100,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "#d1f7c4",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a1",
+      "roundness": {
+        "type": 3
+      },
+      "seed": 598187173,
+      "version": 1,
+      "versionNonce": 1575390767,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "state-legend-node-0-label"
+        },
+        {
+          "id": "state-legend-edge-0",
+          "type": "arrow"
+        },
+        {
+          "id": "state-legend-edge-1",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "state-legend",
+        "node": "built"
+      }
+    },
+    {
+      "id": "state-legend-node-1",
+      "type": "rectangle",
+      "x": 620,
+      "y": 180,
+      "width": 260,
+      "height": 80,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "#ffe8cc",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "dashed",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a2",
+      "roundness": {
+        "type": 3
+      },
+      "seed": 458297996,
+      "version": 1,
+      "versionNonce": 1746935640,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "state-legend-node-1-label"
+        },
+        {
+          "id": "state-legend-edge-1",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "state-legend",
+        "node": "planned",
+        "state": "planned"
+      }
+    },
+    {
+      "id": "state-legend-node-2",
+      "type": "rectangle",
+      "x": 620,
+      "y": 20,
+      "width": 260,
+      "height": 80,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "#d6e6ff",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a3",
+      "roundness": {
+        "type": 3
+      },
+      "seed": 205890331,
+      "version": 1,
+      "versionNonce": 2051953173,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "state-legend-node-2-label"
+        },
+        {
+          "id": "state-legend-edge-0",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "state-legend",
+        "node": "external",
+        "state": "external"
+      }
+    },
+    {
+      "id": "state-legend-edge-0",
+      "type": "arrow",
+      "x": 232,
+      "y": 52,
+      "width": 386,
+      "height": 0,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a4",
+      "roundness": null,
+      "seed": 1150775050,
+      "version": 1,
+      "versionNonce": 1845651806,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "state-legend",
+        "edge": {
+          "from": "built",
+          "to": "external"
+        }
+      },
+      "points": [
+        [
+          0.5,
+          0
+        ],
+        [
+          385.5,
+          0
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "state-legend-node-0",
+        "focus": -0.35999999999999993,
+        "gap": 8
+      },
+      "endBinding": {
+        "elementId": "state-legend-node-2",
+        "focus": 0.2,
+        "gap": 2
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "state-legend-edge-1",
+      "type": "arrow",
+      "x": 232,
+      "y": 85.33333333333333,
+      "width": 386,
+      "height": 126.66666666666667,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "dashed",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a5",
+      "roundness": null,
+      "seed": 1170263387,
+      "version": 1,
+      "versionNonce": 225310293,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "state-legend",
+        "edge": {
+          "from": "built",
+          "to": "planned"
+        },
+        "state": "planned"
+      },
+      "points": [
+        [
+          0.5,
+          0
+        ],
+        [
+          32,
+          0
+        ],
+        [
+          32,
+          126.66666666666667
+        ],
+        [
+          385.5,
+          126.66666666666667
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "state-legend-node-0",
+        "focus": 0.3066666666666665,
+        "gap": 8
+      },
+      "endBinding": {
+        "elementId": "state-legend-node-1",
+        "focus": 0.2,
+        "gap": 2
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "state-legend-edgelabel-0",
+      "type": "text",
+      "x": 383.256,
+      "y": 20.200000000000003,
+      "width": 83.488,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a6",
+      "roundness": null,
+      "seed": 547510140,
+      "version": 1,
+      "versionNonce": 30190600,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "state-legend",
+        "edgeLabelFor": "state-legend-edge-0"
+      },
+      "text": "built arrow",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "left",
+      "verticalAlign": "top",
+      "containerId": null,
+      "originalText": "built arrow",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "state-legend-edgelabel-1",
+      "type": "text",
+      "x": 372,
+      "y": 223,
+      "width": 106,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a7",
+      "roundness": null,
+      "seed": 472496661,
+      "version": 1,
+      "versionNonce": 1698442527,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "state-legend",
+        "edgeLabelFor": "state-legend-edge-1"
+      },
+      "text": "planned arrow",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "left",
+      "verticalAlign": "top",
+      "containerId": null,
+      "originalText": "planned arrow",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "state-legend-node-0-label",
+      "type": "text",
+      "x": 49.32000000000001,
+      "y": 57.5,
+      "width": 161.35999999999999,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a8",
+      "roundness": null,
+      "seed": 1224701324,
+      "version": 1,
+      "versionNonce": 1369831512,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "state-legend"
+      },
+      "text": "built — it exists",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "state-legend-node-0",
+      "originalText": "built — it exists",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "state-legend-node-1-label",
+      "type": "text",
+      "x": 648.04,
+      "y": 207.5,
+      "width": 203.92,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a9",
+      "roundness": null,
+      "seed": 1856016425,
+      "version": 1,
+      "versionNonce": 395875891,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "state-legend"
+      },
+      "text": "planned — go build it",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "state-legend-node-1",
+      "originalText": "planned — go build it",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "state-legend-node-2-label",
+      "type": "text",
+      "x": 651.26,
+      "y": 47.5,
+      "width": 197.48000000000002,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aA",
+      "roundness": null,
+      "seed": 712684358,
+      "version": 1,
+      "versionNonce": 818472618,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "state-legend"
+      },
+      "text": "external — not ours",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "state-legend-node-2",
+      "originalText": "external — not ours",
+      "autoResize": true,
+      "lineHeight": 1.25
+    }
+  ],
+  "appState": {
+    "gridSize": null,
+    "viewBackgroundColor": "#ffffff"
+  },
+  "files": {}
+}

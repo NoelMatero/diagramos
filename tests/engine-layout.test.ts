@@ -274,3 +274,64 @@ describe("diagram layout quality", () => {
     }
   });
 });
+
+describe("declared state is drawn", () => {
+  /**
+   * One box and one arrow of each state, so a single plan answers "does
+   * `planned` differ" and "is anything else disturbed" at the same time.
+   */
+  const statedGraph: LayoutParams = {
+    nodes: [
+      { id: "built", label: "Parser" },
+      { id: "explicit-built", label: "Router", state: "built" },
+      { id: "planned", label: "Cache", state: "planned" },
+      { id: "external", label: "Browser", state: "external" },
+    ],
+    edges: [
+      { from: "built", to: "planned", label: "will feed", state: "planned" },
+      { from: "built", to: "external", label: "serves" },
+      { from: "explicit-built", to: "built", label: "routes", state: "built" },
+    ],
+  };
+
+  const skeletonById = async () => {
+    const plan = await planDiagramLayout(statedGraph, ORIGIN, "agent-test");
+    return new Map(plan.skeletons.map((skeleton) => [skeleton.id as string, skeleton]));
+  };
+
+  it("dashes a planned box and leaves every other state solid", async () => {
+    const byId = await skeletonById();
+    // Node order in the plan follows the order given above.
+    expect(byId.get("agent-test-node-2")!.strokeStyle).toBe("dashed");
+    for (const id of ["agent-test-node-0", "agent-test-node-1", "agent-test-node-3"]) {
+      expect(byId.get(id)!.strokeStyle).toBeUndefined();
+    }
+  });
+
+  it("dashes a planned arrow and leaves every other state solid", async () => {
+    const byId = await skeletonById();
+    expect(byId.get("agent-test-edge-0")!.strokeStyle).toBe("dashed");
+    expect(byId.get("agent-test-edge-1")!.strokeStyle).toBeUndefined();
+    expect(byId.get("agent-test-edge-2")!.strokeStyle).toBeUndefined();
+  });
+
+  it("leaves a planned arrow's label alone, since dashed text is unreadable", async () => {
+    const byId = await skeletonById();
+    expect(byId.get("agent-test-edgelabel-0")!.strokeStyle).toBeUndefined();
+  });
+
+  it("omits the key entirely when nothing is planned, so old boards do not move", async () => {
+    const plan = await planDiagramLayout(planningDiagram, ORIGIN, "agent-test");
+    for (const skeleton of plan.skeletons) {
+      expect(skeleton).not.toHaveProperty("strokeStyle");
+    }
+  });
+
+  it("draws the same board the same way twice", async () => {
+    const [first, second] = await Promise.all([
+      planDiagramLayout(statedGraph, ORIGIN, "agent-test"),
+      planDiagramLayout(statedGraph, ORIGIN, "agent-test"),
+    ]);
+    expect(JSON.stringify(second.skeletons)).toBe(JSON.stringify(first.skeletons));
+  });
+});

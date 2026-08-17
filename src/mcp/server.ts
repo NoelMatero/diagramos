@@ -159,10 +159,10 @@ const nodeSchema = z.object({
     .optional()
     .describe(
       "Whether this exists yet. Omit for 'built' (the default: it exists now). "
-      + "Use 'planned' for something meant to exist — its ref not resolving is then reported "
-      + "as work to do rather than as drift, and check_drift says so once the code catches up. "
-      + "Use 'external' for something deliberately outside this repo (a browser, a third-party "
-      + "service), which is never checked and is not the same as forgetting a ref.",
+      + "Use 'planned' for something meant to exist — it is drawn dashed, its ref not resolving "
+      + "is reported as work to do rather than as drift, and check_drift says so once the code "
+      + "catches up. Use 'external' for something deliberately outside this repo (a browser, a "
+      + "third-party service), which is never checked and is not the same as forgetting a ref.",
     ),
 });
 
@@ -189,8 +189,8 @@ const edgeSchema = z.object({
     .optional()
     .describe(
       "Whether this connection exists yet. Omit for 'built'. Use 'planned' for a connection "
-      + "that should exist — the wiring to be done — and check_drift reports it as work rather "
-      + "than as an unsupported arrow.",
+      + "that should exist — the wiring to be done — which is drawn as a dashed arrow, and "
+      + "check_drift reports it as work rather than as an unsupported arrow.",
     ),
 });
 
