@@ -78,6 +78,23 @@ export interface DiagramPlan {
 
 export const MODEL_GRID_SIZE = 20;
 
+/**
+ * How a declared state is drawn. Only `planned` gets a treatment: dashed is the
+ * established convention for "not real yet", and unlike a colour it survives
+ * greyscale and colour-blindness.
+ *
+ * `external` means "real, but not ours" rather than "not real yet", so it is a
+ * separate question and deliberately left looking like `built` for now.
+ *
+ * The key is omitted rather than set to `"solid"` so a board that declares no
+ * state stays byte-identical to one written before this existed. Nothing here
+ * reads anything but the node's own state, which is what keeps regeneration
+ * deterministic.
+ */
+function stateStyle(state: NodeState | undefined): { strokeStyle?: "dashed" } {
+  return {};
+}
+
 const NODE_FONT_SIZE = 20;
 const EDGE_LABEL_FONT_SIZE = 16;
 // fontFamily 5 in Excalidraw's FONT_FAMILY map; the editor loads this face,
@@ -334,6 +351,7 @@ export async function planDiagramLayout(
       backgroundColor: node.backgroundColor ?? "transparent",
       ...(node.backgroundColor && node.backgroundColor !== "transparent" ? { fillStyle: "solid" } : {}),
       ...(type === "rectangle" && node.rounded ? { roundness: { type: 3 } } : {}),
+      ...stateStyle(node.state),
       // Excalidraw would give the label the container's stroke colour, which
       // on a filled shape can be nearly the same colour as the fill.
       label: {
@@ -381,6 +399,7 @@ export async function planDiagramLayout(
       end: { id: elementIdByNode.get(edge.to) },
       endArrowhead: "arrow",
       strokeColor: edge.strokeColor ?? "#1e1e1e",
+      ...stateStyle(edge.state),
     });
     const label = elkEdge?.labels?.[0];
     if (label?.text) {
