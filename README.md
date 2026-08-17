@@ -99,6 +99,8 @@ Committed on purpose, so you, Claude and CI cannot disagree about it. Reading, s
 
 When something has drifted, `/update-diagram` redraws it: Claude repoints the boxes whose code moved, removes the ones whose code is gone, and tells you which was which. Nothing is fixed automatically, because a diagram silently rewritten every turn is worse than one you know is stale.
 
+A box carrying no `ref` at all is a different problem: it is not stale, it is unread, and every check here is blind to it. `/annotate-diagram` finds those boxes, proposes an anchor for each — or `external`, when the box is a person or another product — and writes nothing until you approve the list. A wrong ref is worse than none, so it is allowed to answer "I cannot tell what this box means".
+
 To get the report at the end of every turn, add this to your project's `.claude/settings.json`:
 
 ```json

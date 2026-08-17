@@ -397,6 +397,7 @@ const workspace = createWorkspace(root);
 const stale = [];
 const examined = [];
 const suggested = [];
+const unannotated = [];
 const problems = [];
 
 /*
@@ -481,6 +482,7 @@ for (const file of checking) {
   // Suggestions are collected apart from drift: they are not a claim going wrong,
   // and a board with nothing but suggestions is still a clean board.
   if (report.unrepresented.length > 0) suggested.push({ file, report });
+  if (report.unannotated.length > 0) unannotated.push({ file, report });
 
   if (report.clean && report.promotions.length === 0 && report.workItems.length === 0) continue;
 
@@ -527,6 +529,29 @@ function renderCoverage(entries, colour) {
       }),
     })),
     foot: "suggestions, not drift \u00b7 add a box or ignore",
+    max: 76,
+  });
+}
+
+/**
+ * Boxes that claim to be about this repo and do not say where.
+ *
+ * Separate from the coverage box above, which is the opposite direction: that
+ * one is code with no box, this one is a box with no code. Both are
+ * suggestions, and neither is drift.
+ *
+ * The point of naming them rather than counting them is that a count cannot be
+ * acted on. `/annotate-diagram` reads this list and proposes an anchor per box.
+ */
+function renderUnannotated(entries, colour) {
+  return box({
+    sections: entries.map((entry) => ({
+      label: path.basename(entry.file)
+        + "  "
+        + paint(entry.report.unannotated.length + " unanchored", "dim", colour),
+      rows: entry.report.unannotated.map((item) => item.label + "  " + paint(item.node, "dim", colour)),
+    })),
+    foot: "/annotate-diagram proposes an anchor for each",
     max: 76,
   });
 }
@@ -600,6 +625,13 @@ function renderCoverageAudit(entries, colour) {
   });
 }
 
+// A box with no code, and code with no box: opposite directions, both
+// suggestions, so they get their own boxes rather than one mixed tally.
+const unanchoredLines =
+  opts.coverage && unannotated.length > 0
+    ? renderUnannotated(unannotated, Boolean(process.stderr.isTTY))
+    : [];
+
 const coverageLines =
   opts.coverage && suggested.length > 0
     ? renderCoverage(suggested, Boolean(process.stderr.isTTY))
@@ -612,12 +644,14 @@ const auditLines =
     ? renderCoverageAudit(examined, Boolean(process.stderr.isTTY))
     : [];
 
-if (showing.length > 0 || problems.length > 0 || coverageLines.length > 0 || auditLines.length > 0) {
+if (showing.length > 0 || problems.length > 0 || coverageLines.length > 0
+  || unanchoredLines.length > 0 || auditLines.length > 0) {
   // Measured: ANSI renders in a systemMessage. Off only when the output is being
   // piped or captured, where escapes would be junk in somebody's log.
   const colour = opts.hook || Boolean(process.stderr.isTTY);
   const lines = [
     ...auditLines,
+    ...unanchoredLines,
     ...coverageLines,
     ...problems,
     ...(showing.length === 0

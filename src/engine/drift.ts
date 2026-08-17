@@ -126,6 +126,26 @@ export interface BoardBaseline {
 }
 
 /**
+ * A generated box with no anchor at all, named so it can be fixed.
+ *
+ * `skippedWhy` already counts these, and a count is what the per-turn notice
+ * should say: nagging about coverage every turn is how a check gets switched
+ * off. But a count cannot be acted on. Nobody is going to open a 33-box board
+ * and diff it against the report by eye, and the measured evidence is that
+ * nobody annotates by hand at all -- every ref in this repo was written by a
+ * tool.
+ *
+ * So the on-demand channel names them, and `/annotate-diagram` reads the list to
+ * propose an anchor per box for a human to approve. The label is carried
+ * because it is the only evidence of what the box meant.
+ */
+export interface UnannotatedFinding {
+  /** Node id, as `create_diagram` and `edit_diagram` refer to it. */
+  node: string;
+  label: string;
+}
+
+/**
  * A code file the diagram's own boxes import, that no box covers.
  *
  * The other direction of drift: not "the board claims something false" but "the
@@ -197,6 +217,12 @@ export interface DriftReport {
    * so it never runs on the per-turn path.
    */
   unrepresented: UnrepresentedFinding[];
+  /**
+   * Generated boxes carrying no anchor, named rather than only counted. Empty
+   * unless `coverage` was asked for -- the same rule `unrepresented` follows,
+   * and for the same reason: this is a suggestion, not a regression.
+   */
+  unannotated: UnannotatedFinding[];
   /** Boxes removed from the board while their code is still in the tree. */
   deleted: DeletedClaimFinding[];
   /** `planned` claims the code has not reached yet. Never affects `clean`. */
@@ -881,6 +907,7 @@ export function checkDrift(
   let handDrawn = 0;
   const skippedWhy: SkipBreakdown<NodeSkipReason> = {};
   const edgesSkippedWhy: SkipBreakdown<EdgeSkipReason> = {};
+  const unannotated: UnannotatedFinding[] = [];
   const assertions: AssertionTally = { checked: 0, downgraded: 0, unsupportedLanguage: 0 };
   const skipNode = (reason: NodeSkipReason) => {
     skipped += 1;
@@ -950,6 +977,10 @@ export function checkDrift(
       .map((entry) => entry?.trim())
       .filter((entry): entry is string => Boolean(entry));
     if (anchors.length === 0) {
+      // Named only on request. Concept boards and `external` boxes never reach
+      // here -- they were excused above -- so this list is exactly the boxes
+      // that claim to be about this repo and say nothing about where.
+      if (options?.coverage) unannotated.push({ node: node.id, label: node.label });
       skipNode("no-ref");
       continue;
     }
@@ -1368,6 +1399,7 @@ export function checkDrift(
     // A suggestion, never part of `clean`: a diagram that omits a module is a
     // choice about what is worth showing, not a broken claim.
     unrepresented,
+    unannotated,
     deleted,
     workItems,
     promotions,
