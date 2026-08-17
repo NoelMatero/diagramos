@@ -1,0 +1,18 @@
+{
+  "description": "Runs the drift check once at the end of every turn, so a diagram that has stopped matching the code says so without anyone remembering to ask. Quiet when nothing is wrong. Exits immediately, before starting node, in a project with no diagrams.",
+  "hooks": {
+    "Stop": [
+      {
+        "//": "Stop is documented to ignore matchers while the plugin-dev validator rejects a hook without one; \"*\" satisfies both. See docs/drift-check.md.",
+        "matcher": "*",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "sh \"${CLAUDE_PLUGIN_ROOT}/hooks/drift.sh\"",
+            "timeout": 30
+          }
+        ]
+      }
+    ]
+  }
+}

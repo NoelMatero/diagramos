@@ -101,7 +101,9 @@ When something has drifted, `/update-diagram` redraws it: Claude repoints the bo
 
 A box carrying no `ref` at all is a different problem: it is not stale, it is unread, and every check here is blind to it. `/annotate-diagram` finds those boxes, proposes an anchor for each — or `external`, when the box is a person or another product — and writes nothing until you approve the list. A wrong ref is worse than none, so it is allowed to answer "I cannot tell what this box means".
 
-To get the report at the end of every turn, add this to your project's `.claude/settings.json`:
+The report arrives at the end of every turn on its own — the plugin installs the hook, and there is nothing to switch on. In a project with no diagrams it costs a directory test and never starts node, so installing this does not make your other repositories slower.
+
+If you are using the MCP server directly rather than the plugin, this is the same thing by hand, in your project's `.claude/settings.json`:
 
 ```json
 { "hooks": { "Stop": [{ "matcher": "*", "hooks": [
@@ -119,7 +121,13 @@ A stale diagram then arrives as an ordinary notice, four lines, counts in red an
 └─ /update-diagram updates the diagram ─────────┘
 ```
 
-`/expand-report` lists every finding and leaves the notice that way until `/shrink-report`. The plugin does not install the hook for you, because a project with no diagrams should not pay for a subprocess on every turn.
+`/expand-report` lists every finding and leaves the notice that way until `/shrink-report`.
+
+Run it yourself with `npx -y diagramos drift`, which answers in one line when nothing has drifted and says how much went unread. In CI it exits non-zero for a diagram that has stopped matching the code, and zero for one describing work that has not landed yet — a repository is not broken because somebody sketched next week:
+
+```yaml
+- run: npx -y diagramos drift
+```
 
 Deliberately shallow. Missing files and symbols are checked by existence alone, which works in any language; the arrow check resolves imports and understands only TypeScript and JavaScript, so elsewhere every arrow is skipped. Nodes without a `ref` are skipped rather than guessed at. A clean report means nothing checkable disagreed — not that the diagram is correct. Reasoning in [docs/drift-check.md](docs/drift-check.md).
 

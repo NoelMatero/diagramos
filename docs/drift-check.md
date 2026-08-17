@@ -19,10 +19,13 @@ What changed while building it:
   arriving when the model could act on it, and no debounce logic to get wrong.
 - **Silent when clean**, which matters more than it sounds: a check that
   announces good news thirty times an hour gets switched off.
-- **The plugin does not ship the hook.** `hooks/hooks.json` at a plugin root is
-  auto-discovered, so shipping one would spawn a subprocess on every turn in
-  every project someone installs this into, most of which have no diagrams. It
-  is documented as opt-in instead.
+- **The plugin ships the hook** (`hooks/hooks.json` + `hooks/drift.sh`), which
+  reverses an earlier decision. It was opt-in because a plugin hook fires in
+  every project someone installs into and most have no diagrams — sound, and it
+  left the one feature that keeps a diagram honest as the one feature every user
+  had to wire up by hand after reading this file. Nobody was going to. See
+  "Shipping the hook" below for the measurement that made the objection cheap to
+  answer.
 - **Refs are confined like board paths.** They are model-authored strings that
   become filesystem reads, so they resolve inside the root and are re-checked
   after realpath; a symlink out of the tree cannot be used to probe for files.
@@ -236,6 +239,22 @@ an answer:
 reported coverage every turn is one that gets switched off — and that would take
 the quiet, correct missing-file check with it. The audit is a question you ask.
 
+**A bare run answers in one line.** The silence above was applied to both callers,
+and only one of them deserved it. Typing the command and getting zero bytes back
+is indistinguishable from a broken install, and was read as exactly that:
+
+```
+7 boards · 12 refs · 12 arrows checked · nothing drifted · 12 unread, --details says why
+```
+
+It names what went unread rather than implying everything was verified, because
+that conflation is the thing this section exists to undo, and a summary line that
+forgot it would put the confusion back in a shorter form. Work items ride along as
+`· 2 planned` — in the tally, never in an alarm.
+
+The asymmetry is the point: the hook fires unbidden and stays silent, a command
+someone chose to run gets an answer. The same line `--details` already draws.
+
 `check_drift` returns `skippedWhy` and `edgesSkippedWhy` alongside the counts, so
 a model deciding whether a diagram is trustworthy has the same information.
 
@@ -374,7 +393,53 @@ behaviour has to come from the harness.
 - **Hard** — a `Stop` hook runs `check-drift.mjs` once per turn. The harness
   executes it whether or not the model remembered. This is what is built.
 - **Hardest** — pre-commit or CI, catching drift introduced without Claude. The
-  script's exit code is there for it; nothing wires it up yet.
+  script's exit code is there for it, and the README now carries the one-line
+  recipe. Nothing in this repository's own CI runs it yet.
+
+## Shipping the hook
+
+The `Stop` hook lived in this repository's `.claude/settings.json` and nowhere
+else, so the check ran here and for nobody else. The stated objection to shipping
+it — a subprocess on every turn in projects with no diagrams — turned out to be
+cheap to answer, once measured in a git repo with no diagrams at all:
+
+| path | cold | warm |
+| --- | --- | --- |
+| `node out/cli/diagramos.mjs drift --hook` | 320 ms | 60 ms |
+| `npx -y diagramos drift --hook` (what a plugin user pays) | 540 ms | **260 ms** |
+
+Silent, exit 0. And nearly all of that is npx and node starting up rather than
+work: the script already finds no diagram directory and stops. So there was
+nothing left to optimise inside it, and the saving had to happen *before* it is
+launched. `hooks/drift.sh` is that guard, and it is two tests:
+
+```sh
+[ -d docs/diagrams ] || [ -f .diagramos.json ] || exit 0
+```
+
+Both are needed. The diagram directory is configurable, so testing only the
+default would silently skip every project that moved it — checking nothing while
+appearing to work, which is the failure this whole area exists to catch.
+
+Three details that are each one bug:
+
+- **A shell script invoked through `sh`, not an inline command.** Installing a
+  plugin copies files into a cache, and relying on the executable bit surviving
+  that is a guess; `sh path` needs no `+x`. It also puts this reasoning next to
+  the guard rather than inside a JSON string.
+- **Not `exec npx`.** `exec` replaces the shell, so npx's exit status would
+  become the hook's and the `|| exit 0` after it would never run.
+- **A launch failure is swallowed.** `--hook` exits 0 once it has delivered its
+  notice, so a non-zero status from npx means it could not fetch or run the
+  package at all — offline, a broken cache. Passing that through would put
+  "Stop hook error: Failed" on every turn of a project that simply has no
+  network, and that is how a check gets switched off for good.
+
+`tests/plugin-hook.test.ts` pins all of it with a fake `npx` first on `PATH`, so
+the assertions are about whether the real command *would have been launched* and
+never about what it would have said. It also pins the version in three places at
+once — `package.json`, the plugin manifest, and the hook script — because nothing
+else checked that they agreed, and a pin that has drifted is worse than none.
 
 The config shape was worth confirming twice, since a wrong key fails silently:
 the published docs say `Stop` ignores matchers, while the plugin-dev validator

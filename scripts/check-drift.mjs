@@ -683,4 +683,35 @@ if (showing.length > 0 || problems.length > 0 || coverageLines.length > 0
   // unbuilt sketch must not fail a build: CI reads this exit code, and a diagram
   // describing next week's work is not a broken repository.
   process.exit(stale.some(({ report }) => !report.clean) || problems.length > 0 ? 1 : 0);
+} else if (!opts.hook && examined.length > 0) {
+  /*
+   * One line, for a person who typed the command and got nothing back.
+   *
+   * The hook stays silent, and that is not an inconsistency: it fires unbidden
+   * every turn, where announcing good news is how a check gets switched off. A
+   * command someone chose to run is the opposite situation -- silence there is
+   * indistinguishable from a broken install, which is exactly how it was read.
+   * Same distinction --details already draws: a question deserves an answer.
+   *
+   * It names what went unread rather than implying everything was verified.
+   * "Clean" and "read" were the same output once, and separating them is the
+   * whole point of the coverage work; a summary line that forgot that would put
+   * the confusion back in a shorter form.
+   */
+  const total = (pick) => examined.reduce((n, { report }) => n + pick(report), 0);
+  const refs = total((r) => r.checked);
+  const arrows = total((r) => r.edgesChecked);
+  const unread = total((r) => r.skipped + r.edgesSkipped);
+  const planned = total((r) => r.workItems.length);
+  console.error(
+    [
+      `${examined.length} board${examined.length === 1 ? "" : "s"}`,
+      `${refs} refs · ${arrows} arrows checked`,
+      "nothing drifted",
+      // Deliberately not a notice of its own: a work item is the sketch being
+      // ahead on purpose, and it belongs in a tally rather than in an alarm.
+      ...(planned ? [`${planned} planned`] : []),
+      ...(unread ? [`${unread} unread, --details says why`] : []),
+    ].join(" · "),
+  );
 }
