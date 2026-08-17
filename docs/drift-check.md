@@ -74,6 +74,13 @@ be told apart by looking rather than by running the check. Dashed rather than a
 colour: it survives greyscale and colour-blindness, and it is already what "not
 real yet" looks like everywhere else.
 
+![built is solid, planned is dashed, external is solid](../assets/state-legend.png)
+
+That picture is generated, not a screenshot:
+`npm run diagram:render docs/diagrams/state-legend.excalidraw assets/state-legend.png`.
+Regenerate it if the styling ever changes, so the legend cannot quietly start
+lying about what the tool draws.
+
 `external` is drawn like `built` on purpose. It means "real, but not ours" rather
 than "not real yet", so it wants a treatment of its own rather than being folded
 into the same one — an open question, not an oversight.

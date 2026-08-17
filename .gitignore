@@ -17,3 +17,6 @@ playwright-report/
 # src/engine/vendor/, whose hand-written entry points are the build's *input*.
 # Ignoring those made a clean clone unbuildable — see .github/workflows/ci.yml.
 /vendor/
+
+# Scratch handoff notes for parallel sessions. Not documentation.
+docs/handoff/

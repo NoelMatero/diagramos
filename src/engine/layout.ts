@@ -92,7 +92,7 @@ export const MODEL_GRID_SIZE = 20;
  * deterministic.
  */
 function stateStyle(state: NodeState | undefined): { strokeStyle?: "dashed" } {
-  return {};
+  return state === "planned" ? { strokeStyle: "dashed" } : {};
 }
 
 const NODE_FONT_SIZE = 20;
