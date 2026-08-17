@@ -889,6 +889,10 @@ server.registerTool(
         followUrl: `http://127.0.0.1:${port}/`,
         showing: relativeToWorkspace(serving),
         ownedByThisSession: live?.file === serving,
+        // /api/health has always reported this; not passing it on left "what is
+        // showing my diagrams" answerable only by shelling out to lsof.
+        pid: probe?.pid,
+        stopWith: "diagramos stop --list shows every board server; diagramos stop stops them",
       });
     }),
 );
@@ -930,7 +934,20 @@ server.registerTool(
         }
       }
       if (!url) {
-        live ??= await startBoardServer({ file, port: boardPort(), root: WORKSPACE_ROOT });
+        /*
+         * No ownerPid on purpose. A board opened for someone is meant to still be
+         * there when this session ends -- that is the whole pitch, a diagram
+         * outliving the conversation that produced it -- so it is not tied to the
+         * life of this process. What it is tied to is the registry, so that
+         * `diagramos stop` can find and stop it. Surviving invisibly is the leak;
+         * surviving where you can see it is the feature.
+         */
+        live ??= await startBoardServer({
+          file,
+          port: boardPort(),
+          root: WORKSPACE_ROOT,
+          startedBy: "a Claude session (open_board)",
+        });
         url = live.urlFor(file);
       }
       // Keep the bare URL on this board too, so a page opened without one still
