@@ -22,7 +22,7 @@ import { readFileSync, readdirSync, realpathSync, statSync } from "node:fs";
 import { readdir } from "node:fs/promises";
 import path from "node:path";
 
-import { parseSymbol, symbolEvidence, type Assertion } from "./assert";
+import { parseSymbol, routeOf, symbolEvidence, type Assertion } from "./assert";
 import { chainBreak, reaches, unsupportedMembers } from "./body";
 import type { BoardFile } from "./board-file";
 import { readGraph, type Provenance } from "./graph";
@@ -38,7 +38,9 @@ export type DriftKind =
   /** `@used` claimed, and every occurrence is the declaration itself. */
   | "unused-symbol"
   /** A symbol a box lists as part of a concept, whose body shows no trace of it. */
-  | "unsupported-member";
+  | "unsupported-member"
+  /** A route anchor whose literal is no longer served by the file or its imports. */
+  | "missing-route";
 
 export interface DriftFinding {
   /** Node id, as edges and edit_diagram refer to it. */
@@ -142,7 +144,13 @@ export interface UnrepresentedFinding {
  * Why a node was not checked. Kept apart from `excused`, which is a declaration
  * that there was nothing to check, and from `handDrawn`, which is a sketch.
  */
-export type NodeSkipReason = "no-ref" | "ref-outside-repo";
+export type NodeSkipReason =
+  | "no-ref"
+  | "ref-outside-repo"
+  /** A directory or glob anchor with more entries than the cap allows reading. */
+  | "anchor-too-large"
+  /** A route anchor on a file that writes no route literals at all. */
+  | "no-route-literals";
 
 /**
  * Why an arrow was not checked. Nine reasons, all of which used to arrive as a
@@ -271,7 +279,7 @@ function mentions(source: string, symbol: string): boolean {
   return new RegExp(`\\b${symbol.replace(REGEX_SPECIAL, "\\$&")}\\b`).test(source);
 }
 
-type Inspection = DriftFinding | "ok" | "skip";
+type Inspection = DriftFinding | "ok" | { skip: NodeSkipReason };
 
 /**
  * How many entries a directory or glob anchor will look at.
@@ -376,6 +384,7 @@ function inspect(
   provenance: Provenance,
   workspace: Workspace,
   tally: AssertionTally,
+  importCache: Map<string, Array<{ abs: string; rel: string }>>,
 ): Inspection {
   const { path: rawTarget, symbol: rawSymbol } = parseRef(ref);
   const base = { node: node.id, label: node.label, ref, provenance };
@@ -396,6 +405,8 @@ function inspect(
   }
   const symbol = parsed?.symbol;
   const assertion = parsed?.assertion;
+  /** A `/`-prefixed symbol, with or without a method token, is a route claim. */
+  const route = symbol === undefined ? undefined : routeOf(symbol);
   /** The finding an assertion verdict turns into, worded for where it looked. */
   const failed = (
     verdict: { kind: "missing-declaration" | "unused-symbol" },
@@ -415,6 +426,14 @@ function inspect(
   const explicitDirectory = rawTarget.endsWith("/");
   const target = explicitDirectory ? rawTarget.replace(/\/+$/, "") : rawTarget;
 
+  if (route && (explicitDirectory || target.includes("*"))) {
+    return {
+      ...base,
+      kind: "unresolvable-ref",
+      detail: `${route.route} is a route, which one file serves. ${rawTarget} is not one file.`,
+    };
+  }
+
   const glob = globOf(target);
   if (target.includes("*") && !glob) {
     return {
@@ -429,7 +448,7 @@ function inspect(
   if (!absolute) {
     // An inferred ref is a reading of someone's label, not a claim they made.
     // A label pointing outside the repo just is not a code reference.
-    if (provenance === "inferred") return "skip";
+    if (provenance === "inferred") return { skip: "ref-outside-repo" };
     return { ...base, kind: "unresolvable-ref", detail: `${lookup} is outside the repository.` };
   }
 
@@ -443,7 +462,7 @@ function inspect(
       return { ...base, kind: "unresolvable-ref", detail: `${glob.directory} is not a directory.` };
     }
     const matched = filesIn(absolute, workspace, glob.pattern);
-    if (matched === undefined) return "skip";
+    if (matched === undefined) return { skip: "anchor-too-large" };
     if (matched.length === 0) {
       return { ...base, kind: "empty-ref", detail: `${target} matches no files.` };
     }
@@ -459,7 +478,7 @@ function inspect(
 
   if (found === "directory") {
     const inside = filesIn(absolute, workspace);
-    if (inside === undefined) return "skip";
+    if (inside === undefined) return { skip: "anchor-too-large" };
     if (workspace.list(absolute).length === 0) {
       return { ...base, kind: "empty-ref", detail: `${target} is empty.` };
     }
@@ -485,6 +504,19 @@ function inspect(
 
   if (explicitDirectory) {
     return { ...base, kind: "unresolvable-ref", detail: `${target}/ is a file, not a directory.` };
+  }
+  if (route) {
+    const pool = routePool(absolute, target, workspace, importCache);
+    // A file writing no route literals at all is a file whose routing cannot be
+    // read. Skipped and counted, never guessed at -- the same answer this gives
+    // for a language it has no reader for.
+    if (pool.size === 0) return { skip: "no-route-literals" };
+    if (poolShows(pool, route.route)) return "ok";
+    return {
+      ...base,
+      kind: "missing-route",
+      detail: `${target} no longer serves ${route.route}.`,
+    };
   }
   if (!symbol) return "ok";
   const source = workspace.read(absolute);
@@ -619,6 +651,46 @@ function getRouteLiterals(file: string, workspace: Workspace): Set<string> {
 }
 
 /**
+ * Route literals a file can be held to: its own, plus its direct imports'.
+ *
+ * One hop, the same neighbourhood the arrow check already reads, because a
+ * server that registers its handlers in one file and names them in another is
+ * ordinary and neither file alone tells the truth.
+ */
+function routePool(
+  fileAbsolute: string,
+  fileRelative: string,
+  workspace: Workspace,
+  importCache: Map<string, Array<{ abs: string; rel: string }>>,
+): Set<string> {
+  const pool = new Set(getRouteLiterals(fileAbsolute, workspace));
+  for (const imported of getImports(fileAbsolute, fileRelative, workspace, importCache)) {
+    for (const literal of getRouteLiterals(imported.abs, workspace)) pool.add(literal);
+  }
+  return pool;
+}
+
+/**
+ * Whether the pool shows this route.
+ *
+ * Exact match, or either string ending in the other. That second clause is for
+ * composed routing: `router.use("/api")` plus `.get("/board")` serves
+ * `/api/board` without writing it anywhere, and every route literal in this
+ * repo happens to be whole only because this repo compares `url.pathname`
+ * directly. A framework that composes is the common case elsewhere, and a
+ * composed route reading as absent would be a loud wrong answer -- so partial
+ * evidence resolves quiet, like every other doubt here.
+ */
+function poolShows(pool: Set<string>, route: string): boolean {
+  if (pool.has(route)) return true;
+  for (const literal of pool) {
+    if (literal.length < 2) continue;
+    if (route.endsWith(literal) || literal.endsWith(route)) return true;
+  }
+  return false;
+}
+
+/**
  * Every symbol a box names, for a language whose bodies can be read.
  *
  * A box standing for a feature lists several -- a static and the macro using
@@ -638,7 +710,11 @@ function symbolsOf(node: { ref?: string; refs?: string[] }, file: string): strin
     const parsed = parseSymbol(symbol);
     // A garbled assertion is already reported by the node check; here it is
     // simply not a symbol worth searching for.
-    if ("garbled" in parsed || parsed.symbol.startsWith("/")) continue;
+    // A route is not a name to search bodies for. Defensive rather than
+    // load-bearing today -- a `/`-prefixed string cannot be an identifier, so
+    // the search would come back empty -- but it was load-bearing when symbols
+    // were matched as raw text and says outright what a route is not.
+    if ("garbled" in parsed || routeOf(parsed.symbol)) continue;
     symbols.add(parsed.symbol);
   }
   return [...symbols];
@@ -662,7 +738,11 @@ function membersByFile(
     const { path: target, symbol } = parseRef(raw);
     if (!symbol) continue;
     const parsed = parseSymbol(symbol);
-    if ("garbled" in parsed || parsed.symbol.startsWith("/")) continue;
+    // A route is not a name to search bodies for. Defensive rather than
+    // load-bearing today -- a `/`-prefixed string cannot be an identifier, so
+    // the search would come back empty -- but it was load-bearing when symbols
+    // were matched as raw text and says outright what a route is not.
+    if ("garbled" in parsed || routeOf(parsed.symbol)) continue;
     const absolute = workspace.resolve(target);
     if (!absolute || workspace.stat(absolute) !== "file") continue;
     const language = languageOf(absolute);
@@ -810,6 +890,9 @@ export function checkDrift(
     edgesSkipped += 1;
     edgesSkippedWhy[reason] = (edgesSkippedWhy[reason] ?? 0) + 1;
   };
+  /** Shared by the box checks and the arrow checks: one read per file per run. */
+  const importCache = new Map<string, Array<{ abs: string; rel: string }>>();
+  /** Shared by the box checks and the arrow checks: one read per file per run. */
 
   /**
    * File one verdict about one arrow.
@@ -874,6 +957,8 @@ export function checkDrift(
     // Counted once per box, not once per anchor: the numbers are about how much
     // of the diagram was read, and a box is one thing on the diagram.
     let anyChecked = false;
+    /** Why the last anchor could not be read, for the count if none could. */
+    let unread: NodeSkipReason = "ref-outside-repo";
     for (const anchor of anchors) {
       const isDeclared = anchor === declared || (node.refs ?? []).includes(anchor);
       const result = inspect(
@@ -882,8 +967,12 @@ export function checkDrift(
         isDeclared ? "recorded" : "inferred",
         workspace,
         assertions,
+        importCache,
       );
-      if (result === "skip") continue;
+      if (typeof result === "object" && "skip" in result) {
+        unread = result.skip;
+        continue;
+      }
       anyChecked = true;
 
       if (node.state === "planned") {
@@ -912,11 +1001,12 @@ export function checkDrift(
 
       if (result !== "ok") findings.push(result);
     }
-    // Every anchor was unreadable -- the only way `inspect` returns "skip" is a
-    // label-derived ref pointing outside the tree, or a directory too large to
-    // read. One box, one count, whichever way it went.
+    // Every anchor was unreadable. One box, one count, and the reason is the
+    // one the last anchor gave rather than a stand-in: a directory too large to
+    // read and a label pointing outside the tree used to be counted as the same
+    // thing, which made the breakdown say something that had not happened.
     if (anyChecked) checked += 1;
-    else skipNode("ref-outside-repo");
+    else skipNode(unread);
 
     /*
      * A concept box has to hold together.
@@ -986,7 +1076,6 @@ export function checkDrift(
   // Edge checking: check each generated edge for corroboration
   const edges: EdgeDriftFinding[] = [];
 
-  const importCache = new Map<string, Array<{ abs: string; rel: string }>>();
 
   if (options?.edges !== false && !concept) {
     const nodeById = new Map<string, typeof graph.nodes[0]>();
