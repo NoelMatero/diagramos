@@ -1,4 +1,6 @@
-import { describe, expect, it } from "vitest";
+import { statSync } from "node:fs";
+
+import { beforeAll, describe, expect, it } from "vitest";
 
 import { convertSkeletons, loadConverter } from "../src/engine/convert";
 import { normalizeElements } from "../src/engine/normalize";
@@ -21,18 +23,53 @@ const GRAPH = {
 };
 
 describe("headless Excalidraw conversion", () => {
-  // Cold load is ~125ms in plain Node; the generous budget here absorbs
-  // vitest's transform pass, which dominates and is not a runtime cost.
-  it("loads the pre-bundled converter without a DOM", async () => {
-    const started = performance.now();
-    await expect(loadConverter()).resolves.toBeTypeOf("function");
-    const elapsed = performance.now() - started;
-    expect(elapsed, `cold load took ${elapsed.toFixed(0)}ms`).toBeLessThan(20_000);
-    // Second call must be cached, not re-parsed.
-    const warm = performance.now();
+  /*
+   * There is no wall-clock assertion here any more, and that is the point.
+   *
+   * This test used to require the cold load under 20 s, on the reasoning that
+   * it costs ~125 ms in plain Node and the budget absorbed vitest's transform
+   * pass. Measured: the plain-Node number is right (107 ms to import, 26 ms to
+   * build the converter) and the vitest number is 2.9-7.9 s on an idle laptop,
+   * because vitest transforms a 13 MB bundle and twenty test files compete for
+   * the cores. A 2.5x margin over a figure that already swings 2.7x run to run
+   * is not a budget, it is a coin flip -- and it flipped, intermittently, for
+   * nobody's benefit.
+   *
+   * What the assertion was groping for was "the bundle has not blown up". The
+   * bundle's size says that deterministically, so that is what is checked. Load
+   * time is a measurement, and this repo keeps measurements in scripts that
+   * print rather than in tests that fail.
+   *
+   * The other half of the old test -- "the second call must be cached, not
+   * re-parsed" -- is gone with no replacement, because there is nothing left to
+   * observe. Node caches the dynamic import and the bundle's own `getConverter`
+   * returns a singleton, so the module-level cache in `convert.ts` saves a
+   * function call and cannot be told apart from its absence: an identity check
+   * passes just as happily with the cache deleted. Mutation-tested, and the
+   * test that looked like it covered this was removed rather than kept for the
+   * green tick.
+   *
+   * The cold load is paid here, once, with a timeout whose only job is to catch
+   * a hang. Leaving it to whichever test ran first meant that test inherited
+   * vitest's 5 s default against a 5 s load, which is the same coin flip in a
+   * different pocket.
+   */
+  beforeAll(async () => {
     await loadConverter();
-    expect(performance.now() - warm).toBeLessThan(50);
-  }, 30_000);
+  }, 60_000);
+
+  it("loads the pre-bundled converter without a DOM", async () => {
+    await expect(loadConverter()).resolves.toBeTypeOf("function");
+  });
+
+  it("keeps the vendored bundle from growing without anyone noticing", () => {
+    // Every millisecond of that cold load, and 13 MB of the published package,
+    // come from this one file. A ceiling near the current size turns "the
+    // bundle doubled" into a failed test instead of a slow afternoon.
+    const bundle = new URL("../vendor/excalidraw-headless.mjs", import.meta.url);
+    const { size } = statSync(bundle);
+    expect(size / 1_048_576, `bundle is ${(size / 1_048_576).toFixed(1)} MB`).toBeLessThan(18);
+  });
 
   it("preserves skeleton ids and rewrites bindings to match", async () => {
     const elements = await convertSkeletons([
