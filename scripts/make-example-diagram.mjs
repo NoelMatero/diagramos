@@ -24,17 +24,37 @@ installExcalifontMeasurer();
 const { board, nodeCount, edgeCount, elementCount } = await createDiagram(emptyBoard(), {
   title: "Diagram-driven development",
   name: "example",
+  // Every box says what it stands for, or says outright that it is not code
+  // here. A box that does neither is never checked by anything -- see
+  // /annotate-diagram. `state: "external"` is the honest answer for another
+  // product, a person, and a drawing file; none of them is a path in this tree,
+  // and inventing one to shorten the coverage report would be a false claim.
   nodes: [
-    { id: "claude", label: "Claude Code", rounded: true },
-    { id: "mcp", label: "Board MCP server" },
-    { id: "engine", label: "ELK layout engine" },
-    { id: "file", label: "board.excalidraw", backgroundColor: "#d0ebff" },
-    { id: "human", label: "You", shape: "ellipse", backgroundColor: "#ffec99" },
+    { id: "claude", label: "Claude Code", rounded: true, state: "external" },
+    { id: "mcp", label: "Board MCP server", ref: "src/mcp/server.ts" },
+    { id: "diagram", label: "Diagram builder", ref: "src/engine/diagram.ts" },
+    { id: "engine", label: "ELK layout engine", ref: "src/engine/layout.ts" },
+    { id: "file", label: "board.excalidraw", backgroundColor: "#d0ebff", state: "external" },
+    { id: "human", label: "You", shape: "ellipse", backgroundColor: "#ffec99", state: "external" },
   ],
+  // Two arrows changed, both because anchoring the boxes exposed them as
+  // simplifications rather than facts -- and in both cases the arrow was the
+  // thing that was wrong, so the fix is the drawing and not a looser anchor.
+  //
+  // "Diagram builder" exists because the server does not reach the layout
+  // engine: it calls diagram.ts, which does. That one the check found on its
+  // own, once both ends were anchored.
+  //
+  // "writes" moved from the layout engine to the server, which is where
+  // writeBoard is actually called; diagram.ts and layout.ts touch no disk at
+  // all. The check could not have found this one -- a drawing file is not code,
+  // so no arrow touching it is ever verified -- which is the reason to get it
+  // right by hand while the rest is being anchored.
   edges: [
     { from: "claude", to: "mcp", label: "tool call" },
-    { from: "mcp", to: "engine", label: "graph" },
-    { from: "engine", to: "file", label: "writes" },
+    { from: "mcp", to: "diagram", label: "graph" },
+    { from: "diagram", to: "engine", label: "layout" },
+    { from: "mcp", to: "file", label: "writes" },
     { from: "file", to: "mcp", label: "reads back" },
     { from: "human", to: "file", label: "edits" },
   ],
