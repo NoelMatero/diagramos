@@ -68,6 +68,14 @@ When a node is real code in this repo, set `ref` on it. That is what lets
 | a whole directory | `src/engine/` — the trailing slash says so, and it must not be empty |
 | something inside a directory | `src/engine/#Workspace` |
 | some files in one directory | `src/engine/*.ts` — `*` in the last segment only, never `**` |
+| an HTTP endpoint | `src/server/board-server.ts#/api/board`, or `#GET /api/board` |
+
+An endpoint box is the one anchor that is not a name. It asks whether the route
+literal is still served by that file or something it imports, which is the only
+mechanically checkable thing about an endpoint — the method token is there for
+the reader and is never verified. A file that writes no route literals at all is
+counted as unread rather than reported as broken, so pointing this at a helper
+module is quiet, not a false alarm.
 
 When one box stands for several things — a feature spread over files, a constant
 and the function using it — add `refs: [...]` beside `ref`. Every anchor is

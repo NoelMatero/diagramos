@@ -191,8 +191,44 @@ remain, in order of leverage:
    convention.~~ **Shipped**, together with `refs: string[]`. Directory anchors
    still disable the arrows around them, which is now visible in the skip
    breakdown rather than silent.
-3. The symbol declaration tier (on-demand `undeclared-symbol`) and route
-   anchors. **Next.**
+3. ~~The symbol declaration tier (on-demand `undeclared-symbol`) and route
+   anchors.~~ **Route anchors shipped 2026-08-17.** Two halves of this step were
+   answered rather than built, and both deserve saying out loud:
+
+   - **The `undeclared-symbol` tier is superseded, not deferred.** It was to be
+     a blind, on-demand tier: every `#symbol` that is mentioned but not
+     declared. `docs/usage-design.md` measured what that does when applied
+     without the author asking — 42 of 134 exports in this repo flagged, because
+     an export used only by its importers looks unused where it is written. The
+     opt-in `@declared` / `@used` syntax shipped instead and was measured at
+     zero false alarms where an author wrote it. Building the blind tier now
+     would add a second, noisier answer to a question already answered.
+   - **The pool form (`#/api/board` with no path) is deferred.** It needs a
+     board-wide route pool threaded into the box check and a new on-demand-only
+     reporting channel, for the weaker of the two claims — the design itself
+     tiers it lower. Today it gives "names a symbol but no file", which is
+     accurate. The anchored form is the one worth having and is what shipped.
+
+   What shipped: `path#/api/board`, and `path#GET /api/board` where the method
+   is read and never verified. The check is that the literal still appears in
+   that file or one it directly imports. Two things keep `missing-route` from
+   crying wolf, both measured:
+
+   - **A file with no route literals at all is counted as unread**, not
+     reported as broken. A route anchor on a helper module is silence.
+   - **A composed route resolves quiet.** `router.use("/api")` plus
+     `.get("/board")` serves `/api/board` and writes it nowhere, so either half
+     being present is enough. Every route literal in this repo happens to be
+     written whole (12 of them, all compared against `url.pathname` directly),
+     which is exactly why this could not be measured here and had to be
+     designed for instead.
+
+   Zero new findings on the seven committed boards and on the four in
+   `orangutan`, which is the bar this step was given. Every guarantee above is
+   mutation-tested; one guard — keeping routes out of the arrow check's symbol
+   list — survives mutation and is documented as defensive rather than
+   load-bearing, because a `/`-prefixed string can no longer be an identifier
+   anywhere.
 4. The annotate mode on `/update-diagram`, measured on
    `architecture.excalidraw` first: proposals reviewed by a human, precision
    recorded here. `example.excalidraw` is the other case waiting on this: it is

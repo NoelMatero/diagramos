@@ -139,7 +139,9 @@ const nodeSchema = z.object({
       "What this node stands for in the repo. A file (src/engine/layout.ts), a symbol in one "
       + "(src/engine/layout.ts#planLayout), a directory (src/engine/ — must not be empty), a symbol "
       + "somewhere directly inside one (src/engine/#Workspace), or a glob over one directory "
-      + "(src/engine/*.ts — * is allowed in the last segment only, never **). Set it when a node is "
+      + "(src/engine/*.ts — * is allowed in the last segment only, never **), or an HTTP endpoint "
+      + "(src/server/board-server.ts#/api/board, optionally with a method token as in #GET /api/board, "
+      + "which is read but never verified). Set it when a node is "
       + "real code so check_drift can tell when it goes stale. Leave it off for anything not in this "
       + "repository, and say why with state or the board's describes.",
     ),
@@ -449,8 +451,11 @@ server.registerTool(
       + "A ref may also claim more than existence: path#symbol@declared asks that the file declare that "
       + "name, path#symbol@used that something there use it beyond its own declaration, and "
       + "@declared+used both -- which is how a box standing for a feature notices the feature being "
-      + "gutted rather than deleted. TypeScript, JavaScript and Rust only; elsewhere the claim falls "
-      + "back to a plain mention and is counted in assertions. When both ends of an arrow name symbols, the arrow is checked inside one function body rather than by imports — so an arrow drawn from the wrong function is caught. Give the arrow via: [...] when the call goes through named intermediaries, and a break reports which hop stopped holding.",
+      + "gutted rather than deleted. TypeScript, TSX, JavaScript, Rust and Python; elsewhere the claim "
+      + "falls "
+      + "back to a plain mention and is counted in assertions. A route anchor (path#/api/board) instead "
+      + "asks that the literal still be served by that file or one it imports; a file writing no route "
+      + "literals at all is counted as unread rather than reported broken. When both ends of an arrow name symbols, the arrow is checked inside one function body rather than by imports — so an arrow drawn from the wrong function is caught. Give the arrow via: [...] when the call goes through named intermediaries, and a break reports which hop stopped holding.",
     inputSchema: {
       path: z
         .string()

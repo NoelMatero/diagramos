@@ -32,13 +32,49 @@ export type ParsedSymbol =
   | { garbled: string };
 
 /**
+ * HTTP methods a route anchor may carry. Read by people, ignored by the check.
+ *
+ * Verifying that `POST /api/file` really is a POST needs framework parsing that
+ * is different per framework and wrong per framework, so the method is
+ * documented as decoration rather than quietly half-checked.
+ */
+const METHODS = new Set(["GET", "POST", "PUT", "PATCH", "DELETE", "HEAD", "OPTIONS"]);
+
+export interface Route {
+  /** Present only when the author wrote one. Never verified. */
+  method?: string;
+  /** The path as written, starting with `/`. This is what gets looked for. */
+  route: string;
+}
+
+/**
+ * Whether this symbol is a route claim rather than a name.
+ *
+ * `/api/board` and `POST /api/board` both are; `logLine` is not. A bare word
+ * followed by a slash-path is only a route when the word is a real method, so
+ * a symbol that happens to contain a space cannot accidentally become one.
+ */
+export function routeOf(symbol: string): Route | undefined {
+  const trimmed = symbol.trim();
+  if (trimmed.startsWith("/")) return { route: trimmed };
+
+  const space = trimmed.indexOf(" ");
+  if (space < 0) return undefined;
+  const method = trimmed.slice(0, space).toUpperCase();
+  const rest = trimmed.slice(space + 1).trim();
+  if (!METHODS.has(method) || !rest.startsWith("/")) return undefined;
+  return { method, route: rest };
+}
+
+/**
  * Splits `log_line@declared+used` into a symbol and what is claimed about it.
  *
- * A symbol starting with `/` is a route, never an assertion, so
- * `#/api/users/@me` stays the literal route it looks like.
+ * A route is never an assertion, so `#/api/users/@me` stays the literal route
+ * it looks like -- and so does `#GET /api/users/@me`, which is why this asks
+ * `routeOf` rather than testing for a leading slash.
  */
 export function parseSymbol(symbol: string): ParsedSymbol {
-  if (symbol.startsWith("/")) return { symbol };
+  if (routeOf(symbol)) return { symbol };
   const at = symbol.indexOf("@");
   if (at < 0) return { symbol };
 

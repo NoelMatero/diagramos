@@ -77,7 +77,7 @@ The bare `127.0.0.1:4747` follows whichever board was opened or written last, wh
 
 ## Keeping a diagram honest
 
-A node can record what it stands for — `ref: "src/engine/layout.ts"`, or `path#symbol` — and `check_drift` compares those claims against the working tree:
+A node can record what it stands for — a file, `path#symbol`, a directory, a `*.ts` glob, or an endpoint like `path#/api/board` — and `check_drift` compares those claims against the working tree:
 
 ```bash
 npx -y diagramos drift                 # every board in docs/diagrams

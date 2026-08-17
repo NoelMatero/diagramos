@@ -159,6 +159,7 @@ const REASONS = {
   "missing-declaration": "the name is in the file, but nothing there declares it",
   "unused-symbol": "it is declared, and nothing outside its own declaration uses it",
   "unsupported-member": "the box lists it, and its body shows no trace of the others",
+  "missing-route": "the file serves routes, and that one is not among them",
 };
 const EDGE_REASON = "nothing in the code connects them: no import either way, "
   + "no third file importing both, no shared route string";
@@ -186,6 +187,7 @@ function target(finding) {
     return `${symbol} in ${file}`;
   }
   if (finding.kind === "unresolvable-ref") return finding.ref;
+  if (finding.kind === "missing-route") return `${symbol} in ${file}`;
   return file;
 }
 
@@ -533,6 +535,8 @@ function renderCoverage(entries, colour) {
 const SKIP_WORDS = {
   "no-ref": "no ref",
   "ref-outside-repo": "ref points outside the repo",
+  "anchor-too-large": "a directory anchor too large to read",
+  "no-route-literals": "a route anchor on a file that serves none",
   "ends-not-bound": "ends not snapped to their boxes",
   "endpoint-missing": "an end points at no box",
   "endpoint-external": "an end is marked external",
