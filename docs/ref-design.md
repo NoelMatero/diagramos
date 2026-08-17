@@ -229,10 +229,61 @@ remain, in order of leverage:
    list — survives mutation and is documented as defensive rather than
    load-bearing, because a `/`-prefixed string can no longer be an identifier
    anywhere.
-4. The annotate mode on `/update-diagram`, measured on
-   `architecture.excalidraw` first: proposals reviewed by a human, precision
-   recorded here. `example.excalidraw` is the other case waiting on this: it is
-   mixed, so no board-level flag can resolve it.
+4. ~~The annotate mode on `/update-diagram`~~ **Shipped 2026-08-17 as its own
+   command, `/annotate-diagram`.**
+
+   **Why a command and not a mode.** `/update-diagram` corrects anchors that have
+   gone wrong; this one writes new anchors from guesses. Different input,
+   different risk, and only one of them needs a human to approve before anything
+   is written. Folding them together would have put an approval gate inside a
+   command that does not otherwise need one.
+
+   **Not `architecture.excalidraw`.** That board is marked `describes: concept`
+   (it is the IMS diagram, per step 1 above), so every box on it is already
+   excused and there is nothing to annotate. `example.excalidraw` was the real
+   case all along: five boxes, no anchors, and mixed — which is exactly why no
+   board-level flag could resolve it.
+
+   **The deterministic half.** `skippedWhy` counted these boxes and a count
+   cannot be acted on, so `coverage` now *names* them: `unannotated`, with the
+   label, on demand only. Concept boards, `external` boxes and hand-drawn boxes
+   are excluded, each because they have already given a complete answer.
+   Mutation-tested.
+
+   **Precision, measured on `example.excalidraw`.** Five boxes, proposals made
+   by following the command and then checked against the tree:
+
+   | box | proposed | verdict |
+   | --- | --- | --- |
+   | Board MCP server | `src/mcp/server.ts` | right — the only MCP server in the tree |
+   | ELK layout engine | `src/engine/layout.ts` | right — the only file importing elkjs |
+   | Claude Code | `external` | right — the agent, not this repo |
+   | You | `external` | right — a person |
+   | board.excalidraw | `docs/diagrams/` | flagged uncertain, and rightly: see below |
+
+   Four of four confident proposals correct; the fifth was declared uncertain,
+   which is the third answer working as designed. Zero box findings afterwards,
+   and zero boxes left unanchored.
+
+   **Three things the measurement taught that reasoning had not**, all now in the
+   command text:
+
+   - **A directory anchor disables the arrows around that box.** `docs/diagrams/`
+     is a modest, true claim and it silently removed two arrows from the check.
+     For an uncertain box, `external` is better than a directory.
+   - **Arrows are checked against `ref`, not `refs`.** Adding a second anchor to
+     a box does nothing for its arrows. Verified: adding
+     `refs: ["src/engine/diagram.ts"]` changed no verdict.
+   - **Correct anchors made an arrow flag, and the arrow was the wrong thing.**
+     `Board MCP server → ELK layout engine` fails because the server calls
+     `diagram.ts`, which calls layout — the diagram was a simplification and the
+     check was right. Anchoring "ELK layout engine" at `src/engine/diagram.ts`
+     turns the board green and makes it lie, so the command is explicit that this
+     is the same failure as inventing a ref.
+
+   That last one is the real result of this step: annotating a board can reveal
+   that the board was wrong, and the command has to be able to say so instead of
+   bending an anchor until the report goes quiet.
 
 Each step behind the existing flag discipline: anything new that can speak
 per-turn gets its own switch, so a noisy newcomer can be shot without losing

@@ -468,10 +468,13 @@ server.registerTool(
         .boolean()
         .default(false)
         .describe(
-          "Also answer the opposite question: what does the code have that the diagram does not "
-          + "show? Returns modules the board's own ref'd files import but no box covers, most-imported "
-          + "first. Suggestions, never drift -- they do not affect clean. Off by default because it "
-          + "reads the imports of every ref'd file; ask for it when deciding what a diagram is missing.",
+          "Two questions the per-turn check does not ask. `unannotated` names the boxes that claim to "
+          + "be about this repo and carry no ref at all, with their labels -- these are invisible to "
+          + "every other check, and naming them is what lets a ref be proposed for each. "
+          + "`unrepresented` is the opposite direction: modules the board's own ref'd files import but "
+          + "no box covers, most-imported first. Both are suggestions, never drift -- they do not "
+          + "affect clean. Off by default because it reads the imports of every ref'd file; ask for it "
+          + "when deciding what a diagram is missing or when annotating one.",
         ),
     },
   },
@@ -525,6 +528,7 @@ server.registerTool(
       const findings: Array<Record<string, unknown>> = [];
       const deleted: Array<Record<string, unknown>> = [];
       const unrepresented: Array<Record<string, unknown>> = [];
+      const unannotated: Array<Record<string, unknown>> = [];
       const edges: Array<Record<string, unknown>> = [];
       const workItems: Array<Record<string, unknown>> = [];
       const promotions: Array<Record<string, unknown>> = [];
@@ -556,6 +560,9 @@ server.registerTool(
         for (const finding of report.deleted) {
           deleted.push({ board: relativeToWorkspace(file), ...finding });
         }
+        for (const item of report.unannotated) {
+          unannotated.push({ board: relativeToWorkspace(file), ...item });
+        }
         for (const finding of report.unrepresented) {
           unrepresented.push({ board: relativeToWorkspace(file), ...finding });
         }
@@ -585,6 +592,7 @@ server.registerTool(
         ...(conceptBoards.length ? { conceptBoards } : {}),
         // What the code has that the diagram does not show. Suggestions about
         // what might be worth drawing, so deliberately outside clean.
+        ...(unannotated.length ? { unannotated } : {}),
         ...(unrepresented.length ? { unrepresented } : {}),
         ...(Object.keys(skippedWhy).length ? { skippedWhy } : {}),
         ...(Object.keys(edgesSkippedWhy).length ? { edgesSkippedWhy } : {}),

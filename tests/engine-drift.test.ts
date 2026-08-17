@@ -1087,6 +1087,85 @@ describe("a box removed while its code is still there", () => {
  * so the tests that matter are the ones proving it stays inside the diagram's own
  * neighbourhood and never becomes a repo scan.
  */
+/**
+ * The other direction: a box with no code.
+ *
+ * These are the boxes every other check is blind to. `skippedWhy` has always
+ * counted them, and a count is right for the per-turn notice, but a count is
+ * not actionable -- nobody diffs a 33-box board against a number by eye, and
+ * the measured evidence is that nobody annotates by hand at all. So the
+ * on-demand channel names them.
+ *
+ * The tests that matter here are the ones proving what is *not* in the list. A
+ * box that has already said it is not about this repo has given a complete
+ * answer, and nagging about it would teach people to ignore the list.
+ */
+describe("boxes the diagram leaves unanchored", () => {
+  async function boardOf(
+    nodes: Array<{ id: string; label: string; ref?: string; state?: "planned" | "built" | "external" }>,
+    describes?: "repo" | "concept",
+  ) {
+    // `describes` is recorded on the title element, so a concept board needs a
+    // title. Passing one without the other is silently ignored, which this
+    // helper would otherwise hide.
+    return (await createDiagram(emptyBoard(), {
+      name: "arch",
+      nodes,
+      edges: [],
+      ...(describes ? { describes, title: "A board" } : {}),
+    })).board;
+  }
+  const tree = { "src/a.ts": "export const a = 1;" };
+
+  it("names the box and its label, which is the only evidence of intent", async () => {
+    const board = await boardOf([
+      { id: "a", label: "A", ref: "src/a.ts" },
+      { id: "mystery", label: "Board MCP server" },
+    ]);
+    const report = checkDrift(board, fakeWorkspace(tree), { coverage: true });
+    expect(report.unannotated).toEqual([{ node: "mystery", label: "Board MCP server" }]);
+    // Unanchored is not drift. It was never a claim, so it cannot have broken.
+    expect(report.clean).toBe(true);
+  });
+
+  it("stays silent unless asked, because a per-turn nag gets the check switched off", async () => {
+    const board = await boardOf([{ id: "mystery", label: "Board MCP server" }]);
+    const report = checkDrift(board, fakeWorkspace(tree));
+    expect(report.unannotated).toEqual([]);
+    // The count is still there every turn; only the naming is on demand.
+    expect(report.skippedWhy).toEqual({ "no-ref": 1 });
+  });
+
+  it("says nothing about a box that declared itself external", async () => {
+    // "not in this repo" is a complete answer, not a missing one.
+    const board = await boardOf([{ id: "you", label: "You", state: "external" }]);
+    expect(checkDrift(board, fakeWorkspace(tree), { coverage: true }).unannotated).toEqual([]);
+  });
+
+  it("says nothing about any box on a concept board", async () => {
+    // A board about a protocol makes no claims about this tree, so having no
+    // anchor is the point rather than an omission.
+    const board = await boardOf(
+      [{ id: "scscf", label: "S-CSCF" }, { id: "hss", label: "HSS" }],
+      "concept",
+    );
+    expect(checkDrift(board, fakeWorkspace(tree), { coverage: true }).unannotated).toEqual([]);
+  });
+
+  it("says nothing about a hand-drawn box, which is a sketch and not a claim", async () => {
+    const board = await boardOf([{ id: "a", label: "A", ref: "src/a.ts" }]);
+    board.elements.push({
+      id: "sketch", type: "rectangle", x: 900, y: 900, width: 100, height: 60,
+    } as unknown as (typeof board.elements)[number]);
+    expect(checkDrift(board, fakeWorkspace(tree), { coverage: true }).unannotated).toEqual([]);
+  });
+
+  it("drops the box from the list once it carries an anchor", async () => {
+    const board = await boardOf([{ id: "mcp", label: "Board MCP server", ref: "src/a.ts" }]);
+    expect(checkDrift(board, fakeWorkspace(tree), { coverage: true }).unannotated).toEqual([]);
+  });
+});
+
 describe("code the diagram leaves out", () => {
   const tree = {
     "src/a.ts": "import { b } from './b';\nimport { deep } from './deep';\nexport const a = b;",

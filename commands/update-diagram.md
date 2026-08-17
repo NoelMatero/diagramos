@@ -14,6 +14,11 @@ MCP board tools are unavailable, run `npm run check:drift` instead.
 If the report is clean, say so in one line and stop. Do not go looking for
 problems it did not find, and do not redraw a diagram that is fine.
 
+This command is for anchors that have gone *wrong*. A box carrying no anchor at
+all is a different job — it is unread rather than stale, and giving it one means
+proposing a claim rather than correcting one, which needs the user's approval.
+`/annotate-diagram` does that.
+
 ## Decide what each finding means
 
 A finding says a box points at a file or symbol that no longer exists. That has
