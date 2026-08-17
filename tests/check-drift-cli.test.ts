@@ -49,6 +49,25 @@ async function checkDrift(): Promise<{ code: number; stderr: string; stdout: str
   }
 }
 
+/**
+ * What the report actually reported, with the one-line summary a bare run now
+ * ends with removed.
+ *
+ * Most assertions below were written as "not a single byte", which was a fair
+ * proxy for "said nothing about this box" back when a clean bare run printed
+ * nothing at all. It answers in one line now, so the proxy breaks while every
+ * one of those intents still holds — and the intent is the thing worth pinning.
+ * The summary itself is asserted once, on its own, so nothing here is covering
+ * for it going missing.
+ */
+function findings(output: string): string {
+  return output
+    .split("\n")
+    .filter((line) => !line.includes("nothing drifted"))
+    .join("\n")
+    .trim();
+}
+
 async function board(nodes: Array<{ id: string; label: string; ref?: string }>) {
   return (await createDiagram(emptyBoard(), { name: "arch", nodes, edges: [] })).board;
 }
@@ -65,16 +84,25 @@ afterAll(() => {
 });
 
 describe("check-drift on the command line", () => {
-  it("says nothing at all when every box still points at real code", async () => {
+  it("answers in one line when every box still points at real code", async () => {
     await writeBoard(
       path.join(workspace, "docs/diagrams/clean.excalidraw"),
       await board([{ id: "p", label: "Present", ref: "src/present.ts" }]),
     );
     const result = await checkDrift();
-    // Silence is the whole design: this runs every turn, and a check that
-    // announces good news thirty times an hour is one somebody switches off.
     expect(result.code).toBe(0);
-    expect(`${result.stdout}${result.stderr}`.trim()).toBe("");
+    /*
+     * This used to assert total silence, with the reasoning that the check runs
+     * every turn and one announcing good news gets switched off. The reasoning
+     * is right and was applied to the wrong caller: the per-turn path is
+     * `--hook`, which is still silent and is pinned to be, below. This path is
+     * somebody typing a command, and silence there reads as a broken install --
+     * which is how it was actually read.
+     */
+    const said = `${result.stdout}${result.stderr}`.trim();
+    expect(said).toContain("nothing drifted");
+    // One line, not a report. The quiet is worth protecting even here.
+    expect(said.split("\n")).toHaveLength(1);
   }, 120_000);
 
   it("reports the stale box, names the file, and exits non-zero", async () => {
@@ -168,7 +196,7 @@ describe("unsupported edges on the command line", () => {
     // point of the separate flag is that a noisy edge check can be silenced
     // without losing the missing-file check.
     expect(result.code).toBe(0);
-    expect(`${result.stdout}${result.stderr}`.trim()).toBe("");
+    expect(findings(`${result.stdout}${result.stderr}`)).toBe("");
   }, 120_000);
 });
 
@@ -305,7 +333,7 @@ describe("the hook channel", () => {
     expect(result.stdout.trim()).toBe("");
   }, 120_000);
 
-  it("says nothing in either mode when the diagram is fine", async () => {
+  it("stays completely silent as a hook when the diagram is fine", async () => {
     const clean = mkdtempSync(path.join(tmpdir(), "drift-cli-hook-clean-"));
     mkdirSync(path.join(clean, "docs/diagrams"), { recursive: true });
     mkdirSync(path.join(clean, "src"), { recursive: true });
@@ -318,10 +346,18 @@ describe("the hook channel", () => {
         path.join(clean, "docs/diagrams/clean.excalidraw"),
         await board([{ id: "p", label: "Present", ref: "src/present.ts" }]),
       );
-      for (const args of [[], ["--hook"]]) {
-        const { stdout, stderr } = await run(TSX, [SCRIPT, ...args], { cwd: clean });
-        expect(`${stdout}${stderr}`.trim()).toBe("");
-      }
+      /*
+       * This is the silence that matters, and now the only one asserted here.
+       *
+       * It fires unbidden at the end of every turn. A summary on a clean board
+       * would be a notice thirty times an hour saying nothing happened, which is
+       * how somebody comes to switch the check off -- taking the quiet, correct
+       * missing-file check with it. The bare command answers instead, and that
+       * asymmetry is deliberate rather than an oversight; the command-line case
+       * is pinned above.
+       */
+      const { stdout, stderr } = await run(TSX, [SCRIPT, "--hook"], { cwd: clean });
+      expect(`${stdout}${stderr}`.trim()).toBe("");
     } finally {
       rmSync(clean, { recursive: true, force: true });
     }
@@ -729,7 +765,7 @@ describe("the diagram directory", () => {
     await boardAt("docs/diagrams/clean.excalidraw");
     await boardAt("diagrams/stray.excalidraw");
     const result = await checkDriftIn(project);
-    expect(`${result.stdout}${result.stderr}`.trim()).toBe("");
+    expect(findings(`${result.stdout}${result.stderr}`)).toBe("");
   }, 120_000);
 
   it("checks the directory the project asked for", async () => {
@@ -737,7 +773,7 @@ describe("the diagram directory", () => {
     writeFileSync(path.join(project, CONFIG_FILE), JSON.stringify({ diagrams: "docs/architecture" }));
     const result = await checkDriftIn(project);
     // Found and checked: no complaint about there being nothing to look at.
-    expect(`${result.stdout}${result.stderr}`.trim()).toBe("");
+    expect(findings(`${result.stdout}${result.stderr}`)).toBe("");
   }, 120_000);
 
   it("refuses a config it cannot honour instead of quietly using the default", async () => {
@@ -798,7 +834,7 @@ describe("check-drift and what a diagram says about time", () => {
     // The whole design session would otherwise get the same notice every turn.
     await stateBoard([{ id: "s", label: "Session store", ref: "src/sessions.ts", state: "planned" }]);
     const result = await check();
-    expect(result.stderr).toBe("");
+    expect(findings(result.stderr)).toBe("");
     expect(result.stdout).toBe("");
     expect(result.code).toBe(0);
   });
@@ -835,9 +871,20 @@ describe("check-drift and what a diagram says about time", () => {
   });
 
   it("says nothing about an external box, which is not the same as a missing ref", async () => {
-    await stateBoard([{ id: "browser", label: "Browser canvas", state: "external" }]);
+    /*
+     * The ref is load-bearing and used to be absent. A box with no ref is
+     * skipped whatever its state, so this passed identically with the `external`
+     * excuse removed from the engine -- it asserted nothing about the thing it
+     * is named after. Caught by mutation, not by the suite.
+     *
+     * Pointing it at a file that does not exist is what makes the excuse the
+     * only reason for silence: without it this is a plain missing-file finding.
+     */
+    await stateBoard([
+      { id: "browser", label: "Browser canvas", ref: "src/browser.ts", state: "external" },
+    ]);
     const result = await check();
-    expect(result.stderr).toBe("");
+    expect(findings(result.stderr)).toBe("");
     expect(result.code).toBe(0);
   });
 });
@@ -924,7 +971,7 @@ describe("check-drift and a box that was removed", () => {
     git("add", "-A");
     git("commit", "-qm", "drop the layout box");
     const after = await check();
-    expect(after.stderr).toBe("");
+    expect(findings(after.stderr)).toBe("");
     expect(after.code).toBe(0);
   });
 
@@ -932,7 +979,7 @@ describe("check-drift and a box that was removed", () => {
     await commitBothThenRemoveLayout();
     rmSync(path.join(project, "src/layout.ts"));
     const result = await check();
-    expect(result.stderr).toBe("");
+    expect(findings(result.stderr)).toBe("");
     expect(result.code).toBe(0);
   });
 
@@ -940,7 +987,7 @@ describe("check-drift and a box that was removed", () => {
     // A repository without git is not a broken one. Silence, never an error.
     await writeBoardWith(["convert"]);
     const result = await check();
-    expect(result.stderr).toBe("");
+    expect(findings(result.stderr)).toBe("");
     expect(result.code).toBe(0);
   });
 
@@ -994,7 +1041,7 @@ describe("check-drift and code the diagram does not show", () => {
     // The board is clean and omits src/b.ts. Saying so every turn is how a check
     // that nags gets switched off, taking the quiet ones with it.
     const result = await check();
-    expect(result.stderr).toBe("");
+    expect(findings(result.stderr)).toBe("");
     expect(result.code).toBe(0);
   });
 
@@ -1069,7 +1116,7 @@ describe("check-drift saying what it did not look at", () => {
     // Nothing here is checkable. The per-turn notice must still say nothing.
     await put("sketch", [{ id: "x", label: "Auth" }, { id: "y", label: "Queue" }], [{ from: "x", to: "y" }]);
     const quiet = await check();
-    expect(quiet.stderr).toBe("");
+    expect(findings(quiet.stderr)).toBe("");
     expect(quiet.code).toBe(0);
   });
 
@@ -1150,7 +1197,7 @@ describe("check-drift and what a box is allowed to say", () => {
       edges: [],
     });
     const result = await check();
-    expect(result.stderr).toBe("");
+    expect(findings(result.stderr)).toBe("");
     expect(result.code).toBe(0);
   });
 
