@@ -22,11 +22,11 @@ import { readFileSync, readdirSync, realpathSync, statSync } from "node:fs";
 import { readdir } from "node:fs/promises";
 import path from "node:path";
 
-import { parseSymbol, symbolEvidence, type Assertion, type StripCache } from "./assert";
+import { parseSymbol, symbolEvidence, type Assertion } from "./assert";
 import { chainBreak, reaches, unsupportedMembers } from "./body";
 import type { BoardFile } from "./board-file";
 import { readGraph, type Provenance } from "./graph";
-import { languageOf, type Language } from "./strip";
+import { languageOf, type Language } from "./parse";
 
 export type DriftKind =
   | "missing-file"
@@ -172,11 +172,11 @@ export type SkipBreakdown<Reason extends string> = Partial<Record<Reason, number
  * that held from one that was never evaluated.
  */
 export interface AssertionTally {
-  /** Assertions actually evaluated against stripped source. */
+  /** Assertions actually evaluated against a parsed file. */
   checked: number;
-  /** The lexer bailed, so this was judged on raw text: today's mention semantics. */
+  /** The parse hit an error somewhere in the file, so the answer is worth less. */
   downgraded: number;
-  /** No lexer or declaration table for that file type. */
+  /** No grammar for that file type. */
   unsupportedLanguage: number;
 }
 
@@ -324,7 +324,7 @@ function mentionedIn(files: string[], symbol: string, workspace: Workspace): boo
  * Judge one file against `@declared` / `@used`.
  *
  * `"unsupported"` is the language with no table, and `"ok"` covers both a
- * satisfied claim and a downgrade -- a bailed lexer falls back to the caller's
+ * satisfied claim and a downgrade -- an unparseable file falls back to the caller's
  * mention check, which has already run. Every uncertainty here resolves quiet.
  */
 function judgeAssertion(
@@ -333,9 +333,8 @@ function judgeAssertion(
   symbol: string,
   assertion: Assertion,
   tally: AssertionTally,
-  cache: StripCache,
 ): "ok" | "unsupported" | { kind: "missing-declaration" | "unused-symbol" } {
-  const evidence = symbolEvidence(filePath, source, symbol, cache);
+  const evidence = symbolEvidence(filePath, source, symbol);
   if (!evidence) {
     tally.unsupportedLanguage += 1;
     return "unsupported";
@@ -361,11 +360,10 @@ function assertedIn(
   assertion: Assertion,
   workspace: Workspace,
   tally: AssertionTally,
-  cache: StripCache,
 ): "ok" | "unsupported" | { kind: "missing-declaration" | "unused-symbol" } {
   let worst: "unsupported" | { kind: "missing-declaration" | "unused-symbol" } = "unsupported";
   for (const file of files) {
-    const verdict = judgeAssertion(file, workspace.read(file), symbol, assertion, tally, cache);
+    const verdict = judgeAssertion(file, workspace.read(file), symbol, assertion, tally);
     if (verdict === "ok") return "ok";
     if (verdict !== "unsupported") worst = verdict;
   }
@@ -378,7 +376,6 @@ function inspect(
   provenance: Provenance,
   workspace: Workspace,
   tally: AssertionTally,
-  cache: StripCache,
 ): Inspection {
   const { path: rawTarget, symbol: rawSymbol } = parseRef(ref);
   const base = { node: node.id, label: node.label, ref, provenance };
@@ -456,7 +453,7 @@ function inspect(
       return { ...base, kind: "missing-symbol", detail: `no file matching ${target} mentions ${symbol}.` };
     }
     if (!assertion) return "ok";
-    const verdict = assertedIn(code, symbol, assertion, workspace, tally, cache);
+    const verdict = assertedIn(code, symbol, assertion, workspace, tally);
     return typeof verdict === "object" ? failed(verdict, `no file matching ${target}`) : "ok";
   }
 
@@ -482,7 +479,7 @@ function inspect(
       return { ...base, kind: "missing-symbol", detail: `nothing directly in ${target} mentions ${symbol}.` };
     }
     if (!assertion) return "ok";
-    const verdict = assertedIn(code, symbol, assertion, workspace, tally, cache);
+    const verdict = assertedIn(code, symbol, assertion, workspace, tally);
     return typeof verdict === "object" ? failed(verdict, `nothing directly in ${target}`) : "ok";
   }
 
@@ -495,7 +492,7 @@ function inspect(
     return { ...base, kind: "missing-symbol", detail: `${target} no longer mentions ${symbol}.` };
   }
   if (!assertion) return "ok";
-  const verdict = judgeAssertion(target, source, symbol, assertion, tally, cache);
+  const verdict = judgeAssertion(target, source, symbol, assertion, tally);
   return typeof verdict === "object" ? failed(verdict, target) : "ok";
 }
 
@@ -805,7 +802,6 @@ export function checkDrift(
   const skippedWhy: SkipBreakdown<NodeSkipReason> = {};
   const edgesSkippedWhy: SkipBreakdown<EdgeSkipReason> = {};
   const assertions: AssertionTally = { checked: 0, downgraded: 0, unsupportedLanguage: 0 };
-  const strips: StripCache = new Map();
   const skipNode = (reason: NodeSkipReason) => {
     skipped += 1;
     skippedWhy[reason] = (skippedWhy[reason] ?? 0) + 1;
@@ -886,7 +882,6 @@ export function checkDrift(
         isDeclared ? "recorded" : "inferred",
         workspace,
         assertions,
-        strips,
       );
       if (result === "skip") continue;
       anyChecked = true;

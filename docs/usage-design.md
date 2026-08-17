@@ -22,6 +22,14 @@ tables. Where the numbers below were re-measured against the shipped code they
 have been replaced and the original is noted — see "What shipped, and what the
 numbers were on the real thing".
 
+**Superseded 2026-08-17:** the strippers and the declaration tables are gone.
+They were replaced by tree-sitter, measured, and the section at the end of this
+file — "The strippers were replaced" — carries the numbers. Everything in this
+document about *what* is claimed and *when* silence is owed still holds; the
+parts describing regexes, blanking, brace counting and the bail rule describe a
+mechanism that no longer exists. They are left in place because the reasoning
+that produced them is why the replacement had a target to beat.
+
 ## The finding first
 
 **Usage is deterministically checkable — inside the files the box itself
@@ -677,3 +685,80 @@ Not measured, and worth saying: one 640-line file with hand-made variants is
 not a corpus; no committed diagram carries an `@` anchor yet, so real-world
 noise is unmeasured until someone draws one — which is why every new finding
 sits behind its own flag.
+
+
+## The strippers were replaced (2026-08-17)
+
+The question that started it: is a per-language regex reader wise, and could
+one design work for almost every language? Measured rather than argued, and
+the answer was no and yes.
+
+**What was wrong.** Not the architecture — claims written by an author,
+verified mechanically, silence on anything unknown — but the implementation.
+Of ~900 lines across `strip.ts`, `assert.ts` and `body.ts`, ~260 were
+language-specific, and 190 of those were two hand-written lexers with the same
+structure, the second written by copying the first. Worse, every bug fixed on
+the way from a 12.8% false-alarm rate to 0.6% was the same kind of bug:
+`Array<{ kind: K }>` read as a body, a method pattern eating its own brace, a
+comma swallowing an object literal. All approximations of a grammar.
+
+**The surprise.** Almost none of this needs to be per-language. Three facts
+hold in every grammar tried:
+
+    a declaration  is a node with a `name` field
+    a function     is one that also has a `body` field
+    a call         is a node with a `function` field
+
+So the language table is now six rows saying which `.wasm` to load. Python
+needed no code at all — and could not have been supported at any price before,
+being indentation-scoped with no braces to count.
+
+**Measured against the TypeScript compiler**, over this repo's own `src/`
+(`npx tsx scripts/audit-arrows.mts`):
+
+| | regex | tree-sitter |
+| --- | --- | --- |
+| missed declarations | 1.6% | **0.0%** |
+| no body extracted | 3.2% | **0.0%** |
+| **false alarms** (a real call edge reported absent) | 0.6% | **0.0%** |
+| wrongly confirmed (an arrow blessed with no path) | 3.2% | 3.0% |
+
+Only the last one barely moved, and it is not a parser problem. An arrow is
+satisfied when a body *names* the other end, not when it calls it — so
+`filesIn` "reaches" a local `stat` because it calls `workspace.stat`, and the
+token is the same. That is a deliberate choice about what an arrow means (an
+arrow may point at data, not only at calls), and it is the one place the tree
+now knows enough to do better if that choice is ever revisited.
+
+**Cost**, which was the thing expected to kill it:
+
+| | regex | tree-sitter |
+| --- | --- | --- |
+| once per process | 0 | ~10 ms |
+| per file | 1.3–4.5 ms | 6–14 ms |
+| per arrow | 1.5–3.3 ms | **0.02–0.04 ms** |
+
+Crossover is around eight arrows; past that tree-sitter is cheaper outright.
+On the real 640-line Rust file the whole `diagramos drift --details` run is
+0.30 s, and every one of the eleven verdicts is identical to the regex
+engine's. 176 lines replace 897.
+
+**What did not survive, and why that is honest.** The bail rule is gone,
+because tree-sitter recovers locally instead of abandoning a file. The
+`downgraded` tally now counts a parse that hit an error anywhere in the file —
+a weaker signal, still reported rather than hidden. The comment-and-string
+tests no longer test a blanking routine; they test the property the routine
+existed for, that a name written in a comment or a string is never a use, and
+the parser gives that for free.
+
+**The one approximation left** is a macro body. `lazy_static! { static ref
+LOGGER: ... }` is ordinary Rust and no grammar parses inside it, because the
+tokens are waiting for an expansion that has not happened. A name following a
+declaring keyword inside macro soup is recorded as a data declaration with no
+readable body — the same guess the old `static\s+ref\s+` regex made, narrower.
+
+**Languages.** TypeScript, TSX, JavaScript, Rust, Python. Python's fixture row
+flipped from "quiet, counted" to "flags everything correctly"; Ruby was added
+as the new witness that an unsupported language stays silent. Adding one is a
+row in `GRAMMARS` and a fixture — Go, Java, C#, C++, PHP, Ruby and Bash
+grammars already ship in the dependency.

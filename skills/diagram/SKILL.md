@@ -87,8 +87,9 @@ something stronger:
 | it lives here and is wired in | `src/lib.rs#log_line@declared+used` |
 
 Those two words are the whole vocabulary; anything else after `@` is a broken
-ref and says so immediately. TypeScript, JavaScript and Rust are read properly;
-in any other language the claim quietly falls back to a plain mention.
+ref and says so immediately. TypeScript, TSX, JavaScript, Rust and Python are
+read properly; in any other language the claim quietly falls back to a plain
+mention.
 
 **Write `@declared+used` only when the box means "this feature is wired in".**
 For a box that means "this thing exists", leave it off. The distinction is not
@@ -111,7 +112,8 @@ narrows to one function's body: does this function name the other, directly or
 through a call it makes in the same file?
 
 That is how `handle_request → log` gets caught when the logging call actually
-lives in `reset_connection`. It works in Rust as well as TypeScript.
+lives in `reset_connection`. It works in every language above, not only
+TypeScript.
 
 So anchor an arrow's endpoints at the granularity you mean. If the arrow means
 "this function calls that one", give both ends `path#symbol`. If it means

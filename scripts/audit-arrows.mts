@@ -11,10 +11,15 @@
  *
  * The number that matters is FALSE ALARMS -- a real call we say is not there.
  * That is the loud direction, and the one that gets a check switched off.
- * First run against this repo: 12.8%. Three bugs later: 0.6%, and the two
- * that remain are `#private` class fields, whose leading `#` defeats the word
- * boundary every symbol search here uses. Known, narrow, not yet worth the
- * change to the boundary rule.
+ * First run against the regex engine: 12.8%. Three bugs later: 0.6%, and the
+ * two that remained were `#private` class fields, whose leading `#` defeated
+ * the word boundary every symbol search used. On tree-sitter it is 0.0%, and
+ * so are missed declarations and unreadable bodies.
+ *
+ * `wrongly confirmed` is the one number still worth reading. It is not a
+ * parser problem: an arrow is satisfied when a body *names* the other end
+ * rather than calling it, so `filesIn` "reaches" a local `stat` by way of
+ * `workspace.stat`. That is a choice about what an arrow means, not a bug.
  *
  * A run is a measurement, not a test: it prints and never fails. The bugs it
  * finds become tests.
@@ -26,7 +31,7 @@ import ts from "typescript";
 
 const REPO = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 import { reaches, bodyOf } from "../src/engine/body";
-import { stripCode } from "../src/engine/strip";
+import { initEngine } from "../src/engine/parse";
 import { symbolEvidence } from "../src/engine/assert";
 
 function walk(dir: string): string[] {
@@ -95,6 +100,8 @@ function parse(source: string, file: string) {
   return { fns, decls, calls };
 }
 
+await initEngine();
+
 let declTotal = 0, declMissed: string[] = [];
 let bodyTotal = 0, bodyMissing: string[] = [];
 let edgeTotal = 0, edgeMissed: string[] = [], edgeSkipped: string[] = [];
@@ -103,11 +110,10 @@ let negTotal = 0, negWrong: string[] = [];
 for (const file of files) {
   const source = readFileSync(file, "utf8");
   const short = file.replace(/.*src\//, "");
-  const stripped = stripCode(source, "ts");
-  if (stripped === undefined) { console.log(`BAILED: ${short}`); continue; }
+  const language = file.endsWith(".tsx") ? "tsx" as const : "ts" as const;
   const { fns, decls, calls } = parse(source, file);
 
-  // 1. Does our declaration table find everything tsc calls a declaration?
+  // 1. Do we find every declaration tsc calls a declaration?
   for (const name of decls) {
     declTotal += 1;
     if (!symbolEvidence(file, source, name)?.declared) declMissed.push(`${short}#${name}`);
@@ -115,14 +121,14 @@ for (const file of files) {
   // 2. Can we extract a body for every function tsc found?
   for (const f of new Set(fns.map((f) => f.name))) {
     bodyTotal += 1;
-    if (bodyOf(stripped, f, "ts") === undefined) bodyMissing.push(`${short}#${f}`);
+    if (bodyOf(source, f, language) === undefined) bodyMissing.push(`${short}#${f}`);
   }
   // 3. Every real same-file call must be confirmed. A miss is a FALSE ALARM.
   const localFns = new Set(fns.map((f) => f.name));
   for (const { from, to } of calls) {
     if (!localFns.has(to) || !localFns.has(from)) continue;
     edgeTotal += 1;
-    const verdict = reaches(source, from, [to], "ts");
+    const verdict = reaches(source, from, [to], language);
     // `undefined` is "no readable body": the arrow is skipped and counted,
     // which is silence rather than a false alarm. Only `false` is loud.
     if (verdict === false) edgeMissed.push(`${short}: ${from} -> ${to}`);
@@ -145,7 +151,7 @@ for (const file of files) {
     for (const b of names) {
       if (a === b || reach.has(b)) continue;
       negTotal += 1;
-      if (reaches(source, a, [b], "ts") === true) negWrong.push(`${short}: ${a} -> ${b}`);
+      if (reaches(source, a, [b], language) === true) negWrong.push(`${short}: ${a} -> ${b}`);
     }
   }
 }

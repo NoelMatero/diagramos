@@ -48,6 +48,7 @@ import {
   findStrayBoards,
   parseRef,
 } from "../src/engine/drift.ts";
+import { initEngine } from "../src/engine/parse.ts";
 
 const root = process.cwd();
 
@@ -454,6 +455,9 @@ if (checking.length === 0) {
   }
   process.exit(0);
 }
+
+// Grammars load once per process; everything below this line is synchronous.
+await initEngine();
 
 for (const file of checking) {
   let report;

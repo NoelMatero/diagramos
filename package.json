@@ -46,6 +46,7 @@
   },
   "dependencies": {
     "@modelcontextprotocol/sdk": "^1.29.0",
+    "@vscode/tree-sitter-wasm": "^0.3.1",
     "elkjs": "0.11.0",
     "fontkit": "^2.0.4",
     "playwright-core": "1.61.1",
