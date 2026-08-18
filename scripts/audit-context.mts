@@ -27,6 +27,11 @@
  * an agent reads them all; the AGENTS.md + README.md row is the honest floor,
  * because that pair is what actually gets loaded unprompted.
  *
+ * The board side of that comparison is every board carrying at least one ref,
+ * summed -- not one board. A repository is documented by all of its boards the
+ * way it is documented by all of its prose, and comparing one board against the
+ * whole of `docs/` flattered the board while it was losing anyway.
+ *
  * Tokens here are chars/4. That is an estimate, not a tokenizer -- the repo has
  * no tokenizer dependency and this ratio is stable enough for a 10x question.
  * Do not quote these as exact.
@@ -137,17 +142,27 @@ for (const file of boards) {
 
 // ----------------------------------------------------------- the comparison
 
-const internals = rows.find((r) => r.rel.endsWith("board-internals.excalidraw"));
+// The board arm is every board that anchors itself in this repo. A concept
+// board (`describes: "concept"`) carries no refs and is deliberately about
+// something else, so it is not part of the price of documenting this codebase.
+const anchored = rows.filter((r) => r.refs > 0).sort((a, b) => a.rel.localeCompare(b.rel));
+const boardTotal = anchored.reduce((sum, r) => sum + r.semantic, 0);
 
 console.log("\n\nTHE NUMBER #52 ASKS FOR\n");
-if (!internals) {
-  console.log("  board-internals.excalidraw is gone; the comparison in #52 no longer has a subject.");
+if (!anchored.length) {
+  console.log("  No board anchors itself in this repo; the comparison in #52 has no subject.");
 } else {
-  const { semantic, nodes, refs } = internals;
-  console.log(`  board-internals: ${nodes} nodes, ${refs} of them anchored at a real path.`);
-  console.log(`  diagram as context   ${num(tok(semantic), 7)} tokens`);
-  console.log(`  prose, floor         ${num(tok(proseDefault), 7)} tokens   ${(proseDefault / semantic).toFixed(1)}x the diagram`);
-  console.log(`  prose, everything    ${num(tok(proseAll), 7)} tokens   ${(proseAll / semantic).toFixed(1)}x the diagram`);
+  for (const row of anchored) {
+    console.log(
+      `  ${pad(path.basename(row.rel), NAME_W)}${num(row.nodes, 4)} nodes,`
+      + `${num(row.refs, 4)} anchored ${num(tok(row.semantic), 8)} tokens`,
+    );
+  }
+  console.log(`  ${pad("", NAME_W)}${"".padStart(4)}        ${"".padStart(9)}${num("-------", 8)}`);
+  console.log(`  ${pad("every anchored board", NAME_W)}${num("", 4)}          ${num(tok(boardTotal), 8)} tokens`);
+  console.log("");
+  console.log(`  prose, floor         ${num(tok(proseDefault), 7)} tokens   ${(proseDefault / boardTotal).toFixed(1)}x the boards`);
+  console.log(`  prose, everything    ${num(tok(proseAll), 7)} tokens   ${(proseAll / boardTotal).toFixed(1)}x the boards`);
   console.log("\n  Cheaper is not the same as better. Whether the cheap context answers");
   console.log("  the question is graded in docs/agent-context-brief.md, not here.");
 }

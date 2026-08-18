@@ -1,0 +1,2452 @@
+{
+  "type": "excalidraw",
+  "version": 2,
+  "source": "diagramos",
+  "elements": [
+    {
+      "id": "liveboard-title",
+      "type": "text",
+      "x": 0,
+      "y": -115,
+      "width": 168.96,
+      "height": 30,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a0",
+      "roundness": null,
+      "seed": 24117585,
+      "version": 1,
+      "versionNonce": 1078460763,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "liveboard",
+        "role": "title"
+      },
+      "text": "The live board",
+      "fontSize": 24,
+      "fontFamily": 5,
+      "textAlign": "left",
+      "verticalAlign": "middle",
+      "containerId": null,
+      "originalText": "The live board",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "liveboard-node-0",
+      "type": "rectangle",
+      "x": 1280,
+      "y": 20,
+      "width": 340,
+      "height": 140,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a1",
+      "roundness": null,
+      "seed": 320788280,
+      "version": 1,
+      "versionNonce": 574259604,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "liveboard-node-0-label"
+        },
+        {
+          "id": "liveboard-edge-0",
+          "type": "arrow"
+        },
+        {
+          "id": "liveboard-edge-1",
+          "type": "arrow"
+        },
+        {
+          "id": "liveboard-edge-2",
+          "type": "arrow"
+        },
+        {
+          "id": "liveboard-edge-3",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "liveboard",
+        "node": "cmd",
+        "ref": "scripts/board.mjs"
+      }
+    },
+    {
+      "id": "liveboard-node-1",
+      "type": "rectangle",
+      "x": 2100,
+      "y": 20,
+      "width": 200,
+      "height": 80,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a2",
+      "roundness": null,
+      "seed": 1083269601,
+      "version": 1,
+      "versionNonce": 107125419,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "liveboard-node-1-label"
+        },
+        {
+          "id": "liveboard-edge-0",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "liveboard",
+        "node": "config",
+        "ref": "src/engine/config.ts"
+      }
+    },
+    {
+      "id": "liveboard-node-2",
+      "type": "rectangle",
+      "x": 2100,
+      "y": 180,
+      "width": 220,
+      "height": 80,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a3",
+      "roundness": null,
+      "seed": 404631766,
+      "version": 1,
+      "versionNonce": 441447610,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "liveboard-node-2-label"
+        },
+        {
+          "id": "liveboard-edge-1",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "liveboard",
+        "node": "find",
+        "ref": "src/engine/drift.ts#findBoards"
+      }
+    },
+    {
+      "id": "liveboard-node-3",
+      "type": "rectangle",
+      "x": 2100,
+      "y": 560,
+      "width": 320,
+      "height": 120,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a4",
+      "roundness": null,
+      "seed": 956395111,
+      "version": 1,
+      "versionNonce": 1473581057,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "liveboard-node-3-label"
+        },
+        {
+          "id": "liveboard-edge-2",
+          "type": "arrow"
+        },
+        {
+          "id": "liveboard-edge-4",
+          "type": "arrow"
+        },
+        {
+          "id": "liveboard-edge-5",
+          "type": "arrow"
+        },
+        {
+          "id": "liveboard-edge-10",
+          "type": "arrow"
+        },
+        {
+          "id": "liveboard-edge-11",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "liveboard",
+        "node": "server",
+        "ref": "src/server/board-server.ts"
+      }
+    },
+    {
+      "id": "liveboard-node-4",
+      "type": "rectangle",
+      "x": 2800,
+      "y": 380,
+      "width": 260,
+      "height": 120,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a5",
+      "roundness": null,
+      "seed": 1835973684,
+      "version": 1,
+      "versionNonce": 1631371776,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "liveboard-node-4-label"
+        },
+        {
+          "id": "liveboard-edge-3",
+          "type": "arrow"
+        },
+        {
+          "id": "liveboard-edge-4",
+          "type": "arrow"
+        },
+        {
+          "id": "liveboard-edge-6",
+          "type": "arrow"
+        },
+        {
+          "id": "liveboard-edge-12",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "liveboard",
+        "node": "boardfile",
+        "ref": "src/engine/board-file.ts"
+      }
+    },
+    {
+      "id": "liveboard-node-5",
+      "type": "rectangle",
+      "x": 3380,
+      "y": 400,
+      "width": 280,
+      "height": 100,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a6",
+      "roundness": null,
+      "seed": 1453429645,
+      "version": 1,
+      "versionNonce": 314056311,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "liveboard-node-5-label"
+        },
+        {
+          "id": "liveboard-edge-5",
+          "type": "arrow"
+        },
+        {
+          "id": "liveboard-edge-6",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "liveboard",
+        "node": "file",
+        "ref": "docs/diagrams"
+      }
+    },
+    {
+      "id": "liveboard-node-6",
+      "type": "rectangle",
+      "x": 20,
+      "y": 260,
+      "width": 340,
+      "height": 80,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a7",
+      "roundness": null,
+      "seed": 1690903026,
+      "version": 1,
+      "versionNonce": 1146299558,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "liveboard-node-6-label"
+        },
+        {
+          "id": "liveboard-edge-7",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "liveboard",
+        "node": "main",
+        "ref": "src/viewer/main.tsx"
+      }
+    },
+    {
+      "id": "liveboard-node-7",
+      "type": "rectangle",
+      "x": 680,
+      "y": 260,
+      "width": 240,
+      "height": 100,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a8",
+      "roundness": null,
+      "seed": 1713397603,
+      "version": 1,
+      "versionNonce": 1423763197,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "liveboard-node-7-label"
+        },
+        {
+          "id": "liveboard-edge-7",
+          "type": "arrow"
+        },
+        {
+          "id": "liveboard-edge-8",
+          "type": "arrow"
+        },
+        {
+          "id": "liveboard-edge-9",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "liveboard",
+        "node": "app",
+        "ref": "src/viewer/App.tsx"
+      }
+    },
+    {
+      "id": "liveboard-node-8",
+      "type": "rectangle",
+      "x": 1320,
+      "y": 620,
+      "width": 280,
+      "height": 100,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a9",
+      "roundness": null,
+      "seed": 433404656,
+      "version": 1,
+      "versionNonce": 1124848204,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "liveboard-node-8-label"
+        },
+        {
+          "id": "liveboard-edge-8",
+          "type": "arrow"
+        },
+        {
+          "id": "liveboard-edge-10",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "liveboard",
+        "node": "sync",
+        "ref": "src/viewer/sync.ts"
+      }
+    },
+    {
+      "id": "liveboard-node-9",
+      "type": "rectangle",
+      "x": 1280,
+      "y": 240,
+      "width": 220,
+      "height": 80,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aA",
+      "roundness": null,
+      "seed": 323775353,
+      "version": 1,
+      "versionNonce": 1950702403,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "liveboard-node-9-label"
+        },
+        {
+          "id": "liveboard-edge-9",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "liveboard",
+        "node": "reveal",
+        "ref": "src/viewer/reveal.ts"
+      }
+    },
+    {
+      "id": "liveboard-node-10",
+      "type": "rectangle",
+      "x": 1320,
+      "y": 400,
+      "width": 300,
+      "height": 100,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aB",
+      "roundness": null,
+      "seed": 913007837,
+      "version": 1,
+      "versionNonce": 605472839,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "liveboard-node-10-label"
+        },
+        {
+          "id": "liveboard-edge-11",
+          "type": "arrow"
+        },
+        {
+          "id": "liveboard-edge-12",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "liveboard",
+        "node": "e2e",
+        "ref": "scripts/e2e-live-board.mjs"
+      }
+    },
+    {
+      "id": "liveboard-edge-0",
+      "type": "arrow",
+      "x": 1626.992,
+      "y": 52,
+      "width": 468.432,
+      "height": 0,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aC",
+      "roundness": null,
+      "seed": 1761638511,
+      "version": 1,
+      "versionNonce": 123038665,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "liveboard",
+        "edge": {
+          "from": "cmd",
+          "to": "config"
+        }
+      },
+      "points": [
+        [
+          0.5,
+          0
+        ],
+        [
+          467.932,
+          0
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "liveboard-node-0",
+        "focus": -0.5428571428571425,
+        "gap": 6.991999999999962
+      },
+      "endBinding": {
+        "elementId": "liveboard-node-1",
+        "focus": 0.20000000000000004,
+        "gap": 4.576000000000022
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "liveboard-edge-1",
+      "type": "arrow",
+      "x": 1626.992,
+      "y": 80,
+      "width": 468.432,
+      "height": 132,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aD",
+      "roundness": null,
+      "seed": 1626663966,
+      "version": 1,
+      "versionNonce": 1808499266,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "liveboard",
+        "edge": {
+          "from": "cmd",
+          "to": "find"
+        }
+      },
+      "points": [
+        [
+          0.5,
+          0
+        ],
+        [
+          104,
+          0
+        ],
+        [
+          104,
+          132
+        ],
+        [
+          467.932,
+          132
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "liveboard-node-0",
+        "focus": -0.14285714285714252,
+        "gap": 6.991999999999962
+      },
+      "endBinding": {
+        "elementId": "liveboard-node-2",
+        "focus": 0.2,
+        "gap": 4.576000000000022
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "liveboard-edge-2",
+      "type": "arrow",
+      "x": 1626.992,
+      "y": 136,
+      "width": 468.432,
+      "height": 444.1333333333333,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aE",
+      "roundness": null,
+      "seed": 1143279305,
+      "version": 1,
+      "versionNonce": 2111754835,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "liveboard",
+        "edge": {
+          "from": "cmd",
+          "to": "server"
+        }
+      },
+      "points": [
+        [
+          0.5,
+          0
+        ],
+        [
+          56,
+          0
+        ],
+        [
+          56,
+          342.3333333333333
+        ],
+        [
+          360.432,
+          342.3333333333333
+        ],
+        [
+          360.432,
+          444.1333333333333
+        ],
+        [
+          467.932,
+          444.1333333333333
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "liveboard-node-0",
+        "focus": 0.6571428571428574,
+        "gap": 6.991999999999962
+      },
+      "endBinding": {
+        "elementId": "liveboard-node-3",
+        "focus": 0.6644444444444445,
+        "gap": 4.576000000000022
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "liveboard-edge-3",
+      "type": "arrow",
+      "x": 1626.992,
+      "y": 108,
+      "width": 1180.6879999999999,
+      "height": 299.3333333333333,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aF",
+      "roundness": null,
+      "seed": 137564288,
+      "version": 1,
+      "versionNonce": 73114204,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "liveboard",
+        "edge": {
+          "from": "cmd",
+          "to": "boardfile"
+        }
+      },
+      "points": [
+        [
+          0.5,
+          0
+        ],
+        [
+          80,
+          0
+        ],
+        [
+          80,
+          255.8
+        ],
+        [
+          1072.6879999999999,
+          255.8
+        ],
+        [
+          1072.6879999999999,
+          299.3333333333333
+        ],
+        [
+          1180.1879999999999,
+          299.3333333333333
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "liveboard-node-0",
+        "focus": 0.2571428571428575,
+        "gap": 6.991999999999962
+      },
+      "endBinding": {
+        "elementId": "liveboard-node-4",
+        "focus": 0.5444444444444448,
+        "gap": 7.679999999999836
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "liveboard-edge-4",
+      "type": "arrow",
+      "x": 2415.424,
+      "y": 590.1333333333333,
+      "width": 392.25599999999986,
+      "height": 122.80000000000001,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aG",
+      "roundness": null,
+      "seed": 368254283,
+      "version": 1,
+      "versionNonce": 1942826437,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "liveboard",
+        "edge": {
+          "from": "server",
+          "to": "boardfile"
+        }
+      },
+      "points": [
+        [
+          0.5,
+          0
+        ],
+        [
+          284.25599999999986,
+          0
+        ],
+        [
+          284.25599999999986,
+          -122.80000000000001
+        ],
+        [
+          391.75599999999986,
+          -122.80000000000001
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "liveboard-node-3",
+        "focus": -0.4977777777777788,
+        "gap": 4.576000000000022
+      },
+      "endBinding": {
+        "elementId": "liveboard-node-4",
+        "focus": -0.45555555555555527,
+        "gap": 7.679999999999836
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "liveboard-edge-5",
+      "type": "arrow",
+      "x": 2415.424,
+      "y": 630.1333333333333,
+      "width": 964.2080000000001,
+      "height": 192.26666666666665,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aH",
+      "roundness": null,
+      "seed": 2083348794,
+      "version": 1,
+      "versionNonce": 2060395662,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "liveboard",
+        "edge": {
+          "from": "server",
+          "to": "file"
+        }
+      },
+      "points": [
+        [
+          0.5,
+          0
+        ],
+        [
+          32,
+          0
+        ],
+        [
+          32,
+          32.799999999999955
+        ],
+        [
+          856.2080000000001,
+          32.799999999999955
+        ],
+        [
+          856.2080000000001,
+          -159.4666666666667
+        ],
+        [
+          963.7080000000001,
+          -159.4666666666667
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "liveboard-node-3",
+        "focus": 0.16888888888888962,
+        "gap": 4.576000000000022
+      },
+      "endBinding": {
+        "elementId": "liveboard-node-5",
+        "focus": -0.41333333333333416,
+        "gap": 1
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "liveboard-edge-6",
+      "type": "arrow",
+      "x": 3067.68,
+      "y": 437.3333333333333,
+      "width": 311.9520000000002,
+      "height": 0,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aI",
+      "roundness": null,
+      "seed": 876982293,
+      "version": 1,
+      "versionNonce": 1497394975,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "liveboard",
+        "edge": {
+          "from": "boardfile",
+          "to": "file"
+        }
+      },
+      "points": [
+        [
+          0.5,
+          0
+        ],
+        [
+          311.4520000000002,
+          0
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "liveboard-node-4",
+        "focus": -0.04444444444444483,
+        "gap": 7.679999999999836
+      },
+      "endBinding": {
+        "elementId": "liveboard-node-5",
+        "focus": 0.2533333333333336,
+        "gap": 1
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "liveboard-edge-7",
+      "type": "arrow",
+      "x": 352,
+      "y": 300.6666666666667,
+      "width": 334.928,
+      "height": 0,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aJ",
+      "roundness": null,
+      "seed": 951995772,
+      "version": 1,
+      "versionNonce": 1976626696,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "liveboard",
+        "edge": {
+          "from": "main",
+          "to": "app"
+        }
+      },
+      "points": [
+        [
+          0.5,
+          0
+        ],
+        [
+          334.428,
+          0
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "liveboard-node-6",
+        "focus": 0.016666666666666743,
+        "gap": 8
+      },
+      "endBinding": {
+        "elementId": "liveboard-node-7",
+        "focus": 0.18666666666666562,
+        "gap": 6.927999999999997
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "liveboard-edge-8",
+      "type": "arrow",
+      "x": 926.928,
+      "y": 317.33333333333337,
+      "width": 390.06399999999996,
+      "height": 349.5999999999999,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aK",
+      "roundness": null,
+      "seed": 712577207,
+      "version": 1,
+      "versionNonce": 1081069329,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "liveboard",
+        "edge": {
+          "from": "app",
+          "to": "sync"
+        }
+      },
+      "points": [
+        [
+          0.5,
+          0
+        ],
+        [
+          32,
+          0
+        ],
+        [
+          32,
+          349.5999999999999
+        ],
+        [
+          389.56399999999996,
+          349.5999999999999
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "liveboard-node-7",
+        "focus": 0.14666666666666775,
+        "gap": 6.927999999999997
+      },
+      "endBinding": {
+        "elementId": "liveboard-node-8",
+        "focus": 0.06133333333333585,
+        "gap": 3.008000000000038
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "liveboard-edge-9",
+      "type": "arrow",
+      "x": 926.928,
+      "y": 284,
+      "width": 360.06399999999996,
+      "height": 0,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aL",
+      "roundness": null,
+      "seed": 108894566,
+      "version": 1,
+      "versionNonce": 1767425610,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "liveboard",
+        "edge": {
+          "from": "app",
+          "to": "reveal"
+        }
+      },
+      "points": [
+        [
+          0.5,
+          0
+        ],
+        [
+          359.56399999999996,
+          0
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "liveboard-node-7",
+        "focus": -0.5199999999999997,
+        "gap": 6.927999999999997
+      },
+      "endBinding": {
+        "elementId": "liveboard-node-9",
+        "focus": -0.1,
+        "gap": 6.991999999999962
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "liveboard-edge-10",
+      "type": "arrow",
+      "x": 1596.992,
+      "y": 666.9333333333333,
+      "width": 498.432,
+      "height": 26.799999999999955,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aM",
+      "roundness": null,
+      "seed": 1488380432,
+      "version": 1,
+      "versionNonce": 1283860716,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "liveboard",
+        "edge": {
+          "from": "sync",
+          "to": "server"
+        }
+      },
+      "points": [
+        [
+          0.5,
+          0
+        ],
+        [
+          390.432,
+          0
+        ],
+        [
+          390.432,
+          -26.799999999999955
+        ],
+        [
+          497.932,
+          -26.799999999999955
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "liveboard-node-8",
+        "focus": -0.06133333333333585,
+        "gap": 3.008000000000038
+      },
+      "endBinding": {
+        "elementId": "liveboard-node-3",
+        "focus": -0.33555555555555544,
+        "gap": 4.576000000000022
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "liveboard-edge-11",
+      "type": "arrow",
+      "x": 1626.992,
+      "y": 470.66666666666663,
+      "width": 468.432,
+      "height": 139.4666666666667,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aN",
+      "roundness": null,
+      "seed": 759409433,
+      "version": 1,
+      "versionNonce": 880783971,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "liveboard",
+        "edge": {
+          "from": "e2e",
+          "to": "server"
+        }
+      },
+      "points": [
+        [
+          0.5,
+          0
+        ],
+        [
+          32,
+          0
+        ],
+        [
+          32,
+          139.4666666666667
+        ],
+        [
+          467.932,
+          139.4666666666667
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "liveboard-node-10",
+        "focus": 0.41333333333333333,
+        "gap": 6.991999999999962
+      },
+      "endBinding": {
+        "elementId": "liveboard-node-3",
+        "focus": 0.16444444444444456,
+        "gap": 4.576000000000022
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "liveboard-edge-12",
+      "type": "arrow",
+      "x": 1626.992,
+      "y": 437.3333333333333,
+      "width": 1180.6879999999999,
+      "height": 0,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aO",
+      "roundness": null,
+      "seed": 361288366,
+      "version": 1,
+      "versionNonce": 643466194,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "liveboard",
+        "edge": {
+          "from": "e2e",
+          "to": "boardfile"
+        }
+      },
+      "points": [
+        [
+          0.5,
+          0
+        ],
+        [
+          1180.1879999999999,
+          0
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "liveboard-node-10",
+        "focus": -0.2533333333333333,
+        "gap": 6.991999999999962
+      },
+      "endBinding": {
+        "elementId": "liveboard-node-4",
+        "focus": 0.04444444444444483,
+        "gap": 7.679999999999836
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "liveboard-edgelabel-0",
+      "type": "text",
+      "x": 1839.3999999999999,
+      "y": 63,
+      "width": 43.616,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aP",
+      "roundness": null,
+      "seed": 1604091479,
+      "version": 1,
+      "versionNonce": 770197553,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "liveboard",
+        "edgeLabelFor": "liveboard-edge-0"
+      },
+      "text": "where",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "left",
+      "verticalAlign": "top",
+      "containerId": null,
+      "originalText": "where",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "liveboard-edgelabel-1",
+      "type": "text",
+      "x": 1834.8799999999999,
+      "y": 223,
+      "width": 52.656,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aQ",
+      "roundness": null,
+      "seed": 297750918,
+      "version": 1,
+      "versionNonce": 496261610,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "liveboard",
+        "edgeLabelFor": "liveboard-edge-1"
+      },
+      "text": "boards",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "left",
+      "verticalAlign": "top",
+      "containerId": null,
+      "originalText": "boards",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "liveboard-edgelabel-2",
+      "type": "text",
+      "x": 1835.528,
+      "y": 489.3333333333333,
+      "width": 51.36,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aR",
+      "roundness": null,
+      "seed": 1306508497,
+      "version": 1,
+      "versionNonce": 338439131,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "liveboard",
+        "edgeLabelFor": "liveboard-edge-2"
+      },
+      "text": "starts",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "left",
+      "verticalAlign": "top",
+      "containerId": null,
+      "originalText": "starts",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "liveboard-edgelabel-3",
+      "type": "text",
+      "x": 2226.288,
+      "y": 332,
+      "width": 58.272,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aS",
+      "roundness": null,
+      "seed": 1053784872,
+      "version": 1,
+      "versionNonce": 767759108,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "liveboard",
+        "edgeLabelFor": "liveboard-edge-3"
+      },
+      "text": "creates",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "left",
+      "verticalAlign": "top",
+      "containerId": null,
+      "originalText": "creates",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "liveboard-edgelabel-4",
+      "type": "text",
+      "x": 2555.424,
+      "y": 601.1333333333333,
+      "width": 112.256,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aT",
+      "roundness": null,
+      "seed": 1926190739,
+      "version": 1,
+      "versionNonce": 388994285,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "liveboard",
+        "edgeLabelFor": "liveboard-edge-4"
+      },
+      "text": "reads / writes",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "left",
+      "verticalAlign": "top",
+      "containerId": null,
+      "originalText": "reads / writes",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "liveboard-edgelabel-5",
+      "type": "text",
+      "x": 2906.136,
+      "y": 673.9333333333333,
+      "width": 63.088,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aU",
+      "roundness": null,
+      "seed": 510306146,
+      "version": 1,
+      "versionNonce": 929308502,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "liveboard",
+        "edgeLabelFor": "liveboard-edge-5"
+      },
+      "text": "watches",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "left",
+      "verticalAlign": "top",
+      "containerId": null,
+      "originalText": "watches",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "liveboard-edgelabel-6",
+      "type": "text",
+      "x": 3207.68,
+      "y": 405.5333333333333,
+      "width": 31.952,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aV",
+      "roundness": null,
+      "seed": 1461765885,
+      "version": 1,
+      "versionNonce": 1235618535,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "liveboard",
+        "edgeLabelFor": "liveboard-edge-6"
+      },
+      "text": "json",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "left",
+      "verticalAlign": "top",
+      "containerId": null,
+      "originalText": "json",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "liveboard-edgelabel-7",
+      "type": "text",
+      "x": 492,
+      "y": 311.6666666666667,
+      "width": 54.928,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aW",
+      "roundness": null,
+      "seed": 1536779364,
+      "version": 1,
+      "versionNonce": 848545776,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "liveboard",
+        "edgeLabelFor": "liveboard-edge-7"
+      },
+      "text": "mounts",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "left",
+      "verticalAlign": "top",
+      "containerId": null,
+      "originalText": "mounts",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "liveboard-edgelabel-8",
+      "type": "text",
+      "x": 1066.9279999999999,
+      "y": 677.9333333333333,
+      "width": 80.064,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aX",
+      "roundness": null,
+      "seed": 1526037391,
+      "version": 1,
+      "versionNonce": 1741688937,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "liveboard",
+        "edgeLabelFor": "liveboard-edge-8"
+      },
+      "text": "subscribes",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "left",
+      "verticalAlign": "top",
+      "containerId": null,
+      "originalText": "subscribes",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "liveboard-edgelabel-9",
+      "type": "text",
+      "x": 1073.216,
+      "y": 252.2,
+      "width": 67.488,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aY",
+      "roundness": null,
+      "seed": 1349486142,
+      "version": 1,
+      "versionNonce": 537335266,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "liveboard",
+        "edgeLabelFor": "liveboard-edge-9"
+      },
+      "text": "animates",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "left",
+      "verticalAlign": "top",
+      "containerId": null,
+      "originalText": "animates",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "liveboard-edgelabel-10",
+      "type": "text",
+      "x": 1766.992,
+      "y": 677.9333333333333,
+      "width": 188.432,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aZ",
+      "roundness": null,
+      "seed": 143567944,
+      "version": 1,
+      "versionNonce": 2038297252,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "liveboard",
+        "edgeLabelFor": "liveboard-edge-10"
+      },
+      "text": "/api/board · /api/events",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "left",
+      "verticalAlign": "top",
+      "containerId": null,
+      "originalText": "/api/board · /api/events",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "liveboard-edgelabel-11",
+      "type": "text",
+      "x": 1838.12,
+      "y": 621.1333333333333,
+      "width": 46.176,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aa",
+      "roundness": null,
+      "seed": 822756209,
+      "version": 1,
+      "versionNonce": 1993511675,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "liveboard",
+        "edgeLabelFor": "liveboard-edge-11"
+      },
+      "text": "drives",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "left",
+      "verticalAlign": "top",
+      "containerId": null,
+      "originalText": "drives",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "liveboard-edgelabel-12",
+      "type": "text",
+      "x": 2225.528,
+      "y": 448.3333333333333,
+      "width": 59.792,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "ab",
+      "roundness": null,
+      "seed": 1961379110,
+      "version": 1,
+      "versionNonce": 2109654282,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "liveboard",
+        "edgeLabelFor": "liveboard-edge-12"
+      },
+      "text": "asserts",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "left",
+      "verticalAlign": "top",
+      "containerId": null,
+      "originalText": "asserts",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "liveboard-node-0-label",
+      "type": "text",
+      "x": 1354.36,
+      "y": 65,
+      "width": 191.28,
+      "height": 50,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "ac",
+      "roundness": null,
+      "seed": 882797701,
+      "version": 1,
+      "versionNonce": 887686799,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "liveboard"
+      },
+      "text": "diagramos board\nport · reuse · spawn",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "liveboard-node-0",
+      "originalText": "diagramos board\nport · reuse · spawn",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "liveboard-node-1-label",
+      "type": "text",
+      "x": 2126.48,
+      "y": 47.5,
+      "width": 147.04000000000002,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "ad",
+      "roundness": null,
+      "seed": 418830648,
+      "version": 1,
+      "versionNonce": 1430628244,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "liveboard"
+      },
+      "text": "which directory",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "liveboard-node-1",
+      "originalText": "which directory",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "liveboard-node-2-label",
+      "type": "text",
+      "x": 2133.8,
+      "y": 207.5,
+      "width": 152.4,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "ae",
+      "roundness": null,
+      "seed": 1437623175,
+      "version": 1,
+      "versionNonce": 2022626465,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "liveboard"
+      },
+      "text": "find the boards",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "liveboard-node-2",
+      "originalText": "find the boards",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "liveboard-node-3-label",
+      "type": "text",
+      "x": 2162.01,
+      "y": 595,
+      "width": 195.98,
+      "height": 50,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "af",
+      "roundness": null,
+      "seed": 134234082,
+      "version": 1,
+      "versionNonce": 1843605718,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "liveboard"
+      },
+      "text": "board server\nHTTP · SSE · watch",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "liveboard-node-3",
+      "originalText": "board server\nHTTP · SSE · watch",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "liveboard-node-4-label",
+      "type": "text",
+      "x": 2831.1,
+      "y": 427.5,
+      "width": 197.8,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "ag",
+      "roundness": null,
+      "seed": 1640231681,
+      "version": 1,
+      "versionNonce": 1112208203,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "liveboard"
+      },
+      "text": "read / write the file",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "liveboard-node-4",
+      "originalText": "read / write the file",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "liveboard-node-5-label",
+      "type": "text",
+      "x": 3467.07,
+      "y": 425,
+      "width": 105.86,
+      "height": 50,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "ah",
+      "roundness": null,
+      "seed": 2087131204,
+      "version": 1,
+      "versionNonce": 1561960784,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "liveboard"
+      },
+      "text": ".excalidraw\nin the repo",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "liveboard-node-5",
+      "originalText": ".excalidraw\nin the repo",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "liveboard-node-6-label",
+      "type": "text",
+      "x": 122.61,
+      "y": 275,
+      "width": 134.78,
+      "height": 50,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "ai",
+      "roundness": null,
+      "seed": 205256595,
+      "version": 1,
+      "versionNonce": 489752557,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "liveboard"
+      },
+      "text": "browser entry\nmounts React",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "liveboard-node-6",
+      "originalText": "browser entry\nmounts React",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "liveboard-node-7-label",
+      "type": "text",
+      "x": 694.61,
+      "y": 285,
+      "width": 210.78,
+      "height": 50,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aj",
+      "roundness": null,
+      "seed": 861321982,
+      "version": 1,
+      "versionNonce": 260304290,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "liveboard"
+      },
+      "text": "canvas\nExcalidraw component",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "liveboard-node-7",
+      "originalText": "canvas\nExcalidraw component",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "liveboard-node-8-label",
+      "type": "text",
+      "x": 1355.5,
+      "y": 645,
+      "width": 209,
+      "height": 50,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "ak",
+      "roundness": null,
+      "seed": 122789325,
+      "version": 1,
+      "versionNonce": 1692839607,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "liveboard"
+      },
+      "text": "sync loop\nfetch · save · revision",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "liveboard-node-8",
+      "originalText": "sync loop\nfetch · save · revision",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "liveboard-node-9-label",
+      "type": "text",
+      "x": 1313,
+      "y": 267.5,
+      "width": 154,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "al",
+      "roundness": null,
+      "seed": 1267799040,
+      "version": 1,
+      "versionNonce": 291185884,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "liveboard"
+      },
+      "text": "reveal animation",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "liveboard-node-9",
+      "originalText": "reveal animation",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "liveboard-node-10-label",
+      "type": "text",
+      "x": 1401.47,
+      "y": 425,
+      "width": 137.06,
+      "height": 50,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "am",
+      "roundness": null,
+      "seed": 1510611732,
+      "version": 1,
+      "versionNonce": 2085481056,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "liveboard"
+      },
+      "text": "live board e2e\nPlaywright",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "liveboard-node-10",
+      "originalText": "live board e2e\nPlaywright",
+      "autoResize": true,
+      "lineHeight": 1.25
+    }
+  ],
+  "appState": {
+    "gridSize": null,
+    "viewBackgroundColor": "#ffffff"
+  },
+  "files": {}
+}

@@ -1,0 +1,2920 @@
+{
+  "type": "excalidraw",
+  "version": 2,
+  "source": "diagramos",
+  "elements": [
+    {
+      "id": "driftcheck-title",
+      "type": "text",
+      "x": 0,
+      "y": -115,
+      "width": 291.072,
+      "height": 30,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a0",
+      "roundness": null,
+      "seed": 1510102886,
+      "version": 1,
+      "versionNonce": 1666179146,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "driftcheck",
+        "role": "title"
+      },
+      "text": "How the drift check runs",
+      "fontSize": 24,
+      "fontFamily": 5,
+      "textAlign": "left",
+      "verticalAlign": "middle",
+      "containerId": null,
+      "originalText": "How the drift check runs",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "driftcheck-node-0",
+      "type": "rectangle",
+      "x": 20,
+      "y": 480,
+      "width": 260,
+      "height": 80,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a1",
+      "roundness": null,
+      "seed": 884516041,
+      "version": 1,
+      "versionNonce": 909374547,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "driftcheck-node-0-label"
+        },
+        {
+          "id": "driftcheck-edge-0",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "driftcheck",
+        "node": "hook",
+        "ref": ".claude/settings.json"
+      }
+    },
+    {
+      "id": "driftcheck-node-1",
+      "type": "rectangle",
+      "x": 580,
+      "y": 400,
+      "width": 300,
+      "height": 240,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a2",
+      "roundness": null,
+      "seed": 2026284672,
+      "version": 1,
+      "versionNonce": 1018217564,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "driftcheck-node-1-label"
+        },
+        {
+          "id": "driftcheck-edge-0",
+          "type": "arrow"
+        },
+        {
+          "id": "driftcheck-edge-1",
+          "type": "arrow"
+        },
+        {
+          "id": "driftcheck-edge-2",
+          "type": "arrow"
+        },
+        {
+          "id": "driftcheck-edge-3",
+          "type": "arrow"
+        },
+        {
+          "id": "driftcheck-edge-4",
+          "type": "arrow"
+        },
+        {
+          "id": "driftcheck-edge-5",
+          "type": "arrow"
+        },
+        {
+          "id": "driftcheck-edge-6",
+          "type": "arrow"
+        },
+        {
+          "id": "driftcheck-edge-7",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "driftcheck",
+        "node": "cli",
+        "ref": "scripts/check-drift.mjs"
+      }
+    },
+    {
+      "id": "driftcheck-node-2",
+      "type": "rectangle",
+      "x": 1220,
+      "y": 20,
+      "width": 200,
+      "height": 80,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a3",
+      "roundness": null,
+      "seed": 1502875247,
+      "version": 1,
+      "versionNonce": 1068142025,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "driftcheck-node-2-label"
+        },
+        {
+          "id": "driftcheck-edge-1",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "driftcheck",
+        "node": "config",
+        "ref": "src/engine/config.ts"
+      }
+    },
+    {
+      "id": "driftcheck-node-3",
+      "type": "rectangle",
+      "x": 1220,
+      "y": 180,
+      "width": 220,
+      "height": 80,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a4",
+      "roundness": null,
+      "seed": 1367900702,
+      "version": 1,
+      "versionNonce": 606118978,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "driftcheck-node-3-label"
+        },
+        {
+          "id": "driftcheck-edge-2",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "driftcheck",
+        "node": "find",
+        "ref": "src/engine/drift.ts#findBoards"
+      }
+    },
+    {
+      "id": "driftcheck-node-4",
+      "type": "rectangle",
+      "x": 2380,
+      "y": 700,
+      "width": 260,
+      "height": 100,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a5",
+      "roundness": null,
+      "seed": 618219029,
+      "version": 1,
+      "versionNonce": 295014687,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "driftcheck-node-4-label"
+        },
+        {
+          "id": "driftcheck-edge-3",
+          "type": "arrow"
+        },
+        {
+          "id": "driftcheck-edge-12",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "driftcheck",
+        "node": "boardfile",
+        "ref": "src/engine/board-file.ts"
+      }
+    },
+    {
+      "id": "driftcheck-node-5",
+      "type": "rectangle",
+      "x": 1960,
+      "y": 740,
+      "width": 220,
+      "height": 80,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a6",
+      "roundness": null,
+      "seed": 693232508,
+      "version": 1,
+      "versionNonce": 774246408,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "driftcheck-node-5-label"
+        },
+        {
+          "id": "driftcheck-edge-8",
+          "type": "arrow"
+        },
+        {
+          "id": "driftcheck-edge-12",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "driftcheck",
+        "node": "graph",
+        "ref": "src/engine/graph.ts"
+      }
+    },
+    {
+      "id": "driftcheck-node-6",
+      "type": "rectangle",
+      "x": 1220,
+      "y": 860,
+      "width": 320,
+      "height": 140,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a7",
+      "roundness": null,
+      "seed": 109491019,
+      "version": 1,
+      "versionNonce": 740446149,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "driftcheck-node-6-label"
+        },
+        {
+          "id": "driftcheck-edge-4",
+          "type": "arrow"
+        },
+        {
+          "id": "driftcheck-edge-8",
+          "type": "arrow"
+        },
+        {
+          "id": "driftcheck-edge-9",
+          "type": "arrow"
+        },
+        {
+          "id": "driftcheck-edge-10",
+          "type": "arrow"
+        },
+        {
+          "id": "driftcheck-edge-11",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "driftcheck",
+        "node": "check",
+        "ref": "src/engine/drift.ts#checkDrift"
+      }
+    },
+    {
+      "id": "driftcheck-node-7",
+      "type": "rectangle",
+      "x": 1920,
+      "y": 1120,
+      "width": 320,
+      "height": 100,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a8",
+      "roundness": null,
+      "seed": 1824585530,
+      "version": 1,
+      "versionNonce": 858015374,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "driftcheck-node-7-label"
+        },
+        {
+          "id": "driftcheck-edge-9",
+          "type": "arrow"
+        },
+        {
+          "id": "driftcheck-edge-13",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "driftcheck",
+        "node": "assert",
+        "ref": "src/engine/assert.ts"
+      }
+    },
+    {
+      "id": "driftcheck-node-8",
+      "type": "rectangle",
+      "x": 1920,
+      "y": 900,
+      "width": 300,
+      "height": 100,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a9",
+      "roundness": null,
+      "seed": 1324923057,
+      "version": 1,
+      "versionNonce": 1853952571,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "driftcheck-node-8-label"
+        },
+        {
+          "id": "driftcheck-edge-10",
+          "type": "arrow"
+        },
+        {
+          "id": "driftcheck-edge-14",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "driftcheck",
+        "node": "body",
+        "ref": "src/engine/body.ts"
+      }
+    },
+    {
+      "id": "driftcheck-node-9",
+      "type": "rectangle",
+      "x": 2380,
+      "y": 1160,
+      "width": 320,
+      "height": 120,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aA",
+      "roundness": null,
+      "seed": 2050990984,
+      "version": 1,
+      "versionNonce": 815266276,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "driftcheck-node-9-label"
+        },
+        {
+          "id": "driftcheck-edge-6",
+          "type": "arrow"
+        },
+        {
+          "id": "driftcheck-edge-13",
+          "type": "arrow"
+        },
+        {
+          "id": "driftcheck-edge-14",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "driftcheck",
+        "node": "parse",
+        "ref": "src/engine/parse.ts"
+      }
+    },
+    {
+      "id": "driftcheck-node-10",
+      "type": "rectangle",
+      "x": 1220,
+      "y": 340,
+      "width": 260,
+      "height": 100,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aB",
+      "roundness": null,
+      "seed": 1534820422,
+      "version": 1,
+      "versionNonce": 1426824618,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "driftcheck-node-10-label"
+        },
+        {
+          "id": "driftcheck-edge-5",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "driftcheck",
+        "node": "baseline",
+        "ref": "src/engine/drift.ts#createGitBaseline"
+      }
+    },
+    {
+      "id": "driftcheck-node-11",
+      "type": "rectangle",
+      "x": 1920,
+      "y": 560,
+      "width": 280,
+      "height": 100,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aC",
+      "roundness": null,
+      "seed": 1477584663,
+      "version": 1,
+      "versionNonce": 2083478513,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "driftcheck-node-11-label"
+        },
+        {
+          "id": "driftcheck-edge-11",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "driftcheck",
+        "node": "coverage",
+        "ref": "src/engine/drift.ts#sourceFilesUnder"
+      }
+    },
+    {
+      "id": "driftcheck-node-12",
+      "type": "rectangle",
+      "x": 580,
+      "y": 1100,
+      "width": 300,
+      "height": 100,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aD",
+      "roundness": null,
+      "seed": 927278056,
+      "version": 1,
+      "versionNonce": 1614902724,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "driftcheck-node-12-label"
+        },
+        {
+          "id": "driftcheck-edge-15",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "driftcheck",
+        "node": "render",
+        "ref": "scripts/check-drift.mjs#render"
+      }
+    },
+    {
+      "id": "driftcheck-node-13",
+      "type": "rectangle",
+      "x": 1220,
+      "y": 1080,
+      "width": 260,
+      "height": 100,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aE",
+      "roundness": null,
+      "seed": 1604459153,
+      "version": 1,
+      "versionNonce": 1227262619,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "driftcheck-node-13-label"
+        },
+        {
+          "id": "driftcheck-edge-7",
+          "type": "arrow"
+        },
+        {
+          "id": "driftcheck-edge-15",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "driftcheck",
+        "node": "box",
+        "ref": "scripts/lib/box.mjs#box"
+      }
+    },
+    {
+      "id": "driftcheck-edge-0",
+      "type": "arrow",
+      "x": 272,
+      "y": 512,
+      "width": 312.46399999999994,
+      "height": 0,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aF",
+      "roundness": null,
+      "seed": 1813129406,
+      "version": 1,
+      "versionNonce": 554493282,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "driftcheck",
+        "edge": {
+          "from": "hook",
+          "to": "cli"
+        }
+      },
+      "points": [
+        [
+          0.5,
+          0
+        ],
+        [
+          311.96399999999994,
+          0
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "driftcheck-node-0",
+        "focus": -0.2,
+        "gap": 8
+      },
+      "endBinding": {
+        "elementId": "driftcheck-node-1",
+        "focus": 0.06666666666666667,
+        "gap": 4.463999999999942
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "driftcheck-edge-1",
+      "type": "arrow",
+      "x": 884.4639999999999,
+      "y": 422,
+      "width": 337.664,
+      "height": 370,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aG",
+      "roundness": null,
+      "seed": 1989680655,
+      "version": 1,
+      "versionNonce": 1758846953,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "driftcheck",
+        "edge": {
+          "from": "cli",
+          "to": "config"
+        }
+      },
+      "points": [
+        [
+          0.5,
+          0
+        ],
+        [
+          32,
+          0
+        ],
+        [
+          32,
+          -370
+        ],
+        [
+          337.164,
+          -370
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "driftcheck-node-1",
+        "focus": -0.8166666666666667,
+        "gap": 4.463999999999942
+      },
+      "endBinding": {
+        "elementId": "driftcheck-node-2",
+        "focus": 0.20000000000000004,
+        "gap": 2.127999999999929
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "driftcheck-edge-2",
+      "type": "arrow",
+      "x": 884.4639999999999,
+      "y": 452,
+      "width": 337.664,
+      "height": 240,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aH",
+      "roundness": null,
+      "seed": 365709600,
+      "version": 1,
+      "versionNonce": 966591868,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "driftcheck",
+        "edge": {
+          "from": "cli",
+          "to": "find"
+        }
+      },
+      "points": [
+        [
+          0.5,
+          0
+        ],
+        [
+          56,
+          0
+        ],
+        [
+          56,
+          -240
+        ],
+        [
+          337.164,
+          -240
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "driftcheck-node-1",
+        "focus": -0.5666666666666668,
+        "gap": 4.463999999999942
+      },
+      "endBinding": {
+        "elementId": "driftcheck-node-3",
+        "focus": 0.2,
+        "gap": 2.127999999999929
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "driftcheck-edge-3",
+      "type": "arrow",
+      "x": 884.4639999999999,
+      "y": 512,
+      "width": 1490.1440000000002,
+      "height": 227.66666666666674,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aI",
+      "roundness": null,
+      "seed": 2073979369,
+      "version": 1,
+      "versionNonce": 95014899,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "driftcheck",
+        "edge": {
+          "from": "cli",
+          "to": "boardfile"
+        }
+      },
+      "points": [
+        [
+          0.5,
+          0
+        ],
+        [
+          1382.1440000000002,
+          0
+        ],
+        [
+          1382.1440000000002,
+          227.66666666666674
+        ],
+        [
+          1489.6440000000002,
+          227.66666666666674
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "driftcheck-node-1",
+        "focus": -0.06666666666666667,
+        "gap": 4.463999999999942
+      },
+      "endBinding": {
+        "elementId": "driftcheck-node-4",
+        "focus": 0.20666666666666755,
+        "gap": 5.391999999999825
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "driftcheck-edge-4",
+      "type": "arrow",
+      "x": 884.4639999999999,
+      "y": 542,
+      "width": 337.664,
+      "height": 387,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aJ",
+      "roundness": null,
+      "seed": 1291125850,
+      "version": 1,
+      "versionNonce": 1766681902,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "driftcheck",
+        "edge": {
+          "from": "cli",
+          "to": "check"
+        }
+      },
+      "points": [
+        [
+          0.5,
+          0
+        ],
+        [
+          80,
+          0
+        ],
+        [
+          80,
+          387
+        ],
+        [
+          337.164,
+          387
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "driftcheck-node-1",
+        "focus": 0.18333333333333332,
+        "gap": 4.463999999999942
+      },
+      "endBinding": {
+        "elementId": "driftcheck-node-6",
+        "focus": 0.014285714285713945,
+        "gap": 2.127999999999929
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "driftcheck-edge-5",
+      "type": "arrow",
+      "x": 884.4639999999999,
+      "y": 482,
+      "width": 337.664,
+      "height": 100,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aK",
+      "roundness": null,
+      "seed": 554719723,
+      "version": 1,
+      "versionNonce": 1431151077,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "driftcheck",
+        "edge": {
+          "from": "cli",
+          "to": "baseline"
+        }
+      },
+      "points": [
+        [
+          0.5,
+          0
+        ],
+        [
+          80,
+          0
+        ],
+        [
+          80,
+          -100
+        ],
+        [
+          337.164,
+          -100
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "driftcheck-node-1",
+        "focus": -0.3166666666666667,
+        "gap": 4.463999999999942
+      },
+      "endBinding": {
+        "elementId": "driftcheck-node-10",
+        "focus": 0.15999999999999967,
+        "gap": 2.127999999999929
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "driftcheck-edge-6",
+      "type": "arrow",
+      "x": 884.4639999999999,
+      "y": 602,
+      "width": 1490.1440000000002,
+      "height": 657,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aL",
+      "roundness": null,
+      "seed": 1880895004,
+      "version": 1,
+      "versionNonce": 1340058408,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "driftcheck",
+        "edge": {
+          "from": "cli",
+          "to": "parse"
+        }
+      },
+      "points": [
+        [
+          0.5,
+          0
+        ],
+        [
+          32,
+          0
+        ],
+        [
+          32,
+          502.66666666666674
+        ],
+        [
+          229.664,
+          502.66666666666674
+        ],
+        [
+          229.664,
+          657
+        ],
+        [
+          1489.6440000000002,
+          657
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "driftcheck-node-1",
+        "focus": 0.6833333333333333,
+        "gap": 4.463999999999942
+      },
+      "endBinding": {
+        "elementId": "driftcheck-node-9",
+        "focus": -0.65,
+        "gap": 5.391999999999825
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "driftcheck-edge-7",
+      "type": "arrow",
+      "x": 884.4639999999999,
+      "y": 572,
+      "width": 337.664,
+      "height": 540.3333333333333,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aM",
+      "roundness": null,
+      "seed": 84656181,
+      "version": 1,
+      "versionNonce": 1628138687,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "driftcheck",
+        "edge": {
+          "from": "cli",
+          "to": "box"
+        }
+      },
+      "points": [
+        [
+          0.5,
+          0
+        ],
+        [
+          56,
+          0
+        ],
+        [
+          56,
+          459.8666666666668
+        ],
+        [
+          253.664,
+          459.8666666666668
+        ],
+        [
+          253.664,
+          540.3333333333333
+        ],
+        [
+          337.164,
+          540.3333333333333
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "driftcheck-node-1",
+        "focus": 0.43333333333333335,
+        "gap": 4.463999999999942
+      },
+      "endBinding": {
+        "elementId": "driftcheck-node-13",
+        "focus": 0.35333333333333594,
+        "gap": 2.127999999999929
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "driftcheck-edge-8",
+      "type": "arrow",
+      "x": 1542.128,
+      "y": 915,
+      "width": 422.48,
+      "height": 142,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aN",
+      "roundness": null,
+      "seed": 761394182,
+      "version": 1,
+      "versionNonce": 513419626,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "driftcheck",
+        "edge": {
+          "from": "check",
+          "to": "graph"
+        }
+      },
+      "points": [
+        [
+          0.5,
+          0
+        ],
+        [
+          56,
+          0
+        ],
+        [
+          56,
+          -142
+        ],
+        [
+          421.98,
+          -142
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "driftcheck-node-6",
+        "focus": -0.2142857142857139,
+        "gap": 2.127999999999929
+      },
+      "endBinding": {
+        "elementId": "driftcheck-node-5",
+        "focus": 0.175,
+        "gap": 4.607999999999947
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "driftcheck-edge-9",
+      "type": "arrow",
+      "x": 1542.128,
+      "y": 971,
+      "width": 372.48,
+      "height": 198,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aO",
+      "roundness": null,
+      "seed": 2067734743,
+      "version": 1,
+      "versionNonce": 787355569,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "driftcheck",
+        "edge": {
+          "from": "check",
+          "to": "assert"
+        }
+      },
+      "points": [
+        [
+          0.5,
+          0
+        ],
+        [
+          32,
+          0
+        ],
+        [
+          32,
+          198
+        ],
+        [
+          371.98,
+          198
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "driftcheck-node-6",
+        "focus": 0.5857142857142861,
+        "gap": 2.127999999999929
+      },
+      "endBinding": {
+        "elementId": "driftcheck-node-7",
+        "focus": 0.019999999999998967,
+        "gap": 5.392000000000053
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "driftcheck-edge-10",
+      "type": "arrow",
+      "x": 1542.128,
+      "y": 943,
+      "width": 382.48,
+      "height": 0,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aP",
+      "roundness": null,
+      "seed": 1070433455,
+      "version": 1,
+      "versionNonce": 91042569,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "driftcheck",
+        "edge": {
+          "from": "check",
+          "to": "body"
+        }
+      },
+      "points": [
+        [
+          0.5,
+          0
+        ],
+        [
+          381.98,
+          0
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "driftcheck-node-6",
+        "focus": 0.18571428571428605,
+        "gap": 2.127999999999929
+      },
+      "endBinding": {
+        "elementId": "driftcheck-node-8",
+        "focus": 0.13999999999999727,
+        "gap": 4.607999999999947
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "driftcheck-edge-11",
+      "type": "arrow",
+      "x": 1542.128,
+      "y": 887,
+      "width": 372.48,
+      "height": 284,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aQ",
+      "roundness": null,
+      "seed": 1677789534,
+      "version": 1,
+      "versionNonce": 1693083778,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "driftcheck",
+        "edge": {
+          "from": "check",
+          "to": "coverage"
+        }
+      },
+      "points": [
+        [
+          0.5,
+          0
+        ],
+        [
+          32,
+          0
+        ],
+        [
+          32,
+          -284
+        ],
+        [
+          371.98,
+          -284
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "driftcheck-node-6",
+        "focus": -0.614285714285714,
+        "gap": 2.127999999999929
+      },
+      "endBinding": {
+        "elementId": "driftcheck-node-11",
+        "focus": 0.13999999999999946,
+        "gap": 5.392000000000053
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "driftcheck-edge-12",
+      "type": "arrow",
+      "x": 2184.608,
+      "y": 773,
+      "width": 190,
+      "height": 0,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aR",
+      "roundness": null,
+      "seed": 1194404873,
+      "version": 1,
+      "versionNonce": 1954762643,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "driftcheck",
+        "edge": {
+          "from": "graph",
+          "to": "boardfile"
+        }
+      },
+      "points": [
+        [
+          0.5,
+          0
+        ],
+        [
+          189.5,
+          0
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "driftcheck-node-5",
+        "focus": -0.175,
+        "gap": 4.608000000000175
+      },
+      "endBinding": {
+        "elementId": "driftcheck-node-4",
+        "focus": -0.4600000000000012,
+        "gap": 5.391999999999825
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "driftcheck-edge-13",
+      "type": "arrow",
+      "x": 2234.608,
+      "y": 1169,
+      "width": 140,
+      "height": 60,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aS",
+      "roundness": null,
+      "seed": 1593842880,
+      "version": 1,
+      "versionNonce": 1446271132,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "driftcheck",
+        "edge": {
+          "from": "assert",
+          "to": "parse"
+        }
+      },
+      "points": [
+        [
+          0.5,
+          0
+        ],
+        [
+          32,
+          0
+        ],
+        [
+          32,
+          60
+        ],
+        [
+          139.5,
+          60
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "driftcheck-node-7",
+        "focus": -0.019999999999998967,
+        "gap": 5.391999999999825
+      },
+      "endBinding": {
+        "elementId": "driftcheck-node-9",
+        "focus": -0.15,
+        "gap": 5.391999999999825
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "driftcheck-edge-14",
+      "type": "arrow",
+      "x": 2224.608,
+      "y": 943,
+      "width": 150,
+      "height": 256,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aT",
+      "roundness": null,
+      "seed": 1782853003,
+      "version": 1,
+      "versionNonce": 1910727173,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "driftcheck",
+        "edge": {
+          "from": "body",
+          "to": "parse"
+        }
+      },
+      "points": [
+        [
+          0.5,
+          0
+        ],
+        [
+          66,
+          0
+        ],
+        [
+          66,
+          256
+        ],
+        [
+          149.5,
+          256
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "driftcheck-node-8",
+        "focus": -0.14,
+        "gap": 4.608000000000175
+      },
+      "endBinding": {
+        "elementId": "driftcheck-node-9",
+        "focus": 0.35,
+        "gap": 5.391999999999825
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "driftcheck-edge-15",
+      "type": "arrow",
+      "x": 884.4639999999999,
+      "y": 1145.6666666666667,
+      "width": 337.664,
+      "height": 0,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aU",
+      "roundness": null,
+      "seed": 2092897658,
+      "version": 1,
+      "versionNonce": 1478945998,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "driftcheck",
+        "edge": {
+          "from": "render",
+          "to": "box"
+        }
+      },
+      "points": [
+        [
+          0.5,
+          0
+        ],
+        [
+          337.164,
+          0
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "driftcheck-node-12",
+        "focus": -0.0866666666666665,
+        "gap": 4.463999999999942
+      },
+      "endBinding": {
+        "elementId": "driftcheck-node-13",
+        "focus": -0.3133333333333373,
+        "gap": 2.127999999999929
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "driftcheck-edgelabel-0",
+      "type": "text",
+      "x": 412,
+      "y": 523,
+      "width": 32.464,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aV",
+      "roundness": null,
+      "seed": 1667247664,
+      "version": 1,
+      "versionNonce": 1262744204,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "driftcheck",
+        "edgeLabelFor": "driftcheck-edge-0"
+      },
+      "text": "runs",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "left",
+      "verticalAlign": "top",
+      "containerId": null,
+      "originalText": "runs",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "driftcheck-edgelabel-1",
+      "type": "text",
+      "x": 1031.4879999999998,
+      "y": 63,
+      "width": 43.616,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aW",
+      "roundness": null,
+      "seed": 194042041,
+      "version": 1,
+      "versionNonce": 1580824707,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "driftcheck",
+        "edgeLabelFor": "driftcheck-edge-1"
+      },
+      "text": "where",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "left",
+      "verticalAlign": "top",
+      "containerId": null,
+      "originalText": "where",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "driftcheck-edgelabel-2",
+      "type": "text",
+      "x": 1026.9679999999998,
+      "y": 223,
+      "width": 52.656,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aX",
+      "roundness": null,
+      "seed": 261955150,
+      "version": 1,
+      "versionNonce": 919049458,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "driftcheck",
+        "edgeLabelFor": "driftcheck-edge-2"
+      },
+      "text": "boards",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "left",
+      "verticalAlign": "top",
+      "containerId": null,
+      "originalText": "boards",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "driftcheck-edgelabel-3",
+      "type": "text",
+      "x": 1360.904,
+      "y": 523,
+      "width": 42.448,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aY",
+      "roundness": null,
+      "seed": 70070623,
+      "version": 1,
+      "versionNonce": 2104237049,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "driftcheck",
+        "edgeLabelFor": "driftcheck-edge-3"
+      },
+      "text": "reads",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "left",
+      "verticalAlign": "top",
+      "containerId": null,
+      "originalText": "reads",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "driftcheck-edgelabel-4",
+      "type": "text",
+      "x": 1027.792,
+      "y": 940,
+      "width": 51.008,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aZ",
+      "roundness": null,
+      "seed": 2139899564,
+      "version": 1,
+      "versionNonce": 1695791096,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "driftcheck",
+        "edgeLabelFor": "driftcheck-edge-4"
+      },
+      "text": "checks",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "left",
+      "verticalAlign": "top",
+      "containerId": null,
+      "originalText": "checks",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "driftcheck-edgelabel-5",
+      "type": "text",
+      "x": 1024.504,
+      "y": 393,
+      "width": 57.584,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aa",
+      "roundness": null,
+      "seed": 556762565,
+      "version": 1,
+      "versionNonce": 1524246223,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "driftcheck",
+        "edgeLabelFor": "driftcheck-edge-5"
+      },
+      "text": "deleted",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "left",
+      "verticalAlign": "top",
+      "containerId": null,
+      "originalText": "deleted",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "driftcheck-edgelabel-6",
+      "type": "text",
+      "x": 1338.9759999999999,
+      "y": 1270,
+      "width": 86.304,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "ab",
+      "roundness": null,
+      "seed": 1548226410,
+      "version": 1,
+      "versionNonce": 1918527294,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "driftcheck",
+        "edgeLabelFor": "driftcheck-edge-6"
+      },
+      "text": "loads wasm",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "left",
+      "verticalAlign": "top",
+      "containerId": null,
+      "originalText": "loads wasm",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "driftcheck-edgelabel-7",
+      "type": "text",
+      "x": 1024.464,
+      "y": 1042.8666666666668,
+      "width": 57.664,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "ac",
+      "roundness": null,
+      "seed": 1143257275,
+      "version": 1,
+      "versionNonce": 574482229,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "driftcheck",
+        "edgeLabelFor": "driftcheck-edge-7"
+      },
+      "text": "reports",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "left",
+      "verticalAlign": "top",
+      "containerId": null,
+      "originalText": "reports",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "driftcheck-edgelabel-8",
+      "type": "text",
+      "x": 1682.128,
+      "y": 784,
+      "width": 92.48,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "ad",
+      "roundness": null,
+      "seed": 573935736,
+      "version": 1,
+      "versionNonce": 587262676,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "driftcheck",
+        "edgeLabelFor": "driftcheck-edge-8"
+      },
+      "text": "nodes · refs",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "left",
+      "verticalAlign": "top",
+      "containerId": null,
+      "originalText": "nodes · refs",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "driftcheck-edgelabel-9",
+      "type": "text",
+      "x": 1706.328,
+      "y": 1180,
+      "width": 44.08,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "ae",
+      "roundness": null,
+      "seed": 211308833,
+      "version": 1,
+      "versionNonce": 1184140267,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "driftcheck",
+        "edgeLabelFor": "driftcheck-edge-9"
+      },
+      "text": "claims",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "left",
+      "verticalAlign": "top",
+      "containerId": null,
+      "originalText": "claims",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "driftcheck-edgelabel-10",
+      "type": "text",
+      "x": 1710.3919999999998,
+      "y": 954,
+      "width": 35.952,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "af",
+      "roundness": null,
+      "seed": 861071045,
+      "version": 1,
+      "versionNonce": 1753995727,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "driftcheck",
+        "edgeLabelFor": "driftcheck-edge-10"
+      },
+      "text": "hops",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "left",
+      "verticalAlign": "top",
+      "containerId": null,
+      "originalText": "hops",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "driftcheck-edgelabel-11",
+      "type": "text",
+      "x": 1693.3519999999999,
+      "y": 614,
+      "width": 70.032,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "ag",
+      "roundness": null,
+      "seed": 296724396,
+      "version": 1,
+      "versionNonce": 1925540600,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "driftcheck",
+        "edgeLabelFor": "driftcheck-edge-11"
+      },
+      "text": "suggests",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "left",
+      "verticalAlign": "top",
+      "containerId": null,
+      "originalText": "suggests",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "driftcheck-edgelabel-15",
+      "type": "text",
+      "x": 1030.984,
+      "y": 1156.6666666666667,
+      "width": 44.624,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "ah",
+      "roundness": null,
+      "seed": 1971556144,
+      "version": 1,
+      "versionNonce": 1492493708,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "driftcheck",
+        "edgeLabelFor": "driftcheck-edge-15"
+      },
+      "text": "draws",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "left",
+      "verticalAlign": "top",
+      "containerId": null,
+      "originalText": "draws",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "driftcheck-node-0-label",
+      "type": "text",
+      "x": 99.88,
+      "y": 495,
+      "width": 100.24,
+      "height": 50,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "ai",
+      "roundness": null,
+      "seed": 618566032,
+      "version": 1,
+      "versionNonce": 788492140,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "driftcheck"
+      },
+      "text": "Stop hook\nevery turn",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "driftcheck-node-0",
+      "originalText": "Stop hook\nevery turn",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "driftcheck-node-1-label",
+      "type": "text",
+      "x": 652.4,
+      "y": 495,
+      "width": 155.2,
+      "height": 50,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aj",
+      "roundness": null,
+      "seed": 1827069533,
+      "version": 1,
+      "versionNonce": 1752632519,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "driftcheck"
+      },
+      "text": "check-drift.mjs\nargs · two exits",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "driftcheck-node-1",
+      "originalText": "check-drift.mjs\nargs · two exits",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "driftcheck-node-2-label",
+      "type": "text",
+      "x": 1246.48,
+      "y": 47.5,
+      "width": 147.04000000000002,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "ak",
+      "roundness": null,
+      "seed": 1490102842,
+      "version": 1,
+      "versionNonce": 1352961934,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "driftcheck"
+      },
+      "text": "which directory",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "driftcheck-node-2",
+      "originalText": "which directory",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "driftcheck-node-3-label",
+      "type": "text",
+      "x": 1253.8,
+      "y": 207.5,
+      "width": 152.4,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "al",
+      "roundness": null,
+      "seed": 1815923967,
+      "version": 1,
+      "versionNonce": 771601433,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "driftcheck"
+      },
+      "text": "find the boards",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "driftcheck-node-3",
+      "originalText": "find the boards",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "driftcheck-node-4-label",
+      "type": "text",
+      "x": 2412.36,
+      "y": 737.5,
+      "width": 195.27999999999997,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "am",
+      "roundness": null,
+      "seed": 409265084,
+      "version": 1,
+      "versionNonce": 441790792,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "driftcheck"
+      },
+      "text": "read the .excalidraw",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "driftcheck-node-4",
+      "originalText": "read the .excalidraw",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "driftcheck-node-5-label",
+      "type": "text",
+      "x": 1987.5,
+      "y": 767.5,
+      "width": 165,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "an",
+      "roundness": null,
+      "seed": 534856985,
+      "version": 1,
+      "versionNonce": 580460643,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "driftcheck"
+      },
+      "text": "board as a graph",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "driftcheck-node-5",
+      "originalText": "board as a graph",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "driftcheck-node-6-label",
+      "type": "text",
+      "x": 1300.87,
+      "y": 905,
+      "width": 158.26,
+      "height": 50,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "ao",
+      "roundness": null,
+      "seed": 1760435958,
+      "version": 1,
+      "versionNonce": 791320154,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "driftcheck"
+      },
+      "text": "checkDrift\nrefs vs the tree",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "driftcheck-node-6",
+      "originalText": "checkDrift\nrefs vs the tree",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "driftcheck-node-7-label",
+      "type": "text",
+      "x": 1991.28,
+      "y": 1145,
+      "width": 177.44,
+      "height": 50,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "ap",
+      "roundness": null,
+      "seed": 2057814571,
+      "version": 1,
+      "versionNonce": 514295845,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "driftcheck"
+      },
+      "text": "what a ref claims\n@declared · @used",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "driftcheck-node-7",
+      "originalText": "what a ref claims\n@declared · @used",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "driftcheck-node-8-label",
+      "type": "text",
+      "x": 1993.36,
+      "y": 925,
+      "width": 153.28,
+      "height": 50,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aq",
+      "roundness": null,
+      "seed": 1137739144,
+      "version": 1,
+      "versionNonce": 2141962212,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "driftcheck"
+      },
+      "text": "arrows inside\na function body",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "driftcheck-node-8",
+      "originalText": "arrows inside\na function body",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "driftcheck-node-9-label",
+      "type": "text",
+      "x": 2424.76,
+      "y": 1195,
+      "width": 230.48,
+      "height": 50,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "ar",
+      "roundness": null,
+      "seed": 380865109,
+      "version": 1,
+      "versionNonce": 905109599,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "driftcheck"
+      },
+      "text": "tree-sitter\nTS · JS · Rust · Python",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "driftcheck-node-9",
+      "originalText": "tree-sitter\nTS · JS · Rust · Python",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "driftcheck-node-10-label",
+      "type": "text",
+      "x": 1264.3,
+      "y": 365,
+      "width": 171.4,
+      "height": 50,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "as",
+      "roundness": null,
+      "seed": 638109879,
+      "version": 1,
+      "versionNonce": 1135507217,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "driftcheck"
+      },
+      "text": "git baseline\nwhat was deleted",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "driftcheck-node-10",
+      "originalText": "git baseline\nwhat was deleted",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "driftcheck-node-11-label",
+      "type": "text",
+      "x": 1938.32,
+      "y": 585,
+      "width": 243.35999999999999,
+      "height": 50,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "at",
+      "roundness": null,
+      "seed": 764516882,
+      "version": 1,
+      "versionNonce": 1214341190,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "driftcheck"
+      },
+      "text": "coverage\nboxes missing, both ways",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "driftcheck-node-11",
+      "originalText": "coverage\nboxes missing, both ways",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "driftcheck-node-12-label",
+      "type": "text",
+      "x": 605.7,
+      "y": 1125,
+      "width": 248.6,
+      "height": 50,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "au",
+      "roundness": null,
+      "seed": 1355814965,
+      "version": 1,
+      "versionNonce": 656536767,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "driftcheck"
+      },
+      "text": "the notice\nrows · tallies · kind → row",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "driftcheck-node-12",
+      "originalText": "the notice\nrows · tallies · kind → row",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "driftcheck-node-13-label",
+      "type": "text",
+      "x": 1293.03,
+      "y": 1105,
+      "width": 113.94,
+      "height": 50,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "av",
+      "roundness": null,
+      "seed": 521167336,
+      "version": 1,
+      "versionNonce": 1161039812,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "driftcheck"
+      },
+      "text": "box drawing\npad · fit",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "driftcheck-node-13",
+      "originalText": "box drawing\npad · fit",
+      "autoResize": true,
+      "lineHeight": 1.25
+    }
+  ],
+  "appState": {
+    "gridSize": null,
+    "viewBackgroundColor": "#ffffff"
+  },
+  "files": {}
+}

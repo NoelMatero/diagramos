@@ -375,7 +375,11 @@ whether anyone leaves the check switched on.
 
 ## Tool and script surface
 
-- `check_drift(path)` — MCP tool. Returns `{ missing[], unrepresented[], edgeMismatches[], clean: boolean }`.
+- `check_drift(path)` — MCP tool. Returns `{ boards[], clean: boolean, findings[], edges[] }`,
+  plus `deleted[]`, `workItems[]`, `promotions[]`, `conceptBoards[]`, `unannotated[]`,
+  `unrepresented[]`, `skippedWhy`, `edgesSkippedWhy` and `assertions` when non-empty.
+  A new `DriftKind` is a new member of `findings[]`, not a new array: the handler
+  spreads each finding generically, so it needs no change beyond its description.
   Read-only; never edits the board.
 - `scripts/check-drift.mjs <board>` — same logic, CLI, non-zero exit when drift
   is found. This is what hooks and CI call.
