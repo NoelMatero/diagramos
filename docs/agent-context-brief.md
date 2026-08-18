@@ -147,21 +147,44 @@ Two side results from the same run:
   with a single ref on it — the `refs` column of the harness reads 12 for it and
   0 for all six others. A scruffier board would do worse, not better.
 
-## The follow-on worth filing
+## The follow-on — diagnosed here, fixed in the same branch
 
-Not done here, because #52 says measure and stop.
+**Coverage was blind to standalone entry points.** `check_drift --coverage`
+reported `unrepresented` modules by walking the imports of files that already
+had a box. That direction grows the board outward, so it only ever reached code
+*downstream* of a box. An entry point is upstream — it imports the boxes and
+nothing imports it back — so no amount of drawing would ever surface one.
+`scripts/check-drift.mjs`, the single most important file for this task, was
+structurally unreachable, and coverage's 10 suggestions were every one of them a
+`src/engine` or `src/viewer` leaf.
 
-**Coverage is blind to standalone entry points.** `check_drift --coverage`
-reports `unrepresented` modules by walking the imports of files that already have
-a box. `scripts/check-drift.mjs` is imported by nothing, so it can never appear —
-the board is missing the single most important file for this task and the repo's
-own completeness check structurally cannot say so. On `board-internals` coverage
-names 10 unrepresented modules and every one of them is a `src/engine` or
-`src/viewer` leaf.
+That was the concrete reason the board lost, so it is now fixed. Coverage runs
+both ways round the import graph: a module the boxes lean on still arrives with
+`importedBy`, and an entry point that calls in arrives with `imports` instead.
+The relevance bar is unchanged — a candidate still has to have a real import
+edge to a box, so relevance stays inherited rather than invented. Only the
+search changed, from following edges to enumerating source files and keeping the
+ones with such an edge.
 
-That is the concrete reason the board lost, and it is fixable. Until it is,
-"12/12 anchored and clean" means every box that exists is honest — it does not
-mean the boxes that should exist do.
+Two things fell out of building it:
+
+- **Tests had to be excluded, or the signal drowned.** Left in, test files were
+  12 of 20 rows on this repo's board — a suite importing four boxes is the suite
+  working, not a box anybody forgot. That is the kind of noise that gets a
+  suggestion switched off along with the quiet checks around it.
+- **It costs nothing measurable here.** 60 source files; `--coverage` times the
+  same as a bare run. The per-turn hook does not pass `--coverage` and is
+  untouched.
+
+`board-internals` now reports six entry points, every one a genuine surface of
+this tool, `scripts/check-drift.mjs` among them.
+
+**What this does and does not buy.** The board is not better yet — it still has
+12 boxes and still has no box for the CLI. What changed is that the instrument
+can now *say so*. "12/12 anchored and clean" still means every box that exists
+is honest; it now also comes with a list of the boxes that should exist. Re-
+running the three arms before those boxes are drawn would just reproduce the
+same loss, so the real re-measurement waits on the drawing.
 
 ## Recommendation
 
@@ -170,7 +193,10 @@ mean the boxes that should exist do.
 2. **Keep the board for what only it can do** — the checkable half. Anchors that
    resolve, states that distinguish planned from built, and a closed set of boxes
    that lets an agent notice its own gap. None of that is a token-cost argument.
-3. **Fix coverage's blind spot before re-running this.** A board that cannot be
-   told it is missing the CLI will keep being missing the CLI. Re-measuring
-   against a board that covers the reporting path is the only way to know whether
-   the diagram lost on principle or merely lost on this board.
+3. ~~Fix coverage's blind spot before re-running this.~~ Done, above.
+4. **Draw the surfaces coverage now names, then re-measure.** The cost table is
+   the argument for doing it: the largest board here is 33 nodes and 2,854
+   tokens, so boards covering the check path, the CLI and the live board would
+   together still cost under a tenth of the prose. The board did not lose because
+   a diagram is a weak way to carry structure. It lost because twelve boxes were
+   asked to describe a repository and only described the MCP path.

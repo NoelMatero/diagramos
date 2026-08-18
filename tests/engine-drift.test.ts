@@ -25,6 +25,21 @@ function fakeWorkspace(files: Record<string, string | "dir">): Workspace {
       p = p.substring(2);
     }
     p = p.replace(/\/+/g, "/");  // Collapse multiple slashes
+    // Fold `..` the way `path.resolve` does in the real workspace. Import
+    // specifiers arrive joined rather than resolved -- a sibling directory
+    // reads as `scripts/../src/engine/core.ts` -- so a double that left them
+    // alone would call every cross-directory import missing. Climbing above
+    // the root is refused here exactly as `resolve` refuses it there.
+    if (p.includes("..")) {
+      const stack: string[] = [];
+      for (const segment of p.split("/")) {
+        if (segment === "." || segment === "") continue;
+        if (segment !== "..") stack.push(segment);
+        else if (stack.length) stack.pop();
+        else return undefined;
+      }
+      p = stack.join("/");
+    }
     return p;
   }
 
@@ -50,7 +65,9 @@ function fakeWorkspace(files: Record<string, string | "dir">): Workspace {
     list: (target) => {
       const normalized = normalize(target);
       if (!normalized) return [];
-      const prefix = `${normalized.replace(/\/$/, "")}/`;
+      // "." is the root, the way `createWorkspace().resolve(".")` gives it, so
+      // its listing is every key's first segment rather than a prefix match.
+      const prefix = normalized === "." ? "" : `${normalized.replace(/\/$/, "")}/`;
       const entries = new Set<string>();
       for (const key of Object.keys(files)) {
         if (!key.startsWith(prefix)) continue;
@@ -1258,6 +1275,70 @@ describe("code the diagram leaves out", () => {
   it("is off unless asked for, because it suggests rather than reports", async () => {
     const board = await boardOf([{ id: "a", label: "A", ref: "src/a.ts" }]);
     expect(checkDrift(board, fakeWorkspace(tree)).unrepresented).toEqual([]);
+  });
+
+  /*
+   * The direction that finds a surface rather than a module.
+   *
+   * `importedBy` grows the board outward along imports and so only ever reaches
+   * things downstream of a box. An entry point is upstream -- it imports the
+   * boxes and nothing imports it -- so it is invisible to that direction no
+   * matter how complete the board becomes. This repo's own board was twelve for
+   * twelve anchored, clean, and missing its whole CLI when that was measured.
+   */
+  const surfaces = {
+    "src": "dir" as const,
+    "src/engine": "dir" as const,
+    "scripts": "dir" as const,
+    "tests": "dir" as const,
+    "src/engine/core.ts": "export const core = 1;",
+    "src/engine/leaf.ts": "export const leaf = 2;",
+    "scripts/cli.mjs": "import { core } from '../src/engine/core.ts';\ncore();",
+    "scripts/unrelated.mjs": "console.log('nothing to do with the board');",
+    "tests/core.test.ts": "import { core } from '../src/engine/core.ts';\ncore();",
+  };
+
+  it("finds an entry point that imports a box and that nothing imports back", async () => {
+    const board = await boardOf([{ id: "core", label: "Core", ref: "src/engine/core.ts" }]);
+    const report = checkDrift(board, fakeWorkspace(surfaces), { coverage: true });
+    const cli = report.unrepresented.find((entry) => entry.file === "scripts/cli.mjs");
+    expect(cli).toMatchObject({ imports: ["src/engine/core.ts"], importedBy: [] });
+    // Still the opposite of drift: a suggestion never fails a build.
+    expect(report.clean).toBe(true);
+  });
+
+  it("keeps the relevance bar: a file that touches no box stays unmentioned", async () => {
+    const board = await boardOf([{ id: "core", label: "Core", ref: "src/engine/core.ts" }]);
+    const files = checkDrift(board, fakeWorkspace(surfaces), { coverage: true })
+      .unrepresented.map((entry) => entry.file);
+    // Enumerating candidates is new; inventing relevance is not. `unrelated.mjs`
+    // is walked and then dropped, because no box is on the other end of it.
+    expect(files).not.toContain("scripts/unrelated.mjs");
+  });
+
+  it("leaves tests out, since a suite importing four boxes is not a missing box", async () => {
+    const board = await boardOf([{ id: "core", label: "Core", ref: "src/engine/core.ts" }]);
+    const files = checkDrift(board, fakeWorkspace(surfaces), { coverage: true })
+      .unrepresented.map((entry) => entry.file);
+    expect(files).not.toContain("tests/core.test.ts");
+  });
+
+  it("ranks entry points after the modules the boxes lean on", async () => {
+    const board = await boardOf([{ id: "core", label: "Core", ref: "src/engine/core.ts" }]);
+    const tree2 = {
+      ...surfaces,
+      "src/engine/core.ts": "import { leaf } from './leaf';\nexport const core = leaf;",
+    };
+    const files = checkDrift(board, fakeWorkspace(tree2), { coverage: true })
+      .unrepresented.map((entry) => entry.file);
+    // leaf.ts is downstream of the box; cli.mjs is upstream of it. Both belong,
+    // and the module several boxes could depend on is the likelier omission.
+    expect(files).toEqual(["src/engine/leaf.ts", "scripts/cli.mjs"]);
+  });
+
+  it("says nothing about entry points unless coverage was asked for", async () => {
+    const board = await boardOf([{ id: "core", label: "Core", ref: "src/engine/core.ts" }]);
+    expect(checkDrift(board, fakeWorkspace(surfaces)).unrepresented).toEqual([]);
   });
 
   it("says nothing on a concept board, and ignores an external box's ref", async () => {

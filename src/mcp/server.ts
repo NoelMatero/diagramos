@@ -471,10 +471,15 @@ server.registerTool(
           "Two questions the per-turn check does not ask. `unannotated` names the boxes that claim to "
           + "be about this repo and carry no ref at all, with their labels -- these are invisible to "
           + "every other check, and naming them is what lets a ref be proposed for each. "
-          + "`unrepresented` is the opposite direction: modules the board's own ref'd files import but "
-          + "no box covers, most-imported first. Both are suggestions, never drift -- they do not "
-          + "affect clean. Off by default because it reads the imports of every ref'd file; ask for it "
-          + "when deciding what a diagram is missing or when annotating one.",
+          + "`unrepresented` is the opposite direction: code no box covers, most-imported first. It "
+          + "runs both ways round the import graph. A module the board's own ref'd files import "
+          + "arrives with `importedBy`; an entry point that imports the board and that nothing "
+          + "imports back -- a CLI, a hook, a browser main -- arrives with `imports` instead, and is "
+          + "the case the first direction structurally cannot reach, so a board can be every-box-"
+          + "anchored and clean while missing an entire surface. Test files are left out. Both are "
+          + "suggestions, never drift -- they do not affect clean. Off by default because it walks "
+          + "the repository's source files; ask for it when deciding what a diagram is missing or "
+          + "when annotating one.",
         ),
     },
   },

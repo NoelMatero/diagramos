@@ -158,6 +158,17 @@ export interface UnrepresentedFinding {
   file: string;
   /** The board's own ref'd files that import it, which is why it is a candidate. */
   importedBy: string[];
+  /**
+   * The board's own ref'd files that *this* file imports, set only when nothing
+   * on the board imports it back.
+   *
+   * An entry point -- a CLI, a hook, a test -- is imported by nothing, so the
+   * `importedBy` direction can never see it however complete the board gets.
+   * That is not a gap in the ranking, it is the shape of the import graph, and
+   * it is why a board can be every-box-anchored and still be missing a whole
+   * surface. Empty `importedBy` and a populated `imports` is that case.
+   */
+  imports?: string[];
 }
 
 /**
@@ -315,6 +326,71 @@ type Inspection = DriftFinding | "ok" | { skip: NodeSkipReason };
  * reading them on every turn is not a per-turn budget.
  */
 const ANCHOR_ENTRY_CAP = 50;
+
+/**
+ * Directories the coverage walk never enters: dependencies, build output, VCS.
+ *
+ * Not a security boundary -- `workspace.resolve` is still the only way in and
+ * out. This is about cost and noise. Generated code is not something a diagram
+ * was ever going to draw.
+ */
+const NEVER_WALK = new Set([
+  "node_modules", "out", "dist", "build", "coverage", "vendor", ".git",
+  "test-results", "playwright-report",
+]);
+
+/**
+ * A test file, by the conventions every JS project shares.
+ *
+ * Tests are the largest group of entry points in any repository and the least
+ * drawable: `tests/engine-drift.test.ts` importing four boxes is the suite
+ * doing its job, not a surface the diagram forgot. Left in, they were 12 of 20
+ * rows on this repo's own board and would have buried the one row that
+ * mattered -- which is how a suggestion gets switched off.
+ */
+const TEST_FILE = /(^|[\\/])(tests?|__tests__|spec)[\\/]|\.(test|spec)\.[^.]+$/;
+
+/**
+ * How many source files the coverage walk will visit before giving up.
+ *
+ * Past this it returns nothing rather than a prefix of the truth, which is the
+ * same choice `filesIn` makes at its own cap: a partial answer to "what is the
+ * board missing?" reads as a complete one and is worse than silence.
+ */
+const WALK_FILE_CAP = 2000;
+
+/**
+ * Every source file in the repository, for the one caller that needs to look
+ * somewhere the board does not already point.
+ *
+ * This is a tree walk, which the rest of this file goes to some length to
+ * avoid, so the distinction matters: a *ref* must never trigger a search,
+ * because a ref is a model-authored string and a search driven by one is an
+ * arbitrary read of the disk. This walk is driven by the tool, takes no input,
+ * and only ever runs behind `coverage`. What it finds is still filtered by an
+ * import edge to a box, so relevance stays inherited rather than invented.
+ *
+ * `undefined` past the cap, meaning "do not report", never "nothing found".
+ */
+function sourceFilesUnder(rootAbsolute: string, workspace: Workspace): string[] | undefined {
+  const found: string[] = [];
+  const queue = [rootAbsolute];
+  while (queue.length) {
+    const directory = queue.pop()!;
+    for (const entry of workspace.list(directory)) {
+      // A dotfile directory is either VCS, tooling, or cache; none is drawable.
+      if (entry.startsWith(".") || NEVER_WALK.has(entry)) continue;
+      const child = `${directory}${path.sep}${entry}`;
+      const kind = workspace.stat(child);
+      if (kind === "directory") queue.push(child);
+      else if (kind === "file" && TS_JS.test(entry)) {
+        if (found.length >= WALK_FILE_CAP) return undefined;
+        found.push(child);
+      }
+    }
+  }
+  return found;
+}
 
 /**
  * A `*` in the last segment, and only there.
@@ -1387,6 +1463,43 @@ export function checkDrift(
       ...[...importers.values()]
         .map((entry) => ({ file: entry.file, importedBy: [...entry.by].sort() }))
         .sort((a, b) => b.importedBy.length - a.importedBy.length || a.file.localeCompare(b.file)),
+    );
+
+    /*
+     * The direction above cannot reach an entry point.
+     *
+     * It grows the board outward along imports, so it only ever finds things
+     * downstream of a box. A CLI, a hook or a test is upstream: it imports the
+     * boxes and nothing imports it, so no amount of drawing will make it
+     * appear. That is how this repo's own board came to be twelve-for-twelve
+     * anchored, clean, and missing the entire reporting half -- measured in
+     * `docs/agent-context-brief.md`, which is what prompted this.
+     *
+     * The relevance bar is unchanged: a candidate still has to import a file a
+     * box already points at. Only the search changes, from following edges to
+     * enumerating files and keeping the ones with such an edge. That costs a
+     * walk, which is why it stays behind `coverage` with everything else here.
+     */
+    const root = workspace.resolve(".");
+    const candidates = root ? sourceFilesUnder(root, workspace) : undefined;
+    const entryPoints: UnrepresentedFinding[] = [];
+    for (const absolute of candidates ?? []) {
+      if (covered(absolute) || importers.has(absolute)) continue;
+      const relative = path.relative(root!, absolute).split(path.sep).join("/");
+      if (TEST_FILE.test(relative)) continue;
+      const reaching = getImports(absolute, relative, workspace, importCache)
+        .filter((imported) => onBoard.has(imported.abs))
+        .map((imported) => onBoard.get(imported.abs)!);
+      if (!reaching.length) continue;
+      entryPoints.push({ file: relative, importedBy: [], imports: [...new Set(reaching)].sort() });
+    }
+
+    // Ranked like the block above and appended after it: a module several boxes
+    // lean on is a likelier omission than one surface that calls in.
+    unrepresented.push(
+      ...entryPoints.sort(
+        (a, b) => b.imports!.length - a.imports!.length || a.file.localeCompare(b.file),
+      ),
     );
   }
 
