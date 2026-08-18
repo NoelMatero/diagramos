@@ -475,6 +475,17 @@ describe("board MCP server", () => {
     // An empty array is four bytes saying nothing.
     expect(JSON.parse(lean)).not.toHaveProperty("unattributed");
 
+    // The response has to explain its own omissions. A board where everything
+    // agrees with every default would otherwise never mention that provenance,
+    // state or endpoints exist, and a reader cannot ask about a concept it has
+    // no way to know is there.
+    expect(JSON.parse(lean).omittedWhenDefault).toEqual({
+      shape: "rectangle",
+      provenance: "recorded",
+      state: "built",
+      endpoints: "declared",
+    });
+
     const odd = leanNodes.find((node) => node.id === "odd");
     expect(odd).toEqual({ id: "odd", label: "Odd", shape: "ellipse", state: "planned" });
 

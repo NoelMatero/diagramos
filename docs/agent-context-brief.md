@@ -264,6 +264,42 @@ plain ones, where before it was one `"state"` among sixty. Whether that helps
 an agent is exactly the kind of claim this brief exists to refuse until it is
 graded, and it has not been graded.
 
+The same refusal applies in the other direction and is the reason for
+`omittedWhenDefault`. The fields are not equally safe to drop, and pricing them
+separately across the 61 nodes and 63 edges on these boards shows why:
+
+| omitted field | cost | carries meaning? |
+|---|---|---|
+| `elementId` | 986 tokens (19.8%) | no — a handle, not a fact |
+| `provenance` | 744 (15.0%) | **yes** — recorded vs inferred |
+| `state` | 484 (9.7%) | **yes** — built vs planned vs external |
+| `endpoints` | 362 (7.3%) | **yes** — how much to trust an arrow |
+| `shape` | 300 (6.0%) | barely |
+
+A quarter of the payload was `elementId` and `shape`, which no reader reasons
+with. The other three do carry meaning, and on these boards they were carrying
+almost none of it: across 61 nodes and 63 edges the only non-default values are
+three `external` boxes and one ellipse. Zero `inferred`, zero `bound`, zero
+`nearest`, zero `planned`.
+
+That cuts both ways, and the second way is the risk. A board where everything
+agrees with every default now mentions `provenance`, `state` and `endpoints`
+**nowhere at all** — so a reader of the payload cannot learn from it that those
+fields exist, and an agent that does not know a concept exists cannot think to
+ask about it. Stating the defaults in the tool description does not fix that: it
+relies on the description having been read and retained.
+
+So every response opens with `omittedWhenDefault`, naming each field and what
+its absence means. It costs ~27 tokens per board against the ~1,590 the fields
+cost spread across every item, taking the saving from 58% to 55%. Three points
+to keep the vocabulary in the data was not a close call.
+
+**What is still not graded:** whether an agent applies the legend correctly.
+That is a narrow, cheap question — a handful of tasks whose answer *is* a
+default value ("which boxes are not built yet", "which of these facts might be
+wrong") run against both payloads — and it has not been run. Nothing here
+should be read as evidence that it does not matter.
+
 A further ~15 points sits in dropping JSON for a plain-text outline (1,317
 tokens). That is **not** free: it flattens multi-line labels and needs escaping
 rules. It was measured, not shipped.

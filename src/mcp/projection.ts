@@ -63,6 +63,28 @@ export interface ProjectionOptions {
   detailed?: boolean;
 }
 
+/**
+ * The legend for what was left out, sent once per response.
+ *
+ * Stating the defaults in the tool description was not enough on its own. A
+ * board where every box agrees with every default mentions `provenance`,
+ * `state` and `endpoints` nowhere at all, so a reader of the payload cannot
+ * learn from it that those fields exist -- and an agent that does not know a
+ * concept exists cannot think to ask about it. Whether that matters is
+ * ungraded, which is exactly why it is not worth betting on: this costs ~30
+ * tokens once, against the ~1,590 the fields cost spread across 61 nodes and
+ * 63 edges on this repo's boards.
+ *
+ * It also makes a response self-describing rather than dependent on the tool
+ * description having been read and retained.
+ */
+const DEFAULTS_LEGEND = {
+  shape: "rectangle",
+  provenance: "recorded",
+  state: "built",
+  endpoints: "declared",
+} as const;
+
 export function projectGraph(
   graph: RecoveredGraph,
   { geometry = false, detailed = false }: ProjectionOptions = {},
@@ -73,6 +95,7 @@ export function projectGraph(
     : nodes.map(({ x: _x, y: _y, width: _w, height: _h, ...node }) => node);
   return {
     ...rest,
+    omittedWhenDefault: DEFAULTS_LEGEND,
     nodes: placed.map((node) => shrink(node, NODE_DEFAULTS, detailed)),
     edges: edges.map((edge) => shrink(edge, EDGE_DEFAULTS, detailed)),
     // An empty array on every response is bytes saying nothing. A board with
