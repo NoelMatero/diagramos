@@ -384,8 +384,10 @@ server.registerTool(
       + "close to and may not be the one intended. A hand-drawn arrow bound at both ends is a precise "
       + "claim despite being inferred. Use this to treat a diagram as a specification. "
       + "A field sitting at its default is left out rather than repeated on every item; the response "
-      + "opens with omittedWhenDefault, which says what each absence means. No unattributed means the "
-      + "board has no strays. Edit or delete by the node id listed here -- edit_diagram resolves it -- "
+      + "opens with omittedWhenDefault, which says what each absence means. A state is built, planned "
+      + "(drawn as intent, not written yet) or external (real, and not yours to change); nodes and "
+      + "edges both carry one. No unattributed means the board has no strays. "
+      + "Edit or delete by the node id listed here -- edit_diagram resolves it -- "
       + "and ask for geometry or includeElements if you need the raw Excalidraw elementId.",
     inputSchema: {
       path: z.string(),

@@ -294,11 +294,89 @@ its absence means. It costs ~27 tokens per board against the ~1,590 the fields
 cost spread across every item, taking the saving from 58% to 55%. Three points
 to keep the vocabulary in the data was not a close call.
 
-**What is still not graded:** whether an agent applies the legend correctly.
-That is a narrow, cheap question — a handful of tasks whose answer *is* a
-default value ("which boxes are not built yet", "which of these facts might be
-wrong") run against both payloads — and it has not been run. Nothing here
-should be read as evidence that it does not matter.
+### Does the trim cost comprehension? (2026-08-18, graded)
+
+The paragraph above said this was ungraded. It has now been run, and the answer
+is no — with one honest caveat that limits how far it generalises.
+
+Four arms, built from one synthetic graph by
+`scripts/bench-default-fields.mts` so they differ only in packaging. Synthetic
+because a sealed agent handed a real board could answer from this repo's code
+instead of from the payload.
+
+| arm | payload | where the defaults are explained |
+| --- | --- | --- |
+| verbose | 1,050 tok | nothing is omitted |
+| lean | 493 | tool description enumerates them |
+| legend | 546 | tool description points at `omittedWhenDefault`, which is in the payload — **what ships** |
+| naive | 493 | **nowhere** — the control |
+
+Two sealed runs per arm, eight runs. Four questions, ground truth written by
+hand first. Three of them have a default value as the answer — *which boxes are
+not built yet* (none), *which were hand-drawn and might be wrong* (none), *is
+this arrow precise or a positional guess* (precise). The fourth asks the same
+things about a board whose values are non-default, as a control on the control.
+
+**32 of 32 answers correct. Every arm, every question. Nothing was wrong and
+nothing said "cannot tell".**
+
+The only thing that moved was stated confidence, and it moved perfectly
+consistently:
+
+| arm | correct | confidence on the three default-valued questions |
+| --- | --- | --- |
+| verbose | 8/8 | `certain` 6/6 |
+| lean | 8/8 | `certain` 6/6 |
+| legend | 8/8 | `certain` 6/6 |
+| naive | 8/8 | **`fairly sure` 6/6** |
+
+So: dropping the fields did not cost accuracy, and explaining them bought
+*certainty* rather than correctness.
+
+**Two things this does not say, and they matter more than what it does.**
+
+First, **the caveat that limits it.** Both naive runs got there by comparing the
+two boards — *"BOARD TWO uses `state:"planned"` when something isn't written
+yet, so the absence here is meaningful."* They recovered the convention from a
+sibling board that happened to be in the same prompt. That is an artefact of the
+test design, not a property of the payload. An agent holding only an
+all-default board has nothing to compare against, and that case was not tested.
+The naive arm's success is partly the test being generous, and it still only
+reached `fairly sure`.
+
+Second, **`omittedWhenDefault` bought no measured gain over the tool
+description.** Both reached `certain`. It is kept anyway, and that is a
+judgement call rather than a validated one: the description sits far from the
+payload in a real session and may not be retained, whereas a legend travels
+with the data. The measured cost of keeping it is 3 percentage points of the
+saving. Recorded as a choice, not as a result.
+
+**The test is also too easy to discriminate much.** An eight-node board, the
+documentation immediately adjacent, and four metadata questions in a row that
+cue careful reading. A harder version would separate the documentation from the
+payload by a long session, use a board with no sibling to compare against, and
+ask the question incidentally rather than as an exam. Read the 32/32 as *no
+evidence of harm at this scale*, not as *proved safe*.
+
+### Found by accident: the payload used words the docs never defined
+
+Every arm hedged on exactly one thing — `state: "external"` — and one said why
+outright: *"external is not defined in the tool docs I was given; I'm reading it
+as third-party."*
+
+It was right to hedge. The `read_diagram` description defined `recorded`,
+`inferred`, `declared`, `bound` and `nearest`, and defined **neither `built`,
+`planned` nor `external`** — while `omittedWhenDefault` named `built` as a
+default without ever saying what a state is. The three agents guessed correctly
+from the labels, which is luck, not documentation.
+
+Fixed: the description now says a state is built, planned (drawn as intent, not
+written yet) or external (real, and not yours to change).
+
+This is the third time this line of work has turned up documentation making a
+claim the code does not support, and the second found purely by accident. That
+pattern is now better evidence for #52's premise than any of the deliberate
+measurements.
 
 A further ~15 points sits in dropping JSON for a plain-text outline (1,317
 tokens). That is **not** free: it flattens multi-line labels and needs escaping
