@@ -345,6 +345,14 @@ this repository. The remaining five are `example.excalidraw`, which is genuinely
 mixed — "Board MCP server" and "ELK layout engine" are this repo, "Claude Code"
 and "You" are not — and needs per-box work rather than a board-level flag.
 
+That per-box work has since been done, by following `/annotate-diagram`: two
+boxes anchored, three declared `external`, and no box left unexplained. It cost
+one box on the diagram. Anchoring both ends of "Board MCP server → ELK layout
+engine" made that arrow flag, correctly — the server calls `diagram.ts`, which
+calls the layout engine — so the board gained a "Diagram builder" box rather than
+a looser anchor. The board now contributes 3 refs and 2 arrows to the check that
+it contributed nothing to before.
+
 ## Two jobs, deliberately separate
 
 | | Cost | Needs a model | When to run |
