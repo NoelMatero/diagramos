@@ -228,6 +228,46 @@ Two side results, unchanged from run one and still true:
 - **Raw file versus semantic payload is 12–16x on every board.** An agent that
   `cat`s an `.excalidraw` pays that multiple for the same graph.
 
+### Price, revisited (2026-08-18)
+
+The paragraph above stands as what was measured on the day, and the arms above
+were handed the payload it describes. It no longer describes what the tool
+sends.
+
+Asking where the tokens actually went turned up an answer that had nothing to
+do with diagrams. Of a `read_diagram` response, **58% was packaging**: `shape`
+said `rectangle`, `provenance` said `recorded`, `state` said `built`,
+`endpoints` said `declared` — the same four words repeated on every box and
+every arrow of every response — plus an `elementId` only an edit needs.
+`projectGraph` now omits a field sitting at its default, the read_diagram
+description states each default once per session instead, and `applyEdits`
+resolves semantic node ids so nothing needs the withheld handle.
+
+| | before | after |
+|---|---|---|
+| the same six anchored boards | 4,917 tokens | **2,060** |
+| against the prose floor | 1.5x more | **1.6x less** |
+| against every tracked `.md` | 8.0x less | **19.2x less** |
+
+The shipped total reads 2,100 rather than 2,060 because the same change added a
+`projection.ts` box to `board-internals`: a module inside a subsystem this repo
+draws should be drawn. Its one arrow is import-backed and checked.
+
+So the cheapness argument is back, and this time it is not doing any work it
+should not: nothing was dropped that a caller cannot ask for, and the recorded
+accuracy result above is untouched. The honest framing is that boards were
+never expensive — the envelope was.
+
+One unmeasured effect, stated as the guess it is: a lean payload reads
+differently. A `planned` box is now the only annotated thing on a board of
+plain ones, where before it was one `"state"` among sixty. Whether that helps
+an agent is exactly the kind of claim this brief exists to refuse until it is
+graded, and it has not been graded.
+
+A further ~15 points sits in dropping JSON for a plain-text outline (1,317
+tokens). That is **not** free: it flattens multi-line labels and needs escaping
+rules. It was measured, not shipped.
+
 ## What the redraw broke or could not do
 
 Reported because they are real and neither is fixed.

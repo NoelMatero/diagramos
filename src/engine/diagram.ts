@@ -9,7 +9,7 @@ import { convertSkeletons } from "./convert";
 import { installNodeFontMeasurer } from "./font";
 import { emptyBoard, type BoardFile } from "./board-file";
 import type { ExcalidrawElement } from "./normalize";
-import { NODE_SHAPES, type BoardDescribes } from "./graph";
+import { NODE_SHAPES, readGraph, type BoardDescribes } from "./graph";
 import {
   planBounds,
   planDiagramLayout,
@@ -572,7 +572,20 @@ export function applyEdits(
 ): EditResult {
   const byId = new Map(board.elements.map((element) => [String(element.id), element]));
 
-  const doomed = new Set(deletes.map(String));
+  // Callers address elements with whatever id read_diagram gave them, and that
+  // is the semantic node id -- "api", not a raw Excalidraw handle. Resolving it
+  // here is what lets a read drop elementId: without this an edit would skip
+  // every id the caller actually holds and report that nothing matched.
+  //
+  // A real element id always wins, so a node called the same thing as some
+  // element cannot shadow it.
+  const byNodeId = new Map<string, string>();
+  for (const node of readGraph(board).nodes) {
+    if (!byId.has(node.id)) byNodeId.set(node.id, node.elementId);
+  }
+  const resolve = (id: string) => (byId.has(id) ? id : byNodeId.get(id) ?? id);
+
+  const doomed = new Set(deletes.map((id) => resolve(String(id))));
   for (const id of [...doomed]) {
     for (const bound of (byId.get(id)?.boundElements as Array<{ id?: string; type?: string }> | undefined) ?? []) {
       if (bound?.type === "text" && bound.id) doomed.add(bound.id);
@@ -585,7 +598,7 @@ export function applyEdits(
   for (const update of updates) {
     const { id, props, ...rest } = update as { id?: unknown; props?: unknown };
     if (typeof id !== "string") continue;
-    patches.set(id, (props && typeof props === "object" ? props : rest) as Record<string, unknown>);
+    patches.set(resolve(id), (props && typeof props === "object" ? props : rest) as Record<string, unknown>);
   }
 
   const skipped = [...new Set([...patches.keys(), ...doomed].filter((id) => !byId.has(id)))];

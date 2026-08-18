@@ -12,15 +12,21 @@
  *
  *   raw          the .excalidraw file on disk. Every point of every stroke.
  *                What you get if an agent just cats the file. Never do this.
- *   geometry     readGraph as the engine sees it, coordinates included.
- *   semantic     what `read_diagram` actually returns -- server.ts drops x/y/
- *                width/height on the way out. This is the number to compare.
+ *   geometry     what `read_diagram geometry:true` returns: the same graph with
+ *                coordinates and element handles kept.
+ *   semantic     what `read_diagram` actually returns. This is the number to
+ *                compare, and it comes from `projectGraph` rather than a copy
+ *                of its rules, so the audit cannot drift away from the payload.
  *
- * On board-internals the semantic payload is ~4 kB against ~59 kB of raw file,
- * so the trim is worth roughly 15x. The geometry columns are the answer to the
+ * On board-internals the semantic payload is ~1.6 kB against ~59 kB of raw file,
+ * so the trim is worth roughly 37x. The geometry columns are the answer to the
  * doubt raised in #52 about `read_diagram` shipping coordinates nobody needs:
- * it does not, and has not since the trim in server.ts. Cost of the coordinates
- * had they been left in: about 12%, which is smaller than the issue assumed.
+ * it does not, and has not since the trim in server.ts.
+ *
+ * Those columns got further apart on purpose. Once the repeated defaults went,
+ * coordinates stopped being lost in the noise -- asking for them now roughly
+ * doubles a response instead of adding 12%. That is the trim working, not
+ * geometry getting more expensive.
  *
  * The comparison that decides #52 is `semantic` against PROSE. Note that PROSE
  * counts every tracked .md, which is the fair denominator only if you believe
@@ -45,6 +51,7 @@ import { fileURLToPath } from "node:url";
 const REPO = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 import { readBoard } from "../src/engine/board-file";
 import { readGraph } from "../src/engine/graph";
+import { projectGraph } from "../src/mcp/projection";
 
 /** chars/4. An estimate; see the header. */
 const tok = (chars: number) => Math.round(chars / 4);
@@ -122,14 +129,9 @@ for (const file of boards) {
   }
   const graph = readGraph(board);
 
-  // Mirror what src/mcp/server.ts does on the way out: geometry is dropped
-  // unless asked for. Keep this in step with the read_diagram handler.
-  const trimmed = {
-    ...graph,
-    nodes: graph.nodes.map(({ x: _x, y: _y, width: _w, height: _h, ...rest }) => rest),
-  };
-  const withGeometry = JSON.stringify(graph).length;
-  const semantic = JSON.stringify(trimmed).length;
+  // The real thing the model is sent, not an imitation of it.
+  const withGeometry = JSON.stringify(projectGraph(graph, { geometry: true, detailed: true })).length;
+  const semantic = JSON.stringify(projectGraph(graph)).length;
   const refs = graph.nodes.filter((n) => n.ref).length;
 
   rows.push({ rel, semantic, nodes: graph.nodes.length, refs });

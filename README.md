@@ -156,4 +156,4 @@ The `.mcp.json` here registers the server for this project, so edits to `src/` t
 
 **Output is deterministic.** Element ids and seeds are derived by hashing stable ids, so regenerating an unchanged diagram produces a byte-identical file. Diagrams diff usefully instead of churning every line.
 
-**Your drawings are never redrawn.** Generated elements carry a `customData` marker; anything without one is yours. Regeneration replaces only what it made before, and `read_diagram` labels every fact `recorded` (drawn by a tool, exact) or `inferred` (hand-drawn, derived from geometry), so a caller knows what to trust.
+**Your drawings are never redrawn.** Generated elements carry a `customData` marker; anything without one is yours. Regeneration replaces only what it made before, and `read_diagram` labels every fact `recorded` (drawn by a tool, exact) or `inferred` (hand-drawn, derived from geometry), so a caller knows what to trust. `recorded` is the default and is left out of the response rather than repeated on every box — along with `rectangle`, `built` and `declared`, which together were 58% of what a read cost.

@@ -123,7 +123,9 @@ describe("board MCP server", () => {
     expect(nodes.map((node) => node.id).sort()).toEqual(["api", "client", "db"]);
     expect(nodes.find((node) => node.id === "api")?.label).toBe("API");
     // Everything this tool drew must round-trip exactly, never be re-guessed.
-    expect(nodes.every((node) => node.provenance === "recorded")).toBe(true);
+    // Recorded is the default and is left out of the response, so what proves
+    // it round-tripped is that nothing came back inferred.
+    expect(nodes.every((node) => node.provenance === undefined)).toBe(true);
 
     const edges = graph.edges as Array<{ from: string; to: string; label?: string }>;
     expect(edges).toEqual(
@@ -167,6 +169,30 @@ describe("board MCP server", () => {
     // The shape must list the arrow too, or the editor drops the attachment.
     const source = board.elements.find((element: { id: string }) => element.id === arrow.startBinding.elementId);
     expect(source.boundElements.some((bound: { id: string }) => bound.id === arrow.id)).toBe(true);
+  }, 60_000);
+
+  /**
+   * read_diagram no longer hands out elementId by default, so the only id a
+   * caller normally holds is the node id. If an edit could not take that, the
+   * saving would have been paid for with a second read on every change -- or,
+   * worse, a silent "no element has these ids" on an id the tool just printed.
+   */
+  it("edits by the node id read_diagram actually returns", async () => {
+    const graph = jsonOf(await call("read_diagram", { path: BOARD }));
+    const clientNode = (graph.nodes as Array<Record<string, unknown>>).find((node) => node.id === "client");
+    expect(clientNode).not.toHaveProperty("elementId");
+
+    const result = jsonOf(await call("edit_diagram", {
+      path: BOARD,
+      updates: [{ id: "client", backgroundColor: "#b2f2bb" }],
+    }));
+    expect(result.skipped).toBeUndefined();
+
+    const board = JSON.parse(await readFile(path.join(workspace, BOARD), "utf8"));
+    const element = board.elements.find(
+      (item: { customData?: { node?: string } }) => item.customData?.node === "client",
+    );
+    expect(element.backgroundColor).toBe("#b2f2bb");
   }, 60_000);
 
   it("reports unknown ids instead of silently doing nothing", async () => {
@@ -411,6 +437,9 @@ describe("board MCP server", () => {
   it("keeps read_diagram lean by default and opt-in when detail is wanted", async () => {
     const board = "docs/diagrams/cost.excalidraw";
     const nodes = Array.from({ length: 20 }, (_, index) => ({ id: `n${index}`, label: `Node ${index}` }));
+    // One box that disagrees with every default, so the trim is proved to be
+    // dropping repetition rather than dropping content.
+    nodes.push({ id: "odd", label: "Odd", shape: "ellipse", state: "planned" } as (typeof nodes)[number]);
     await call("create_diagram", {
       path: board,
       title: "Cost",
@@ -428,10 +457,34 @@ describe("board MCP server", () => {
     expect(withGeometry.length).toBeGreaterThan(lean.length);
     const leanNodes = (JSON.parse(lean) as { nodes: Array<Record<string, unknown>> }).nodes;
     expect(leanNodes[0]).not.toHaveProperty("x");
-    expect(leanNodes[0]).toHaveProperty("elementId");
     expect(
       (JSON.parse(withGeometry) as { nodes: Array<Record<string, unknown>> }).nodes[0],
     ).toHaveProperty("x");
+
+    // Words every box repeats are not content. These are the documented
+    // defaults, so their absence is the claim; only the id, the label and
+    // whatever the board actually says survive.
+    for (const key of ["shape", "provenance", "state", "elementId"]) {
+      expect(leanNodes[0], key).not.toHaveProperty(key);
+    }
+    expect(leanNodes[0]).toEqual({ id: "n0", label: "Node 0" });
+    const leanEdges = (JSON.parse(lean) as { edges: Array<Record<string, unknown>> }).edges;
+    for (const key of ["provenance", "endpoints", "state", "elementId"]) {
+      expect(leanEdges[0], key).not.toHaveProperty(key);
+    }
+    // An empty array is four bytes saying nothing.
+    expect(JSON.parse(lean)).not.toHaveProperty("unattributed");
+
+    const odd = leanNodes.find((node) => node.id === "odd");
+    expect(odd).toEqual({ id: "odd", label: "Odd", shape: "ellipse", state: "planned" });
+
+    // Withheld, never lost: either detail flag brings the raw handle back for
+    // a caller that has to address an element directly.
+    for (const detailed of [withGeometry, withElements]) {
+      expect(
+        (JSON.parse(detailed) as { nodes: Array<Record<string, unknown>> }).nodes[0],
+      ).toHaveProperty("elementId");
+    }
 
     // Elements are projected to what an edit addresses, not dumped raw.
     const elements = (JSON.parse(withElements) as { elements: Array<Record<string, unknown>> }).elements;
