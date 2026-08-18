@@ -5,6 +5,7 @@
  *   diagramos                  # speak MCP over stdio -- what the plugin runs
  *   diagramos board            # the live board
  *   diagramos drift            # the drift check
+ *   diagramos stop             # stop board servers
  *
  * Bare `diagramos` has to stay the MCP server. `.claude-plugin/plugin.json`
  * runs `npx -y diagramos@<version>` with no arguments and then talks protocol
@@ -12,13 +13,13 @@
  * failed to handshake, with nothing readable to say why.
  *
  * Each subcommand stays a separate built file rather than a branch inside one
- * bundle, so starting the MCP server does not parse the board server and the
- * drift check on the way past. That is also why the import below goes through a
+ * bundle, so starting the MCP server does not parse the board server, the drift
+ * check and the stop command on the way past. That is also why the import below goes through a
  * URL: it is a sibling output resolved at runtime, not a module to inline.
  */
 
 /** Subcommand -> the file built beside this one. */
-const COMMANDS = { board: "board.mjs", drift: "drift.mjs" };
+const COMMANDS = { board: "board.mjs", drift: "drift.mjs", stop: "stop.mjs" };
 
 const USAGE = [
   "usage: diagramos [command]",
@@ -26,8 +27,9 @@ const USAGE = [
   "  diagramos              speak MCP over stdio (what the Claude Code plugin runs)",
   "  diagramos board        serve boards in a live local page",
   "  diagramos drift        report diagrams that no longer match the code",
+  "  diagramos stop         stop board servers (--list to see them first)",
   "",
-  "Both commands take --help of their own.",
+  "Every command takes --help of their own.",
 ].join("\n");
 
 const [first] = process.argv.slice(2);

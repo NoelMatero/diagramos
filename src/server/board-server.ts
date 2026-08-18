@@ -19,8 +19,18 @@ import path from "node:path";
 import { fileURLToPath } from "node:url";
 
 import { readBoard, serializeBoard, writeBoard, type BoardFile } from "../engine/board-file";
+import { processAlive, registerServer } from "./server-registry";
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "../..");
+
+/**
+ * How often a server with an owner checks that the owner is still there.
+ *
+ * Two seconds is chosen against the cost of being wrong in each direction: a
+ * server that lingers two seconds past its owner harms nobody, and polling this
+ * cheaply (one signal-0, no allocation) is invisible next to serving a file.
+ */
+const OWNER_POLL_MS = 2000;
 const VIEWER_DIR = path.join(ROOT, "out/viewer");
 
 const MIME_BY_EXT: Record<string, string> = {
@@ -78,6 +88,23 @@ export interface BoardServerOptions {
    * arbitrary file on disk.
    */
   root?: string;
+  /**
+   * The process this server belongs to. When it is given, the server checks
+   * whether that process is still alive and shuts down when it is not.
+   *
+   * This is what stops a spawned server from outliving whoever spawned it. A
+   * child is not killed when its parent dies -- it is reparented and keeps
+   * running -- which is how nine board servers came to be found here, the oldest
+   * five days old, four of them serving test directories that no longer existed.
+   *
+   * Left unset for a server that is *meant* to outlive its starter: the shared
+   * one a session opens for the user, whose whole point is that the board is
+   * still there when the session is gone. That one is stopped by asking, with
+   * `diagramos stop`, not by dying quietly.
+   */
+  ownerPid?: number;
+  /** Recorded in the registry so a listing can say where a server came from. */
+  startedBy?: string;
 }
 
 export interface RunningBoardServer {
@@ -135,6 +162,7 @@ export async function startBoardServer(options: BoardServerOptions): Promise<Run
   let file = path.resolve(options.file);
   const host = options.host ?? "127.0.0.1";
   const root = options.root ? path.resolve(options.root) : undefined;
+  const startedAt = new Date().toISOString();
 
   let nextSubscriberId = 0;
   /**
@@ -291,6 +319,9 @@ export async function startBoardServer(options: BoardServerOptions): Promise<Run
           file,
           revision: boards.get(file)?.revision,
           pid: process.pid,
+          ...(root ? { root } : {}),
+          startedAt,
+          ...(options.ownerPid ? { owner: options.ownerPid } : {}),
           // Tells another process that `?file=` is understood here. Without it a
           // newer session would hand out pinned URLs to an older server, which
           // ignores the query and silently serves the wrong board.
@@ -408,6 +439,57 @@ export async function startBoardServer(options: BoardServerOptions): Promise<Run
     });
   });
 
+  /*
+   * Registered only once it is actually listening. An entry written before the
+   * bind could describe a server that never came up, and `stop` would report a
+   * board that was never there.
+   */
+  const unregister = await registerServer({
+    pid: process.pid,
+    port,
+    ...(root ? { root } : {}),
+    startedAt,
+    ...(options.ownerPid ? { owner: options.ownerPid } : {}),
+    ...(options.startedBy ? { startedBy: options.startedBy } : {}),
+  });
+
+  /*
+   * The owner watchdog. Polling rather than waiting on an event because there is
+   * no portable notification for "my parent died" -- on macOS and Linux the
+   * child simply gets reparented and carries on serving.
+   *
+   * Unref'd so it never keeps the process alive on its own: the point is to end
+   * a process, never to extend one.
+   */
+  let watchdog: NodeJS.Timeout | undefined;
+  if (options.ownerPid !== undefined) {
+    const owner = options.ownerPid;
+    watchdog = setInterval(() => {
+      if (processAlive(owner)) return;
+      clearInterval(watchdog);
+      void close().then(
+        () => process.exit(0),
+        () => process.exit(0),
+      );
+    }, OWNER_POLL_MS);
+    watchdog.unref();
+  }
+
+  async function close(): Promise<void> {
+    if (watchdog) clearInterval(watchdog);
+    for (const watcher of watchers.values()) watcher.close();
+    watchers.clear();
+    for (const state of boards.values()) {
+      if (state.debounce) clearTimeout(state.debounce);
+      for (const subscriber of state.subscribers) subscriber.response.end();
+      state.subscribers = [];
+    }
+    for (const subscriber of followers) subscriber.response.end();
+    followers = [];
+    await new Promise<void>((resolve) => server.close(() => resolve()));
+    await unregister();
+  }
+
   return {
     url: `http://${host}:${port}/`,
     port,
@@ -421,18 +503,7 @@ export async function startBoardServer(options: BoardServerOptions): Promise<Run
     boards() {
       return [file, ...[...boards.keys()].filter((candidate) => candidate !== file)];
     },
-    async close() {
-      for (const watcher of watchers.values()) watcher.close();
-      watchers.clear();
-      for (const state of boards.values()) {
-        if (state.debounce) clearTimeout(state.debounce);
-        for (const subscriber of state.subscribers) subscriber.response.end();
-        state.subscribers = [];
-      }
-      for (const subscriber of followers) subscriber.response.end();
-      followers = [];
-      await new Promise<void>((resolve) => server.close(() => resolve()));
-    },
+    close,
   };
 }
 
@@ -446,6 +517,18 @@ export interface BoardProbe {
    */
   multiBoard?: boolean;
   boards?: string[];
+  /**
+   * The server's process id. `/api/health` has always returned this; it was
+   * missing here, so `board_status` could not pass it on and the model had to
+   * shell out to `lsof` to answer "what is showing my diagrams".
+   */
+  pid?: number;
+  /** The project it serves. Absent on an unrooted server. */
+  root?: string;
+  /** ISO 8601, so a listing can say how long it has been running. */
+  startedAt?: string;
+  /** The process it belongs to and will not outlive, when it has one. */
+  owner?: number;
 }
 
 /** What the board server on this port says about itself, if one is there. */

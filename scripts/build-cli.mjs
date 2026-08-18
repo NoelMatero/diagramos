@@ -20,7 +20,7 @@
  *   src/engine/render.ts   -> vendor/excalidraw-browser.js
  *   src/server/board-server.ts -> out/viewer
  *
- * Bundling collapses all three onto this output file, so its depth *is* their
+ * Bundling collapses them all onto this output file, so its depth *is* their
  * root calculation. Moving this output one directory shallower or deeper breaks
  * rendering and the live board at runtime, silently, in a way tests running from
  * source cannot see. The assertion below fails the build instead.
@@ -41,12 +41,13 @@ assert.equal(
 );
 
 const entries = [
-  // The bin. Dispatches to the three below, which stay separate files so one
-  // command does not pay to parse the other two.
+  // The bin. Dispatches to the four below, which stay separate files so one
+  // command does not pay to parse the others.
   { entry: "scripts/diagramos.mjs", outfile: `${OUT_DIR}/diagramos.mjs`, label: "dispatcher" },
   { entry: "src/mcp/server.ts", outfile: `${OUT_DIR}/server.mjs`, label: "MCP server" },
   { entry: "scripts/check-drift.mjs", outfile: `${OUT_DIR}/drift.mjs`, label: "drift check" },
   { entry: "scripts/board.mjs", outfile: `${OUT_DIR}/board.mjs`, label: "live board" },
+  { entry: "scripts/stop.mjs", outfile: `${OUT_DIR}/stop.mjs`, label: "stop" },
 ];
 
 for (const target of entries) {

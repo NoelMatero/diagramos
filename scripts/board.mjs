@@ -50,6 +50,9 @@ const USAGE = [
   "",
   "  DIAGRAMOS_PORT       port to serve on (default 4747)",
   "  DIAGRAMOS_NO_OPEN=1  do not launch a browser",
+  "",
+  "  diagramos stop --list  what is already running",
+  "  diagramos stop         stop it, from any terminal",
 ].join("\n");
 
 if (args.includes("--help") || args.includes("-h")) {
@@ -179,10 +182,34 @@ if (shared) {
   process.exit(0);
 }
 
+/*
+ * Who this server belongs to.
+ *
+ * Run by a person in a terminal, it belongs to that terminal: closing the window
+ * sends SIGHUP and it goes with it, which is already the right behaviour and
+ * needs no help. Run by another process -- a test, a script -- nobody is coming
+ * back for it, and a child is *not* killed when its parent dies, it is
+ * reparented and keeps serving. That is what left nine of these running here,
+ * four of them serving test directories that had already been deleted.
+ *
+ * So a non-interactive start adopts its parent and shuts down when the parent is
+ * gone. On by default rather than behind a flag: the runs that leak are exactly
+ * the ones nobody was watching closely enough to pass a flag to.
+ *
+ * A parent of 1 means there is nobody left to watch -- already orphaned, or
+ * started detached on purpose. Adopting launchd would report an owner that can
+ * never die, which reads as "someone is coming back for this" when nobody is.
+ */
+const ownerPid = process.stdout.isTTY || process.ppid <= 1 ? undefined : process.ppid;
+
 let port = wanted;
 let server;
+const startOptions = {
+  root,
+  ...(ownerPid ? { ownerPid, startedBy: `diagramos board (parent pid ${ownerPid})` } : { startedBy: "diagramos board" }),
+};
 try {
-  server = await startBoardServer({ file: boards[0], port, root });
+  server = await startBoardServer({ file: boards[0], port, ...startOptions });
 } catch (error) {
   if (error?.code !== "EADDRINUSE") throw error;
   // Something else holds the usual port: another project's board, or a program
@@ -190,7 +217,7 @@ try {
   // and saying whose it is beats leaving someone to hunt for the process.
   const occupant = await probeBoard(wanted);
   port = await freePort();
-  server = await startBoardServer({ file: boards[0], port, root });
+  server = await startBoardServer({ file: boards[0], port, ...startOptions });
   console.log(
     occupant?.file
       ? `port ${wanted} is serving ${path.dirname(occupant.file)} (pid ${occupant.pid}) — using ${port} instead`
@@ -210,7 +237,9 @@ for (const board of boards) {
   console.log(`board  ${path.relative(root, board)}`);
   console.log(`live   ${urlFor(board)}`);
 }
-console.log("ctrl-c to stop");
+// Both ways of stopping it, because the second one is the answer when this
+// terminal is gone and the server is not.
+console.log("ctrl-c to stop, or diagramos stop from anywhere");
 
 openBrowser(urlFor(boards[0]));
 
