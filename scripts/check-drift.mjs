@@ -514,7 +514,8 @@ const showing = expanded ? stale : worthANotice;
  * Its own box, not folded into the drift tally: "2 gone" is a claim going wrong,
  * while this is a suggestion about what might be worth drawing, and mixing them
  * would let a suggestion read as a defect. Ranked most-imported first by the
- * engine, so the module several boxes depend on sits at the top.
+ * engine, so the module several boxes depend on sits at the top, with the
+ * entry points that call into the board after them.
  */
 function renderCoverage(entries, colour) {
   return box({
@@ -523,9 +524,14 @@ function renderCoverage(entries, colour) {
         + "  "
         + paint(entry.report.unrepresented.length + " not shown", "dim", colour),
       rows: entry.report.unrepresented.map((missing) => {
-        const count = missing.importedBy.length;
+        // Which way the import runs. `<-` is a module the boxes lean on; `->`
+        // is a surface that calls in and that nothing imports back, so no
+        // amount of drawing would have made it show up in the first list.
+        const inbound = missing.imports ?? null;
+        const count = inbound ? inbound.length : missing.importedBy.length;
         const noun = count === 1 ? "box" : "boxes";
-        return missing.file + "  " + paint("\u2190 " + count + " " + noun, "dim", colour);
+        const arrow = inbound ? "\u2192 " : "\u2190 ";
+        return missing.file + "  " + paint(arrow + count + " " + noun, "dim", colour);
       }),
     })),
     foot: "suggestions, not drift \u00b7 add a box or ignore",
