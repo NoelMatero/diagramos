@@ -5,7 +5,8 @@
  *   diagramos                  # speak MCP over stdio -- what the plugin runs
  *   diagramos board            # the live board
  *   diagramos drift            # the drift check
- *   diagramos stop             # stop board servers
+ *   diagramos stop             # stop board services
+ *   diagramos serve            # the background board service, normally started for you
  *
  * Bare `diagramos` has to stay the MCP server. `.claude-plugin/plugin.json`
  * runs `npx -y diagramos@<version>` with no arguments and then talks protocol
@@ -19,7 +20,7 @@
  */
 
 /** Subcommand -> the file built beside this one. */
-const COMMANDS = { board: "board.mjs", drift: "drift.mjs", stop: "stop.mjs" };
+const COMMANDS = { board: "board.mjs", drift: "drift.mjs", stop: "stop.mjs", serve: "serve.mjs" };
 
 const USAGE = [
   "usage: diagramos [command]",
@@ -27,7 +28,8 @@ const USAGE = [
   "  diagramos              speak MCP over stdio (what the Claude Code plugin runs)",
   "  diagramos board        serve boards in a live local page",
   "  diagramos drift        report diagrams that no longer match the code",
-  "  diagramos stop         stop board servers (--list to see them first)",
+  "  diagramos stop         stop board services (--list to see them first)",
+  "  diagramos serve        run the background board service in the foreground",
   "",
   "Every command takes --help of their own.",
 ].join("\n");

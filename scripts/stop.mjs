@@ -1,11 +1,11 @@
 #!/usr/bin/env node
 /**
- * Sees and stops board servers.
+ * Sees and stops board services.
  *
- *   diagramos stop           # stop every board server running on this machine
+ *   diagramos stop           # stop every board service running on this machine
  *   diagramos stop --list    # show them, stop nothing
  *
- * This exists because a board server has no fixed address. It takes 4747 when
+ * This exists because a board service has no fixed address. It takes 4747 when
  * that is free and an ephemeral port when it is not, so there was no way to find
  * one without `lsof`, and no way to stop one without reading a pid out of it.
  * Nine were once found running here, on eight ports, the oldest five days old.
@@ -20,7 +20,7 @@ import { listServers, stopServer } from "../src/server/server-registry.ts";
 const USAGE = [
   "usage: diagramos stop [--list]",
   "",
-  "  no arguments   stop every board server running on this machine",
+  "  no arguments   stop every board service running on this machine",
   "  --list         show what is running, stop nothing",
   "",
   "A board is a file in your repository. Stopping its server closes the live",
@@ -92,12 +92,12 @@ if (pruned > 0) {
 }
 
 if (running.length === 0) {
-  console.log("no board servers running");
+  console.log("no board services running");
   process.exit(0);
 }
 
 if (listOnly) {
-  console.log(`${running.length} board ${running.length === 1 ? "server" : "servers"} running`);
+  console.log(`${running.length} board ${running.length === 1 ? "service" : "services"} running`);
   for (const entry of running) console.log(`  ${describe(entry)}`);
   console.log("");
   console.log("diagramos stop  stops all of them");
@@ -125,7 +125,7 @@ console.log("");
 console.log(
   stopped === 0
     ? "nothing left to stop"
-    : `stopped ${stopped} board ${stopped === 1 ? "server" : "servers"}. Your diagrams are untouched — run diagramos board to look again.`,
+    : `stopped ${stopped} board ${stopped === 1 ? "service" : "services"}. Your diagrams are untouched — run diagramos board to look again.`,
 );
 
 // A server that refused to die is the one case where a caller scripting this

@@ -41,13 +41,14 @@ assert.equal(
 );
 
 const entries = [
-  // The bin. Dispatches to the four below, which stay separate files so one
+  // The bin. Dispatches to the five below, which stay separate files so one
   // command does not pay to parse the others.
   { entry: "scripts/diagramos.mjs", outfile: `${OUT_DIR}/diagramos.mjs`, label: "dispatcher" },
   { entry: "src/mcp/server.ts", outfile: `${OUT_DIR}/server.mjs`, label: "MCP server" },
   { entry: "scripts/check-drift.mjs", outfile: `${OUT_DIR}/drift.mjs`, label: "drift check" },
   { entry: "scripts/board.mjs", outfile: `${OUT_DIR}/board.mjs`, label: "live board" },
   { entry: "scripts/stop.mjs", outfile: `${OUT_DIR}/stop.mjs`, label: "stop" },
+  { entry: "scripts/serve.mjs", outfile: `${OUT_DIR}/serve.mjs`, label: "board service" },
 ];
 
 for (const target of entries) {

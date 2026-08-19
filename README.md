@@ -54,19 +54,25 @@ Ask Claude to open a board, or start one yourself in any project:
 ```bash
 npx -y diagramos board                    # every board in docs/diagrams
 npx -y diagramos board docs/diagrams/architecture.excalidraw
-npx -y diagramos stop --list              # every board server running here
+npx -y diagramos stop --list              # every board service running here
 npx -y diagramos stop                     # stop them
 ```
 
 Working inside this repo, `npm run board` is the same command.
 
-A local page on `127.0.0.1:4747` showing the file. One port serves every project, so if a board from somewhere else already holds it, `diagramos board` says whose it is and moves to a free port rather than failing to start. A board already serving *this* project is shared instead of duplicated. Anything that writes it — a tool, your editor, `git checkout` — appears immediately over SSE, and anything you draw is written straight back. Both sides edit one artifact.
+A local page on `127.0.0.1:4747` showing the file. Anything that writes it — a tool, your editor, `git checkout` — appears immediately over SSE, and anything you draw is written straight back. Both sides edit one artifact.
+
+The command does not hold your terminal. It makes sure a background board service is running and gives you back the prompt, so closing that window — or ending the Claude session that opened the board — leaves the boards up. One service per project: run the command again, or open a board from a session, and you get the one that is already there rather than a second. One port serves every project, so if another project already holds 4747 this one takes a free port, and the registry is what makes that port findable again.
+
+`127.0.0.1:4747/boards` lists every board the service can show and carries a button that stops it, for the times you would rather not reach for a command.
 
 Conflicts resolve in your favour. A save carrying a stale revision is refused with the current board attached, so an agent write cannot discard a stroke you just made.
 
-**Stopping one.** A board Claude opens for you deliberately outlives the session that opened it — a diagram you are reading should not vanish because a terminal closed. `diagramos stop --list` says what is running, where it came from and how long it has been up, and `diagramos stop` stops it. That works from any terminal, including one that has nothing to do with the session that started the server, which is the point: a board server takes a free port when 4747 is busy, and finding one used to mean `lsof`.
+**Stopping one.** A board you or Claude opens outlives the thing that opened it — a diagram you are reading should not vanish because a terminal closed or a session ended. `diagramos stop --list` says what is running, where it came from and how long it has been up, and `diagramos stop` stops it. That works from any terminal, including one with nothing to do with the session that started the service, which is the point: a service takes a free port when 4747 is busy, and finding one used to mean `lsof`.
 
-A server started *on another process's behalf* is not left to you to notice. It records who started it and shuts down when that process is gone, because a child process is not killed when its parent dies — it is reparented and keeps serving. Nine of them were once found running on one machine, the oldest five days old, four still serving test directories that had been deleted.
+It also stops itself. After twelve hours with no page open and no request, a service shuts down; an open page holds a live stream, so a board you are actually using is never idle. Set `DIAGRAMOS_IDLE_HOURS` to change that, or to `0` to keep a service until you stop it yourself. Nothing is lost when it fires — a board is a file in your repository, and the next `diagramos board` has a service back in under a second.
+
+That combination is what ended the original bug: nine board servers were once found running on one machine, on eight different ports, the oldest five days old and four still serving test directories that had been deleted. They accumulated because each one belonged to whatever process happened to start it, and none of them could be seen. Now a project has one service, it is in a registry that `stop` reads, and it does not sit there forever.
 
 Stopping a server closes the live page and nothing else. The board is a file in your repository; it is still there, still in git, still openable in any Excalidraw editor.
 
