@@ -242,6 +242,78 @@ describe("board server", () => {
   }, 20_000);
 
   /**
+   * #70: the follow URL means "whatever board is current", which is right for
+   * reading and catastrophic for writing -- a save composed against one board
+   * can land on whichever file the server was switched to in the meantime.
+   * Observed as a freshly generated board wiped within seconds of a switch.
+   * So a save names the file its scene came from, and lands there.
+   */
+  it("writes a save to the file its scene came from, not the one now followed", async () => {
+    const next = path.join(workspace, "switched-to.excalidraw");
+    await writeBoard(next, boardWith("n1", "n2"));
+
+    // A client loaded the followed board...
+    const loaded = (await (await fetch(api("/api/board"))).json()) as {
+      revision: string;
+      file: string;
+      board: BoardFile;
+    };
+    // ...then the server was pointed at a different file...
+    await server.setFile(next);
+    // ...and the client's save -- its scene plus one stroke -- arrives late.
+    const ids = loaded.board.elements.map((element) => String(element.id));
+    const response = await fetch(api("/api/board"), {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        revision: loaded.revision,
+        file: loaded.file,
+        board: boardWith(...ids, "stroke"),
+      }),
+    });
+    expect(response.status).toBe(200);
+
+    // The stroke landed on the board it was drawn on.
+    const origin = await readBoard(loaded.file);
+    expect(origin.elements.map((element) => element.id)).toContain("stroke");
+    // The newly followed board holds nothing of the old one.
+    const followed = await readBoard(next);
+    expect(followed.elements.map((element) => element.id)).toEqual(["n1", "n2"]);
+
+    await server.setFile(boardFile);
+  }, 20_000);
+
+  it("refuses a save naming a file outside the root", async () => {
+    const before = await readBoard(boardFile);
+    const response = await fetch(api("/api/board"), {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ revision: "0000000000000000", file: "/etc/hosts", board: boardWith("evil") }),
+    });
+    expect(response.status).toBe(403);
+    expect((await readBoard(boardFile)).elements.length).toBe(before.elements.length);
+  }, 20_000);
+
+  /**
+   * A write that makes no claim about what it replaces is exactly the shape of
+   * a wipe: the revision check is the only thing standing between a stale
+   * client and the file, and an absent revision used to walk straight past it.
+   */
+  it("refuses a save that carries no revision", async () => {
+    const before = await readBoard(boardFile);
+    const response = await fetch(api("/api/board"), {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ board: boardWith("blind") }),
+    });
+    expect(response.status).toBe(400);
+    const after = await readBoard(boardFile);
+    expect(after.elements.map((element) => element.id)).toEqual(
+      before.elements.map((element) => element.id),
+    );
+  }, 20_000);
+
+  /**
    * Number("abc") is NaN, and NaN is not nullish, so a coerced port survives
    * every `?? default` on the way down to listen(). The reason to refuse rather
    * than fall back is diagnostic: a NaN port makes the health probe report "no
@@ -297,10 +369,11 @@ describe("board server serving several boards", () => {
 
   it("writes to the board named in the query and leaves the other alone", async () => {
     const before = await readBoard(boardFile);
+    const loaded = (await (await fetch(pinned("/api/board", second()))).json()) as { revision: string };
     const response = await fetch(pinned("/api/board", second()), {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ board: boardWith("s1", "s2", "s3") }),
+      body: JSON.stringify({ revision: loaded.revision, board: boardWith("s1", "s2", "s3") }),
     });
     expect(response.status).toBe(200);
 
