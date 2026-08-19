@@ -9,6 +9,7 @@ import { beforeAll, afterAll } from "vitest";
 import fs from "node:fs/promises";
 import os from "node:os";
 import path from "node:path";
+import { createServer } from "node:net";
 import { initEngine, resetEngineCache } from "../src/engine/parse";
 import { resetBodyCache } from "../src/engine/body";
 import { listServers, stopServer } from "../src/server/server-registry";
@@ -24,6 +25,31 @@ import { listServers, stopServer } from "../src/server/server-registry";
  * which is what keeps the built CLI's servers inside the throwaway too.
  */
 process.env.DIAGRAMOS_STATE_DIR = await fs.mkdtemp(path.join(os.tmpdir(), "diagramos-registry-"));
+
+/*
+ * And a port that is nobody's.
+ *
+ * Individual files pin their own, but a file that forgets asks for 4747 -- and
+ * on any machine this tool is actually used on, that is the developer's own
+ * board. The suite would then compete with it for the port, and answer "is this
+ * machine quiet" alongside "is the code right" (#77).
+ *
+ * Set here rather than left to each file, because the failure of forgetting is
+ * invisible: falling back to a free port works, so a test that took somebody's
+ * board away still passes. Inherited by every subprocess a test spawns, which is
+ * what puts the built CLI inside the same guarantee.
+ */
+process.env.DIAGRAMOS_PORT = String(
+  await new Promise<number>((resolve, reject) => {
+    const probe = createServer();
+    probe.once("error", reject);
+    probe.listen(0, "127.0.0.1", () => {
+      const address = probe.address();
+      if (address && typeof address === "object") probe.close(() => resolve(address.port));
+      else probe.close(() => reject(new Error("no port")));
+    });
+  }),
+);
 
 beforeAll(async () => { await initEngine(); });
 
