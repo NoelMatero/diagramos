@@ -68,7 +68,8 @@ async function until(predicate: () => boolean | Promise<boolean>, timeoutMs = 15
  * servers are registered" must not count one another test left mid-run.
  */
 beforeEach(async () => {
-  workspace = await fs.mkdtemp(path.join(os.tmpdir(), "board-lifecycle-"));
+  // Resolved: the board service reports resolved paths, and /var is a link.
+  workspace = await fs.realpath(await fs.mkdtemp(path.join(os.tmpdir(), "board-lifecycle-")));
   stateDir = path.join(workspace, "state");
   process.env.DIAGRAMOS_STATE_DIR = stateDir;
   await fs.mkdir(path.join(workspace, "docs/diagrams"), { recursive: true });

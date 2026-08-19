@@ -98,6 +98,40 @@ describe("a second project", () => {
     }
   }, 60_000);
 
+  it("is found through a path that goes the long way round, rather than started twice", async () => {
+    /*
+     * A service records `process.cwd()`, which the operating system has already
+     * resolved; a caller's path usually has not been. On macOS every temporary
+     * directory is reached through `/var`, a link to `/private/var` -- so the
+     * two spellings of one project never matched, a service was started and
+     * registered and then never found again, and the next caller started
+     * another. Exactly the pile this was all meant to end.
+     */
+    const here = await makeProject("alpha");
+    const other = await makeProject("beta");
+    // A marker, so the project resolves to the repository rather than to the
+    // directory the board sits in -- the fallback for a directory nothing
+    // claims, and not what is being measured here.
+    await fs.mkdir(path.join(other, ".git"), { recursive: true });
+    const link = path.join(home, "by-another-name");
+    await fs.symlink(other, link);
+
+    await run(here, ["board"]);
+    // Named through the link, from somewhere else. The project this resolves to
+    // is worked out from the path, not from a working directory -- a working
+    // directory arrives already resolved, which is why this is the case that
+    // reaches the problem.
+    const viaLink = await run(here, ["board", path.join(link, "docs/diagrams/architecture.excalidraw")]);
+    expect(viaLink.code, viaLink.stderr).toBe(0);
+
+    const { running } = await listServers();
+    expect(running).toHaveLength(1);
+    // Recorded under the name the project really has, so the next caller --
+    // spelling it either way -- finds this service instead of starting another.
+    expect(running[0]!.roots).toContain(other);
+    expect(running[0]!.roots).not.toContain(link);
+  }, 60_000);
+
   it("is listed under its own heading by the command that stops them", async () => {
     const first = await makeProject("alpha");
     const second = await makeProject("beta");
@@ -166,6 +200,36 @@ describe("the boundary a service keeps", () => {
       const response = await fetch(`http://127.0.0.1:${server.port}/api/board?file=${encodeURIComponent(secret)}`);
       expect(response.status).toBe(403);
       expect(await response.text()).not.toContain("hunter2");
+    } finally {
+      await server.close();
+    }
+  }, 30_000);
+
+  it("is not walked past by a link inside a project pointing out of it", async () => {
+    /*
+     * The reason the check resolves symlinks rather than comparing the path it
+     * was given. A link is a perfectly ordinary thing to find in a repository,
+     * and `docs/diagrams/elsewhere.excalidraw -> /somewhere/secret.excalidraw`
+     * sits inside the project by every test that only looks at the text of the
+     * path.
+     */
+    const project = await makeProject("alpha");
+    const outside = await fs.mkdtemp(path.join(home, "outside-"));
+    const secret = path.join(await fs.realpath(outside), "secret.excalidraw");
+    await fs.writeFile(secret, serializeBoard(emptyBoard()), "utf8");
+    const link = path.join(project, "docs/diagrams/elsewhere.excalidraw");
+    await fs.symlink(secret, link);
+
+    const server = await startBoardServer({
+      file: path.join(project, "docs/diagrams/architecture.excalidraw"),
+      port: 0,
+      root: project,
+    });
+    try {
+      const response = await fetch(
+        `http://127.0.0.1:${server.port}/api/board?file=${encodeURIComponent(link)}`,
+      );
+      expect(response.status).toBe(403);
     } finally {
       await server.close();
     }

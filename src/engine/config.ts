@@ -18,7 +18,7 @@
  * Not `.diagramos/`, which is in .gitignore and holds local per-user state.
  * Not package.json, because this tool is language-agnostic on purpose.
  */
-import { readFileSync } from "node:fs";
+import { existsSync, readFileSync } from "node:fs";
 import path from "node:path";
 
 /** Committed, at the repository root. Absent in almost every project. */
@@ -96,4 +96,32 @@ export function readProjectConfig(root: string): ProjectConfig {
 /** Repo-relative directory this project keeps its boards in. */
 export function diagramDir(root: string): string {
   return readProjectConfig(root).diagrams;
+}
+
+/**
+ * The project a file belongs to: the nearest directory above it that a project
+ * marks itself with.
+ *
+ * Needed because a board can be named from anywhere now that one service holds
+ * several projects, and "which project is this" decides two things that matter:
+ * the directory the service is allowed to serve, and the tree a board's refs
+ * are resolved in. Guessing the board's own directory for both would confine a
+ * service to `docs/diagrams` and make every ref above it read as drift.
+ *
+ * `.diagramos.json` first because a project that says where its diagrams live
+ * has said where its root is; `.git` otherwise, which is the boundary almost
+ * every repository already has. Neither present, the file's own directory is
+ * the honest answer -- narrower than the truth, never wider.
+ */
+export function projectRootFor(file: string): string {
+  let directory = path.dirname(path.resolve(file));
+  // Stops at the filesystem root, where dirname returns its argument unchanged.
+  for (;;) {
+    if (existsSync(path.join(directory, CONFIG_FILE)) || existsSync(path.join(directory, ".git"))) {
+      return directory;
+    }
+    const parent = path.dirname(directory);
+    if (parent === directory) return path.dirname(path.resolve(file));
+    directory = parent;
+  }
 }

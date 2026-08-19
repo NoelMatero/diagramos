@@ -13,7 +13,7 @@
  */
 import { createHash, randomBytes, timingSafeEqual } from "node:crypto";
 import { watch, type FSWatcher } from "node:fs";
-import { readFile, stat } from "node:fs/promises";
+import { readFile, realpath, stat } from "node:fs/promises";
 import { createServer, type IncomingMessage, type Server, type ServerResponse } from "node:http";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
@@ -225,10 +225,39 @@ interface BoardState {
   debounce?: NodeJS.Timeout;
 }
 
+/**
+ * A path with every symlink resolved, which is the only spelling a confinement
+ * check can be made against.
+ *
+ * Two reasons, and the second is the important one. A caller's path often has
+ * not been resolved -- on macOS `/var` is a link to `/private/var` -- so a
+ * project can be named one way by whoever started the service and another way by
+ * whoever asks it for a board, and an honest request is refused. And a link
+ * *inside* a project pointing out of it is how a check against the unresolved
+ * path gets walked straight past.
+ *
+ * Something that does not exist yet is resolved through its parent instead, so
+ * naming a new board still works but cannot describe a place its directory does
+ * not really lead.
+ */
+async function realPathOf(target: string): Promise<string> {
+  try {
+    return await realpath(target);
+  } catch {
+    try {
+      return path.join(await realpath(path.dirname(target)), path.basename(target));
+    } catch {
+      return target;
+    }
+  }
+}
+
 export async function startBoardServer(options: BoardServerOptions): Promise<RunningBoardServer> {
-  let file = path.resolve(options.file);
   const host = options.host ?? "127.0.0.1";
-  const root = options.root ? path.resolve(options.root) : undefined;
+  // Roots and boards are held resolved, so every comparison between them is
+  // between two paths spelled the same way.
+  const root = options.root ? await realPathOf(path.resolve(options.root)) : undefined;
+  let file = await realPathOf(path.resolve(options.file));
   const startedAt = new Date().toISOString();
   /*
    * Every project this service will serve. It starts as the one it was told
@@ -334,7 +363,7 @@ export async function startBoardServer(options: BoardServerOptions): Promise<Run
   await track(file);
 
   const setFile = async (next: string): Promise<void> => {
-    const resolved = path.resolve(next);
+    const resolved = await realPathOf(path.resolve(next));
     if (resolved === file) return;
     const state = await track(resolved);
     file = resolved;
@@ -350,7 +379,7 @@ export async function startBoardServer(options: BoardServerOptions): Promise<Run
    * is refused — the query string is as much an untrusted input as the
    * takeover endpoint's body.
    */
-  const requestedFile = (url: URL): { file?: string; error?: string } => {
+  const requestedFile = async (url: URL): Promise<{ file?: string; error?: string }> => {
     const raw = url.searchParams.get("file");
     if (!raw) return { file };
     /*
@@ -361,7 +390,7 @@ export async function startBoardServer(options: BoardServerOptions): Promise<Run
      * Boards in adopted projects are named by absolute path for that reason.
      */
     const resolved = path.isAbsolute(raw) ? path.resolve(raw) : path.resolve(root ?? ROOT, raw);
-    return checkInRoots(resolved);
+    return await checkInRoots(resolved);
   };
 
   /**
@@ -382,7 +411,7 @@ export async function startBoardServer(options: BoardServerOptions): Promise<Run
   };
 
   /** A board is a `.excalidraw` file inside one of the projects this service serves. */
-  const checkInRoots = (resolved: string): { file?: string; error?: string } => {
+  const checkInRoots = async (resolved: string): Promise<{ file?: string; error?: string }> => {
     /*
      * Boards only. Every path that reaches here is read as a board and handed
      * back, so without this the confinement would still allow any file in the
@@ -394,12 +423,15 @@ export async function startBoardServer(options: BoardServerOptions): Promise<Run
       return { error: "a board is a .excalidraw file" };
     }
     if (!roots.length) return { file: resolved };
+    const real = await realPathOf(resolved);
     const inside = roots.some((candidate) => {
-      const relative = path.relative(candidate, resolved);
+      const relative = path.relative(candidate, real);
       return !relative.startsWith("..") && !path.isAbsolute(relative);
     });
     if (!inside) return { error: `file is outside the projects this board service serves` };
-    return { file: resolved };
+    // The resolved path onward, so everything downstream -- watchers, the board
+    // map, what a page is told it is showing -- agrees on one name per file.
+    return { file: real };
   };
 
   /**
@@ -499,7 +531,7 @@ export async function startBoardServer(options: BoardServerOptions): Promise<Run
         if (typeof payload.root !== "string" || !payload.root) {
           return json(response, 400, { error: "root is required" });
         }
-        const added = path.resolve(payload.root);
+        const added = await realPathOf(path.resolve(payload.root));
         if (!(await fileExists(added))) {
           return json(response, 404, { error: `no such directory: ${added}` });
         }
@@ -582,7 +614,7 @@ export async function startBoardServer(options: BoardServerOptions): Promise<Run
         if (typeof payload.file !== "string" || !payload.file) {
           return json(response, 400, { error: "file is required" });
         }
-        const requested = checkInRoots(path.resolve(payload.file));
+        const requested = await checkInRoots(path.resolve(payload.file));
         if (!requested.file) return json(response, 403, { error: requested.error });
         if (!(await fileExists(requested.file))) {
           return json(response, 404, { error: `no such file: ${requested.file}` });
@@ -599,7 +631,7 @@ export async function startBoardServer(options: BoardServerOptions): Promise<Run
        * server growing a file-system watcher over the whole repository.
        */
       if (request.method === "GET" && url.pathname === "/api/drift") {
-        const target = requestedFile(url);
+        const target = await requestedFile(url);
         if (!target.file) return json(response, 403, { error: target.error });
         if (!(await fileExists(target.file))) {
           return json(response, 404, { error: `no such file: ${target.file}` });
@@ -616,7 +648,7 @@ export async function startBoardServer(options: BoardServerOptions): Promise<Run
       }
 
       if (request.method === "GET" && url.pathname === "/api/board") {
-        const target = requestedFile(url);
+        const target = await requestedFile(url);
         if (!target.file) return json(response, 403, { error: target.error });
         if (!(await fileExists(target.file))) {
           return json(response, 404, { error: `no such file: ${target.file}` });
@@ -654,14 +686,14 @@ export async function startBoardServer(options: BoardServerOptions): Promise<Run
           // root it would refuse every save in an adopted project, and it would
           // be the one way in that never got narrowed to boards -- a write is a
           // worse thing to leave wide than a read.
-          const named = checkInRoots(path.resolve(payload.file));
+          const named = await checkInRoots(path.resolve(payload.file));
           if (!named.file) return json(response, 403, { error: named.error });
           if (!(await fileExists(named.file))) {
             return json(response, 404, { error: `no such file: ${named.file}` });
           }
           saveTo = named.file;
         } else {
-          const target = requestedFile(url);
+          const target = await requestedFile(url);
           if (!target.file) return json(response, 403, { error: target.error });
           saveTo = target.file;
         }
@@ -680,7 +712,7 @@ export async function startBoardServer(options: BoardServerOptions): Promise<Run
       }
 
       if (request.method === "GET" && url.pathname === "/api/events") {
-        const target = requestedFile(url);
+        const target = await requestedFile(url);
         if (!target.file) return json(response, 403, { error: target.error });
         // A stream named a board explicitly: pin it, so nothing re-points it.
         const pinned = url.searchParams.has("file");

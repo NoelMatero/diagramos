@@ -95,6 +95,28 @@ export interface EnsuredServer {
   probe?: BoardProbe;
 }
 
+/**
+ * A project path as the service will record it.
+ *
+ * A service records `process.cwd()`, which the operating system has already
+ * resolved through every symlink. A caller's path usually has not been: on macOS
+ * `/var` is a link to `/private/var`, so a project under a temporary directory
+ * is named one way here and another way there, and the two never match --
+ * meaning a service was started, registered, and then never found, and the next
+ * caller started another. Resolving here is what keeps the two spellings the
+ * same name.
+ *
+ * A path that cannot be resolved is passed through: it is about to fail for a
+ * better reason than this one.
+ */
+async function normalizeRoot(root: string): Promise<string> {
+  try {
+    return await fs.realpath(path.resolve(root));
+  } catch {
+    return path.resolve(root);
+  }
+}
+
 /** Whether a service already covers this project. */
 function servesRoot(entry: RegisteredServer, root: string): boolean {
   const covered = entry.roots ?? (entry.root ? [entry.root] : []);
@@ -109,7 +131,7 @@ function servesRoot(entry: RegisteredServer, root: string): boolean {
  * probing 4747 would report "nothing running" while it serves happily.
  */
 export async function ensureBoardServer(options: EnsureOptions): Promise<EnsuredServer> {
-  const root = path.resolve(options.root);
+  const root = await normalizeRoot(options.root);
 
   const existing = await findServing(root);
   if (existing) return { ...existing, started: false };
@@ -149,8 +171,9 @@ export async function ensureBoardServer(options: EnsureOptions): Promise<Ensured
  * serving this project from another project's port entirely.
  */
 export async function findServing(root: string): Promise<{ port: number; pid: number; probe?: BoardProbe } | undefined> {
+  const resolved = await normalizeRoot(root);
   const { running } = await listServers();
-  for (const entry of running.filter((candidate) => servesRoot(candidate, root))) {
+  for (const entry of running.filter((candidate) => servesRoot(candidate, resolved))) {
     const probe = await probeBoard(entry.port);
     // Registered but not answering: the process is alive and the port is not,
     // which is a service still starting or one wedged. Either way it is not a
