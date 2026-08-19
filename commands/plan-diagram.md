@@ -66,3 +66,18 @@ showing. Then, as the work is built (by you when asked, or by anyone else):
 
 When the user says build, build **from the board**: read it back, take the
 work items in dependency order, and let the promotions confirm progress.
+
+## When the plan changes, the board changes in the same turn
+
+Plans change while being built: a piece lands at a different path than the
+box promised, a piece turns out unnecessary, a new piece appears. The decision
+and the board edit are **one action, not two** — repoint the ref, remove the
+box, or add the new dashed box in the same turn the plan actually changed.
+"I'll update the diagram after" is how a plan becomes a picture of last week.
+
+The safety net when that is forgotten is deliberate nagging, not silence: a
+dashed box whose work landed somewhere else never promotes, so the end-of-turn
+notice keeps counting it as work to do forever. A planned count that refuses
+to fall while the work is visibly landing means the board and the plan have
+parted — treat it as a signal to reconcile them, in whichever direction is
+true.
