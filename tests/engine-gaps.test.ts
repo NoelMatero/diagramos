@@ -1,7 +1,7 @@
 /**
  * Honest gaps computation: what a board does not show, split into gaps elsewhere and gaps nowhere.
  */
-import { mkdtempSync, rmSync, writeFileSync } from "node:fs";
+import { mkdirSync, mkdtempSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import path from "node:path";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
@@ -151,6 +151,93 @@ describe("honest gaps", () => {
 
     // Test file should be excluded even though it imports a
     expect(result).not.toContain("tests/a.test.ts");
+  });
+
+  it("suppresses the on-no-board claim when the board is outside the searched directory", async () => {
+    // A misconfigured diagram directory finds no siblings, so every
+    // sibling-drawn file would reclassify as "nobody draws this" -- the exact
+    // confident lie the feature exists to prevent. The discriminator: the board
+    // itself is missing from the search results.
+    const board = await createDiagram(emptyBoard(), {
+      name: "outside-test",
+      nodes: [{ id: "n1", label: "A", ref: "src/a.ts" }],
+      edges: [],
+    });
+    const boardPath = await createBoardFile(path.join(tempDir, "docs", "diagrams"), "outside", board.board);
+    const result = await computeHonestGaps(board.board, boardPath, tempDir, "docs/nonexistent");
+    expect(result).toBeDefined();
+    expect(result).toContain("could not be determined");
+    expect(result).not.toContain("on no board");
+  });
+
+  it("still names true gaps in a single-board repo", async () => {
+    // No siblings is not the same as searching the wrong place: with the one
+    // board present in the results, "on no board" is true and gets said.
+    const solo = mkdtempSync(path.join(tmpdir(), "gaps-solo-"));
+    try {
+      mkdirSync(path.join(solo, "docs", "diagrams"), { recursive: true });
+      mkdirSync(path.join(solo, "src"), { recursive: true });
+      writeFileSync(path.join(solo, "src", "a.ts"), "export const a = 1;");
+      writeFileSync(path.join(solo, "src", "b.ts"), "import { a } from './a';\nexport const b = a;");
+      const board = await createDiagram(emptyBoard(), {
+        name: "solo-board",
+        nodes: [{ id: "n1", label: "A", ref: "src/a.ts" }],
+        edges: [],
+      });
+      const boardPath = await createBoardFile(path.join(solo, "docs", "diagrams"), "solo", board.board);
+      const result = await computeHonestGaps(board.board, boardPath, solo, "docs/diagrams");
+      expect(result).toBeDefined();
+      expect(result).toContain("on no board");
+      expect(result).toContain("src/b.ts");
+    } finally {
+      rmSync(solo, { recursive: true, force: true });
+    }
+  });
+
+  it("credits every board that draws a gap file, and counts the file once", async () => {
+    const multi = mkdtempSync(path.join(tmpdir(), "gaps-multi-"));
+    try {
+      mkdirSync(path.join(multi, "docs", "diagrams"), { recursive: true });
+      mkdirSync(path.join(multi, "src"), { recursive: true });
+      writeFileSync(path.join(multi, "src", "x.ts"), "export const x = 1;");
+      writeFileSync(path.join(multi, "src", "hub.ts"), "import { x } from './x';\nexport const hub = x;");
+      const main = await createDiagram(emptyBoard(), {
+        name: "main-board",
+        nodes: [{ id: "n1", label: "Hub", ref: "src/hub.ts" }],
+        edges: [],
+      });
+      const one = await createDiagram(emptyBoard(), {
+        name: "sibling-one",
+        nodes: [{ id: "n1", label: "X", ref: "src/x.ts" }],
+        edges: [],
+      });
+      const two = await createDiagram(emptyBoard(), {
+        name: "sibling-two",
+        nodes: [{ id: "n1", label: "X again", ref: "src/x.ts" }],
+        edges: [],
+      });
+      const dir = path.join(multi, "docs", "diagrams");
+      const mainPath = await createBoardFile(dir, "main-board", main.board);
+      await createBoardFile(dir, "sibling-one", one.board);
+      await createBoardFile(dir, "sibling-two", two.board);
+      const result = await computeHonestGaps(main.board, mainPath, multi, "docs/diagrams");
+      expect(result).toBeDefined();
+      // Both covering boards are named; the file itself is counted exactly once.
+      expect(result).toContain("sibling-one.excalidraw");
+      expect(result).toContain("sibling-two.excalidraw");
+      expect(result).toMatch(/^1 related file is drawn on other boards/);
+    } finally {
+      rmSync(multi, { recursive: true, force: true });
+    }
+  });
+
+  it("says so when the computation fails, instead of going silent", async () => {
+    // A board object broken enough to throw inside must not read as "nothing
+    // to declare" -- failure and cleanliness are the two states this feature
+    // exists to keep apart.
+    const broken = { elements: 42 } as never;
+    const result = await computeHonestGaps(broken, "/nowhere/x.excalidraw", tempDir, "docs/diagrams");
+    expect(result).toContain("could not be determined");
   });
 
   it("degrades gracefully when a sibling board fails to parse", async () => {

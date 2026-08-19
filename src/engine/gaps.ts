@@ -6,14 +6,17 @@
  * 1. Files related to this board that ARE drawn on a sibling board.
  * 2. Files related to this board that no board in the diagram directory covers.
  *
- * Always silent on failure (degrade gracefully) and silent when there is nothing
- * to report. The line should be self-explanatory: ~30–60 tokens, one sentence.
+ * Silent only when there is genuinely nothing to say. A failure to compute the
+ * answer is said out loud in one short clause, never rendered as silence --
+ * "this board has nothing to declare" and "I could not tell" are the exact two
+ * states this feature exists to keep apart, so it cannot be allowed to conflate
+ * them about itself. The line should be self-explanatory: ~30–60 tokens.
  */
 import path from "node:path";
 
 import type { BoardFile } from "./board-file";
 import { readBoard } from "./board-file";
-import { boardCoverage, checkDrift, createWorkspace, findBoards, type Workspace } from "./drift";
+import { boardCoverage, checkDrift, createWorkspace, findBoards } from "./drift";
 import { readGraph } from "./graph";
 
 /**
@@ -23,10 +26,10 @@ import { readGraph } from "./graph";
  * 1. Related files drawn on sibling boards (list board names).
  * 2. Related files on no board in the directory (list file paths, capped at 8).
  *
- * Returns undefined when there is nothing to report (no gaps, concept board,
- * no anchored refs, or coverage walk gave up).
- *
- * Degrades gracefully on any error: returns undefined rather than throwing.
+ * Returns undefined only when silence is the truth: no gaps, a concept board,
+ * no anchored refs, or the coverage walk gave up before answering. Any actual
+ * failure returns a sentence saying the answer could not be determined --
+ * degraded, still honest, never thrown.
  */
 export async function computeHonestGaps(
   board: BoardFile,
@@ -50,10 +53,31 @@ export async function computeHonestGaps(
 
     // Load sibling boards and extract their coverage.
     const boardFiles = await findBoards(root, diagramDir);
+
+    /*
+     * If this board is not among the boards the search found, the search looked
+     * in the wrong place -- a misconfigured diagram directory, or a board living
+     * outside it, which this repo's own findStrayBoards path exists because of.
+     * Every sibling-drawn file would then silently reclassify as "nobody draws
+     * this" and the sentence would assert it at full confidence: the exact lie
+     * this feature was built to kill, arriving through the back door.
+     *
+     * The board being present is the discriminator, not "zero siblings": a
+     * single-board repo has no siblings and its "on no board" claim is true and
+     * still deserves saying.
+     */
+    const self = path.resolve(boardPath);
+    if (!boardFiles.some((file) => path.resolve(file) === self)) {
+      const count = report.unrepresented.length;
+      return `${count} related file${count === 1 ? " is" : "s are"} not drawn here; `
+        + "whether other boards draw them could not be determined, because this board "
+        + "is outside the diagram directory that was searched";
+    }
+
     const siblingCoverages = new Map<string, (absolute: string) => boolean>();
 
     for (const siblingPath of boardFiles) {
-      if (siblingPath === boardPath) continue;  // Exclude self
+      if (path.resolve(siblingPath) === self) continue;  // Exclude self
       try {
         const sibling = await readBoard(siblingPath);
         const siblingGraph = readGraph(sibling);
@@ -64,25 +88,29 @@ export async function computeHonestGaps(
       }
     }
 
-    // Categorize unrepresented files.
-    const drawnElsewhere = new Map<string, Set<string>>();  // board name -> set of file paths
+    /*
+     * Categorize unrepresented files. Every sibling is consulted for every
+     * file: a file drawn on three boards credits all three, so the pointer
+     * list is "the boards that cover my gaps", not "one board per gap file".
+     * The count and the pointers are kept as two separate sets because they
+     * answer different questions -- distinct files for how much is elsewhere,
+     * board names for where to look -- and summing files per board would count
+     * a thrice-drawn file three times.
+     */
+    const elsewhereFiles = new Set<string>();
+    const elsewhereBoards = new Set<string>();
     const drawnNowhere: string[] = [];
 
     for (const finding of report.unrepresented) {
       const resolved = workspace.resolve(finding.file);
       if (!resolved) continue;
 
-      // Check if this file is covered by a sibling board.
       let foundOnSibling = false;
       for (const [siblingName, siblingCovered] of siblingCoverages) {
         if (siblingCovered(resolved)) {
-          // Track which board covers this file
-          if (!drawnElsewhere.has(siblingName)) {
-            drawnElsewhere.set(siblingName, new Set());
-          }
-          drawnElsewhere.get(siblingName)!.add(finding.file);
+          elsewhereFiles.add(finding.file);
+          elsewhereBoards.add(siblingName);
           foundOnSibling = true;
-          break;  // Once a file is found on a sibling, stop checking
         }
       }
 
@@ -94,13 +122,9 @@ export async function computeHonestGaps(
     // Build the message.
     const parts: string[] = [];
 
-    if (drawnElsewhere.size > 0) {
-      // Count total files drawn elsewhere
-      let fileCount = 0;
-      for (const files of drawnElsewhere.values()) {
-        fileCount += files.size;
-      }
-      const boards = [...drawnElsewhere.keys()].sort().join(", ");
+    if (elsewhereFiles.size > 0) {
+      const fileCount = elsewhereFiles.size;
+      const boards = [...elsewhereBoards].sort().join(", ");
       parts.push(`${fileCount} related file${fileCount === 1 ? " is" : "s are"} drawn on other boards (${boards})`);
     }
 
@@ -127,7 +151,14 @@ export async function computeHonestGaps(
     }
     return `${parts[0]}; ${parts[1]}`;
   } catch {
-    // Degrade gracefully: any failure returns undefined, never throws.
-    return undefined;
+    /*
+     * A failure must not render as a clean board. "Nothing to declare" and
+     * "could not tell" are the two states this whole feature exists to keep
+     * apart, so the failure is said in one short clause -- the same choice the
+     * drift CLI's footer makes ("silence means these agreed · not that
+     * everything was read"). Quiet enough to survive being read on every turn;
+     * never an exception, because a gap note must not break a board read.
+     */
+    return "what this board leaves out could not be determined";
   }
 }

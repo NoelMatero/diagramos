@@ -457,3 +457,14 @@ The recommendation above said "make coverage aware of sibling boards" before dra
 - Engine stays independent of MCP: coverage logic extracted to `boardCoverage()` helper in drift.ts, reused by both checkDrift and computeHonestGaps
 - Silence is fallback: field only appears when there are gaps to report
 - Covers recommendation #6: sibling awareness built, coverage no longer per-board only
+
+## Honest gaps, round 2: four defects fixed before landing — 2026-08-19
+
+Review of the above found four defects; all fixed on the same branch, each pinned by a test that fails against the round-1 code.
+
+1. **A lost sibling directory produced a confident lie (serious).** With a misconfigured diagram directory, `findBoards` found no siblings and every sibling-drawn file silently reclassified as "on no board" — reproduced: board-internals claimed 18 files on no board, including `src/engine/config.ts`, drawn on three boards. The guard is the board's own presence in the search results, not "zero siblings", so a legitimate single-board repo still gets its true "on no board" sentence (also pinned by a test). When the guard trips, the sentence says the sibling question could not be answered instead of asserting the wrong half.
+2. **A failed computation rendered as a clean board.** The catch-all returned undefined, making "I failed" identical to "nothing to declare" — the two states the feature exists to keep apart. Failure now returns "what this board leaves out could not be determined"; genuine silence is unchanged.
+3. **Only the first covering board was credited.** The sibling loop stopped at the first match, so a file drawn on three boards named one. All covering boards are now named; the count is distinct files, so a thrice-drawn file counts once. Visible effect: published-cli's pointer list went from 2 board names to 5.
+4. **The feature reported itself.** `src/engine/gaps.ts` sat in every board's "on no board" list because the PR added the module without drawing it. It is now a box on `board-internals.excalidraw` with two import-backed arrows (server → gaps, gaps → drift); `check:drift` stays clean at 58 refs / 53 arrows.
+
+Sentence costs after round 2: 41–70 tokens on the six boards with gaps (chars/4 on the real sentences), unchanged in kind. The revised sentences name more boards (defect 3's fix), which is where the upper bound moved. Still ungraded whether any of this helps a reading agent; the task set above remains the missing instrument.
