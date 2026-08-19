@@ -20,7 +20,8 @@ import { fileURLToPath } from "node:url";
 
 import { readBoard, serializeBoard, writeBoard, type BoardFile } from "../engine/board-file";
 import { diagramDir } from "../engine/config";
-import { findBoards } from "../engine/drift";
+import { checkDrift, createGitBaseline, createWorkspace, findBoards } from "../engine/drift";
+import { initEngine } from "../engine/parse";
 import { processAlive, registerServer } from "./server-registry";
 import { boardsPage } from "./boards-page";
 
@@ -239,6 +240,8 @@ export async function startBoardServer(options: BoardServerOptions): Promise<Run
   // One watcher per directory rather than per board: boards usually share a
   // directory, and watching it twice would deliver every event twice.
   const watchers = new Map<string, FSWatcher>();
+  /** Tree-sitter grammars for /api/drift, loaded on the first request only. */
+  let engineReady: Promise<void> | undefined;
 
   const write = (subscribers: Subscriber[], payload: Record<string, unknown>) => {
     const frame = `data: ${JSON.stringify(payload)}\n\n`;
@@ -475,6 +478,30 @@ export async function startBoardServer(options: BoardServerOptions): Promise<Run
         }
         await setFile(requested);
         return json(response, 200, { ok: true, file });
+      }
+
+      /*
+       * The drift report for one board, so the page can show *status* and not
+       * only the picture. Computed on request rather than watched live: the
+       * viewer asks again whenever the board changes, when its tab regains
+       * focus, and on a slow timer, which covers the working loop without this
+       * server growing a file-system watcher over the whole repository.
+       */
+      if (request.method === "GET" && url.pathname === "/api/drift") {
+        const target = requestedFile(url);
+        if (!target.file) return json(response, 403, { error: target.error });
+        if (!(await fileExists(target.file))) {
+          return json(response, 404, { error: `no such file: ${target.file}` });
+        }
+        // Grammars load once per process, lazily: a server nobody asks for
+        // status keeps starting as fast as it always did.
+        engineReady ??= initEngine();
+        await engineReady;
+        const workspaceRoot = root ?? process.cwd();
+        const report = checkDrift(await readBoard(target.file), createWorkspace(workspaceRoot), {
+          baseline: createGitBaseline(workspaceRoot, target.file),
+        });
+        return json(response, 200, { file: target.file, report });
       }
 
       if (request.method === "GET" && url.pathname === "/api/board") {

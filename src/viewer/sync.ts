@@ -55,7 +55,7 @@ function pinnedBoard(): string | null {
   }
 }
 
-function withBoard(path: string): string {
+export function withBoard(path: string): string {
   const pinned = pinnedBoard();
   return pinned ? `${path}?file=${encodeURIComponent(pinned)}` : path;
 }
