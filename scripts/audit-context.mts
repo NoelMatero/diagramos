@@ -50,7 +50,9 @@ import { fileURLToPath } from "node:url";
 
 const REPO = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 import { readBoard } from "../src/engine/board-file";
+import { computeHonestGaps } from "../src/engine/gaps";
 import { readGraph } from "../src/engine/graph";
+import { initEngine } from "../src/engine/parse";
 import { projectGraph } from "../src/mcp/projection";
 
 /** chars/4. An estimate; see the header. */
@@ -100,6 +102,10 @@ console.log(`  ${pad("every tracked .md", 34)}${num(proseAll, 9)}${num(tok(prose
 // --------------------------------------------------------------- the boards
 
 const DIAGRAM_DIR = path.join(REPO, "docs", "diagrams");
+// Grammars load once; without them the gap check inside computeHonestGaps
+// would degrade to its failure sentence and this audit would price that
+// instead of the real payload.
+await initEngine();
 const boards = readdirSync(DIAGRAM_DIR)
   .filter((e) => e.endsWith(".excalidraw"))
   .map((e) => path.join(DIAGRAM_DIR, e))
@@ -129,9 +135,11 @@ for (const file of boards) {
   }
   const graph = readGraph(board);
 
-  // The real thing the model is sent, not an imitation of it.
-  const withGeometry = JSON.stringify(projectGraph(graph, { geometry: true, detailed: true })).length;
-  const semantic = JSON.stringify(projectGraph(graph)).length;
+  // The real thing the model is sent, not an imitation of it -- including the
+  // honest-gaps sentence, which rides on every read of a board that has gaps.
+  const notShown = await computeHonestGaps(board, file, REPO, "docs/diagrams");
+  const withGeometry = JSON.stringify(projectGraph(graph, { geometry: true, detailed: true, notShown })).length;
+  const semantic = JSON.stringify(projectGraph(graph, { notShown })).length;
   const refs = graph.nodes.filter((n) => n.ref).length;
 
   rows.push({ rel, semantic, nodes: graph.nodes.length, refs });

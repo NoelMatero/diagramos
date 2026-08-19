@@ -430,14 +430,13 @@ server.registerTool(
 
       return text({
         file: relativeToWorkspace(file),
-        ...projectGraph(graph, { geometry, detailed: geometry || includeElements }),
+        ...projectGraph(graph, { geometry, detailed: geometry || includeElements, notShown }),
         // Named here so a caller can address a single diagram (delete_diagram,
         // or create_diagram with append) without having to guess its name from
         // element id prefixes.
         ...(diagrams.length ? { diagrams } : {}),
         summary: `${graph.nodes.length} nodes, ${graph.edges.length} edges`
           + (inferred.length ? `, ${inferred.length} inferred from hand-drawn elements` : ""),
-        ...(notShown ? { notShown } : {}),
         ...(includeElements
           ? {
               elements: board.elements
