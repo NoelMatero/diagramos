@@ -78,14 +78,27 @@ describe("the panel's rows", () => {
 });
 
 describe("the clean summary", () => {
-  it("says what was read, so in-sync and unread cannot look alike", () => {
-    expect(summaryOf(reportWith({ checked: 4, edgesChecked: 2 }))).toBe("4 refs · 2 arrows checked");
+  it("says what was read in plain words, so in-sync and unread cannot look alike", () => {
+    expect(summaryOf(reportWith({ checked: 4, edgesChecked: 2 }))).toBe(
+      "checked 4 boxes and 2 arrows against the code — all still true",
+    );
     expect(summaryOf(reportWith({ checked: 4, edgesChecked: 0, skipped: 3 }))).toBe(
-      "4 refs · 0 arrows checked · 3 unread",
+      "checked 4 boxes and 0 arrows against the code — all still true — 3 more boxes have no ref, so they went unchecked",
+    );
+    expect(summaryOf(reportWith({ checked: 1, edgesChecked: 1, skipped: 1 }))).toBe(
+      "checked 1 box and 1 arrow against the code — all still true — 1 more box has no ref, so it went unchecked",
+    );
+  });
+
+  it("admits when nothing was checkable instead of reading as verified", () => {
+    expect(summaryOf(reportWith({}))).toBe(
+      "nothing on this board points at code yet, so nothing was checked",
     );
   });
 
   it("names a concept board instead of pretending it was checked", () => {
-    expect(summaryOf(reportWith({ concept: true }))).toBe("concept board · not about this repo");
+    expect(summaryOf(reportWith({ concept: true }))).toBe(
+      "a concept board — it describes something outside this repo, so nothing here is checked",
+    );
   });
 });
