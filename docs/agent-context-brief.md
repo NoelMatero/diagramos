@@ -436,3 +436,37 @@ Reported because they are real and neither is fixed.
 7. **Build the task set before the next board.** Eight questions, hand-written
    ground truth, all arms re-run. Without it every further change is a guess with
    a good story attached.
+
+## Honest gaps: what a board does not show — 2026-08-18
+
+The recommendation above said "make coverage aware of sibling boards" before drawing more. This session shipped it.
+
+**What shipped:** When `read_diagram` is called on an anchored board, the response now carries `notShown`, a single sentence describing two truths: files related to the board that ARE drawn on a sibling board in the diagram directory (listing board names), and files related to the board that are on NO board in the directory (listing paths, capped at 8). Omitted entirely when there are no gaps, when the board is a concept board, when it has no anchored refs, or when the walk gives up. Always silent on error: a computation failure just means the field is absent, never an exception.
+
+**Measured behaviour on this repo's 12 boards:**
+- 82 total unrepresented files across all boards
+- 62 (76%) drawn on other boards → now named in notShown (e.g., "13 related files are drawn on other boards (drift-check.excalidraw, live-board.excalidraw)")
+- 20 (24%) on no board at all → listed in notShown with paths; deduped across boards that is six files, one of which is `src/engine/gaps.ts` itself — the module shipped today, correctly reported as not yet drawn
+- 0 test files appearing (TEST_FILE filter fixed: was only applied upstream, now applies downstream too)
+
+**Cost:** Measured on the real sentences (chars/4): 37–67 tokens per board read, only on the six boards that have gaps, nothing on the six that do not. Against the ~400-token baseline read that is roughly 10–17%. The raw `unrepresented` payload this replaces was priced at ~300–420 tokens and called a covered file "missing" four times in five; the sentence is the deduplicated, sibling-aware reading of the same data. Whether the line actually helps a reading agent is ungraded — the task-set recommendation above still stands.
+
+**Design rules followed:**
+- Default ON with cheap guard: coverage computation runs, result is silent when nothing to report
+- Degrades gracefully: any error returns undefined (field omitted), never throws
+- Engine stays independent of MCP: coverage logic extracted to `boardCoverage()` helper in drift.ts, reused by both checkDrift and computeHonestGaps
+- Silence is fallback: field only appears when there are gaps to report
+- Covers recommendation #6: sibling awareness built, coverage no longer per-board only
+
+## Honest gaps, round 2: four defects fixed before landing — 2026-08-19
+
+Review of the above found four defects; all fixed on the same branch, each pinned by a test that fails against the round-1 code.
+
+1. **A lost sibling directory produced a confident lie (serious).** With a misconfigured diagram directory, `findBoards` found no siblings and every sibling-drawn file silently reclassified as "on no board" — reproduced: board-internals claimed 18 files on no board, including `src/engine/config.ts`, drawn on three boards. The guard is the board's own presence in the search results, not "zero siblings", so a legitimate single-board repo still gets its true "on no board" sentence (also pinned by a test). When the guard trips, the sentence says the sibling question could not be answered instead of asserting the wrong half.
+2. **A failed computation rendered as a clean board.** The catch-all returned undefined, making "I failed" identical to "nothing to declare" — the two states the feature exists to keep apart. Failure now returns "what this board leaves out could not be determined"; genuine silence is unchanged.
+3. **Only the first covering board was credited.** The sibling loop stopped at the first match, so a file drawn on three boards named one. All covering boards are now named; the count is distinct files, so a thrice-drawn file counts once. Visible effect: published-cli's pointer list went from 2 board names to 5.
+4. **The feature reported itself.** `src/engine/gaps.ts` sat in every board's "on no board" list because the PR added the module without drawing it. It is now a box on `board-internals.excalidraw` with two import-backed arrows (server → gaps, gaps → drift); `check:drift` stays clean at 58 refs / 53 arrows.
+
+Sentence costs after round 2: 41–70 tokens on the six boards with gaps (chars/4 on the real sentences), unchanged in kind. The revised sentences name more boards (defect 3's fix), which is where the upper bound moved. Still ungraded whether any of this helps a reading agent; the task set above remains the missing instrument.
+
+**After rebasing onto #61 — 2026-08-19.** The sentence now rides inside `projectGraph()` in `src/mcp/projection.ts` rather than being spread on in the handler, so this audit prices the payload the model is actually sent — the reason that module exists. Re-measured against #61's trimmed reads (210–521 tokens per anchored board): the sentence adds 44–73 tokens, which is 11–31% of a read — 11–19% on the five larger boards, 31% on the smallest (example, 210 tokens), where a fixed-size sentence is proportionally loudest. The earlier "roughly 10–17% of a ~400-token read" claim in this section was written against pre-trim reads and understated the share; these are the honest numbers. `check:drift` after the rebase: 59 refs, 54 arrows, nothing drifted (board-internals now also carries #61's projection box).

@@ -400,7 +400,7 @@ function sourceFilesUnder(rootAbsolute: string, workspace: Workspace): string[] 
  * Allowing `**`, or a star mid-path, turns a model-authored string back into a
  * tree walk.
  */
-function globOf(target: string): { directory: string; pattern: RegExp } | undefined {
+export function globOf(target: string): { directory: string; pattern: RegExp } | undefined {
   if (!target.includes("*")) return undefined;
   const cut = target.lastIndexOf("/");
   const directory = cut < 0 ? "." : target.slice(0, cut);
@@ -967,6 +967,46 @@ function checkEdgeCorroboration(
   };
 }
 
+/**
+ * Coverage information from a board: what files it covers and how to test coverage.
+ *
+ * A board covers a file if a node ref resolves to that file, or a directory/glob
+ * ref covers it. This logic is reused by checkDrift and computeHonestGaps to
+ * keep interpretations in sync.
+ *
+ * Returns an object with onBoard map and a covered function for testing.
+ */
+export function boardCoverage(
+  graph: { nodes: Array<{ ref?: string; refs?: string[]; state?: string }> },
+  workspace: Workspace,
+): { onBoard: Map<string, string>; covered: (absolute: string) => boolean } {
+  const onBoard = new Map<string, string>();  // absolute -> repo-relative
+  const directories: string[] = [];
+
+  for (const node of graph.nodes) {
+    if (node.state === "external") continue;
+    for (const ref of [node.ref, ...(node.refs ?? [])]) {
+      const anchor = ref?.trim();
+      if (!anchor) continue;
+      const { path: target } = parseRef(anchor);
+      // A glob names a directory's worth of files; treat its directory as
+      // covering them, which is what the box is claiming.
+      const glob = globOf(target);
+      const resolved = workspace.resolve(glob ? glob.directory : target);
+      if (!resolved) continue;
+      const kind = workspace.stat(resolved);
+      if (glob || kind === "directory") directories.push(resolved);
+      else if (kind === "file") onBoard.set(resolved, target);
+    }
+  }
+
+  const covered = (absolute: string) =>
+    onBoard.has(absolute)
+    || directories.some((directory) => absolute.startsWith(directory.replace(/[\\/]?$/, path.sep)));
+
+  return { onBoard, covered };
+}
+
 export function checkDrift(
   board: BoardFile,
   workspace: Workspace,
@@ -1419,34 +1459,17 @@ export function checkDrift(
    */
   const unrepresented: UnrepresentedFinding[] = [];
   if (options?.coverage && !concept) {
-    const onBoard = new Map<string, string>();  // absolute -> repo-relative
-    const directories: string[] = [];
-    for (const node of graph.nodes) {
-      if (node.state === "external") continue;
-      for (const ref of [node.ref, ...(node.refs ?? [])]) {
-        const anchor = ref?.trim();
-        if (!anchor) continue;
-        const { path: target } = parseRef(anchor);
-        // A glob names a directory's worth of files; treat its directory as
-        // covering them, which is what the box is claiming.
-        const glob = globOf(target);
-        const resolved = workspace.resolve(glob ? glob.directory : target);
-        if (!resolved) continue;
-        const kind = workspace.stat(resolved);
-        if (glob || kind === "directory") directories.push(resolved);
-        else if (kind === "file") onBoard.set(resolved, target);
-      }
-    }
-
-    const covered = (absolute: string) =>
-      onBoard.has(absolute)
-      || directories.some((directory) => absolute.startsWith(directory.replace(/[\\/]?$/, path.sep)));
+    const { onBoard, covered } = boardCoverage(graph, workspace);
 
     const importers = new Map<string, { file: string; by: Set<string> }>();
     for (const [absolute, relative] of onBoard) {
       if (!TS_JS.test(absolute)) continue;
       for (const imported of getImports(absolute, relative, workspace, importCache)) {
         if (covered(imported.abs)) continue;
+        // Test files are excluded like they are in the upstream pass. A suite
+        // importing four boxes is the suite doing its job, not a module this board
+        // forgot to draw. Left in they bury the modules that matter.
+        if (TEST_FILE.test(imported.rel)) continue;
         // Import resolution keeps the specifier as joined, so a sibling directory
         // arrives as `src/mcp/../engine/config.ts`. Deduping is by absolute path
         // and so already correct; this is about what a reader is shown.

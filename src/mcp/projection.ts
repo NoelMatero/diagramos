@@ -61,6 +61,13 @@ export interface ProjectionOptions {
   geometry?: boolean;
   /** Keep `elementId`. Implied by anything that addresses elements directly. */
   detailed?: boolean;
+  /**
+   * The honest-gaps sentence, computed by the caller (it needs the filesystem
+   * and sibling boards, which a pure projection of one graph must not touch).
+   * Carried through here rather than spread on afterwards so the audit prices
+   * the payload the model is actually sent -- the reason this module exists.
+   */
+  notShown?: string;
 }
 
 /**
@@ -87,7 +94,7 @@ const DEFAULTS_LEGEND = {
 
 export function projectGraph(
   graph: RecoveredGraph,
-  { geometry = false, detailed = false }: ProjectionOptions = {},
+  { geometry = false, detailed = false, notShown }: ProjectionOptions = {},
 ): Record<string, unknown> {
   const { nodes, edges, unattributed, ...rest } = graph;
   const placed = geometry
@@ -101,5 +108,8 @@ export function projectGraph(
     // An empty array on every response is bytes saying nothing. A board with
     // strays on it still reports them.
     ...(unattributed.length ? { unattributed } : {}),
+    // Absent when there is genuinely nothing to say; the sentence itself says
+    // when the answer could not be determined, so silence stays meaningful.
+    ...(notShown ? { notShown } : {}),
   };
 }
