@@ -348,6 +348,64 @@ describe("board MCP server", () => {
   }, 120_000);
 
   /**
+   * The plan-first loop's draw-time half (#78): a box pointing at code that
+   * does not exist is either a typo or a plan that forgot to say so, and the
+   * tool result has to say it immediately -- to the model, while it can still
+   * fix the ref or mark the box planned -- instead of one turn later as a red
+   * notice to the user.
+   */
+  it("says at draw time when a box points at code that does not exist", async () => {
+    const board = "docs/diagrams/draw-time.excalidraw";
+    await writeFile(path.join(workspace, "already.ts"), "export const already = 1;\n");
+    const result = jsonOf(
+      await call("create_diagram", {
+        path: board,
+        nodes: [
+          { id: "real", label: "Already here", ref: "already.ts" },
+          { id: "ghost", label: "Ghost", ref: "src/not-written-yet.ts" },
+        ],
+      }),
+    );
+    expect(result.pointsAtNothing).toEqual(["Ghost → src/not-written-yet.ts"]);
+    expect(String(result.fix)).toContain('state: "planned"');
+    expect(result.plannedWork).toBeUndefined();
+  }, 120_000);
+
+  it("reports planned boxes as tracked work, not as a problem", async () => {
+    const board = "docs/diagrams/plan.excalidraw";
+    await writeFile(path.join(workspace, "already.ts"), "export const already = 1;\n");
+    const result = jsonOf(
+      await call("create_diagram", {
+        path: board,
+        nodes: [
+          { id: "real", label: "Already here", ref: "already.ts" },
+          { id: "next", label: "Next", ref: "src/next.ts", state: "planned" },
+        ],
+        edges: [{ from: "real", to: "next", state: "planned" }],
+      }),
+    );
+    expect(result.pointsAtNothing).toBeUndefined();
+    expect(result.fix).toBeUndefined();
+    // One item, not two: the planned arrow's far end has no code yet, so the
+    // arrow is unreadable rather than pending -- the same answer check_drift
+    // and the end-of-turn notice give, which is the point of reusing them.
+    expect(String(result.plannedWork)).toMatch(/^1 planned item tracked/);
+  }, 120_000);
+
+  it("stays quiet at draw time when every ref resolves", async () => {
+    const board = "docs/diagrams/resolved.excalidraw";
+    await writeFile(path.join(workspace, "already.ts"), "export const already = 1;\n");
+    const result = jsonOf(
+      await call("create_diagram", {
+        path: board,
+        nodes: [{ id: "real", label: "Already here", ref: "already.ts" }],
+      }),
+    );
+    expect(result.pointsAtNothing).toBeUndefined();
+    expect(result.plannedWork).toBeUndefined();
+  }, 120_000);
+
+  /**
    * No diagram is "current": a project holds as many as it likes, and checking
    * means checking all of them unless one is named.
    */

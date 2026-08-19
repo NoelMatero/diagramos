@@ -178,7 +178,8 @@ as an oversight:
   its state**: the automatic promotion is deterministic, waits until *every*
   anchor on the box resolves, and reports itself as `promoted`. Editing the
   state yourself preempts it for no gain. (Setting `built` naturally as part of
-  a redraw you are doing for other reasons is fine.)
+  a redraw you are doing for other reasons is fine.) When the user wants a whole
+  piece of work planned as a board before building it, that is `/plan-diagram`.
 - **A box that is not code in this repo** — a browser, a vendor API, another
   project: `state: "external"`. Never checked, and distinct from a forgotten ref.
 - **A whole board that is not about this codebase** — a protocol, a standard,

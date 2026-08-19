@@ -386,12 +386,40 @@ server.registerTool(
       });
       await writeBoard(file, result.board);
       await followBoard(file);
+      // Say it now, not one turn later: a box pointing at code that does not
+      // exist is either a typo or a plan that forgot to say so. Left alone,
+      // the end-of-turn check reports it to the user in red; caught here, the
+      // model can still fix the ref or mark the box planned before anyone
+      // sees an alarm. Edge corroboration runs too, but only for its planned
+      // work items -- questionable arrows are a review matter, not a
+      // draw-time one, and are left to check_drift.
+      await initEngine();
+      const drawn = checkDrift(result.board, createWorkspace(WORKSPACE_ROOT));
       return text({
         wrote: relativeToWorkspace(file),
         nodes: result.nodeCount,
         edges: result.edgeCount,
         elements: result.elementCount,
         idPrefix: result.prefix,
+        ...(drawn.findings.length
+          ? {
+              pointsAtNothing: drawn.findings.map(
+                (finding) => `${finding.label || finding.node} → ${finding.ref}`,
+              ),
+              fix:
+                "Each of those is a typo to correct or work not written yet. Work to come carries "
+                + 'state: "planned" -- drawn dashed, reported as a work item, and flipped to built '
+                + "on its own when the code lands. Left as is, the end-of-turn check reports it to "
+                + "the user in red.",
+            }
+          : {}),
+        ...(drawn.workItems.length
+          ? {
+              plannedWork:
+                `${drawn.workItems.length} planned ${drawn.workItems.length === 1 ? "item" : "items"} `
+                + "tracked as work to do; each flips to built on its own when its code lands.",
+            }
+          : {}),
         ...(result.replacedCount
           ? {
               replaced: { diagrams: result.replacedDiagrams, elements: result.replacedCount },
