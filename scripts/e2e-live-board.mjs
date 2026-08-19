@@ -300,6 +300,32 @@ try {
     `${liveCount(sideBefore)} -> ${liveCount(sideAfter)}`,
   );
 
+  /*
+   * The way from a board to every other board.
+   *
+   * The index exists and is printed by the command, but a page you can only
+   * reach by having been told it exists is the one part of this that nobody
+   * finds. The filename in the pill is the link, checked here rather than by
+   * asserting an href: what matters is that clicking it lands somewhere that
+   * lists boards.
+   */
+  const indexHref = await page.$eval(".status-file", (el) => el.getAttribute("href"));
+  check("the board's name links to the index", indexHref === "/boards", String(indexHref));
+
+  const indexPage = await browser.newPage();
+  await indexPage.goto(new URL("/boards", server.url).href, { waitUntil: "load" });
+  await indexPage.waitForFunction(() => document.querySelectorAll("#boards li a .name").length > 0, undefined, {
+    timeout: 10_000,
+  });
+  const listed = await indexPage.$$eval("#boards li a .name", (nodes) => nodes.map((node) => node.textContent));
+  check(
+    "the index lists the board being served",
+    listed.some((name) => String(name).endsWith("twin.excalidraw") || String(name).endsWith("live.excalidraw")),
+    listed.join(", "),
+  );
+  await indexPage.screenshot({ path: shot("4-index") });
+  await indexPage.close();
+
   // The pill must not present a filename as current once the connection is gone:
   // the server may have been re-pointed or replaced, and the page cannot tell.
   await server.close();
