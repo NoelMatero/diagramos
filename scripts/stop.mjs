@@ -64,12 +64,27 @@ const age = (startedAt) => {
   return `${amount} ${unit}${amount === 1 ? "" : "s"}`;
 };
 
-/** The project a server serves, shortened to something a person recognises. */
-const where = (entry) => {
-  if (!entry.root) return "no project";
+/** A path shortened to something a person recognises at a glance. */
+const shorten = (target) => {
   const home = process.env.HOME;
-  return home && entry.root.startsWith(home) ? `~${entry.root.slice(home.length)}` : entry.root;
+  return home && target.startsWith(home) ? `~${target.slice(home.length)}` : target;
 };
+
+/**
+ * The projects a service serves.
+ *
+ * All of them, not just the first: one service covers every project you have
+ * opened, so naming one would make stopping it look far smaller than it is.
+ */
+const where = (entry) => {
+  const projects = entry.roots?.length ? entry.roots : entry.root ? [entry.root] : [];
+  if (!projects.length) return "no project";
+  const [first, ...rest] = projects.map(shorten);
+  return rest.length ? `${first} +${rest.length} more` : first;
+};
+
+/** Every project on its own line, for the listing, where there is room to say so. */
+const projectsOf = (entry) => (entry.roots?.length ? entry.roots : entry.root ? [entry.root] : []).map(shorten);
 
 const describe = (entry) =>
   [
@@ -98,7 +113,23 @@ if (running.length === 0) {
 
 if (listOnly) {
   console.log(`${running.length} board ${running.length === 1 ? "service" : "services"} running`);
-  for (const entry of running) console.log(`  ${describe(entry)}`);
+  for (const entry of running) {
+    const projects = projectsOf(entry);
+    console.log(
+      `  ${[
+        `pid ${String(entry.pid).padEnd(7)}`,
+        `port ${String(entry.port).padEnd(6)}`,
+        `up ${age(entry.startedAt).padEnd(11)}`,
+        projects[0] ?? "no project",
+        entry.owner ? `(owned by pid ${entry.owner})` : "",
+      ]
+        .filter(Boolean)
+        .join(" ")}`,
+    );
+    // Adopted projects underneath, so a service covering four repositories does
+    // not look like one covering the first.
+    for (const project of projects.slice(1)) console.log(`${" ".repeat(38)}${project}`);
+  }
   console.log("");
   console.log("diagramos stop  stops all of them");
   process.exit(0);

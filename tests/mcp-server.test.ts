@@ -4,7 +4,7 @@
  * schemas, serialisation, or path handling break, these fail.
  */
 import { createServer } from "node:http";
-import { mkdtempSync, rmSync } from "node:fs";
+import { mkdtempSync, realpathSync, rmSync } from "node:fs";
 import { mkdir, readFile, writeFile } from "node:fs/promises";
 import os from "node:os";
 import path from "node:path";
@@ -53,7 +53,8 @@ async function freePort(): Promise<number> {
 }
 
 beforeAll(async () => {
-  workspace = mkdtempSync(path.join(os.tmpdir(), "board-mcp-"));
+  // Resolved: the board service reports resolved paths, and /var is a link.
+  workspace = realpathSync(mkdtempSync(path.join(os.tmpdir(), "board-mcp-")));
   boardPort = await freePort();
   client = new Client({ name: "test", version: "0" });
   await client.connect(

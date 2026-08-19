@@ -36,10 +36,19 @@ function StatusPill({
   return (
     <div className={`status status-${status}`} title={title}>
       <span className="status-dot" />
-      {/* Which board this is showing. Without it, a page pointed at another
-          file looks identical to one that simply is not updating. */}
+      {/* Which board this is showing, and the way to the rest of them. Without
+          the name, a page pointed at another file looks identical to one that
+          simply is not updating; without the link, the index listing every
+          board is reachable only by having been told it exists, which makes it
+          the one part of this nobody finds. */}
       {file ? (
-        <span className={`status-file${stale ? " status-file-stale" : ""}`}>{file.split("/").pop()}</span>
+        <a
+          className={`status-file${stale ? " status-file-stale" : ""}`}
+          href="/boards"
+          title={`${file} — every board this service is showing`}
+        >
+          {file.split("/").pop()}
+        </a>
       ) : null}
       {STATUS_LABEL[status]}
     </div>
