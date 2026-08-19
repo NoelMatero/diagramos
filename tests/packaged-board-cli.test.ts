@@ -221,7 +221,9 @@ describe("packaged board CLI", () => {
     const outside = path.join(workspace, "docs/diagrams/architecture.excalidraw");
     const elsewhere = mkdtempSync(path.join(os.tmpdir(), "board-cli-elsewhere-"));
     try {
-      const { code, stdout, stderr } = await runToExit(elsewhere, [outside]);
+      // A port of our own: without one the service asks for 4747 and competes
+      // with whatever board the developer has open (#77).
+      const { code, stdout, stderr } = await runToExit(elsewhere, [outside], await freePort());
       expect(code, stderr).toBe(0);
       // Named absolutely, because a relative name would resolve against the
       // project the service started in and mean a different file.
