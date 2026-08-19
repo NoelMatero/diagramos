@@ -39,11 +39,11 @@ import { initEngine } from "../engine/parse";
 import { renderBoardToPng } from "../engine/render";
 import {
   probeBoard,
-  probeBoardServer,
   resolveBoardPort,
-  startBoardServer,
-  type RunningBoardServer,
+  type BoardProbe,
 } from "../server/board-server";
+import { ensureBoardServer } from "../server/daemon";
+import { listServers } from "../server/server-registry";
 import {
   relativeToWorkspace,
   resolveBoardPath,
@@ -197,12 +197,19 @@ const edgeSchema = z.object({
 });
 
 /**
- * One live board per session. Every tool that writes points it at the file it
- * just wrote, so the page follows the work instead of staying pinned to
- * whatever was opened first -- a board silently watching a different file is
- * indistinguishable from one that has stopped updating.
+ * The board service this session has been talking to, if any.
+ *
+ * A port, not a server. This process used to host the board itself, which meant
+ * the board died when the session did -- the opposite of the promise that a
+ * diagram outlives the conversation that produced it. The service now runs on
+ * its own; all this remembers is where to find it, so a write can point it at
+ * the file it just changed without going through the registry every time.
+ *
+ * Every tool that writes points the page at the file it just wrote, because a
+ * board silently watching a different file is indistinguishable from one that
+ * has stopped updating.
  */
-let live: RunningBoardServer | undefined;
+let servicePort: number | undefined;
 
 /**
  * Read on use rather than once at load, so a malformed DIAGRAMOS_PORT fails only
@@ -226,10 +233,42 @@ function pinnedBoardUrl(port: number, file: string): string {
   return `http://127.0.0.1:${port}/?file=${encodeURIComponent(file)}`;
 }
 
-/** Asks a board server owned by another process to show this file. */
+/**
+ * The board service serving this workspace, if one is running.
+ *
+ * Found through the registry rather than by probing the default port, because
+ * the port is not an address: a service pushed off 4747 by another project is on
+ * an ephemeral one, and probing 4747 would report "no board running" while it
+ * serves this workspace perfectly well.
+ *
+ * The remembered port is checked before the registry is read, so the common case
+ * -- a session that already opened a board, writing to it again -- costs one
+ * request instead of a directory listing.
+ */
+async function currentService(): Promise<{ port: number; probe: BoardProbe } | undefined> {
+  if (servicePort !== undefined) {
+    const probe = await probeBoard(servicePort);
+    if (probe) return { port: servicePort, probe };
+    servicePort = undefined;
+  }
+  const { running } = await listServers();
+  for (const entry of running) {
+    if (entry.root === undefined || path.resolve(entry.root) !== WORKSPACE_ROOT) continue;
+    const probe = await probeBoard(entry.port);
+    if (probe?.multiBoard) {
+      servicePort = entry.port;
+      return { port: entry.port, probe };
+    }
+  }
+  return undefined;
+}
+
+/** Asks the board service to show this file. */
 async function steerExistingBoard(file: string): Promise<string | undefined> {
-  const port = boardPort();
-  const serving = await probeBoardServer(port);
+  const service = await currentService();
+  if (!service) return undefined;
+  const { port } = service;
+  const serving = service.probe.file;
   if (serving === undefined) return undefined;
   if (serving === file) return `http://127.0.0.1:${port}/`;
   try {
@@ -249,18 +288,16 @@ async function steerExistingBoard(file: string): Promise<string | undefined> {
 /**
  * Keeps the live page on the file being worked on.
  *
- * The board may be owned by this process or by another session that happens to
- * hold the port -- a long-lived one, or a stale one. Either way the page must
- * follow the work, so try our own server first and otherwise steer whoever has
- * it. A board silently watching a different file is indistinguishable from one
- * that has stopped updating, which is the worst possible failure here.
+ * Always over HTTP now, whether or not this session is the one that started the
+ * service: nothing here hosts a board, so there is no in-process shortcut left
+ * and no second code path to keep in step with this one.
+ *
+ * Never starts a service. Writing a diagram is not a request to open a window,
+ * and a tool that quietly spawned one would be starting a background process on
+ * somebody who only asked for a file.
  */
 async function followBoard(file: string): Promise<void> {
   try {
-    if (live) {
-      if (live.file !== file) await live.setFile(file);
-      return;
-    }
     await steerExistingBoard(file);
   } catch {
     // Losing the live view must never fail the write that succeeded.
@@ -885,20 +922,20 @@ server.registerTool(
   },
   async () =>
     guard(async () => {
-      // Ask the port rather than trusting our own handle: the board may belong
-      // to another session, and ours may have been superseded.
-      const port = boardPort();
-      const probe = await probeBoard(port);
-      const serving = probe?.file;
-      if (serving === undefined) {
+      // Ask the registry, then the service: the board never belongs to this
+      // process, and the port it is on is not fixed.
+      const service = await currentService();
+      const serving = service?.probe.file;
+      if (!service || serving === undefined) {
         return text({
           running: false,
           note: "No live board. Call open_board to start one; every other tool works without it.",
         });
       }
+      const { port, probe } = service;
       // Every board with a page of its own, so the model can say which URL shows
       // what instead of handing over one address for several diagrams.
-      const open = (live?.boards() ?? probe?.boards ?? [serving]).map((file) => ({
+      const open = (probe.boards ?? [serving]).map((file) => ({
         file: relativeToWorkspace(file),
         url: pinnedBoardUrl(port, file),
       }));
@@ -907,12 +944,16 @@ server.registerTool(
         boards: open,
         // The bare URL, which follows whichever board was opened or written last.
         followUrl: `http://127.0.0.1:${port}/`,
+        // The page listing every board this service can show, with a stop button.
+        // Worth handing over: it is the answer for someone who will never type a
+        // command to find out what is running.
+        allBoardsUrl: `http://127.0.0.1:${port}/boards`,
         showing: relativeToWorkspace(serving),
-        ownedByThisSession: live?.file === serving,
-        // /api/health has always reported this; not passing it on left "what is
-        // showing my diagrams" answerable only by shelling out to lsof.
-        pid: probe?.pid,
-        stopWith: "diagramos stop --list shows every board server; diagramos stop stops them",
+        // The service outlives this session on purpose, so "is it ours" is not a
+        // useful thing to report any more; where it came from is.
+        pid: probe.pid,
+        startedBy: probe.startedBy,
+        stopWith: "diagramos stop --list shows every board service; diagramos stop stops them",
       });
     }),
 );
@@ -939,37 +980,25 @@ server.registerTool(
       // shows the viewer an error until something writes.
       await writeBoard(file, await readBoard(file));
 
-      // Another session may already hold the port. Using its server is better
-      // than starting a second board the user has to know about.
-      let url: string | undefined;
-      if (!live) {
-        const port = boardPort();
-        const probe = await probeBoard(port);
-        if (probe?.multiBoard) {
-          url = pinnedBoardUrl(port, file);
-        } else if (probe) {
-          // Older server: it has no idea about pinned URLs, so the only way to
-          // put this board on screen is to re-point the one page it serves.
-          url = await steerExistingBoard(file);
-        }
-      }
-      if (!url) {
-        /*
-         * No ownerPid on purpose. A board opened for someone is meant to still be
-         * there when this session ends -- that is the whole pitch, a diagram
-         * outliving the conversation that produced it -- so it is not tied to the
-         * life of this process. What it is tied to is the registry, so that
-         * `diagramos stop` can find and stop it. Surviving invisibly is the leak;
-         * surviving where you can see it is the feature.
-         */
-        live ??= await startBoardServer({
-          file,
-          port: boardPort(),
-          root: WORKSPACE_ROOT,
-          startedBy: "a Claude session (open_board)",
-        });
-        url = live.urlFor(file);
-      }
+      /*
+       * Ask for a board service; do not become one.
+       *
+       * Hosting the server in this process is what made a board die with the
+       * session that opened it: quitting Claude took the MCP server down and the
+       * board with it, and letting go without quitting left it serving where
+       * nobody could see it. The service is spawned detached instead, so the
+       * board is still there afterwards -- and is in the registry, so
+       * `diagramos stop` can find it. Surviving invisibly was the leak; surviving
+       * where you can see it is the feature.
+       */
+      const service = await ensureBoardServer({
+        root: WORKSPACE_ROOT,
+        port: boardPort(),
+        file,
+        startedBy: "a Claude session (open_board)",
+      });
+      servicePort = service.port;
+      const url = pinnedBoardUrl(service.port, file);
       // Keep the bare URL on this board too, so a page opened without one still
       // shows what was asked for last. Pinned pages are untouched by design.
       await followBoard(file);

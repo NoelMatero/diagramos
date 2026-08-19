@@ -14,15 +14,20 @@
  * The page follows the file: anything that writes it -- Claude, another
  * editor, git checkout -- shows up immediately, and anything drawn in the page
  * is written straight back.
+ *
+ * The command does not stay in the foreground. It makes sure a background board
+ * service is running, prints where the boards are, and gives you back your
+ * prompt -- so closing the terminal, or the session that opened it, leaves the
+ * boards up. `diagramos stop` is what ends them.
  */
 import path from "node:path";
 import { spawn } from "node:child_process";
-import { createServer } from "node:net";
 
 import { readBoard, writeBoard } from "../src/engine/board-file.ts";
 import { CONFIG_FILE, ConfigError, DEFAULT_DIAGRAM_DIR, diagramDir } from "../src/engine/config.ts";
 import { findBoards, findStrayBoards } from "../src/engine/drift.ts";
-import { fileExists, probeBoard, resolveBoardPort, startBoardServer } from "../src/server/board-server.ts";
+import { fileExists, resolveBoardPort } from "../src/server/board-server.ts";
+import { ensureBoardServer } from "../src/server/daemon.ts";
 
 const root = process.cwd();
 
@@ -50,6 +55,8 @@ const USAGE = [
   "",
   "  DIAGRAMOS_PORT       port to serve on (default 4747)",
   "  DIAGRAMOS_NO_OPEN=1  do not launch a browser",
+  "",
+  "Boards are served by a background service that outlives this terminal.",
   "",
   "  diagramos stop --list  what is already running",
   "  diagramos stop         stop it, from any terminal",
@@ -118,48 +125,15 @@ const openBrowser = (url) => {
 };
 
 /**
- * A pinned URL for a board on a server we do not own.
+ * A pinned URL for a board on the service.
  *
- * By absolute path deliberately: a relative name resolves against *that*
- * server's root, and two projects both holding docs/diagrams/architecture
- * would quietly hand back the wrong one. Slashes are left unescaped -- a query
- * value does not need them escaped, and this URL is the thing being read.
+ * By name rather than absolute path: the service resolves a relative name
+ * against the root it serves, which is this project. Slashes are left unescaped
+ * -- a query value does not need them escaped, and this URL is the thing being
+ * read.
  */
 const pinnedOn = (port, board) =>
-  `http://127.0.0.1:${port}/?file=${encodeURIComponent(board).replace(/%2F/g, "/")}`;
-
-/**
- * Whether the server already on this port will serve *these* boards.
- *
- * The port is shared across every project on the machine, so what answers is
- * often a board server belonging to another repo. Health does not report its
- * root, and asking is the only way to find out: a board outside that root comes
- * back 403, and starting a second server is then the right move rather than a
- * failure.
- */
-async function sharesTheseBoards(port, board) {
-  const probe = await probeBoard(port);
-  if (!probe?.multiBoard) return undefined;
-  try {
-    const response = await fetch(`http://127.0.0.1:${port}/api/board?file=${encodeURIComponent(board)}`, {
-      signal: AbortSignal.timeout(1000),
-    });
-    return response.ok ? probe : undefined;
-  } catch {
-    return undefined;
-  }
-}
-
-/** A port nobody is on, for when the usual one is taken. */
-const freePort = () =>
-  new Promise((resolve, reject) => {
-    const probe = createServer();
-    probe.once("error", reject);
-    probe.listen(0, "127.0.0.1", () => {
-      const { port } = probe.address();
-      probe.close(() => resolve(port));
-    });
-  });
+  `http://127.0.0.1:${port}/?file=${encodeURIComponent(path.relative(root, board)).replace(/%2F/g, "/")}`;
 
 let wanted;
 try {
@@ -168,83 +142,48 @@ try {
   fail(error.message);
 }
 
-// Already live and already serving this project -- usually a board Claude
-// opened in a session that is still running. A second server would be a second
-// set of URLs for the same files, so hand over the ones that work and stop.
-const shared = await sharesTheseBoards(wanted, boards[0]);
-if (shared) {
-  console.log(`board server already running on ${wanted} (pid ${shared.pid})`);
-  for (const board of boards) {
-    console.log(`board  ${path.relative(root, board)}`);
-    console.log(`live   ${pinnedOn(wanted, board)}`);
-  }
-  openBrowser(pinnedOn(wanted, boards[0]));
-  process.exit(0);
-}
-
 /*
- * Who this server belongs to.
+ * Ask for a service rather than becoming one.
  *
- * Run by a person in a terminal, it belongs to that terminal: closing the window
- * sends SIGHUP and it goes with it, which is already the right behaviour and
- * needs no help. Run by another process -- a test, a script -- nobody is coming
- * back for it, and a child is *not* killed when its parent dies, it is
- * reparented and keeps serving. That is what left nine of these running here,
- * four of them serving test directories that had already been deleted.
- *
- * So a non-interactive start adopts its parent and shuts down when the parent is
- * gone. On by default rather than behind a flag: the runs that leak are exactly
- * the ones nobody was watching closely enough to pass a flag to.
- *
- * A parent of 1 means there is nobody left to watch -- already orphaned, or
- * started detached on purpose. Adopting launchd would report an owner that can
- * never die, which reads as "someone is coming back for this" when nobody is.
+ * This used to hold the server in the foreground, which meant the boards went
+ * away with the terminal -- and a run that was not interactive left a server
+ * behind that nobody could see. Both problems were the same problem: the server
+ * belonged to whatever happened to start it. Now it belongs to the person, and
+ * ending it is something you ask for.
  */
-const ownerPid = process.stdout.isTTY || process.ppid <= 1 ? undefined : process.ppid;
-
-let port = wanted;
-let server;
-const startOptions = {
-  root,
-  ...(ownerPid ? { ownerPid, startedBy: `diagramos board (parent pid ${ownerPid})` } : { startedBy: "diagramos board" }),
-};
+/*
+ * No owner. The service belongs to the person, not to this terminal.
+ *
+ * The previous rule -- adopt the parent unless a person is watching -- existed
+ * to stop board servers accumulating, and it is not what stops them now. A
+ * project gets one service and every later run of this command finds it, so
+ * there is nothing left to accumulate. What is left is a service nobody comes
+ * back to, and that is handled by the service itself: it shuts down after long
+ * enough with nothing looking at it.
+ */
+let service;
 try {
-  server = await startBoardServer({ file: boards[0], port, ...startOptions });
+  service = await ensureBoardServer({ root, port: wanted, file: boards[0], startedBy: "diagramos board" });
 } catch (error) {
-  if (error?.code !== "EADDRINUSE") throw error;
-  // Something else holds the usual port: another project's board, or a program
-  // with nothing to do with us. Moving to a free one beats refusing to start,
-  // and saying whose it is beats leaving someone to hunt for the process.
-  const occupant = await probeBoard(wanted);
-  port = await freePort();
-  server = await startBoardServer({ file: boards[0], port, ...startOptions });
-  console.log(
-    occupant?.file
-      ? `port ${wanted} is serving ${path.dirname(occupant.file)} (pid ${occupant.pid}) — using ${port} instead`
-      : `port ${wanted} is in use by something else — using ${port} instead`,
-  );
+  fail(error.message);
 }
 
-/*
- * One board gets the bare URL, which follows whatever is written next -- what
- * you want when you are working on one diagram and letting Claude drive.
- * Several get pinned URLs, so boards opened side by side each stay on their own
- * file no matter what gets written.
- */
-const urlFor = (board) => (boards.length === 1 ? server.url : server.urlFor(board));
+if (service.port !== wanted) {
+  // Worth saying: someone looking for 4747 needs to know why it is not there.
+  console.log(`port ${wanted} was taken — this project is on ${service.port}`);
+}
 
 for (const board of boards) {
   console.log(`board  ${path.relative(root, board)}`);
-  console.log(`live   ${urlFor(board)}`);
+  console.log(`live   ${pinnedOn(service.port, board)}`);
 }
-// Both ways of stopping it, because the second one is the answer when this
-// terminal is gone and the server is not.
-console.log("ctrl-c to stop, or diagramos stop from anywhere");
+console.log(`all    http://127.0.0.1:${service.port}/boards`);
+console.log("");
+console.log(
+  service.started
+    ? `started a board service (pid ${service.pid}). It keeps running after this terminal closes.`
+    : `using the board service already running (pid ${service.pid}).`,
+);
+console.log("diagramos stop        stop it, from any terminal");
 
-openBrowser(urlFor(boards[0]));
-
-for (const signal of ["SIGINT", "SIGTERM"]) {
-  process.on(signal, () => {
-    void server.close().then(() => process.exit(0));
-  });
-}
+openBrowser(pinnedOn(service.port, boards[0]));

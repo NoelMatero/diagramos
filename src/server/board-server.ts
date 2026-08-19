@@ -19,7 +19,11 @@ import path from "node:path";
 import { fileURLToPath } from "node:url";
 
 import { readBoard, serializeBoard, writeBoard, type BoardFile } from "../engine/board-file";
+import { diagramDir } from "../engine/config";
+import { checkDrift, createGitBaseline, createWorkspace, findBoards } from "../engine/drift";
+import { initEngine } from "../engine/parse";
 import { processAlive, registerServer } from "./server-registry";
+import { boardsPage } from "./boards-page";
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "../..");
 
@@ -31,7 +35,38 @@ const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "../..")
  * cheaply (one signal-0, no allocation) is invisible next to serving a file.
  */
 const OWNER_POLL_MS = 2000;
+
+/**
+ * How long a service runs with nothing looking at it before it stops itself.
+ *
+ * The service outlives the terminal and the session that started it, which is
+ * the point -- but "outlives" has to end somewhere, or a project opened once on
+ * a long-lived machine keeps a process forever. Twelve hours is chosen to be
+ * longer than any working day and shorter than a weekend: a board you are using
+ * is never idle, because an open page holds a live stream, and a board nobody
+ * has looked at since yesterday is not one anybody is coming back to.
+ *
+ * Nothing is lost when it fires. A board is a file; the next `diagramos board`
+ * has a service back in under a second.
+ */
+const DEFAULT_IDLE_HOURS = 12;
+const IDLE_CHECK_MS = 60_000;
 const VIEWER_DIR = path.join(ROOT, "out/viewer");
+
+/**
+ * The idle fuse, in milliseconds, from a DIAGRAMOS_IDLE_HOURS-style value.
+ *
+ * `0` disables it, for a service somebody means to keep. A value that is not a
+ * number falls back to the default rather than failing: a typo here should cost
+ * the fuse, not the ability to look at a diagram.
+ */
+export function resolveIdleMs(raw: string | undefined): number {
+  const trimmed = raw?.trim();
+  if (!trimmed) return DEFAULT_IDLE_HOURS * 3_600_000;
+  const hours = Number(trimmed);
+  if (!Number.isFinite(hours) || hours < 0) return DEFAULT_IDLE_HOURS * 3_600_000;
+  return hours * 3_600_000;
+}
 
 const MIME_BY_EXT: Record<string, string> = {
   ".html": "text/html; charset=utf-8",
@@ -105,6 +140,11 @@ export interface BoardServerOptions {
   ownerPid?: number;
   /** Recorded in the registry so a listing can say where a server came from. */
   startedBy?: string;
+  /**
+   * Stop after this long with no open page and no request. Zero never stops.
+   * Defaults to DIAGRAMOS_IDLE_HOURS, and to twelve hours without that.
+   */
+  idleMs?: number;
 }
 
 export interface RunningBoardServer {
@@ -150,6 +190,26 @@ function json(response: ServerResponse, status: number, payload: unknown): void 
   response.end(body);
 }
 
+/**
+ * Whether a request came from something other than a page of ours.
+ *
+ * A browser will send a simple cross-origin POST to 127.0.0.1 without asking
+ * anyone's permission, so any web page open in the user's browser can reach an
+ * endpoint here. Requiring a header a simple request cannot carry forces a
+ * preflight, and we answer no preflight, so a cross-origin call never arrives at
+ * all. Our own page and our own tools send it deliberately.
+ *
+ * Only guards what acts on the service itself. Reads and board saves are left
+ * alone: the viewer is a page like any other, and breaking its save to defend
+ * against a page that could only ever save a board it cannot see would trade a
+ * real feature for an imaginary threat.
+ */
+export const CONTROL_HEADER = "x-diagramos";
+
+function fromOurTools(request: IncomingMessage): boolean {
+  return typeof request.headers[CONTROL_HEADER] === "string";
+}
+
 /** Per-board state. One of these exists for every board anyone has asked for. */
 interface BoardState {
   revision: string;
@@ -180,6 +240,8 @@ export async function startBoardServer(options: BoardServerOptions): Promise<Run
   // One watcher per directory rather than per board: boards usually share a
   // directory, and watching it twice would deliver every event twice.
   const watchers = new Map<string, FSWatcher>();
+  /** Tree-sitter grammars for /api/drift, loaded on the first request only. */
+  let engineReady: Promise<void> | undefined;
 
   const write = (subscribers: Subscriber[], payload: Record<string, unknown>) => {
     const frame = `data: ${JSON.stringify(payload)}\n\n`;
@@ -309,9 +371,26 @@ export async function startBoardServer(options: BoardServerOptions): Promise<Run
     }
   };
 
+  /*
+   * When something last showed an interest. An open page counts continuously
+   * rather than once, because a page that sits there watching a diagram all
+   * afternoon makes no requests at all -- judging idleness by requests alone
+   * would close the board out from under exactly the person using it.
+   */
+  let lastSeen = Date.now();
+  const busy = () => followers.length > 0 || [...boards.values()].some((state) => state.subscribers.length > 0);
+
   const server: Server = createServer(async (request, response) => {
     try {
       const url = new URL(request.url ?? "/", `http://${host}`);
+      /*
+       * Health does not count as interest. It is what other tools ask before
+       * deciding whether a board exists -- a session checking status, a command
+       * looking for a service to reuse -- and counting it would let a monitor
+       * keep an abandoned service alive indefinitely, which is the failure this
+       * fuse exists to end.
+       */
+      if (url.pathname !== "/api/health") lastSeen = Date.now();
 
       if (url.pathname === "/api/health") {
         return json(response, 200, {
@@ -322,12 +401,58 @@ export async function startBoardServer(options: BoardServerOptions): Promise<Run
           ...(root ? { root } : {}),
           startedAt,
           ...(options.ownerPid ? { owner: options.ownerPid } : {}),
+          ...(options.startedBy ? { startedBy: options.startedBy } : {}),
           // Tells another process that `?file=` is understood here. Without it a
           // newer session would hand out pinned URLs to an older server, which
           // ignores the query and silently serves the wrong board.
           multiBoard: true,
           boards: [...boards.keys()],
         });
+      }
+
+      /*
+       * Every board this service can show, for the index page. Read live rather
+       * than cached: a board added while the service runs is exactly the case
+       * where a stale list looks like a bug in the tool.
+       */
+      if (request.method === "GET" && url.pathname === "/api/boards") {
+        const listed = root ? await findBoards(root, diagramDir(root)).catch(() => []) : [];
+        // Boards asked for by name that live outside the diagram directory are
+        // still being served, so leaving them off the index would make the one
+        // page that claims to show everything the one place they are missing.
+        const known = [...new Set([...listed, ...boards.keys()])].sort();
+        return json(response, 200, {
+          root,
+          pid: process.pid,
+          port,
+          startedAt,
+          current: file,
+          boards: known.map((target) => ({
+            file: target,
+            name: nameFor(target),
+            url: `/?file=${encodeURIComponent(nameFor(target))}`,
+            current: target === file,
+          })),
+        });
+      }
+
+      /*
+       * Stops the service from the page, so stopping a board does not require
+       * knowing there is a command for it.
+       *
+       * Closing is all it does. In the background service that empties the event
+       * loop and the process ends on its own, which is why there is no exit call
+       * here to go wrong in a test that hosts a server in its own process.
+       */
+      if (request.method === "POST" && url.pathname === "/api/shutdown") {
+        if (!fromOurTools(request)) {
+          return json(response, 403, { error: `shutdown needs the ${CONTROL_HEADER} header` });
+        }
+        json(response, 200, { ok: true, stopping: process.pid });
+        // After the reply is on the wire: close() ends the connection this
+        // answer is travelling on.
+        setTimeout(() => void close().catch(() => undefined), 50);
+        return undefined;
       }
 
       /*
@@ -353,6 +478,30 @@ export async function startBoardServer(options: BoardServerOptions): Promise<Run
         }
         await setFile(requested);
         return json(response, 200, { ok: true, file });
+      }
+
+      /*
+       * The drift report for one board, so the page can show *status* and not
+       * only the picture. Computed on request rather than watched live: the
+       * viewer asks again whenever the board changes, when its tab regains
+       * focus, and on a slow timer, which covers the working loop without this
+       * server growing a file-system watcher over the whole repository.
+       */
+      if (request.method === "GET" && url.pathname === "/api/drift") {
+        const target = requestedFile(url);
+        if (!target.file) return json(response, 403, { error: target.error });
+        if (!(await fileExists(target.file))) {
+          return json(response, 404, { error: `no such file: ${target.file}` });
+        }
+        // Grammars load once per process, lazily: a server nobody asks for
+        // status keeps starting as fast as it always did.
+        engineReady ??= initEngine();
+        await engineReady;
+        const workspaceRoot = root ?? process.cwd();
+        const report = checkDrift(await readBoard(target.file), createWorkspace(workspaceRoot), {
+          baseline: createGitBaseline(workspaceRoot, target.file),
+        });
+        return json(response, 200, { file: target.file, report });
       }
 
       if (request.method === "GET" && url.pathname === "/api/board") {
@@ -451,6 +600,17 @@ export async function startBoardServer(options: BoardServerOptions): Promise<Run
         return undefined;
       }
 
+      if (request.method === "GET" && (url.pathname === "/boards" || url.pathname === "/boards/")) {
+        const body = boardsPage();
+        response.writeHead(200, {
+          "Content-Type": "text/html; charset=utf-8",
+          "Content-Length": Buffer.byteLength(body),
+          "Cache-Control": "no-store",
+        });
+        response.end(body);
+        return undefined;
+      }
+
       if (request.method === "GET") return serveViewer(response, url.pathname);
       response.writeHead(405).end("method not allowed");
       return undefined;
@@ -504,7 +664,31 @@ export async function startBoardServer(options: BoardServerOptions): Promise<Run
     watchdog.unref();
   }
 
+  /*
+   * The idle fuse. Checked on a slow interval rather than scheduled precisely,
+   * because being a minute late to stop an unused service costs nothing and a
+   * rescheduled timer per request would be work on every page load.
+   *
+   * Unref'd for the same reason the watchdog is: its job is to end a process,
+   * never to be the reason one stays alive.
+   */
+  const idleMs = options.idleMs ?? resolveIdleMs(process.env.DIAGRAMOS_IDLE_HOURS);
+  let idleTimer: NodeJS.Timeout | undefined;
+  if (idleMs > 0) {
+    idleTimer = setInterval(() => {
+      if (busy()) {
+        lastSeen = Date.now();
+        return;
+      }
+      if (Date.now() - lastSeen < idleMs) return;
+      clearInterval(idleTimer);
+      void close().catch(() => undefined);
+    }, Math.max(50, Math.min(IDLE_CHECK_MS, idleMs)));
+    idleTimer.unref();
+  }
+
   async function close(): Promise<void> {
+    if (idleTimer) clearInterval(idleTimer);
     if (watchdog) clearInterval(watchdog);
     for (const watcher of watchers.values()) watcher.close();
     watchers.clear();
@@ -558,6 +742,12 @@ export interface BoardProbe {
   startedAt?: string;
   /** The process it belongs to and will not outlive, when it has one. */
   owner?: number;
+  /**
+   * How it was started, in words. The registry records this for `diagramos
+   * stop`; reporting it here lets a session say where a board came from without
+   * reading another process's state directory.
+   */
+  startedBy?: string;
 }
 
 /** What the board server on this port says about itself, if one is there. */

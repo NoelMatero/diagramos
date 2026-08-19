@@ -61,6 +61,13 @@ export interface EdgeDriftFinding {
   toLabel: string;
   fromRef: string;
   toRef: string;
+  /**
+   * `from -> to` in node ids -- the arrow as the canvas and edit_diagram know
+   * it. `from`/`to` above are file paths, which name the *evidence*; this names
+   * the *element*, so a caller can reveal or edit the arrow the finding is
+   * about. Same shape a WorkItem or Promotion uses for an edge.
+   */
+  node: string;
   /** `broken-chain` is a `via` arrow whose named route stopped holding. */
   kind: "unsupported-edge" | "broken-chain";
   detail: string;
@@ -898,7 +905,7 @@ function checkEdgeCorroboration(
   workspace: Workspace,
   importCache: Map<string, Array<{ abs: string; rel: string }>>,
   sharedImporterCandidates: Map<string, string>,
-): EdgeDriftFinding | undefined {
+): Omit<EdgeDriftFinding, "node"> | undefined {
   // Parse refs: keep only path, ignore symbol
   const { path: fromPath } = parseRef(fromRef);
   const { path: toPath } = parseRef(toRef);
@@ -1048,10 +1055,13 @@ export function checkDrift(
     edge: { from: string; to: string; state: string },
     fromNode: { label: string },
     toNode: { label: string },
-    finding: EdgeDriftFinding | undefined,
+    finding: Omit<EdgeDriftFinding, "node"> | undefined,
   ) => {
     if (edge.state !== "planned") {
-      if (finding) edges.push(finding);
+      // Stamped here rather than at each construction site: this is the one
+      // place that still holds the edge itself, and the ids name the arrow on
+      // the canvas while the finding's paths name the evidence.
+      if (finding) edges.push({ ...finding, node: `${edge.from} -> ${edge.to}` });
       return;
     }
     const claim = `${fromNode.label || edge.from} -> ${toNode.label || edge.to}`;
@@ -1399,7 +1409,7 @@ export function checkDrift(
 
       const verdict = bothNamed ? checkSymbolEdge(fromEnd, toEnd, workspace) : "unreadable";
 
-      let finding: EdgeDriftFinding | undefined;
+      let finding: Omit<EdgeDriftFinding, "node"> | undefined;
       if (verdict !== "unreadable") {
         edgesChecked += 1;
         if (verdict === "unreached") {

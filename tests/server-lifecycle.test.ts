@@ -154,50 +154,236 @@ describe("the registry of running board servers", () => {
   });
 });
 
-describe("a server that belongs to another process", () => {
-  it("shuts down when that process dies, instead of being reparented and living on", async () => {
-    const port = await freePort();
-    const log = path.join(workspace, "board.log");
+describe("a board service", () => {
+  /** Backgrounds a command under `sh`, so it has a real parent that can be killed. */
+  function underShell(command: string, env: Record<string, string>): { shell: ReturnType<typeof spawn> } {
+    const shell = spawn("sh", ["-c", `${command} & echo $!; wait`], {
+      cwd: workspace,
+      env: { ...process.env, DIAGRAMOS_NO_OPEN: "1", DIAGRAMOS_STATE_DIR: stateDir, ...env },
+    });
+    return { shell };
+  }
 
+  it("keeps serving after the process that started it is gone", async () => {
     /*
-     * The leak, staged exactly as it happens. `sh` starts the board CLI in the
-     * background and then waits, so the CLI adopts a real parent; killing the
-     * shell with SIGKILL sends the CLI nothing at all. Before the watchdog, this
-     * is the point where the server was reparented to launchd and kept serving
-     * for five days.
+     * The promise this whole design exists for, staged the way it is lived: a
+     * shell starts the service and is then killed outright, which is what
+     * closing a terminal or quitting a session amounts to. Before this, the
+     * board lived inside whoever asked for it and went down with them.
      */
-    const parent = spawn(
-      "sh",
-      ["-c", `exec node "${BUNDLE}" board docs/diagrams/board.excalidraw >"${log}" 2>&1 & echo $!; wait`],
-      {
-        cwd: workspace,
-        env: { ...process.env, DIAGRAMOS_PORT: String(port), DIAGRAMOS_NO_OPEN: "1", DIAGRAMOS_STATE_DIR: stateDir },
-      },
-    );
-
-    let announced = "";
-    parent.stdout?.on("data", (chunk: Buffer) => {
-      announced += chunk.toString();
+    const port = await freePort();
+    const log = path.join(workspace, "service.log");
+    const { shell } = underShell(`exec node "${BUNDLE}" serve >"${log}" 2>&1`, {
+      DIAGRAMOS_PORT: String(port),
     });
 
-    const serverPid = await until(() => /\d/.test(announced)).then(() => Number.parseInt(announced.trim(), 10));
-    expect(Number.isInteger(serverPid)).toBe(true);
-
-    // Up and serving before anything is killed, so a pass cannot come from a
-    // server that simply failed to start.
     expect(await until(async () => (await probeBoard(port)) !== undefined)).toBe(true);
-    const probe = await probeBoard(port);
-    expect(probe?.owner).toBe(parent.pid);
 
-    parent.kill("SIGKILL");
-    expect(await until(() => !processAlive(parent.pid!))).toBe(true);
+    shell.kill("SIGKILL");
+    expect(await until(() => !processAlive(shell.pid!))).toBe(true);
 
-    // The server is still there for a moment -- that is the mechanism, not a
-    // failure -- and then notices and goes.
-    expect(await until(() => !processAlive(serverPid))).toBe(true);
+    // Long enough that an owner watchdog would have fired, so a pass cannot come
+    // from simply not having waited.
+    await new Promise((resolve) => setTimeout(resolve, 3000));
+    expect(await probeBoard(port)).toBeDefined();
+    // And it is findable, which is what separates surviving from leaking.
+    const { running } = await listServers();
+    expect(running.map((entry) => entry.port)).toContain(port);
+
+    for (const entry of running) await stopServer(entry);
     expect(await probeBoard(port)).toBeUndefined();
-    // And it took its registry entry with it, so `stop` does not offer it later.
-    expect((await listServers()).running).toHaveLength(0);
+  }, 30_000);
+
+  it("survives the terminal it was started from closing", async () => {
+    /*
+     * The case above proves the service does not die with its starter. This one
+     * proves `diagramos board` puts it somewhere a closing terminal cannot reach:
+     * a terminal hangs up on its whole process group, so a service merely spawned
+     * as a child would go down with the window that opened it. Signalled here the
+     * same way -- to the group, not to the shell.
+     */
+    const port = await freePort();
+    const shell = spawn("sh", ["-c", `node "${BUNDLE}" board docs/diagrams/board.excalidraw`], {
+      cwd: workspace,
+      // Makes the shell a group leader, so the group can be signalled below.
+      detached: true,
+      env: { ...process.env, DIAGRAMOS_NO_OPEN: "1", DIAGRAMOS_STATE_DIR: stateDir, DIAGRAMOS_PORT: String(port) },
+    });
+    try {
+      // The command returns the prompt rather than holding it; the service is
+      // what is still there.
+      expect(await until(() => shell.exitCode !== null)).toBe(true);
+      expect(await until(async () => (await probeBoard(port)) !== undefined)).toBe(true);
+
+      /*
+       * ESRCH here means the group is already empty -- which is itself the
+       * service having left it -- so it is not an error. The assertion is the
+       * next line either way: a service still in that group would have been hung
+       * up on and stopped answering.
+       */
+      try {
+        process.kill(-shell.pid!, "SIGHUP");
+      } catch (error) {
+        if ((error as NodeJS.ErrnoException).code !== "ESRCH") throw error;
+      }
+      await new Promise((resolve) => setTimeout(resolve, 2000));
+
+      expect(await probeBoard(port)).toBeDefined();
+    } finally {
+      for (const entry of (await listServers()).running) await stopServer(entry);
+    }
+  }, 30_000);
+
+  it("stops itself once nothing has looked at it for long enough", async () => {
+    /*
+     * The guard that replaced the owner watchdog. A service belongs to the
+     * person rather than to a process, so nothing dying can end it -- which
+     * leaves "a project opened once, on a machine that stays up" as the way a
+     * process runs forever. An idle fuse ends that case without ever touching a
+     * board somebody is using: an open page holds a stream, and a held stream is
+     * not idle.
+     */
+    const port = await freePort();
+    const log = path.join(workspace, "idle.log");
+    const { shell } = underShell(`exec node "${BUNDLE}" serve >"${log}" 2>&1`, {
+      DIAGRAMOS_PORT: String(port),
+      // One second, expressed the way the setting is: in hours.
+      DIAGRAMOS_IDLE_HOURS: String(1 / 3600),
+    });
+    try {
+      expect(await until(async () => (await probeBoard(port)) !== undefined)).toBe(true);
+      expect(await until(async () => (await probeBoard(port)) === undefined, 20_000)).toBe(true);
+      // Gone from the registry too, so `stop` does not offer it afterwards.
+      expect(await until(async () => (await listServers()).running.length === 0)).toBe(true);
+    } finally {
+      shell.kill("SIGKILL");
+    }
+  }, 30_000);
+
+  it("stays up while a page is watching, however long that is", async () => {
+    // The other half of the fuse, and the half that would hurt if it were wrong:
+    // a diagram left open on a second screen must not close itself.
+    const server = await startBoardServer({
+      file: path.join(workspace, "docs/diagrams/board.excalidraw"),
+      port: 0,
+      root: workspace,
+      idleMs: 200,
+    });
+    const controller = new AbortController();
+    try {
+      const stream = await fetch(`http://127.0.0.1:${server.port}/api/events`, {
+        signal: controller.signal,
+      });
+      expect(stream.ok).toBe(true);
+      // Several times the fuse, with no request of any kind in between.
+      await new Promise((resolve) => setTimeout(resolve, 1200));
+      expect(await probeBoard(server.port)).toBeDefined();
+    } finally {
+      controller.abort();
+      await server.close();
+    }
+  }, 30_000);
+
+  it("shuts down with its owner when an unattended caller named one", async () => {
+    /*
+     * Kept for the caller nobody is watching -- a script, a CI step -- which can
+     * name a process the service must not outlive. The mechanism is the same one
+     * that fixed the original leak: a child is reparented rather than killed when
+     * its parent dies, so it has to notice on its own.
+     */
+    const port = await freePort();
+    const log = path.join(workspace, "owned.log");
+    // A real process to own it, and one this test can kill. Naming the test
+    // worker would assert only that an owner is *reported*, since the worker is
+    // still alive at the end of the case.
+    const owner = spawn("sleep", ["300"]);
+    const { shell } = underShell(`exec node "${BUNDLE}" serve >"${log}" 2>&1`, {
+      DIAGRAMOS_PORT: String(port),
+      DIAGRAMOS_OWNER_PID: String(owner.pid),
+    });
+    try {
+      expect(await until(async () => (await probeBoard(port)) !== undefined)).toBe(true);
+      const probe = await probeBoard(port);
+      expect(probe?.owner).toBe(owner.pid);
+      const servicePid = probe!.pid!;
+
+      owner.kill("SIGKILL");
+      expect(await until(() => !processAlive(owner.pid!))).toBe(true);
+
+      // Reparented rather than killed, so it has to notice by itself -- and then
+      // take its registry entry with it.
+      expect(await until(() => !processAlive(servicePid))).toBe(true);
+      expect(await probeBoard(port)).toBeUndefined();
+      expect(await until(async () => (await listServers()).running.length === 0)).toBe(true);
+    } finally {
+      owner.kill("SIGKILL");
+      shell.kill("SIGKILL");
+      for (const entry of (await listServers()).running) await stopServer(entry);
+    }
+  }, 30_000);
+});
+
+describe("stopping a service from its own page", () => {
+  it("lists the boards it can show", async () => {
+    const server = await startBoardServer({
+      file: path.join(workspace, "docs/diagrams/board.excalidraw"),
+      port: 0,
+      root: workspace,
+    });
+    try {
+      const payload = (await (await fetch(`http://127.0.0.1:${server.port}/api/boards`)).json()) as {
+        root: string;
+        boards: Array<{ name: string; current: boolean }>;
+      };
+      expect(payload.root).toBe(workspace);
+      expect(payload.boards.map((board) => board.name)).toContain(
+        path.join("docs", "diagrams", "board.excalidraw"),
+      );
+      expect(payload.boards.find((board) => board.current)).toBeDefined();
+      // The page that shows all this is served, not just the data behind it.
+      const page = await fetch(`http://127.0.0.1:${server.port}/boards`);
+      expect(page.status).toBe(200);
+      expect(await page.text()).toContain("Stop this board service");
+    } finally {
+      await server.close();
+    }
+  }, 30_000);
+
+  it("refuses a shutdown that did not come from one of our own pages", async () => {
+    /*
+     * A browser will send a simple cross-origin POST to 127.0.0.1 without asking
+     * anyone, so any site the user has open could otherwise close their boards.
+     * Requiring a header a simple request cannot carry means such a call never
+     * arrives at all.
+     */
+    const server = await startBoardServer({
+      file: path.join(workspace, "docs/diagrams/board.excalidraw"),
+      port: 0,
+      root: workspace,
+    });
+    try {
+      const response = await fetch(`http://127.0.0.1:${server.port}/api/shutdown`, { method: "POST" });
+      expect(response.status).toBe(403);
+      expect(await probeBoard(server.port)).toBeDefined();
+    } finally {
+      await server.close();
+    }
+  }, 30_000);
+
+  it("stops when the page asks", async () => {
+    const server = await startBoardServer({
+      file: path.join(workspace, "docs/diagrams/board.excalidraw"),
+      port: 0,
+      root: workspace,
+    });
+    const response = await fetch(`http://127.0.0.1:${server.port}/api/shutdown`, {
+      method: "POST",
+      headers: { "x-diagramos": "stop" },
+    });
+    expect(response.status).toBe(200);
+    expect(await until(async () => (await probeBoard(server.port)) === undefined)).toBe(true);
+    // The registry entry goes with it, so nothing offers to stop it twice.
+    expect(await until(async () => (await listServers()).running.length === 0)).toBe(true);
   }, 30_000);
 });
 
@@ -221,7 +407,7 @@ describe("diagramos stop", () => {
   it("says so plainly when nothing is running", async () => {
     const { code, stdout } = await run(["stop"]);
     expect(code).toBe(0);
-    expect(stdout).toContain("no board servers running");
+    expect(stdout).toContain("no board services running");
   });
 
   it("shows a running server, with the port it took and how long it has been up", async () => {
