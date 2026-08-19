@@ -24,8 +24,27 @@ import path from "node:path";
 export interface RegisteredServer {
   pid: number;
   port: number;
-  /** The project it serves; the boundary `?file=` is confined to. */
+  /**
+   * The project it started in. Still the one relative board names resolve
+   * against, and the one a listing names when it has to name a single place.
+   */
   root?: string;
+  /**
+   * Every project it will serve, the first being `root`. A service adopts
+   * another project when something asks it to, which is how one service comes
+   * to serve a whole machine instead of one repository per port.
+   */
+  roots?: string[];
+  /**
+   * The secret that lets a local process widen this service to another project.
+   *
+   * Adding a root extends what `?file=` can reach, so it cannot be something any
+   * page in the browser can ask for -- a site the user has open can POST to
+   * 127.0.0.1 without permission. This file is readable only by its owner, so
+   * holding the token is proof of being one of the user's own processes rather
+   * than something rendered in their browser.
+   */
+  token?: string;
   /** ISO 8601. Answers "how long has this been here", which is how a leak looks. */
   startedAt: string;
   /**
@@ -61,11 +80,34 @@ const entryFile = (pid: number): string => path.join(registryDir(), `${pid}.json
  * later; it is not how it serves boards. An unwritable home directory should
  * cost you `diagramos stop`, not the ability to look at a diagram.
  */
+/**
+ * Rewrites a running service's entry, for the parts that change while it runs.
+ *
+ * Only the roots do. Everything else about a service is settled the moment it
+ * binds a port.
+ */
+export async function updateServer(pid: number, changes: Partial<RegisteredServer>): Promise<void> {
+  const file = entryFile(pid);
+  try {
+    const current = JSON.parse(await fs.readFile(file, "utf8")) as RegisteredServer;
+    await fs.writeFile(file, `${JSON.stringify({ ...current, ...changes }, undefined, 2)}\n`, {
+      encoding: "utf8",
+      mode: 0o600,
+    });
+  } catch {
+    // Same reasoning as registering: losing the record costs `diagramos stop`,
+    // not the ability to look at a diagram.
+  }
+}
+
 export async function registerServer(entry: RegisteredServer): Promise<() => Promise<void>> {
   const file = entryFile(entry.pid);
   try {
-    await fs.mkdir(registryDir(), { recursive: true });
-    await fs.writeFile(file, `${JSON.stringify(entry, undefined, 2)}\n`, "utf8");
+    // Owner-only, both of them: the entry carries the token that widens a
+    // service, so a registry another user can read is a service another user can
+    // point at their own directories.
+    await fs.mkdir(registryDir(), { recursive: true, mode: 0o700 });
+    await fs.writeFile(file, `${JSON.stringify(entry, undefined, 2)}\n`, { encoding: "utf8", mode: 0o600 });
   } catch {
     return async () => undefined;
   }

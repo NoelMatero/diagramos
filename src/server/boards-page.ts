@@ -42,6 +42,9 @@ li a { display: flex; justify-content: space-between; gap: 1rem; align-items: ba
        padding: .85rem 1rem; color: inherit; text-decoration: none; }
 li a:hover { border-color: var(--accent); }
 .name { font-weight: 550; }
+h2 { font-size: .8rem; font-weight: 600; letter-spacing: .04em; text-transform: uppercase;
+     color: var(--muted); margin: 1.75rem 0 .6rem; }
+h2:first-of-type { margin-top: 0; }
 .tag { color: var(--accent); font-size: .8rem; }
 footer { margin-top: 2.5rem; padding-top: 1.25rem; border-top: 1px solid var(--line);
          display: flex; justify-content: space-between; align-items: center; gap: 1rem; flex-wrap: wrap; }
@@ -65,20 +68,38 @@ const fmt = (iso) => {
   return Math.round(s / 86400) + " days";
 };
 
+const short = (p) => p.split("/").filter(Boolean).slice(-2).join("/");
+
 async function load() {
   const data = await (await fetch("/api/boards", { cache: "no-store" })).json();
   const list = document.querySelector("#boards");
-  document.querySelector("#project").textContent = data.root ?? "no project";
+  const projects = data.roots && data.roots.length ? data.roots : [data.root].filter(Boolean);
+  document.querySelector("#project").textContent =
+    projects.length > 1 ? projects.length + " projects" : projects[0] ?? "no project";
   document.querySelector("#meta").textContent =
     "pid " + data.pid + " · port " + data.port + " · up " + fmt(data.startedAt);
   if (!data.boards.length) {
-    list.innerHTML = '<li><a class="empty">No boards in this project yet.</a></li>';
+    list.replaceChildren(Object.assign(document.createElement("li"), { className: "empty" }));
+    list.firstChild.textContent = "No boards yet.";
     return;
   }
+  /*
+   * Grouped by project once there is more than one, because a flat list of forty
+   * boards across four repositories is the same wall of names the command line
+   * gave you. With a single project the heading would say nothing, so it is left
+   * off.
+   */
+  const groups = new Map();
+  for (const b of data.boards) {
+    const key = b.project || "";
+    if (!groups.has(key)) groups.set(key, []);
+    groups.get(key).push(b);
+  }
+
   // Built as nodes rather than as a string: a board name comes from the
   // filesystem, and a filename is allowed to contain angle brackets.
-  list.replaceChildren(...data.boards.map((b) => {
-    const item = document.createElement("li");
+  const item = (b) => {
+    const node = document.createElement("li");
     const link = document.createElement("a");
     link.href = b.url;
     const name = document.createElement("span");
@@ -91,9 +112,21 @@ async function load() {
       tag.textContent = "showing now";
       link.append(tag);
     }
-    item.append(link);
-    return item;
-  }));
+    node.append(link);
+    return node;
+  };
+
+  const nodes = [];
+  for (const [project, entries] of groups) {
+    if (groups.size > 1) {
+      const heading = document.createElement("h2");
+      heading.textContent = project ? short(project) : "elsewhere";
+      heading.title = project;
+      nodes.push(heading);
+    }
+    nodes.push(...entries.map(item));
+  }
+  list.replaceChildren(...nodes);
 }
 
 document.querySelector("#stop").addEventListener("click", async (event) => {

@@ -11,7 +11,7 @@
  * over the top and retries, so an agent write can never silently discard a
  * stroke the human just made.
  */
-import { createHash } from "node:crypto";
+import { createHash, randomBytes, timingSafeEqual } from "node:crypto";
 import { watch, type FSWatcher } from "node:fs";
 import { readFile, stat } from "node:fs/promises";
 import { createServer, type IncomingMessage, type Server, type ServerResponse } from "node:http";
@@ -22,7 +22,7 @@ import { readBoard, serializeBoard, writeBoard, type BoardFile } from "../engine
 import { diagramDir } from "../engine/config";
 import { checkDrift, createGitBaseline, createWorkspace, findBoards } from "../engine/drift";
 import { initEngine } from "../engine/parse";
-import { processAlive, registerServer } from "./server-registry";
+import { processAlive, registerServer, updateServer } from "./server-registry";
 import { boardsPage } from "./boards-page";
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "../..");
@@ -210,6 +210,13 @@ function fromOurTools(request: IncomingMessage): boolean {
   return typeof request.headers[CONTROL_HEADER] === "string";
 }
 
+/** Constant-time compare, so a wrong token cannot be found one character at a time. */
+function sameToken(expected: string, given: string): boolean {
+  const a = Buffer.from(expected);
+  const b = Buffer.from(given);
+  return a.length === b.length && timingSafeEqual(a, b);
+}
+
 /** Per-board state. One of these exists for every board anyone has asked for. */
 interface BoardState {
   revision: string;
@@ -223,6 +230,23 @@ export async function startBoardServer(options: BoardServerOptions): Promise<Run
   const host = options.host ?? "127.0.0.1";
   const root = options.root ? path.resolve(options.root) : undefined;
   const startedAt = new Date().toISOString();
+  /*
+   * Every project this service will serve. It starts as the one it was told
+   * about and grows when another asks to be adopted, which is what lets one
+   * service cover a machine rather than one per repository per port.
+   *
+   * A set of directories, never "anywhere": the confinement is the guard that
+   * stops a page in the browser reading a file it was not shown, and widening it
+   * to the projects you actually opened is a different thing from removing it.
+   */
+  const roots: string[] = root ? [root] : [];
+  /*
+   * Proof that a caller is one of the user's own processes rather than something
+   * running in their browser. It is written into the registry entry, which only
+   * the user can read; a page has no way to obtain it.
+   */
+  const token = randomBytes(24).toString("hex");
+  const matchesToken = (given: unknown): boolean => typeof given === "string" && sameToken(token, given);
 
   let nextSubscriberId = 0;
   /**
@@ -329,17 +353,64 @@ export async function startBoardServer(options: BoardServerOptions): Promise<Run
   const requestedFile = (url: URL): { file?: string; error?: string } => {
     const raw = url.searchParams.get("file");
     if (!raw) return { file };
+    /*
+     * A relative name resolves against the project this service started in, and
+     * only that one. Resolving it against every root would make
+     * `docs/diagrams/architecture.excalidraw` mean two different files once a
+     * second project is adopted, and pick between them by accident of ordering.
+     * Boards in adopted projects are named by absolute path for that reason.
+     */
     const resolved = path.isAbsolute(raw) ? path.resolve(raw) : path.resolve(root ?? ROOT, raw);
-    if (root) {
-      const relative = path.relative(root, resolved);
-      if (relative.startsWith("..") || path.isAbsolute(relative)) {
-        return { error: `file is outside the board root (${root})` };
-      }
+    return checkInRoots(resolved);
+  };
+
+  /**
+   * The project a board belongs to.
+   *
+   * Drift is measured against the repository the board describes, so a board in
+   * an adopted project must not be checked against the project this service
+   * happened to start in -- every ref would resolve in the wrong tree and the
+   * whole board would read as drifted.
+   */
+  const rootFor = (target: string): string => {
+    const resolved = path.resolve(target);
+    const owner = roots.find((candidate) => {
+      const relative = path.relative(candidate, resolved);
+      return !relative.startsWith("..") && !path.isAbsolute(relative);
+    });
+    return owner ?? root ?? process.cwd();
+  };
+
+  /** A board is a `.excalidraw` file inside one of the projects this service serves. */
+  const checkInRoots = (resolved: string): { file?: string; error?: string } => {
+    /*
+     * Boards only. Every path that reaches here is read as a board and handed
+     * back, so without this the confinement would still allow any file in the
+     * project -- an .env, a private key -- to be fetched by a page that guessed
+     * its name. Narrowing it to the extension the service exists to serve costs
+     * nothing and makes serving several projects safer than serving one did.
+     */
+    if (path.extname(resolved).toLowerCase() !== ".excalidraw") {
+      return { error: "a board is a .excalidraw file" };
     }
+    if (!roots.length) return { file: resolved };
+    const inside = roots.some((candidate) => {
+      const relative = path.relative(candidate, resolved);
+      return !relative.startsWith("..") && !path.isAbsolute(relative);
+    });
+    if (!inside) return { error: `file is outside the projects this board service serves` };
     return { file: resolved };
   };
 
-  /** How a pinned URL names a board: relative to the root when there is one. */
+  /**
+   * How a pinned URL names a board.
+   *
+   * Relative for the project this service started in, absolute for every
+   * project it later adopted -- because a relative name only resolves back to
+   * the same file for the first one. Two projects can hold
+   * `docs/diagrams/architecture.excalidraw`, and a URL that could mean either is
+   * worse than a long one.
+   */
   const nameFor = (target: string) => {
     const resolved = path.resolve(target);
     if (!root) return resolved;
@@ -399,6 +470,7 @@ export async function startBoardServer(options: BoardServerOptions): Promise<Run
           revision: boards.get(file)?.revision,
           pid: process.pid,
           ...(root ? { root } : {}),
+          roots: [...roots],
           startedAt,
           ...(options.ownerPid ? { owner: options.ownerPid } : {}),
           ...(options.startedBy ? { startedBy: options.startedBy } : {}),
@@ -411,28 +483,72 @@ export async function startBoardServer(options: BoardServerOptions): Promise<Run
       }
 
       /*
+       * Adopts another project, so one service can serve a machine.
+       *
+       * Guarded by the token in the registry entry rather than by the header the
+       * other control endpoints use. This is the one call that widens what
+       * `?file=` can reach, and a header only proves the caller is not a browser
+       * on another site; the token proves it is one of the user's own processes,
+       * because the file holding it is readable by nobody else.
+       */
+      if (request.method === "POST" && url.pathname === "/api/roots") {
+        const payload = JSON.parse(await readBody(request, 8192)) as { root?: string; token?: string };
+        if (!matchesToken(payload.token)) {
+          return json(response, 403, { error: "a valid token is required to add a project" });
+        }
+        if (typeof payload.root !== "string" || !payload.root) {
+          return json(response, 400, { error: "root is required" });
+        }
+        const added = path.resolve(payload.root);
+        if (!(await fileExists(added))) {
+          return json(response, 404, { error: `no such directory: ${added}` });
+        }
+        if (!roots.some((candidate) => candidate === added)) {
+          roots.push(added);
+          // Recorded so a listing says what this service actually covers, and so
+          // the next caller can see it already serves their project.
+          await updateServer(process.pid, { roots: [...roots] });
+        }
+        return json(response, 200, { ok: true, roots: [...roots] });
+      }
+
+      /*
        * Every board this service can show, for the index page. Read live rather
        * than cached: a board added while the service runs is exactly the case
        * where a stale list looks like a bug in the tool.
        */
       if (request.method === "GET" && url.pathname === "/api/boards") {
-        const listed = root ? await findBoards(root, diagramDir(root)).catch(() => []) : [];
-        // Boards asked for by name that live outside the diagram directory are
+        const found = new Map<string, string>();
+        for (const project of roots) {
+          for (const board of await findBoards(project, diagramDir(project)).catch(() => [])) {
+            found.set(board, project);
+          }
+        }
+        // Boards asked for by name that live outside a diagram directory are
         // still being served, so leaving them off the index would make the one
         // page that claims to show everything the one place they are missing.
-        const known = [...new Set([...listed, ...boards.keys()])].sort();
+        for (const board of boards.keys()) {
+          if (found.has(board)) continue;
+          found.set(board, roots.find((project) => board.startsWith(`${project}${path.sep}`)) ?? "");
+        }
         return json(response, 200, {
           root,
+          roots: [...roots],
           pid: process.pid,
           port,
           startedAt,
           current: file,
-          boards: known.map((target) => ({
-            file: target,
-            name: nameFor(target),
-            url: `/?file=${encodeURIComponent(nameFor(target))}`,
-            current: target === file,
-          })),
+          boards: [...found.entries()]
+            .sort(([a], [b]) => a.localeCompare(b))
+            .map(([target, project]) => ({
+              file: target,
+              project,
+              // Named within its own project, so a list covering several of them
+              // does not read as a wall of identical absolute paths.
+              name: project ? path.relative(project, target) : target,
+              url: `/?file=${encodeURIComponent(nameFor(target))}`,
+              current: target === file,
+            })),
         });
       }
 
@@ -466,17 +582,12 @@ export async function startBoardServer(options: BoardServerOptions): Promise<Run
         if (typeof payload.file !== "string" || !payload.file) {
           return json(response, 400, { error: "file is required" });
         }
-        const requested = path.resolve(payload.file);
-        if (root) {
-          const relative = path.relative(root, requested);
-          if (relative.startsWith("..") || path.isAbsolute(relative)) {
-            return json(response, 403, { error: `file is outside the board root (${root})` });
-          }
+        const requested = checkInRoots(path.resolve(payload.file));
+        if (!requested.file) return json(response, 403, { error: requested.error });
+        if (!(await fileExists(requested.file))) {
+          return json(response, 404, { error: `no such file: ${requested.file}` });
         }
-        if (!(await fileExists(requested))) {
-          return json(response, 404, { error: `no such file: ${requested}` });
-        }
-        await setFile(requested);
+        await setFile(requested.file);
         return json(response, 200, { ok: true, file });
       }
 
@@ -497,7 +608,7 @@ export async function startBoardServer(options: BoardServerOptions): Promise<Run
         // status keeps starting as fast as it always did.
         engineReady ??= initEngine();
         await engineReady;
-        const workspaceRoot = root ?? process.cwd();
+        const workspaceRoot = rootFor(target.file);
         const report = checkDrift(await readBoard(target.file), createWorkspace(workspaceRoot), {
           baseline: createGitBaseline(workspaceRoot, target.file),
         });
@@ -539,17 +650,16 @@ export async function startBoardServer(options: BoardServerOptions): Promise<Run
         // wiped a freshly generated board (#70).
         let saveTo: string;
         if (typeof payload.file === "string" && payload.file) {
-          const named = path.resolve(payload.file);
-          if (root) {
-            const relative = path.relative(root, named);
-            if (relative.startsWith("..") || path.isAbsolute(relative)) {
-              return json(response, 403, { error: `file is outside the board root (${root})` });
-            }
+          // Through the same check every other path uses. Written against one
+          // root it would refuse every save in an adopted project, and it would
+          // be the one way in that never got narrowed to boards -- a write is a
+          // worse thing to leave wide than a read.
+          const named = checkInRoots(path.resolve(payload.file));
+          if (!named.file) return json(response, 403, { error: named.error });
+          if (!(await fileExists(named.file))) {
+            return json(response, 404, { error: `no such file: ${named.file}` });
           }
-          if (!(await fileExists(named))) {
-            return json(response, 404, { error: `no such file: ${named}` });
-          }
-          saveTo = named;
+          saveTo = named.file;
         } else {
           const target = requestedFile(url);
           if (!target.file) return json(response, 403, { error: target.error });
@@ -637,6 +747,8 @@ export async function startBoardServer(options: BoardServerOptions): Promise<Run
     pid: process.pid,
     port,
     ...(root ? { root } : {}),
+    roots: [...roots],
+    token,
     startedAt,
     ...(options.ownerPid ? { owner: options.ownerPid } : {}),
     ...(options.startedBy ? { startedBy: options.startedBy } : {}),
@@ -736,8 +848,14 @@ export interface BoardProbe {
    * shell out to `lsof` to answer "what is showing my diagrams".
    */
   pid?: number;
-  /** The project it serves. Absent on an unrooted server. */
+  /** The project it started in. Absent on an unrooted server. */
   root?: string;
+  /**
+   * Every project it serves. Absent on a service from before one could serve
+   * more than one, which is how a caller knows to start its own rather than ask
+   * to be adopted by a service that would not understand the request.
+   */
+  roots?: string[];
   /** ISO 8601, so a listing can say how long it has been running. */
   startedAt?: string;
   /** The process it belongs to and will not outlive, when it has one. */
