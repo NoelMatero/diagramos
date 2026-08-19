@@ -64,9 +64,9 @@ A local page on `127.0.0.1:4747` showing the file. Anything that writes it — a
 
 The command does not hold your terminal. It makes sure a background board service is running and gives you back the prompt, so closing that window — or ending the Claude session that opened the board — leaves the boards up.
 
-**One service, however many projects.** Open a board in a second repository and it joins the service already running rather than starting another on another port. So `diagramos stop --list` is one line rather than a list, and `127.0.0.1:4747/boards` shows everything you have open, grouped by project, with a button that stops the lot.
+**One service, however many projects.** Open a board in a second repository and it joins the service already running rather than starting another on another port. You can also name a board that lives somewhere else — `diagramos board ../other-repo/docs/diagrams/architecture.excalidraw` — and that project joins the same service. So `diagramos stop --list` is one line rather than a list, and `127.0.0.1:4747/boards` shows everything you have open, grouped by project, with a button that stops the lot. The board name in the corner of any board links there.
 
-A service still only serves directories you actually opened, and only `.excalidraw` files inside them — that confinement is what stops a page in your browser reading a file it was never shown, and it did not go away to make this work. Adding a project to a running service takes a token from the service's own registry entry, which is readable by nobody but you, so a web page cannot ask for it however hard it tries.
+A service still only serves directories you actually opened, and only `.excalidraw` files inside them — that confinement is what stops a page in your browser reading a file it was never shown, and it did not go away to make this work. Paths are compared with every symlink resolved, so a link inside a project pointing out of it is not a way past. Adding a project to a running service takes a token from the service's own registry entry, which is readable by nobody but you, so a web page cannot ask for it however hard it tries.
 
 Conflicts resolve in your favour. A save carrying a stale revision is refused with the current board attached, so an agent write cannot discard a stroke you just made.
 

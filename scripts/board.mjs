@@ -24,7 +24,7 @@ import path from "node:path";
 import { spawn } from "node:child_process";
 
 import { readBoard, writeBoard } from "../src/engine/board-file.ts";
-import { CONFIG_FILE, ConfigError, DEFAULT_DIAGRAM_DIR, diagramDir } from "../src/engine/config.ts";
+import { CONFIG_FILE, ConfigError, DEFAULT_DIAGRAM_DIR, diagramDir, projectRootFor } from "../src/engine/config.ts";
 import { findBoards, findStrayBoards } from "../src/engine/drift.ts";
 import { fileExists, resolveBoardPort } from "../src/server/board-server.ts";
 import { ensureBoardServer } from "../src/server/daemon.ts";
@@ -51,7 +51,8 @@ const USAGE = [
   "",
   "  no arguments   serve every board in this project's diagram directory",
   `                 (${DEFAULT_DIAGRAM_DIR}, or "diagrams" in ${CONFIG_FILE})`,
-  "  a board path   serve the ones you name, creating any that is not there yet",
+  "  a board path   serve the ones you name, creating any that is not there yet.",
+  "                 They may live in another project; it joins the same service",
   "",
   "  DIAGRAMOS_PORT       port to serve on (default 4747)",
   "  DIAGRAMOS_NO_OPEN=1  do not launch a browser",
@@ -99,16 +100,46 @@ if (!boards.length) {
   );
 }
 
-// Every board has to sit inside the directory the server is rooted at. That
-// root is what stops `?file=` and the takeover endpoint from reaching an
-// arbitrary file on disk, so a board outside it is refused rather than served
-// by widening the root to cover it.
+/*
+ * A board named here can live in another project.
+ *
+ * It could not before, because a service was confined to one directory and
+ * serving a board outside it would have meant removing the guard that stops a
+ * page reaching an arbitrary file. A service now holds a set of projects, so
+ * the board's own project is added to it instead -- the guard stays, and the
+ * set of places it allows is the set you actually named.
+ *
+ * The extension is checked here rather than left to the server, so naming the
+ * wrong file fails with a sentence instead of a 403 from a URL.
+ */
 for (const board of boards) {
-  const relative = path.relative(root, board);
-  if (relative.startsWith("..") || path.isAbsolute(relative)) {
-    fail(`board is outside ${root}: ${board}`, "run diagramos board from the project the board lives in");
+  if (path.extname(board).toLowerCase() !== ".excalidraw") {
+    fail(`not a board: ${board}`, "a board is a .excalidraw file");
   }
 }
+
+/*
+ * The projects to serve, this one first when it is among them: a relative board
+ * name resolves against the project the service started in, so putting the
+ * directory you are standing in anywhere else would make the short URLs mean
+ * somebody else's boards.
+ */
+/*
+ * A board here belongs to here. Only a board somewhere else has to have its
+ * project worked out, and the answer for one outside any repository is its own
+ * directory -- narrower than the truth, never wider. Asking `projectRootFor`
+ * about a board in this project would answer with whatever marker it found
+ * first, which for a project with no `.git` is `docs/diagrams`, and a service
+ * rooted there would make every relative name and every ref resolve one
+ * directory too deep.
+ */
+const projectOf = (board) => {
+  const relative = path.relative(root, board);
+  return !relative.startsWith("..") && !path.isAbsolute(relative) ? root : projectRootFor(board);
+};
+
+const projects = [...new Set(boards.map((board) => projectOf(board)))];
+const ordered = projects.includes(root) ? [root, ...projects.filter((project) => project !== root)] : projects;
 
 // Materialise a board that is not there yet, so the watcher has something to
 // follow -- naming a new file is how you start one. Boards that already exist
@@ -125,15 +156,28 @@ const openBrowser = (url) => {
 };
 
 /**
- * A pinned URL for a board on the service.
+ * How the service will understand a board's name.
  *
- * By name rather than absolute path: the service resolves a relative name
- * against the root it serves, which is this project. Slashes are left unescaped
- * -- a query value does not need them escaped, and this URL is the thing being
- * read.
+ * Relative for boards inside the project the service started in, absolute for
+ * everything else. Which project that is belongs to the *service*, not to us --
+ * it may have been running for days, started somewhere entirely different -- so
+ * it is read back from the service rather than assumed to be this directory.
+ * Assuming would produce a short URL that quietly resolves to another
+ * repository's board of the same name.
  */
-const pinnedOn = (port, board) =>
-  `http://127.0.0.1:${port}/?file=${encodeURIComponent(path.relative(root, board)).replace(/%2F/g, "/")}`;
+const nameOn = (probe, board) => {
+  const base = probe?.root;
+  if (!base) return board;
+  const relative = path.relative(base, board);
+  return relative.startsWith("..") || path.isAbsolute(relative) ? board : relative;
+};
+
+/**
+ * A pinned URL for a board on the service. Slashes are left unescaped -- a query
+ * value does not need them escaped, and this URL is the thing being read.
+ */
+const pinnedOn = (port, probe, board) =>
+  `http://127.0.0.1:${port}/?file=${encodeURIComponent(nameOn(probe, board)).replace(/%2F/g, "/")}`;
 
 let wanted;
 try {
@@ -163,7 +207,22 @@ try {
  */
 let service;
 try {
-  service = await ensureBoardServer({ root, port: wanted, file: boards[0], startedBy: "diagramos board" });
+  /*
+   * One call per project, and the same call whether one is running or not:
+   * asking for a service that exists adds the project to it, so serving boards
+   * from three repositories is three asks rather than three services.
+   */
+  for (const project of ordered) {
+    const first = boards.find((board) => projectOf(board) === project);
+    const next = await ensureBoardServer({
+      root: project,
+      port: wanted,
+      file: first,
+      startedBy: "diagramos board",
+    });
+    // `started` is true if any of them had to start one; the rest joined it.
+    service = { ...next, started: Boolean(service?.started) || next.started };
+  }
 } catch (error) {
   fail(error.message);
 }
@@ -174,8 +233,11 @@ if (service.port !== wanted) {
 }
 
 for (const board of boards) {
-  console.log(`board  ${path.relative(root, board)}`);
-  console.log(`live   ${pinnedOn(service.port, board)}`);
+  // Shown relative to where you are standing, which is what you typed, even
+  // when the URL has to name it absolutely for the service.
+  const shown = path.relative(root, board);
+  console.log(`board  ${shown.startsWith("..") ? board : shown}`);
+  console.log(`live   ${pinnedOn(service.port, service.probe, board)}`);
 }
 console.log(`all    http://127.0.0.1:${service.port}/boards`);
 console.log("");
@@ -186,4 +248,4 @@ console.log(
 );
 console.log("diagramos stop        stop it, from any terminal");
 
-openBrowser(pinnedOn(service.port, boards[0]));
+openBrowser(pinnedOn(service.port, service.probe, boards[0]));

@@ -41,11 +41,15 @@ li { border: 1px solid var(--line); border-radius: 10px; background: var(--card)
 li a { display: flex; justify-content: space-between; gap: 1rem; align-items: baseline;
        padding: .85rem 1rem; color: inherit; text-decoration: none; }
 li a:hover { border-color: var(--accent); }
-.name { font-weight: 550; }
+/* A board with no project is named by its full path, which can be longer than
+   the row; breaking it anywhere beats it deciding the width of the page. */
+.name { font-weight: 550; overflow-wrap: anywhere; }
 h2 { font-size: .8rem; font-weight: 600; letter-spacing: .04em; text-transform: uppercase;
      color: var(--muted); margin: 1.75rem 0 .6rem; }
 h2:first-of-type { margin-top: 0; }
-.tag { color: var(--accent); font-size: .8rem; }
+/* Never wraps: two words on two lines next to a filename reads as part of the
+   name rather than as a label about it. */
+.tag { color: var(--accent); font-size: .8rem; white-space: nowrap; flex-shrink: 0; }
 footer { margin-top: 2.5rem; padding-top: 1.25rem; border-top: 1px solid var(--line);
          display: flex; justify-content: space-between; align-items: center; gap: 1rem; flex-wrap: wrap; }
 .meta { color: var(--muted); font-size: .85rem; }

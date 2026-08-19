@@ -2,7 +2,7 @@
  * The live board server: file -> browser and browser -> file, plus the
  * conflict rule that keeps an agent write from erasing a human stroke.
  */
-import { mkdtempSync, rmSync, writeFileSync } from "node:fs";
+import { mkdtempSync, realpathSync, rmSync, writeFileSync } from "node:fs";
 import { readFile } from "node:fs/promises";
 import os from "node:os";
 import path from "node:path";
@@ -78,7 +78,14 @@ function waitForPush(known: string, timeoutMs = 4000): Promise<string> {
 }
 
 beforeAll(async () => {
-  workspace = mkdtempSync(path.join(os.tmpdir(), "board-live-"));
+  /*
+   * Resolved, because the server holds its root and its boards resolved -- a
+   * confinement check between two spellings of one directory is no check at all.
+   * On macOS a temporary directory is reached through /var, which is a link to
+   * /private/var, so an unresolved fixture here compares against a path the
+   * server will never report.
+   */
+  workspace = realpathSync(mkdtempSync(path.join(os.tmpdir(), "board-live-")));
   boardFile = path.join(workspace, "board.excalidraw");
   await writeBoard(boardFile, boardWith("a"));
   server = await startBoardServer({ file: boardFile, port: 0, root: workspace });

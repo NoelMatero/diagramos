@@ -210,18 +210,38 @@ describe("packaged board CLI", () => {
     }
   }, 30_000);
 
-  it("refuses a board outside the directory it is rooted at", async () => {
+  it("serves a board from another project, by adding that project to the service", async () => {
+    /*
+     * This used to be refused. A service was confined to one directory, so a
+     * board outside it could only be served by removing the guard that stops a
+     * page reaching an arbitrary file. A service now holds a set of projects,
+     * so the board's own project is added to the set instead -- the guard stays
+     * and the places it allows are the ones that were named.
+     */
     const outside = path.join(workspace, "docs/diagrams/architecture.excalidraw");
     const elsewhere = mkdtempSync(path.join(os.tmpdir(), "board-cli-elsewhere-"));
     try {
-      // Without a root, POST /api/file would let any local page point the board
-      // at an arbitrary file on disk.
-      const { code, stderr } = await runToExit(elsewhere, [outside]);
-      expect(code).toBe(2);
-      expect(stderr).toContain("outside");
+      const { code, stdout, stderr } = await runToExit(elsewhere, [outside]);
+      expect(code, stderr).toBe(0);
+      // Named absolutely, because a relative name would resolve against the
+      // project the service started in and mean a different file.
+      expect(stdout).toContain(encodeURIComponent(outside).replace(/%2F/g, "/"));
+
+      const port = Number(/127\.0\.0\.1:(\d+)\//.exec(stdout)![1]);
+      const response = await fetch(`http://127.0.0.1:${port}/api/board?file=${encodeURIComponent(outside)}`);
+      expect(response.status).toBe(200);
     } finally {
+      await stopAllServices();
       rmSync(elsewhere, { recursive: true, force: true });
     }
+  }, 30_000);
+
+  it("refuses a file that is not a board, before starting anything", async () => {
+    const notABoard = path.join(workspace, "docs/diagrams/notes.md");
+    writeFileSync(notABoard, "# notes\n", "utf8");
+    const { code, stderr } = await runToExit(workspace, [notABoard]);
+    expect(code).toBe(2);
+    expect(stderr).toContain("a board is a .excalidraw file");
   }, 30_000);
 });
 
