@@ -24,6 +24,7 @@ import {
   listDiagrams,
 } from "../engine/diagram";
 import { readGraph } from "../engine/graph";
+import { projectGraph } from "./projection";
 import { CONFIG_FILE, DEFAULT_DIAGRAM_DIR, diagramDir } from "../engine/config";
 import {
   checkDrift,
@@ -381,7 +382,13 @@ server.registerTool(
       + "from geometry). Every edge also says how its ends were resolved: declared or bound are "
       + "exact pointers to two shapes, nearest means an end was matched to whichever shape it landed "
       + "close to and may not be the one intended. A hand-drawn arrow bound at both ends is a precise "
-      + "claim despite being inferred. Use this to treat a diagram as a specification.",
+      + "claim despite being inferred. Use this to treat a diagram as a specification. "
+      + "A field sitting at its default is left out rather than repeated on every item; the response "
+      + "opens with omittedWhenDefault, which says what each absence means. A state is built, planned "
+      + "(drawn as intent, not written yet) or external (real, and not yours to change); nodes and "
+      + "edges both carry one. No unattributed means the board has no strays. "
+      + "Edit or delete by the node id listed here -- edit_diagram resolves it -- "
+      + "and ask for geometry or includeElements if you need the raw Excalidraw elementId.",
     inputSchema: {
       path: z.string(),
       geometry: z
@@ -408,16 +415,11 @@ server.registerTool(
       const graph = readGraph(board);
       const inferred = [...graph.nodes, ...graph.edges].filter((item) => item.provenance === "inferred");
       const diagrams = listDiagrams(board);
-      // Geometry is dropped unless asked for. readGraph stays rich because the
-      // engine and its tests want the whole picture; what crosses to the model
-      // is trimmed here, where the cost is paid.
-      const nodes = geometry
-        ? graph.nodes
-        : graph.nodes.map(({ x: _x, y: _y, width: _w, height: _h, ...rest }) => rest);
+      // readGraph stays rich because the engine and its tests want the whole
+      // picture. projectGraph is the narrower thing a model is charged for.
       return text({
         file: relativeToWorkspace(file),
-        ...graph,
-        nodes,
+        ...projectGraph(graph, { geometry, detailed: geometry || includeElements }),
         // Named here so a caller can address a single diagram (delete_diagram,
         // or create_diagram with append) without having to guess its name from
         // element id prefixes.
@@ -690,7 +692,9 @@ server.registerTool(
     title: "Edit diagram",
     description:
       "Patch or delete elements by id, hand-drawn ones included: move, resize, recolour, relabel. "
-      + "Deleting a shape takes its bound label. Read the board first; change only what must change.",
+      + "The id can be a node id from read_diagram or a raw Excalidraw element id; a real element id "
+      + "wins if something is called both. Deleting a shape takes its bound label. Read the board "
+      + "first; change only what must change.",
     inputSchema: {
       path: z.string(),
       updates: z

@@ -228,6 +228,160 @@ Two side results, unchanged from run one and still true:
 - **Raw file versus semantic payload is 12–16x on every board.** An agent that
   `cat`s an `.excalidraw` pays that multiple for the same graph.
 
+### Price, revisited (2026-08-18)
+
+The paragraph above stands as what was measured on the day, and the arms above
+were handed the payload it describes. It no longer describes what the tool
+sends.
+
+Asking where the tokens actually went turned up an answer that had nothing to
+do with diagrams. Of a `read_diagram` response, **58% was packaging**: `shape`
+said `rectangle`, `provenance` said `recorded`, `state` said `built`,
+`endpoints` said `declared` — the same four words repeated on every box and
+every arrow of every response — plus an `elementId` only an edit needs.
+`projectGraph` now omits a field sitting at its default, the read_diagram
+description states each default once per session instead, and `applyEdits`
+resolves semantic node ids so nothing needs the withheld handle.
+
+| | before | after |
+|---|---|---|
+| the same six anchored boards | 4,917 tokens | **2,060** |
+| against the prose floor | 1.5x more | **1.6x less** |
+| against every tracked `.md` | 8.0x less | **19.2x less** |
+
+The shipped total reads 2,100 rather than 2,060 because the same change added a
+`projection.ts` box to `board-internals`: a module inside a subsystem this repo
+draws should be drawn. Its one arrow is import-backed and checked.
+
+So the cheapness argument is back, and this time it is not doing any work it
+should not: nothing was dropped that a caller cannot ask for, and the recorded
+accuracy result above is untouched. The honest framing is that boards were
+never expensive — the envelope was.
+
+One unmeasured effect, stated as the guess it is: a lean payload reads
+differently. A `planned` box is now the only annotated thing on a board of
+plain ones, where before it was one `"state"` among sixty. Whether that helps
+an agent is exactly the kind of claim this brief exists to refuse until it is
+graded, and it has not been graded.
+
+The same refusal applies in the other direction and is the reason for
+`omittedWhenDefault`. The fields are not equally safe to drop, and pricing them
+separately across the 61 nodes and 63 edges on these boards shows why:
+
+| omitted field | cost | carries meaning? |
+|---|---|---|
+| `elementId` | 986 tokens (19.8%) | no — a handle, not a fact |
+| `provenance` | 744 (15.0%) | **yes** — recorded vs inferred |
+| `state` | 484 (9.7%) | **yes** — built vs planned vs external |
+| `endpoints` | 362 (7.3%) | **yes** — how much to trust an arrow |
+| `shape` | 300 (6.0%) | barely |
+
+A quarter of the payload was `elementId` and `shape`, which no reader reasons
+with. The other three do carry meaning, and on these boards they were carrying
+almost none of it: across 61 nodes and 63 edges the only non-default values are
+three `external` boxes and one ellipse. Zero `inferred`, zero `bound`, zero
+`nearest`, zero `planned`.
+
+That cuts both ways, and the second way is the risk. A board where everything
+agrees with every default now mentions `provenance`, `state` and `endpoints`
+**nowhere at all** — so a reader of the payload cannot learn from it that those
+fields exist, and an agent that does not know a concept exists cannot think to
+ask about it. Stating the defaults in the tool description does not fix that: it
+relies on the description having been read and retained.
+
+So every response opens with `omittedWhenDefault`, naming each field and what
+its absence means. It costs ~27 tokens per board against the ~1,590 the fields
+cost spread across every item, taking the saving from 58% to 55%. Three points
+to keep the vocabulary in the data was not a close call.
+
+### Does the trim cost comprehension? (2026-08-18, graded)
+
+The paragraph above said this was ungraded. It has now been run, and the answer
+is no — with one honest caveat that limits how far it generalises.
+
+Four arms, built from one synthetic graph by
+`scripts/bench-default-fields.mts` so they differ only in packaging. Synthetic
+because a sealed agent handed a real board could answer from this repo's code
+instead of from the payload.
+
+| arm | payload | where the defaults are explained |
+| --- | --- | --- |
+| verbose | 1,050 tok | nothing is omitted |
+| lean | 493 | tool description enumerates them |
+| legend | 546 | tool description points at `omittedWhenDefault`, which is in the payload — **what ships** |
+| naive | 493 | **nowhere** — the control |
+
+Two sealed runs per arm, eight runs. Four questions, ground truth written by
+hand first. Three of them have a default value as the answer — *which boxes are
+not built yet* (none), *which were hand-drawn and might be wrong* (none), *is
+this arrow precise or a positional guess* (precise). The fourth asks the same
+things about a board whose values are non-default, as a control on the control.
+
+**32 of 32 answers correct. Every arm, every question. Nothing was wrong and
+nothing said "cannot tell".**
+
+The only thing that moved was stated confidence, and it moved perfectly
+consistently:
+
+| arm | correct | confidence on the three default-valued questions |
+| --- | --- | --- |
+| verbose | 8/8 | `certain` 6/6 |
+| lean | 8/8 | `certain` 6/6 |
+| legend | 8/8 | `certain` 6/6 |
+| naive | 8/8 | **`fairly sure` 6/6** |
+
+So: dropping the fields did not cost accuracy, and explaining them bought
+*certainty* rather than correctness.
+
+**Two things this does not say, and they matter more than what it does.**
+
+First, **the caveat that limits it.** Both naive runs got there by comparing the
+two boards — *"BOARD TWO uses `state:"planned"` when something isn't written
+yet, so the absence here is meaningful."* They recovered the convention from a
+sibling board that happened to be in the same prompt. That is an artefact of the
+test design, not a property of the payload. An agent holding only an
+all-default board has nothing to compare against, and that case was not tested.
+The naive arm's success is partly the test being generous, and it still only
+reached `fairly sure`.
+
+Second, **`omittedWhenDefault` bought no measured gain over the tool
+description.** Both reached `certain`. It is kept anyway, and that is a
+judgement call rather than a validated one: the description sits far from the
+payload in a real session and may not be retained, whereas a legend travels
+with the data. The measured cost of keeping it is 3 percentage points of the
+saving. Recorded as a choice, not as a result.
+
+**The test is also too easy to discriminate much.** An eight-node board, the
+documentation immediately adjacent, and four metadata questions in a row that
+cue careful reading. A harder version would separate the documentation from the
+payload by a long session, use a board with no sibling to compare against, and
+ask the question incidentally rather than as an exam. Read the 32/32 as *no
+evidence of harm at this scale*, not as *proved safe*.
+
+### Found by accident: the payload used words the docs never defined
+
+Every arm hedged on exactly one thing — `state: "external"` — and one said why
+outright: *"external is not defined in the tool docs I was given; I'm reading it
+as third-party."*
+
+It was right to hedge. The `read_diagram` description defined `recorded`,
+`inferred`, `declared`, `bound` and `nearest`, and defined **neither `built`,
+`planned` nor `external`** — while `omittedWhenDefault` named `built` as a
+default without ever saying what a state is. The three agents guessed correctly
+from the labels, which is luck, not documentation.
+
+Fixed: the description now says a state is built, planned (drawn as intent, not
+written yet) or external (real, and not yours to change).
+
+This is the third time this line of work has turned up documentation making a
+claim the code does not support, and the second found purely by accident. That
+pattern is now better evidence for #52's premise than any of the deliberate
+measurements.
+
+A further ~15 points sits in dropping JSON for a plain-text outline (1,317
+tokens). That is **not** free: it flattens multi-line labels and needs escaping
+rules. It was measured, not shipped.
+
 ## What the redraw broke or could not do
 
 Reported because they are real and neither is fixed.
