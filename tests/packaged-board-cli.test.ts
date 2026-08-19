@@ -12,8 +12,8 @@
  * No graceful skip when the bundle is absent: `npm install` builds it through
  * `prepare`, so a missing bundle is a real regression, not a reason to pass.
  */
-import { existsSync, mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from "node:fs";
-import { spawn, type ChildProcess } from "node:child_process";
+import { existsSync, mkdirSync, mkdtempSync, readFileSync, realpathSync, rmSync, writeFileSync } from "node:fs";
+import { spawn } from "node:child_process";
 import { createServer as createHttpServer } from "node:http";
 import { createServer } from "node:net";
 import os from "node:os";
@@ -21,12 +21,12 @@ import path from "node:path";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
 
 import { emptyBoard, serializeBoard } from "../src/engine/board-file";
+import { listServers, stopServer } from "../src/server/server-registry";
 
 const REPO = path.resolve(__dirname, "..");
 const BUNDLE = path.join(REPO, "out/cli/diagramos.mjs");
 
 let workspace: string;
-let running: ChildProcess | undefined;
 /** The port the running board is on, set once it is up and reused by later cases. */
 let boardPort: number;
 
@@ -50,34 +50,27 @@ function writeBoardFile(file: string, label: string): void {
   writeFileSync(file, serializeBoard(board), "utf8");
 }
 
-/** Starts the bin and resolves once it says it is up. */
-function startBoard(cwd: string, args: string[], port: number): Promise<{ child: ChildProcess; stdout: string }> {
-  return new Promise((resolve, reject) => {
-    const child = spawn(process.execPath, [BUNDLE, "board", ...args], {
-      cwd,
-      env: { ...process.env, DIAGRAMOS_PORT: String(port), DIAGRAMOS_NO_OPEN: "1" },
-    });
-    let stdout = "";
-    let stderr = "";
-    const timer = setTimeout(() => {
-      child.kill();
-      reject(new Error(`timed out waiting for the board\nstdout: ${stdout}\nstderr: ${stderr}`));
-    }, 20_000);
-    child.stdout!.on("data", (chunk) => {
-      stdout += String(chunk);
-      if (stdout.includes("ctrl-c to stop")) {
-        clearTimeout(timer);
-        resolve({ child, stdout });
-      }
-    });
-    child.stderr!.on("data", (chunk) => {
-      stderr += String(chunk);
-    });
-    child.on("exit", (code) => {
-      clearTimeout(timer);
-      reject(new Error(`board exited ${code} before serving\nstderr: ${stderr}`));
-    });
-  });
+/**
+ * Runs the bin and returns what it printed, once it has exited.
+ *
+ * `diagramos board` no longer stays in the foreground: it makes sure a
+ * background service is running and gives the prompt back, which is what lets
+ * the boards outlive the terminal. So the thing to wait for is the exit, and the
+ * thing still running afterwards is the service -- stopped in afterAll through
+ * the registry, exactly the way `diagramos stop` finds it.
+ */
+async function startBoard(cwd: string, args: string[], port: number): Promise<{ stdout: string }> {
+  const result = await runToExit(cwd, args, port);
+  if (result.code !== 0) {
+    throw new Error(`board exited ${result.code}\nstdout: ${result.stdout}\nstderr: ${result.stderr}`);
+  }
+  return { stdout: result.stdout };
+}
+
+/** Stops every board service this file started, so ports do not pile up between cases. */
+async function stopAllServices(): Promise<void> {
+  const { running } = await listServers();
+  for (const entry of running) await stopServer(entry, { graceMs: 2000 });
 }
 
 /** Runs the bin to completion, for the paths that print and stop rather than serve. */
@@ -116,8 +109,8 @@ beforeAll(() => {
   writeBoardFile(path.join(workspace, "docs/diagrams/auth.excalidraw"), "auth");
 });
 
-afterAll(() => {
-  running?.kill();
+afterAll(async () => {
+  await stopAllServices();
   if (workspace) rmSync(workspace, { recursive: true, force: true });
 });
 
@@ -125,8 +118,11 @@ describe("packaged board CLI", () => {
   it("finds every board in the standard directory with no arguments", async () => {
     boardPort = await freePort();
     const started = await startBoard(workspace, [], boardPort);
-    running = started.child;
 
+    // The command is gone and the boards are still being served: that is the
+    // whole behaviour, so it is asserted before anything about the output.
+    expect((await fetch(`http://127.0.0.1:${boardPort}/api/health`)).ok).toBe(true);
+    expect(started.stdout).toContain("It keeps running after this terminal closes.");
     expect(started.stdout).toContain("docs/diagrams/architecture.excalidraw");
     expect(started.stdout).toContain("docs/diagrams/auth.excalidraw");
     // Several boards get pinned URLs, so two opened side by side stay put.
@@ -167,15 +163,14 @@ describe("packaged board CLI", () => {
     // from a board server it could have shared.
     const squatter = createHttpServer((_request, response) => response.writeHead(404).end());
     await new Promise<void>((resolve) => squatter.listen(taken, "127.0.0.1", () => resolve()));
-    let started: { child: ChildProcess; stdout: string } | undefined;
     try {
-      started = await startBoard(workspace, [], taken);
-      expect(started.stdout).toContain(`port ${taken} is in use`);
+      const started = await startBoard(workspace, [], taken);
+      expect(started.stdout).toContain(`port ${taken} was taken`);
       const used = Number(/127\.0\.0\.1:(\d+)\//.exec(started.stdout)![1]);
       expect(used).not.toBe(taken);
       expect((await fetch(`http://127.0.0.1:${used}/`)).status).toBe(200);
     } finally {
-      started?.child.kill();
+      await stopAllServices();
       // The bin probes the port before giving up on it, and close() alone waits
       // forever on that socket.
       squatter.closeAllConnections();
@@ -183,19 +178,24 @@ describe("packaged board CLI", () => {
     }
   }, 30_000);
 
-  it("shares a board server already serving this project rather than starting a second", async () => {
+  it("shares a board service already serving this project rather than starting a second", async () => {
     const port = await freePort();
-    const first = await startBoard(workspace, [], port);
+    await startBoard(workspace, [], port);
     try {
       const second = await runToExit(workspace, [], port);
       expect(second.code).toBe(0);
       expect(second.stdout).toContain("already running");
-      // Named absolutely on purpose: a relative name resolves against the other
-      // server's root, so two projects holding the same filename would serve
-      // each other's diagram without either side noticing.
-      expect(second.stdout).toContain(path.join(workspace, "docs/diagrams/architecture.excalidraw"));
+      // On the same port, which is what "shared" means here: a second service
+      // would have been pushed onto an ephemeral one.
+      expect(second.stdout).toContain(`http://127.0.0.1:${port}/?file=`);
+      // One service in the registry for this project, not two. Compared through
+      // realpath: the service records process.cwd(), and on macOS a temporary
+      // directory reaches it with /private prefixed.
+      const real = realpathSync(workspace);
+      const { running } = await listServers();
+      expect(running.filter((entry) => entry.root === real)).toHaveLength(1);
     } finally {
-      first.child.kill();
+      await stopAllServices();
     }
   }, 30_000);
 
@@ -228,14 +228,13 @@ describe("packaged board CLI", () => {
 describe("the diagram directory", () => {
   it("serves the directory the project asked for", async () => {
     const project = mkdtempSync(path.join(os.tmpdir(), "board-cli-configured-"));
-    let started: { child: ChildProcess; stdout: string } | undefined;
     try {
       writeFileSync(path.join(project, ".diagramos.json"), JSON.stringify({ diagrams: "docs/architecture" }));
       writeBoardFile(path.join(project, "docs/architecture/system.excalidraw"), "sys");
-      started = await startBoard(project, [], await freePort());
+      const started = await startBoard(project, [], await freePort());
       expect(started.stdout).toContain(path.join("docs", "architecture", "system.excalidraw"));
     } finally {
-      started?.child.kill();
+      await stopAllServices();
       rmSync(project, { recursive: true, force: true });
     }
   }, 30_000);
