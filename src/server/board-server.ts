@@ -20,7 +20,8 @@ import { fileURLToPath } from "node:url";
 
 import { readBoard, serializeBoard, writeBoard, type BoardFile } from "../engine/board-file";
 import { diagramDir } from "../engine/config";
-import { findBoards } from "../engine/drift";
+import { checkDrift, createGitBaseline, createWorkspace, findBoards } from "../engine/drift";
+import { initEngine } from "../engine/parse";
 import { processAlive, registerServer, updateServer } from "./server-registry";
 import { boardsPage } from "./boards-page";
 
@@ -263,6 +264,8 @@ export async function startBoardServer(options: BoardServerOptions): Promise<Run
   // One watcher per directory rather than per board: boards usually share a
   // directory, and watching it twice would deliver every event twice.
   const watchers = new Map<string, FSWatcher>();
+  /** Tree-sitter grammars for /api/drift, loaded on the first request only. */
+  let engineReady: Promise<void> | undefined;
 
   const write = (subscribers: Subscriber[], payload: Record<string, unknown>) => {
     const frame = `data: ${JSON.stringify(payload)}\n\n`;
@@ -359,6 +362,23 @@ export async function startBoardServer(options: BoardServerOptions): Promise<Run
      */
     const resolved = path.isAbsolute(raw) ? path.resolve(raw) : path.resolve(root ?? ROOT, raw);
     return checkInRoots(resolved);
+  };
+
+  /**
+   * The project a board belongs to.
+   *
+   * Drift is measured against the repository the board describes, so a board in
+   * an adopted project must not be checked against the project this service
+   * happened to start in -- every ref would resolve in the wrong tree and the
+   * whole board would read as drifted.
+   */
+  const rootFor = (target: string): string => {
+    const resolved = path.resolve(target);
+    const owner = roots.find((candidate) => {
+      const relative = path.relative(candidate, resolved);
+      return !relative.startsWith("..") && !path.isAbsolute(relative);
+    });
+    return owner ?? root ?? process.cwd();
   };
 
   /** A board is a `.excalidraw` file inside one of the projects this service serves. */
@@ -571,6 +591,30 @@ export async function startBoardServer(options: BoardServerOptions): Promise<Run
         return json(response, 200, { ok: true, file });
       }
 
+      /*
+       * The drift report for one board, so the page can show *status* and not
+       * only the picture. Computed on request rather than watched live: the
+       * viewer asks again whenever the board changes, when its tab regains
+       * focus, and on a slow timer, which covers the working loop without this
+       * server growing a file-system watcher over the whole repository.
+       */
+      if (request.method === "GET" && url.pathname === "/api/drift") {
+        const target = requestedFile(url);
+        if (!target.file) return json(response, 403, { error: target.error });
+        if (!(await fileExists(target.file))) {
+          return json(response, 404, { error: `no such file: ${target.file}` });
+        }
+        // Grammars load once per process, lazily: a server nobody asks for
+        // status keeps starting as fast as it always did.
+        engineReady ??= initEngine();
+        await engineReady;
+        const workspaceRoot = rootFor(target.file);
+        const report = checkDrift(await readBoard(target.file), createWorkspace(workspaceRoot), {
+          baseline: createGitBaseline(workspaceRoot, target.file),
+        });
+        return json(response, 200, { file: target.file, report });
+      }
+
       if (request.method === "GET" && url.pathname === "/api/board") {
         const target = requestedFile(url);
         if (!target.file) return json(response, 403, { error: target.error });
@@ -584,27 +628,55 @@ export async function startBoardServer(options: BoardServerOptions): Promise<Run
       }
 
       if (request.method === "POST" && url.pathname === "/api/board") {
-        const target = requestedFile(url);
-        if (!target.file) return json(response, 403, { error: target.error });
         const payload = JSON.parse(await readBody(request)) as {
           revision?: string;
           board?: BoardFile;
+          file?: string;
         };
         if (!payload.board || !Array.isArray(payload.board.elements)) {
           return json(response, 400, { error: "board with an elements array is required" });
         }
-        const state = await track(target.file);
-        const onDisk = await readBoard(target.file);
+        // A write must say what it thinks it is replacing. Without the claim
+        // there is nothing standing between a stale client and the file, and a
+        // stale scene written blind is exactly the shape of a wipe (#70).
+        if (!payload.revision) {
+          return json(response, 400, { error: "revision is required — pull the board first" });
+        }
+        // The save lands on the file the scene came from, when the client says
+        // which. The bare URL means "whatever board is current" -- right for
+        // reading, wrong for writing: the server can be switched to another
+        // file between a scene being composed and its save arriving, and
+        // resolving the write against the *new* file is how a follow tab once
+        // wiped a freshly generated board (#70).
+        let saveTo: string;
+        if (typeof payload.file === "string" && payload.file) {
+          // Through the same check every other path uses. Written against one
+          // root it would refuse every save in an adopted project, and it would
+          // be the one way in that never got narrowed to boards -- a write is a
+          // worse thing to leave wide than a read.
+          const named = checkInRoots(path.resolve(payload.file));
+          if (!named.file) return json(response, 403, { error: named.error });
+          if (!(await fileExists(named.file))) {
+            return json(response, 404, { error: `no such file: ${named.file}` });
+          }
+          saveTo = named.file;
+        } else {
+          const target = requestedFile(url);
+          if (!target.file) return json(response, 403, { error: target.error });
+          saveTo = target.file;
+        }
+        const state = await track(saveTo);
+        const onDisk = await readBoard(saveTo);
         const diskRevision = revisionOf(onDisk);
-        if (payload.revision && payload.revision !== diskRevision) {
+        if (payload.revision !== diskRevision) {
           // Stale write. Hand back the current board so the browser can merge
           // its own edits over it instead of clobbering or losing them.
-          return json(response, 409, { error: "stale revision", revision: diskRevision, board: onDisk });
+          return json(response, 409, { error: "stale revision", revision: diskRevision, board: onDisk, file: saveTo });
         }
-        await writeBoard(target.file, payload.board);
+        await writeBoard(saveTo, payload.board);
         state.revision = revisionOf(payload.board);
-        announce(target.file, state.revision);
-        return json(response, 200, { revision: state.revision });
+        announce(saveTo, state.revision);
+        return json(response, 200, { revision: state.revision, file: saveTo });
       }
 
       if (request.method === "GET" && url.pathname === "/api/events") {

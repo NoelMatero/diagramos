@@ -209,6 +209,10 @@ describe("an arrow between two symbol-anchored boxes", () => {
     expect(report.edges).toHaveLength(1);
     expect(report.edges[0].detail).toContain("worth a look");
     expect(report.edges[0].detail).toContain("LOGGER or log_line");
+    // `from`/`to` are file paths (the evidence); `node` names the arrow itself,
+    // in node ids, so a caller can reveal or edit the element the finding is
+    // about. The board page's click-to-reveal reads exactly this.
+    expect(report.edges[0].node).toBe("a -> b");
   });
 
   it("accepts any one of the symbols a feature box lists", async () => {

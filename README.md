@@ -89,6 +89,8 @@ Open two and they stay put — writing one diagram, or asking Claude to open a t
 
 The bare `127.0.0.1:4747` follows whichever board was opened or written last, which is what you want when you are working on one diagram and letting Claude drive.
 
+**The board shows its own status.** A chip in the corner carries the same tally the end-of-turn notice does — boxes whose code is gone in red, questionable arrows in amber, planned work in grey. Click it and every finding is a row; click a row and the canvas jumps to the box or arrow it is about. When there is nothing to say it reads as what was checked, not just "in sync", because a board nobody could read and a board that agrees are different kinds of quiet. It refreshes when the board changes and when you come back to the tab.
+
 **Reading them offline.** `diagramos board` is an ordinary local server and the viewer it serves ships inside the package, fonts and all, so it needs no network and no Claude Code — on a plane, it is the same command. Or skip us entirely: a `.excalidraw` file opens in the [VS Code Excalidraw extension](https://marketplace.visualstudio.com/items?itemName=pomdtr.excalidraw-editor) and in Obsidian's Excalidraw plugin, both offline. That is the advantage of the diagram being a file.
 
 ## Keeping a diagram honest

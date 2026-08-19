@@ -193,6 +193,98 @@ describe("the boundary a service keeps", () => {
   }, 60_000);
 });
 
+describe("a service holding two projects", () => {
+  /*
+   * The three cases below are all one hazard: code written when a service had a
+   * single root, meeting a service that has several. Each one read `root` where
+   * it should have asked which project the board actually belongs to, and each
+   * merged without a conflict because nothing about the text disagreed.
+   */
+  it("saves a board in the second project, rather than refusing it as foreign", async () => {
+    const first = await makeProject("alpha");
+    const second = await makeProject("beta");
+    await run(first, ["board"]);
+    await run(second, ["board"]);
+    const port = (await listServers()).running[0]!.port;
+
+    const board = path.join(second, "docs/diagrams/architecture.excalidraw");
+    const current = (await (
+      await fetch(`http://127.0.0.1:${port}/api/board?file=${encodeURIComponent(board)}`)
+    ).json()) as { revision: string; board: unknown };
+
+    const response = await fetch(`http://127.0.0.1:${port}/api/board`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ file: board, revision: current.revision, board: current.board }),
+    });
+    expect(response.status, await response.clone().text()).toBe(200);
+    expect(((await response.json()) as { file: string }).file).toBe(board);
+  }, 60_000);
+
+  it("will not write a board over a file that is not one", async () => {
+    // A save names its own destination, which makes it the one way in that has
+    // to be narrowed to boards as hard as reading was -- more so, since it
+    // replaces what it lands on.
+    const project = await makeProject("alpha");
+    const secret = path.join(project, ".env");
+    await fs.writeFile(secret, "SECRET=hunter2\n", "utf8");
+    await run(project, ["board"]);
+    const port = (await listServers()).running[0]!.port;
+
+    const response = await fetch(`http://127.0.0.1:${port}/api/board`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ file: secret, revision: "whatever", board: emptyBoard() }),
+    });
+    expect(response.status).toBe(403);
+    expect(await fs.readFile(secret, "utf8")).toContain("hunter2");
+  }, 60_000);
+
+  it("measures drift against the project the board belongs to", async () => {
+    /*
+     * Every ref on a board resolves inside its own repository. Checked against
+     * the project the service happened to start in, a perfectly good board reads
+     * as entirely drifted -- and the report would look like real findings rather
+     * than like a question asked in the wrong place.
+     */
+    const first = await makeProject("alpha");
+    const second = await makeProject("beta");
+    // A file that exists only in the second project, referenced by its board.
+    await fs.writeFile(path.join(second, "gateway.ts"), "export const gateway = true;\n", "utf8");
+    const board = path.join(second, "docs/diagrams/architecture.excalidraw");
+    await fs.writeFile(
+      board,
+      JSON.stringify({
+        ...emptyBoard(),
+        elements: [
+          {
+            id: "gw",
+            type: "rectangle",
+            x: 0,
+            y: 0,
+            width: 10,
+            height: 10,
+            customData: { node: "gw", ref: "gateway.ts" },
+          },
+        ],
+      }),
+      "utf8",
+    );
+
+    await run(first, ["board"]);
+    await run(second, ["board"]);
+    const port = (await listServers()).running[0]!.port;
+
+    const payload = (await (
+      await fetch(`http://127.0.0.1:${port}/api/drift?file=${encodeURIComponent(board)}`)
+    ).json()) as { report: { clean: boolean; checked: number; findings: Array<{ node: string }> } };
+
+    expect(payload.report.checked).toBe(1);
+    expect(payload.report.findings).toHaveLength(0);
+    expect(payload.report.clean).toBe(true);
+  }, 60_000);
+});
+
 describe("the index page", () => {
   it("groups every board it can show by the project it belongs to", async () => {
     const first = await makeProject("alpha");

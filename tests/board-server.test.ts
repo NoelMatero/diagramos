@@ -2,7 +2,7 @@
  * The live board server: file -> browser and browser -> file, plus the
  * conflict rule that keeps an agent write from erasing a human stroke.
  */
-import { mkdtempSync, rmSync } from "node:fs";
+import { mkdtempSync, rmSync, writeFileSync } from "node:fs";
 import { readFile } from "node:fs/promises";
 import os from "node:os";
 import path from "node:path";
@@ -242,6 +242,78 @@ describe("board server", () => {
   }, 20_000);
 
   /**
+   * #70: the follow URL means "whatever board is current", which is right for
+   * reading and catastrophic for writing -- a save composed against one board
+   * can land on whichever file the server was switched to in the meantime.
+   * Observed as a freshly generated board wiped within seconds of a switch.
+   * So a save names the file its scene came from, and lands there.
+   */
+  it("writes a save to the file its scene came from, not the one now followed", async () => {
+    const next = path.join(workspace, "switched-to.excalidraw");
+    await writeBoard(next, boardWith("n1", "n2"));
+
+    // A client loaded the followed board...
+    const loaded = (await (await fetch(api("/api/board"))).json()) as {
+      revision: string;
+      file: string;
+      board: BoardFile;
+    };
+    // ...then the server was pointed at a different file...
+    await server.setFile(next);
+    // ...and the client's save -- its scene plus one stroke -- arrives late.
+    const ids = loaded.board.elements.map((element) => String(element.id));
+    const response = await fetch(api("/api/board"), {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        revision: loaded.revision,
+        file: loaded.file,
+        board: boardWith(...ids, "stroke"),
+      }),
+    });
+    expect(response.status).toBe(200);
+
+    // The stroke landed on the board it was drawn on.
+    const origin = await readBoard(loaded.file);
+    expect(origin.elements.map((element) => element.id)).toContain("stroke");
+    // The newly followed board holds nothing of the old one.
+    const followed = await readBoard(next);
+    expect(followed.elements.map((element) => element.id)).toEqual(["n1", "n2"]);
+
+    await server.setFile(boardFile);
+  }, 20_000);
+
+  it("refuses a save naming a file outside the root", async () => {
+    const before = await readBoard(boardFile);
+    const response = await fetch(api("/api/board"), {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ revision: "0000000000000000", file: "/etc/hosts", board: boardWith("evil") }),
+    });
+    expect(response.status).toBe(403);
+    expect((await readBoard(boardFile)).elements.length).toBe(before.elements.length);
+  }, 20_000);
+
+  /**
+   * A write that makes no claim about what it replaces is exactly the shape of
+   * a wipe: the revision check is the only thing standing between a stale
+   * client and the file, and an absent revision used to walk straight past it.
+   */
+  it("refuses a save that carries no revision", async () => {
+    const before = await readBoard(boardFile);
+    const response = await fetch(api("/api/board"), {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ board: boardWith("blind") }),
+    });
+    expect(response.status).toBe(400);
+    const after = await readBoard(boardFile);
+    expect(after.elements.map((element) => element.id)).toEqual(
+      before.elements.map((element) => element.id),
+    );
+  }, 20_000);
+
+  /**
    * Number("abc") is NaN, and NaN is not nullish, so a coerced port survives
    * every `?? default` on the way down to listen(). The reason to refuse rather
    * than fall back is diagnostic: a NaN port makes the health probe report "no
@@ -297,10 +369,11 @@ describe("board server serving several boards", () => {
 
   it("writes to the board named in the query and leaves the other alone", async () => {
     const before = await readBoard(boardFile);
+    const loaded = (await (await fetch(pinned("/api/board", second()))).json()) as { revision: string };
     const response = await fetch(pinned("/api/board", second()), {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ board: boardWith("s1", "s2", "s3") }),
+      body: JSON.stringify({ revision: loaded.revision, board: boardWith("s1", "s2", "s3") }),
     });
     expect(response.status).toBe(200);
 
@@ -370,5 +443,63 @@ describe("board server serving several boards", () => {
   it("builds a pinned URL that names the board relative to the root", () => {
     expect(server.urlFor(second())).toBe(`${server.url}?file=second.excalidraw`);
     expect(server.boards()[0]).toBe(server.file);
+  });
+});
+
+/**
+ * The drift endpoint: the same report the CLI gets, for the page the diagram
+ * lives on. The engine is covered by engine-drift.test.ts; what is covered
+ * here is that the server runs it against the right root and refuses to be
+ * pointed outside it.
+ */
+describe("board server drift status", () => {
+  /** A generated-looking box: customData is what makes it checkable. */
+  function anchored(id: string, ref: string, state?: string): Record<string, unknown> {
+    return { ...elementNamed(id), customData: { node: id, ref, ...(state ? { state } : {}) } };
+  }
+
+  function statusBoard(...elements: Array<Record<string, unknown>>): BoardFile {
+    return { ...emptyBoard(), elements: elements as never };
+  }
+
+  const driftUrl = (board: string) =>
+    api(`/api/drift?file=${encodeURIComponent(path.relative(workspace, board))}`);
+
+  it("reports stale and clean boxes the way the CLI does", async () => {
+    writeFileSync(path.join(workspace, "present.ts"), "export const present = true;\n");
+    const board = path.join(workspace, "status.excalidraw");
+    await writeBoard(board, statusBoard(anchored("ok", "present.ts"), anchored("gone", "vanished.ts")));
+
+    const response = await fetch(driftUrl(board));
+    expect(response.status).toBe(200);
+    const payload = (await response.json()) as {
+      report: { clean: boolean; checked: number; findings: Array<{ node: string; kind: string }> };
+    };
+    expect(payload.report.clean).toBe(false);
+    expect(payload.report.checked).toBe(2);
+    expect(payload.report.findings).toHaveLength(1);
+    expect(payload.report.findings[0]).toMatchObject({ node: "gone", kind: "missing-file" });
+  });
+
+  it("reports a planned box as work, so the page can show the sketch being ahead", async () => {
+    const board = path.join(workspace, "planned.excalidraw");
+    await writeBoard(board, statusBoard(anchored("next", "future.ts", "planned")));
+
+    const payload = (await (await fetch(driftUrl(board))).json()) as {
+      report: { clean: boolean; workItems: Array<{ node: string }>; promotions: unknown[] };
+    };
+    expect(payload.report.clean).toBe(true);
+    expect(payload.report.workItems).toHaveLength(1);
+    expect(payload.report.workItems[0]).toMatchObject({ node: "next" });
+  });
+
+  it("refuses a board outside the root, like every other endpoint", async () => {
+    const response = await fetch(api(`/api/drift?file=${encodeURIComponent("../outside.excalidraw")}`));
+    expect(response.status).toBe(403);
+  });
+
+  it("404s a board that does not exist", async () => {
+    const response = await fetch(api(`/api/drift?file=${encodeURIComponent("ghost.excalidraw")}`));
+    expect(response.status).toBe(404);
   });
 });

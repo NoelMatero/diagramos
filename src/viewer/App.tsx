@@ -2,8 +2,9 @@ import { Excalidraw } from "@excalidraw/excalidraw";
 import type { ExcalidrawImperativeAPI } from "@excalidraw/excalidraw/types";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
-import { BoardSync, type BoardPayload, type SyncStatus } from "./sync";
+import { BoardSync, withBoard, type BoardPayload, type SyncStatus } from "./sync";
 import { planReveal, prefersReducedMotion } from "./reveal";
+import { rowsOf, summaryOf, tallyOf, worstToneOf, type DriftView } from "./drift";
 
 const STATUS_LABEL: Record<SyncStatus, string> = {
   connecting: "connecting",
@@ -45,11 +46,117 @@ function StatusPill({
   );
 }
 
+/**
+ * The board's status, on the board.
+ *
+ * Every signal the drift checker produces used to reach only the CLI; this is
+ * the same report on the page the diagram lives on. Collapsed it is a chip with
+ * the notice's tally; open it lists the findings, and clicking one reveals the
+ * box it is about. Quiet green when there is nothing to say -- worded as what
+ * was checked, because "in sync" and "unread" must not look alike.
+ */
+function DriftPanel({
+  report,
+  onReveal,
+}: {
+  report?: DriftView;
+  onReveal: (node: string) => void;
+}) {
+  const [open, setOpen] = useState(false);
+  if (!report) return null;
+
+  const tally = tallyOf(report);
+  const rows = rowsOf(report);
+  const quiet = rows.length === 0;
+  const tone = quiet ? "good" : worstToneOf(rows);
+
+  return (
+    <div className="drift">
+      <button
+        type="button"
+        className="drift-chip"
+        onClick={() => setOpen((current) => !current)}
+        title="Diagram status — click for details"
+      >
+        <span className={`drift-dot tone-${tone}`} />
+        {quiet
+          ? report.concept
+            ? "concept board"
+            : "in sync"
+          : tally.map((part) => (
+              <span key={part.text} className={`tone-${part.tone}`}>
+                {part.text}
+              </span>
+            ))}
+      </button>
+      {open ? (
+        <div className="drift-body">
+          {quiet ? (
+            <div className="drift-row tone-dim">{summaryOf(report)}</div>
+          ) : (
+            rows.map((row) => (
+              <button
+                type="button"
+                key={`${row.tone}:${row.text}`}
+                className={`drift-row tone-${row.tone}`}
+                disabled={!row.node}
+                onClick={() => row.node && onReveal(row.node)}
+                title={row.node ? "Show on the board" : undefined}
+              >
+                {row.text}
+              </button>
+            ))
+          )}
+        </div>
+      ) : null}
+    </div>
+  );
+}
+
 export default function App() {
   const apiRef = useRef<ExcalidrawImperativeAPI | null>(null);
   const [status, setStatus] = useState<SyncStatus>("connecting");
   const [detail, setDetail] = useState<string>();
   const [file, setFile] = useState<string>();
+  const [drift, setDrift] = useState<DriftView>();
+
+  /**
+   * Ask the server for the board's status. Failure leaves the last report up
+   * rather than blanking the panel: a hiccup should not read as "all clean".
+   */
+  const refreshDrift = useCallback(async () => {
+    try {
+      const response = await fetch(withBoard("/api/drift"), { cache: "no-store" });
+      if (!response.ok) return;
+      const payload = (await response.json()) as { report?: DriftView };
+      if (payload.report) setDrift(payload.report);
+    } catch {
+      // Offline is already told by the status pill; stale beats wrong here.
+    }
+  }, []);
+
+  /**
+   * Reveal the element a status row is about: centre it and select it. The
+   * report names nodes semantically; the canvas knows them by customData.
+   */
+  const revealNode = useCallback((node: string) => {
+    const api = apiRef.current;
+    if (!api) return;
+    const match = api.getSceneElements().find((element) => {
+      const custom = (
+        element as unknown as {
+          customData?: { node?: string; edge?: { from?: string; to?: string } };
+        }
+      ).customData;
+      if (!custom) return false;
+      if (custom.node === node) return true;
+      return custom.edge ? `${custom.edge.from} -> ${custom.edge.to}` === node : false;
+    });
+    if (!match) return;
+    // Centre without changing zoom: fitting one box to the screen is a lurch.
+    api.scrollToContent([match], { animate: true });
+    api.updateScene({ appState: { selectedElementIds: { [match.id]: true } } });
+  }, []);
 
   // Suppresses the onChange that our own updateScene triggers, so applying a
   // remote board does not immediately bounce back as a local save. It stays set
@@ -106,6 +213,8 @@ export default function App() {
             setTimeout(() => {
               applyingRemote.current = false;
             }, 0);
+            // The board just changed on disk, so its status likely did too.
+            window.setTimeout(() => void refreshDrift(), 250);
           };
 
           const showFrame = (index: number) => {
@@ -124,7 +233,7 @@ export default function App() {
           setDetail(why);
         },
       }),
-    [],
+    [refreshDrift],
   );
 
   useEffect(() => {
@@ -134,6 +243,26 @@ export default function App() {
       sync.stop();
     };
   }, [sync]);
+
+  /*
+   * Drift can arrive from the code side with no board write at all -- deleting
+   * a file the board points at changes the status and fires no SSE. Refetching
+   * on focus catches "I flipped to the browser to look", and a slow visible-tab
+   * timer catches watching the page while working elsewhere. Cheap on purpose;
+   * a file-system watcher over the whole repo is a different kind of process.
+   */
+  useEffect(() => {
+    void refreshDrift();
+    const timer = window.setInterval(() => {
+      if (!document.hidden) void refreshDrift();
+    }, 30_000);
+    const onFocus = () => void refreshDrift();
+    window.addEventListener("focus", onFocus);
+    return () => {
+      window.clearInterval(timer);
+      window.removeEventListener("focus", onFocus);
+    };
+  }, [refreshDrift]);
 
   const onChange = useCallback(
     (
@@ -157,6 +286,7 @@ export default function App() {
   return (
     <div className="board-root">
       <StatusPill status={status} detail={detail} file={file} />
+      <DriftPanel report={drift} onReveal={revealNode} />
       <Excalidraw
         excalidrawAPI={(api) => {
           apiRef.current = api;
@@ -164,9 +294,15 @@ export default function App() {
           // the canvas is actually showing, not against what the API returns.
           (window as unknown as { __boardScene?: () => unknown }).__boardScene = () => {
             const elements = api.getSceneElements();
+            const all = api.getSceneElementsIncludingDeleted();
             return {
               count: elements.length,
               ids: elements.map((element) => element.id),
+              // Soft-deleted residue matters: onChange reports these too, so a
+              // save can carry them into the file. A canvas that looks right can
+              // still be about to write elements from a board it no longer shows.
+              deleted: all.length - elements.length,
+              deletedIds: all.filter((element) => element.isDeleted).map((element) => element.id),
               // Lets a test wait for the reveal to finish instead of sleeping a
               // guessed number of milliseconds and hoping.
               revealing: revealTimer.current !== undefined,

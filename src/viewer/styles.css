@@ -77,3 +77,93 @@ body,
   font-style: italic;
   opacity: 55%;
 }
+
+/* The board's status, mirroring the sync pill on the other side. Anchored
+   bottom-left above Excalidraw's own zoom and undo controls, growing upward
+   when opened so the chip itself never moves. */
+.drift {
+  position: fixed;
+  left: 14px;
+  bottom: 62px;
+  z-index: 10;
+  display: flex;
+  flex-direction: column-reverse;
+  align-items: flex-start;
+  gap: 6px;
+  font-size: 12px;
+  font-variant-numeric: tabular-nums;
+}
+
+.drift-chip {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 5px 11px;
+  border-radius: 999px;
+  border: 1px solid rgb(0 0 0 / 8%);
+  background: rgb(255 255 255 / 92%);
+  box-shadow: 0 1px 4px rgb(0 0 0 / 8%);
+  font: inherit;
+  color: #555;
+  cursor: pointer;
+  user-select: none;
+}
+
+.drift-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: currentcolor;
+}
+
+.drift-body {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  max-width: 44ch;
+  max-height: 40vh;
+  overflow-y: auto;
+  padding: 6px;
+  border-radius: 10px;
+  border: 1px solid rgb(0 0 0 / 8%);
+  background: rgb(255 255 255 / 96%);
+  box-shadow: 0 2px 8px rgb(0 0 0 / 10%);
+}
+
+.drift-row {
+  padding: 4px 8px;
+  border: 0;
+  border-radius: 6px;
+  background: none;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.drift-row:not(:disabled):hover {
+  background: rgb(0 0 0 / 5%);
+}
+
+/* A row about an element that is gone has nothing to reveal. */
+.drift-row:disabled {
+  cursor: default;
+}
+
+.tone-bad {
+  color: #e03131;
+}
+
+.tone-warn {
+  color: #f08c00;
+}
+
+.tone-good {
+  color: #2f9e44;
+}
+
+.tone-dim {
+  color: #868e96;
+}

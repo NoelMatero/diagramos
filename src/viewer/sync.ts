@@ -55,7 +55,7 @@ function pinnedBoard(): string | null {
   }
 }
 
-function withBoard(path: string): string {
+export function withBoard(path: string): string {
   const pinned = pinnedBoard();
   return pinned ? `${path}?file=${encodeURIComponent(pinned)}` : path;
 }
@@ -198,13 +198,31 @@ export class BoardSync {
     const board = this.#pending;
     this.#pending = undefined;
     this.#inFlight = true;
+    // Everything about this save is read now, before the first await: the
+    // generation it belongs to, the file the scene came from, the revision it
+    // claims to replace. A pull landing mid-flight changes all three, and a
+    // save must describe the scene it holds, not the one that superseded it.
+    const generation = this.#generation;
+    const file = this.#file;
     this.handlers.onStatus("saving");
     try {
       const response = await fetch(withBoard("/api/board"), {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ revision: this.#revision, board }),
+        // `file` addresses the write: the follow URL means "whatever board is
+        // current", and the server can be switched to another file while this
+        // request is in flight. A save that does not say which board it is
+        // about lands on the new one -- that wiped a board once (#70).
+        body: JSON.stringify({ revision: this.#revision, board, ...(file ? { file } : {}) }),
       });
+
+      if (this.#generation !== generation) {
+        // A different board arrived while this save was in flight. Whatever
+        // the server answered is about a scene this page no longer shows;
+        // merging or adopting it would paint the old board over the new one.
+        this.#inFlight = false;
+        return;
+      }
 
       if (response.status === 409) {
         const conflict = (await response.json()) as { revision: string; board: BoardPayload };
