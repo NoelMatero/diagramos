@@ -172,6 +172,37 @@ export interface UnrepresentedFinding {
 }
 
 /**
+ * An arrow nothing read, named rather than only counted.
+ *
+ * `edgesSkippedWhy` already says how many went unread and why, and a reason
+ * without a subject cannot be acted on: a board reporting "4 arrows skipped: an
+ * end is marked external" gives a reader no way to learn *which* four, short of
+ * opening this file. That is the same argument `unannotated` won for boxes, and
+ * arrows simply never got the same treatment.
+ *
+ * It catches nothing on its own. Silence here had two meanings -- "this agreed
+ * with the code" and "nobody looked" -- and from outside the tool they were
+ * indistinguishable. This separates them, and then a human decides.
+ *
+ * Unlike `unannotated` and `unrepresented` this is not gated on `coverage`.
+ * Those two go looking for something; this only writes down a decision the
+ * check has already made, so gating it would buy nothing and would leave
+ * `--details` -- the flag whose entire job is saying what was not read --
+ * unable to answer its own question.
+ */
+export interface UnreadEdgeFinding {
+  /** Node ids, as `edit_diagram` refers to them. */
+  from: string;
+  to: string;
+  /** Box labels: what a reader recognises on the board. Falls back to the id. */
+  fromLabel: string;
+  toLabel: string;
+  /** The arrow's own label, when it carries one. */
+  label?: string;
+  reason: EdgeSkipReason;
+}
+
+/**
  * Why a node was not checked. Kept apart from `excused`, which is a declaration
  * that there was nothing to check, and from `handDrawn`, which is a sketch.
  */
@@ -261,6 +292,11 @@ export interface DriftReport {
   edgesSkipped: number;
   /** The same number, split by reason. This is the one people ask about. */
   edgesSkippedWhy: SkipBreakdown<EdgeSkipReason>;
+  /**
+   * The same arrows again, named. Always populated: it records a decision
+   * already taken rather than going looking, so there is nothing to defer.
+   */
+  unreadEdges: UnreadEdgeFinding[];
 }
 
 /**
@@ -1024,14 +1060,37 @@ export function checkDrift(
   const skippedWhy: SkipBreakdown<NodeSkipReason> = {};
   const edgesSkippedWhy: SkipBreakdown<EdgeSkipReason> = {};
   const unannotated: UnannotatedFinding[] = [];
+  const unreadEdges: UnreadEdgeFinding[] = [];
   const assertions: AssertionTally = { checked: 0, downgraded: 0, unsupportedLanguage: 0 };
   const skipNode = (reason: NodeSkipReason) => {
     skipped += 1;
     skippedWhy[reason] = (skippedWhy[reason] ?? 0) + 1;
   };
-  const skipEdge = (reason: EdgeSkipReason) => {
+  /**
+   * Every exit from the arrow check goes through here, which is the point: a
+   * skip that forgets to name its arrow is the bug this is fixing, and there is
+   * no second place to forget it in.
+   *
+   * The nodes are optional because two of the reasons fire before an endpoint
+   * has resolved to a box at all; the id is a worse name than the label but it
+   * is never nothing.
+   */
+  const skipEdge = (
+    reason: EdgeSkipReason,
+    edge: { from: string; to: string; label?: string },
+    fromNode?: { label: string },
+    toNode?: { label: string },
+  ) => {
     edgesSkipped += 1;
     edgesSkippedWhy[reason] = (edgesSkippedWhy[reason] ?? 0) + 1;
+    unreadEdges.push({
+      from: edge.from,
+      to: edge.to,
+      fromLabel: fromNode?.label || edge.from,
+      toLabel: toNode?.label || edge.to,
+      ...(edge.label ? { label: edge.label } : {}),
+      reason,
+    });
   };
   /** Shared by the box checks and the arrow checks: one read per file per run. */
   const importCache = new Map<string, Array<{ abs: string; rel: string }>>();
@@ -1268,31 +1327,34 @@ export function checkDrift(
        * they landed close to, which is an observation about geometry rather than
        * a claim about the design.
        */
-      if (edge.endpoints === "nearest") {
-        skipEdge("ends-not-bound");
-        continue;
-      }
-
+      // Resolved before the first skip rather than after it: these are two map
+      // lookups with no side effects, and doing them up here is what lets every
+      // exit below name the arrow by its box labels instead of its raw ids.
       const fromNode = nodeById.get(edge.from);
       const toNode = nodeById.get(edge.to);
 
+      if (edge.endpoints === "nearest") {
+        skipEdge("ends-not-bound", edge, fromNode, toNode);
+        continue;
+      }
+
       // Both endpoints must exist, be recorded, have refs
       if (!fromNode || !toNode) {
-        skipEdge("endpoint-missing");
+        skipEdge("endpoint-missing", edge, fromNode, toNode);
         continue;
       }
 
       // An arrow into something deliberately outside the repo has nothing to
       // corroborate against, and saying so would be noise, not a finding.
       if (fromNode.state === "external" || toNode.state === "external") {
-        skipEdge("endpoint-external");
+        skipEdge("endpoint-external", edge, fromNode, toNode);
         continue;
       }
 
       const fromRef = fromNode.ref?.trim();
       const toRef = toNode.ref?.trim();
       if (!fromRef || !toRef) {
-        skipEdge("endpoint-has-no-ref");
+        skipEdge("endpoint-has-no-ref", edge, fromNode, toNode);
         continue;
       }
 
@@ -1304,7 +1366,7 @@ export function checkDrift(
 
       // Skip if either file is missing or is not a file
       if (!fromFile || !toFile) {
-        skipEdge("endpoint-outside-repo");
+        skipEdge("endpoint-outside-repo", edge, fromNode, toNode);
         continue;
       }
       const fromStat = workspace.stat(fromFile);
@@ -1315,6 +1377,9 @@ export function checkDrift(
         // gone is already reported as drift by the node check.
         skipEdge(
           fromStat === "missing" || toStat === "missing" ? "endpoint-file-missing" : "directory-ref",
+          edge,
+          fromNode,
+          toNode,
         );
         continue;
       }
@@ -1351,7 +1416,7 @@ export function checkDrift(
         const source = workspace.read(fromFile);
         const broken = chainBreak(source, fromEnd.symbols[0]!, via, toEnd.symbols, language);
         if (broken?.unreadable) {
-          skipEdge("no-function-body");
+          skipEdge("no-function-body", edge, fromNode, toNode);
           continue;
         }
         edgesChecked += 1;
@@ -1421,7 +1486,7 @@ export function checkDrift(
         // Either the ends are not both symbol-anchored, or no body could be
         // read. Fall back to the file-level channels, which need TypeScript.
         if (!TS_JS.test(fromFile) || !TS_JS.test(toFile)) {
-          skipEdge(bothNamed ? "no-function-body" : "not-ts-or-js");
+          skipEdge(bothNamed ? "no-function-body" : "not-ts-or-js", edge, fromNode, toNode);
           continue;
         }
         edgesChecked += 1;
@@ -1550,6 +1615,7 @@ export function checkDrift(
     edgesChecked,
     edgesSkipped,
     edgesSkippedWhy,
+    unreadEdges,
   };
 }
 

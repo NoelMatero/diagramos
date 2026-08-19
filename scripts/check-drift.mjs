@@ -143,7 +143,19 @@ async function boardsToCheck(boards, directory) {
 
 /** Box name as the reader sees it on the canvas. */
 function boxName(finding) {
-  return (finding.label || finding.node).replace(/\s+/g, " ");
+  return oneLine(finding.label || finding.node);
+}
+
+/**
+ * A box label as one row.
+ *
+ * Labels wrap on the board -- "board server\nHTTP · SSE · watch" is one label
+ * with a newline in it -- and a row containing a newline does not shear the
+ * frame, it splits it in half. Every label reaching a padded row goes through
+ * here.
+ */
+function oneLine(text) {
+  return String(text).replace(/\s+/g, " ");
 }
 
 /**
@@ -597,7 +609,7 @@ function renderUnannotated(entries, colour) {
       label: path.basename(entry.file)
         + "  "
         + paint(entry.report.unannotated.length + " unanchored", "dim", colour),
-      rows: entry.report.unannotated.map((item) => item.label + "  " + paint(item.node, "dim", colour)),
+      rows: entry.report.unannotated.map((item) => oneLine(item.label) + "  " + paint(item.node, "dim", colour)),
     })),
     foot: "/annotate-diagram proposes an anchor for each",
     max: 76,
@@ -637,6 +649,54 @@ function skipWords(why) {
 }
 
 /**
+ * How many arrows to name before the list stops being read.
+ *
+ * Eight is enough for every board in this repo and short enough that the audit
+ * box stays skimmable on a diagram with fifty arrows. The overflow says how many
+ * it kept back: a list that quietly stopped at eight would be the same failure
+ * as a count -- it would read as "that is all of them".
+ */
+const ARROW_CAP = 8;
+
+/**
+ * The arrows behind the count.
+ *
+ * The count and its reason were already here, and neither can be acted on: a
+ * board saying "4 arrows skipped: an end is marked external" leaves a reader no
+ * way to find out which four without opening the engine. Naming them is the same
+ * move `unannotated` already made for boxes, for the same reason.
+ *
+ * They are named by their box labels rather than their refs, because that is
+ * what a person recognises when they go and look at the board. The arrow's own
+ * label is carried when it has one -- it is often the whole claim ("writes"),
+ * and it is the part no check reads.
+ *
+ * Grouped by reason, and the reason is repeated per group only when the board
+ * has more than one: with a single reason it is already on the line above, and
+ * printing it twice is noise.
+ */
+function unreadArrowRows(unread, colour) {
+  const byReason = new Map();
+  for (const arrow of unread ?? []) {
+    if (!byReason.has(arrow.reason)) byReason.set(arrow.reason, []);
+    byReason.get(arrow.reason).push(arrow);
+  }
+  const rows = [];
+  const grouped = byReason.size > 1;
+  const indent = grouped ? "    " : "  ";
+  for (const [reason, arrows] of byReason) {
+    if (grouped) rows.push(paint(`  ${SKIP_WORDS[reason] ?? reason}`, "dim", colour));
+    for (const arrow of arrows.slice(0, ARROW_CAP)) {
+      const claim = arrow.label ? paint(`  ${oneLine(arrow.label)}`, "dim", colour) : "";
+      rows.push(`${indent}${oneLine(arrow.fromLabel)} → ${oneLine(arrow.toLabel)}${claim}`);
+    }
+    const held = arrows.length - ARROW_CAP;
+    if (held > 0) rows.push(paint(`${indent}+${held} more`, "dim", colour));
+  }
+  return rows;
+}
+
+/**
  * What was looked at, and what was not.
  *
  * Printed only for --details, and printed even when everything is clean. That is
@@ -652,7 +712,10 @@ function renderCoverageAudit(entries, colour) {
       if (report.excused) rows.push(paint(`${report.excused} boxes outside this repo by declaration`, "dim", colour));
       if (report.handDrawn) rows.push(paint(`${report.handDrawn} hand-drawn boxes, never checked`, "dim", colour));
       if (report.skipped) rows.push(paint(`${report.skipped} boxes skipped: ${skipWords(report.skippedWhy)}`, "yellow", colour));
-      if (report.edgesSkipped) rows.push(paint(`${report.edgesSkipped} arrows skipped: ${skipWords(report.edgesSkippedWhy)}`, "yellow", colour));
+      if (report.edgesSkipped) {
+        rows.push(paint(`${report.edgesSkipped} arrows skipped: ${skipWords(report.edgesSkippedWhy)}`, "yellow", colour));
+        rows.push(...unreadArrowRows(report.unreadEdges, colour));
+      }
       // A weakened assertion still passes the plain mention check, so without
       // this line an unjudged claim and a satisfied one look identical.
       const weak = report.assertions.downgraded + report.assertions.unsupportedLanguage;
