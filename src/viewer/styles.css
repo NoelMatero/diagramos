@@ -104,6 +104,12 @@ body,
   font-variant-numeric: tabular-nums;
 }
 
+.drift-chips {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
 .drift-chip {
   display: flex;
   align-items: center;
@@ -160,6 +166,13 @@ body,
 /* A row about an element that is gone has nothing to reveal. */
 .drift-row:disabled {
   cursor: default;
+}
+
+/* The history panel's closing caveat: present, but not competing with rows. */
+.drift-footnote {
+  margin-top: 2px;
+  border-top: 1px solid rgb(0 0 0 / 6%);
+  font-size: 11px;
 }
 
 .tone-bad {

@@ -510,3 +510,46 @@ describe("board server drift status", () => {
     expect(response.status).toBe(404);
   });
 });
+
+describe("board server history (#68)", () => {
+  it("tells the board's timeline: baseline, then each save with its source", async () => {
+    const board = path.join(workspace, "timeline.excalidraw");
+    await writeBoard(board, boardWith("t1", "t2"));
+    const url = (route: string) =>
+      api(`${route}?file=${encodeURIComponent(path.relative(workspace, board))}`);
+
+    // First sight of the board is the baseline entry.
+    const opened = (await (await fetch(url("/api/history"))).json()) as {
+      entries: Array<{ source: string; elements: number; added: number; removed: number }>;
+    };
+    expect(opened.entries).toHaveLength(1);
+    expect(opened.entries[0]).toMatchObject({ source: "opened", elements: 2, added: 0, removed: 0 });
+
+    // A save from the page is recorded as one, with its delta.
+    const loaded = (await (await fetch(url("/api/board"))).json()) as { revision: string };
+    const saved = await fetch(url("/api/board"), {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ revision: loaded.revision, board: boardWith("t1", "t2", "t3") }),
+    });
+    expect(saved.status).toBe(200);
+
+    const after = (await (await fetch(url("/api/history"))).json()) as {
+      entries: Array<{ source: string; elements: number; added: number; removed: number }>;
+    };
+    expect(after.entries).toHaveLength(2);
+    // Newest first, and the save's file-watcher echo did not double-count.
+    expect(after.entries[0]).toMatchObject({ source: "page", elements: 3, added: 1, removed: 0 });
+    expect(after.entries[1]).toMatchObject({ source: "opened" });
+  }, 20_000);
+
+  it("refuses history for a board outside the root", async () => {
+    const response = await fetch(api(`/api/history?file=${encodeURIComponent("../outside.excalidraw")}`));
+    expect(response.status).toBe(403);
+  });
+
+  it("404s history for a board that does not exist", async () => {
+    const response = await fetch(api(`/api/history?file=${encodeURIComponent("ghost.excalidraw")}`));
+    expect(response.status).toBe(404);
+  });
+});

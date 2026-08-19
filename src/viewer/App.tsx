@@ -5,6 +5,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { BoardSync, withBoard, type BoardPayload, type SyncStatus } from "./sync";
 import { planReveal, prefersReducedMotion } from "./reveal";
 import { rowsOf, summaryOf, tallyOf, worstToneOf, type DriftView } from "./drift";
+import { HISTORY_PATH, rowsOfHistory, type HistoryEntryView } from "./history";
 
 const STATUS_LABEL: Record<SyncStatus, string> = {
   connecting: "connecting",
@@ -66,12 +67,18 @@ function StatusPill({
  */
 function DriftPanel({
   report,
+  history,
   onReveal,
 }: {
   report?: DriftView;
+  history: HistoryEntryView[];
   onReveal: (node: string) => void;
 }) {
-  const [open, setOpen] = useState(false);
+  // One body slot shared by both chips: two panels open at once would cover
+  // each other in this corner, and the second question replaces the first.
+  const [open, setOpen] = useState<"none" | "status" | "history">("none");
+  const toggle = (panel: "status" | "history") =>
+    setOpen((current) => (current === panel ? "none" : panel));
   if (!report) return null;
 
   const tally = tallyOf(report);
@@ -81,24 +88,36 @@ function DriftPanel({
 
   return (
     <div className="drift">
-      <button
-        type="button"
-        className="drift-chip"
-        onClick={() => setOpen((current) => !current)}
-        title="Diagram status — click for details"
-      >
-        <span className={`drift-dot tone-${tone}`} />
-        {quiet
-          ? report.concept
-            ? "concept board"
-            : "in sync"
-          : tally.map((part) => (
-              <span key={part.text} className={`tone-${part.tone}`}>
-                {part.text}
-              </span>
-            ))}
-      </button>
-      {open ? (
+      <div className="drift-chips">
+        <button
+          type="button"
+          className="drift-chip"
+          onClick={() => toggle("status")}
+          title="Diagram status — click for details"
+        >
+          <span className={`drift-dot tone-${tone}`} />
+          {quiet
+            ? report.concept
+              ? "concept board"
+              : "in sync"
+            : tally.map((part) => (
+                <span key={part.text} className={`tone-${part.tone}`}>
+                  {part.text}
+                </span>
+              ))}
+        </button>
+        {history.length > 0 ? (
+          <button
+            type="button"
+            className="drift-chip"
+            onClick={() => toggle("history")}
+            title="What changed this board while the service has been up"
+          >
+            history
+          </button>
+        ) : null}
+      </div>
+      {open === "status" ? (
         <div className="drift-body">
           {quiet ? (
             <div className="drift-row tone-dim">{summaryOf(report)}</div>
@@ -118,6 +137,18 @@ function DriftPanel({
           )}
         </div>
       ) : null}
+      {open === "history" ? (
+        <div className="drift-body">
+          {rowsOfHistory(history).map((row, index) => (
+            <div key={`${index}:${row.text}`} className="drift-row tone-dim">
+              {row.text}
+            </div>
+          ))}
+          <div className="drift-row tone-dim drift-footnote">
+            since this service started · git holds the rest
+          </div>
+        </div>
+      ) : null}
     </div>
   );
 }
@@ -128,6 +159,7 @@ export default function App() {
   const [detail, setDetail] = useState<string>();
   const [file, setFile] = useState<string>();
   const [drift, setDrift] = useState<DriftView>();
+  const [history, setHistory] = useState<HistoryEntryView[]>([]);
 
   /**
    * Ask the server for the board's status. Failure leaves the last report up
@@ -141,6 +173,14 @@ export default function App() {
       if (payload.report) setDrift(payload.report);
     } catch {
       // Offline is already told by the status pill; stale beats wrong here.
+    }
+    try {
+      const response = await fetch(withBoard(HISTORY_PATH), { cache: "no-store" });
+      if (!response.ok) return;
+      const payload = (await response.json()) as { entries?: HistoryEntryView[] };
+      if (payload.entries) setHistory(payload.entries);
+    } catch {
+      // Same rule as the report: keep the last timeline rather than blanking it.
     }
   }, []);
 
@@ -295,7 +335,7 @@ export default function App() {
   return (
     <div className="board-root">
       <StatusPill status={status} detail={detail} file={file} />
-      <DriftPanel report={drift} onReveal={revealNode} />
+      <DriftPanel report={drift} history={history} onReveal={revealNode} />
       <Excalidraw
         excalidrawAPI={(api) => {
           apiRef.current = api;

@@ -143,7 +143,7 @@
       "backgroundColor": "transparent",
       "fillStyle": "solid",
       "strokeWidth": 2,
-      "strokeStyle": "dashed",
+      "strokeStyle": "solid",
       "roughness": 1,
       "opacity": 100,
       "groupIds": [],
@@ -151,7 +151,7 @@
       "index": "a3",
       "roundness": null,
       "seed": 63236756,
-      "version": 1,
+      "version": 2,
       "versionNonce": 761434336,
       "isDeleted": false,
       "boundElements": [
@@ -175,8 +175,7 @@
         "origin": "diagram",
         "diagram": "plan-history",
         "node": "recorder",
-        "ref": "src/server/history.ts",
-        "state": "planned"
+        "ref": "src/server/history.ts"
       }
     },
     {
@@ -191,7 +190,7 @@
       "backgroundColor": "transparent",
       "fillStyle": "solid",
       "strokeWidth": 2,
-      "strokeStyle": "dashed",
+      "strokeStyle": "solid",
       "roughness": 1,
       "opacity": 100,
       "groupIds": [],
@@ -199,7 +198,7 @@
       "index": "a4",
       "roundness": null,
       "seed": 573037,
-      "version": 1,
+      "version": 2,
       "versionNonce": 1571199191,
       "isDeleted": false,
       "boundElements": [
@@ -223,8 +222,7 @@
         "origin": "diagram",
         "diagram": "plan-history",
         "node": "timeline",
-        "ref": "src/viewer/history.ts",
-        "state": "planned"
+        "ref": "src/viewer/history.ts"
       }
     },
     {
@@ -239,7 +237,7 @@
       "backgroundColor": "transparent",
       "fillStyle": "solid",
       "strokeWidth": 2,
-      "strokeStyle": "dashed",
+      "strokeStyle": "solid",
       "roughness": 1,
       "opacity": 100,
       "groupIds": [],
@@ -247,7 +245,7 @@
       "index": "a5",
       "roundness": null,
       "seed": 1062900197,
-      "version": 1,
+      "version": 2,
       "versionNonce": 991445359,
       "isDeleted": false,
       "boundElements": null,
@@ -260,8 +258,7 @@
         "edge": {
           "from": "server",
           "to": "recorder"
-        },
-        "state": "planned"
+        }
       },
       "points": [
         [
@@ -300,7 +297,7 @@
       "backgroundColor": "transparent",
       "fillStyle": "solid",
       "strokeWidth": 2,
-      "strokeStyle": "dashed",
+      "strokeStyle": "solid",
       "roughness": 1,
       "opacity": 100,
       "groupIds": [],
@@ -308,7 +305,7 @@
       "index": "a6",
       "roundness": null,
       "seed": 1903706572,
-      "version": 1,
+      "version": 2,
       "versionNonce": 79518360,
       "isDeleted": false,
       "boundElements": null,
@@ -321,8 +318,7 @@
         "edge": {
           "from": "recorder",
           "to": "timeline"
-        },
-        "state": "planned"
+        }
       },
       "points": [
         [
@@ -369,7 +365,7 @@
       "backgroundColor": "transparent",
       "fillStyle": "solid",
       "strokeWidth": 2,
-      "strokeStyle": "dashed",
+      "strokeStyle": "solid",
       "roughness": 1,
       "opacity": 100,
       "groupIds": [],
@@ -377,7 +373,7 @@
       "index": "a7",
       "roundness": null,
       "seed": 1651298907,
-      "version": 1,
+      "version": 2,
       "versionNonce": 809096533,
       "isDeleted": false,
       "boundElements": null,
@@ -390,8 +386,7 @@
         "edge": {
           "from": "viewer",
           "to": "timeline"
-        },
-        "state": "planned"
+        }
       },
       "points": [
         [

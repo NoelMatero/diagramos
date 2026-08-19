@@ -19,6 +19,7 @@ import path from "node:path";
 import { fileURLToPath } from "node:url";
 
 import { readBoard, serializeBoard, writeBoard, type BoardFile } from "../engine/board-file";
+import { BoardHistory, HISTORY_ROUTE } from "./history";
 import { diagramDir } from "../engine/config";
 import { checkDrift, createGitBaseline, createWorkspace, findBoards } from "../engine/drift";
 import { initEngine } from "../engine/parse";
@@ -295,6 +296,8 @@ export async function startBoardServer(options: BoardServerOptions): Promise<Run
   const watchers = new Map<string, FSWatcher>();
   /** Tree-sitter grammars for /api/drift, loaded on the first request only. */
   let engineReady: Promise<void> | undefined;
+  /** The recent timeline of every board this service has seen (#68). */
+  const history = new BoardHistory();
 
   const write = (subscribers: Subscriber[], payload: Record<string, unknown>) => {
     const frame = `data: ${JSON.stringify(payload)}\n\n`;
@@ -317,9 +320,11 @@ export async function startBoardServer(options: BoardServerOptions): Promise<Run
     if (state.debounce) clearTimeout(state.debounce);
     state.debounce = setTimeout(async () => {
       try {
-        const revision = revisionOf(await readBoard(target));
+        const board = await readBoard(target);
+        const revision = revisionOf(board);
         if (revision === state.revision) return;
         state.revision = revision;
+        history.record(target, board, revision, "file");
         announce(target, revision);
       } catch {
         // A partially written file will fire again when the write completes.
@@ -354,8 +359,13 @@ export async function startBoardServer(options: BoardServerOptions): Promise<Run
   const track = async (target: string): Promise<BoardState> => {
     const existing = boards.get(target);
     if (existing) return existing;
-    const state: BoardState = { revision: revisionOf(await readBoard(target)), subscribers: [] };
+    const board = await readBoard(target);
+    const state: BoardState = { revision: revisionOf(board), subscribers: [] };
     boards.set(target, state);
+    // The baseline entry: not a change, but the state every later delta is
+    // measured against, and the honest answer to "when did this service first
+    // see this board".
+    history.record(target, board, state.revision, "opened");
     watchDirectory(path.dirname(target));
     return state;
   };
@@ -647,6 +657,22 @@ export async function startBoardServer(options: BoardServerOptions): Promise<Run
         return json(response, 200, { file: target.file, report });
       }
 
+      /**
+       * The board's recent timeline (#68): what changed it and by how much,
+       * newest first. Only what this service saw -- git holds the durable
+       * history, and the page says so rather than pretending otherwise.
+       */
+      if (request.method === "GET" && url.pathname === HISTORY_ROUTE) {
+        const target = await requestedFile(url);
+        if (!target.file) return json(response, 403, { error: target.error });
+        if (!(await fileExists(target.file))) {
+          return json(response, 404, { error: `no such file: ${target.file}` });
+        }
+        // A board asked about is a board tracked, so its later changes land here.
+        await track(target.file);
+        return json(response, 200, { file: target.file, entries: history.entriesFor(target.file) });
+      }
+
       if (request.method === "GET" && url.pathname === "/api/board") {
         const target = await requestedFile(url);
         if (!target.file) return json(response, 403, { error: target.error });
@@ -707,6 +733,10 @@ export async function startBoardServer(options: BoardServerOptions): Promise<Run
         }
         await writeBoard(saveTo, payload.board);
         state.revision = revisionOf(payload.board);
+        // Recorded now rather than left to the file watcher's echo, so the
+        // entry can say "page": the watcher only knows something wrote the
+        // file, not that it was a person drawing.
+        history.record(saveTo, payload.board, state.revision, "page");
         announce(saveTo, state.revision);
         return json(response, 200, { revision: state.revision, file: saveTo });
       }

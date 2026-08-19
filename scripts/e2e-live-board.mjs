@@ -11,7 +11,7 @@
  */
 import path from "node:path";
 import os from "node:os";
-import { mkdtempSync, rmSync } from "node:fs";
+import { mkdtempSync, realpathSync, rmSync } from "node:fs";
 import { chromium } from "playwright";
 
 import { installExcalifontMeasurer } from "../tests/helpers/excalifont.ts";
@@ -86,6 +86,31 @@ try {
   await writeBoard(file, grown.board);
   const after = await waitForScene(page, (value) => value.count > initial.count);
   check("added arrow appears without a reload", after.count > initial.count, `${initial.count} -> ${after.count}`);
+
+  // The board's timeline (#68): the write above must be on it, after the
+  // baseline entry from the service first seeing the board — and the page must
+  // offer it as a chip.
+  // Resolved spelling: the service tracks boards by realpath, and on macOS the
+  // tmpdir arrives through the /var -> /private/var link. The unresolved
+  // spelling would be tracked as a second board with its own empty timeline.
+  const historyUrl = new URL(
+    `/api/history?file=${encodeURIComponent(realpathSync(file))}`,
+    server.url,
+  ).href;
+  const timeline = await (await fetch(historyUrl)).json();
+  check(
+    "the write is on the board's timeline",
+    Array.isArray(timeline.entries)
+      && timeline.entries.length >= 2
+      && timeline.entries.at(-1).source === "opened"
+      && timeline.entries[0].added > 0,
+    `${timeline.entries?.length ?? 0} entries, newest ${JSON.stringify(timeline.entries?.[0] ?? null)}`,
+  );
+  await page.waitForTimeout(700); // the panel refetches shortly after a board change
+  const historyChip = await page.evaluate(() =>
+    [...document.querySelectorAll(".drift-chip")].some((chip) => chip.textContent?.includes("history")),
+  );
+  check("the page offers the timeline as a chip", historyChip);
 
   // 2. The reported failure: an entirely new diagram replacing the old one in
   //    the same file. Every element id changes, so a viewer that only merges
