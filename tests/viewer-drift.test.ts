@@ -31,7 +31,7 @@ describe("the status chip's tally", () => {
         { node: "a", label: "Old Cache", ref: "src/cache.ts", kind: "missing-file" },
         { node: "b", label: "Hollow", ref: "src/empty.ts", kind: "empty-ref" },
       ],
-      edges: [{ from: "a", to: "b", fromLabel: "A", toLabel: "B" }],
+      edges: [{ from: "src/a.ts", to: "src/b.ts", fromLabel: "A", toLabel: "B", node: "a -> b" }],
       workItems: [{ node: "c", label: "Next" }],
       promotions: [{ node: "d", label: "Landed" }],
     });
@@ -56,7 +56,7 @@ describe("the panel's rows", () => {
         clean: false,
         deleted: [{ node: "gone", label: "Removed box", ref: "src/still.ts" }],
         findings: [{ node: "a", label: "Old Cache", ref: "src/cache.ts", kind: "missing-file" }],
-        edges: [{ from: "a", to: "b", fromLabel: "A", toLabel: "B" }],
+        edges: [{ from: "src/a.ts", to: "src/b.ts", fromLabel: "A", toLabel: "B", node: "a -> b" }],
         promotions: [{ node: "d", label: "Landed" }],
         workItems: [{ node: "c", label: "Next" }],
       }),

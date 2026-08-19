@@ -20,7 +20,7 @@ export type Tone = "bad" | "warn" | "good" | "dim";
 export interface DriftView {
   clean: boolean;
   findings: Array<{ node: string; label: string; ref: string; kind: string }>;
-  edges: Array<{ from: string; to: string; fromLabel: string; toLabel: string }>;
+  edges: Array<{ from: string; to: string; fromLabel: string; toLabel: string; node: string }>;
   deleted: Array<{ node: string; label: string; ref: string }>;
   workItems: Array<{ node: string; label: string; ref?: string }>;
   promotions: Array<{ node: string; label: string }>;
@@ -82,7 +82,9 @@ export function rowsOf(report: DriftView): StatusRow[] {
     ...report.edges.map((finding) => ({
       text: `${name(finding.fromLabel, finding.from)} → ${name(finding.toLabel, finding.to)}`,
       tone: "warn" as Tone,
-      node: `${finding.from} -> ${finding.to}`,
+      // The finding's own from/to are file paths (the evidence); `node` is the
+      // arrow in node ids, which is what the canvas can reveal.
+      node: finding.node,
     })),
     ...report.promotions.map((promotion) => ({
       text: `${name(promotion.label, promotion.node)} is built now`,

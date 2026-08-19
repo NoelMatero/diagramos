@@ -173,7 +173,12 @@ as an oversight:
 
 - **A box for something you are about to build**: keep the ref and set
   `state: "planned"`. `check_drift` then reports it as work to do rather than as
-  drift, and tells you once the code catches up so you can flip it to `built`.
+  drift — and once the code catches up, the end-of-turn check flips the box to
+  `built` on its own. **Do not flip it by hand or redraw the box just to update
+  its state**: the automatic promotion is deterministic, waits until *every*
+  anchor on the box resolves, and reports itself as `promoted`. Editing the
+  state yourself preempts it for no gain. (Setting `built` naturally as part of
+  a redraw you are doing for other reasons is fine.)
 - **A box that is not code in this repo** — a browser, a vendor API, another
   project: `state: "external"`. Never checked, and distinct from a forgotten ref.
 - **A whole board that is not about this codebase** — a protocol, a standard,
