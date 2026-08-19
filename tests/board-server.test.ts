@@ -2,7 +2,7 @@
  * The live board server: file -> browser and browser -> file, plus the
  * conflict rule that keeps an agent write from erasing a human stroke.
  */
-import { mkdtempSync, rmSync } from "node:fs";
+import { mkdtempSync, rmSync, writeFileSync } from "node:fs";
 import { readFile } from "node:fs/promises";
 import os from "node:os";
 import path from "node:path";
@@ -370,5 +370,63 @@ describe("board server serving several boards", () => {
   it("builds a pinned URL that names the board relative to the root", () => {
     expect(server.urlFor(second())).toBe(`${server.url}?file=second.excalidraw`);
     expect(server.boards()[0]).toBe(server.file);
+  });
+});
+
+/**
+ * The drift endpoint: the same report the CLI gets, for the page the diagram
+ * lives on. The engine is covered by engine-drift.test.ts; what is covered
+ * here is that the server runs it against the right root and refuses to be
+ * pointed outside it.
+ */
+describe("board server drift status", () => {
+  /** A generated-looking box: customData is what makes it checkable. */
+  function anchored(id: string, ref: string, state?: string): Record<string, unknown> {
+    return { ...elementNamed(id), customData: { node: id, ref, ...(state ? { state } : {}) } };
+  }
+
+  function statusBoard(...elements: Array<Record<string, unknown>>): BoardFile {
+    return { ...emptyBoard(), elements: elements as never };
+  }
+
+  const driftUrl = (board: string) =>
+    api(`/api/drift?file=${encodeURIComponent(path.relative(workspace, board))}`);
+
+  it("reports stale and clean boxes the way the CLI does", async () => {
+    writeFileSync(path.join(workspace, "present.ts"), "export const present = true;\n");
+    const board = path.join(workspace, "status.excalidraw");
+    await writeBoard(board, statusBoard(anchored("ok", "present.ts"), anchored("gone", "vanished.ts")));
+
+    const response = await fetch(driftUrl(board));
+    expect(response.status).toBe(200);
+    const payload = (await response.json()) as {
+      report: { clean: boolean; checked: number; findings: Array<{ node: string; kind: string }> };
+    };
+    expect(payload.report.clean).toBe(false);
+    expect(payload.report.checked).toBe(2);
+    expect(payload.report.findings).toHaveLength(1);
+    expect(payload.report.findings[0]).toMatchObject({ node: "gone", kind: "missing-file" });
+  });
+
+  it("reports a planned box as work, so the page can show the sketch being ahead", async () => {
+    const board = path.join(workspace, "planned.excalidraw");
+    await writeBoard(board, statusBoard(anchored("next", "future.ts", "planned")));
+
+    const payload = (await (await fetch(driftUrl(board))).json()) as {
+      report: { clean: boolean; workItems: Array<{ node: string }>; promotions: unknown[] };
+    };
+    expect(payload.report.clean).toBe(true);
+    expect(payload.report.workItems).toHaveLength(1);
+    expect(payload.report.workItems[0]).toMatchObject({ node: "next" });
+  });
+
+  it("refuses a board outside the root, like every other endpoint", async () => {
+    const response = await fetch(api(`/api/drift?file=${encodeURIComponent("../outside.excalidraw")}`));
+    expect(response.status).toBe(403);
+  });
+
+  it("404s a board that does not exist", async () => {
+    const response = await fetch(api(`/api/drift?file=${encodeURIComponent("ghost.excalidraw")}`));
+    expect(response.status).toBe(404);
   });
 });
