@@ -407,6 +407,49 @@ describe("board MCP server", () => {
   }, 120_000);
 
   /**
+   * An arrow nothing checked, named on request.
+   *
+   * The counts already say how many arrows went unread and why. A caller
+   * deciding whether a diagram can be trusted needs to know *which*, and the
+   * reason alone does not say: an arrow onto an `external` box carries no claim
+   * any check here can test, and until it is named it reads exactly like an
+   * arrow that passed.
+   */
+  it("names unread arrows only when coverage is asked for", async () => {
+    const board = "docs/diagrams/unread.excalidraw";
+    await writeFile(path.join(workspace, "engine.ts"), "export const plan = 1;\n");
+    await call("create_diagram", {
+      path: board,
+      nodes: [
+        { id: "engine", label: "ELK layout engine", ref: "engine.ts" },
+        { id: "file", label: "board.excalidraw", state: "external" },
+      ],
+      edges: [{ from: "engine", to: "file", label: "writes" }],
+    });
+
+    // The per-turn answer stays a count: this response is read every turn.
+    const quiet = jsonOf(await call("check_drift", { path: board }));
+    expect(quiet.clean).toBe(true);
+    expect(quiet.edgesSkippedWhy).toEqual({ "endpoint-external": 1 });
+    expect(quiet.unreadEdges).toBeUndefined();
+
+    const asked = jsonOf(await call("check_drift", { path: board, coverage: true }));
+    expect(asked.unreadEdges).toEqual([
+      {
+        board,
+        from: "engine",
+        to: "file",
+        fromLabel: "ELK layout engine",
+        toLabel: "board.excalidraw",
+        label: "writes",
+        reason: "endpoint-external",
+      },
+    ]);
+    // Unread is not drift. Nothing here was claimed falsely; nothing was read.
+    expect(asked.clean).toBe(true);
+  }, 120_000);
+
+  /**
    * No diagram is "current": a project holds as many as it likes, and checking
    * means checking all of them unless one is named.
    */

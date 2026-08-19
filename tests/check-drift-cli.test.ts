@@ -526,6 +526,98 @@ describe("--details", () => {
 });
 
 /**
+ * The arrows the audit could not read, by name.
+ *
+ * `--details` already said how many went unread and why. A reason with no
+ * subject cannot be acted on: "4 arrows skipped: an end is marked external" gives
+ * a reader no way to find which four short of opening the engine, which is how a
+ * false arrow survived on this repo's own example board from the first commit.
+ */
+describe("--details names the arrows nothing read", () => {
+  let project: string;
+
+  beforeAll(async () => {
+    project = mkdtempSync(path.join(tmpdir(), "drift-cli-unread-"));
+    mkdirSync(path.join(project, "docs/diagrams"), { recursive: true });
+    mkdirSync(path.join(project, "src"), { recursive: true });
+    writeFileSync(path.join(project, "src/engine.ts"), "export const plan = 1;\n");
+    const { board } = await createDiagram(emptyBoard(), {
+      name: "mixed",
+      nodes: [
+        { id: "engine", label: "ELK layout engine", ref: "src/engine.ts" },
+        { id: "file", label: "board.excalidraw", state: "external" },
+        { id: "human", label: "You", state: "external" },
+      ],
+      edges: [
+        { from: "engine", to: "file", label: "writes" },
+        { from: "human", to: "file", label: "edits" },
+      ],
+    });
+    await writeBoard(path.join(project, "docs/diagrams/mixed.excalidraw"), board);
+
+    // Ten of one reason, to prove the cap says what it kept back.
+    const many = Array.from({ length: 10 }, (_, index) => `out${index}`);
+    const { board: crowded } = await createDiagram(emptyBoard(), {
+      name: "crowded",
+      nodes: [
+        { id: "engine", label: "Engine", ref: "src/engine.ts" },
+        ...many.map((id) => ({ id, label: id.toUpperCase(), state: "external" as const })),
+      ],
+      edges: many.map((id) => ({ from: "engine", to: id })),
+    });
+    await writeBoard(path.join(project, "docs/diagrams/crowded.excalidraw"), crowded);
+  }, 180_000);
+
+  afterAll(() => {
+    if (project) rmSync(project, { recursive: true, force: true });
+  });
+
+  /*
+   * Reads stderr, and reads it on a clean exit too.
+   *
+   * Both halves matter here and neither is true of the sync helpers above. The
+   * report is written to stderr, so a helper returning `execFileSync`'s stdout
+   * gets "" no matter what was printed; and this board has nothing wrong with
+   * it, so the run exits 0 and never reaches a catch block. Either mistake
+   * passes the negative test below for entirely the wrong reason.
+   */
+  async function at(...args: string[]) {
+    try {
+      const { stdout, stderr } = await run(TSX, [SCRIPT, ...args], { cwd: project });
+      return stdout + stderr;
+    } catch (error) {
+      const failure = error as { stdout?: string; stderr?: string };
+      return (failure.stdout ?? "") + (failure.stderr ?? "");
+    }
+  }
+
+  it("names them by their box labels and carries the arrow's own word", async () => {
+    const out = await at("--details");
+    expect(out).toContain("2 arrows skipped");
+    expect(out).toContain("ELK layout engine → board.excalidraw");
+    expect(out).toContain("writes");
+    expect(out).toContain("You → board.excalidraw");
+  }, 180_000);
+
+  it("stops at a readable number and says how many it kept back", async () => {
+    // A list that quietly stopped at eight would be the same failure as a count:
+    // it would read as "that is all of them".
+    const out = await at("--details");
+    const crowded = out.slice(out.indexOf("crowded.excalidraw"));
+    expect(crowded).toContain("10 arrows skipped");
+    expect((crowded.match(/Engine → OUT/g) ?? []).length).toBe(8);
+    expect(crowded).toContain("+2 more");
+  }, 180_000);
+
+  it("says nothing about them on the per-turn run, which has to stay quiet", async () => {
+    // The whole point of the audit living behind a flag: a check that nags every
+    // turn is a check somebody switches off.
+    const out = await at();
+    expect(out).not.toContain("ELK layout engine → board.excalidraw");
+  }, 180_000);
+});
+
+/**
  * How much the notice says, which is deliberately not much.
  *
  * One diagram lists what is wrong with it; several list themselves with counts.

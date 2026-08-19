@@ -243,7 +243,7 @@ Measured on this repo, which had been reporting clean every turn for months:
 | boards with anything checkable | **1 of 7** |
 
 Every check now records *why* something went unread, not just how many. Two
-reasons for a box (`no-ref`, `ref-outside-repo`) and eight for an arrow — the one
+reasons for a box (`no-ref`, `ref-outside-repo`) and nine for an arrow — the one
 that matters most being `ends-not-bound`, because an arrow that was never snapped
 to its boxes looks exactly like one that was.
 
@@ -262,6 +262,48 @@ an answer:
 │ 25 arrows skipped: 25 an end has no ref                       │
 └─ silence means these agreed · not that everything was read ───┘
 ```
+
+**An unread arrow is named, not just counted.** A reason with no subject cannot
+be acted on — "4 arrows skipped: an end is marked external" leaves a reader no way
+to learn *which* four short of opening `drift.ts`:
+
+```
+┌─ example.excalidraw  3 refs · 2 arrows checked ───────────────┐
+│ 3 boxes outside this repo by declaration                      │
+│ 4 arrows skipped: 4 an end is marked external                 │
+│   Claude Code → Board MCP server  tool call                   │
+│   Board MCP server → board.excalidraw  writes                 │
+│   board.excalidraw → Board MCP server  reads back             │
+│   You → board.excalidraw  edits                               │
+└─ silence means these agreed · not that everything was read ───┘
+```
+
+This is the argument `unannotated` already won for boxes, applied to arrows,
+which never got the same treatment. It measures nothing new and catches nothing
+by itself: silence had two meanings — *this agreed with the code* and *nobody
+looked* — and from outside the tool they were indistinguishable. The cost of that
+is not hypothetical. `example.excalidraw` carried an arrow reading **ELK layout
+engine → board.excalidraw, "writes"** from the first commit. It was false —
+`writeBoard` is called in `src/mcp/server.ts`, and nothing in `layout.ts`'s
+import chain touches `node:fs` — and every run said nothing, because an arrow
+onto an `external` box is dropped before anything looks at it. It was found by
+reading this file, which is not a route a user has.
+
+Named unconditionally, unlike `unannotated` and `unrepresented`. Those two go
+looking for something and wait to be asked; this only writes down a decision the
+check already made, so deferring it would buy nothing and would leave `--details`
+— the flag whose whole job is saying what was not read — unable to answer its own
+question. The list stops at eight per reason and says how many it held back: a
+list that quietly stopped would read as "that is all of them", which is the
+failure being fixed rather than a smaller version of it.
+
+**What it still cannot do.** Naming the arrow does not check it. The claim in
+that arrow was the word *"writes"*, and labels are decoration to this tool —
+nothing in `drift.ts` reads `edge.label`. Every channel the arrow check has asks
+*does the code at this end reach the code at that end*, and with a person or a
+drawing file at one end there is no other end to reach. So the honest position is
+that these arrows carry no claim this check can test, and the fix is to say so
+out loud rather than to guess. What to do about it is tracked separately.
 
 **The per-turn notice does not change.** It stays quiet, because a notice that
 reported coverage every turn is one that gets switched off — and that would take
@@ -284,7 +326,10 @@ The asymmetry is the point: the hook fires unbidden and stays silent, a command
 someone chose to run gets an answer. The same line `--details` already draws.
 
 `check_drift` returns `skippedWhy` and `edgesSkippedWhy` alongside the counts, so
-a model deciding whether a diagram is trustworthy has the same information.
+a model deciding whether a diagram is trustworthy has the same information, and
+`coverage: true` adds `unreadEdges` — the same arrows by name. That one is gated
+where the CLI's is not, because the MCP response is read every turn and the
+counts already answer the per-turn question.
 
 Most of the 105 unread boxes are the telecom boards, which describe a protocol
 rather than this repository. Marking them `describes: "concept"` turns them from
@@ -413,6 +458,7 @@ whether anyone leaves the check switched on.
 
 - `check_drift(path)` — MCP tool. Returns `{ boards[], clean: boolean, findings[], edges[] }`,
   plus `deleted[]`, `workItems[]`, `promotions[]`, `conceptBoards[]`, `unannotated[]`,
+  `unreadEdges[]`,
   `unrepresented[]`, `skippedWhy`, `edgesSkippedWhy` and `assertions` when non-empty.
   A new `DriftKind` is a new member of `findings[]`, not a new array: the handler
   spreads each finding generically, so it needs no change beyond its description.

@@ -541,7 +541,12 @@ server.registerTool(
         .boolean()
         .default(false)
         .describe(
-          "Two questions the per-turn check does not ask. `unannotated` names the boxes that claim to "
+          "Three questions the per-turn check does not ask. `unreadEdges` names the arrows nothing "
+          + "checked, with the reason for each: an arrow with an end marked external, or refless, or "
+          + "pointing at a directory carries no claim any check here can test, and until it is named "
+          + "it is indistinguishable from an arrow that passed. It is not drift and not a suggestion "
+          + "-- it is the list of things this tool did not look at. "
+          + "`unannotated` names the boxes that claim to "
           + "be about this repo and carry no ref at all, with their labels -- these are invisible to "
           + "every other check, and naming them is what lets a ref be proposed for each. "
           + "`unrepresented` is the opposite direction: code no box covers, most-imported first. It "
@@ -607,6 +612,7 @@ server.registerTool(
       const deleted: Array<Record<string, unknown>> = [];
       const unrepresented: Array<Record<string, unknown>> = [];
       const unannotated: Array<Record<string, unknown>> = [];
+      const unreadEdges: Array<Record<string, unknown>> = [];
       const edges: Array<Record<string, unknown>> = [];
       const workItems: Array<Record<string, unknown>> = [];
       const promotions: Array<Record<string, unknown>> = [];
@@ -644,6 +650,15 @@ server.registerTool(
         for (const finding of report.unrepresented) {
           unrepresented.push({ board: relativeToWorkspace(file), ...finding });
         }
+        // Named only when asked. `edgesSkippedWhy` is the per-turn answer and
+        // stays a count; the list behind it is for deciding what to fix, which
+        // is the same moment `unannotated` is wanted, and it costs tokens on a
+        // response that is otherwise read every turn.
+        if (coverage) {
+          for (const arrow of report.unreadEdges) {
+            unreadEdges.push({ board: relativeToWorkspace(file), ...arrow });
+          }
+        }
         for (const finding of report.edges) {
           edges.push({ board: relativeToWorkspace(file), ...finding });
         }
@@ -672,6 +687,7 @@ server.registerTool(
         // what might be worth drawing, so deliberately outside clean.
         ...(unannotated.length ? { unannotated } : {}),
         ...(unrepresented.length ? { unrepresented } : {}),
+        ...(unreadEdges.length ? { unreadEdges } : {}),
         ...(Object.keys(skippedWhy).length ? { skippedWhy } : {}),
         ...(Object.keys(edgesSkippedWhy).length ? { edgesSkippedWhy } : {}),
         ...(assertions.checked || assertions.downgraded || assertions.unsupportedLanguage

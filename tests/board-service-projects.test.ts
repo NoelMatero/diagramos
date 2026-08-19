@@ -15,12 +15,13 @@
  */
 import { spawn } from "node:child_process";
 import fs from "node:fs/promises";
+import { createServer } from "node:net";
 import os from "node:os";
 import path from "node:path";
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
 
 import { emptyBoard, serializeBoard } from "../src/engine/board-file";
-import { probeBoard, startBoardServer } from "../src/server/board-server";
+import { DEFAULT_BOARD_PORT, probeBoard, startBoardServer } from "../src/server/board-server";
 import { listServers, stopServer } from "../src/server/server-registry";
 
 const REPO = path.resolve(__dirname, "..");
@@ -28,6 +29,29 @@ const BUNDLE = path.join(REPO, "out/cli/diagramos.mjs");
 
 let home: string;
 let stateDir: string;
+/**
+ * A port of this file's own.
+ *
+ * Left unset, every service these tests start would ask for 4747 and get it or
+ * fall back -- which works, but means the suite competes with whatever board the
+ * developer has open, and takes the default port from them for the length of a
+ * run. `npm test` should answer "is the code right", not "is this machine
+ * quiet" (#77).
+ */
+let port: number;
+
+/** A port nobody is on yet. Racy in principle; a fixed one collides in CI. */
+function freePort(): Promise<number> {
+  return new Promise((resolve, reject) => {
+    const probe = createServer();
+    probe.once("error", reject);
+    probe.listen(0, "127.0.0.1", () => {
+      const address = probe.address();
+      if (address && typeof address === "object") probe.close(() => resolve(address.port));
+      else probe.close(() => reject(new Error("no port")));
+    });
+  });
+}
 
 /** A project with one board in the standard place. */
 async function makeProject(name: string): Promise<string> {
@@ -48,7 +72,12 @@ function run(cwd: string, args: string[]): Promise<{ code: number; stdout: strin
   return new Promise((resolve, reject) => {
     const child = spawn(process.execPath, [BUNDLE, ...args], {
       cwd,
-      env: { ...process.env, DIAGRAMOS_NO_OPEN: "1", DIAGRAMOS_STATE_DIR: stateDir },
+      env: {
+        ...process.env,
+        DIAGRAMOS_NO_OPEN: "1",
+        DIAGRAMOS_STATE_DIR: stateDir,
+        DIAGRAMOS_PORT: String(port),
+      },
     });
     let stdout = "";
     let stderr = "";
@@ -63,11 +92,27 @@ beforeEach(async () => {
   home = await fs.mkdtemp(path.join(os.tmpdir(), "board-projects-"));
   stateDir = path.join(home, "state");
   process.env.DIAGRAMOS_STATE_DIR = stateDir;
+  port = await freePort();
 });
 
 afterEach(async () => {
   for (const entry of (await listServers()).running) await stopServer(entry, { graceMs: 2000 });
   await fs.rm(home, { recursive: true, force: true });
+});
+
+describe("the suite itself", () => {
+  it("never asks for the port a developer's own board is on", () => {
+    /*
+     * The guard, asserted rather than trusted. Removing the line in setup.ts
+     * that sets this would go unnoticed otherwise: a service that cannot have
+     * 4747 falls back to a free port and every test still passes, having taken
+     * somebody's board away on the way past (#77).
+     */
+    expect(process.env.DIAGRAMOS_PORT).toBeDefined();
+    expect(Number(process.env.DIAGRAMOS_PORT)).not.toBe(DEFAULT_BOARD_PORT);
+    expect(process.env.DIAGRAMOS_STATE_DIR).toBeDefined();
+    expect(process.env.DIAGRAMOS_STATE_DIR).not.toContain(os.homedir());
+  });
 });
 
 describe("a second project", () => {

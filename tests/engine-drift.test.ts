@@ -10,7 +10,7 @@ import { afterAll, beforeAll, describe, expect, it } from "vitest";
 import { emptyBoard, type BoardFile } from "../src/engine/board-file";
 import { createDiagram } from "../src/engine/diagram";
 import { checkDrift, createWorkspace, parseRef, refFromLabel, type Workspace } from "../src/engine/drift";
-import { readGraph } from "../src/engine/graph";
+import { readGraph, type NodeState } from "../src/engine/graph";
 import { applyPromotions } from "../src/engine/promote";
 import type { ExcalidrawElement } from "../src/engine/normalize";
 import { installExcalifontMeasurer } from "./helpers/excalifont";
@@ -1181,6 +1181,123 @@ describe("boxes the diagram leaves unanchored", () => {
   it("drops the box from the list once it carries an anchor", async () => {
     const board = await boardOf([{ id: "mcp", label: "Board MCP server", ref: "src/a.ts" }]);
     expect(checkDrift(board, fakeWorkspace(tree), { coverage: true }).unannotated).toEqual([]);
+  });
+});
+
+/**
+ * Arrows nothing read.
+ *
+ * The bug this closes is not a wrong answer, it is an ambiguous silence: an
+ * arrow that passed and an arrow nobody looked at were reported identically, and
+ * the only way to tell them apart was to read the engine. A false "writes" arrow
+ * survived from the first commit that way.
+ */
+describe("naming the arrows nothing read", () => {
+  async function boardOf(
+    nodes: Array<{ id: string; label: string; ref?: string; state?: NodeState }>,
+    edges: Array<{ from: string; to: string; label?: string }>,
+  ): Promise<BoardFile> {
+    return (await createDiagram(emptyBoard(), { name: "arch", nodes, edges })).board;
+  }
+  const tree = {
+    "src/a.ts": "export const a = 1;",
+    "src/b.ts": "import { a } from './a';\nexport const b = a;",
+    "src/dir": "dir" as const,
+  };
+
+  it("names both boxes and the arrow's own label, which is the whole claim", async () => {
+    const board = await boardOf(
+      [
+        { id: "engine", label: "ELK layout engine", ref: "src/a.ts" },
+        { id: "file", label: "board.excalidraw", state: "external" },
+      ],
+      [{ from: "engine", to: "file", label: "writes" }],
+    );
+    const report = checkDrift(board, fakeWorkspace(tree));
+    expect(report.unreadEdges).toEqual([
+      {
+        from: "engine",
+        to: "file",
+        fromLabel: "ELK layout engine",
+        toLabel: "board.excalidraw",
+        label: "writes",
+        reason: "endpoint-external",
+      },
+    ]);
+    // Unread is not drift: nothing was claimed falsely, nothing was checked.
+    expect(report.clean).toBe(true);
+  });
+
+  it("names them without being asked, unlike the box list", async () => {
+    // `unannotated` waits for `coverage` because it is a suggestion and because
+    // naming boxes every turn is how a check gets switched off. This is neither:
+    // it writes down a decision already taken, and costs nothing to record.
+    const board = await boardOf(
+      [
+        { id: "a", label: "A", ref: "src/a.ts" },
+        { id: "you", label: "You", state: "external" },
+      ],
+      [{ from: "a", to: "you" }],
+    );
+    expect(checkDrift(board, fakeWorkspace(tree)).unreadEdges).toHaveLength(1);
+  });
+
+  it("omits the arrow's label when it has none, rather than inventing an empty one", async () => {
+    const board = await boardOf(
+      [
+        { id: "a", label: "A", ref: "src/a.ts" },
+        { id: "you", label: "You", state: "external" },
+      ],
+      [{ from: "a", to: "you" }],
+    );
+    expect(checkDrift(board, fakeWorkspace(tree)).unreadEdges[0]).not.toHaveProperty("label");
+  });
+
+  it("leaves a checked arrow out of the list", async () => {
+    const board = await boardOf(
+      [
+        { id: "a", label: "A", ref: "src/a.ts" },
+        { id: "b", label: "B", ref: "src/b.ts" },
+      ],
+      [{ from: "b", to: "a", label: "imports" }],
+    );
+    const report = checkDrift(board, fakeWorkspace(tree));
+    expect(report.edgesChecked).toBe(1);
+    expect(report.unreadEdges).toEqual([]);
+  });
+
+  /*
+   * The invariant that makes the list trustworthy. Nine reasons leave the arrow
+   * check and every one of them has to name its arrow -- a skip that forgets is
+   * exactly the silence being fixed, and it would be invisible in any test that
+   * only looked at one reason at a time.
+   */
+  it("names every arrow it counted, whatever the reason", async () => {
+    const board = await boardOf(
+      [
+        { id: "a", label: "A", ref: "src/a.ts" },
+        { id: "b", label: "B", ref: "src/b.ts" },
+        { id: "you", label: "You", state: "external" },
+        { id: "bare", label: "Bare" },
+        { id: "dir", label: "A directory", ref: "src/dir" },
+        { id: "gone", label: "Gone", ref: "src/missing.ts" },
+      ],
+      [
+        { from: "a", to: "you", label: "external end" },
+        { from: "a", to: "bare", label: "no ref" },
+        { from: "a", to: "dir", label: "directory" },
+        { from: "a", to: "gone", label: "missing file" },
+        { from: "b", to: "a", label: "checked" },
+      ],
+    );
+    const report = checkDrift(board, fakeWorkspace(tree));
+    expect(report.unreadEdges).toHaveLength(report.edgesSkipped);
+    expect(report.edgesChecked).toBe(1);
+    // Every counted reason appears in the list exactly as often as it was counted.
+    const tally: Record<string, number> = {};
+    for (const arrow of report.unreadEdges) tally[arrow.reason] = (tally[arrow.reason] ?? 0) + 1;
+    expect(tally).toEqual(report.edgesSkippedWhy);
+    expect(report.unreadEdges.every((arrow) => arrow.fromLabel && arrow.toLabel)).toBe(true);
   });
 });
 
