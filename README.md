@@ -91,6 +91,8 @@ The bare `127.0.0.1:4747` follows whichever board was opened or written last, wh
 
 **The board shows its own status.** A chip in the corner carries the same tally the end-of-turn notice does — boxes whose code is gone in red, questionable arrows in amber, planned work in grey. Click it and every finding is a row; click a row and the canvas jumps to the box or arrow it is about. When there is nothing to say it reads as what was checked, not just "in sync", because a board nobody could read and a board that agrees are different kinds of quiet. It refreshes when the board changes and when you come back to the tab.
 
+**The board tells its recent past.** A `history` chip next to the status one lists what changed the board while the service has been up — each save with when, what it did to the element count, and who did it: drawn on the page, or written to the file by a tool, an editor, or git. Held in memory on purpose and the panel says so: the board itself is the artifact, git is the durable history, and this is the working session's timeline rather than a second file claiming to be the past.
+
 **Reading them offline.** `diagramos board` is an ordinary local server and the viewer it serves ships inside the package, fonts and all, so it needs no network and no Claude Code — on a plane, it is the same command. Or skip us entirely: a `.excalidraw` file opens in the [VS Code Excalidraw extension](https://marketplace.visualstudio.com/items?itemName=pomdtr.excalidraw-editor) and in Obsidian's Excalidraw plugin, both offline. That is the advantage of the diagram being a file.
 
 ## Keeping a diagram honest
