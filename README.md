@@ -62,9 +62,11 @@ Working inside this repo, `npm run board` is the same command.
 
 A local page on `127.0.0.1:4747` showing the file. Anything that writes it — a tool, your editor, `git checkout` — appears immediately over SSE, and anything you draw is written straight back. Both sides edit one artifact.
 
-The command does not hold your terminal. It makes sure a background board service is running and gives you back the prompt, so closing that window — or ending the Claude session that opened the board — leaves the boards up. One service per project: run the command again, or open a board from a session, and you get the one that is already there rather than a second. One port serves every project, so if another project already holds 4747 this one takes a free port, and the registry is what makes that port findable again.
+The command does not hold your terminal. It makes sure a background board service is running and gives you back the prompt, so closing that window — or ending the Claude session that opened the board — leaves the boards up.
 
-`127.0.0.1:4747/boards` lists every board the service can show and carries a button that stops it, for the times you would rather not reach for a command.
+**One service, however many projects.** Open a board in a second repository and it joins the service already running rather than starting another on another port. So `diagramos stop --list` is one line rather than a list, and `127.0.0.1:4747/boards` shows everything you have open, grouped by project, with a button that stops the lot.
+
+A service still only serves directories you actually opened, and only `.excalidraw` files inside them — that confinement is what stops a page in your browser reading a file it was never shown, and it did not go away to make this work. Adding a project to a running service takes a token from the service's own registry entry, which is readable by nobody but you, so a web page cannot ask for it however hard it tries.
 
 Conflicts resolve in your favour. A save carrying a stale revision is refused with the current board attached, so an agent write cannot discard a stroke you just made.
 

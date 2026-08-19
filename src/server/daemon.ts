@@ -95,9 +95,10 @@ export interface EnsuredServer {
   probe?: BoardProbe;
 }
 
-/** A registry entry is usable for this project when it is up and serves that root. */
+/** Whether a service already covers this project. */
 function servesRoot(entry: RegisteredServer, root: string): boolean {
-  return entry.root !== undefined && path.resolve(entry.root) === path.resolve(root);
+  const covered = entry.roots ?? (entry.root ? [entry.root] : []);
+  return covered.some((candidate) => path.resolve(candidate) === path.resolve(root));
 }
 
 /**
@@ -114,6 +115,15 @@ export async function ensureBoardServer(options: EnsureOptions): Promise<Ensured
   if (existing) return { ...existing, started: false };
 
   /*
+   * Nothing serves this project yet, but something may serve another one. Ask it
+   * to take this project too, rather than starting a second service: one service
+   * for every project you have open is the whole point, and it is what makes
+   * `diagramos stop` a single answer instead of a list.
+   */
+  const adopted = await adoptInto(root);
+  if (adopted) return { ...adopted, started: false };
+
+  /*
    * Only one starter at a time. Two sessions opening a board in the same second
    * would otherwise both find nothing, both spawn, and the loser would end up on
    * an ephemeral port -- two services for one project, which is the pile this
@@ -122,7 +132,7 @@ export async function ensureBoardServer(options: EnsureOptions): Promise<Ensured
   const release = await acquireStartLock(root);
   try {
     // Someone may have won the lock and started one while we waited for it.
-    const raced = await findServing(root);
+    const raced = (await findServing(root)) ?? (await adoptInto(root));
     if (raced) return { ...raced, started: false };
     return { ...(await spawnService(root, options)), started: true };
   } finally {
@@ -130,8 +140,15 @@ export async function ensureBoardServer(options: EnsureOptions): Promise<Ensured
   }
 }
 
-/** A running, answering service for this project, if there is one. */
-async function findServing(root: string): Promise<{ port: number; pid: number; probe?: BoardProbe } | undefined> {
+/**
+ * A running, answering service for this project, if there is one.
+ *
+ * Exported because asking "is a board up" and asking "give me a board" have to
+ * agree about what counts, and the answer is not "something is listening on
+ * 4747" -- a service takes an ephemeral port when that one is busy, and may be
+ * serving this project from another project's port entirely.
+ */
+export async function findServing(root: string): Promise<{ port: number; pid: number; probe?: BoardProbe } | undefined> {
   const { running } = await listServers();
   for (const entry of running.filter((candidate) => servesRoot(candidate, root))) {
     const probe = await probeBoard(entry.port);
@@ -139,6 +156,43 @@ async function findServing(root: string): Promise<{ port: number; pid: number; p
     // which is a service still starting or one wedged. Either way it is not a
     // board yet, so keep looking rather than hand back an address that fails.
     if (probe?.multiBoard) return { port: entry.port, pid: entry.pid, probe };
+  }
+  return undefined;
+}
+
+/**
+ * Asks a service already running on this machine to serve this project too.
+ *
+ * The token comes from the service's own registry entry, which only its owner
+ * can read -- that is what separates one of the user's processes from a page in
+ * their browser, which can post to 127.0.0.1 but cannot read a file.
+ *
+ * Returns nothing when there is no service, when it predates serving more than
+ * one project, or when it refuses. Every one of those means starting our own,
+ * which is the behaviour before this existed.
+ */
+async function adoptInto(root: string): Promise<{ port: number; pid: number; probe?: BoardProbe } | undefined> {
+  const { running } = await listServers();
+  // Oldest first, which listServers already gives: the long-lived service is the
+  // one most likely to still be there next time, and piling projects onto it
+  // beats spreading them over whichever happened to start last.
+  for (const entry of running) {
+    if (!entry.token) continue;
+    const probe = await probeBoard(entry.port);
+    // A service that cannot say what it serves cannot be asked to serve more.
+    if (!probe?.multiBoard || probe.roots === undefined) continue;
+    try {
+      const response = await fetch(`http://127.0.0.1:${entry.port}/api/roots`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ root, token: entry.token }),
+        signal: AbortSignal.timeout(2000),
+      });
+      if (!response.ok) continue;
+      return { port: entry.port, pid: entry.pid, probe: await probeBoard(entry.port) };
+    } catch {
+      continue;
+    }
   }
   return undefined;
 }

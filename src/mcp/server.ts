@@ -42,8 +42,7 @@ import {
   resolveBoardPort,
   type BoardProbe,
 } from "../server/board-server";
-import { ensureBoardServer } from "../server/daemon";
-import { listServers } from "../server/server-registry";
+import { ensureBoardServer, findServing } from "../server/daemon";
 import {
   relativeToWorkspace,
   resolveBoardPath,
@@ -251,16 +250,12 @@ async function currentService(): Promise<{ port: number; probe: BoardProbe } | u
     if (probe) return { port: servicePort, probe };
     servicePort = undefined;
   }
-  const { running } = await listServers();
-  for (const entry of running) {
-    if (entry.root === undefined || path.resolve(entry.root) !== WORKSPACE_ROOT) continue;
-    const probe = await probeBoard(entry.port);
-    if (probe?.multiBoard) {
-      servicePort = entry.port;
-      return { port: entry.port, probe };
-    }
-  }
-  return undefined;
+  // The same rule `open_board` uses to decide whether to start one, so status
+  // and opening can never disagree about whether a board exists.
+  const found = await findServing(WORKSPACE_ROOT);
+  if (!found?.probe) return undefined;
+  servicePort = found.port;
+  return { port: found.port, probe: found.probe };
 }
 
 /** Asks the board service to show this file. */
@@ -966,8 +961,9 @@ server.registerTool(
       "Open the board in a live local page. It updates the moment any tool writes the file, and "
       + "what the user draws is saved back, so you both edit the same board. Returns a URL pinned to "
       + "this board: several can be open at once and each stays on its own diagram, so opening a "
-      + "second one does not disturb a page the user is watching. One server serves them all. "
-      + "Prefer it to a shell command.",
+      + "second one does not disturb a page the user is watching. One background service serves them "
+      + "all, and it outlives this session -- the board is still there afterwards, and `diagramos "
+      + "stop` is what ends it. Prefer it to a shell command.",
     inputSchema: {
       path: z.string(),
       open: z.boolean().default(true).describe("Also launch the system browser"),
