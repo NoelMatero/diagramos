@@ -38,7 +38,8 @@ import { existsSync, mkdirSync, rmSync, writeFileSync } from "node:fs";
 import path from "node:path";
 
 import { box, fit, pad } from "./lib/box.mjs";
-import { readBoard } from "../src/engine/board-file.ts";
+import { readBoard, writeBoard } from "../src/engine/board-file.ts";
+import { applyPromotions } from "../src/engine/promote.ts";
 import { CONFIG_FILE, ConfigError, DEFAULT_DIAGRAM_DIR, diagramDir } from "../src/engine/config.ts";
 import {
   checkDrift,
@@ -215,7 +216,8 @@ const MAX_LISTED = 6;
  * with anything -- it is the sketch being ahead on purpose, and it would sit
  * there unchanged for the whole of a design session.
  */
-function rowsFor({ report }, colour, all = false) {
+function rowsFor({ report, promoted = [] }, colour, all = false) {
+  const promotedNodes = new Set(promoted.map((promotion) => promotion.node));
   return [
     ...report.deleted.map((finding) =>
       paint(`${boxName(finding)} removed, ${parseRef(finding.ref).path} still there`, "red", colour),
@@ -234,11 +236,16 @@ function rowsFor({ report }, colour, all = false) {
         colour,
       );
     }),
-    // Good news, and the only row here that says the diagram is behind the code
-    // rather than the other way round.
-    ...report.promotions.map((promotion) =>
-      paint(`${boxName(promotion)} is built now`, "green", colour),
+    // Good news the check acted on: the board is already advanced, so this
+    // line appears once and the next run is quiet about it.
+    ...promoted.map((promotion) =>
+      paint(`${boxName(promotion)} is built now — board updated`, "green", colour),
     ),
+    // Good news the check held back from: the same box still has unbuilt
+    // anchors, so flipping it would erase the remaining work from the picture.
+    ...report.promotions
+      .filter((promotion) => !promotedNodes.has(promotion.node))
+      .map((promotion) => paint(`${boxName(promotion)} is built now`, "green", colour)),
     ...(all
       ? report.workItems.map((item) => paint(`${boxName(item)} not built yet`, "dim", colour))
       : []),
@@ -246,7 +253,7 @@ function rowsFor({ report }, colour, all = false) {
 }
 
 /** "2 gone  1 arrow  1 built", each part coloured, empty parts dropped. */
-function tallyCounts(gone, empty, unused, removed, arrows, built, planned, colour) {
+function tallyCounts(gone, empty, unused, removed, arrows, promoted, built, planned, colour) {
   return [
     gone ? paint(`${gone} gone`, "red", colour) : "",
     empty ? paint(`${empty} empty`, "red", colour) : "",
@@ -255,22 +262,27 @@ function tallyCounts(gone, empty, unused, removed, arrows, built, planned, colou
     unused ? paint(`${unused} unused`, "red", colour) : "",
     removed ? paint(`${removed} removed`, "red", colour) : "",
     arrows ? paint(`${arrows} ${arrows === 1 ? "arrow" : "arrows"}`, "yellow", colour) : "",
+    // "promoted" is done -- the board was advanced this run; "built" is still
+    // waiting -- the code landed and the board could not be advanced for it.
+    promoted ? paint(`${promoted} promoted`, "green", colour) : "",
     built ? paint(`${built} built`, "green", colour) : "",
     planned ? paint(`${planned} planned`, "dim", colour) : "",
   ].filter(Boolean).join("  ");
 }
 
-function tallyFor(report, colour) {
+function tallyFor({ report, promoted = [] }, colour) {
   const count = (kind) => report.findings.filter((finding) => finding.kind === kind).length;
   const empty = count("empty-ref");
   const unused = count("unused-symbol");
+  const promotedNodes = new Set(promoted.map((promotion) => promotion.node));
   return tallyCounts(
     report.findings.length - empty - unused,
     empty,
     unused,
     report.deleted.length,
     report.edges.length,
-    report.promotions.length,
+    promoted.length,
+    report.promotions.filter((promotion) => !promotedNodes.has(promotion.node)).length,
     report.workItems.length,
     colour,
   );
@@ -287,7 +299,7 @@ function tallyFor(report, colour) {
 function renderDetails(stale, colour, foot = "/update-diagram updates the diagram") {
   return box({
     sections: stale.map((entry) => ({
-      label: `${path.basename(entry.file)}  ${tallyFor(entry.report, colour)}`,
+      label: `${path.basename(entry.file)}  ${tallyFor(entry, colour)}`,
       rows: rowsFor(entry, colour, true),
     })),
     foot,
@@ -313,24 +325,29 @@ function render(stale, colour) {
   // of what a notice firing every turn should do. The rule is now the simple one —
   // one diagram, see what is wrong; several, see where.
   const totals = stale.reduce(
-    (sum, { report }) => ({
-      gone: sum.gone + report.findings.filter(
-        (finding) => finding.kind !== "empty-ref" && finding.kind !== "unused-symbol",
-      ).length,
-      empty: sum.empty + report.findings.filter((finding) => finding.kind === "empty-ref").length,
-      unused: sum.unused + report.findings.filter((finding) => finding.kind === "unused-symbol").length,
-      removed: sum.removed + report.deleted.length,
-      arrows: sum.arrows + report.edges.length,
-      built: sum.built + report.promotions.length,
-      planned: sum.planned + report.workItems.length,
-    }),
-    { gone: 0, empty: 0, unused: 0, removed: 0, arrows: 0, built: 0, planned: 0 },
+    (sum, { report, promoted = [] }) => {
+      const promotedNodes = new Set(promoted.map((promotion) => promotion.node));
+      return {
+        gone: sum.gone + report.findings.filter(
+          (finding) => finding.kind !== "empty-ref" && finding.kind !== "unused-symbol",
+        ).length,
+        empty: sum.empty + report.findings.filter((finding) => finding.kind === "empty-ref").length,
+        unused: sum.unused + report.findings.filter((finding) => finding.kind === "unused-symbol").length,
+        removed: sum.removed + report.deleted.length,
+        arrows: sum.arrows + report.edges.length,
+        promoted: sum.promoted + promoted.length,
+        built: sum.built
+          + report.promotions.filter((promotion) => !promotedNodes.has(promotion.node)).length,
+        planned: sum.planned + report.workItems.length,
+      };
+    },
+    { gone: 0, empty: 0, unused: 0, removed: 0, arrows: 0, promoted: 0, built: 0, planned: 0 },
   );
 
   // Too many to list: counts per diagram, and a pointer to the view that has room.
   const head = single
-    ? `${path.basename(stale[0].file)}  ${tallyCounts(totals.gone, totals.empty, totals.unused, totals.removed, totals.arrows, totals.built, totals.planned, colour)}`
-    : `${stale.length} diagrams out of date  ${tallyCounts(totals.gone, totals.empty, totals.unused, totals.removed, totals.arrows, totals.built, totals.planned, colour)}`;
+    ? `${path.basename(stale[0].file)}  ${tallyCounts(totals.gone, totals.empty, totals.unused, totals.removed, totals.arrows, totals.promoted, totals.built, totals.planned, colour)}`
+    : `${stale.length} diagrams out of date  ${tallyCounts(totals.gone, totals.empty, totals.unused, totals.removed, totals.arrows, totals.promoted, totals.built, totals.planned, colour)}`;
 
   const rows = [];
   let hidden = 0;
@@ -340,7 +357,7 @@ function render(stale, colour) {
   } else {
     const widest = Math.min(28, Math.max(...stale.map(({ file }) => path.basename(file).length)));
     for (const { entry } of found.slice(0, MAX_LISTED)) {
-      rows.push(`${pad(fit(path.basename(entry.file), widest), widest)}  ${tallyFor(entry.report, colour)}`);
+      rows.push(`${pad(fit(path.basename(entry.file), widest), widest)}  ${tallyFor(entry, colour)}`);
     }
     hidden = Math.max(0, stale.length - MAX_LISTED);
   }
@@ -464,20 +481,45 @@ await initEngine();
 
 for (const file of checking) {
   let report;
+  /** Promotions actually written to the board this run, one per box or arrow. */
+  let promoted = [];
   try {
-    report = checkDrift(await readBoard(file), workspace, {
+    const boardFile = await readBoard(file);
+    report = checkDrift(boardFile, workspace, {
       edges: opts.edges,
       coverage: opts.coverage,
       // Per board, so the cheap "unmodified" answer short-circuits each one.
       ...(opts.deletions ? { baseline: createGitBaseline(root, file) } : {}),
     });
+    /*
+     * A promotion says the board is behind the code by exactly one edit, and
+     * this makes the edit: flip the box to built, write the file, say so once.
+     * The next run then has nothing to repeat, and on a live board the box
+     * turns solid on screen the moment the work lands.
+     *
+     * Hook-only on purpose. `drift` in a terminal, CI or a pre-commit hook is
+     * a check, and a check that mutates the working tree breaks every
+     * `git diff --exit-code` that runs after it. A box only partly landed --
+     * several anchors, some unresolved -- is held, not applied.
+     */
+    if (opts.hook && report.promotions.length > 0) {
+      const result = applyPromotions(boardFile, report);
+      if (result.applied.length > 0) {
+        try {
+          await writeBoard(file, result.board);
+          promoted = result.applied;
+        } catch {
+          // A tree we cannot write to: keep reporting the promotion instead.
+        }
+      }
+    }
   } catch (error) {
     // An unreadable board is a problem, but not drift. Say so and keep going
     // rather than failing a commit over a file that may not be a board at all.
     problems.push(`${path.relative(root, file)}: could not read (${error.message})`);
     continue;
   }
-  examined.push({ file, report });
+  examined.push({ file, report, promoted });
 
   // Suggestions are collected apart from drift: they are not a claim going wrong,
   // and a board with nothing but suggestions is still a clean board.
@@ -486,7 +528,7 @@ for (const file of checking) {
 
   if (report.clean && report.promotions.length === 0 && report.workItems.length === 0) continue;
 
-  stale.push({ file, report });
+  stale.push({ file, report, promoted });
 }
 
 /*

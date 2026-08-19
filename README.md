@@ -137,6 +137,8 @@ Run it yourself with `npx -y diagramos drift`, which answers in one line when no
 - run: npx -y diagramos drift
 ```
 
+**A diagram can describe the future.** Mark a box or arrow `planned` and it is drawn dashed: a sketch of what is meant to exist, not a claim that it does. The check then reports its missing code as work to do rather than drift — and the moment the code lands, the per-turn hook advances the board itself: the box turns solid on the live page, the notice says `promoted` once, and the next turn is quiet. A box that stands for several files stays dashed until all of them exist. The edit is an ordinary change to a file in git, so undoing it is one checkout; the bare `drift` command never applies it, because a check that mutates the working tree is a check CI cannot trust.
+
 Deliberately shallow. Missing files and symbols are checked by existence alone, which works in any language; the arrow check resolves imports and understands only TypeScript and JavaScript, so elsewhere every arrow is skipped. Nodes without a `ref` are skipped rather than guessed at. A clean report means nothing checkable disagreed — not that the diagram is correct. Reasoning in [docs/drift-check.md](docs/drift-check.md).
 
 ## Working on it
