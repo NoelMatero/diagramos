@@ -264,6 +264,42 @@ try {
   await pageMain.close();
   await pageSide.close();
 
+  // 7. A save racing a file switch must never cross files (#70): composed
+  //    against one board, it lands on that board or not at all. Before saves
+  //    were addressed to their file, this exact timing wrote the whole old
+  //    scene into the newly followed board via the 409-merge path.
+  await waitForScene(page, (value) => value.count > 0 && settled(value));
+  const liveBefore = await readBoard(file);
+  const sideBefore = await readBoard(sideFile);
+  await page.mouse.click(600, 300); // focus the canvas so the shortcut lands
+  await page.keyboard.press("p");
+  await page.mouse.move(220, 520);
+  await page.mouse.down();
+  await page.mouse.move(280, 560, { steps: 4 });
+  await page.mouse.up();
+  await page.waitForTimeout(390); // the save debounce is 400ms: switch mid-flush
+  await server.setFile(file);
+  await page.waitForTimeout(2500);
+
+  const liveIds = new Set(liveBefore.elements.map((element) => String(element.id)));
+  const sideIds = new Set(sideBefore.elements.map((element) => String(element.id)));
+  const liveAfter = await readBoard(file);
+  const crossed = liveAfter.elements.filter(
+    (element) => sideIds.has(String(element.id)) && !liveIds.has(String(element.id)),
+  );
+  check(
+    "a save racing a file switch does not leak into the next board",
+    crossed.length === 0,
+    `${crossed.length} foreign elements`,
+  );
+  const liveCount = (board) => board.elements.filter((element) => !element.isDeleted).length;
+  const sideAfter = await readBoard(sideFile);
+  check(
+    "the board switched away from keeps its elements",
+    liveCount(sideAfter) >= liveCount(sideBefore),
+    `${liveCount(sideBefore)} -> ${liveCount(sideAfter)}`,
+  );
+
   // The pill must not present a filename as current once the connection is gone:
   // the server may have been re-pointed or replaced, and the page cannot tell.
   await server.close();

@@ -294,9 +294,15 @@ export default function App() {
           // the canvas is actually showing, not against what the API returns.
           (window as unknown as { __boardScene?: () => unknown }).__boardScene = () => {
             const elements = api.getSceneElements();
+            const all = api.getSceneElementsIncludingDeleted();
             return {
               count: elements.length,
               ids: elements.map((element) => element.id),
+              // Soft-deleted residue matters: onChange reports these too, so a
+              // save can carry them into the file. A canvas that looks right can
+              // still be about to write elements from a board it no longer shows.
+              deleted: all.length - elements.length,
+              deletedIds: all.filter((element) => element.isDeleted).map((element) => element.id),
               // Lets a test wait for the reveal to finish instead of sleeping a
               // guessed number of milliseconds and hoping.
               revealing: revealTimer.current !== undefined,

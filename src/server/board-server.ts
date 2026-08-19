@@ -517,27 +517,56 @@ export async function startBoardServer(options: BoardServerOptions): Promise<Run
       }
 
       if (request.method === "POST" && url.pathname === "/api/board") {
-        const target = requestedFile(url);
-        if (!target.file) return json(response, 403, { error: target.error });
         const payload = JSON.parse(await readBody(request)) as {
           revision?: string;
           board?: BoardFile;
+          file?: string;
         };
         if (!payload.board || !Array.isArray(payload.board.elements)) {
           return json(response, 400, { error: "board with an elements array is required" });
         }
-        const state = await track(target.file);
-        const onDisk = await readBoard(target.file);
+        // A write must say what it thinks it is replacing. Without the claim
+        // there is nothing standing between a stale client and the file, and a
+        // stale scene written blind is exactly the shape of a wipe (#70).
+        if (!payload.revision) {
+          return json(response, 400, { error: "revision is required — pull the board first" });
+        }
+        // The save lands on the file the scene came from, when the client says
+        // which. The bare URL means "whatever board is current" -- right for
+        // reading, wrong for writing: the server can be switched to another
+        // file between a scene being composed and its save arriving, and
+        // resolving the write against the *new* file is how a follow tab once
+        // wiped a freshly generated board (#70).
+        let saveTo: string;
+        if (typeof payload.file === "string" && payload.file) {
+          const named = path.resolve(payload.file);
+          if (root) {
+            const relative = path.relative(root, named);
+            if (relative.startsWith("..") || path.isAbsolute(relative)) {
+              return json(response, 403, { error: `file is outside the board root (${root})` });
+            }
+          }
+          if (!(await fileExists(named))) {
+            return json(response, 404, { error: `no such file: ${named}` });
+          }
+          saveTo = named;
+        } else {
+          const target = requestedFile(url);
+          if (!target.file) return json(response, 403, { error: target.error });
+          saveTo = target.file;
+        }
+        const state = await track(saveTo);
+        const onDisk = await readBoard(saveTo);
         const diskRevision = revisionOf(onDisk);
-        if (payload.revision && payload.revision !== diskRevision) {
+        if (payload.revision !== diskRevision) {
           // Stale write. Hand back the current board so the browser can merge
           // its own edits over it instead of clobbering or losing them.
-          return json(response, 409, { error: "stale revision", revision: diskRevision, board: onDisk });
+          return json(response, 409, { error: "stale revision", revision: diskRevision, board: onDisk, file: saveTo });
         }
-        await writeBoard(target.file, payload.board);
+        await writeBoard(saveTo, payload.board);
         state.revision = revisionOf(payload.board);
-        announce(target.file, state.revision);
-        return json(response, 200, { revision: state.revision });
+        announce(saveTo, state.revision);
+        return json(response, 200, { revision: state.revision, file: saveTo });
       }
 
       if (request.method === "GET" && url.pathname === "/api/events") {
