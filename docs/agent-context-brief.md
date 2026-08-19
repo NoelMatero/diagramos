@@ -470,3 +470,51 @@ Review of the above found four defects; all fixed on the same branch, each pinne
 Sentence costs after round 2: 41–70 tokens on the six boards with gaps (chars/4 on the real sentences), unchanged in kind. The revised sentences name more boards (defect 3's fix), which is where the upper bound moved. Still ungraded whether any of this helps a reading agent; the task set above remains the missing instrument.
 
 **After rebasing onto #61 — 2026-08-19.** The sentence now rides inside `projectGraph()` in `src/mcp/projection.ts` rather than being spread on in the handler, so this audit prices the payload the model is actually sent — the reason that module exists. Re-measured against #61's trimmed reads (210–521 tokens per anchored board): the sentence adds 44–73 tokens, which is 11–31% of a read — 11–19% on the five larger boards, 31% on the smallest (example, 210 tokens), where a fixed-size sentence is proportionally loudest. The earlier "roughly 10–17% of a ~400-token read" claim in this section was written against pre-trim reads and understated the share; these are the honest numbers. `check:drift` after the rebase: 59 refs, 54 arrows, nothing drifted (board-internals now also carries #61's projection box).
+
+## The task set — #63, 2026-08-19
+
+**The three claims in the table at the top of #52's follow-up now have numbers, not stories. All three come out in the board's favour, and the biggest new finding wasn't about boards at all: the prose corpus is stale in ways that produced wrong answers, not just missing ones.**
+
+`scripts/bench-task-set.mts` builds three arms from the live repo — no synthetic graph this time. **prose**: every tracked `.md` (`AGENTS.md`, `README.md`, `docs/*.md` except this brief), same file list `audit-context.mts` prices as "every tracked .md", 39,638 tokens. **board**: the six diagrams that anchor themselves in this repo (`board-internals`, `drift-check`, `example`, `live-board`, `picture-path`, `published-cli`), read through the real `projectGraph` + `computeHonestGaps` path — not a copy of `read_diagram`'s rules, 2,833 tokens. **both**: their concatenation, 42,471 tokens. Full ground truth, written by hand from the code before any arm ran, is in that script's header comment; a summary is below.
+
+**Eight questions, one per arm, asked once each — n=1 per arm, same as every run in this file so far.** A sealed reader (a fresh subagent, given exactly one arm's printed text and instructed not to use any other tool or file) answered all eight in one sitting per arm. First attempt handed each reader a file path to `Read`; the tool's own per-call token cap silently truncated the prose and both arms at ~56K characters, so those two readers only ever saw about a third of their context and answered accordingly — a bug in this measurement, not a finding about prose, and both were rerun instructing the reader to read the file in four fixed chunks. The rerun transcripts confirm full coverage (`both` explicitly re-verified it reached the true end of file). This is the same "handed a file with filesystem access, went and looked at the real thing" risk `bench-default-fields.mts` warns about, aimed at a tool boundary rather than the repo boundary — worth remembering if this harness is reused with a bigger corpus.
+
+### The eight questions
+
+| # | kind | question | ground truth (short) |
+| --- | --- | --- | --- |
+| Q1 | location | Where is `check_drift` registered vs. where does it actually check? | Registered in `src/mcp/server.ts`; the comparison is `checkDrift()` in `src/engine/drift.ts` — same function the CLI calls, not a copy. |
+| Q2 | location, trap | What files change to add a real `diagramos audit` subcommand, and why can't `diagramos.mjs` show you by import analysis? | `scripts/diagramos.mjs` (COMMANDS map) + `scripts/build-cli.mjs` (a new bundle entry); the dispatch is `import(new URL(...))` at runtime, invisible to any static import graph. |
+| Q3 | structure | Who breaks if `graph.ts` renamed `readGraph`, outside its own tests? | 8 files: `mcp/projection.ts`, `mcp/server.ts`, `engine/gaps.ts`, `engine/drift.ts`, `engine/diagram.ts`, `engine/layout.ts` (type-only), `scripts/audit-context.mts`, `scripts/make-example-diagram.mjs`. |
+| Q4 | structure | What actually draws the PNG in `render_diagram`? | `render.ts` orchestrates; the real Excalidraw library, running in headless Chromium against the prebuilt `vendor/excalidraw-browser.js` (`build-vendor.mjs` from `src/engine/vendor/browser-entry.ts`), draws the pixels. |
+| Q5 | status, trap | Is anything on the six repo boards drawn `planned`? | No — every node/edge on all six is `built`, `recorded`. Trap: `docs/ref-brief.md` still opens "not yet built," which is now false — that design shipped across #36/#39/#43/#46. |
+| Q6 | trust | Of 12 `.excalidraw` files, how many describe this repo, and how do you tell? | 6 do (have `ref`s); 6 are `describes: "concept"` with zero refs (5 telecom/IMS boards + `auth.excalidraw`, misleadingly titled, + `state-legend`). The tell is the `describes` field, not the filename — `architecture.excalidraw` is the IMS diagram. |
+| Q7 | absence | What does `board-internals.excalidraw` not show, and how does it know? | Its own `notShown`: 13 files drawn on sibling boards, 4 on no board (`normalize.ts`, `font.ts`, `contrast.ts`, `server-registry.ts`) — computed live by `computeHonestGaps` on every read. |
+| Q8 | absence, repo-wide | Any real file on *no* diagram at all? | Yes: `normalize.ts`, `font.ts`, `contrast.ts`, `server-registry.ts`, `viewer/styles.css` — confirmed by cross-referencing every board's `notShown`. |
+
+### Results
+
+Graded against the ground truth above; **correct** = matches; **partial** = right mechanism/some right files, materially incomplete; **wrong** = could not answer the current repo, or named the wrong specifics.
+
+| | Q1 | Q2 | Q3 | Q4 | Q5 | Q6 | Q7 | Q8 | score |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| prose | correct | **wrong** | partial (2/8) | correct | **wrong** | **wrong** | partial | **wrong** | 2 correct · 2 partial · 4 wrong |
+| board | correct | correct | partial (3/8) | partial | correct | partial | correct | correct | 5 correct · 3 partial · 0 wrong |
+| both | correct | correct | partial (3/8) | correct | correct | correct | correct | correct | 7 correct · 1 partial · 0 wrong |
+
+**Board never gave an outright wrong answer.** Every partial was the reader correctly hedging on something the board genuinely doesn't draw (Q3's importers that have no edge into `graph`; Q4's vendor-bundle link, which `published-cli.excalidraw` draws as a node with zero edges). That is the same pattern `bench-default-fields.mts` found in its own naive arm, upside down: uncertainty tracked the actual gaps in the payload rather than papering over them.
+
+**Prose failed by being stale, not by being absent — the new finding.** Q2, Q5, Q6 and Q8 all failed the same way: the prose reader correctly quoted the docs, and the docs were describing a repo that no longer exists. `docs/arrow-check-brief.md` and `docs/ref-brief.md` both anchor on "seven committed diagrams" — a 2026-08-04/08-15 snapshot — while the repo now has twelve; `docs/ref-brief.md`'s status line still says a design is "not yet built" that shipped across three PRs since. A reader that trusts prose at face value doesn't fail open the way an unresolvable ref does — it answers confidently from a fact that used to be true. Nothing in this repo's tooling currently catches a stale *sentence* the way `check_drift` catches a stale *ref*.
+
+**Both beat either alone, decisively — 7 of 8 clean.** Its one partial (Q3) is the same one both single arms hit, for the same reason: nobody draws `mcp/projection.ts`, `engine/gaps.ts`, `engine/diagram.ts`, `engine/layout.ts` or `scripts/audit-context.mts` as importing `graph.ts`, on any board or in any doc's prose, so no arm — sealed or not — could have named all eight without reading the source. That is itself an answer to Q8's question turned back on the method: a "structure" question about an undrawn, undocumented relationship is exactly the kind neither context wins, and the honest result is "unknown, not zero."
+
+### Restating the three claims from the top of this file
+
+- **"The board beats the docs"** — not a coin flip any more: 5 correct + 3 honest-partial + 0 wrong for board, against 2 correct + 2 partial + 4 wrong for prose, n=1 per arm on 8 questions spanning the five kinds that have separated the arms before. Weak evidence by sample size, no longer none.
+- **"The redraw made the board better"** — out of scope for this run; this measures the current board against the current prose, not a before/after.
+- **"The 55% payload trim is safe"** — untouched by this result; `bench-default-fields.mts` still owns that question, and its own caveat about a control being flattered by prompt structure applies here too (the sealed readers were told the shape of what they'd receive, which is unavoidable once questions are asked in the abstract rather than embedded in the payload).
+- **"The honest-gaps sentence helps"** — the first real evidence either way. Q7 and Q8 are built directly on `notShown`, and every arm holding a board answered both correctly, board-only included, from that one field alone. Prose could only reconstruct a stale, partially-wrong version of the same answer from `docs/drift-check.md`'s older coverage table. The sentence is pulling weight a plain read of the code would not have shown.
+
+### What this does not settle
+
+n=1 per arm, one question set, one model, one day. Sealing was enforced by instruction to a subagent holding real tool access, not a hard sandbox — trusted the same way every prior run in this file trusted it. A "control arm that should fail" was built into the questions as traps (Q2, Q5) rather than as a fourth arm; none of the trap questions actually caught an arm inventing a wrong answer with false confidence, which is worth another round designed specifically to try harder. `scripts/bench-task-set.mts` is committed and reproducible; rerunning it costs three sealed reads.
