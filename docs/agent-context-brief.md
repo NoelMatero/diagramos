@@ -436,3 +436,24 @@ Reported because they are real and neither is fixed.
 7. **Build the task set before the next board.** Eight questions, hand-written
    ground truth, all arms re-run. Without it every further change is a guess with
    a good story attached.
+
+## Honest gaps: what a board does not show — 2026-08-18
+
+The recommendation above said "make coverage aware of sibling boards" before drawing more. This session shipped it.
+
+**What shipped:** When `read_diagram` is called on an anchored board, the response now carries `notShown`, a single sentence describing two truths: files related to the board that ARE drawn on a sibling board in the diagram directory (listing board names), and files related to the board that are on NO board in the directory (listing paths, capped at 8). Omitted entirely when there are no gaps, when the board is a concept board, when it has no anchored refs, or when the walk gives up. Always silent on error: a computation failure just means the field is absent, never an exception.
+
+**Measured behaviour on this repo's 12 boards:**
+- 82 total unrepresented files across all boards
+- 62 (76%) drawn on other boards → now named in notShown (e.g., "13 related files are drawn on other boards (drift-check.excalidraw, live-board.excalidraw)")
+- 20 (24%) on no board at all → listed in notShown with paths; deduped across boards that is six files, one of which is `src/engine/gaps.ts` itself — the module shipped today, correctly reported as not yet drawn
+- 0 test files appearing (TEST_FILE filter fixed: was only applied upstream, now applies downstream too)
+
+**Cost:** Measured on the real sentences (chars/4): 37–67 tokens per board read, only on the six boards that have gaps, nothing on the six that do not. Against the ~400-token baseline read that is roughly 10–17%. The raw `unrepresented` payload this replaces was priced at ~300–420 tokens and called a covered file "missing" four times in five; the sentence is the deduplicated, sibling-aware reading of the same data. Whether the line actually helps a reading agent is ungraded — the task-set recommendation above still stands.
+
+**Design rules followed:**
+- Default ON with cheap guard: coverage computation runs, result is silent when nothing to report
+- Degrades gracefully: any error returns undefined (field omitted), never throws
+- Engine stays independent of MCP: coverage logic extracted to `boardCoverage()` helper in drift.ts, reused by both checkDrift and computeHonestGaps
+- Silence is fallback: field only appears when there are gaps to report
+- Covers recommendation #6: sibling awareness built, coverage no longer per-board only

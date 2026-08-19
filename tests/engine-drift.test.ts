@@ -1323,6 +1323,24 @@ describe("code the diagram leaves out", () => {
     expect(files).not.toContain("tests/core.test.ts");
   });
 
+  it("also excludes test files imported by board refs (downstream direction)", async () => {
+    // Regression test for the TEST_FILE filter bug: test files should be excluded
+    // even when a file on the board imports them (downstream direction), not just
+    // when they are entry points (upstream direction).
+    const treesWithTestImport = {
+      ...surfaces,
+      "src/engine/core.ts": "import { helper } from '../../tests/helpers/excalifont';\nexport const core = helper;",
+      "tests": "dir" as const,
+      "tests/helpers": "dir" as const,
+      "tests/helpers/excalifont.ts": "export function helper() { return 1; }",
+    };
+    const board = await boardOf([{ id: "core", label: "Core", ref: "src/engine/core.ts" }]);
+    const files = checkDrift(board, fakeWorkspace(treesWithTestImport), { coverage: true })
+      .unrepresented.map((entry) => entry.file);
+    // The test file should not appear even though core.ts imports it
+    expect(files).not.toContain("tests/helpers/excalifont.ts");
+  });
+
   it("ranks entry points after the modules the boxes lean on", async () => {
     const board = await boardOf([{ id: "core", label: "Core", ref: "src/engine/core.ts" }]);
     const tree2 = {

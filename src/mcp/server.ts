@@ -33,6 +33,7 @@ import {
   findBoards,
   findStrayBoards,
 } from "../engine/drift";
+import { computeHonestGaps } from "../engine/gaps";
 import { loadConverter } from "../engine/convert";
 import { initEngine } from "../engine/parse";
 import { renderBoardToPng } from "../engine/render";
@@ -388,7 +389,8 @@ server.registerTool(
       + "(drawn as intent, not written yet) or external (real, and not yours to change); nodes and "
       + "edges both carry one. No unattributed means the board has no strays. "
       + "Edit or delete by the node id listed here -- edit_diagram resolves it -- "
-      + "and ask for geometry or includeElements if you need the raw Excalidraw elementId.",
+      + "and ask for geometry or includeElements if you need the raw Excalidraw elementId. "
+      + "When the board has anchored refs, notShown describes what it leaves out: files drawn on sibling boards and files on no board.",
     inputSchema: {
       path: z.string(),
       geometry: z
@@ -417,6 +419,15 @@ server.registerTool(
       const diagrams = listDiagrams(board);
       // readGraph stays rich because the engine and its tests want the whole
       // picture. projectGraph is the narrower thing a model is charged for.
+
+      // Compute honest gaps: what this board does not show. Defaults to silent.
+      const notShown = await computeHonestGaps(
+        board,
+        file,
+        WORKSPACE_ROOT,
+        diagramDir(WORKSPACE_ROOT),
+      );
+
       return text({
         file: relativeToWorkspace(file),
         ...projectGraph(graph, { geometry, detailed: geometry || includeElements }),
@@ -426,6 +437,7 @@ server.registerTool(
         ...(diagrams.length ? { diagrams } : {}),
         summary: `${graph.nodes.length} nodes, ${graph.edges.length} edges`
           + (inferred.length ? `, ${inferred.length} inferred from hand-drawn elements` : ""),
+        ...(notShown ? { notShown } : {}),
         ...(includeElements
           ? {
               elements: board.elements
