@@ -11,6 +11,7 @@ import { emptyBoard, type BoardFile } from "../src/engine/board-file";
 import { createDiagram } from "../src/engine/diagram";
 import { checkDrift, createWorkspace, parseRef, refFromLabel, type Workspace } from "../src/engine/drift";
 import { readGraph } from "../src/engine/graph";
+import { applyPromotions } from "../src/engine/promote";
 import type { ExcalidrawElement } from "../src/engine/normalize";
 import { installExcalifontMeasurer } from "./helpers/excalifont";
 
@@ -1594,5 +1595,132 @@ describe("anchor forms", () => {
     };
     const board = await boardOf([{ id: "a", label: "A", ref: "src/a.ts", refs: ["src/b.ts"] }]);
     expect(checkDrift(board, fakeWorkspace(files), { coverage: true }).unrepresented).toEqual([]);
+  });
+});
+
+describe("applyPromotions: the board advances itself", () => {
+  /** A board built through the real pipeline, so the flip meets real elements. */
+  async function drawn(
+    nodes: Array<{ id: string; label: string; ref?: string; refs?: string[]; state?: "planned" | "built" | "external" }>,
+    edges: Array<{ from: string; to: string; state?: "planned" | "built" | "external" }> = [],
+  ): Promise<BoardFile> {
+    return (await createDiagram(emptyBoard(), { name: "arch", nodes, edges })).board;
+  }
+
+  const shapeOf = (board: BoardFile, node: string) =>
+    board.elements.find((e) => (e.customData as { node?: string })?.node === node)!;
+
+  it("flips a promoted box to exactly what regenerating it as built would write", async () => {
+    const board = await drawn([{ id: "a", label: "Auth service", ref: "src/auth.ts", state: "planned" }]);
+    const files = fakeWorkspace({ "src/auth.ts": "export const x = 1;" });
+    const result = applyPromotions(board, checkDrift(board, files));
+
+    expect(result.applied).toHaveLength(1);
+    expect(result.applied[0]).toMatchObject({ node: "a" });
+    expect(result.held).toHaveLength(0);
+
+    const shape = shapeOf(result.board, "a");
+    expect(shape.strokeStyle).toBe("solid");
+    expect(shape.customData).not.toHaveProperty("state");
+    // Bumped so the live page reconciles the element rather than ignoring it.
+    expect(shape.version).toBe(2);
+    expect(readGraph(result.board).nodes[0]!.state).toBe("built");
+
+    // The loop actually closes: the next check has nothing left to say.
+    const after = checkDrift(result.board, files);
+    expect(after.promotions).toHaveLength(0);
+    expect(after.clean).toBe(true);
+  });
+
+  it("holds a box whose other anchor has not landed", async () => {
+    const board = await drawn([
+      { id: "a", label: "Auth", ref: "src/auth.ts", refs: ["src/tokens.ts"], state: "planned" },
+    ]);
+    const report = checkDrift(board, fakeWorkspace({ "src/auth.ts": "export const x = 1;" }));
+    expect(report.promotions).toHaveLength(1);
+    expect(report.workItems).toHaveLength(1);
+
+    const result = applyPromotions(board, report);
+    // Flipping it now would erase src/tokens.ts from the picture.
+    expect(result.applied).toHaveLength(0);
+    expect(result.held).toHaveLength(1);
+    expect(result.board).toBe(board);
+    expect(shapeOf(board, "a").customData).toMatchObject({ state: "planned" });
+  });
+
+  it("holds a box whose other anchor is malformed rather than unbuilt", async () => {
+    const board = await drawn([
+      { id: "a", label: "Auth", ref: "src/auth.ts", refs: ["../outside.ts"], state: "planned" },
+    ]);
+    const report = checkDrift(board, fakeWorkspace({ "src/auth.ts": "export const x = 1;" }));
+    expect(report.promotions).toHaveLength(1);
+    expect(report.findings[0]).toMatchObject({ kind: "unresolvable-ref", node: "a" });
+    const result = applyPromotions(board, report);
+    expect(result.applied).toHaveLength(0);
+    expect(result.board).toBe(board);
+  });
+
+  it("flips a box once, however many of its anchors resolved", async () => {
+    const board = await drawn([
+      { id: "a", label: "Auth", ref: "src/auth.ts", refs: ["src/tokens.ts"], state: "planned" },
+    ]);
+    const report = checkDrift(
+      board,
+      fakeWorkspace({ "src/auth.ts": "export const x = 1;", "src/tokens.ts": "export const t = 1;" }),
+    );
+    expect(report.promotions).toHaveLength(2);
+    const result = applyPromotions(board, report);
+    expect(result.applied).toHaveLength(1);
+    expect(shapeOf(result.board, "a").version).toBe(2);
+  });
+
+  it("flips a promoted arrow the same way", async () => {
+    const board = await drawn(
+      [
+        { id: "a", label: "A", ref: "src/a.ts" },
+        { id: "b", label: "B", ref: "src/b.ts" },
+      ],
+      [{ from: "a", to: "b", state: "planned" }],
+    );
+    const files = fakeWorkspace({
+      "src/a.ts": "import { b } from './b';\nexport const a = b;",
+      "src/b.ts": "export const b = 2;",
+    });
+    const result = applyPromotions(board, checkDrift(board, files));
+    expect(result.applied).toHaveLength(1);
+    expect(result.applied[0]).toMatchObject({ node: "a -> b" });
+
+    const arrow = result.board.elements.find((e) => e.type === "arrow")!;
+    expect(arrow.strokeStyle).toBe("solid");
+    expect(arrow.customData).not.toHaveProperty("state");
+    expect(checkDrift(result.board, files).promotions).toHaveLength(0);
+  });
+
+  it("returns the board untouched when there is nothing to promote", async () => {
+    const board = await drawn([{ id: "a", label: "A", ref: "src/a.ts" }]);
+    const result = applyPromotions(board, checkDrift(board, fakeWorkspace({ "src/a.ts": "x" })));
+    expect(result.applied).toHaveLength(0);
+    expect(result.board).toBe(board);
+  });
+
+  it("leaves hand-drawn elements alone while promoting beside them", async () => {
+    const board = await drawn([{ id: "a", label: "Auth", ref: "src/auth.ts", state: "planned" }]);
+    const sketch = {
+      ...structuredClone(board.elements.find((e) => e.type === "rectangle")!),
+      id: "hand-drawn-sketch",
+      strokeStyle: "dashed",
+      customData: undefined,
+      version: 7,
+    } as ExcalidrawElement;
+    const withSketch: BoardFile = { ...board, elements: [...board.elements, sketch] };
+
+    const result = applyPromotions(
+      withSketch,
+      checkDrift(withSketch, fakeWorkspace({ "src/auth.ts": "export const x = 1;" })),
+    );
+    expect(result.applied).toHaveLength(1);
+    const kept = result.board.elements.find((e) => e.id === "hand-drawn-sketch")!;
+    expect(kept.strokeStyle).toBe("dashed");
+    expect(kept.version).toBe(7);
   });
 });

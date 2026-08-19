@@ -9,7 +9,7 @@
  * from a hook — the way it actually runs — nobody ever saw it.
  */
 import { execFile, execFileSync } from "node:child_process";
-import { mkdtempSync, mkdirSync, rmSync, writeFileSync } from "node:fs";
+import { mkdtempSync, mkdirSync, readFileSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import path from "node:path";
 import { promisify } from "node:util";
@@ -1239,4 +1239,85 @@ describe("check-drift and what a box is allowed to say", () => {
     expect(details.stderr).toContain("outside this repo by declaration");
     expect(details.stderr).not.toContain("boxes skipped");
   });
+});
+
+/**
+ * Promotions applied from the hook, and only from the hook.
+ *
+ * The per-turn path advances the board when a planned box's code lands: that is
+ * the loop closing, and the notice says so once instead of repeating "is built
+ * now" forever. The bare command stays a check -- a check that mutates the
+ * working tree breaks every `git diff --exit-code` that runs after it in CI.
+ */
+describe("promotion from the hook", () => {
+  let project: string;
+  const boardPath = () => path.join(project, "docs/diagrams/plan.excalidraw");
+
+  async function check(...args: string[]) {
+    try {
+      const { stdout, stderr } = await run(TSX, [SCRIPT, ...args], { cwd: project });
+      return { code: 0, stdout, stderr };
+    } catch (error) {
+      const failure = error as { code?: number; stdout?: string; stderr?: string };
+      return { code: failure.code ?? -1, stdout: failure.stdout ?? "", stderr: failure.stderr ?? "" };
+    }
+  }
+
+  /** A planned box whose code already landed: one promotion waiting. */
+  async function plantPromotion() {
+    const { board: drawn } = await createDiagram(emptyBoard(), {
+      name: "plan",
+      nodes: [{ id: "auth", label: "Auth service", ref: "src/auth.ts", state: "planned" }],
+      edges: [],
+    });
+    await writeBoard(boardPath(), drawn);
+    writeFileSync(path.join(project, "src/auth.ts"), "export const auth = true;\n");
+  }
+
+  function plannedShape(): { strokeStyle?: string; customData?: Record<string, unknown> } {
+    const file = JSON.parse(readFileSync(boardPath(), "utf8")) as {
+      elements: Array<{ type: string; strokeStyle?: string; customData?: Record<string, unknown> }>;
+    };
+    return file.elements.find(
+      (element) => (element.customData as { node?: string } | undefined)?.node === "auth",
+    )!;
+  }
+
+  beforeEach(async () => {
+    project = mkdtempSync(path.join(tmpdir(), "drift-cli-promote-"));
+    mkdirSync(path.join(project, "docs/diagrams"), { recursive: true });
+    mkdirSync(path.join(project, "src"), { recursive: true });
+    await plantPromotion();
+  });
+
+  afterEach(() => {
+    if (project) rmSync(project, { recursive: true, force: true });
+  });
+
+  it("advances the board, says so once, and is quiet the next turn", async () => {
+    const first = await check("--hook");
+    expect(first.code).toBe(0);
+    const payload = JSON.parse(first.stdout) as { systemMessage: string };
+    expect(payload.systemMessage).toContain("promoted");
+    expect(payload.systemMessage).toContain("board updated");
+
+    // The file itself was advanced to what regenerating it as built would write.
+    const shape = plannedShape();
+    expect(shape.strokeStyle).toBe("solid");
+    expect(shape.customData).not.toHaveProperty("state");
+
+    // The loop is closed: nothing left to repeat.
+    const second = await check("--hook");
+    expect(`${second.stdout}${second.stderr}`.trim()).toBe("");
+  }, 120_000);
+
+  it("leaves the file alone when it is not a hook", async () => {
+    const result = await check();
+    // Still reported -- as news, not as an action taken.
+    expect(result.stderr).toContain("built");
+    expect(result.stderr).not.toContain("promoted");
+    const shape = plannedShape();
+    expect(shape.strokeStyle).toBe("dashed");
+    expect(shape.customData).toMatchObject({ state: "planned" });
+  }, 120_000);
 });

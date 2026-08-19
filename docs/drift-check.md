@@ -113,6 +113,18 @@ and it is one edit from going away. Work items still show up in the tally
 (`1 gone  1 planned`), so they are discoverable, and `--details` lists them in
 full — being quiet is not the same as withholding.
 
+**The hook makes that one edit itself.** On the per-turn path a promotion is
+applied, not just announced: the box is flipped to exactly what regenerating it
+as `built` would write — solid stroke, no state key, version bumped so the live
+page redraws it — and the notice says `promoted` once instead of `is built now`
+forever. On a live board the box turns solid the moment the work lands, which is
+the loop this whole field exists for. Two deliberate limits: a box only partly
+landed — several anchors, some still missing — is held, because flipping it
+would erase the remaining work from the picture; and only the hook applies,
+never the bare `drift` command, because a check that mutates the working tree
+breaks every `git diff --exit-code` that CI runs after it. The applied edit is
+an ordinary change to a file in git, so undoing it is one checkout.
+
 `external` earns its place separately. Measured: 106 of 117 nodes in this repo's
 diagrams carry no ref, and some of that is deliberate — the telecom boards
 describe a protocol, not this repository. Without a way to say so, "not code" and
