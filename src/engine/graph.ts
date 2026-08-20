@@ -144,6 +144,11 @@ export interface RecoveredGraph {
   edges: RecoveredEdge[];
   /** Elements that are neither node nor edge: annotations, images, strays. */
   unattributed: Array<{ elementId: string; type: string; text?: string; x: number; y: number }>;
+  /**
+   * Count of arrow elements that failed to resolve at one or both ends.
+   * These never make it into edges[] and are the truly dangling arrows.
+   */
+  strayArrows: number;
 }
 
 interface Box {
@@ -288,6 +293,7 @@ export function readGraph(board: BoardFile): RecoveredGraph {
   }
 
   const edges: RecoveredEdge[] = [];
+  let strayArrows = 0;
   for (const arrow of arrows) {
     const custom = customOf(arrow);
     const recorded = custom.edge as { from?: string; to?: string } | undefined;
@@ -335,7 +341,10 @@ export function readGraph(board: BoardFile): RecoveredGraph {
     }
 
     consumed.add(arrow.id);
-    if (!from || !to) continue;
+    if (!from || !to) {
+      strayArrows += 1;
+      continue;
+    }
 
     let label = recordedEdgeLabel.get(arrow.id) ?? labelByContainer.get(arrow.id);
     if (!label) {
@@ -390,5 +399,6 @@ export function readGraph(board: BoardFile): RecoveredGraph {
     nodes,
     edges,
     unattributed,
+    strayArrows,
   };
 }

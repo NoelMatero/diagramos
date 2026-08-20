@@ -185,9 +185,9 @@ A deleted arrow is not reported when the connection had no corroboration anyway 
 
 ### Stray arrows
 
-An arrow bound at fewer than two ends is an incomplete stroke, not a specification. Hand-drawn arrows that were never snapped to their boxes are counted and reported as a dim note when `--details` is asked for, so an incomplete sketch does not clutter the main notice.
+An arrow that fails to resolve at one or both ends is an incomplete stroke, not a specification. These arrows never make it into the graph's edge list — they drop out when both binding and proximity matching fail to find a target, which is exactly the "never surfaces anywhere" silence described by the issue.
 
-Arrows with both ends bound, whether through Excalidraw bindings or explicit declaration, are specifications and are checked normally.
+They are counted and reported as a dim note when `--details` is asked for, so an incomplete sketch does not clutter the main notice. Arrows that resolve at both ends, whether through Excalidraw bindings or explicit declaration, are specifications and are checked normally.
 
 ## Code the diagram does not show
 

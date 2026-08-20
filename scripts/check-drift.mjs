@@ -251,7 +251,7 @@ function rowsFor({ report, promoted = [] }, colour, all = false) {
     // Deleted edges: quiet notes about arrows that were removed but the code still supports
     ...(report.deletedEdges ?? []).map((finding) =>
       paint(
-        `${oneLine(finding.fromLabel || finding.from)} → ${oneLine(finding.toLabel || finding.to)} deleted`,
+        `arrow ${oneLine(finding.fromLabel || finding.from)} → ${oneLine(finding.toLabel || finding.to)} deleted — the code still connects them`,
         "dim",
         colour,
       ),

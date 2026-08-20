@@ -25,7 +25,7 @@ import path from "node:path";
 import { parseSymbol, routeOf, symbolEvidence, type Assertion } from "./assert";
 import { chainBreak, reaches, unsupportedMembers } from "./body";
 import type { BoardFile } from "./board-file";
-import { readGraph, type Provenance } from "./graph";
+import { readGraph, type Provenance, type RecoveredGraph } from "./graph";
 import { languageOf, type Language } from "./parse";
 
 export type DriftKind =
@@ -1281,10 +1281,13 @@ export function checkDrift(
    * deletion either -- the ordinary checks own that.
    */
   const deleted: DeletedClaimFinding[] = [];
+  const deletedEdges: DeletedEdgeFinding[] = [];
   const baseline = options?.baseline?.committed();
+  let baselineGraph: RecoveredGraph | undefined;
   if (baseline) {
+    baselineGraph = readGraph(baseline);
     const live = new Set(graph.nodes.map((node) => node.id));
-    for (const was of readGraph(baseline).nodes) {
+    for (const was of baselineGraph.nodes) {
       if (was.provenance !== "recorded" || was.state === "external") continue;
       const ref = was.ref?.trim();
       if (!ref || live.has(was.id)) continue;
@@ -1621,15 +1624,8 @@ export function checkDrift(
    * but the code still supports the connection.
    *
    * Only reported when both endpoints still have corroboration against the code.
-   * Quiet note, never affects clean or findings.
+   * Quiet note, never affects clean or findings. Reuses baseline already read above.
    */
-  const deletedEdges: DeletedEdgeFinding[] = [];
-  let committedBoard: BoardFile | undefined;
-  const baselineObj = options?.baseline as BoardBaseline | undefined;
-  if (baselineObj && typeof baselineObj.committed === "function") {
-    committedBoard = baselineObj.committed();
-  }
-  const baselineGraph = committedBoard ? readGraph(committedBoard) : undefined;
   if (baselineGraph && !concept) {
     const liveEdgeSet = new Set<string>();
     for (const edge of graph.edges) {
@@ -1640,6 +1636,26 @@ export function checkDrift(
     const baselineNodeById = new Map<string, typeof baselineGraph.nodes[0]>();
     for (const node of baselineGraph.nodes) {
       baselineNodeById.set(node.id, node);
+    }
+
+    // Build shared importer candidates once for all deleted-edge checks
+    const sharedImporterCandidates = new Map<string, string>();
+    for (const node of baselineGraph.nodes) {
+      const nodeRef = node.ref?.trim();
+      if (!nodeRef) continue;
+      const { path: nodePath } = parseRef(nodeRef);
+      const resolved = workspace.resolve(nodePath);
+      if (resolved && workspace.stat(resolved) === "file") {
+        sharedImporterCandidates.set(resolved, nodePath);
+      }
+    }
+    for (const [file, fileRel] of sharedImporterCandidates) {
+      const fileImports = getImports(file, fileRel, workspace, importCache);
+      for (const imp of fileImports) {
+        if (!sharedImporterCandidates.has(imp.abs)) {
+          sharedImporterCandidates.set(imp.abs, imp.rel);
+        }
+      }
     }
 
     for (const edge of baselineGraph.edges) {
@@ -1679,28 +1695,7 @@ export function checkDrift(
                 toNode.label,
                 workspace,
                 importCache,
-                // Build shared importer candidates for baseline check
-                (() => {
-                  const candidates = new Map<string, string>();
-                  for (const node of baselineGraph.nodes) {
-                    const nodeRef = node.ref?.trim();
-                    if (!nodeRef) continue;
-                    const { path: nodePath } = parseRef(nodeRef);
-                    const resolved = workspace.resolve(nodePath);
-                    if (resolved && workspace.stat(resolved) === "file") {
-                      candidates.set(resolved, nodePath);
-                    }
-                  }
-                  for (const [file, fileRel] of candidates) {
-                    const fileImports = getImports(file, fileRel, workspace, importCache);
-                    for (const imp of fileImports) {
-                      if (!candidates.has(imp.abs)) {
-                        candidates.set(imp.abs, imp.rel);
-                      }
-                    }
-                  }
-                  return candidates;
-                })(),
+                sharedImporterCandidates,
               );
 
               // Only report if the connection is still supported (no finding)
@@ -1710,30 +1705,13 @@ export function checkDrift(
                   to: toPath,
                   fromLabel: fromNode.label,
                   toLabel: toNode.label,
-                  detail: `a deleted arrow the code still supports: ${fromNode.label || fromPath} → ${toNode.label || toPath}`,
+                  detail: `arrow ${fromNode.label || fromPath} → ${toNode.label || toPath} deleted — the code still connects them`,
                 });
               }
             }
           }
         }
       }
-    }
-  }
-
-  /*
-   * Stray arrows: arrows with fewer than two bound endpoints.
-   * These are incomplete strokes, not specifications.
-   *
-   * An arrow bound at neither end (or at only one end) is an incomplete sketch.
-   * This happens when at least one endpoint is resolved through proximity
-   * matching (`endpoints === "nearest"`) rather than explicit declaration or
-   * Excalidraw binding.
-   */
-  let strayArrows = 0;
-  for (const edge of graph.edges) {
-    // Count arrows where at least one end is proximity-matched (incomplete stroke)
-    if (edge.endpoints === "nearest") {
-      strayArrows += 1;
     }
   }
 
@@ -1763,7 +1741,7 @@ export function checkDrift(
     edgesSkipped,
     edgesSkippedWhy,
     unreadEdges,
-    ...(strayArrows > 0 ? { strayArrows } : {}),
+    ...(graph.strayArrows > 0 ? { strayArrows: graph.strayArrows } : {}),
   };
 }
 
