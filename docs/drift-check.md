@@ -177,6 +177,18 @@ Three silences, each load-bearing:
 The cheap path is the common one: `git status --porcelain` on the board runs
 first, and an unmodified board stops there without reading a baseline.
 
+### Deleted arrows
+
+When an arrow is removed from the board, the check can detect if the code still supports that connection. If both endpoints exist in the code and have corroboration (one imports the other, they share an importer, or they share a route string), the removal is reported as a quiet note beside the deleted boxes, never a finding.
+
+A deleted arrow is not reported when the connection had no corroboration anyway — removing an uncorroborated arrow is cleanup, not loss.
+
+### Stray arrows
+
+An arrow bound at fewer than two ends is an incomplete stroke, not a specification. Hand-drawn arrows that were never snapped to their boxes are counted and reported as a dim note when `--details` is asked for, so an incomplete sketch does not clutter the main notice.
+
+Arrows with both ends bound, whether through Excalidraw bindings or explicit declaration, are specifications and are checked normally.
+
 ## Code the diagram does not show
 
 Every other check reads a claim and asks whether it still holds. This one asks the

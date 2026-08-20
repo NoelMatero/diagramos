@@ -257,6 +257,14 @@ export interface AssertionTally {
   unsupportedLanguage: number;
 }
 
+export interface DeletedEdgeFinding {
+  from: string;
+  to: string;
+  fromLabel: string;
+  toLabel: string;
+  detail: string;
+}
+
 export interface DriftReport {
   clean: boolean;
   findings: DriftFinding[];
@@ -274,6 +282,8 @@ export interface DriftReport {
   unannotated: UnannotatedFinding[];
   /** Boxes removed from the board while their code is still in the tree. */
   deleted: DeletedClaimFinding[];
+  /** Arrows removed from the board while the code still supports them. */
+  deletedEdges?: DeletedEdgeFinding[];
   /** `planned` claims the code has not reached yet. Never affects `clean`. */
   workItems: WorkItem[];
   /** `planned` claims that now hold, so the board can be advanced. Never affects `clean`. */
@@ -304,6 +314,11 @@ export interface DriftReport {
    * already taken rather than going looking, so there is nothing to defer.
    */
   unreadEdges: UnreadEdgeFinding[];
+  /**
+   * Count of arrows with fewer than two bound endpoints (dangling arrows).
+   * These are incomplete strokes, not checked specifications.
+   */
+  strayArrows?: number;
 }
 
 /**
@@ -1601,6 +1616,127 @@ export function checkDrift(
     );
   }
 
+  /*
+   * Deleted edges: arrows that were on the committed board and are no longer there,
+   * but the code still supports the connection.
+   *
+   * Only reported when both endpoints still have corroboration against the code.
+   * Quiet note, never affects clean or findings.
+   */
+  const deletedEdges: DeletedEdgeFinding[] = [];
+  let committedBoard: BoardFile | undefined;
+  const baselineObj = options?.baseline as BoardBaseline | undefined;
+  if (baselineObj && typeof baselineObj.committed === "function") {
+    committedBoard = baselineObj.committed();
+  }
+  const baselineGraph = committedBoard ? readGraph(committedBoard) : undefined;
+  if (baselineGraph && !concept) {
+    const liveEdgeSet = new Set<string>();
+    for (const edge of graph.edges) {
+      // Key edges by their node ids, not element ids, since regeneration changes element ids
+      liveEdgeSet.add(`${edge.from} -> ${edge.to}`);
+    }
+
+    const baselineNodeById = new Map<string, typeof baselineGraph.nodes[0]>();
+    for (const node of baselineGraph.nodes) {
+      baselineNodeById.set(node.id, node);
+    }
+
+    for (const edge of baselineGraph.edges) {
+      const edgeKey = `${edge.from} -> ${edge.to}`;
+      // If this edge is not in the working board, check if it should be reported
+      if (!liveEdgeSet.has(edgeKey)) {
+        const fromNode = baselineNodeById.get(edge.from);
+        const toNode = baselineNodeById.get(edge.to);
+
+        // Only report if both endpoints exist, are recorded, and have refs
+        if (
+          fromNode && toNode
+          && fromNode.provenance === "recorded"
+          && toNode.provenance === "recorded"
+          && fromNode.ref && toNode.ref
+          && fromNode.state !== "external"
+          && toNode.state !== "external"
+        ) {
+          const fromRef = fromNode.ref.trim();
+          const toRef = toNode.ref.trim();
+          const { path: fromPath } = parseRef(fromRef);
+          const { path: toPath } = parseRef(toRef);
+          const fromFile = workspace.resolve(fromPath);
+          const toFile = workspace.resolve(toPath);
+
+          // Both files must exist and be TS/JS files
+          if (fromFile && toFile && TS_JS.test(fromFile) && TS_JS.test(toFile)) {
+            const fromStat = workspace.stat(fromFile);
+            const toStat = workspace.stat(toFile);
+
+            if (fromStat === "file" && toStat === "file") {
+              // Check if the connection still has corroboration in the code
+              const finding = checkEdgeCorroboration(
+                fromRef,
+                toRef,
+                fromNode.label,
+                toNode.label,
+                workspace,
+                importCache,
+                // Build shared importer candidates for baseline check
+                (() => {
+                  const candidates = new Map<string, string>();
+                  for (const node of baselineGraph.nodes) {
+                    const nodeRef = node.ref?.trim();
+                    if (!nodeRef) continue;
+                    const { path: nodePath } = parseRef(nodeRef);
+                    const resolved = workspace.resolve(nodePath);
+                    if (resolved && workspace.stat(resolved) === "file") {
+                      candidates.set(resolved, nodePath);
+                    }
+                  }
+                  for (const [file, fileRel] of candidates) {
+                    const fileImports = getImports(file, fileRel, workspace, importCache);
+                    for (const imp of fileImports) {
+                      if (!candidates.has(imp.abs)) {
+                        candidates.set(imp.abs, imp.rel);
+                      }
+                    }
+                  }
+                  return candidates;
+                })(),
+              );
+
+              // Only report if the connection is still supported (no finding)
+              if (!finding) {
+                deletedEdges.push({
+                  from: fromPath,
+                  to: toPath,
+                  fromLabel: fromNode.label,
+                  toLabel: toNode.label,
+                  detail: `a deleted arrow the code still supports: ${fromNode.label || fromPath} → ${toNode.label || toPath}`,
+                });
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+
+  /*
+   * Stray arrows: arrows with fewer than two bound endpoints.
+   * These are incomplete strokes, not specifications.
+   *
+   * An arrow bound at neither end (or at only one end) is an incomplete sketch.
+   * This happens when at least one endpoint is resolved through proximity
+   * matching (`endpoints === "nearest"`) rather than explicit declaration or
+   * Excalidraw binding.
+   */
+  let strayArrows = 0;
+  for (const edge of graph.edges) {
+    // Count arrows where at least one end is proximity-matched (incomplete stroke)
+    if (edge.endpoints === "nearest") {
+      strayArrows += 1;
+    }
+  }
+
   return {
     // `clean` means "nothing has regressed". Work items and promotions are both
     // deliberately excluded: they drive the CLI's exit code, and neither an
@@ -1612,6 +1748,7 @@ export function checkDrift(
     unrepresented,
     unannotated,
     deleted,
+    ...(deletedEdges.length > 0 ? { deletedEdges } : {}),
     workItems,
     promotions,
     checked,
@@ -1626,6 +1763,7 @@ export function checkDrift(
     edgesSkipped,
     edgesSkippedWhy,
     unreadEdges,
+    ...(strayArrows > 0 ? { strayArrows } : {}),
   };
 }
 

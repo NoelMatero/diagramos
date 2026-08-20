@@ -22,11 +22,13 @@ export interface DriftView {
   findings: Array<{ node: string; label: string; ref: string; kind: string }>;
   edges: Array<{ from: string; to: string; fromLabel: string; toLabel: string; node: string }>;
   deleted: Array<{ node: string; label: string; ref: string }>;
+  deletedEdges?: Array<{ fromLabel: string; toLabel: string }>;
   workItems: Array<{ node: string; label: string; ref?: string }>;
   promotions: Array<{ node: string; label: string }>;
   checked: number;
   skipped: number;
   edgesChecked: number;
+  strayArrows?: number;
   concept: boolean;
 }
 
@@ -61,6 +63,12 @@ export function tallyOf(report: DriftView): TallyPart[] {
       tone: "warn",
     });
   }
+  if (report.strayArrows) {
+    parts.push({
+      text: `${report.strayArrows} stray ${report.strayArrows === 1 ? "arrow" : "arrows"}`,
+      tone: "dim",
+    });
+  }
   if (report.promotions.length) parts.push({ text: `${report.promotions.length} built`, tone: "good" });
   if (report.workItems.length) parts.push({ text: `${report.workItems.length} planned`, tone: "dim" });
   return parts;
@@ -85,6 +93,11 @@ export function rowsOf(report: DriftView): StatusRow[] {
       // The finding's own from/to are file paths (the evidence); `node` is the
       // arrow in node ids, which is what the canvas can reveal.
       node: finding.node,
+    })),
+    // Deleted edges: quiet notes about arrows that were removed but the code still supports
+    ...(report.deletedEdges ?? []).map((finding) => ({
+      text: `${name(finding.fromLabel, finding.fromLabel)} → ${name(finding.toLabel, finding.toLabel)} deleted`,
+      tone: "dim" as Tone,
     })),
     ...report.promotions.map((promotion) => ({
       text: `${name(promotion.label, promotion.node)} is built now`,

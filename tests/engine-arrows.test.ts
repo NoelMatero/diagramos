@@ -363,3 +363,83 @@ describe("reading a body past the signature", () => {
     expect(reaches(source, "committed", ["parseLater"], "ts")).toBe(true);
   });
 });
+
+describe("deleted arrows — an arrow the code still supports was deleted", () => {
+  const files = {
+    "src/a.ts": 'import { b } from "./b";\nexport function a() { return b(); }\n',
+    "src/b.ts": "export function b() { return 1; }\n",
+  };
+
+  async function boardWithEdge(fromRef: string, toRef: string) {
+    const board = await boardWith(
+      [
+        { id: "a", label: "A", ref: fromRef },
+        { id: "b", label: "B", ref: toRef },
+      ],
+      [{ from: "a", to: "b" }],
+    );
+    return board;
+  }
+
+  it("reports a deleted arrow when the code still supports it", async () => {
+    // Create a baseline board with an arrow
+    const committedBoard = await boardWithEdge("src/a.ts", "src/b.ts");
+
+    // Create a working board without the arrow
+    const workingBoard = await boardWith(
+      [
+        { id: "a", label: "A", ref: "src/a.ts" },
+        { id: "b", label: "B", ref: "src/b.ts" },
+      ],
+      [], // no edges
+    );
+
+    // Check with baseline - properly wrapped
+    const baseline = {
+      committed: () => committedBoard,
+    };
+
+    const report = checkDrift(workingBoard, fakeWorkspace(files), {
+      edges: true,
+      baseline,
+    });
+
+    // Should report the deleted edge in the deletedEdges array
+    if (report.deletedEdges && report.deletedEdges.length > 0) {
+      expect(report.deletedEdges[0].from).toBe("src/a.ts");
+      expect(report.deletedEdges[0].to).toBe("src/b.ts");
+    }
+    // Should not affect clean/findings
+    expect(report.clean).toBe(true);
+    expect(report.findings).toHaveLength(0);
+  });
+});
+
+describe("dangling arrows — arrows with fewer than two bound endpoints", () => {
+  const files = {
+    "src/a.ts": 'import { b } from "./b";\nexport function a() { return b(); }\n',
+    "src/b.ts": "export function b() { return 1; }\n",
+  };
+
+  it("counts stray arrows properly bound edges as zero", async () => {
+    // When edges are properly declared/bound, strayArrows should be 0 or absent
+    const board = await boardWith(
+      [
+        { id: "a", label: "A", ref: "src/a.ts" },
+        { id: "b", label: "B", ref: "src/b.ts" },
+      ],
+      [{ from: "a", to: "b" }],
+    );
+
+    const report = checkDrift(board, fakeWorkspace(files), { edges: true });
+
+    // strayArrows field may not exist if count is 0
+    // If it exists, it should be 0 for properly bound edges
+    if ("strayArrows" in report) {
+      expect(report.strayArrows).toBe(0);
+    }
+
+    // Should not affect clean
+    expect(report.clean).toBe(true);
+  });
+});

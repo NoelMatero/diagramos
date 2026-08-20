@@ -248,6 +248,14 @@ function rowsFor({ report, promoted = [] }, colour, all = false) {
         colour,
       );
     }),
+    // Deleted edges: quiet notes about arrows that were removed but the code still supports
+    ...(report.deletedEdges ?? []).map((finding) =>
+      paint(
+        `${oneLine(finding.fromLabel || finding.from)} → ${oneLine(finding.toLabel || finding.to)} deleted`,
+        "dim",
+        colour,
+      ),
+    ),
     // Good news the check acted on: the board is already advanced, so this
     // line appears once and the next run is quiet about it.
     ...promoted.map((promotion) =>
@@ -265,7 +273,7 @@ function rowsFor({ report, promoted = [] }, colour, all = false) {
 }
 
 /** "2 gone  1 arrow  1 built", each part coloured, empty parts dropped. */
-function tallyCounts(gone, empty, unused, removed, arrows, promoted, built, planned, colour) {
+function tallyCounts(gone, empty, unused, removed, arrows, stray, promoted, built, planned, colour) {
   return [
     gone ? paint(`${gone} gone`, "red", colour) : "",
     empty ? paint(`${empty} empty`, "red", colour) : "",
@@ -274,6 +282,7 @@ function tallyCounts(gone, empty, unused, removed, arrows, promoted, built, plan
     unused ? paint(`${unused} unused`, "red", colour) : "",
     removed ? paint(`${removed} removed`, "red", colour) : "",
     arrows ? paint(`${arrows} ${arrows === 1 ? "arrow" : "arrows"}`, "yellow", colour) : "",
+    stray ? paint(`${stray} stray ${stray === 1 ? "arrow" : "arrows"}`, "dim", colour) : "",
     // "promoted" is done -- the board was advanced this run; "built" is still
     // waiting -- the code landed and the board could not be advanced for it.
     promoted ? paint(`${promoted} promoted`, "green", colour) : "",
@@ -293,6 +302,7 @@ function tallyFor({ report, promoted = [] }, colour) {
     unused,
     report.deleted.length,
     report.edges.length,
+    report.strayArrows ?? 0,
     promoted.length,
     report.promotions.filter((promotion) => !promotedNodes.has(promotion.node)).length,
     report.workItems.length,
@@ -347,19 +357,20 @@ function render(stale, colour) {
         unused: sum.unused + report.findings.filter((finding) => finding.kind === "unused-symbol").length,
         removed: sum.removed + report.deleted.length,
         arrows: sum.arrows + report.edges.length,
+        stray: sum.stray + (report.strayArrows ?? 0),
         promoted: sum.promoted + promoted.length,
         built: sum.built
           + report.promotions.filter((promotion) => !promotedNodes.has(promotion.node)).length,
         planned: sum.planned + report.workItems.length,
       };
     },
-    { gone: 0, empty: 0, unused: 0, removed: 0, arrows: 0, promoted: 0, built: 0, planned: 0 },
+    { gone: 0, empty: 0, unused: 0, removed: 0, arrows: 0, stray: 0, promoted: 0, built: 0, planned: 0 },
   );
 
   // Too many to list: counts per diagram, and a pointer to the view that has room.
   const head = single
-    ? `${path.basename(stale[0].file)}  ${tallyCounts(totals.gone, totals.empty, totals.unused, totals.removed, totals.arrows, totals.promoted, totals.built, totals.planned, colour)}`
-    : `${stale.length} diagrams out of date  ${tallyCounts(totals.gone, totals.empty, totals.unused, totals.removed, totals.arrows, totals.promoted, totals.built, totals.planned, colour)}`;
+    ? `${path.basename(stale[0].file)}  ${tallyCounts(totals.gone, totals.empty, totals.unused, totals.removed, totals.arrows, totals.stray, totals.promoted, totals.built, totals.planned, colour)}`
+    : `${stale.length} diagrams out of date  ${tallyCounts(totals.gone, totals.empty, totals.unused, totals.removed, totals.arrows, totals.stray, totals.promoted, totals.built, totals.planned, colour)}`;
 
   const rows = [];
   let hidden = 0;
@@ -715,6 +726,9 @@ function renderCoverageAudit(entries, colour) {
       if (report.edgesSkipped) {
         rows.push(paint(`${report.edgesSkipped} arrows skipped: ${skipWords(report.edgesSkippedWhy)}`, "yellow", colour));
         rows.push(...unreadArrowRows(report.unreadEdges, colour));
+      }
+      if (report.strayArrows) {
+        rows.push(paint(`${report.strayArrows} stray ${report.strayArrows === 1 ? "arrow" : "arrows"} (attached at one end or none)`, "dim", colour));
       }
       // A weakened assertion still passes the plain mention check, so without
       // this line an unjudged claim and a satisfied one look identical.
