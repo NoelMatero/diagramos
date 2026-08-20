@@ -87,19 +87,22 @@ describe("the timeline as the page words it", () => {
     expect(timeAgo("2026-08-18T12:00:00Z", now)).toBe("2d ago");
   });
 
-  it("words each entry by what it did and who did it", () => {
+  it("words each entry by what it did and who did it, toned so rows scan apart", () => {
     const rows = rowsOfHistory(
       [
         { at: "2026-08-20T11:59:55Z", elements: 14, added: 3, removed: 1, source: "page" },
-        { at: "2026-08-20T11:55:00Z", elements: 12, added: 0, removed: 0, source: "file" },
-        { at: "2026-08-20T11:00:00Z", elements: 12, added: 0, removed: 0, source: "opened" },
+        { at: "2026-08-20T11:58:00Z", elements: 12, added: 1, removed: 0, source: "page" },
+        { at: "2026-08-20T11:55:00Z", elements: 11, added: 0, removed: 0, source: "file" },
+        { at: "2026-08-20T11:00:00Z", elements: 11, added: 0, removed: 0, source: "opened" },
       ],
       now,
     );
-    expect(rows.map((row) => row.text)).toEqual([
-      "just now · +3 −1 · drawn on the page",
-      "5m ago · edited · written to the file",
-      "1h ago · 12 elements · first seen here",
+    expect(rows).toEqual([
+      // Anything removed is worth a glance, even alongside additions.
+      { when: "just now", delta: "+3 elements −1", who: "drawn by hand", tone: "warn" },
+      { when: "2m ago", delta: "+1 element", who: "drawn by hand", tone: "good" },
+      { when: "5m ago", delta: "restyled or moved", who: "a tool, an editor, or git", tone: "dim" },
+      { when: "1h ago", delta: "11 elements", who: "first seen by this service", tone: "dim" },
     ]);
   });
 });

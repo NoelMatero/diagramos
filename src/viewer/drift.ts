@@ -106,9 +106,23 @@ export function worstToneOf(rows: StatusRow[]): Tone {
   return "good";
 }
 
-/** The clean chip's words: what was read, so "in sync" cannot mean "unread". */
+/**
+ * The clean chip's words: what was read, so "in sync" cannot mean "unread".
+ * In sentences, not tallies -- "4 refs · 3 arrows checked" needed the reader
+ * to already know what a ref is, which is the one thing a status line that
+ * only appears when everything is fine cannot assume.
+ */
 export function summaryOf(report: DriftView): string {
-  if (report.concept) return "concept board · not about this repo";
-  const unread = report.skipped ? ` · ${report.skipped} unread` : "";
-  return `${report.checked} refs · ${report.edgesChecked} arrows checked${unread}`;
+  if (report.concept) {
+    return "a concept board — it describes something outside this repo, so nothing here is checked";
+  }
+  if (!report.checked && !report.edgesChecked) {
+    return "nothing on this board points at code yet, so nothing was checked";
+  }
+  const boxes = `${report.checked} ${report.checked === 1 ? "box" : "boxes"}`;
+  const arrows = `${report.edgesChecked} ${report.edgesChecked === 1 ? "arrow" : "arrows"}`;
+  const unread = report.skipped
+    ? ` — ${report.skipped} more ${report.skipped === 1 ? "box has no ref, so it" : "boxes have no ref, so they"} went unchecked`
+    : "";
+  return `checked ${boxes} and ${arrows} against the code — all still true${unread}`;
 }

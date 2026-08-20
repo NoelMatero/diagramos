@@ -120,7 +120,7 @@ function DriftPanel({
       {open === "status" ? (
         <div className="drift-body">
           {quiet ? (
-            <div className="drift-row tone-dim">{summaryOf(report)}</div>
+            <div className="drift-row drift-row-wrap tone-dim">{summaryOf(report)}</div>
           ) : (
             rows.map((row) => (
               <button
@@ -140,11 +140,13 @@ function DriftPanel({
       {open === "history" ? (
         <div className="drift-body">
           {rowsOfHistory(history).map((row, index) => (
-            <div key={`${index}:${row.text}`} className="drift-row tone-dim">
-              {row.text}
+            <div key={`${index}:${row.when}:${row.delta}`} className="drift-row hist-row">
+              <span className="hist-when">{row.when}</span>
+              <span className={`tone-${row.tone}`}>{row.delta}</span>
+              <span className="hist-who">{row.who}</span>
             </div>
           ))}
-          <div className="drift-row tone-dim drift-footnote">
+          <div className="drift-row drift-row-wrap tone-dim drift-footnote">
             since this service started · git holds the rest
           </div>
         </div>

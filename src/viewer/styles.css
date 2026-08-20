@@ -168,6 +168,30 @@ body,
   cursor: default;
 }
 
+/* Rows that carry a sentence wrap instead of vanishing into an ellipsis. */
+.drift-row-wrap {
+  white-space: normal;
+}
+
+/* A timeline row: when, what, who — columns aligned so the eye can scan one. */
+.hist-row {
+  display: flex;
+  gap: 10px;
+  align-items: baseline;
+  cursor: default;
+}
+
+.hist-when {
+  min-width: 8ch;
+  color: #868e96;
+}
+
+.hist-who {
+  margin-left: auto;
+  color: #868e96;
+  font-size: 11px;
+}
+
 /* The history panel's closing caveat: present, but not competing with rows. */
 .drift-footnote {
   margin-top: 2px;

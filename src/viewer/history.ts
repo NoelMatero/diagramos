@@ -33,31 +33,42 @@ export function timeAgo(iso: string, now: Date = new Date()): string {
 }
 
 export interface HistoryRow {
-  text: string;
+  when: string;
+  /** What the change did, in words a stranger can read. */
+  delta: string;
+  /** Who made it: a hand on the board, or something writing the file. */
+  who: string;
+  /** Additions read as good news, removals as worth a glance, the rest as quiet. */
+  tone: "good" | "warn" | "dim";
 }
 
 /**
- * One row per entry, newest first, in words rather than numbers alone:
- * "+3 −1" is a delta, "edited" is a change that moved or restyled without
- * adding, and the oldest row says the count it started from, because a
- * timeline that opens mid-story should say so.
+ * One row per entry, newest first, split into parts so the page can colour
+ * them apart -- a single grey string made every row look like every other,
+ * which defeats a timeline. The oldest row says the count it started from,
+ * because a timeline that opens mid-story should say so.
  */
 export function rowsOfHistory(entries: HistoryEntryView[], now: Date = new Date()): HistoryRow[] {
   return entries.map((entry) => {
+    const opened = entry.source === "opened";
     const delta =
       entry.added || entry.removed
-        ? [entry.added ? `+${entry.added}` : "", entry.removed ? `−${entry.removed}` : ""]
+        ? [
+            entry.added ? `+${entry.added} ${entry.added === 1 ? "element" : "elements"}` : "",
+            entry.removed ? `−${entry.removed}` : "",
+          ]
             .filter(Boolean)
             .join(" ")
-        : entry.source === "opened"
+        : opened
           ? `${entry.elements} ${entry.elements === 1 ? "element" : "elements"}`
-          : "edited";
+          : "restyled or moved";
     const who =
       entry.source === "page"
-        ? "drawn on the page"
+        ? "drawn by hand"
         : entry.source === "file"
-          ? "written to the file"
-          : "first seen here";
-    return { text: `${timeAgo(entry.at, now)} · ${delta} · ${who}` };
+          ? "a tool, an editor, or git"
+          : "first seen by this service";
+    const tone = opened || (!entry.added && !entry.removed) ? "dim" : entry.removed ? "warn" : "good";
+    return { when: timeAgo(entry.at, now), delta, who, tone };
   });
 }
