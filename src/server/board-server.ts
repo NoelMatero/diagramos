@@ -21,6 +21,7 @@ import { fileURLToPath } from "node:url";
 import { readBoard, serializeBoard, writeBoard, type BoardFile } from "../engine/board-file";
 import { BoardHistory, HISTORY_ROUTE } from "./history";
 import { diagramDir } from "../engine/config";
+import { createCodeGraphOption } from "../engine/codegraph";
 import { checkDrift, createGitBaseline, createWorkspace, findBoards } from "../engine/drift";
 import { initEngine } from "../engine/parse";
 import { processAlive, registerServer, updateServer } from "./server-registry";
@@ -651,8 +652,10 @@ export async function startBoardServer(options: BoardServerOptions): Promise<Run
         engineReady ??= initEngine();
         await engineReady;
         const workspaceRoot = rootFor(target.file);
+        const codeGraph = createCodeGraphOption(workspaceRoot);
         const report = checkDrift(await readBoard(target.file), createWorkspace(workspaceRoot), {
           baseline: createGitBaseline(workspaceRoot, target.file),
+          ...(codeGraph ? { codeGraph } : {}),
         });
         return json(response, 200, { file: target.file, report });
       }

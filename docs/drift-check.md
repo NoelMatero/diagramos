@@ -632,6 +632,86 @@ carries none of that risk. If the automatic version is ever wanted, it belongs
 behind a flag on the script, off by default, with `stop_hook_active` verified
 empirically first.
 
+## The code graph: a fifth way to confirm an arrow
+
+The arrow check has always had four ways to confirm a connection: one file
+imports the other, a third file imports both, both name the same HTTP route,
+or a function body reaches the other end. All four read the two endpoint
+files, fresh, on every check — which bounds what they can see.
+
+The fifth is different: a map of the whole repo, computed once per commit and
+read at check time as plain JSON. The map is built by
+[Graphify](https://pypi.org/project/graphifyy/), whose code pass is local and
+deterministic — tree-sitter parsing, no model, nothing leaves the machine. A
+post-commit hook (installed by `npm install`) runs it and records which commit
+and Graphify version built the map. The check itself never runs Graphify,
+never runs Python; it only reads the JSON.
+
+### Getting it, without having to think about it
+
+`npm install` sets the whole thing up: it installs the post-commit hook, and
+it installs Graphify itself if the machine already has a Python tool installer
+(`uv`, else `pipx`). Nobody should have to read a doc to get the deeper check
+— it is on, or it is silent, never "documented as opt-in".
+
+The restraint in that: it uses only an installer already present, never
+installs an installer, and never fails an `npm install` — no installer, no
+network, a bad package index all exit quietly. `DIAGRAMOS_SKIP_GRAPHIFY=1`
+skips it, and so does `CI`, where a per-machine tool install is not wanted.
+
+By hand, if it was skipped or failed:
+
+```
+npm run graph:install    # installs graphify (needs uv or pipx)
+npm run graph:refresh    # builds the map now, instead of at the next commit
+```
+
+An arrow is confirmed when the map shows a chain of at most three steps —
+calls, imports, re-exports, dynamic imports, each read directly from source —
+**all pointing the same way**, from one end to the other (either direction).
+That last clause is the safety of the whole thing. Without it, two files that
+merely import the same helper would "connect" through it, and one big file
+that imports everything would connect all of its imports to each other. A
+chain whose edges all point one way means the dependency genuinely flows end
+to end.
+
+The map also answers two questions the live channels never could:
+
+- **A box that anchors a directory.** The directory means everything under
+  it, and the map can say whether anything in there reaches the other end.
+  These arrows used to be skipped as "an end refs a directory".
+- **Files the channels cannot read.** The import channels need TypeScript;
+  Graphify parses ~40 languages, so an arrow between two Python or Rust files
+  can now be confirmed at file level. These used to be skipped as "not
+  TypeScript or JavaScript".
+
+### What turns it off — always silently
+
+The channel only ever *confirms*. It never creates a finding, and every way
+it can fail is silence — the check then behaves exactly as it did before the
+channel existed:
+
+- No `graphify-out/graph.json` or sidecar (Graphify not installed, or never
+  run since; the CLI says so once, quietly, then never again).
+- A Graphify version outside the tested range (0.9.x today; a new release is
+  adopted deliberately, after re-testing).
+- A map the loader does not fully understand.
+- **Anything edited since the map was built.** The map describes a commit; a
+  file changed after it (staged, unstaged, or in later commits) falls back to
+  the live channels, so a stale map can never confirm a connection you just
+  removed. A directory endpoint goes stale as soon as anything under it does.
+
+### What it cannot see
+
+- Configuration-carried wiring: package.json scripts, hook registrations,
+  `.mcp.json`. Graphify reads config files as generic key trees, not as
+  "this entry runs that file".
+- Route methods (`#GET` versus `#POST` on the same path).
+- Anything its extractor missed — it is a parser, not a compiler.
+
+A miss means silence, not an alarm: the arrow stays amber ("could not
+confirm"), never red.
+
 ## Open questions
 
 - ~~Should drift auto-regenerate, or only report?~~ **Report only.** Silent

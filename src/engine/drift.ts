@@ -25,6 +25,7 @@ import path from "node:path";
 import { parseSymbol, routeOf, symbolEvidence, type Assertion } from "./assert";
 import { chainBreak, reaches, unsupportedMembers } from "./body";
 import type { BoardFile } from "./board-file";
+import { connects, refIsStale, type CodeGraphOption } from "./codegraph";
 import { readGraph, type Provenance, type RecoveredGraph } from "./graph";
 import { languageOf, type Language } from "./parse";
 
@@ -945,8 +946,9 @@ function checkSymbolEdge(
 }
 
 /**
- * Check if edge A → B is backed by one of the four corroboration channels.
+ * Check if edge A → B is backed by one of the five corroboration channels.
  * Assumes both files are valid TS/JS files; returns a finding if not backed, undefined if backed.
+ * Channels: imports, shared importer, shared route, symbol chain, code graph.
  */
 function checkEdgeCorroboration(
   fromRef: string,
@@ -956,6 +958,7 @@ function checkEdgeCorroboration(
   workspace: Workspace,
   importCache: Map<string, Array<{ abs: string; rel: string }>>,
   sharedImporterCandidates: Map<string, string>,
+  codeGraphOption?: CodeGraphOption,
 ): Omit<EdgeDriftFinding, "node"> | undefined {
   // Parse refs: keep only path, ignore symbol
   const { path: fromPath } = parseRef(fromRef);
@@ -1012,6 +1015,13 @@ function checkEdgeCorroboration(
     return undefined;
   }
 
+  // Channel 5: the code graph — precomputed whole-repo connectivity. It only
+  // ever confirms, and it is consulted last, so with it off (or stale for
+  // these files) the check behaves exactly as it did before the channel.
+  if (codeGraphConfirms(codeGraphOption, fromPath, toPath)) {
+    return undefined;
+  }
+
   // No channel fires: flag it as worth a look, not necessarily wrong
   return {
     from: fromPath,
@@ -1023,6 +1033,21 @@ function checkEdgeCorroboration(
     kind: "unsupported-edge",
     detail: `nothing in ${fromPath} imports, is imported by, shares an importer with, or shares a route string with ${toPath} — worth a look, not necessarily wrong.`,
   };
+}
+
+/**
+ * The code graph may confirm an arrow only when it is loaded and both endpoint
+ * refs (file or directory) are untouched since the graph's commit. Anything
+ * else is a "no", never an error: staleness falls back to the live channels.
+ */
+function codeGraphConfirms(
+  option: CodeGraphOption | undefined,
+  fromPath: string,
+  toPath: string,
+): boolean {
+  if (!option) return false;
+  if (refIsStale(fromPath, option.modified) || refIsStale(toPath, option.modified)) return false;
+  return connects(option.graph, fromPath, toPath);
 }
 
 /**
@@ -1068,7 +1093,12 @@ export function boardCoverage(
 export function checkDrift(
   board: BoardFile,
   workspace: Workspace,
-  options?: { edges?: boolean; baseline?: BoardBaseline; coverage?: boolean },
+  options?: {
+    edges?: boolean;
+    baseline?: BoardBaseline;
+    coverage?: boolean;
+    codeGraph?: CodeGraphOption;
+  },
 ): DriftReport {
   const findings: DriftFinding[] = [];
   const workItems: WorkItem[] = [];
@@ -1403,12 +1433,17 @@ export function checkDrift(
         // Both land here, and they are not the same thing to a reader: one end
         // standing for a subsystem is a choice, one pointing at a file that is
         // gone is already reported as drift by the node check.
-        skipEdge(
-          fromStat === "missing" || toStat === "missing" ? "endpoint-file-missing" : "directory-ref",
-          edge,
-          fromNode,
-          toNode,
-        );
+        const missing = fromStat === "missing" || toStat === "missing";
+        // A box standing for a directory means everything under it, and the
+        // code graph can answer that: does anything in here reach the other
+        // end? Confirmed is checked; not confirmed stays a skip, because the
+        // graph proving nothing proves nothing.
+        if (!missing && codeGraphConfirms(options?.codeGraph, fromPath, toPath)) {
+          edgesChecked += 1;
+          recordEdge(edge, fromNode, toNode, undefined);
+          continue;
+        }
+        skipEdge(missing ? "endpoint-file-missing" : "directory-ref", edge, fromNode, toNode);
         continue;
       }
 
@@ -1514,6 +1549,15 @@ export function checkDrift(
         // Either the ends are not both symbol-anchored, or no body could be
         // read. Fall back to the file-level channels, which need TypeScript.
         if (!TS_JS.test(fromFile) || !TS_JS.test(toFile)) {
+          // The import channels need TypeScript; the code graph does not.
+          // graphify parses ~40 grammars, so an arrow between two Python or
+          // Rust files can still be confirmed at file level -- the same
+          // fallback a TypeScript arrow gets from the channels below.
+          if (codeGraphConfirms(options?.codeGraph, fromPath, toPath)) {
+            edgesChecked += 1;
+            recordEdge(edge, fromNode, toNode, undefined);
+            continue;
+          }
           skipEdge(bothNamed ? "no-function-body" : "not-ts-or-js", edge, fromNode, toNode);
           continue;
         }
@@ -1526,6 +1570,7 @@ export function checkDrift(
           workspace,
           importCache,
           sharedImporterCandidates,
+          options?.codeGraph,
         );
       }
       recordEdge(edge, fromNode, toNode, finding);
@@ -1696,6 +1741,7 @@ export function checkDrift(
                 workspace,
                 importCache,
                 sharedImporterCandidates,
+                options?.codeGraph,
               );
 
               // Only report if the connection is still supported (no finding)
