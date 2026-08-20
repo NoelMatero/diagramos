@@ -107,11 +107,11 @@ export function goodNewsSince(board: BoardFile, committed: BoardFile | undefined
 }
 
 /**
- * The green line itself, or `undefined` when there is nothing to say.
+ * The tally itself, or `undefined` when there is nothing to say.
  *
- * One line, tallies only: `board improved: +2 boxes · 1 built · 1 arrow wired`.
- * Names would be nicer and longer; the notice runs after every turn, and the
- * quiet-check rule outranks nice.
+ * Tallies only: `+2 boxes · 1 built · 1 arrow wired`. Names would be nicer and
+ * longer; the notice runs after every turn, and the quiet-check rule outranks
+ * nice. The caller prefixes the board's name.
  */
 export function goodNewsLine(news: GoodNews | undefined): string | undefined {
   if (!news || !hasGoodNews(news)) return undefined;
@@ -123,5 +123,28 @@ export function goodNewsLine(news: GoodNews | undefined): string | undefined {
   if (news.builtEdges.length) {
     parts.push(`${news.builtEdges.length} ${news.builtEdges.length === 1 ? "arrow" : "arrows"} wired`);
   }
-  return `board improved: ${parts.join(" · ")}`;
+  return parts.join(" · ");
+}
+
+/**
+ * The ids behind a piece of news, so a notice can remember what it already
+ * announced. Prefixes keep an added box and a flipped box with the same id
+ * distinct.
+ */
+export function goodNewsIds(news: GoodNews): string[] {
+  return [
+    ...news.addedBoxes.map((box) => `+${box.node}`),
+    ...news.builtBoxes.map((box) => `=${box.node}`),
+    ...news.builtEdges.map((edge) => `>${edge.from}→${edge.to}`),
+  ];
+}
+
+/** The part of `news` that `seenIds` (from `goodNewsIds`) has not covered yet. */
+export function novelGoodNews(news: GoodNews, seenIds: string[]): GoodNews {
+  const seen = new Set(seenIds);
+  return {
+    addedBoxes: news.addedBoxes.filter((box) => !seen.has(`+${box.node}`)),
+    builtBoxes: news.builtBoxes.filter((box) => !seen.has(`=${box.node}`)),
+    builtEdges: news.builtEdges.filter((edge) => !seen.has(`>${edge.from}→${edge.to}`)),
+  };
 }

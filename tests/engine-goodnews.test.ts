@@ -7,7 +7,7 @@ import { describe, expect, it } from "vitest";
 
 import { emptyBoard, type BoardFile } from "../src/engine/board-file";
 import { createDiagram } from "../src/engine/diagram";
-import { goodNewsLine, goodNewsSince, hasGoodNews } from "../src/engine/goodnews";
+import { goodNewsIds, goodNewsLine, goodNewsSince, hasGoodNews, novelGoodNews } from "../src/engine/goodnews";
 import type { ExcalidrawElement } from "../src/engine/normalize";
 import type { NodeState } from "../src/engine/graph";
 import { installExcalifontMeasurer } from "./helpers/excalifont";
@@ -141,17 +141,40 @@ describe("the green line", () => {
         builtBoxes: [{ node: "c", label: "C" }],
         builtEdges: [{ from: "a", to: "c" }],
       }),
-    ).toBe("board improved: +2 boxes · 1 built · 1 arrow wired");
+    ).toBe("+2 boxes · 1 built · 1 arrow wired");
   });
 
   it("uses singular forms and drops empty parts", () => {
     expect(
       goodNewsLine({ addedBoxes: [{ node: "a", label: "A" }], builtBoxes: [], builtEdges: [] }),
-    ).toBe("board improved: +1 box");
+    ).toBe("+1 box");
   });
 
   it("is undefined when there is nothing to say — no empty green line", () => {
     expect(goodNewsLine({ addedBoxes: [], builtBoxes: [], builtEdges: [] })).toBeUndefined();
     expect(goodNewsLine(undefined)).toBeUndefined();
+  });
+});
+
+describe("remembering what was already announced", () => {
+  const news = {
+    addedBoxes: [{ node: "a", label: "A" }],
+    builtBoxes: [{ node: "a", label: "A" }],
+    builtEdges: [{ from: "a", to: "b" }],
+  };
+
+  it("keeps an added box and a flipped box with the same id distinct", () => {
+    expect(goodNewsIds(news)).toEqual(["+a", "=a", ">a→b"]);
+  });
+
+  it("filters to what has not been announced yet", () => {
+    const novel = novelGoodNews(news, ["+a", ">a→b"]);
+    expect(novel.addedBoxes).toEqual([]);
+    expect(novel.builtBoxes).toEqual([{ node: "a", label: "A" }]);
+    expect(novel.builtEdges).toEqual([]);
+  });
+
+  it("passes everything through when nothing was seen", () => {
+    expect(novelGoodNews(news, [])).toEqual(news);
   });
 });
