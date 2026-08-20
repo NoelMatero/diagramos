@@ -1095,6 +1095,136 @@ describe("check-drift and a box that was removed", () => {
 });
 
 /**
+ * Good news through the hook (#67), against real git.
+ *
+ * Bad news always reached the notice; a board that *improved* — a box added, a
+ * box Claude flipped to built by redrawing — said nothing unless the hook made
+ * the edit itself. What is pinned here is the whole liveability contract: the
+ * improvement is announced, announced once rather than every turn until the
+ * commit, and never twice when the hook's own promotion already has a line.
+ */
+describe("check-drift and a board that improved", () => {
+  let project: string;
+
+  function git(...args: string[]) {
+    execFileSync("git", args, {
+      cwd: project,
+      stdio: "ignore",
+      env: {
+        ...process.env,
+        GIT_AUTHOR_NAME: "t",
+        GIT_AUTHOR_EMAIL: "t@example.com",
+        GIT_COMMITTER_NAME: "t",
+        GIT_COMMITTER_EMAIL: "t@example.com",
+      },
+    });
+  }
+
+  async function writeBoardWith(nodes: Array<{ id: string; state?: "planned" | "built" }>) {
+    const made = await createDiagram(emptyBoard(), {
+      name: "arch",
+      nodes: nodes.map(({ id, state }) => ({
+        id,
+        label: id.toUpperCase(),
+        ref: `src/${id}.ts`,
+        ...(state ? { state } : {}),
+      })),
+      edges: [],
+    });
+    await writeBoard(path.join(project, "docs/diagrams/arch.excalidraw"), made.board);
+  }
+
+  /** The hook's systemMessage, or "" when the run stayed silent. */
+  async function hookMessage(): Promise<string> {
+    const { stdout } = await run(TSX, [SCRIPT, "--hook"], { cwd: project });
+    if (!stdout.trim()) return "";
+    return (JSON.parse(stdout) as { systemMessage: string }).systemMessage;
+  }
+
+  beforeEach(async () => {
+    project = mkdtempSync(path.join(tmpdir(), "drift-goodnews-"));
+    mkdirSync(path.join(project, "docs/diagrams"), { recursive: true });
+    mkdirSync(path.join(project, "src"), { recursive: true });
+    writeFileSync(path.join(project, "src/core.ts"), "export const core = 1;\n");
+    git("init", "-q");
+  });
+
+  afterEach(() => {
+    rmSync(project, { recursive: true, force: true });
+  });
+
+  it("announces a box Claude flipped to built, then never repeats it", async () => {
+    // Committed: the box is a plan. Then the code lands AND Claude redraws the
+    // board to built in the same turn — the case where the hook used to find
+    // nothing to promote and therefore said nothing.
+    await writeBoardWith([{ id: "core" }, { id: "feature", state: "planned" }]);
+    git("add", "-A");
+    git("commit", "-qm", "plan");
+    writeFileSync(path.join(project, "src/feature.ts"), "export const feature = 1;\n");
+    await writeBoardWith([{ id: "core" }, { id: "feature", state: "built" }]);
+
+    const first = await hookMessage();
+    expect(first).toContain("arch.excalidraw improved");
+    expect(first).toContain("1 built");
+
+    // The board stays uncommitted, so the same comparison holds next turn —
+    // and a notice repeating good news every turn is one somebody turns off.
+    expect(await hookMessage()).toBe("");
+  });
+
+  it("announces an added box once, while the plan itself stays out of the alarm", async () => {
+    await writeBoardWith([{ id: "core" }]);
+    git("add", "-A");
+    git("commit", "-qm", "board");
+    await writeBoardWith([{ id: "core" }, { id: "next", state: "planned" }]);
+
+    const first = await hookMessage();
+    expect(first).toContain("+1 box");
+    // The new box is planned and unbuilt — a work item, not a finding.
+    expect(first).not.toContain("NEXT →");
+    expect(await hookMessage()).toBe("");
+  });
+
+  it("does not also call the hook's own promotion an improvement", async () => {
+    // Committed as planned, then only the code lands: the hook itself promotes.
+    await writeBoardWith([{ id: "core" }, { id: "feature", state: "planned" }]);
+    git("add", "-A");
+    git("commit", "-qm", "plan");
+    writeFileSync(path.join(project, "src/feature.ts"), "export const feature = 1;\n");
+
+    const first = await hookMessage();
+    expect(first).toContain("board updated");
+    expect(first).not.toContain("improved");
+    // Next turn the board says built and the committed one still says planned.
+    // That flip was already announced as a promotion; it must not come back as news.
+    expect(await hookMessage()).toBe("");
+  });
+
+  it("goes back to fresh ears once the improvement is committed", async () => {
+    await writeBoardWith([{ id: "core" }]);
+    git("add", "-A");
+    git("commit", "-qm", "board");
+    await writeBoardWith([{ id: "core" }, { id: "next", state: "planned" }]);
+    expect(await hookMessage()).toContain("+1 box");
+
+    // Committing is what makes news old: the memory clears with it, so the
+    // *next* improvement after this one is announced from scratch.
+    git("add", "-A");
+    git("commit", "-qm", "keep the new box");
+    expect(await hookMessage()).toBe("");
+    await writeBoardWith([{ id: "core" }, { id: "next", state: "planned" }, { id: "later", state: "planned" }]);
+    expect(await hookMessage()).toContain("+1 box");
+  });
+
+  it("stays silent in a project with no git", async () => {
+    // No comparison point is silence, never an error.
+    rmSync(path.join(project, ".git"), { recursive: true, force: true });
+    await writeBoardWith([{ id: "core" }]);
+    expect(await hookMessage()).toBe("");
+  });
+});
+
+/**
  * Coverage on the command line. The engine decides what to suggest; what matters
  * here is that it never happens on its own — this is the one check that proposes
  * additions, and the per-turn notice is the thing it must stay out of.

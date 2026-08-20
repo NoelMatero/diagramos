@@ -189,6 +189,27 @@ An arrow that fails to resolve at one or both ends is an incomplete stroke, not 
 
 They are counted and reported as a dim note when `--details` is asked for, so an incomplete sketch does not clutter the main notice. Arrows that resolve at both ends, whether through Excalidraw bindings or explicit declaration, are specifications and are checked normally.
 
+### What the board started saying — the green line
+
+The same committed-board comparison, read the other way (#67). Bad news always
+reached the per-turn notice; a board that *improved* — a box added, a box or
+arrow flipped from planned to built by a redraw rather than by the hook — said
+nothing, because the check found nothing to promote. Now it says so, in green
+and in one line: `arch.excalidraw improved: +1 box · 1 built`.
+
+Announced **once**. The comparison point is git and boards go uncommitted for
+whole sessions, so the same news would otherwise repeat every turn until the
+commit — and a notice repeating good news thirty times an hour is one somebody
+turns off. What has been announced is remembered per board in `.diagramos/`
+(gitignored, beside the expand/shrink mode), and committing the board clears it,
+so the next improvement is heard fresh.
+
+The quiet rules carry over: hook only (a terminal run already has its summary
+line), recorded elements only (a hand-drawn doodle is not announced back at its
+author), never an `external` box, never a move, restyle, or relabel. A flip the
+hook applies itself keeps its existing "promoted" line and is never repeated as
+news.
+
 ## Code the diagram does not show
 
 Every other check reads a claim and asks whether it still holds. This one asks the

@@ -34,7 +34,7 @@
  * The JSON shape below is the one that was measured. Slimming it is not obviously
  * safe without measuring again.
  */
-import { existsSync, mkdirSync, rmSync, writeFileSync } from "node:fs";
+import { existsSync, mkdirSync, readFileSync, rmSync, writeFileSync } from "node:fs";
 import path from "node:path";
 
 import { box, fit, pad } from "./lib/box.mjs";
@@ -51,6 +51,7 @@ import {
 } from "../src/engine/drift.ts";
 import { initEngine } from "../src/engine/parse.ts";
 import { createCodeGraphOption } from "../src/engine/codegraph.ts";
+import { goodNewsIds, goodNewsLine, goodNewsSince, novelGoodNews } from "../src/engine/goodnews.ts";
 
 const root = process.cwd();
 
@@ -507,19 +508,34 @@ await initEngine();
 // failure is silence: the checker below runs exactly as it does without it.
 const codeGraphOption = createCodeGraphOption(root);
 
+/**
+ * Boards that improved since their last commit: a box added, a box or arrow
+ * somebody other than this hook flipped to built (#67). Bad news always
+ * reached the notice; this is the green counterpart, computed against the same
+ * git baseline the deleted-box check uses.
+ */
+const improved = [];
+
 for (const file of checking) {
   let report;
   /** Promotions actually written to the board this run, one per box or arrow. */
   let promoted = [];
   try {
     const boardFile = await readBoard(file);
+    // Per board, so the cheap "unmodified" answer short-circuits each one.
+    const baseline = opts.deletions ? createGitBaseline(root, file) : undefined;
     report = checkDrift(boardFile, workspace, {
       edges: opts.edges,
       coverage: opts.coverage,
-      // Per board, so the cheap "unmodified" answer short-circuits each one.
-      ...(opts.deletions ? { baseline: createGitBaseline(root, file) } : {}),
+      ...(baseline ? { baseline } : {}),
       ...(codeGraphOption ? { codeGraph: codeGraphOption } : {}),
     });
+    // Read before promotions are applied below, so a flip the hook makes this
+    // run is announced once as "promoted" and never again as news.
+    if (opts.hook && baseline) {
+      const news = goodNewsSince(boardFile, baseline.committed());
+      if (news) improved.push({ file, news });
+    }
     /*
      * A promotion says the board is behind the code by exactly one edit, and
      * this makes the edit: flip the box to built, write the file, say so once.
@@ -818,8 +834,64 @@ if (
   }
 }
 
+/*
+ * The green line (#67): what improved on a board since its last commit — a box
+ * added, a box or arrow flipped to built by anything other than this hook. The
+ * hook's own promotions already have a line, so they are excluded above by
+ * reading the board before they were applied, and recorded below so the next
+ * run does not rediscover them.
+ *
+ * Said once. The comparison point is git, and boards go uncommitted for whole
+ * sessions, so the same news would otherwise repeat every turn until a commit
+ * -- and a notice that repeats good news thirty times an hour is a notice
+ * somebody turns off. What has been announced is remembered per board in
+ * .diagramos/, which is gitignored, beside the expand/shrink mode. A committed
+ * board has no news, so its memory clears itself.
+ */
+const NEWS_SEEN_FILE = path.join(root, ".diagramos", "good-news-seen.json");
+const goodLines = [];
+if (opts.hook) {
+  let seen = {};
+  try {
+    seen = JSON.parse(readFileSync(NEWS_SEEN_FILE, "utf8"));
+    if (!seen || typeof seen !== "object") seen = {};
+  } catch {
+    // First run, or a file we cannot read: everything current counts as news.
+    seen = {};
+  }
+  const next = {};
+  for (const { file, news } of improved) {
+    const key = path.relative(root, file);
+    const already = Array.isArray(seen[key]) ? seen[key] : [];
+    const line = goodNewsLine(novelGoodNews(news, already));
+    if (line) goodLines.push(paint(`${path.basename(file)} improved: ${line}`, "green", true));
+    // Ids that stopped being news -- a box deleted again before the commit --
+    // drop out here, so doing the same thing twice is announced twice.
+    next[key] = goodNewsIds(news);
+  }
+  // A flip this hook applied is announced as "promoted" this run; remember it
+  // so the next run, where the baseline still says planned, keeps quiet.
+  for (const { file, promoted } of examined) {
+    if (promoted.length === 0) continue;
+    const key = path.relative(root, file);
+    const ids = promoted.map((promotion) =>
+      promotion.node.includes(" -> ")
+        ? `>${promotion.node.split(" -> ").join("→")}`
+        : `=${promotion.node}`,
+    );
+    next[key] = [...new Set([...(next[key] ?? []), ...ids])];
+  }
+  try {
+    mkdirSync(path.dirname(NEWS_SEEN_FILE), { recursive: true });
+    writeFileSync(NEWS_SEEN_FILE, `${JSON.stringify(next)}\n`);
+  } catch {
+    // A tree we cannot write to: the news may repeat, nothing else changes.
+  }
+}
+
 if (showing.length > 0 || problems.length > 0 || coverageLines.length > 0
-  || unanchoredLines.length > 0 || auditLines.length > 0 || hintLines.length > 0) {
+  || unanchoredLines.length > 0 || auditLines.length > 0 || hintLines.length > 0
+  || goodLines.length > 0) {
   // Measured: ANSI renders in a systemMessage. Off only when the output is being
   // piped or captured, where escapes would be junk in somebody's log.
   const colour = opts.hook || Boolean(process.stderr.isTTY);
@@ -841,6 +913,7 @@ if (showing.length > 0 || problems.length > 0 || coverageLines.length > 0
               : "/update-diagram updates the diagram",
           )
         : render(showing, colour)),
+    ...goodLines,
     ...hintLines,
   ];
 
