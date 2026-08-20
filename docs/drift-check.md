@@ -632,6 +632,43 @@ carries none of that risk. If the automatic version is ever wanted, it belongs
 behind a flag on the script, off by default, with `stop_hook_active` verified
 empirically first.
 
+## Code graph corroboration
+
+The arrow check has five channels for corroboration. The first four have always been available:
+
+1. **Direct imports** — one file imports the other
+2. **Shared importer** — a third file imports both
+3. **Shared route literal** — both reach the same HTTP route
+4. **Call chain** — symbols in each file reach each other
+
+The fifth is **code graph**: a precomputed whole-repo connectivity graph built by the external tool [Graphify](https://github.com/modelcontextprotocol/graphify) and read at check time as plain JSON.
+
+The code graph detects paths of up to 3 hops using extracted-confidence relations: `calls`, `imports`, `imports_from`, `re_exports`, `dynamic_import`. It is consulted only when the first four channels fail, so today's behavior (when the graph is unavailable or stale) is byte-identical to before.
+
+The channel only *confirms* arrows (suppresses the amber `unsupported-edge` finding). It never creates a finding, never flags anything. A gap in the graph means silence, identical to today.
+
+### When the code graph is consulted
+
+The graph is available when:
+
+- `graphify` is installed on PATH (test with `which graphify`)
+- The `graphify-out/graph.json` file exists (written at commit time)
+- The `graphify-out/code-graph-meta.json` sidecar is present with version and commit hash
+- The graphify version is in the tested range (0.9.x currently; 0.10.0+ are rejected)
+- Neither endpoint file has changed since the graph was built (freshness guard)
+
+If any condition fails, the channel is off and the check reports as if it never existed.
+
+### What the code graph cannot see
+
+Graphify extracts call graphs from source code. Like the other channels, it cannot see:
+
+- Configuration-driven wiring (package.json scripts, .mcp.json plugin registration, route definitions in comments)
+- Route method handler registration (frameworks that bind HTTP methods dynamically)
+- Anything the extractor missed (it's pattern-based, not a full compiler)
+
+A miss means silence, not an alarm: the finding stays `unsupported-edge` and the arrow is unconfirmed.
+
 ## Open questions
 
 - ~~Should drift auto-regenerate, or only report?~~ **Report only.** Silent

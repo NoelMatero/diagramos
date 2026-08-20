@@ -25,6 +25,7 @@ import path from "node:path";
 import { parseSymbol, routeOf, symbolEvidence, type Assertion } from "./assert";
 import { chainBreak, reaches, unsupportedMembers } from "./body";
 import type { BoardFile } from "./board-file";
+import { connects, type LoadedCodeGraph } from "./codegraph";
 import { readGraph, type Provenance, type RecoveredGraph } from "./graph";
 import { languageOf, type Language } from "./parse";
 
@@ -945,8 +946,9 @@ function checkSymbolEdge(
 }
 
 /**
- * Check if edge A → B is backed by one of the four corroboration channels.
+ * Check if edge A → B is backed by one of the five corroboration channels.
  * Assumes both files are valid TS/JS files; returns a finding if not backed, undefined if backed.
+ * Channels: imports, shared importer, shared route, symbol chain, code graph.
  */
 function checkEdgeCorroboration(
   fromRef: string,
@@ -956,6 +958,7 @@ function checkEdgeCorroboration(
   workspace: Workspace,
   importCache: Map<string, Array<{ abs: string; rel: string }>>,
   sharedImporterCandidates: Map<string, string>,
+  codeGraphOption?: { graph: LoadedCodeGraph; modified: Set<string> },
 ): Omit<EdgeDriftFinding, "node"> | undefined {
   // Parse refs: keep only path, ignore symbol
   const { path: fromPath } = parseRef(fromRef);
@@ -1012,6 +1015,24 @@ function checkEdgeCorroboration(
     return undefined;
   }
 
+  // Channel 5: Code graph — precomputed whole-repo connectivity
+  // The channel only confirms arrows (never creates findings).
+  // It is consulted LAST so behavior with it off is identical to today.
+  if (codeGraphOption) {
+    const { graph, modified } = codeGraphOption;
+    const { path: fromPath } = parseRef(fromRef);
+    const { path: toPath } = parseRef(toRef);
+
+    // Freshness guard: do not consult the graph if either endpoint file has
+    // changed since the graph was built. Modified set includes repo-relative paths.
+    const fromModified = modified.has(fromPath) || isUnderDirectory(fromPath, modified);
+    const toModified = modified.has(toPath) || isUnderDirectory(toPath, modified);
+
+    if (!fromModified && !toModified && connects(graph, fromPath, toPath)) {
+      return undefined; // Edge corroborated by code graph
+    }
+  }
+
   // No channel fires: flag it as worth a look, not necessarily wrong
   return {
     from: fromPath,
@@ -1023,6 +1044,21 @@ function checkEdgeCorroboration(
     kind: "unsupported-edge",
     detail: `nothing in ${fromPath} imports, is imported by, shares an importer with, or shares a route string with ${toPath} — worth a look, not necessarily wrong.`,
   };
+}
+
+/**
+ * Check if a file path (which might be a directory) is "under" any directory in
+ * the modified set. Used for freshness guard: if any file under a directory
+ * changed, the directory endpoint becomes stale.
+ */
+function isUnderDirectory(filePath: string, modified: Set<string>): boolean {
+  for (const mod of modified) {
+    if (mod.endsWith("/")) {
+      // Directory endpoint
+      if (filePath.startsWith(mod)) return true;
+    }
+  }
+  return false;
 }
 
 /**
@@ -1068,7 +1104,12 @@ export function boardCoverage(
 export function checkDrift(
   board: BoardFile,
   workspace: Workspace,
-  options?: { edges?: boolean; baseline?: BoardBaseline; coverage?: boolean },
+  options?: {
+    edges?: boolean;
+    baseline?: BoardBaseline;
+    coverage?: boolean;
+    codeGraph?: { graph: LoadedCodeGraph; modified: Set<string> };
+  },
 ): DriftReport {
   const findings: DriftFinding[] = [];
   const workItems: WorkItem[] = [];
@@ -1526,6 +1567,7 @@ export function checkDrift(
           workspace,
           importCache,
           sharedImporterCandidates,
+          options?.codeGraph,
         );
       }
       recordEdge(edge, fromNode, toNode, finding);
@@ -1696,6 +1738,7 @@ export function checkDrift(
                 workspace,
                 importCache,
                 sharedImporterCandidates,
+                options?.codeGraph,
               );
 
               // Only report if the connection is still supported (no finding)

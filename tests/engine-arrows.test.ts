@@ -554,4 +554,116 @@ describe("dangling arrows — arrows that fail to resolve at one or both ends", 
     expect(report.strayArrows).toBe(1);
     expect(report.clean).toBe(true);
   });
+
+  it("code graph corroborates an unsupported edge", async () => {
+    // An arrow that no existing channel can confirm becomes corroborated
+    // when a fixture code graph is passed in options.
+    const files = {
+      "src/a.ts": "export function callC() {}",
+      "src/b.ts": "export function called() {}",
+      "src/c.ts": "import { callC } from './a'; callC();",
+    };
+
+    const board = await boardWith(
+      [
+        { id: "a", label: "A", ref: "src/a.ts" },
+        { id: "b", label: "B", ref: "src/b.ts" },
+      ],
+      [{ from: "a", to: "b" }],
+    );
+
+    // Without code graph, the edge is unsupported (no direct a→b connection)
+    const reportWithout = checkDrift(board, fakeWorkspace(files), { edges: true });
+    expect(reportWithout.edges).toHaveLength(1);
+    expect(reportWithout.edges[0].kind).toBe("unsupported-edge");
+
+    // With code graph showing a→c→b, the edge is corroborated
+    const codeGraph = {
+      nodesByFile: new Map([
+        ["src/a.ts", ["a_fn"]],
+        ["src/c.ts", ["c_helper"]],
+        ["src/b.ts", ["b_target"]],
+      ]),
+      adjacency: new Map([
+        ["a_fn", new Set(["c_helper"])],
+        ["c_helper", new Set(["a_fn", "b_target"])],
+        ["b_target", new Set(["c_helper"])],
+      ]),
+      nodeDegrees: new Map([
+        ["a_fn", 1],
+        ["c_helper", 2],
+        ["b_target", 1],
+      ]),
+      relations: new Map([
+        ["a_fn:c_helper", new Set(["calls"])],
+        ["c_helper:b_target", new Set(["calls"])],
+      ]),
+    };
+
+    const reportWith = checkDrift(board, fakeWorkspace(files), {
+      edges: true,
+      codeGraph: { graph: codeGraph, modified: new Set() },
+    });
+    expect(reportWith.edges).toHaveLength(0);
+    expect(reportWith.clean).toBe(true);
+  });
+
+  it("code graph skips check when endpoint file is in modified set", async () => {
+    const files = {
+      "src/a.ts": "export function callC() {}",
+      "src/b.ts": "export function called() {}",
+    };
+
+    const board = await boardWith(
+      [
+        { id: "a", label: "A", ref: "src/a.ts" },
+        { id: "b", label: "B", ref: "src/b.ts" },
+      ],
+      [{ from: "a", to: "b" }],
+    );
+
+    const codeGraph = {
+      nodesByFile: new Map([
+        ["src/a.ts", ["a_fn"]],
+        ["src/b.ts", ["b_fn"]],
+      ]),
+      adjacency: new Map([
+        ["a_fn", new Set(["b_fn"])],
+        ["b_fn", new Set(["a_fn"])],
+      ]),
+      nodeDegrees: new Map([
+        ["a_fn", 1],
+        ["b_fn", 1],
+      ]),
+      relations: new Map([["a_fn:b_fn", new Set(["calls"])]]),
+    };
+
+    // With modified file, even though code graph says yes, we don't trust it
+    const report = checkDrift(board, fakeWorkspace(files), {
+      edges: true,
+      codeGraph: { graph: codeGraph, modified: new Set(["src/a.ts"]) },
+    });
+    expect(report.edges).toHaveLength(1);
+    expect(report.edges[0].kind).toBe("unsupported-edge");
+  });
+
+  it("code graph becomes unavailable with stale or invalid graph", async () => {
+    const files = {
+      "src/a.ts": "export function callC() {}",
+      "src/b.ts": "export function called() {}",
+    };
+
+    const board = await boardWith(
+      [
+        { id: "a", label: "A", ref: "src/a.ts" },
+        { id: "b", label: "B", ref: "src/b.ts" },
+      ],
+      [{ from: "a", to: "b" }],
+    );
+
+    // No code graph option → defaults to undefined
+    const reportNoGraph = checkDrift(board, fakeWorkspace(files), { edges: true });
+    expect(reportNoGraph.edges).toHaveLength(1);
+    expect(reportNoGraph.edges[0].kind).toBe("unsupported-edge");
+  });
 });

@@ -20,3 +20,7 @@ playwright-report/
 
 # Scratch handoff notes for parallel sessions. Not documentation.
 docs/handoff/
+
+# Code graph output: precomputed by graphify, not committed.
+# (sidecar metadata is also here; freshness is checked at check time)
+graphify-out/

@@ -50,6 +50,7 @@ import {
   parseRef,
 } from "../src/engine/drift.ts";
 import { initEngine } from "../src/engine/parse.ts";
+import { loadCodeGraph } from "../src/engine/codegraph.ts";
 
 const root = process.cwd();
 
@@ -502,6 +503,68 @@ if (checking.length === 0) {
 // Grammars load once per process; everything below this line is synchronous.
 await initEngine();
 
+/**
+ * Load the code graph and compute which files have been modified since it was built.
+ * Returns undefined if the graph is unavailable or out of date.
+ */
+async function loadCodeGraphWithFreshness() {
+  try {
+    const { readFileSync, existsSync } = await import("node:fs");
+    const { execSync } = await import("node:child_process");
+
+    const graphPath = path.join(root, "graphify-out", "graph.json");
+    const metaPath = path.join(root, "graphify-out", "code-graph-meta.json");
+
+    // Check if files exist
+    if (!existsSync(graphPath) || !existsSync(metaPath)) {
+      return undefined;
+    }
+
+    // Load and validate
+    const graphJson = JSON.parse(readFileSync(graphPath, "utf-8"));
+    const meta = JSON.parse(readFileSync(metaPath, "utf-8"));
+
+    const graph = loadCodeGraph(graphJson, meta.graphify);
+    if (!graph) return undefined;
+
+    // Compute modified files: unstaged + uncommitted
+    let modified = new Set();
+
+    try {
+      // Unstaged changes
+      const unstaged = execSync("git diff --name-only", { cwd: root, encoding: "utf-8" });
+      for (const line of unstaged.split("\n").filter(Boolean)) {
+        modified.add(line.replace(/\\/g, "/"));
+      }
+
+      // Staged changes (to be committed)
+      const staged = execSync("git diff --cached --name-only", { cwd: root, encoding: "utf-8" });
+      for (const line of staged.split("\n").filter(Boolean)) {
+        modified.add(line.replace(/\\/g, "/"));
+      }
+
+      // Since last graph commit
+      const sinceCommit = execSync(`git diff --name-only ${meta.commit}..HEAD`, {
+        cwd: root,
+        encoding: "utf-8",
+      });
+      for (const line of sinceCommit.split("\n").filter(Boolean)) {
+        modified.add(line.replace(/\\/g, "/"));
+      }
+    } catch {
+      // If git commands fail, the graph is unavailable (no repo, detached state, etc.)
+      return undefined;
+    }
+
+    return { graph, modified };
+  } catch {
+    // Any error during graph loading: silently skip the channel
+    return undefined;
+  }
+}
+
+const codeGraphOption = await loadCodeGraphWithFreshness();
+
 for (const file of checking) {
   let report;
   /** Promotions actually written to the board this run, one per box or arrow. */
@@ -513,6 +576,7 @@ for (const file of checking) {
       coverage: opts.coverage,
       // Per board, so the cheap "unmodified" answer short-circuits each one.
       ...(opts.deletions ? { baseline: createGitBaseline(root, file) } : {}),
+      ...(codeGraphOption ? { codeGraph: codeGraphOption } : {}),
     });
     /*
      * A promotion says the board is behind the code by exactly one edit, and
