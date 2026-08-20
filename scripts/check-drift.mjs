@@ -50,6 +50,7 @@ import {
   parseRef,
 } from "../src/engine/drift.ts";
 import { initEngine } from "../src/engine/parse.ts";
+import { createCodeGraphOption } from "../src/engine/codegraph.ts";
 
 const root = process.cwd();
 
@@ -502,6 +503,10 @@ if (checking.length === 0) {
 // Grammars load once per process; everything below this line is synchronous.
 await initEngine();
 
+// The code graph, when a committed build of it exists and parses. Every
+// failure is silence: the checker below runs exactly as it does without it.
+const codeGraphOption = createCodeGraphOption(root);
+
 for (const file of checking) {
   let report;
   /** Promotions actually written to the board this run, one per box or arrow. */
@@ -513,6 +518,7 @@ for (const file of checking) {
       coverage: opts.coverage,
       // Per board, so the cheap "unmodified" answer short-circuits each one.
       ...(opts.deletions ? { baseline: createGitBaseline(root, file) } : {}),
+      ...(codeGraphOption ? { codeGraph: codeGraphOption } : {}),
     });
     /*
      * A promotion says the board is behind the code by exactly one edit, and
@@ -780,8 +786,40 @@ const auditLines =
     ? renderCoverageAudit(examined, Boolean(process.stderr.isTTY))
     : [];
 
+/*
+ * A one-time pointer at the deeper check, only when it would have mattered:
+ * no graph has ever been built here, and this run left arrows unconfirmed.
+ * Once ever per checkout -- the marker lives beside the expand/shrink mode in
+ * .diagramos/, which is gitignored, so the choice to ignore it is one
+ * person's. Never a finding, never an exit code.
+ */
+const HINT_FILE = path.join(root, ".diagramos", "code-graph-hint-shown");
+const hintLines = [];
+if (
+  !codeGraphOption
+  && !existsSync(path.join(root, "graphify-out", "graph.json"))
+  && examined.some(({ report }) =>
+    report.edges.length > 0
+    || (report.edgesSkippedWhy["directory-ref"] ?? 0) > 0
+    || (report.edgesSkippedWhy["not-ts-or-js"] ?? 0) > 0
+    || (report.edgesSkippedWhy["no-function-body"] ?? 0) > 0)
+  && !existsSync(HINT_FILE)
+) {
+  hintLines.push(paint(
+    "some arrows could not be checked — a deeper check exists: npm run graph:install (needs uv or pipx), then npm run graph:refresh",
+    "dim",
+    opts.hook || Boolean(process.stderr.isTTY),
+  ));
+  try {
+    mkdirSync(path.dirname(HINT_FILE), { recursive: true });
+    writeFileSync(HINT_FILE, "shown\n");
+  } catch {
+    // A tree we cannot write to: the hint may repeat, nothing else changes.
+  }
+}
+
 if (showing.length > 0 || problems.length > 0 || coverageLines.length > 0
-  || unanchoredLines.length > 0 || auditLines.length > 0) {
+  || unanchoredLines.length > 0 || auditLines.length > 0 || hintLines.length > 0) {
   // Measured: ANSI renders in a systemMessage. Off only when the output is being
   // piped or captured, where escapes would be junk in somebody's log.
   const colour = opts.hook || Boolean(process.stderr.isTTY);
@@ -803,6 +841,7 @@ if (showing.length > 0 || problems.length > 0 || coverageLines.length > 0
               : "/update-diagram updates the diagram",
           )
         : render(showing, colour)),
+    ...hintLines,
   ];
 
   if (opts.hook) {
