@@ -641,11 +641,30 @@ files, fresh, on every check — which bounds what they can see.
 
 The fifth is different: a map of the whole repo, computed once per commit and
 read at check time as plain JSON. The map is built by
-[Graphify](https://pypi.org/project/graphifyy/) (`uv tool install graphifyy`),
-whose code pass is local and deterministic — tree-sitter parsing, no model,
-nothing leaves the machine. A post-commit hook (installed by `npm install`)
-runs it and records which commit and Graphify version built the map. The check
-itself never runs Graphify, never runs Python; it only reads the JSON.
+[Graphify](https://pypi.org/project/graphifyy/), whose code pass is local and
+deterministic — tree-sitter parsing, no model, nothing leaves the machine. A
+post-commit hook (installed by `npm install`) runs it and records which commit
+and Graphify version built the map. The check itself never runs Graphify,
+never runs Python; it only reads the JSON.
+
+### Getting it, without having to think about it
+
+`npm install` sets the whole thing up: it installs the post-commit hook, and
+it installs Graphify itself if the machine already has a Python tool installer
+(`uv`, else `pipx`). Nobody should have to read a doc to get the deeper check
+— it is on, or it is silent, never "documented as opt-in".
+
+The restraint in that: it uses only an installer already present, never
+installs an installer, and never fails an `npm install` — no installer, no
+network, a bad package index all exit quietly. `DIAGRAMOS_SKIP_GRAPHIFY=1`
+skips it, and so does `CI`, where a per-machine tool install is not wanted.
+
+By hand, if it was skipped or failed:
+
+```
+npm run graph:install    # installs graphify (needs uv or pipx)
+npm run graph:refresh    # builds the map now, instead of at the next commit
+```
 
 An arrow is confirmed when the map shows a chain of at most three steps —
 calls, imports, re-exports, dynamic imports, each read directly from source —

@@ -806,7 +806,7 @@ if (
   && !existsSync(HINT_FILE)
 ) {
   hintLines.push(paint(
-    "some arrows could not be checked — a deeper check exists: install graphify (uv tool install graphifyy), then commit once",
+    "some arrows could not be checked — a deeper check exists: npm run graph:install (needs uv or pipx), then npm run graph:refresh",
     "dim",
     opts.hook || Boolean(process.stderr.isTTY),
   ));
