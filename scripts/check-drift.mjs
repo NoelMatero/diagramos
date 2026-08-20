@@ -50,7 +50,7 @@ import {
   parseRef,
 } from "../src/engine/drift.ts";
 import { initEngine } from "../src/engine/parse.ts";
-import { loadCodeGraph } from "../src/engine/codegraph.ts";
+import { createCodeGraphOption } from "../src/engine/codegraph.ts";
 
 const root = process.cwd();
 
@@ -503,67 +503,9 @@ if (checking.length === 0) {
 // Grammars load once per process; everything below this line is synchronous.
 await initEngine();
 
-/**
- * Load the code graph and compute which files have been modified since it was built.
- * Returns undefined if the graph is unavailable or out of date.
- */
-async function loadCodeGraphWithFreshness() {
-  try {
-    const { readFileSync, existsSync } = await import("node:fs");
-    const { execSync } = await import("node:child_process");
-
-    const graphPath = path.join(root, "graphify-out", "graph.json");
-    const metaPath = path.join(root, "graphify-out", "code-graph-meta.json");
-
-    // Check if files exist
-    if (!existsSync(graphPath) || !existsSync(metaPath)) {
-      return undefined;
-    }
-
-    // Load and validate
-    const graphJson = JSON.parse(readFileSync(graphPath, "utf-8"));
-    const meta = JSON.parse(readFileSync(metaPath, "utf-8"));
-
-    const graph = loadCodeGraph(graphJson, meta.graphify);
-    if (!graph) return undefined;
-
-    // Compute modified files: unstaged + uncommitted
-    let modified = new Set();
-
-    try {
-      // Unstaged changes
-      const unstaged = execSync("git diff --name-only", { cwd: root, encoding: "utf-8" });
-      for (const line of unstaged.split("\n").filter(Boolean)) {
-        modified.add(line.replace(/\\/g, "/"));
-      }
-
-      // Staged changes (to be committed)
-      const staged = execSync("git diff --cached --name-only", { cwd: root, encoding: "utf-8" });
-      for (const line of staged.split("\n").filter(Boolean)) {
-        modified.add(line.replace(/\\/g, "/"));
-      }
-
-      // Since last graph commit
-      const sinceCommit = execSync(`git diff --name-only ${meta.commit}..HEAD`, {
-        cwd: root,
-        encoding: "utf-8",
-      });
-      for (const line of sinceCommit.split("\n").filter(Boolean)) {
-        modified.add(line.replace(/\\/g, "/"));
-      }
-    } catch {
-      // If git commands fail, the graph is unavailable (no repo, detached state, etc.)
-      return undefined;
-    }
-
-    return { graph, modified };
-  } catch {
-    // Any error during graph loading: silently skip the channel
-    return undefined;
-  }
-}
-
-const codeGraphOption = await loadCodeGraphWithFreshness();
+// The code graph, when a committed build of it exists and parses. Every
+// failure is silence: the checker below runs exactly as it does without it.
+const codeGraphOption = createCodeGraphOption(root);
 
 for (const file of checking) {
   let report;
@@ -844,8 +786,40 @@ const auditLines =
     ? renderCoverageAudit(examined, Boolean(process.stderr.isTTY))
     : [];
 
+/*
+ * A one-time pointer at the deeper check, only when it would have mattered:
+ * no graph has ever been built here, and this run left arrows unconfirmed.
+ * Once ever per checkout -- the marker lives beside the expand/shrink mode in
+ * .diagramos/, which is gitignored, so the choice to ignore it is one
+ * person's. Never a finding, never an exit code.
+ */
+const HINT_FILE = path.join(root, ".diagramos", "code-graph-hint-shown");
+const hintLines = [];
+if (
+  !codeGraphOption
+  && !existsSync(path.join(root, "graphify-out", "graph.json"))
+  && examined.some(({ report }) =>
+    report.edges.length > 0
+    || (report.edgesSkippedWhy["directory-ref"] ?? 0) > 0
+    || (report.edgesSkippedWhy["not-ts-or-js"] ?? 0) > 0
+    || (report.edgesSkippedWhy["no-function-body"] ?? 0) > 0)
+  && !existsSync(HINT_FILE)
+) {
+  hintLines.push(paint(
+    "some arrows could not be checked — a deeper check exists: install graphify (uv tool install graphifyy), then commit once",
+    "dim",
+    opts.hook || Boolean(process.stderr.isTTY),
+  ));
+  try {
+    mkdirSync(path.dirname(HINT_FILE), { recursive: true });
+    writeFileSync(HINT_FILE, "shown\n");
+  } catch {
+    // A tree we cannot write to: the hint may repeat, nothing else changes.
+  }
+}
+
 if (showing.length > 0 || problems.length > 0 || coverageLines.length > 0
-  || unanchoredLines.length > 0 || auditLines.length > 0) {
+  || unanchoredLines.length > 0 || auditLines.length > 0 || hintLines.length > 0) {
   // Measured: ANSI renders in a systemMessage. Off only when the output is being
   // piped or captured, where escapes would be junk in somebody's log.
   const colour = opts.hook || Boolean(process.stderr.isTTY);
@@ -867,6 +841,7 @@ if (showing.length > 0 || problems.length > 0 || coverageLines.length > 0
               : "/update-diagram updates the diagram",
           )
         : render(showing, colour)),
+    ...hintLines,
   ];
 
   if (opts.hook) {

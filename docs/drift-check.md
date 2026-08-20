@@ -632,42 +632,66 @@ carries none of that risk. If the automatic version is ever wanted, it belongs
 behind a flag on the script, off by default, with `stop_hook_active` verified
 empirically first.
 
-## Code graph corroboration
+## The code graph: a fifth way to confirm an arrow
 
-The arrow check has five channels for corroboration. The first four have always been available:
+The arrow check has always had four ways to confirm a connection: one file
+imports the other, a third file imports both, both name the same HTTP route,
+or a function body reaches the other end. All four read the two endpoint
+files, fresh, on every check — which bounds what they can see.
 
-1. **Direct imports** — one file imports the other
-2. **Shared importer** — a third file imports both
-3. **Shared route literal** — both reach the same HTTP route
-4. **Call chain** — symbols in each file reach each other
+The fifth is different: a map of the whole repo, computed once per commit and
+read at check time as plain JSON. The map is built by
+[Graphify](https://pypi.org/project/graphifyy/) (`uv tool install graphifyy`),
+whose code pass is local and deterministic — tree-sitter parsing, no model,
+nothing leaves the machine. A post-commit hook (installed by `npm install`)
+runs it and records which commit and Graphify version built the map. The check
+itself never runs Graphify, never runs Python; it only reads the JSON.
 
-The fifth is **code graph**: a precomputed whole-repo connectivity graph built by the external tool [Graphify](https://github.com/modelcontextprotocol/graphify) and read at check time as plain JSON.
+An arrow is confirmed when the map shows a chain of at most three steps —
+calls, imports, re-exports, dynamic imports, each read directly from source —
+**all pointing the same way**, from one end to the other (either direction).
+That last clause is the safety of the whole thing. Without it, two files that
+merely import the same helper would "connect" through it, and one big file
+that imports everything would connect all of its imports to each other. A
+chain whose edges all point one way means the dependency genuinely flows end
+to end.
 
-The code graph detects paths of up to 3 hops using extracted-confidence relations: `calls`, `imports`, `imports_from`, `re_exports`, `dynamic_import`. It is consulted only when the first four channels fail, so today's behavior (when the graph is unavailable or stale) is byte-identical to before.
+The map also answers two questions the live channels never could:
 
-The channel only *confirms* arrows (suppresses the amber `unsupported-edge` finding). It never creates a finding, never flags anything. A gap in the graph means silence, identical to today.
+- **A box that anchors a directory.** The directory means everything under
+  it, and the map can say whether anything in there reaches the other end.
+  These arrows used to be skipped as "an end refs a directory".
+- **Files the channels cannot read.** The import channels need TypeScript;
+  Graphify parses ~40 languages, so an arrow between two Python or Rust files
+  can now be confirmed at file level. These used to be skipped as "not
+  TypeScript or JavaScript".
 
-### When the code graph is consulted
+### What turns it off — always silently
 
-The graph is available when:
+The channel only ever *confirms*. It never creates a finding, and every way
+it can fail is silence — the check then behaves exactly as it did before the
+channel existed:
 
-- `graphify` is installed on PATH (test with `which graphify`)
-- The `graphify-out/graph.json` file exists (written at commit time)
-- The `graphify-out/code-graph-meta.json` sidecar is present with version and commit hash
-- The graphify version is in the tested range (0.9.x currently; 0.10.0+ are rejected)
-- Neither endpoint file has changed since the graph was built (freshness guard)
+- No `graphify-out/graph.json` or sidecar (Graphify not installed, or never
+  run since; the CLI says so once, quietly, then never again).
+- A Graphify version outside the tested range (0.9.x today; a new release is
+  adopted deliberately, after re-testing).
+- A map the loader does not fully understand.
+- **Anything edited since the map was built.** The map describes a commit; a
+  file changed after it (staged, unstaged, or in later commits) falls back to
+  the live channels, so a stale map can never confirm a connection you just
+  removed. A directory endpoint goes stale as soon as anything under it does.
 
-If any condition fails, the channel is off and the check reports as if it never existed.
+### What it cannot see
 
-### What the code graph cannot see
+- Configuration-carried wiring: package.json scripts, hook registrations,
+  `.mcp.json`. Graphify reads config files as generic key trees, not as
+  "this entry runs that file".
+- Route methods (`#GET` versus `#POST` on the same path).
+- Anything its extractor missed — it is a parser, not a compiler.
 
-Graphify extracts call graphs from source code. Like the other channels, it cannot see:
-
-- Configuration-driven wiring (package.json scripts, .mcp.json plugin registration, route definitions in comments)
-- Route method handler registration (frameworks that bind HTTP methods dynamically)
-- Anything the extractor missed (it's pattern-based, not a full compiler)
-
-A miss means silence, not an alarm: the finding stays `unsupported-edge` and the arrow is unconfirmed.
+A miss means silence, not an alarm: the arrow stays amber ("could not
+confirm"), never red.
 
 ## Open questions
 

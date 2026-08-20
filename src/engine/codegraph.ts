@@ -1,46 +1,59 @@
 /**
  * Code graph channel: a precomputed whole-repo graph of code relations.
  *
- * Built at commit time by graphify, read at check time as plain JSON, no model
- * or subprocess involved. Corroborates arrows (suppresses unsupported-edge)
- * when endpoints connect through extracted-confidence code relations.
+ * Built at commit time by graphify (`scripts/refresh-code-graph.mjs`), read at
+ * check time as plain JSON. No model, no subprocess, nothing non-deterministic
+ * in the check path: the same graph and the same question always give the same
+ * answer.
  *
- * False positives are worse than silence: the channel only *confirms* arrows.
- * A gap in the graph means silence, identical to today.
+ * False positives are worse than silence, so the channel only ever *confirms*
+ * arrows. A gap in the graph, a stale graph, a version we have not tested, a
+ * file the extractor missed -- all of it means silence, identical to the
+ * checker without this channel.
  */
 
-/**
- * The schema graphify's NetworkX node-link export.
- * Nodes: `{ id, source_file, ... }`.
- * Edges: `{ source, target, relation, confidence, ... }`.
- */
-export interface CodeGraphSchema {
-  nodes?: Array<{ id?: string; source_file?: string }>;
+import { execFileSync } from "node:child_process";
+import { existsSync, readFileSync } from "node:fs";
+import path from "node:path";
+
+/** The shape we require of graphify's NetworkX node-link export. */
+interface CodeGraphSchema {
+  nodes?: Array<{ id?: unknown; source_file?: unknown }>;
   links?: Array<{
-    source?: string;
-    target?: string;
-    relation?: string;
-    confidence?: string;
+    source?: unknown;
+    target?: unknown;
+    relation?: unknown;
+    confidence?: unknown;
   }>;
 }
 
 export interface LoadedCodeGraph {
-  nodesByFile: Map<string, string[]>; // source_file -> node ids
-  adjacency: Map<string, Set<string>>; // node id -> adjacent node ids (undirected, whitelisted edges only, EXTRACTED only)
-  nodeDegrees: Map<string, number>; // node id -> degree in the whitelisted graph
-  relations: Map<string, Set<string>>; // "a:b" -> set of relation types between a and b
+  /** source_file -> every node extracted from that file (the file node and its symbols). */
+  nodesByFile: Map<string, string[]>;
+  /** node id -> node ids it points at, over whitelisted EXTRACTED edges only. */
+  forward: Map<string, Set<string>>;
+}
+
+/** The graph plus which files have changed since it was built. */
+export interface CodeGraphOption {
+  graph: LoadedCodeGraph;
+  modified: Set<string>;
 }
 
 /**
- * How many edges a node can have before it is treated as a hub.
- * Hubs are excluded from paths to prevent false positives like
- * "A and B both import shared config" being read as "A connects to B".
+ * The graphify versions this channel has been tested against. Anything else
+ * turns the channel off: a new major or minor release may change what the
+ * extractor emits, and we bump this deliberately, after re-testing that a
+ * rebuild on the same tree is byte-identical.
  */
-const HUB_DEGREE_THRESHOLD = 20;
+const TESTED_VERSION_PREFIX = "0.9.";
 
 /**
- * Relations that serve as corroboration when extracted.
- * Direction is treated as undirected.
+ * Relations that count as a hop. Each is a claim the extractor read directly
+ * from source (we additionally require EXTRACTED confidence): a call, an
+ * import, a re-export, a dynamic import. Everything else -- `contains`,
+ * `references`, `extends`, anything INFERRED -- is not evidence that code
+ * reaches code, and never travels.
  */
 const WHITELISTED_RELATIONS = new Set([
   "calls",
@@ -50,260 +63,184 @@ const WHITELISTED_RELATIONS = new Set([
   "dynamic_import",
 ]);
 
-/**
- * Relations that expand endpoint sets but do not count as hops.
- * These let us recognize that a symbol and its containing file are
- * in the same place.
- */
-const EXPANSION_RELATIONS = new Set(["contains", "method"]);
+/** How many hops a chain may take between the two endpoint sets. */
+const MAX_HOPS = 3;
 
 /**
- * Load and validate a graphify output graph.
+ * Parse and validate a graphify export.
  *
- * Returns undefined when: either file missing; JSON unparseable; schema
- * unexpected; or the graphify version is outside the tested range (0.9.x only).
- *
- * @param graph The parsed graphify JSON.
- * @param graphifyVersion The `graphify --version` string.
+ * Returns undefined -- channel off -- when the version is untested or the
+ * shape is not what we know how to read. Validation is strict on purpose:
+ * a graph we half-understand is a graph we might confirm the wrong arrow with.
  */
 export function loadCodeGraph(
   graph: CodeGraphSchema,
   graphifyVersion: string,
 ): LoadedCodeGraph | undefined {
-  // Validate version (0.9.x only, not 0.10.0+)
-  if (!graphifyVersion.startsWith("0.9.")) {
+  if (typeof graphifyVersion !== "string" || !graphifyVersion.startsWith(TESTED_VERSION_PREFIX)) {
     return undefined;
   }
+  if (!Array.isArray(graph?.nodes) || !Array.isArray(graph?.links)) return undefined;
 
-  // Validate schema
-  if (!graph.nodes || !Array.isArray(graph.nodes)) return undefined;
-  if (!graph.links || !Array.isArray(graph.links)) return undefined;
-
-  // Validate all nodes have id and source_file
-  for (const node of graph.nodes) {
-    if (typeof node.id !== "string" || typeof node.source_file !== "string") {
-      return undefined;
-    }
-  }
-
-  // Validate all edges have required fields
-  for (const edge of graph.links) {
-    if (
-      typeof edge.source !== "string"
-      || typeof edge.target !== "string"
-      || typeof edge.relation !== "string"
-      || typeof edge.confidence !== "string"
-    ) {
-      return undefined;
-    }
-  }
-
-  // Build node lookup by file
   const nodesByFile = new Map<string, string[]>();
+  const known = new Set<string>();
   for (const node of graph.nodes) {
-    const file = node.source_file!;
-    if (!nodesByFile.has(file)) {
-      nodesByFile.set(file, []);
+    if (typeof node?.id !== "string" || typeof node?.source_file !== "string") {
+      return undefined;
     }
-    nodesByFile.get(file)!.push(node.id!);
+    known.add(node.id);
+    const list = nodesByFile.get(node.source_file);
+    if (list) list.push(node.id);
+    else nodesByFile.set(node.source_file, [node.id]);
   }
 
-  // Build adjacency for whitelisted, extracted edges
-  const adjacency = new Map<string, Set<string>>();
-  const nodeDegrees = new Map<string, number>();
-  const relations = new Map<string, Set<string>>();
-
-  // Initialize all nodes with empty adjacency
-  for (const node of graph.nodes) {
-    adjacency.set(node.id!, new Set());
-    nodeDegrees.set(node.id!, 0);
-  }
-
-  // Add edges: whitelisted relations with EXTRACTED confidence only
+  const forward = new Map<string, Set<string>>();
   for (const edge of graph.links) {
     if (
-      WHITELISTED_RELATIONS.has(edge.relation!)
-      && edge.confidence === "EXTRACTED"
+      typeof edge?.source !== "string"
+      || typeof edge?.target !== "string"
+      || typeof edge?.relation !== "string"
+      || typeof edge?.confidence !== "string"
     ) {
-      const src = edge.source!;
-      const tgt = edge.target!;
-      const rel = edge.relation!;
-
-      // Undirected: add both directions
-      adjacency.get(src)?.add(tgt);
-      adjacency.get(tgt)?.add(src);
-
-      // Count degree (both directions count towards one edge)
-      nodeDegrees.set(src, (nodeDegrees.get(src) ?? 0) + 1);
-      nodeDegrees.set(tgt, (nodeDegrees.get(tgt) ?? 0) + 1);
-
-      // Store relation types between this pair
-      const key = src < tgt ? `${src}:${tgt}` : `${tgt}:${src}`;
-      if (!relations.has(key)) {
-        relations.set(key, new Set());
-      }
-      relations.get(key)!.add(rel);
+      return undefined;
     }
+    if (!WHITELISTED_RELATIONS.has(edge.relation) || edge.confidence !== "EXTRACTED") continue;
+    if (!known.has(edge.source) || !known.has(edge.target)) continue;
+    const out = forward.get(edge.source);
+    if (out) out.add(edge.target);
+    else forward.set(edge.source, new Set([edge.target]));
   }
 
-  return { nodesByFile, adjacency, nodeDegrees, relations };
+  return { nodesByFile, forward };
 }
 
 /**
- * Whether endpoints in two files are connected by a path of at most 3 hops
- * through whitelisted relations.
+ * Whether the code reaches from one endpoint to the other through a chain of
+ * at most MAX_HOPS whitelisted edges, all pointing the same way.
  *
- * Endpoints expand through contains/method edges (not counted as hops) to
- * include all symbols in the same file.
+ * Direction-consistency is the correctness core, not a nicety. An undirected
+ * walk connects nearly everything to nearly everything: two files that both
+ * import the same helper meet in the middle (A -> H <- B), and one file that
+ * imports both endpoints bridges them (A <- H -> B). Neither is evidence that
+ * A and B are connected, and both are everywhere in a real repo. A chain whose
+ * edges all point one way (A -> H -> B, or B -> H -> A) is different: the
+ * dependency genuinely flows end to end. So the search runs twice, once from
+ * each side, forward only.
  *
- * Respects 3-hop limit and avoids the false-positive pattern where two
- * files that both import a shared hub are incorrectly read as connected.
- *
- * Direction-agnostic (undirected walk).
- *
- * @param graph Loaded code graph.
- * @param fileA Endpoint file path (absolute or repo-relative).
- * @param fileB Endpoint file path (absolute or repo-relative).
- * @returns True if connected within 3 hops, false otherwise.
+ * An endpoint may be a file or a directory. A directory stands for everything
+ * under it, matched on the path segment ("src/eng" never matches
+ * "src/engine/a.ts").
  */
-export function connects(
+export function connects(graph: LoadedCodeGraph, refA: string, refB: string): boolean {
+  const a = expandEndpoint(graph, refA);
+  if (a.size === 0) return false;
+  const b = expandEndpoint(graph, refB);
+  if (b.size === 0) return false;
+  return reachesForward(graph, a, b) || reachesForward(graph, b, a);
+}
+
+/** Breadth-first, forward edges only, at most MAX_HOPS deep. */
+function reachesForward(
   graph: LoadedCodeGraph,
-  fileA: string,
-  fileB: string,
+  start: Set<string>,
+  goal: Set<string>,
 ): boolean {
-  const startNodes = expandEndpoint(graph, fileA);
-  const endNodes = expandEndpoint(graph, fileB);
-  const endNodesSet = new Set(endNodes);
-
-  if (startNodes.length === 0 || endNodes.length === 0) {
-    return false;
-  }
-
-  // BFS from all start nodes, tracking the path to detect import hubs
-  const queue: Array<{
-    nodeId: string;
-    distance: number;
-    path: string[]; // Path of node IDs for hub detection
-  }> = [];
-  const visited = new Set<string>();
-
-  for (const start of startNodes) {
-    queue.push({ nodeId: start, distance: 0, path: [start] });
-    visited.add(start);
-  }
-
-  while (queue.length > 0) {
-    const { nodeId, distance, path } = queue.shift()!;
-
-    // Check if we reached any endpoint
-    if (endNodesSet.has(nodeId)) {
-      // Check if this is an import-hub pattern (should be rare at distance 2)
-      if (distance === 2 && isImportHubPattern(graph, startNodes, endNodes, path)) {
-        continue; // Skip this path, keep looking for alternatives
+  for (const node of start) if (goal.has(node)) return true;
+  let frontier = start;
+  const seen = new Set(start);
+  for (let hop = 0; hop < MAX_HOPS; hop += 1) {
+    const next = new Set<string>();
+    for (const node of frontier) {
+      const out = graph.forward.get(node);
+      if (!out) continue;
+      for (const target of out) {
+        if (seen.has(target)) continue;
+        if (goal.has(target)) return true;
+        seen.add(target);
+        next.add(target);
       }
-      return true;
     }
+    if (next.size === 0) return false;
+    frontier = next;
+  }
+  return false;
+}
 
-    // Stop if we've gone too far
-    if (distance >= 3) {
-      continue;
-    }
+/** All nodes standing for a file, or for everything under a directory. */
+function expandEndpoint(graph: LoadedCodeGraph, ref: string): Set<string> {
+  const exact = graph.nodesByFile.get(ref);
+  if (exact) return new Set(exact);
+  const prefix = ref.endsWith("/") ? ref : `${ref}/`;
+  const result = new Set<string>();
+  for (const [file, nodes] of graph.nodesByFile) {
+    if (file.startsWith(prefix)) for (const node of nodes) result.add(node);
+  }
+  return result;
+}
 
-    // Explore neighbors
-    const neighbors = graph.adjacency.get(nodeId);
-    if (!neighbors) continue;
+/**
+ * Whether a ref (file or directory) has changed since the graph was built.
+ * A directory is stale as soon as anything under it is.
+ */
+export function refIsStale(ref: string, modified: Set<string>): boolean {
+  if (modified.has(ref)) return true;
+  const prefix = ref.endsWith("/") ? ref : `${ref}/`;
+  for (const file of modified) {
+    if (file.startsWith(prefix)) return true;
+  }
+  return false;
+}
 
-    for (const neighbor of neighbors) {
-      if (visited.has(neighbor)) continue;
+/**
+ * Load graphify-out/graph.json for a repo, ready to hand to checkDrift.
+ *
+ * Mirrors createGitBaseline's stance: every failure is silence. No graph, no
+ * sidecar, unparseable JSON, an untested graphify version, a sidecar commit
+ * git does not recognise, no git at all -- all `undefined`, and the checker
+ * behaves exactly as it does without the channel.
+ *
+ * The modified set is what makes the graph safe to consult between commits:
+ * the graph describes the sidecar's commit, so any file changed since then
+ * (staged, unstaged, or in later commits) falls back to the live channels.
+ */
+export function createCodeGraphOption(root: string): CodeGraphOption | undefined {
+  try {
+    const graphPath = path.join(root, "graphify-out", "graph.json");
+    const metaPath = path.join(root, "graphify-out", "code-graph-meta.json");
+    if (!existsSync(graphPath) || !existsSync(metaPath)) return undefined;
 
-      visited.add(neighbor);
-      queue.push({
-        nodeId: neighbor,
-        distance: distance + 1,
-        path: [...path, neighbor],
+    const meta = JSON.parse(readFileSync(metaPath, "utf8")) as {
+      commit?: unknown;
+      graphify?: unknown;
+    };
+    if (typeof meta.commit !== "string" || !/^[0-9a-f]{7,40}$/.test(meta.commit)) return undefined;
+    if (typeof meta.graphify !== "string") return undefined;
+
+    const graph = loadCodeGraph(
+      JSON.parse(readFileSync(graphPath, "utf8")) as CodeGraphSchema,
+      meta.graphify,
+    );
+    if (!graph) return undefined;
+
+    const git = (args: string[]) =>
+      execFileSync("git", args, {
+        cwd: root,
+        encoding: "utf8",
+        stdio: ["ignore", "pipe", "ignore"],
+        maxBuffer: 32 * 1024 * 1024,
       });
-    }
-  }
-
-  return false;
-}
-
-/**
- * Check if a 2-hop path exhibits the "import hub" pattern:
- * start → hub ← end, where both edges are imports.
- *
- * This prevents false positives like "A and B both import shared config"
- * being read as "A connects to B".
- */
-function isImportHubPattern(
-  graph: LoadedCodeGraph,
-  startNodes: string[],
-  endNodes: string[],
-  path: string[],
-): boolean {
-  // Only matters for 2-hop paths: [start, hub, end]
-  if (path.length !== 3) return false;
-
-  const [start, hub, end] = path;
-
-  // start and end must both be in their respective endpoint sets
-  if (!startNodes.includes(start) || !endNodes.includes(end)) return false;
-
-  // Both edges must be import relations
-  const startToHub = getRelationKey(start, hub);
-  const hubToEnd = getRelationKey(hub, end);
-
-  const startToHubRels = graph.relations.get(startToHub);
-  const hubToEndRels = graph.relations.get(hubToEnd);
-
-  // If either edge has relations other than imports, allow the path
-  if (startToHubRels?.has("imports") === false || hubToEndRels?.has("imports") === false) {
-    return false;
-  }
-
-  // Both edges are imports: this is the import-hub pattern, reject it
-  if (startToHubRels?.has("imports") && hubToEndRels?.has("imports")) {
-    return true;
-  }
-
-  return false;
-}
-
-function getRelationKey(a: string, b: string): string {
-  return a < b ? `${a}:${b}` : `${b}:${a}`;
-}
-
-/**
- * Get all nodes that represent an endpoint.
- *
- * For a file endpoint: all nodes whose source_file equals that file.
- *
- * For a directory endpoint (path ending with /): all nodes whose source_file
- * starts with that directory path. Matching is prefix-based to exclude sibling
- * paths that share a prefix but differ after their next separator.
- *
- * Expansion through contains/method edges is NOT done here; that would break
- * the search algorithm. Instead, we initialize the BFS with all nodes in the
- * file, which has the same effect.
- */
-function expandEndpoint(graph: LoadedCodeGraph, endpoint: string): string[] {
-  // Check if directory endpoint (ends with /)
-  if (endpoint.endsWith("/")) {
-    const result: string[] = [];
-    for (const [file, nodes] of graph.nodesByFile) {
-      // Exact match: file starts with directory prefix AND
-      // the character immediately after the prefix (if any) is NOT part of
-      // a sibling directory name.
-      // "src/engine/" should match "src/engine/a.ts" but not "src/eng/b.ts"
-      // "src/engine/" should match "src/engine/sub/a.ts"
-      // Use a simple startsWith check since the directory already ends with /
-      if (file.startsWith(endpoint)) {
-        result.push(...nodes);
+    const modified = new Set<string>();
+    // Working tree against HEAD (staged and unstaged in one call), then
+    // anything committed after the graph was built.
+    for (const chunk of [git(["diff", "--name-only", "HEAD"]), git(["diff", "--name-only", `${meta.commit}..HEAD`])]) {
+      for (const line of chunk.split("\n")) {
+        const file = line.trim();
+        if (file) modified.add(file.split(path.sep).join("/"));
       }
     }
-    return result;
-  }
 
-  // File endpoint
-  return graph.nodesByFile.get(endpoint) ?? [];
+    return { graph, modified };
+  } catch {
+    return undefined;
+  }
 }

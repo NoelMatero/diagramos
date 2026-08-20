@@ -16,6 +16,7 @@ import { beforeAll, describe, expect, it } from "vitest";
 
 import { emptyBoard, type BoardFile } from "../src/engine/board-file";
 import { bodyOf, callsIn, reaches } from "../src/engine/body";
+import { loadCodeGraph } from "../src/engine/codegraph";
 import { createDiagram } from "../src/engine/diagram";
 import { checkDrift, type Workspace } from "../src/engine/drift";
 import { installExcalifontMeasurer } from "./helpers/excalifont";
@@ -555,115 +556,158 @@ describe("dangling arrows — arrows that fail to resolve at one or both ends", 
     expect(report.clean).toBe(true);
   });
 
-  it("code graph corroborates an unsupported edge", async () => {
-    // An arrow that no existing channel can confirm becomes corroborated
-    // when a fixture code graph is passed in options.
-    const files = {
-      "src/a.ts": "export function callC() {}",
-      "src/b.ts": "export function called() {}",
-      "src/c.ts": "import { callC } from './a'; callC();",
-    };
+});
 
-    const board = await boardWith(
+describe("code graph — the fifth corroboration channel", () => {
+  /** A tiny graphify export, parsed through the real loader. */
+  function fixtureGraph(
+    nodes: Array<[id: string, file: string]>,
+    links: Array<[source: string, target: string, relation?: string]>,
+  ) {
+    const graph = loadCodeGraph(
+      {
+        nodes: nodes.map(([id, source_file]) => ({ id, source_file })),
+        links: links.map(([source, target, relation]) => ({
+          source,
+          target,
+          relation: relation ?? "calls",
+          confidence: "EXTRACTED",
+        })),
+      },
+      "0.9.47",
+    );
+    expect(graph).toBeDefined();
+    return graph!;
+  }
+
+  const files = {
+    "src/a.ts": "export function callC() {}",
+    "src/b.ts": "export function called() {}",
+    "src/c.ts": "import { callC } from './a'; callC();",
+  };
+
+  async function arrowAB(fromRef = "src/a.ts", toRef = "src/b.ts") {
+    return boardWith(
       [
-        { id: "a", label: "A", ref: "src/a.ts" },
-        { id: "b", label: "B", ref: "src/b.ts" },
+        { id: "a", label: "A", ref: fromRef },
+        { id: "b", label: "B", ref: toRef },
       ],
       [{ from: "a", to: "b" }],
     );
+  }
 
-    // Without code graph, the edge is unsupported (no direct a→b connection)
-    const reportWithout = checkDrift(board, fakeWorkspace(files), { edges: true });
-    expect(reportWithout.edges).toHaveLength(1);
-    expect(reportWithout.edges[0].kind).toBe("unsupported-edge");
+  // A chain a → c → b: the dependency flows end to end through another file.
+  const chain = () =>
+    fixtureGraph(
+      [["a_fn", "src/a.ts"], ["c_helper", "src/c.ts"], ["b_target", "src/b.ts"]],
+      [["a_fn", "c_helper"], ["c_helper", "b_target"]],
+    );
 
-    // With code graph showing a→c→b, the edge is corroborated
-    const codeGraph = {
-      nodesByFile: new Map([
-        ["src/a.ts", ["a_fn"]],
-        ["src/c.ts", ["c_helper"]],
-        ["src/b.ts", ["b_target"]],
-      ]),
-      adjacency: new Map([
-        ["a_fn", new Set(["c_helper"])],
-        ["c_helper", new Set(["a_fn", "b_target"])],
-        ["b_target", new Set(["c_helper"])],
-      ]),
-      nodeDegrees: new Map([
-        ["a_fn", 1],
-        ["c_helper", 2],
-        ["b_target", 1],
-      ]),
-      relations: new Map([
-        ["a_fn:c_helper", new Set(["calls"])],
-        ["c_helper:b_target", new Set(["calls"])],
-      ]),
-    };
+  it("corroborates an arrow no other channel can confirm", async () => {
+    const board = await arrowAB();
 
-    const reportWith = checkDrift(board, fakeWorkspace(files), {
+    const without = checkDrift(board, fakeWorkspace(files), { edges: true });
+    expect(without.edges).toHaveLength(1);
+    expect(without.edges[0].kind).toBe("unsupported-edge");
+
+    const withGraph = checkDrift(board, fakeWorkspace(files), {
       edges: true,
-      codeGraph: { graph: codeGraph, modified: new Set() },
+      codeGraph: { graph: chain(), modified: new Set() },
     });
-    expect(reportWith.edges).toHaveLength(0);
-    expect(reportWith.clean).toBe(true);
+    expect(withGraph.edges).toHaveLength(0);
+    expect(withGraph.clean).toBe(true);
   });
 
-  it("code graph skips check when endpoint file is in modified set", async () => {
-    const files = {
-      "src/a.ts": "export function callC() {}",
-      "src/b.ts": "export function called() {}",
-    };
-
-    const board = await boardWith(
-      [
-        { id: "a", label: "A", ref: "src/a.ts" },
-        { id: "b", label: "B", ref: "src/b.ts" },
-      ],
-      [{ from: "a", to: "b" }],
-    );
-
-    const codeGraph = {
-      nodesByFile: new Map([
-        ["src/a.ts", ["a_fn"]],
-        ["src/b.ts", ["b_fn"]],
-      ]),
-      adjacency: new Map([
-        ["a_fn", new Set(["b_fn"])],
-        ["b_fn", new Set(["a_fn"])],
-      ]),
-      nodeDegrees: new Map([
-        ["a_fn", 1],
-        ["b_fn", 1],
-      ]),
-      relations: new Map([["a_fn:b_fn", new Set(["calls"])]]),
-    };
-
-    // With modified file, even though code graph says yes, we don't trust it
+  it("does not trust the graph for a file edited since it was built", async () => {
+    const board = await arrowAB();
     const report = checkDrift(board, fakeWorkspace(files), {
       edges: true,
-      codeGraph: { graph: codeGraph, modified: new Set(["src/a.ts"]) },
+      codeGraph: { graph: chain(), modified: new Set(["src/a.ts"]) },
     });
     expect(report.edges).toHaveLength(1);
     expect(report.edges[0].kind).toBe("unsupported-edge");
   });
 
-  it("code graph becomes unavailable with stale or invalid graph", async () => {
-    const files = {
-      "src/a.ts": "export function callC() {}",
-      "src/b.ts": "export function called() {}",
+  it("stays exactly as before when no graph is given", async () => {
+    const report = checkDrift(await arrowAB(), fakeWorkspace(files), { edges: true });
+    expect(report.edges).toHaveLength(1);
+    expect(report.edges[0].kind).toBe("unsupported-edge");
+  });
+
+  it("checks an arrow whose end is a directory", async () => {
+    // src/sub is a directory; the graph knows a file inside it that b reaches.
+    const workspace: Workspace = {
+      resolve: (relative) => (relative.startsWith("../") ? undefined : relative),
+      stat: (target) =>
+        target === "src/sub" ? "directory" : files[target as keyof typeof files] === undefined ? "missing" : "file",
+      read: (target) => files[target as keyof typeof files] ?? "",
+      list: () => [],
     };
-
-    const board = await boardWith(
-      [
-        { id: "a", label: "A", ref: "src/a.ts" },
-        { id: "b", label: "B", ref: "src/b.ts" },
-      ],
-      [{ from: "a", to: "b" }],
+    const graph = fixtureGraph(
+      [["inner", "src/sub/inner.ts"], ["b_target", "src/b.ts"]],
+      [["inner", "b_target"]],
     );
+    const board = await arrowAB("src/sub", "src/b.ts");
 
-    // No code graph option → defaults to undefined
-    const reportNoGraph = checkDrift(board, fakeWorkspace(files), { edges: true });
-    expect(reportNoGraph.edges).toHaveLength(1);
-    expect(reportNoGraph.edges[0].kind).toBe("unsupported-edge");
+    const without = checkDrift(board, workspace, { edges: true });
+    expect(without.edgesSkippedWhy["directory-ref"]).toBe(1);
+
+    const withGraph = checkDrift(board, workspace, {
+      edges: true,
+      codeGraph: { graph, modified: new Set() },
+    });
+    expect(withGraph.edgesSkippedWhy["directory-ref"]).toBeUndefined();
+    expect(withGraph.edgesChecked).toBe(1);
+    expect(withGraph.edges).toHaveLength(0);
+
+    // Editing anything under the directory turns the graph off for it.
+    const stale = checkDrift(board, workspace, {
+      edges: true,
+      codeGraph: { graph, modified: new Set(["src/sub/inner.ts"]) },
+    });
+    expect(stale.edgesSkippedWhy["directory-ref"]).toBe(1);
+  });
+
+  it("checks an arrow between files the channels cannot read", async () => {
+    const pyFiles = {
+      "src/x.py": "from y import go\ngo()\n",
+      "src/y.py": "def go(): pass\n",
+    };
+    const graph = fixtureGraph(
+      [["x", "src/x.py"], ["y_go", "src/y.py"]],
+      [["x", "y_go", "imports"]],
+    );
+    const board = await arrowAB("src/x.py", "src/y.py");
+
+    const without = checkDrift(board, fakeWorkspace(pyFiles), { edges: true });
+    expect(without.edgesSkippedWhy["not-ts-or-js"]).toBe(1);
+
+    const withGraph = checkDrift(board, fakeWorkspace(pyFiles), {
+      edges: true,
+      codeGraph: { graph, modified: new Set() },
+    });
+    expect(withGraph.edgesSkippedWhy["not-ts-or-js"]).toBeUndefined();
+    expect(withGraph.edgesChecked).toBe(1);
+    expect(withGraph.edges).toHaveLength(0);
+  });
+
+  it("a graph that proves nothing leaves the skip in place, never an alarm", async () => {
+    const pyFiles = {
+      "src/x.py": "print(1)\n",
+      "src/y.py": "print(2)\n",
+    };
+    // The graph knows both files but no chain between them.
+    const graph = fixtureGraph(
+      [["x", "src/x.py"], ["y", "src/y.py"]],
+      [],
+    );
+    const board = await arrowAB("src/x.py", "src/y.py");
+    const report = checkDrift(board, fakeWorkspace(pyFiles), {
+      edges: true,
+      codeGraph: { graph, modified: new Set() },
+    });
+    expect(report.edgesSkippedWhy["not-ts-or-js"]).toBe(1);
+    expect(report.edges).toHaveLength(0);
+    expect(report.clean).toBe(true);
   });
 });

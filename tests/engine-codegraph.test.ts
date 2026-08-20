@@ -1,359 +1,230 @@
 /**
- * Code graph channel tests: a precomputed whole-repo graph read at check time.
+ * The code graph channel: loader strictness and the shape of a connection.
  *
- * The channel corroborates arrows (suppresses "unsupported-edge") when the
- * endpoints connect through a path of extracted-confidence code relations:
- * calls, imports, imports_from, re_exports, dynamic_import. Directions are
- * treated as undirected (either direction is evidence).
- *
- * A path may not exceed 3 hops. Endpoints expand through contains/method
- * edges (these do not count as hops) to include symbols in the same file.
+ * The one idea under test everywhere here: a connection is a chain whose edges
+ * all point the same way. The two everyday false positives — two files that
+ * both import the same helper, and one file that imports both ends — must
+ * never read as a connection, while a genuine chain through another file must.
  */
+
 import { describe, expect, it } from "vitest";
 
-import { loadCodeGraph, connects } from "../src/engine/codegraph";
+import { connects, loadCodeGraph, refIsStale } from "../src/engine/codegraph";
 
-interface SimpleGraph {
-  nodes: Array<{ id: string; source_file: string }>;
-  links: Array<{
-    source: string;
-    target: string;
-    relation: string;
-    confidence: string;
-  }>;
-}
+type RawNode = { id?: unknown; source_file?: unknown };
+type RawLink = { source?: unknown; target?: unknown; relation?: unknown; confidence?: unknown };
 
-function makeGraph(
-  nodes: Array<{ id: string; source_file: string }>,
-  links: Array<{
-    source: string;
-    target: string;
-    relation: string;
-    confidence?: string;
-  }>,
-): SimpleGraph {
+function raw(
+  nodes: Array<[id: string, file: string]>,
+  links: Array<[source: string, target: string, relation?: string, confidence?: string]>,
+): { nodes: RawNode[]; links: RawLink[] } {
   return {
-    nodes,
-    links: links.map((l) => ({ ...l, confidence: l.confidence ?? "EXTRACTED" })),
+    nodes: nodes.map(([id, source_file]) => ({ id, source_file })),
+    links: links.map(([source, target, relation, confidence]) => ({
+      source,
+      target,
+      relation: relation ?? "calls",
+      confidence: confidence ?? "EXTRACTED",
+    })),
   };
 }
 
-describe("loadCodeGraph", () => {
-  it("loads a valid graph with nodes and links", () => {
-    const graph = makeGraph(
+function graphOf(
+  nodes: Array<[id: string, file: string]>,
+  links: Array<[source: string, target: string, relation?: string, confidence?: string]>,
+) {
+  const graph = loadCodeGraph(raw(nodes, links), "0.9.47");
+  expect(graph).toBeDefined();
+  return graph!;
+}
+
+describe("loading a graphify export", () => {
+  const valid = raw([["a", "src/a.ts"]], []);
+
+  it("loads a tested version and refuses everything else", () => {
+    expect(loadCodeGraph(valid, "0.9.47")).toBeDefined();
+    expect(loadCodeGraph(valid, "0.9.1")).toBeDefined();
+    expect(loadCodeGraph(valid, "0.10.0")).toBeUndefined();
+    expect(loadCodeGraph(valid, "1.0.0")).toBeUndefined();
+    expect(loadCodeGraph(valid, "")).toBeUndefined();
+  });
+
+  it("refuses a shape it does not fully understand", () => {
+    expect(loadCodeGraph({} as never, "0.9.47")).toBeUndefined();
+    expect(loadCodeGraph({ nodes: [], links: "no" } as never, "0.9.47")).toBeUndefined();
+    expect(
+      loadCodeGraph({ nodes: [{ id: 7, source_file: "src/a.ts" }], links: [] }, "0.9.47"),
+    ).toBeUndefined();
+    expect(
+      loadCodeGraph(
+        { nodes: [{ id: "a", source_file: "src/a.ts" }], links: [{ source: "a" }] },
+        "0.9.47",
+      ),
+    ).toBeUndefined();
+  });
+
+  it("keeps only whitelisted relations at EXTRACTED confidence", () => {
+    const graph = graphOf(
+      [["a", "src/a.ts"], ["b", "src/b.ts"], ["c", "src/c.ts"], ["d", "src/d.ts"]],
       [
-        { id: "a", source_file: "a.ts" },
-        { id: "b", source_file: "b.ts" },
+        ["a", "b", "calls", "INFERRED"], // right relation, guessed — dropped
+        ["a", "c", "references"], // wrong relation — dropped
+        ["a", "d", "extends"], // wrong relation — dropped
       ],
-      [{ source: "a", target: "b", relation: "calls" }],
     );
-    const loaded = loadCodeGraph(graph as any, "0.9.47");
-    expect(loaded).toBeDefined();
+    expect(connects(graph, "src/a.ts", "src/b.ts")).toBe(false);
+    expect(connects(graph, "src/a.ts", "src/c.ts")).toBe(false);
+    expect(connects(graph, "src/a.ts", "src/d.ts")).toBe(false);
   });
 
-  it("returns undefined for missing nodes array", () => {
-    const invalid = { links: [] } as any;
-    const loaded = loadCodeGraph(invalid, "0.9.47");
-    expect(loaded).toBeUndefined();
-  });
-
-  it("returns undefined for missing links array", () => {
-    const invalid = { nodes: [] } as any;
-    const loaded = loadCodeGraph(invalid, "0.9.47");
-    expect(loaded).toBeUndefined();
-  });
-
-  it("returns undefined for node missing source_file", () => {
-    const invalid = makeGraph(
-      [{ id: "a" }] as any,
-      [{ source: "a", target: "b", relation: "calls" }],
+  it("drops edges that point at nodes the graph does not declare", () => {
+    const graph = graphOf(
+      [["a", "src/a.ts"], ["b", "src/b.ts"]],
+      [["a", "ghost"], ["ghost", "b"]],
     );
-    const loaded = loadCodeGraph(invalid as any, "0.9.47");
-    expect(loaded).toBeUndefined();
-  });
-
-  it("returns undefined for edge missing required fields", () => {
-    const invalid = makeGraph(
-      [{ id: "a", source_file: "a.ts" }],
-      [{ source: "a", target: "b" } as any],
-    );
-    const loaded = loadCodeGraph(invalid as any, "0.9.47");
-    expect(loaded).toBeUndefined();
-  });
-
-  it("rejects version 0.10.0", () => {
-    const graph = makeGraph(
-      [{ id: "a", source_file: "a.ts" }],
-      [],
-    );
-    const loaded = loadCodeGraph(graph as any, "0.10.0");
-    expect(loaded).toBeUndefined();
-  });
-
-  it("accepts version 0.9.47", () => {
-    const graph = makeGraph(
-      [{ id: "a", source_file: "a.ts" }],
-      [],
-    );
-    const loaded = loadCodeGraph(graph as any, "0.9.47");
-    expect(loaded).toBeDefined();
-  });
-
-  it("accepts version 0.9.0", () => {
-    const graph = makeGraph(
-      [{ id: "a", source_file: "a.ts" }],
-      [],
-    );
-    const loaded = loadCodeGraph(graph as any, "0.9.0");
-    expect(loaded).toBeDefined();
+    expect(connects(graph, "src/a.ts", "src/b.ts")).toBe(false);
   });
 });
 
-describe("connects", () => {
-  it("detects a direct call between files", () => {
-    const graph = makeGraph(
-      [
-        { id: "a_fn", source_file: "a.ts" },
-        { id: "b_fn", source_file: "b.ts" },
-      ],
-      [{ source: "a_fn", target: "b_fn", relation: "calls" }],
+describe("what counts as a connection", () => {
+  it("a direct edge connects, in either reading direction", () => {
+    const graph = graphOf(
+      [["a", "src/a.ts"], ["b", "src/b.ts"]],
+      [["a", "b", "imports"]],
     );
-    const loaded = loadCodeGraph(graph as any, "0.9.47")!;
-    const result = connects(loaded, "a.ts", "b.ts");
-    expect(result).toBe(true);
+    expect(connects(graph, "src/a.ts", "src/b.ts")).toBe(true);
+    expect(connects(graph, "src/b.ts", "src/a.ts")).toBe(true);
   });
 
-  it("detects a call chain A→helper(C)→B within 3 hops", () => {
-    // A calls helper in C, C calls B
-    const graph = makeGraph(
-      [
-        { id: "a_main", source_file: "a.ts" },
-        { id: "c_helper", source_file: "c.ts" },
-        { id: "b_target", source_file: "b.ts" },
-      ],
-      [
-        { source: "a_main", target: "c_helper", relation: "calls" },
-        { source: "c_helper", target: "b_target", relation: "calls" },
-      ],
+  it("a chain through another file connects: a → c → b", () => {
+    const graph = graphOf(
+      [["a", "src/a.ts"], ["c", "src/c.ts"], ["b", "src/b.ts"]],
+      [["a", "c", "imports"], ["c", "b", "calls"]],
     );
-    const loaded = loadCodeGraph(graph as any, "0.9.47")!;
-    const result = connects(loaded, "a.ts", "b.ts");
-    expect(result).toBe(true);
+    expect(connects(graph, "src/a.ts", "src/b.ts")).toBe(true);
   });
 
-  it("treats imports as whitelisted edges", () => {
-    const graph = makeGraph(
-      [
-        { id: "a_mod", source_file: "a.ts" },
-        { id: "b_mod", source_file: "b.ts" },
-      ],
-      [{ source: "a_mod", target: "b_mod", relation: "imports" }],
+  it("two files importing the same helper do NOT connect: a → h ← b", () => {
+    // The lodash trap. Both depend on h; neither reaches the other.
+    const graph = graphOf(
+      [["a", "src/a.ts"], ["h", "src/h.ts"], ["b", "src/b.ts"]],
+      [["a", "h", "imports"], ["b", "h", "imports"]],
     );
-    const loaded = loadCodeGraph(graph as any, "0.9.47")!;
-    const result = connects(loaded, "a.ts", "b.ts");
-    expect(result).toBe(true);
+    expect(connects(graph, "src/a.ts", "src/b.ts")).toBe(false);
   });
 
-  it("treats imports_from as whitelisted", () => {
-    const graph = makeGraph(
-      [
-        { id: "a_mod", source_file: "a.ts" },
-        { id: "b_mod", source_file: "b.ts" },
-      ],
-      [{ source: "a_mod", target: "b_mod", relation: "imports_from" }],
+  it("two symbols calling the same utility do NOT connect: a → u ← b", () => {
+    const graph = graphOf(
+      [["fa", "src/a.ts"], ["u", "src/util.ts"], ["fb", "src/b.ts"]],
+      [["fa", "u", "calls"], ["fb", "u", "calls"]],
     );
-    const loaded = loadCodeGraph(graph as any, "0.9.47")!;
-    const result = connects(loaded, "a.ts", "b.ts");
-    expect(result).toBe(true);
+    expect(connects(graph, "src/a.ts", "src/b.ts")).toBe(false);
   });
 
-  it("treats re_exports as whitelisted", () => {
-    const graph = makeGraph(
-      [
-        { id: "a_mod", source_file: "a.ts" },
-        { id: "b_mod", source_file: "b.ts" },
-      ],
-      [{ source: "a_mod", target: "b_mod", relation: "re_exports" }],
+  it("one file importing both ends does NOT connect them: a ← h → b", () => {
+    // An entry point that imports everything must not bridge its imports.
+    const graph = graphOf(
+      [["a", "src/a.ts"], ["h", "src/main.ts"], ["b", "src/b.ts"]],
+      [["h", "a", "imports"], ["h", "b", "imports"]],
     );
-    const loaded = loadCodeGraph(graph as any, "0.9.47")!;
-    const result = connects(loaded, "a.ts", "b.ts");
-    expect(result).toBe(true);
+    expect(connects(graph, "src/a.ts", "src/b.ts")).toBe(false);
   });
 
-  it("treats dynamic_import as whitelisted", () => {
-    const graph = makeGraph(
-      [
-        { id: "a_mod", source_file: "a.ts" },
-        { id: "b_mod", source_file: "b.ts" },
-      ],
-      [{ source: "a_mod", target: "b_mod", relation: "dynamic_import" }],
+  it("a barrel chain connects: a imports the barrel, the barrel re-exports b", () => {
+    const graph = graphOf(
+      [["a", "src/a.ts"], ["index", "src/lib/index.ts"], ["b", "src/lib/b.ts"]],
+      [["a", "index", "imports"], ["index", "b", "re_exports"]],
     );
-    const loaded = loadCodeGraph(graph as any, "0.9.47")!;
-    const result = connects(loaded, "a.ts", "b.ts");
-    expect(result).toBe(true);
+    expect(connects(graph, "src/a.ts", "src/lib/b.ts")).toBe(true);
   });
 
-  it("ignores INFERRED edges", () => {
-    const graph = makeGraph(
-      [
-        { id: "a_fn", source_file: "a.ts" },
-        { id: "b_fn", source_file: "b.ts" },
-      ],
-      [{ source: "a_fn", target: "b_fn", relation: "calls", confidence: "INFERRED" }],
+  it("a dynamic import counts", () => {
+    const graph = graphOf(
+      [["a", "src/a.ts"], ["b", "src/b.ts"]],
+      [["a", "b", "dynamic_import"]],
     );
-    const loaded = loadCodeGraph(graph as any, "0.9.47")!;
-    const result = connects(loaded, "a.ts", "b.ts");
-    expect(result).toBe(false);
+    expect(connects(graph, "src/a.ts", "src/b.ts")).toBe(true);
   });
 
-  it("ignores AMBIGUOUS edges", () => {
-    const graph = makeGraph(
-      [
-        { id: "a_fn", source_file: "a.ts" },
-        { id: "b_fn", source_file: "b.ts" },
-      ],
-      [{ source: "a_fn", target: "b_fn", relation: "calls", confidence: "AMBIGUOUS" }],
-    );
-    const loaded = loadCodeGraph(graph as any, "0.9.47")!;
-    const result = connects(loaded, "a.ts", "b.ts");
-    expect(result).toBe(false);
+  it("three hops connect, four do not", () => {
+    const nodes: Array<[string, string]> = [
+      ["n0", "src/f0.ts"],
+      ["n1", "src/f1.ts"],
+      ["n2", "src/f2.ts"],
+      ["n3", "src/f3.ts"],
+      ["n4", "src/f4.ts"],
+    ];
+    const links: Array<[string, string, string?]> = [
+      ["n0", "n1"], ["n1", "n2"], ["n2", "n3"], ["n3", "n4"],
+    ];
+    const graph = graphOf(nodes, links);
+    expect(connects(graph, "src/f0.ts", "src/f3.ts")).toBe(true); // 3 hops
+    expect(connects(graph, "src/f0.ts", "src/f4.ts")).toBe(false); // 4 hops
   });
 
-  it("ignores non-whitelisted relations", () => {
-    const graph = makeGraph(
-      [
-        { id: "a_mod", source_file: "a.ts" },
-        { id: "b_mod", source_file: "b.ts" },
-      ],
-      [
-        { source: "a_mod", target: "b_mod", relation: "references" },
-        { source: "a_mod", target: "b_mod", relation: "extends" },
-      ],
+  it("a chain broken by one wrong-way edge does NOT connect", () => {
+    // a → x, then b → x: the last edge points the wrong way, so no chain
+    // a…b exists in either direction, even though an undirected walk finds one.
+    const graph = graphOf(
+      [["a", "src/a.ts"], ["x", "src/x.ts"], ["b", "src/b.ts"], ["y", "src/y.ts"]],
+      [["a", "y", "imports"], ["y", "x", "imports"], ["b", "x", "imports"]],
     );
-    const loaded = loadCodeGraph(graph as any, "0.9.47")!;
-    const result = connects(loaded, "a.ts", "b.ts");
-    expect(result).toBe(false);
+    expect(connects(graph, "src/a.ts", "src/b.ts")).toBe(false);
   });
 
-  it("respects undirectional path (B→A connection works when A→B is drawn)", () => {
-    const graph = makeGraph(
-      [
-        { id: "a_fn", source_file: "a.ts" },
-        { id: "b_fn", source_file: "b.ts" },
-      ],
-      [{ source: "b_fn", target: "a_fn", relation: "calls" }],
+  it("a file's symbols count as the file", () => {
+    // The call leaves a symbol inside a.ts and lands on a symbol inside b.ts.
+    const graph = graphOf(
+      [["file_a", "src/a.ts"], ["fn_a", "src/a.ts"], ["fn_b", "src/b.ts"]],
+      [["fn_a", "fn_b", "calls"]],
     );
-    const loaded = loadCodeGraph(graph as any, "0.9.47")!;
-    const result = connects(loaded, "a.ts", "b.ts");
-    expect(result).toBe(true);
+    expect(connects(graph, "src/a.ts", "src/b.ts")).toBe(true);
   });
 
-  it("does not pass through a high-degree hub node (A→HUB←B pattern blocks A↔B)", () => {
-    // A imports HUB, B imports HUB, but no whitelisted path A↔B without going through HUB twice
-    const graph = makeGraph(
+  it("an endpoint the extractor never saw is silence", () => {
+    const graph = graphOf([["a", "src/a.ts"]], []);
+    expect(connects(graph, "src/a.ts", "src/unseen.ts")).toBe(false);
+    expect(connects(graph, "src/unseen.ts", "src/a.ts")).toBe(false);
+  });
+});
+
+describe("directory endpoints", () => {
+  const graph = () =>
+    graphOf(
       [
-        { id: "a_mod", source_file: "a.ts" },
-        { id: "hub_mod", source_file: "hub.ts" },
-        { id: "b_mod", source_file: "b.ts" },
+        ["inner", "src/engine/inner.ts"],
+        ["deep", "src/engine/sub/deep.ts"],
+        ["sibling", "src/eng/sibling.ts"],
+        ["b", "src/b.ts"],
       ],
-      [
-        { source: "a_mod", target: "hub_mod", relation: "imports" },
-        { source: "b_mod", target: "hub_mod", relation: "imports" },
-      ],
+      [["inner", "b", "imports"], ["sibling", "b", "imports"]],
     );
-    const loaded = loadCodeGraph(graph as any, "0.9.47")!;
-    const result = connects(loaded, "a.ts", "b.ts");
-    expect(result).toBe(false);
+
+  it("a directory stands for everything under it", () => {
+    expect(connects(graph(), "src/engine", "src/b.ts")).toBe(true);
+    expect(connects(graph(), "src/engine/", "src/b.ts")).toBe(true);
   });
 
-  it("allows a legitimate 2-hop chain even with a hub present", () => {
-    // A calls helper in B, B imports HUB, C imports HUB
-    // A→B is legitimate even though the network has a hub
-    const graph = makeGraph(
-      [
-        { id: "a_mod", source_file: "a.ts" },
-        { id: "b_helper", source_file: "b.ts" },
-        { id: "hub_mod", source_file: "hub.ts" },
-        { id: "c_mod", source_file: "c.ts" },
-      ],
-      [
-        { source: "a_mod", target: "b_helper", relation: "calls" },
-        { source: "b_helper", target: "hub_mod", relation: "imports" },
-        { source: "c_mod", target: "hub_mod", relation: "imports" },
-      ],
+  it("a directory never matches a sibling sharing its prefix", () => {
+    // src/eng/sibling.ts connects to b; src/engineX must not borrow that.
+    const g = graphOf(
+      [["sibling", "src/eng/sibling.ts"], ["b", "src/b.ts"]],
+      [["sibling", "b", "imports"]],
     );
-    const loaded = loadCodeGraph(graph as any, "0.9.47")!;
-    const result = connects(loaded, "a.ts", "b.ts");
-    expect(result).toBe(true);
+    expect(connects(g, "src/eng", "src/b.ts")).toBe(true);
+    expect(connects(g, "src/en", "src/b.ts")).toBe(false);
+  });
+});
+
+describe("staleness of a ref", () => {
+  it("a file is stale when it is in the modified set", () => {
+    expect(refIsStale("src/a.ts", new Set(["src/a.ts"]))).toBe(true);
+    expect(refIsStale("src/a.ts", new Set(["src/b.ts"]))).toBe(false);
   });
 
-  it("expands file endpoints through contains edges to include symbols", () => {
-    // file_a contains symbol_a, symbol_a calls symbol_b, file_b contains symbol_b
-    const graph = makeGraph(
-      [
-        { id: "file_a", source_file: "a.ts" },
-        { id: "symbol_a", source_file: "a.ts" },
-        { id: "symbol_b", source_file: "b.ts" },
-        { id: "file_b", source_file: "b.ts" },
-      ],
-      [
-        { source: "file_a", target: "symbol_a", relation: "contains" },
-        { source: "symbol_a", target: "symbol_b", relation: "calls" },
-        { source: "file_b", target: "symbol_b", relation: "contains" },
-      ],
-    );
-    const loaded = loadCodeGraph(graph as any, "0.9.47")!;
-    const result = connects(loaded, "a.ts", "b.ts");
-    expect(result).toBe(true);
-  });
-
-  it("expands directory endpoints to match files under the directory", () => {
-    const graph = makeGraph(
-      [
-        { id: "a_fn", source_file: "a.ts" },
-        { id: "b_fn", source_file: "src/engine/b.ts" },
-      ],
-      [{ source: "a_fn", target: "b_fn", relation: "calls" }],
-    );
-    const loaded = loadCodeGraph(graph as any, "0.9.47")!;
-    // Testing with exact directory match
-    const result = connects(loaded, "a.ts", "src/engine/");
-    expect(result).toBe(true);
-  });
-
-  it("does not match directory endpoints to sibling paths with shared prefix", () => {
-    const graph = makeGraph(
-      [
-        { id: "a_fn", source_file: "src/engine/a.ts" },
-        { id: "b_fn", source_file: "src/eng/b.ts" },
-      ],
-      [], // No edge between them
-    );
-    const loaded = loadCodeGraph(graph as any, "0.9.47")!;
-    // src/eng/ should not match src/engine/ — they're separate directories
-    const result = connects(loaded, "src/engine/", "src/eng/");
-    expect(result).toBe(false);
-  });
-
-  it("respects 3-hop limit (4+ hops return false)", () => {
-    // A→B→C→D→E is 4 hops, exceeds limit
-    const graph = makeGraph(
-      [
-        { id: "a", source_file: "a.ts" },
-        { id: "b", source_file: "b.ts" },
-        { id: "c", source_file: "c.ts" },
-        { id: "d", source_file: "d.ts" },
-        { id: "e", source_file: "e.ts" },
-      ],
-      [
-        { source: "a", target: "b", relation: "calls" },
-        { source: "b", target: "c", relation: "calls" },
-        { source: "c", target: "d", relation: "calls" },
-        { source: "d", target: "e", relation: "calls" },
-      ],
-    );
-    const loaded = loadCodeGraph(graph as any, "0.9.47")!;
-    const result = connects(loaded, "a.ts", "e.ts");
-    expect(result).toBe(false);
+  it("a directory is stale as soon as anything under it is", () => {
+    expect(refIsStale("src/engine", new Set(["src/engine/deep/x.ts"]))).toBe(true);
+    expect(refIsStale("src/engine", new Set(["src/eng/x.ts"]))).toBe(false);
+    expect(refIsStale("src/eng", new Set(["src/engine/x.ts"]))).toBe(false);
   });
 });
