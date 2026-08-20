@@ -44,6 +44,15 @@ describe("the status chip's tally", () => {
     ]);
   });
 
+  it("includes stray arrows when present", () => {
+    const report = reportWith({
+      strayArrows: 2,
+    });
+    expect(tallyOf(report)).toEqual([
+      { text: "2 stray arrows", tone: "dim" },
+    ]);
+  });
+
   it("is empty when there is nothing to say", () => {
     expect(tallyOf(reportWith({ checked: 5 }))).toEqual([]);
   });
@@ -68,6 +77,24 @@ describe("the panel's rows", () => {
     expect(rows[2].text).toBe("A → B");
     expect(rows[3].text).toBe("Landed is built now");
     expect(rows[4].text).toBe("Next not built yet");
+  });
+
+  it("includes deleted edges when present", () => {
+    const rows = rowsOf(
+      reportWith({
+        deletedEdges: [
+          { fromLabel: "Module A", toLabel: "Module B" },
+        ],
+      }),
+    );
+    expect(rows).toHaveLength(1);
+    expect(rows[0].text).toBe("arrow Module A → Module B deleted — the code still connects them");
+    expect(rows[0].tone).toBe("dim");
+  });
+
+  it("omits deleted edges when absent", () => {
+    const rows = rowsOf(reportWith({}));
+    expect(rows.every((r) => !r.text.includes("deleted"))).toBe(true);
   });
 
   it("colours the dot by the worst news present", () => {
