@@ -96,7 +96,7 @@ export function rowsOf(report: DriftView): StatusRow[] {
     })),
     // Deleted edges: quiet notes about arrows that were removed but the code still supports
     ...(report.deletedEdges ?? []).map((finding) => ({
-      text: `${name(finding.fromLabel, finding.fromLabel)} → ${name(finding.toLabel, finding.toLabel)} deleted`,
+      text: `arrow ${name(finding.fromLabel, finding.fromLabel)} → ${name(finding.toLabel, finding.toLabel)} deleted — the code still connects them`,
       tone: "dim" as Tone,
     })),
     ...report.promotions.map((promotion) => ({

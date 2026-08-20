@@ -549,7 +549,15 @@ for (const file of checking) {
   if (report.unrepresented.length > 0) suggested.push({ file, report });
   if (report.unannotated.length > 0) unannotated.push({ file, report });
 
-  if (report.clean && report.promotions.length === 0 && report.workItems.length === 0) continue;
+  // A deleted arrow the code still supports is one-time news: the note lasts
+  // until the deletion is committed, then the baseline agrees and it goes away.
+  // It keeps the board on the list without ever touching the exit code.
+  if (
+    report.clean
+    && report.promotions.length === 0
+    && report.workItems.length === 0
+    && (report.deletedEdges?.length ?? 0) === 0
+  ) continue;
 
   stale.push({ file, report, promoted });
 }
@@ -569,7 +577,10 @@ for (const file of checking) {
  * the difference between being quiet and withholding.
  */
 const worthANotice = stale.filter(
-  ({ report }) => !report.clean || report.promotions.length > 0,
+  ({ report }) =>
+    !report.clean
+    || report.promotions.length > 0
+    || (report.deletedEdges?.length ?? 0) > 0,
 );
 const showing = expanded ? stale : worthANotice;
 

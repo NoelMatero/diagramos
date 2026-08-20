@@ -88,7 +88,7 @@ describe("the panel's rows", () => {
       }),
     );
     expect(rows).toHaveLength(1);
-    expect(rows[0].text).toContain("deleted");
+    expect(rows[0].text).toBe("arrow Module A → Module B deleted — the code still connects them");
     expect(rows[0].tone).toBe("dim");
   });
 

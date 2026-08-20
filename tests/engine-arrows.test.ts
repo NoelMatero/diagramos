@@ -494,13 +494,7 @@ describe("dangling arrows — arrows that fail to resolve at one or both ends", 
     expect(report.clean).toBe(true);
   });
 
-  it("includes strayArrows count when present", async () => {
-    // The strayArrows count comes from graph.strayArrows which is computed
-    // in readGraph when arrows fail to resolve at one or both ends.
-    // This test verifies the count flows through the report correctly.
-    // Note: Creating actual unresolved arrows requires hand-drawn arrows on
-    // the Excalidraw canvas that don't bind or match proximity, which is
-    // difficult to construct in tests. The count is verified to exist when > 0.
+  it("counts an arrow bound at neither end, floating in empty space", async () => {
     const board = await boardWith(
       [
         { id: "a", label: "A", ref: "src/a.ts" },
@@ -508,12 +502,56 @@ describe("dangling arrows — arrows that fail to resolve at one or both ends", 
       ],
       [{ from: "a", to: "b" }],
     );
+    // A hand-drawn stroke: no bindings, no recorded edge, endpoints far from
+    // every box, so neither binding nor proximity can resolve it.
+    board.elements.push({
+      id: "stray-floating",
+      type: "arrow",
+      x: 90_000,
+      y: 90_000,
+      width: 120,
+      height: 0,
+      points: [[0, 0], [120, 0]],
+      startBinding: null,
+      endBinding: null,
+    });
 
     const report = checkDrift(board, fakeWorkspace(files), { edges: true });
 
-    // Properly created edges should not have stray arrows
-    // (strayArrows would only be non-zero with hand-drawn arrows
-    // that don't resolve to any box)
-    expect("strayArrows" in report).toBe(false);
+    expect(report.strayArrows).toBe(1);
+    // An incomplete stroke is never a finding and never dirties the board.
+    expect(report.clean).toBe(true);
+    expect(report.findings).toHaveLength(0);
+  });
+
+  it("counts an arrow that resolves at one end only", async () => {
+    const board = await boardWith(
+      [
+        { id: "a", label: "A", ref: "src/a.ts" },
+        { id: "b", label: "B", ref: "src/b.ts" },
+      ],
+      [{ from: "a", to: "b" }],
+    );
+    // Start the stroke on top of box A (proximity resolves that end), and
+    // leave the other end in empty space: still an incomplete stroke.
+    const boxA = board.elements.find(
+      (element) => element.type === "rectangle",
+    )!;
+    board.elements.push({
+      id: "stray-one-end",
+      type: "arrow",
+      x: Number(boxA.x),
+      y: Number(boxA.y),
+      width: 90_000,
+      height: 90_000,
+      points: [[0, 0], [90_000, 90_000]],
+      startBinding: null,
+      endBinding: null,
+    });
+
+    const report = checkDrift(board, fakeWorkspace(files), { edges: true });
+
+    expect(report.strayArrows).toBe(1);
+    expect(report.clean).toBe(true);
   });
 });
