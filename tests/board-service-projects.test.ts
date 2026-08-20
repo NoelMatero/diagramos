@@ -18,9 +18,10 @@ import fs from "node:fs/promises";
 import { createServer } from "node:net";
 import os from "node:os";
 import path from "node:path";
-import { afterEach, beforeEach, describe, expect, it } from "vitest";
+import { afterEach, beforeAll, beforeEach, describe, expect, it } from "vitest";
 
 import { emptyBoard, serializeBoard } from "../src/engine/board-file";
+import { assertFreshCliBundle } from "./helpers/fresh-bundle";
 import { DEFAULT_BOARD_PORT, probeBoard, startBoardServer } from "../src/server/board-server";
 import { listServers, stopServer } from "../src/server/server-registry";
 
@@ -87,6 +88,9 @@ function run(cwd: string, args: string[]): Promise<{ code: number; stdout: strin
     child.on("close", (code) => resolve({ code: code ?? 0, stdout, stderr }));
   });
 }
+
+// A stale bundle fails as a wall of timeouts; refuse it in milliseconds (#77).
+beforeAll(() => assertFreshCliBundle());
 
 beforeEach(async () => {
   home = await fs.mkdtemp(path.join(os.tmpdir(), "board-projects-"));
