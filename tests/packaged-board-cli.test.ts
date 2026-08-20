@@ -12,7 +12,7 @@
  * No graceful skip when the bundle is absent: `npm install` builds it through
  * `prepare`, so a missing bundle is a real regression, not a reason to pass.
  */
-import { existsSync, mkdirSync, mkdtempSync, readFileSync, realpathSync, rmSync, writeFileSync } from "node:fs";
+import { mkdirSync, mkdtempSync, readFileSync, realpathSync, rmSync, writeFileSync } from "node:fs";
 import { spawn } from "node:child_process";
 import { createServer as createHttpServer } from "node:http";
 import { createServer } from "node:net";
@@ -22,6 +22,7 @@ import { afterAll, beforeAll, describe, expect, it } from "vitest";
 
 import { emptyBoard, serializeBoard } from "../src/engine/board-file";
 import { listServers, stopServer } from "../src/server/server-registry";
+import { assertFreshCliBundle } from "./helpers/fresh-bundle";
 
 const REPO = path.resolve(__dirname, "..");
 const BUNDLE = path.join(REPO, "out/cli/diagramos.mjs");
@@ -101,7 +102,9 @@ function runToExit(
 }
 
 beforeAll(() => {
-  if (!existsSync(BUNDLE)) throw new Error(`${BUNDLE} is not built. Run \`npm run build:cli\`.`);
+  // Missing *or stale*: a bundle behind the sources fails as a wall of
+  // timeouts, which reads as broken code rather than as a build to run (#77).
+  assertFreshCliBundle();
   // A consumer's project, not this repo: the bin has to find boards by the
   // standard directory alone, with no package.json and no scripts to lean on.
   workspace = mkdtempSync(path.join(os.tmpdir(), "board-cli-"));

@@ -20,7 +20,7 @@ import fs from "node:fs/promises";
 import { createServer } from "node:net";
 import os from "node:os";
 import path from "node:path";
-import { afterEach, beforeEach, describe, expect, it } from "vitest";
+import { afterEach, beforeAll, beforeEach, describe, expect, it } from "vitest";
 
 import { emptyBoard, serializeBoard } from "../src/engine/board-file";
 import { probeBoard, startBoardServer } from "../src/server/board-server";
@@ -32,9 +32,13 @@ import {
   stopServer,
   type RegisteredServer,
 } from "../src/server/server-registry";
+import { assertFreshCliBundle } from "./helpers/fresh-bundle";
 
 const REPO = path.resolve(__dirname, "..");
 const BUNDLE = path.join(REPO, "out/cli/diagramos.mjs");
+
+// A stale bundle fails as a wall of timeouts; refuse it in milliseconds (#77).
+beforeAll(() => assertFreshCliBundle());
 
 let workspace: string;
 let stateDir: string;
