@@ -420,7 +420,8 @@ server.registerTool(
         ...(claimed
           ? {
               claims: `${claimed} ${claimed === 1 ? "arrow claims" : "arrows claim"} needs`
-                + ", shown on the board as @needs. Nothing judges it yet.",
+                + ", shown on the board as @needs. Each one is now checked for"
+                + " direction: an arrow drawn against the dependency is reported as backwards.",
             }
           : {}),
         elements: result.elementCount,
@@ -835,7 +836,8 @@ server.registerTool(
         ...(claimed
           ? {
               claims: `${claimed} ${claimed === 1 ? "arrow claims" : "arrows claim"} needs`
-                + ", shown on the board as @needs. Nothing judges it yet.",
+                + ", shown on the board as @needs. Each one is now checked for"
+                + " direction: an arrow drawn against the dependency is reported as backwards.",
             }
           : {}),
       });

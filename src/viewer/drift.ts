@@ -20,7 +20,11 @@ export type Tone = "bad" | "warn" | "good" | "dim";
 export interface DriftView {
   clean: boolean;
   findings: Array<{ node: string; label: string; ref: string; kind: string }>;
-  edges: Array<{ from: string; to: string; fromLabel: string; toLabel: string; node: string }>;
+  edges: Array<{
+    from: string; to: string; fromLabel: string; toLabel: string; node: string;
+    /** `backwards-edge` is the only value this page treats differently. */
+    kind: string;
+  }>;
   deleted: Array<{ node: string; label: string; ref: string }>;
   deletedEdges?: Array<{ fromLabel: string; toLabel: string }>;
   /** Claim words the vocabulary does not have. Optional: older payloads have none. */
@@ -62,9 +66,24 @@ export function tallyOf(report: DriftView): TallyPart[] {
   if (report.garbledClaims?.length) {
     parts.push({ text: `${report.garbledClaims.length} unreadable`, tone: "bad" });
   }
-  if (report.edges.length) {
+  /*
+   * Backwards arrows counted apart, and first.
+   *
+   * "3 arrows" in amber reads as three things to look into. One of them being
+   * definitely wrong is different news, and rolling it into the amber total is
+   * how a red finding gets read as a maybe.
+   */
+  const backwards = report.edges.filter((finding) => finding.kind === "backwards-edge").length;
+  const unsupported = report.edges.length - backwards;
+  if (backwards) {
     parts.push({
-      text: `${report.edges.length} ${report.edges.length === 1 ? "arrow" : "arrows"}`,
+      text: `${backwards} ${backwards === 1 ? "arrow" : "arrows"} backwards`,
+      tone: "bad",
+    });
+  }
+  if (unsupported) {
+    parts.push({
+      text: `${unsupported} ${unsupported === 1 ? "arrow" : "arrows"}`,
       tone: "warn",
     });
   }
@@ -100,8 +119,15 @@ export function rowsOf(report: DriftView): StatusRow[] {
       node: finding.node,
     })),
     ...report.edges.map((finding) => ({
-      text: `${name(finding.fromLabel, finding.from)} → ${name(finding.toLabel, finding.to)}`,
-      tone: "warn" as Tone,
+      /*
+       * Amber on this board means "we could not corroborate this, have a look".
+       * A backwards arrow is not that -- it is the diagram being wrong, with the
+       * line of code that proves it -- and painting the two the same colour on
+       * the live view buries the only arrow verdict worth acting on at once.
+       */
+      text: `${name(finding.fromLabel, finding.from)} → ${name(finding.toLabel, finding.to)}`
+        + (finding.kind === "backwards-edge" ? " · drawn backwards" : ""),
+      tone: (finding.kind === "backwards-edge" ? "bad" : "warn") as Tone,
       // The finding's own from/to are file paths (the evidence); `node` is the
       // arrow in node ids, which is what the canvas can reveal.
       node: finding.node,

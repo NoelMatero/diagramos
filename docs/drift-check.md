@@ -462,11 +462,46 @@ declaration — an `import`, a `require`, an `#include`. It deliberately does no
 mean "calls", "sends data to", or "depends on conceptually". That narrowness is
 the whole point: a direction has an opposite, and an opposite is falsifiable.
 
-**Nothing judges it yet.** A board whose arrows claim `needs` produces the same
-report, byte for byte, as the same board without them. The verdict needs a
-dependency reader we control and a per-language recall measurement to license it;
-both are in `docs/handoff/sharper-claims-design.md`, and both come after this.
-What exists now is the slot and its visibility.
+### A backwards arrow is the one thing on a board that can be wrong
+
+This is the only verdict in the tool that refutes rather than confirms, and it
+exists because `needs` has a direction. Draw `A → B` with `needs`, and if the
+dependency runs from B to A **and only from B to A**, the arrow is not
+unconfirmed — it is wrong, and the report says so in red, names the file and
+line, and fails the build.
+
+Four gates, all required:
+
+| gate | why |
+| --- | --- |
+| the arrow carries `needs` | an unclaimed arrow means "related somehow", which has no opposite |
+| its state is `built` | sketching a dependency that currently runs the other way is a thing people do on purpose |
+| the language is licensed | `licence.ts`, measured against the compiler over 12,824 edges |
+| neither end is dynamic or half-read | a file that reaches out at runtime, or that we could not parse to the end, cannot support *absence* |
+
+And one more that is not a gate but a rule: **if the dependency exists both ways,
+say nothing.** Cycles are legal in TypeScript, and in a cycle neither arrow is
+more correct than the other. The rule is not "ties do not happen" — this
+repository has no cycles today, and that is luck rather than law.
+
+Everything that is not `backwards` falls straight through to the checks it always
+went through. A confirmed `needs` gets confirmed again a moment later by the
+ordinary channels; an absent one goes amber exactly as it did before claims
+existed. The only new row in the table is the wrong one, and every real board in
+this repository produces a byte-identical report to the one it produced before
+this landed.
+
+**A claim written this turn gets its own sentence.** The next turn's check is the
+first one to see a `needs` an agent wrote a moment ago, and a bare "this is
+wrong" then reads as the tool telling somebody off for something the tool itself
+wrote. So when the committed board did not carry the claim and the working one
+does, the message opens with *a claim written this turn is already wrong*.
+
+**What was not checked is said out loud.** A claim that passed and a claim that
+was never checked look identical in a clean report, and only one of them means
+the diagram is being held to anything. So `--details` names the withheld ones by
+reason: in a cycle, in a language with no measured reader, with an end that
+reaches out at runtime, with an end that could not be parsed to the end.
 
 **Where it lives.** `customData.edge.claim` is authoritative, and the word is
 written onto the arrow's label as `@needs` — the same form a human can type onto

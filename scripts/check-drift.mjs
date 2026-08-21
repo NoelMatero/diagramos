@@ -180,6 +180,23 @@ const EDGE_REASON = "nothing in the code connects them: no import either way, "
   + "no third file importing both, no shared route string";
 
 /**
+ * Why a `needs` arrow got no direction verdict.
+ *
+ * Phrased as what is missing rather than as a code, because every one of these
+ * is a reason the tool declined to accuse somebody and the reader is entitled to
+ * know which. `cycle` is the odd one out: nothing is missing there, the question
+ * simply has no answer.
+ */
+const NEEDS_WITHHELD = {
+  unlicensed: "in a language with no measured reader",
+  unreadable: "with an end that could not be read",
+  incomplete: "with an end that could not be parsed to the end",
+  dynamic: "with an end that reaches out at runtime",
+  "same-file": "pointing at their own file",
+  cycle: "in a cycle, where neither direction is more correct",
+};
+
+/**
  * The short row's version of a broken route.
  *
  * Two sentences the engine can produce, and they are not the same news: one
@@ -252,11 +269,20 @@ function rowsFor({ report, promoted = [] }, colour, all = false) {
       // thing this shape offers over a plain unsupported arrow. Printing just
       // the endpoints would throw it away.
       const hop = finding.kind === "broken-chain" ? brokenHop(finding.detail) : undefined;
+      /*
+       * The one arrow row that is red, and the only one that says which way to
+       * fix it. Every other yellow row here means "worth a look"; this one means
+       * the arrow is pointing the wrong way, and it is worth looking different so
+       * nobody spends time re-checking a connection that is simply reversed.
+       */
+      const backwards = finding.kind === "backwards-edge";
       return paint(
         `${boxName({ label: finding.fromLabel, node: finding.from })}`
-        + ` \u2192 ${boxName({ label: finding.toLabel, node: finding.to })}`
+        + ` ${backwards ? "\u2192 (should be \u2190)" : "\u2192"} `
+        + `${boxName({ label: finding.toLabel, node: finding.to })}`
+        + (backwards ? " \u00b7 drawn backwards" : "")
         + (hop ? ` \u00b7 ${hop}` : ""),
-        "yellow",
+        backwards ? "red" : "yellow",
         colour,
       );
     }),
@@ -795,17 +821,35 @@ function renderCoverageAudit(entries, colour) {
       if (weak) {
         rows.push(paint(`${weak} declared/used claims read as plain mentions: ${assertionWords(report.assertions)}`, "yellow", colour));
       }
-      // Said here and nowhere else. A claim changes no verdict today, so the
-      // notice must not grow a line for it -- a board with claims and the same
-      // board without check identically, which is the promise. But "read and
-      // judged by nothing" is exactly what this view exists to admit to.
+      /*
+       * What became of the claims, in the one view that exists to admit to gaps.
+       *
+       * A `needs` arrow can now be called wrong, which makes the difference
+       * between "checked and fine" and "never checked" worth real money -- they
+       * look identical in a clean report, and only one of them means the diagram
+       * is being held to anything. So the withheld ones are named by reason.
+       */
       const needs = report.claims?.needs ?? 0;
       if (needs > 0) {
-        rows.push(paint(
-          `${needs} ${needs === 1 ? "arrow claims" : "arrows claim"} needs \u00b7 recorded, not checked yet`,
-          "dim",
-          colour,
-        ));
+        const checked = report.claims?.needsChecked ?? 0;
+        if (checked > 0) {
+          rows.push(paint(
+            `${checked} needs ${checked === 1 ? "arrow" : "arrows"} checked for direction`,
+            "dim",
+            colour,
+          ));
+        }
+        const withheld = report.claims?.needsWithheld ?? {};
+        const reasons = Object.entries(withheld).filter(([, count]) => count > 0);
+        const total = reasons.reduce((sum, [, count]) => sum + count, 0);
+        if (total > 0) {
+          rows.push(paint(
+            `${total} needs ${total === 1 ? "arrow" : "arrows"} not checked: `
+            + reasons.map(([why, count]) => `${count} ${NEEDS_WITHHELD[why] ?? why}`).join(", "),
+            "yellow",
+            colour,
+          ));
+        }
       }
       if (rows.length === 0) rows.push(paint("everything on this board was checked", "dim", colour));
       return {
