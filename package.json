@@ -41,6 +41,7 @@
     "typecheck": "tsc --noEmit",
     "check:drift": "tsx scripts/check-drift.mjs",
     "measure:deps": "tsx scripts/measure-deps.mts",
+    "measure:licence": "tsx scripts/measure-licence.mts",
     "pretest": "npm run build:cli",
     "test": "vitest run",
     "test:watch": "vitest",

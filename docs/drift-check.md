@@ -548,9 +548,9 @@ therefore an arrow we called backwards.
 ### What it measures on this repo
 
 `npm run measure:deps` runs both channels over the tree and prints the
-difference. When this was written, over 99 files:
+difference. When this was written, over 103 files:
 
-- **229 dependency edges** from the regex channel, **228** from the reader.
+- **240 dependency edges** from the regex channel, **239** from the reader.
 - **One** edge only the regex found:
   `path.join(import.meta.dirname, "../docs/diagrams/board-internals.excalidraw")`,
   which reads to a pattern as an import of a diagram and to a grammar as an
@@ -559,12 +559,108 @@ difference. When this was written, over 99 files:
 - **One file cannot be read to the end**: `font.ts`, which builds a cache key
   with a literal NUL byte. Recovery is local, so its dependencies are still
   found — it just cannot support a claim that something is *absent*.
-- **9 of 99 files escape statically.** Flagged per file, never per repo, so one
+- **9 of 103 files escape statically.** Flagged per file, never per repo, so one
   dynamic corner does not cost a whole codebase its verdicts.
 
 Finding all of that also fixed a disagreement inside the engine: `languageOf`
 did not recognise `.mts` or `.cts` while `drift.ts` already counted them as
 TypeScript, so five of this repo's own script files parsed as nothing at all.
+
+## The licence: earning the right to say "wrong"
+
+A "wrong" verdict is an accusation. It says the arrow points one way and the
+code points the other, and it rests on two claims at once: the dependency exists
+in the direction the code has it, and it does *not* exist in the direction the
+board drew. Both kinds of reader error turn into a false accusation. An edge
+invented makes the tool accuse on evidence that was never there. An edge missed
+makes it accuse because it mistook its own blindness for an absence. Neither is
+recoverable once somebody has stopped believing the tool.
+
+So no language gets to say "wrong" until the misses have been counted, and the
+count lives in `src/engine/licence.ts` where it can be argued with.
+
+### The referee is not us
+
+The two channels agreeing was never the evidence it looked like. `deps.ts` finds
+specifiers with a grammar and the regex channel finds them with a pattern, but
+**both hand what they find to `resolve.ts`** to turn into a file. Their agreement
+says nothing at all about the step they share — and that shared step is where the
+tsconfig and package.json nicknames live, which is the part most likely to be
+wrong and the part this repository, declaring none of its own, could never
+exercise.
+
+The referee is the TypeScript compiler: `ts.createSourceFile` for the
+specifiers, `ts.resolveModuleName` for the files. Not our parse, not our
+resolver, not our idea of what an import is. Disagreeing with it is our bug by
+definition.
+
+`scripts/lib/licence.ts` runs both over the same tree.
+`npm run measure:licence` reproduces the number; `--check` fails if it has
+moved.
+
+### What it cost, and what it bought
+
+The first run found **121 dependencies the compiler saw and the reader did
+not** — none of them visible from inside this repository. Each one turned into a
+rule:
+
+| what was missing | found in |
+| --- | --- |
+| a type-only module: `./utils` where the only file is `utils.d.ts` | vue, excalidraw, vite |
+| package.json `imports`: `#dep-types/connect` | vite, 77 edges by itself |
+| conditional targets — taking the first branch offered instead of the one every reader shares | vite |
+| a `#` nickname declared in tsconfig `paths` rather than package.json | vite |
+| a directory whose own package.json names an entry other than `index` | vite |
+| a package importing itself by its published name | vite, TanStack |
+| a specifier in backticks with nothing interpolated into it | vite |
+| `.cjs` meaning `.cts`, where `.js` and `.mjs` were already handled | vite |
+
+Two of those were bugs introduced *while* fixing the others, and the referee
+caught both in the same run: reserving `#` for Node lost a tsconfig alias, and
+self-reference without an `exports` field asserted an edge Node itself refuses.
+
+### The number
+
+Measured 2026-08-21 over five repositories at pinned commits — vue, vite,
+TanStack Query, Excalidraw and NestJS, chosen because all five declare nicknames
+and this repository does not:
+
+| | |
+| --- | --- |
+| files | 5,759 |
+| dependency edges | 12,824 |
+| missed — the compiler saw it, the reader did not | **2** |
+| invented — the reader saw it, the compiler did not | **1** |
+| recall | **99.984%** |
+| precision | **99.992%** |
+
+The three that remain are named in the licence rather than rounded away:
+
+- A package importing itself through a condition only its own build defines.
+  TanStack Query routes `.` to `src/index.ts` via a custom tsconfig condition;
+  every condition a reader can know about points at build output that is not in
+  a fresh clone.
+- `./x.js` where both `x.js` and `x.ts` exist. The compiler takes the TypeScript
+  file, the reader takes the one actually named, and there is no third answer in
+  the text. One vite fixture does this, and it is both the miss and the
+  invention.
+
+This repository is deliberately **not** in the corpus: its file count moves with
+every commit, so a pinned row would be wrong by the next one. It is measured
+continuously instead — `tests/engine-licence.test.ts` runs the same harness over
+the working tree and fails on any disagreement at all, which is stricter than a
+number in a table and runs in CI where the corpus cannot.
+
+### What is not licensed
+
+Everything else. The licence names extensions, and a file whose extension no
+licence covers is a file no verdict may be built on — the same silence an
+unsupported language already gets everywhere else in the engine. Graphify's
+per-language extractors sit at visibly different maturities and publish no
+recall figure anywhere, so the number above is a *TypeScript* number and
+transfers to nothing.
+
+Nothing consults the licence yet. The verdict that will is a separate change.
 
 ## Two jobs, deliberately separate
 
@@ -621,6 +717,13 @@ whether anyone leaves the check switched on.
   Read-only; never edits the board.
 - `scripts/check-drift.mjs <board>` — same logic, CLI, non-zero exit when drift
   is found. This is what hooks and CI call.
+- `npm run measure:deps` — both dependency channels over this tree, and the
+  difference between them.
+- `npm run measure:licence` — the reader against the TypeScript compiler over
+  the pinned corpus, cloning what is missing into `.corpus/`. `--check` exits
+  non-zero if the committed number has moved; a path argument measures one tree
+  of your own instead. Needs the network, which is why it is a command rather
+  than a test.
 
 Sharing one implementation in `src/engine/drift.ts` keeps the tool and the
 script from disagreeing.

@@ -24,3 +24,7 @@ docs/handoff/
 # Code graph output: precomputed by graphify, not committed.
 # (sidecar metadata is also here; freshness is checked at check time)
 graphify-out/
+
+# Corpus clones for `npm run measure:licence`. A licence records the commit it
+# was measured at, not a copy of somebody else's repository.
+/.corpus/
