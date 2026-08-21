@@ -264,6 +264,53 @@ describe("board MCP server", () => {
   }, 120_000);
 
   /**
+   * The claim slot, over the wire.
+   *
+   * The engine tests cover what a claim is; this covers whether an agent can
+   * actually write one and read it back, which is the part that breaks when a
+   * schema field is added in one place and forgotten in another.
+   */
+  it("carries an arrow claim through the tools and shows it on the board", async () => {
+    const board = "docs/diagrams/claimed.excalidraw";
+    const wrote = jsonOf(await call("create_diagram", {
+      path: board,
+      nodes: [{ id: "a", label: "A" }, { id: "b", label: "B" }],
+      edges: [{ from: "a", to: "b", claim: "needs" }],
+    }));
+    // Named the turn it is written.
+    expect(String(wrote.claims)).toContain("needs");
+
+    const read = jsonOf(await call("read_diagram", { path: board }));
+    expect((read.edges as Array<{ claim?: string }>)[0].claim).toBe("needs");
+
+    // And visible: the word is on the canvas, not only in the metadata.
+    const parsed = JSON.parse(await readFile(path.join(workspace, board), "utf8"));
+    const texts = parsed.elements
+      .filter((element: { isDeleted?: boolean; type: string }) => !element.isDeleted && element.type === "text")
+      .map((element: { text: string }) => element.text);
+    expect(texts).toContain("@needs");
+  }, 120_000);
+
+  it("refuses a claim word that is not in the vocabulary", async () => {
+    const board = "docs/diagrams/bad-claim.excalidraw";
+    // Through the schema there is nothing to argue about: the enum rejects it.
+    await expect(call("create_diagram", {
+      path: board,
+      nodes: [{ id: "a", label: "A" }, { id: "b", label: "B" }],
+      edges: [{ from: "a", to: "b", claim: "depends" }],
+    })).rejects.toThrow();
+
+    // Typed into a label instead, it is caught the turn it is written rather
+    // than at the end of the turn by the hook.
+    const wrote = jsonOf(await call("create_diagram", {
+      path: board,
+      nodes: [{ id: "a", label: "A" }, { id: "b", label: "B" }],
+      edges: [{ from: "a", to: "b", label: "@need" }],
+    }));
+    expect(JSON.stringify(wrote.garbledClaims)).toContain("@needs");
+  }, 120_000);
+
+  /**
    * Without this tool the only way to drop a diagram was to regenerate the
    * board from a graph you still had to hand, or to enumerate element ids into
    * edit_diagram. Both are workarounds standing in for a missing feature.

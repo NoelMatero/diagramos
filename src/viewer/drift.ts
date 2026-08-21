@@ -23,6 +23,8 @@ export interface DriftView {
   edges: Array<{ from: string; to: string; fromLabel: string; toLabel: string; node: string }>;
   deleted: Array<{ node: string; label: string; ref: string }>;
   deletedEdges?: Array<{ fromLabel: string; toLabel: string }>;
+  /** Claim words the vocabulary does not have. Optional: older payloads have none. */
+  garbledClaims?: Array<{ on: string; label: string; written: string }>;
   workItems: Array<{ node: string; label: string; ref?: string }>;
   promotions: Array<{ node: string; label: string }>;
   checked: number;
@@ -57,6 +59,9 @@ export function tallyOf(report: DriftView): TallyPart[] {
   if (empty) parts.push({ text: `${empty} empty`, tone: "bad" });
   if (unused) parts.push({ text: `${unused} unused`, tone: "bad" });
   if (report.deleted.length) parts.push({ text: `${report.deleted.length} removed`, tone: "bad" });
+  if (report.garbledClaims?.length) {
+    parts.push({ text: `${report.garbledClaims.length} unreadable`, tone: "bad" });
+  }
   if (report.edges.length) {
     parts.push({
       text: `${report.edges.length} ${report.edges.length === 1 ? "arrow" : "arrows"}`,
@@ -77,6 +82,13 @@ export function tallyOf(report: DriftView): TallyPart[] {
 /** One row per finding, the CLI's long form, with a node id where one still exists. */
 export function rowsOf(report: DriftView): StatusRow[] {
   return [
+    // A word the check cannot read comes first: everything below it is the board
+    // and the code disagreeing, which is a smaller problem than a claim nothing
+    // can ever evaluate.
+    ...(report.garbledClaims ?? []).map((finding) => ({
+      text: `${finding.on === "arrow" ? "arrow " : ""}${name(finding.label, finding.label)} · @${finding.written} is not a claim`,
+      tone: "bad" as Tone,
+    })),
     // The element is gone from the board, so there is nothing to reveal.
     ...report.deleted.map((finding) => ({
       text: `${name(finding.label, finding.node)} removed · ${finding.ref} still there`,

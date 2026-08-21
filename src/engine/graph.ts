@@ -12,6 +12,7 @@
  * Inference is always reported as such. A caller deciding whether to trust a
  * label needs to know whether it was recorded or guessed.
  */
+import { parseArrowClaim, readLabelClaim, type ArrowClaim, type ParsedClaim } from "./claim";
 import type { ExcalidrawElement } from "./normalize";
 import type { BoardFile } from "./board-file";
 
@@ -91,6 +92,15 @@ export interface RecoveredNode {
   refs?: string[];
   /** Whether the node claims to exist yet. Defaults to `built`. */
   state: NodeState;
+  /**
+   * A claim written on this box that is not on the vocabulary -- which today is
+   * every claim, because no box claim is checked yet.
+   *
+   * Carried rather than dropped so it can be said out loud. A claim nothing
+   * judges is indistinguishable from a claim that passed, and silence here
+   * would be the engine agreeing with something it never read.
+   */
+  claimGarbled?: string;
 }
 
 /**
@@ -134,6 +144,16 @@ export interface RecoveredEdge {
    * say *which* hop rather than shrugging at the whole arrow.
    */
   via?: string[];
+  /**
+   * What kind of relationship this arrow asserts, when it says.
+   *
+   * `customData` is authoritative and the label is the human's way in, in that
+   * order. Absent on every arrow drawn before claims existed, and absence is
+   * not a claim: an arrow that says nothing is checked exactly as it always was.
+   */
+  claim?: ArrowClaim;
+  /** A claim word that is not on the whitelist, kept so the caller can be loud about it. */
+  claimGarbled?: string;
 }
 
 export interface RecoveredGraph {
@@ -213,6 +233,23 @@ function customOf(element: ExcalidrawElement): Record<string, unknown> {
   return custom && typeof custom === "object" ? (custom as Record<string, unknown>) : {};
 }
 
+/**
+ * A claim as it was written, whatever shape it was written in.
+ *
+ * A word (`"needs"`) and a set of flags (`{ closed: true }`) are both plausible
+ * things to find in a hand-edited board, and both should be reported by the name
+ * their author used rather than by the JSON around it.
+ */
+function claimWritten(value: unknown): string | undefined {
+  if (typeof value === "string") return value.trim() || undefined;
+  if (value && typeof value === "object") {
+    const record = value as Record<string, unknown>;
+    const set = Object.keys(record).filter((key) => record[key]);
+    if (set.length > 0) return set.join("+");
+  }
+  return undefined;
+}
+
 export function readGraph(board: BoardFile): RecoveredGraph {
   const elements = board.elements.filter(isLive);
   const byId = new Map(elements.map((element) => [element.id, element]));
@@ -257,6 +294,8 @@ export function readGraph(board: BoardFile): RecoveredGraph {
         .map((entry) => entry.trim())
       : undefined;
     const bounds = box(shape);
+    // Every box claim is garbled today: the vocabulary is empty on purpose.
+    const claimGarbled = claimWritten(custom.claim);
     nodes.push({
       id,
       label: labelByContainer.get(shape.id) ?? inferredLabelByShape.get(shape.id) ?? "",
@@ -270,6 +309,7 @@ export function readGraph(board: BoardFile): RecoveredGraph {
       ...(ref ? { ref } : {}),
       ...(refs?.length ? { refs } : {}),
       state: stateOf(custom.state),
+      ...(claimGarbled ? { claimGarbled } : {}),
     });
     nodeIdByElement.set(shape.id, id);
     consumed.add(shape.id);
@@ -296,7 +336,7 @@ export function readGraph(board: BoardFile): RecoveredGraph {
   let strayArrows = 0;
   for (const arrow of arrows) {
     const custom = customOf(arrow);
-    const recorded = custom.edge as { from?: string; to?: string } | undefined;
+    const recorded = custom.edge as { from?: string; to?: string; claim?: unknown } | undefined;
     const via = Array.isArray(custom.via)
       ? custom.via.filter((hop): hop is string => typeof hop === "string" && hop.trim() !== "")
         .map((hop) => hop.trim())
@@ -346,8 +386,20 @@ export function readGraph(board: BoardFile): RecoveredGraph {
       continue;
     }
 
-    let label = recordedEdgeLabel.get(arrow.id) ?? labelByContainer.get(arrow.id);
-    if (!label) {
+    // An exact label is one somebody put on *this* arrow: generated with the
+    // diagram, or typed onto the arrow in the app. Only those are read for a
+    // claim, and only those are shouted at for a bad one -- the fallback below
+    // guesses which arrow a loose piece of text belongs to, and being loud
+    // about a guess is how a legend two boxes away becomes an error.
+    const exactLabel = recordedEdgeLabel.get(arrow.id) ?? labelByContainer.get(arrow.id);
+    let label = exactLabel;
+    let labelClaim: ParsedClaim | undefined;
+    if (exactLabel) {
+      const read = readLabelClaim(exactLabel);
+      label = read.text;
+      labelClaim = read.parsed;
+    }
+    if (!exactLabel) {
       const ends = arrowEndpoints(arrow);
       if (ends) {
         const midpoint = { x: (ends.start.x + ends.end.x) / 2, y: (ends.start.y + ends.end.y) / 2 };
@@ -367,6 +419,18 @@ export function readGraph(board: BoardFile): RecoveredGraph {
       }
     }
 
+    // `customData` wins the value, and a garbled label is still reported: the
+    // two are different questions. One asks what this arrow claims, the other
+    // asks whether somebody typed a word that means nothing.
+    const written = recorded?.claim === undefined ? undefined : claimWritten(recorded.claim);
+    const declared = written === undefined ? undefined : parseArrowClaim(written);
+    const claim = declared && "claim" in declared
+      ? declared.claim
+      : labelClaim && "claim" in labelClaim ? labelClaim.claim : undefined;
+    const claimGarbled = declared && "garbled" in declared
+      ? declared.garbled
+      : labelClaim && "garbled" in labelClaim ? labelClaim.garbled : undefined;
+
     edges.push({
       from,
       to,
@@ -376,6 +440,10 @@ export function readGraph(board: BoardFile): RecoveredGraph {
       endpoints,
       state: stateOf(custom.state),
       ...(via?.length ? { via } : {}),
+      ...(claim ? { claim } : {}),
+      // `!== undefined` rather than truthy: a lone "@" is a word somebody meant
+      // to finish, and it says nothing, so it is reported and not swallowed.
+      ...(claimGarbled !== undefined ? { claimGarbled } : {}),
     });
   }
 
