@@ -503,6 +503,69 @@ Transcribing them is free; guessing them is what produces the 29%. A symbol
 declared in one file and called only from others takes `@declared` alone, and a
 file nobody read takes no suffix at all — the smaller claim, not the worse one.
 
+## Reading dependencies ourselves
+
+Confirming and refuting want opposite evidence, so they get different readers.
+
+**Confirming** wants breadth: any connection at all, found any way. That is the
+five channels in `drift.ts` plus the code graph, and it can afford to be
+generous, because being generous only ever produces silence.
+
+**Refuting** wants the tightest evidence there is: one dependency declaration,
+read out of the source text of a file we know we parsed completely, in a
+language somebody measured. It is the verdict that can cost trust, so it does
+not rest on anything we cannot measure end to end. `src/engine/deps.ts` is that
+reader. Nothing calls it yet.
+
+Per file it answers three things, and the second and third exist to stop the
+first being over-trusted:
+
+| answer | what it is for |
+| --- | --- |
+| dependencies | what the file declares, resolved to files in this repo |
+| complete | false when the parse recovered from an error, so nothing can be proved *absent* in it |
+| dynamic | the ways it reaches out at runtime, where no reader can follow |
+
+### Why not graphify's
+
+Graphify keeps confirming and is good at it. Its JS/TS pass reaches
+`import('x')` only through a regex rescue whose docstring says it has false
+positives in comments and strings, because its own walker never visits calls at
+module scope. That trade is right for breadth and fatal for refutation: a false
+positive there is a false accusation about somebody's diagram. This reader walks
+the whole tree, so a dynamic import at module scope is an ordinary node and
+there is nothing to rescue.
+
+The same argument runs the other way for one piece, and that piece was taken:
+**graphify's import resolution rules**, ported into `src/engine/resolve.ts` with
+attribution. `import { x } from "@/engine/foo"` is a nickname, and what `@/`
+stands for lives in a tsconfig that may be JSONC, may extend three others, and
+may set `baseUrl`. Our resolver read none of that, and this repository declares
+no nicknames — so the hole was invisible from inside our own tree and would only
+ever have surfaced in somebody else's, as a dependency we could not find and
+therefore an arrow we called backwards.
+
+### What it measures on this repo
+
+`npm run measure:deps` runs both channels over the tree and prints the
+difference. When this was written, over 99 files:
+
+- **229 dependency edges** from the regex channel, **228** from the reader.
+- **One** edge only the regex found:
+  `path.join(import.meta.dirname, "../docs/diagrams/board-internals.excalidraw")`,
+  which reads to a pattern as an import of a diagram and to a grammar as an
+  argument to a function.
+- **None** the other way. The reader never invents an edge the channel missed.
+- **One file cannot be read to the end**: `font.ts`, which builds a cache key
+  with a literal NUL byte. Recovery is local, so its dependencies are still
+  found — it just cannot support a claim that something is *absent*.
+- **9 of 99 files escape statically.** Flagged per file, never per repo, so one
+  dynamic corner does not cost a whole codebase its verdicts.
+
+Finding all of that also fixed a disagreement inside the engine: `languageOf`
+did not recognise `.mts` or `.cts` while `drift.ts` already counted them as
+TypeScript, so five of this repo's own script files parsed as nothing at all.
+
 ## Two jobs, deliberately separate
 
 | | Cost | Needs a model | When to run |

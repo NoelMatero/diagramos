@@ -47,7 +47,11 @@ export type Language = keyof typeof GRAMMARS;
 const BY_EXTENSION: Array<[RegExp, Language]> = [
   [/\.tsx$/, "tsx"],
   [/\.jsx$/, "tsx"],
-  [/\.ts$/, "ts"],
+  // `.mts` and `.cts` are TypeScript with a module system named in the
+  // extension, and were missing here while `drift.ts` already counted them as
+  // TypeScript for its import check -- so the engine disagreed with itself, and
+  // five of this repo's own script files parsed as nothing at all.
+  [/\.(ts|mts|cts)$/, "ts"],
   [/\.(js|mjs|cjs)$/, "js"],
   [/\.rs$/, "rust"],
   [/\.py$/, "python"],
@@ -89,6 +93,8 @@ export interface Node {
   childCount: number;
   /** True when the parse hit an error anywhere under this node. Recovery is local. */
   hasError: boolean;
+  /** Byte offset of the node's first character, for naming the line evidence sits on. */
+  startIndex: number;
   child(index: number): Node | null;
   childForFieldName(field: string): Node | null;
 }
