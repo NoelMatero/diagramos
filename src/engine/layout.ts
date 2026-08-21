@@ -10,6 +10,7 @@
 // and plain Node ESM will not guess the `.js`. tsx and vite resolve it either way,
 // which is why the built server was the only place this broke.
 import ELK from "elkjs/lib/elk.bundled.js";
+import { labelWithClaim, type ArrowClaim } from "./claim";
 import { readableInk } from "./contrast";
 import type { NodeState } from "./graph";
 import type { ElkExtendedEdge, ElkNode } from "elkjs/lib/elk-api";
@@ -51,6 +52,12 @@ export type GraphEdge = {
   state?: NodeState;
   /** The route this connection takes, named hop by hop. Layout ignores it. */
   via?: string[];
+  /**
+   * What kind of relationship the arrow asserts. Layout does not ignore this
+   * one: the claim is written into the label, because a claim nobody can see on
+   * the board is a claim nobody can refuse.
+   */
+  claim?: ArrowClaim;
 };
 export type DiagramLayoutOptions = {
   direction?: "RIGHT" | "DOWN";
@@ -273,7 +280,13 @@ export async function planDiagramLayout(
   idPrefix = `agent-${Date.now().toString(36)}`,
 ): Promise<DiagramPlan> {
   validateGraph(params);
-  const edges = params.edges ?? [];
+  // The claim is folded into the label here, once, so everything downstream --
+  // the width ELK reserves, the text element, the label the checker reads back
+  // -- is looking at the same string. `@needs` is the form a human types, so a
+  // generated arrow and a hand-typed one are the same arrow.
+  const edges = (params.edges ?? []).map((edge) =>
+    edge.claim ? { ...edge, label: labelWithClaim(edge.label, edge.claim) } : edge,
+  );
   const direction = params.layout?.direction ?? "RIGHT";
   const nodeSpacing = Math.min(240, Math.max(60, snapModelCoordinate(params.layout?.nodeSpacing, 80)));
   const layerSpacing = Math.min(360, Math.max(80, snapModelCoordinate(params.layout?.layerSpacing, 140)));

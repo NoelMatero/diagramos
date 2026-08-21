@@ -136,6 +136,95 @@ describe("check-drift on the command line", () => {
   }, 120_000);
 });
 
+describe("claims on the command line", () => {
+  /*
+   * Its own project, for the reason the block below has one, and because this is
+   * the only place the two halves of the claim slot can be seen together: a word
+   * that is not a claim has to reach the notice, and a claim that *is* a claim
+   * has to leave the notice exactly as it found it.
+   */
+  let project: string;
+
+  async function check(...args: string[]) {
+    try {
+      const { stdout, stderr } = await run(TSX, [SCRIPT, ...args], { cwd: project });
+      return { code: 0, stdout, stderr };
+    } catch (error) {
+      const failure = error as { code?: number; stdout?: string; stderr?: string };
+      return { code: failure.code ?? -1, stdout: failure.stdout ?? "", stderr: failure.stderr ?? "" };
+    }
+  }
+
+  async function write(name: string, edge: { label?: string; claim?: "needs" }) {
+    const { board } = await createDiagram(emptyBoard(), {
+      name,
+      nodes: [
+        { id: "reader", label: "Reader", ref: "src/reader.ts" },
+        { id: "store", label: "Store", ref: "src/store.ts" },
+      ],
+      edges: [{ from: "reader", to: "store", ...edge }],
+    });
+    await writeBoard(path.join(project, `docs/diagrams/${name}.excalidraw`), board);
+  }
+
+  beforeEach(() => {
+    project = mkdtempSync(path.join(tmpdir(), "drift-cli-claims-"));
+    mkdirSync(path.join(project, "docs/diagrams"), { recursive: true });
+    mkdirSync(path.join(project, "src"), { recursive: true });
+    // reader imports store, so the arrow is corroborated and the check is quiet
+    // about it. Whatever the claim does, it does on top of silence.
+    writeFileSync(path.join(project, "src/store.ts"), "export const store = 1;\n");
+    writeFileSync(
+      path.join(project, "src/reader.ts"),
+      "import { store } from './store';\nexport const reader = store;\n",
+    );
+  });
+
+  afterEach(() => {
+    if (project) rmSync(project, { recursive: true, force: true });
+  });
+
+  it("says nothing new about an arrow that claims needs", async () => {
+    await write("claimed", { claim: "needs" });
+    const claimed = await check();
+    rmSync(project, { recursive: true, force: true });
+
+    // The same board again, claim removed, checked from a fresh project.
+    project = mkdtempSync(path.join(tmpdir(), "drift-cli-claims-"));
+    mkdirSync(path.join(project, "docs/diagrams"), { recursive: true });
+    mkdirSync(path.join(project, "src"), { recursive: true });
+    writeFileSync(path.join(project, "src/store.ts"), "export const store = 1;\n");
+    writeFileSync(
+      path.join(project, "src/reader.ts"),
+      "import { store } from './store';\nexport const reader = store;\n",
+    );
+    await write("claimed", {});
+    const bare = await check();
+
+    expect(claimed.code).toBe(bare.code);
+    expect(`${claimed.stdout}${claimed.stderr}`).toBe(`${bare.stdout}${bare.stderr}`);
+  }, 120_000);
+
+  it("is loud about a word that is not a claim, and exits non-zero", async () => {
+    await write("typo", { label: "@need" });
+    const result = await check();
+    expect(result.code).toBe(1);
+    expect(result.stderr).toContain("typo.excalidraw");
+    expect(result.stderr).toContain("Reader");
+    expect(result.stderr).toContain("@need is not a claim");
+    // Its own word in the tally: an unreadable claim is not an arrow the code
+    // failed to corroborate.
+    expect(result.stderr).toContain("1 unreadable");
+  }, 120_000);
+
+  it("admits in the long form that a claim was read and not checked", async () => {
+    await write("claimed", { claim: "needs" });
+    const result = await check("--details");
+    expect(`${result.stdout}${result.stderr}`).toContain("1 arrow claims needs");
+    expect(`${result.stdout}${result.stderr}`).toContain("not checked yet");
+  }, 120_000);
+});
+
 describe("unsupported edges on the command line", () => {
   // Its own project, because the boards above accumulate: once stale.excalidraw
   // exists that workspace exits 1 forever, and the --no-edges silence below

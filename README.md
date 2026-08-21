@@ -38,7 +38,7 @@ Then just ask: *"Draw how this project works to docs/diagrams/architecture.excal
 | `read_diagram` | Read a board back as a graph, with provenance on every fact. |
 | `edit_diagram` | Patch or delete elements by id, hand-drawn ones included. |
 | `delete_diagram` | Remove a named diagram, keeping hand-drawn work. |
-| `check_drift` | Report nodes pointing at code that no longer exists. |
+| `check_drift` | Compare every board against the tree: what has gone stale, what is still to build, what the code has caught up with. |
 | `connect_nodes` | Draw bound arrows between existing shapes, including ones you drew. |
 | `render_diagram` | Rasterise to PNG, so the model can look at what it made. |
 | `place_image` | Put an image on the board, beside the diagram that specified it. |
@@ -150,6 +150,8 @@ Run it yourself with `npx -y diagramos drift`, which answers in one line when no
 ```
 
 **A diagram can describe the future.** Mark a box or arrow `planned` and it is drawn dashed: a sketch of what is meant to exist, not a claim that it does. The check then reports its missing code as work to do rather than drift — and the moment the code lands, the per-turn hook advances the board itself: the box turns solid on the live page, the notice says `promoted` once, and the next turn is quiet. A box that stands for several files stays dashed until all of them exist. The edit is an ordinary change to a file in git, so undoing it is one checkout; the bare `drift` command never applies it, because a check that mutates the working tree is a check CI cannot trust.
+
+**An arrow can say what it means.** An arrow means "these two are related, somehow", and nothing can disprove "somehow" — so an arrow drawn backwards passes every check forever. An arrow can carry one word instead: `needs`, the box at the tail declares a dependency on the box at the head. It is written on the arrow as `@needs`, so you can see it and delete it. Nothing judges it yet — a board with claims checks identically to the same board without them — but a word outside the vocabulary is an error the turn it is written, because a claim no check can read looks exactly like one that passed. The verdict it exists for is next: [the design](docs/handoff/sharper-claims-design.md).
 
 That makes planning a front door rather than an afterthought: `/plan-diagram` draws the plan for something before any of it is written — the pieces that exist as solid boxes, the work to come dashed, every dashed box anchored to the exact path its code will live at. The board is the to-do list, you bend it into shape by drawing on it, and it ticks itself off as the work lands. `create_diagram` checks every board as it writes it and tells the model, not you, about a box pointing at nothing — a typo gets fixed before it ever reaches your notice as red.
 

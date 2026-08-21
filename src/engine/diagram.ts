@@ -5,6 +5,7 @@
  * Everything here takes a BoardFile and returns a new one. Nothing touches
  * disk, so the MCP layer stays a thin read-modify-write around these.
  */
+import { labelWithClaim, type ArrowClaim } from "./claim";
 import { convertSkeletons } from "./convert";
 import { installNodeFontMeasurer } from "./font";
 import { emptyBoard, type BoardFile } from "./board-file";
@@ -338,7 +339,9 @@ export async function createDiagram(
   }
   (params.edges ?? []).forEach((edge, index) => {
     customData.set(`${prefix}-edge-${index}`, {
-      edge: { from: edge.from, to: edge.to },
+      // The claim rides inside `edge` rather than beside it: it is a fact about
+      // the connection, and it survives with the endpoints or not at all.
+      edge: { from: edge.from, to: edge.to, ...(edge.claim ? { claim: edge.claim } : {}) },
       ...(edge.state && edge.state !== "built" ? { state: edge.state } : {}),
       ...(edge.via?.length ? { via: edge.via.map((hop) => hop.trim()).filter(Boolean) } : {}),
     });
@@ -375,6 +378,8 @@ export interface Connection {
   to: string;
   label?: string;
   bidirectional?: boolean;
+  /** What kind of relationship the arrow asserts. Written into customData and onto the label. */
+  claim?: ArrowClaim;
 }
 
 /**
@@ -503,13 +508,16 @@ export async function connectNodes(
         endArrowhead: "arrow",
         ...(connection.bidirectional ? { startArrowhead: "arrow" } : {}),
         strokeColor: "#1e1e1e",
-        ...(connection.label?.trim() ? { label: { text: connection.label.trim() } } : {}),
+        ...(labelWithClaim(connection.label, connection.claim)
+          ? { label: { text: labelWithClaim(connection.label, connection.claim)! } }
+          : {}),
       },
       fromId: String(from.id),
       toId: String(to.id),
       semantic: {
         from: (from.customData as { node?: string } | undefined)?.node ?? String(from.id),
         to: (to.customData as { node?: string } | undefined)?.node ?? String(to.id),
+        ...(connection.claim ? { claim: connection.claim } : {}),
       },
     };
   });

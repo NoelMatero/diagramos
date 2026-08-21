@@ -180,6 +180,18 @@ const edgeSchema = z.object({
       + "pair is checked inside one function body, so a chain of any depth is verified and a "
       + "break names the hop that stopped holding. Only for arrows whose ends both name symbols.",
     ),
+  claim: z
+    .enum(["needs"])
+    .optional()
+    .describe(
+      "What this arrow asserts, when it asserts anything. 'needs': the from end declares a "
+      + "dependency on the to end — an import, a require, an include. Write it ONLY when you have "
+      + "read that line in the code: it is a transcription of something you saw, never a guess "
+      + "about what the relationship probably is. A relationship you cannot point at is an arrow "
+      + "with no claim, which is fine and is what most arrows are. Shown on the board as @needs "
+      + "and recorded; nothing judges it yet, and the check that can call a needs arrow backwards "
+      + "will judge the claims already on the board when it lands.",
+    ),
   label: z.string().optional().describe("One or two words; longer crowds the diagram"),
   strokeColor: z
     .string()
@@ -391,10 +403,20 @@ server.registerTool(
       // draw-time one, and are left to check_drift.
       await initEngine();
       const drawn = checkDrift(result.board, createWorkspace(WORKSPACE_ROOT));
+      // Named the turn it is written, because a claim nobody saw go on is a
+      // claim nobody can refuse. The board shows it too; this is for whoever is
+      // reading the transcript rather than the canvas.
+      const claimed = edges.filter((edge) => edge.claim).length;
       return text({
         wrote: relativeToWorkspace(file),
         nodes: result.nodeCount,
         edges: result.edgeCount,
+        ...(claimed
+          ? {
+              claims: `${claimed} ${claimed === 1 ? "arrow claims" : "arrows claim"} needs`
+                + ", shown on the board as @needs. Nothing judges it yet.",
+            }
+          : {}),
         elements: result.elementCount,
         idPrefix: result.prefix,
         ...(drawn.findings.length
@@ -408,6 +430,12 @@ server.registerTool(
                 + "on its own when the code lands. Left as is, the end-of-turn check reports it to "
                 + "the user in red.",
             }
+          : {}),
+        // Loud the turn it is written, which is the whole point of a closed
+        // vocabulary: the author is still here, and a word no check can read
+        // would otherwise sit on the board until somebody noticed the colour.
+        ...(drawn.garbledClaims.length
+          ? { garbledClaims: drawn.garbledClaims.map((finding) => finding.detail) }
           : {}),
         ...(drawn.workItems.length
           ? {
@@ -615,6 +643,7 @@ server.registerTool(
       const unannotated: Array<Record<string, unknown>> = [];
       const unreadEdges: Array<Record<string, unknown>> = [];
       const edges: Array<Record<string, unknown>> = [];
+      const garbledClaims: Array<Record<string, unknown>> = [];
       const workItems: Array<Record<string, unknown>> = [];
       const promotions: Array<Record<string, unknown>> = [];
       const conceptBoards: string[] = [];
@@ -665,6 +694,11 @@ server.registerTool(
         for (const finding of report.edges) {
           edges.push({ board: relativeToWorkspace(file), ...finding });
         }
+        // Carried whole, `detail` included: it names the vocabulary, and the
+        // caller reading this is usually the one that wrote the bad word.
+        for (const finding of report.garbledClaims) {
+          garbledClaims.push({ board: relativeToWorkspace(file), ...finding });
+        }
         for (const item of report.workItems) {
           workItems.push({ board: relativeToWorkspace(file), ...item });
         }
@@ -675,9 +709,13 @@ server.registerTool(
 
       return text({
         boards: files.map((file) => relativeToWorkspace(file)),
-        clean: findings.length === 0 && edges.length === 0 && deleted.length === 0,
+        clean: findings.length === 0 && edges.length === 0 && deleted.length === 0
+          && garbledClaims.length === 0,
         findings,
         edges,
+        // A claim word nothing recognises. Not a disagreement with the code -- a
+        // line on the board no check can read -- so it is named on its own.
+        ...(garbledClaims.length ? { garbledClaims } : {}),
         // Boxes the diagram stopped claiming, while their code is still here.
         // Uncommitted only: committing the board is what says it was deliberate.
         ...(deleted.length ? { deleted } : {}),
@@ -761,6 +799,18 @@ server.registerTool(
             to: z.string(),
             label: z.string().optional(),
             bidirectional: z.boolean().optional(),
+            claim: z
+              .enum(["needs"])
+              .optional()
+              .describe(
+      "What this arrow asserts, when it asserts anything. 'needs': the from end declares a "
+      + "dependency on the to end — an import, a require, an include. Write it ONLY when you have "
+      + "read that line in the code: it is a transcription of something you saw, never a guess "
+      + "about what the relationship probably is. A relationship you cannot point at is an arrow "
+      + "with no claim, which is fine and is what most arrows are. Shown on the board as @needs "
+      + "and recorded; nothing judges it yet, and the check that can call a needs arrow backwards "
+      + "will judge the claims already on the board when it lands.",
+              ),
           }),
         )
         .min(1),
@@ -772,7 +822,17 @@ server.registerTool(
       const { board, created } = await connectNodes(await readBoard(file), connections);
       await writeBoard(file, board);
       await followBoard(file);
-      return text({ wrote: relativeToWorkspace(file), arrows: created });
+      const claimed = connections.filter((connection) => connection.claim).length;
+      return text({
+        wrote: relativeToWorkspace(file),
+        arrows: created,
+        ...(claimed
+          ? {
+              claims: `${claimed} ${claimed === 1 ? "arrow claims" : "arrows claim"} needs`
+                + ", shown on the board as @needs. Nothing judges it yet.",
+            }
+          : {}),
+      });
     }),
 );
 

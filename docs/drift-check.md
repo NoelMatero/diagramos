@@ -443,6 +443,59 @@ calls the layout engine — so the board gained a "Diagram builder" box rather t
 a looser anchor. The board now contributes 3 refs and 2 arrows to the check that
 it contributed nothing to before.
 
+## What an arrow is allowed to say
+
+An arrow says "these two are related, somehow". Nothing can disprove "somehow":
+the check looks for a connection in the code, and failing to find one is never
+proof there is none. So a negative arrow result is amber forever, and an arrow
+drawn backwards survives every run. That is a ceiling in the claim, not in the
+checker.
+
+An arrow can now carry one word instead:
+
+| word | on | claim |
+| --- | --- | --- |
+| `needs` | arrows | the `from` end declares a dependency on the `to` end |
+
+`needs` means the narrow, textual, per-language fact of a dependency
+declaration — an `import`, a `require`, an `#include`. It deliberately does not
+mean "calls", "sends data to", or "depends on conceptually". That narrowness is
+the whole point: a direction has an opposite, and an opposite is falsifiable.
+
+**Nothing judges it yet.** A board whose arrows claim `needs` produces the same
+report, byte for byte, as the same board without them. The verdict needs a
+dependency reader we control and a per-language recall measurement to license it;
+both are in `docs/handoff/sharper-claims-design.md`, and both come after this.
+What exists now is the slot and its visibility.
+
+**Where it lives.** `customData.edge.claim` is authoritative, and the word is
+written onto the arrow's label as `@needs` — the same form a human can type onto
+an arrow in the app. One syntax, both directions: a generated claim and a
+hand-typed one are the same claim, and a board stripped of its `customData` still
+says what it claimed. A claim you cannot see is a claim you cannot refuse, which
+is why it is not metadata only.
+
+**The whitelist is closed.** `@need`, `@depends`, `@sends` are errors the turn
+they are written — red in the notice, non-zero exit, named in `create_diagram`'s
+own answer before the turn ends. This follows `assert.ts`, which carries exactly
+two words and refuses the rest: a vocabulary that accepts what it does not check
+becomes decoration, and a claim nothing evaluates looks exactly like a claim that
+passed.
+
+**Boxes carry the slot and no word.** The design's box claim is `closed` —
+nothing outside this directory depends on anything inside it — and it is real,
+but its checker is not written. So a claim written on a box today is refused out
+loud rather than rendered and ignored. `closed` arrives in the same change as the
+check that can call it wrong.
+
+**Claims are authored, never inferred.** The measurement in `assert.ts` is the
+standing answer: applied blindly to all 121 exports in this repo, `@declared` /
+`@used` flagged 35 — 29% noise. Applied where an author wrote it: zero false
+alarms. The rule for a model writing `needs` follows from that — write it only
+when you have read the dependency in the code, so the claim is a transcription
+and not a hypothesis. A later "wrong" then means *this was true when drawn, and
+the code has moved*.
+
 ## Two jobs, deliberately separate
 
 | | Cost | Needs a model | When to run |

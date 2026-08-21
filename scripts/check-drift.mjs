@@ -233,6 +233,16 @@ const MAX_LISTED = 6;
 function rowsFor({ report, promoted = [] }, colour, all = false) {
   const promotedNodes = new Set(promoted.map((promotion) => promotion.node));
   return [
+    // First, because it is the only row here that says the check could not read
+    // the board rather than that the board and the code disagree.
+    ...(report.garbledClaims ?? []).map((finding) =>
+      paint(
+        `${finding.on === "arrow" ? "arrow " : ""}${oneLine(finding.label)}`
+        + ` \u00b7 @${finding.written} is not a claim`,
+        "red",
+        colour,
+      ),
+    ),
     ...report.deleted.map((finding) =>
       paint(`${boxName(finding)} removed, ${parseRef(finding.ref).path} still there`, "red", colour),
     ),
@@ -274,8 +284,14 @@ function rowsFor({ report, promoted = [] }, colour, all = false) {
   ];
 }
 
-/** "2 gone  1 arrow  1 built", each part coloured, empty parts dropped. */
-function tallyCounts(gone, empty, unused, removed, arrows, stray, promoted, built, planned, colour) {
+/**
+ * "2 gone  1 arrow  1 built", each part coloured, empty parts dropped.
+ *
+ * Named fields rather than positions: there are ten of them, two call sites
+ * spell every one out, and the tenth argument is where a counting bug goes to
+ * hide.
+ */
+function tallyCounts({ gone, empty, unused, removed, garbled, arrows, stray, promoted, built, planned }, colour) {
   return [
     gone ? paint(`${gone} gone`, "red", colour) : "",
     empty ? paint(`${empty} empty`, "red", colour) : "",
@@ -283,6 +299,9 @@ function tallyCounts(gone, empty, unused, removed, arrows, stray, promoted, buil
     // still there, and nothing calls it any more.
     unused ? paint(`${unused} unused`, "red", colour) : "",
     removed ? paint(`${removed} removed`, "red", colour) : "",
+    // Red, and not folded into "arrows": an unreadable claim is not an arrow the
+    // code failed to corroborate, it is a word the check could not read at all.
+    garbled ? paint(`${garbled} unreadable`, "red", colour) : "",
     arrows ? paint(`${arrows} ${arrows === 1 ? "arrow" : "arrows"}`, "yellow", colour) : "",
     stray ? paint(`${stray} stray ${stray === 1 ? "arrow" : "arrows"}`, "dim", colour) : "",
     // "promoted" is done -- the board was advanced this run; "built" is still
@@ -299,15 +318,18 @@ function tallyFor({ report, promoted = [] }, colour) {
   const unused = count("unused-symbol");
   const promotedNodes = new Set(promoted.map((promotion) => promotion.node));
   return tallyCounts(
-    report.findings.length - empty - unused,
-    empty,
-    unused,
-    report.deleted.length,
-    report.edges.length,
-    report.strayArrows ?? 0,
-    promoted.length,
-    report.promotions.filter((promotion) => !promotedNodes.has(promotion.node)).length,
-    report.workItems.length,
+    {
+      gone: report.findings.length - empty - unused,
+      empty,
+      unused,
+      removed: report.deleted.length,
+      garbled: (report.garbledClaims ?? []).length,
+      arrows: report.edges.length,
+      stray: report.strayArrows ?? 0,
+      promoted: promoted.length,
+      built: report.promotions.filter((promotion) => !promotedNodes.has(promotion.node)).length,
+      planned: report.workItems.length,
+    },
     colour,
   );
 }
@@ -358,6 +380,7 @@ function render(stale, colour) {
         empty: sum.empty + report.findings.filter((finding) => finding.kind === "empty-ref").length,
         unused: sum.unused + report.findings.filter((finding) => finding.kind === "unused-symbol").length,
         removed: sum.removed + report.deleted.length,
+        garbled: sum.garbled + (report.garbledClaims ?? []).length,
         arrows: sum.arrows + report.edges.length,
         stray: sum.stray + (report.strayArrows ?? 0),
         promoted: sum.promoted + promoted.length,
@@ -366,13 +389,13 @@ function render(stale, colour) {
         planned: sum.planned + report.workItems.length,
       };
     },
-    { gone: 0, empty: 0, unused: 0, removed: 0, arrows: 0, stray: 0, promoted: 0, built: 0, planned: 0 },
+    { gone: 0, empty: 0, unused: 0, removed: 0, garbled: 0, arrows: 0, stray: 0, promoted: 0, built: 0, planned: 0 },
   );
 
   // Too many to list: counts per diagram, and a pointer to the view that has room.
   const head = single
-    ? `${path.basename(stale[0].file)}  ${tallyCounts(totals.gone, totals.empty, totals.unused, totals.removed, totals.arrows, totals.stray, totals.promoted, totals.built, totals.planned, colour)}`
-    : `${stale.length} diagrams out of date  ${tallyCounts(totals.gone, totals.empty, totals.unused, totals.removed, totals.arrows, totals.stray, totals.promoted, totals.built, totals.planned, colour)}`;
+    ? `${path.basename(stale[0].file)}  ${tallyCounts(totals, colour)}`
+    : `${stale.length} diagrams out of date  ${tallyCounts(totals, colour)}`;
 
   const rows = [];
   let hidden = 0;
@@ -771,6 +794,18 @@ function renderCoverageAudit(entries, colour) {
       }
       if (weak) {
         rows.push(paint(`${weak} declared/used claims read as plain mentions: ${assertionWords(report.assertions)}`, "yellow", colour));
+      }
+      // Said here and nowhere else. A claim changes no verdict today, so the
+      // notice must not grow a line for it -- a board with claims and the same
+      // board without check identically, which is the promise. But "read and
+      // judged by nothing" is exactly what this view exists to admit to.
+      const needs = report.claims?.needs ?? 0;
+      if (needs > 0) {
+        rows.push(paint(
+          `${needs} ${needs === 1 ? "arrow claims" : "arrows claim"} needs \u00b7 recorded, not checked yet`,
+          "dim",
+          colour,
+        ));
       }
       if (rows.length === 0) rows.push(paint("everything on this board was checked", "dim", colour));
       return {

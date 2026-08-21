@@ -25,6 +25,7 @@ import path from "node:path";
 import { parseSymbol, routeOf, symbolEvidence, type Assertion } from "./assert";
 import { chainBreak, reaches, unsupportedMembers } from "./body";
 import type { BoardFile } from "./board-file";
+import { arrowClaimError, boxClaimError } from "./claim";
 import { connects, refIsStale, type CodeGraphOption } from "./codegraph";
 import { readGraph, type Provenance, type RecoveredGraph } from "./graph";
 import { languageOf, type Language } from "./parse";
@@ -258,6 +259,37 @@ export interface AssertionTally {
   unsupportedLanguage: number;
 }
 
+/**
+ * A word written in a claim slot that the vocabulary does not have.
+ *
+ * Loud, and loud the turn it is written, for the reason `parseSymbol` is loud
+ * about `@exported`: a claim that is not recognised is checked by nothing, and a
+ * claim checked by nothing looks exactly like a claim that passed. The whitelist
+ * only means something if falling off it makes a noise.
+ */
+export interface GarbledClaimFinding {
+  /** Arrows and boxes have different vocabularies, so the refusal differs too. */
+  on: "arrow" | "box";
+  /** What a reader sees on the canvas: a box's label, or `from → to` for an arrow. */
+  label: string;
+  /** The word as written, without the `@`. */
+  written: string;
+  detail: string;
+}
+
+/**
+ * Claims recorded on this board, by word.
+ *
+ * Counted and not judged. Nothing here changes a verdict -- an arrow that says
+ * `needs` is checked exactly as the same arrow saying nothing -- so the count is
+ * the only way to tell a board that carries claims from one that does not, and
+ * the only honest way to say "read, not checked" out loud.
+ */
+export interface ClaimTally {
+  /** Arrows asserting that the tail declares a dependency on the head. */
+  needs: number;
+}
+
 export interface DeletedEdgeFinding {
   from: string;
   to: string;
@@ -297,6 +329,10 @@ export interface DriftReport {
   skippedWhy: SkipBreakdown<NodeSkipReason>;
   /** What became of any `@declared` / `@used` claims. All zeroes on a board with none. */
   assertions: AssertionTally;
+  /** Claims carried by arrows and boxes. Recorded and shown; judged by nothing yet. */
+  claims: ClaimTally;
+  /** Claim words that are not in the vocabulary. Part of `clean`, because a typo is a defect. */
+  garbledClaims: GarbledClaimFinding[];
   /** Nodes not about this repo: an `external` node, or any node on a concept board. */
   excused: number;
   /** Hand-drawn nodes, ignored by design. */
@@ -1114,6 +1150,8 @@ export function checkDrift(
   const unannotated: UnannotatedFinding[] = [];
   const unreadEdges: UnreadEdgeFinding[] = [];
   const assertions: AssertionTally = { checked: 0, downgraded: 0, unsupportedLanguage: 0 };
+  const claims: ClaimTally = { needs: 0 };
+  const garbledClaims: GarbledClaimFinding[] = [];
   const skipNode = (reason: NodeSkipReason) => {
     skipped += 1;
     skippedWhy[reason] = (skippedWhy[reason] ?? 0) + 1;
@@ -1335,6 +1373,38 @@ export function checkDrift(
           + "that file still exists. Committing the diagram makes the removal final.",
       });
     }
+  }
+
+  /*
+   * What the board claims, read but not judged.
+   *
+   * Its own pass, deliberately outside the corroboration block below, because a
+   * claim is not a corroboration question. Edge checking is off on a concept
+   * board and can be switched off outright; a word that means nothing is still a
+   * word that means nothing, and the turn it is written is the only turn its
+   * author is still there to fix it.
+   */
+  for (const edge of graph.edges) {
+    if (edge.claim) claims[edge.claim] += 1;
+    if (edge.claimGarbled !== undefined) {
+      const fromNode = graph.nodes.find((node) => node.id === edge.from);
+      const toNode = graph.nodes.find((node) => node.id === edge.to);
+      garbledClaims.push({
+        on: "arrow",
+        label: `${fromNode?.label || edge.from} → ${toNode?.label || edge.to}`,
+        written: edge.claimGarbled,
+        detail: arrowClaimError(edge.claimGarbled),
+      });
+    }
+  }
+  for (const node of graph.nodes) {
+    if (node.claimGarbled === undefined) continue;
+    garbledClaims.push({
+      on: "box",
+      label: node.label || node.id,
+      written: node.claimGarbled,
+      detail: boxClaimError(node.claimGarbled),
+    });
   }
 
   // Edge checking: check each generated edge for corroboration
@@ -1765,7 +1835,11 @@ export function checkDrift(
     // `clean` means "nothing has regressed". Work items and promotions are both
     // deliberately excluded: they drive the CLI's exit code, and neither an
     // unbuilt sketch nor good news should fail a build.
-    clean: findings.length === 0 && edges.length === 0 && deleted.length === 0,
+    // A garbled claim counts: it is not a disagreement with the code, it is a
+    // line on the board that no check can ever read, and leaving it out would
+    // let it sit there quietly forever.
+    clean: findings.length === 0 && edges.length === 0 && deleted.length === 0
+      && garbledClaims.length === 0,
     findings,
     // A suggestion, never part of `clean`: a diagram that omits a module is a
     // choice about what is worth showing, not a broken claim.
@@ -1779,6 +1853,8 @@ export function checkDrift(
     skipped,
     skippedWhy,
     assertions,
+    claims,
+    garbledClaims,
     excused,
     handDrawn,
     concept,
