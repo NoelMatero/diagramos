@@ -73,6 +73,28 @@ if (args.includes("--help") || args.includes("-h")) {
 const unknownOption = args.find((arg) => arg.startsWith("-"));
 if (unknownOption) fail(`unknown option ${unknownOption}`, USAGE);
 
+/*
+ * A sibling verb is not a filename either. `diagramos board stop` is an easy
+ * slip for `diagramos stop` -- both exist -- and the implied-extension rule
+ * below would answer it by creating an empty stop.excalidraw at the root and
+ * serving it (#83). A bare word that names another diagramos command gets the
+ * correct spelling instead. A board genuinely called stop can still be named:
+ * spelling out stop.excalidraw is the statement of intent.
+ */
+const SIBLING_VERBS = ["board", "drift", "stop", "serve"];
+const verb = args.find(
+  (arg) => !path.extname(arg) && !arg.includes("/") && !arg.includes(path.sep)
+    && (SIBLING_VERBS.includes(arg) || arg === "help"),
+);
+if (verb) {
+  fail(
+    verb === "help"
+      ? "help is `diagramos board --help`, not a board name"
+      : `${verb} is \`diagramos ${verb}\`, not a board name`,
+    `a board really named ${verb} is spelled ${verb}.excalidraw`,
+  );
+}
+
 // A broken config is fatal rather than a quiet fall back to the default: serving
 // diagrams from somewhere the project did not name is worse than not starting.
 let directory;
