@@ -130,22 +130,36 @@ export function loadCodeGraph(
  * An endpoint may be a file or a directory. A directory stands for everything
  * under it, matched on the path segment ("src/eng" never matches
  * "src/engine/a.ts").
+ *
+ * Two endpoints that share any node are refused outright, before the search.
+ * Two boxes on the same file expand to the same set, and a subsystem box
+ * pointing at a file inside it expands to a superset -- so the walk would
+ * start already standing on its goal and confirm the arrow against a graph
+ * holding no edge at all. "A reaches A" says nothing about two different
+ * things drawn on a board, and counting it as checked would inflate the
+ * coverage tally while silencing a question nobody asked. Silence here is
+ * the honest answer: the other channels still get their say.
  */
 export function connects(graph: LoadedCodeGraph, refA: string, refB: string): boolean {
   const a = expandEndpoint(graph, refA);
   if (a.size === 0) return false;
   const b = expandEndpoint(graph, refB);
   if (b.size === 0) return false;
+  for (const node of a) if (b.has(node)) return false;
   return reachesForward(graph, a, b) || reachesForward(graph, b, a);
 }
 
-/** Breadth-first, forward edges only, at most MAX_HOPS deep. */
+/**
+ * Breadth-first, forward edges only, at most MAX_HOPS deep.
+ *
+ * The two sets are disjoint by the time this runs, so a chain of at least one
+ * real edge is the only thing that can return true.
+ */
 function reachesForward(
   graph: LoadedCodeGraph,
   start: Set<string>,
   goal: Set<string>,
 ): boolean {
-  for (const node of start) if (goal.has(node)) return true;
   let frontier = start;
   const seen = new Set(start);
   for (let hop = 0; hop < MAX_HOPS; hop += 1) {

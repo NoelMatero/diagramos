@@ -691,6 +691,61 @@ describe("code graph — the fifth corroboration channel", () => {
     expect(withGraph.edges).toHaveLength(0);
   });
 
+  it("never confirms an arrow whose two ends are the same file", async () => {
+    // Two boxes on one file, drawn as an arrow between them. The graph holds
+    // no edge between the endpoints -- there is nothing it could confirm --
+    // but both ends expand to the same node set, which used to read as
+    // "reaches". An honest amber must stay amber, and stay uncounted.
+    const soloFiles = { "src/solo.ts": "function one() {}\nfunction two() {}\n" };
+    const graph = fixtureGraph(
+      [["one", "src/solo.ts"], ["two", "src/solo.ts"]],
+      [["one", "two"]],
+    );
+    const board = await arrowAB("src/solo.ts", "src/solo.ts");
+
+    const without = checkDrift(board, fakeWorkspace(soloFiles), { edges: true });
+    expect(without.edges).toHaveLength(1);
+    expect(without.edges[0].kind).toBe("unsupported-edge");
+
+    const withGraph = checkDrift(board, fakeWorkspace(soloFiles), {
+      edges: true,
+      codeGraph: { graph, modified: new Set() },
+    });
+    expect(withGraph.edges).toHaveLength(1);
+    expect(withGraph.edges[0].kind).toBe("unsupported-edge");
+    expect(withGraph.edgesChecked).toBe(without.edgesChecked);
+  });
+
+  it("never confirms a subsystem arrow pointing at a file inside itself", async () => {
+    // src/sub → src/sub/inner.ts, the everyday "subsystem and its part" shape.
+    // The directory's node set contains the file's, so the walk would start on
+    // its goal. The graph holds no edge between them, so this stays a skip.
+    const workspace: Workspace = {
+      resolve: (relative) => (relative.startsWith("../") ? undefined : relative),
+      stat: (target) =>
+        target === "src/sub"
+          ? "directory"
+          : target === "src/sub/inner.ts"
+            ? "file"
+            : files[target as keyof typeof files] === undefined ? "missing" : "file",
+      read: () => "",
+      list: () => [],
+    };
+    const graph = fixtureGraph(
+      [["inner", "src/sub/inner.ts"], ["other", "src/sub/other.ts"]],
+      [["other", "inner"]],
+    );
+    const board = await arrowAB("src/sub", "src/sub/inner.ts");
+
+    const report = checkDrift(board, workspace, {
+      edges: true,
+      codeGraph: { graph, modified: new Set() },
+    });
+    expect(report.edgesSkippedWhy["directory-ref"]).toBe(1);
+    expect(report.edgesChecked).toBe(0);
+    expect(report.edges).toHaveLength(0);
+  });
+
   it("a graph that proves nothing leaves the skip in place, never an alarm", async () => {
     const pyFiles = {
       "src/x.py": "print(1)\n",
