@@ -181,6 +181,16 @@ describe("what counts as a connection", () => {
     expect(connects(graph, "src/a.ts", "src/b.ts")).toBe(true);
   });
 
+  it("a file never connects to itself", () => {
+    // Two boxes on the same file expand to the same node set. Whatever that
+    // file does internally, it is not evidence about an arrow between them.
+    const graph = graphOf(
+      [["fn_one", "src/a.ts"], ["fn_two", "src/a.ts"]],
+      [["fn_one", "fn_two", "calls"]],
+    );
+    expect(connects(graph, "src/a.ts", "src/a.ts")).toBe(false);
+  });
+
   it("an endpoint the extractor never saw is silence", () => {
     const graph = graphOf([["a", "src/a.ts"]], []);
     expect(connects(graph, "src/a.ts", "src/unseen.ts")).toBe(false);
@@ -203,6 +213,27 @@ describe("directory endpoints", () => {
   it("a directory stands for everything under it", () => {
     expect(connects(graph(), "src/engine", "src/b.ts")).toBe(true);
     expect(connects(graph(), "src/engine/", "src/b.ts")).toBe(true);
+  });
+
+  it("a directory containing the other end confirms nothing", () => {
+    // src/engine → src/engine/inner.ts. The sets overlap, so the walk would
+    // start on its goal; against a graph with no edge between them that is a
+    // confirmation out of thin air.
+    const g = graphOf(
+      [["inner", "src/engine/inner.ts"], ["other", "src/engine/other.ts"]],
+      [],
+    );
+    expect(connects(g, "src/engine", "src/engine/inner.ts")).toBe(false);
+    expect(connects(g, "src/engine/inner.ts", "src/engine")).toBe(false);
+  });
+
+  it("two directories that overlap confirm nothing", () => {
+    // src/engine is inside src, so one set contains the other.
+    const g = graphOf(
+      [["inner", "src/engine/inner.ts"], ["b", "src/b.ts"]],
+      [["inner", "b", "imports"]],
+    );
+    expect(connects(g, "src", "src/engine")).toBe(false);
   });
 
   it("a directory never matches a sibling sharing its prefix", () => {

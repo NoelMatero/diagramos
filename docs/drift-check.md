@@ -696,6 +696,13 @@ that imports everything would connect all of its imports to each other. A
 chain whose edges all point one way means the dependency genuinely flows end
 to end.
 
+The chain also has to go somewhere. Two ends that overlap in the map —
+two boxes on the same file, or a subsystem box pointing at a file inside
+itself — are refused before the search starts, because the walk would begin
+already standing on its goal and "confirm" the arrow against a map holding no
+edge between them at all. *A reaches A* says nothing about two different
+things drawn on a board. Those arrows stay amber, and stay uncounted.
+
 The map also answers two questions the live channels never could:
 
 - **A box that anchors a directory.** The directory means everything under
