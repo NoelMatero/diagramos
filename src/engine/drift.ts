@@ -29,6 +29,7 @@ import { arrowClaimError, boxClaimError } from "./claim";
 import { connects, refIsStale, type CodeGraphOption } from "./codegraph";
 import { readGraph, type Provenance, type RecoveredGraph } from "./graph";
 import { languageOf, type Language } from "./parse";
+import { checkNeeds, type NeedsWithheld } from "./needs";
 import { resolveDependency, type ConfigCache } from "./resolve";
 import type { Workspace } from "./workspace";
 
@@ -58,6 +59,18 @@ export interface DriftFinding {
   detail: string;
 }
 
+/**
+ * What can be said about one arrow.
+ *
+ * `broken-chain` is a `via` arrow whose named route stopped holding.
+ *
+ * `backwards-edge` is the only member that means **wrong** rather than *worth a
+ * look*, and it is reachable only from a `needs` claim on a `built` arrow --
+ * because that is the only claim with a direction, and so the only one with an
+ * opposite to find.
+ */
+export type EdgeFindingKind = "unsupported-edge" | "broken-chain" | "backwards-edge";
+
 export interface EdgeDriftFinding {
   from: string;
   to: string;
@@ -72,8 +85,7 @@ export interface EdgeDriftFinding {
    * about. Same shape a WorkItem or Promotion uses for an edge.
    */
   node: string;
-  /** `broken-chain` is a `via` arrow whose named route stopped holding. */
-  kind: "unsupported-edge" | "broken-chain";
+  kind: EdgeFindingKind;
   detail: string;
 }
 
@@ -91,8 +103,15 @@ export interface WorkItem {
   label: string;
   /** Absent for an edge, where the claim is the connection and not one anchor. */
   ref?: string;
-  /** Why it is not there yet -- the same distinctions the checks already draw. */
-  kind: DriftKind | "unsupported-edge" | "broken-chain";
+  /**
+   * Why it is not there yet -- the same distinctions the checks already draw.
+   *
+   * `backwards-edge` cannot appear here, and the reason is a rule rather than an
+   * accident: the wrong verdict is gated on `built`, so a `planned` arrow never
+   * reaches it. Sketching a dependency that currently runs the other way is a
+   * thing people do on purpose, and being accused of it is not useful.
+   */
+  kind: DriftKind | EdgeFindingKind;
   detail: string;
 }
 
@@ -280,16 +299,26 @@ export interface GarbledClaimFinding {
 }
 
 /**
- * Claims recorded on this board, by word.
+ * Claims recorded on this board, and what became of them.
  *
- * Counted and not judged. Nothing here changes a verdict -- an arrow that says
- * `needs` is checked exactly as the same arrow saying nothing -- so the count is
- * the only way to tell a board that carries claims from one that does not, and
- * the only honest way to say "read, not checked" out loud.
+ * A `needs` arrow is now the one thing on a board that can be called *wrong*, so
+ * the count alone stopped being enough: what matters is how many of them were
+ * actually held to that standard. Every arrow that carried the claim and got no
+ * verdict is counted under the reason it got none.
  */
 export interface ClaimTally {
   /** Arrows asserting that the tail declares a dependency on the head. */
   needs: number;
+  /** Of those, how many got a direction verdict rather than a reason to stay quiet. */
+  needsChecked: number;
+  /**
+   * Why the rest got none, by reason.
+   *
+   * Shown rather than swallowed. A claim that was never checked and a claim that
+   * passed look identical in a clean report, and the difference is the whole
+   * question of whether the diagram is being held to anything.
+   */
+  needsWithheld: SkipBreakdown<NeedsWithheld | "cycle">;
 }
 
 export interface DeletedEdgeFinding {
@@ -1127,7 +1156,7 @@ export function checkDrift(
   const unannotated: UnannotatedFinding[] = [];
   const unreadEdges: UnreadEdgeFinding[] = [];
   const assertions: AssertionTally = { checked: 0, downgraded: 0, unsupportedLanguage: 0 };
-  const claims: ClaimTally = { needs: 0 };
+  const claims: ClaimTally = { needs: 0, needsChecked: 0, needsWithheld: {} };
   const garbledClaims: GarbledClaimFinding[] = [];
   const skipNode = (reason: NodeSkipReason) => {
     skipped += 1;
@@ -1491,6 +1520,83 @@ export function checkDrift(
         }
         skipEdge(missing ? "endpoint-file-missing" : "directory-ref", edge, fromNode, toNode);
         continue;
+      }
+
+      /*
+       * The one question with an answer that can be "wrong".
+       *
+       * Every other check here confirms. `needs` is the exception: the tail
+       * declares a dependency on the head, which is a direction, so finding the
+       * dependency *only* the other way is proof rather than a hint. That makes
+       * this the first thing on a board that can fail a build on an arrow, and
+       * the reason `needs.ts` is written almost entirely out of reasons to say
+       * nothing.
+       *
+       * Four gates, all required, and three of them are already above: the arrow
+       * carried the claim, its state is `built`, and `checkNeeds` refuses unless
+       * both files are in a measured language, both parsed to the end, and
+       * neither reaches out at runtime.
+       *
+       * A verdict of anything but `backwards` falls straight through to the
+       * checks below, untouched. That is deliberate and it is what keeps the
+       * claim from quietly changing anything else: a confirmed `needs` is
+       * confirmed again by the ordinary channels a moment later, and an absent
+       * one goes amber exactly as it did before claims existed.
+       */
+      if (edge.claim === "needs" && edge.state !== "planned") {
+        const needs = checkNeeds(fromPath, toPath, workspace, importCache.configs);
+        if (needs.verdict === "withheld") {
+          claims.needsWithheld[needs.why] = (claims.needsWithheld[needs.why] ?? 0) + 1;
+        } else if (needs.verdict === "cycle") {
+          /*
+           * Both directions exist, so neither arrow is more correct than the
+           * other. Cycles are legal in TypeScript, and the rule is *if both
+           * directions exist, say nothing* -- never *ties do not happen*. This
+           * repository has none today, which is luck rather than law.
+           */
+          claims.needsWithheld.cycle = (claims.needsWithheld.cycle ?? 0) + 1;
+        } else {
+          claims.needsChecked += 1;
+          if (needs.verdict === "backwards") {
+            /*
+             * Counted as checked here rather than by falling through, because
+             * this exit is the only one that does not reach the channels below.
+             * Leaving it out read as "1 arrow drawn backwards · 0 arrows
+             * checked", which invites the reader to distrust the finding.
+             */
+            edgesChecked += 1;
+            const { evidence } = needs;
+            /*
+             * A claim written this turn gets its own sentence.
+             *
+             * The next turn's check is the first one that sees a `needs` an agent
+             * wrote a moment ago, and a bare "this is wrong" then reads as the
+             * tool accusing somebody of something the tool itself wrote. The
+             * baseline is only present when the board is modified and
+             * uncommitted, which is exactly the window where that is the case.
+             */
+            const wasClaimed = baselineGraph?.edges.some(
+              (was) => was.from === edge.from && was.to === edge.to && was.claim === "needs",
+            );
+            const fresh = baselineGraph !== undefined && !wasClaimed;
+            recordEdge(edge, fromNode, toNode, {
+              from: fromPath,
+              to: toPath,
+              fromLabel: fromNode.label,
+              toLabel: toNode.label,
+              fromRef,
+              toRef,
+              kind: "backwards-edge",
+              detail:
+                (fresh ? "a claim written this turn is already wrong: " : "")
+                + `this arrow says ${fromNode.label || fromPath} needs `
+                + `${toNode.label || toPath}, but the dependency runs the other way — `
+                + `${evidence.file} line ${evidence.line} declares "${evidence.specifier}", `
+                + `and ${fromPath} declares nothing on ${toPath}. Turn the arrow round.`,
+            });
+            continue;
+          }
+        }
       }
 
       /*

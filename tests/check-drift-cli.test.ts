@@ -217,11 +217,48 @@ describe("claims on the command line", () => {
     expect(result.stderr).toContain("1 unreadable");
   }, 120_000);
 
-  it("admits in the long form that a claim was read and not checked", async () => {
+  it("says in the long form that the claim was checked for direction", async () => {
     await write("claimed", { claim: "needs" });
     const result = await check("--details");
-    expect(`${result.stdout}${result.stderr}`).toContain("1 arrow claims needs");
-    expect(`${result.stdout}${result.stderr}`).toContain("not checked yet");
+    expect(`${result.stdout}${result.stderr}`).toContain("1 needs arrow checked for direction");
+  }, 120_000);
+
+  it("calls a backwards claim wrong, names the fix, and exits non-zero", async () => {
+    // Same two files, arrow turned round: store does not import reader.
+    const { board } = await createDiagram(emptyBoard(), {
+      name: "backwards",
+      nodes: [
+        { id: "reader", label: "Reader", ref: "src/reader.ts" },
+        { id: "store", label: "Store", ref: "src/store.ts" },
+      ],
+      edges: [{ from: "store", to: "reader", claim: "needs" }],
+    });
+    await writeBoard(path.join(project, "docs/diagrams/backwards.excalidraw"), board);
+
+    const result = await check();
+    const output = `${result.stdout}${result.stderr}`;
+    expect(result.code).toBe(1);
+    expect(output).toContain("backwards.excalidraw");
+    expect(output).toContain("drawn backwards");
+    // The direction to fix it, in the row itself: this is the one arrow row that
+    // can say which way round it should have been.
+    expect(output).toContain("should be");
+  }, 120_000);
+
+  it("says nothing about a backwards arrow that carries no claim", async () => {
+    const { board } = await createDiagram(emptyBoard(), {
+      name: "unclaimed",
+      nodes: [
+        { id: "reader", label: "Reader", ref: "src/reader.ts" },
+        { id: "store", label: "Store", ref: "src/store.ts" },
+      ],
+      edges: [{ from: "store", to: "reader" }],
+    });
+    await writeBoard(path.join(project, "docs/diagrams/unclaimed.excalidraw"), board);
+
+    const result = await check();
+    expect(result.code).toBe(0);
+    expect(`${result.stdout}${result.stderr}`).not.toContain("backwards");
   }, 120_000);
 });
 

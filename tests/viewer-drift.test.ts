@@ -31,7 +31,7 @@ describe("the status chip's tally", () => {
         { node: "a", label: "Old Cache", ref: "src/cache.ts", kind: "missing-file" },
         { node: "b", label: "Hollow", ref: "src/empty.ts", kind: "empty-ref" },
       ],
-      edges: [{ from: "src/a.ts", to: "src/b.ts", fromLabel: "A", toLabel: "B", node: "a -> b" }],
+      edges: [{ from: "src/a.ts", to: "src/b.ts", fromLabel: "A", toLabel: "B", node: "a -> b", kind: "unsupported-edge" }],
       workItems: [{ node: "c", label: "Next" }],
       promotions: [{ node: "d", label: "Landed" }],
     });
@@ -65,7 +65,7 @@ describe("the panel's rows", () => {
         clean: false,
         deleted: [{ node: "gone", label: "Removed box", ref: "src/still.ts" }],
         findings: [{ node: "a", label: "Old Cache", ref: "src/cache.ts", kind: "missing-file" }],
-        edges: [{ from: "src/a.ts", to: "src/b.ts", fromLabel: "A", toLabel: "B", node: "a -> b" }],
+        edges: [{ from: "src/a.ts", to: "src/b.ts", fromLabel: "A", toLabel: "B", node: "a -> b", kind: "unsupported-edge" }],
         promotions: [{ node: "d", label: "Landed" }],
         workItems: [{ node: "c", label: "Next" }],
       }),
@@ -77,6 +77,32 @@ describe("the panel's rows", () => {
     expect(rows[2].text).toBe("A → B");
     expect(rows[3].text).toBe("Landed is built now");
     expect(rows[4].text).toBe("Next not built yet");
+  });
+
+  it("shows a backwards arrow as red and says which way round", () => {
+    /*
+     * The live board is where somebody is actually looking when this fires, and
+     * amber there means "have a look". A backwards arrow is not a maybe -- there
+     * is a line of code that proves it -- so it gets the colour that means act,
+     * and it is counted apart in the chip so one certain thing is not averaged
+     * into the uncertain ones.
+     */
+    const report = reportWith({
+      clean: false,
+      edges: [
+        { from: "a.ts", to: "b.ts", fromLabel: "A", toLabel: "B", node: "a -> b", kind: "backwards-edge" },
+        { from: "b.ts", to: "c.ts", fromLabel: "B", toLabel: "C", node: "b -> c", kind: "unsupported-edge" },
+      ],
+    });
+    const rows = rowsOf(report);
+    expect(rows[0].tone).toBe("bad");
+    expect(rows[0].text).toContain("drawn backwards");
+    expect(rows[1].tone).toBe("warn");
+    expect(rows[1].text).not.toContain("backwards");
+    expect(tallyOf(report)).toEqual([
+      { text: "1 arrow backwards", tone: "bad" },
+      { text: "1 arrow", tone: "warn" },
+    ]);
   });
 
   it("includes deleted edges when present", () => {

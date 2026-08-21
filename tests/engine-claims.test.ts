@@ -1,14 +1,15 @@
 /**
- * The claim slot: a word an arrow can carry, and what it must not do yet.
+ * The claim slot: a word an arrow can carry, and the one verdict it unlocks.
  *
- * Step one of the plan in docs/handoff/sharper-claims-implementation.md. The
- * word `needs` exists, it is written into customData, it is shown on the board,
- * and a word that is not on the whitelist is loud the turn it is written.
+ * The word `needs` exists, it is written into customData, it is shown on the
+ * board, and a word that is not on the whitelist is loud the turn it is written.
  *
- * The test this file is really about is the last one: a board whose arrows claim
- * `needs` produces the same report, to the byte, as the same board with the
- * claims stripped out. Nothing here judges anything. The verdict comes later,
- * and it comes with the reader that can prove it.
+ * The last block is what this file is really about, and it has been rewritten
+ * once. It used to promise that a claim changed *nothing* -- a board with claims
+ * and the same board without checked byte for byte, backwards arrow and all. Now
+ * it promises something narrower: a claim changes one verdict, the backwards one,
+ * and every arrow that carries no claim is checked exactly as it always was.
+ * `tests/engine-needs.test.ts` holds the gates that verdict has to clear.
  */
 import { describe, expect, it } from "vitest";
 
@@ -194,14 +195,21 @@ describe("a word that is not a claim", () => {
   });
 });
 
-describe("a claim changes no verdict", () => {
+describe("a claim changes exactly one verdict", () => {
   /**
-   * The promise of this step, and the only test that can hold anyone to it.
+   * What this test held for two issues, and what it holds now.
+   *
+   * It was written to promise the opposite: a claim changed *nothing*, and the
+   * backwards arrow below went unnoticed on purpose because noticing was a later
+   * issue's job. That issue has landed. The promise it replaces is narrower and
+   * more useful -- a claim changes one verdict and only one, and every other
+   * arrow on the board is checked exactly as it was before claims existed.
    *
    * Two boards, identical but for the claims, checked against the same tree.
-   * `needs` is even *wrong* here -- b.ts imports a.ts, and the arrow claims the
-   * other direction -- and the report does not notice, because noticing is the
-   * next issue's job and this one must not anticipate it.
+   * `a -> b` claims `needs` and is drawn backwards: b.ts imports a.ts. That one
+   * is now called wrong. `b -> c` claims `needs` too and has no connection in
+   * either direction, so it stays amber -- which is the more important half,
+   * because an absence is not evidence and never becomes one.
    */
   const files = {
     "a.ts": "export const a = 1;\n",
@@ -228,20 +236,36 @@ describe("a claim changes no verdict", () => {
     return checkDrift(board, fakeWorkspace(files), { edges: true });
   }
 
-  it("checks byte-identically with the claims and without them", async () => {
+  it("calls the backwards arrow wrong, and leaves the other one amber", async () => {
     const claimed = await reportFor(true);
-    const bare = await reportFor(false);
 
-    expect(claimed.claims).toEqual({ needs: 2 });
-    expect(bare.claims).toEqual({ needs: 0 });
+    expect(claimed.claims.needs).toBe(2);
     expect(claimed.garbledClaims).toEqual([]);
 
-    // Everything a reader is ever shown, compared as one string. The claim tally
-    // is the only field allowed to differ, and it is stripped from both sides.
-    const verdicts = (report: Awaited<ReturnType<typeof reportFor>>) =>
-      JSON.stringify({ ...report, claims: undefined });
-    expect(verdicts(claimed)).toBe(verdicts(bare));
-    // And the backwards arrow is still not called wrong by anyone.
-    expect(claimed.edges.map((finding) => finding.kind)).toEqual(["unsupported-edge"]);
+    const byKind = new Map(claimed.edges.map((finding) => [finding.kind, finding]));
+    expect([...byKind.keys()].sort()).toEqual(["backwards-edge", "unsupported-edge"]);
+
+    // The accusation names its evidence, or it is not worth making.
+    const wrong = byKind.get("backwards-edge")!;
+    expect(wrong.from).toBe("a.ts");
+    expect(wrong.to).toBe("b.ts");
+    expect(wrong.detail).toContain("b.ts");
+    expect(wrong.detail).toContain("line 1");
+    expect(claimed.clean).toBe(false);
+  });
+
+  it("leaves every arrow without a claim exactly as it was", async () => {
+    const bare = await reportFor(false);
+
+    expect(bare.claims.needs).toBe(0);
+    /*
+     * One finding, and it is the arrow that is actually fine to complain about.
+     * `a -> b` is silent here even though it is drawn backwards, because without
+     * a claim the check asks "are these connected at all", finds that b imports
+     * a, and is satisfied. That is the ceiling this issue exists to lift, and
+     * this is what it looks like from underneath.
+     */
+    expect(bare.edges.map((finding) => finding.kind)).toEqual(["unsupported-edge"]);
+    expect(bare.edges[0]!.from).toBe("b.ts");
   });
 });
