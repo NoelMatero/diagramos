@@ -517,11 +517,76 @@ two words and refuses the rest: a vocabulary that accepts what it does not check
 becomes decoration, and a claim nothing evaluates looks exactly like a claim that
 passed.
 
-**Boxes carry the slot and no word.** The design's box claim is `closed` —
-nothing outside this directory depends on anything inside it — and it is real,
-but its checker is not written. So a claim written on a box today is refused out
-loud rather than rendered and ignored. `closed` arrives in the same change as the
-check that can call it wrong.
+### A box can be wrong too: `closed`
+
+An arrow got a direction. A box gets a boundary.
+
+| word | on | claim |
+| --- | --- | --- |
+| `closed` | boxes standing for a directory | nothing outside this directory imports anything inside it, except through the doors the box lists |
+
+This is what an architecture diagram actually asserts. You draw a ring round a
+subsystem, put the rest of the system outside it, and what you mean is *the rest
+of the system does not reach in here*. Until now that ring meant nothing a check
+could read.
+
+```
+Engine · src/server/board-server.ts:21 reaches in (+36 more)
+```
+
+**One import refutes it; nothing less than everything confirms it.** That
+asymmetry is the whole design, because `needs` is about one pair of files and
+`closed` is about every file there is:
+
+- **Refuting is cheap and sound.** One import from outside, read out of the
+  source text, and the claim is false. Nothing else has to be readable — we saw
+  the line. A breach is reported even if half the repository could not be parsed.
+- **Confirming is expensive and gated.** "Nothing reaches in" is a statement
+  about every file, so it holds only if every file was read to the end. One file
+  that could import at runtime and the honest answer is *no breach found* — which
+  is a different sentence from *closed*, and is reported as a gap rather than as
+  a pass or a failure.
+
+Getting that backwards is the failure worth naming: a walk that quietly skipped
+what it could not read would paint a green box over a subsystem it never opened.
+
+**Only two of the four escape flags count here.** `needs` withholds on all of
+them; `closed` cares about `dynamic-import` and `eval` alone, because no *call*
+creates a module dependency that is not already declared somewhere in the text.
+You cannot import through `table[key]()`. The two claims ask different things of
+the same flags, and treating all four as equally blinding would cost a
+confirmation for no reason.
+
+**Tests are exempt, and the exemption is loud.** Tests reach into everything and
+have to: testing a private function means importing it. Counting them would make
+`closed` unclaimable in every repository that has a suite, which is a check
+nobody would ever switch on. So they are held apart — and *counted in the
+report*, never filtered out upstream:
+
+```
+80 imports into a closed box from tests, which do not break the claim
+```
+
+Renaming a file to `foo.test.ts` moves a breach from one list to the other, in
+public. It does not make it disappear. That visibility is the only thing standing
+between an exclusion and a loophole.
+
+**A stale door is reported too.** A door nobody came through is not a failure —
+a subsystem being tidier than it promised — but it is usually a door that *was*
+used until the import that needed it moved, and a door nobody removes silently
+widens the claim.
+
+**It only walks when you ask.** Every other check here is bounded by the diagram:
+a box names a file, an arrow names two. A `closed` box makes a claim about the
+whole repository, so proving it means walking the tree — and that walk happens
+only on boards that carry the claim. No `closed` box, no walk; one walk covers
+however many a board carries.
+
+**Measured on this repo.** No directory here is closed. `src/engine` is reached
+by 37 imports from outside once `drift.ts` is listed as a door, and `src/viewer`
+has no breach at all but cannot be *confirmed*, because 7 files elsewhere import
+at runtime. Both of those are facts nobody knew before the claim existed, which
+is the point.
 
 **Claims are authored, never inferred.** The measurement in `assert.ts` is the
 standing answer: applied blindly to all 121 exports in this repo, `@declared` /

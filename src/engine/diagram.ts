@@ -326,15 +326,34 @@ export async function createDiagram(
       .filter((node) => node.state && node.state !== "built")
       .map((node) => [node.id, node.state!]),
   );
+  /*
+   * Written in the object form rather than the bare word, and always with
+   * `through` -- even empty.
+   *
+   * An empty list is the claim of total isolation, and it has to be
+   * distinguishable from a claim whose doors were dropped somewhere in the
+   * plumbing. Writing the key always means a board that lost its doors is a
+   * board that says so, rather than one that quietly tightened its own claim.
+   */
+  const closedByNode = new Map(
+    params.nodes
+      .filter((node) => node.closed)
+      .map((node) => [
+        node.id,
+        { closed: true, through: (node.closed!.through ?? []).map((entry) => entry.trim()).filter(Boolean) },
+      ]),
+  );
   for (const [nodeId, elementId] of plan.elementIdByNode) {
     const ref = refByNode.get(nodeId);
     const state = stateByNode.get(nodeId);
     const extra = extraRefsByNode.get(nodeId);
+    const claim = closedByNode.get(nodeId);
     customData.set(elementId, {
       node: nodeId,
       ...(ref ? { ref } : {}),
       ...(extra?.length ? { refs: extra } : {}),
       ...(state ? { state } : {}),
+      ...(claim ? { claim } : {}),
     });
   }
   (params.edges ?? []).forEach((edge, index) => {

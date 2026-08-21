@@ -26,6 +26,7 @@ import { parseSymbol, routeOf, symbolEvidence, type Assertion } from "./assert";
 import { chainBreak, reaches, unsupportedMembers } from "./body";
 import type { BoardFile } from "./board-file";
 import { arrowClaimError, boxClaimError } from "./claim";
+import { checkClosed, type ClosedBreach } from "./closed";
 import { connects, refIsStale, type CodeGraphOption } from "./codegraph";
 import { readGraph, type Provenance, type RecoveredGraph } from "./graph";
 import { languageOf, type Language } from "./parse";
@@ -45,7 +46,15 @@ export type DriftKind =
   /** A symbol a box lists as part of a concept, whose body shows no trace of it. */
   | "unsupported-member"
   /** A route anchor whose literal is no longer served by the file or its imports. */
-  | "missing-route";
+  | "missing-route"
+  /**
+   * A `closed` box that something outside reaches into.
+   *
+   * The only box finding whose evidence is a file the box does not name: every
+   * other one is about the anchor going stale, this one is about somebody else's
+   * import. So the detail names the offending file and line rather than the box.
+   */
+  | "open-box";
 
 export interface DriftFinding {
   /** Node id, as edges and edit_diagram refer to it. */
@@ -307,6 +316,18 @@ export interface GarbledClaimFinding {
  * verdict is counted under the reason it got none.
  */
 export interface ClaimTally {
+  /** Boxes asserting that nothing outside their directory reaches inside it. */
+  closed: number;
+  /** Of those, how many were proved rather than merely not disproved. */
+  closedHeld: number;
+  /**
+   * Imports from a test file into a `closed` box, which do not break the claim.
+   *
+   * Counted and shown rather than filtered out upstream, because an exclusion
+   * you cannot see is one that rots. Renaming a file to `foo.test.ts` moves a
+   * breach into this number in public; it does not make it disappear.
+   */
+  closedTestReaches: number;
   /** Arrows asserting that the tail declares a dependency on the head. */
   needs: number;
   /** Of those, how many got a direction verdict rather than a reason to stay quiet. */
@@ -319,6 +340,45 @@ export interface ClaimTally {
    * question of whether the diagram is being held to anything.
    */
   needsWithheld: SkipBreakdown<NeedsWithheld | "cycle">;
+}
+
+/**
+ * One import into a `closed` box, named in full.
+ *
+ * The summary finding names the worst offender and counts the rest; this is the
+ * whole list, for the caller that wants to fix them rather than be told there
+ * are twenty.
+ */
+export interface ClosedBreachFinding extends ClosedBreach {
+  /** The box whose claim this breaks. */
+  node: string;
+  label: string;
+}
+
+/**
+ * A `closed` box with no breach found and no right to say so.
+ *
+ * Not a failure and not a pass. The claim covers every file in the repository,
+ * and these are the files that could not answer for themselves -- half-parsed,
+ * reaching out at runtime, or in a language nobody measured. Reported as a gap,
+ * because a green box resting on files nothing read is the failure this whole
+ * tool is built to avoid.
+ */
+export interface ClosedUnprovenFinding {
+  node: string;
+  label: string;
+  ref: string;
+  /** The files that could not support a statement of absence. Empty when capped. */
+  unread: string[];
+  /** True when the walk hit its cap, so nothing at all was proved. */
+  capped: boolean;
+}
+
+/** A door a `closed` box lists that nothing came through. Quiet note, never a failure. */
+export interface ClosedUnusedDoorFinding {
+  node: string;
+  label: string;
+  doors: string[];
 }
 
 export interface DeletedEdgeFinding {
@@ -364,6 +424,12 @@ export interface DriftReport {
   claims: ClaimTally;
   /** Claim words that are not in the vocabulary. Part of `clean`, because a typo is a defect. */
   garbledClaims: GarbledClaimFinding[];
+  /** Every import into a `closed` box, in full. The summary of these is in `findings`. */
+  closedBreaches: ClosedBreachFinding[];
+  /** `closed` boxes nothing disproved and nothing could prove. Never affects `clean`. */
+  closedUnproven: ClosedUnprovenFinding[];
+  /** Doors listed on a `closed` box that nothing came through. Never affects `clean`. */
+  closedUnusedDoors: ClosedUnusedDoorFinding[];
   /** Nodes not about this repo: an `external` node, or any node on a concept board. */
   excused: number;
   /** Hand-drawn nodes, ignored by design. */
@@ -1156,7 +1222,13 @@ export function checkDrift(
   const unannotated: UnannotatedFinding[] = [];
   const unreadEdges: UnreadEdgeFinding[] = [];
   const assertions: AssertionTally = { checked: 0, downgraded: 0, unsupportedLanguage: 0 };
-  const claims: ClaimTally = { needs: 0, needsChecked: 0, needsWithheld: {} };
+  const claims: ClaimTally = {
+    closed: 0, closedHeld: 0, closedTestReaches: 0,
+    needs: 0, needsChecked: 0, needsWithheld: {},
+  };
+  const closedBreaches: ClosedBreachFinding[] = [];
+  const closedUnproven: ClosedUnprovenFinding[] = [];
+  const closedUnusedDoors: ClosedUnusedDoorFinding[] = [];
   const garbledClaims: GarbledClaimFinding[] = [];
   const skipNode = (reason: NodeSkipReason) => {
     skipped += 1;
@@ -1410,6 +1482,123 @@ export function checkDrift(
       written: node.claimGarbled,
       detail: boxClaimError(node.claimGarbled),
     });
+  }
+
+  /*
+   * `closed` boxes: the one check here that reads files the board never names.
+   *
+   * Everything else in this file is bounded by the diagram -- a box names a
+   * file, an arrow names two. A `closed` box makes a claim about *every* file in
+   * the repository, so proving it means walking the tree, and that walk is
+   * exactly the cost this file otherwise goes out of its way to avoid.
+   *
+   * So it is paid only by the boards that ask for it: no `closed` box, no walk.
+   * One walk covers however many closed boxes a board carries, and it is the
+   * same walk the coverage suggestion already uses, cap and skip list included.
+   */
+  const closedBoxes = graph.nodes.filter(
+    (node) => node.claim?.closed && node.provenance === "recorded" && node.state !== "external",
+  );
+  if (closedBoxes.length > 0 && !concept) {
+    const rootAbsolute = workspace.resolve(".");
+    const walked = rootAbsolute ? sourceFilesUnder(rootAbsolute, workspace) : undefined;
+    const relative = (absolute: string) =>
+      rootAbsolute ? path.relative(rootAbsolute, absolute).split(path.sep).join("/") : absolute;
+    const files = (walked ?? []).map(relative);
+
+    for (const node of closedBoxes) {
+      claims.closed += 1;
+      const anchor = node.ref?.trim();
+      const target = anchor ? parseRef(anchor).path : undefined;
+      const resolved = target ? workspace.resolve(target) : undefined;
+
+      /*
+       * A `closed` box has to stand for a directory. Anything else is a claim
+       * about a set with one thing in it, which is not what anybody means by
+       * closed, and it is refused rather than answered -- reading it as "nobody
+       * imports this file" would quietly turn a boundary claim into a
+       * dead-code claim.
+       */
+      if (!target || !resolved || workspace.stat(resolved) !== "directory") {
+        findings.push({
+          node: node.id,
+          label: node.label || node.id,
+          ref: anchor ?? "",
+          kind: "open-box",
+          provenance: "recorded",
+          detail: anchor
+            ? `@closed says nothing outside this directory reaches in, and ${target} is not a `
+              + "directory. Point the box at a directory, or drop the claim."
+            : "@closed needs a directory to be about, and this box has no ref.",
+        });
+        continue;
+      }
+
+      const verdict = checkClosed(
+        target,
+        node.claim!.through,
+        files,
+        workspace,
+        (file) => TEST_FILE.test(file),
+        importCache.configs,
+        walked === undefined,
+      );
+      claims.closedTestReaches += verdict.fromTests.length;
+
+      if (verdict.breaches.length > 0) {
+        /*
+         * One finding per box, not per breach.
+         *
+         * Twenty imports into a subsystem is one broken boundary, and twenty
+         * rows saying so is how a report stops being read. The worst offender
+         * is named in full and the rest are counted; `--details` has them all.
+         */
+        const [first, ...rest] = verdict.breaches;
+        findings.push({
+          node: node.id,
+          label: node.label || node.id,
+          ref: anchor ?? target,
+          kind: "open-box",
+          provenance: "recorded",
+          detail: `${first!.file} line ${first!.line} imports "${first!.specifier}", reaching `
+            + `${first!.into} inside ${target}`
+            + (rest.length > 0 ? `, and ${rest.length} more ${rest.length === 1 ? "import does" : "imports do"} the same` : "")
+            + ". Add it to the box's doors, or stop reaching in.",
+        });
+        closedBreaches.push(
+          ...verdict.breaches.map((breach) => ({ node: node.id, label: node.label || node.id, ...breach })),
+        );
+        continue;
+      }
+
+      /*
+       * No breach found is not the same sentence as closed.
+       *
+       * The claim is about every file there is, so it holds only if every file
+       * was read to the end. A walk that quietly skipped what it could not parse
+       * would paint the box green on the strength of files nothing opened, which
+       * is the one thing this tool exists not to do. Unproven is reported as a
+       * gap rather than as a failure: the board is not wrong, it is unchecked.
+       */
+      if (verdict.capped || verdict.unread.length > 0) {
+        closedUnproven.push({
+          node: node.id,
+          label: node.label || node.id,
+          ref: anchor ?? target,
+          unread: verdict.capped ? [] : verdict.unread,
+          capped: verdict.capped,
+        });
+        continue;
+      }
+      claims.closedHeld += 1;
+      if (verdict.unusedDoors.length > 0) {
+        closedUnusedDoors.push({
+          node: node.id,
+          label: node.label || node.id,
+          doors: verdict.unusedDoors,
+        });
+      }
+    }
   }
 
   // Edge checking: check each generated edge for corroboration
@@ -1923,6 +2112,9 @@ export function checkDrift(
     clean: findings.length === 0 && edges.length === 0 && deleted.length === 0
       && garbledClaims.length === 0,
     findings,
+    closedBreaches,
+    closedUnproven,
+    closedUnusedDoors,
     // A suggestion, never part of `clean`: a diagram that omits a module is a
     // choice about what is worth showing, not a broken claim.
     unrepresented,

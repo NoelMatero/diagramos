@@ -168,6 +168,7 @@ function oneLine(text) {
  */
 const REASONS = {
   "missing-file": "that file is not in the repo any more",
+  "open-box": "something outside this directory reaches into it",
   "missing-symbol": "the file is there, that name in it is not",
   "unresolvable-ref": "that is not a path in this repo at all",
   "empty-ref": "it exists but has nothing in it",
@@ -203,6 +204,21 @@ const NEEDS_WITHHELD = {
  * says the connection is gone, the other says only the route is stale. Reading
  * them off the detail keeps the notice from turning both into the scarier one.
  */
+/**
+ * The short row's version of a breached `closed` box: who got in, and how many.
+ *
+ * Read off the detail the same way `brokenHop` is, and for the same reason --
+ * the engine already wrote the sentence, and a second phrasing here is a second
+ * thing to keep in sync.
+ */
+function openBox(detail) {
+  const who = detail.match(/^(\S+) line (\d+)/);
+  const more = detail.match(/and (\d+) more/);
+  if (!who) return "something outside reaches in";
+  return `${who[1]}:${who[2]} reaches in`
+    + (more ? ` (+${more[1]} more)` : "");
+}
+
 function brokenHop(detail) {
   if (detail.includes("still connected, but not by this route")) {
     return "connected, but the route is wrong";
@@ -263,7 +279,20 @@ function rowsFor({ report, promoted = [] }, colour, all = false) {
     ...report.deleted.map((finding) =>
       paint(`${boxName(finding)} removed, ${parseRef(finding.ref).path} still there`, "red", colour),
     ),
-    ...report.findings.map((finding) => paint(`${boxName(finding)} \u2192 ${target(finding)}`, "red", colour)),
+    ...report.findings.map((finding) =>
+      /*
+       * The one box finding whose evidence is somewhere else.
+       *
+       * Every other row here reads "box → the thing it points at", because every
+       * other finding is the anchor going stale. An `open-box` is about somebody
+       * else's import, so the arrow form would name the wrong file entirely --
+       * it would point at the directory that is fine rather than at the file
+       * that reached into it.
+       */
+      finding.kind === "open-box"
+        ? paint(`${boxName(finding)} \u00b7 ${openBox(finding.detail)}`, "red", colour)
+        : paint(`${boxName(finding)} \u2192 ${target(finding)}`, "red", colour),
+    ),
     ...report.edges.map((finding) => {
       // A named route knows where it stopped holding, and that is the only
       // thing this shape offers over a plain unsupported arrow. Printing just
@@ -317,10 +346,13 @@ function rowsFor({ report, promoted = [] }, colour, all = false) {
  * spell every one out, and the tenth argument is where a counting bug goes to
  * hide.
  */
-function tallyCounts({ gone, empty, unused, removed, garbled, arrows, stray, promoted, built, planned }, colour) {
+function tallyCounts({ gone, empty, unused, open, removed, garbled, arrows, stray, promoted, built, planned }, colour) {
   return [
     gone ? paint(`${gone} gone`, "red", colour) : "",
     empty ? paint(`${empty} empty`, "red", colour) : "",
+    // Its own word, because "1 gone" was actively wrong for it: nothing is gone,
+    // a boundary the board claimed is being reached through.
+    open ? paint(`${open} reached into`, "red", colour) : "",
     // Separate from "gone" because it is a different sentence: the code is
     // still there, and nothing calls it any more.
     unused ? paint(`${unused} unused`, "red", colour) : "",
@@ -342,12 +374,14 @@ function tallyFor({ report, promoted = [] }, colour) {
   const count = (kind) => report.findings.filter((finding) => finding.kind === kind).length;
   const empty = count("empty-ref");
   const unused = count("unused-symbol");
+  const open = count("open-box");
   const promotedNodes = new Set(promoted.map((promotion) => promotion.node));
   return tallyCounts(
     {
-      gone: report.findings.length - empty - unused,
+      gone: report.findings.length - empty - unused - open,
       empty,
       unused,
+      open,
       removed: report.deleted.length,
       garbled: (report.garbledClaims ?? []).length,
       arrows: report.edges.length,
@@ -829,6 +863,49 @@ function renderCoverageAudit(entries, colour) {
        * look identical in a clean report, and only one of them means the diagram
        * is being held to anything. So the withheld ones are named by reason.
        */
+      /*
+       * What became of the box claims.
+       *
+       * `closed` is the one claim whose *silence* costs something to earn: it is
+       * about every file in the repository, so it holds only if every file was
+       * read. A box nothing disproved and nothing could prove is neither red nor
+       * green, and saying so is the only honest third thing.
+       */
+      const closed = report.claims?.closed ?? 0;
+      if (closed > 0) {
+        const held = report.claims?.closedHeld ?? 0;
+        if (held > 0) {
+          rows.push(paint(`${held} closed ${held === 1 ? "box" : "boxes"} held`, "dim", colour));
+        }
+        for (const gap of report.closedUnproven ?? []) {
+          rows.push(paint(
+            `${oneLine(gap.label)} · @closed: no breach found, `
+            + (gap.capped
+              ? "the repository is too large to walk"
+              : `${gap.unread.length} ${gap.unread.length === 1 ? "file" : "files"} could not be read`),
+            "dim",
+            colour,
+          ));
+        }
+        // Never silent. An exclusion you cannot see is one that rots, and this
+        // is the number that says how much the test exemption is carrying.
+        const reaches = report.claims?.closedTestReaches ?? 0;
+        if (reaches > 0) {
+          rows.push(paint(
+            `${reaches} ${reaches === 1 ? "import" : "imports"} into a closed box from tests, which do not break the claim`,
+            "dim",
+            colour,
+          ));
+        }
+        for (const stale of report.closedUnusedDoors ?? []) {
+          rows.push(paint(
+            `${oneLine(stale.label)} · ${stale.doors.length} listed `
+            + `${stale.doors.length === 1 ? "door nothing" : "doors nothing"} came through: ${stale.doors.join(", ")}`,
+            "dim",
+            colour,
+          ));
+        }
+      }
       const needs = report.claims?.needs ?? 0;
       if (needs > 0) {
         const checked = report.claims?.needsChecked ?? 0;

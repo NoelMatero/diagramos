@@ -165,20 +165,39 @@ describe("a word that is not a claim", () => {
     expect(report.clean).toBe(false);
   });
 
-  it("fails loudly on a box, because no box claim is checked yet", () => {
+  it("reads @closed on a box, now that something judges it", () => {
+    // This test used to assert the opposite. `closed` was refused out loud for
+    // two issues on the rule that a word enters the vocabulary on the day its
+    // checker does -- and this is that day, so the refusal is what had to go.
     const board = boardOf([
       drawn({
         id: "r1",
         type: "rectangle",
         width: 200,
         height: 100,
-        customData: { node: "engine", ref: "a.ts", claim: { closed: true } },
+        customData: { node: "engine", ref: "src/engine", claim: { closed: true } },
+      }),
+    ]);
+    const report = checkDrift(board, workspace());
+    expect(report.garbledClaims).toEqual([]);
+    expect(readGraph(board).nodes[0]!.claim).toEqual({ closed: true, through: [] });
+  });
+
+  it("is still loud on a box claiming a word that is not closed", () => {
+    const board = boardOf([
+      drawn({
+        id: "r1",
+        type: "rectangle",
+        width: 200,
+        height: 100,
+        customData: { node: "engine", ref: "src/engine", claim: { sealed: true } },
       }),
     ]);
     const report = checkDrift(board, workspace());
     expect(report.garbledClaims).toHaveLength(1);
-    expect(report.garbledClaims[0]).toMatchObject({ on: "box", written: "closed" });
-    expect(report.garbledClaims[0].detail).toContain("arrive with the check that judges them");
+    expect(report.garbledClaims[0]).toMatchObject({ on: "box", written: "sealed" });
+    expect(report.garbledClaims[0].detail).toContain("@closed");
+    expect(report.clean).toBe(false);
   });
 
   it("is still loud on a concept board, where nothing else is checked", async () => {

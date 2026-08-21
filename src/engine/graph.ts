@@ -12,7 +12,10 @@
  * Inference is always reported as such. A caller deciding whether to trust a
  * label needs to know whether it was recorded or guessed.
  */
-import { parseArrowClaim, readLabelClaim, type ArrowClaim, type ParsedClaim } from "./claim";
+import {
+  parseArrowClaim, parseBoxClaim, readLabelClaim,
+  type ArrowClaim, type BoxClaim, type ParsedClaim,
+} from "./claim";
 import type { ExcalidrawElement } from "./normalize";
 import type { BoardFile } from "./board-file";
 
@@ -93,8 +96,13 @@ export interface RecoveredNode {
   /** Whether the node claims to exist yet. Defaults to `built`. */
   state: NodeState;
   /**
-   * A claim written on this box that is not on the vocabulary -- which today is
-   * every claim, because no box claim is checked yet.
+   * What this box asserts about the directory it stands for, when it asserts
+   * anything. Absent on every box drawn before claims existed, and absence is
+   * not a claim: a box that says nothing is checked exactly as it always was.
+   */
+  claim?: BoxClaim;
+  /**
+   * A claim written on this box that is not on the vocabulary.
    *
    * Carried rather than dropped so it can be said out loud. A claim nothing
    * judges is indistinguishable from a claim that passed, and silence here
@@ -294,8 +302,8 @@ export function readGraph(board: BoardFile): RecoveredGraph {
         .map((entry) => entry.trim())
       : undefined;
     const bounds = box(shape);
-    // Every box claim is garbled today: the vocabulary is empty on purpose.
-    const claimGarbled = claimWritten(custom.claim);
+    const boxClaim = parseBoxClaim(custom.claim);
+    const claimGarbled = boxClaim && "garbled" in boxClaim ? boxClaim.garbled : undefined;
     nodes.push({
       id,
       label: labelByContainer.get(shape.id) ?? inferredLabelByShape.get(shape.id) ?? "",
@@ -309,7 +317,8 @@ export function readGraph(board: BoardFile): RecoveredGraph {
       ...(ref ? { ref } : {}),
       ...(refs?.length ? { refs } : {}),
       state: stateOf(custom.state),
-      ...(claimGarbled ? { claimGarbled } : {}),
+      ...(boxClaim && "claim" in boxClaim ? { claim: boxClaim.claim } : {}),
+      ...(claimGarbled !== undefined ? { claimGarbled } : {}),
     });
     nodeIdByElement.set(shape.id, id);
     consumed.add(shape.id);
