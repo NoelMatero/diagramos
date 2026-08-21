@@ -40,6 +40,7 @@
     "graph:refresh": "node scripts/refresh-code-graph.mjs",
     "typecheck": "tsc --noEmit",
     "check:drift": "tsx scripts/check-drift.mjs",
+    "measure:deps": "tsx scripts/measure-deps.mts",
     "pretest": "npm run build:cli",
     "test": "vitest run",
     "test:watch": "vitest",

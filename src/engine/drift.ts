@@ -29,6 +29,8 @@ import { arrowClaimError, boxClaimError } from "./claim";
 import { connects, refIsStale, type CodeGraphOption } from "./codegraph";
 import { readGraph, type Provenance, type RecoveredGraph } from "./graph";
 import { languageOf, type Language } from "./parse";
+import { resolveDependency, type ConfigCache } from "./resolve";
+import type { Workspace } from "./workspace";
 
 export type DriftKind =
   | "missing-file"
@@ -359,24 +361,10 @@ export interface DriftReport {
 }
 
 /**
- * The filesystem, narrowed to what detection needs and injected so the checks
- * are testable without a real tree.
+ * Re-exported so every existing caller keeps importing it from here. It moved
+ * to its own module when the import resolver grew big enough to need it too.
  */
-export interface Workspace {
-  /** Absolute path for a repo-relative ref; undefined when it escapes the root. */
-  resolve(relativePath: string): string | undefined;
-  stat(absolutePath: string): "file" | "directory" | "missing";
-  /** Only called when stat said "file". */
-  read(absolutePath: string): string;
-  /**
-   * Entry names directly inside a directory, unsorted, never recursive.
-   *
-   * One level is the whole security design for globs: a ref can name a single
-   * directory's listing and never a search. Only called when stat said
-   * "directory"; an unreadable directory is an empty list, not a throw.
-   */
-  list(absolutePath: string): string[];
-}
+export type { Workspace } from "./workspace";
 
 /**
  * A label worth reading as a path: at least one slash and a file extension.
@@ -581,7 +569,7 @@ function inspect(
   provenance: Provenance,
   workspace: Workspace,
   tally: AssertionTally,
-  importCache: Map<string, Array<{ abs: string; rel: string }>>,
+  importCache: ReadCache,
 ): Inspection {
   const { path: rawTarget, symbol: rawSymbol } = parseRef(ref);
   const base = { node: node.id, label: node.label, ref, provenance };
@@ -726,77 +714,50 @@ function inspect(
 }
 
 /**
- * Resolve a relative import specifier to a file path within the workspace.
- * Tries the spec as written, each extension variant, and index.<ext> in the directory.
- * fromFile should be a repo-relative path (not absolute).
- * Returns { abs: absolute path, rel: repo-relative path } or undefined if not found.
+ * What one run has already read off disk.
+ *
+ * Imports are cached per file, and the tsconfig a file resolves its nicknames
+ * against is cached per directory. Both belong to one run and neither outlives
+ * it: a config read once and remembered forever is a fact with a shelf life,
+ * which is the rot this whole check exists to catch.
  */
-function resolveImport(
-  spec: string,
-  fromFile: string,
-  workspace: Workspace,
-): { abs: string; rel: string } | undefined {
-  // Relative imports only. Absolute specifiers or node_modules are skipped.
-  if (!spec.startsWith(".")) {
-    return undefined;
-  }
-
-  // Compute the directory of fromFile (repo-relative)
-  const lastSlash = fromFile.lastIndexOf("/");
-  const fromDir = lastSlash < 0 ? "" : fromFile.substring(0, lastSlash);
-
-  // Resolve the import spec relative to fromDir
-  let base = spec;
-  // Remove leading ./ for joining
-  if (base.startsWith("./")) {
-    base = base.substring(2);
-  }
-
-  // Join with directory (keep ../ as-is for workspace.resolve to normalize)
-  let resolved = base;
-  if (fromDir) {
-    resolved = fromDir + "/" + base;
-  }
-
-  // Generate candidates with extension variants
-  const candidates: string[] = [resolved];
-
-  if (resolved.endsWith(".js")) {
-    candidates.push(resolved.slice(0, -3) + ".ts", resolved.slice(0, -3) + ".tsx");
-  } else if (resolved.endsWith(".mjs")) {
-    candidates.push(resolved.slice(0, -4) + ".ts", resolved.slice(0, -4) + ".tsx");
-  } else if (!resolved.match(/\.(ts|tsx|js|jsx|mjs|cjs|mts)$/)) {
-    // No extension: try common TS/JS extensions
-    candidates.push(resolved + ".ts", resolved + ".tsx", resolved + ".js", resolved + ".mjs");
-    // Try index variants
-    candidates.push(resolved + "/index.ts", resolved + "/index.tsx", resolved + "/index.js", resolved + "/index.mjs");
-  }
-
-  // Check each candidate (workspace.resolve will normalize and validate)
-  for (const candidate of candidates) {
-    const abs = workspace.resolve(candidate);
-    if (abs && workspace.stat(abs) === "file") {
-      return { abs, rel: candidate };
-    }
-  }
-
-  return undefined;
+export interface ReadCache {
+  imports: Map<string, Array<{ abs: string; rel: string }>>;
+  configs: ConfigCache;
 }
 
 /**
- * Extract all relative imports from a file, caching results per file within a single check.
- * fileAbsolute is the absolute path; fileRelative is the repo-relative path.
- * Returns array of { abs, rel } objects for each resolved import.
+ * Every import in a file, found by pattern and cached per file within one check.
+ *
+ * The regex is over-eager and always has been, which is survivable because this
+ * is a *confirming* channel: a specifier it invents either resolves to a real
+ * file, and the confirmation is at worst generous, or it is dropped. It is not
+ * evidence any "wrong" verdict may rest on -- `deps.ts` reads the grammar for
+ * that, and refuses what this cannot tell apart. Measured over this repo the
+ * difference is a single edge: `path.join(import.meta.dirname,
+ * "../docs/diagrams/board-internals.excalidraw")` reads here as an import of a
+ * diagram.
+ *
+ * Resolution itself moved to `resolve.ts` and is now shared with that reader.
+ * One resolver, because two would drift apart, and the day they disagreed is
+ * the day a verdict rested on a path the other channel never tried. The move
+ * brought tsconfig nicknames (`@/engine/foo`) along, which this never handled;
+ * on this repo that changes nothing, since it declares none.
  */
-function getImports(fileAbsolute: string, fileRelative: string, workspace: Workspace, cache: Map<string, Array<{ abs: string; rel: string }>>): Array<{ abs: string; rel: string }> {
-  if (cache.has(fileAbsolute)) {
-    return cache.get(fileAbsolute)!;
+function getImports(
+  fileAbsolute: string,
+  fileRelative: string,
+  workspace: Workspace,
+  cache: ReadCache,
+): Array<{ abs: string; rel: string }> {
+  if (cache.imports.has(fileAbsolute)) {
+    return cache.imports.get(fileAbsolute)!;
   }
 
   const imports: Array<{ abs: string; rel: string }> = [];
   const found = workspace.stat(fileAbsolute);
   if (found !== "file") {
-    cache.set(fileAbsolute, imports);
+    cache.imports.set(fileAbsolute, imports);
     return imports;
   }
 
@@ -812,15 +773,31 @@ function getImports(fileAbsolute: string, fileRelative: string, workspace: Works
   while ((match = importRegex.exec(source)) !== null) {
     const spec = match[1] || match[2] || match[3];
     if (spec) {
-      const resolved = resolveImport(spec, fileRelative, workspace);
+      const resolved = resolveDependency(spec, fileRelative, workspace, cache.configs);
       if (resolved) {
         imports.push(resolved);
       }
     }
   }
 
-  cache.set(fileAbsolute, imports);
+  cache.imports.set(fileAbsolute, imports);
   return imports;
+}
+
+/**
+ * The regex channel's imports for one file, exposed for measurement only.
+ *
+ * The licence step compares a parsed reader against this, and the comparison is
+ * only worth anything if it runs the *actual* channel rather than a paraphrase
+ * of it. Never call this as evidence: it is the over-eager one, and knowing by
+ * how much is the entire point of exporting it.
+ */
+export function regexImports(
+  fileAbsolute: string,
+  fileRelative: string,
+  workspace: Workspace,
+): Array<{ abs: string; rel: string }> {
+  return getImports(fileAbsolute, fileRelative, workspace, { imports: new Map(), configs: new Map() });
 }
 
 /**
@@ -858,7 +835,7 @@ function routePool(
   fileAbsolute: string,
   fileRelative: string,
   workspace: Workspace,
-  importCache: Map<string, Array<{ abs: string; rel: string }>>,
+  importCache: ReadCache,
 ): Set<string> {
   const pool = new Set(getRouteLiterals(fileAbsolute, workspace));
   for (const imported of getImports(fileAbsolute, fileRelative, workspace, importCache)) {
@@ -992,7 +969,7 @@ function checkEdgeCorroboration(
   fromLabel: string,
   toLabel: string,
   workspace: Workspace,
-  importCache: Map<string, Array<{ abs: string; rel: string }>>,
+  importCache: ReadCache,
   sharedImporterCandidates: Map<string, string>,
   codeGraphOption?: CodeGraphOption,
 ): Omit<EdgeDriftFinding, "node"> | undefined {
@@ -1183,8 +1160,7 @@ export function checkDrift(
     });
   };
   /** Shared by the box checks and the arrow checks: one read per file per run. */
-  const importCache = new Map<string, Array<{ abs: string; rel: string }>>();
-  /** Shared by the box checks and the arrow checks: one read per file per run. */
+  const importCache: ReadCache = { imports: new Map(), configs: new Map() };
 
   /**
    * File one verdict about one arrow.
