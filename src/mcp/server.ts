@@ -162,6 +162,27 @@ const nodeSchema = z.object({
       + "separately; the box is clean when all of them are. ref stays the primary one, and is what "
       + "arrows between boxes are checked against.",
     ),
+  closed: z
+    .object({
+      through: z
+        .array(z.string())
+        .optional()
+        .describe(
+          "Files inside the directory that outside code IS allowed to reach — the front doors. "
+          + "Repo-relative paths. Omit or leave empty to claim total isolation, which is unusual "
+          + "but real.",
+        ),
+    })
+    .optional()
+    .describe(
+      "Only for a box whose ref is a DIRECTORY. Claims that nothing outside that directory "
+      + "imports anything inside it, except through the doors listed in `through`. THIS IS "
+      + "CHECKED against every file in the repository: one import from outside that no door "
+      + "allows makes the claim false, by file and line, and the build fails. Test files are "
+      + "exempt and counted separately. Write it ONLY when you have reason to believe the "
+      + "boundary holds — check first, because claiming it on a subsystem everything reaches "
+      + "into produces an immediate failure that is your mistake, not the user's.",
+    ),
   state: z
     .enum(["planned", "built", "external"])
     .optional()
@@ -195,8 +216,10 @@ const edgeSchema = z.object({
       + "read that line in the code: it is a transcription of something you saw, never a guess "
       + "about what the relationship probably is. A relationship you cannot point at is an arrow "
       + "with no claim, which is fine and is what most arrows are. Shown on the board as @needs "
-      + "and recorded; nothing judges it yet, and the check that can call a needs arrow backwards "
-      + "will judge the claims already on the board when it lands.",
+      + "and recorded, and CHECKED: if the dependency runs the other way and only the other "
+      + "way, the arrow is reported as backwards, by file and line, and the build fails. So a "
+      + "needs you guessed at is not a harmless decoration -- it is a false statement read back "
+      + "to the user, on their diagram, in red.",
     ),
   label: z.string().optional().describe("One or two words; longer crowds the diagram"),
   strokeColor: z
@@ -651,6 +674,8 @@ server.registerTool(
       const unreadEdges: Array<Record<string, unknown>> = [];
       const edges: Array<Record<string, unknown>> = [];
       const garbledClaims: Array<Record<string, unknown>> = [];
+      const closedBreaches: Array<Record<string, unknown>> = [];
+      const closedUnproven: Array<Record<string, unknown>> = [];
       const workItems: Array<Record<string, unknown>> = [];
       const promotions: Array<Record<string, unknown>> = [];
       const conceptBoards: string[] = [];
@@ -701,6 +726,20 @@ server.registerTool(
         for (const finding of report.edges) {
           edges.push({ board: relativeToWorkspace(file), ...finding });
         }
+        /*
+         * The whole breach list, not just the summary in `findings`.
+         *
+         * The caller reading this is usually the one about to fix the boundary,
+         * and "and 36 more imports do the same" is not something anybody can act
+         * on. Unproven boxes come too: a claim nothing could check is exactly
+         * what an agent must not read as a claim that passed.
+         */
+        for (const breach of report.closedBreaches) {
+          closedBreaches.push({ board: relativeToWorkspace(file), ...breach });
+        }
+        for (const gap of report.closedUnproven) {
+          closedUnproven.push({ board: relativeToWorkspace(file), ...gap });
+        }
         // Carried whole, `detail` included: it names the vocabulary, and the
         // caller reading this is usually the one that wrote the bad word.
         for (const finding of report.garbledClaims) {
@@ -723,6 +762,13 @@ server.registerTool(
         // A claim word nothing recognises. Not a disagreement with the code -- a
         // line on the board no check can read -- so it is named on its own.
         ...(garbledClaims.length ? { garbledClaims } : {}),
+        // Every import into a `closed` box, where `findings` carries only the
+        // worst one and a count. Fixing a boundary needs the list.
+        ...(closedBreaches.length ? { closedBreaches } : {}),
+        // Boxes nothing disproved and nothing could prove. Outside `clean`,
+        // because the board is not wrong -- it is unchecked, which is a
+        // different thing and has to read as one.
+        ...(closedUnproven.length ? { closedUnproven } : {}),
         // Boxes the diagram stopped claiming, while their code is still here.
         // Uncommitted only: committing the board is what says it was deliberate.
         ...(deleted.length ? { deleted } : {}),
@@ -815,8 +861,10 @@ server.registerTool(
       + "read that line in the code: it is a transcription of something you saw, never a guess "
       + "about what the relationship probably is. A relationship you cannot point at is an arrow "
       + "with no claim, which is fine and is what most arrows are. Shown on the board as @needs "
-      + "and recorded; nothing judges it yet, and the check that can call a needs arrow backwards "
-      + "will judge the claims already on the board when it lands.",
+      + "and recorded, and CHECKED: if the dependency runs the other way and only the other "
+      + "way, the arrow is reported as backwards, by file and line, and the build fails. So a "
+      + "needs you guessed at is not a harmless decoration -- it is a false statement read back "
+      + "to the user, on their diagram, in red.",
               ),
           }),
         )

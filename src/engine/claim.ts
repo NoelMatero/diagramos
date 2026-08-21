@@ -1,5 +1,5 @@
 /**
- * What an arrow is allowed to claim, and what a box is not allowed to claim yet.
+ * What an arrow and a box are allowed to claim.
  *
  * An arrow today means "these two are related, somehow". Nothing can disprove
  * "somehow": the check looks for any connection in the code, and failing to find
@@ -9,8 +9,9 @@
  * A claim is the way out. `needs` says *what kind* of relationship the arrow
  * asserts -- the tail declares a dependency on the head, in whatever way the
  * language declares dependencies -- and that has a direction. A direction has an
- * opposite, and an opposite can be shown to be the only one present. Nothing
- * here judges anything: this file is the slot the verdict will later plug into.
+ * opposite, and an opposite can be shown to be the only one present. `closed`
+ * does the same for a box: nothing outside this directory reaches inside it, so
+ * one import from outside refutes it outright.
  *
  * The whitelist is closed, and stays closed. `assert.ts` carries exactly two
  * words and refuses everything else, which is the only reason `@declared` still
@@ -24,16 +25,75 @@ export const ARROW_CLAIMS = ["needs"] as const;
 export type ArrowClaim = (typeof ARROW_CLAIMS)[number];
 
 /**
- * Deliberately empty.
+ * One word, and it arrived with its checker rather than before it.
  *
- * The design's box claim is `closed` -- nothing outside this directory depends
- * on anything inside it -- and it is real, but its checker is not written. An
- * inert word is worse than no word: a claim that is rendered and judged by
- * nothing reads exactly like a claim that passed. So the slot on a box is read
- * and refused out loud, and `closed` arrives in the same change as the check
- * that can call it wrong.
+ * `closed` says nothing outside this directory depends on anything inside it,
+ * except through the doors the box lists. Like `needs` it earns its place by
+ * being refutable: one import from outside, read out of the source text, and the
+ * claim is false with a file and a line to show for it.
+ *
+ * The rule this list follows is the one `assert.ts` established and the reason
+ * `@declared` still means one thing: a word goes in here on the day something
+ * can call it wrong, and not a day earlier. A claim that is rendered and judged
+ * by nothing reads exactly like a claim that passed.
  */
-export const BOX_CLAIMS: readonly string[] = [];
+export const BOX_CLAIMS = ["closed"] as const;
+
+/**
+ * What a box claims, once parsed.
+ *
+ * `through` is the front doors: files inside the directory that outside code is
+ * allowed to reach. An empty list is a real claim rather than a malformed one --
+ * total isolation is unusual but it happens, and this repository's own
+ * `src/viewer` is exactly that shape.
+ */
+export interface BoxClaim {
+  closed: true;
+  through: string[];
+}
+
+export type ParsedBoxClaim = { claim: BoxClaim } | { garbled: string };
+
+/**
+ * A box claim from whatever was written in `customData.claim`.
+ *
+ * Two shapes are accepted because two things write them: `"closed"` is what a
+ * person types, and `{ closed: true, through: [...] }` is what a tool records.
+ * Anything else is garbled and loud -- including `{ closed: false }`, which is
+ * not "no claim" but a claim spelled wrong, and silently ignoring it would let a
+ * box look checked when nothing read it.
+ */
+export function parseBoxClaim(value: unknown): ParsedBoxClaim | undefined {
+  if (value === undefined || value === null) return undefined;
+
+  if (typeof value === "string") {
+    const word = value.trim().toLowerCase().replace(/^@/, "");
+    if (!word) return undefined;
+    return word === "closed" ? { claim: { closed: true, through: [] } } : { garbled: value.trim() };
+  }
+
+  if (typeof value === "object") {
+    const record = value as Record<string, unknown>;
+    /*
+     * `through` is not a claim word, it is the claim's argument, so it is taken
+     * out before the vocabulary is checked. Leaving it in made a box with doors
+     * read as claiming "closed+through", which is a word nobody wrote and a
+     * refusal nobody could act on.
+     */
+    const { through: listed, ...words } = record;
+    const set = Object.keys(words).filter((key) => words[key]);
+    if (set.length === 0) return { garbled: Object.keys(words).join("+") || "{}" };
+    if (set.length !== 1 || set[0] !== "closed") return { garbled: set.join("+") };
+    const through = Array.isArray(listed)
+      ? listed
+        .filter((entry): entry is string => typeof entry === "string" && entry.trim() !== "")
+        .map((entry) => entry.trim())
+      : [];
+    return { claim: { closed: true, through } };
+  }
+
+  return { garbled: String(value) };
+}
 
 export type ParsedClaim =
   | { claim: ArrowClaim }
@@ -61,11 +121,9 @@ export function arrowClaimError(written: string): string {
   return `"@${written}" is not something an arrow can claim. Use ${vocabulary(ARROW_CLAIMS)}, or drop the @.`;
 }
 
-/** The sentence shown when a box claims anything at all, which nothing checks yet. */
+/** The sentence shown when a box claims a word that is not a claim. */
 export function boxClaimError(written: string): string {
-  return BOX_CLAIMS.length === 0
-    ? `"${written}" is not something a box can claim yet: box claims arrive with the check that judges them.`
-    : `"${written}" is not something a box can claim. Use ${vocabulary(BOX_CLAIMS)}.`;
+  return `"${written}" is not something a box can claim. Use ${vocabulary(BOX_CLAIMS)}, or drop it.`;
 }
 
 /**

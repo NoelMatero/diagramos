@@ -42,6 +42,11 @@ export type GraphNode = {
    * `external`. Carried through to customData; layout ignores it.
    */
   state?: NodeState;
+  /**
+   * Claims that nothing outside this box's directory reaches inside it, except
+   * through the listed doors. Carried through to customData; layout ignores it.
+   */
+  closed?: { through?: string[] };
 };
 export type GraphEdge = {
   from: string;

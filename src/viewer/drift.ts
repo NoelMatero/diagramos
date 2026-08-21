@@ -19,7 +19,11 @@ export type Tone = "bad" | "warn" | "good" | "dim";
  */
 export interface DriftView {
   clean: boolean;
-  findings: Array<{ node: string; label: string; ref: string; kind: string }>;
+  findings: Array<{
+    node: string; label: string; ref: string; kind: string;
+    /** Only read for `open-box`, whose evidence is a file the box does not name. */
+    detail?: string;
+  }>;
   edges: Array<{
     from: string; to: string; fromLabel: string; toLabel: string; node: string;
     /** `backwards-edge` is the only value this page treats differently. */
@@ -114,7 +118,12 @@ export function rowsOf(report: DriftView): StatusRow[] {
       tone: "bad" as Tone,
     })),
     ...report.findings.map((finding) => ({
-      text: `${name(finding.label, finding.node)} → ${finding.ref}`,
+      // `open-box` is the one finding whose evidence is somewhere else entirely,
+      // so "box → its ref" would name the directory that is fine rather than the
+      // file that reached into it.
+      text: finding.kind === "open-box"
+        ? `${name(finding.label, finding.node)} · ${finding.detail ?? "something outside reaches in"}`
+        : `${name(finding.label, finding.node)} → ${finding.ref}`,
       tone: "bad" as Tone,
       node: finding.node,
     })),
