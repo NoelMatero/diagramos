@@ -80,15 +80,32 @@ function unquote(text: string): string {
   return text.length >= 2 ? text.slice(1, -1) : text;
 }
 
-/** The first string literal passed to a call: the specifier of `require`/`import`. */
+/**
+ * The first string literal passed to a call: the specifier of `require`/`import`.
+ *
+ * Backticks count, but only with nothing interpolated into them. ``import(`./x`)``
+ * is a string that happens to be quoted oddly and every compiler reads it as one;
+ * ``import(`./${name}`)`` is a value, and guessing at it is how a reader starts
+ * inventing dependencies. The `dynamic-import` flag already records that the file
+ * reaches out at runtime, so nothing is lost by declining the second.
+ */
 function firstStringArgument(call: Node): Node | undefined {
   const args = call.childForFieldName("arguments");
   if (!args) return undefined;
   for (let index = 0; index < args.childCount; index += 1) {
     const child = args.child(index);
     if (child?.type === "string") return child;
+    if (child?.type === "template_string" && !interpolated(child)) return child;
   }
   return undefined;
+}
+
+/** True when a template has any `${...}` in it, which makes its value runtime-only. */
+function interpolated(template: Node): boolean {
+  for (let index = 0; index < template.childCount; index += 1) {
+    if (template.child(index)?.type === "template_substitution") return true;
+  }
+  return false;
 }
 
 /**

@@ -40,7 +40,12 @@ export interface DependencyMeasurement {
  * install -- generated, gitignored, and nobody's source. Measuring a reader
  * against minified output says nothing about whether it can read code.
  */
-const SKIP = new Set(["node_modules", ".git", "out", "graphify", "graphify-out", ".claude"]);
+const SKIP = new Set([
+  "node_modules", ".git", "out", "graphify", "graphify-out", ".claude",
+  // Somebody else's repositories, cloned by `npm run measure:licence`. Walking
+  // into them turns a measurement of this tree into a measurement of five others.
+  ".corpus",
+]);
 
 /**
  * Only the one at the root. `.gitignore` writes it `/vendor/` and says why: an
