@@ -242,7 +242,7 @@
         "origin": "diagram",
         "diagram": "driftcheck",
         "node": "find",
-        "ref": "src/engine/drift.ts#findBoards"
+        "ref": "src/engine/drift.ts#findBoards@declared"
       }
     },
     {
@@ -395,7 +395,7 @@
         "origin": "diagram",
         "diagram": "driftcheck",
         "node": "check",
-        "ref": "src/engine/drift.ts#checkDrift"
+        "ref": "src/engine/drift.ts#checkDrift@declared"
       }
     },
     {
@@ -583,7 +583,7 @@
         "origin": "diagram",
         "diagram": "driftcheck",
         "node": "baseline",
-        "ref": "src/engine/drift.ts#createGitBaseline"
+        "ref": "src/engine/drift.ts#createGitBaseline@declared"
       }
     },
     {
@@ -626,7 +626,7 @@
         "origin": "diagram",
         "diagram": "driftcheck",
         "node": "coverage",
-        "ref": "src/engine/drift.ts#sourceFilesUnder"
+        "ref": "src/engine/drift.ts#sourceFilesUnder@declared+used"
       }
     },
     {
@@ -669,7 +669,7 @@
         "origin": "diagram",
         "diagram": "driftcheck",
         "node": "render",
-        "ref": "scripts/check-drift.mjs#render"
+        "ref": "scripts/check-drift.mjs#render@declared+used"
       }
     },
     {
@@ -716,7 +716,7 @@
         "origin": "diagram",
         "diagram": "driftcheck",
         "node": "box",
-        "ref": "scripts/lib/box.mjs#box"
+        "ref": "scripts/lib/box.mjs#box@declared"
       }
     },
     {

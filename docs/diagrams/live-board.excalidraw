@@ -183,7 +183,7 @@
         "origin": "diagram",
         "diagram": "liveboard",
         "node": "find",
-        "ref": "src/engine/drift.ts#findBoards"
+        "ref": "src/engine/drift.ts#findBoards@declared"
       }
     },
     {

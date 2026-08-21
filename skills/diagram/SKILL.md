@@ -85,25 +85,36 @@ arrows between boxes are checked against it.
 ### Claiming a symbol is still wired in
 
 A plain `path#symbol` asks only whether the name appears in the file, so a file
-holding nothing but a comment mentioning it passes. Add `@` when the box means
-something stronger:
+holding nothing but a comment mentioning it passes. Add `@` to record what you
+actually read there:
 
-| you mean | write |
+| what the file showed you | write |
 | --- | --- |
-| this file defines it | `src/lib.rs#log_line@declared` |
+| the symbol is declared here | `src/lib.rs#log_line@declared` |
 | something here calls it | `src/server.rs#log_line@used` |
-| it lives here and is wired in | `src/lib.rs#log_line@declared+used` |
+| both — it lives here and is wired in | `src/lib.rs#log_line@declared+used` |
+
+**Transcribe it, never infer it.** Setting a symbol ref means you already had
+that file open to find the symbol, so both answers were on screen: you saw the
+`fn`, the `def`, the `export function` — that is `@declared`; you saw the name
+again somewhere that was not its declaration — that is `@used`. Write the ones
+you saw and stop. Do not add `@used` because a box labelled "logging" is
+obviously called from somewhere: that is a hypothesis, and a hypothesis that
+ages badly is indistinguishable from real drift later.
+
+A symbol declared here but called only by other files gets `@declared` alone,
+and that is the common case, not a shortfall. If you did not look, leave the
+suffix off entirely — a plain `path#symbol` is a smaller claim, not a worse one.
+
+The cost of guessing instead is measured: applied blindly to all 121 exports in
+this repo, "declared and used" flags 35 of them — 29% noise — because an export
+used only by its importers looks unused where it is written. Applied where
+someone had actually read the file, it was quiet.
 
 Those two words are the whole vocabulary; anything else after `@` is a broken
 ref and says so immediately. TypeScript, TSX, JavaScript, Rust and Python are
 read properly; in any other language the claim quietly falls back to a plain
 mention.
-
-**Write `@declared+used` only when the box means "this feature is wired in".**
-For a box that means "this thing exists", leave it off. The distinction is not
-cosmetic: applied blindly to all 134 exports in this repo, "declared and used"
-flags 42 of them, because a module used only by its importers looks unused where
-it is written. Applied where it is actually meant, it is quiet.
 
 For a feature spread across files, name the files — the box carries the graph:
 

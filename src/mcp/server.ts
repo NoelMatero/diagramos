@@ -145,7 +145,13 @@ const nodeSchema = z.object({
       + "(src/server/board-server.ts#/api/board, optionally with a method token as in #GET /api/board, "
       + "which is read but never verified). Set it when a node is "
       + "real code so check_drift can tell when it goes stale. Leave it off for anything not in this "
-      + "repository, and say why with state or the board's describes.",
+      + "repository, and say why with state or the board's describes. "
+      + "A symbol ref may end in @declared, @used, or @declared+used, which narrows the check from "
+      + "'this file mentions the name' to 'this file declares it' and 'something here calls it'. "
+      + "Write it ONLY from the code you just read to locate the symbol: it is a transcription of "
+      + "what was on screen, never a guess about what the box probably does. A symbol declared here "
+      + "but called only from other files takes @declared alone. Unread means no suffix, which is a "
+      + "smaller claim rather than a worse one.",
     ),
   refs: z
     .array(z.string())

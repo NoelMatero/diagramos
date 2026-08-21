@@ -496,6 +496,13 @@ when you have read the dependency in the code, so the claim is a transcription
 and not a hypothesis. A later "wrong" then means *this was true when drawn, and
 the code has moved*.
 
+The same rule governs `@declared` / `@used` on a box, and it costs nothing to
+follow: setting a symbol ref already means having that file open, so the
+declaration and the call sites were on screen when the ref was written.
+Transcribing them is free; guessing them is what produces the 29%. A symbol
+declared in one file and called only from others takes `@declared` alone, and a
+file nobody read takes no suffix at all — the smaller claim, not the worse one.
+
 ## Two jobs, deliberately separate
 
 | | Cost | Needs a model | When to run |
