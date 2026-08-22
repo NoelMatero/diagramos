@@ -1,3 +1,6 @@
+experiementing with a new interface for vibecoding / understanding code. not done
+
+
 <h1 align="center">Diagramos</h1>
 
 <p align="center">
