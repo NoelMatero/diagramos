@@ -51,6 +51,7 @@ import {
 } from "../src/engine/drift.ts";
 import { initEngine } from "../src/engine/parse.ts";
 import { createCodeGraphOption } from "../src/engine/codegraph.ts";
+import { createLedger } from "../src/engine/ledger.ts";
 import { goodNewsIds, goodNewsLine, goodNewsSince, novelGoodNews } from "../src/engine/goodnews.ts";
 
 const root = process.cwd();
@@ -193,6 +194,7 @@ const NEEDS_WITHHELD = {
   unreadable: "with an end that could not be read",
   incomplete: "with an end that could not be parsed to the end",
   dynamic: "with an end that reaches out at runtime",
+  unvouched: "with an end no source index has ever read",
   "same-file": "pointing at their own file",
   cycle: "in a cycle, where neither direction is more correct",
 };
@@ -591,6 +593,10 @@ await initEngine();
 // failure is silence: the checker below runs exactly as it does without it.
 const codeGraphOption = createCodeGraphOption(root);
 
+// Which files a source index has read, so a verdict is never built on one
+// nothing has. No manifest means no gate, not an empty one.
+const ledger = createLedger(root);
+
 /**
  * Boards that improved since their last commit: a box added, a box or arrow
  * somebody other than this hook flipped to built (#67). Bad news always
@@ -612,6 +618,7 @@ for (const file of checking) {
       coverage: opts.coverage,
       ...(baseline ? { baseline } : {}),
       ...(codeGraphOption ? { codeGraph: codeGraphOption } : {}),
+      ...(ledger ? { ledger } : {}),
     });
     // Read before promotions are applied below, so a flip the hook makes this
     // run is announced once as "promoted" and never again as news.

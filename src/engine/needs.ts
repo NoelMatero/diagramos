@@ -14,6 +14,9 @@
  * So the whole file is written as reasons not to answer. A verdict needs all of:
  *
  * - both files in a language whose reader has been **measured** (`licence.ts`);
+ * - both files **vouched for** by a source index (`ledger.ts`), so the text we
+ *   read is text some other tool also thinks is source of this repository, and
+ *   not a generated bundle or a script hidden away in a dotted directory;
  * - both files **parsed to the end**, because "there is no dependency in here"
  *   is a statement about the whole file and a recovered parse read less than one;
  * - neither file **reaching out at runtime**, where no reader can follow;
@@ -25,6 +28,7 @@
  * and always safe; the accusation is not.
  */
 import { readDependencies } from "./deps";
+import { vouchedFor, type Ledger } from "./ledger";
 import { licenceFor } from "./licence";
 import type { ConfigCache } from "./resolve";
 import type { Workspace } from "./workspace";
@@ -35,6 +39,8 @@ export type NeedsWithheld =
   | "unlicensed"
   /** One end could not be read at all -- missing, or a language with no grammar. */
   | "unreadable"
+  /** No source index has ever read one end, so it may not be source at all. */
+  | "unvouched"
   /** A parse recovered from an error, so nothing can be proved absent in it. */
   | "incomplete"
   /** One end reaches out at runtime; the text is not the whole story. */
@@ -70,11 +76,19 @@ function declares(
   file: string,
   workspace: Workspace,
   cache: ConfigCache,
+  ledger?: Ledger,
 ): { on: Map<string, NeedsEvidence>; why?: NeedsWithheld } {
   if (!licenceFor(file)) return { on: new Map(), why: "unlicensed" };
 
   const absolute = workspace.resolve(file);
   if (!absolute || workspace.stat(absolute) !== "file") return { on: new Map(), why: "unreadable" };
+
+  /*
+   * Checked before the parse, and after the stat, so a file that is simply gone
+   * is told that rather than this. The order costs one directory lookup and buys
+   * the more useful sentence.
+   */
+  if (!vouchedFor(ledger, file)) return { on: new Map(), why: "unvouched" };
 
   const read = readDependencies(file, workspace.read(absolute), workspace, cache);
   if (!read) return { on: new Map(), why: "unreadable" };
@@ -116,12 +130,13 @@ export function checkNeeds(
   to: string,
   workspace: Workspace,
   cache: ConfigCache = new Map(),
+  ledger?: Ledger,
 ): NeedsVerdict {
   if (from === to) return { verdict: "withheld", why: "same-file" };
 
-  const tail = declares(from, workspace, cache);
+  const tail = declares(from, workspace, cache, ledger);
   if (tail.why) return { verdict: "withheld", why: tail.why };
-  const head = declares(to, workspace, cache);
+  const head = declares(to, workspace, cache, ledger);
   if (head.why) return { verdict: "withheld", why: head.why };
 
   const forward = tail.on.get(to);
