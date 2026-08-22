@@ -51,6 +51,15 @@ export interface LicenceMeasurement {
   incomplete: string[];
   /** Files that reach out at runtime, which a verdict already refuses to use. */
   dynamic: string[];
+  /**
+   * Source files no compilation unit declares, so the referee never opened them.
+   *
+   * Rust only, and not the same thing as `skipped`: a skipped file has no
+   * grammar, an unloaded one has no crate. Kept apart because they say different
+   * things about what the licence covers -- the first is a language we cannot
+   * read, the second is code nothing compiles.
+   */
+  unloaded?: string[];
 }
 
 const SKIP_DIRECTORIES = new Set([

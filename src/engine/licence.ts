@@ -33,6 +33,21 @@ export interface CorpusEntry {
   missed: number;
   /** Reader had it, the referee did not. */
   invented: number;
+  /**
+   * Source files present in the tree that the measurement left out entirely,
+   * because the referee never opened them.
+   *
+   * Recorded rather than netted off, and the reason is the point of this whole
+   * file. A file no crate declares is a file rustc never compiles, so
+   * rust-analyzer has no opinion about it and neither may we -- the exclusion is
+   * symmetric, and `files` above already counts only what was compared, so the
+   * recall and precision are honest about the sample they describe. What they
+   * cannot tell you is how big that sample was as a fraction of the tree, and a
+   * reader who cannot see the denominator cannot argue with the number. Rust
+   * leaves out 15% of the corpus this way, and the files a referee fails to load
+   * are not a random 15%: they are the awkward ones.
+   */
+  unmeasured?: number;
 }
 
 export interface Licence {
@@ -81,6 +96,58 @@ export const LICENCES: readonly Licence[] = [
         "takes the TypeScript file, the reader takes the one actually named, and " +
         "there is no third answer in the text. One vite test fixture does this, " +
         "which is both the miss and the invention in that row.",
+    ],
+  },
+  {
+    language: "rust",
+    extensions: [".rs"],
+    measured: "2026-08-22",
+    referee:
+      "rust-analyzer, asked for an LSIF dump: the same name resolution an " +
+      "editor does, written by people who were not us. A path is counted as " +
+      "naming a file when the thing it resolves to is a *module* -- which " +
+      "rust-analyzer states itself, in the hover text on every result -- so " +
+      "the two sides mean the same thing by an edge. Neither a nightly " +
+      "toolchain nor a successful build is needed, which is what makes " +
+      "measuring five repositories practical.",
+    /*
+     * Rust is here to prove the licence is a mechanism rather than a story told
+     * about TypeScript, and it did not go through unchanged: the reader lost
+     * and regained recall six times against these five repositories, and every
+     * recovery was a rule of the language nobody would have guessed at from
+     * inside a repository with no Rust in it -- `[[bin]] path`, `autotests =
+     * false`, uniform paths, `pub extern crate .. as ..`, `super` inside an
+     * inline module, `#[path]` sharing a module between two crates.
+     */
+    corpus: [
+      { name: "dtolnay/anyhow", url: "https://github.com/dtolnay/anyhow.git", commit: "bf3ed9149f4334c984c1ad252b534107b307078c", files: 28, edges: 48, missed: 0, invented: 1, unmeasured: 9 },
+      { name: "BurntSushi/ripgrep", url: "https://github.com/BurntSushi/ripgrep.git", commit: "3fce3b5bb0236da2df6d99672afb8a719642eca7", files: 104, edges: 357, missed: 0, invented: 8, unmeasured: 6 },
+      { name: "serde-rs/json", url: "https://github.com/serde-rs/json.git", commit: "afdf6fc67247dd7fa4fcde1381e6ecc6bcc7a30e", files: 55, edges: 187, missed: 0, invented: 18, unmeasured: 16 },
+      { name: "rust-lang/regex", url: "https://github.com/rust-lang/regex.git", commit: "72d650cb0a880a01ab6dc2137c0888e8f89740f7", files: 214, edges: 1304, missed: 0, invented: 1, unmeasured: 13 },
+      { name: "clap-rs/clap", url: "https://github.com/clap-rs/clap.git", commit: "6982fb1c98c7247e38a6d4f04191b94e30497e7b", files: 261, edges: 643, missed: 5, invented: 1, unmeasured: 69 },
+    ],
+    known: [
+      "A file compiled into two crates at once, where `crate::` has a different " +
+        "answer in each. serde_json's tests/lexical.rs says `#[path = " +
+        "\"../src/lexical/mod.rs\"] mod lexical;`, so src/lexical/*.rs belongs to " +
+        "the library and to that test; clap_complete_nushell's tests/common.rs is " +
+        "both a module of another test and a test target of its own. Both answers " +
+        "are true, in different builds, and the reader gives both. rust-analyzer " +
+        "files each source file under one crate and gives that one -- which is " +
+        "also why it has no edge for src/lib.rs's own `mod lexical;`, a line " +
+        "plainly there in the text. Nineteen of the twenty-nine inventions.",
+      "`super` written inside an inline `#[cfg(test)] mod tests`. The reader takes " +
+        "the language's rule: the enclosing module, which is that same file. The " +
+        "referee reports it as the file in two places in this corpus and as the " +
+        "file's parent in five others, so both signs of this disagreement are " +
+        "present -- clap's five misses, and two of the inventions.",
+      "Code behind a feature flag. `#[cfg(feature = \"pcre2\")] pub extern crate " +
+        "grep_pcre2 as pcre2;` is a dependency under that feature and nothing " +
+        "under the default build the referee indexes. Five of ripgrep's eight.",
+      "A path inside a `macro_rules!` body. `$crate::util::setup(..)` is a real " +
+        "dependency of the crate the macro is written in; the referee does not " +
+        "resolve paths in a definition nobody has expanded. anyhow's one and two " +
+        "of ripgrep's.",
     ],
   },
 ];

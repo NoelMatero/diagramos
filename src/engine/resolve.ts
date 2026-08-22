@@ -33,6 +33,7 @@
  * - `baseUrl` alone resolves too, and a config with a baseUrl and no paths used
  *   to yield nothing at all (#2153).
  */
+import type { RustLayout } from "./rust";
 import type { Workspace } from "./workspace";
 
 /**
@@ -93,7 +94,7 @@ interface ConfigRules {
  * and a tsconfig read once and remembered forever is a fact with a shelf life --
  * the exact rot this tool exists to catch.
  */
-export type ConfigCache = Map<string, ConfigRules | ImportRules | undefined>;
+export type ConfigCache = Map<string, ConfigRules | ImportRules | RustLayout | undefined>;
 
 /** `a/b/../c` -> `a/c`, without needing to know where the repo root is. */
 function normalizeRelative(value: string): string {
@@ -216,7 +217,7 @@ function rulesFor(fromFile: string, workspace: Workspace, cache: ConfigCache): C
     cache.set(directory, configFile ? rulesFrom(configFile, workspace, new Set()) : undefined);
   }
   const cached = cache.get(directory);
-  return cached?.kind === "imports" ? undefined : cached;
+  return cached === undefined || cached.kind !== undefined ? undefined : cached;
 }
 
 /**

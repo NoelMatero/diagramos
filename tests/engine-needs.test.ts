@@ -154,11 +154,16 @@ describe("the reasons not to answer", () => {
   });
 
   it("says nothing about a language nobody measured", () => {
-    const rust = {
-      "main.rs": 'mod helper;\nfn main() { helper::go(); }\n',
-      "helper.rs": "pub fn go() {}\n",
+    /*
+     * Go, because Rust stopped being an example of this the day it got a
+     * licence -- which is the mechanism working. The point of the test is the
+     * gate, not the language: whatever has not been measured is silent.
+     */
+    const go = {
+      "main.go": 'package main\n\nimport "example/helper"\n\nfunc main() { helper.Go() }\n',
+      "helper/helper.go": "package helper\n\nfunc Go() {}\n",
     };
-    expect(checkNeeds("helper.rs", "main.rs", fakeWorkspace(rust)))
+    expect(checkNeeds("helper/helper.go", "main.go", fakeWorkspace(go)))
       .toEqual({ verdict: "withheld", why: "unlicensed" });
   });
 

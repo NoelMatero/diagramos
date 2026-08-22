@@ -29,6 +29,7 @@ import { arrowClaimError, boxClaimError } from "./claim";
 import { checkClosed, type ClosedBreach } from "./closed";
 import { connects, refIsStale, type CodeGraphOption } from "./codegraph";
 import { readGraph, type Provenance, type RecoveredGraph } from "./graph";
+import { licenceFor } from "./licence";
 import { languageOf, type Language } from "./parse";
 import { ledgerAdditions, type Ledger } from "./ledger";
 import { checkNeeds, type NeedsWithheld } from "./needs";
@@ -474,6 +475,20 @@ const REGEX_SPECIAL = /[.*+?^${}()|[\]\\]/g;
 /** Files whose imports this can parse. Everything else is silent, never wrong. */
 const TS_JS = /\.(ts|tsx|js|jsx|mjs|cjs)$/;
 
+/**
+ * Files the dependency reader has a measured licence for.
+ *
+ * Wider than `TS_JS` and deliberately tied to `licence.ts` rather than to a
+ * second list: `closed` asks whether *anything* in the repository reaches into a
+ * directory, and a walk that only looked at TypeScript would report a green box
+ * over a Rust subsystem it never opened. A file with no licence is not silence
+ * here -- `checkClosed` records it as unread, which costs the claim its
+ * confirmation -- so what belongs in this walk is exactly what can be read.
+ */
+function readableSource(name: string): boolean {
+  return licenceFor(name) !== undefined;
+}
+
 /** Splits `path#symbol`. Either half may be empty; the caller decides. */
 export function parseRef(ref: string): { path: string; symbol?: string } {
   const hash = ref.indexOf("#");
@@ -562,7 +577,7 @@ function sourceFilesUnder(rootAbsolute: string, workspace: Workspace): string[] 
       const child = `${directory}${path.sep}${entry}`;
       const kind = workspace.stat(child);
       if (kind === "directory") queue.push(child);
-      else if (kind === "file" && TS_JS.test(entry)) {
+      else if (kind === "file" && readableSource(entry)) {
         if (found.length >= WALK_FILE_CAP) return undefined;
         found.push(child);
       }
@@ -1764,9 +1779,11 @@ export function checkDrift(
         } else if (needs.verdict === "cycle") {
           /*
            * Both directions exist, so neither arrow is more correct than the
-           * other. Cycles are legal in TypeScript, and the rule is *if both
-           * directions exist, say nothing* -- never *ties do not happen*. This
-           * repository has none today, which is luck rather than law.
+           * other. Cycles are legal in every language licensed here, and the
+           * rule is *if both directions exist, say nothing* -- never *ties do
+           * not happen*. This repository has none today, which is luck rather
+           * than law; Rust crates have them constantly, because a module naming
+           * `crate::` and a root naming `mod` is a cycle by construction.
            */
           claims.needsWithheld.cycle = (claims.needsWithheld.cycle ?? 0) + 1;
         } else {
