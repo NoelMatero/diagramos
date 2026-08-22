@@ -33,6 +33,21 @@ export interface CorpusEntry {
   missed: number;
   /** Reader had it, the referee did not. */
   invented: number;
+  /**
+   * Source files present in the tree that the measurement left out entirely,
+   * because the referee never opened them.
+   *
+   * Recorded rather than netted off, and the reason is the point of this whole
+   * file. A file no crate declares is a file rustc never compiles, so
+   * rust-analyzer has no opinion about it and neither may we -- the exclusion is
+   * symmetric, and `files` above already counts only what was compared, so the
+   * recall and precision are honest about the sample they describe. What they
+   * cannot tell you is how big that sample was as a fraction of the tree, and a
+   * reader who cannot see the denominator cannot argue with the number. Rust
+   * leaves out 15% of the corpus this way, and the files a referee fails to load
+   * are not a random 15%: they are the awkward ones.
+   */
+  unmeasured?: number;
 }
 
 export interface Licence {
@@ -105,11 +120,11 @@ export const LICENCES: readonly Licence[] = [
      * inline module, `#[path]` sharing a module between two crates.
      */
     corpus: [
-      { name: "dtolnay/anyhow", url: "https://github.com/dtolnay/anyhow.git", commit: "bf3ed9149f4334c984c1ad252b534107b307078c", files: 28, edges: 48, missed: 0, invented: 1 },
-      { name: "BurntSushi/ripgrep", url: "https://github.com/BurntSushi/ripgrep.git", commit: "3fce3b5bb0236da2df6d99672afb8a719642eca7", files: 104, edges: 357, missed: 0, invented: 8 },
-      { name: "serde-rs/json", url: "https://github.com/serde-rs/json.git", commit: "afdf6fc67247dd7fa4fcde1381e6ecc6bcc7a30e", files: 55, edges: 187, missed: 0, invented: 18 },
-      { name: "rust-lang/regex", url: "https://github.com/rust-lang/regex.git", commit: "72d650cb0a880a01ab6dc2137c0888e8f89740f7", files: 214, edges: 1304, missed: 0, invented: 1 },
-      { name: "clap-rs/clap", url: "https://github.com/clap-rs/clap.git", commit: "6982fb1c98c7247e38a6d4f04191b94e30497e7b", files: 261, edges: 643, missed: 5, invented: 1 },
+      { name: "dtolnay/anyhow", url: "https://github.com/dtolnay/anyhow.git", commit: "bf3ed9149f4334c984c1ad252b534107b307078c", files: 28, edges: 48, missed: 0, invented: 1, unmeasured: 9 },
+      { name: "BurntSushi/ripgrep", url: "https://github.com/BurntSushi/ripgrep.git", commit: "3fce3b5bb0236da2df6d99672afb8a719642eca7", files: 104, edges: 357, missed: 0, invented: 8, unmeasured: 6 },
+      { name: "serde-rs/json", url: "https://github.com/serde-rs/json.git", commit: "afdf6fc67247dd7fa4fcde1381e6ecc6bcc7a30e", files: 55, edges: 187, missed: 0, invented: 18, unmeasured: 16 },
+      { name: "rust-lang/regex", url: "https://github.com/rust-lang/regex.git", commit: "72d650cb0a880a01ab6dc2137c0888e8f89740f7", files: 214, edges: 1304, missed: 0, invented: 1, unmeasured: 13 },
+      { name: "clap-rs/clap", url: "https://github.com/clap-rs/clap.git", commit: "6982fb1c98c7247e38a6d4f04191b94e30497e7b", files: 261, edges: 643, missed: 5, invented: 1, unmeasured: 69 },
     ],
     known: [
       "A file compiled into two crates at once, where `crate::` has a different " +

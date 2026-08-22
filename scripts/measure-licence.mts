@@ -103,7 +103,9 @@ console.error(`corpus in ${CORPUS_DIRECTORY}`);
 
 async function measureOne(licence: Licence): Promise<void> {
   const measure = harnessFor(licence.language);
-  const rows: Array<{ entry: CorpusEntry; files: number; edges: number; missed: number; invented: number }> = [];
+  const rows: Array<{
+    entry: CorpusEntry; files: number; edges: number; missed: number; invented: number; unmeasured: number;
+  }> = [];
 
   for (const entry of licence.corpus) {
     const root = ensureClone(entry);
@@ -126,6 +128,7 @@ async function measureOne(licence: Licence): Promise<void> {
       edges: measured.refereeEdges.size,
       missed: measured.missed.length,
       invented: measured.invented.length,
+      unmeasured: measured.unloaded?.length ?? 0,
     });
     if (measured.skipped.length > 0) {
       console.error(`  ${entry.name}: ${measured.skipped.length} source files with no grammar -- the licence covers less than it claims`);
@@ -137,18 +140,21 @@ async function measureOne(licence: Licence): Promise<void> {
 
   console.log("");
   console.log(`${licence.language}`);
-  console.log("repository                files   edges   missed  invented");
+  console.log("repository                files   edges   missed  invented  unmeasured");
   for (const row of rows) {
     console.log(
-      `${row.entry.name.padEnd(24)} ${String(row.files).padStart(5)}  ${String(row.edges).padStart(6)}  ${String(row.missed).padStart(6)}  ${String(row.invented).padStart(8)}`,
+      `${row.entry.name.padEnd(24)} ${String(row.files).padStart(5)}  ${String(row.edges).padStart(6)}  `
+      + `${String(row.missed).padStart(6)}  ${String(row.invented).padStart(8)}  ${String(row.unmeasured).padStart(10)}`,
     );
     const same =
       row.files === row.entry.files && row.edges === row.entry.edges &&
-      row.missed === row.entry.missed && row.invented === row.entry.invented;
+      row.missed === row.entry.missed && row.invented === row.entry.invented
+      && row.unmeasured === (row.entry.unmeasured ?? 0);
     if (!same) {
       moved = true;
       console.log(
-        `${" ".repeat(24)} licence says ${row.entry.files} / ${row.entry.edges} / ${row.entry.missed} / ${row.entry.invented}`,
+        `${" ".repeat(24)} licence says ${row.entry.files} / ${row.entry.edges} / ${row.entry.missed}`
+        + ` / ${row.entry.invented} / ${row.entry.unmeasured ?? 0}`,
       );
     }
   }
@@ -157,12 +163,21 @@ async function measureOne(licence: Licence): Promise<void> {
     (into, row) => ({
       files: into.files + row.files, edges: into.edges + row.edges,
       missed: into.missed + row.missed, invented: into.invented + row.invented,
+      unmeasured: into.unmeasured + row.unmeasured,
     }),
-    { files: 0, edges: 0, missed: 0, invented: 0 },
+    { files: 0, edges: 0, missed: 0, invented: 0, unmeasured: 0 },
   );
   const agreed = totals.edges - totals.missed;
   console.log("");
   console.log(`${totals.files} files, ${totals.edges} dependency edges`);
+  if (totals.unmeasured > 0) {
+    const onDisk = totals.files + totals.unmeasured;
+    console.log(
+      `${totals.unmeasured} of the ${onDisk} source files present were left out: `
+      + `the referee never opened them, so it has no opinion to disagree with `
+      + `(${((totals.unmeasured / onDisk) * 100).toFixed(1)}% of the corpus)`,
+    );
+  }
   console.log(`recall    ${percentOf(agreed, totals.edges)}  (${totals.missed} the referee saw and the reader did not)`);
   console.log(`precision ${percentOf(agreed, agreed + totals.invented)}  (${totals.invented} the reader saw and the referee did not)`);
 

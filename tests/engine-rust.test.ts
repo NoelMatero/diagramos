@@ -19,6 +19,7 @@
  */
 import { describe, expect, it, beforeAll } from "vitest";
 
+import { checkClosed } from "../src/engine/closed";
 import { readDependencies } from "../src/engine/deps";
 import type { Workspace } from "../src/engine/drift";
 import { licenceFor } from "../src/engine/licence";
@@ -478,6 +479,31 @@ describe("the reasons a Rust file cannot support a refutation", () => {
       "src/lib.rs": "cfg_if! {\n    if #[cfg(unix)] { use crate::unix::Fd; }\n}\n",
     };
     expect(flagsOf(files, "src/lib.rs")).toEqual(["macro-expansion"]);
+  });
+
+  it("costs a `closed` box its confirmation, because a macro can hide a `use`", () => {
+    /*
+     * The flag's own words are that the file could be declaring anything and the
+     * reader would not know, and "nothing outside reaches in" is a statement
+     * about every file. So the file is recorded as unread rather than counted as
+     * clean: the box comes back unproven, not green.
+     *
+     * The reader does better than the flag suggests -- it pulls `::`-joined runs
+     * out of token trees and reads `macro_rules!` bodies where they are written
+     * -- so this costs a confirmation only where one would have been a guess.
+     */
+    const files = {
+      "Cargo.toml": MANIFEST,
+      "src/lib.rs": "pub mod engine;\npub mod outside;\n",
+      "src/engine/mod.rs": "pub struct Inner;\n",
+      "src/outside.rs": "wire_up!();\n",
+    };
+    const rust = Object.keys(files).filter((file) => file.endsWith(".rs"));
+    const verdict = checkClosed(
+      "src/engine", ["src/engine/mod.rs"], rust, fakeWorkspace(files), () => false,
+    );
+    expect(verdict.breaches).toEqual([]);
+    expect(verdict.unread).toEqual(["src/outside.rs"]);
   });
 
   it("does not flag a macro inside a function body", () => {

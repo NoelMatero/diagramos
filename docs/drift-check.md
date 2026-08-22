@@ -552,12 +552,24 @@ asymmetry is the whole design, because `needs` is about one pair of files and
 Getting that backwards is the failure worth naming: a walk that quietly skipped
 what it could not read would paint a green box over a subsystem it never opened.
 
-**Only two of the four escape flags count here.** `needs` withholds on all of
-them; `closed` cares about `dynamic-import` and `eval` alone, because no *call*
-creates a module dependency that is not already declared somewhere in the text.
-You cannot import through `table[key]()`. The two claims ask different things of
-the same flags, and treating all four as equally blinding would cost a
-confirmation for no reason.
+**Three of the five escape flags count here.** `needs` withholds on all of them,
+because any of them makes the text an incomplete account of what a file does.
+`closed` asks something narrower — *could there be an import in here we did not
+see?* — and the answer splits them:
+
+| flag | hides an import? |
+| --- | --- |
+| `dynamic-import`, `eval` | yes, at runtime |
+| `macro-expansion` | yes: a macro at item position is exactly where a `use` can be written and not read |
+| `computed-call`, `mutable-function` | no. You cannot import through `table[key]()`, and no *call* creates a module dependency that is not already declared somewhere in the text |
+
+The reader does better on macros than the flag suggests — it reassembles
+`::`-joined runs out of token trees and reads `macro_rules!` bodies where they
+are defined — but a macro from another crate can still expand to a path no file
+here spells, and a claim that everything was read cannot be built on a file that
+says it does not know what it declares. The split is by what an escape can hide,
+not by how alarming it sounds, and it costs a confirmation only where a
+confirmation would have been a guess.
 
 **Tests are exempt, and the exemption is loud.** Tests reach into everything and
 have to: testing a private function means importing it. Counting them would make
@@ -854,6 +866,16 @@ argument for the licence in one paragraph.
 | invented | 1 | 29 |
 | recall | 99.984% | **99.803%** |
 | precision | 99.992% | **98.869%** |
+| source files left out of the measurement | 0 | **113 of 775 (15%)** |
+
+**Rust's sample is 85% of its corpus, and the last row is why.** A file no crate
+declares is a file rustc never compiles, so rust-analyzer never opens it and has
+no opinion to disagree with. Those files are excluded from both sides, so the
+percentages are honest about the sample they describe — but the sample is not the
+tree, and the files a referee fails to load are not a random 15%: they are the
+awkward ones. Clap alone accounts for 69 of the 113. The count is recorded per
+repository in `licence.ts` and `--check` fails if it moves, because a number
+whose denominator you cannot see is a number you cannot argue with.
 
 Rust's precision is the weaker number and the licence says why rather than
 rounding it away. Nineteen of the twenty-nine are one shape: a file compiled
