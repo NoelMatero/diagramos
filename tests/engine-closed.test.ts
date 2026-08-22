@@ -187,9 +187,11 @@ describe("confirming is gated: silence has to be earned", () => {
   });
 
   it("records a file in a language nobody measured", () => {
-    const files = { ...clean, "src/main.rs": "mod helper;\n" };
+    // Go, because Rust has a licence now. An unlicensed file is not skipped:
+    // it is written down, and it costs the box its confirmation.
+    const files = { ...clean, "src/main.go": 'package main\n\nimport "x"\n' };
     const verdict = checkClosed("src/engine", [], Object.keys(files), fakeWorkspace(files), NO_TESTS);
-    expect(verdict.unread).toEqual(["src/main.rs"]);
+    expect(verdict.unread).toEqual(["src/main.go"]);
   });
 
   it("does not count a computed call, which cannot hide an import", () => {

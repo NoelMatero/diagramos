@@ -27,11 +27,25 @@
  *   reader can follow. One flag on either endpoint has to be enough to withhold
  *   a verdict, so they are collected per file and never per repo.
  *
- * Nothing calls this yet. It produces no verdict and changes no report.
+ * Rust is read by `deps-rust.ts` and returned in the same shape, because what
+ * a caller wants is the same three answers whatever the language. Almost
+ * nothing else is shared: a TypeScript dependency is a string literal in one
+ * of four statements, and a Rust one is a path into a module tree no single
+ * file contains.
  */
 import { each, languageOf, parseSource, type Node } from "./parse";
 import { resolveDependency, type ConfigCache } from "./resolve";
+import { readRustLayout } from "./rust";
+import { readRustDependencies } from "./deps-rust";
 import type { Workspace } from "./workspace";
+
+/**
+ * Where the Rust module tree is kept between files.
+ *
+ * A `\0` cannot appear in a path, so this key can never be mistaken for the
+ * directory lookups sharing the map.
+ */
+const RUST_LAYOUT_KEY = "\0rust-layout";
 
 /**
  * Why a file cannot be read statically.
@@ -53,7 +67,15 @@ export type DynamicReason =
    * this repo are inferred argument passing, and none touch `layout.ts`, where
    * `measurerOverride?.()` is exactly this shape.
    */
-  | "mutable-function";
+  | "mutable-function"
+  /**
+   * A macro at item position, which parses as a token tree and nothing else.
+   *
+   * Rust only. `cfg_if! { use crate::unix::Fd; }` puts a real import somewhere
+   * no grammar can see it -- the `use` inside is three loose tokens -- so the
+   * file could be declaring anything and the reader would not know.
+   */
+  | "macro-expansion";
 
 export interface FileDependency {
   /** The specifier as written, so a report can quote the line. */
@@ -167,11 +189,24 @@ export function readDependencies(
   configs: ConfigCache = new Map(),
 ): FileDependencies | undefined {
   const language = languageOf(filePath);
+  if (language === "rust") {
+    /*
+     * Rust resolves against a module tree rather than against the filesystem,
+     * and the tree is a fact about the whole repository -- a path can name a
+     * sibling package in the same workspace. So it is built once and kept in
+     * the same cache the tsconfig lookups use, under a key no path can collide
+     * with.
+     */
+    const cached = configs.get(RUST_LAYOUT_KEY);
+    const layout = cached?.kind === "rust-layout" ? cached : readRustLayout(workspace);
+    configs.set(RUST_LAYOUT_KEY, layout);
+    return readRustDependencies(filePath, source, workspace, layout);
+  }
   if (!language || (language !== "ts" && language !== "tsx" && language !== "js")) {
-    // Deliberately TypeScript and JavaScript only. Every other grammar this
-    // engine loads declares dependencies differently, and a reader that guesses
-    // at a language it was not measured on is the thing the licence step exists
-    // to prevent.
+    // Deliberately TypeScript and JavaScript only, plus Rust above. Every other
+    // grammar this engine loads declares dependencies differently, and a reader
+    // that guesses at a language it was not measured on is the thing the licence
+    // step exists to prevent.
     return undefined;
   }
   const tree = parseSource(source, language);

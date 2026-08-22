@@ -202,7 +202,8 @@ describe("the licence on record", () => {
 
   it("covers a file this tool would actually read", () => {
     expect(licenceFor("src/engine/drift.ts")?.language).toBe("typescript");
-    expect(licenceFor("src/engine/board.rs")).toBeUndefined();
+    expect(licenceFor("src/engine/board.rs")?.language).toBe("rust");
+    expect(licenceFor("src/main.go")).toBeUndefined();
     expect(licenceFor("docs/notes.md")).toBeUndefined();
   });
 

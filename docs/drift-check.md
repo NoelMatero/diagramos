@@ -476,12 +476,12 @@ Five gates, all required:
 | --- | --- |
 | the arrow carries `needs` | an unclaimed arrow means "related somehow", which has no opposite |
 | its state is `built` | sketching a dependency that currently runs the other way is a thing people do on purpose |
-| the language is licensed | `licence.ts`, measured against the compiler over 12,824 edges |
+| the language is licensed | `licence.ts` — TypeScript against the compiler over 12,824 edges, Rust against rust-analyzer over 2,539 |
 | both ends are files of this repository | something other than our own reader has to agree the file is source at all — see the ledger below |
 | neither end is dynamic or half-read | a file that reaches out at runtime, or that we could not parse to the end, cannot support *absence* |
 
 And one more that is not a gate but a rule: **if the dependency exists both ways,
-say nothing.** Cycles are legal in TypeScript, and in a cycle neither arrow is
+say nothing.** Cycles are legal in TypeScript and in Rust, and in a cycle neither arrow is
 more correct than the other. The rule is not "ties do not happen" — this
 repository has no cycles today, and that is luck rather than law.
 
@@ -811,16 +811,71 @@ continuously instead — `tests/engine-licence.test.ts` runs the same harness ov
 the working tree and fails on any disagreement at all, which is stricter than a
 number in a table and runs in CI where the corpus cannot.
 
+### A second language, to find out whether this is a mechanism
+
+A fair question about all of the above: is the licence a mechanism, or is it a
+story told about TypeScript? The way to find out is to put through a language
+that shares nothing with TypeScript except the idea of one file needing another
+— and Rust does not even share the word. A TypeScript specifier is a path with
+half the answer written in it. A Rust path names a position in a *module tree*
+that no single file contains: `crate::ptr::Own` is meaningless until the `mod`
+declarations scattered across the crate have said where `ptr` lives.
+
+**The referee is rust-analyzer**, asked for an LSIF dump — the same name
+resolution an editor does, and neither a nightly toolchain nor a successful
+build is needed, which is what made measuring five repositories practical. A
+path counts as naming a file when what it resolves to is a *module*, which
+rust-analyzer states itself in the hover text on every result, so both sides
+mean the same thing by an edge.
+
+It went the way step 3 went, which is the point:
+
+| what was missing | found in |
+| --- | --- |
+| `[[bin]] path = "crates/core/main.rs"` — a crate root nowhere near a `src/` | ripgrep, 95 edges by itself |
+| `autotests = false` — with it, `tests/*.rs` are modules; without, each is its own crate | ripgrep, regex |
+| `super` inside an inline `mod tests`, which is the file itself and not its parent | ripgrep, 11 false edges |
+| a short name the file bound with `use crate::args;` and then wrote as `args::syntax` | regex, 110 edges |
+| `pub extern crate grep_printer as printer;` — a crate re-exported under another name | ripgrep, 30 edges |
+| uniform paths: `pub use generator::*;` beside `mod generator;` | clap |
+| `#[path = "../src/lexical/mod.rs"]`, which puts one file in two crates at once | serde_json |
+| paths inside a macro's token tree, where `write!(f, "{:?}", crate::util::escape::X)` has no path node at all | regex |
+| `quote! { .. }`, which is the *opposite* — code being written, not code being run | clap, 7 false edges |
+
+None of those were guessable from a repository with no Rust in it, which is the
+argument for the licence in one paragraph.
+
+| | TypeScript | Rust |
+| --- | --- | --- |
+| repositories | 5 | 5 |
+| files | 5,759 | 662 |
+| dependency edges | 12,824 | 2,539 |
+| missed | 2 | 5 |
+| invented | 1 | 29 |
+| recall | 99.984% | **99.803%** |
+| precision | 99.992% | **98.869%** |
+
+Rust's precision is the weaker number and the licence says why rather than
+rounding it away. Nineteen of the twenty-nine are one shape: a file compiled
+into two crates at once, where `crate::` means a different file in each build.
+The reader gives both answers; rust-analyzer files each source file under a
+single crate and gives that one. It is the same reason the referee has no edge
+for serde_json's own `mod lexical;`, a line plainly there in the text.
+
 ### What is not licensed
 
 Everything else. The licence names extensions, and a file whose extension no
 licence covers is a file no verdict may be built on — the same silence an
 unsupported language already gets everywhere else in the engine. Graphify's
 per-language extractors sit at visibly different maturities and publish no
-recall figure anywhere, so the number above is a *TypeScript* number and
-transfers to nothing.
+recall figure anywhere, so these numbers transfer to nothing but the languages
+they name.
 
-Nothing consults the licence yet. The verdict that will is a separate change.
+The licence is consulted by `needs` (`needs.ts`) and by `closed` (`closed.ts`),
+and by the walk that feeds `closed`: it looks for every file a licence covers,
+so a Rust file reaching into a closed box is found rather than passed over. A
+file with no licence is not skipped there — it is recorded as unread, which
+costs the box its confirmation.
 
 ## Two jobs, deliberately separate
 
@@ -879,11 +934,12 @@ whether anyone leaves the check switched on.
   is found. This is what hooks and CI call.
 - `npm run measure:deps` — both dependency channels over this tree, and the
   difference between them.
-- `npm run measure:licence` — the reader against the TypeScript compiler over
+- `npm run measure:licence` — the reader against each language's referee over
   the pinned corpus, cloning what is missing into `.corpus/`. `--check` exits
-  non-zero if the committed number has moved; a path argument measures one tree
-  of your own instead. Needs the network, which is why it is a command rather
-  than a test.
+  non-zero if the committed number has moved; `--only=rust` measures one
+  language; a path argument measures one tree of your own instead. Needs the
+  network, and Rust needs `rust-analyzer` on the PATH — without it that half
+  fails loudly rather than scoring nothing against a referee that never ran.
 
 Sharing one implementation in `src/engine/drift.ts` keeps the tool and the
 script from disagreeing.
