@@ -18,7 +18,8 @@
  *   is a statement about the whole file and a recovered parse read less than one;
  * - neither file **reaching out at runtime**, where no reader can follow;
  * - the dependency in **exactly one** direction. Both ways is a cycle, which is
- *   legal in TypeScript and unanswerable: neither arrow is more correct.
+ *   legal in TypeScript and in Rust, and unanswerable either way: neither
+ *   arrow is more correct.
  *
  * Miss any of those and this returns `withheld` with the reason, and the caller
  * falls back to the amber it would have shown anyway. Silence is always available
