@@ -26,6 +26,7 @@ import {
 import { readGraph } from "../engine/graph";
 import { projectGraph } from "./projection";
 import { createCodeGraphOption } from "../engine/codegraph";
+import { createLedger } from "../engine/ledger";
 import { CONFIG_FILE, DEFAULT_DIAGRAM_DIR, diagramDir } from "../engine/config";
 import {
   checkDrift,
@@ -682,11 +683,13 @@ server.registerTool(
       // Grammars load once per process; everything below this line is synchronous.
       await initEngine();
       const codeGraph = createCodeGraphOption(WORKSPACE_ROOT);
+      const ledger = createLedger(WORKSPACE_ROOT);
       for (const file of files) {
         const report = checkDrift(await readBoard(file), workspace, {
           coverage,
           baseline: createGitBaseline(WORKSPACE_ROOT, file),
           ...(codeGraph ? { codeGraph } : {}),
+          ...(ledger ? { ledger } : {}),
         });
         totals.checked += report.checked;
         totals.skipped += report.skipped;

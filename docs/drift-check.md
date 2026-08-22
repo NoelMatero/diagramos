@@ -470,13 +470,14 @@ dependency runs from B to A **and only from B to A**, the arrow is not
 unconfirmed — it is wrong, and the report says so in red, names the file and
 line, and fails the build.
 
-Four gates, all required:
+Five gates, all required:
 
 | gate | why |
 | --- | --- |
 | the arrow carries `needs` | an unclaimed arrow means "related somehow", which has no opposite |
 | its state is `built` | sketching a dependency that currently runs the other way is a thing people do on purpose |
 | the language is licensed | `licence.ts`, measured against the compiler over 12,824 edges |
+| both ends are files of this repository | something other than our own reader has to agree the file is source at all — see the ledger below |
 | neither end is dynamic or half-read | a file that reaches out at runtime, or that we could not parse to the end, cannot support *absence* |
 
 And one more that is not a gate but a rule: **if the dependency exists both ways,
@@ -501,7 +502,8 @@ does, the message opens with *a claim written this turn is already wrong*.
 was never checked look identical in a clean report, and only one of them means
 the diagram is being held to anything. So `--details` names the withheld ones by
 reason: in a cycle, in a language with no measured reader, with an end that
-reaches out at runtime, with an end that could not be parsed to the end.
+reaches out at runtime, with an end that could not be parsed to the end, with an
+end no source index has ever read.
 
 **Where it lives.** `customData.edge.claim` is authoritative, and the word is
 written onto the arrow's label as `@needs` — the same form a human can type onto
@@ -587,6 +589,64 @@ by 37 imports from outside once `drift.ts` is listed as a door, and `src/viewer`
 has no breach at all but cannot be *confirmed*, because 7 files elsewhere import
 at runtime. Both of those are facts nobody knew before the claim existed, which
 is the point.
+
+### The coverage ledger: is this a file of the repository at all?
+
+Every gate above asks something about a file's *contents* — is the language
+measured, did the parse finish, does the code reach out at runtime. None of them
+asks the prior question. The reader will parse a 13 MB generated bundle in
+`vendor/`, or a minified chunk under `out/viewer/assets/`, exactly as cheerfully
+as it parses `src/engine/drift.ts`, and hand back a confident list of
+dependencies from something nobody wrote or maintains.
+
+**Measured on this repo: 142 such files clear every other gate.** They are static,
+they parse to the end, they are in a licensed language. Only this stops them.
+
+So a verdict now needs a second opinion that the file is source, from somewhere
+that is not our own reader. Two places already hold one, and a file only has to
+satisfy **either**:
+
+| authority | what it knows | where it is right |
+| --- | --- | --- |
+| git | everything tracked, plus everything untracked that no ignore rule covers | a file you created one second ago |
+| `graphify-out/manifest.json` | every file graphify walked, with an mtime and an AST hash | a tree with no `.git`, and directories git ignores |
+
+**Either, not both, and the reason is a number.** The manifest alone vouches for
+70 of this repository's 92 source files, because it is built at commit time and
+the files you are working on are the newest ones. Gate on it by itself and the
+check goes quiet on 41 files somebody wrote — which is a gate that switches
+itself off exactly when you are using it. Somebody already wrote down which files
+are build output; it is called `.gitignore`, and `--exclude-standard` is what
+reads it.
+
+**It does not answer freshness, and must not be read as if it does.** The ledger
+says a file *is* source, not that any index of it is current. Our own reader
+always reads the file on disk as it is right now, so a file edited since graphify
+last ran is still perfectly readable. Gating on the AST hash would silence the
+check on every file you touched. Staleness is a question about the *graph*, and
+the code-graph channel already answers it there.
+
+**The two claims use it in opposite directions**, which is the part worth being
+careful about:
+
+- **`needs` subtracts.** It is a claim about two named files, and the accusation
+  says one of them contains no such dependency. An end nothing vouches for is an
+  end at the edge of the repository, and the verdict is withheld — reported as
+  *with an end no source index has ever read*.
+- **`closed` adds.** The tree walk behind it refuses to enter dotted and vendored
+  directories and says nothing about having done so. A script in one of them can
+  import straight into the box, and the box would go green on a walk that never
+  opened the file. The ledger names what is in there, so those files get read
+  after all. A file the ledger has *not* heard of is never held against `closed`:
+  we read the text ourselves, and the absence of an import in it is our own
+  evidence.
+
+**Absent means off.** No git and no manifest, unparseable JSON, a shape we do not
+recognise, a ledger vouching for nothing: all of those switch the gate off
+entirely. A second opinion nobody gave is not a second opinion that said no. On
+this repository every board produces a byte-identical report with the ledger and
+without it — what changed is what would happen if somebody drew an arrow at
+`vendor/excalidraw-headless.mjs`.
 
 **Claims are authored, never inferred.** The measurement in `assert.ts` is the
 standing answer: applied blindly to all 121 exports in this repo, `@declared` /

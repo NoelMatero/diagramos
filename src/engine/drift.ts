@@ -30,6 +30,7 @@ import { checkClosed, type ClosedBreach } from "./closed";
 import { connects, refIsStale, type CodeGraphOption } from "./codegraph";
 import { readGraph, type Provenance, type RecoveredGraph } from "./graph";
 import { languageOf, type Language } from "./parse";
+import { ledgerAdditions, type Ledger } from "./ledger";
 import { checkNeeds, type NeedsWithheld } from "./needs";
 import { resolveDependency, type ConfigCache } from "./resolve";
 import type { Workspace } from "./workspace";
@@ -1206,6 +1207,11 @@ export function checkDrift(
     baseline?: BoardBaseline;
     coverage?: boolean;
     codeGraph?: CodeGraphOption;
+    /**
+     * Which files a source index has actually read. Absent means the gate is
+     * off, not that nothing was read -- see `ledger.ts`.
+     */
+    ledger?: Ledger;
   },
 ): DriftReport {
   const findings: DriftFinding[] = [];
@@ -1504,7 +1510,26 @@ export function checkDrift(
     const walked = rootAbsolute ? sourceFilesUnder(rootAbsolute, workspace) : undefined;
     const relative = (absolute: string) =>
       rootAbsolute ? path.relative(rootAbsolute, absolute).split(path.sep).join("/") : absolute;
-    const files = (walked ?? []).map(relative);
+    /*
+     * The walk plus whatever the ledger knows about the places the walk will not
+     * go.
+     *
+     * `sourceFilesUnder` skips dotted directories and the vendored ones outright,
+     * and says nothing about having done so. For every other caller that is a
+     * sensible tidiness rule; for this one it is a hole, because a script in a
+     * hidden directory can import straight into the box and the box would go
+     * green on a walk that never opened it. The ledger is a second tool's list of
+     * what is in there, so those files get read after all -- and if one of them
+     * reaches in, that is a breach with a line number, not a shrug.
+     *
+     * Additive only. A file the ledger has never heard of is not held against
+     * `closed`: we read the text ourselves and absence of an import in it is our
+     * own evidence, not graphify's. See `ledgerAdditions`.
+     */
+    const walkedRelative = (walked ?? []).map(relative);
+    const files = walked === undefined
+      ? walkedRelative
+      : [...walkedRelative, ...ledgerAdditions(options?.ledger, walkedRelative, workspace)];
 
     for (const node of closedBoxes) {
       claims.closed += 1;
@@ -1723,8 +1748,8 @@ export function checkDrift(
        *
        * Four gates, all required, and three of them are already above: the arrow
        * carried the claim, its state is `built`, and `checkNeeds` refuses unless
-       * both files are in a measured language, both parsed to the end, and
-       * neither reaches out at runtime.
+       * both files are in a measured language, both vouched for by a source
+       * index, both parsed to the end, and neither reaches out at runtime.
        *
        * A verdict of anything but `backwards` falls straight through to the
        * checks below, untouched. That is deliberate and it is what keeps the
@@ -1733,7 +1758,7 @@ export function checkDrift(
        * one goes amber exactly as it did before claims existed.
        */
       if (edge.claim === "needs" && edge.state !== "planned") {
-        const needs = checkNeeds(fromPath, toPath, workspace, importCache.configs);
+        const needs = checkNeeds(fromPath, toPath, workspace, importCache.configs, options?.ledger);
         if (needs.verdict === "withheld") {
           claims.needsWithheld[needs.why] = (claims.needsWithheld[needs.why] ?? 0) + 1;
         } else if (needs.verdict === "cycle") {
