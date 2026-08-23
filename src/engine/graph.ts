@@ -324,8 +324,9 @@ export function readGraph(board: BoardFile): RecoveredGraph {
     consumed.add(shape.id);
   }
 
-  // Edge labels: recorded ones name their edge outright; otherwise a free text
-  // element is matched to the nearest arrow it plausibly annotates.
+  // Edge labels: on boards written before labels were bound to their arrows, a
+  // free text element names its edge through `edgeLabelFor`; otherwise a free
+  // text element is matched to the nearest arrow it plausibly annotates.
   const arrows = elements.filter((element) => element.type === "arrow");
   const recordedEdgeLabel = new Map<string, string>();
   const looseLabels: ExcalidrawElement[] = [];
@@ -400,7 +401,14 @@ export function readGraph(board: BoardFile): RecoveredGraph {
     // claim, and only those are shouted at for a bad one -- the fallback below
     // guesses which arrow a loose piece of text belongs to, and being loud
     // about a guess is how a legend two boxes away becomes an error.
-    const exactLabel = recordedEdgeLabel.get(arrow.id) ?? labelByContainer.get(arrow.id);
+    // The bound label wins. On a board written before edge labels were bound
+    // there can be both, and the bound one is then the newer of the two: the
+    // generated text came with the diagram, and the only way a bound label got
+    // onto that arrow is that somebody typed it. Reading the generated one
+    // first made a hand-typed claim unreadable -- and, worse, made a hand-typed
+    // word that is *not* a claim unrefusable, so the vocabulary could rot
+    // quietly. Whoever touched the arrow last is who the arrow speaks for.
+    const exactLabel = labelByContainer.get(arrow.id) ?? recordedEdgeLabel.get(arrow.id);
     let label = exactLabel;
     let labelClaim: ParsedClaim | undefined;
     if (exactLabel) {

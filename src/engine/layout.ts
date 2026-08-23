@@ -279,6 +279,92 @@ function dedupePoints(points: Array<{ x: number; y: number }>): Array<{ x: numbe
     || point.y !== points[index - 1].y);
 }
 
+type Point = { x: number; y: number };
+
+function spansOf(route: readonly Point[]): number[] {
+  return route.slice(1).map((point, index) => Math.hypot(point.x - route[index].x, point.y - route[index].y));
+}
+
+/**
+ * Splits the longest segment between two indices in half, in place.
+ *
+ * The new point sits on the segment it splits, so the drawn line does not move
+ * -- it just has one more point on it. Returns false when there is nothing left
+ * worth splitting, which is the caller's cue to stop.
+ */
+function splitLongestSegment(route: Point[], from: number, to: number): boolean {
+  let best = -1;
+  let longest = 0;
+  for (let index = from; index < to; index++) {
+    const span = Math.hypot(route[index + 1].x - route[index].x, route[index + 1].y - route[index].y);
+    if (span > longest) {
+      longest = span;
+      best = index;
+    }
+  }
+  if (best < 0 || longest === 0) return false;
+  const start = route[best];
+  const end = route[best + 1];
+  route.splice(best + 1, 0, { x: (start.x + end.x) / 2, y: (start.y + end.y) / 2 });
+  return true;
+}
+
+/**
+ * The route rewritten so its middle point is the middle of the line.
+ *
+ * Excalidraw places a bound label itself, off the route, and the rule it uses
+ * is fixed: with an odd number of points the text is centred on the middle
+ * one. It never sees where ELK reserved room, so the only say the engine has in
+ * where a label lands is which point ends up in the middle -- and the point
+ * halfway along the line is the one with the most clearance on either side,
+ * which is what ELK was reserving room for anyway.
+ *
+ * The short side is padded by splitting segments where the line already runs
+ * straight, so the shape stays the one ELK routed and only the point count
+ * changes.
+ */
+function centreRouteOnItsMidpoint(route: readonly Point[]): Point[] {
+  if (route.length < 2) return [...route];
+  const spans = spansOf(route);
+  const total = spans.reduce((sum, span) => sum + span, 0);
+  if (total === 0) return [...route];
+
+  const points: Point[] = route.map((point) => ({ ...point }));
+  let middle = 0;
+  let remaining = total / 2;
+  for (const [index, span] of spans.entries()) {
+    if (remaining > span && index < spans.length - 1) {
+      remaining -= span;
+      continue;
+    }
+    const ratio = span === 0 ? 0 : Math.min(1, remaining / span);
+    // A halfway mark that already has a point on it takes that point. Inserting
+    // a second one there would be a zero-length segment, which reads as a
+    // duplicate to everything downstream.
+    if (ratio < 1e-6) middle = index;
+    else if (1 - ratio < 1e-6) middle = index + 1;
+    else {
+      const start = route[index];
+      const end = route[index + 1];
+      middle = index + 1;
+      points.splice(middle, 0, {
+        x: start.x + (end.x - start.x) * ratio,
+        y: start.y + (end.y - start.y) * ratio,
+      });
+    }
+    break;
+  }
+
+  while (middle < points.length - 1 - middle) {
+    if (!splitLongestSegment(points, 0, middle)) return points;
+    middle += 1;
+  }
+  while (points.length - 1 - middle < middle) {
+    if (!splitLongestSegment(points, middle, points.length - 1)) return points;
+  }
+  return points;
+}
+
 export async function planDiagramLayout(
   params: LayoutParams,
   origin: { x: number; y: number },
@@ -380,7 +466,7 @@ export async function planDiagramLayout(
   });
 
   const edgeSkeletons: JsonObject[] = [];
-  const edgeLabelSkeletons: JsonObject[] = [];
+  let edgeLabelCount = 0;
   for (const [index, edge] of edges.entries()) {
     const elkEdge = elkEdges.find((candidate) => candidate.id === `edge-${index}`);
     const section = elkEdge?.sections?.[0];
@@ -406,38 +492,40 @@ export async function planDiagramLayout(
       x: origin.x + point.x,
       y: origin.y + point.y,
     })));
-    const routeOrigin = absoluteRoute[0];
+    const labelText = elkEdge?.labels?.[0]?.text?.trim();
+    if (labelText) edgeLabelCount += 1;
+    const route = labelText ? centreRouteOnItsMidpoint(absoluteRoute) : absoluteRoute;
+    const routeOrigin = route[0];
     edgeSkeletons.push({
       id: `${idPrefix}-edge-${index}`,
       type: "arrow",
       x: routeOrigin.x,
       y: routeOrigin.y,
-      points: absoluteRoute.map((point) => [point.x - routeOrigin.x, point.y - routeOrigin.y]),
+      points: route.map((point) => [point.x - routeOrigin.x, point.y - routeOrigin.y]),
       start: { id: elementIdByNode.get(edge.from) },
       end: { id: elementIdByNode.get(edge.to) },
       endArrowhead: "arrow",
       strokeColor: edge.strokeColor ?? "#1e1e1e",
       ...stateStyle(edge.state),
+      // The label goes on the arrow, not beside it. A free text element sitting
+      // at the midpoint looks identical and is not a label: Excalidraw does not
+      // know it belongs to the arrow, so double-clicking the arrow edits the
+      // arrow's points instead of its text -- which is how a person trying to
+      // type a claim silently unbinds the connector instead. Bound, the arrow
+      // is the same arrow whether the engine drew it or a person did.
+      ...(labelText
+        ? {
+            label: {
+              text: labelText,
+              fontSize: EDGE_LABEL_FONT_SIZE,
+              // Edge labels sit on the canvas, not on a fill, so they follow
+              // the edge's own colour. Left dashed the text would be
+              // unreadable, and Excalidraw keeps bound text solid for us.
+              strokeColor: edge.strokeColor ?? "#1e1e1e",
+            },
+          }
+        : {}),
     });
-    const label = elkEdge?.labels?.[0];
-    if (label?.text) {
-      const size = measureText(label.text, EDGE_LABEL_FONT_SIZE);
-      edgeLabelSkeletons.push({
-        id: `${idPrefix}-edgelabel-${index}`,
-        type: "text",
-        x: origin.x + finiteNumber(label.x),
-        y: origin.y + finiteNumber(label.y),
-        width: size.width,
-        height: size.height,
-        text: label.text,
-        fontSize: EDGE_LABEL_FONT_SIZE,
-        fontFamily: 5,
-        // Edge labels sit on the canvas, not on a fill, so they follow the
-        // edge's own colour.
-        strokeColor: edge.strokeColor ?? "#1e1e1e",
-        backgroundColor: "transparent",
-      });
-    }
   }
 
   const graphWidth = snapUpSize(Math.max(
@@ -468,14 +556,13 @@ export async function planDiagramLayout(
     }] : []),
     ...nodeSkeletons,
     ...edgeSkeletons,
-    ...edgeLabelSkeletons,
   ];
 
   return {
     skeletons,
     nodeCount: params.nodes.length,
     edgeCount: edges.length,
-    edgeLabelCount: edgeLabelSkeletons.length,
+    edgeLabelCount,
     elementIdByNode,
     idPrefix,
     graphWidth,
@@ -508,6 +595,13 @@ export function planBounds(plan: DiagramPlan): PlanBounds {
     if (skeleton.type === "arrow" && Array.isArray(skeleton.points)) {
       for (const point of skeleton.points as Array<[number, number]>) {
         include(x + finiteNumber(point[0]), y + finiteNumber(point[1]));
+      }
+      // A bound label can hang past the end of a short route, and a diagram
+      // stacked below another has to clear the text as well as the line.
+      const bound = boundLabelBox(skeleton);
+      if (bound) {
+        include(bound.x, bound.y);
+        include(bound.x + bound.width, bound.y + bound.height);
       }
     } else {
       include(x, y);
@@ -560,6 +654,46 @@ function segmentIntersectsBox(segment: Segment, box: Box, shrink: number): boole
   return minX < right && maxX > left && minY < bottom && maxY > top;
 }
 
+/**
+ * Where Excalidraw will draw an arrow's bound label, and how big.
+ *
+ * Bound text carries no coordinates of its own -- the app recomputes the
+ * position from the route every time the arrow moves, so the plan cannot place
+ * it and neither can we. What the plan can do is predict it, which is all the
+ * collision and bounds checks below ever needed: Excalidraw centres the text on
+ * the middle vertex of an odd route and on the middle segment's midpoint of an
+ * even one.
+ */
+function boundLabelBox(arrow: JsonObject): Box | undefined {
+  const label = arrow.label as { text?: unknown } | undefined;
+  const text = typeof label?.text === "string" ? label.text.trim() : "";
+  if (!text) return undefined;
+  const points = (Array.isArray(arrow.points) ? arrow.points : []) as Array<[number, number]>;
+  if (points.length < 2) return undefined;
+  const originX = finiteNumber(arrow.x);
+  const originY = finiteNumber(arrow.y);
+  const at = (index: number) => ({
+    x: originX + finiteNumber(points[index]?.[0]),
+    y: originY + finiteNumber(points[index]?.[1]),
+  });
+  const centre = points.length % 2 === 1
+    ? at((points.length - 1) / 2)
+    : (() => {
+      const index = points.length / 2 - 1;
+      const first = at(index);
+      const second = at(index + 1);
+      return { x: (first.x + second.x) / 2, y: (first.y + second.y) / 2 };
+    })();
+  const size = measureText(text, EDGE_LABEL_FONT_SIZE);
+  return {
+    id: `${String(arrow.id)}-label`,
+    x: centre.x - size.width / 2,
+    y: centre.y - size.height / 2,
+    width: size.width,
+    height: size.height,
+  };
+}
+
 function arrowSegments(arrow: JsonObject): Segment[] {
   const originX = finiteNumber(arrow.x);
   const originY = finiteNumber(arrow.y);
@@ -597,11 +731,14 @@ export function evaluateDiagramPlan(plan: DiagramPlan): DiagramQualityReport {
       width: finiteNumber(skeleton.width),
       height: finiteNumber(skeleton.height),
     };
-    if (skeleton.type === "arrow") arrows.push(skeleton);
-    else if (id.includes("-node-")) nodes.push(box);
+    if (skeleton.type === "arrow") {
+      arrows.push(skeleton);
+      const bound = boundLabelBox(skeleton);
+      if (bound) labels.push(bound);
+    } else if (id.includes("-node-")) nodes.push(box);
     // The title competes for the same space as edge labels; hold it to the
     // same collision standard.
-    else if (id.includes("-edgelabel-") || id.endsWith("-title")) labels.push(box);
+    else if (id.endsWith("-title")) labels.push(box);
   }
 
   for (let a = 0; a < nodes.length; a++) {

@@ -67,8 +67,9 @@ function isHandDrawn(element: ExcalidrawElement): boolean {
 
 /**
  * Ids minted by planDiagramLayout, from which a legacy element's diagram can be
- * recovered: `<prefix>-node-3`, `-edge-3`, `-edgelabel-3`, `-title`, and the
- * `-label` suffix Excalidraw adds to a bound label.
+ * recovered: `<prefix>-node-3`, `-edge-3`, `-title`, and the `-label` suffix
+ * Excalidraw adds to a bound label. `-edgelabel-3` is the shape edge labels had
+ * before they were bound to their arrows; boards written then still carry it.
  */
 const GENERATED_ID = /^(.+?)-(?:node|edge|edgelabel)-\d+(?:-label)?$|^(.+?)-title$/;
 
@@ -364,7 +365,6 @@ export async function createDiagram(
       ...(edge.state && edge.state !== "built" ? { state: edge.state } : {}),
       ...(edge.via?.length ? { via: edge.via.map((hop) => hop.trim()).filter(Boolean) } : {}),
     });
-    customData.set(`${prefix}-edgelabel-${index}`, { edgeLabelFor: `${prefix}-edge-${index}` });
   });
   if (params.title?.trim()) {
     customData.set(`${prefix}-title`, {

@@ -36,9 +36,14 @@ way to notice when the code has moved out from under it.
 
 ## What makes this tractable here
 
-Generated elements carry `customData` (`{ node, edge, edgeLabelFor, role, origin }`),
-so `readGraph()` returns an exact node and edge list rather than something
-re-derived from geometry. Drift detection is therefore a real set comparison,
+Generated elements carry `customData` (`{ node, edge, role, origin }`), so
+`readGraph()` returns an exact node and edge list rather than something
+re-derived from geometry. An edge's label is bound to its arrow the way
+Excalidraw binds any label to its container, so editing it on the canvas edits
+the arrow's label rather than the arrow's shape. Boards written before that was
+true carry the label as a free text element tagged `edgeLabelFor`, and it is
+still read -- but a label typed on the arrow itself wins, because it is the
+newer of the two. Drift detection is therefore a real set comparison,
 not fuzzy matching against rectangles.
 
 Hand-drawn elements are reported as `provenance: "inferred"`. They must be

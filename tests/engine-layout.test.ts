@@ -317,7 +317,9 @@ describe("declared state is drawn", () => {
 
   it("leaves a planned arrow's label alone, since dashed text is unreadable", async () => {
     const byId = await skeletonById();
-    expect(byId.get("agent-test-edgelabel-0")!.strokeStyle).toBeUndefined();
+    const label = byId.get("agent-test-edge-0")!.label as Record<string, unknown>;
+    expect(label.text).toBe("will feed");
+    expect(label).not.toHaveProperty("strokeStyle");
   });
 
   it("omits the key entirely when nothing is planned, so old boards do not move", async () => {
