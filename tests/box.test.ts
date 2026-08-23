@@ -15,6 +15,10 @@ import { box, fit, pad, width } from "../scripts/lib/box.mjs";
 const RED = "🔴";
 const AMBER = "🟡";
 
+const RED_ON = "\u001b[31m";
+const DIM_ON = "\u001b[2m";
+const OFF = "\u001b[0m";
+
 describe("display width", () => {
   it("counts the wide markers as two cells", () => {
     expect(width(RED)).toBe(2);
@@ -49,6 +53,32 @@ describe("padding and fitting", () => {
   it("leaves text that already fits exactly alone", () => {
     expect(fit("abc", 3)).toBe("abc");
   });
+
+  // The point of red is that "the arrow is backwards" looks different from
+  // "worth a look". A cut used to rebuild the row from an ANSI-stripped copy, so
+  // any row long enough to truncate — most of them, at 72 cells — came out with
+  // no colour at all, and the difference vanished silently.
+  it("keeps colour through a cut", () => {
+    const cut = fit(`${RED_ON}${"a".repeat(40)}${OFF}`, 10);
+    expect(cut).toContain(RED_ON);
+    expect(width(cut)).toBeLessThanOrEqual(10);
+    expect(cut.endsWith("…")).toBe(false);
+  });
+
+  it("closes the colour it left on, so it cannot bleed into the border", () => {
+    expect(fit(`${RED_ON}${"a".repeat(40)}${OFF}`, 10).endsWith(OFF)).toBe(true);
+  });
+
+  it("does not re-close a colour that was already off at the cut", () => {
+    const cut = fit(`${RED_ON}red${OFF} ${"a".repeat(40)}`, 12);
+    expect(cut.endsWith("…")).toBe(true);
+  });
+
+  it("carries every escape a row picked up, not just the first", () => {
+    const cut = fit(`${RED_ON}red${OFF} ${DIM_ON}${"a".repeat(40)}`, 20);
+    expect(cut).toContain(RED_ON);
+    expect(cut).toContain(DIM_ON);
+  });
 });
 
 describe("box", () => {
@@ -62,6 +92,12 @@ describe("box", () => {
     ]);
     const widths = new Set(lines.map(width));
     expect([...widths]).toHaveLength(1);
+  });
+
+  it("keeps a long row's colour, and still lines the row up", () => {
+    const lines = box({ head: "head", foot: "foot", rows: [`${RED_ON}${"long finding ".repeat(12)}${OFF}`] });
+    expect(lines[1]).toContain(RED_ON);
+    expect(new Set(lines.map(width)).size).toBe(1);
   });
 
   it("stays aligned when the heading carries colour and a marker", () => {
