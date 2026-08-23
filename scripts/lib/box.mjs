@@ -48,15 +48,57 @@ export function width(text) {
   return cells;
 }
 
-/** Cuts to fit, marking the cut with an ellipsis rather than truncating silently. */
+/**
+ * The escape sequences, matched one at a time from a known position.
+ *
+ * `ANSI` is global and used to strip; this one is sticky, so `fit()` can ask
+ * "is there an escape *here*" while walking, and keep what it finds instead of
+ * throwing it away.
+ */
+const ANSI_HERE = /\u001b\[[0-9;]*m/y;
+const OFF = "\u001b[0m";
+
+/** True for the escape that turns colour off, so a cut knows if it left one on. */
+function isReset(escape) {
+  const parameters = escape.slice(2, -1);
+  return parameters === "" || /^0+(?:;0+)*$/u.test(parameters);
+}
+
+/**
+ * Cuts to fit, marking the cut with an ellipsis rather than truncating silently.
+ *
+ * Colour is carried through the cut. It used to be measured and discarded in the
+ * same breath — the string was rebuilt from an ANSI-stripped copy — so a row that
+ * fitted kept its colour and a row that did not lost it. That made the one red
+ * `backwards-edge` row, the row whose whole point is to look different from the
+ * amber "worth a look" ones, render identical to them, because it was long enough
+ * to truncate. Escapes are zero width: they are copied, never counted, and if the
+ * cut lands while a colour is still on, the reset is re-emitted so the colour does
+ * not bleed into the box border.
+ */
 export function fit(text, cells) {
-  if (width(text) <= cells) return String(text);
+  const source = String(text);
+  if (width(source) <= cells) return source;
   let out = "";
-  for (const character of String(text).replace(ANSI, "")) {
-    if (width(out) + width(character) > cells - 1) break;
+  let used = 0;
+  let coloured = false;
+  for (let index = 0; index < source.length; ) {
+    ANSI_HERE.lastIndex = index;
+    const escape = ANSI_HERE.exec(source);
+    if (escape) {
+      out += escape[0];
+      coloured = !isReset(escape[0]);
+      index = ANSI_HERE.lastIndex;
+      continue;
+    }
+    const character = String.fromCodePoint(source.codePointAt(index));
+    const size = width(character);
+    if (used + size > cells - 1) break;
     out += character;
+    used += size;
+    index += character.length;
   }
-  return `${out}…`;
+  return `${out}\u2026${coloured ? OFF : ""}`;
 }
 
 /** Pads to a display width, so a cell holding an emoji still lines up. */
