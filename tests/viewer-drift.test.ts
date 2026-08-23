@@ -155,3 +155,131 @@ describe("the clean summary", () => {
     );
   });
 });
+
+/**
+ * A report the page is too old to read (#116).
+ *
+ * `out/viewer` is a prebuilt bundle and nothing rebuilds it, so the page can be
+ * a release behind the engine answering it and look completely normal being so.
+ * The measured case: `backwards-edge` shipped, the API returned it, and the
+ * previous bundle folded it into the generic amber arrow count -- shown as one
+ * arrow to look into, when it was one arrow definitely drawn the wrong way.
+ *
+ * Two defences, and they are not the same one. Below, a kind with no branch
+ * gets its own dim row and its own count, so no future verdict can be dressed
+ * as this release's. Above that, the report's own vocabulary is compared
+ * against the words this file knows, so the page can say *why*.
+ */
+describe("a finding kind this page has never heard of", () => {
+  const future = {
+    from: "src/a.ts", to: "src/b.ts", fromLabel: "A", toLabel: "B",
+    node: "a -> b", kind: "sideways-edge", detail: "b.ts reaches sideways into a.ts",
+  };
+
+  it("keeps it out of the amber arrow count instead of guessing", () => {
+    const report = reportWith({
+      clean: false,
+      edges: [
+        { from: "src/c.ts", to: "src/d.ts", fromLabel: "C", toLabel: "D", node: "c -> d", kind: "unsupported-edge" },
+        future,
+      ],
+    });
+    expect(tallyOf(report)).toEqual([
+      { text: "1 arrow", tone: "warn" },
+      { text: "1 finding this page cannot read", tone: "dim" },
+    ]);
+  });
+
+  it("quotes the engine's own words rather than inventing a sentence", () => {
+    const rows = rowsOf(reportWith({ clean: false, edges: [future] }));
+    expect(rows).toEqual([
+      {
+        text: "A → B · sideways-edge: b.ts reaches sideways into a.ts",
+        tone: "dim",
+        node: "a -> b",
+      },
+    ]);
+  });
+
+  it("stops an unknown box kind from being counted as a file that is gone", () => {
+    const report = reportWith({
+      clean: false,
+      findings: [
+        { node: "a", label: "Cache", ref: "src/cache.ts", kind: "missing-file" },
+        { node: "b", label: "Guard", ref: "src/guard.ts", kind: "unfenced-box", detail: "nothing fences it" },
+      ],
+    });
+    // One gone, not two: the second is a word this bundle predates.
+    expect(tallyOf(report)).toEqual([
+      { text: "1 gone", tone: "bad" },
+      { text: "1 finding this page cannot read", tone: "dim" },
+    ]);
+  });
+
+  it("says the page is out of date when the server knows a word it does not", () => {
+    const report = reportWith({
+      vocabulary: ["missing-file", "backwards-edge", "sideways-edge"],
+    });
+    expect(tallyOf(report)).toEqual([{ text: "page out of date", tone: "bad" }]);
+    expect(rowsOf(report)[0]).toEqual({
+      text: "this page is out of date — it does not know: sideways-edge"
+        + " · restart the board to rebuild it",
+      tone: "bad",
+    });
+    // Loud, because every count beside it was graded by the wrong rules.
+    expect(worstToneOf(rowsOf(report))).toBe("bad");
+  });
+
+  it("stays quiet when the server's vocabulary is one it knows in full", () => {
+    const report = reportWith({
+      checked: 3,
+      vocabulary: ["missing-file", "empty-ref", "unsupported-edge", "backwards-edge"],
+    });
+    expect(tallyOf(report)).toEqual([]);
+    expect(rowsOf(report)).toEqual([]);
+  });
+
+  it("treats a report with no vocabulary as nothing to compare, not a mismatch", () => {
+    expect(tallyOf(reportWith({ checked: 3 }))).toEqual([]);
+  });
+});
+
+/**
+ * A `@needs` nobody could answer (#113).
+ *
+ * The chip's quiet state says "all still true". Over an unevaluated claim that
+ * is the one sentence a status panel must never print: writing `@needs` was the
+ * question, and silence in reply reads as the answer.
+ */
+describe("an unanswered claim on the board", () => {
+  const unsnapped = reportWith({
+    checked: 9,
+    edgesChecked: 11,
+    claims: { needs: 1, needsChecked: 0, needsWithheld: { "ends-not-bound": 1 } },
+  });
+
+  it("keeps the chip off its all-clear wording", () => {
+    expect(tallyOf(unsnapped)).toEqual([{ text: "1 unchecked claim", tone: "warn" }]);
+    // Non-empty rows are what stop App.tsx reaching for summaryOf's "all still true".
+    expect(rowsOf(unsnapped)).not.toEqual([]);
+    expect(worstToneOf(rowsOf(unsnapped))).toBe("warn");
+  });
+
+  it("names the reason, and the drag that fixes this one", () => {
+    expect(rowsOf(unsnapped)[0]).toEqual({
+      text: "1 needs arrow not checked: 1 with an end not snapped to its box"
+        + " — drag it on until the box highlights",
+      tone: "warn",
+    });
+  });
+
+  it("says nothing about a board whose claims all got a verdict", () => {
+    const answered = reportWith({
+      checked: 9,
+      edgesChecked: 11,
+      claims: { needs: 2, needsChecked: 2, needsWithheld: {} },
+    });
+    expect(tallyOf(answered)).toEqual([]);
+    expect(rowsOf(answered)).toEqual([]);
+  });
+});

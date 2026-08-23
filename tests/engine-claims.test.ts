@@ -288,3 +288,78 @@ describe("a claim changes exactly one verdict", () => {
     expect(bare.edges[0]!.from).toBe("b.ts");
   });
 });
+
+/**
+ * A claim nobody could answer (#113).
+ *
+ * Skipping an arrow is ordinarily right and ordinarily quiet: an arrow the
+ * checker cannot read is not news. `@needs` is the exception, because writing it
+ * is somebody asking a question out loud, and a report that says nothing back
+ * reads as "checked, and fine". It was neither.
+ *
+ * The gate exercised here is the one that found the bug -- ends never snapped to
+ * their boxes, which is invisible on screen because the arrow still touches both
+ * boxes. Every other gate ahead of `checkNeeds` goes through the same counter.
+ */
+describe("a needs claim the check never reached", () => {
+  const files = {
+    "a.ts": "export const a = 1;\n",
+    "b.ts": "import { a } from './a';\nexport const b = a;\n",
+  };
+
+  /**
+   * Two boxes and one hand-drawn arrow between them, bound or not.
+   *
+   * Unbound is the reported case: `startBinding` and `endBinding` are null, so
+   * both ends resolve by proximity, which is an observation about geometry
+   * rather than a claim about the design -- and is skipped for exactly that
+   * reason. The label is attached the way the app attaches one, through
+   * `containerId`, so the claim itself is read either way.
+   */
+  const boardWith = (bound: boolean, claimed = true) =>
+    boardOf([
+      drawn({
+        id: "box-a", type: "rectangle", x: 0, y: 0, width: 100, height: 60,
+        customData: { node: "a", ref: "a.ts" },
+      }),
+      drawn({
+        id: "box-b", type: "rectangle", x: 300, y: 0, width: 100, height: 60,
+        customData: { node: "b", ref: "b.ts" },
+      }),
+      drawn({
+        id: "arrow", type: "arrow", x: 100, y: 30, width: 200, height: 0,
+        points: [[0, 0], [200, 0]],
+        ...(bound ? { startBinding: { elementId: "box-a" }, endBinding: { elementId: "box-b" } } : {}),
+      }),
+      ...(claimed ? [drawn({ id: "arrow-label", type: "text", containerId: "arrow", text: "@needs" })] : []),
+    ]);
+
+  it("counts the claim, and says which gate dropped it", () => {
+    const graph = readGraph(boardWith(false));
+    // The claim is read: this is a correctly written `@needs`, not a typo.
+    expect(graph.edges[0]).toMatchObject({ from: "a", to: "b", claim: "needs", endpoints: "nearest" });
+
+    const report = checkDrift(boardWith(false), fakeWorkspace(files), { edges: true });
+    expect(report.claims.needs).toBe(1);
+    // Not checked, and the reason names the thing to go and fix.
+    expect(report.claims.needsChecked).toBe(0);
+    expect(report.claims.needsWithheld).toEqual({ "ends-not-bound": 1 });
+  });
+
+  it("still says nothing about the same arrow when it carries no claim", () => {
+    const report = checkDrift(boardWith(false, false), fakeWorkspace(files), { edges: true });
+    // The same arrow, the same skip, and nothing to report: nobody asked.
+    expect(report.claims.needs).toBe(0);
+    expect(report.claims.needsWithheld).toEqual({});
+    expect(report.edgesSkippedWhy).toEqual({ "ends-not-bound": 1 });
+  });
+
+  it("answers the claim once the ends are snapped, and does not count it twice", () => {
+    const report = checkDrift(boardWith(true), fakeWorkspace(files), { edges: true });
+    expect(report.claims.needs).toBe(1);
+    // b.ts imports a.ts, and the arrow says a needs b: backwards, and checked.
+    expect(report.claims.needsChecked).toBe(1);
+    expect(report.claims.needsWithheld).toEqual({});
+    expect(report.edges.map((finding) => finding.kind)).toEqual(["backwards-edge"]);
+  });
+});

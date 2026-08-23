@@ -498,12 +498,28 @@ wrong" then reads as the tool telling somebody off for something the tool itself
 wrote. So when the committed board did not carry the claim and the working one
 does, the message opens with *a claim written this turn is already wrong*.
 
-**What was not checked is said out loud.** A claim that passed and a claim that
-was never checked look identical in a clean report, and only one of them means
-the diagram is being held to anything. So `--details` names the withheld ones by
-reason: in a cycle, in a language with no measured reader, with an end that
-reaches out at runtime, with an end that could not be parsed to the end, with an
-end no source index has ever read.
+**What was not checked is said out loud, in the default report.** A claim that
+passed and a claim that was never checked look identical in a clean report, and
+only one of them means the diagram is being held to anything. So the notice —
+not just `--details` — names them by reason: in a cycle, in a language with no
+measured reader, with an end that reaches out at runtime, with an end that could
+not be parsed to the end, with an end no source index has ever read.
+
+That list has a second half, and it is the one that caught the project owner
+out (#113). The reasons above are `checkNeeds` reading two files and declining
+to answer. An arrow can also be dropped *before* it ever gets there — an end not
+snapped to its box, an end with no ref, an end marked external, an end that refs
+a directory. Skipping an arrow is ordinarily right and ordinarily quiet, because
+an arrow the checker cannot read is not news. A *claimed* arrow is the
+exception: writing `@needs` is somebody asking a question out loud, and a report
+that says nothing back reads as "checked, and fine".
+
+The unsnapped case is the one worth knowing about, because it is invisible: an
+arrow whose ends merely touch its boxes looks exactly like one snapped to them,
+and both `startBinding` and `endBinding` are null. The report says so and says
+what to do — *drag each end onto its box until the box highlights*.
+
+It never changes the exit code. Nothing is failing; the claim was never tried.
 
 **Where it lives.** `customData.edge.claim` is authoritative, and the word is
 written onto the arrow's label as `@needs` — the same form a human can type onto
@@ -1116,6 +1132,48 @@ A command costs one thing to type when the reader decides it is worth it, and
 carries none of that risk. If the automatic version is ever wanted, it belongs
 behind a flag on the script, off by default, with `stop_hook_active` verified
 empirically first.
+
+## The board page grades the report, and can be older than it
+
+The live board shows the same report as a chip in the corner, and it is the one
+reader of this check that is *compiled separately*. `out/viewer` is a prebuilt
+bundle; nothing rebuilds it and nothing used to notice it was old. So after a
+pull that adds a finding kind, the CLI and `GET /api/drift` are current and the
+page is not — and it looks completely normal being so.
+
+Measured on this machine (#116), two days after `backwards-edge` shipped:
+
+| | built from | knows `backwards-edge`? |
+| --- | --- | --- |
+| `npm run check:drift` | source, via tsx | yes |
+| `GET /api/drift` | source, via tsx | yes — returns `"kind": "backwards-edge"` |
+| the board page | `out/viewer/`, two days old | **no** |
+
+The page had no branch for the kind, so it fell into the leftover arrow count:
+shown as *1 arrow* in amber, when it was *1 arrow backwards* in red. A hard
+refresh does not help — the stale artefact is on disk, not in the browser cache
+— which is what made it hard to see from the outside.
+
+Two defences, and they are deliberately not the same one.
+
+- **The page refuses to guess.** A `kind` it has no branch for gets its own row,
+  a neutral tone, and the engine's own `detail` quoted verbatim — never folded
+  into a category it does not belong to. Counting by subtraction was the bug:
+  a remainder cannot tell *not one of the ones I separated out* from *not one of
+  the ones I know*, and those are the two states the panel exists to keep apart.
+  This holds for every kind added from here on, with no coordination.
+- **The report says what words it knows.** Every report carries `vocabulary` —
+  the full list of verdict words the engine can emit, whether or not it used
+  any. The page compares it against its own and, on a word it lacks, says *this
+  page is out of date · restart the board to rebuild it*. A compile-time
+  exhaustiveness check makes adding a kind without listing it an error, which is
+  the only reason that list can be trusted.
+
+Rebuilding on serve was considered and rejected: the viewer build takes ~38 s,
+which is not something to put in front of opening a diagram, and the published
+package has no sources to rebuild from. Instead `diagramos board` compares
+`src/viewer` mtimes against the bundle and prints one line when it is behind —
+cheap, in-repo only, and silent where there are no sources.
 
 ## The code graph: a fifth way to confirm an arrow
 
