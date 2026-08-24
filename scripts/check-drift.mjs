@@ -258,6 +258,31 @@ function unsnappedClaimFix(report) {
 }
 
 /**
+ * What a promotion just started, said once, under the promotions it belongs to.
+ *
+ * A promoted arrow that carried `@needs` has had its direction read by nothing
+ * so far -- the check is gated on `built`, and until this run the arrow was
+ * `planned`. So the sequence a person sees is "built now" this turn and, if the
+ * code went the other way, "drawn backwards" the next, which read back to back
+ * looks like the tool contradicting itself (#123). It is not: the promotion
+ * established that the connection exists and never said which way it runs. One
+ * line here makes that the obvious reading instead of the generous one.
+ *
+ * Only the promotions actually written. A promotion merely *reported* -- `drift`
+ * in a terminal, or a box with anchors still unbuilt -- leaves the arrow planned,
+ * so nothing goes live and there is nothing to warn about.
+ *
+ * Its own row rather than more words on the line above, for the same reason
+ * `unsnappedClaimFix` has one: those lines carry a box label and the notice
+ * truncates at the width of the box.
+ */
+function claimWentLive(promoted) {
+  return promoted.some((promotion) => promotion.claim === "needs")
+    ? "  a promoted @needs is read for the first time on the next check"
+    : undefined;
+}
+
+/**
  * The short row's version of a broken route.
  *
  * Two sentences the engine can produce, and they are not the same news: one
@@ -327,6 +352,7 @@ function rowsFor({ report, promoted = [] }, colour, all = false) {
   const promotedNodes = new Set(promoted.map((promotion) => promotion.node));
   const unanswered = unansweredClaimWords(report);
   const unsnapped = unsnappedClaimFix(report);
+  const promotedClaim = claimWentLive(promoted);
   return [
     // First, because it is the only row here that says the check could not read
     // the board rather than that the board and the code disagree.
@@ -402,6 +428,7 @@ function rowsFor({ report, promoted = [] }, colour, all = false) {
     ...promoted.map((promotion) =>
       paint(`${boxName(promotion)} is built now — board updated`, "green", colour),
     ),
+    ...(promotedClaim ? [paint(promotedClaim, "dim", colour)] : []),
     // Good news the check held back from: the same box still has unbuilt
     // anchors, so flipping it would erase the remaining work from the picture.
     ...report.promotions

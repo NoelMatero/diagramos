@@ -25,7 +25,7 @@ import path from "node:path";
 import { parseSymbol, routeOf, symbolEvidence, type Assertion } from "./assert";
 import { chainBreak, reaches, unsupportedMembers } from "./body";
 import type { BoardFile } from "./board-file";
-import { arrowClaimError, boxClaimError } from "./claim";
+import { arrowClaimError, boxClaimError, type ArrowClaim } from "./claim";
 import { checkClosed, type ClosedBreach } from "./closed";
 import { connects, refIsStale, type CodeGraphOption } from "./codegraph";
 import { readGraph, type Provenance, type RecoveredGraph } from "./graph";
@@ -181,6 +181,18 @@ export interface Promotion {
   /** Absent for an edge promotion, where the claim is the connection itself. */
   ref?: string;
   detail: string;
+  /**
+   * The claim this promotion just made checkable, when the promoted thing
+   * carried one.
+   *
+   * A promotion and the first verdict on a claim are two runs apart, and read
+   * back to back they can look like the tool changing its mind: "built now"
+   * this turn, "drawn backwards" the next. They are not in conflict -- the
+   * promotion established that the connection exists, never which way it runs
+   * -- but only a report that says so can be read that way (#123). Carried here
+   * so the sentence announcing the promotion can name what it did *not* settle.
+   */
+  claim?: ArrowClaim;
 }
 
 /**
@@ -1358,7 +1370,7 @@ export function checkDrift(
    * news that the work landed.
    */
   const recordEdge = (
-    edge: { from: string; to: string; state: string },
+    edge: { from: string; to: string; state: string; claim?: ArrowClaim },
     fromNode: { label: string },
     toNode: { label: string },
     finding: Omit<EdgeDriftFinding, "node"> | undefined,
@@ -1382,7 +1394,11 @@ export function checkDrift(
       promotions.push({
         node: `${edge.from} -> ${edge.to}`,
         label: claim,
-        detail: "the code now connects these, so this is no longer planned.",
+        detail: "the code now connects these, so this is no longer planned."
+          + (edge.claim === "needs"
+            ? " Its @needs direction is read for the first time on the next check."
+            : ""),
+        ...(edge.claim ? { claim: edge.claim } : {}),
       });
     }
   };
@@ -1582,9 +1598,22 @@ export function checkDrift(
    * So it is paid only by the boards that ask for it: no `closed` box, no walk.
    * One walk covers however many closed boxes a board carries, and it is the
    * same walk the coverage suggestion already uses, cap and skip list included.
+   *
+   * `external` and `planned` are both excused, and not for the same reason. An
+   * external box stands for code that is not ours; there is no tree to walk. A
+   * `planned` box stands for a directory that does not exist yet, and its
+   * `closed` is the boundary the subsystem is *meant* to hold once built -- the
+   * same shape of statement `needs` makes on a planned arrow, and gated the same
+   * way (#123). Grading it now would read the absent directory as "not a
+   * directory" and file an `open-box` regression against work nobody has started,
+   * which is the one thing `planned` exists to prevent: a build must not fail
+   * because somebody sketched next week's subsystem. The gate releases itself --
+   * the directory landing promotes the box to `built`, and the very next run
+   * checks the claim for real.
    */
   const closedBoxes = graph.nodes.filter(
-    (node) => node.claim?.closed && node.provenance === "recorded" && node.state !== "external",
+    (node) => node.claim?.closed && node.provenance === "recorded"
+      && node.state !== "external" && node.state !== "planned",
   );
   if (closedBoxes.length > 0 && !concept) {
     const rootAbsolute = workspace.resolve(".");

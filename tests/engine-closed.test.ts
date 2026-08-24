@@ -353,4 +353,77 @@ describe("on a board", () => {
     expect(report.claims.closed).toBe(0);
     expect(report.clean).toBe(true);
   });
+
+  /**
+   * A `closed` claim on a subsystem nobody has built yet (#123).
+   *
+   * `planned` is the state that says *this is the future*, and the rule the rest
+   * of the file already keeps is that the future is never graded: a build must not
+   * fail because somebody sketched next week's work. `closed` was the one claim
+   * that had never been told. A planned box's ref points at a directory that does
+   * not exist, the walk read that as "not a directory", and the board came back
+   * with a red `open-box` regression against a subsystem with no code in it -- so
+   * the same board said, of one box, both "this is planned" and "this is drift".
+   *
+   * Gated exactly like `needs` on a planned arrow, and for the same reason: on a
+   * plan the claim is a specification, not a transcription, and a specification
+   * cannot be wrong yet. The gate releases itself -- the directory landing
+   * promotes the box, and the next run checks the claim for real.
+   */
+  describe("a planned box", () => {
+    async function plannedBoardOf(ref: string): Promise<BoardFile> {
+      const { board } = await createDiagram(emptyBoard(), {
+        name: "arch",
+        nodes: [{ id: "engine", label: "Engine", ref, state: "planned", closed: {} }],
+        edges: [],
+      });
+      return board;
+    }
+
+    it("is on the plan's checklist, not in the drift report", async () => {
+      // Nothing under src/engine exists yet; the box is the plan to write it.
+      const report = await checkDrift(
+        await plannedBoardOf("src/engine"),
+        fakeWorkspace({ "src/server/serve.ts": "export const serve = 1;\n" }),
+        { edges: false },
+      );
+      expect(report.findings).toEqual([]);
+      expect(report.clean).toBe(true);
+      expect(report.workItems.map((item) => item.node)).toEqual(["engine"]);
+    });
+
+    it("is not counted as a claim anything answered", async () => {
+      const report = await checkDrift(
+        await plannedBoardOf("src/engine"),
+        fakeWorkspace({ "src/server/serve.ts": "export const serve = 1;\n" }),
+        { edges: false },
+      );
+      // Neither held nor breached nor unproven: never asked. Counting it as
+      // asked-and-unproven would put a gap in the audit that no work can close.
+      expect(report.claims).toMatchObject({ closed: 0, closedHeld: 0 });
+      expect(report.closedUnproven).toEqual([]);
+    });
+
+    it("goes live the moment the same box is built", async () => {
+      // The identical claim, with the state the promotion will write. Now it is a
+      // transcription, and the breach that was excused above is a finding.
+      const report = await checkDrift(await boardOf("src/engine"), fakeWorkspace(BREACHED), { edges: false });
+      expect(report.findings[0]).toMatchObject({ kind: "open-box", node: "engine" });
+      expect(report.clean).toBe(false);
+    });
+
+    it("does not walk the tree for a board whose only closed box is planned", async () => {
+      /*
+       * The walk is the one unbounded cost in the whole check, and `closed` is the
+       * only thing that buys it. A gate that skipped the verdict but kept the walk
+       * would charge every plan board for an answer it then threw away.
+       */
+      let walked = 0;
+      const files = { "src/server/serve.ts": "export const serve = 1;\n" };
+      const real = fakeWorkspace(files);
+      const counting = { ...real, list: (target: string) => { walked += 1; return real.list(target); } };
+      await checkDrift(await plannedBoardOf("src/engine"), counting, { edges: false });
+      expect(walked).toBe(0);
+    });
+  });
 });

@@ -104,6 +104,21 @@ The third row is the only one that fails a build. Work items and promotions are
 kept out of `clean` and out of the exit code on purpose: CI reads that code, and
 a repository is not broken because somebody sketched next week's work.
 
+**A claim on a planned thing is a specification, and nothing grades it.** Both
+claims — `@needs` on an arrow, `@closed` on a directory box — are gated on
+`built`, so a plan can state which way a dependency will run and what boundary a
+subsystem will hold without any of it being read against today's code. That is
+the inversion the plan-first workflow rests on: everywhere else a claim is a
+transcription of a line somebody read, and here there is no line to read yet.
+Writing one therefore costs nothing and can accuse nobody, and the gate releases
+itself — the code landing promotes the thing to `built`, and the claim is checked
+for the first time on the run after.
+
+That makes a promotion and a claim's first verdict two runs apart, which is why
+the promotion says so. "Built now" this turn and "drawn backwards" the next is
+one event read in order, not the check changing its mind: the promotion
+established that the connection exists and never said which way it runs.
+
 **`missing` is deliberately not a state.** State is declared by whoever draws the
 box; existence is observed, free, every run. Recording "missing" would put a fact
 with a shelf life into a committed file, which is the rot this check exists to

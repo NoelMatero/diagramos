@@ -182,7 +182,10 @@ const nodeSchema = z.object({
       + "allows makes the claim false, by file and line, and the build fails. Test files are "
       + "exempt and counted separately. Write it ONLY when you have reason to believe the "
       + "boundary holds — check first, because claiming it on a subsystem everything reaches "
-      + "into produces an immediate failure that is your mistake, not the user's.",
+      + "into produces an immediate failure that is your mistake, not the user's. On a "
+      + "state:'planned' box the directory does not exist yet, so the claim is the boundary the "
+      + "subsystem is meant to hold once built; nothing is walked or checked until the box "
+      + "promotes.",
     ),
   state: z
     .enum(["planned", "built", "external"])
@@ -221,7 +224,10 @@ const edgeSchema = z.object({
       + "and recorded, and CHECKED: if the dependency runs the other way and only the other "
       + "way, the arrow is reported as backwards, by file and line, and the build fails. So a "
       + "needs you guessed at is not a harmless decoration -- it is a false statement read back "
-      + "to the user, on their diagram, in red.",
+      + "to the user, on their diagram, in red. That rule is about arrows that exist. On a "
+      + "state:'planned' arrow there is no line to read, so the claim is a specification of "
+      + "which way the dependency will run once built; nothing checks it until the code lands "
+      + "and the arrow promotes, so writing it there costs nothing and accuses nobody.",
     ),
   label: z.string().optional().describe("One or two words; longer crowds the diagram"),
   strokeColor: z
@@ -868,7 +874,10 @@ server.registerTool(
       + "and recorded, and CHECKED: if the dependency runs the other way and only the other "
       + "way, the arrow is reported as backwards, by file and line, and the build fails. So a "
       + "needs you guessed at is not a harmless decoration -- it is a false statement read back "
-      + "to the user, on their diagram, in red.",
+      + "to the user, on their diagram, in red. That rule is about arrows that exist. On a "
+      + "state:'planned' arrow there is no line to read, so the claim is a specification of "
+      + "which way the dependency will run once built; nothing checks it until the code lands "
+      + "and the arrow promotes, so writing it there costs nothing and accuses nobody.",
               ),
           }),
         )
