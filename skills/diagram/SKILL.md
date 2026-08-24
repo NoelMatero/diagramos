@@ -214,6 +214,13 @@ two places here where guessing has a real cost.
 Both are optional. An arrow with no claim and a box with no claim are the
 normal case, not a shortfall.
 
+Both are also about `built` things, and the rules below say so as if that were
+the only case. It is not. On a `planned` arrow or box there is no line to read,
+so a claim there is a specification rather than a transcription — *when this is
+built, it will work this way* — and nothing grades it until the code lands and
+the thing promotes. Writing one on a plan therefore costs nothing and can accuse
+nobody. `/plan-diagram` is where that is spelled out.
+
 #### `claim: "needs"` — this arrow's direction is a fact
 
 A plain arrow means "these two are related, somehow". Nothing can disprove

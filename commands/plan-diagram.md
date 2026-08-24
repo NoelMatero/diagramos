@@ -38,24 +38,80 @@ Every box for code that does not exist yet:
 A box that stands for something outside this repo — a browser, a vendor API —
 is `state: "external"`, not planned: no code of ours will ever land for it.
 
-## Say which way the new dependencies will run
+## Claims on a plan are specifications, not transcriptions
 
-A planned arrow between two boxes that will import each other can carry
-`claim: "needs"`, and on a plan it is the one claim you are allowed to write
-without having read the line — because there is no line yet. `needs` on a
-planned arrow is a **specification**: it says the `from` end will declare a
-dependency on the `to` end, and it names which end that is.
+Everywhere else in this tool a claim is a **transcription**: you write it only
+when you have read the line in the code that makes it true. That rule exists
+because a claim can come back *wrong* — in red, naming a file and a line — and
+a claim you guessed is the tool reporting your mistake to somebody who did not
+make it.
 
-That is worth writing down because dependency direction is the part of a plan
-that gets built backwards. Nothing is checked while the arrow is planned. The
-moment the connection lands, the arrow promotes and the claim goes live — and
-if the import ended up running the other way, the very next check says so in
-red, naming the line, instead of the board quietly agreeing with whatever got
-built.
+A plan is the one place the rule does not apply, because there is nothing to
+read. `state: "planned"` says *this is the future*, and a claim on a planned
+thing is a **specification**: when this is built, it will work this way. That
+inversion is the whole of drawing a plan first, and it is why both claims are
+worth writing here even though nothing can confirm them yet.
+
+Writing one costs nothing and accuses nobody. Every verdict that can say
+"wrong" is gated on `built`, so a planned box and a planned arrow are never
+graded — a plan that contradicts today's code is a plan, not drift, and CI
+stays green. The gate releases itself: the moment the code lands, the thing
+promotes to `built` and the claim it was carrying is checked for the first
+time.
+
+### `claim: "needs"` on a planned arrow — which way the dependency will run
+
+`needs` says **the `from` end will declare a dependency on the `to` end** — an
+import, a require, a `use`. On the board it reads as `@needs` on the arrow's
+label, after your own words.
+
+```
+edges: [{ from: "scheduler", to: "queue", state: "planned", claim: "needs" }]
+```
+
+Worth writing because dependency direction is the part of a plan that gets
+built backwards, and a plain arrow can never catch that: "these two are
+related" has no opposite to be caught by. When the connection lands, the arrow
+promotes and the claim goes live — and if the import ended up running the other
+way, the next check says so in red, naming the line, instead of the board
+quietly agreeing with whatever got built.
+
+Those two runs are one event, not a reversal. Promotion establishes that the
+connection now exists; it never said which way it runs, and the report says so
+where it announces the promotion. A "backwards" the turn after "built now" is
+the first answer to the question the plan asked, not a change of mind.
 
 Write it on the arrows where the direction is a real decision. Leave it off the
 ones where "these two talk" is all you meant; a planned arrow with no claim is
 still a planned arrow.
+
+### `closed: {}` on a planned directory box — the boundary it will hold
+
+`closed` says **nothing outside this box reaches into it**. Only for a box
+whose `ref` is a directory, and on a plan that directory does not exist yet, so
+what the claim states is the boundary the subsystem is *meant* to hold once
+built:
+
+```
+{ id: "scheduler", label: "the scheduler", ref: "src/scheduler",
+  state: "planned", closed: { through: ["src/scheduler/index.ts"] } }
+```
+
+`through` is the list of front doors — the files inside that outside code will
+be allowed to import. An empty or omitted `through` claims total isolation.
+
+This is the design decision most likely to be quietly abandoned while the work
+is built, because nothing about writing a file inside the directory reminds you
+that the directory was supposed to have one way in. Writing it down at plan
+time is what makes the first import that goes round the front door a red
+finding rather than an afternoon's archaeology a year later. Nothing is checked
+while the box is planned; the walk starts the run after it promotes.
+
+Do not claim it on a subsystem you already know everything reaches into — that
+is a boundary you would have to build first, and the claim will be red from the
+day the box turns solid.
+
+## Check the board you just drew
 
 `create_diagram` checks the board as it writes it. If the result names boxes
 that point at nothing, those are your mistakes to fix **now** — a typo in a

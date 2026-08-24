@@ -71,30 +71,58 @@ describe("the skill teaches everything the engine accepts", () => {
   });
 });
 
-describe("the skill teaches nothing the engine would refuse", () => {
+describe("the guidance teaches nothing the engine would refuse", () => {
   /**
-   * The other direction, and the one that rots quietly. A skill still teaching a
+   * The other direction, and the one that rots quietly. Guidance still teaching a
    * word that was taken out of the whitelist sends an author to write a ref that
    * comes back as broken -- and the author has no way to tell that the guidance
    * is the thing at fault rather than their diagram.
+   *
+   * Every file that teaches authoring, not just the skill: the commands teach the
+   * same vocabulary and rot the same way, and `plan-diagram` now spells `@needs`
+   * out where a person would type it.
    */
-  it("uses no @word outside the two closed whitelists", () => {
+  const AUTHORING = [
+    "skills/diagram/SKILL.md",
+    "commands/plan-diagram.md",
+    "commands/annotate-diagram.md",
+    "commands/update-diagram.md",
+  ];
+
+  it.each(AUTHORING)("uses no @word in %s outside the two closed whitelists", (file) => {
     const allowed = new Set<string>([...SYMBOL_WORDS, ...ARROW_CLAIMS]);
-    const written = [...SKILL.matchAll(/@([a-z][a-z-]*)/g)].map((match) => match[1]!);
+    const written = [...read(file).matchAll(/@([a-z][a-z-]*)/g)].map((match) => match[1]!);
     expect([...new Set(written)].filter((word) => !allowed.has(word))).toEqual([]);
   });
 });
 
 describe("the commands that author boards mention the claims", () => {
   /*
-   * Narrower than the skill on purpose. A command is a procedure for one job, so
-   * it has to name the claim *its* job can produce and is not required to carry
-   * the whole vocabulary: planning is where a dependency direction is decided
-   * before it exists, and annotating is the one pass where somebody already has
-   * the file open, which is the only honest moment to transcribe one.
+   * Narrower than the skill for one of them and not for the other, and the
+   * asymmetry is the point.
+   *
+   * `annotate-diagram` is a procedure for one job -- somebody has the file open,
+   * which is the only honest moment to transcribe a claim -- so it has to name
+   * the claims its job can produce and nothing more.
+   *
+   * `plan-diagram` carries the whole vocabulary, because it is the one place a
+   * claim means something *different* (#123). Everywhere else a claim is a
+   * transcription: write it only when you have read the line. On a planned thing
+   * there is no line, so the claim is a specification -- when this is built, it
+   * will work this way -- and the rule that governs `built` does not restrict it.
+   * An author who has only ever been taught the transcription rule concludes,
+   * correctly from what they were told and wrongly in fact, that a plan must not
+   * carry claims at all. So a claim missing from this file is not a thinner
+   * explanation of the same thing; it is the only explanation there was.
    */
-  it("plan-diagram says a planned arrow can specify its direction", () => {
-    expect(copyable(read("commands/plan-diagram.md"))).toContain("needs");
+  const PLAN = copyable(read("commands/plan-diagram.md"));
+
+  it.each([...ARROW_CLAIMS])("plan-diagram says a planned arrow can specify %s", (claim) => {
+    expect(PLAN).toContain(claim);
+  });
+
+  it.each([...BOX_CLAIMS])("plan-diagram says a planned box can specify %s", (claim) => {
+    expect(PLAN).toContain(claim);
   });
 
   it("annotate-diagram offers claims under the approval gate it already has", () => {
