@@ -202,6 +202,100 @@ Same field on an edge. A connection you intend but have not wired yet is
 `state: "planned"`, which is the honest way to draw the arrow before the import
 exists.
 
+### The two claims that can come back wrong
+
+Everything above can be *unconfirmed*. These two can be **refuted** — reported
+in red, with a file and a line, as a thing the diagram states and the code
+contradicts. That is the point of them, and it is also why they are the only
+two places here where guessing has a real cost.
+
+Both are optional. An arrow with no claim and a box with no claim are the
+normal case, not a shortfall.
+
+#### `claim: "needs"` — this arrow's direction is a fact
+
+A plain arrow means "these two are related, somehow". Nothing can disprove
+*somehow*: the check looks for any connection and failing to find one is never
+proof there is none, so a plain arrow's worst verdict is amber forever, and an
+arrow drawn the wrong way round survives every run.
+
+`needs` is the way out. It says **the `from` end declares a dependency on the
+`to` end** — an import, a require, a `use`, an include. A direction has an
+opposite, and an opposite can be shown to be the only one present:
+
+```
+edges: [{ from: "server", to: "logging", claim: "needs" }]
+```
+
+Get it backwards and the next check says so in red, naming the line that proves
+it, and tells you to turn the arrow round. That is the whole feature.
+
+It is written onto the arrow's label as `@needs`, after the reader's own words,
+because a claim nobody can see on the board is a claim nobody can refuse. That
+also makes it the one claim a person can write without any tool: `@needs` typed
+into an arrow's label is read back as the same claim, and so is the tick in the
+board page's panel. Expect to find claims on a board you did not put there.
+
+**Transcribe it, never infer it.** Write `needs` only when you have read the
+line that declares the dependency — the same rule as `@declared`, for the same
+reason. "The server obviously imports the logger" is a hypothesis. A wrong
+`needs` is not a harmless decoration: it is a false statement read back to the
+user, on their diagram, in red, and the report can tell it was written this
+turn — it says *a claim written this turn is already wrong*, which is the tool
+reporting your mistake to somebody who did not make it.
+
+If you did not read the line, draw the arrow with no claim. That is a smaller
+statement, not a worse one.
+
+The check withholds rather than guesses when it cannot see enough to refute:
+a language with no measured reader, a parse that recovered from an error, a
+file that reaches out at runtime, an end anchored at a directory, both ends the
+same file. The claim is then recorded and unverified, which costs nothing —
+so a `needs` you actually read is always worth writing, even where you cannot
+be sure it will be checked.
+
+#### `closed: {}` — nothing outside reaches into this box
+
+This is the claim architecture diagrams actually make and could never say: you
+draw a box round a subsystem, put the rest of the system outside it, and what
+you mean is *the rest of the system does not reach in here*.
+
+Only for a box whose `ref` is a **directory**. `through` lists the front doors
+— repo-relative paths of files **inside** the directory that outside code is
+allowed to import:
+
+```
+{ id: "engine", label: "the engine", ref: "src/engine",
+  closed: { through: ["src/engine/index.ts"] } }
+```
+
+An empty or omitted `through` claims total isolation. Unusual, and real: this
+repository's own `src/viewer` is exactly that shape.
+
+**The two halves are wildly unequal, and you should expect that.** Refuting is
+cheap — one import from outside, read out of the source, and the claim is false.
+Confirming is a statement about every file in the repository, so it holds only
+if every file was read to the end. One file the reader could not finish and the
+honest answer is *no breach found*, which the report prints as unproven rather
+than as a pass.
+
+**Check before you claim.** Claiming `closed` on a subsystem everything reaches
+into produces an immediate red failure that is your mistake, not the user's.
+`check_drift` returns `closedBreaches` — every import in, by file and line — so
+the way to find out is to claim it on a scratch board and read the list, or to
+look at what imports the directory before you write it.
+
+**The test-file trap.** Tests reach into everything, and they have to: testing
+a private function means importing it. Test breaches are held apart and do not
+refute the claim — but they are counted and shown, never filtered out. Renaming
+a file to `foo.test.ts` moves a breach from one list to the other in public; it
+does not make it disappear. So a `closed` box in a repo with a suite is normal
+and readable, and nobody can quietly widen it by naming a file cleverly.
+
+A door nobody used is reported too. Not a failure — a subsystem being tidier
+than it promised — but usually a door that *was* used until the import moved,
+and a stale door silently widens the claim.
+
 Run `check_drift` after changing module structure, and regenerate the diagram it
 complains about — `/update-diagram` does exactly that if the user asks for it by name.
 A clean report with `checked: 0` means no node had a ref, not that the diagram is

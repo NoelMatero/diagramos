@@ -38,6 +38,25 @@ Every box for code that does not exist yet:
 A box that stands for something outside this repo — a browser, a vendor API —
 is `state: "external"`, not planned: no code of ours will ever land for it.
 
+## Say which way the new dependencies will run
+
+A planned arrow between two boxes that will import each other can carry
+`claim: "needs"`, and on a plan it is the one claim you are allowed to write
+without having read the line — because there is no line yet. `needs` on a
+planned arrow is a **specification**: it says the `from` end will declare a
+dependency on the `to` end, and it names which end that is.
+
+That is worth writing down because dependency direction is the part of a plan
+that gets built backwards. Nothing is checked while the arrow is planned. The
+moment the connection lands, the arrow promotes and the claim goes live — and
+if the import ended up running the other way, the very next check says so in
+red, naming the line, instead of the board quietly agreeing with whatever got
+built.
+
+Write it on the arrows where the direction is a real decision. Leave it off the
+ones where "these two talk" is all you meant; a planned arrow with no claim is
+still a planned arrow.
+
 `create_diagram` checks the board as it writes it. If the result names boxes
 that point at nothing, those are your mistakes to fix **now** — a typo in a
 ref, or a future box you forgot to mark planned — before the user ever sees a
