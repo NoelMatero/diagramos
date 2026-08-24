@@ -174,12 +174,28 @@ describe("setting what it means", () => {
     expect(built[0]!.strokeStyle).toBe("solid");
   });
 
-  it("leaves the stroke alone on a change that was never about planning", () => {
-    // Only coming off `planned` restores solid, because only `planned` put the
-    // dashes there. A box that was built and is now somebody else's code keeps
-    // whatever it was drawn with.
+  it("dots a box that is not our code, so it stops looking checked", () => {
+    const next = editScene([box({ customData: { node: "n" } })], "b1", {
+      set: "state",
+      state: "external",
+    });
+    expect(next[0]!.strokeStyle).toBe("dotted");
+  });
+
+  it("puts the stroke back when a box stops being someone else's", () => {
+    const outside = editScene([box({ customData: { node: "n" } })], "b1", {
+      set: "state",
+      state: "external",
+    });
+    expect(editScene(outside, "b1", { set: "state", state: "built" })[0]!.strokeStyle).toBe("solid");
+  });
+
+  it("leaves a stroke somebody chose alone when there is no treatment to undo", () => {
+    // Solid is restored only where a state had put something else there. A box
+    // drawn dashed by hand that was built all along stays as it was drawn --
+    // the panel does not tidy strokes it never touched.
     const scene = [box({ strokeStyle: "dashed", customData: { node: "n" } })];
-    const next = editScene(scene, "b1", { set: "state", state: "external" });
+    const next = editScene(scene, "b1", { set: "state", state: "built" });
     expect(next[0]!.strokeStyle).toBe("dashed");
   });
 

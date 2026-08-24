@@ -192,7 +192,9 @@ as an oversight:
   a redraw you are doing for other reasons is fine.) When the user wants a whole
   piece of work planned as a board before building it, that is `/plan-diagram`.
 - **A box that is not code in this repo** — a browser, a vendor API, another
-  project: `state: "external"`. Never checked, and distinct from a forgotten ref.
+  project: `state: "external"`. Never checked, and distinct from a forgotten
+  ref. Drawn dotted, so a box nothing verifies does not sit on the board
+  looking exactly like one that is verified every turn.
 - **A whole board that is not about this codebase** — a protocol, a standard,
   someone else's system: pass `describes: "concept"` to `create_diagram`. That
   excuses every box at once, and it needs a title, since that is where it is

@@ -299,16 +299,20 @@ describe("declared state is drawn", () => {
     return new Map(plan.skeletons.map((skeleton) => [skeleton.id as string, skeleton]));
   };
 
-  it("dashes a planned box and leaves every other state solid", async () => {
+  it("gives each state its own stroke, and built no stroke at all", async () => {
     const byId = await skeletonById();
     // Node order in the plan follows the order given above.
     expect(byId.get("agent-test-node-2")!.strokeStyle).toBe("dashed");
-    for (const id of ["agent-test-node-0", "agent-test-node-1", "agent-test-node-3"]) {
+    // Not the same as built, and not the same as planned. "Never checked" and
+    // "always checked" used to be drawn identically, which is the wrong way
+    // round for a tool whose claim is that the picture and the code agree.
+    expect(byId.get("agent-test-node-3")!.strokeStyle).toBe("dotted");
+    for (const id of ["agent-test-node-0", "agent-test-node-1"]) {
       expect(byId.get(id)!.strokeStyle).toBeUndefined();
     }
   });
 
-  it("dashes a planned arrow and leaves every other state solid", async () => {
+  it("dashes a planned arrow and leaves a built one alone", async () => {
     const byId = await skeletonById();
     expect(byId.get("agent-test-edge-0")!.strokeStyle).toBe("dashed");
     expect(byId.get("agent-test-edge-1")!.strokeStyle).toBeUndefined();

@@ -192,7 +192,8 @@ const nodeSchema = z.object({
       + "Use 'planned' for something meant to exist — it is drawn dashed, its ref not resolving "
       + "is reported as work to do rather than as drift, and check_drift says so once the code "
       + "catches up. Use 'external' for something deliberately outside this repo (a browser, a "
-      + "third-party service), which is never checked and is not the same as forgetting a ref.",
+      + "third-party service), which is drawn dotted, is never checked, and is not the same as "
+      + "forgetting a ref.",
     ),
 });
 

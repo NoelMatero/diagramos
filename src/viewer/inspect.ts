@@ -341,15 +341,24 @@ export function editScene(
      * The picture has to agree with the meaning, and nobody should have to
      * remember to make it agree.
      *
-     * Coming *off* `planned` restores the solid stroke, which is the same rule
-     * the engine's own promotion follows when a planned box's code lands: it
-     * writes exactly what regenerating the diagram as `built` would write.
-     * Following that rule here rather than inventing a marker key means a box
-     * flipped by hand and a box flipped by the check come out identical -- and
-     * no key ends up in the file that a regeneration would not write.
+     * The strokes are the engine's, restated: `layout.ts` draws `planned`
+     * dashed and `external` dotted when *it* writes a board, so a box set by
+     * hand has to land on the same stroke or the two routes disagree about a
+     * board neither of them owns.
+     *
+     * Going back to `built` restores solid only when there was a treatment to
+     * undo. That is the rule `promote.ts` follows when a planned box's code
+     * lands -- it writes exactly what regenerating as `built` would write --
+     * and it is what keeps this from stomping a stroke somebody chose on a box
+     * that was never anything but built.
      */
-    if (edit.state === "planned") element = { strokeStyle: "dashed" };
-    else if (stateOf(custom.state) === "planned") element = { strokeStyle: "solid" };
+    const STROKE: Record<NodeState, "solid" | "dashed" | "dotted"> = {
+      built: "solid",
+      planned: "dashed",
+      external: "dotted",
+    };
+    if (edit.state !== "built") element = { strokeStyle: STROKE[edit.state] };
+    else if (stateOf(custom.state) !== "built") element = { strokeStyle: "solid" };
   }
 
   if (edit.set === "closed" && isBox) {

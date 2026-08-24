@@ -154,6 +154,8 @@ Run it yourself with `npx -y diagramos drift`, which answers in one line when no
 - run: npx -y diagramos drift
 ```
 
+**The stroke says how much to trust a box.** Solid is a claim the check verifies every turn. Dashed is `planned` — meant to exist, not claimed to. Dotted is `external`: somebody else's code, deliberately never checked. Stroke rather than colour, because colour is how you mark subsystems, and because dashes survive greyscale and colour-blindness where a hue does not.
+
 **A diagram can describe the future.** Mark a box or arrow `planned` and it is drawn dashed: a sketch of what is meant to exist, not a claim that it does. The check then reports its missing code as work to do rather than drift — and the moment the code lands, the per-turn hook advances the board itself: the box turns solid on the live page, the notice says `promoted` once, and the next turn is quiet. A box that stands for several files stays dashed until all of them exist. The edit is an ordinary change to a file in git, so undoing it is one checkout; the bare `drift` command never applies it, because a check that mutates the working tree is a check CI cannot trust.
 
 **A box can say where its edges are.** Draw a ring round a folder and mark it `closed`, and it means: nothing outside this folder imports anything inside it, except through the doors you list. One import from anywhere in the repo makes that false, by file and line. The reverse costs more — "nothing reaches in" is a claim about every file, so it only *holds* if every file could be read, and a file that imports at runtime leaves the box unproven rather than green. Tests are exempt, because testing a private function means importing it, and the number of test imports is printed rather than hidden.
