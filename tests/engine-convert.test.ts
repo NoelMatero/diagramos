@@ -207,7 +207,7 @@ describe("full ELK layout to elements, headless", () => {
    * converter honours `strokeStyle` rather than defaulting it back to solid,
    * which is the only reason a planned box looks planned in the editor.
    */
-  it("carries a planned box's dashed stroke through the converter", async () => {
+  it("carries each state's stroke through the converter", async () => {
     const plan = await planDiagramLayout({
       nodes: [
         { id: "built", label: "Parser" },
@@ -224,10 +224,13 @@ describe("full ELK layout to elements, headless", () => {
 
     expect(styleOf("diagram-node-1")).toBe("dashed");
     expect(styleOf("diagram-edge-0")).toBe("dashed");
-    // Built, external, and the label bound inside the planned box stay solid.
+    expect(styleOf("diagram-node-2")).toBe("dotted");
+    // Built, and the label bound inside the planned box, stay solid. The label
+    // especially: dashed or dotted text is unreadable, and the box carrying the
+    // state is the thing the stroke is about.
     expect(styleOf("diagram-node-0")).toBe("solid");
-    expect(styleOf("diagram-node-2")).toBe("solid");
     expect(styleOf("diagram-edge-1")).toBe("solid");
     expect(styleOf("diagram-node-1-label")).toBe("solid");
+    expect(styleOf("diagram-node-2-label")).toBe("solid");
   });
 });

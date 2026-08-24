@@ -91,20 +91,32 @@ export interface DiagramPlan {
 export const MODEL_GRID_SIZE = 20;
 
 /**
- * How a declared state is drawn. Only `planned` gets a treatment: dashed is the
- * established convention for "not real yet", and unlike a colour it survives
- * greyscale and colour-blindness.
+ * How a declared state is drawn.
  *
- * `external` means "real, but not ours" rather than "not real yet", so it is a
- * separate question and deliberately left looking like `built` for now.
+ * Both treatments are stroke styles, not colours: unlike a colour they survive
+ * greyscale and colour-blindness, and colour is already spoken for — a board's
+ * author uses `backgroundColor` and `strokeColor` to mark subsystems, and a rule
+ * that overrode either would fight the picture they are drawing.
  *
- * The key is omitted rather than set to `"solid"` so a board that declares no
- * state stays byte-identical to one written before this existed. Nothing here
- * reads anything but the node's own state, which is what keeps regeneration
- * deterministic.
+ * - `planned` is **dashed**, the established convention for "not real yet".
+ * - `external` is **dotted**. It means "real, but not ours", which is a
+ *   different question from `planned` and gets a neighbouring answer: related
+ *   enough to read as "something is different about this box", distinct enough
+ *   to tell apart. It used to be drawn exactly like `built`, so the one state
+ *   that is *never checked* looked identical to the one that always is — the
+ *   box saying "do not look here" was indistinguishable from the box saying
+ *   "this is verified", which is the wrong way round for a tool whose whole
+ *   claim is that the picture and the code agree.
+ *
+ * The key is omitted for `built` rather than set to `"solid"`, so a board that
+ * declares no state stays byte-identical to one written before this existed.
+ * Nothing here reads anything but the node's own state, which is what keeps
+ * regeneration deterministic.
  */
-function stateStyle(state: NodeState | undefined): { strokeStyle?: "dashed" } {
-  return state === "planned" ? { strokeStyle: "dashed" } : {};
+function stateStyle(state: NodeState | undefined): { strokeStyle?: "dashed" | "dotted" } {
+  if (state === "planned") return { strokeStyle: "dashed" };
+  if (state === "external") return { strokeStyle: "dotted" };
+  return {};
 }
 
 const NODE_FONT_SIZE = 20;
