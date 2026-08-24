@@ -26,12 +26,13 @@ export interface RevealElement extends Record<string, unknown> {
 /**
  * The element this one should appear alongside, if any.
  *
- * Two different kinds of attachment, and missing the second one showed: a bound
- * label is tied to its container structurally, but an edge label is a free
- * text element positioned at the arrow's midpoint with nothing linking it to the
- * connector. Grouping only by `containerId` let edge labels arrive with the
- * boxes, a beat before their arrows, so a stray word hung in empty space. The
- * engine records the relationship, so use it.
+ * Two different kinds of attachment, and missing the second one showed. An edge
+ * label is bound to its arrow now, so `containerId` answers it; on a board
+ * written before that it is a free text element positioned at the arrow's
+ * midpoint with nothing linking it to the connector. Grouping only by
+ * `containerId` let those edge labels arrive with the boxes, a beat before
+ * their arrows, so a stray word hung in empty space. The engine records the
+ * relationship, so use it.
  */
 function attachedTo(element: RevealElement, present: ReadonlySet<string>): string | undefined {
   const container = element.containerId;

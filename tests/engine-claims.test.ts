@@ -13,7 +13,7 @@
  */
 import { describe, expect, it } from "vitest";
 
-import { emptyBoard, type BoardFile } from "../src/engine/board-file";
+import { bindLooseEdgeLabels, emptyBoard, type BoardFile } from "../src/engine/board-file";
 import { labelWithClaim, readLabelClaim } from "../src/engine/claim";
 import { connectNodes, createDiagram } from "../src/engine/diagram";
 import { checkDrift, type Workspace } from "../src/engine/drift";
@@ -145,6 +145,169 @@ describe("carrying a claim on a board", () => {
     expect(graph.edges[0].claim).toBeUndefined();
     expect(graph.edges[0].claimGarbled).toBeUndefined();
     expect(graph.edges[0].label).toBe("ask @noel");
+  });
+});
+
+describe("typing a claim onto an arrow the engine drew", () => {
+  /**
+   * The route the issue found closed. A generated edge label used to be a free
+   * text element parked at the arrow's midpoint, which looks like a label and is
+   * not one: Excalidraw never knew it belonged to the arrow, so double-clicking
+   * to type a claim edited the arrow's points instead and unbound it. Bound, the
+   * label is the same object a person would have made by hand.
+   */
+  const labelled = async () => {
+    const { board } = await createDiagram(emptyBoard(), {
+      name: "arch",
+      nodes: [{ id: "a", label: "A" }, { id: "b", label: "B" }],
+      edges: [{ from: "a", to: "b", label: "geometry" }],
+    });
+    const arrow = board.elements.find((element) => element.type === "arrow")!;
+    const label = board.elements.find((element) => element.containerId === arrow.id)!;
+    return { board, arrow, label };
+  };
+
+  it("binds a generated edge label to its arrow, both ways", async () => {
+    const { arrow, label } = await labelled();
+    expect(label.text).toBe("geometry");
+    expect(label.containerId).toBe(arrow.id);
+    expect(arrow.boundElements).toContainEqual({ type: "text", id: label.id });
+  });
+
+  it("leaves no free-floating text pretending to be that label", async () => {
+    const { board, label } = await labelled();
+    const loose = board.elements.filter(
+      (element) => element.type === "text" && typeof element.containerId !== "string",
+    );
+    expect(loose.map((element) => element.text)).not.toContain("geometry");
+    expect(loose.some((element) => (element.customData as { edgeLabelFor?: unknown })?.edgeLabelFor))
+      .toBe(false);
+    expect(label.containerId).toBeTruthy();
+  });
+
+  /** Typing into that label is the whole point, so it has to reach the checker. */
+  it("reads a claim typed into a generated label", async () => {
+    const { board, label } = await labelled();
+    const edited = { ...board, elements: board.elements.map(
+      (element) => (element.id === label.id ? { ...element, text: "geometry @needs" } : element),
+    ) };
+    expect(readGraph(edited).edges[0]).toMatchObject({ label: "geometry", claim: "needs" });
+  });
+
+  it("refuses a word that is not a claim typed into a generated label", async () => {
+    const { board, label } = await labelled();
+    const edited = { ...board, elements: board.elements.map(
+      (element) => (element.id === label.id ? { ...element, text: "geometry @calls" } : element),
+    ) };
+    expect(readGraph(edited).edges[0].claimGarbled).toBe("calls");
+  });
+
+  /**
+   * Boards written before edge labels were bound still carry the free text, and
+   * the arrow they name is exactly the arrow somebody is most likely to type on.
+   * Whoever touched it last is who it speaks for, so the typed label wins.
+   */
+  it("prefers a hand-typed label over the generated text on an older board", () => {
+    const graph = readGraph(
+      boardOf([
+        drawn({ id: "a", type: "rectangle", width: 100, height: 60, customData: { node: "a" } }),
+        drawn({ id: "b", type: "rectangle", x: 300, width: 100, height: 60, customData: { node: "b" } }),
+        drawn({
+          id: "arrow",
+          type: "arrow",
+          x: 105,
+          y: 30,
+          points: [[0, 0], [190, 0]],
+          customData: { edge: { from: "a", to: "b" } },
+        }),
+        drawn({
+          id: "old",
+          type: "text",
+          x: 170,
+          y: 20,
+          width: 60,
+          height: 20,
+          text: "geometry",
+          customData: { edgeLabelFor: "arrow" },
+        }),
+        drawn({ id: "typed", type: "text", containerId: "arrow", text: "geometry @needs" }),
+      ]),
+    );
+    expect(graph.edges[0]).toMatchObject({ label: "geometry", claim: "needs" });
+  });
+
+  /**
+   * Reading an older board ties its edge labels on, so the trapdoor closes
+   * without anybody having to redraw the diagram first.
+   */
+  it("binds an older board's loose edge label to its arrow on the way in", () => {
+    const bound = bindLooseEdgeLabels([
+      drawn({ id: "arrow", type: "arrow", x: 0, y: 0, points: [[0, 0], [190, 0]] }),
+      drawn({ id: "old", type: "text", x: 80, y: -10, text: "reads", customData: { edgeLabelFor: "arrow" } }),
+    ]);
+    expect(bound.find((element) => element.id === "old")).toMatchObject({
+      containerId: "arrow",
+      textAlign: "center",
+      verticalAlign: "middle",
+    });
+    expect(bound.find((element) => element.id === "arrow")!.boundElements)
+      .toEqual([{ type: "text", id: "old" }]);
+  });
+
+  it("leaves a board with nothing loose to bind exactly as it was", () => {
+    const elements = [
+      drawn({ id: "arrow", type: "arrow", points: [[0, 0], [190, 0]] }),
+      drawn({ id: "typed", type: "text", containerId: "arrow", text: "reads" }),
+      drawn({ id: "note", type: "text", x: 400, text: "a legend" }),
+    ];
+    expect(bindLooseEdgeLabels(elements)).toBe(elements);
+  });
+
+  it("will not bind a second label onto an arrow that already has one", () => {
+    const bound = bindLooseEdgeLabels([
+      drawn({ id: "arrow", type: "arrow", points: [[0, 0], [190, 0]] }),
+      drawn({ id: "typed", type: "text", containerId: "arrow", text: "reads @needs" }),
+      drawn({ id: "old", type: "text", x: 80, text: "reads", customData: { edgeLabelFor: "arrow" } }),
+    ]);
+    expect(bound.find((element) => element.id === "old")!.containerId).toBeUndefined();
+  });
+
+  it("will not bind a label onto something that is not an arrow, or is not there", () => {
+    const elements = [
+      drawn({ id: "box", type: "rectangle", width: 100, height: 60 }),
+      drawn({ id: "onBox", type: "text", text: "x", customData: { edgeLabelFor: "box" } }),
+      drawn({ id: "orphan", type: "text", text: "y", customData: { edgeLabelFor: "gone" } }),
+    ];
+    expect(bindLooseEdgeLabels(elements)).toBe(elements);
+  });
+
+  it("is just as loud about a bad word on an older board's labelled arrow", () => {
+    const graph = readGraph(
+      boardOf([
+        drawn({ id: "a", type: "rectangle", width: 100, height: 60, customData: { node: "a" } }),
+        drawn({ id: "b", type: "rectangle", x: 300, width: 100, height: 60, customData: { node: "b" } }),
+        drawn({
+          id: "arrow",
+          type: "arrow",
+          x: 105,
+          y: 30,
+          points: [[0, 0], [190, 0]],
+          customData: { edge: { from: "a", to: "b" } },
+        }),
+        drawn({
+          id: "old",
+          type: "text",
+          x: 170,
+          y: 20,
+          width: 60,
+          height: 20,
+          text: "reads",
+          customData: { edgeLabelFor: "arrow" },
+        }),
+        drawn({ id: "typed", type: "text", containerId: "arrow", text: "reads @calls" }),
+      ]),
+    );
+    expect(graph.edges[0].claimGarbled).toBe("calls");
   });
 });
 
