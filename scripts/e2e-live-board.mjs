@@ -326,6 +326,97 @@ try {
   );
 
   /*
+   * What a box means, shown and set from the page (#114, #111).
+   *
+   * Its own board and its own tab, so none of the state above is disturbed.
+   *
+   * The selection is made the way a reader actually makes it: click the finding
+   * in the status panel, which reveals and selects the box it is about. That is
+   * the path #114 is really about -- a verdict names a file, and until now there
+   * was no way to get from the verdict to the box on the canvas -- and it is
+   * also the only way to select an element here without doing arithmetic on the
+   * canvas transform to find where the box landed in screen pixels.
+   *
+   * The final assertion is against the *file*, not the panel. A panel that
+   * looked right while writing nothing is exactly the failure worth catching.
+   */
+  const meaningFile = path.join(workspace, "meaning.excalidraw");
+  const meaningBoard = await createDiagram(emptyBoard(), {
+    title: "Meaning",
+    name: "m1",
+    nodes: [
+      { id: "engine", label: "the engine", ref: "nowhere/missing.ts" },
+      { id: "page", label: "the page" },
+    ],
+    edges: [{ from: "page", to: "engine", label: "asks" }],
+  });
+  await writeBoard(meaningFile, meaningBoard.board);
+
+  const meaningPage = await browser.newPage({ viewport: { width: 1400, height: 800 } });
+  meaningPage.on("pageerror", (error) => errors.push(String(error)));
+  await meaningPage.goto(`${server.url}?file=${encodeURIComponent(meaningFile)}`, { waitUntil: "load" });
+  await meaningPage.waitForFunction(() => typeof window.__boardScene === "function", undefined, { timeout: 20_000 });
+  await waitForScene(meaningPage, (value) => value.count > 0 && settled(value));
+
+  await meaningPage.waitForSelector(".drift-chip", { timeout: 10_000 });
+  await meaningPage.click(".drift-chip");
+  await meaningPage.waitForSelector(".drift-row:not(:disabled)", { timeout: 10_000 });
+  await meaningPage.click(".drift-row:not(:disabled)");
+
+  const panel = await meaningPage.waitForSelector(".inspect", { timeout: 10_000 }).catch(() => null);
+  check("selecting a box shows what it means", panel !== null);
+
+  const shownRef = panel
+    ? await meaningPage.$eval(".inspect .inspect-input", (el) => el.value)
+    : "";
+  check(
+    "the panel shows the file the box points at, which the canvas never did",
+    shownRef === "nowhere/missing.ts",
+    shownRef,
+  );
+
+  const shownFinding = panel
+    ? await meaningPage.$eval(".inspect-findings", (el) => el.textContent ?? "")
+    : "";
+  check(
+    "the panel carries the verdict on that one box",
+    shownFinding.includes("nowhere/missing.ts"),
+    shownFinding.trim(),
+  );
+
+  // The gesture #111 is about: mark the thing that does not exist yet.
+  const plannedButton = await meaningPage.$$(".inspect-option");
+  const labels = await Promise.all(plannedButton.map((button) => button.textContent()));
+  const planned = plannedButton[labels.indexOf("Planned")];
+  if (planned) await planned.click();
+
+  const marked = await (async () => {
+    const deadline = Date.now() + 8000;
+    while (Date.now() < deadline) {
+      const board = await readBoard(meaningFile);
+      const box = board.elements.find((element) => element.customData?.node === "engine");
+      if (box?.customData?.state === "planned") return box;
+      await meaningPage.waitForTimeout(150);
+    }
+    return (await readBoard(meaningFile)).elements.find((element) => element.customData?.node === "engine");
+  })();
+
+  check(
+    "clicking Planned writes it to the file, with no agent in the loop",
+    marked?.customData?.state === "planned",
+    JSON.stringify(marked?.customData ?? null),
+  );
+  // The picture has to agree with the meaning, or the board says two things.
+  check(
+    "a box marked planned is drawn dashed",
+    marked?.strokeStyle === "dashed",
+    String(marked?.strokeStyle),
+  );
+
+  await meaningPage.screenshot({ path: shot("5-meaning") });
+  await meaningPage.close();
+
+  /*
    * The way from a board to every other board.
    *
    * The index exists and is printed by the command, but a page you can only

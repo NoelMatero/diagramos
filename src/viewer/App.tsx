@@ -6,6 +6,8 @@ import { BoardSync, withBoard, type BoardPayload, type SyncStatus } from "./sync
 import { planReveal, prefersReducedMotion } from "./reveal";
 import { rowsOf, summaryOf, tallyOf, worstToneOf, type DriftView } from "./drift";
 import { HISTORY_PATH, rowsOfHistory, type HistoryEntryView } from "./history";
+import Inspector from "./Inspector";
+import { editScene, meaningOf, type Edit, type SceneElement } from "./inspect";
 
 const STATUS_LABEL: Record<SyncStatus, string> = {
   connecting: "connecting",
@@ -162,6 +164,20 @@ export default function App() {
   const [file, setFile] = useState<string>();
   const [drift, setDrift] = useState<DriftView>();
   const [history, setHistory] = useState<HistoryEntryView[]>([]);
+  /*
+   * What is selected, and the scene it is selected in.
+   *
+   * Both, because the panel is about *meaning*, and meaning is not on the
+   * selected element alone: an arrow names its ends by node id, and the words a
+   * reader sees for those ends are on two other boxes. Kept as state rather than
+   * read from the API on demand so a change anywhere -- an agent writing the
+   * board, a label retyped -- re-renders the panel instead of leaving it showing
+   * the last thing that happened to be true.
+   */
+  const [selected, setSelected] = useState<string>();
+  const [scene, setScene] = useState<readonly SceneElement[]>([]);
+  /** The repository's files, for the anchor picker. Empty is workable, not broken. */
+  const [paths, setPaths] = useState<string[]>([]);
 
   /**
    * Ask the server for the board's status. Failure leaves the last report up
@@ -315,12 +331,53 @@ export default function App() {
     };
   }, [refreshDrift]);
 
+  /*
+   * The repository's file list, for the anchor picker.
+   *
+   * Once per board rather than per keystroke: it is a `git ls-files` behind the
+   * endpoint, and re-asking on every letter typed would turn picking a file into
+   * a request per letter for a list that changes when somebody writes code, not
+   * when somebody types. A file added since this loaded is missing from the
+   * suggestions and can still be typed in full, which is the right way round.
+   */
+  useEffect(() => {
+    let dropped = false;
+    void (async () => {
+      try {
+        const response = await fetch(withBoard("/api/paths"), { cache: "no-store" });
+        if (!response.ok) return;
+        const payload = (await response.json()) as { paths?: string[] };
+        if (!dropped && Array.isArray(payload.paths)) setPaths(payload.paths);
+      } catch {
+        // No list means the field takes a typed path, which is what it did
+        // before there was a list. Nothing here is worth an error on the page.
+      }
+    })();
+    return () => {
+      dropped = true;
+    };
+  }, [file]);
+
   const onChange = useCallback(
     (
       elements: readonly unknown[],
-      _appState: unknown,
+      appState: unknown,
       files: Record<string, unknown>,
     ) => {
+      // Ahead of the remote guard on purpose. The guard is about not writing the
+      // file back; what is on screen is still what is on screen, and a panel that
+      // stopped following the canvas whenever an agent wrote to it would go stale
+      // exactly when the board changed under the reader.
+      setScene(elements as readonly SceneElement[]);
+      const chosen = Object.entries(
+        ((appState as { selectedElementIds?: Record<string, boolean> } | undefined)
+          ?.selectedElementIds) ?? {},
+      ).filter(([, on]) => on);
+      // One only. Several boxes selected have no single meaning, and inventing
+      // one would be this panel guessing on a canvas whose whole stance is that
+      // guesses do not get to make claims.
+      setSelected(chosen.length === 1 ? chosen[0]![0] : undefined);
+
       if (applyingRemote.current) return;
       sync.push({
         type: "excalidraw",
@@ -334,10 +391,39 @@ export default function App() {
     [sync],
   );
 
+  const meaning = useMemo(() => meaningOf(scene, selected), [scene, selected]);
+
+  /*
+   * Write the change straight into the scene.
+   *
+   * No new road: `updateScene` fires the same `onChange` a stroke fires, which
+   * the existing sync pushes to the file with the same revision check and the
+   * same conflict handling. That is why setting a box's meaning by hand turned
+   * out to be small -- the saving half was already built, and only the field to
+   * type into was missing.
+   */
+  const onEdit = useCallback(
+    (edit: Edit) => {
+      const api = apiRef.current;
+      if (!api || !selected) return;
+      const next = editScene(
+        api.getSceneElements() as unknown as SceneElement[],
+        selected,
+        edit,
+      );
+      type SceneElements = NonNullable<
+        Parameters<ExcalidrawImperativeAPI["updateScene"]>[0]["elements"]
+      >;
+      api.updateScene({ elements: next as unknown as SceneElements });
+    },
+    [selected],
+  );
+
   return (
     <div className="board-root">
       <StatusPill status={status} detail={detail} file={file} />
       <DriftPanel report={drift} history={history} onReveal={revealNode} />
+      <Inspector meaning={meaning} report={drift} paths={paths} onEdit={onEdit} />
       <Excalidraw
         excalidrawAPI={(api) => {
           apiRef.current = api;

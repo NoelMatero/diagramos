@@ -22,7 +22,7 @@ import { readBoard, serializeBoard, writeBoard, type BoardFile } from "../engine
 import { BoardHistory, HISTORY_ROUTE } from "./history";
 import { diagramDir } from "../engine/config";
 import { createCodeGraphOption } from "../engine/codegraph";
-import { createLedger } from "../engine/ledger";
+import { createLedger, gitKnown } from "../engine/ledger";
 import { checkDrift, createGitBaseline, createWorkspace, findBoards } from "../engine/drift";
 import { initEngine } from "../engine/parse";
 import { processAlive, registerServer, updateServer } from "./server-registry";
@@ -676,6 +676,31 @@ export async function startBoardServer(options: BoardServerOptions): Promise<Run
         }
         await setFile(requested.file);
         return json(response, 200, { ok: true, file });
+      }
+
+      /*
+       * The files this board's project has, for the panel that anchors a box.
+       *
+       * A ref typed by hand is a ref that can be typo'd, and a typo'd ref is a
+       * false claim that produces a finding every turn until somebody tracks it
+       * down. Handing the page the real list turns anchoring into picking, so
+       * the wrong answer is the one nobody can select.
+       *
+       * Read live and uncached: a file created a minute ago is exactly the one
+       * being drawn, and `gitKnown` already counts it. Cheap enough to do that
+       * way -- one `git ls-files` against a tree git has indexed -- and a stale
+       * list here reads as "the tool cannot see my file", which is worse than
+       * the milliseconds.
+       */
+      if (request.method === "GET" && url.pathname === "/api/paths") {
+        const target = await requestedFile(url);
+        if (!target.file) return json(response, 403, { error: target.error });
+        const project = rootFor(target.file);
+        // Not a git repository, or git unavailable: an empty list, not an
+        // error. The panel then lets the path be typed, which is the same
+        // affordance it always had, rather than looking broken.
+        const known = gitKnown(project) ?? new Set<string>();
+        return json(response, 200, { root: project, paths: [...known].sort() });
       }
 
       /*

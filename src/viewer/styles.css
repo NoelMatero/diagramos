@@ -199,6 +199,189 @@ body,
   font-size: 11px;
 }
 
+/* What the selected box or arrow means.
+
+   Top-right, because Excalidraw owns the other three corners when something is
+   selected: its own shape panel opens top-left, its zoom and undo controls sit
+   bottom-left under the status chip, and the sync pill has bottom-right. Capped
+   short of the pill so the two never meet on a small window. */
+.inspect {
+  position: fixed;
+  top: 70px;
+  right: 14px;
+  z-index: 10;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  width: 268px;
+  max-height: calc(100vh - 150px);
+  overflow-y: auto;
+  padding: 12px;
+  border-radius: 10px;
+  border: 1px solid rgb(0 0 0 / 8%);
+  background: rgb(255 255 255 / 96%);
+  box-shadow: 0 2px 8px rgb(0 0 0 / 10%);
+  font-size: 12px;
+  color: #495057;
+}
+
+.inspect-head {
+  font-weight: 600;
+  color: #212529;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.inspect-label {
+  margin-top: 4px;
+  color: #868e96;
+  font-size: 11px;
+}
+
+.inspect-label-sub {
+  margin-top: 0;
+  padding-left: 22px;
+}
+
+.inspect-path {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.inspect-input {
+  flex: 1;
+  min-width: 0;
+  padding: 5px 7px;
+  border: 1px solid rgb(0 0 0 / 12%);
+  border-radius: 6px;
+  background: #fff;
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 11px;
+  color: #212529;
+}
+
+.inspect-input:focus {
+  outline: none;
+  border-color: #4c6ef5;
+}
+
+/* One character wide whether or not it says anything, so a field does not
+   twitch sideways the moment the path becomes real. */
+.inspect-check {
+  width: 1ch;
+  color: #2f9e44;
+  cursor: default;
+}
+
+.inspect-check-bad {
+  color: #f08c00;
+}
+
+.inspect-drop {
+  border: 0;
+  background: none;
+  padding: 0 2px;
+  font: inherit;
+  color: #adb5bd;
+  cursor: pointer;
+}
+
+.inspect-drop:hover {
+  color: #e03131;
+}
+
+.inspect-add {
+  align-self: flex-start;
+  border: 0;
+  background: none;
+  padding: 2px 0;
+  font: inherit;
+  font-size: 11px;
+  color: #868e96;
+  cursor: pointer;
+}
+
+.inspect-add:hover {
+  color: #4c6ef5;
+}
+
+/* Three answers to one question, so they read as one control rather than as
+   three things that happen to be adjacent. */
+.inspect-choice {
+  display: flex;
+  border: 1px solid rgb(0 0 0 / 12%);
+  border-radius: 6px;
+  overflow: hidden;
+}
+
+.inspect-option {
+  flex: 1;
+  padding: 5px 4px;
+  border: 0;
+  border-right: 1px solid rgb(0 0 0 / 8%);
+  background: #fff;
+  font: inherit;
+  font-size: 11px;
+  color: #868e96;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.inspect-option:last-child {
+  border-right: 0;
+}
+
+.inspect-option:hover {
+  background: rgb(0 0 0 / 4%);
+}
+
+.inspect-option-on {
+  background: #4c6ef5;
+  color: #fff;
+}
+
+.inspect-option-on:hover {
+  background: #4263eb;
+}
+
+.inspect-tick {
+  display: flex;
+  align-items: flex-start;
+  gap: 7px;
+  margin-top: 6px;
+  cursor: pointer;
+  line-height: 1.4;
+}
+
+.inspect-tick input {
+  margin: 2px 0 0;
+  flex: none;
+}
+
+/* Said beside the tick it is about, in the voice of the report rather than of a
+   form: what ticking this buys, or what is still missing before it shows. */
+.inspect-note {
+  padding-left: 22px;
+  color: #868e96;
+  font-size: 11px;
+  line-height: 1.45;
+}
+
+/* The verdict on this one element, which is the whole reason the panel can be
+   trusted: the fields above say what was claimed, and these say how it went. */
+.inspect-findings {
+  margin-top: 8px;
+  padding-top: 8px;
+  border-top: 1px solid rgb(0 0 0 / 8%);
+}
+
+.inspect-row {
+  padding: 2px 0;
+  line-height: 1.45;
+}
+
 .tone-bad {
   color: #e03131;
 }

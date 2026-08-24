@@ -249,6 +249,14 @@ leaves the first page where it is, so a project split across several diagrams ca
 have them open side by side — call `open_board` once per diagram and give the user
 both addresses rather than one that changes under them.
 
+Selecting a box or an arrow on that page opens a panel showing what it means —
+its files, its state, its claim, and the findings about it — and every field is
+editable there. So the user can anchor a box, mark one `planned`, or claim an
+arrow's direction without asking you, and a board can come back changed in ways
+no tool call of yours explains. Read the board before assuming your last write is
+what is on it. A box the user sketched and anchored themselves is `recorded` like
+any other, and is checked like any other.
+
 `board_status` says what is running: every open board with its own URL, and which
 one the bare address is currently following. Never give the user a localhost URL
 you did not get back from one of those two tools in this session — an address that
