@@ -26,7 +26,7 @@ import { spawn } from "node:child_process";
 import { readBoard, writeBoard } from "../src/engine/board-file.ts";
 import { CONFIG_FILE, ConfigError, DEFAULT_DIAGRAM_DIR, diagramDir, projectRootFor } from "../src/engine/config.ts";
 import { findBoards, findStrayBoards } from "../src/engine/drift.ts";
-import { fileExists, resolveBoardPort } from "../src/server/board-server.ts";
+import { fileExists, resolveBoardPort, staleViewerBundle } from "../src/server/board-server.ts";
 import { ensureBoardServer } from "../src/server/daemon.ts";
 
 const root = process.cwd();
@@ -269,5 +269,22 @@ console.log(
     : `using the board service already running (pid ${service.pid}).`,
 );
 console.log("diagramos stop        stop it, from any terminal");
+
+/*
+ * The page is served from a bundle nothing rebuilds (#116).
+ *
+ * Said here rather than from inside the service, which is a daemon whose output
+ * nobody sees. Said after the URLs, because the board still works -- it is the
+ * *interpretation* of the report that is a build behind, and the page says so
+ * too once it notices the server using a word it does not have. This is the
+ * earlier warning, for the person who has just pulled and would otherwise spend
+ * the afternoon on why the browser and the CLI disagree.
+ */
+if (await staleViewerBundle()) {
+  console.log("");
+  console.log(
+    "the board page is older than src/viewer — run `npm run build:viewer`, then `diagramos stop` and this command again",
+  );
+}
 
 openBrowser(pinnedOn(service.port, service.probe, boards[0]));

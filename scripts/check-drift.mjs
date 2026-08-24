@@ -197,7 +197,65 @@ const NEEDS_WITHHELD = {
   unvouched: "with an end no source index has ever read",
   "same-file": "pointing at their own file",
   cycle: "in a cycle, where neither direction is more correct",
+  /*
+   * The arrow never reached `checkNeeds` at all. Same sentence, because the
+   * question the reader is asking is the same one -- why did nobody check this
+   * -- and the phrasing that already answers it should not fork just because
+   * the answer comes from an earlier gate.
+   */
+  "ends-not-bound": "with an end not snapped to its box",
+  "endpoint-missing": "with an end that points at no box",
+  "endpoint-external": "with an end marked external",
+  "endpoint-has-no-ref": "with an end that has no ref",
+  "endpoint-outside-repo": "with an end pointing outside the repo",
+  "endpoint-file-missing": "with an end whose file is missing",
+  "directory-ref": "with an end that refs a directory, not a file",
 };
+
+/**
+ * `@needs` arrows nobody answered, on this board.
+ *
+ * The count, not the reasons: this is the number that decides whether the board
+ * is worth a notice at all, and it is read in three places.
+ */
+function unansweredClaims(report) {
+  return Object.values(report.claims?.needsWithheld ?? {}).reduce((sum, count) => sum + count, 0);
+}
+
+/**
+ * The one-line version: what went unanswered and why, ordered commonest first.
+ *
+ * Deliberately the same sentence `--details` prints. `--details` earns the right
+ * to say it about every board; the notice says it because a question asked and
+ * not answered is news whether or not anybody asked for the long form.
+ */
+function unansweredClaimWords(report) {
+  const reasons = Object.entries(report.claims?.needsWithheld ?? {})
+    .filter(([, count]) => count > 0)
+    .sort((a, b) => b[1] - a[1]);
+  const total = reasons.reduce((sum, [, count]) => sum + count, 0);
+  if (total === 0) return undefined;
+  return `${total} needs ${total === 1 ? "arrow" : "arrows"} not checked: `
+    + reasons.map(([why, count]) => `${count} ${NEEDS_WITHHELD[why] ?? why}`).join(", ");
+}
+
+/**
+ * The one reason on that list somebody can fix by hand, and how.
+ *
+ * `ends-not-bound` is the only one a person causes by drawing rather than by
+ * the shape of their code, and it is invisible on screen: an arrow whose ends
+ * merely touch its boxes looks exactly like one snapped to them. Every other
+ * reason is a fact about the files, where there is nothing to drag.
+ *
+ * Its own row rather than more words on the line above, because the line above
+ * has to survive being one of several reasons on a board with several arrows,
+ * and the notice truncates at the width of the box.
+ */
+function unsnappedClaimFix(report) {
+  return (report.claims?.needsWithheld?.["ends-not-bound"] ?? 0) > 0
+    ? "  drag each end onto its box until the box highlights"
+    : undefined;
+}
 
 /**
  * The short row's version of a broken route.
@@ -267,6 +325,8 @@ const MAX_LISTED = 6;
  */
 function rowsFor({ report, promoted = [] }, colour, all = false) {
   const promotedNodes = new Set(promoted.map((promotion) => promotion.node));
+  const unanswered = unansweredClaimWords(report);
+  const unsnapped = unsnappedClaimFix(report);
   return [
     // First, because it is the only row here that says the check could not read
     // the board rather than that the board and the code disagree.
@@ -278,6 +338,18 @@ function rowsFor({ report, promoted = [] }, colour, all = false) {
         colour,
       ),
     ),
+    /*
+     * A question asked and not answered, next to the unreadable ones and above
+     * the disagreements, for the same reason they are: the rows below are the
+     * board and the code differing, which somebody can go and look at. This one
+     * says nobody looked, and reading it after a clean-looking list is how it
+     * gets mistaken for a footnote.
+     *
+     * Yellow, not red. Nothing here is wrong -- the claim may well hold. What is
+     * wrong is that a clean report was standing in for an answer.
+     */
+    ...(unanswered ? [paint(unanswered, "yellow", colour)] : []),
+    ...(unsnapped ? [paint(unsnapped, "dim", colour)] : []),
     ...report.deleted.map((finding) =>
       paint(`${boxName(finding)} removed, ${parseRef(finding.ref).path} still there`, "red", colour),
     ),
@@ -348,7 +420,7 @@ function rowsFor({ report, promoted = [] }, colour, all = false) {
  * spell every one out, and the tenth argument is where a counting bug goes to
  * hide.
  */
-function tallyCounts({ gone, empty, unused, open, removed, garbled, arrows, stray, promoted, built, planned }, colour) {
+function tallyCounts({ gone, empty, unused, open, removed, garbled, unanswered, arrows, stray, promoted, built, planned }, colour) {
   return [
     gone ? paint(`${gone} gone`, "red", colour) : "",
     empty ? paint(`${empty} empty`, "red", colour) : "",
@@ -362,6 +434,11 @@ function tallyCounts({ gone, empty, unused, open, removed, garbled, arrows, stra
     // Red, and not folded into "arrows": an unreadable claim is not an arrow the
     // code failed to corroborate, it is a word the check could not read at all.
     garbled ? paint(`${garbled} unreadable`, "red", colour) : "",
+    // Apart from "arrows", which means the code did not corroborate this one.
+    // Here nothing was corroborated or refuted: the claim was never put to the
+    // code at all, and folding it into the amber total would make "not asked"
+    // read as "asked, no answer".
+    unanswered ? paint(`${unanswered} unchecked ${unanswered === 1 ? "claim" : "claims"}`, "yellow", colour) : "",
     arrows ? paint(`${arrows} ${arrows === 1 ? "arrow" : "arrows"}`, "yellow", colour) : "",
     stray ? paint(`${stray} stray ${stray === 1 ? "arrow" : "arrows"}`, "dim", colour) : "",
     // "promoted" is done -- the board was advanced this run; "built" is still
@@ -386,6 +463,7 @@ function tallyFor({ report, promoted = [] }, colour) {
       open,
       removed: report.deleted.length,
       garbled: (report.garbledClaims ?? []).length,
+      unanswered: unansweredClaims(report),
       arrows: report.edges.length,
       stray: report.strayArrows ?? 0,
       promoted: promoted.length,
@@ -443,6 +521,7 @@ function render(stale, colour) {
         unused: sum.unused + report.findings.filter((finding) => finding.kind === "unused-symbol").length,
         removed: sum.removed + report.deleted.length,
         garbled: sum.garbled + (report.garbledClaims ?? []).length,
+        unanswered: sum.unanswered + unansweredClaims(report),
         arrows: sum.arrows + report.edges.length,
         stray: sum.stray + (report.strayArrows ?? 0),
         promoted: sum.promoted + promoted.length,
@@ -451,7 +530,7 @@ function render(stale, colour) {
         planned: sum.planned + report.workItems.length,
       };
     },
-    { gone: 0, empty: 0, unused: 0, removed: 0, garbled: 0, arrows: 0, stray: 0, promoted: 0, built: 0, planned: 0 },
+    { gone: 0, empty: 0, unused: 0, removed: 0, garbled: 0, unanswered: 0, arrows: 0, stray: 0, promoted: 0, built: 0, planned: 0 },
   );
 
   // Too many to list: counts per diagram, and a pointer to the view that has room.
@@ -669,6 +748,10 @@ for (const file of checking) {
     && report.promotions.length === 0
     && report.workItems.length === 0
     && (report.deletedEdges?.length ?? 0) === 0
+    // A `@needs` nobody could answer keeps the board on the list, the same way a
+    // deleted arrow does and for the same reason: it is news, and it never
+    // touches the exit code. The claim is not failing -- it was never tried.
+    && unansweredClaims(report) === 0
   ) continue;
 
   stale.push({ file, report, promoted });
@@ -692,7 +775,15 @@ const worthANotice = stale.filter(
   ({ report }) =>
     !report.clean
     || report.promotions.length > 0
-    || (report.deletedEdges?.length ?? 0) > 0,
+    || (report.deletedEdges?.length ?? 0) > 0
+    /*
+     * Someone wrote `@needs` and got no answer. That is the one skip that has to
+     * reach the per-turn notice rather than wait for `--details`, because
+     * writing the claim *was* the question, and a quiet report in reply reads as
+     * "checked, and fine" -- the exact conflation this whole check exists to
+     * prevent. Work items stay out for the opposite reason: nobody asked.
+     */
+    || unansweredClaims(report) > 0,
 );
 const showing = expanded ? stale : worthANotice;
 
@@ -923,17 +1014,13 @@ function renderCoverageAudit(entries, colour) {
             colour,
           ));
         }
-        const withheld = report.claims?.needsWithheld ?? {};
-        const reasons = Object.entries(withheld).filter(([, count]) => count > 0);
-        const total = reasons.reduce((sum, [, count]) => sum + count, 0);
-        if (total > 0) {
-          rows.push(paint(
-            `${total} needs ${total === 1 ? "arrow" : "arrows"} not checked: `
-            + reasons.map(([why, count]) => `${count} ${NEEDS_WITHHELD[why] ?? why}`).join(", "),
-            "yellow",
-            colour,
-          ));
-        }
+        // The same sentence the notice prints, from the same function. Two
+        // phrasings of one fact is two things to keep in sync, and the notice's
+        // is the one a person sees every turn.
+        const unanswered = unansweredClaimWords(report);
+        if (unanswered) rows.push(paint(unanswered, "yellow", colour));
+        const unsnapped = unsnappedClaimFix(report);
+        if (unsnapped) rows.push(paint(unsnapped, "dim", colour));
       }
       if (rows.length === 0) rows.push(paint("everything on this board was checked", "dim", colour));
       return {

@@ -82,6 +82,50 @@ export interface DriftFinding {
  */
 export type EdgeFindingKind = "unsupported-edge" | "broken-chain" | "backwards-edge";
 
+/**
+ * Every verdict word this engine can put in a report, as data (#116).
+ *
+ * A reader of a report -- the board page above all -- grades findings by kind,
+ * and it is compiled separately and shipped as a built bundle, so it can be
+ * older than the engine answering it. When it is, a kind it has no branch for
+ * lands in whatever bucket its arithmetic leaves over, and a red finding is
+ * shown as an amber one with nothing anywhere saying so.
+ *
+ * So the report carries the list, and a reader can compare it against the words
+ * it knows and say "I am out of date" instead of guessing. `satisfies` and the
+ * exhaustiveness check below make adding a kind to either union without adding
+ * it here a compile error, which is the only reason this list can be trusted.
+ */
+export const DRIFT_KINDS = [
+  "missing-file",
+  "missing-symbol",
+  "unresolvable-ref",
+  "empty-ref",
+  "missing-declaration",
+  "unused-symbol",
+  "unsupported-member",
+  "missing-route",
+  "open-box",
+] as const satisfies readonly DriftKind[];
+
+export const EDGE_FINDING_KINDS = [
+  "unsupported-edge",
+  "broken-chain",
+  "backwards-edge",
+] as const satisfies readonly EdgeFindingKind[];
+
+/*
+ * The half `satisfies` cannot do: it proves every listed word is a real kind,
+ * not that every real kind is listed. Add one to a union and forget the array,
+ * and `never` stops being assignable here.
+ */
+const _everyKindIsListed: never =
+  undefined as unknown as Exclude<
+    DriftKind | EdgeFindingKind,
+    (typeof DRIFT_KINDS)[number] | (typeof EDGE_FINDING_KINDS)[number]
+  >;
+void _everyKindIsListed;
+
 export interface EdgeDriftFinding {
   from: string;
   to: string;
@@ -340,8 +384,20 @@ export interface ClaimTally {
    * Shown rather than swallowed. A claim that was never checked and a claim that
    * passed look identical in a clean report, and the difference is the whole
    * question of whether the diagram is being held to anything.
+   *
+   * Two families of reason share this map on purpose. A `NeedsWithheld` is
+   * `checkNeeds` looking at the two files and declining to answer; an
+   * `EdgeSkipReason` is the arrow never getting that far -- an end not snapped
+   * to its box, an end with no ref. To the person who wrote the claim they are
+   * one question with one answer, "why did nobody check this", so they are one
+   * line with one count and the key says which.
+   *
+   * With edge checking on, every non-`planned` `needs` arrow lands in exactly
+   * one of these or in `needsChecked`: there is no third place for a claim to
+   * fall out of the walk unremarked, which is the whole point. `needs` itself
+   * counts `planned` arrows too, so it is the larger number.
    */
-  needsWithheld: SkipBreakdown<NeedsWithheld | "cycle">;
+  needsWithheld: SkipBreakdown<NeedsWithheld | "cycle" | EdgeSkipReason>;
 }
 
 /**
@@ -455,6 +511,16 @@ export interface DriftReport {
    * These are incomplete strokes, not checked specifications.
    */
   strayArrows?: number;
+  /**
+   * Every verdict word this engine could have used, whether or not it did.
+   *
+   * Not a finding: it is how a separately built reader tells "no finding of
+   * that kind" from "I have never heard of that kind". The board page is built
+   * ahead of time into `out/viewer` and nothing rebuilds it on a pull, so it
+   * can be a release behind the engine it is talking to and look completely
+   * normal being so (#116).
+   */
+  vocabulary: string[];
 }
 
 /**
@@ -1695,28 +1761,47 @@ export function checkDrift(
       const fromNode = nodeById.get(edge.from);
       const toNode = nodeById.get(edge.to);
 
+      /*
+       * An arrow carrying `@needs` is a question somebody asked on purpose, and
+       * every exit from here has to answer it -- with a verdict, or with the
+       * reason there is none.
+       *
+       * Skipping is ordinarily right and ordinarily quiet: an arrow the checker
+       * cannot read is not news. A *claimed* arrow is the exception, because
+       * silence in reply to a question reads as "checked, and fine". The gates
+       * below all fire before `checkNeeds` is reached, so without this the claim
+       * would never be counted at all -- and the very first `@needs` written by
+       * hand, on an arrow that looks right on screen, would report success.
+       */
+      const claimed = edge.claim === "needs" && edge.state !== "planned";
+      /** Skip the arrow, and if it carried a claim, say the claim went unanswered. */
+      const skipClaimedEdge = (reason: EdgeSkipReason) => {
+        if (claimed) claims.needsWithheld[reason] = (claims.needsWithheld[reason] ?? 0) + 1;
+        skipEdge(reason, edge, fromNode, toNode);
+      };
+
       if (edge.endpoints === "nearest") {
-        skipEdge("ends-not-bound", edge, fromNode, toNode);
+        skipClaimedEdge("ends-not-bound");
         continue;
       }
 
       // Both endpoints must exist, be recorded, have refs
       if (!fromNode || !toNode) {
-        skipEdge("endpoint-missing", edge, fromNode, toNode);
+        skipClaimedEdge("endpoint-missing");
         continue;
       }
 
       // An arrow into something deliberately outside the repo has nothing to
       // corroborate against, and saying so would be noise, not a finding.
       if (fromNode.state === "external" || toNode.state === "external") {
-        skipEdge("endpoint-external", edge, fromNode, toNode);
+        skipClaimedEdge("endpoint-external");
         continue;
       }
 
       const fromRef = fromNode.ref?.trim();
       const toRef = toNode.ref?.trim();
       if (!fromRef || !toRef) {
-        skipEdge("endpoint-has-no-ref", edge, fromNode, toNode);
+        skipClaimedEdge("endpoint-has-no-ref");
         continue;
       }
 
@@ -1728,7 +1813,7 @@ export function checkDrift(
 
       // Skip if either file is missing or is not a file
       if (!fromFile || !toFile) {
-        skipEdge("endpoint-outside-repo", edge, fromNode, toNode);
+        skipClaimedEdge("endpoint-outside-repo");
         continue;
       }
       const fromStat = workspace.stat(fromFile);
@@ -1744,10 +1829,17 @@ export function checkDrift(
         // graph proving nothing proves nothing.
         if (!missing && codeGraphConfirms(options?.codeGraph, fromPath, toPath)) {
           edgesChecked += 1;
+          /*
+           * The connection is corroborated; the *direction* is not. `checkNeeds`
+           * reads two files, and one end here stands for a whole directory, so
+           * the claim still got no verdict and still has to be counted as one
+           * that got none.
+           */
+          if (claimed) claims.needsWithheld["directory-ref"] = (claims.needsWithheld["directory-ref"] ?? 0) + 1;
           recordEdge(edge, fromNode, toNode, undefined);
           continue;
         }
-        skipEdge(missing ? "endpoint-file-missing" : "directory-ref", edge, fromNode, toNode);
+        skipClaimedEdge(missing ? "endpoint-file-missing" : "directory-ref");
         continue;
       }
 
@@ -1772,7 +1864,7 @@ export function checkDrift(
        * confirmed again by the ordinary channels a moment later, and an absent
        * one goes amber exactly as it did before claims existed.
        */
-      if (edge.claim === "needs" && edge.state !== "planned") {
+      if (claimed) {
         const needs = checkNeeds(fromPath, toPath, workspace, importCache.configs, options?.ledger);
         if (needs.verdict === "withheld") {
           claims.needsWithheld[needs.why] = (claims.needsWithheld[needs.why] ?? 0) + 1;
@@ -2180,6 +2272,10 @@ export function checkDrift(
     edgesSkippedWhy,
     unreadEdges,
     ...(graph.strayArrows > 0 ? { strayArrows: graph.strayArrows } : {}),
+    // Unconditional, and unconditionally the whole list: a vocabulary sent only
+    // when it is used would tell a stale reader nothing on the one board where
+    // nothing is wrong, which is where it matters most.
+    vocabulary: [...DRIFT_KINDS, ...EDGE_FINDING_KINDS],
   };
 }
 

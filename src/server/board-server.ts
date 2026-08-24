@@ -13,7 +13,7 @@
  */
 import { createHash, randomBytes, timingSafeEqual } from "node:crypto";
 import { watch, type FSWatcher } from "node:fs";
-import { readFile, realpath, stat } from "node:fs/promises";
+import { readdir, readFile, realpath, stat } from "node:fs/promises";
 import { createServer, type IncomingMessage, type Server, type ServerResponse } from "node:http";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
@@ -55,6 +55,49 @@ const OWNER_POLL_MS = 2000;
 const DEFAULT_IDLE_HOURS = 12;
 const IDLE_CHECK_MS = 60_000;
 const VIEWER_DIR = path.join(ROOT, "out/viewer");
+const VIEWER_SRC = path.join(ROOT, "src/viewer");
+
+/**
+ * Whether the board page on disk is older than the sources it was built from.
+ *
+ * `out/viewer` is a prebuilt bundle and nothing rebuilds it: after a pull that
+ * changes how findings are graded, the server is current and the served page is
+ * not, and the page looks completely normal being two days out of date (#116).
+ * A hard refresh does not help, because the stale artefact is on disk rather
+ * than in the browser's cache -- which is what made this hard to see from the
+ * outside.
+ *
+ * Only a warning. The page catches the semantic half itself by comparing the
+ * report's vocabulary against the words it knows, and that half works in the
+ * published package too. This is the cheaper, earlier signal for the person
+ * running from a checkout: eight `stat` calls, said before they open the tab.
+ *
+ * Silent when there are no sources -- an installed package has none, and a
+ * bundle cannot be behind sources that are not there.
+ */
+export async function staleViewerBundle(): Promise<boolean> {
+  const newerThan = async (built: number, dir: string): Promise<boolean> => {
+    for (const entry of await readdir(dir, { withFileTypes: true })) {
+      const target = path.join(dir, entry.name);
+      // A directory's own mtime moves when files are added or removed and not
+      // when one is edited, so the walk goes in rather than trusting it.
+      if (entry.isDirectory()) {
+        if (await newerThan(built, target)) return true;
+      } else if ((await stat(target)).mtimeMs > built) {
+        return true;
+      }
+    }
+    return false;
+  };
+  try {
+    const built = (await stat(path.join(VIEWER_DIR, "index.js"))).mtimeMs;
+    return await newerThan(built, VIEWER_SRC);
+  } catch {
+    // No sources, no bundle, or a tree we cannot stat. None of those is a
+    // staleness claim, and none of them is worth failing a board over.
+    return false;
+  }
+}
 
 /**
  * The idle fuse, in milliseconds, from a DIAGRAMOS_IDLE_HOURS-style value.
