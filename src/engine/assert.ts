@@ -18,8 +18,15 @@
 import { symbolCounts } from "./body";
 import { languageOf } from "./parse";
 
-/** The closed whitelist. Anything else after `@` is a broken ref, loudly. */
-const WORDS = ["declared", "used"] as const;
+/**
+ * The closed whitelist. Anything else after `@` is a broken ref, loudly.
+ *
+ * Exported so the authoring guidance can be checked against it. A word the
+ * engine accepts and nothing teaches is a word nobody writes -- which is how
+ * the claims shipped to fourteen boards and appeared on none of them (#110).
+ */
+export const SYMBOL_WORDS = ["declared", "used"] as const;
+const WORDS = SYMBOL_WORDS;
 
 export interface Assertion {
   declared: boolean;

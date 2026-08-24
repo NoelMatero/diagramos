@@ -81,6 +81,36 @@ Three costs that are not obvious, all of them measured on this repo:
   and makes it lie. Offer the honest options — draw the missing middle box, or
   leave the finding — and let the user choose.
 
+## While you are in there: the claims you can prove
+
+Anchoring a box means you already had the file open. That is the only moment
+where a claim is a transcription rather than a guess, so it is the right moment
+to offer one — under the same approval gate, in the same table, never written
+on your own say-so.
+
+Two, and only where the evidence was actually in front of you:
+
+- **`claim: "needs"` on an arrow.** You anchored both ends, and while reading
+  one of them you saw the import of the other. Then the arrow's direction is
+  something you read, and it is worth recording: without a claim the arrow can
+  never be shown to be backwards, and with one a reversal is caught by file and
+  line. Offer it only for arrows where you saw the line. "It must import it"
+  does not qualify, and an arrow with no claim is the normal case.
+- **`closed` on a box you anchored to a directory.** Only worth raising when
+  the directory looks like a real boundary and you can say what reaches in.
+  Check before offering: `check_drift` returns `closedBreaches`, and a `closed`
+  proposal that fires red on the first run after the user approved it is your
+  mistake landing on their board.
+
+Do not go looking. This command's job is anchors; a claim is a thing you
+noticed, and a pass spent hunting for claims to propose is how the transcription
+rule quietly becomes a guessing rule. If you saw nothing worth claiming, propose
+nothing — that is the common outcome and it is not a shortfall.
+
+Put them in the same table as the anchors, marked as claims, each with the file
+and line you read. A claim with no line beside it is a claim you should not be
+proposing.
+
 ## Propose, then wait
 
 Show every proposal in one table before writing anything: the box, what you
@@ -94,7 +124,8 @@ Do not write on the strength of your own confidence.
 ## Write
 
 Once approved, regenerate the board with `create_diagram` on the same path,
-carrying over **every** node and edge and adding only the approved anchors.
+carrying over **every** node and edge and adding only what was approved — the
+anchors, and any claims that came with them.
 
 Be honest about the cost: regeneration decides the layout of the generated part
 fresh, so a board somebody arranged by hand comes back arranged by the engine.
@@ -102,8 +133,8 @@ Hand-drawn elements survive. Say this before writing if the board looks
 hand-arranged, and let the user decide whether the anchors are worth it.
 
 Finish by re-running the check and reporting in a sentence or two: how many
-boxes now carry an anchor, how many were marked external, and what you left
-unresolved.
+boxes now carry an anchor, how many were marked external, how many claims went
+on, and what you left unresolved.
 
 If a new anchor made the board go loud, name it and say which of the two things
 you think happened, because they need opposite fixes: either the anchor is wrong
