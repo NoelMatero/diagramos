@@ -2,6 +2,7 @@
  * The live board server: file -> browser and browser -> file, plus the
  * conflict rule that keeps an agent write from erasing a human stroke.
  */
+import { execFileSync } from "node:child_process";
 import { mkdtempSync, realpathSync, rmSync, writeFileSync } from "node:fs";
 import { readFile } from "node:fs/promises";
 import os from "node:os";
@@ -509,6 +510,79 @@ describe("board server drift status", () => {
     const response = await fetch(api(`/api/drift?file=${encodeURIComponent("ghost.excalidraw")}`));
     expect(response.status).toBe(404);
   });
+});
+
+describe("board server file list (#114, #111)", () => {
+  /*
+   * Its own repository, because this is the one endpoint whose answer *is* the
+   * git tree. Sharing the suite's workspace would mean either turning that into
+   * a repo -- which the drift tests read differently -- or asserting against an
+   * empty list, which passes whether or not anything works.
+   */
+  let repo: string;
+  let repoServer: RunningBoardServer;
+
+  beforeAll(async () => {
+    repo = realpathSync(mkdtempSync(path.join(os.tmpdir(), "board-paths-")));
+    execFileSync("git", ["init", "-q"], { cwd: repo, stdio: "ignore" });
+    writeFileSync(path.join(repo, "tracked.ts"), "export const tracked = true;\n");
+    execFileSync("git", ["add", "tracked.ts"], { cwd: repo, stdio: "ignore" });
+    writeFileSync(path.join(repo, ".gitignore"), "ignored.ts\n");
+    writeFileSync(path.join(repo, "untracked.ts"), "export const fresh = true;\n");
+    writeFileSync(path.join(repo, "ignored.ts"), "export const hidden = true;\n");
+    const board = path.join(repo, "board.excalidraw");
+    await writeBoard(board, boardWith("x"));
+    repoServer = await startBoardServer({ file: board, port: 0, root: repo });
+  }, 60_000);
+
+  afterAll(async () => {
+    await repoServer?.close();
+    if (repo) rmSync(repo, { recursive: true, force: true });
+  });
+
+  const listed = async (): Promise<string[]> => {
+    const response = await fetch(new URL("/api/paths", repoServer.url).href);
+    expect(response.status).toBe(200);
+    return ((await response.json()) as { paths: string[] }).paths;
+  };
+
+  it("offers the files the repository has, staged or not", async () => {
+    // A file written a minute ago and never staged is the file you are most
+    // likely to be drawing a box for, so it has to be pickable.
+    const paths = await listed();
+    expect(paths).toContain("tracked.ts");
+    expect(paths).toContain("untracked.ts");
+  });
+
+  it("leaves out what .gitignore already ruled out", async () => {
+    // Otherwise the picker fills with build output and the one file wanted is
+    // buried under out/, which is how a picker stops being faster than typing.
+    expect(await listed()).not.toContain("ignored.ts");
+  });
+
+  it("refuses a board outside the root, like every other endpoint", async () => {
+    const response = await fetch(
+      new URL(`/api/paths?file=${encodeURIComponent("../outside.excalidraw")}`, repoServer.url).href,
+    );
+    expect(response.status).toBe(403);
+  });
+
+  it("answers with an empty list where there is no version control, not an error", async () => {
+    // The panel then takes a typed path, which is what it did before there was
+    // a list at all. A 500 here would make an unversioned project look broken.
+    const bare = realpathSync(mkdtempSync(path.join(os.tmpdir(), "board-nogit-")));
+    const board = path.join(bare, "board.excalidraw");
+    await writeBoard(board, boardWith("y"));
+    const plain = await startBoardServer({ file: board, port: 0, root: bare });
+    try {
+      const response = await fetch(new URL("/api/paths", plain.url).href);
+      expect(response.status).toBe(200);
+      expect(((await response.json()) as { paths: string[] }).paths).toEqual([]);
+    } finally {
+      await plain.close();
+      rmSync(bare, { recursive: true, force: true });
+    }
+  }, 30_000);
 });
 
 describe("board server history (#68)", () => {

@@ -94,8 +94,13 @@ export function loadLedger(manifest: unknown): Ledger | undefined {
  * directories, because somebody already wrote those rules down in `.gitignore`.
  *
  * `undefined` on any failure, including not being a git repository at all.
+ *
+ * Exported because the board page asks the same question for a different reason:
+ * the panel that anchors a box to a file offers this list to pick from, so a ref
+ * is chosen rather than typed. "Files this repository has" is one question, and
+ * answering it twice would be two answers waiting to disagree.
  */
-function gitKnown(root: string): Set<string> | undefined {
+export function gitKnown(root: string): Set<string> | undefined {
   try {
     const listed = execFileSync(
       "git",
