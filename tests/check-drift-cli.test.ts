@@ -1471,7 +1471,9 @@ describe("check-drift saying what it did not look at", () => {
   it("admits how little it read when asked", async () => {
     await put("sketch", [{ id: "x", label: "Auth" }, { id: "y", label: "Queue" }], [{ from: "x", to: "y" }]);
     const asked = await check("--details");
-    expect(asked.stderr).toContain("0 refs");
+    // Not "0 boxes checked", which reads as a pass: the shared words say there
+    // was nothing here to read.
+    expect(asked.stderr).toContain("nothing here points at code yet");
     expect(asked.stderr).toContain("2 boxes skipped");
     expect(asked.stderr).toContain("no ref");
     expect(asked.stderr).toContain("1 arrows skipped");
@@ -1485,7 +1487,8 @@ describe("check-drift saying what it did not look at", () => {
     // same as one that could not be.
     await put("real", [{ id: "a", label: "A", ref: "src/a.ts" }]);
     const asked = await check("--details");
-    expect(asked.stderr).toContain("1 refs");
+    // The live board's chip says this in exactly these words.
+    expect(asked.stderr).toContain("checked 1 box and 0 arrows");
     expect(asked.stderr).toContain("everything on this board was checked");
     expect(asked.stderr).not.toContain("boxes skipped");
   });

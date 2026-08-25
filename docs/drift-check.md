@@ -310,7 +310,7 @@ Three things stay separate, because they are not the same claim:
 an answer:
 
 ```
-┌─ ims.excalidraw  0 refs · 0 arrows checked ───────────────────┐
+┌─ ims.excalidraw  nothing here points at code yet ─────────────┐
 │ 19 boxes skipped: 19 no ref                                   │
 │ 25 arrows skipped: 25 an end has no ref                       │
 └─ silence means these agreed · not that everything was read ───┘
@@ -321,7 +321,7 @@ be acted on — "4 arrows skipped: an end is marked external" leaves a reader no
 to learn *which* four short of opening `drift.ts`:
 
 ```
-┌─ example.excalidraw  3 refs · 2 arrows checked ───────────────┐
+┌─ example.excalidraw  checked 3 boxes and 2 arrows ────────────┐
 │ 3 boxes outside this repo by declaration                      │
 │ 4 arrows skipped: 4 an end is marked external                 │
 │   Claude Code → Board MCP server  tool call                   │
@@ -367,7 +367,7 @@ and only one of them deserved it. Typing the command and getting zero bytes back
 is indistinguishable from a broken install, and was read as exactly that:
 
 ```
-7 boards · 12 refs · 12 arrows checked · nothing drifted · 12 unread, --details says why
+7 boards · 12 boxes and 12 arrows checked · nothing drifted · 12 unread, --details says why
 ```
 
 It names what went unread rather than implying everything was verified, because
