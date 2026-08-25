@@ -377,21 +377,16 @@ export function worstToneOf(rows: StatusRow[]): Tone {
 
 /**
  * The clean chip's words: what was read, so "in sync" cannot mean "unread".
- * In sentences, not tallies -- "4 refs · 3 arrows checked" needed the reader
- * to already know what a ref is, which is the one thing a status line that
- * only appears when everything is fine cannot assume.
+ *
+ * The sentence itself lives in the engine, because the CLI says the same thing
+ * every run and the two had drifted into different nouns for the same number.
+ * Re-exported rather than wrapped so this page has no second opinion to keep in
+ * step, and taking a `DriftView` still type-checks: the engine asks for the four
+ * counts, which the report already carries.
+ *
+ * Unlike the vocabulary above, this is not something the bundle can be too old
+ * for. A wording change ships inside this bundle, so a stale `out/viewer` shows
+ * a stale sentence about counts that are still correct -- last release's words,
+ * never a wrong number.
  */
-export function summaryOf(report: DriftView): string {
-  if (report.concept) {
-    return "a concept board — it describes something outside this repo, so nothing here is checked";
-  }
-  if (!report.checked && !report.edgesChecked) {
-    return "nothing on this board points at code yet, so nothing was checked";
-  }
-  const boxes = `${report.checked} ${report.checked === 1 ? "box" : "boxes"}`;
-  const arrows = `${report.edgesChecked} ${report.edgesChecked === 1 ? "arrow" : "arrows"}`;
-  const unread = report.skipped
-    ? ` — ${report.skipped} more ${report.skipped === 1 ? "box has no ref, so it" : "boxes have no ref, so they"} went unchecked`
-    : "";
-  return `checked ${boxes} and ${arrows} against the code — all still true${unread}`;
-}
+export { summaryOf } from "../engine/summary";

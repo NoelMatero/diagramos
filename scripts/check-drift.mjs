@@ -41,6 +41,7 @@ import { box, fit, pad } from "./lib/box.mjs";
 import { readBoard, writeBoard } from "../src/engine/board-file.ts";
 import { applyPromotions } from "../src/engine/promote.ts";
 import { CONFIG_FILE, ConfigError, DEFAULT_DIAGRAM_DIR, diagramDir } from "../src/engine/config.ts";
+import { countedWords, coverageLabel } from "../src/engine/summary.ts";
 import {
   checkDrift,
   createGitBaseline,
@@ -960,7 +961,8 @@ function renderCoverageAudit(entries, colour) {
   return box({
     sections: entries.map(({ file, report }) => {
       const rows = [];
-      if (report.concept) rows.push(paint("concept board · not about this repo", "dim", colour));
+      // No concept row: this box's header now carries those exact words, and
+      // saying it twice in one frame is how two phrasings start drifting again.
       if (report.excused) rows.push(paint(`${report.excused} boxes outside this repo by declaration`, "dim", colour));
       if (report.handDrawn) rows.push(paint(`${report.handDrawn} hand-drawn boxes, never checked`, "dim", colour));
       if (report.skipped) rows.push(paint(`${report.skipped} boxes skipped: ${skipWords(report.skippedWhy)}`, "yellow", colour));
@@ -1051,7 +1053,11 @@ function renderCoverageAudit(entries, colour) {
       }
       if (rows.length === 0) rows.push(paint("everything on this board was checked", "dim", colour));
       return {
-        label: `${path.basename(file)}  ${paint(`${report.checked} refs · ${report.edgesChecked} arrows checked`, "dim", colour)}`,
+        // The same words the live board's chip uses, from the same function --
+        // "refs" here and "boxes" there was one number with two names. The
+        // verdict stays out of it: this box prints over a broken board too, and
+        // the label form is the one that survives a filename eating the width.
+        label: `${path.basename(file)}  ${paint(coverageLabel(report), "dim", colour)}`,
         rows,
       };
     }),
@@ -1231,7 +1237,9 @@ if (showing.length > 0 || problems.length > 0 || coverageLines.length > 0
   console.error(
     [
       `${examined.length} board${examined.length === 1 ? "" : "s"}`,
-      `${refs} refs · ${arrows} arrows checked`,
+      // Totalled across boards, so no single board's concept flag applies --
+      // but the nouns and the plurals are the shared ones.
+      `${countedWords({ checked: refs, edgesChecked: arrows })} checked`,
       "nothing drifted",
       // Deliberately not a notice of its own: a work item is the sketch being
       // ahead on purpose, and it belongs in a tally rather than in an alarm.
