@@ -45,8 +45,11 @@ export interface CodeGraphOption {
  * turns the channel off: a new major or minor release may change what the
  * extractor emits, and we bump this deliberately, after re-testing that a
  * rebuild on the same tree is byte-identical.
+ *
+ * Exported because the builder asks before it spends anything: a graph this
+ * loader would refuse is not worth the seconds it takes to make.
  */
-const TESTED_VERSION_PREFIX = "0.9.";
+export const TESTED_VERSION_PREFIX = "0.9.";
 
 /**
  * Relations that count as a hop. Each is a claim the extractor read directly
