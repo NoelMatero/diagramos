@@ -1,6 +1,6 @@
 {
   "name": "diagramos",
-  "version": "0.1.0",
+  "version": "0.2.0-rc.2",
   "description": "Diagram-driven development: an MCP server that gives Claude read/write access to Excalidraw diagrams that live in the repo, plus a live local board.",
   "keywords": [
     "diagram",
@@ -36,6 +36,8 @@
     "build:cli": "node scripts/build-cli.mjs",
     "build": "npm run build:vendor && npm run build:viewer && npm run build:cli",
     "prepare": "npm run build && node scripts/install-hooks.mjs && node scripts/ensure-graphify.mjs",
+    "//prepublishOnly": "0.2.0-rc.1 shipped with hooks/drift.sh still pinned to 0.1.0, so the Stop hook ran a build that had no `drift` subcommand and quietly started the MCP server instead: one line, exit 0, no check, every turn. tests/plugin-hook.test.ts catches exactly that -- it just was not run. This gate is the reason it cannot be skipped again. Builds first because packaged-board-cli serves the viewer out of the tarball, and prepublishOnly runs before prepare. e2e is left out on purpose: it needs a chromium nobody should have to install to publish.",
+    "prepublishOnly": "npm run typecheck && npm run build && npm test",
     "graph:install": "node scripts/ensure-graphify.mjs",
     "graph:refresh": "node scripts/refresh-code-graph.mjs",
     "typecheck": "tsc --noEmit",
