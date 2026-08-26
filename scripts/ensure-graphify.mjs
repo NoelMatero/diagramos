@@ -18,13 +18,9 @@
 
 import { spawnSync } from "node:child_process";
 
-const PACKAGE = "graphifyy";
-
-/** Installers we know how to drive, in the order we prefer them. */
-const INSTALLERS = [
-  { command: "uv", args: ["tool", "install", PACKAGE] },
-  { command: "pipx", args: ["install", PACKAGE] },
-];
+// Shared with the builder, and with the sentence the check prints when
+// graphify is missing: one list, so the advice and the install agree.
+import { INSTALLERS, PACKAGE } from "./lib/code-graph.mjs";
 
 const run = (command, args, timeout) =>
   spawnSync(command, args, {

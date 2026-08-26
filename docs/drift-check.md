@@ -1202,32 +1202,59 @@ imports the other, a third file imports both, both name the same HTTP route,
 or a function body reaches the other end. All four read the two endpoint
 files, fresh, on every check — which bounds what they can see.
 
-The fifth is different: a map of the whole repo, computed once per commit and
+The fifth is different: a map of the whole repo, built once per commit and
 read at check time as plain JSON. The map is built by
 [Graphify](https://pypi.org/project/graphifyy/), whose code pass is local and
-deterministic — tree-sitter parsing, no model, nothing leaves the machine. A
-post-commit hook (installed by `npm install`) runs it and records which commit
-and Graphify version built the map. The check itself never runs Graphify,
-never runs Python; it only reads the JSON.
+deterministic — tree-sitter parsing, no model, nothing leaves the machine. The
+build records which commit and which Graphify version made the map, which is
+what lets a later check decide whether to trust it.
 
 ### Getting it, without having to think about it
 
-`npm install` sets the whole thing up: it installs the post-commit hook, and
-it installs Graphify itself if the machine already has a Python tool installer
-(`uv`, else `pipx`). Nobody should have to read a doc to get the deeper check
-— it is on, or it is silent, never "documented as opt-in".
+**The check builds the map itself when the project has none.** That is the
+whole answer, and it took a wrong one first. The map used to be built only by
+a post-commit hook that `npm install` wires up — which works in the repo that
+develops this tool and nowhere else, because `prepare` never runs for a project
+that merely installs the tool: it arrives as a marketplace clone plus `npx`.
+So the project that most needed a map was the one project that never got one,
+and the single line mentioning it told the reader to run two `npm run` scripts
+out of *diagramos's* `package.json` (#132). Correct advice, wrong reader.
 
-The restraint in that: it uses only an installer already present, never
-installs an installer, and never fails an `npm install` — no installer, no
-network, a bad package index all exit quietly. `DIAGRAMOS_SKIP_GRAPHIFY=1`
-skips it, and so does `CI`, where a per-machine tool install is not wanted.
+The guard on building it is cheap, and every part of it is a file test, a
+`--version`, or a walk over elements already in memory:
 
-By hand, if it was skipped or failed:
+- only when arrows are being checked, and only when a board draws one — an
+  arrow is the only thing the map can help with;
+- only when the map is missing or a commit behind. An *uncommitted* edit does
+  not count as behind: the reader already falls back to the live channels for
+  any file touched since the map was built, so an edit costs a little coverage
+  and no correctness, while rebuilding per edit would mean rebuilding every
+  turn;
+- only when Graphify is already installed. The check installs nothing;
+- at most one attempt per commit, recorded before the build runs, so a repo
+  where extraction fails or runs past the 60-second cap pays for it once
+  rather than on every turn.
 
-```
-npm run graph:install    # installs graphify (needs uv or pipx)
-npm run graph:refresh    # builds the map now, instead of at the next commit
-```
+In practice that is one build per commit, at the first check after it, on the
+run that needed it — 0.5 s on a ten-file repo, ~6 s on this one. The
+post-commit hook stays where it is wired: a build that already happened is
+better than one somebody waits for.
+
+The output directory is made invisible to git on the way out — `graphify-out/`
+gets a `.gitignore` holding `*`, which ignores its contents and itself. A
+project that never asked for a megabyte of derived JSON does not get it in a
+`git status`, and nobody has to edit their own `.gitignore` for us.
+
+Installing Graphify is the one part left, and `npm install` does it in a repo
+where `prepare` runs: it installs Graphify if the machine already has a Python
+tool installer (`uv`, else `pipx`), using only an installer already present,
+never installing an installer, and never failing an `npm install`. Elsewhere
+the check says one line, once, when an arrow actually went unread — and it
+names `uv tool install graphifyy` only if this machine has `uv` or `pipx` to
+run it with. A Rust repo with no Python toolchain is told the truth instead:
+some arrows cannot be checked here. `DIAGRAMOS_SKIP_GRAPHIFY=1` turns all of
+it off, the install and the build both, and then the check says nothing at all;
+`CI` skips the install too, where a per-machine tool install is not wanted.
 
 An arrow is confirmed when the map shows a chain of at most three steps —
 calls, imports, re-exports, dynamic imports, each read directly from source —
@@ -1261,8 +1288,9 @@ The channel only ever *confirms*. It never creates a finding, and every way
 it can fail is silence — the check then behaves exactly as it did before the
 channel existed:
 
-- No `graphify-out/graph.json` or sidecar (Graphify not installed, or never
-  run since; the CLI says so once, quietly, then never again).
+- No `graphify-out/graph.json` or sidecar, and no way to make one: Graphify
+  not installed, no git to date the map against, or an extraction that failed.
+  The CLI says so once, quietly, then never again.
 - A Graphify version outside the tested range (0.9.x today; a new release is
   adopted deliberately, after re-testing).
 - A map the loader does not fully understand.

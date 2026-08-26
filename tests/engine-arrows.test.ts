@@ -32,6 +32,43 @@ function fakeWorkspace(files: Record<string, string>): Workspace {
   };
 }
 
+/**
+ * The same file map, with directories inferred from the paths.
+ *
+ * `fakeWorkspace` lists nothing, which is fine for TypeScript -- a specifier
+ * resolves against the filesystem one lookup at a time. Rust needs a walk: the
+ * module tree is built from the `Cargo.toml` files in the tree, and a workspace
+ * that cannot list a directory has no crates and therefore no readable Rust.
+ */
+function treeWorkspace(files: Record<string, string>): Workspace {
+  const norm = (target: string) => {
+    const trimmed = target.replace(/^\.\//, "");
+    return trimmed === "" || trimmed === "." ? "." : trimmed;
+  };
+  return {
+    resolve: (relative) => (relative.startsWith("../") ? undefined : norm(relative)),
+    stat: (target) => {
+      const at = norm(target);
+      if (at === ".") return "directory";
+      if (files[at] !== undefined) return "file";
+      return Object.keys(files).some((file) => file.startsWith(`${at}/`)) ? "directory" : "missing";
+    },
+    read: (target) => files[norm(target)] ?? "",
+    list: (target) => {
+      const at = norm(target);
+      const prefix = at === "." ? "" : `${at}/`;
+      const names = new Set<string>();
+      for (const file of Object.keys(files)) {
+        if (!file.startsWith(prefix)) continue;
+        names.add(file.slice(prefix.length).split("/")[0]!);
+      }
+      return [...names];
+    },
+  };
+}
+
+const CARGO = '[package]\nname = "demo"\nedition = "2021"\n';
+
 async function boardWith(
   nodes: Array<{ id: string; label: string; ref?: string; refs?: string[] }>,
   edges: Array<{ from: string; to: string }>,
@@ -280,7 +317,11 @@ describe("what function granularity leaves alone", () => {
     expect(report.edgesChecked).toBe(1);
   });
 
-  it("still skips a Rust arrow when neither end names a symbol", async () => {
+  it("skips a Rust arrow no crate declares, and says that rather than the language", async () => {
+    // `src/lib.rs` here belongs to no crate, because nothing lists a
+    // `Cargo.toml`. So `mod` and `crate::` have no root to resolve against and
+    // the reader would find nothing -- which is not the same fact as "there is
+    // nothing there", and the skip reason is the one that says so.
     const board = await boardWith(
       [
         { id: "a", label: "A", ref: "src/lib.rs" },
@@ -292,7 +333,152 @@ describe("what function granularity leaves alone", () => {
       board,
       fakeWorkspace({ "src/lib.rs": RUST, "src/other.rs": "pub fn x() {}\n" }),
     );
-    expect(report.edgesSkippedWhy).toEqual({ "not-ts-or-js": 1 });
+    expect(report.edgesSkippedWhy).toEqual({ "outside-licence": 1 });
+    expect(report.edgesChecked).toBe(0);
+  });
+});
+
+/**
+ * The arrow check asks `licence.ts` which languages it can read, the way the
+ * direction check and the closure check already did.
+ *
+ * It used to ask a regex for TypeScript extensions instead, so a Rust board was
+ * told "not TypeScript or JavaScript" about arrows between two files this
+ * repository had measured a reader for -- 14 of 50 arrows on the board in issue
+ * #131, a reason that was simply not true. The tests below are one per channel,
+ * because "Rust works now" is not a claim any single one of them supports.
+ */
+describe("arrows between files in a language with a licence", () => {
+  it("confirms one Rust file declaring the other", async () => {
+    const files = {
+      "Cargo.toml": CARGO,
+      "src/lib.rs": "pub mod route;\n",
+      "src/route.rs": "pub fn go() {}\n",
+    };
+    const board = await boardWith(
+      [
+        { id: "a", label: "lib", ref: "src/lib.rs" },
+        { id: "b", label: "route", ref: "src/route.rs" },
+      ],
+      [{ from: "a", to: "b" }],
+    );
+    const report = checkDrift(board, treeWorkspace(files), { edges: true });
+    expect(report.edgesSkippedWhy).toEqual({});
+    expect(report.edgesChecked).toBe(1);
+    expect(report.edges).toEqual([]);
+  });
+
+  it("confirms an arrow drawn against the declaration, not with it", async () => {
+    // Channel 2. The arrow points from `route` to `lib`; only `lib` declares
+    // anything. Corroboration is symmetric on purpose -- it confirms a
+    // connection and never a direction, which is `needs.ts`'s job.
+    const files = {
+      "Cargo.toml": CARGO,
+      "src/lib.rs": "pub mod route;\n",
+      "src/route.rs": "pub fn go() {}\n",
+    };
+    const board = await boardWith(
+      [
+        { id: "a", label: "route", ref: "src/route.rs" },
+        { id: "b", label: "lib", ref: "src/lib.rs" },
+      ],
+      [{ from: "a", to: "b" }],
+    );
+    const report = checkDrift(board, treeWorkspace(files), { edges: true });
+    expect(report.edgesChecked).toBe(1);
+    expect(report.edges).toEqual([]);
+  });
+
+  it("confirms two Rust files a third one both reaches into", async () => {
+    // Channel 3. Neither endpoint names the other; the crate root names both.
+    const files = {
+      "Cargo.toml": CARGO,
+      "src/lib.rs": "pub mod request;\npub mod response;\n",
+      "src/request.rs": "pub fn read() {}\n",
+      "src/response.rs": "pub fn write() {}\n",
+    };
+    const board = await boardWith(
+      [
+        { id: "root", label: "lib", ref: "src/lib.rs" },
+        { id: "a", label: "request", ref: "src/request.rs" },
+        { id: "b", label: "response", ref: "src/response.rs" },
+      ],
+      [{ from: "a", to: "b" }],
+    );
+    const report = checkDrift(board, treeWorkspace(files), { edges: true });
+    expect(report.edgesChecked).toBe(1);
+    expect(report.edges).toEqual([]);
+  });
+
+  it("flags an unconnected Rust arrow without claiming it read route strings", async () => {
+    /*
+     * The route channel is TypeScript's and was not widened with the gate. Both
+     * files here write `"/users"`, which is exactly what that channel looks
+     * for, and the arrow is still amber -- and the sentence names the three
+     * channels that ran rather than the four a TypeScript arrow gets.
+     *
+     * A licence is per language. This channel has been measured on one.
+     */
+    const files = {
+      "Cargo.toml": CARGO,
+      "src/lib.rs": "pub mod alone;\npub mod other;\n",
+      "src/alone.rs": 'pub fn a() { let _ = "/users"; }\n',
+      "src/other.rs": 'pub fn b() { let _ = "/users"; }\n',
+    };
+    const board = await boardWith(
+      [
+        { id: "a", label: "alone", ref: "src/alone.rs" },
+        { id: "b", label: "other", ref: "src/other.rs" },
+      ],
+      [{ from: "a", to: "b" }],
+    );
+    // No box for `src/lib.rs`, so it is not a shared-importer candidate and
+    // channel 3 cannot rescue this the way the test above relies on.
+    const report = checkDrift(board, treeWorkspace(files), { edges: true });
+    expect(report.edgesChecked).toBe(1);
+    expect(report.edges).toHaveLength(1);
+    expect(report.edges[0].kind).toBe("unsupported-edge");
+    expect(report.edges[0].detail).not.toContain("route string");
+    expect(report.edges[0].detail).toContain("shares an importer with");
+  });
+
+  it("still names route strings for a TypeScript arrow", async () => {
+    // The other half of the sentence above: the channel did not go away, it
+    // only stopped claiming languages it was never measured on.
+    const files = {
+      "src/a.ts": "export const a = 1;\n",
+      "src/b.ts": "export const b = 2;\n",
+    };
+    const board = await boardWith(
+      [
+        { id: "a", label: "A", ref: "src/a.ts" },
+        { id: "b", label: "B", ref: "src/b.ts" },
+      ],
+      [{ from: "a", to: "b" }],
+    );
+    const report = checkDrift(board, fakeWorkspace(files), { edges: true });
+    expect(report.edges).toHaveLength(1);
+    expect(report.edges[0].detail).toContain("shares a route string with");
+  });
+
+  it("stays silent about a language no licence names", async () => {
+    // The gate is the licence, not "anything but TypeScript". Ruby has no
+    // grammar and no corpus, so it gets the same silence it always did -- under
+    // a name that is about the licence rather than about one regex.
+    const board = await boardWith(
+      [
+        { id: "a", label: "A", ref: "src/a.rb" },
+        { id: "b", label: "B", ref: "src/b.rb" },
+      ],
+      [{ from: "a", to: "b" }],
+    );
+    const report = checkDrift(
+      board,
+      fakeWorkspace({ "src/a.rb": "require_relative 'b'\n", "src/b.rb": "def go; end\n" }),
+      { edges: true },
+    );
+    expect(report.edgesSkippedWhy).toEqual({ "unlicensed-language": 1 });
+    expect(report.edges).toEqual([]);
   });
 });
 
@@ -854,13 +1040,13 @@ describe("code graph — the fifth corroboration channel", () => {
     const board = await arrowAB("src/x.py", "src/y.py");
 
     const without = checkDrift(board, fakeWorkspace(pyFiles), { edges: true });
-    expect(without.edgesSkippedWhy["not-ts-or-js"]).toBe(1);
+    expect(without.edgesSkippedWhy["unlicensed-language"]).toBe(1);
 
     const withGraph = checkDrift(board, fakeWorkspace(pyFiles), {
       edges: true,
       codeGraph: { graph, modified: new Set() },
     });
-    expect(withGraph.edgesSkippedWhy["not-ts-or-js"]).toBeUndefined();
+    expect(withGraph.edgesSkippedWhy["unlicensed-language"]).toBeUndefined();
     expect(withGraph.edgesChecked).toBe(1);
     expect(withGraph.edges).toHaveLength(0);
   });
@@ -935,7 +1121,7 @@ describe("code graph — the fifth corroboration channel", () => {
       edges: true,
       codeGraph: { graph, modified: new Set() },
     });
-    expect(report.edgesSkippedWhy["not-ts-or-js"]).toBe(1);
+    expect(report.edgesSkippedWhy["unlicensed-language"]).toBe(1);
     expect(report.edges).toHaveLength(0);
     expect(report.clean).toBe(true);
   });

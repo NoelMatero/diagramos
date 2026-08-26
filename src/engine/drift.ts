@@ -28,6 +28,7 @@ import type { BoardFile } from "./board-file";
 import { arrowClaimError, boxClaimError, type ArrowClaim } from "./claim";
 import { checkClosed, type ClosedBreach } from "./closed";
 import { connects, refIsStale, type CodeGraphOption } from "./codegraph";
+import { readDependencies, readerCanPlace } from "./deps";
 import { readGraph, type Provenance, type RecoveredGraph } from "./graph";
 import { licenceFor } from "./licence";
 import { languageOf, type Language } from "./parse";
@@ -312,7 +313,7 @@ export type NodeSkipReason =
   | "no-route-literals";
 
 /**
- * Why an arrow was not checked. Nine reasons, all of which used to arrive as a
+ * Why an arrow was not checked. Eleven reasons, all of which used to arrive as a
  * single number -- so a reader could see that five arrows went unchecked without
  * any way to learn that two of them simply had not been snapped to their boxes.
  */
@@ -338,7 +339,23 @@ export type EdgeSkipReason =
    * deleted* was spent on a ref shape the README documents as legal.
    */
   | "glob-ref"
-  | "not-ts-or-js"
+  /**
+   * Neither endpoint's language has a measured licence, so no reader here has
+   * earned an opinion about it. Called `not-ts-or-js` until Rust arrived: that
+   * name was a description of one regex rather than of what the engine can
+   * read, and it went on being printed over a language `licence.ts` had
+   * measured and `deps.ts` had a reader for.
+   */
+  | "unlicensed-language"
+  /**
+   * The language has a licence and this file is not the kind of file the
+   * licence was measured over. Today that means one thing: a Rust file no
+   * crate declares, whose `mod` and `crate::` paths have no root to resolve
+   * against. The corpus left those out rather than netting them off, so a
+   * channel that read one anyway would be confirming from a reader nobody
+   * measured -- see `readerCanPlace` in `deps.ts`.
+   */
+  | "outside-licence"
   /** Both ends named a symbol, and neither one has a body that could be read. */
   | "no-function-body";
 
@@ -564,21 +581,40 @@ const PATH_LIKE = /^[\w@.-]+(?:\/[\w@.-]+)+\.\w{1,10}$/;
 
 const REGEX_SPECIAL = /[.*+?^${}()|[\]\\]/g;
 
-/** Files whose imports this can parse. Everything else is silent, never wrong. */
+/**
+ * Files a symbol may be looked for inside a directory anchor.
+ *
+ * All that is left of a regex that used to gate the arrow check too, and the
+ * remaining two call sites are a text search rather than a parse -- so this is
+ * narrower than what the engine can read, and the node-level mirror of the bug
+ * the arrow check just had. Out of scope here, and named so the next reader
+ * finds it rather than rediscovering it from a report.
+ */
 const TS_JS = /\.(ts|tsx|js|jsx|mjs|cjs)$/;
 
 /**
  * Files the dependency reader has a measured licence for.
  *
- * Wider than `TS_JS` and deliberately tied to `licence.ts` rather than to a
- * second list: `closed` asks whether *anything* in the repository reaches into a
- * directory, and a walk that only looked at TypeScript would report a green box
- * over a Rust subsystem it never opened. A file with no licence is not silence
- * here -- `checkClosed` records it as unread, which costs the claim its
- * confirmation -- so what belongs in this walk is exactly what can be read.
+ * Deliberately tied to `licence.ts` rather than to a second list: `closed` asks
+ * whether *anything* in the repository reaches into a directory, and a walk
+ * that only looked at TypeScript would report a green box over a Rust subsystem
+ * it never opened. A file with no licence is not silence here -- `checkClosed`
+ * records it as unread, which costs the claim its confirmation -- so what
+ * belongs in this walk is exactly what can be read.
  */
 function readableSource(name: string): boolean {
   return licenceFor(name) !== undefined;
+}
+
+/**
+ * Which measured language a file is, or nothing at all.
+ *
+ * `readableSource` answers yes or no, and two questions here need the name:
+ * which reader to hand a file's imports to, and whether the route channel --
+ * measured against TypeScript routing and nothing else -- may speak about it.
+ */
+function licensedLanguage(name: string): string | undefined {
+  return licenceFor(name)?.language;
 }
 
 /** Splits `path#symbol`. Either half may be empty; the caller decides. */
@@ -930,7 +966,13 @@ export interface ReadCache {
 }
 
 /**
- * Every import in a file, found by pattern and cached per file within one check.
+ * Every import in a file, cached per file within one check.
+ *
+ * Two readers behind one question, chosen by the file's licence: JavaScript and
+ * TypeScript by the regex below, everything else measured by `deps.ts`. Callers
+ * ask "what does this file import" and get one answer either way, which is the
+ * point -- a caller that had to know the language would be a fourth place the
+ * engine could disagree with itself about which languages it can read.
  *
  * The regex is over-eager and always has been, which is survivable because this
  * is a *confirming* channel: a specifier it invents either resolves to a real
@@ -964,7 +1006,41 @@ function getImports(
     return imports;
   }
 
+  /*
+   * A language with a licence but not this regex is read by `deps.ts` instead.
+   *
+   * The regex below knows the shape of a JavaScript import and nothing else, so
+   * pointing it at Rust finds no dependencies at all -- and an empty answer is
+   * indistinguishable here from a file that genuinely imports nothing, which is
+   * how a confirming channel starts flagging true arrows. `deps.ts` returns the
+   * same fields for either language, so what changes is the reader and not the
+   * shape.
+   *
+   * `complete` and `dynamic` are deliberately not consulted. They exist so a
+   * *refutation* can be withheld from a file we could not fully read; this is a
+   * confirming caller, and a confirmation off a partly-read file is at worst
+   * generous -- the same trade the regex has always made.
+   */
+  const language = licensedLanguage(fileRelative);
+  if (!language) {
+    cache.imports.set(fileAbsolute, imports);
+    return imports;
+  }
+
   const source = workspace.read(fileAbsolute);
+
+  if (language !== "typescript") {
+    const read = readDependencies(fileRelative, source, workspace, cache.configs);
+    for (const dependency of read?.dependencies ?? []) {
+      if (!dependency.file) continue;
+      const absolute = workspace.resolve(dependency.file);
+      if (!absolute || imports.some((existing) => existing.abs === absolute)) continue;
+      imports.push({ abs: absolute, rel: dependency.file });
+    }
+    cache.imports.set(fileAbsolute, imports);
+    return imports;
+  }
+
   // Match relative imports: import x from "path", require("path"), import("path"), export ... from "path"
   // Patterns:
   //   - import ... from "path" / export ... from "path"
@@ -1208,27 +1284,47 @@ function checkEdgeCorroboration(
     }
   }
 
-  // Channel 4: Shared route literal, one hop out
-  const fromRoutes = new Set([
-    ...getRouteLiterals(fromFileAbs, workspace),
-  ]);
-  for (const imp of importsFrom) {
-    for (const route of getRouteLiterals(imp.abs, workspace)) {
-      fromRoutes.add(route);
-    }
-  }
+  /*
+   * Channel 4: Shared route literal, one hop out. TypeScript only, and
+   * deliberately not widened with the language gate that let this function see
+   * Rust at all.
+   *
+   * The three channels above are `deps.ts`, and `deps.ts` answers only for
+   * languages `licence.ts` has a corpus for. This one is a regex over string
+   * literals that begin with a slash, and the only routing it was ever tried
+   * against was a TypeScript one -- a licence is per language, and a channel
+   * nobody has measured on Rust has not earned Rust. It would very likely fire
+   * on `Router::new().route("/users", ..)`; "very likely" is the word this
+   * whole file exists to refuse.
+   *
+   * So the gate widened three readers and left the fourth where it was
+   * measured, and the amber below names only the channels that ran.
+   */
+  const routesReadable = licensedLanguage(fromPath) === "typescript"
+    && licensedLanguage(toPath) === "typescript";
 
-  const toRoutes = new Set([
-    ...getRouteLiterals(toFileAbs, workspace),
-  ]);
-  for (const imp of importsTo) {
-    for (const route of getRouteLiterals(imp.abs, workspace)) {
-      toRoutes.add(route);
+  if (routesReadable) {
+    const fromRoutes = new Set([
+      ...getRouteLiterals(fromFileAbs, workspace),
+    ]);
+    for (const imp of importsFrom) {
+      for (const route of getRouteLiterals(imp.abs, workspace)) {
+        fromRoutes.add(route);
+      }
     }
-  }
 
-  if ([...fromRoutes].some((route) => toRoutes.has(route))) {
-    return undefined;
+    const toRoutes = new Set([
+      ...getRouteLiterals(toFileAbs, workspace),
+    ]);
+    for (const imp of importsTo) {
+      for (const route of getRouteLiterals(imp.abs, workspace)) {
+        toRoutes.add(route);
+      }
+    }
+
+    if ([...fromRoutes].some((route) => toRoutes.has(route))) {
+      return undefined;
+    }
   }
 
   // Channel 5: the code graph — precomputed whole-repo connectivity. It only
@@ -1247,7 +1343,12 @@ function checkEdgeCorroboration(
     fromRef,
     toRef,
     kind: "unsupported-edge",
-    detail: `nothing in ${fromPath} imports, is imported by, shares an importer with, or shares a route string with ${toPath} — worth a look, not necessarily wrong.`,
+    // Named channel by channel rather than as a fixed sentence, because the
+    // route channel does not run on every language and a message that claimed
+    // it had is the same kind of untrue as the skip reason this replaced.
+    detail: `nothing in ${fromPath} ${routesReadable
+      ? "imports, is imported by, shares an importer with, or shares a route string with"
+      : "imports, is imported by, or shares an importer with"} ${toPath} — worth a look, not necessarily wrong.`,
   };
 }
 
@@ -2174,19 +2275,40 @@ export function checkDrift(
           };
         }
       } else {
-        // Either the ends are not both symbol-anchored, or no body could be
-        // read. Fall back to the file-level channels, which need TypeScript.
-        if (!TS_JS.test(fromFile) || !TS_JS.test(toFile)) {
-          // The import channels need TypeScript; the code graph does not.
-          // graphify parses ~40 grammars, so an arrow between two Python or
-          // Rust files can still be confirmed at file level -- the same
-          // fallback a TypeScript arrow gets from the channels below.
+        /*
+         * Either the ends are not both symbol-anchored, or no body could be
+         * read. Fall back to the file-level channels, which need a language
+         * somebody measured.
+         *
+         * The question is the licence's, not a regex's, and the reason is the
+         * one `readableSource` gives thirty lines up: this file already routes
+         * the direction check, the closure check and the ledger through
+         * `licence.ts`, and this was the one call site that never got
+         * converted. So a Rust board was told "not TypeScript or JavaScript"
+         * about arrows whose two files `deps.ts` can read and `licence.ts` has
+         * a number for -- the direction check accepting what the corroboration
+         * check refused, on the same board, about the same two files.
+         */
+        const licensed = licenceFor(fromFile) !== undefined && licenceFor(toFile) !== undefined;
+        const placeable = licensed
+          && readerCanPlace(fromPath, workspace, importCache.configs)
+          && readerCanPlace(toPath, workspace, importCache.configs);
+        if (!placeable) {
+          // The channels need a measured reader; the code graph does not.
+          // graphify parses ~40 grammars, so an arrow between two Ruby or Go
+          // files can still be confirmed at file level -- the same fallback a
+          // licensed arrow gets from the channels below.
           if (codeGraphConfirms(options?.codeGraph, wholeRef(fromPath), wholeRef(toPath))) {
             edgesChecked += 1;
             recordEdge(edge, fromNode, toNode, undefined);
             continue;
           }
-          skipEdge(bothNamed ? "no-function-body" : "not-ts-or-js", edge, fromNode, toNode);
+          skipEdge(
+            bothNamed ? "no-function-body" : licensed ? "outside-licence" : "unlicensed-language",
+            edge,
+            fromNode,
+            toNode,
+          );
           continue;
         }
         edgesChecked += 1;
@@ -2229,7 +2351,16 @@ export function checkDrift(
 
     const importers = new Map<string, { file: string; by: Set<string> }>();
     for (const [absolute, relative] of onBoard) {
-      if (!TS_JS.test(absolute)) continue;
+      // Same reader, same gate: a box over a Rust module has imports worth
+      // nominating for a box of their own, and the walk that finds them is the
+      // one above. Left on the regex, this pass simply had nothing to say about
+      // half the languages the arrow check now reads.
+      //
+      // The licence alone here, without `readerCanPlace`'s second half. This
+      // only ever *nominates* a module for a box, so a file the reader can
+      // place only partly yields a shorter list of suggestions and never a
+      // claim about anybody's diagram.
+      if (!licenceFor(absolute)) continue;
       for (const imported of getImports(absolute, relative, workspace, importCache)) {
         if (covered(imported.abs)) continue;
         // Test files are excluded like they are in the upstream pass. A suite
@@ -2354,8 +2485,15 @@ export function checkDrift(
           const fromFile = workspace.resolve(fromPath);
           const toFile = workspace.resolve(toPath);
 
-          // Both files must exist and be TS/JS files
-          if (fromFile && toFile && TS_JS.test(fromFile) && TS_JS.test(toFile)) {
+          // Both files must exist and be readable by a measured reader. The
+          // same gate as the live pass above, because this calls the same
+          // corroboration function -- two answers here would mean an arrow
+          // could be checkable while drawn and unreadable once deleted.
+          if (
+            fromFile && toFile
+            && readerCanPlace(fromPath, workspace, importCache.configs)
+            && readerCanPlace(toPath, workspace, importCache.configs)
+          ) {
             const fromStat = workspace.stat(fromFile);
             const toStat = workspace.stat(toFile);
 

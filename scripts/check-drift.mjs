@@ -38,6 +38,13 @@ import { existsSync, mkdirSync, readFileSync, rmSync, writeFileSync } from "node
 import path from "node:path";
 
 import { box, fit, pad } from "./lib/box.mjs";
+import {
+  buildCodeGraph,
+  codeGraphIsCurrent,
+  findInstaller,
+  graphifyVersion,
+  headCommit,
+} from "./lib/code-graph.mjs";
 import { readBoard, writeBoard } from "../src/engine/board-file.ts";
 import { applyPromotions } from "../src/engine/promote.ts";
 import { CONFIG_FILE, ConfigError, DEFAULT_DIAGRAM_DIR, diagramDir } from "../src/engine/config.ts";
@@ -51,7 +58,7 @@ import {
   parseRef,
 } from "../src/engine/drift.ts";
 import { initEngine } from "../src/engine/parse.ts";
-import { createCodeGraphOption } from "../src/engine/codegraph.ts";
+import { createCodeGraphOption, TESTED_VERSION_PREFIX } from "../src/engine/codegraph.ts";
 import { createLedger } from "../src/engine/ledger.ts";
 import { goodNewsIds, goodNewsLine, goodNewsSince, novelGoodNews } from "../src/engine/goodnews.ts";
 
@@ -697,8 +704,99 @@ if (checking.length === 0) {
 // Grammars load once per process; everything below this line is synchronous.
 await initEngine();
 
-// The code graph, when a committed build of it exists and parses. Every
-// failure is silence: the checker below runs exactly as it does without it.
+/*
+ * Every board is read before any of them is checked, because two decisions
+ * need the files in hand: whether an unreadable board is a problem to report,
+ * and whether this run has a single arrow on it -- which is the only thing the
+ * code graph can ever help with, and therefore the guard on paying to build
+ * one.
+ */
+const loaded = [];
+for (const file of checking) {
+  try {
+    loaded.push({ file, boardFile: await readBoard(file) });
+  } catch (error) {
+    // An unreadable board is a problem, but not drift. Say so and keep going
+    // rather than failing a commit over a file that may not be a board at all.
+    problems.push(`${path.relative(root, file)}: could not read (${error.message})`);
+  }
+}
+
+/*
+ * The graph, built here when this project has none.
+ *
+ * It used to be built only by a post-commit hook, installed by `npm prepare`
+ * -- which never runs for a project that installs this tool, so the graph was
+ * never built there and the check told the reader to run two scripts out of
+ * *this* package.json (#132). Telling someone to fetch a Python tool in a Rust
+ * repo is weaker than opt-in; it is opt-in with instructions that do not work.
+ * So the check does it, once per commit, and says so once.
+ *
+ * The guard is what keeps this cheap, and every part of it is a file test or a
+ * `--version`:
+ *
+ * - only when arrows are being checked, and only when a board draws one;
+ * - only when the graph is missing or a commit behind (an uncommitted edit is
+ *   not stale: the reader falls back per file, and rebuilding per edit would
+ *   mean rebuilding every turn);
+ * - only when graphify is already installed, at a version the reader accepts
+ *   -- this never installs anything, and never builds a graph that would be
+ *   refused on arrival;
+ * - at most one attempt per commit, so a repo where the extraction fails or
+ *   times out pays for it once rather than on every turn.
+ *
+ * DIAGRAMOS_SKIP_GRAPHIFY=1 opts out entirely, the same variable that stops
+ * the installer.
+ */
+const ATTEMPT_FILE = path.join(root, ".diagramos", "code-graph-attempted");
+/** What was built this run, for the one-time line at the bottom. */
+let builtGraph;
+/** Whether a build ran here at all, which is what "could not be built" means. */
+let attemptedGraph = false;
+// Cheapest questions first: two flags and a walk over elements already in
+// memory, before anything spawns a subprocess.
+if (
+  opts.edges
+  && !process.env.DIAGRAMOS_SKIP_GRAPHIFY
+  && loaded.some(({ boardFile }) => boardFile.elements.some((element) => element.type === "arrow"))
+) {
+  const head = headCommit(root);
+  if (head && !codeGraphIsCurrent(root, head) && readAttempt() !== head) {
+    // Recorded before the build, not after, so a build that dies -- or takes
+    // the whole timeout -- is still an attempt that happened.
+    writeAttempt(head);
+    attemptedGraph = true;
+    // A minute, not the builder's two: this one runs in front of somebody
+    // waiting for a turn to end, and a check that hangs is worse than an arrow
+    // that goes unread.
+    builtGraph = buildCodeGraph(root, {
+      timeout: 60_000,
+      versionPrefix: TESTED_VERSION_PREFIX,
+    });
+  }
+}
+
+/** The commit the last build attempt here was for, successful or not. */
+function readAttempt() {
+  try {
+    return readFileSync(ATTEMPT_FILE, "utf8").trim();
+  } catch {
+    return undefined;
+  }
+}
+
+function writeAttempt(commit) {
+  try {
+    mkdirSync(path.dirname(ATTEMPT_FILE), { recursive: true });
+    writeFileSync(ATTEMPT_FILE, `${commit}\n`);
+  } catch {
+    // A tree we cannot write to: the attempt may repeat, nothing else changes.
+  }
+}
+
+// The code graph, when a build of it exists and parses -- the one just made, or
+// one an earlier run or the commit hook left. Every failure is silence: the
+// checker below runs exactly as it does without it.
 const codeGraphOption = createCodeGraphOption(root);
 
 // Which files a source index has read, so a verdict is never built on one
@@ -713,12 +811,11 @@ const ledger = createLedger(root);
  */
 const improved = [];
 
-for (const file of checking) {
+for (const { file, boardFile } of loaded) {
   let report;
   /** Promotions actually written to the board this run, one per box or arrow. */
   let promoted = [];
   try {
-    const boardFile = await readBoard(file);
     // Per board, so the cheap "unmodified" answer short-circuits each one.
     const baseline = opts.deletions ? createGitBaseline(root, file) : undefined;
     report = checkDrift(boardFile, workspace, {
@@ -757,9 +854,9 @@ for (const file of checking) {
       }
     }
   } catch (error) {
-    // An unreadable board is a problem, but not drift. Say so and keep going
-    // rather than failing a commit over a file that may not be a board at all.
-    problems.push(`${path.relative(root, file)}: could not read (${error.message})`);
+    // A board that read fine and still could not be checked: a problem, but not
+    // drift. Say so and keep going rather than failing a commit over one file.
+    problems.push(`${path.relative(root, file)}: could not check (${error.message})`);
     continue;
   }
   examined.push({ file, report, promoted });
@@ -884,7 +981,8 @@ const SKIP_WORDS = {
   "endpoint-file-missing": "an end's file is missing",
   "directory-ref": "an end refs a directory",
   "glob-ref": "an end refs a glob",
-  "not-ts-or-js": "not TypeScript or JavaScript",
+  "unlicensed-language": "no licence for that language",
+  "outside-licence": "an end the reader cannot place",
   "no-function-body": "both ends name something with no body to read",
 };
 
@@ -1088,30 +1186,86 @@ const auditLines =
     : [];
 
 /*
- * A one-time pointer at the deeper check, only when it would have mattered:
- * no graph has ever been built here, and this run left arrows unconfirmed.
- * Once ever per checkout -- the marker lives beside the expand/shrink mode in
- * .diagramos/, which is gitignored, so the choice to ignore it is one
- * person's. Never a finding, never an exit code.
+ * One line about the code graph, said once ever per checkout, only when it
+ * would have mattered: this run left arrows the graph could have read.
+ *
+ * There are two things to say and they are not the same sentence, which is
+ * where this went wrong before (#132). When the graph was built, the news is
+ * that it happened and that nobody has to do it again. When graphify is
+ * missing, the news is that some arrows cannot be checked here -- and the
+ * command that would change that is a Python tool install, so it is named only
+ * when this machine already has something to install it with. Sending a Rust
+ * repo off to acquire a Python toolchain is not advice, and the old line did
+ * worse: it named two `npm run` scripts out of this package.json, which the
+ * reader's project does not have.
+ *
+ * The marker lives beside the expand/shrink mode in .diagramos/, which is
+ * gitignored, so the choice to ignore it is one person's. Never a finding,
+ * never an exit code.
  */
 const HINT_FILE = path.join(root, ".diagramos", "code-graph-hint-shown");
+
+/** The sentence, or nothing when there is no true one to say. */
+function codeGraphNews() {
+  // Built *and* read back: a graph the reader refused is not good news, and
+  // announcing one would be the check congratulating itself.
+  if (builtGraph && codeGraphOption) {
+    return `built the code graph in ${builtGraph.seconds.toFixed(1)}s — arrows in any language `
+      + "can be checked now, and it rebuilds itself when it falls behind";
+  }
+  // Somebody who opted out already knows.
+  if (process.env.DIAGRAMOS_SKIP_GRAPHIFY) return undefined;
+  // Not installed is the ordinary case, and the only one an install fixes. The
+  // command is named only when this machine already has something to run it
+  // with: a Rust repo does not necessarily want a Python toolchain, and telling
+  // it to get one is not advice.
+  if (!graphifyVersion()) {
+    const installer = findInstaller();
+    return installer
+      ? "some arrows could not be checked — a deeper check exists, and needs graphify: "
+        + `${installer.hint} (a Python tool; the check then builds and refreshes the graph itself)`
+      : "some arrows cannot be checked in this project — the deeper check needs graphify, "
+        + "a Python tool, and this machine has no uv or pipx to install it with";
+  }
+  // Installed, tried here, and still nothing usable: an extraction that failed
+  // or ran past the timeout, a graphify release outside the tested range, a
+  // graph the reader will not parse. Naming an install would be nonsense, and
+  // the arrows really did go unread.
+  if (attemptedGraph) {
+    return "some arrows could not be checked — there is no code graph here the check "
+      + "can use, so the deeper check stayed off";
+  }
+  // Installed, and a graph already on disk that the reader refused. Nothing was
+  // attempted this run, and that is this project's business rather than the
+  // reader's: silent, as it has always been.
+  return undefined;
+}
+
 const hintLines = [];
-if (
-  !codeGraphOption
-  && !existsSync(path.join(root, "graphify-out", "graph.json"))
-  && examined.some(({ report }) =>
-    report.edges.length > 0
-    || (report.edgesSkippedWhy["directory-ref"] ?? 0) > 0
-    || (report.edgesSkippedWhy["glob-ref"] ?? 0) > 0
-    || (report.edgesSkippedWhy["not-ts-or-js"] ?? 0) > 0
-    || (report.edgesSkippedWhy["no-function-body"] ?? 0) > 0)
-  && !existsSync(HINT_FILE)
-) {
-  hintLines.push(paint(
-    "some arrows could not be checked — a deeper check exists: npm run graph:install (needs uv or pipx), then npm run graph:refresh",
-    "dim",
-    opts.hook || Boolean(process.stderr.isTTY),
-  ));
+/*
+ * Worth saying only when the graph would have changed this run's answer: it
+ * was just built, or arrows went unconfirmed that it could have read. The
+ * sentence itself is worked out once -- it probes for graphify, so asking
+ * twice would pay twice.
+ *
+ * Every reason here is one the graph can answer where the live channels
+ * could not: an end standing for a directory or for a glob, a language no
+ * licence covers, a file the reader cannot place, or no body to read.
+ */
+const worthSaying =
+  !existsSync(HINT_FILE)
+  && (builtGraph
+    || (!codeGraphOption
+      && examined.some(({ report }) =>
+        report.edges.length > 0
+        || (report.edgesSkippedWhy["directory-ref"] ?? 0) > 0
+        || (report.edgesSkippedWhy["glob-ref"] ?? 0) > 0
+        || (report.edgesSkippedWhy["unlicensed-language"] ?? 0) > 0
+        || (report.edgesSkippedWhy["outside-licence"] ?? 0) > 0
+        || (report.edgesSkippedWhy["no-function-body"] ?? 0) > 0)));
+const graphNews = worthSaying ? codeGraphNews() : undefined;
+if (graphNews) {
+  hintLines.push(paint(graphNews, "dim", opts.hook || Boolean(process.stderr.isTTY)));
   try {
     mkdirSync(path.dirname(HINT_FILE), { recursive: true });
     writeFileSync(HINT_FILE, "shown\n");
