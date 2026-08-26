@@ -144,6 +144,16 @@ each now carries what it measured on 2026-08-04:
 
 ## The rule that shipped (measured 2026-08-04)
 
+> **Corrected 2026-08-27 (#133): an unbacked edge is no longer flagged at all.**
+> The rule below stands as the definition of *backed*; what changed is what
+> happens when nothing backs it. Every channel here only ever confirms, so an
+> edge with no trace is absence of evidence — it is now counted as unconfirmed
+> and named under `--details`, never coloured, never in the notice, never in the
+> exit code. Measured on a 50-arrow Rust board: 17 amber, 15 of them arrows
+> carrying a descriptive label and no claim at all. "Worth a look, never wrong"
+> was the right instinct and still one step too loud. See the three-states table
+> in `docs/drift-check.md`.
+
 An edge is **backed** when any static trace of a relationship connects its two
 files; only an edge with *no* trace at all is flagged, and the wording is "worth a
 look", never "wrong". Four corroboration channels:

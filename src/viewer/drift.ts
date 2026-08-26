@@ -19,6 +19,8 @@
  * instead of quietly grading a report by last release's rules.
  */
 
+import { summaryOf as sentenceFor } from "../engine/summary";
+
 export type Tone = "bad" | "warn" | "good" | "dim";
 
 /**
@@ -83,6 +85,15 @@ export interface DriftView {
     needsChecked: number;
     needsWithheld?: Record<string, number>;
   };
+  /**
+   * Arrows read and not corroborated. Optional: older payloads have none.
+   *
+   * Counted and said, never a row and never a colour. Amber used to mean this,
+   * and on a board over a language full of data types it was most of the amber
+   * there was -- fifteen of seventeen, on the board that settled it, all of
+   * them arrows that claimed nothing (#133). Absence of evidence gets a number.
+   */
+  unconfirmedEdges?: Array<{ fromLabel: string; toLabel: string; reason: string }>;
   workItems: Array<{ node: string; label: string; ref?: string }>;
   promotions: Array<{ node: string; label: string }>;
   checked: number;
@@ -224,6 +235,23 @@ export function tallyOf(report: DriftView): TallyPart[] {
     parts.push({
       text: `${unsupported} ${unsupported === 1 ? "arrow" : "arrows"}`,
       tone: "warn",
+    });
+  }
+  /*
+   * Arrows read and not corroborated: a number, dim, and no row anywhere.
+   *
+   * This is what most of the amber above used to be, and the difference between
+   * the two lines is the difference between "have a look at this" and "I could
+   * not tell". Dim rather than warn because nothing is wrong: an arrow the
+   * board never made a claim about cannot be contradicted, and painting the
+   * absence of evidence is how fifteen descriptive labels arrived as fifteen
+   * defects (#133).
+   */
+  const unconfirmed = report.unconfirmedEdges?.length ?? 0;
+  if (unconfirmed) {
+    parts.push({
+      text: `${unconfirmed} unconfirmed`,
+      tone: "dim",
     });
   }
   /*
@@ -381,13 +409,16 @@ export function worstToneOf(rows: StatusRow[]): Tone {
  *
  * The sentence itself lives in the engine, because the CLI says the same thing
  * every run and the two had drifted into different nouns for the same number.
- * Re-exported rather than wrapped so this page has no second opinion to keep in
- * step, and taking a `DriftView` still type-checks: the engine asks for the four
- * counts, which the report already carries.
+ * This wrapper does no wording of its own: it counts one list -- the report
+ * names its unconfirmed arrows, the sentence wants how many -- and hands the
+ * rest of the report straight through. So the page still has no second opinion
+ * to keep in step, only arithmetic.
  *
  * Unlike the vocabulary above, this is not something the bundle can be too old
  * for. A wording change ships inside this bundle, so a stale `out/viewer` shows
  * a stale sentence about counts that are still correct -- last release's words,
  * never a wrong number.
  */
-export { summaryOf } from "../engine/summary";
+export function summaryOf(view: DriftView): string {
+  return sentenceFor({ ...view, unconfirmed: view.unconfirmedEdges?.length ?? 0 });
+}

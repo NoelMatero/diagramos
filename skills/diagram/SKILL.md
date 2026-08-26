@@ -140,6 +140,15 @@ something looser — orchestration, ownership, "these belong together" — ancho
 at file level and let the import channels answer, because a body-scoped search
 will not find a relationship that was never a call.
 
+The same goes for **a box standing for data**: a struct, a static, a table, a
+buffer. There is no body to read on that side, and the relationship almost
+always lives in a type in a signature, a field, or an enclosing `impl` — none of
+which is inside any function body. An arrow into a symbol like that comes back
+unconfirmed, and the report says so with the fix in the sentence: anchor that end
+at file level. Nothing accuses you of anything for it, and nothing about the
+board is wrong; the arrow just goes unverified until it is anchored at a
+granularity the code can answer.
+
 When a box stands for a concept rather than one function, list in `refs` **the
 symbols whose invocation counts as using it** — the interface, not just the
 implementation. Any one of them being reached settles the arrow, so fifty
@@ -225,8 +234,14 @@ nobody. `/plan-diagram` is where that is spelled out.
 
 A plain arrow means "these two are related, somehow". Nothing can disprove
 *somehow*: the check looks for any connection and failing to find one is never
-proof there is none, so a plain arrow's worst verdict is amber forever, and an
-arrow drawn the wrong way round survives every run.
+proof there is none. So a plain arrow has no bad verdict available to it — it
+comes back confirmed, or it comes back counted as unconfirmed — and an arrow
+drawn the wrong way round survives every run.
+
+Draw those freely. An arrow that claims nothing is never reported against you,
+never coloured, and never fails a build; the report keeps a number, because "how
+much of this board is actually verified" is a fair question. What it costs is
+only that: the arrow stays unverified.
 
 `needs` is the way out. It says **the `from` end declares a dependency on the
 `to` end** — an import, a require, a `use`, an include. A direction has an

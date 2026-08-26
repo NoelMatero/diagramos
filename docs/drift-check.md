@@ -467,9 +467,68 @@ it contributed nothing to before.
 
 An arrow says "these two are related, somehow". Nothing can disprove "somehow":
 the check looks for a connection in the code, and failing to find one is never
-proof there is none. So a negative arrow result is amber forever, and an arrow
-drawn backwards survives every run. That is a ceiling in the claim, not in the
-checker.
+proof there is none. So a plain arrow has no negative verdict available to it,
+and an arrow drawn backwards survives every run. That is a ceiling in the claim,
+not in the checker.
+
+### Three states, and only one of them is news
+
+For most of this project's life there were two: confirmed, and amber. Amber was
+rendered like a finding — painted on the board, listed in the notice, counted in
+the headline, exit 1 — while meaning *nothing was found either way*. Absence of
+evidence, dressed as evidence.
+
+What that costs was measured on the first Rust board an agent drew here: 50
+arrows, 17 amber, and **15 of the 17 carried a descriptive label and no claim at
+all** — `owns`, `populates`, `fills i_buf`, `drains o_buf`. Eleven of them
+pointed at a struct, while the body search walks function bodies looking for a
+call. A board where 12% of the amber is actionable is a check somebody switches
+off, and that is the same argument this tool already makes about good news
+thirty times an hour, pointed the other way.
+
+So an arrow now lands in one of three states:
+
+| state | meaning | how it reads |
+| --- | --- | --- |
+| **confirmed** | a channel found the connection | silent |
+| **unconfirmed** | read, and nothing found either way | a count, and a name under `--details`. No colour, no row on the canvas, no exit code |
+| **unread** | nobody looked — an external end, a directory ref, a language with no reader | a count, as before |
+
+And a finding is what is left: **a claim the code contradicts**. `backwards-edge`
+for a `needs` pointing the wrong way, `broken-chain` for a `via` route that stops
+holding. Both are things somebody wrote down on purpose, and both come with the
+line of code that refutes them.
+
+This is the converse of the rule `claim.ts` already stated. A word gets into the
+vocabulary on the day something can call it wrong; an arrow that says nothing
+checkable is, by the same rule, not something to be judged at all.
+
+**Unconfirmed still has to be visible**, or this trades one dishonesty for
+another — "checked 30 arrows · nothing drifted" reads as *30 arrows verified*. So
+the count rides in three places: the closing line of a bare run (`17
+unconfirmed, 20 unread, --details says why`), the board page's clean chip (`— 17
+arrows were read and not confirmed`), and the `--details` audit, which names each
+arrow by both box labels and groups them by reason:
+
+| reason | what it means |
+| --- | --- |
+| `no-call-either-way` | both ends name something with a body, both bodies were read, neither reaches the other. The sharpest "nothing found" available here |
+| `an-end-is-data` | an end names a struct, a static or a field, so there is no body on that side to search from and the relationship is likely a type in a signature, a field, or an enclosing `impl` — all invisible to a body search. **Anchor that end at file level** and the import channels can answer instead |
+| `nothing-connects-them` | the file-level channels came up empty: no import either way, no shared importer, no shared route, nothing in the code graph |
+
+The second one is the only line in this report that can be acted on into
+*better* coverage rather than a fix, which is why it carries the instruction in
+the sentence rather than in a doc. It is also the one the measurement was mostly
+made of: 11 of the 17.
+
+What this deliberately costs: two of those 17 arrows were genuine diagram
+errors — a parse hop hung off the wrong function, and an arrow from a function
+that never touches the collection it points at. Neither is a finding any more.
+They are named under `--details`, in the `no-call-either-way` group, which is
+kept as its own reason precisely so it can be promoted back to news cheaply if a
+confirm-only vocabulary (#127) makes that worth doing. Judging an arrow that
+claims nothing was catching them by accident, at a cost of thirteen false alarms
+each.
 
 An arrow can now carry one word instead:
 
@@ -507,10 +566,15 @@ repository has no cycles today, and that is luck rather than law.
 
 Everything that is not `backwards` falls straight through to the checks it always
 went through. A confirmed `needs` gets confirmed again a moment later by the
-ordinary channels; an absent one goes amber exactly as it did before claims
-existed. The only new row in the table is the wrong one, and every real board in
-this repository produces a byte-identical report to the one it produced before
-this landed.
+ordinary channels; one nothing corroborates is counted as unconfirmed, exactly
+like an arrow that claimed nothing. The only row in the table that accuses
+anybody is the wrong one.
+
+That last part fixed a straight contradiction. A `needs` the direction check
+declined to answer — one end reaching out at runtime, say — used to be counted
+as withheld *and* painted amber by the corroboration channel, so one board said
+"I could not check this" and "this looks wrong" about the same arrow at the same
+time. Both of the claimed arrows on the Rust board were in exactly that state.
 
 **A claim written this turn gets its own sentence.** The next turn's check is the
 first one to see a `needs` an agent wrote a moment ago, and a bare "this is
@@ -1270,7 +1334,7 @@ two boxes on the same file, or a subsystem box pointing at a file inside
 itself — are refused before the search starts, because the walk would begin
 already standing on its goal and "confirm" the arrow against a map holding no
 edge between them at all. *A reaches A* says nothing about two different
-things drawn on a board. Those arrows stay amber, and stay uncounted.
+things drawn on a board. Those arrows stay unconfirmed, and stay uncounted.
 
 The map also answers two questions the live channels never could:
 
@@ -1307,7 +1371,7 @@ channel existed:
 - Route methods (`#GET` versus `#POST` on the same path).
 - Anything its extractor missed — it is a parser, not a compiler.
 
-A miss means silence, not an alarm: the arrow stays amber ("could not
+A miss means silence, not an alarm: the arrow stays unconfirmed ("could not
 confirm"), never red.
 
 ## Open questions

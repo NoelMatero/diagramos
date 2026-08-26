@@ -445,7 +445,7 @@ describe("edge checking", () => {
     expect(report4.edges).toHaveLength(0);
   });
 
-  it("flags an edge when no channel fires", async () => {
+  it("counts an edge no channel fires for, instead of flagging it", async () => {
     const board = await boardWith([
       { id: "a", label: "A", ref: "a.ts" },
       { id: "b", label: "B", ref: "b.ts" },
@@ -497,15 +497,20 @@ describe("edge checking", () => {
         "b.ts": "export const B = 1;",
       }),
     );
-    expect(report.edges).toHaveLength(1);
-    expect(report.edges[0]).toMatchObject({
-      from: "a.ts",
-      to: "b.ts",
+    // Read, and nothing found either way: a count, not a verdict (#133). The
+    // arrow is named and carries the sentence saying what was looked for, so
+    // `--details` can answer "which ones" without any of it being a finding.
+    expect(report.edges).toHaveLength(0);
+    expect(report.clean).toBe(true);
+    expect(report.unconfirmedEdges).toHaveLength(1);
+    expect(report.unconfirmedEdges[0]).toMatchObject({
+      from: "a",
+      to: "b",
       fromLabel: "A",
       toLabel: "B",
-      kind: "unsupported-edge",
+      reason: "nothing-connects-them",
     });
-    expect(report.edges[0].detail).toContain("worth a look");
+    expect(report.unconfirmedEdges[0].detail).toContain("imports");
   });
 
   it("skips edges touching directory refs", async () => {
@@ -803,9 +808,11 @@ describe("an arrow is trusted for its bindings, not its author", () => {
     const report = checkDrift(board, fakeWorkspace(unconnected));
     expect(report.edgesChecked).toBe(1);
     expect(report.edgesSkipped).toBe(0);
-    // Nothing in the code connects these two, and the arrow says something does.
-    expect(report.edges).toHaveLength(1);
-    expect(report.edges[0]).toMatchObject({ kind: "unsupported-edge", fromLabel: "Left", toLabel: "Right" });
+    // Read like any other arrow, and nothing in the code connects these two --
+    // which is counted rather than reported, the same as a generated arrow.
+    expect(report.edges).toHaveLength(0);
+    expect(report.unconfirmedEdges).toHaveLength(1);
+    expect(report.unconfirmedEdges[0]).toMatchObject({ fromLabel: "Left", toLabel: "Right" });
   });
 
   it("stays quiet about a hand-drawn arrow the code actually supports", async () => {

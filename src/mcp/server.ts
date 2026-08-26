@@ -220,7 +220,9 @@ const edgeSchema = z.object({
       + "dependency on the to end — an import, a require, an include. Write it ONLY when you have "
       + "read that line in the code: it is a transcription of something you saw, never a guess "
       + "about what the relationship probably is. A relationship you cannot point at is an arrow "
-      + "with no claim, which is fine and is what most arrows are. Shown on the board as @needs "
+      + "with no claim, which is fine and is what most arrows are: an unclaimed arrow is looked "
+      + "for and counted, never judged, so it cannot come back as a finding against you. Shown "
+      + "on the board as @needs "
       + "and recorded, and CHECKED: if the dependency runs the other way and only the other "
       + "way, the arrow is reported as backwards, by file and line, and the build fails. So a "
       + "needs you guessed at is not a harmless decoration -- it is a false statement read back "
@@ -582,8 +584,10 @@ server.registerTool(
     description:
       "Do these diagrams still match the code? Compares each node's ref against the working tree "
       + "and reports the ones pointing at a file or symbol that is gone, and checks arrows for static "
-      + "connections through imports, shared orchestrators, or route literals — unsupported ones are "
-      + "worth a look, not wrong. Read-only, and cheap "
+      + "connections through imports, shared orchestrators, or route literals. An arrow nothing "
+      + "corroborates is NOT a finding: every channel here only confirms, so failing to confirm is "
+      + "absence of evidence, and it is counted in unconfirmedEdges rather than reported against the "
+      + "board. Read-only, and cheap "
       + "enough to run whenever module structure changes. Nodes without a ref are skipped, "
       + "hand-drawn ones ignored, and edges touching refless nodes are skipped, so a clean report means "
       + "nothing checkable disagreed -- not that the diagram is correct. skippedWhy and edgesSkippedWhy "
@@ -608,7 +612,11 @@ server.registerTool(
         .boolean()
         .default(false)
         .describe(
-          "Three questions the per-turn check does not ask. `unreadEdges` names the arrows nothing "
+          "Three questions the per-turn check does not ask. `unconfirmedEdges` names the arrows "
+          + "that were read and came back with nothing either way, each with the reason -- and the "
+          + "one reason worth acting on is `an-end-is-data`: a box anchored at a struct, a static "
+          + "or a field cannot be reached by a search through function bodies, so anchor that end "
+          + "at file level and the import channels can answer instead. `unreadEdges` names the arrows nothing "
           + "checked, with the reason for each: an arrow with an end marked external, or refless, or "
           + "pointing at a directory carries no claim any check here can test, and until it is named "
           + "it is indistinguishable from an arrow that passed. It is not drift and not a suggestion "
@@ -662,6 +670,14 @@ server.registerTool(
         handDrawn: 0,
         edgesChecked: 0,
         edgesSkipped: 0,
+        /**
+         * Read, and not corroborated. Part of edgesChecked, not extra to it.
+         *
+         * Unconditional, unlike the list behind it: "checked" on its own reads
+         * as "verified", and a caller that cannot see this number cannot tell a
+         * board that was confirmed from one that was merely legible (#133).
+         */
+        edgesUnconfirmed: 0,
       };
       // Why, not just how many: a caller cannot act on "5 skipped", and cannot
       // tell it apart from "nothing here was readable".
@@ -680,6 +696,7 @@ server.registerTool(
       const unrepresented: Array<Record<string, unknown>> = [];
       const unannotated: Array<Record<string, unknown>> = [];
       const unreadEdges: Array<Record<string, unknown>> = [];
+      const unconfirmedEdges: Array<Record<string, unknown>> = [];
       const edges: Array<Record<string, unknown>> = [];
       const garbledClaims: Array<Record<string, unknown>> = [];
       const closedBreaches: Array<Record<string, unknown>> = [];
@@ -704,6 +721,7 @@ server.registerTool(
         totals.handDrawn += report.handDrawn;
         totals.edgesChecked += report.edgesChecked;
         totals.edgesSkipped += report.edgesSkipped;
+        totals.edgesUnconfirmed += report.unconfirmedEdges.length;
         tally(skippedWhy, report.skippedWhy);
         tally(edgesSkippedWhy, report.edgesSkippedWhy);
         assertions.checked += report.assertions.checked;
@@ -731,6 +749,12 @@ server.registerTool(
         if (coverage) {
           for (const arrow of report.unreadEdges) {
             unreadEdges.push({ board: relativeToWorkspace(file), ...arrow });
+          }
+          // Same rule as `unreadEdges`: the count is the per-turn answer, and
+          // the list behind it -- with the sentence saying what to re-anchor --
+          // is for the moment somebody has decided to fix the board.
+          for (const arrow of report.unconfirmedEdges) {
+            unconfirmedEdges.push({ board: relativeToWorkspace(file), ...arrow });
           }
         }
         for (const finding of report.edges) {
@@ -792,6 +816,7 @@ server.registerTool(
         ...(unannotated.length ? { unannotated } : {}),
         ...(unrepresented.length ? { unrepresented } : {}),
         ...(unreadEdges.length ? { unreadEdges } : {}),
+        ...(unconfirmedEdges.length ? { unconfirmedEdges } : {}),
         ...(Object.keys(skippedWhy).length ? { skippedWhy } : {}),
         ...(Object.keys(edgesSkippedWhy).length ? { edgesSkippedWhy } : {}),
         ...(assertions.checked || assertions.downgraded || assertions.unsupportedLanguage
@@ -870,7 +895,9 @@ server.registerTool(
       + "dependency on the to end — an import, a require, an include. Write it ONLY when you have "
       + "read that line in the code: it is a transcription of something you saw, never a guess "
       + "about what the relationship probably is. A relationship you cannot point at is an arrow "
-      + "with no claim, which is fine and is what most arrows are. Shown on the board as @needs "
+      + "with no claim, which is fine and is what most arrows are: an unclaimed arrow is looked "
+      + "for and counted, never judged, so it cannot come back as a finding against you. Shown "
+      + "on the board as @needs "
       + "and recorded, and CHECKED: if the dependency runs the other way and only the other "
       + "way, the arrow is reported as backwards, by file and line, and the build fails. So a "
       + "needs you guessed at is not a harmless decoration -- it is a false statement read back "

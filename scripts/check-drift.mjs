@@ -186,9 +186,6 @@ const REASONS = {
   "unsupported-member": "the box lists it, and its body shows no trace of the others",
   "missing-route": "the file serves routes, and that one is not among them",
 };
-const EDGE_REASON = "nothing in the code connects them: no import either way, "
-  + "no third file importing both, no shared route string";
-
 /**
  * Why a `needs` arrow got no direction verdict.
  *
@@ -452,11 +449,11 @@ function rowsFor({ report, promoted = [] }, colour, all = false) {
 /**
  * "2 gone  1 arrow  1 built", each part coloured, empty parts dropped.
  *
- * Named fields rather than positions: there are ten of them, two call sites
- * spell every one out, and the tenth argument is where a counting bug goes to
+ * Named fields rather than positions: there are a dozen of them, two call sites
+ * spell every one out, and the twelfth argument is where a counting bug goes to
  * hide.
  */
-function tallyCounts({ gone, empty, unused, open, removed, garbled, unanswered, arrows, stray, promoted, built, planned }, colour) {
+function tallyCounts({ gone, empty, unused, open, removed, garbled, unanswered, backwards, arrows, stray, promoted, built, planned }, colour) {
   return [
     gone ? paint(`${gone} gone`, "red", colour) : "",
     empty ? paint(`${empty} empty`, "red", colour) : "",
@@ -475,6 +472,17 @@ function tallyCounts({ gone, empty, unused, open, removed, garbled, unanswered, 
     // code at all, and folding it into the amber total would make "not asked"
     // read as "asked, no answer".
     unanswered ? paint(`${unanswered} unchecked ${unanswered === 1 ? "claim" : "claims"}`, "yellow", colour) : "",
+    /*
+     * Backwards arrows counted apart, and red, the way the board page has
+     * always counted them.
+     *
+     * They used to sit inside the amber "N arrows" total beside the arrows the
+     * code merely failed to corroborate, which read a refutation as a maybe.
+     * Since #133 that total holds nothing else worth confusing them with --
+     * absence is a count now, not a finding -- so keeping them folded in would
+     * be colouring the only certain arrow verdict as the uncertain one.
+     */
+    backwards ? paint(`${backwards} ${backwards === 1 ? "arrow" : "arrows"} backwards`, "red", colour) : "",
     arrows ? paint(`${arrows} ${arrows === 1 ? "arrow" : "arrows"}`, "yellow", colour) : "",
     stray ? paint(`${stray} stray ${stray === 1 ? "arrow" : "arrows"}`, "dim", colour) : "",
     // "promoted" is done -- the board was advanced this run; "built" is still
@@ -500,7 +508,8 @@ function tallyFor({ report, promoted = [] }, colour) {
       removed: report.deleted.length,
       garbled: (report.garbledClaims ?? []).length,
       unanswered: unansweredClaims(report),
-      arrows: report.edges.length,
+      backwards: report.edges.filter((finding) => finding.kind === "backwards-edge").length,
+      arrows: report.edges.filter((finding) => finding.kind !== "backwards-edge").length,
       stray: report.strayArrows ?? 0,
       promoted: promoted.length,
       built: report.promotions.filter((promotion) => !promotedNodes.has(promotion.node)).length,
@@ -558,7 +567,10 @@ function render(stale, colour) {
         removed: sum.removed + report.deleted.length,
         garbled: sum.garbled + (report.garbledClaims ?? []).length,
         unanswered: sum.unanswered + unansweredClaims(report),
-        arrows: sum.arrows + report.edges.length,
+        backwards: sum.backwards
+          + report.edges.filter((finding) => finding.kind === "backwards-edge").length,
+        arrows: sum.arrows
+          + report.edges.filter((finding) => finding.kind !== "backwards-edge").length,
         stray: sum.stray + (report.strayArrows ?? 0),
         promoted: sum.promoted + promoted.length,
         built: sum.built
@@ -566,7 +578,7 @@ function render(stale, colour) {
         planned: sum.planned + report.workItems.length,
       };
     },
-    { gone: 0, empty: 0, unused: 0, removed: 0, garbled: 0, unanswered: 0, arrows: 0, stray: 0, promoted: 0, built: 0, planned: 0 },
+    { gone: 0, empty: 0, unused: 0, removed: 0, garbled: 0, unanswered: 0, backwards: 0, arrows: 0, stray: 0, promoted: 0, built: 0, planned: 0 },
   );
 
   // Too many to list: counts per diagram, and a pointer to the view that has room.
@@ -986,6 +998,21 @@ const SKIP_WORDS = {
   "no-function-body": "both ends name something with no body to read",
 };
 
+/**
+ * Why an arrow the check read came back unconfirmed, in words.
+ *
+ * Kept apart from SKIP_WORDS above because it is the opposite situation: a skip
+ * means nobody looked, and these mean somebody looked and found nothing. The
+ * second one carries an instruction, because it is the only one of the three a
+ * reader can act on — and acting on it turns an unreadable arrow into a checked
+ * one, which no other line in this report can offer.
+ */
+const UNCONFIRMED_WORDS = {
+  "no-call-either-way": "nothing calls the other, either way",
+  "an-end-is-data": "an end names data, not something that runs — anchor that end at file level",
+  "nothing-connects-them": "no import, shared importer or shared route connects them",
+};
+
 /** Why a `@declared` / `@used` claim was read as a plain mention instead. */
 function assertionWords(assertions) {
   return [
@@ -994,11 +1021,16 @@ function assertionWords(assertions) {
   ].filter(Boolean).join(" · ");
 }
 
-function skipWords(why) {
+/** "14 not TypeScript or JavaScript · 6 an end is marked external", most first. */
+function reasonWords(why, words) {
   return Object.entries(why)
     .sort((a, b) => b[1] - a[1])
-    .map(([reason, count]) => `${count} ${SKIP_WORDS[reason] ?? reason}`)
+    .map(([reason, count]) => `${count} ${words[reason] ?? reason}`)
     .join(" · ");
+}
+
+function skipWords(why) {
+  return reasonWords(why, SKIP_WORDS);
 }
 
 /**
@@ -1027,10 +1059,14 @@ const ARROW_CAP = 8;
  * Grouped by reason, and the reason is repeated per group only when the board
  * has more than one: with a single reason it is already on the line above, and
  * printing it twice is noise.
+ *
+ * Two lists come through here now — arrows nothing read, and arrows that were
+ * read and not corroborated — because a reader wants the same thing of both:
+ * which arrows, and why. The words differ, so the table is passed in.
  */
-function unreadArrowRows(unread, colour) {
+function arrowRows(arrowsIn, words, colour) {
   const byReason = new Map();
-  for (const arrow of unread ?? []) {
+  for (const arrow of arrowsIn ?? []) {
     if (!byReason.has(arrow.reason)) byReason.set(arrow.reason, []);
     byReason.get(arrow.reason).push(arrow);
   }
@@ -1038,7 +1074,7 @@ function unreadArrowRows(unread, colour) {
   const grouped = byReason.size > 1;
   const indent = grouped ? "    " : "  ";
   for (const [reason, arrows] of byReason) {
-    if (grouped) rows.push(paint(`  ${SKIP_WORDS[reason] ?? reason}`, "dim", colour));
+    if (grouped) rows.push(paint(`  ${words[reason] ?? reason}`, "dim", colour));
     for (const arrow of arrows.slice(0, ARROW_CAP)) {
       const claim = arrow.label ? paint(`  ${oneLine(arrow.label)}`, "dim", colour) : "";
       rows.push(`${indent}${oneLine(arrow.fromLabel)} → ${oneLine(arrow.toLabel)}${claim}`);
@@ -1068,7 +1104,27 @@ function renderCoverageAudit(entries, colour) {
       if (report.skipped) rows.push(paint(`${report.skipped} boxes skipped: ${skipWords(report.skippedWhy)}`, "yellow", colour));
       if (report.edgesSkipped) {
         rows.push(paint(`${report.edgesSkipped} arrows skipped: ${skipWords(report.edgesSkippedWhy)}`, "yellow", colour));
-        rows.push(...unreadArrowRows(report.unreadEdges, colour));
+        rows.push(...arrowRows(report.unreadEdges, SKIP_WORDS, colour));
+      }
+      /*
+       * Read, and not corroborated. The line the amber arrows became (#133).
+       *
+       * Yellow like the skips and unlike a finding, because it belongs to the
+       * same family: what this check could not establish. It is the answer to
+       * "how much of this board is actually verified", which a clean verdict on
+       * its own cannot give.
+       */
+      const unconfirmed = report.unconfirmedEdges ?? [];
+      if (unconfirmed.length) {
+        const why = {};
+        for (const arrow of unconfirmed) why[arrow.reason] = (why[arrow.reason] ?? 0) + 1;
+        rows.push(paint(
+          `${unconfirmed.length} ${unconfirmed.length === 1 ? "arrow" : "arrows"} read and not `
+          + `confirmed: ${reasonWords(why, UNCONFIRMED_WORDS)}`,
+          "yellow",
+          colour,
+        ));
+        rows.push(...arrowRows(unconfirmed, UNCONFIRMED_WORDS, colour));
       }
       if (report.strayArrows) {
         rows.push(paint(`${report.strayArrows} stray ${report.strayArrows === 1 ? "arrow" : "arrows"} (attached at one end or none)`, "dim", colour));
@@ -1257,7 +1313,15 @@ const worthSaying =
   && (builtGraph
     || (!codeGraphOption
       && examined.some(({ report }) =>
-        report.edges.length > 0
+        /*
+         * Every way the graph could have changed this run's answer. Arrows that
+         * went unconfirmed are the biggest of them, and they used to be counted
+         * here as `edges.length` -- absence was a finding then (#133). The skips
+         * under it are the ones the graph reads and the live channels do not: a
+         * directory or glob anchor, a language no licence names, an end the
+         * reader cannot place, and two ends with no body between them.
+         */
+        (report.unconfirmedEdges ?? []).length > 0
         || (report.edgesSkippedWhy["directory-ref"] ?? 0) > 0
         || (report.edgesSkippedWhy["glob-ref"] ?? 0) > 0
         || (report.edgesSkippedWhy["unlicensed-language"] ?? 0) > 0
@@ -1391,6 +1455,20 @@ if (showing.length > 0 || problems.length > 0 || coverageLines.length > 0
   const arrows = total((r) => r.edgesChecked);
   const unread = total((r) => r.skipped + r.edgesSkipped);
   const planned = total((r) => r.workItems.length);
+  /*
+   * Read and not corroborated, said out loud next to "nothing drifted".
+   *
+   * "30 arrows checked · nothing drifted" was true and heard as "30 arrows
+   * verified", and on a board over a language full of data types most of those
+   * arrows can be read without being confirmed (#133). Unconfirmed and unread
+   * are two different silences and they share the tail, because the reader's
+   * next move for both is the same flag.
+   */
+  const unconfirmed = total((r) => (r.unconfirmedEdges ?? []).length);
+  const quiet = [
+    unconfirmed ? `${unconfirmed} unconfirmed` : "",
+    unread ? `${unread} unread` : "",
+  ].filter(Boolean).join(", ");
   console.error(
     [
       `${examined.length} board${examined.length === 1 ? "" : "s"}`,
@@ -1401,7 +1479,7 @@ if (showing.length > 0 || problems.length > 0 || coverageLines.length > 0
       // Deliberately not a notice of its own: a work item is the sketch being
       // ahead on purpose, and it belongs in a tally rather than in an alarm.
       ...(planned ? [`${planned} planned`] : []),
-      ...(unread ? [`${unread} unread, --details says why`] : []),
+      ...(quiet ? [`${quiet}, --details says why`] : []),
     ].join(" · "),
   );
 }

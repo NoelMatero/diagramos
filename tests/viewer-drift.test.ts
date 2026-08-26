@@ -44,6 +44,36 @@ describe("the status chip's tally", () => {
     ]);
   });
 
+  it("counts unconfirmed arrows dim, apart from the amber ones", () => {
+    /*
+     * Two numbers that used to be one. Amber means "have a look at this";
+     * unconfirmed means "I could not tell", which is not a defect and must not
+     * borrow a defect's colour -- on the board this came from, fifteen of the
+     * seventeen ambers were arrows that claimed nothing at all (#133).
+     */
+    const report = reportWith({
+      edges: [{ from: "src/a.ts", to: "src/b.ts", fromLabel: "A", toLabel: "B", node: "a -> b", kind: "backwards-edge" }],
+      unconfirmedEdges: [
+        { fromLabel: "C", toLabel: "D", reason: "an-end-is-data" },
+        { fromLabel: "E", toLabel: "F", reason: "no-call-either-way" },
+      ],
+    });
+    expect(tallyOf(report)).toEqual([
+      { text: "1 arrow backwards", tone: "bad" },
+      { text: "2 unconfirmed", tone: "dim" },
+    ]);
+  });
+
+  it("gives an unconfirmed arrow no row, so nothing on the canvas is marked", () => {
+    // A row is a thing to click and go and look at. There is nothing to see:
+    // the check looked already and found nothing either way.
+    const report = reportWith({
+      unconfirmedEdges: [{ fromLabel: "C", toLabel: "D", reason: "an-end-is-data" }],
+    });
+    expect(rowsOf(report)).toEqual([]);
+    expect(worstToneOf(rowsOf(report))).toBe("good");
+  });
+
   it("includes stray arrows when present", () => {
     const report = reportWith({
       strayArrows: 2,
@@ -140,6 +170,32 @@ describe("the clean summary", () => {
     );
     expect(summaryOf(reportWith({ checked: 1, edgesChecked: 1, skipped: 1 }))).toBe(
       "checked 1 box and 1 arrow against the code — all still true — 1 more box has no ref, so it went unchecked",
+    );
+  });
+
+  it("says how many arrows went unconfirmed, so all-still-true is not heard as all-verified", () => {
+    /*
+     * The board that started this had 30 arrows read and 17 of them confirmed by
+     * nothing (#133). "checked 32 boxes and 30 arrows — all still true" is
+     * every word of it true and the wrong thing to hear, and the count is what
+     * makes the difference sayable in one breath.
+     */
+    expect(summaryOf(reportWith({
+      checked: 4,
+      edgesChecked: 2,
+      unconfirmedEdges: [
+        { fromLabel: "A", toLabel: "B", reason: "an-end-is-data" },
+        { fromLabel: "C", toLabel: "D", reason: "no-call-either-way" },
+      ],
+    }))).toBe(
+      "checked 4 boxes and 2 arrows against the code — all still true — 2 arrows were read and not confirmed",
+    );
+    expect(summaryOf(reportWith({
+      checked: 1,
+      edgesChecked: 1,
+      unconfirmedEdges: [{ fromLabel: "A", toLabel: "B", reason: "no-call-either-way" }],
+    }))).toBe(
+      "checked 1 box and 1 arrow against the code — all still true — 1 arrow was read and not confirmed",
     );
   });
 
