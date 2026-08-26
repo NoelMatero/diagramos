@@ -251,7 +251,7 @@ describe.each(FIXTURES)("$file", (fixture) => {
         // reaches the body check -- it skips at the file channels, which do
         // not read this language either. Counted, not guessed.
         expect(report.edges).toEqual([]);
-        expect(report.edgesSkippedWhy).toEqual({ "not-ts-or-js": 1 });
+        expect(report.edgesSkippedWhy).toEqual({ "unlicensed-language": 1 });
       }
     });
 
