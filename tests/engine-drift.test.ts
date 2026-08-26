@@ -1633,7 +1633,7 @@ describe("saying what was not looked at", () => {
           [{ from: "a", to: "b" }],
         ),
         { "src/a.ts": "x", "src/b.py": "y" },
-        "not-ts-or-js",
+        "unlicensed-language",
       ],
     ];
 

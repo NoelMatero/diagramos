@@ -174,9 +174,15 @@ export function licenceTotals(licence: Licence): {
 /**
  * The licence covering a file, if any.
  *
- * Nothing consults this yet. A file whose extension no licence names is a file
- * no verdict may be built on, which is the same silence an unsupported language
- * already gets everywhere else in the engine.
+ * A file whose extension no licence names is a file no verdict may be built on,
+ * which is the same silence an unsupported language already gets everywhere
+ * else in the engine. The direction check, the closure check, the ledger and
+ * the arrow check all ask this rather than keeping a list of their own -- the
+ * arrow check being the last to convert, which took until issue #131 and cost
+ * a Rust board 14 of its 50 arrows in the meantime.
+ *
+ * It answers about the extension, which for Rust is only half the question:
+ * `readerCanPlace` in `deps.ts` asks the other half.
  */
 export function licenceFor(filePath: string): Licence | undefined {
   return LICENCES.find((licence) =>

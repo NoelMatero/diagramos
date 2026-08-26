@@ -33,9 +33,10 @@
  * of four statements, and a Rust one is a path into a module tree no single
  * file contains.
  */
+import { licenceFor } from "./licence";
 import { each, languageOf, parseSource, type Node } from "./parse";
 import { resolveDependency, type ConfigCache } from "./resolve";
-import { readRustLayout } from "./rust";
+import { crateOf, readRustLayout, type RustLayout } from "./rust";
 import { readRustDependencies } from "./deps-rust";
 import type { Workspace } from "./workspace";
 
@@ -46,6 +47,49 @@ import type { Workspace } from "./workspace";
  * directory lookups sharing the map.
  */
 const RUST_LAYOUT_KEY = "\0rust-layout";
+
+/**
+ * The module tree, built once per cache.
+ *
+ * Rust resolves against a module tree rather than against the filesystem, and
+ * the tree is a fact about the whole repository -- a path can name a sibling
+ * package in the same workspace. So it is built once and kept in the same cache
+ * the tsconfig lookups use, under a key no path can collide with.
+ */
+function rustLayoutFor(workspace: Workspace, configs: ConfigCache): RustLayout {
+  const cached = configs.get(RUST_LAYOUT_KEY);
+  const layout = cached?.kind === "rust-layout" ? cached : readRustLayout(workspace);
+  configs.set(RUST_LAYOUT_KEY, layout);
+  return layout;
+}
+
+/**
+ * Whether a reader here can place this file well enough to be believed.
+ *
+ * `licenceFor` answers about the extension, and for Rust that is only half the
+ * question. The corpus was measured over files a crate declares, and the
+ * licence says why the rest were left out rather than netted off: a file no
+ * crate declares is one rustc never compiles, so the referee has no opinion
+ * about it and neither may we. Rust leaves out 15% of the corpus that way.
+ *
+ * The failure is not abstract. `pub mod route;` in a crateless file resolves to
+ * nothing -- not because the module is absent, but because there is no crate
+ * root to resolve it against -- and a confirming channel handed that answer
+ * calls a true arrow unsupported. That is the reader mistaking its own
+ * blindness for an absence, which is the first paragraph of `licence.ts`.
+ *
+ * TypeScript has no equivalent condition: a specifier resolves against the
+ * filesystem, so there, having the extension is having the reader.
+ */
+export function readerCanPlace(
+  filePath: string,
+  workspace: Workspace,
+  configs: ConfigCache = new Map(),
+): boolean {
+  if (!licenceFor(filePath)) return false;
+  if (languageOf(filePath) !== "rust") return true;
+  return crateOf(filePath, rustLayoutFor(workspace, configs)) !== undefined;
+}
 
 /**
  * Why a file cannot be read statically.
@@ -190,17 +234,7 @@ export function readDependencies(
 ): FileDependencies | undefined {
   const language = languageOf(filePath);
   if (language === "rust") {
-    /*
-     * Rust resolves against a module tree rather than against the filesystem,
-     * and the tree is a fact about the whole repository -- a path can name a
-     * sibling package in the same workspace. So it is built once and kept in
-     * the same cache the tsconfig lookups use, under a key no path can collide
-     * with.
-     */
-    const cached = configs.get(RUST_LAYOUT_KEY);
-    const layout = cached?.kind === "rust-layout" ? cached : readRustLayout(workspace);
-    configs.set(RUST_LAYOUT_KEY, layout);
-    return readRustDependencies(filePath, source, workspace, layout);
+    return readRustDependencies(filePath, source, workspace, rustLayoutFor(workspace, configs));
   }
   if (!language || (language !== "ts" && language !== "tsx" && language !== "js")) {
     // Deliberately TypeScript and JavaScript only, plus Rust above. Every other
