@@ -324,6 +324,20 @@ export type EdgeSkipReason =
   | "endpoint-outside-repo"
   | "endpoint-file-missing"
   | "directory-ref"
+  /**
+   * An end refs a glob, so it stands for a set of files rather than one.
+   *
+   * Its own reason rather than folded into `directory-ref`, because a glob is
+   * narrower than the directory it lists and the reader who wrote `*.ts` should
+   * see their own words back. Both mean the same thing to the channels: the
+   * two-file questions have no single pair to ask about.
+   *
+   * Before this existed a glob-anchored arrow was reported as
+   * `endpoint-file-missing` -- `stat` was handed a path with a `*` in it and
+   * answered "missing", so the one reason that means *your code has been
+   * deleted* was spent on a ref shape the README documents as legal.
+   */
+  | "glob-ref"
   | "not-ts-or-js"
   /** Both ends named a symbol, and neither one has a body that could be read. */
   | "no-function-body";
@@ -1834,41 +1848,88 @@ export function checkDrift(
         continue;
       }
 
-      // Parse refs and check if both point to TS/JS files (not directories or missing)
+      // Parse refs and check what each end actually anchors to
       const { path: fromPath } = parseRef(fromRef);
       const { path: toPath } = parseRef(toRef);
-      const fromFile = workspace.resolve(fromPath);
-      const toFile = workspace.resolve(toPath);
 
-      // Skip if either file is missing or is not a file
+      /*
+       * A glob anchors to the directory it lists.
+       *
+       * The same conversion `boardCoverage` makes for the box check, in the
+       * words it uses there: a glob names a directory's worth of files, so
+       * treat its directory as covering them, which is what the box is
+       * claiming. That is why a glob-anchored *box* has never reported drift
+       * while every *arrow* touching one did -- this path handed `stat` a path
+       * with a `*` in it, got "missing" back, and reported the end's file as
+       * deleted. The board was fine and the code was fine.
+       *
+       * A `*` the glob reader refuses -- one outside the last path segment --
+       * anchors to nothing at all. The box already says so loudly, as an
+       * `unresolvable-ref` finding; here it is enough that the end is a
+       * pattern rather than a file, which is what the skip reason says.
+       */
+      const fromGlob = globOf(fromPath);
+      const toGlob = globOf(toPath);
+      const fromPattern = fromPath.includes("*");
+      const toPattern = toPath.includes("*");
+      const fromAnchor = fromGlob ? fromGlob.directory : fromPath;
+      const toAnchor = toGlob ? toGlob.directory : toPath;
+      const fromFile = workspace.resolve(fromAnchor);
+      const toFile = workspace.resolve(toAnchor);
+
+      // Skip if either anchor is outside the repo
       if (!fromFile || !toFile) {
         skipClaimedEdge("endpoint-outside-repo");
         continue;
       }
       const fromStat = workspace.stat(fromFile);
       const toStat = workspace.stat(toFile);
-      if (fromStat !== "file" || toStat !== "file") {
-        // Both land here, and they are not the same thing to a reader: one end
-        // standing for a subsystem is a choice, one pointing at a file that is
-        // gone is already reported as drift by the node check.
-        const missing = fromStat === "missing" || toStat === "missing";
+      /*
+       * A pattern is a set of files however its directory stats, so it never
+       * reaches the two-file channels below. Letting one through would hand a
+       * path with a `*` in it to a reader that resolves imports.
+       */
+      const fromSingle = !fromPattern && fromStat === "file";
+      const toSingle = !toPattern && toStat === "file";
+      if (!fromSingle || !toSingle) {
+        /*
+         * Three things land here and they are not the same to a reader: an end
+         * standing for a subsystem is a choice, an end standing for a set of
+         * files is a choice, and an end pointing at a file that is gone is
+         * already reported as drift by the node check.
+         *
+         * Only a real path can be the third one. A well-formed glob anchors to
+         * a directory, so a directory that is gone is missing in the ordinary
+         * way and the box says so too. A `*` the glob reader refused anchors to
+         * nothing, and `stat` answering "missing" about a path with a `*` in it
+         * is not news about the repository -- reading it as news is the whole
+         * of this bug.
+         *
+         * A pattern on either end names the arrow, even when the other end is a
+         * plain directory: it is the more specific of the two shapes and the
+         * more surprising thing to find on a board.
+         */
+        const missing = (!fromPattern || Boolean(fromGlob)) && fromStat === "missing"
+          || (!toPattern || Boolean(toGlob)) && toStat === "missing";
+        const shape: EdgeSkipReason = fromPattern || toPattern ? "glob-ref" : "directory-ref";
         // A box standing for a directory means everything under it, and the
         // code graph can answer that: does anything in here reach the other
         // end? Confirmed is checked; not confirmed stays a skip, because the
-        // graph proving nothing proves nothing.
-        if (!missing && codeGraphConfirms(options?.codeGraph, fromPath, toPath)) {
+        // graph proving nothing proves nothing. A glob asks it about the
+        // directory it lists, which is the anchor it just resolved through.
+        if (!missing && codeGraphConfirms(options?.codeGraph, fromAnchor, toAnchor)) {
           edgesChecked += 1;
           /*
            * The connection is corroborated; the *direction* is not. `checkNeeds`
-           * reads two files, and one end here stands for a whole directory, so
-           * the claim still got no verdict and still has to be counted as one
-           * that got none.
+           * reads two files, and one end here stands for a whole directory or a
+           * set of them, so the claim still got no verdict and still has to be
+           * counted as one that got none.
            */
-          if (claimed) claims.needsWithheld["directory-ref"] = (claims.needsWithheld["directory-ref"] ?? 0) + 1;
+          if (claimed) claims.needsWithheld[shape] = (claims.needsWithheld[shape] ?? 0) + 1;
           recordEdge(edge, fromNode, toNode, undefined);
           continue;
         }
-        skipClaimedEdge(missing ? "endpoint-file-missing" : "directory-ref");
+        skipClaimedEdge(missing ? "endpoint-file-missing" : shape);
         continue;
       }
 

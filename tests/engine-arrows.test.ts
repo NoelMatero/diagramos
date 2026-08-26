@@ -668,6 +668,82 @@ describe("code graph — the fifth corroboration channel", () => {
     expect(stale.edgesSkippedWhy["directory-ref"]).toBe(1);
   });
 
+  /*
+   * A glob ref behaves like the directory it lists.
+   *
+   * `README.md` lists a glob as a legal ref and the box check honours it, but
+   * this path used to hand `stat` a path with a `*` in it, get "missing" back,
+   * and report every arrow touching the box as `endpoint-file-missing` -- the
+   * one reason that means *your code has been deleted*. Issue #126.
+   *
+   * The tests are paired with the directory ones above on purpose: the promise
+   * is that the two ref shapes get the same treatment, not that globs got some
+   * treatment of their own.
+   */
+  const globWorkspace = (): Workspace => ({
+    resolve: (relative) => (relative.startsWith("../") ? undefined : relative),
+    stat: (target) =>
+      target === "src/sub" ? "directory" : files[target as keyof typeof files] === undefined ? "missing" : "file",
+    read: (target) => files[target as keyof typeof files] ?? "",
+    list: () => [],
+  });
+
+  it("checks an arrow whose end is a glob", async () => {
+    const graph = fixtureGraph(
+      [["inner", "src/sub/inner.ts"], ["b_target", "src/b.ts"]],
+      [["inner", "b_target"]],
+    );
+    const board = await arrowAB("src/sub/*.ts", "src/b.ts");
+
+    // Without the graph it is a skip -- and the skip says "glob", not "gone".
+    const without = checkDrift(board, globWorkspace(), { edges: true });
+    expect(without.edgesSkippedWhy).toEqual({ "glob-ref": 1 });
+    expect(without.edgesChecked).toBe(0);
+
+    const withGraph = checkDrift(board, globWorkspace(), {
+      edges: true,
+      codeGraph: { graph, modified: new Set() },
+    });
+    expect(withGraph.edgesSkippedWhy["glob-ref"]).toBeUndefined();
+    expect(withGraph.edgesChecked).toBe(1);
+    expect(withGraph.edges).toHaveLength(0);
+  });
+
+  it("distrusts the graph for a glob whose directory has been edited", async () => {
+    // The same staleness rule as a directory ref, because it is the same
+    // anchor: the glob resolved through `src/sub`, so anything under it counts.
+    const graph = fixtureGraph(
+      [["inner", "src/sub/inner.ts"], ["b_target", "src/b.ts"]],
+      [["inner", "b_target"]],
+    );
+    const board = await arrowAB("src/sub/*.ts", "src/b.ts");
+    const report = checkDrift(board, globWorkspace(), {
+      edges: true,
+      codeGraph: { graph, modified: new Set(["src/sub/inner.ts"]) },
+    });
+    expect(report.edgesSkippedWhy).toEqual({ "glob-ref": 1 });
+  });
+
+  it("never reports a glob as a file that has been deleted", async () => {
+    // Three shapes of `*`, none of which is news about the repository: one the
+    // glob reader lists, one it refuses because the `*` is not in the last
+    // segment, and one over a directory that is present.
+    for (const ref of ["src/sub/*.ts", "src/*/inner.ts", "src/sub/*"]) {
+      const board = await arrowAB(ref, "src/b.ts");
+      const report = checkDrift(board, globWorkspace(), { edges: true });
+      expect(report.edgesSkippedWhy["endpoint-file-missing"], ref).toBeUndefined();
+      expect(report.edgesSkippedWhy["glob-ref"], ref).toBe(1);
+    }
+  });
+
+  it("still says a file is missing when the glob's directory really is gone", async () => {
+    // The reason is not retired, it is spent correctly: `src/nope` is not
+    // there, and the box reports that as drift too.
+    const board = await arrowAB("src/nope/*.ts", "src/b.ts");
+    const report = checkDrift(board, globWorkspace(), { edges: true });
+    expect(report.edgesSkippedWhy).toEqual({ "endpoint-file-missing": 1 });
+  });
+
   it("checks an arrow between files the channels cannot read", async () => {
     const pyFiles = {
       "src/x.py": "from y import go\ngo()\n",

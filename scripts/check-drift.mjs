@@ -211,6 +211,7 @@ const NEEDS_WITHHELD = {
   "endpoint-outside-repo": "with an end pointing outside the repo",
   "endpoint-file-missing": "with an end whose file is missing",
   "directory-ref": "with an end that refs a directory, not a file",
+  "glob-ref": "with an end that refs a glob, not a file",
 };
 
 /**
@@ -882,6 +883,7 @@ const SKIP_WORDS = {
   "endpoint-outside-repo": "an end points outside the repo",
   "endpoint-file-missing": "an end's file is missing",
   "directory-ref": "an end refs a directory",
+  "glob-ref": "an end refs a glob",
   "not-ts-or-js": "not TypeScript or JavaScript",
   "no-function-body": "both ends name something with no body to read",
 };
@@ -1100,6 +1102,7 @@ if (
   && examined.some(({ report }) =>
     report.edges.length > 0
     || (report.edgesSkippedWhy["directory-ref"] ?? 0) > 0
+    || (report.edgesSkippedWhy["glob-ref"] ?? 0) > 0
     || (report.edgesSkippedWhy["not-ts-or-js"] ?? 0) > 0
     || (report.edgesSkippedWhy["no-function-body"] ?? 0) > 0)
   && !existsSync(HINT_FILE)

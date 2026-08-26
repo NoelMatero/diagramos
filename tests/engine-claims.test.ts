@@ -525,4 +525,53 @@ describe("a needs claim the check never reached", () => {
     expect(report.claims.needsWithheld).toEqual({});
     expect(report.edges.map((finding) => finding.kind)).toEqual(["backwards-edge"]);
   });
+
+  /*
+   * A claim on an end that stands for many files gets no verdict.
+   *
+   * `checkNeeds` reads two files and answers about a direction. A directory or
+   * a glob is a set, so "this end declares a dependency on that end" has no
+   * single pair to ask about -- any-of and all-of are different questions and
+   * neither was asked. Withheld is the honest outcome and the report already
+   * knows how to explain it, which is what issue #126 asked to be settled.
+   *
+   * Both shapes here, in one test, because the point is that they agree.
+   */
+  it("withholds the verdict when an end stands for a set of files", () => {
+    const setEnds: Record<string, "directory" | "file"> = {
+      "src/sub": "directory",
+      "src/b.ts": "file",
+    };
+    const workspace: Workspace = {
+      resolve: (relative) => (relative.startsWith("../") ? undefined : relative),
+      stat: (target) => setEnds[target] ?? "missing",
+      read: () => "",
+      list: () => [],
+    };
+
+    for (const [ref, why] of [["src/sub", "directory-ref"], ["src/sub/*.ts", "glob-ref"]] as const) {
+      const board = boardOf([
+        drawn({
+          id: "box-a", type: "rectangle", x: 0, y: 0, width: 100, height: 60,
+          customData: { node: "a", ref },
+        }),
+        drawn({
+          id: "box-b", type: "rectangle", x: 300, y: 0, width: 100, height: 60,
+          customData: { node: "b", ref: "src/b.ts" },
+        }),
+        drawn({
+          id: "arrow", type: "arrow", x: 100, y: 30, width: 200, height: 0,
+          points: [[0, 0], [200, 0]],
+          startBinding: { elementId: "box-a" },
+          endBinding: { elementId: "box-b" },
+        }),
+        drawn({ id: "arrow-label", type: "text", containerId: "arrow", text: "@needs" }),
+      ]);
+      const report = checkDrift(board, workspace, { edges: true });
+      // The question was asked, and the report says nobody answered it.
+      expect(report.claims.needs, ref).toBe(1);
+      expect(report.claims.needsChecked, ref).toBe(0);
+      expect(report.claims.needsWithheld, ref).toEqual({ [why]: 1 });
+    }
+  });
 });
