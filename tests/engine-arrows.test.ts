@@ -680,12 +680,23 @@ describe("code graph — the fifth corroboration channel", () => {
    * is that the two ref shapes get the same treatment, not that globs got some
    * treatment of their own.
    */
+  /*
+   * Like the directory workspace above, but it can list `src/sub`.
+   *
+   * A glob is expanded by listing, so a workspace that lists nothing has no
+   * evidence for one -- correct, and useless as a fixture for the case where
+   * the graph is supposed to answer.
+   */
   const globWorkspace = (): Workspace => ({
     resolve: (relative) => (relative.startsWith("../") ? undefined : relative),
     stat: (target) =>
-      target === "src/sub" ? "directory" : files[target as keyof typeof files] === undefined ? "missing" : "file",
+      target === "src/sub"
+        ? "directory"
+        : target === "src/sub/inner.ts"
+          ? "file"
+          : files[target as keyof typeof files] === undefined ? "missing" : "file",
     read: (target) => files[target as keyof typeof files] ?? "",
-    list: () => [],
+    list: (target) => (target === "src/sub" ? ["inner.ts"] : []),
   });
 
   it("checks an arrow whose end is a glob", async () => {
@@ -734,6 +745,93 @@ describe("code graph — the fifth corroboration channel", () => {
       expect(report.edgesSkippedWhy["endpoint-file-missing"], ref).toBeUndefined();
       expect(report.edgesSkippedWhy["glob-ref"], ref).toBe(1);
     }
+  });
+
+  /*
+   * The glob's own files, never its directory's.
+   *
+   * Anchoring a glob to its directory is how it gets *checked* at all, and it
+   * would have been the whole fix if the graph were then asked about the
+   * directory too -- which would confirm `*.ts` through a `.py` in a
+   * subdirectory, on evidence the box never claimed. A wrong confirmation is
+   * silent and it makes a box look verified, so the anchor and the evidence are
+   * deliberately two different things: strict about when the graph may speak,
+   * exact about what it speaks from.
+   */
+  const nested = {
+    "src/sub": "directory",
+    "src/sub/inner.ts": "file",
+    "src/sub/notes.md": "file",
+    "src/sub/deep": "directory",
+    "src/sub/deep/buried.ts": "file",
+    "src/b.ts": "file",
+  } as const;
+
+  const nestedWorkspace = (): Workspace => ({
+    resolve: (relative) => (relative.startsWith("../") ? undefined : relative),
+    stat: (target) => nested[target as keyof typeof nested] ?? "missing",
+    read: () => "",
+    list: (target) => {
+      const prefix = target === "." ? "" : `${target}/`;
+      const names = new Set<string>();
+      for (const key of Object.keys(nested)) {
+        if (!key.startsWith(prefix) || key === target) continue;
+        names.add(key.slice(prefix.length).split("/")[0]!);
+      }
+      return [...names];
+    },
+  });
+
+  /** A graph whose only edge is `file` reaching `src/b.ts`. */
+  const graphVia = (file: string) =>
+    fixtureGraph([["x", file], ["b_target", "src/b.ts"]], [["x", "b_target"]]);
+
+  it("confirms a glob only through a file the glob matches", async () => {
+    const board = await arrowAB("src/sub/*.ts", "src/b.ts");
+    const report = checkDrift(board, nestedWorkspace(), {
+      edges: true,
+      codeGraph: { graph: graphVia("src/sub/inner.ts"), modified: new Set() },
+    });
+    expect(report.edgesChecked).toBe(1);
+    expect(report.edges).toHaveLength(0);
+  });
+
+  it("refuses to confirm a glob through a file it does not match", async () => {
+    // Two ways to miss, and both used to confirm when the glob was answered for
+    // by its directory: the wrong extension beside it, and the right extension
+    // one level down. A glob lists one directory and never searches.
+    for (const via of ["src/sub/notes.md", "src/sub/deep/buried.ts"]) {
+      const board = await arrowAB("src/sub/*.ts", "src/b.ts");
+      const report = checkDrift(board, nestedWorkspace(), {
+        edges: true,
+        codeGraph: { graph: graphVia(via), modified: new Set() },
+      });
+      expect(report.edgesChecked, via).toBe(0);
+      expect(report.edgesSkippedWhy, via).toEqual({ "glob-ref": 1 });
+    }
+  });
+
+  it("leaves a directory ref answering for everything under it", async () => {
+    // The control: a directory box does claim its whole subtree, so the same
+    // buried file that must not confirm a glob still confirms a directory.
+    const board = await arrowAB("src/sub", "src/b.ts");
+    const report = checkDrift(board, nestedWorkspace(), {
+      edges: true,
+      codeGraph: { graph: graphVia("src/sub/deep/buried.ts"), modified: new Set() },
+    });
+    expect(report.edgesChecked).toBe(1);
+  });
+
+  it("says nothing for a glob that matches no file at all", async () => {
+    // Nothing to speak from is not the same as nothing to find, and the skip
+    // is the answer it had before the graph was consulted.
+    const board = await arrowAB("src/sub/*.rs", "src/b.ts");
+    const report = checkDrift(board, nestedWorkspace(), {
+      edges: true,
+      codeGraph: { graph: graphVia("src/sub/inner.ts"), modified: new Set() },
+    });
+    expect(report.edgesChecked).toBe(0);
+    expect(report.edgesSkippedWhy).toEqual({ "glob-ref": 1 });
   });
 
   it("still says a file is missing when the glob's directory really is gone", async () => {

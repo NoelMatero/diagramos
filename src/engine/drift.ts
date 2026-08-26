@@ -1234,7 +1234,7 @@ function checkEdgeCorroboration(
   // Channel 5: the code graph — precomputed whole-repo connectivity. It only
   // ever confirms, and it is consulted last, so with it off (or stale for
   // these files) the check behaves exactly as it did before the channel.
-  if (codeGraphConfirms(codeGraphOption, fromPath, toPath)) {
+  if (codeGraphConfirms(codeGraphOption, wholeRef(fromPath), wholeRef(toPath))) {
     return undefined;
   }
 
@@ -1255,15 +1255,59 @@ function checkEdgeCorroboration(
  * The code graph may confirm an arrow only when it is loaded and both endpoint
  * refs (file or directory) are untouched since the graph's commit. Anything
  * else is a "no", never an error: staleness falls back to the live channels.
+ *
+ * An endpoint has two refs and they are deliberately not the same one. The
+ * *anchor* is what has to be untouched, and the *evidence* is what the graph
+ * may speak from. For a file or a directory they are one path. For a glob they
+ * are not: it is anchored to the directory it lists, because a file appearing
+ * in or vanishing from that directory changes which files the box stands for
+ * and the graph would not know -- while the evidence is only the files the
+ * glob actually matches, because `*.ts` did not name the `.py` beside it.
+ *
+ * Strict about when it may speak, exact about what it speaks from.
  */
 function codeGraphConfirms(
   option: CodeGraphOption | undefined,
-  fromPath: string,
-  toPath: string,
+  from: { anchor: string; evidence: string | readonly string[] },
+  to: { anchor: string; evidence: string | readonly string[] },
 ): boolean {
   if (!option) return false;
-  if (refIsStale(fromPath, option.modified) || refIsStale(toPath, option.modified)) return false;
-  return connects(option.graph, fromPath, toPath);
+  if (refIsStale(from.anchor, option.modified) || refIsStale(to.anchor, option.modified)) return false;
+  return connects(option.graph, from.evidence, to.evidence);
+}
+
+/** The plain case: anchor and evidence are the same path. */
+function wholeRef(ref: string): { anchor: string; evidence: string } {
+  return { anchor: ref, evidence: ref };
+}
+
+/**
+ * What an arrow endpoint anchors to, and what the graph may speak from.
+ *
+ * A glob is the only shape where those differ. It lists one directory, so the
+ * evidence is exactly the entries matching the pattern -- not the directory,
+ * which would let `src/mcp/*.ts` be confirmed through a `.py` file in a
+ * subdirectory, on evidence the box never claimed.
+ *
+ * Three ways to have no evidence at all, and all of them read as "the graph
+ * cannot answer this" rather than as an error:
+ *
+ * - a `*` outside the last path segment, which `globOf` refuses to list;
+ * - a directory with more entries than `filesIn` will read, the same cap a
+ *   node-level anchor is held to;
+ * - a pattern matching nothing, where there is nothing to speak from.
+ */
+function edgeEndpoint(
+  refPath: string,
+  absolute: string,
+  workspace: Workspace,
+): { anchor: string; evidence: readonly string[] } | undefined {
+  const glob = globOf(refPath);
+  if (!glob) return undefined;
+  const matched = filesIn(absolute, workspace, glob.pattern);
+  if (matched === undefined || matched.length === 0) return undefined;
+  const directory = glob.directory === "." ? "" : `${glob.directory}/`;
+  return { anchor: glob.directory, evidence: matched.map((name) => `${directory}${name}`) };
 }
 
 /**
@@ -1855,13 +1899,17 @@ export function checkDrift(
       /*
        * A glob anchors to the directory it lists.
        *
-       * The same conversion `boardCoverage` makes for the box check, in the
-       * words it uses there: a glob names a directory's worth of files, so
-       * treat its directory as covering them, which is what the box is
-       * claiming. That is why a glob-anchored *box* has never reported drift
-       * while every *arrow* touching one did -- this path handed `stat` a path
-       * with a `*` in it, got "missing" back, and reported the end's file as
-       * deleted. The board was fine and the code was fine.
+       * `boardCoverage` makes the same conversion for the box check -- a glob
+       * names a directory's worth of files, so its directory is what has to be
+       * looked at -- and that is why a glob-anchored *box* has never reported
+       * drift while every *arrow* touching one did. This path handed `stat` a
+       * path with a `*` in it, got "missing" back, and reported the end's file
+       * as deleted. The board was fine and the code was fine.
+       *
+       * The anchor is where the *looking* happens and not what the box claims.
+       * `*.ts` claims the files it matches, so the directory is a stepping
+       * stone to them and never a stand-in for them -- see `edgeEndpoint`,
+       * which is where that distinction is spent.
        *
        * A `*` the glob reader refuses -- one outside the last path segment --
        * anchors to nothing at all. The box already says so loudly, as an
@@ -1912,12 +1960,27 @@ export function checkDrift(
         const missing = (!fromPattern || Boolean(fromGlob)) && fromStat === "missing"
           || (!toPattern || Boolean(toGlob)) && toStat === "missing";
         const shape: EdgeSkipReason = fromPattern || toPattern ? "glob-ref" : "directory-ref";
-        // A box standing for a directory means everything under it, and the
-        // code graph can answer that: does anything in here reach the other
-        // end? Confirmed is checked; not confirmed stays a skip, because the
-        // graph proving nothing proves nothing. A glob asks it about the
-        // directory it lists, which is the anchor it just resolved through.
-        if (!missing && codeGraphConfirms(options?.codeGraph, fromAnchor, toAnchor)) {
+        /*
+         * A box standing for a directory means everything under it, and the
+         * code graph can answer that: does anything in here reach the other
+         * end? Confirmed is checked; not confirmed stays a skip, because the
+         * graph proving nothing proves nothing.
+         *
+         * A glob means the files it matches, so it is expanded to them rather
+         * than answered for by its directory. A pattern the lister cannot
+         * expand has no evidence and so gets no confirmation -- the skip below,
+         * which is the same answer it had before the graph was consulted.
+         */
+        const fromEvidence = fromPattern
+          ? edgeEndpoint(fromPath, fromFile, workspace)
+          : wholeRef(fromAnchor);
+        const toEvidence = toPattern
+          ? edgeEndpoint(toPath, toFile, workspace)
+          : wholeRef(toAnchor);
+        if (
+          !missing && fromEvidence && toEvidence
+          && codeGraphConfirms(options?.codeGraph, fromEvidence, toEvidence)
+        ) {
           edgesChecked += 1;
           /*
            * The connection is corroborated; the *direction* is not. `checkNeeds`
@@ -2118,7 +2181,7 @@ export function checkDrift(
           // graphify parses ~40 grammars, so an arrow between two Python or
           // Rust files can still be confirmed at file level -- the same
           // fallback a TypeScript arrow gets from the channels below.
-          if (codeGraphConfirms(options?.codeGraph, fromPath, toPath)) {
+          if (codeGraphConfirms(options?.codeGraph, wholeRef(fromPath), wholeRef(toPath))) {
             edgesChecked += 1;
             recordEdge(edge, fromNode, toNode, undefined);
             continue;
