@@ -47,4 +47,4 @@ cd "${CLAUDE_PROJECT_DIR:-.}" 2>/dev/null || exit 0
 #
 # Not `exec`: it would replace this shell, so npx's exit status would become the
 # hook's and the `|| exit 0` would never run.
-npx -y diagramos@0.1.0 drift --hook || exit 0
+npx -y diagramos@0.2.0-rc.2 drift --hook || exit 0
