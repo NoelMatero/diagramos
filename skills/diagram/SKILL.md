@@ -144,10 +144,14 @@ The same goes for **a box standing for data**: a struct, a static, a table, a
 buffer. There is no body to read on that side, and the relationship almost
 always lives in a type in a signature, a field, or an enclosing `impl` — none of
 which is inside any function body. An arrow into a symbol like that comes back
-unconfirmed, and the report says so with the fix in the sentence: anchor that end
-at file level. Nothing accuses you of anything for it, and nothing about the
-board is wrong; the arrow just goes unverified until it is anchored at a
-granularity the code can answer.
+unconfirmed, and `create_diagram` says so in its own result, the turn you draw
+it — how many arrows nothing corroborated, why, and which ones are the
+re-anchorable kind — with the fix in the sentence: anchor that end at file
+level. It is information and never a refusal. Nothing accuses you of anything
+for it, and nothing about the board is wrong; the arrow just goes unverified
+until it is anchored at a granularity the code can answer. Changing a ref with
+`edit_diagram` gets the same answer, because that is the other way an arrow
+gains its anchors.
 
 When a box stands for a concept rather than one function, list in `refs` **the
 symbols whose invocation counts as using it** — the interface, not just the

@@ -56,6 +56,7 @@ import {
   findBoards,
   findStrayBoards,
   parseRef,
+  UNCONFIRMED_WORDS,
 } from "../src/engine/drift.ts";
 import { initEngine } from "../src/engine/parse.ts";
 import { createCodeGraphOption, TESTED_VERSION_PREFIX } from "../src/engine/codegraph.ts";
@@ -1080,21 +1081,18 @@ const SKIP_WORDS = {
   "no-function-body": "both ends name something with no body to read",
 };
 
-/**
+/*
  * Why an arrow the check read came back unconfirmed, in words.
  *
  * Kept apart from SKIP_WORDS above because it is the opposite situation: a skip
- * means nobody looked, and these mean somebody looked and found nothing. The
- * second one carries an instruction, because it is the only one of the three a
- * reader can act on — and acting on it turns an unreadable arrow into a checked
- * one, which no other line in this report can offer.
+ * means nobody looked, and these mean somebody looked and found nothing.
+ *
+ * The table itself moved into the engine when `create_diagram` started saying
+ * the same thing at draw time (#145). Two surfaces reading one table is the
+ * point: this report and the tool result now cannot describe the same arrow in
+ * two different vocabularies, which is the failure `summary.ts` was written to
+ * end for the sentence above it.
  */
-const UNCONFIRMED_WORDS = {
-  "no-call-either-way": "nothing calls the other, either way",
-  "an-end-is-data": "an end names data, not something that runs — anchor that end at file level",
-  "nothing-connects-them": "no import, shared importer or shared route connects them",
-  "feeds-runs-the-other-way": "the only flow found runs the other way",
-};
 
 /** Why a `@declared` / `@used` claim was read as a plain mention instead. */
 function assertionWords(assertions) {
