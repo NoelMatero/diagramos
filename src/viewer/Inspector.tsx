@@ -289,28 +289,60 @@ export default function Inspector({
         </>
       ) : (
         <>
+          {/*
+            Two words, one arrow, so ticking one takes the other off: an arrow
+            asserts one thing, and the engine reads two claims as garbled rather
+            than guessing which was meant. Ticks rather than a dropdown because
+            each one is a sentence about *these two boxes* -- which is the whole
+            reason this panel reads better than the JSON it replaced.
+          */}
           <label className="inspect-tick">
             <input
               type="checkbox"
-              checked={meaning.needs}
-              onChange={(event) => onEdit({ set: "needs", needs: event.target.checked })}
+              checked={meaning.claim === "needs"}
+              onChange={(event) => onEdit({ set: "claim", ...(event.target.checked ? { claim: "needs" as const } : {}) })}
             />
             <span>
               <b>{meaning.fromLabel}</b> needs <b>{meaning.toLabel}</b>
             </span>
           </label>
+          <label className="inspect-tick">
+            <input
+              type="checkbox"
+              checked={meaning.claim === "feeds"}
+              onChange={(event) => onEdit({ set: "claim", ...(event.target.checked ? { claim: "feeds" as const } : {}) })}
+            />
+            <span>
+              <b>{meaning.fromLabel}</b>&apos;s result goes into <b>{meaning.toLabel}</b>
+            </span>
+          </label>
           {/*
             The payoff, said once and only where it applies: an arrow that only
-            means "related, somehow" can never be shown to be backwards, because
-            failing to find a connection is not proof there is none. Claiming a
-            direction is what makes the opposite refutable.
+            means "related, somehow" can never be confirmed as anything in
+            particular, because finding a connection somewhere says nothing
+            about what this arrow asserts. Claiming one of the two is what gives
+            the check a question it can answer.
           */}
-          {meaning.needs ? null : (
+          {meaning.claim ? null : (
             <div className="inspect-note">
-              Tick this and a backwards arrow becomes something the check can catch.
+              Tick one and the check has something to answer: a backwards
+              dependency it can catch, or a flow it can go and find.
             </div>
           )}
-          {meaning.needs && !meaning.labelled ? (
+          {meaning.claim === "needs" ? (
+            <div className="inspect-note">
+              Only tick this if you have read the import. A wrong one is reported
+              in red, with the line that disproves it.
+            </div>
+          ) : null}
+          {meaning.claim === "feeds" ? (
+            <div className="inspect-note">
+              Confirmed by finding the flow — one function binding the first
+              result and passing it to the second. Not finding it is never held
+              against the arrow.
+            </div>
+          ) : null}
+          {meaning.claim && !meaning.labelled ? (
             <div className="inspect-note">
               Recorded, but not written on the arrow. Double-click the arrow to give it a
               label and the claim shows there too.

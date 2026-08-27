@@ -219,13 +219,58 @@ const NEEDS_WITHHELD = {
 };
 
 /**
- * `@needs` arrows nobody answered, on this board.
+ * Why a `@feeds` claim got no confirmation.
+ *
+ * Split into two groups by one question -- could anybody have looked -- because
+ * that is what decides whether it belongs in a notice that fires every turn.
+ * The first four mean nobody could, which is the same news an unanswered
+ * `@needs` is (#113): silence in reply to a question reads as "checked, and
+ * fine". The last two mean somebody looked, and #133 settled what those are
+ * worth: a count, never an alarm.
+ */
+const FEEDS_NOT_CONFIRMED = {
+  "not-symbols": "with an end anchored at a file rather than a symbol",
+  "nowhere-to-look": "in a tree too large to walk",
+  "ends-not-bound": "with an end not snapped to its box",
+  "endpoint-missing": "with an end that points at no box",
+  "endpoint-external": "with an end marked external",
+  "endpoint-has-no-ref": "with an end that has no ref",
+  "endpoint-outside-repo": "with an end pointing outside the repo",
+  "endpoint-file-missing": "with an end whose file is missing",
+  "directory-ref": "with an end that refs a directory, not a file",
+  "glob-ref": "with an end that refs a glob, not a file",
+  absent: "where no flow was found in either direction",
+  reversed: "where the only flow found runs the other way",
+};
+
+/** The feeds reasons that mean nobody looked, which are the ones worth a notice. */
+const FEEDS_UNANSWERED = new Set(
+  Object.keys(FEEDS_NOT_CONFIRMED).filter((why) => why !== "absent" && why !== "reversed"),
+);
+
+/** Reasons with a count, commonest first, so a sentence can list them. */
+function withheldReasons(table, only) {
+  return Object.entries(table ?? {})
+    .filter(([why, count]) => count > 0 && (!only || only.has(why)))
+    .sort((a, b) => b[1] - a[1]);
+}
+
+/**
+ * Claims nobody answered, on this board.
  *
  * The count, not the reasons: this is the number that decides whether the board
  * is worth a notice at all, and it is read in three places.
+ *
+ * Both words land here, and `feeds` brings only the half of its reasons that
+ * mean nobody could look. A flow that was searched for and not found is not an
+ * unanswered question, it is an answer of "no evidence" -- which is a count
+ * (#133), and putting it in a per-turn notice is how the amber this project
+ * just finished removing would come back under a new name.
  */
 function unansweredClaims(report) {
-  return Object.values(report.claims?.needsWithheld ?? {}).reduce((sum, count) => sum + count, 0);
+  const needs = withheldReasons(report.claims?.needsWithheld);
+  const feeds = withheldReasons(report.claims?.feedsWithheld, FEEDS_UNANSWERED);
+  return [...needs, ...feeds].reduce((sum, [, count]) => sum + count, 0);
 }
 
 /**
@@ -234,15 +279,30 @@ function unansweredClaims(report) {
  * Deliberately the same sentence `--details` prints. `--details` earns the right
  * to say it about every board; the notice says it because a question asked and
  * not answered is news whether or not anybody asked for the long form.
+ *
+ * One line per word, because the two words are answered by different readers
+ * and a reader who wrote one of them should not have to work out which half of
+ * a merged sentence is about theirs.
  */
-function unansweredClaimWords(report) {
-  const reasons = Object.entries(report.claims?.needsWithheld ?? {})
-    .filter(([, count]) => count > 0)
-    .sort((a, b) => b[1] - a[1]);
-  const total = reasons.reduce((sum, [, count]) => sum + count, 0);
-  if (total === 0) return undefined;
-  return `${total} needs ${total === 1 ? "arrow" : "arrows"} not checked: `
-    + reasons.map(([why, count]) => `${count} ${NEEDS_WITHHELD[why] ?? why}`).join(", ");
+function unansweredClaimLines(report) {
+  const said = [];
+  for (const [word, reasons, table] of [
+    ["needs", withheldReasons(report.claims?.needsWithheld), NEEDS_WITHHELD],
+    ["feeds", withheldReasons(report.claims?.feedsWithheld, FEEDS_UNANSWERED), FEEDS_NOT_CONFIRMED],
+  ]) {
+    const total = reasons.reduce((sum, [, count]) => sum + count, 0);
+    if (total === 0) continue;
+    said.push(
+      `${total} ${word} ${total === 1 ? "arrow" : "arrows"} not checked: `
+      + reasons.map(([why, count]) => `${count} ${table[why] ?? why}`).join(", "),
+    );
+  }
+  /*
+   * One string per line, never one string with newlines in it. A row carrying a
+   * newline does not wrap inside the frame, it splits the frame in half -- the
+   * same rule `oneLine` exists for.
+   */
+  return said;
 }
 
 /**
@@ -283,9 +343,11 @@ function unsnappedClaimFix(report) {
  * truncates at the width of the box.
  */
 function claimWentLive(promoted) {
-  return promoted.some((promotion) => promotion.claim === "needs")
-    ? "  a promoted @needs is read for the first time on the next check"
-    : undefined;
+  // Whichever word it was. A promoted arrow's claim has been read by nothing so
+  // far -- both checks are gated on `built` -- and the next run is the first
+  // one that will look at it.
+  const word = promoted.find((promotion) => promotion.claim)?.claim;
+  return word ? `  a promoted @${word} is read for the first time on the next check` : undefined;
 }
 
 /**
@@ -356,7 +418,7 @@ const MAX_LISTED = 6;
  */
 function rowsFor({ report, promoted = [] }, colour, all = false) {
   const promotedNodes = new Set(promoted.map((promotion) => promotion.node));
-  const unanswered = unansweredClaimWords(report);
+  const unanswered = unansweredClaimLines(report);
   const unsnapped = unsnappedClaimFix(report);
   const promotedClaim = claimWentLive(promoted);
   return [
@@ -380,7 +442,7 @@ function rowsFor({ report, promoted = [] }, colour, all = false) {
      * Yellow, not red. Nothing here is wrong -- the claim may well hold. What is
      * wrong is that a clean report was standing in for an answer.
      */
-    ...(unanswered ? [paint(unanswered, "yellow", colour)] : []),
+    ...unanswered.map((line) => paint(line, "yellow", colour)),
     ...(unsnapped ? [paint(unsnapped, "dim", colour)] : []),
     ...report.deleted.map((finding) =>
       paint(`${boxName(finding)} removed, ${parseRef(finding.ref).path} still there`, "red", colour),
@@ -1011,6 +1073,7 @@ const UNCONFIRMED_WORDS = {
   "no-call-either-way": "nothing calls the other, either way",
   "an-end-is-data": "an end names data, not something that runs — anchor that end at file level",
   "nothing-connects-them": "no import, shared importer or shared route connects them",
+  "feeds-runs-the-other-way": "the only flow found runs the other way",
 };
 
 /** Why a `@declared` / `@used` claim was read as a plain mention instead. */
@@ -1190,7 +1253,8 @@ function renderCoverageAudit(entries, colour) {
         }
       }
       const needs = report.claims?.needs ?? 0;
-      if (needs > 0) {
+      const feeds = report.claims?.feeds ?? 0;
+      if (needs > 0 || feeds > 0) {
         const checked = report.claims?.needsChecked ?? 0;
         if (checked > 0) {
           rows.push(paint(
@@ -1199,11 +1263,37 @@ function renderCoverageAudit(entries, colour) {
             colour,
           ));
         }
-        // The same sentence the notice prints, from the same function. Two
+        /*
+         * `feeds` says confirmed rather than checked, because that is all it can
+         * ever say: it finds the flow or it does not, and not finding one is not
+         * a verdict about the arrow. The word difference is the whole difference
+         * between the two claims, in the one place a reader meets both.
+         */
+        const flows = report.claims?.feedsConfirmed ?? 0;
+        if (flows > 0) {
+          rows.push(paint(
+            `${flows} feeds ${flows === 1 ? "arrow" : "arrows"} confirmed by a flow`,
+            "dim",
+            colour,
+          ));
+        }
+        // Looked at, and nothing found: the count, here only. It is not news
+        // and it never opens a notice; a reader who asked for details gets it.
+        const searched = withheldReasons(report.claims?.feedsWithheld)
+          .filter(([why]) => !FEEDS_UNANSWERED.has(why));
+        const searchedTotal = searched.reduce((sum, [, count]) => sum + count, 0);
+        if (searchedTotal > 0) {
+          rows.push(paint(
+            `${searchedTotal} feeds ${searchedTotal === 1 ? "arrow" : "arrows"} not confirmed: `
+            + searched.map(([why, count]) => `${count} ${FEEDS_NOT_CONFIRMED[why] ?? why}`).join(", "),
+            "yellow",
+            colour,
+          ));
+        }
+        // The same sentences the notice prints, from the same function. Two
         // phrasings of one fact is two things to keep in sync, and the notice's
         // is the one a person sees every turn.
-        const unanswered = unansweredClaimWords(report);
-        if (unanswered) rows.push(paint(unanswered, "yellow", colour));
+        for (const line of unansweredClaimLines(report)) rows.push(paint(line, "yellow", colour));
         const unsnapped = unsnappedClaimFix(report);
         if (unsnapped) rows.push(paint(unsnapped, "dim", colour));
       }

@@ -13,7 +13,7 @@ import { describe, expect, it } from "vitest";
 
 import {
   editScene,
-  labelWithNeeds,
+  labelWithClaim,
   meaningOf,
   refExists,
   type SceneElement,
@@ -107,7 +107,6 @@ describe("reading what is selected", () => {
       fromLabel: "read / write the file",
       toLabel: "read back as a graph",
       node: "file -> graph",
-      needs: false,
       labelled: false,
     });
   });
@@ -128,7 +127,7 @@ describe("reading what is selected", () => {
 
   it("sees a claim typed into an arrow's label, not only one recorded", () => {
     const scene = [arrow(), label("a1", "reads @needs")];
-    expect(meaningOf(scene, "a1")).toMatchObject({ needs: true, labelled: true });
+    expect(meaningOf(scene, "a1")).toMatchObject({ claim: "needs", labelled: true });
   });
 });
 
@@ -241,7 +240,7 @@ describe("setting what it means", () => {
 
   it("records an arrow claim where the checker reads it, keeping the ends", () => {
     const scene = [arrow({ customData: { edge: { from: "a", to: "b" } } })];
-    const next = editScene(scene, "a1", { set: "needs", needs: true });
+    const next = editScene(scene, "a1", { set: "claim", claim: "needs" });
     expect(customOf(next, "a1").edge).toEqual({ from: "a", to: "b", claim: "needs" });
   });
 
@@ -251,13 +250,13 @@ describe("setting what it means", () => {
       box({ id: "b2", customData: { node: "graph" } }),
       arrow({ startBinding: { elementId: "b1" }, endBinding: { elementId: "b2" } }),
     ];
-    const next = editScene(scene, "a1", { set: "needs", needs: true });
+    const next = editScene(scene, "a1", { set: "claim", claim: "needs" });
     expect(customOf(next, "a1").edge).toEqual({ from: "file", to: "graph", claim: "needs" });
   });
 
   it("writes the claim onto the arrow's label too, so it can be read on the board", () => {
     const scene = [arrow({ customData: { edge: { from: "a", to: "b" } } }), label("a1", "reads")];
-    const next = editScene(scene, "a1", { set: "needs", needs: true });
+    const next = editScene(scene, "a1", { set: "claim", claim: "needs" });
     const written = next.find((element) => element.id === "a1-label");
     expect(written?.text).toBe("reads @needs");
     expect(written?.originalText).toBe("reads @needs");
@@ -265,7 +264,7 @@ describe("setting what it means", () => {
 
   it("takes the claim back off the label when it is unticked", () => {
     const scene = [arrow({ customData: { edge: { from: "a", to: "b" } } }), label("a1", "reads @needs")];
-    const next = editScene(scene, "a1", { set: "needs", needs: false });
+    const next = editScene(scene, "a1", { set: "claim" });
     expect(next.find((element) => element.id === "a1-label")?.text).toBe("reads");
     expect(customOf(next, "a1").edge).toEqual({ from: "a", to: "b" });
   });
@@ -312,19 +311,19 @@ describe("does that file exist", () => {
 
 describe("the claim on a label", () => {
   it("adds the claim after the reader's own words", () => {
-    expect(labelWithNeeds("reads", true)).toBe("reads @needs");
+    expect(labelWithClaim("reads", "needs")).toBe("reads @needs");
   });
 
   it("does not write it twice", () => {
-    expect(labelWithNeeds("reads @needs", true)).toBe("reads @needs");
+    expect(labelWithClaim("reads @needs", "needs")).toBe("reads @needs");
   });
 
   it("removes it without taking the words with it", () => {
-    expect(labelWithNeeds("reads @needs", false)).toBe("reads");
+    expect(labelWithClaim("reads @needs")).toBe("reads");
   });
 
   it("makes a label out of the claim alone when there were no words", () => {
-    expect(labelWithNeeds("", true)).toBe("@needs");
-    expect(labelWithNeeds("@needs", false)).toBe("");
+    expect(labelWithClaim("", "needs")).toBe("@needs");
+    expect(labelWithClaim("@needs")).toBe("");
   });
 });

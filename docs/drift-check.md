@@ -530,16 +530,21 @@ confirm-only vocabulary (#127) makes that worth doing. Judging an arrow that
 claims nothing was catching them by accident, at a cost of thirteen false alarms
 each.
 
-An arrow can now carry one word instead:
+An arrow can carry a word instead:
 
-| word | on | claim |
-| --- | --- | --- |
-| `needs` | arrows | the `from` end declares a dependency on the `to` end |
+| word | on | claim | can it say *wrong*? |
+| --- | --- | --- | --- |
+| `needs` | arrows | the `from` end declares a dependency on the `to` end | yes |
+| `feeds` | arrows | the `from` end's result goes into the `to` end | no — confirm-only |
 
 `needs` means the narrow, textual, per-language fact of a dependency
 declaration — an `import`, a `require`, an `#include`. It deliberately does not
 mean "calls", "sends data to", or "depends on conceptually". That narrowness is
 the whole point: a direction has an opposite, and an opposite is falsifiable.
+
+`feeds` is the other thing an arrow usually means, and the two are not the same
+fact — they frequently point opposite ways, because the file holding a result
+imports the one that produced it. It has its own section below.
 
 ### A backwards arrow is the one thing on a board that can be wrong
 
@@ -1258,6 +1263,89 @@ which is not something to put in front of opening a diagram, and the published
 package has no sources to rebuild from. Instead `diagramos board` compares
 `src/viewer` mtimes against the bundle and prints one line when it is behind —
 cheap, in-repo only, and silent where there are no sources.
+
+## `feeds`: the pipeline arrow, and the first confirm-only word
+
+The gap, measured (#127): on `claim-path.excalidraw` — the first board an agent
+drew here unprompted, with nobody looking for this — **every** arrow that could
+never be confirmed was one shape. `readBoard → readGraph`, and neither function
+calls the other:
+
+```js
+const sibling = await readBoard(siblingPath);   // readBoard's result...
+const siblingGraph = readGraph(sibling);        // ...goes into readGraph
+```
+
+The arrow is completely correct. The wiring is deterministic, quotable, and
+lives in a **third** function — `gaps.ts` — which is the one place a body-scoped
+search never looks. Four out of four unconfirmable arrows on that board were
+this, and the author had done nothing wrong and had nothing they could do.
+
+`feeds` says it: *the tail's result goes into the head*. The check goes and
+finds the flow.
+
+### Two shapes count, and deliberately no more
+
+```
+B(A(x))                  A's result is handed straight to B
+const v = A(x); B(v)     A's result is bound, and the binding is passed
+```
+
+The binding form requires the name to be passed as a **direct argument**, in a
+scope that can see the binding, after it. `B(v.field)`, `B({ v })`,
+`B(list.map(...))`, a reassignment, a value out of a destructure, `[A()]` — none
+of them count. Each is a judgement call, and each wrong judgement would be the
+tool telling somebody their correct diagram is wrong. `await A()`, `(A())`,
+`A()?` and `&A()` do count: those wrappers do not change whose result it is.
+
+Scope is enforced rather than approximated, because ignoring it is a real false
+positive: two functions in one file can each hold `const result = ...`, and
+reading the binding in the first as the value passed in the second would confirm
+an arrow out of two unrelated lines.
+
+### Where it looks
+
+The two endpoint files, and every source file in the repository — the same walk
+`closed` boxes get, bounded the same way, and for the same reason: the evidence
+is somewhere the board does not point. A file that never writes either name is
+skipped before it is parsed. It runs once per board, only when a board carries a
+`feeds` arrow, and only on `built` ones.
+
+That is the one place this check reads outside the diagram, so the same rule
+applies as everywhere else: the *walk* is fixed and takes no input. The two
+symbol names only filter what it found, so no model-authored string turns into a
+search of the disk.
+
+### Confirm-only, and why that is not a weakness
+
+There is no `feeds`-is-wrong verdict and there will not be one. A value can
+reach the other end through a callback, a struct field, a builder chain — so
+*not finding* a flow says close to nothing, and a red built on that absence
+would be a false accusation waiting for its first callback. `needs` earns its
+red because a file's dependency declarations are enumerable; dataflow is not.
+
+So the report has three answers, and every one of them is honest:
+
+| what happened | what the report says |
+| --- | --- |
+| the flow was found | the arrow is confirmed, silently, and `--details` counts it as *confirmed by a flow* |
+| no flow either way | counted, and the arrow falls through to the ordinary channels — an import can still confirm it |
+| the only flow runs the other way | named, with the file and line, as `the only flow found runs the other way` — **not** a finding |
+
+That last row is the most specific thing this engine can say about an arrow
+without accusing anybody, and it exists because #133 made "unconfirmed" a count
+instead of a colour. Before that, a word that could not go red would still have
+painted every arrow it failed to confirm — which is exactly the rot the old
+admission rule was written to prevent.
+
+Which is the other half of what this landed: **the vocabulary's admission rule
+changed.** It used to be *a word goes in on the day something can call it
+wrong*. What that rule actually guards against is a claim whose green is
+guaranteed — "some function calls both of these" is symmetric, so it confirms
+whichever way the arrow was drawn and says nothing about what was asserted. The
+rule is now: a word is admissible when confirming it is evidence of **the
+specific thing it asserts**. Refutable words may go red; confirm-only words
+never do. `claim.ts` carries the argument in full.
 
 ## The code graph: a fifth way to confirm an arrow
 

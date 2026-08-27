@@ -213,23 +213,31 @@ const edgeSchema = z.object({
       + "break names the hop that stopped holding. Only for arrows whose ends both name symbols.",
     ),
   claim: z
-    .enum(["needs"])
+    .enum(["needs", "feeds"])
     .optional()
     .describe(
-      "What this arrow asserts, when it asserts anything. 'needs': the from end declares a "
-      + "dependency on the to end — an import, a require, an include. Write it ONLY when you have "
-      + "read that line in the code: it is a transcription of something you saw, never a guess "
-      + "about what the relationship probably is. A relationship you cannot point at is an arrow "
-      + "with no claim, which is fine and is what most arrows are: an unclaimed arrow is looked "
-      + "for and counted, never judged, so it cannot come back as a finding against you. Shown "
-      + "on the board as @needs "
-      + "and recorded, and CHECKED: if the dependency runs the other way and only the other "
-      + "way, the arrow is reported as backwards, by file and line, and the build fails. So a "
-      + "needs you guessed at is not a harmless decoration -- it is a false statement read back "
-      + "to the user, on their diagram, in red. That rule is about arrows that exist. On a "
-      + "state:'planned' arrow there is no line to read, so the claim is a specification of "
-      + "which way the dependency will run once built; nothing checks it until the code lands "
-      + "and the arrow promotes, so writing it there costs nothing and accuses nobody.",
+      "What this arrow asserts, when it asserts anything. Two words, and an arrow may carry one. "
+      + "'needs': the from end declares a dependency on the to end — an import, a require, an "
+      + "include. Write it ONLY when you have read that line in the code: it is a transcription of "
+      + "something you saw, never a guess about what the relationship probably is. Shown on the "
+      + "board as @needs and recorded, and CHECKED: if the dependency runs the other way and only "
+      + "the other way, the arrow is reported as backwards, by file and line, and the build fails. "
+      + "So a needs you guessed at is not a harmless decoration -- it is a false statement read "
+      + "back to the user, on their diagram, in red. "
+      + "'feeds': the from end's RESULT goes into the to end -- the pipeline arrow, which is a "
+      + "different fact and often points the opposite way from the import. Confirmed by finding "
+      + "the flow written down somewhere a person can read it: one function binding the first "
+      + "call's result and passing it to the second, or handing it straight over. It CANNOT fail "
+      + "-- a value can reach the other end through a callback or a field no reader follows, so "
+      + "not finding the flow is never held against the arrow, and there is no red for it. Both "
+      + "ends must anchor a symbol (path#symbol), because a file has no result. "
+      + "A relationship you cannot point at is an arrow with no claim, which is fine and is what "
+      + "most arrows are: an unclaimed arrow is looked for and counted, never judged, so it cannot "
+      + "come back as a finding against you. "
+      + "Both rules are about arrows that exist. On a state:'planned' arrow there is nothing to "
+      + "read yet, so a claim there is a specification of what will be true once built; nothing "
+      + "checks it until the code lands and the arrow promotes, so writing it there costs nothing "
+      + "and accuses nobody.",
     ),
   label: z.string().optional().describe("One or two words; longer crowds the diagram"),
   strokeColor: z
@@ -584,10 +592,8 @@ server.registerTool(
     description:
       "Do these diagrams still match the code? Compares each node's ref against the working tree "
       + "and reports the ones pointing at a file or symbol that is gone, and checks arrows for static "
-      + "connections through imports, shared orchestrators, or route literals. An arrow nothing "
-      + "corroborates is NOT a finding: every channel here only confirms, so failing to confirm is "
-      + "absence of evidence, and it is counted in unconfirmedEdges rather than reported against the "
-      + "board. Read-only, and cheap "
+      + "connections through imports, shared orchestrators, or route literals — unsupported ones are "
+      + "worth a look, not wrong. Read-only, and cheap "
       + "enough to run whenever module structure changes. Nodes without a ref are skipped, "
       + "hand-drawn ones ignored, and edges touching refless nodes are skipped, so a clean report means "
       + "nothing checkable disagreed -- not that the diagram is correct. skippedWhy and edgesSkippedWhy "
@@ -612,11 +618,7 @@ server.registerTool(
         .boolean()
         .default(false)
         .describe(
-          "Three questions the per-turn check does not ask. `unconfirmedEdges` names the arrows "
-          + "that were read and came back with nothing either way, each with the reason -- and the "
-          + "one reason worth acting on is `an-end-is-data`: a box anchored at a struct, a static "
-          + "or a field cannot be reached by a search through function bodies, so anchor that end "
-          + "at file level and the import channels can answer instead. `unreadEdges` names the arrows nothing "
+          "Three questions the per-turn check does not ask. `unreadEdges` names the arrows nothing "
           + "checked, with the reason for each: an arrow with an end marked external, or refless, or "
           + "pointing at a directory carries no claim any check here can test, and until it is named "
           + "it is indistinguishable from an arrow that passed. It is not drift and not a suggestion "
@@ -670,14 +672,6 @@ server.registerTool(
         handDrawn: 0,
         edgesChecked: 0,
         edgesSkipped: 0,
-        /**
-         * Read, and not corroborated. Part of edgesChecked, not extra to it.
-         *
-         * Unconditional, unlike the list behind it: "checked" on its own reads
-         * as "verified", and a caller that cannot see this number cannot tell a
-         * board that was confirmed from one that was merely legible (#133).
-         */
-        edgesUnconfirmed: 0,
       };
       // Why, not just how many: a caller cannot act on "5 skipped", and cannot
       // tell it apart from "nothing here was readable".
@@ -696,7 +690,6 @@ server.registerTool(
       const unrepresented: Array<Record<string, unknown>> = [];
       const unannotated: Array<Record<string, unknown>> = [];
       const unreadEdges: Array<Record<string, unknown>> = [];
-      const unconfirmedEdges: Array<Record<string, unknown>> = [];
       const edges: Array<Record<string, unknown>> = [];
       const garbledClaims: Array<Record<string, unknown>> = [];
       const closedBreaches: Array<Record<string, unknown>> = [];
@@ -721,7 +714,6 @@ server.registerTool(
         totals.handDrawn += report.handDrawn;
         totals.edgesChecked += report.edgesChecked;
         totals.edgesSkipped += report.edgesSkipped;
-        totals.edgesUnconfirmed += report.unconfirmedEdges.length;
         tally(skippedWhy, report.skippedWhy);
         tally(edgesSkippedWhy, report.edgesSkippedWhy);
         assertions.checked += report.assertions.checked;
@@ -749,12 +741,6 @@ server.registerTool(
         if (coverage) {
           for (const arrow of report.unreadEdges) {
             unreadEdges.push({ board: relativeToWorkspace(file), ...arrow });
-          }
-          // Same rule as `unreadEdges`: the count is the per-turn answer, and
-          // the list behind it -- with the sentence saying what to re-anchor --
-          // is for the moment somebody has decided to fix the board.
-          for (const arrow of report.unconfirmedEdges) {
-            unconfirmedEdges.push({ board: relativeToWorkspace(file), ...arrow });
           }
         }
         for (const finding of report.edges) {
@@ -816,7 +802,6 @@ server.registerTool(
         ...(unannotated.length ? { unannotated } : {}),
         ...(unrepresented.length ? { unrepresented } : {}),
         ...(unreadEdges.length ? { unreadEdges } : {}),
-        ...(unconfirmedEdges.length ? { unconfirmedEdges } : {}),
         ...(Object.keys(skippedWhy).length ? { skippedWhy } : {}),
         ...(Object.keys(edgesSkippedWhy).length ? { edgesSkippedWhy } : {}),
         ...(assertions.checked || assertions.downgraded || assertions.unsupportedLanguage
@@ -888,23 +873,31 @@ server.registerTool(
             label: z.string().optional(),
             bidirectional: z.boolean().optional(),
             claim: z
-              .enum(["needs"])
+              .enum(["needs", "feeds"])
               .optional()
               .describe(
-      "What this arrow asserts, when it asserts anything. 'needs': the from end declares a "
-      + "dependency on the to end — an import, a require, an include. Write it ONLY when you have "
-      + "read that line in the code: it is a transcription of something you saw, never a guess "
-      + "about what the relationship probably is. A relationship you cannot point at is an arrow "
-      + "with no claim, which is fine and is what most arrows are: an unclaimed arrow is looked "
-      + "for and counted, never judged, so it cannot come back as a finding against you. Shown "
-      + "on the board as @needs "
-      + "and recorded, and CHECKED: if the dependency runs the other way and only the other "
-      + "way, the arrow is reported as backwards, by file and line, and the build fails. So a "
-      + "needs you guessed at is not a harmless decoration -- it is a false statement read back "
-      + "to the user, on their diagram, in red. That rule is about arrows that exist. On a "
-      + "state:'planned' arrow there is no line to read, so the claim is a specification of "
-      + "which way the dependency will run once built; nothing checks it until the code lands "
-      + "and the arrow promotes, so writing it there costs nothing and accuses nobody.",
+      "What this arrow asserts, when it asserts anything. Two words, and an arrow may carry one. "
+      + "'needs': the from end declares a dependency on the to end — an import, a require, an "
+      + "include. Write it ONLY when you have read that line in the code: it is a transcription of "
+      + "something you saw, never a guess about what the relationship probably is. Shown on the "
+      + "board as @needs and recorded, and CHECKED: if the dependency runs the other way and only "
+      + "the other way, the arrow is reported as backwards, by file and line, and the build fails. "
+      + "So a needs you guessed at is not a harmless decoration -- it is a false statement read "
+      + "back to the user, on their diagram, in red. "
+      + "'feeds': the from end's RESULT goes into the to end -- the pipeline arrow, which is a "
+      + "different fact and often points the opposite way from the import. Confirmed by finding "
+      + "the flow written down somewhere a person can read it: one function binding the first "
+      + "call's result and passing it to the second, or handing it straight over. It CANNOT fail "
+      + "-- a value can reach the other end through a callback or a field no reader follows, so "
+      + "not finding the flow is never held against the arrow, and there is no red for it. Both "
+      + "ends must anchor a symbol (path#symbol), because a file has no result. "
+      + "A relationship you cannot point at is an arrow with no claim, which is fine and is what "
+      + "most arrows are: an unclaimed arrow is looked for and counted, never judged, so it cannot "
+      + "come back as a finding against you. "
+      + "Both rules are about arrows that exist. On a state:'planned' arrow there is nothing to "
+      + "read yet, so a claim there is a specification of what will be true once built; nothing "
+      + "checks it until the code lands and the arrow promotes, so writing it there costs nothing "
+      + "and accuses nobody.",
               ),
           }),
         )

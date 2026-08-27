@@ -167,6 +167,17 @@ Run it yourself with `npx -y diagramos drift`, which answers in one line when no
 
 **An arrow can be wrong, not just unconfirmed.** An arrow means "these two are related, somehow", and nothing can disprove "somehow" — so an arrow drawn backwards used to pass every check forever. An arrow can carry one word instead: `needs`, the box at the tail declares a dependency on the box at the head. It is written on the arrow as `@needs`, so you can see it and delete it. That word has a direction, so it has an opposite: if the dependency runs the other way and only the other way, the check calls the arrow **backwards**, names the file and line, and fails the build. If it runs both ways it says nothing, because in a cycle neither arrow is more correct. The right to say that is earned per language and the number is in the repo — 12,824 dependency edges across five projects, measured against the TypeScript compiler rather than against ourselves.
 
+**An arrow can also mean "this feeds that", which is a different fact.** A great
+many arrows do not mean "A imports B" — they mean *A's output goes into B*, a
+pipeline, which frequently points the opposite way to the import. `feeds` says
+it, and the check goes and finds the flow: one function that binds the first
+result and passes it to the second, usually in a third file the diagram never
+draws. It is the first claim here that **cannot** fail. A value can reach the
+other end through a callback or a field no reader follows, so not finding the
+flow is never held against the arrow — it is a number in `--details`. Finding it
+is evidence. A word that only confirms is worth having now that an unconfirmed
+arrow is a count rather than a colour.
+
 That makes planning a front door rather than an afterthought: `/plan-diagram` draws the plan for something before any of it is written — the pieces that exist as solid boxes, the work to come dashed, every dashed box anchored to the exact path its code will live at. The board is the to-do list, you bend it into shape by drawing on it, and it ticks itself off as the work lands. `create_diagram` checks every board as it writes it and tells the model, not you, about a box pointing at nothing — a typo gets fixed before it ever reaches your notice as red.
 
 Deliberately shallow. Missing files and symbols are checked by existence alone, which works in any language; the arrow check resolves imports and understands only TypeScript and JavaScript, so elsewhere every arrow is skipped. Nodes without a `ref` are skipped rather than guessed at. A clean report means nothing checkable disagreed — not that the diagram is correct. Reasoning in [docs/drift-check.md](docs/drift-check.md).

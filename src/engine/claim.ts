@@ -1,26 +1,59 @@
 /**
  * What an arrow and a box are allowed to claim.
  *
- * An arrow today means "these two are related, somehow". Nothing can disprove
- * "somehow": the check looks for any connection in the code, and failing to find
- * one is never proof there is none. So a negative arrow result is amber forever,
- * and an arrow drawn backwards survives every run.
+ * An unclaimed arrow means "these two are related, somehow". Nothing can
+ * disprove "somehow": the check looks for any connection in the code, and
+ * failing to find one is never proof there is none -- which is why an arrow
+ * that claims nothing is now counted rather than judged (#133).
  *
- * A claim is the way out. `needs` says *what kind* of relationship the arrow
- * asserts -- the tail declares a dependency on the head, in whatever way the
- * language declares dependencies -- and that has a direction. A direction has an
- * opposite, and an opposite can be shown to be the only one present. `closed`
- * does the same for a box: nothing outside this directory reaches inside it, so
- * one import from outside refutes it outright.
+ * A claim is the way to say something the code can actually answer. `needs`
+ * says the tail declares a dependency on the head, in whatever way the language
+ * declares dependencies. `feeds` says the tail's result goes into the head --
+ * the pipeline arrow, which is a different fact and frequently points the
+ * opposite way. `closed` does the same for a box: nothing outside this
+ * directory reaches inside it.
  *
- * The whitelist is closed, and stays closed. `assert.ts` carries exactly two
- * words and refuses everything else, which is the only reason `@declared` still
- * means one thing; a vocabulary that accepts what it does not check rots into
+ * ## What earns a word its place
+ *
+ * The rule used to be refutability: a word goes in on the day something can
+ * call it wrong. That was the right instinct read one notch too strictly, and
+ * `feeds` is what showed the difference. What the rule is really guarding
+ * against is a claim whose **green is guaranteed** -- one where confirmation
+ * carries no information. "Some function calls both of these" is that: it is
+ * symmetric, so it comes back green whichever way the arrow was drawn, and a
+ * verdict that cannot depend on what you asserted is decoration in a verdict's
+ * clothes.
+ *
+ * A word is admissible when confirming it is evidence of **the specific thing
+ * it asserts**. That gives two kinds, and both are honest:
+ *
+ * - **Refutable** -- `needs`, `closed`. The absence is enumerable (a file's
+ *   dependency declarations; every import into a directory), so finding only
+ *   the opposite is proof, and the report may say *wrong*, in red, with a line.
+ * - **Confirm-only** -- `feeds`. Absence proves nothing, because a value can
+ *   reach the other end through a callback or a field no reader follows. So it
+ *   confirms and otherwise stays quiet, which is the same stance the code-graph
+ *   channel has always taken.
+ *
+ * Confirm-only became affordable when unconfirmed stopped being a colour
+ * (#133). Before that, a word that could not go red would still have painted
+ * every arrow it failed to confirm, which is the rot the old rule was written
+ * to prevent.
+ *
+ * The whitelist stays closed either way. `assert.ts` carries exactly two words
+ * and refuses everything else, which is the only reason `@declared` still means
+ * one thing; a vocabulary that accepts what it does not check rots into
  * decoration. So an unrecognised word is loud the turn it is written.
  */
 
-/** The closed whitelist for arrows. One word, and it earns its place by having an opposite. */
-export const ARROW_CLAIMS = ["needs"] as const;
+/**
+ * The closed whitelist for arrows.
+ *
+ * `needs` is refutable and can fail a build. `feeds` confirms only. Both say
+ * something the code can answer about the direction they were drawn in, which
+ * is what admission turns on -- see the rule above.
+ */
+export const ARROW_CLAIMS = ["needs", "feeds"] as const;
 
 export type ArrowClaim = (typeof ARROW_CLAIMS)[number];
 
@@ -28,14 +61,14 @@ export type ArrowClaim = (typeof ARROW_CLAIMS)[number];
  * One word, and it arrived with its checker rather than before it.
  *
  * `closed` says nothing outside this directory depends on anything inside it,
- * except through the doors the box lists. Like `needs` it earns its place by
- * being refutable: one import from outside, read out of the source text, and the
- * claim is false with a file and a line to show for it.
+ * except through the doors the box lists. Like `needs` it is refutable: one
+ * import from outside, read out of the source text, and the claim is false with
+ * a file and a line to show for it.
  *
  * The rule this list follows is the one `assert.ts` established and the reason
- * `@declared` still means one thing: a word goes in here on the day something
- * can call it wrong, and not a day earlier. A claim that is rendered and judged
- * by nothing reads exactly like a claim that passed.
+ * `@declared` still means one thing: a word arrives with the thing that reads
+ * it, never before. A claim that is rendered and judged by nothing reads
+ * exactly like a claim that passed.
  */
 export const BOX_CLAIMS = ["closed"] as const;
 
