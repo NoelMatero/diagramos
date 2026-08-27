@@ -46,6 +46,45 @@ export type NodeState = "planned" | "built" | "external";
 
 export const NODE_STATES: readonly NodeState[] = ["planned", "built", "external"];
 
+/**
+ * How a declared state is drawn.
+ *
+ * Both treatments are stroke styles, not colours: unlike a colour they survive
+ * greyscale and colour-blindness, and colour is already spoken for -- a board's
+ * author uses `backgroundColor` and `strokeColor` to mark subsystems, and a rule
+ * that overrode either would fight the picture they are drawing.
+ *
+ * - `planned` is **dashed**, the established convention for "not real yet".
+ * - `external` is **dotted**. It means "real, but not ours", which is a
+ *   different question from `planned` and gets a neighbouring answer: related
+ *   enough to read as "something is different about this box", distinct enough
+ *   to tell apart. It used to be drawn exactly like `built`, so the one state
+ *   that is *never checked* looked identical to the one that always is -- the
+ *   box saying "do not look here" was indistinguishable from the box saying
+ *   "this is verified", which is the wrong way round for a tool whose whole
+ *   claim is that the picture and the code agree.
+ *
+ * The key is omitted for `built` rather than set to `"solid"`, so a board that
+ * declares no state stays byte-identical to one written before this existed.
+ * Nothing here reads anything but the node's own state, which is what keeps
+ * regeneration deterministic.
+ *
+ * Here rather than in `layout.ts` because three places now need to agree on it,
+ * and two of them must not import the layout module -- it instantiates ELK at
+ * load time, which is a heavy thing to pull into the Stop hook or the board
+ * service. The renderer writes this stroke; `promote.ts` writes the `built`
+ * stroke early when a live promotion lands, and puts *this* one back when the
+ * evidence for it goes away (#130). A mapping duplicated across those three
+ * would drift, and the drift would look like a rendering bug.
+ */
+export function strokeStyleForState(
+  state: NodeState | undefined,
+): { strokeStyle?: "dashed" | "dotted" } {
+  if (state === "planned") return { strokeStyle: "dashed" };
+  if (state === "external") return { strokeStyle: "dotted" };
+  return {};
+}
+
 /** Unrecognised values fall back to the default rather than throwing: a board is user data. */
 function stateOf(value: unknown): NodeState {
   return typeof value === "string" && (NODE_STATES as readonly string[]).includes(value)

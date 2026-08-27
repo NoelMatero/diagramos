@@ -6,7 +6,7 @@
  * describes. Everything written here is deterministic so an unchanged diagram
  * produces an unchanged file.
  */
-import { mkdir, readFile, writeFile } from "node:fs/promises";
+import { mkdir, readFile, rename, rm, writeFile } from "node:fs/promises";
 import path from "node:path";
 
 import type { ExcalidrawElement } from "./normalize";
@@ -134,7 +134,41 @@ export async function readBoard(file: string): Promise<BoardFile> {
   };
 }
 
+/**
+ * Writes the board, and never leaves a half-written one behind.
+ *
+ * Written to a temporary name in the same directory and renamed over the target,
+ * because `rename` within a filesystem is atomic: a reader either gets the whole
+ * old file or the whole new one, never a truncated prefix of either.
+ *
+ * This was a plain `writeFile` for as long as one process wrote boards. Two now
+ * do -- the Stop hook promotes at the end of a turn, and the board service
+ * promotes while one is being watched (#130) -- and a `.excalidraw` caught
+ * mid-write does not fail loudly. It parses as invalid JSON, `readBoard` throws,
+ * and the board reads as "could not read" until something writes it again.
+ *
+ * Same directory on purpose: a rename across filesystems is not atomic, and
+ * `os.tmpdir()` is frequently a different one.
+ *
+ * The temporary name carries the pid, so two processes writing the same board at
+ * the same moment cannot collide on the scratch file. One of them still wins the
+ * rename -- that is a race about *content*, settled by the revision check in the
+ * service and by the hook running last, and not something this can decide.
+ */
 export async function writeBoard(file: string, board: BoardFile): Promise<void> {
-  await mkdir(path.dirname(path.resolve(file)), { recursive: true });
-  await writeFile(file, serializeBoard(board), "utf8");
+  const target = path.resolve(file);
+  await mkdir(path.dirname(target), { recursive: true });
+  const scratch = path.join(
+    path.dirname(target),
+    `.${path.basename(target)}.${process.pid}.tmp`,
+  );
+  try {
+    await writeFile(scratch, serializeBoard(board), "utf8");
+    await rename(scratch, target);
+  } catch (error) {
+    // A failed write must not leave the scratch file in the diagram directory,
+    // where `findBoards` would go on offering it as a board.
+    await rm(scratch, { force: true }).catch(() => undefined);
+    throw error;
+  }
 }

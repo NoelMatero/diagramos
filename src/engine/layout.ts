@@ -12,7 +12,7 @@
 import ELK from "elkjs/lib/elk.bundled.js";
 import { labelWithClaim, type ArrowClaim } from "./claim";
 import { readableInk } from "./contrast";
-import type { NodeState } from "./graph";
+import { strokeStyleForState, type NodeState } from "./graph";
 import type { ElkExtendedEdge, ElkNode } from "elkjs/lib/elk-api";
 
 type JsonObject = Record<string, unknown>;
@@ -89,35 +89,6 @@ export interface DiagramPlan {
 }
 
 export const MODEL_GRID_SIZE = 20;
-
-/**
- * How a declared state is drawn.
- *
- * Both treatments are stroke styles, not colours: unlike a colour they survive
- * greyscale and colour-blindness, and colour is already spoken for — a board's
- * author uses `backgroundColor` and `strokeColor` to mark subsystems, and a rule
- * that overrode either would fight the picture they are drawing.
- *
- * - `planned` is **dashed**, the established convention for "not real yet".
- * - `external` is **dotted**. It means "real, but not ours", which is a
- *   different question from `planned` and gets a neighbouring answer: related
- *   enough to read as "something is different about this box", distinct enough
- *   to tell apart. It used to be drawn exactly like `built`, so the one state
- *   that is *never checked* looked identical to the one that always is — the
- *   box saying "do not look here" was indistinguishable from the box saying
- *   "this is verified", which is the wrong way round for a tool whose whole
- *   claim is that the picture and the code agree.
- *
- * The key is omitted for `built` rather than set to `"solid"`, so a board that
- * declares no state stays byte-identical to one written before this existed.
- * Nothing here reads anything but the node's own state, which is what keeps
- * regeneration deterministic.
- */
-function stateStyle(state: NodeState | undefined): { strokeStyle?: "dashed" | "dotted" } {
-  if (state === "planned") return { strokeStyle: "dashed" };
-  if (state === "external") return { strokeStyle: "dotted" };
-  return {};
-}
 
 const NODE_FONT_SIZE = 20;
 const EDGE_LABEL_FONT_SIZE = 16;
@@ -467,7 +438,7 @@ export async function planDiagramLayout(
       backgroundColor: node.backgroundColor ?? "transparent",
       ...(node.backgroundColor && node.backgroundColor !== "transparent" ? { fillStyle: "solid" } : {}),
       ...(type === "rectangle" && node.rounded ? { roundness: { type: 3 } } : {}),
-      ...stateStyle(node.state),
+      ...strokeStyleForState(node.state),
       // Excalidraw would give the label the container's stroke colour, which
       // on a filled shape can be nearly the same colour as the fill.
       label: {
@@ -518,7 +489,7 @@ export async function planDiagramLayout(
       end: { id: elementIdByNode.get(edge.to) },
       endArrowhead: "arrow",
       strokeColor: edge.strokeColor ?? "#1e1e1e",
-      ...stateStyle(edge.state),
+      ...strokeStyleForState(edge.state),
       // The label goes on the arrow, not beside it. A free text element sitting
       // at the midpoint looks identical and is not a label: Excalidraw does not
       // know it belongs to the arrow, so double-clicking the arrow edits the

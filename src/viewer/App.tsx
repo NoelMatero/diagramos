@@ -4,7 +4,15 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
 import { BoardSync, withBoard, type BoardPayload, type SyncStatus } from "./sync";
 import { planReveal, prefersReducedMotion } from "./reveal";
-import { rowsOf, summaryOf, tallyOf, worstToneOf, type DriftView } from "./drift";
+import {
+  livePromotedCount,
+  livePromotionNote,
+  rowsOf,
+  summaryOf,
+  tallyOf,
+  worstToneOf,
+  type DriftView,
+} from "./drift";
 import { HISTORY_PATH, rowsOfHistory, type HistoryEntryView } from "./history";
 import Inspector from "./Inspector";
 import { editScene, meaningOf, type Edit, type SceneElement } from "./inspect";
@@ -70,10 +78,13 @@ function StatusPill({
 function DriftPanel({
   report,
   history,
+  shownEarly,
   onReveal,
 }: {
   report?: DriftView;
   history: HistoryEntryView[];
+  /** Boxes the service drew as built before the turn recorded them (#130). */
+  shownEarly: number;
   onReveal: (node: string) => void;
 }) {
   // One body slot shared by both chips: two panels open at once would cover
@@ -87,6 +98,7 @@ function DriftPanel({
   const rows = rowsOf(report);
   const quiet = rows.length === 0;
   const tone = quiet ? "good" : worstToneOf(rows);
+  const early = livePromotionNote(shownEarly);
 
   return (
     <div className="drift">
@@ -107,6 +119,9 @@ function DriftPanel({
                   {part.text}
                 </span>
               ))}
+          {/* Visible with the panel shut, because that is when somebody is
+              watching the board rather than reading it. */}
+          {early ? <span className="drift-early">{shownEarly} early</span> : null}
         </button>
         {history.length > 0 ? (
           <button
@@ -121,6 +136,7 @@ function DriftPanel({
       </div>
       {open === "status" ? (
         <div className="drift-body">
+          {early ? <div className="drift-row drift-row-wrap tone-good">{early}</div> : null}
           {quiet ? (
             <div className="drift-row drift-row-wrap tone-dim">{summaryOf(report)}</div>
           ) : (
@@ -280,8 +296,12 @@ export default function App() {
             setTimeout(() => {
               applyingRemote.current = false;
             }, 0);
-            // The board just changed on disk, so its status likely did too.
-            window.setTimeout(() => void refreshDrift(), 250);
+            // The board just changed on disk, so its status likely did too --
+            // unless the change was the service drawing a promotion early, in
+            // which case the code is mid-turn and a report taken now would grade
+            // half-written work. The promotion is already in the scene the box
+            // was just drawn from; the report waits for a settled moment.
+            if (!meta.livePromotion) window.setTimeout(() => void refreshDrift(), 250);
           };
 
           const showFrame = (index: number) => {
@@ -422,7 +442,12 @@ export default function App() {
   return (
     <div className="board-root">
       <StatusPill status={status} detail={detail} file={file} />
-      <DriftPanel report={drift} history={history} onReveal={revealNode} />
+      <DriftPanel
+        report={drift}
+        history={history}
+        shownEarly={livePromotedCount(scene)}
+        onReveal={revealNode}
+      />
       <Inspector meaning={meaning} report={drift} paths={paths} onEdit={onEdit} />
       <Excalidraw
         excalidrawAPI={(api) => {

@@ -13,7 +13,7 @@
  */
 
 import { execFileSync } from "node:child_process";
-import { existsSync, readFileSync } from "node:fs";
+import { existsSync, readFileSync, statSync } from "node:fs";
 import path from "node:path";
 
 /** The shape we require of graphify's NetworkX node-link export. */
@@ -245,7 +245,53 @@ export function refIsStale(ref: string, modified: Set<string>): boolean {
  * The modified set is what makes the graph safe to consult between commits:
  * the graph describes the sidecar's commit, so any file changed since then
  * (staged, unstaged, or in later commits) falls back to the live channels.
+ *
+ * ## Why the parse is cached and the modified set is not
+ *
+ * A one-shot `drift` run calls this once and the cost is invisible. The board
+ * service calls it per request, and #130 makes it call it per save while a board
+ * is being watched, which is where the split starts to matter. Measured on this
+ * repository, whose graph is 15 MB:
+ *
+ *     read + parse graph.json   ~35ms
+ *     loadCodeGraph              ~9ms
+ *     two git diffs             ~30ms
+ *
+ * The first two depend only on the file, which is rebuilt at commit time and
+ * never between -- so keying them on the file's identity is exact rather than a
+ * guess, and a rebuilt graph invalidates itself. The git half depends on the
+ * working tree, which is precisely what changes while somebody is typing, so it
+ * is recomputed every time. Caching *that* on a timer would let the channel
+ * confirm an arrow from a graph that no longer describes the file, which is the
+ * one thing `modified` exists to prevent.
  */
+interface CachedGraph {
+  /** The file's identity when it was parsed: size and modification time. */
+  stamp: string;
+  graphify: string;
+  graph: LoadedCodeGraph | undefined;
+}
+
+const graphCache = new Map<string, CachedGraph>();
+
+/**
+ * The parsed graph for a path, reusing the last parse when the file has not
+ * moved. A cached `undefined` is a cached answer too: an unloadable graph should
+ * not be re-parsed 15 MB at a time on every keystroke to be refused again.
+ */
+function cachedGraph(graphPath: string, graphify: string): LoadedCodeGraph | undefined {
+  const info = statSync(graphPath);
+  const stamp = `${info.size}:${info.mtimeMs}`;
+  const hit = graphCache.get(graphPath);
+  if (hit && hit.stamp === stamp && hit.graphify === graphify) return hit.graph;
+  const graph = loadCodeGraph(
+    JSON.parse(readFileSync(graphPath, "utf8")) as CodeGraphSchema,
+    graphify,
+  );
+  graphCache.set(graphPath, { stamp, graphify, graph });
+  return graph;
+}
+
 export function createCodeGraphOption(root: string): CodeGraphOption | undefined {
   try {
     const graphPath = path.join(root, "graphify-out", "graph.json");
@@ -259,10 +305,7 @@ export function createCodeGraphOption(root: string): CodeGraphOption | undefined
     if (typeof meta.commit !== "string" || !/^[0-9a-f]{7,40}$/.test(meta.commit)) return undefined;
     if (typeof meta.graphify !== "string") return undefined;
 
-    const graph = loadCodeGraph(
-      JSON.parse(readFileSync(graphPath, "utf8")) as CodeGraphSchema,
-      meta.graphify,
-    );
+    const graph = cachedGraph(graphPath, meta.graphify);
     if (!graph) return undefined;
 
     const git = (args: string[]) =>

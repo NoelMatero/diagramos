@@ -27,6 +27,8 @@ import { checkDrift, createGitBaseline, createWorkspace, findBoards } from "../e
 import { initEngine } from "../engine/parse";
 import { processAlive, registerServer, updateServer } from "./server-registry";
 import { boardsPage } from "./boards-page";
+import { watchCode, type CodeWatch } from "./code-watch";
+import { reconcileLivePromotions } from "../engine/promote";
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "../..");
 
@@ -269,6 +271,17 @@ interface BoardState {
   /** Pages pinned to this board with `?file=`. */
   subscribers: Subscriber[];
   debounce?: NodeJS.Timeout;
+  /**
+   * The watcher over the code this board describes, live only while somebody is
+   * looking (#130).
+   *
+   * The guard is the point rather than an optimisation. This is a recursive
+   * watch over a repository plus a drift check per burst, and a service holding
+   * that open for a board no page has asked about would be spending a user's
+   * battery on a question nobody is waiting for an answer to. Started on the
+   * first listener, stopped on the last.
+   */
+  codeWatch?: CodeWatch;
 }
 
 /**
@@ -421,7 +434,14 @@ export async function startBoardServer(options: BoardServerOptions): Promise<Run
     const resolved = await realPathOf(path.resolve(next));
     if (resolved === file) return;
     const state = await track(resolved);
+    const previous = file;
     file = resolved;
+    // Followers count towards whichever board is current, so pointing the
+    // service somewhere else moves their claim: the board they were holding open
+    // may now have nobody on it, and the new one may have just gained a room
+    // full of listeners.
+    syncCodeWatch(previous);
+    syncCodeWatch(resolved);
     // switchedFile tells the page this is a different document, so it reframes
     // rather than assuming the old viewport still means anything. Only followers
     // hear it; a pinned page has not switched to anything.
@@ -463,6 +483,86 @@ export async function startBoardServer(options: BoardServerOptions): Promise<Run
       return !relative.startsWith("..") && !path.isAbsolute(relative);
     });
     return owner ?? root ?? process.cwd();
+  };
+
+  /** The drift report for a board, from its own project. Shared by the endpoint and the watcher. */
+  const reportFor = async (target: string) => {
+    engineReady ??= initEngine();
+    await engineReady;
+    const workspaceRoot = rootFor(target);
+    const codeGraph = createCodeGraphOption(workspaceRoot);
+    const ledger = createLedger(workspaceRoot);
+    const board = await readBoard(target);
+    const report = checkDrift(board, createWorkspace(workspaceRoot), {
+      baseline: createGitBaseline(workspaceRoot, target),
+      ...(codeGraph ? { codeGraph } : {}),
+      ...(ledger ? { ledger } : {}),
+    });
+    return { board, report };
+  };
+
+  /**
+   * Re-check a board's code and draw any promotion straight away (#130).
+   *
+   * ## Why this writes the board file
+   *
+   * A box is dashed because the *file* says `planned`; the page renders what the
+   * file holds. So the only way a box turns solid on screen is for the file to
+   * change, and the service is already a writer of board files -- that is what
+   * `POST /api/board` is. What is new is the reason, not the act.
+   *
+   * The record is untouched: `reconcileLivePromotions` writes a stroke and a
+   * marker and never the `state` key, so every check still returns exactly what
+   * it would have returned. See its own comment for why that division is the
+   * thing that makes previewing safe at all.
+   *
+   * ## Why no fresh report is pushed with it
+   *
+   * The page refetches `/api/drift` whenever the board changes, which would turn
+   * every mid-turn write into a full status refresh -- and mid-turn the tree is
+   * half-written, so that is exactly how a board starts flashing red at things
+   * that are merely unfinished. The frame is therefore tagged `livePromotion`,
+   * and the page applies the scene without asking for a new report. Good news
+   * travels at the speed of the code; bad news keeps the cadence it already had
+   * (a focus, a board write somebody else made, the slow timer).
+   */
+  const promoteLive = async (target: string): Promise<void> => {
+    const state = boards.get(target);
+    if (!state) return;
+    const { board, report } = await reportFor(target);
+    // Written since the read that produced this report -- by the page, the Stop
+    // hook, or an editor. Their own announce covers it, and writing our older
+    // scene over theirs is the shape of a wipe (#70). The next burst re-reads.
+    if (revisionOf(board) !== state.revision) return;
+    const live = reconcileLivePromotions(board, report);
+    if (!live.changed) return;
+    await writeBoard(target, live.board);
+    state.revision = revisionOf(live.board);
+    history.record(target, live.board, state.revision, "live");
+    announce(target, state.revision, { livePromotion: true });
+  };
+
+  /**
+   * Start or stop a board's code watcher to match whether anyone is listening.
+   *
+   * Called from both ends of every subscription, so "is anybody there" is asked
+   * in one place rather than inferred at each. Followers count: a page on the
+   * bare URL is watching whichever board is current, and it wants the same
+   * liveness as one that named a file.
+   */
+  const syncCodeWatch = (target: string): void => {
+    const state = boards.get(target);
+    if (!state) return;
+    const listeners = state.subscribers.length + (target === file ? followers.length : 0);
+    if (listeners > 0 && !state.codeWatch) {
+      state.codeWatch = watchCode({
+        root: rootFor(target),
+        onSettled: () => promoteLive(target),
+      });
+    } else if (listeners === 0 && state.codeWatch) {
+      state.codeWatch.close();
+      state.codeWatch = undefined;
+    }
   };
 
   /** A board is a `.excalidraw` file inside one of the projects this service serves. */
@@ -718,16 +818,7 @@ export async function startBoardServer(options: BoardServerOptions): Promise<Run
         }
         // Grammars load once per process, lazily: a server nobody asks for
         // status keeps starting as fast as it always did.
-        engineReady ??= initEngine();
-        await engineReady;
-        const workspaceRoot = rootFor(target.file);
-        const codeGraph = createCodeGraphOption(workspaceRoot);
-        const ledger = createLedger(workspaceRoot);
-        const report = checkDrift(await readBoard(target.file), createWorkspace(workspaceRoot), {
-          baseline: createGitBaseline(workspaceRoot, target.file),
-          ...(codeGraph ? { codeGraph } : {}),
-          ...(ledger ? { ledger } : {}),
-        });
+        const { report } = await reportFor(target.file);
         return json(response, 200, { file: target.file, report });
       }
 
@@ -833,6 +924,11 @@ export async function startBoardServer(options: BoardServerOptions): Promise<Run
         const subscriber = { response, id: ++nextSubscriberId };
         if (pinned) state.subscribers.push(subscriber);
         else followers.push(subscriber);
+        // Somebody is watching now, so the code is worth watching too. Held in
+        // a local because the close handler below runs long after `target` has
+        // been narrowed, and it must take the watcher down for the same board.
+        const watching = target.file;
+        syncCodeWatch(watching);
         // Proxies drop idle streams; a periodic comment keeps it warm.
         const keepAlive = setInterval(() => response.write(": ping\n\n"), 25_000);
         request.on("close", () => {
@@ -842,6 +938,8 @@ export async function startBoardServer(options: BoardServerOptions): Promise<Run
           } else {
             followers = followers.filter((candidate) => candidate.id !== subscriber.id);
           }
+          // The last page to close takes the code watcher down with it.
+          syncCodeWatch(watching);
         });
         return undefined;
       }
@@ -942,6 +1040,11 @@ export async function startBoardServer(options: BoardServerOptions): Promise<Run
     watchers.clear();
     for (const state of boards.values()) {
       if (state.debounce) clearTimeout(state.debounce);
+      // A recursive watch outlives the process that opened it only in the sense
+      // that it keeps the event loop alive, which is enough to stop a service
+      // from ever exiting.
+      state.codeWatch?.close();
+      state.codeWatch = undefined;
       for (const subscriber of state.subscribers) subscriber.response.end();
       state.subscribers = [];
     }

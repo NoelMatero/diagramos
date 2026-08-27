@@ -132,6 +132,24 @@ body,
   background: currentcolor;
 }
 
+/*
+ * A count of boxes drawn as built before the turn recorded them (#130).
+ *
+ * Deliberately not styled like the tallies beside it. Those report a finished
+ * check; this reports a picture running ahead of one, and it has to be possible
+ * to tell at a glance -- somebody who screenshots a mid-turn board should be able
+ * to see from the image that it was mid-turn. Hence the outline rather than a
+ * colour: dashed is what "not settled yet" already means everywhere else on this
+ * canvas, since it is how a planned box is drawn.
+ */
+.drift-early {
+  padding: 1px 7px;
+  border: 1px dashed #2f9e44;
+  border-radius: 999px;
+  color: #2f9e44;
+  font-size: 0.85em;
+}
+
 .drift-body {
   display: flex;
   flex-direction: column;

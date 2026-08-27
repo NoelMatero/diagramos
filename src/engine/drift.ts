@@ -2910,8 +2910,15 @@ export async function findBoards(root: string, dir: string): Promise<string[]> {
   }
 }
 
-/** Never searched: build output, dependencies, and local state, none of which hold diagrams. */
-const NOT_SEARCHED = new Set([
+/**
+ * Never walked: build output, dependencies, and local state.
+ *
+ * Two callers, one list. Board discovery skips these because none of them hold
+ * diagrams; the code watcher (#130) skips them because none of them hold code
+ * anybody is writing, and `node_modules` alone would cost more watch handles
+ * than the entire rest of a repository put together.
+ */
+export const NOT_WALKED: ReadonlySet<string> = new Set([
   "node_modules",
   ".git",
   "out",
@@ -2956,7 +2963,7 @@ export async function findStrayBoards(
     for (const entry of entries.sort((a, b) => a.name.localeCompare(b.name))) {
       const absolute = path.join(directory, entry.name);
       if (entry.isDirectory()) {
-        if (NOT_SEARCHED.has(entry.name) || absolute === skip) continue;
+        if (NOT_WALKED.has(entry.name) || absolute === skip) continue;
         await walk(absolute);
       } else if (entry.name.endsWith(".excalidraw")) {
         if (found.length < limit) found.push(path.relative(root, absolute));

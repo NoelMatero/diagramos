@@ -46,7 +46,7 @@ import {
   headCommit,
 } from "./lib/code-graph.mjs";
 import { readBoard, writeBoard } from "../src/engine/board-file.ts";
-import { applyPromotions } from "../src/engine/promote.ts";
+import { applyPromotions, clearLivePromotions } from "../src/engine/promote.ts";
 import { CONFIG_FILE, ConfigError, DEFAULT_DIAGRAM_DIR, diagramDir } from "../src/engine/config.ts";
 import { countedWords, coverageLabel } from "../src/engine/summary.ts";
 import {
@@ -916,11 +916,31 @@ for (const { file, boardFile } of loaded) {
      * `git diff --exit-code` that runs after it. A box only partly landed --
      * several anchors, some unresolved -- is held, not applied.
      */
-    if (opts.hook && report.promotions.length > 0) {
-      const result = applyPromotions(boardFile, report);
-      if (result.applied.length > 0) {
+    if (opts.hook) {
+      const result =
+        report.promotions.length > 0
+          ? applyPromotions(boardFile, report)
+          : { board: boardFile, applied: [] };
+      /*
+       * Previews the promotion above did not settle, taken back off.
+       *
+       * While a board is being watched, the service flips a box to a solid
+       * stroke the moment its code lands, without recording it as built (#130).
+       * That preview is only as good as the moment it was drawn -- and this is
+       * the moment the question gets asked properly. A box whose file has since
+       * been deleted, or which the check now holds for another unresolved
+       * anchor, goes back to dashed here and never became `built`.
+       *
+       * `applyPromotions` has already removed the marker from everything it
+       * settled, so what this finds is exactly the previews that did not earn
+       * it. It also cleans up after a service that was killed mid-turn, which
+       * would otherwise leave a board looking built with a record saying
+       * planned and nothing left running to correct it.
+       */
+      const settled = clearLivePromotions(result.board);
+      if (result.applied.length > 0 || settled.cleared > 0) {
         try {
-          await writeBoard(file, result.board);
+          await writeBoard(file, settled.board);
           promoted = result.applied;
         } catch {
           // A tree we cannot write to: keep reporting the promotion instead.

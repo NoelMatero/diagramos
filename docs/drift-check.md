@@ -137,13 +137,45 @@ full — being quiet is not the same as withholding.
 applied, not just announced: the box is flipped to exactly what regenerating it
 as `built` would write — solid stroke, no state key, version bumped so the live
 page redraws it — and the notice says `promoted` once instead of `is built now`
-forever. On a live board the box turns solid the moment the work lands, which is
-the loop this whole field exists for. Two deliberate limits: a box only partly
-landed — several anchors, some still missing — is held, because flipping it
-would erase the remaining work from the picture; and only the hook applies,
-never the bare `drift` command, because a check that mutates the working tree
-breaks every `git diff --exit-code` that CI runs after it. The applied edit is
-an ordinary change to a file in git, so undoing it is one checkout.
+forever. Two deliberate limits: a box only partly landed — several anchors, some
+still missing — is held, because flipping it would erase the remaining work from
+the picture; and only the hook applies, never the bare `drift` command, because a
+check that mutates the working tree breaks every `git diff --exit-code` that CI
+runs after it. The applied edit is an ordinary change to a file in git, so
+undoing it is one checkout.
+
+**While a board is open, the box turns solid before the turn ends.** The hook is
+the end of a turn, and a turn is minutes; the loop this field exists for is
+"you write code and the diagram moves". So the board service watches the
+repository whenever a page is holding its stream open, re-checks on every burst
+of changes, and flips a promotable box to a solid stroke straight away —
+measured at about 390ms from the file being written to the box being redrawn
+(#130).
+
+What it does *not* do is record the promotion. `state` still says `planned`, and
+that division is the whole reason this is safe to do mid-turn. Applying a real
+promotion deletes the `state` key, which is a one-way door: mid-turn a file is
+created empty and filled two seconds later, a rename lands as three edits, and
+walking through that door on half-written evidence would erase something the
+author typed with nothing able to put it back. A stroke can simply be put back.
+So the preview writes a stroke and a marker, nothing in the engine reads a
+stroke, and every check returns exactly what it would have returned. If the code
+goes away again the flip is undone; if it is still there at the end of the turn,
+the hook settles it for real and the picture does not change, because it already
+looked right.
+
+Three consequences worth knowing:
+
+- **The preview is visible as a preview.** The chip carries a dashed `N early`
+  count, so a mid-turn screenshot is not mistaken for a settled verdict.
+- **Only good news travels this fast.** The page applies a preview without
+  refetching its status, so a half-written tree cannot make the board flash red
+  at work that is merely unfinished. Bad news keeps the cadence it already had:
+  a focus, a board write, the slow timer.
+- **Nobody looking, nothing watching.** The watcher starts on the first page to
+  open a stream and stops with the last one to close, so a board no page has
+  asked about costs nothing. An abandoned preview — a service killed mid-turn —
+  is cleaned up by the next hook run.
 
 `external` earns its place separately. Measured: 106 of 117 nodes in this repo's
 diagrams carry no ref, and some of that is deliberate — the telecom boards

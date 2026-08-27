@@ -20,8 +20,15 @@ export const HISTORY_ROUTE = "/api/history";
  * editor save, a git checkout), and "opened" is the baseline entry recorded
  * when the service first sees a board -- not a change at all, which is why it
  * is named rather than dressed up as one.
+ *
+ * "live" is the service drawing a promotion early (#130): code landed, a
+ * `planned` box now resolves, and the box was flipped to look built without
+ * being recorded as built. Named apart from "file" because it is the one source
+ * here that is this service's own doing and is not yet a settled fact -- a
+ * timeline that called it a file write would be claiming the promotion
+ * happened, when what happened is that it was previewed.
  */
-export type HistorySource = "page" | "file" | "opened";
+export type HistorySource = "page" | "file" | "opened" | "live";
 
 export interface HistoryEntry {
   revision: string;

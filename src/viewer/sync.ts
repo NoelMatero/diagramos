@@ -29,6 +29,18 @@ export interface RemoteBoardMeta {
    * for ordinary additions it must be left alone.
    */
   wholesale: boolean;
+  /**
+   * True when this scene arrived because the service drew a promotion early
+   * (#130): code landed mid-turn and a `planned` box was flipped to look built.
+   *
+   * The page reads this as "apply the scene, do not ask for a new report". Every
+   * other board change refetches the status, which is right when the change is
+   * something somebody finished -- and wrong here, because mid-turn the tree is
+   * half-written and a status taken then would paint red at unfinished work. The
+   * promotion is already in the scene, so the good news lands either way; what
+   * this suppresses is the bad news that has not settled.
+   */
+  livePromotion: boolean;
 }
 
 export interface SyncHandlers {
@@ -105,13 +117,18 @@ export class BoardSync {
     this.#events = new EventSource(withBoard("/api/events"));
     this.#events.onmessage = (event) => {
       try {
-        const payload = JSON.parse(event.data) as { type?: string; revision?: string; file?: string };
+        const payload = JSON.parse(event.data) as {
+          type?: string;
+          revision?: string;
+          file?: string;
+          livePromotion?: boolean;
+        };
         if (payload.type !== "board" || !payload.revision) return;
         // Our own save echoes back; only a genuinely newer revision matters --
         // or a different file, which can carry an identical revision.
         const sameFile = payload.file === undefined || payload.file === this.#file;
         if (payload.revision === this.#revision && sameFile) return;
-        void this.pull();
+        void this.pull({ livePromotion: payload.livePromotion === true });
       } catch {
         // Ignore malformed frames; the next one will be fine.
       }
@@ -125,7 +142,7 @@ export class BoardSync {
     if (this.#timer) window.clearTimeout(this.#timer);
   }
 
-  async pull(): Promise<void> {
+  async pull(cause: { livePromotion?: boolean } = {}): Promise<void> {
     try {
       const response = await fetch(withBoard("/api/board"), { cache: "no-store" });
       if (!response.ok) throw new Error(`GET /api/board -> ${response.status}`);
@@ -149,7 +166,11 @@ export class BoardSync {
       this.#file = payload.file ?? "";
       this.#lastSynced = elementMap(payload.board.elements);
       this.#lastSentFingerprint = fingerprint(payload.board.elements);
-      this.handlers.onRemoteBoard(payload.board, { file: payload.file, wholesale });
+      this.handlers.onRemoteBoard(payload.board, {
+        file: payload.file,
+        wholesale,
+        livePromotion: cause.livePromotion === true,
+      });
       this.handlers.onStatus("live");
     } catch (error) {
       this.handlers.onStatus("offline", error instanceof Error ? error.message : String(error));
@@ -230,7 +251,9 @@ export class BoardSync {
         this.#revision = conflict.revision;
         this.#pending = merged;
         this.#pendingGeneration = this.#generation;
-        this.handlers.onRemoteBoard(merged, { wholesale: false });
+        // A merge after a rejected save: a real change, and its status is worth
+        // refetching. Not a live promotion.
+        this.handlers.onRemoteBoard(merged, { wholesale: false, livePromotion: false });
         this.#inFlight = false;
         return void this.#flush();
       }
