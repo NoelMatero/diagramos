@@ -418,14 +418,21 @@ describe("a claim changes exactly one verdict", () => {
     return checkDrift(board, fakeWorkspace(files), { edges: true });
   }
 
-  it("calls the backwards arrow wrong, and leaves the other one amber", async () => {
+  it("calls the backwards arrow wrong, and only counts the other one", async () => {
     const claimed = await reportFor(true);
 
     expect(claimed.claims.needs).toBe(2);
     expect(claimed.garbledClaims).toEqual([]);
 
+    /*
+     * One finding, not two. The second arrow's claim could not be answered
+     * either way, and an unanswerable claim is counted rather than accused
+     * (#133) -- so the only verdict here is the one with a line of code behind
+     * it, which is exactly the arrow a reader should be looking at.
+     */
     const byKind = new Map(claimed.edges.map((finding) => [finding.kind, finding]));
-    expect([...byKind.keys()].sort()).toEqual(["backwards-edge", "unsupported-edge"]);
+    expect([...byKind.keys()]).toEqual(["backwards-edge"]);
+    expect(claimed.unconfirmedEdges).toHaveLength(1);
 
     // The accusation names its evidence, or it is not worth making.
     const wrong = byKind.get("backwards-edge")!;
@@ -436,19 +443,21 @@ describe("a claim changes exactly one verdict", () => {
     expect(claimed.clean).toBe(false);
   });
 
-  it("leaves every arrow without a claim exactly as it was", async () => {
+  it("says nothing at all about an arrow that claims nothing", async () => {
     const bare = await reportFor(false);
 
     expect(bare.claims.needs).toBe(0);
     /*
-     * One finding, and it is the arrow that is actually fine to complain about.
-     * `a -> b` is silent here even though it is drawn backwards, because without
-     * a claim the check asks "are these connected at all", finds that b imports
-     * a, and is satisfied. That is the ceiling this issue exists to lift, and
-     * this is what it looks like from underneath.
+     * No finding, and that is the point of both issues at once. `a -> b` is
+     * silent because without a claim the check asks "are these connected at
+     * all", finds that b imports a, and is satisfied -- the ceiling #113 exists
+     * to lift. `b -> c` is silent because the check looked, found nothing, and
+     * has nothing to accuse anybody of: an arrow that asserts nothing cannot be
+     * contradicted, so it is counted instead (#133).
      */
-    expect(bare.edges.map((finding) => finding.kind)).toEqual(["unsupported-edge"]);
-    expect(bare.edges[0]!.from).toBe("b.ts");
+    expect(bare.edges).toEqual([]);
+    expect(bare.clean).toBe(true);
+    expect(bare.unconfirmedEdges.map((arrow) => arrow.from)).toEqual(["b"]);
   });
 });
 

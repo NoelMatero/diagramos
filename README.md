@@ -92,7 +92,7 @@ Open two and they stay put — writing one diagram, or asking Claude to open a t
 
 The bare `127.0.0.1:4747` follows whichever board was opened or written last, which is what you want when you are working on one diagram and letting Claude drive.
 
-**The board shows its own status.** A chip in the corner carries the same tally the end-of-turn notice does — boxes whose code is gone in red, questionable arrows in amber, planned work in grey. Click it and every finding is a row; click a row and the canvas jumps to the box or arrow it is about. When there is nothing to say it reads as what was checked, not just "in sync", because a board nobody could read and a board that agrees are different kinds of quiet. It refreshes when the board changes and when you come back to the tab.
+**The board shows its own status.** A chip in the corner carries the same tally the end-of-turn notice does — boxes whose code is gone in red, an arrow the code contradicts in red, planned work in grey, and arrows nothing could confirm as a quiet number rather than a colour. Click it and every finding is a row; click a row and the canvas jumps to the box or arrow it is about. When there is nothing to say it reads as what was checked, not just "in sync", because a board nobody could read and a board that agrees are different kinds of quiet. It refreshes when the board changes and when you come back to the tab.
 
 **A box says what it is about, and you can change it.** Select one and a panel opens with the plain version of what it claims: the file it stands for, whether that exists yet, whether anything outside reaches inside it, and the findings about that one box. All of it editable. Files are picked from the ones the repository actually has rather than typed, so an anchor cannot be a typo, and marking something **Planned** draws it dashed at the same moment — the picture never disagrees with the meaning. Sketch a box by hand, give it a file, and it becomes a real checked box; that is the whole of "draw the thing that doesn't exist yet", with nothing to ask an agent for. A dashed box you drew yourself is still just a dashed box: this tool never reads intent off a stroke, because a guess that makes a claim is the one thing the check cannot be allowed to do.
 
@@ -139,12 +139,17 @@ If you are using the MCP server directly rather than the plugin, this is the sam
 A stale diagram then arrives as an ordinary notice, four lines, counts in red and amber:
 
 ```
-┌─ board-internals.excalidraw  2 gone  1 arrow ─┐
-│ Old Cache → src/cache.ts                      │
-│ Legacy sync → src/sync/legacy.ts              │
-│ Contrast → Staggered reveal                   │
-└─ /update-diagram updates the diagram ─────────┘
+┌─ board-internals.excalidraw  2 gone  1 arrow backwards ────────┐
+│ Old Cache → src/cache.ts                                       │
+│ Legacy sync → src/sync/legacy.ts                               │
+│ Contrast → (should be ←) Staggered reveal · drawn backwards    │
+└─ /update-diagram updates it · /expand-report shows them all ───┘
 ```
+
+Everything in there is something the code contradicts. An arrow nothing could
+corroborate is not in there and never fails a build: every channel only ever
+confirms, so failing to confirm is absence of evidence, and it is counted —
+`npx -y diagramos drift --details` says how many and which.
 
 `/expand-report` lists every finding and leaves the notice that way until `/shrink-report`.
 

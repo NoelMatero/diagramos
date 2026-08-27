@@ -181,11 +181,13 @@ describe("what a route anchor refuses to guess", () => {
       "src/a.ts": 'export function serveA(url: URL) { if (url.pathname === "/api/board") return 1; }\n',
       "src/b.ts": 'export function serveB(url: URL) { if (url.pathname === "/api/file") return 2; }\n',
     }));
-    // Both boxes checked and clean; the arrow is what is in doubt.
+    // Both boxes checked and clean; the arrow is what is in doubt -- and doubt
+    // is counted, not reported (#133).
     expect(report.findings).toEqual([]);
     expect(report.checked).toBe(2);
     expect(report.edgesChecked).toBe(1);
-    expect(report.edges.map((edge) => edge.kind)).toEqual(["unsupported-edge"]);
+    expect(report.edges).toEqual([]);
+    expect(report.unconfirmedEdges.map((arrow) => arrow.reason)).toEqual(["nothing-connects-them"]);
   });
 
 });

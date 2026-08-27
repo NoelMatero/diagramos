@@ -23,7 +23,7 @@ import { readdir } from "node:fs/promises";
 import path from "node:path";
 
 import { parseSymbol, routeOf, symbolEvidence, type Assertion } from "./assert";
-import { chainBreak, reaches, unsupportedMembers } from "./body";
+import { chainBreak, declarationsOf, reaches, unsupportedMembers } from "./body";
 import type { BoardFile } from "./board-file";
 import { arrowClaimError, boxClaimError, type ArrowClaim } from "./claim";
 import { checkClosed, type ClosedBreach } from "./closed";
@@ -74,12 +74,21 @@ export interface DriftFinding {
 /**
  * What can be said about one arrow.
  *
- * `broken-chain` is a `via` arrow whose named route stopped holding.
+ * `broken-chain` is a `via` arrow whose named route stopped holding. Still a
+ * finding, and for the same reason `backwards-edge` is: somebody wrote the route
+ * down, and a hop that stopped holding is that claim being contradicted.
  *
  * `backwards-edge` is the only member that means **wrong** rather than *worth a
  * look*, and it is reachable only from a `needs` claim on a `built` arrow --
  * because that is the only claim with a direction, and so the only one with an
  * opposite to find.
+ *
+ * `unsupported-edge` no longer appears on a `built` arrow at all (#133). On one
+ * it was the check reporting that it had found nothing, which is not a fact
+ * about the diagram; that is `UnconfirmedEdge` now. It survives here for
+ * `planned` arrows, where absence is the news the board asked for -- the
+ * connection you drew has not landed yet -- and it reaches the report as a
+ * `WorkItem`, never as drift.
  */
 export type EdgeFindingKind = "unsupported-edge" | "broken-chain" | "backwards-edge";
 
@@ -299,6 +308,70 @@ export interface UnreadEdgeFinding {
   label?: string;
   reason: EdgeSkipReason;
 }
+
+/**
+ * Why an arrow the check *did* read came back unconfirmed.
+ *
+ * Three, and the difference between them is how much the silence is worth.
+ *
+ * - `no-call-either-way` is a question with an answer: both ends name something
+ *   with a body, both bodies were read, and neither reaches the other. The
+ *   sharpest "nothing found" this engine can produce.
+ * - `an-end-is-data` is a question that was never the right one. A struct, a
+ *   static or a field has no body that calls anything, so a call search over it
+ *   answers about the wrong thing -- and the fix is on the board, not in the
+ *   code: anchor that end at file level.
+ * - `nothing-connects-them` is the file-level channels coming up empty: no
+ *   import either way, no shared importer, no shared route, nothing in the code
+ *   graph.
+ */
+export type EdgeUnconfirmedReason =
+  | "no-call-either-way"
+  | "an-end-is-data"
+  | "nothing-connects-them";
+
+/**
+ * An arrow that was read and could not be corroborated.
+ *
+ * Deliberately not a finding (#133). Every channel here only ever *confirms*,
+ * so failing to confirm is absence of evidence, and rendering absence as a
+ * per-arrow verdict is how a board that claimed nothing arrived with fifteen
+ * things to look at -- on the first Rust board an agent drew, 15 of 17 ambers
+ * were arrows carrying a descriptive label and no claim at all. `claim.ts` only
+ * admits a word once something can call it wrong; the converse now holds too,
+ * and an arrow that asserts nothing checkable is counted rather than judged.
+ *
+ * Named and not merely counted, for the reason `unreadEdges` was: a number
+ * nobody can act on is a number nobody reads. `--details` prints these; the
+ * per-turn notice does not, `clean` does not include them, and no exit code
+ * ever turns on one.
+ */
+export interface UnconfirmedEdge {
+  /** Node ids, as `edit_diagram` refers to them. */
+  from: string;
+  to: string;
+  /** Box labels: what a reader recognises on the board. Falls back to the id. */
+  fromLabel: string;
+  toLabel: string;
+  /** The arrow's own label, when it carries one -- often the whole relationship. */
+  label?: string;
+  reason: EdgeUnconfirmedReason;
+  /** The engine's own sentence, including what to do about `an-end-is-data`. */
+  detail: string;
+}
+
+/**
+ * What one arrow check came to, as the recorder is told it.
+ *
+ * Three words instead of "a finding, or nothing", because "nothing" was two
+ * different things wearing one shape: proved connected, and looked at and not
+ * proved. Spelling the third one out is what lets the report keep it as a
+ * number without it having to pass through `edges` on the way.
+ */
+type EdgeOutcome =
+  | { kind: "confirmed" }
+  | { kind: "finding"; finding: Omit<EdgeDriftFinding, "node"> }
+  | { kind: "unconfirmed"; reason: EdgeUnconfirmedReason; detail: string };
 
 /**
  * Why a node was not checked. Kept apart from `excused`, which is a declaration
@@ -549,6 +622,14 @@ export interface DriftReport {
    * already taken rather than going looking, so there is nothing to defer.
    */
   unreadEdges: UnreadEdgeFinding[];
+  /**
+   * Arrows that were read and not corroborated: counted, named, never judged.
+   *
+   * The honest half of what amber used to say. "How much of this board is
+   * actually verified" is a real question and this is the answer to it --
+   * `edgesChecked` minus these is what came back confirmed.
+   */
+  unconfirmedEdges: UnconfirmedEdge[];
   /**
    * Count of arrows with fewer than two bound endpoints (dangling arrows).
    * These are incomplete strokes, not checked specifications.
@@ -1211,6 +1292,22 @@ function membersByFile(
 type SymbolEdgeVerdict = "reached" | "unreached" | "unreadable";
 
 /**
+ * What the body search found, and -- when it found nothing -- whether the
+ * question it asked was the right one.
+ *
+ * `dataEnds` is the second half, and it is the difference between "these two
+ * functions do not call each other" and "one of these ends is not a function at
+ * all". A name declaring a struct, a static or a field has no body that calls
+ * anything, so an end anchored at one turns a call search into a question the
+ * code cannot answer either way (#133). The names are carried out so the reader
+ * can be told which end to re-anchor.
+ */
+interface SymbolEdgeResult {
+  verdict: SymbolEdgeVerdict;
+  dataEnds: string[];
+}
+
+/**
  * Does either end's function body reach the other, directly or in one hop?
  *
  * Both directions are tried and any evidence is enough: an arrow means these
@@ -1221,37 +1318,71 @@ function checkSymbolEdge(
   from: { file: string; path: string; symbols: string[] },
   to: { file: string; path: string; symbols: string[] },
   workspace: Workspace,
-): SymbolEdgeVerdict {
+): SymbolEdgeResult {
   let asked = false;
+  /*
+   * Ends whose every name declares data rather than something that runs.
+   *
+   * Per end, not per name: a box listing `LOGGER` and `log_line` is answerable
+   * through the callable one, and one static among several names does not make
+   * the question a bad one. An end where *nothing* runs is different -- there is
+   * no body on that side to search from, and the relationship it stands in is
+   * almost always a type in a signature, a field, or an enclosing impl, none of
+   * which is inside any body. That is the shape this exists to name.
+   *
+   * Collected while the search runs, because the search reads the same
+   * declarations anyway -- and only ever read on the way out, when nothing was
+   * found. A reached arrow does not care what shape its ends are.
+   */
+  const dataEnds: string[] = [];
   for (const [start, target] of [[from, to], [to, from]] as const) {
     const language = languageOf(start.file);
     if (!language) continue;
     const source = workspace.read(start.file);
+    let runs = false;
+    let declared = false;
     for (const symbol of start.symbols) {
+      const declarations = declarationsOf(source, symbol, language);
+      if (declarations.length > 0) declared = true;
+      if (declarations.some((one) => one.kind === "callable")) runs = true;
       const verdict = reaches(source, symbol, target.symbols, language);
       if (verdict === undefined) continue;
       asked = true;
-      if (verdict) return "reached";
+      if (verdict) return { verdict: "reached", dataEnds: [] };
     }
+    /*
+     * Only once the whole end has been read, and only when something there was
+     * actually declared. A name the file does not declare at all is not data --
+     * it is a missing symbol, which the node check reports on its own, and
+     * calling it data here would be the report inventing a second diagnosis for
+     * one mistake.
+     */
+    if (declared && !runs) dataEnds.push(start.symbols.join(" / "));
   }
-  return asked ? "unreached" : "unreadable";
+  return { verdict: asked ? "unreached" : "unreadable", dataEnds };
 }
 
 /**
- * Check if edge A → B is backed by one of the five corroboration channels.
- * Assumes both files are valid TS/JS files; returns a finding if not backed, undefined if backed.
- * Channels: imports, shared importer, shared route, symbol chain, code graph.
+ * Whether edge A → B is backed by one of the five corroboration channels:
+ * imports either way, a shared importer, a shared route string, the code graph.
+ * Assumes both files are valid TS/JS files.
+ *
+ * An answer rather than a finding (#133). Every channel here confirms and none
+ * refutes, so the only thing this can honestly report is whether one of them
+ * fired -- and, when none did, which ones were even able to run. What to *do*
+ * about that belongs to the caller, which is the only place that knows whether
+ * the arrow claimed anything.
  */
-function checkEdgeCorroboration(
+type Corroboration = { confirmed: true } | { confirmed: false; detail: string };
+
+function corroborates(
   fromRef: string,
   toRef: string,
-  fromLabel: string,
-  toLabel: string,
   workspace: Workspace,
   importCache: ReadCache,
   sharedImporterCandidates: Map<string, string>,
   codeGraphOption?: CodeGraphOption,
-): Omit<EdgeDriftFinding, "node"> | undefined {
+): Corroboration {
   // Parse refs: keep only path, ignore symbol
   const { path: fromPath } = parseRef(fromRef);
   const { path: toPath } = parseRef(toRef);
@@ -1263,13 +1394,13 @@ function checkEdgeCorroboration(
   // Channel 1: A imports B
   const importsFrom = getImports(fromFileAbs, fromPath, workspace, importCache);
   if (importsFrom.some((imp) => imp.abs === toFileAbs)) {
-    return undefined;
+    return { confirmed: true };
   }
 
   // Channel 2: B imports A
   const importsTo = getImports(toFileAbs, toPath, workspace, importCache);
   if (importsTo.some((imp) => imp.abs === fromFileAbs)) {
-    return undefined;
+    return { confirmed: true };
   }
 
   // Channel 3: Shared importer — any file C that imports both A and B
@@ -1280,7 +1411,7 @@ function checkEdgeCorroboration(
       fileImports.some((imp) => imp.abs === fromFileAbs)
       && fileImports.some((imp) => imp.abs === toFileAbs)
     ) {
-      return undefined;
+      return { confirmed: true };
     }
   }
 
@@ -1323,7 +1454,7 @@ function checkEdgeCorroboration(
     }
 
     if ([...fromRoutes].some((route) => toRoutes.has(route))) {
-      return undefined;
+      return { confirmed: true };
     }
   }
 
@@ -1331,24 +1462,20 @@ function checkEdgeCorroboration(
   // ever confirms, and it is consulted last, so with it off (or stale for
   // these files) the check behaves exactly as it did before the channel.
   if (codeGraphConfirms(codeGraphOption, wholeRef(fromPath), wholeRef(toPath))) {
-    return undefined;
+    return { confirmed: true };
   }
 
-  // No channel fires: flag it as worth a look, not necessarily wrong
+  /*
+   * No channel fires. Not a verdict -- the caller counts it -- but the sentence
+   * comes from here, because this is the only place that knows which channels
+   * actually ran: the route channel is TypeScript-only, and a message claiming
+   * it had run is the same kind of untrue as the skip reason that replaced.
+   */
   return {
-    from: fromPath,
-    to: toPath,
-    fromLabel,
-    toLabel,
-    fromRef,
-    toRef,
-    kind: "unsupported-edge",
-    // Named channel by channel rather than as a fixed sentence, because the
-    // route channel does not run on every language and a message that claimed
-    // it had is the same kind of untrue as the skip reason this replaced.
+    confirmed: false,
     detail: `nothing in ${fromPath} ${routesReadable
       ? "imports, is imported by, shares an importer with, or shares a route string with"
-      : "imports, is imported by, or shares an importer with"} ${toPath} — worth a look, not necessarily wrong.`,
+      : "imports, is imported by, or shares an importer with"} ${toPath}.`,
   };
 }
 
@@ -1479,6 +1606,7 @@ export function checkDrift(
   const edgesSkippedWhy: SkipBreakdown<EdgeSkipReason> = {};
   const unannotated: UnannotatedFinding[] = [];
   const unreadEdges: UnreadEdgeFinding[] = [];
+  const unconfirmedEdges: UnconfirmedEdge[] = [];
   const assertions: AssertionTally = { checked: 0, downgraded: 0, unsupportedLanguage: 0 };
   const claims: ClaimTally = {
     closed: 0, closedHeld: 0, closedTestReaches: 0,
@@ -1527,27 +1655,56 @@ export function checkDrift(
    * A `planned` arrow is the connection you want, not one you are claiming
    * exists. Absent corroboration is then the work, and corroboration is the
    * news that the work landed.
+   *
+   * Three outcomes rather than the old two, and the new one carries the whole
+   * of #133. `confirmed` and `finding` are unchanged: something was proved, or
+   * something was proved wrong. `unconfirmed` is the third thing that was
+   * always happening and had nowhere to go -- the check looked and found
+   * nothing -- and it is filed as a count instead of as a verdict, because
+   * absence of evidence is not evidence, however amber it is painted.
+   *
+   * A `planned` arrow is the one place absence still speaks, and it says the
+   * opposite thing: nobody is being accused, the sketch is simply ahead of the
+   * code. So the work-item branch takes unconfirmed and finding alike.
    */
   const recordEdge = (
-    edge: { from: string; to: string; state: string; claim?: ArrowClaim },
+    edge: { from: string; to: string; state: string; claim?: ArrowClaim; label?: string },
     fromNode: { label: string },
     toNode: { label: string },
-    finding: Omit<EdgeDriftFinding, "node"> | undefined,
+    outcome: EdgeOutcome,
   ) => {
+    const finding = outcome.kind === "finding" ? outcome.finding : undefined;
     if (edge.state !== "planned") {
       // Stamped here rather than at each construction site: this is the one
       // place that still holds the edge itself, and the ids name the arrow on
       // the canvas while the finding's paths name the evidence.
       if (finding) edges.push({ ...finding, node: `${edge.from} -> ${edge.to}` });
+      if (outcome.kind === "unconfirmed") {
+        unconfirmedEdges.push({
+          from: edge.from,
+          to: edge.to,
+          fromLabel: fromNode.label || edge.from,
+          toLabel: toNode.label || edge.to,
+          ...(edge.label ? { label: edge.label } : {}),
+          reason: outcome.reason,
+          detail: outcome.detail,
+        });
+      }
       return;
     }
     const claim = `${fromNode.label || edge.from} -> ${toNode.label || edge.to}`;
-    if (finding) {
+    if (outcome.kind !== "confirmed") {
       workItems.push({
         node: `${edge.from} -> ${edge.to}`,
         label: claim,
-        kind: finding.kind,
-        detail: finding.detail,
+        /*
+         * `unsupported-edge` survives here and only here. On a built arrow it
+         * was an accusation and is now a count; on a `planned` one it is the
+         * plan-first flow working exactly as designed -- the connection you
+         * drew has not landed yet -- which is news the board asked for.
+         */
+        kind: outcome.kind === "finding" ? outcome.finding.kind : "unsupported-edge",
+        detail: outcome.kind === "finding" ? outcome.finding.detail : outcome.detail,
       });
     } else {
       promotions.push({
@@ -2090,7 +2247,7 @@ export function checkDrift(
            * counted as one that got none.
            */
           if (claimed) claims.needsWithheld[shape] = (claims.needsWithheld[shape] ?? 0) + 1;
-          recordEdge(edge, fromNode, toNode, undefined);
+          recordEdge(edge, fromNode, toNode, { kind: "confirmed" });
           continue;
         }
         skipClaimedEdge(missing ? "endpoint-file-missing" : shape);
@@ -2156,7 +2313,7 @@ export function checkDrift(
               (was) => was.from === edge.from && was.to === edge.to && was.claim === "needs",
             );
             const fresh = baselineGraph !== undefined && !wasClaimed;
-            recordEdge(edge, fromNode, toNode, {
+            recordEdge(edge, fromNode, toNode, { kind: "finding", finding: {
               from: fromPath,
               to: toPath,
               fromLabel: fromNode.label,
@@ -2170,7 +2327,7 @@ export function checkDrift(
                 + `${toNode.label || toPath}, but the dependency runs the other way — `
                 + `${evidence.file} line ${evidence.line} declares "${evidence.specifier}", `
                 + `and ${fromPath} declares nothing on ${toPath}. Turn the arrow round.`,
-            });
+            } });
             continue;
           }
         }
@@ -2229,13 +2386,13 @@ export function checkDrift(
          * way.
          */
         const stillConnected = broken
-          && checkSymbolEdge(fromEnd, toEnd, workspace) === "reached";
+          && checkSymbolEdge(fromEnd, toEnd, workspace).verdict === "reached";
         recordEdge(
           edge,
           fromNode,
           toNode,
           broken
-            ? {
+            ? { kind: "finding", finding: {
                 from: fromPath,
                 to: toPath,
                 fromLabel: fromNode.label,
@@ -2248,31 +2405,50 @@ export function checkDrift(
                     + `${broken.at} names ${broken.next}. Correct the route or drop it.`
                   : `the route breaks at ${broken.at}: nothing in it names ${broken.next} `
                     + `— worth a look, not necessarily wrong.`,
-              }
-            : undefined,
+              } }
+            : { kind: "confirmed" },
         );
         continue;
       }
 
-      const verdict = bothNamed ? checkSymbolEdge(fromEnd, toEnd, workspace) : "unreadable";
+      const symbolResult = bothNamed
+        ? checkSymbolEdge(fromEnd, toEnd, workspace)
+        : { verdict: "unreadable" as const, dataEnds: [] };
 
-      let finding: Omit<EdgeDriftFinding, "node"> | undefined;
-      if (verdict !== "unreadable") {
+      let outcome: EdgeOutcome = { kind: "confirmed" };
+      if (symbolResult.verdict !== "unreadable") {
         edgesChecked += 1;
-        if (verdict === "unreached") {
-          finding = {
-            from: fromPath,
-            to: toPath,
-            fromLabel: fromNode.label,
-            toLabel: toNode.label,
-            fromRef,
-            toRef,
-            kind: "unsupported-edge",
-            detail:
-              `nothing in ${fromEnd.symbols.join(" or ")} names ${toEnd.symbols.join(" or ")}, `
-              + `directly or through a call in the same file, and nothing the other way either `
-              + `— worth a look, not necessarily wrong.`,
-          };
+        if (symbolResult.verdict === "unreached") {
+          /*
+           * Nothing found -- and which of two sentences that deserves depends
+           * on whether the search could have found anything at all.
+           *
+           * An end anchored at a struct, a static or a field has no body to
+           * read, so "nothing calls anything" is a fact about the anchor rather
+           * than about the design. That is by far the commonest shape in a
+           * language with data types on the board: 11 of the 17 ambers this
+           * came from pointed at a Rust struct, with the relationship living in
+           * a signature or a field the body search never looks at. The reader
+           * gets told what to change instead of what is wrong.
+           */
+          const data = symbolResult.dataEnds;
+          outcome = data.length > 0
+            ? {
+                kind: "unconfirmed",
+                reason: "an-end-is-data",
+                detail:
+                  `${data.join(" and ")} names data rather than something that runs, so a `
+                  + `search through function bodies cannot see this relationship — a type in a `
+                  + `signature, a field, an enclosing impl are all invisible to it. Anchor that `
+                  + `end at file level and the import channels can answer instead.`,
+              }
+            : {
+                kind: "unconfirmed",
+                reason: "no-call-either-way",
+                detail:
+                  `nothing in ${fromEnd.symbols.join(" or ")} names ${toEnd.symbols.join(" or ")}, `
+                  + `directly or through a call in the same file, and nothing the other way either.`,
+              };
         }
       } else {
         /*
@@ -2300,7 +2476,7 @@ export function checkDrift(
           // licensed arrow gets from the channels below.
           if (codeGraphConfirms(options?.codeGraph, wholeRef(fromPath), wholeRef(toPath))) {
             edgesChecked += 1;
-            recordEdge(edge, fromNode, toNode, undefined);
+            recordEdge(edge, fromNode, toNode, { kind: "confirmed" });
             continue;
           }
           skipEdge(
@@ -2312,18 +2488,19 @@ export function checkDrift(
           continue;
         }
         edgesChecked += 1;
-        finding = checkEdgeCorroboration(
+        const answer = corroborates(
           fromRef,
           toRef,
-          fromNode.label,
-          toNode.label,
           workspace,
           importCache,
           sharedImporterCandidates,
           options?.codeGraph,
         );
+        outcome = answer.confirmed
+          ? { kind: "confirmed" }
+          : { kind: "unconfirmed", reason: "nothing-connects-them", detail: answer.detail };
       }
-      recordEdge(edge, fromNode, toNode, finding);
+      recordEdge(edge, fromNode, toNode, outcome);
     }
   }
 
@@ -2499,19 +2676,17 @@ export function checkDrift(
 
             if (fromStat === "file" && toStat === "file") {
               // Check if the connection still has corroboration in the code
-              const finding = checkEdgeCorroboration(
+              const supported = corroborates(
                 fromRef,
                 toRef,
-                fromNode.label,
-                toNode.label,
                 workspace,
                 importCache,
                 sharedImporterCandidates,
                 options?.codeGraph,
               );
 
-              // Only report if the connection is still supported (no finding)
-              if (!finding) {
+              // Only report if the connection is still supported
+              if (supported.confirmed) {
                 deletedEdges.push({
                   from: fromPath,
                   to: toPath,
@@ -2562,6 +2737,7 @@ export function checkDrift(
     edgesSkipped,
     edgesSkippedWhy,
     unreadEdges,
+    unconfirmedEdges,
     ...(graph.strayArrows > 0 ? { strayArrows: graph.strayArrows } : {}),
     // Unconditional, and unconditionally the whole list: a vocabulary sent only
     // when it is used would tell a stale reader nothing on the one board where

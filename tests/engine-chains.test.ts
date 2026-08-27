@@ -182,8 +182,10 @@ describe("an arrow carrying via", () => {
     );
     expect(checkDrift(board, fakeWorkspace(files)).edges).toEqual([]);
 
-    // And the arrow still flags when the chain is genuinely cut, which is the
-    // thing that would be lost if depth blessed everything.
+    // And the arrow still comes back unconfirmed when the chain is genuinely
+    // cut, which is the thing that would be lost if depth blessed everything.
+    // Unconfirmed rather than flagged: a plain arrow claims nothing, so the
+    // difference the search makes is to a count (#133).
     const cut = await boardWith(
       [
         { id: "a", label: "handle_fail", ref: "src/lib.rs#handle_fail" },
@@ -191,7 +193,9 @@ describe("an arrow carrying via", () => {
       ],
       [{ from: "a", to: "b" }],
     );
-    expect(checkDrift(cut, fakeWorkspace({ "src/lib.rs": CUT })).edges).toHaveLength(1);
+    const report = checkDrift(cut, fakeWorkspace({ "src/lib.rs": CUT }));
+    expect(report.edges).toEqual([]);
+    expect(report.unconfirmedEdges).toHaveLength(1);
   });
 
   it("flags the broken link and says where", async () => {

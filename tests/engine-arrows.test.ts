@@ -244,26 +244,35 @@ describe("an arrow between two symbol-anchored boxes", () => {
     // Same file at both ends, so imports, shared importers and routes are all
     // satisfied. Only the body scope knows `register` never logs.
     const report = await edge("src/lib.rs#register", ["src/lib.rs#LOGGER", "src/lib.rs#log_line"]);
-    expect(report.edges).toHaveLength(1);
-    expect(report.edges[0].detail).toContain("worth a look");
-    expect(report.edges[0].detail).toContain("LOGGER or log_line");
-    // `from`/`to` are file paths (the evidence); `node` names the arrow itself,
-    // in node ids, so a caller can reveal or edit the element the finding is
-    // about. The board page's click-to-reveal reads exactly this.
-    expect(report.edges[0].node).toBe("a -> b");
+    /*
+     * Counted rather than flagged (#133), and counted as the sharp reason: both
+     * ends have something that runs, both bodies were read, and neither names
+     * the other. The box listing a static alongside a macro is what makes this
+     * end answerable -- one name that runs is enough for the question to be a
+     * fair one.
+     */
+    expect(report.edges).toEqual([]);
+    expect(report.unconfirmedEdges).toHaveLength(1);
+    expect(report.unconfirmedEdges[0].reason).toBe("no-call-either-way");
+    expect(report.unconfirmedEdges[0].detail).toContain("LOGGER or log_line");
+    // Named by node ids, which is what a caller can reveal or edit on the
+    // canvas. The board page's click-to-reveal reads exactly this.
+    expect(report.unconfirmedEdges[0].from).toBe("a");
+    expect(report.unconfirmedEdges[0].to).toBe("b");
   });
 
   it("accepts any one of the symbols a feature box lists", async () => {
-    // `send` is reached by nothing, so a box claiming only that is flagged...
+    // `send` is reached by nothing, so a box claiming only that goes unconfirmed...
     const alone = await edge("src/lib.rs#handle_request", ["src/lib.rs#send"]);
-    expect(alone.edges).toHaveLength(1);
+    expect(alone.unconfirmedEdges).toHaveLength(1);
     // ...and adding a member that *is* reached settles the whole box. One
     // member is enough, which is concept membership needing no new code.
     const withMember = await edge("src/lib.rs#handle_request", [
       "src/lib.rs#send",
       "src/lib.rs#log_line",
     ]);
-    expect(withMember.edges).toEqual([]);
+    expect(withMember.unconfirmedEdges).toEqual([]);
+    expect(withMember.edgesChecked).toBe(1);
   });
 
   it("reaches the macro's own dependencies through the hop", () => {
@@ -410,12 +419,12 @@ describe("arrows between files in a language with a licence", () => {
     expect(report.edges).toEqual([]);
   });
 
-  it("flags an unconnected Rust arrow without claiming it read route strings", async () => {
+  it("counts an unconnected Rust arrow without claiming it read route strings", async () => {
     /*
      * The route channel is TypeScript's and was not widened with the gate. Both
      * files here write `"/users"`, which is exactly what that channel looks
-     * for, and the arrow is still amber -- and the sentence names the three
-     * channels that ran rather than the four a TypeScript arrow gets.
+     * for, and the arrow still comes back unconfirmed -- and the sentence names
+     * the three channels that ran rather than the four a TypeScript arrow gets.
      *
      * A licence is per language. This channel has been measured on one.
      */
@@ -436,10 +445,11 @@ describe("arrows between files in a language with a licence", () => {
     // channel 3 cannot rescue this the way the test above relies on.
     const report = checkDrift(board, treeWorkspace(files), { edges: true });
     expect(report.edgesChecked).toBe(1);
-    expect(report.edges).toHaveLength(1);
-    expect(report.edges[0].kind).toBe("unsupported-edge");
-    expect(report.edges[0].detail).not.toContain("route string");
-    expect(report.edges[0].detail).toContain("shares an importer with");
+    expect(report.edges).toEqual([]);
+    expect(report.unconfirmedEdges).toHaveLength(1);
+    expect(report.unconfirmedEdges[0]!.reason).toBe("nothing-connects-them");
+    expect(report.unconfirmedEdges[0]!.detail).not.toContain("route string");
+    expect(report.unconfirmedEdges[0]!.detail).toContain("shares an importer with");
   });
 
   it("still names route strings for a TypeScript arrow", async () => {
@@ -457,8 +467,8 @@ describe("arrows between files in a language with a licence", () => {
       [{ from: "a", to: "b" }],
     );
     const report = checkDrift(board, fakeWorkspace(files), { edges: true });
-    expect(report.edges).toHaveLength(1);
-    expect(report.edges[0].detail).toContain("shares a route string with");
+    expect(report.unconfirmedEdges).toHaveLength(1);
+    expect(report.unconfirmedEdges[0]!.detail).toContain("shares a route string with");
   });
 
   it("stays silent about a language no licence names", async () => {
@@ -793,14 +803,17 @@ describe("code graph — the fifth corroboration channel", () => {
     const board = await arrowAB();
 
     const without = checkDrift(board, fakeWorkspace(files), { edges: true });
-    expect(without.edges).toHaveLength(1);
-    expect(without.edges[0].kind).toBe("unsupported-edge");
+    // Never a finding, with or without the graph (#133): what the graph changes
+    // is whether the arrow ends up confirmed or merely counted.
+    expect(without.edges).toHaveLength(0);
+    expect(without.unconfirmedEdges).toHaveLength(1);
+    expect(without.unconfirmedEdges[0].reason).toBe("nothing-connects-them");
 
     const withGraph = checkDrift(board, fakeWorkspace(files), {
       edges: true,
       codeGraph: { graph: chain(), modified: new Set() },
     });
-    expect(withGraph.edges).toHaveLength(0);
+    expect(withGraph.unconfirmedEdges).toHaveLength(0);
     expect(withGraph.clean).toBe(true);
   });
 
@@ -810,14 +823,12 @@ describe("code graph — the fifth corroboration channel", () => {
       edges: true,
       codeGraph: { graph: chain(), modified: new Set(["src/a.ts"]) },
     });
-    expect(report.edges).toHaveLength(1);
-    expect(report.edges[0].kind).toBe("unsupported-edge");
+    expect(report.unconfirmedEdges).toHaveLength(1);
   });
 
   it("stays exactly as before when no graph is given", async () => {
     const report = checkDrift(await arrowAB(), fakeWorkspace(files), { edges: true });
-    expect(report.edges).toHaveLength(1);
-    expect(report.edges[0].kind).toBe("unsupported-edge");
+    expect(report.unconfirmedEdges).toHaveLength(1);
   });
 
   it("checks an arrow whose end is a directory", async () => {
@@ -1055,7 +1066,7 @@ describe("code graph — the fifth corroboration channel", () => {
     // Two boxes on one file, drawn as an arrow between them. The graph holds
     // no edge between the endpoints -- there is nothing it could confirm --
     // but both ends expand to the same node set, which used to read as
-    // "reaches". An honest amber must stay amber, and stay uncounted.
+    // "reaches". Unconfirmed must stay unconfirmed, and stay uncounted.
     const soloFiles = { "src/solo.ts": "function one() {}\nfunction two() {}\n" };
     const graph = fixtureGraph(
       [["one", "src/solo.ts"], ["two", "src/solo.ts"]],
@@ -1064,15 +1075,14 @@ describe("code graph — the fifth corroboration channel", () => {
     const board = await arrowAB("src/solo.ts", "src/solo.ts");
 
     const without = checkDrift(board, fakeWorkspace(soloFiles), { edges: true });
-    expect(without.edges).toHaveLength(1);
-    expect(without.edges[0].kind).toBe("unsupported-edge");
+    expect(without.unconfirmedEdges).toHaveLength(1);
 
     const withGraph = checkDrift(board, fakeWorkspace(soloFiles), {
       edges: true,
       codeGraph: { graph, modified: new Set() },
     });
-    expect(withGraph.edges).toHaveLength(1);
-    expect(withGraph.edges[0].kind).toBe("unsupported-edge");
+    expect(withGraph.unconfirmedEdges).toHaveLength(1);
+    expect(withGraph.edges).toHaveLength(0);
     expect(withGraph.edgesChecked).toBe(without.edgesChecked);
   });
 

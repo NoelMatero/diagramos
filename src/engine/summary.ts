@@ -33,7 +33,7 @@
  * needs, and a narrow input is what keeps that true.
  */
 
-/** The four facts a "what was checked" sentence is made of. */
+/** The facts a "what was checked" sentence is made of. */
 export interface Checked {
   /** Boxes with a ref that were compared against the code. */
   checked: number;
@@ -41,6 +41,16 @@ export interface Checked {
   edgesChecked: number;
   /** Boxes carrying no ref, so nothing could be read for them. */
   skipped?: number;
+  /**
+   * Arrows that were compared and came back unconfirmed.
+   *
+   * Part of `edgesChecked`, not extra to it: these were read, and nothing was
+   * found either way. Here because "checked" on its own reads as "verified",
+   * and on a board drawn over a language full of data types most arrows can be
+   * read without being confirmed (#133). A clean verdict beside a number this
+   * large is honest only if it says so.
+   */
+  unconfirmed?: number;
   /** The board is not about this repo, so nothing here is checkable. */
   concept?: boolean;
 }
@@ -121,5 +131,15 @@ export function summaryOf(facts: Checked): string {
   const unread = skipped
     ? ` — ${skipped} more ${skipped === 1 ? "box has no ref, so it" : "boxes have no ref, so they"} went unchecked`
     : "";
-  return `${coverage} — all still true${unread}`;
+  /*
+   * The other half of the same honesty. An arrow read and not corroborated is
+   * not a disagreement, so "all still true" holds -- and a reader who is not
+   * told how many of them there were will hear "all verified", which is the one
+   * thing this sentence exists to prevent.
+   */
+  const unconfirmed = facts.unconfirmed ?? 0;
+  const unproven = unconfirmed
+    ? ` — ${unconfirmed} ${unconfirmed === 1 ? "arrow was read and not" : "arrows were read and not"} confirmed`
+    : "";
+  return `${coverage} — all still true${unproven}${unread}`;
 }

@@ -59,11 +59,18 @@ async function checkDrift(): Promise<{ code: number; stderr: string; stdout: str
  * one of those intents still holds — and the intent is the thing worth pinning.
  * The summary itself is asserted once, on its own, so nothing here is covering
  * for it going missing.
+ *
+ * The code-graph line goes the same way, and for the same reason: it is said
+ * once per checkout, it is about this machine's tooling rather than about any
+ * board, and whether it appears depends on whether graphify happens to be
+ * installed where the tests run — which is how it caught a green local suite and
+ * a red CI one. Its own tests are in `code-graph-build.test.ts`.
  */
 function findings(output: string): string {
   return output
     .split("\n")
     .filter((line) => !line.includes("nothing drifted"))
+    .filter((line) => !line.includes("code graph") && !line.includes("graphify"))
     .join("\n")
     .trim();
 }
@@ -262,7 +269,7 @@ describe("claims on the command line", () => {
   }, 120_000);
 });
 
-describe("unsupported edges on the command line", () => {
+describe("an arrow nothing corroborates, on the command line", () => {
   // Its own project, because the boards above accumulate: once stale.excalidraw
   // exists that workspace exits 1 forever, and the --no-edges silence below
   // would have nothing left to prove.
@@ -284,7 +291,8 @@ describe("unsupported edges on the command line", () => {
     mkdirSync(path.join(project, "src"), { recursive: true });
     // Both files exist, so the missing-file check stays quiet. Nothing imports,
     // mentions, or shares a string with anything — the drawn arrow is the only
-    // claim of a relationship, which is exactly what the edge check flags.
+    // claim of a relationship, and it is not a claim any channel here can put to
+    // the code either way.
     writeFileSync(path.join(project, "src/left.ts"), "export const left = 1;\n");
     writeFileSync(path.join(project, "src/right.ts"), "export const right = 1;\n");
     const { board: drawn } = await createDiagram(emptyBoard(), {
@@ -302,38 +310,58 @@ describe("unsupported edges on the command line", () => {
     if (project) rmSync(project, { recursive: true, force: true });
   });
 
-  it("flags the arrow, names both boxes, and never calls it wrong", async () => {
+  it("says nothing about it, and does not fail the build over it", async () => {
+    /*
+     * The whole of #133 at the surface. This arrow used to be amber, listed and
+     * counted, and exit 1 -- on the strength of nobody having found anything.
+     * Every channel here only confirms, so there was never a fact behind it:
+     * fifteen of the seventeen ambers on the first Rust board an agent drew were
+     * arrows exactly like this one, carrying a descriptive label and no claim.
+     */
     const result = await check();
-    expect(result.code).toBe(1);
-    expect(result.stderr).toContain("edges.excalidraw");
-    expect(result.stderr).toContain("Left");
-    expect(result.stderr).toContain("Right");
-    // An unsupported arrow is a suspicion, not a verdict. The notice carries that
-    // in colour rather than in a sentence repeated every turn, and says "arrow",
-    // never "wrong".
-    expect(result.stderr).toContain("1 arrow");
-    expect(result.stderr).not.toContain("gone");
-    expect(result.stderr.toLowerCase()).not.toContain("wrong");
+    expect(result.code).toBe(0);
+    const said = `${result.stdout}${result.stderr}`;
+    expect(findings(said)).toBe("");
   }, 120_000);
 
-  it("--no-edges turns off just this check, and the report goes quiet", async () => {
-    const result = await check("--no-edges");
+  it("counts it where a reader asked how much was verified", async () => {
+    // Quiet is not the same as hidden. --details is the flag whose whole job is
+    // saying what was and was not read, and this is the honest half of what the
+    // amber used to carry: the arrow, by both box labels, and why nothing came
+    // back.
+    const result = await check("--details");
+    expect(result.stderr).toContain("1 arrow read and not confirmed");
+    expect(result.stderr).toContain("no import, shared importer");
+    expect(result.stderr).toContain("Left");
+    expect(result.stderr).toContain("Right");
+    // Still not a verdict, in any wording.
+    expect(result.stderr.toLowerCase()).not.toContain("wrong");
+    expect(result.stderr).not.toContain("gone");
+  }, 120_000);
+
+  it("--no-edges turns off just this check, so even the count goes away", async () => {
+    const result = await check("--no-edges", "--details");
     // The files all exist, so with edges off there is nothing to say — and the
-    // point of the separate flag is that a noisy edge check can be silenced
+    // point of the separate flag is that the arrow check can be silenced
     // without losing the missing-file check.
     expect(result.code).toBe(0);
-    expect(findings(`${result.stdout}${result.stderr}`)).toBe("");
+    expect(result.stderr).not.toContain("not confirmed");
   }, 120_000);
 });
 
 /**
  * How a report with a lot in it reads.
  *
- * The failure this guards against is not wrongness, it is length: every
- * unsupported arrow fails for the same reason, and printing that reason once per
- * arrow produced a wall of near-identical lines — 2360 characters for twelve
- * arrows, measured — which is a report nobody reads to the end. Saying it once
- * and listing the arrows brings the same information to 477.
+ * The failure this guards against is not wrongness, it is length: twelve arrow
+ * findings all fail for the same reason, and printing that reason once per arrow
+ * produced a wall of near-identical lines — 2360 characters for twelve arrows,
+ * measured — which is a report nobody reads to the end. Saying it once and
+ * listing the arrows brings the same information to 477.
+ *
+ * Twelve arrows drawn backwards, since #133: an arrow nothing corroborates is no
+ * longer a finding at all, so the only way to get twelve arrow findings on one
+ * board is twelve claims the code contradicts. The shape under test is the same
+ * one — many rows, one kind, one reason.
  */
 describe("a report with many findings stays readable", () => {
   const NAMES = ["a", "b", "c", "d", "e", "f", "g", "h", "i", "j", "k", "l", "m"];
@@ -344,15 +372,21 @@ describe("a report with many findings stays readable", () => {
     project = mkdtempSync(path.join(tmpdir(), "drift-cli-many-"));
     mkdirSync(path.join(project, "docs/diagrams"), { recursive: true });
     mkdirSync(path.join(project, "src"), { recursive: true });
-    // Every file exists and none of them touch each other, so all twelve arrows
-    // are flagged and the missing-file check stays quiet.
-    for (const name of NAMES) {
-      writeFileSync(path.join(project, `src/${name}.ts`), `export const ${name} = 1;\n`);
+    // Every file exists, so the missing-file check stays quiet, and every one of
+    // the twelve imports `a` — while each arrow claims that `a` needs *it*. The
+    // dependency runs the other way in all twelve, by a line the check can
+    // quote, which is what makes them findings rather than a tally.
+    writeFileSync(path.join(project, "src/a.ts"), "export const a = 1;\n");
+    for (const name of NAMES.slice(1)) {
+      writeFileSync(
+        path.join(project, `src/${name}.ts`),
+        `import { a } from "./a";\nexport const ${name} = a;\n`,
+      );
     }
     const { board: drawn } = await createDiagram(emptyBoard(), {
       name: "many",
       nodes: NAMES.map((name) => ({ id: name, label: name.toUpperCase(), ref: `src/${name}.ts` })),
-      edges: NAMES.slice(1).map((name) => ({ from: "a", to: name })),
+      edges: NAMES.slice(1).map((name) => ({ from: "a", to: name, claim: "needs" as const })),
     });
     await writeBoard(path.join(project, "docs/diagrams/many.excalidraw"), drawn);
 
@@ -586,13 +620,21 @@ describe("--details", () => {
     project = mkdtempSync(path.join(tmpdir(), "drift-cli-details-"));
     mkdirSync(path.join(project, "docs/diagrams"), { recursive: true });
     mkdirSync(path.join(project, "src"), { recursive: true });
-    for (const name of MANY) {
-      writeFileSync(path.join(project, `src/${name}.ts`), `export const ${name} = 1;\n`);
+    // Twelve files importing `a`, against twelve arrows claiming `a` needs them.
+    writeFileSync(path.join(project, "src/a.ts"), "export const a = 1;\n");
+    for (const name of MANY.slice(1)) {
+      writeFileSync(
+        path.join(project, `src/${name}.ts`),
+        `import { a } from "./a";\nexport const ${name} = a;\n`,
+      );
     }
     const { board: first } = await createDiagram(emptyBoard(), {
       name: "one",
       nodes: MANY.map((name) => ({ id: name, label: name.toUpperCase(), ref: `src/${name}.ts` })),
-      edges: MANY.slice(1).map((name) => ({ from: "a", to: name })),
+      // Backwards, all twelve, for the reason the box above this describe gives:
+      // an arrow nothing corroborates is a count now, not a finding (#133), and
+      // what is under test here is how a long list of findings prints.
+      edges: MANY.slice(1).map((name) => ({ from: "a", to: name, claim: "needs" as const })),
     });
     await writeBoard(path.join(project, "docs/diagrams/one.excalidraw"), first);
 

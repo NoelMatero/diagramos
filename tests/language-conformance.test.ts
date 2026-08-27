@@ -242,15 +242,23 @@ describe.each(FIXTURES)("$file", (fixture) => {
       expect(report.edges).toEqual([]);
     });
 
-    it(`${supported ? "flags" : "cannot read"} an arrow from a function that never logs`, async () => {
+    it(`${supported ? "counts" : "cannot read"} an arrow from a function that never logs`, async () => {
       const report = await arrow(fixture.silent);
       if (supported) {
-        expect(report.edges).toHaveLength(1);
+        // Read in this language, and nothing found either way. Counted rather
+        // than reported: the arrow claimed nothing, so there is nothing to
+        // contradict (#133). What the language table buys is being able to ask
+        // at all, which is what the reason word records.
+        expect(report.edges).toEqual([]);
+        expect(report.unconfirmedEdges).toHaveLength(1);
+        expect(report.unconfirmedEdges[0]!.reason).toBe("no-call-either-way");
       } else {
         // With no table, the symbols are not even collected, so this never
         // reaches the body check -- it skips at the file channels, which do
-        // not read this language either. Counted, not guessed.
+        // not read this language either. Unread, which is a third thing again:
+        // nobody looked, rather than looked and found nothing.
         expect(report.edges).toEqual([]);
+        expect(report.unconfirmedEdges).toEqual([]);
         expect(report.edgesSkippedWhy).toEqual({ "unlicensed-language": 1 });
       }
     });
