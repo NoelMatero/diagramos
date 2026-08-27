@@ -42,30 +42,67 @@ async function became(check: () => boolean, timeoutMs = 3000): Promise<boolean> 
 
 let armed = false;
 
+/** Waits until no callback has arrived for `quietMs`, however long that takes. */
+async function untilQuiet(hits: () => number, quietMs = 400): Promise<void> {
+  let last = hits();
+  let since = Date.now();
+  while (Date.now() - since < quietMs) {
+    await sleep(50);
+    if (hits() !== last) {
+      last = hits();
+      since = Date.now();
+    }
+  }
+}
+
 /**
- * Starts the watcher, waits until it is genuinely watching, and only then lets
- * the callback count.
+ * Starts the watcher, proves it is delivering, waits for the tree to go quiet,
+ * and only then lets the callback count.
  *
- * Both halves are needed. Without the pause the first write races the watch
- * itself and loses often enough to make everything here flaky. And FSEvents
- * hands a new watcher a short replay of what happened just before it started --
- * measured here, the temp directory itself arrives as a `change` under its own
- * basename, and the `src/` that `beforeEach` made arrives as a `rename`. Those
- * are real events about a real tree and the watcher is right to pass them on; in
- * the service they cost one extra drift check when a page connects, which is
- * harmless and arguably the correct thing to do on arrival. In a test they are
- * somebody else's changes being attributed to this one, so the count starts
- * after they have drained.
+ * All three steps are load-bearing, and the middle one is why this is not just a
+ * sleep. FSEvents hands a new watcher a short replay of what happened just
+ * before it started -- the temp directory itself and the `src/` that
+ * `beforeEach` made. Those are real events about a real tree and the watcher is
+ * right to pass them on; in the service they cost one extra drift check when a
+ * page connects, which is harmless and arguably correct on arrival. In a test
+ * they are somebody else's changes being attributed to this one.
+ *
+ * A fixed pause was the first attempt and it was wrong: it guesses how long the
+ * replay takes, and under a loaded machine -- the whole suite running at once --
+ * the replay lands *after* the guess and gets counted. Measured at roughly one
+ * failure in three full-suite runs and never once in isolation, which is the
+ * worst shape a test can have. So nothing here is timed: the sentinel proves the
+ * watcher is attached and delivering, and the quiet check waits for the replay
+ * to actually stop rather than for a clock to run out.
  */
 async function start(onSettled: () => void | Promise<void>): Promise<void> {
+  let hits = 0;
   armed = false;
   watcher = watchCode({
     root,
     settleMs: SETTLE_MS,
-    onSettled: () => (armed ? onSettled() : undefined),
+    onSettled: () => {
+      hits += 1;
+      return armed ? onSettled() : undefined;
+    },
   });
   expect(watcher).toBeDefined();
-  await sleep(450);
+
+  // Attached and delivering, established rather than assumed. Rewritten in a
+  // loop because the first write can land before the watch is up, and a single
+  // one that lost that race would leave this waiting forever.
+  const sentinel = path.join(root, "src/arming-sentinel.ts");
+  const deadline = Date.now() + 8000;
+  while (hits === 0 && Date.now() < deadline) {
+    writeFileSync(sentinel, `export const n = ${Date.now()};\n`);
+    await sleep(60);
+  }
+  expect(hits).toBeGreaterThan(0);
+
+  // The sentinel and the replay both drain here. Left on disk on purpose: the
+  // whole tree is thrown away in afterEach, and deleting it would be one more
+  // event to wait out.
+  await untilQuiet(() => hits);
   armed = true;
 }
 
