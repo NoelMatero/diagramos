@@ -51,6 +51,11 @@ export interface HistoryRow {
 export function rowsOfHistory(entries: HistoryEntryView[], now: Date = new Date()): HistoryRow[] {
   return entries.map((entry) => {
     const opened = entry.source === "opened";
+    // A live promotion adds and removes nothing -- it restyles a box that was
+    // already there. "restyled or moved" is true of it and tells you nothing,
+    // so it gets the one thing worth knowing instead: something was drawn ahead
+    // of the record.
+    const live = entry.source === "live";
     const delta =
       entry.added || entry.removed
         ? [
@@ -61,14 +66,24 @@ export function rowsOfHistory(entries: HistoryEntryView[], now: Date = new Date(
             .join(" ")
         : opened
           ? `${entry.elements} ${entry.elements === 1 ? "element" : "elements"}`
-          : "restyled or moved";
+          : live
+            ? "shown as built early"
+            : "restyled or moved";
     const who =
       entry.source === "page"
         ? "drawn by hand"
         : entry.source === "file"
           ? "a tool, an editor, or git"
-          : "first seen by this service";
-    const tone = opened || (!entry.added && !entry.removed) ? "dim" : entry.removed ? "warn" : "good";
+          : live
+            ? "code landed — not recorded yet"
+            : "first seen by this service";
+    const tone = live
+      ? "good"
+      : opened || (!entry.added && !entry.removed)
+        ? "dim"
+        : entry.removed
+          ? "warn"
+          : "good";
     return { when: timeAgo(entry.at, now), delta, who, tone };
   });
 }

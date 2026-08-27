@@ -422,6 +422,41 @@ export function rowsOf(report: DriftView): StatusRow[] {
   ];
 }
 
+/**
+ * The `customData` key the service marks a box with when it draws a promotion
+ * ahead of the record (#130). Spelled here and in `promote.ts`; the shared
+ * string is the whole connection between the two.
+ */
+export const LIVE_PROMOTION_KEY = "livePromotion";
+
+/**
+ * How many boxes on screen are drawn as built without being recorded as built.
+ *
+ * Read off the scene rather than the report, and that is the only place it could
+ * come from: the flip is a stroke, the record still says `planned`, so a report
+ * describes these boxes as planned and is right to. The scene is the only
+ * witness to the preview.
+ */
+export function livePromotedCount(scene: readonly { customData?: Record<string, unknown>; isDeleted?: boolean }[]): number {
+  return scene.filter(
+    (element) => element.isDeleted !== true && element.customData?.[LIVE_PROMOTION_KEY] === true,
+  ).length;
+}
+
+/**
+ * The words for a preview, or nothing when there is none.
+ *
+ * Requirement two of #130: whatever streams has to look unsettled, so that a
+ * mid-turn screenshot is not filed as a bug. Saying "shown early" rather than
+ * "promoted" is the whole job -- it names a picture running ahead of a record,
+ * which is exactly what has happened, and it stops the number reading as a
+ * second opinion about what is built.
+ */
+export function livePromotionNote(count: number): string | undefined {
+  if (count <= 0) return undefined;
+  return `${count} shown early — not recorded until the turn ends`;
+}
+
 /** The dot's colour: the worst news wins, and quiet is green. */
 export function worstToneOf(rows: StatusRow[]): Tone {
   if (rows.some((row) => row.tone === "bad")) return "bad";

@@ -105,4 +105,25 @@ describe("the timeline as the page words it", () => {
       { when: "1h ago", delta: "11 elements", who: "first seen by this service", tone: "dim" },
     ]);
   });
+
+  /**
+   * A live promotion (#130) adds and removes nothing -- it restyles a box that
+   * was already there. Left to the generic wording it reads "restyled or moved"
+   * by "first seen by this service", which is wrong twice over: it was a
+   * promotion being previewed, and it was this service that did it.
+   */
+  it("says what a preview was, rather than calling it a restyle", () => {
+    const rows = rowsOfHistory(
+      [{ at: "2026-08-20T11:59:55Z", elements: 11, added: 0, removed: 0, source: "live" }],
+      now,
+    );
+    expect(rows).toEqual([
+      {
+        when: "just now",
+        delta: "shown as built early",
+        who: "code landed — not recorded yet",
+        tone: "good",
+      },
+    ]);
+  });
 });

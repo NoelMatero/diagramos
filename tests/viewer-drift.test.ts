@@ -5,7 +5,16 @@
  */
 import { describe, expect, it } from "vitest";
 
-import { rowsOf, summaryOf, tallyOf, worstToneOf, type DriftView } from "../src/viewer/drift";
+import {
+  livePromotedCount,
+  livePromotionNote,
+  rowsOf,
+  summaryOf,
+  tallyOf,
+  worstToneOf,
+  LIVE_PROMOTION_KEY,
+  type DriftView,
+} from "../src/viewer/drift";
 
 function reportWith(overrides: Partial<DriftView>): DriftView {
   return {
@@ -337,5 +346,58 @@ describe("an unanswered claim on the board", () => {
     });
     expect(tallyOf(answered)).toEqual([]);
     expect(rowsOf(answered)).toEqual([]);
+  });
+});
+
+/**
+ * The preview counter (#130).
+ *
+ * Read off the scene rather than the report, and that is the only place it could
+ * come from: a live promotion writes a stroke and leaves the record saying
+ * `planned`, so a report describes these boxes as planned and is right to.
+ */
+describe("boxes shown as built before the turn recorded them", () => {
+  const box = (id: string, custom: Record<string, unknown> = {}) => ({
+    id,
+    customData: custom,
+  });
+
+  it("counts the marked boxes and nothing else", () => {
+    expect(
+      livePromotedCount([
+        box("a", { node: "a", [LIVE_PROMOTION_KEY]: true }),
+        box("b", { node: "b" }),
+        box("c", { node: "c", [LIVE_PROMOTION_KEY]: true }),
+        box("d"),
+      ]),
+    ).toBe(2);
+  });
+
+  it("does not count a deleted element still sitting in the scene", () => {
+    // Excalidraw keeps removed elements around with isDeleted set, so a count
+    // that ignored the flag would keep reporting a preview of a box nobody can
+    // see.
+    expect(
+      livePromotedCount([
+        { ...box("a", { [LIVE_PROMOTION_KEY]: true }), isDeleted: true },
+        box("b", { [LIVE_PROMOTION_KEY]: true }),
+      ]),
+    ).toBe(1);
+  });
+
+  it("says nothing at all when nothing was shown early", () => {
+    expect(livePromotedCount([box("a", { node: "a" })])).toBe(0);
+    expect(livePromotionNote(0)).toBeUndefined();
+  });
+
+  /**
+   * Requirement two of the issue: whatever streams has to look unsettled, so a
+   * mid-turn screenshot is not filed as a bug. Hence "shown early" rather than
+   * "promoted" -- it names a picture running ahead of a record, which is exactly
+   * what has happened.
+   */
+  it("words it as a picture running ahead of the record", () => {
+    expect(livePromotionNote(1)).toBe("1 shown early — not recorded until the turn ends");
+    expect(livePromotionNote(3)).toBe("3 shown early — not recorded until the turn ends");
   });
 });
