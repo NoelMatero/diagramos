@@ -150,6 +150,19 @@ beforeEach(async () => {
   project = mkdtempSync(path.join(tmpdir(), "code-graph-"));
   bin = mkdtempSync(path.join(tmpdir(), "code-graph-bin-"));
   log = path.join(bin, "calls.log");
+  /*
+   * Two Rust files and deliberately no `Cargo.toml`.
+   *
+   * The arrow between them has to be one the live channels cannot read, or
+   * there is nothing here for a graph to add. Since #131 that takes both
+   * halves: Rust has a licence, so the extension alone no longer stops the
+   * import channel, and it is the absence of a manifest that does -- a file no
+   * crate declares has no root for `mod b;` to resolve against, so the reader
+   * cannot place it and says so instead of guessing.
+   *
+   * Adding a manifest here would let channel 1 confirm the arrow on its own
+   * and quietly empty every assertion below.
+   */
   write("src/a.rs", "mod b;\npub fn serve() { b::handle(); }\n");
   write("src/b.rs", "pub fn handle() {}\n");
   await board();
@@ -176,14 +189,14 @@ describe("the check builds the code graph it needs", () => {
     expect(sidecar).toEqual({ commit: head(), graphify: "0.9.47" });
     // The arrow between two Rust files is the one the live channels cannot
     // read. Built and consulted on this run, it is no longer skipped.
-    expect(said).not.toContain("not TypeScript or JavaScript");
+    expect(said).not.toContain("the reader cannot place");
     expect(said).toContain("built the code graph");
   }, 120_000);
 
   it("skips the arrow when there is no graphify, which is the state this fixes", async () => {
     const said = await drift("--details");
     expect(extractions()).toBe(0);
-    expect(said).toContain("not TypeScript or JavaScript");
+    expect(said).toContain("the reader cannot place");
   }, 120_000);
 
   it("does not build again while the graph still describes this commit", async () => {
@@ -249,7 +262,7 @@ describe("the check builds the code graph it needs", () => {
     fakeGraphify({ version: "1.2.0" });
     const said = await drift("--details");
     expect(extractions()).toBe(0);
-    expect(said).toContain("not TypeScript or JavaScript");
+    expect(said).toContain("the reader cannot place");
     expect(said).not.toContain("built the code graph");
   }, 120_000);
 

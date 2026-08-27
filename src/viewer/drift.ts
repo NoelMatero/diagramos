@@ -142,6 +142,7 @@ const WITHHELD_WORDS: Record<string, string> = {
   "endpoint-outside-repo": "with an end pointing outside the repo",
   "endpoint-file-missing": "with an end whose file is missing",
   "directory-ref": "with an end that refs a directory, not a file",
+  "glob-ref": "with an end that refs a glob, not a file",
 };
 
 function claimWithheldWords(report: DriftView): string {

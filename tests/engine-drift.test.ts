@@ -1570,8 +1570,8 @@ describe("code the diagram leaves out", () => {
  * Why something was not checked.
  *
  * "5 arrows skipped" is not usable by anyone: it cannot be told apart from "there
- * was nothing here I could read", and it never says which of seven reasons
- * applied. These pin the reason, not the count.
+ * was nothing here I could read", and it never says which reason applied. These
+ * pin the reason, not the count.
  */
 describe("saying what was not looked at", () => {
   async function boardOf(
@@ -1625,6 +1625,38 @@ describe("saying what was not looked at", () => {
         ),
         { "src/a.ts": "x", "src/lib": "dir" },
         "directory-ref",
+      ],
+      [
+        "an end refing a glob",
+        () => boardOf(
+          [{ id: "a", label: "A", ref: "src/a.ts" }, { id: "b", label: "B", ref: "src/lib/*.ts" }],
+          [{ from: "a", to: "b" }],
+        ),
+        { "src/a.ts": "x", "src/lib": "dir", "src/lib/one.ts": "y" },
+        "glob-ref",
+      ],
+      [
+        // A `*` outside the last segment is a glob nobody can list, so the end
+        // anchors to nothing. Still a pattern, and still not a deleted file.
+        "an end refing a glob with a * nobody can list",
+        () => boardOf(
+          [{ id: "a", label: "A", ref: "src/a.ts" }, { id: "b", label: "B", ref: "src/*/one.ts" }],
+          [{ from: "a", to: "b" }],
+        ),
+        { "src/a.ts": "x", "src/lib": "dir", "src/lib/one.ts": "y" },
+        "glob-ref",
+      ],
+      [
+        // The other side of it: a glob over a directory that really is gone
+        // keeps the reason that means something has been deleted, because
+        // something has.
+        "an end refing a glob whose directory is gone",
+        () => boardOf(
+          [{ id: "a", label: "A", ref: "src/a.ts" }, { id: "b", label: "B", ref: "src/gone/*.ts" }],
+          [{ from: "a", to: "b" }],
+        ),
+        { "src/a.ts": "x" },
+        "endpoint-file-missing",
       ],
       [
         "an end in another language",

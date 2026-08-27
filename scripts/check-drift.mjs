@@ -218,6 +218,7 @@ const NEEDS_WITHHELD = {
   "endpoint-outside-repo": "with an end pointing outside the repo",
   "endpoint-file-missing": "with an end whose file is missing",
   "directory-ref": "with an end that refs a directory, not a file",
+  "glob-ref": "with an end that refs a glob, not a file",
 };
 
 /**
@@ -979,7 +980,9 @@ const SKIP_WORDS = {
   "endpoint-outside-repo": "an end points outside the repo",
   "endpoint-file-missing": "an end's file is missing",
   "directory-ref": "an end refs a directory",
-  "not-ts-or-js": "not TypeScript or JavaScript",
+  "glob-ref": "an end refs a glob",
+  "unlicensed-language": "no licence for that language",
+  "outside-licence": "an end the reader cannot place",
   "no-function-body": "both ends name something with no body to read",
 };
 
@@ -1244,6 +1247,10 @@ const hintLines = [];
  * was just built, or arrows went unconfirmed that it could have read. The
  * sentence itself is worked out once -- it probes for graphify, so asking
  * twice would pay twice.
+ *
+ * Every reason here is one the graph can answer where the live channels
+ * could not: an end standing for a directory or for a glob, a language no
+ * licence covers, a file the reader cannot place, or no body to read.
  */
 const worthSaying =
   !existsSync(HINT_FILE)
@@ -1252,7 +1259,9 @@ const worthSaying =
       && examined.some(({ report }) =>
         report.edges.length > 0
         || (report.edgesSkippedWhy["directory-ref"] ?? 0) > 0
-        || (report.edgesSkippedWhy["not-ts-or-js"] ?? 0) > 0
+        || (report.edgesSkippedWhy["glob-ref"] ?? 0) > 0
+        || (report.edgesSkippedWhy["unlicensed-language"] ?? 0) > 0
+        || (report.edgesSkippedWhy["outside-licence"] ?? 0) > 0
         || (report.edgesSkippedWhy["no-function-body"] ?? 0) > 0)));
 const graphNews = worthSaying ? codeGraphNews() : undefined;
 if (graphNews) {

@@ -143,10 +143,14 @@ export function loadCodeGraph(
  * coverage tally while silencing a question nobody asked. Silence here is
  * the honest answer: the other channels still get their say.
  */
-export function connects(graph: LoadedCodeGraph, refA: string, refB: string): boolean {
-  const a = expandEndpoint(graph, refA);
+export function connects(
+  graph: LoadedCodeGraph,
+  refA: string | readonly string[],
+  refB: string | readonly string[],
+): boolean {
+  const a = expandEndpoints(graph, refA);
   if (a.size === 0) return false;
-  const b = expandEndpoint(graph, refB);
+  const b = expandEndpoints(graph, refB);
   if (b.size === 0) return false;
   for (const node of a) if (b.has(node)) return false;
   return reachesForward(graph, a, b) || reachesForward(graph, b, a);
@@ -181,6 +185,28 @@ function reachesForward(
     frontier = next;
   }
   return false;
+}
+
+/**
+ * One endpoint's nodes, from one ref or from a list of them.
+ *
+ * A list is how a glob arrives: `*.ts` names the files it matches and not the
+ * directory holding them, so the caller lists them and the union is the
+ * endpoint. Unioning before the disjointness check below is the point -- asking
+ * per file and taking any yes would let a set overlapping the other end at one
+ * file still confirm through another, which is not the question `connects` is
+ * documented to answer.
+ */
+function expandEndpoints(
+  graph: LoadedCodeGraph,
+  refs: string | readonly string[],
+): Set<string> {
+  if (typeof refs === "string") return expandEndpoint(graph, refs);
+  const out = new Set<string>();
+  for (const ref of refs) {
+    for (const node of expandEndpoint(graph, ref)) out.add(node);
+  }
+  return out;
 }
 
 /** All nodes standing for a file, or for everything under a directory. */
