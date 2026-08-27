@@ -377,6 +377,36 @@ const server = new McpServer(
   },
 );
 
+/**
+ * What the arrows just written claim, said the turn they are written.
+ *
+ * A claim nobody saw go on is a claim nobody can refuse -- the board shows it,
+ * and this is for whoever is reading the transcript rather than the canvas.
+ *
+ * Grouped by word rather than counted together, because the two words carry
+ * opposite consequences: `needs` can come back wrong and fail a build, `feeds`
+ * can only ever come back confirmed. One sentence covering both would tell an
+ * author the wrong thing about half of what they wrote.
+ */
+function claimNote(arrows: ReadonlyArray<{ claim?: string }>): { claims?: string } {
+  const byWord = new Map<string, number>();
+  for (const arrow of arrows) {
+    if (arrow.claim) byWord.set(arrow.claim, (byWord.get(arrow.claim) ?? 0) + 1);
+  }
+  if (byWord.size === 0) return {};
+  const said = [...byWord].map(([word, count]) => {
+    const opening = `${count} ${count === 1 ? "arrow claims" : "arrows claim"} ${word}, `
+      + `shown on the board as @${word}.`;
+    return word === "needs"
+      ? `${opening} Each one is now checked for direction: an arrow drawn against the dependency`
+        + " is reported as backwards."
+      : `${opening} Each one is now checked by looking for the flow — a function binding the first`
+        + " result and passing it into the second. Finding it confirms the arrow; not finding it is"
+        + " counted and never held against it.";
+  });
+  return { claims: said.join(" ") };
+}
+
 server.registerTool(
   "create_diagram",
   {
@@ -453,18 +483,12 @@ server.registerTool(
       // Named the turn it is written, because a claim nobody saw go on is a
       // claim nobody can refuse. The board shows it too; this is for whoever is
       // reading the transcript rather than the canvas.
-      const claimed = edges.filter((edge) => edge.claim).length;
+
       return text({
         wrote: relativeToWorkspace(file),
         nodes: result.nodeCount,
         edges: result.edgeCount,
-        ...(claimed
-          ? {
-              claims: `${claimed} ${claimed === 1 ? "arrow claims" : "arrows claim"} needs`
-                + ", shown on the board as @needs. Each one is now checked for"
-                + " direction: an arrow drawn against the dependency is reported as backwards.",
-            }
-          : {}),
+        ...claimNote(edges),
         elements: result.elementCount,
         idPrefix: result.prefix,
         ...(drawn.findings.length
@@ -910,17 +934,10 @@ server.registerTool(
       const { board, created } = await connectNodes(await readBoard(file), connections);
       await writeBoard(file, board);
       await followBoard(file);
-      const claimed = connections.filter((connection) => connection.claim).length;
       return text({
         wrote: relativeToWorkspace(file),
         arrows: created,
-        ...(claimed
-          ? {
-              claims: `${claimed} ${claimed === 1 ? "arrow claims" : "arrows claim"} needs`
-                + ", shown on the board as @needs. Each one is now checked for"
-                + " direction: an arrow drawn against the dependency is reported as backwards.",
-            }
-          : {}),
+        ...claimNote(connections),
       });
     }),
 );
