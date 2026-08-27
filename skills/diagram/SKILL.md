@@ -278,6 +278,41 @@ same file. The claim is then recorded and unverified, which costs nothing —
 so a `needs` you actually read is always worth writing, even where you cannot
 be sure it will be checked.
 
+#### `claim: "feeds"` — this arrow's result goes into that box
+
+A lot of arrows do not mean "A imports B". They mean **A's output goes into B**
+— a pipeline. That is a different fact, and it frequently runs the *opposite*
+way to the import: the file holding a result usually imports the one that
+produced it.
+
+```
+edges: [{ from: "parse", to: "render", claim: "feeds" }]
+```
+
+It reads as `@feeds` on the label, next to your own words, and it is checked by
+going and finding the flow: one function that binds the first call's result and
+passes it into the second, or hands it straight over. That function is usually
+in neither endpoint — the wiring lives in a third file the board often does not
+draw at all — so this is the one arrow check that looks outside the diagram.
+
+Both ends must name a symbol (`path#symbol`). A file has no result.
+
+**It can never come back red.** A value can reach the other end through a
+callback, a struct field, a builder chain — places no reader follows — so
+failing to find the flow is not evidence the arrow is wrong. Finding it is
+evidence it is right. So `feeds` confirms or it stays quiet, and the honest
+consequence is that guessing costs you nothing *and buys you nothing*: an
+unfound flow is a count in `--details`, not a verdict.
+
+That makes it the opposite trade from `needs`. `needs` is powerful and
+dangerous — write it only from a line you read. `feeds` is safe and weaker:
+write it wherever the arrow really means a pipeline, and the check will confirm
+the ones it can see.
+
+The two are mutually exclusive on one arrow: an arrow asserts one thing, and two
+claims is one unanswered question about which was meant, which the check refuses
+rather than resolving.
+
 #### `closed: {}` — nothing outside reaches into this box
 
 This is the claim architecture diagrams actually make and could never say: you

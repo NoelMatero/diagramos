@@ -279,6 +279,9 @@ describe("board MCP server", () => {
     }));
     // Named the turn it is written.
     expect(String(wrote.claims)).toContain("needs");
+    // Named per word, because the two carry opposite consequences: this one can
+    // come back wrong, and an author told otherwise would be told wrong.
+    expect(String(wrote.claims)).toContain("backwards");
 
     const read = jsonOf(await call("read_diagram", { path: board }));
     expect((read.edges as Array<{ claim?: string }>)[0].claim).toBe("needs");

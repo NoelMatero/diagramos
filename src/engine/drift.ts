@@ -24,6 +24,7 @@ import path from "node:path";
 
 import { parseSymbol, routeOf, symbolEvidence, type Assertion } from "./assert";
 import { chainBreak, declarationsOf, reaches, unsupportedMembers } from "./body";
+import { checkFeeds, type FeedsCandidate, type FeedsWithheld } from "./feeds";
 import type { BoardFile } from "./board-file";
 import { arrowClaimError, boxClaimError, type ArrowClaim } from "./claim";
 import { checkClosed, type ClosedBreach } from "./closed";
@@ -328,7 +329,18 @@ export interface UnreadEdgeFinding {
 export type EdgeUnconfirmedReason =
   | "no-call-either-way"
   | "an-end-is-data"
-  | "nothing-connects-them";
+  | "nothing-connects-them"
+  /**
+   * A `@feeds` arrow where the only flow found runs the other way.
+   *
+   * The most specific thing this engine can say about an arrow without
+   * accusing anybody. It is *not* a refutation and never will be: the search
+   * reads two shapes of dataflow in the files that can see both ends, so a
+   * forward flow through a callback or a struct field is a miss, not a
+   * disproof. What it is, is a named line somebody can go and read -- which is
+   * more use than a colour.
+   */
+  | "feeds-runs-the-other-way";
 
 /**
  * An arrow that was read and could not be corroborated.
@@ -492,6 +504,27 @@ export interface ClaimTally {
   closedTestReaches: number;
   /** Arrows asserting that the tail declares a dependency on the head. */
   needs: number;
+  /** Arrows asserting that the tail's result goes into the head. */
+  feeds: number;
+  /**
+   * Of those, how many were confirmed by a flow somebody can go and read.
+   *
+   * There is no `feedsWrong` and there will not be one. `feeds` confirms only:
+   * a value can reach the other end through a callback or a field no reader
+   * follows, so not finding the flow is not evidence the arrow is wrong --
+   * see `feeds.ts`.
+   */
+  feedsConfirmed: number;
+  /**
+   * Why the rest got no confirmation, by reason.
+   *
+   * Same two families as `needsWithheld` below, and the same argument for
+   * showing it: a claim nobody could check and a claim that passed look
+   * identical in a clean report. `absent` is in here too -- the search ran and
+   * found no flow -- because to the person who wrote the claim "nothing found"
+   * is one of the answers, not a different kind of silence.
+   */
+  feedsWithheld: SkipBreakdown<FeedsWithheld | "absent" | "reversed" | EdgeSkipReason>;
   /** Of those, how many got a direction verdict rather than a reason to stay quiet. */
   needsChecked: number;
   /**
@@ -1611,6 +1644,7 @@ export function checkDrift(
   const claims: ClaimTally = {
     closed: 0, closedHeld: 0, closedTestReaches: 0,
     needs: 0, needsChecked: 0, needsWithheld: {},
+    feeds: 0, feedsConfirmed: 0, feedsWithheld: {},
   };
   const closedBreaches: ClosedBreachFinding[] = [];
   const closedUnproven: ClosedUnprovenFinding[] = [];
@@ -1648,6 +1682,39 @@ export function checkDrift(
   };
   /** Shared by the box checks and the arrow checks: one read per file per run. */
   const importCache: ReadCache = { imports: new Map(), configs: new Map() };
+
+  /**
+   * Files the wiring behind a `@feeds` arrow could be in.
+   *
+   * A pipeline arrow's evidence is in neither endpoint: `readBoard`'s result
+   * reaches `readGraph` inside a third function, in a file the board very often
+   * does not draw at all (#127). So this is the one arrow check that looks
+   * somewhere the diagram does not point -- the same licence `closed` boxes
+   * have, and bounded the same way. `sourceFilesUnder` is driven by the tool
+   * and takes no input: the two symbol names only filter what it found, so no
+   * model-authored string turns into a search.
+   *
+   * Built once, on the first `@feeds` arrow, and never on a board without one.
+   * Undefined means the walk gave up past its cap, which is a different answer
+   * from finding nothing and is reported as one.
+   */
+  let feedsPool: FeedsCandidate[] | undefined | null = null;
+  const feedsCandidates = (): FeedsCandidate[] | undefined => {
+    if (feedsPool !== null) return feedsPool;
+    const rootAbsolute = workspace.resolve(".");
+    const walked = rootAbsolute ? sourceFilesUnder(rootAbsolute, workspace) : undefined;
+    if (!rootAbsolute || walked === undefined) {
+      feedsPool = undefined;
+      return feedsPool;
+    }
+    feedsPool = walked.flatMap((absolute) => {
+      const language = languageOf(absolute);
+      if (!language) return [];
+      const relative = path.relative(rootAbsolute, absolute).split(path.sep).join("/");
+      return [{ path: relative, source: workspace.read(absolute), language }];
+    });
+    return feedsPool;
+  };
 
   /**
    * File one verdict about one arrow.
@@ -1711,8 +1778,8 @@ export function checkDrift(
         node: `${edge.from} -> ${edge.to}`,
         label: claim,
         detail: "the code now connects these, so this is no longer planned."
-          + (edge.claim === "needs"
-            ? " Its @needs direction is read for the first time on the next check."
+          + (edge.claim
+            ? ` Its @${edge.claim} is read for the first time on the next check.`
             : ""),
         ...(edge.claim ? { claim: edge.claim } : {}),
       });
@@ -2107,21 +2174,27 @@ export function checkDrift(
       const toNode = nodeById.get(edge.to);
 
       /*
-       * An arrow carrying `@needs` is a question somebody asked on purpose, and
+       * An arrow carrying a claim is a question somebody asked on purpose, and
        * every exit from here has to answer it -- with a verdict, or with the
        * reason there is none.
        *
        * Skipping is ordinarily right and ordinarily quiet: an arrow the checker
        * cannot read is not news. A *claimed* arrow is the exception, because
        * silence in reply to a question reads as "checked, and fine". The gates
-       * below all fire before `checkNeeds` is reached, so without this the claim
-       * would never be counted at all -- and the very first `@needs` written by
-       * hand, on an arrow that looks right on screen, would report success.
+       * below all fire before either checker is reached, so without this the
+       * claim would never be counted at all -- and the very first claim written
+       * by hand, on an arrow that looks right on screen, would report success.
+       *
+       * Both words come through here, into their own tally. A `planned` arrow
+       * carries no claim about today, so it is exempt: there is no line to read
+       * yet, and nothing to withhold a verdict about.
        */
-      const claimed = edge.claim === "needs" && edge.state !== "planned";
+      const claimed = edge.claim !== undefined && edge.state !== "planned";
+      /** Where an unanswered claim on this arrow gets counted. */
+      const withheld = edge.claim === "feeds" ? claims.feedsWithheld : claims.needsWithheld;
       /** Skip the arrow, and if it carried a claim, say the claim went unanswered. */
       const skipClaimedEdge = (reason: EdgeSkipReason) => {
-        if (claimed) claims.needsWithheld[reason] = (claims.needsWithheld[reason] ?? 0) + 1;
+        if (claimed) withheld[reason] = (withheld[reason] ?? 0) + 1;
         skipEdge(reason, edge, fromNode, toNode);
       };
 
@@ -2246,7 +2319,7 @@ export function checkDrift(
            * set of them, so the claim still got no verdict and still has to be
            * counted as one that got none.
            */
-          if (claimed) claims.needsWithheld[shape] = (claims.needsWithheld[shape] ?? 0) + 1;
+          if (claimed) withheld[shape] = (withheld[shape] ?? 0) + 1;
           recordEdge(edge, fromNode, toNode, { kind: "confirmed" });
           continue;
         }
@@ -2275,7 +2348,7 @@ export function checkDrift(
        * confirmed again by the ordinary channels a moment later, and an absent
        * one goes amber exactly as it did before claims existed.
        */
-      if (claimed) {
+      if (claimed && edge.claim === "needs") {
         const needs = checkNeeds(fromPath, toPath, workspace, importCache.configs, options?.ledger);
         if (needs.verdict === "withheld") {
           claims.needsWithheld[needs.why] = (claims.needsWithheld[needs.why] ?? 0) + 1;
@@ -2360,6 +2433,76 @@ export function checkDrift(
        * on failure would throw away exactly that.
        */
       const via = edge.via;
+
+      /*
+       * `@feeds`: does the tail's result actually go into the head?
+       *
+       * Placed after `needs` and before everything else, because it is the most
+       * specific question available about this arrow -- a named flow in a named
+       * file -- and the looser channels below can only say "connected somehow".
+       * It runs on `built` arrows carrying the claim, and it confirms or it
+       * stays quiet; `feeds.ts` says why there is no third option.
+       *
+       * A `via` route beats it: that is the author naming the path themselves,
+       * and a route written down is a sharper claim than a flow discovered.
+       */
+      /*
+       * `planned` is inside this gate rather than outside it, unlike `needs`.
+       *
+       * The plan-first rule is that the gate releases itself: the moment the code
+       * lands, the thing promotes. For a pipeline arrow the code landing *is* the
+       * flow existing, and this is the only channel that can see one -- so a
+       * planned `@feeds` that stayed outside would sit as a work item forever
+       * while the very pipeline it described ran in the repo. Nothing here can
+       * accuse anybody, which is what makes that safe: a plan gets the
+       * confirmation and none of the counting, because its claim is still a
+       * specification until it promotes.
+       */
+      if (edge.claim === "feeds" && !(via && via.length > 0)) {
+        if (!bothNamed) {
+          if (claimed) {
+            claims.feedsWithheld["not-symbols"] = (claims.feedsWithheld["not-symbols"] ?? 0) + 1;
+          }
+        } else {
+          const pool = feedsCandidates();
+          const feeds = pool === undefined
+            ? { verdict: "withheld" as const, why: "nowhere-to-look" as const }
+            : checkFeeds(fromEnd, toEnd, pool);
+          if (feeds.verdict === "confirmed") {
+            if (claimed) claims.feedsConfirmed += 1;
+            edgesChecked += 1;
+            recordEdge(edge, fromNode, toNode, { kind: "confirmed" });
+            continue;
+          }
+          if (feeds.verdict === "reversed") {
+            if (claimed) claims.feedsWithheld.reversed = (claims.feedsWithheld.reversed ?? 0) + 1;
+            edgesChecked += 1;
+            const { evidence } = feeds;
+            const through = evidence.through ? ` through "${evidence.through}"` : "";
+            recordEdge(edge, fromNode, toNode, {
+              kind: "unconfirmed",
+              reason: "feeds-runs-the-other-way",
+              detail:
+                `this arrow says ${fromNode.label || fromPath} feeds `
+                + `${toNode.label || toPath}, and the only flow found runs the other way: `
+                + `${evidence.file} line ${evidence.line} passes ${evidence.producer}'s result `
+                + `into ${evidence.consumer}${through}. Worth a look at the arrow — and not `
+                + `proof, because a flow reaching the other way through a callback or a field `
+                + `would not have been found either.`,
+            });
+            continue;
+          }
+          /*
+           * Nothing found, or nowhere to look. Counted, and then straight on to
+           * the ordinary channels: a `feeds` arrow between two files that import
+           * each other is still a corroborated arrow, and the claim going
+           * unconfirmed does not take that away.
+           */
+          const why = feeds.verdict === "withheld" ? feeds.why : "absent";
+          if (claimed) claims.feedsWithheld[why] = (claims.feedsWithheld[why] ?? 0) + 1;
+        }
+      }
+
       if (bothNamed && via && via.length > 0) {
         const language = languageOf(fromFile)!;
         const source = workspace.read(fromFile);

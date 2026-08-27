@@ -85,6 +85,28 @@ Write it on the arrows where the direction is a real decision. Leave it off the
 ones where "these two talk" is all you meant; a planned arrow with no claim is
 still a planned arrow.
 
+### `claim: "feeds"` on a planned arrow — the pipeline you are about to build
+
+`feeds` says **the `from` end's result will go into the `to` end**. It reads as
+`@feeds` on the label, and it is a different fact from `needs` — often pointing
+the opposite way, because the file holding the result frequently imports the one
+producing it.
+
+```
+edges: [{ from: "parse", to: "render", state: "planned", claim: "feeds" }]
+```
+
+This is the claim for a plan that is a *sequence*: read, then transform, then
+write. When the code lands, the arrow promotes and the check goes looking for
+the flow — one function binding the first result and passing it to the second —
+in any file that can see both ends, including the wiring file the board does not
+draw.
+
+It cannot come back red, ever, and that is deliberate: a value can reach the
+other end through a callback or a field no reader follows, so failing to find
+the flow says nothing about the arrow. Finding it does. Both ends need to name a
+symbol (`path#symbol`), because a file has no result.
+
 ### `closed: {}` on a planned directory box — the boundary it will hold
 
 `closed` says **nothing outside this box reaches into it**. Only for a box

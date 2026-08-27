@@ -84,6 +84,17 @@ export interface DriftView {
     needs: number;
     needsChecked: number;
     needsWithheld?: Record<string, number>;
+    /**
+     * The same two facts for `@feeds`. Optional: older payloads have neither.
+     *
+     * Only the half of `feedsWithheld` that means *nobody could look* is
+     * unanswered news, which is the same split the CLI makes. A flow that was
+     * searched for and not found is an answer of "no evidence", and #133 settled
+     * what those are worth: a count, never a chip that reads like a defect.
+     */
+    feeds?: number;
+    feedsConfirmed?: number;
+    feedsWithheld?: Record<string, number>;
   };
   /**
    * Arrows read and not corroborated. Optional: older payloads have none.
@@ -125,9 +136,16 @@ export function unknownKindsIn(report: DriftView): string[] {
   );
 }
 
-/** `@needs` arrows this board asked about and got no answer for. */
+/** The two `feeds` reasons that mean somebody looked, which are not unanswered. */
+const SEARCHED = new Set(["absent", "reversed"]);
+
+/** Claims this board asked about and got no answer for, both words. */
 function unansweredClaims(report: DriftView): number {
-  return Object.values(report.claims?.needsWithheld ?? {}).reduce((sum, count) => sum + count, 0);
+  const needs = Object.values(report.claims?.needsWithheld ?? {});
+  const feeds = Object.entries(report.claims?.feedsWithheld ?? {})
+    .filter(([why]) => !SEARCHED.has(why))
+    .map(([, count]) => count);
+  return [...needs, ...feeds].reduce((sum, count) => sum + count, 0);
 }
 
 /**
@@ -154,10 +172,17 @@ const WITHHELD_WORDS: Record<string, string> = {
   "endpoint-file-missing": "with an end whose file is missing",
   "directory-ref": "with an end that refs a directory, not a file",
   "glob-ref": "with an end that refs a glob, not a file",
+  // `feeds` only: an end anchored at a file has no result to follow.
+  "not-symbols": "with an end anchored at a file rather than a symbol",
+  "nowhere-to-look": "in a tree too large to walk",
 };
 
 function claimWithheldWords(report: DriftView): string {
-  return Object.entries(report.claims?.needsWithheld ?? {})
+  const reasons = [
+    ...Object.entries(report.claims?.needsWithheld ?? {}),
+    ...Object.entries(report.claims?.feedsWithheld ?? {}).filter(([why]) => !SEARCHED.has(why)),
+  ];
+  return reasons
     .filter(([, count]) => count > 0)
     .sort((a, b) => b[1] - a[1])
     .map(([why, count]) => `${count} ${WITHHELD_WORDS[why] ?? why}`)

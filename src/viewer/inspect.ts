@@ -41,8 +41,21 @@ export const STATE_WORDS: Record<NodeState, string> = {
   external: "Not our code",
 };
 
-/** The one word an arrow can claim. Kept closed for the reason `claim.ts` keeps it closed. */
-const NEEDS = "needs";
+/**
+ * What an arrow can claim, and the words for it.
+ *
+ * Mirrored from `claim.ts` rather than imported, the same way `NodeState` above
+ * is: this module has no imports on purpose, so the panel is a pure function of
+ * a scene and nothing drags the engine into the browser bundle. The cost is that
+ * a word added there has to be added here, and the cost of getting it wrong is
+ * small and visible -- a tick the checker ignores, or a claim with no tick.
+ *
+ * The sentences are the panel's own, because the panel is where a person reads
+ * them: a claim nobody understands is a claim nobody should be ticking.
+ */
+export type ArrowClaim = "needs" | "feeds";
+
+const CLAIM_WORDS: readonly ArrowClaim[] = ["needs", "feeds"];
 
 /** The shapes that count as a box, matching what the engine reads as a node. */
 const NODE_SHAPES = ["rectangle", "diamond", "ellipse"];
@@ -87,8 +100,8 @@ export interface ArrowMeaning {
   toLabel: string;
   node?: string;
   state: NodeState;
-  /** Whether this arrow claims the tail depends on the head. */
-  needs: boolean;
+  /** What this arrow claims, when it claims anything. */
+  claim?: ArrowClaim;
   /**
    * Whether the arrow carries a visible label. A claim is meant to be readable
    * on the board, and with no label there is nowhere to read it -- so the panel
@@ -179,18 +192,26 @@ function boundNode(binding: { elementId?: string } | null | undefined, elements:
  * the tick in the panel has to reflect either, because either is a real way the
  * claim got there.
  */
-function labelClaimsNeeds(text: string): boolean {
-  return text
+function labelClaim(text: string): ArrowClaim | undefined {
+  const marked = text
     .trim()
     .split(/\s+/)
-    .some((word) => word.toLowerCase() === `@${NEEDS}`);
+    .filter((word) => word.startsWith("@"))
+    .map((word) => word.slice(1).toLowerCase());
+  const known = marked.filter((word): word is ArrowClaim => CLAIM_WORDS.includes(word as ArrowClaim));
+  // Two claims is not two facts, and the engine refuses them outright. Here it
+  // means there is nothing single to tick, which is the honest state to show.
+  return known.length === 1 ? known[0] : undefined;
 }
 
-function claimedNeeds(custom: Record<string, unknown>, label: string): boolean {
+function claimOf(custom: Record<string, unknown>, label: string): ArrowClaim | undefined {
   const edge = custom.edge;
   const written = edge && typeof edge === "object" ? (edge as Record<string, unknown>).claim : undefined;
-  if (typeof written === "string") return written.trim().toLowerCase() === NEEDS;
-  return labelClaimsNeeds(label);
+  if (typeof written === "string") {
+    const word = written.trim().toLowerCase() as ArrowClaim;
+    return CLAIM_WORDS.includes(word) ? word : undefined;
+  }
+  return labelClaim(label);
 }
 
 /** The `closed` claim as the panel needs it, from either shape the engine accepts. */
@@ -251,7 +272,7 @@ export function meaningOf(elements: readonly SceneElement[], selectedId: string 
       toLabel: (to ? names.get(to) : undefined) ?? to ?? "something",
       ...(from && to ? { node: `${from} -> ${to}` } : {}),
       state: stateOf(custom.state),
-      needs: claimedNeeds(custom, text),
+      ...(claimOf(custom, text) ? { claim: claimOf(custom, text) } : {}),
       labelled: Boolean(label),
     };
   }
@@ -283,7 +304,8 @@ export type Edit =
   | { set: "refs"; refs: string[] }
   | { set: "state"; state: NodeState }
   | { set: "closed"; closed: boolean; through?: string[] }
-  | { set: "needs"; needs: boolean };
+  /** `undefined` takes the claim away, which is the panel's only way to say "no claim". */
+  | { set: "claim"; claim?: ArrowClaim };
 
 function bump(element: SceneElement, changes: Partial<SceneElement>): SceneElement {
   return { ...element, ...changes, version: (Number(element.version) || 1) + 1 };
@@ -298,12 +320,20 @@ function withCustom(element: SceneElement, changes: Record<string, unknown>): Re
   return next;
 }
 
-/** The label text for an arrow, with the claim added or taken away. */
-export function labelWithNeeds(text: string, needs: boolean): string {
+/**
+ * The label text for an arrow, with the claim added or taken away.
+ *
+ * Every known word comes off first, whichever one was there: an arrow asserts
+ * one thing, so switching from `@needs` to `@feeds` must not leave a label
+ * claiming both -- which the engine reads as garbled and refuses, loudly.
+ */
+export function labelWithClaim(text: string, claim?: ArrowClaim): string {
   const words = text.trim().split(/\s+/).filter(Boolean);
-  const plain = words.filter((word) => word.toLowerCase() !== `@${NEEDS}`);
-  if (!needs) return plain.join(" ");
-  return [...plain, `@${NEEDS}`].join(" ").trim();
+  const plain = words.filter(
+    (word) => !(word.startsWith("@") && CLAIM_WORDS.includes(word.slice(1).toLowerCase() as ArrowClaim)),
+  );
+  if (!claim) return plain.join(" ");
+  return [...plain, `@${claim}`].join(" ").trim();
 }
 
 /**
@@ -371,7 +401,7 @@ export function editScene(
     };
   }
 
-  if (edit.set === "needs" && target.type === "arrow") {
+  if (edit.set === "claim" && target.type === "arrow") {
     const edge = custom.edge && typeof custom.edge === "object" ? (custom.edge as Record<string, unknown>) : {};
     const from = typeof edge.from === "string" ? edge.from : boundNode(target.startBinding, all);
     const to = typeof edge.to === "string" ? edge.to : boundNode(target.endBinding, all);
@@ -379,7 +409,7 @@ export function editScene(
       edge: {
         ...(from ? { from } : {}),
         ...(to ? { to } : {}),
-        ...(edit.needs ? { claim: NEEDS } : {}),
+        ...(edit.claim ? { claim: edit.claim } : {}),
       },
     };
   }
@@ -399,10 +429,10 @@ export function editScene(
 
   const label = boundLabels(all).get(elementId);
   const relabel =
-    edit.set === "needs" && label
+    edit.set === "claim" && label
       ? bump(label, {
-          text: labelWithNeeds(String(label.text ?? ""), edit.needs),
-          originalText: labelWithNeeds(String(label.originalText ?? label.text ?? ""), edit.needs),
+          text: labelWithClaim(String(label.text ?? ""), edit.claim),
+          originalText: labelWithClaim(String(label.originalText ?? label.text ?? ""), edit.claim),
         })
       : undefined;
 
