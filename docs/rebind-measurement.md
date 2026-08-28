@@ -116,7 +116,10 @@ channel confirmed the first of them independently.
 
 ## What this says the feature should be
 
-Opinion from here down, resting on the numbers above.
+Opinion from here down, resting on the numbers above. **The first half of it
+shipped**: the drift report now follows a stale anchor and prints where the code
+went, on the two channels below and never on the third. It does not write to a
+board. `docs/drift-check.md` has the section, `src/engine/follow.ts` the code.
 
 **Rebind on rename evidence and symbol evidence. Never on a filename alone.**
 

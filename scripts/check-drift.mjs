@@ -47,6 +47,7 @@ import {
 } from "./lib/code-graph.mjs";
 import { readBoard, writeBoard } from "../src/engine/board-file.ts";
 import { applyPromotions, clearLivePromotions } from "../src/engine/promote.ts";
+import { applyFollowed } from "../src/engine/repair.ts";
 import { CONFIG_FILE, ConfigError, DEFAULT_DIAGRAM_DIR, diagramDir } from "../src/engine/config.ts";
 import { countedWords, coverageLabel } from "../src/engine/summary.ts";
 import {
@@ -58,6 +59,7 @@ import {
   parseRef,
   UNCONFIRMED_WORDS,
 } from "../src/engine/drift.ts";
+import { createGitTrail } from "../src/engine/follow.ts";
 import { initEngine } from "../src/engine/parse.ts";
 import { createCodeGraphOption, TESTED_VERSION_PREFIX } from "../src/engine/codegraph.ts";
 import { createLedger } from "../src/engine/ledger.ts";
@@ -78,6 +80,9 @@ const USAGE = [
   "  --no-edges     skip the arrow check",
   "  --no-deletions skip the removed-box check",
   "  --coverage     also suggest code the diagram does not show (never automatic)",
+  "  --repair       rewrite the refs whose code the repository can place, and",
+  "                 say which. Only where there is exactly one answer; never",
+  "                 on the per-turn path.",
   "",
   "Silent, exit 0, when nothing has drifted.",
 ].join("\n");
@@ -96,6 +101,7 @@ function parseArgs() {
     details: false,
     expand: false,
     shrink: false,
+    repair: false,
   };
   const boards = [];
 
@@ -114,6 +120,8 @@ function parseArgs() {
       opts.expand = true;
     } else if (arg === "--shrink") {
       opts.shrink = true;
+    } else if (arg === "--repair") {
+      opts.repair = true;
     } else if (!arg.startsWith("--")) {
       boards.push(arg);
     }
@@ -406,6 +414,23 @@ function paint(text, colour, enabled) {
   return enabled && colour ? `${COLOUR[colour]}${text}${COLOUR.off}` : String(text);
 }
 
+/**
+ * Where the code behind a stale box went, under the row that says it is stale.
+ *
+ * Dim and indented, because it is not a second problem -- it is the answer to
+ * the search the row above used to start, and painting it red would read as one
+ * more thing wrong.
+ *
+ * The notice shows only the rows that end in an address. A followed ref with no
+ * address is an explanation of why nobody can answer, which is worth reading
+ * once when somebody asks and is not worth a line every turn.
+ */
+function followRow(followed, colour, all) {
+  if (!followed) return [];
+  if (!all && !followed.becomes) return [];
+  return [paint(`  ↳ ${oneLine(followed.detail)}`, "dim", colour)];
+}
+
 /** Rows of findings. Low on purpose: this fires at the end of every turn. */
 const MAX_LISTED = 6;
 
@@ -419,6 +444,7 @@ const MAX_LISTED = 6;
  */
 function rowsFor({ report, promoted = [] }, colour, all = false) {
   const promotedNodes = new Set(promoted.map((promotion) => promotion.node));
+  const followedFor = new Map((report.followed ?? []).map((entry) => [entry.node, entry]));
   const unanswered = unansweredClaimLines(report);
   const unsnapped = unsnappedClaimFix(report);
   const promotedClaim = claimWentLive(promoted);
@@ -448,7 +474,7 @@ function rowsFor({ report, promoted = [] }, colour, all = false) {
     ...report.deleted.map((finding) =>
       paint(`${boxName(finding)} removed, ${parseRef(finding.ref).path} still there`, "red", colour),
     ),
-    ...report.findings.map((finding) =>
+    ...report.findings.flatMap((finding) => [
       /*
        * The one box finding whose evidence is somewhere else.
        *
@@ -461,7 +487,8 @@ function rowsFor({ report, promoted = [] }, colour, all = false) {
       finding.kind === "open-box"
         ? paint(`${boxName(finding)} \u00b7 ${openBox(finding.detail)}`, "red", colour)
         : paint(`${boxName(finding)} \u2192 ${target(finding)}`, "red", colour),
-    ),
+      ...followRow(followedFor.get(finding.node), colour, all),
+    ]),
     ...report.edges.map((finding) => {
       // A named route knows where it stopped holding, and that is the only
       // thing this shape offers over a plain unsupported arrow. Printing just
@@ -886,6 +913,20 @@ const ledger = createLedger(root);
  */
 const improved = [];
 
+/*
+ * Where moved code went, shared by every board in this run.
+ *
+ * Always on, and no flag to turn it off, because it costs nothing to have here:
+ * nothing is asked of git until a box is *already* a finding, so a clean report
+ * -- the case that fires at the end of every turn -- never touches it at all. One
+ * trail rather than one per board so two diagrams pointing at the same moved file
+ * ask about it once.
+ */
+const trail = createGitTrail(root);
+
+/** Refs `--repair` rewrote, per board. Empty on every other run. */
+const repaired = [];
+
 for (const { file, boardFile } of loaded) {
   let report;
   /** Promotions actually written to the board this run, one per box or arrow. */
@@ -896,6 +937,7 @@ for (const { file, boardFile } of loaded) {
     report = checkDrift(boardFile, workspace, {
       edges: opts.edges,
       coverage: opts.coverage,
+      trail,
       ...(baseline ? { baseline } : {}),
       ...(codeGraphOption ? { codeGraph: codeGraphOption } : {}),
       ...(ledger ? { ledger } : {}),
@@ -917,6 +959,45 @@ for (const { file, boardFile } of loaded) {
      * `git diff --exit-code` that runs after it. A box only partly landed --
      * several anchors, some unresolved -- is held, not applied.
      */
+    /*
+     * The board repairing its own addresses, when somebody asks it to.
+     *
+     * Everything above reports; this is the one path that writes a ref. Asked
+     * for explicitly and never on `--hook`, because the per-turn path runs
+     * without anybody watching and this is the edit that has to be watched: a
+     * wrong rebind is silent, and the whole argument for allowing one at all
+     * (`docs/rebind-measurement.md`) rests on the two channels behind it being
+     * the ones that were never wrong. Reported line by line, old ref and new,
+     * so it can be read and reverted.
+     *
+     * Ordered before promotions so a box whose ref this fixes is checked again
+     * on the next run rather than being promoted on the strength of the old one.
+     */
+    if (opts.repair && !opts.hook && report.followed.length > 0) {
+      const result = applyFollowed(boardFile, report);
+      if (result.applied.length > 0) {
+        try {
+          await writeBoard(file, result.board);
+          repaired.push({ file, applied: result.applied });
+          // The board just changed underneath the report, so the findings this
+          // repair answered are no longer true. Re-checking is cheaper than
+          // explaining a stale list, and it is what the next run would say.
+          report = checkDrift(result.board, workspace, {
+            edges: opts.edges,
+            coverage: opts.coverage,
+            trail,
+            // The baseline comes too. Without it the second pass would drop the
+            // removed-box findings the first pass made, and a repair would
+            // quietly take a deleted claim off the report with it.
+            ...(baseline ? { baseline } : {}),
+            ...(codeGraphOption ? { codeGraph: codeGraphOption } : {}),
+            ...(ledger ? { ledger } : {}),
+          });
+        } catch {
+          // An unwritable tree: keep reporting the suggestion instead of it.
+        }
+      }
+    }
     if (opts.hook) {
       const result =
         report.promotions.length > 0
@@ -1461,6 +1542,32 @@ if (graphNews) {
  * board has no news, so its memory clears itself.
  */
 const NEWS_SEEN_FILE = path.join(root, ".diagramos", "good-news-seen.json");
+/**
+ * What `--repair` rewrote, in a box of its own.
+ *
+ * Separate from the findings above rather than folded in, because these are the
+ * opposite kind of line: everything else says the board and the code disagree,
+ * and this says the disagreement is over and here is the edit that ended it.
+ * Old ref and new on every row, because the only defence against a wrong rebind
+ * is that somebody can see it and put it back.
+ */
+const repairedLines = repaired.length === 0
+  ? []
+  : box({
+      sections: repaired.map(({ file, applied }) => ({
+        label: `${path.basename(file)}  ${applied.length} repaired`,
+        rows: applied.map((entry) =>
+          paint(
+            `${oneLine(entry.label)} \u00b7 ${entry.was} \u2192 ${entry.now}`,
+            "green",
+            opts.hook || Boolean(process.stderr.isTTY),
+          ),
+        ),
+      })),
+      foot: "refs rewritten from git \u00b7 check the diff before committing",
+      max: 72,
+    });
+
 const goodLines = [];
 if (opts.hook) {
   let seen = {};
@@ -1503,11 +1610,14 @@ if (opts.hook) {
 
 if (showing.length > 0 || problems.length > 0 || coverageLines.length > 0
   || unanchoredLines.length > 0 || auditLines.length > 0 || hintLines.length > 0
-  || goodLines.length > 0) {
+  || goodLines.length > 0 || repairedLines.length > 0) {
   // Measured: ANSI renders in a systemMessage. Off only when the output is being
   // piped or captured, where escapes would be junk in somebody's log.
   const colour = opts.hook || Boolean(process.stderr.isTTY);
   const lines = [
+    // First: it is the one group here that reports a change already made to the
+    // working tree, and it has to be read before the findings that survived it.
+    ...repairedLines,
     ...auditLines,
     ...unanchoredLines,
     ...coverageLines,

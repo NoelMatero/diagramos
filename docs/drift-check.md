@@ -1254,6 +1254,94 @@ carries none of that risk. If the automatic version is ever wanted, it belongs
 behind a flag on the script, off by default, with `stop_hook_active` verified
 empirically first.
 
+## The report says where the code went
+
+A finding that says "this points at nothing" is true and hands the reader a
+search. Most of the time the search has a written-down answer: the file moved and
+the design did not change, and git recorded the move at the time it happened.
+Asking a model to go looking for that is the expensive, non-reproducible way to
+get an answer the repository can state.
+
+So a stale anchor is followed, and the report carries the destination next to the
+finding:
+
+```
+Layout → src/old-layout.ts
+  ↳ moved to src/engine/layout.ts — git recorded the rename.
+Renderer → render in src/renderer.ts
+  ↳ render is declared in src/engine/render.ts now, and nowhere else.
+```
+
+**Two channels, and the third was thrown out on the measurement.**
+`docs/rebind-measurement.md` replayed 281 broken anchors across two histories and
+sorted every answer by where it came from.
+
+- **rename** — git recorded the move. 119 answers, no wrong ones found.
+- **symbol** — the name is *declared* in exactly one file in the tree now.
+  Declared, not mentioned: a call site is not a place to re-aim a box. 18
+  answers, no wrong ones found.
+- **filename** — a file elsewhere with the same basename. Not asked. It produced
+  every wrong answer in both histories, all three of them on a file called
+  `index.ts` or `__init__.py`, and its wrong answers are indistinguishable from
+  its right ones: one candidate, stated confidently. A name every directory has
+  identifies nothing.
+
+More than one candidate and the follower declines and says why, which is a better
+report than silence and still not an instruction.
+
+**Nothing is rewritten.** The suggestion sits under the finding; the finding still
+counts, `clean` is still false, and the exit code does not move. That restraint is
+the conclusion of the measurement rather than caution for its own sake: a wrong
+rebind is silent, and a board that quietly re-aims itself at the wrong function is
+worse than one that says "come and look". Whether an `--apply` ever exists is a
+separate decision, and the thing that would earn it is a season of suggestions a
+person accepted every time.
+
+**It costs nothing when nothing is wrong.** Git is not asked anything until a box
+is already a finding, so the clean report — the one that fires at the end of every
+turn — never shells out at all. `create_diagram` and `edit_diagram` answer the
+same way, at the moment the ref is written, which is the cheapest time to fix it.
+
+The live board page does not show this yet. It reads the same report, so the field
+is there for it whenever the viewer bundle catches up.
+
+### And can write it back, when asked
+
+`diagramos drift --repair` applies the answers that have exactly one address and
+prints every one of them, old ref and new:
+
+```
+┌─ arch.excalidraw  2 repaired ───────────────────────────────────┐
+│ Layout · src/old-layout.ts → src/engine/layout.ts               │
+│ Renderer · src/renderer.ts#render → src/engine/render.ts#render │
+└─ refs rewritten from git · check the diff before committing ────┘
+```
+
+Then it re-checks, so the run that repaired a board reports the board it left
+behind rather than the one it found.
+
+**It is a flag and not a behaviour, and `--hook` refuses it outright.** The
+per-turn path runs unattended, and an unattended rebind is precisely the silent
+failure the measurement warned about. A repair somebody typed and can read in
+their diff is a different thing from one that happened while they were looking
+elsewhere, and the difference is the whole safety argument.
+
+What it will not touch, all of it enforced rather than documented:
+
+- **An answer with more than one candidate.** Only `becomes` is applied.
+- **Hand-drawn elements**, by construction — a repair is matched back to its
+  element through the *recorded* graph, and an `inferred` anchor never reaches
+  the follower at all.
+- **A ref that changed under the report.** The old string has to still be on the
+  box; if it is not, the entry is held and said so.
+- **Anything but the address.** Position, size, label, state, bindings and the
+  box's other anchors come out identical. `version` moves, because something did
+  change and a live viewer has to notice.
+
+The order matters: repairs run before promotions, so a box whose ref this fixes
+is judged again on its new address rather than promoted on the strength of the
+old one.
+
 ## The board page grades the report, and can be older than it
 
 The live board shows the same report as a chip in the corner, and it is the one
