@@ -1,5 +1,8 @@
 # Board AI agent instructions
 
+How to *report* your work — summaries and PR descriptions — is a separate file:
+[CLAUDE.md](CLAUDE.md). Read that before writing either.
+
 This repository is a diagram-driven-development toolkit: an MCP server that gives
 a coding agent read/write access to `.excalidraw` files that live in the repo,
 plus a live local board for editing them alongside a human.
