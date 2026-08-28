@@ -457,6 +457,109 @@ describe("board MCP server", () => {
   }, 120_000);
 
   /**
+   * The arrow half of the same draw-time answer (#145).
+   *
+   * The check ran the arrow pass here all along and threw the result away, on
+   * the grounds that a questionable arrow was a review matter. #133 removed the
+   * amber that made it one; what is left is a fact about which anchor went on
+   * which box, and the author is the only one who can still change that.
+   */
+  it("says at draw time which arrows nothing corroborated, and why", async () => {
+    const board = "docs/diagrams/anchors.excalidraw";
+    await writeFile(
+      path.join(workspace, "shape.ts"),
+      "export interface Shape { size: number }\nexport function draw(): number { return 1; }\n"
+      + "export function tidy(): number { return 2; }\n",
+    );
+    const result = jsonOf(
+      await call("create_diagram", {
+        path: board,
+        nodes: [
+          { id: "draw", label: "draw()", ref: "shape.ts#draw" },
+          { id: "shape", label: "Shape", ref: "shape.ts#Shape" },
+          { id: "tidy", label: "tidy()", ref: "shape.ts#tidy" },
+        ],
+        edges: [
+          { from: "draw", to: "shape", label: "produces" },
+          { from: "draw", to: "tidy" },
+        ],
+      }),
+    );
+
+    // Counted, with the check's own words for why -- both reasons, worst first.
+    expect(String(result.arrowsNotConfirmed)).toContain("2 arrows were read");
+    expect(String(result.arrowsNotConfirmed)).toContain("an end names data");
+    expect(String(result.arrowsNotConfirmed)).toContain("nothing calls the other");
+    // Named only for the reason a reader can act on. "draw() → tidy()" is
+    // honest and unactionable, so it stays a number.
+    expect(result.anchoredAtData).toEqual(["draw() → Shape"]);
+    // And never a defect: no refusal, no finding, and the board was written.
+    expect(result.pointsAtNothing).toBeUndefined();
+    expect(String(result.aboutThoseArrows)).toContain("not a finding");
+    expect(result.wrote).toBe(board);
+  }, 120_000);
+
+  it("says nothing about arrows when the code corroborates them", async () => {
+    const board = "docs/diagrams/corroborated.excalidraw";
+    await writeFile(
+      path.join(workspace, "calls.ts"),
+      "export function inner(): number { return 1; }\nexport function outer(): number { return inner(); }\n",
+    );
+    const result = jsonOf(
+      await call("create_diagram", {
+        path: board,
+        nodes: [
+          { id: "outer", label: "outer()", ref: "calls.ts#outer" },
+          { id: "inner", label: "inner()", ref: "calls.ts#inner" },
+        ],
+        edges: [{ from: "outer", to: "inner" }],
+      }),
+    );
+    expect(result.arrowsNotConfirmed).toBeUndefined();
+    expect(result.anchoredAtData).toBeUndefined();
+    expect(result.aboutThoseArrows).toBeUndefined();
+  }, 120_000);
+
+  /**
+   * An edit is the other way a box gets its ref, so it is the other way an
+   * arrow gets its anchors -- and the tool that changes an anchor should not be
+   * the one tool silent about anchoring.
+   */
+  it("gives the same answer when an edit changes a ref", async () => {
+    const board = "docs/diagrams/edited-anchor.excalidraw";
+    await writeFile(
+      path.join(workspace, "edited.ts"),
+      "export interface Held { size: number }\nexport function keep(): number { return 1; }\n",
+    );
+    await call("create_diagram", {
+      path: board,
+      nodes: [
+        { id: "keep", label: "keep()", ref: "edited.ts#keep" },
+        { id: "held", label: "Held", ref: "edited.ts" },
+      ],
+      edges: [{ from: "keep", to: "held" }],
+    });
+
+    // A cosmetic patch reads nothing: a whole drift check on every nudge would
+    // be paid for over and over and answer a question nobody asked.
+    const moved = jsonOf(
+      await call("edit_diagram", { path: board, updates: [{ id: "held", backgroundColor: "#ffec99" }] }),
+    );
+    expect(moved.arrowsNotConfirmed).toBeUndefined();
+
+    // Re-anchoring the box at the interface is what turns the arrow
+    // unanswerable, and it is said in the same breath as the edit.
+    const reanchored = jsonOf(
+      await call("edit_diagram", {
+        path: board,
+        updates: [{ id: "held", customData: { node: "held", ref: "edited.ts#Held" } }],
+      }),
+    );
+    expect(String(reanchored.arrowsNotConfirmed)).toContain("an end names data");
+    expect(reanchored.anchoredAtData).toEqual(["keep() → Held"]);
+  }, 120_000);
+
+  /**
    * An arrow nothing checked, named on request.
    *
    * The counts already say how many arrows went unread and why. A caller

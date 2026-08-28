@@ -343,6 +343,31 @@ export type EdgeUnconfirmedReason =
   | "feeds-runs-the-other-way";
 
 /**
+ * Why an arrow came back unconfirmed, in words -- the one place they are written.
+ *
+ * There are two surfaces now and there were nearly two vocabularies. The CLI's
+ * `--details` audit has said these sentences since #133; `create_diagram` says
+ * them at draw time as of #145, which is the same fact told to the author while
+ * they can still act on it. An author who saw both would otherwise have to work
+ * out that "an end names data" and whatever the tool had invented were the same
+ * finding, which is the exact confusion `summary.ts` exists to have ended for
+ * the "what was checked" sentence.
+ *
+ * Typed as a total record on purpose: a fifth reason word cannot be added to
+ * the union without this file being made to say what it means in English.
+ *
+ * The second and fourth carry an instruction, because they are the two a reader
+ * can act on -- and acting on the second turns an unconfirmable arrow into a
+ * checkable one, which nothing else here can offer.
+ */
+export const UNCONFIRMED_WORDS: Record<EdgeUnconfirmedReason, string> = {
+  "no-call-either-way": "nothing calls the other, either way",
+  "an-end-is-data": "an end names data, not something that runs — anchor that end at file level",
+  "nothing-connects-them": "no import, shared importer or shared route connects them",
+  "feeds-runs-the-other-way": "the only flow found runs the other way",
+};
+
+/**
  * An arrow that was read and could not be corroborated.
  *
  * Deliberately not a finding (#133). Every channel here only ever *confirms*,

@@ -34,6 +34,8 @@ import {
   createWorkspace,
   findBoards,
   findStrayBoards,
+  UNCONFIRMED_WORDS,
+  type UnconfirmedEdge,
 } from "../engine/drift";
 import { computeHonestGaps } from "../engine/gaps";
 import { loadConverter } from "../engine/convert";
@@ -407,6 +409,150 @@ function claimNote(arrows: ReadonlyArray<{ claim?: string }>): { claims?: string
   return { claims: said.join(" ") };
 }
 
+/** A box label on one line, cut to the part that says which box it is. */
+function shortLabel(label: string): string {
+  const flat = label.replace(/\s+/g, " ").trim();
+  return flat.length > 60 ? `${flat.slice(0, 59)}…` : flat;
+}
+
+/**
+ * How many arrows to name before the list stops being read.
+ *
+ * The same eight the CLI's audit stops at, for the same reason: long enough for
+ * every board in this repo, short enough that a fifty-arrow board comes back
+ * with a note rather than a wall. The overflow is counted out loud, because a
+ * list that quietly stopped at eight would read as "that is all of them".
+ */
+const ARROW_CAP = 8;
+
+/**
+ * The arrow half of the draw-time check: what nothing corroborated, and why.
+ *
+ * This used to be thrown away. The check runs the whole arrow pass here anyway,
+ * and the result was dropped on the floor with a comment saying questionable
+ * arrows were a review matter -- true while an uncorroborated arrow came back
+ * amber, because review time is when you look at ambers. #133 removed the
+ * amber, and what is left is not a defect at all: it is a fact about *how the
+ * arrow was anchored*, and the only person who can change an anchor is the
+ * author, who is here now and gone by the time any check runs (#145).
+ *
+ * Three rules keep it from becoming the amber again under a new name:
+ *
+ * - It never refuses anything. The board is written either way, and an
+ *   uncorroborated arrow may be a perfectly good arrow with a deliberate
+ *   anchor.
+ * - It is not a finding, and says so. Nothing downstream reports these: no
+ *   colour on the board, no row in the notice, no exit code.
+ * - It borrows the check's own words, from the check's own table, so a reader
+ *   who sees both surfaces is not learning a second vocabulary for one fact.
+ *
+ * Everything is counted; only the arrows a reader can act on are named. The two
+ * generic reasons -- nothing calls the other, nothing connects them -- are
+ * honest and unactionable, so naming them buys a longer message and no
+ * decision. `an-end-is-data` is the opposite: it is the anchor, it is by far
+ * the commonest (11 of 17 on the board this came from), and moving that end to
+ * file level turns an unconfirmable arrow into a checkable one.
+ */
+function unconfirmedArrowNote(unconfirmed: ReadonlyArray<UnconfirmedEdge>): Record<string, unknown> {
+  if (unconfirmed.length === 0) return {};
+  const byReason = new Map<UnconfirmedEdge["reason"], number>();
+  for (const arrow of unconfirmed) {
+    byReason.set(arrow.reason, (byReason.get(arrow.reason) ?? 0) + 1);
+  }
+  // Commonest first: on a board where one anchoring habit produced most of
+  // this, that habit is the sentence worth reading.
+  const why = [...byReason]
+    .sort((a, b) => b[1] - a[1])
+    .map(([reason, count]) => `${count} ${UNCONFIRMED_WORDS[reason]}`)
+    .join(" · ");
+  const named = (reason: UnconfirmedEdge["reason"], say: (arrow: UnconfirmedEdge) => string) => {
+    const matching = unconfirmed.filter((arrow) => arrow.reason === reason);
+    if (matching.length === 0) return undefined;
+    const shown = matching.slice(0, ARROW_CAP).map(say);
+    const held = matching.length - shown.length;
+    return held > 0 ? [...shown, `+${held} more`] : shown;
+  };
+  // Named by box label, not by ref: that is what a person recognises when they
+  // go back to the board to move an anchor. Box labels run to several lines on
+  // a dense board -- one of these is 96 characters over three -- so they are
+  // flattened and cut to the part that identifies the box, which is the first
+  // thing written in it.
+  const dataEnds = named(
+    "an-end-is-data",
+    (arrow) => `${shortLabel(arrow.fromLabel)} → ${shortLabel(arrow.toLabel)}`,
+  );
+  // Rare, and the one sentence here that names a line somebody can go and read,
+  // so it is carried whole rather than reduced to two labels.
+  const backwardsFlow = named("feeds-runs-the-other-way", (arrow) => arrow.detail);
+  return {
+    arrowsNotConfirmed:
+      `${unconfirmed.length} ${unconfirmed.length === 1 ? "arrow was" : "arrows were"} read and `
+      + `nothing corroborated ${unconfirmed.length === 1 ? "it" : "them"}: ${why}.`,
+    ...(dataEnds ? { anchoredAtData: dataEnds } : {}),
+    ...(backwardsFlow ? { flowRunsTheOtherWay: backwardsFlow } : {}),
+    aboutThoseArrows:
+      "Information, not a finding: nothing here contradicts the board, and nothing downstream "
+      + "reports it -- no colour, no notice, no exit code. It is said now because most of it was "
+      + "decided by which anchor went on which box, and you are the last person who can change "
+      + "that."
+      + (dataEnds
+        ? " An end naming a struct, a field or a static has no body for a call search to read. If "
+          + "the arrow means a call, anchor that end at the function that makes it; if it means "
+          + "orchestration or ownership, anchor it at file level and the import channels can "
+          + "answer instead."
+        : "")
+      + " If the anchors are already the ones you meant, leave them.",
+  };
+}
+
+/**
+ * Everything the check has to say about a board the moment it is written.
+ *
+ * One function because there is now more than one way to write a board. The
+ * facts are the same whichever tool got here, and two copies of these sentences
+ * would drift the way the "what was checked" line drifted before `summary.ts`
+ * took it over.
+ *
+ * The order is the order they matter in: a ref pointing at nothing is probably a
+ * typo, a garbled claim is a word no check can read, planned work is on purpose,
+ * and the arrows are information about anchoring rather than anything wrong.
+ */
+function drawTimeNotes(drawn: {
+  findings: ReadonlyArray<{ node: string; label?: string; ref: string }>;
+  garbledClaims: ReadonlyArray<{ detail: string }>;
+  workItems: ReadonlyArray<unknown>;
+  unconfirmedEdges: ReadonlyArray<UnconfirmedEdge>;
+}): Record<string, unknown> {
+  return {
+    ...(drawn.findings.length
+      ? {
+          pointsAtNothing: drawn.findings.map(
+            (finding) => `${finding.label || finding.node} → ${finding.ref}`,
+          ),
+          fix:
+            "Each of those is a typo to correct or work not written yet. Work to come carries "
+            + 'state: "planned" -- drawn dashed, reported as a work item, and flipped to built '
+            + "on its own when the code lands. Left as is, the end-of-turn check reports it to "
+            + "the user in red.",
+        }
+      : {}),
+    // Loud the turn it is written, which is the whole point of a closed
+    // vocabulary: the author is still here, and a word no check can read
+    // would otherwise sit on the board until somebody noticed the colour.
+    ...(drawn.garbledClaims.length
+      ? { garbledClaims: drawn.garbledClaims.map((finding) => finding.detail) }
+      : {}),
+    ...(drawn.workItems.length
+      ? {
+          plannedWork:
+            `${drawn.workItems.length} planned ${drawn.workItems.length === 1 ? "item" : "items"} `
+            + "tracked as work to do; each flips to built on its own when its code lands.",
+        }
+      : {}),
+    ...unconfirmedArrowNote(drawn.unconfirmedEdges),
+  };
+}
+
 server.registerTool(
   "create_diagram",
   {
@@ -475,9 +621,9 @@ server.registerTool(
       // exist is either a typo or a plan that forgot to say so. Left alone,
       // the end-of-turn check reports it to the user in red; caught here, the
       // model can still fix the ref or mark the box planned before anyone
-      // sees an alarm. Edge corroboration runs too, but only for its planned
-      // work items -- questionable arrows are a review matter, not a
-      // draw-time one, and are left to check_drift.
+      // sees an alarm. The arrow pass runs in the same call and is reported
+      // too -- see unconfirmedArrowNote for why that stopped being a review
+      // matter the day the amber went away.
       await initEngine();
       const drawn = checkDrift(result.board, createWorkspace(WORKSPACE_ROOT));
       // Named the turn it is written, because a claim nobody saw go on is a
@@ -491,31 +637,7 @@ server.registerTool(
         ...claimNote(edges),
         elements: result.elementCount,
         idPrefix: result.prefix,
-        ...(drawn.findings.length
-          ? {
-              pointsAtNothing: drawn.findings.map(
-                (finding) => `${finding.label || finding.node} → ${finding.ref}`,
-              ),
-              fix:
-                "Each of those is a typo to correct or work not written yet. Work to come carries "
-                + 'state: "planned" -- drawn dashed, reported as a work item, and flipped to built '
-                + "on its own when the code lands. Left as is, the end-of-turn check reports it to "
-                + "the user in red.",
-            }
-          : {}),
-        // Loud the turn it is written, which is the whole point of a closed
-        // vocabulary: the author is still here, and a word no check can read
-        // would otherwise sit on the board until somebody noticed the colour.
-        ...(drawn.garbledClaims.length
-          ? { garbledClaims: drawn.garbledClaims.map((finding) => finding.detail) }
-          : {}),
-        ...(drawn.workItems.length
-          ? {
-              plannedWork:
-                `${drawn.workItems.length} planned ${drawn.workItems.length === 1 ? "item" : "items"} `
-                + "tracked as work to do; each flips to built on its own when its code lands.",
-            }
-          : {}),
+        ...drawTimeNotes(drawn),
         ...(result.replacedCount
           ? {
               replaced: { diagrams: result.replacedDiagrams, elements: result.replacedCount },
@@ -966,11 +1088,35 @@ server.registerTool(
       const result = applyEdits(await readBoard(file), updates, deletes);
       await writeBoard(file, result.board);
       await followBoard(file);
+      /*
+       * An arrow gains its anchors from the boxes at its ends, and a box gains
+       * its ref here as often as at creation -- an edit is how a ref gets
+       * corrected. So the same draw-time answer is owed here, and withholding
+       * it would mean the tool that *changes* an anchor is the one tool silent
+       * about anchoring.
+       *
+       * Guarded rather than unconditional, because this tool is mostly used to
+       * move and recolour things and a whole drift check on every nudge would
+       * be paid for nothing. `customData` is the only route to a ref, a state
+       * or a claim, so its presence in a patch is an exact test for "this edit
+       * could have changed what the check reads" -- not a heuristic.
+       */
+      const touchedAnchors = updates.some((update) => {
+        const { props } = update as { props?: unknown };
+        const payload = (props && typeof props === "object" ? props : update) as Record<string, unknown>;
+        return payload.customData !== undefined;
+      });
+      let notes: Record<string, unknown> = {};
+      if (touchedAnchors && result.updated.length) {
+        await initEngine();
+        notes = drawTimeNotes(checkDrift(result.board, createWorkspace(WORKSPACE_ROOT)));
+      }
       return text({
         wrote: relativeToWorkspace(file),
         updated: result.updated,
         deleted: result.deleted,
         ...(result.skipped.length ? { skipped: result.skipped, note: "No element has these ids." } : {}),
+        ...notes,
       });
     }),
 );
