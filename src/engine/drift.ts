@@ -25,6 +25,7 @@ import path from "node:path";
 import { parseSymbol, routeOf, symbolEvidence, type Assertion } from "./assert";
 import { chainBreak, declarationsOf, reaches, unsupportedMembers } from "./body";
 import { checkFeeds, type FeedsCandidate, type FeedsWithheld } from "./feeds";
+import { followAnchors, type FollowedRef, type StaleAnchor, type Trail } from "./follow";
 import type { BoardFile } from "./board-file";
 import { arrowClaimError, boxClaimError, type ArrowClaim } from "./claim";
 import { checkClosed, type ClosedBreach } from "./closed";
@@ -624,6 +625,16 @@ export interface DeletedEdgeFinding {
 export interface DriftReport {
   clean: boolean;
   findings: DriftFinding[];
+  /**
+   * Where the code behind a stale anchor went, when the repository can say so
+   * without guessing. Empty unless a `trail` was supplied.
+   *
+   * Never part of `clean`, and never a finding of its own: every entry here is a
+   * row in `findings` with an address attached. The finding is still the thing
+   * that is wrong; this is the answer to the search it used to start. See
+   * `follow.ts` for why only two channels are allowed to answer.
+   */
+  followed: FollowedRef[];
   /**
    * Files the board's neighbourhood imports but does not show. Empty unless
    * `coverage` was asked for: it is the one check here that suggests additions,
@@ -1642,6 +1653,12 @@ export function checkDrift(
   options?: {
     edges?: boolean;
     baseline?: BoardBaseline;
+    /**
+     * The repository's memory of where code moved to. Absent means the question
+     * is not asked, which is what a caller with no git or no interest wants --
+     * `followed` then comes back empty, exactly as it does when nothing moved.
+     */
+    trail?: Trail;
     coverage?: boolean;
     codeGraph?: CodeGraphOption;
     /**
@@ -2880,6 +2897,7 @@ export function checkDrift(
     clean: findings.length === 0 && edges.length === 0 && deleted.length === 0
       && garbledClaims.length === 0,
     findings,
+    followed: options?.trail ? followStale(findings, options.trail) : [],
     closedBreaches,
     closedUnproven,
     closedUnusedDoors,
@@ -3054,6 +3072,48 @@ export function createWorkspace(root: string): Workspace {
       }
     },
   };
+}
+
+/**
+ * The findings that are an *address* problem, handed to the follower.
+ *
+ * Two filters, and both are about not proposing a claim nobody made.
+ * `missing-file` and `missing-symbol` are the only kinds where something moved;
+ * every other kind is a claim that failed for a reason no new address fixes -- a
+ * route that stopped being served, a symbol that is there but undeclared, a glob
+ * matching nothing.
+ *
+ * `inferred` anchors are dropped for the sharper reason. Their ref was *guessed
+ * from the label* rather than written by anyone, so re-aiming one is proposing a
+ * claim rather than correcting one, and `/update-diagram` already draws that line
+ * in the same place.
+ */
+function followStale(findings: readonly DriftFinding[], trail: Trail): FollowedRef[] {
+  const anchors: StaleAnchor[] = [];
+  for (const finding of findings) {
+    if (finding.provenance !== "recorded") continue;
+    if (finding.kind !== "missing-file" && finding.kind !== "missing-symbol") continue;
+    const { path: target, symbol } = parseRef(finding.ref);
+    if (!target || target.endsWith("/") || target.includes("*")) continue;
+    // The raw symbol is what any suggestion is rebuilt from, so an assertion
+    // word or a route literal survives the rewrite. Only the bare identifier
+    // inside it is something to go looking for.
+    let name: string | undefined;
+    if (symbol && !routeOf(symbol)) {
+      const parsed = parseSymbol(symbol);
+      if (!("garbled" in parsed)) name = parsed.symbol;
+    }
+    anchors.push({
+      node: finding.node,
+      label: finding.label,
+      ref: finding.ref,
+      path: target,
+      symbol,
+      name,
+      kind: finding.kind,
+    });
+  }
+  return anchors.length > 0 ? followAnchors(anchors, trail) : [];
 }
 
 /**

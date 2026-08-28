@@ -1751,3 +1751,84 @@ describe("promotion from the hook", () => {
     expect(said.systemMessage).not.toContain("@needs");
   }, 120_000);
 });
+
+/**
+ * The half of a stale box the report used to leave to a search.
+ *
+ * The engine's own following is covered by `follow-refs.test.ts`. What is
+ * covered here is whether it reaches a person: the row has to appear under the
+ * finding it belongs to, in the short report that fires every turn, because the
+ * moment it is only in the long form is the moment nobody sees it.
+ */
+describe("saying where the code went", () => {
+  let project: string;
+
+  function git(...args: string[]): void {
+    execFileSync("git", args, { cwd: project, stdio: "ignore" });
+  }
+
+  async function check(): Promise<string> {
+    try {
+      const { stdout, stderr } = await run(TSX, [SCRIPT], { cwd: project });
+      return `${stdout}${stderr}`;
+    } catch (error) {
+      const failure = error as { stdout?: string; stderr?: string };
+      return `${failure.stdout ?? ""}${failure.stderr ?? ""}`;
+    }
+  }
+
+  beforeAll(async () => {
+    project = mkdtempSync(path.join(tmpdir(), "drift-follow-"));
+    mkdirSync(path.join(project, "docs/diagrams"), { recursive: true });
+    mkdirSync(path.join(project, "src"), { recursive: true });
+    git("init", "-q");
+    writeFileSync(path.join(project, "src/old-layout.ts"), "export function layout(): number {\n  return 1;\n}\n");
+    writeFileSync(path.join(project, "src/kept.ts"), "export const kept = true;\n");
+    await writeBoard(
+      path.join(project, "docs/diagrams/arch.excalidraw"),
+      await board([
+        { id: "l", label: "Layout", ref: "src/old-layout.ts" },
+        { id: "k", label: "Kept", ref: "src/kept.ts" },
+      ]),
+    );
+    git("add", "-A");
+    execFileSync(
+      "git",
+      ["-c", "user.email=t@example.com", "-c", "user.name=Test", "commit", "-q", "-m", "start"],
+      { cwd: project, stdio: "ignore" },
+    );
+    mkdirSync(path.join(project, "src/engine"), { recursive: true });
+    git("mv", "src/old-layout.ts", "src/engine/layout.ts");
+    execFileSync(
+      "git",
+      ["-c", "user.email=t@example.com", "-c", "user.name=Test", "commit", "-q", "-m", "move it"],
+      { cwd: project, stdio: "ignore" },
+    );
+  }, 120_000);
+
+  afterAll(() => {
+    if (project) rmSync(project, { recursive: true, force: true });
+  });
+
+  it("prints the new address under the box that lost it", async () => {
+    const said = await check();
+    expect(said).toContain("Layout → src/old-layout.ts");
+    expect(said).toContain("moved to src/engine/layout.ts");
+  }, 120_000);
+
+  it("still counts the box as a finding", async () => {
+    // A suggestion is not a repair. If following a ref ever turned a stale board
+    // green, the report would be lying in the most expensive direction.
+    try {
+      await run(TSX, [SCRIPT], { cwd: project });
+      throw new Error("expected a non-zero exit");
+    } catch (error) {
+      expect((error as { code?: number }).code).toBe(1);
+    }
+  }, 120_000);
+
+  it("says nothing extra about a box whose code never moved", async () => {
+    const said = await check();
+    expect(said).not.toContain("Kept");
+  }, 120_000);
+});

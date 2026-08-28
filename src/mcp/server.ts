@@ -37,6 +37,7 @@ import {
   UNCONFIRMED_WORDS,
   type UnconfirmedEdge,
 } from "../engine/drift";
+import { createGitTrail, type FollowedRef } from "../engine/follow";
 import { computeHonestGaps } from "../engine/gaps";
 import { loadConverter } from "../engine/convert";
 import { initEngine } from "../engine/parse";
@@ -522,6 +523,7 @@ function drawTimeNotes(drawn: {
   garbledClaims: ReadonlyArray<{ detail: string }>;
   workItems: ReadonlyArray<unknown>;
   unconfirmedEdges: ReadonlyArray<UnconfirmedEdge>;
+  followed: ReadonlyArray<FollowedRef>;
 }): Record<string, unknown> {
   return {
     ...(drawn.findings.length
@@ -534,6 +536,25 @@ function drawTimeNotes(drawn: {
             + 'state: "planned" -- drawn dashed, reported as a work item, and flipped to built '
             + "on its own when the code lands. Left as is, the end-of-turn check reports it to "
             + "the user in red.",
+        }
+      : {}),
+    /*
+     * Where the code behind one of those went, when the repository can say so.
+     *
+     * The cheapest possible correction and the one most likely to be needed: a
+     * box drawn against an address that moved is not a mistake about the
+     * architecture, it is a mistake about a path, and the answer was already
+     * written down in git. Saying it here means the ref gets fixed in the same
+     * turn it was written rather than by somebody searching the tree later.
+     *
+     * Nothing has been changed. `becomes` is a ref to write; an entry without
+     * one is the follower saying why it will not choose. See `follow.ts`.
+     */
+    ...(drawn.followed.length
+      ? {
+          movedTo: drawn.followed.map(
+            (entry) => `${entry.ref} \u2014 ${entry.detail}`,
+          ),
         }
       : {}),
     // Loud the turn it is written, which is the whole point of a closed
@@ -625,7 +646,9 @@ server.registerTool(
       // too -- see unconfirmedArrowNote for why that stopped being a review
       // matter the day the amber went away.
       await initEngine();
-      const drawn = checkDrift(result.board, createWorkspace(WORKSPACE_ROOT));
+      const drawn = checkDrift(result.board, createWorkspace(WORKSPACE_ROOT), {
+        trail: createGitTrail(WORKSPACE_ROOT),
+      });
       // Named the turn it is written, because a claim nobody saw go on is a
       // claim nobody can refuse. The board shows it too; this is for whoever is
       // reading the transcript rather than the canvas.
@@ -833,6 +856,7 @@ server.registerTool(
       };
       const findings: Array<Record<string, unknown>> = [];
       const deleted: Array<Record<string, unknown>> = [];
+      const followed: Array<Record<string, unknown>> = [];
       const unrepresented: Array<Record<string, unknown>> = [];
       const unannotated: Array<Record<string, unknown>> = [];
       const unreadEdges: Array<Record<string, unknown>> = [];
@@ -847,9 +871,14 @@ server.registerTool(
       await initEngine();
       const codeGraph = createCodeGraphOption(WORKSPACE_ROOT);
       const ledger = createLedger(WORKSPACE_ROOT);
+      // One trail for every board in the call: two diagrams pointing at the same
+      // moved file then ask git about it once. Costs nothing until a box is
+      // already a finding, so a clean run never touches it.
+      const trail = createGitTrail(WORKSPACE_ROOT);
       for (const file of files) {
         const report = checkDrift(await readBoard(file), workspace, {
           coverage,
+          trail,
           baseline: createGitBaseline(WORKSPACE_ROOT, file),
           ...(codeGraph ? { codeGraph } : {}),
           ...(ledger ? { ledger } : {}),
@@ -873,6 +902,18 @@ server.registerTool(
         }
         for (const finding of report.deleted) {
           deleted.push({ board: relativeToWorkspace(file), ...finding });
+        }
+        /*
+         * Where the code behind a stale box went.
+         *
+         * Carried separately from `findings` rather than folded into them,
+         * because the two say different things and a caller has to be able to
+         * tell them apart: a finding is the board being wrong, and this is an
+         * address the repository can state without anybody searching for it. A
+         * suggestion merged into a finding would read as a repair.
+         */
+        for (const entry of report.followed) {
+          followed.push({ board: relativeToWorkspace(file), ...entry });
         }
         for (const item of report.unannotated) {
           unannotated.push({ board: relativeToWorkspace(file), ...item });
@@ -938,6 +979,19 @@ server.registerTool(
         // Boxes the diagram stopped claiming, while their code is still here.
         // Uncommitted only: committing the board is what says it was deliberate.
         ...(deleted.length ? { deleted } : {}),
+        /*
+         * Stale boxes whose code the repository can place. Never part of
+         * `clean`: every one of these is still a finding above.
+         *
+         * Two shapes, and the difference is the whole point. An entry with
+         * `becomes` is an address to write, arrived at by git recording the move
+         * or by the name being declared in exactly one file -- the two channels
+         * that produced no wrong answer in 281 replayed cases. An entry with
+         * `candidates` instead is the follower declining, and its `detail` says
+         * why. Neither is an instruction: nothing here has edited anything, and
+         * `docs/rebind-measurement.md` is why that restraint is deliberate.
+         */
+        ...(followed.length ? { followed } : {}),
         // Both are separate from `clean` on purpose: a planned box the code has
         // not reached is work, not drift, and a promotion is good news.
         ...(workItems.length ? { workItems } : {}),
@@ -1109,7 +1163,9 @@ server.registerTool(
       let notes: Record<string, unknown> = {};
       if (touchedAnchors && result.updated.length) {
         await initEngine();
-        notes = drawTimeNotes(checkDrift(result.board, createWorkspace(WORKSPACE_ROOT)));
+        notes = drawTimeNotes(checkDrift(result.board, createWorkspace(WORKSPACE_ROOT), {
+          trail: createGitTrail(WORKSPACE_ROOT),
+        }));
       }
       return text({
         wrote: relativeToWorkspace(file),
