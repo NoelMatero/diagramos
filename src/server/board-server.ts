@@ -485,16 +485,38 @@ export async function startBoardServer(options: BoardServerOptions): Promise<Run
     return owner ?? root ?? process.cwd();
   };
 
-  /** The drift report for a board, from its own project. Shared by the endpoint and the watcher. */
-  const reportFor = async (target: string) => {
+  /**
+   * The drift report for a board, from its own project.
+   *
+   * `full` is what the status endpoint asks for. The live promotion path asks
+   * for the cheap form instead, and the difference is not a shortcut -- it is
+   * the same rule that governs everything else on that path.
+   *
+   * `baseline` produces deleted-claim findings and `ledger` gates verdicts so a
+   * claim is not judged on a file nothing read. Both exist to get *bad news*
+   * right, and the live path shows no bad news by design. Neither has any say in
+   * whether a `planned` box resolves, so dropping them changes no promotion --
+   * and it removes two synchronous `git` calls from a check that runs on every
+   * burst of edits.
+   *
+   * That matters because this engine is synchronous: while a check runs, this
+   * service answers nothing. `/api/drift` has always paid that, on a slow timer
+   * and on focus; the live path made it frequent, so it is worth being the
+   * cheapest check that can still answer the only question it asks.
+   */
+  const reportFor = async (target: string, full = true) => {
     engineReady ??= initEngine();
     await engineReady;
     const workspaceRoot = rootFor(target);
     const codeGraph = createCodeGraphOption(workspaceRoot);
-    const ledger = createLedger(workspaceRoot);
+    // Kept even on the cheap path: a `planned` arrow is promoted by the same
+    // corroboration channels that check a built one, and the graph is one of
+    // them. Its parse is cached; what is left is the working-tree diff, which
+    // has to stay fresh precisely because the tree is what is changing.
+    const ledger = full ? createLedger(workspaceRoot) : undefined;
     const board = await readBoard(target);
     const report = checkDrift(board, createWorkspace(workspaceRoot), {
-      baseline: createGitBaseline(workspaceRoot, target),
+      ...(full ? { baseline: createGitBaseline(workspaceRoot, target) } : {}),
       ...(codeGraph ? { codeGraph } : {}),
       ...(ledger ? { ledger } : {}),
     });
@@ -529,7 +551,7 @@ export async function startBoardServer(options: BoardServerOptions): Promise<Run
   const promoteLive = async (target: string): Promise<void> => {
     const state = boards.get(target);
     if (!state) return;
-    const { board, report } = await reportFor(target);
+    const { board, report } = await reportFor(target, false);
     // Written since the read that produced this report -- by the page, the Stop
     // hook, or an editor. Their own announce covers it, and writing our older
     // scene over theirs is the shape of a wipe (#70). The next burst re-reads.
