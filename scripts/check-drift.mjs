@@ -48,6 +48,8 @@ import {
 import { readBoard, writeBoard } from "../src/engine/board-file.ts";
 import { applyPromotions, clearLivePromotions } from "../src/engine/promote.ts";
 import { applyFollowed } from "../src/engine/repair.ts";
+import { acceptBackwards, backwardsArrows } from "../src/engine/accept.ts";
+import { readGraph } from "../src/engine/graph.ts";
 import { CONFIG_FILE, ConfigError, DEFAULT_DIAGRAM_DIR, diagramDir } from "../src/engine/config.ts";
 import { countedWords, coverageLabel } from "../src/engine/summary.ts";
 import {
@@ -83,6 +85,10 @@ const USAGE = [
   "  --repair       rewrite the refs whose code the repository can place, and",
   "                 say which. Only where there is exactly one answer; never",
   "                 on the per-turn path.",
+  '  --accept "a -> b"',
+  "                 the code is right and the arrow was wrong: turn that one",
+  "                 arrow round. Only an arrow this run reports as backwards,",
+  "                 one at a time, never on the per-turn path.",
   "",
   "Silent, exit 0, when nothing has drifted.",
 ].join("\n");
@@ -102,10 +108,13 @@ function parseArgs() {
     expand: false,
     shrink: false,
     repair: false,
+    /** The one arrow `--accept` was asked to turn round, if any. */
+    accept: undefined,
   };
   const boards = [];
 
-  for (const arg of argv) {
+  for (let index = 0; index < argv.length; index++) {
+    const arg = argv[index];
     if (arg === "--no-edges") {
       opts.edges = false;
     } else if (arg === "--no-deletions") {
@@ -122,6 +131,20 @@ function parseArgs() {
       opts.shrink = true;
     } else if (arg === "--repair") {
       opts.repair = true;
+    } else if (arg === "--accept" || arg.startsWith("--accept=")) {
+      /*
+       * The one argument here that takes a value, because the value is the
+       * whole safety property: accepting is per-arrow, and an `--accept` that
+       * defaulted to "all of them" would be the silent rewriting this is
+       * carefully not.
+       */
+      const inline = arg.startsWith("--accept=") ? arg.slice("--accept=".length) : undefined;
+      const value = inline ?? argv[++index];
+      if (!value || value.startsWith("--")) {
+        console.error('--accept needs the arrow to turn round, as `--accept "from -> to"`.');
+        process.exit(2);
+      }
+      opts.accept = value.trim();
     } else if (!arg.startsWith("--")) {
       boards.push(arg);
     }
@@ -435,6 +458,47 @@ function followRow(followed, colour, all) {
 const MAX_LISTED = 6;
 
 /**
+ * The way out, under the findings that need one (#141).
+ *
+ * `backwards-edge` is the only verdict here that means *wrong*, and until there
+ * was a command for it the answers were to change the code or hand-edit the
+ * board file -- so the loudest thing this check says was the one thing nobody
+ * could act on. The foot offers `/update-diagram`, which is scoped to anchors
+ * that went stale and says outright that it is not for this, so the report has
+ * to carry its own answer.
+ *
+ * One line per report rather than one per arrow, and added *after* the rows are
+ * trimmed rather than among them. It is not a finding: counted as one it ate
+ * into the six that get listed and inflated "and N more", so a notice about
+ * twelve arrows claimed twenty-one.
+ *
+ * It names an id because the id is what the command takes, and only one because
+ * only one can be accepted at a time -- with no count of the rest, which in the
+ * expanded view would sit under a list of every one of them.
+ *
+ * Dim, and phrased as the exception, because it is one: the common reading of a
+ * backwards arrow is that the code drifted and the diagram was right, and a line
+ * leading with "or accept it" would be teaching people to silence the check.
+ */
+function acceptHint(entries, colour) {
+  const backwards = entries.flatMap(({ report }) =>
+    report.edges.filter((finding) => finding.kind === "backwards-edge"),
+  );
+  if (backwards.length === 0) return [];
+  return [
+    paint(
+      `  \u21b3 code right? /accept-arrow "${backwards[0].node}"`
+      // Named only when there is a choice to be wrong about. With several
+      // backwards arrows the line names one of them, and somebody who read that
+      // as "this fixes them all" would be surprised by the second run.
+      + (backwards.length > 1 ? " \u00b7 one arrow at a time" : ""),
+      "dim",
+      colour,
+    ),
+  ];
+}
+
+/**
  * One finding per row: what the box says, and what it points at.
  *
  * Work items are listed only when `all` is set, which the long form does and the
@@ -621,7 +685,7 @@ function renderDetails(stale, colour, foot = "/update-diagram updates the diagra
   return box({
     sections: stale.map((entry) => ({
       label: `${path.basename(entry.file)}  ${tallyFor(entry, colour)}`,
-      rows: rowsFor(entry, colour, true),
+      rows: [...rowsFor(entry, colour, true), ...acceptHint([entry], colour)],
     })),
     foot,
     max: 72,
@@ -691,6 +755,7 @@ function render(stale, colour) {
   if (hidden > 0) {
     rows.push(paint(`\u2026 and ${hidden} more${single ? "" : " diagrams"}`, "dim", colour));
   }
+  rows.push(...acceptHint(stale, colour));
 
   return box({ head, foot: "/update-diagram updates it · /expand-report shows them all", rows });
 }
@@ -733,6 +798,17 @@ async function hookOnStdin() {
 
 const { boards, opts } = parseArgs();
 if (!opts.hook) opts.hook = await hookOnStdin();
+/*
+ * The per-turn path never accepts, and the guard is here rather than a comment,
+ * because `--hook` is also set by being *run* as a hook -- so this catches a
+ * configuration that would otherwise turn arrows round every turn with nobody
+ * watching. Accepting is a person deciding the architecture changed; a hook
+ * cannot be that person.
+ */
+if (opts.accept && opts.hook) {
+  console.error("--accept is not available on the hook path: turning an arrow round is a decision somebody makes, not one a check makes for them.");
+  process.exit(2);
+}
 if (opts.expand) setExpanded(true);
 if (opts.shrink) setExpanded(false);
 // --details is a one-off; the mode file is what the next hook run reads.
@@ -927,6 +1003,45 @@ const trail = createGitTrail(root);
 /** Refs `--repair` rewrote, per board. Empty on every other run. */
 const repaired = [];
 
+/** The arrow `--accept` turned round, and the reason it did not. One of each, at most. */
+const accepted = [];
+const acceptHeld = [];
+
+/*
+ * Which board holds the arrow `--accept` names, settled before a single board is
+ * written.
+ *
+ * The rule the whole feature rests on is one claim at a time, and the loop below
+ * writes each board as it reaches it -- so if two diagrams both drew `a -> b`,
+ * deciding inside the loop would flip the first and only then discover the
+ * second. This asks the cheap question first: it reads the recorded graph of
+ * each board, which costs nothing next to a drift check, and refuses outright
+ * rather than turning an arrow nobody pointed at.
+ */
+let acceptFile;
+if (opts.accept) {
+  const holding = loaded.filter(({ boardFile }) =>
+    readGraph(boardFile).edges.some((edge) => `${edge.from} -> ${edge.to}` === opts.accept),
+  );
+  if (holding.length === 0) {
+    console.error(
+      `No arrow here is drawn \`${opts.accept}\`. Run the check without --accept; `
+        + `a backwards finding names the arrow in the form to pass back.`,
+    );
+    process.exit(2);
+  }
+  if (holding.length > 1) {
+    console.error(
+      `\`${opts.accept}\` is drawn on ${holding.length} boards, and this turns one arrow round, `
+        + `not several. Name the board:\n`
+        + holding.map(({ file }) => `  diagramos drift ${path.relative(root, file)} --accept "${opts.accept}"`)
+          .join("\n"),
+    );
+    process.exit(2);
+  }
+  acceptFile = holding[0].file;
+}
+
 for (const { file, boardFile } of loaded) {
   let report;
   /** Promotions actually written to the board this run, one per box or arrow. */
@@ -996,6 +1111,51 @@ for (const { file, boardFile } of loaded) {
         } catch {
           // An unwritable tree: keep reporting the suggestion instead of it.
         }
+      }
+    }
+    /*
+     * The one place a claim's meaning changes, and only because somebody said so.
+     *
+     * Everything else on this path either reports, repairs an address, or
+     * releases a plan gate the code already opened. This decides that the
+     * dependency runs the other way -- a design decision, which is why it is
+     * reachable only from an argument naming one arrow, and never from --hook.
+     *
+     * It is checked against the report first: an arrow this run does not accuse
+     * cannot be accepted, so a stale terminal cannot flip something that stopped
+     * being wrong ten minutes ago.
+     */
+    if (file === acceptFile) {
+      const result = acceptBackwards(boardFile, report, opts.accept);
+      if (result.applied) {
+        try {
+          await writeBoard(file, result.board);
+          accepted.push({ file, applied: result.applied });
+          // The board changed underneath the report, and the finding this just
+          // answered is not true any more. Re-checking is what the next run
+          // would say, and cheaper than explaining a stale list.
+          report = checkDrift(result.board, workspace, {
+            edges: opts.edges,
+            coverage: opts.coverage,
+            trail,
+            ...(baseline ? { baseline } : {}),
+            ...(codeGraphOption ? { codeGraph: codeGraphOption } : {}),
+            ...(ledger ? { ledger } : {}),
+          });
+        } catch (error) {
+          acceptHeld.push({
+            file,
+            held: { node: opts.accept, why: "unwritable", detail: `could not write the board (${error.message}).` },
+          });
+        }
+      } else if (result.held) {
+        /*
+         * A refusal names what *can* be accepted. The commonest way to land here
+         * is a typo in an arrow id, and a bare "no" leaves somebody guessing at
+         * a string the tool is holding right there.
+         */
+        const available = backwardsArrows(report);
+        acceptHeld.push({ file, held: result.held, available });
       }
     }
     if (opts.hook) {
@@ -1568,6 +1728,47 @@ const repairedLines = repaired.length === 0
       max: 72,
     });
 
+/**
+ * The arrow `--accept` turned round, or the reason it would not.
+ *
+ * Its own box for the same reason `--repair` has one: everything else on the
+ * report says the board and the code disagree, and this says somebody settled a
+ * disagreement and here is the edit. The foot is the important line -- the diff
+ * is the whole record that a design decision was made, so it has to be read
+ * before it is committed.
+ */
+const acceptedLines = accepted.length === 0 && acceptHeld.length === 0
+  ? []
+  : box({
+      sections: [
+        ...accepted.map(({ file, applied }) => ({
+          label: `${path.basename(file)}  arrow turned round`,
+          rows: [
+            paint(
+              `${oneLine(applied.fromLabel)} \u2192 ${oneLine(applied.toLabel)}`
+                + `  becomes  ${oneLine(applied.toLabel)} \u2192 ${oneLine(applied.fromLabel)}`,
+              "green",
+              Boolean(process.stderr.isTTY),
+            ),
+            `${applied.was.from} -> ${applied.was.to}  becomes  ${applied.now.from} -> ${applied.now.to}`,
+          ],
+        })),
+        ...acceptHeld.map(({ file, held, available }) => ({
+          label: `${path.basename(file)}  not accepted`,
+          rows: [
+            paint(held.detail, "red", Boolean(process.stderr.isTTY)),
+            ...(available && available.length > 0
+              ? [`this run says these are backwards: ${available.map((id) => `"${id}"`).join(", ")}`]
+              : []),
+          ],
+        })),
+      ],
+      foot: accepted.length > 0
+        ? "the diagram now says the dependency runs the other way \u00b7 read the diff before committing"
+        : "nothing was changed",
+      max: 78,
+    });
+
 const goodLines = [];
 if (opts.hook) {
   let seen = {};
@@ -1610,13 +1811,14 @@ if (opts.hook) {
 
 if (showing.length > 0 || problems.length > 0 || coverageLines.length > 0
   || unanchoredLines.length > 0 || auditLines.length > 0 || hintLines.length > 0
-  || goodLines.length > 0 || repairedLines.length > 0) {
+  || goodLines.length > 0 || repairedLines.length > 0 || acceptedLines.length > 0) {
   // Measured: ANSI renders in a systemMessage. Off only when the output is being
   // piped or captured, where escapes would be junk in somebody's log.
   const colour = opts.hook || Boolean(process.stderr.isTTY);
   const lines = [
     // First: it is the one group here that reports a change already made to the
     // working tree, and it has to be read before the findings that survived it.
+    ...acceptedLines,
     ...repairedLines,
     ...auditLines,
     ...unanchoredLines,

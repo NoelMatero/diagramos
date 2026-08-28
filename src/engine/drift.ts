@@ -2441,7 +2441,23 @@ export function checkDrift(
                 + `this arrow says ${fromNode.label || fromPath} needs `
                 + `${toNode.label || toPath}, but the dependency runs the other way — `
                 + `${evidence.file} line ${evidence.line} declares "${evidence.specifier}", `
-                + `and ${fromPath} declares nothing on ${toPath}. Turn the arrow round.`,
+                + `and ${fromPath} declares nothing on ${toPath}. Turn the arrow round`
+                /*
+                 * The way out, said where the accusation is (#141).
+                 *
+                 * This is the only finding here that means *wrong*, and until
+                 * there was a command for it the only answers were to change
+                 * the code or hand-edit the board file -- so the loudest thing
+                 * this tool says was the one thing nobody could act on. An
+                 * affordance nobody can see from the finding is not one.
+                 *
+                 * Second, and phrased as the exception, because it is: the
+                 * common case is that the code drifted and the diagram was
+                 * right, and a report that led with "or just accept it" would
+                 * be teaching people to silence the check.
+                 */
+                + ` — or, if the code is right and the arrow was wrong, `
+                + `\`drift --accept "${edge.from} -> ${edge.to}"\` turns it round for you.`,
             } });
             continue;
           }

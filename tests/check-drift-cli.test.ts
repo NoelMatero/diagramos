@@ -425,6 +425,19 @@ describe("a report with many findings stays readable", () => {
     expect(listed + hidden).toBe(12);
   });
 
+  it("offers the way out once, not once per arrow", () => {
+    /*
+     * Twelve backwards arrows, one line telling you what to do about them.
+     *
+     * Printed per arrow it was not a finding being counted as one: it ate into
+     * the six rows that get listed and inflated "and N more", so a notice about
+     * twelve arrows claimed twenty-one. It also has to stay out of the count
+     * above, which is the assertion in the test before this one.
+     */
+    expect((stderr.match(/\/accept-arrow/g) ?? []).length).toBe(1);
+    expect(stderr).toContain("one arrow at a time");
+  });
+
   it("stays short enough to read", () => {
     // The old format spent 2360 characters on this exact case.
     expect(stderr.length).toBeLessThan(800);
