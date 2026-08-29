@@ -1851,6 +1851,17 @@ if (showing.length > 0 || problems.length > 0 || coverageLines.length > 0
   }
 
   console.error(lines.join("\n"));
+  /*
+   * A refused `--accept` answers the command rather than the repository.
+   *
+   * 2, like every other way of asking for the wrong arrow -- an id nothing is
+   * drawn as, an id on two boards, the flag with no value. Those exit before a
+   * board is read; this one cannot, because whether the arrow is accused is a
+   * question only the check can answer. Falling through to the report's own code
+   * meant a refusal on an otherwise clean board exited 0, so a script could not
+   * tell "turned it round" from "would not".
+   */
+  if (acceptHeld.length > 0 && accepted.length === 0) process.exit(2);
   // Non-zero only for something that has actually regressed. A promotion or an
   // unbuilt sketch must not fail a build: CI reads this exit code, and a diagram
   // describing next week's work is not a broken repository.

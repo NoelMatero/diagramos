@@ -253,8 +253,15 @@ describe("--accept on the command line", () => {
       nodes: [
         { id: "one", label: "One", ref: "src/a.ts" },
         { id: "two", label: "Two", ref: "src/b.ts" },
+        { id: "three", label: "Three", ref: "src/c.ts" },
       ],
-      edges: [{ from: "one", to: "two", claim: "needs" }],
+      edges: [
+        // Backwards, and first, so `drawnAs` reads the arrow under test.
+        { from: "one", to: "two", claim: "needs" },
+        // True, and therefore never accused: the arrow that proves a refusal is
+        // about what the report says rather than about the id being unknown.
+        { from: "three", to: "one", claim: "needs" },
+      ],
     });
     await writeBoard(path.join(repo, at), board);
   }
@@ -266,6 +273,7 @@ describe("--accept on the command line", () => {
     execFileSync("git", ["init", "-q"], { cwd: repo, stdio: "ignore" });
     writeFileSync(path.join(repo, "src/a.ts"), FILES["a.ts"]!);
     writeFileSync(path.join(repo, "src/b.ts"), FILES["b.ts"]!);
+    writeFileSync(path.join(repo, "src/c.ts"), 'import { a } from "./a";\nexport const c = a;\n');
   }, 120_000);
 
   afterAll(() => {
@@ -299,6 +307,18 @@ describe("--accept on the command line", () => {
     expect(drawnAs()).toBe("two -> one");
     // Re-checked after the write, so what is printed is what the next run says.
     expect(run().status).toBe(0);
+  }, 120_000);
+
+  it("says so in its exit code when it would not turn one round", async () => {
+    await drawBoard();
+    // 2, like every other way of naming the wrong arrow. Falling through to the
+    // report's own code meant a refusal on an otherwise clean board exited 0,
+    // and a script could not tell "turned it round" from "would not".
+    const refused = run("--accept", "three -> one");
+    expect(refused.status).toBe(2);
+    expect(refused.out).toContain("does not say three -> one is drawn backwards");
+    expect(refused.out).toContain('this run says these are backwards: "one -> two"');
+    expect(drawnAs()).toBe("one -> two");
   }, 120_000);
 
   it("refuses on the hook path, where nobody is watching", async () => {
