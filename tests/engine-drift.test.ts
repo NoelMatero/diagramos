@@ -853,7 +853,7 @@ describe("state: what the diagram claims about time", () => {
   /** A board whose nodes carry a state, built through the real pipeline. */
   async function stateBoard(
     nodes: Array<{ id: string; label: string; ref?: string; state?: "planned" | "built" | "external" }>,
-    options?: { title?: string; describes?: "repo" | "concept"; edges?: Array<{ from: string; to: string; state?: "planned" | "built" | "external"; claim?: "needs" }> },
+    options?: { title?: string; describes?: "repo" | "concept"; edges?: Array<{ from: string; to: string; state?: "planned" | "built" | "external"; claim?: "needs" | "feeds" }> },
   ): Promise<BoardFile> {
     const result = await createDiagram(emptyBoard(), {
       name: "arch",
@@ -986,20 +986,22 @@ describe("state: what the diagram claims about time", () => {
   });
 
   /**
-   * Promotion and the first verdict on a claim are two runs apart (#123).
+   * Promotion and the first verdict on a `@needs` claim used to be two runs
+   * apart (#123), and #124 closed the gap between them.
    *
-   * A planned `@needs` arrow is a specification: it says which way the
-   * dependency *will* run, and nothing checks it, because the wrong verdict is
-   * gated on `built`. So the run that promotes the arrow is the run that makes
-   * the claim answerable for the first time -- and if the code went the other
-   * way, the next run says "drawn backwards". Read back to back that looks like
-   * the tool approving something and then rejecting it. It is not: the promotion
-   * established that the connection exists and never said which way it runs.
+   * The old sequence: nothing read a planned arrow's direction, so the run that
+   * promoted it was the run that made the claim answerable, and if the code had
+   * gone the other way the next run said "drawn backwards". Read back to back
+   * that looked like the tool approving something and then rejecting it, and the
+   * promotion carried the claim so the report could say so out loud.
    *
-   * The promotion carries the claim so the report can say that out loud, rather
-   * than leaving the reader to work out which of two sentences to believe.
+   * The direction is read before the promotion is offered now, and a backwards
+   * answer holds the promotion back rather than following it a turn later. So a
+   * promoted `@needs` has nothing outstanding, and the sentence warning that it
+   * did is gone. The word is still carried: a caller that stopped naming it
+   * could no longer tell a promoted claim from a promoted arrow with none.
    */
-  it("hands the promoted claim on, so the next run's verdict is not a reversal", async () => {
+  it("leaves nothing outstanding on a promoted @needs", async () => {
     const board = await stateBoard(
       [
         { id: "a", label: "A", ref: "src/a.ts" },
@@ -1013,7 +1015,28 @@ describe("state: what the diagram claims about time", () => {
     }));
     expect(report.promotions).toHaveLength(1);
     expect(report.promotions[0]).toMatchObject({ node: "a -> b", claim: "needs" });
-    expect(report.promotions[0]!.detail).toContain("@needs");
+    expect(report.promotions[0]!.detail).not.toContain("@needs");
+  });
+
+  /**
+   * `@feeds` keeps the warning, because it keeps the situation that earned it:
+   * a pipeline claim has no direction to be proved wrong and so gets no check on
+   * the way in, and the run after the promotion really is the first one to look.
+   */
+  it("still says a promoted @feeds has not been read yet", async () => {
+    const board = await stateBoard(
+      [
+        { id: "a", label: "A", ref: "src/a.ts" },
+        { id: "b", label: "B", ref: "src/b.ts" },
+      ],
+      { edges: [{ from: "a", to: "b", state: "planned", claim: "feeds" }] },
+    );
+    const report = checkDrift(board, fakeWorkspace({
+      "src/a.ts": "import { b } from './b';\nexport const a = b;",
+      "src/b.ts": "export const b = 2;",
+    }));
+    expect(report.promotions).toHaveLength(1);
+    expect(report.promotions[0]!.detail).toContain("@feeds");
   });
 
   it("says nothing about a claim on a promotion that never carried one", async () => {
@@ -1032,13 +1055,21 @@ describe("state: what the diagram claims about time", () => {
     expect(report.promotions[0]!.detail).not.toContain("@needs");
   });
 
-  it("promotes a planned arrow the code contradicts, instead of accusing it", async () => {
+  it("does not call a plan built when the code went the other way", async () => {
     /*
-     * The arrow says A will need B. The code that landed has B importing A. On a
-     * built arrow that is `backwards-edge` in red; on a plan it is a plan whose
-     * connection now exists, drawn the other way round, and being accused of
-     * sketching a dependency that currently runs the other way is not useful.
-     * This is the run the promotion note above is written for.
+     * The arrow says A will need B. The code that landed has B importing A.
+     *
+     * This used to promote (#124). Promotion asks whether the two ends are
+     * connected, and connected has no direction, so code doing the reverse
+     * corroborated the plan exactly as well as code doing it -- and the board
+     * reported the work as done. The direction was then read on the run after,
+     * once the arrow was `built`, and contradicted it.
+     *
+     * Not a finding, though. `backwards-edge` on a built arrow is an accusation
+     * and would be a lie here: sketching a dependency that currently runs the
+     * other way is a thing people do on purpose, and from here that plan and a
+     * plan an agent implemented backwards are indistinguishable. What is
+     * certain is that the connection is not the one that was drawn.
      */
     const board = await stateBoard(
       [
@@ -1051,12 +1082,46 @@ describe("state: what the diagram claims about time", () => {
       "src/a.ts": "export const a = 1;",
       "src/b.ts": "import { a } from './a';\nexport const b = a;",
     }));
+    expect(report.promotions).toEqual([]);
+    expect(report.workItems).toHaveLength(1);
+    expect(report.workItems[0]!.kind).toBe("built-backwards");
+    expect(report.workItems[0]!.node).toBe("a -> b");
+    expect(report.workItems[0]!.detail).toContain("runs the other way");
+    // Names the evidence, in the file and at the line somebody can go and read.
+    expect(report.workItems[0]!.detail).toContain("src/b.ts line 1");
+    // Not an accusation, and never a failed build: a plan cannot break CI.
     expect(report.edges).toEqual([]);
-    expect(report.promotions).toHaveLength(1);
+    expect(report.findings).toEqual([]);
     expect(report.clean).toBe(true);
-    // Never reached, so never counted as answered either way.
+    // Counted, because this exit does not reach the channels below and a report
+    // naming an arrow while claiming to have checked none reads as untrustworthy.
+    expect(report.edgesChecked).toBe(1);
+    // The claim tallies stay about live claims on built arrows. A plan makes no
+    // claim about today; its direction was read for one question, and the answer
+    // is the work item rather than a number in a summary.
     expect(report.claims.needsChecked).toBe(0);
     expect(report.claims.needsWithheld).toEqual({});
+  });
+
+  it("still promotes a planned arrow the code built the way it was drawn", async () => {
+    // The other half of the pair, and the one that must not have moved: the
+    // guard above only ever fires on `backwards`, and every other verdict falls
+    // through to the ordinary channels untouched.
+    const board = await stateBoard(
+      [
+        { id: "a", label: "A", ref: "src/a.ts" },
+        { id: "b", label: "B", ref: "src/b.ts" },
+      ],
+      { edges: [{ from: "a", to: "b", state: "planned", claim: "needs" }] },
+    );
+    const report = checkDrift(board, fakeWorkspace({
+      "src/a.ts": "import { b } from './b';\nexport const a = b;",
+      "src/b.ts": "export const b = 2;",
+    }));
+    expect(report.promotions).toHaveLength(1);
+    expect(report.workItems).toEqual([]);
+    expect(report.edges).toEqual([]);
+    expect(report.clean).toBe(true);
   });
 
   it("skips an arrow that touches an external node", async () => {

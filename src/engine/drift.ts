@@ -91,8 +91,20 @@ export interface DriftFinding {
  * `planned` arrows, where absence is the news the board asked for -- the
  * connection you drew has not landed yet -- and it reaches the report as a
  * `WorkItem`, never as drift.
+ *
+ * `built-backwards` is that arrow's other answer, and it is `planned`-only for
+ * the mirror-image reason (#124). Promotion asks whether the two ends are
+ * connected, which has no direction, so a dependency built the opposite way to
+ * the plan corroborates the arrow and promotes it -- the board reporting the
+ * plan as done on the strength of code that does the reverse. It reaches the
+ * report as a `WorkItem` too: the work is genuinely not done, and a plan must
+ * never fail a build.
  */
-export type EdgeFindingKind = "unsupported-edge" | "broken-chain" | "backwards-edge";
+export type EdgeFindingKind =
+  | "unsupported-edge"
+  | "broken-chain"
+  | "backwards-edge"
+  | "built-backwards";
 
 /**
  * Every verdict word this engine can put in a report, as data (#116).
@@ -124,6 +136,7 @@ export const EDGE_FINDING_KINDS = [
   "unsupported-edge",
   "broken-chain",
   "backwards-edge",
+  "built-backwards",
 ] as const satisfies readonly EdgeFindingKind[];
 
 /*
@@ -177,6 +190,14 @@ export interface WorkItem {
    * accident: the wrong verdict is gated on `built`, so a `planned` arrow never
    * reaches it. Sketching a dependency that currently runs the other way is a
    * thing people do on purpose, and being accused of it is not useful.
+   *
+   * `built-backwards` is the near neighbour that can, and it is not that
+   * accusation (#124). It says what the code does -- these two are connected,
+   * the other way round -- and draws no conclusion about who is wrong, because
+   * the sketch-an-inversion case and the built-it-backwards case are
+   * indistinguishable from here and always will be. What it does establish is
+   * that the plan has not landed, which is the one thing the old answer got
+   * wrong: the arrow was promoted, and the board said the work was done.
    */
   kind: DriftKind | EdgeFindingKind;
   detail: string;
@@ -197,12 +218,19 @@ export interface Promotion {
    * The claim this promotion just made checkable, when the promoted thing
    * carried one.
    *
-   * A promotion and the first verdict on a claim are two runs apart, and read
-   * back to back they can look like the tool changing its mind: "built now"
-   * this turn, "drawn backwards" the next. They are not in conflict -- the
-   * promotion established that the connection exists, never which way it runs
-   * -- but only a report that says so can be read that way (#123). Carried here
-   * so the sentence announcing the promotion can name what it did *not* settle.
+   * A promotion and the first verdict on a claim were two runs apart, and read
+   * back to back they looked like the tool changing its mind: "built now" this
+   * turn, "drawn backwards" the next. They were not in conflict -- the promotion
+   * established that the connection exists, never which way it runs -- but only
+   * a report that says so could be read that way (#123). Carried here so the
+   * sentence announcing the promotion can name what it did *not* settle.
+   *
+   * True of `feeds` and no longer of `needs` (#124). A `needs` arrow's direction
+   * is read before the promotion is offered now, so it arrives with nothing
+   * outstanding: the pair of runs that disagreed cannot occur, and the promotion
+   * a reader sees is one the direction check already let through. Still carried
+   * for both, because a caller that stops naming the word loses the ability to
+   * tell a promoted claim from a promoted arrow with none.
    */
   claim?: ArrowClaim;
 }
@@ -1811,6 +1839,12 @@ export function checkDrift(
          * was an accusation and is now a count; on a `planned` one it is the
          * plan-first flow working exactly as designed -- the connection you
          * drew has not landed yet -- which is news the board asked for.
+         *
+         * `built-backwards` arrives by the same door and says the sharper
+         * version of the same thing: not "nothing landed" but "something did,
+         * and it goes the other way". A work item rather than a finding because
+         * the news is still that the plan is not built, and because a build must
+         * not fail over a sketch however the code around it turned out.
          */
         kind: outcome.kind === "finding" ? outcome.finding.kind : "unsupported-edge",
         detail: outcome.kind === "finding" ? outcome.finding.detail : outcome.detail,
@@ -1820,8 +1854,19 @@ export function checkDrift(
         node: `${edge.from} -> ${edge.to}`,
         label: claim,
         detail: "the code now connects these, so this is no longer planned."
-          + (edge.claim
-            ? ` Its @${edge.claim} is read for the first time on the next check.`
+          /*
+           * `feeds` only, and it used to be both (#124). The warning exists
+           * because a promoted claim had been read by nothing and the run after
+           * was the first that would look at it, so "built now" and then
+           * "backwards" a turn later read as the tool changing its mind (#123).
+           * A `needs` arrow is now read on the way in -- that is what holds the
+           * promotion back when the code went the other way -- so by the time a
+           * promotion is offered its direction is either confirmed or one the
+           * next run cannot answer either. There is no pending question left to
+           * warn about. `feeds` has no such check and keeps the line.
+           */
+          + (edge.claim === "feeds"
+            ? " Its @feeds is read for the first time on the next check."
             : ""),
         ...(edge.claim ? { claim: edge.claim } : {}),
       });
@@ -2390,9 +2435,68 @@ export function checkDrift(
        * confirmed again by the ordinary channels a moment later, and an absent
        * one goes amber exactly as it did before claims existed.
        */
-      if (claimed && edge.claim === "needs") {
+      if (edge.claim === "needs" && (claimed || edge.state === "planned")) {
         const needs = checkNeeds(fromPath, toPath, workspace, importCache.configs, options?.ledger);
-        if (needs.verdict === "withheld") {
+        /*
+         * A `planned` arrow asks this one question and ignores every other
+         * answer it could get (#124).
+         *
+         * The gate below it -- the arrow is `built` -- was protecting the right
+         * thing and reaching too far. What it protects is the *accusation*:
+         * sketching a dependency that currently runs the other way is a thing
+         * people do on purpose, and a red finding about it would be a lie about
+         * a plan. That still holds and nothing here changes it.
+         *
+         * What it was also doing, unintentionally, was leaving the promotion
+         * unguarded. Promotion asks whether the two ends are connected, and
+         * "connected" has no direction: a dependency built the opposite way to
+         * the plan satisfies it exactly as well as the planned one does. So the
+         * arrow was corroborated, promoted, and reported as good news -- and the
+         * direction only read on the run *after*, once the arrow was `built`,
+         * which then contradicted it. Two runs, opposite answers, nothing
+         * changed in between, and the first of the two is the one people act on.
+         *
+         * So the question is asked here instead, before the promotion is
+         * offered rather than a run after it was taken. Only `backwards` is
+         * acted on. Everything else -- confirmed, withheld, a cycle -- falls
+         * through to the ordinary channels untouched, which is what keeps this
+         * from being a second checker with its own opinions about plans.
+         *
+         * The claim tallies are deliberately not touched. They answer "are the
+         * live claims on this board being held to anything", and a plan makes no
+         * claim about today; its direction is read for one question only, and
+         * the answer to that question is the work item below rather than a
+         * number in a summary.
+         */
+        if (edge.state === "planned") {
+          if (needs.verdict === "backwards") {
+            // Counted for the same reason the `built` exit below counts itself:
+            // this path does not reach the channels underneath, and a report
+            // that names an arrow while claiming to have checked none of them
+            // invites the reader to distrust it.
+            edgesChecked += 1;
+            const { evidence } = needs;
+            recordEdge(edge, fromNode, toNode, { kind: "finding", finding: {
+              from: fromPath,
+              to: toPath,
+              fromLabel: fromNode.label,
+              toLabel: toNode.label,
+              fromRef,
+              toRef,
+              kind: "built-backwards",
+              detail:
+                `the plan says ${fromNode.label || fromPath} needs `
+                + `${toNode.label || toPath}, and what is there runs the other way — `
+                + `${evidence.file} line ${evidence.line} declares "${evidence.specifier}", `
+                + `and ${fromPath} declares nothing on ${toPath}. Left planned rather `
+                + `than marked built: either the arrow is drawn the wrong way round, `
+                + `or the code is. If the code is right, `
+                + `\`drift --accept "${edge.from} -> ${edge.to}"\` turns the arrow round `
+                + `and the next check marks it built.`,
+            } });
+            continue;
+          }
+        } else if (needs.verdict === "withheld") {
           claims.needsWithheld[needs.why] = (claims.needsWithheld[needs.why] ?? 0) + 1;
         } else if (needs.verdict === "cycle") {
           /*

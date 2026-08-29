@@ -358,13 +358,17 @@ function unsnappedClaimFix(report) {
 /**
  * What a promotion just started, said once, under the promotions it belongs to.
  *
- * A promoted arrow that carried `@needs` has had its direction read by nothing
- * so far -- the check is gated on `built`, and until this run the arrow was
- * `planned`. So the sequence a person sees is "built now" this turn and, if the
- * code went the other way, "drawn backwards" the next, which read back to back
- * looks like the tool contradicting itself (#123). It is not: the promotion
- * established that the connection exists and never said which way it runs. One
- * line here makes that the obvious reading instead of the generous one.
+ * `@feeds` only, and it used to be both words (#124). A promoted claim had been
+ * read by nothing so far, so "built now" this turn and "drawn backwards" the
+ * next read back to back as the tool contradicting itself (#123), and one line
+ * here made the promotion's narrower meaning the obvious reading.
+ *
+ * A `@needs` arrow no longer arrives here with that question open. Its direction
+ * is read before the promotion is offered, and a backwards answer holds the
+ * promotion back rather than following it a run later -- so a promoted `@needs`
+ * is one whose direction was either confirmed or is one nothing can answer, and
+ * the pair of contradicting runs cannot happen. `@feeds` has no direction to be
+ * wrong about and no such check, so it keeps the line.
  *
  * Only the promotions actually written. A promotion merely *reported* -- `drift`
  * in a terminal, or a box with anchors still unbuilt -- leaves the arrow planned,
@@ -375,10 +379,7 @@ function unsnappedClaimFix(report) {
  * truncates at the width of the box.
  */
 function claimWentLive(promoted) {
-  // Whichever word it was. A promoted arrow's claim has been read by nothing so
-  // far -- both checks are gated on `built` -- and the next run is the first
-  // one that will look at it.
-  const word = promoted.find((promotion) => promotion.claim)?.claim;
+  const word = promoted.find((promotion) => promotion.claim === "feeds")?.claim;
   return word ? `  a promoted @${word} is read for the first time on the next check` : undefined;
 }
 
@@ -454,6 +455,19 @@ function followRow(followed, colour, all) {
   return [paint(`  ↳ ${oneLine(followed.detail)}`, "dim", colour)];
 }
 
+/**
+ * Plans the code contradicted, as opposed to plans it has not reached (#124).
+ *
+ * Both are work items and the report keeps them together, because both mean the
+ * same thing about the board: this is still a sketch. They are pulled apart
+ * everywhere a person reads them, because they mean opposite things about what
+ * to do next -- one says carry on, the other says somebody has to decide which
+ * of the two directions is the wrong one.
+ */
+function builtBackwards(report) {
+  return report.workItems.filter((item) => item.kind === "built-backwards");
+}
+
 /** Rows of findings. Low on purpose: this fires at the end of every turn. */
 const MAX_LISTED = 6;
 
@@ -481,9 +495,13 @@ const MAX_LISTED = 6;
  * leading with "or accept it" would be teaching people to silence the check.
  */
 function acceptHint(entries, colour) {
-  const backwards = entries.flatMap(({ report }) =>
-    report.edges.filter((finding) => finding.kind === "backwards-edge"),
-  );
+  // Both reports that say an arrow runs against the code, and they are offered
+  // the same way out because it is the same one (#124): a `built` arrow the
+  // check contradicts, and a `planned` one the code went the other way on.
+  const backwards = entries.flatMap(({ report }) => [
+    ...report.edges.filter((finding) => finding.kind === "backwards-edge"),
+    ...builtBackwards(report),
+  ]);
   if (backwards.length === 0) return [];
   return [
     paint(
@@ -575,6 +593,24 @@ function rowsFor({ report, promoted = [] }, colour, all = false) {
         colour,
       );
     }),
+    /*
+     * A plan the code went the other way on.
+     *
+     * Not gated on --all, unlike every other work item, and yellow rather than
+     * dim. Until #124 this arrow was promoted instead: "built now — board
+     * updated", in green, on the strength of a connection that runs against the
+     * plan, with the contradiction arriving a run later once the arrow was
+     * `built`. The row that replaces it has to be visible in the same place the
+     * green one was, or the fix is only that the good news stopped.
+     *
+     * Not red, and phrased as an observation rather than a verdict: from here a
+     * plan somebody drew to invert a dependency and a plan an agent implemented
+     * backwards are the same two files pointing the same way. What is certain is
+     * what the code does, and that the plan is not built.
+     */
+    ...builtBackwards(report).map((item) =>
+      paint(`${boxName(item)} \u00b7 built the other way round`, "yellow", colour),
+    ),
     // Deleted edges: quiet notes about arrows that were removed but the code still supports
     ...(report.deletedEdges ?? []).map((finding) =>
       paint(
@@ -595,7 +631,9 @@ function rowsFor({ report, promoted = [] }, colour, all = false) {
       .filter((promotion) => !promotedNodes.has(promotion.node))
       .map((promotion) => paint(`${boxName(promotion)} is built now`, "green", colour)),
     ...(all
-      ? report.workItems.map((item) => paint(`${boxName(item)} not built yet`, "dim", colour))
+      ? report.workItems
+        .filter((item) => item.kind !== "built-backwards")
+        .map((item) => paint(`${boxName(item)} not built yet`, "dim", colour))
       : []),
   ];
 }
@@ -1239,7 +1277,15 @@ const worthANotice = stale.filter(
      * "checked, and fine" -- the exact conflation this whole check exists to
      * prevent. Work items stay out for the opposite reason: nobody asked.
      */
-    || unansweredClaims(report) > 0,
+    || unansweredClaims(report) > 0
+    /*
+     * The one work item that does open a notice, and the paragraph above says
+     * why the others do not: a sketch the code has not reached would sit there
+     * unchanged for a whole design session. This one is not that. Something
+     * landed between the last turn and this one and it runs against the plan,
+     * which is news exactly once, at the moment it is cheapest to fix.
+     */
+    || builtBackwards(report).length > 0,
 );
 const showing = expanded ? stale : worthANotice;
 

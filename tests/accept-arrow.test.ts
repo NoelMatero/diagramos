@@ -329,7 +329,10 @@ describe("--accept on the command line", () => {
     // and a script could not tell "turned it round" from "would not".
     const refused = run("--accept", "three -> one");
     expect(refused.status).toBe(2);
-    expect(refused.out).toContain("does not say three -> one is drawn backwards");
+    // "runs against the code" rather than "is drawn backwards": the same command
+    // answers a planned arrow the code went the other way on (#124), and that one
+    // is not drawn backwards -- it may be the code that is.
+    expect(refused.out).toContain("does not say three -> one runs against the code");
     // Said once. The report printing underneath already names every backwards
     // arrow and carries the id to paste, and a refusal repeating that list read
     // as the tool having printed itself twice.

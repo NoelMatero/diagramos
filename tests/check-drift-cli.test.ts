@@ -1727,8 +1727,8 @@ describe("promotion from the hook", () => {
     expect(shape.customData).toMatchObject({ state: "planned" });
   }, 120_000);
 
-  /** A planned `@needs` arrow whose connection already landed. */
-  async function plantClaimedPromotion(claim?: "needs") {
+  /** A planned arrow whose connection already landed, drawn the way the code runs. */
+  async function plantClaimedPromotion(claim?: "needs" | "feeds") {
     const { board: drawn } = await createDiagram(emptyBoard(), {
       name: "plan",
       nodes: [
@@ -1743,17 +1743,30 @@ describe("promotion from the hook", () => {
   }
 
   /*
-   * The promotion of a claimed arrow is the run that makes the claim answerable
-   * for the first time, and the answer -- including "drawn backwards" -- comes
-   * on the run after (#123). Without a word here the pair reads as the tool
-   * changing its mind about the same arrow one turn apart.
+   * The promotion of a claimed arrow used to be the run that made the claim
+   * answerable for the first time, with the answer -- including "drawn
+   * backwards" -- arriving on the run after (#123). Without a word here the pair
+   * read as the tool changing its mind about the same arrow one turn apart.
+   *
+   * `@feeds` is still in that position and keeps the line. `@needs` is not:
+   * its direction is read before the promotion is offered now (#124), so a
+   * promoted one has nothing outstanding and a warning that it did would be the
+   * report inventing a pending question.
    */
-  it("says a promoted @needs has not been read yet", async () => {
+  it("says a promoted @feeds has not been read yet", async () => {
+    await plantClaimedPromotion("feeds");
+    const result = await check("--hook");
+    const said = JSON.parse(result.stdout) as { systemMessage: string };
+    expect(said.systemMessage).toContain("board updated");
+    expect(said.systemMessage).toContain("a promoted @feeds is read for the first time");
+  }, 120_000);
+
+  it("says nothing is outstanding on a promoted @needs", async () => {
     await plantClaimedPromotion("needs");
     const result = await check("--hook");
     const said = JSON.parse(result.stdout) as { systemMessage: string };
     expect(said.systemMessage).toContain("board updated");
-    expect(said.systemMessage).toContain("a promoted @needs is read for the first time");
+    expect(said.systemMessage).not.toContain("read for the first time");
   }, 120_000);
 
   it("keeps quiet about claims when the promoted arrow carried none", async () => {

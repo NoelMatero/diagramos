@@ -197,16 +197,26 @@ describe("what the board does with it", () => {
     expect(report.clean).toBe(true);
   });
 
-  it("leaves a planned arrow alone, however it is drawn", async () => {
-    const report = await verdicts(
+  it("never accuses a planned arrow, whichever way it is drawn", async () => {
+    // Drawn the way the code runs.
+    const along = await verdicts(
       await boardOf("a.ts", "b.ts", { claim: "needs", state: "planned" }),
       files,
     );
-    // Not in findings and not in edges: a sketch of a dependency that currently
-    // runs the other way is a plan, not a lie.
-    expect(report.edges).toEqual([]);
-    expect(report.claims.needsChecked).toBe(0);
-    expect(report.clean).toBe(true);
+    // Drawn against it -- the case that would be `backwards-edge` on a built
+    // arrow. A sketch of a dependency that currently runs the other way is a
+    // plan, not a lie, and #124 did not change that: what it changed is whether
+    // the plan gets reported as built. See `engine-drift.test.ts`.
+    const against = await verdicts(
+      await boardOf("b.ts", "a.ts", { claim: "needs", state: "planned" }),
+      files,
+    );
+    for (const report of [along, against]) {
+      expect(report.edges).toEqual([]);
+      expect(report.findings).toEqual([]);
+      expect(report.claims.needsChecked).toBe(0);
+      expect(report.clean).toBe(true);
+    }
   });
 
   it("counts a withheld claim under its reason rather than dropping it", async () => {

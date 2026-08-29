@@ -56,8 +56,16 @@ Writing one costs nothing and accuses nobody. Every verdict that can say
 "wrong" is gated on `built`, so a planned box and a planned arrow are never
 graded — a plan that contradicts today's code is a plan, not drift, and CI
 stays green. The gate releases itself: the moment the code lands, the thing
-promotes to `built` and the claim it was carrying is checked for the first
-time.
+promotes to `built` and the claim it was carrying goes live.
+
+One thing a planned `needs` arrow does get checked for, and it is not a grade:
+whether the connection that landed is the one you drew. "Has this been built
+yet" asks whether the two ends are connected, and connected has no direction, so
+a dependency built the opposite way round used to satisfy it — the plan reported
+as done on the strength of code doing the reverse. Now the direction is read
+before the promotion, and an arrow the code went the other way on stays planned
+with a line saying so. Still no red, still exit 0, and still nobody accused: it
+says what the code does and leaves you to decide which of the two is wrong.
 
 ### `claim: "needs"` on a planned arrow — which way the dependency will run
 

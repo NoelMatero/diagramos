@@ -99,10 +99,13 @@ reading:
 | --- | --- | --- |
 | `planned` | missing | **work item** — go build it |
 | `planned` | exists | **promotion** — the code caught up, the board can be advanced |
+| `planned` | exists, running the other way | **work item** — something landed, and it is not this |
 | `built` | missing | **regression** — real drift |
 | `built` | exists | nothing |
 
-The third row is the only one that fails a build. Work items and promotions are
+The third row is `built-backwards` and is described under
+[a plan the code went the other way on](#a-plan-the-code-went-the-other-way-on).
+The fourth is the only one that fails a build. Work items and promotions are
 kept out of `clean` and out of the exit code on purpose: CI reads that code, and
 a repository is not broken because somebody sketched next week's work.
 
@@ -112,14 +115,11 @@ claims — `@needs` on an arrow, `@closed` on a directory box — are gated on
 subsystem will hold without any of it being read against today's code. That is
 the inversion the plan-first workflow rests on: everywhere else a claim is a
 transcription of a line somebody read, and here there is no line to read yet.
-Writing one therefore costs nothing and can accuse nobody, and the gate releases
-itself — the code landing promotes the thing to `built`, and the claim is checked
-for the first time on the run after.
+Writing one therefore costs nothing and can accuse nobody.
 
-That makes a promotion and a claim's first verdict two runs apart, which is why
-the promotion says so. "Built now" this turn and "drawn backwards" the next is
-one event read in order, not the check changing its mind: the promotion
-established that the connection exists and never said which way it runs.
+The gate releases itself — the code landing promotes the thing to `built`, and
+the claim goes live. A `@needs` arrow's *direction* is read one step earlier than
+that, on the way in rather than the run after, and the section below says why.
 
 **`missing` is deliberately not a state.** State is declared by whoever draws the
 box; existence is observed, free, every run. Recording "missing" would put a fact
@@ -134,6 +134,10 @@ wrong: it says planned, the code says built. That is drift in the mild direction
 and it is one edit from going away. Work items still show up in the tally
 (`1 gone  1 planned`), so they are discoverable, and `--details` lists them in
 full — being quiet is not the same as withholding.
+
+One work item does open the notice: `built-backwards`. It is not the sketch being
+ahead — something landed between one turn and the next and it runs against the
+plan, which is news exactly once, at the moment it is cheapest to fix.
 
 **The hook makes that one edit itself.** On the per-turn path a promotion is
 applied, not just announced: the box is flipped to exactly what regenerating it
@@ -1344,6 +1348,75 @@ The order matters: repairs run before promotions, so a box whose ref this fixes
 is judged again on its new address rather than promoted on the strength of the
 old one.
 
+## A plan the code went the other way on
+
+You draw the plan first, mark the arrow `planned`, and Claude goes and writes the
+code. Every run the check asks one question about that arrow — has this been
+built yet — and when the answer is yes it says so and advances the board. That
+green line is the only good news the tool produces.
+
+It was answering the wrong question. "Built yet" asks whether the two ends are
+connected, and connected has no direction: if the arrow plans `A needs B` and
+what landed is B depending on A, the two files are connected all the same. The
+answer came back yes, the plan was reported as done, and the board was rewritten.
+The direction was read on the run *after* — once the arrow was `built`, which is
+where the wrong verdict is gated — and said the opposite:
+
+```
+run 1   Two → One is built now — board updated
+run 2   Two → (should be ←) One · drawn backwards
+```
+
+Two runs, opposite answers about the same arrow, nothing changed in between. The
+first is the one people act on.
+
+**The question is asked before the promotion now.** A `planned` arrow carrying
+`@needs` gets the same direction check a `built` one gets, with the same four
+gates — both ends in a measured language, both vouched for by a source index,
+both parsed to the end, neither reaching out at runtime, and no cycle. Only one
+verdict is acted on. `backwards` holds the promotion back and files a work item;
+confirmed, withheld and cycle all fall through to the ordinary channels exactly
+as before, because each of those is the tool being unable to tell, and *cannot
+tell* must never become *did not land*.
+
+```
+One → Two · built the other way round
+  ↳ code right? /accept-arrow "one -> two"
+```
+
+**Amber, and never red.** This is the one place the `planned` safety rule was
+worth re-deriving rather than reusing. `backwards-edge` on a built arrow is an
+accusation, and here it would be a lie: sketching an arrow that inverts a
+dependency existing today is a thing people do on purpose, and from inside the
+check that plan and a plan an agent implemented backwards are the same two files
+pointing the same way. Git history does not separate them either — a turn touches
+unrelated files, a human adds the import by hand, a rebase brings one in.
+
+So the row states what the code does, names the file and the line, and draws no
+conclusion about who is wrong. It does not touch the exit code, it is not in
+`findings`, and a plan still cannot fail a build. What it does establish is the
+half that was never in doubt: **the arrow that was drawn is not the one that was
+built**, so the plan has not landed and the board must not say it has.
+
+**It shows without `--details`.** Every other work item waits to be asked for, on
+the grounds that a sketch the code has not reached would sit there unchanged for
+a whole design session. This one replaces a line that was green and appeared by
+default, and a fix whose only visible effect is that the good news stopped is not
+a fix.
+
+**The promotion stopped carrying a warning about `@needs`.** It used to say the
+claim would be read for the first time on the next check, which existed to stop
+the two contradicting runs above from reading as the tool changing its mind. That
+sequence can no longer happen: a promoted `@needs` is one whose direction either
+confirmed or is one nothing can answer. `@feeds` keeps the line — it has no
+direction to be wrong about and no check on the way in.
+
+**`/accept-arrow` answers it too.** If the plan was transcribed backwards, the way
+out is the same act on the same arrow, and leaving it to hand-edited JSON would
+put back exactly the gap the section below closed, one state over. Nothing is
+promoted by the accept: the arrow now runs the way the code does, so the next
+check corroborates and promotes it through the ordinary path.
+
 ## Accepting a backwards arrow
 
 Every write above either corrects an *address* or releases a plan gate the code
@@ -1425,8 +1498,9 @@ What it will not touch:
   quiet.
 - **The rest of the board.** No other element is read or rewritten.
 
-`planned` arrows never reach any of this: the wrong verdict is gated on `built`,
-so there is nothing to accept and nothing to accuse.
+A `planned` arrow reaches it by the other door, described below: it is never
+accused, but the code can still have gone the other way on it, and turning it
+round is the same act on the same arrow.
 
 **The finding carries the way out.** A backwards row in the notice gets one dim
 line under the findings naming the command and an id to paste — once per report,

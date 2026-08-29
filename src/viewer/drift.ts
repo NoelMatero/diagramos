@@ -47,6 +47,7 @@ const KNOWN_EDGE_KINDS = new Set([
   "unsupported-edge",
   "broken-chain",
   "backwards-edge",
+  "built-backwards",
 ]);
 
 /**
@@ -105,7 +106,14 @@ export interface DriftView {
    * them arrows that claimed nothing (#133). Absence of evidence gets a number.
    */
   unconfirmedEdges?: Array<{ fromLabel: string; toLabel: string; reason: string }>;
-  workItems: Array<{ node: string; label: string; ref?: string }>;
+  /**
+   * `kind` is read for one word only. `built-backwards` is the plan the code
+   * contradicted rather than the plan the code has not reached, and the two say
+   * opposite things to a reader: one means keep going, the other means somebody
+   * has to decide. Optional because older payloads carry no kind at all, and a
+   * missing one falls back to the ordinary "not built yet".
+   */
+  workItems: Array<{ node: string; label: string; ref?: string; kind?: string }>;
   promotions: Array<{ node: string; label: string }>;
   checked: number;
   skipped: number;
@@ -414,11 +422,28 @@ export function rowsOf(report: DriftView): StatusRow[] {
       tone: "good" as Tone,
       node: promotion.node,
     })),
-    ...report.workItems.map((item) => ({
-      text: `${name(item.label, item.node)} not built yet`,
-      tone: "dim" as Tone,
-      node: item.node,
-    })),
+    /*
+     * The one work item that is not "still to come" (#124).
+     *
+     * Amber and above the rest, because it is the only row here somebody has to
+     * act on: the connection exists and runs against the plan, so either the
+     * arrow is drawn the wrong way round or the code is. Dim, among a list of
+     * things not started yet, it read as one more thing not started yet.
+     */
+    ...report.workItems
+      .filter((item) => item.kind === "built-backwards")
+      .map((item) => ({
+        text: `${name(item.label, item.node)} · built the other way round`,
+        tone: "warn" as Tone,
+        node: item.node,
+      })),
+    ...report.workItems
+      .filter((item) => item.kind !== "built-backwards")
+      .map((item) => ({
+        text: `${name(item.label, item.node)} not built yet`,
+        tone: "dim" as Tone,
+        node: item.node,
+      })),
   ];
 }
 
