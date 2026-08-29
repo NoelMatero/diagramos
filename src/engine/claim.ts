@@ -73,6 +73,86 @@ export type ArrowClaim = (typeof ARROW_CLAIMS)[number];
 export const BOX_CLAIMS = ["closed"] as const;
 
 /**
+ * The one claim a whole board can make, rather than a box or an arrow.
+ *
+ * Every other word here is **local**: it is about one arrow, or one directory,
+ * and it is refuted by reading that one thing. `needs` says this dependency
+ * runs this way. `closed` says this boundary holds. None of them can say *"and
+ * that is all of them"*, which is why a board cannot be wrong by omission --
+ * delete an arrow and nothing notices, grow a subsystem past its picture and
+ * the report stays clean (#135).
+ *
+ * `complete` is the second kind. It takes a directory and asserts that within
+ * it, the board shows everything it reaches: every module under that directory
+ * that a box already imports, or that imports a box, has a box of its own. The
+ * refutation is a module that does not.
+ *
+ * ## Why this one is admissible where "draw more boxes" is not
+ *
+ * The same computation has existed for most of this project's life as
+ * `unrepresented`, and it has always been a suggestion, off unless asked for.
+ * Not because it was wrong -- it is the same walk either way -- but because
+ * nobody asked it. Whether a module deserves a box is a judgement about what is
+ * worth showing, and an engine that volunteers that judgement every turn is one
+ * that gets switched off, taking the quiet correct checks with it.
+ *
+ * A claim changes who is speaking. The author says the picture is complete
+ * here, the engine reads it, and a module nobody drew is that person's own
+ * assertion coming back wrong rather than the tool having an opinion. Silence
+ * means it held.
+ *
+ * ## The bound, which is the part that usually sinks a completeness claim
+ *
+ * "Everything that touches `Orangutan`" is checkable. "Everything that touches
+ * `parse`" is not -- the name is everywhere and the walk returns the
+ * repository. This claim never faces that, because its target is a directory
+ * rather than a symbol and its candidates are the ones `unrepresented` already
+ * bounds: a module has to be connected to something already drawn before it can
+ * count as missing, so relevance was decided by whoever drew the diagram. Cost
+ * scales with the diagram, not the tree.
+ *
+ * What it does face is the opposite failure, and `checkDrift` refuses rather
+ * than answers in all three cases: a scope that is not a directory, a scope
+ * some box already covers whole -- which would make the claim unfalsifiable,
+ * the exact rot the admission rule above exists to keep out -- and a scope
+ * holding nothing the licence can read, which is reported unproven rather than
+ * held, because "found no missing module" and "could not look" are not the same
+ * sentence.
+ */
+export const BOARD_CLAIMS = ["complete"] as const;
+
+/**
+ * What a board claims, once parsed. `about` is the directory the completeness
+ * is scoped to; there is no unscoped form, because "this board is complete"
+ * with no target is a claim about the whole repository and nothing could bound
+ * it.
+ */
+export interface BoardClaim {
+  complete: true;
+  about: string;
+}
+
+export type ParsedBoardClaim = { claim: BoardClaim } | { garbled: string };
+
+/**
+ * A board claim from whatever was written in the title element's
+ * `customData.complete`.
+ *
+ * The value is the directory, so `complete: "src/engine"` is the whole claim --
+ * there is no separate word to spell, and so no vocabulary to get wrong. What
+ * can still be wrong is the shape, and a shape that is not a non-empty string
+ * is garbled and loud rather than ignored: a board that looks like it claims
+ * completeness and is read by nothing is worse than one that claims nothing.
+ */
+export function parseBoardClaim(value: unknown): ParsedBoardClaim | undefined {
+  if (value === undefined || value === null) return undefined;
+  if (typeof value !== "string") return { garbled: typeof value };
+  const about = value.trim().replace(/^@/, "").replace(/\/+$/, "");
+  if (!about) return { garbled: '""' };
+  return { claim: { complete: true, about } };
+}
+
+/**
  * What a box claims, once parsed.
  *
  * `through` is the front doors: files inside the directory that outside code is

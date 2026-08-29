@@ -405,6 +405,25 @@ function openBox(detail) {
     + (more ? ` (+${more[1]} more)` : "");
 }
 
+/**
+ * A complete claim's refusal, short enough for a notice that fires every turn.
+ *
+ * The engine's sentence names the module, says how the board reaches it, counts
+ * the rest and says what to do about it -- which is right in a report somebody
+ * opened on purpose and four times too long for a box that appears unasked. The
+ * first module and the count are the part that says how bad it is; the rest is
+ * in `--details` and in `undrawn`.
+ */
+function incompleteBoard(detail) {
+  const missing = /\. (\S+) has no box/.exec(detail);
+  const more = /and (\d+) more modules? (?:is|are) missing/.exec(detail);
+  const scope = /every module under (\S+)/.exec(detail);
+  if (!missing) return detail;
+  return `${missing[1]} has no box`
+    + (more ? ` (+${more[1]} more` : "")
+    + (more && scope ? ` under ${scope[1]})` : more ? ")" : "");
+}
+
 function brokenHop(detail) {
   if (detail.includes("still connected, but not by this route")) {
     return "connected, but the route is wrong";
@@ -558,17 +577,21 @@ function rowsFor({ report, promoted = [] }, colour, all = false) {
     ),
     ...report.findings.flatMap((finding) => [
       /*
-       * The one box finding whose evidence is somewhere else.
+       * The two findings whose evidence is somewhere else.
        *
        * Every other row here reads "box → the thing it points at", because every
        * other finding is the anchor going stale. An `open-box` is about somebody
        * else's import, so the arrow form would name the wrong file entirely --
        * it would point at the directory that is fine rather than at the file
-       * that reached into it.
+       * that reached into it. `incomplete-board` is further out still: it is not
+       * about a box at all, but about a module with no box, so there is nothing
+       * for an arrow to point from. Both say the engine's own sentence instead.
        */
       finding.kind === "open-box"
         ? paint(`${boxName(finding)} \u00b7 ${openBox(finding.detail)}`, "red", colour)
-        : paint(`${boxName(finding)} \u2192 ${target(finding)}`, "red", colour),
+        : finding.kind === "incomplete-board"
+          ? paint(`${boxName(finding)} \u00b7 ${incompleteBoard(finding.detail)}`, "red", colour)
+          : paint(`${boxName(finding)} \u2192 ${target(finding)}`, "red", colour),
       ...followRow(followedFor.get(finding.node), colour, all),
     ]),
     ...report.edges.map((finding) => {
@@ -645,13 +668,16 @@ function rowsFor({ report, promoted = [] }, colour, all = false) {
  * spell every one out, and the twelfth argument is where a counting bug goes to
  * hide.
  */
-function tallyCounts({ gone, empty, unused, open, removed, garbled, unanswered, backwards, arrows, stray, promoted, built, planned }, colour) {
+function tallyCounts({ gone, empty, unused, open, incomplete, removed, garbled, unanswered, backwards, arrows, stray, promoted, built, planned }, colour) {
   return [
     gone ? paint(`${gone} gone`, "red", colour) : "",
     empty ? paint(`${empty} empty`, "red", colour) : "",
     // Its own word, because "1 gone" was actively wrong for it: nothing is gone,
     // a boundary the board claimed is being reached through.
     open ? paint(`${open} reached into`, "red", colour) : "",
+    // Same reasoning as "reached into": "1 gone" would say a file disappeared,
+    // and what happened is that the board never drew one.
+    incomplete ? paint(`${incomplete} incomplete`, "red", colour) : "",
     // Separate from "gone" because it is a different sentence: the code is
     // still there, and nothing calls it any more.
     unused ? paint(`${unused} unused`, "red", colour) : "",
@@ -690,13 +716,17 @@ function tallyFor({ report, promoted = [] }, colour) {
   const empty = count("empty-ref");
   const unused = count("unused-symbol");
   const open = count("open-box");
+  // Out of "gone" for the reason "open-box" is: nothing here is missing from
+  // the tree, the board is missing something from the picture.
+  const incomplete = count("incomplete-board");
   const promotedNodes = new Set(promoted.map((promotion) => promotion.node));
   return tallyCounts(
     {
-      gone: report.findings.length - empty - unused - open,
+      gone: report.findings.length - empty - unused - open - incomplete,
       empty,
       unused,
       open,
+      incomplete,
       removed: report.deleted.length,
       garbled: (report.garbledClaims ?? []).length,
       unanswered: unansweredClaims(report),
@@ -752,8 +782,12 @@ function render(stale, colour) {
       const promotedNodes = new Set(promoted.map((promotion) => promotion.node));
       return {
         gone: sum.gone + report.findings.filter(
-          (finding) => finding.kind !== "empty-ref" && finding.kind !== "unused-symbol",
+          (finding) => finding.kind !== "empty-ref" && finding.kind !== "unused-symbol"
+            && finding.kind !== "open-box" && finding.kind !== "incomplete-board",
         ).length,
+        open: sum.open + report.findings.filter((finding) => finding.kind === "open-box").length,
+        incomplete: sum.incomplete
+          + report.findings.filter((finding) => finding.kind === "incomplete-board").length,
         empty: sum.empty + report.findings.filter((finding) => finding.kind === "empty-ref").length,
         unused: sum.unused + report.findings.filter((finding) => finding.kind === "unused-symbol").length,
         removed: sum.removed + report.deleted.length,
@@ -770,7 +804,7 @@ function render(stale, colour) {
         planned: sum.planned + report.workItems.length,
       };
     },
-    { gone: 0, empty: 0, unused: 0, removed: 0, garbled: 0, unanswered: 0, backwards: 0, arrows: 0, stray: 0, promoted: 0, built: 0, planned: 0 },
+    { gone: 0, empty: 0, unused: 0, open: 0, incomplete: 0, removed: 0, garbled: 0, unanswered: 0, backwards: 0, arrows: 0, stray: 0, promoted: 0, built: 0, planned: 0 },
   );
 
   // Too many to list: counts per diagram, and a pointer to the view that has room.
@@ -1549,6 +1583,24 @@ function renderCoverageAudit(entries, colour) {
             "dim",
             colour,
           ));
+        }
+      }
+      /*
+       * And the one claim a whole board makes.
+       *
+       * Same shape as `closed` above, for the same reason: held is worth saying
+       * out loud because silence is what the claim buys, and a scope nothing
+       * could read is neither held nor broken. The modules themselves are a
+       * finding, so they are already in the list above this one -- what is left
+       * here is what became of the claim.
+       */
+      const complete = report.claims?.complete ?? 0;
+      if (complete > 0) {
+        if ((report.claims?.completeHeld ?? 0) > 0) {
+          rows.push(paint("board complete about its scope: nothing it reaches is undrawn", "dim", colour));
+        }
+        for (const gap of report.completeUnproven ?? []) {
+          rows.push(paint(`@complete ${gap.about}: ${gap.detail}`, "dim", colour));
         }
       }
       const needs = report.claims?.needs ?? 0;

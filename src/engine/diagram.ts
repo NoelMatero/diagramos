@@ -31,6 +31,12 @@ export interface CreateDiagramParams {
    * the title element, so a concept board needs a title.
    */
   describes?: BoardDescribes;
+  /**
+   * A directory this board asserts it is complete about: every module under it
+   * that the board reaches has a box. Recorded on the title element beside
+   * `describes`, since it is a fact about the whole picture. See `claim.ts`.
+   */
+  complete?: string;
   nodes: GraphNode[];
   edges: GraphEdge[];
   layout?: DiagramLayoutOptions;
@@ -372,6 +378,9 @@ export async function createDiagram(
       // Only `concept` is recorded: `repo` is the default reading, and writing
       // it would churn every existing board for no change in meaning.
       ...(params.describes === "concept" ? { describes: "concept" } : {}),
+      // Written only when asserted. There is no default completeness, and a
+      // board that says nothing about what it omits is the ordinary case.
+      ...(params.complete?.trim() ? { complete: params.complete.trim() } : {}),
     });
   }
 

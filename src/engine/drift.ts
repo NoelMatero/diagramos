@@ -59,7 +59,17 @@ export type DriftKind =
    * other one is about the anchor going stale, this one is about somebody else's
    * import. So the detail names the offending file and line rather than the box.
    */
-  | "open-box";
+  | "open-box"
+  /**
+   * A board that claimed to be complete about a directory and is not.
+   *
+   * The only finding here that is not about a box at all: `node` is the string
+   * `"board"`, because the claim lives on the title element and the thing that
+   * is wrong is the picture rather than any one anchor in it. Also the only one
+   * a caller can hit by writing a claim that could never fail -- see
+   * `checkDrift`, which refuses an unfalsifiable scope with this same kind.
+   */
+  | "incomplete-board";
 
 export interface DriftFinding {
   /** Node id, as edges and edit_diagram refer to it. */
@@ -130,6 +140,7 @@ export const DRIFT_KINDS = [
   "unsupported-member",
   "missing-route",
   "open-box",
+  "incomplete-board",
 ] as const satisfies readonly DriftKind[];
 
 export const EDGE_FINDING_KINDS = [
@@ -526,8 +537,8 @@ export interface AssertionTally {
  * only means something if falling off it makes a noise.
  */
 export interface GarbledClaimFinding {
-  /** Arrows and boxes have different vocabularies, so the refusal differs too. */
-  on: "arrow" | "box";
+  /** Arrows, boxes and the board itself have different vocabularies, so the refusal differs too. */
+  on: "arrow" | "box" | "board";
   /** What a reader sees on the canvas: a box's label, or `from → to` for an arrow. */
   label: string;
   /** The word as written, without the `@`. */
@@ -556,6 +567,19 @@ export interface ClaimTally {
    * breach into this number in public; it does not make it disappear.
    */
   closedTestReaches: number;
+  /**
+   * Whether the board asserts it is complete about a directory. One or zero:
+   * a board carries at most one such claim, on its title element.
+   */
+  complete: number;
+  /**
+   * Of those, how many were proved -- every module under the scope that the
+   * board reaches turned out to have a box.
+   *
+   * `complete` minus this is not the number that failed. A claim the licence
+   * could not read is neither held nor broken, and lands in `completeUnproven`.
+   */
+  completeHeld: number;
   /** Arrows asserting that the tail declares a dependency on the head. */
   needs: number;
   /** Arrows asserting that the tail's result goes into the head. */
@@ -642,6 +666,40 @@ export interface ClosedUnusedDoorFinding {
   doors: string[];
 }
 
+/**
+ * A module under a claimed-complete directory that no box on the board draws.
+ *
+ * The same fact `unrepresented` reports as a suggestion, reported as a
+ * refutation because somebody claimed otherwise. `importedBy` and `imports`
+ * carry the reason it counted as relevant at all -- it is connected to
+ * something already on the board -- so the row can say why it is being named
+ * rather than asserting the author should have wanted it.
+ */
+export interface UndrawnFinding {
+  /** Repo-relative path of the module nothing draws. */
+  file: string;
+  /** Files already on the board that import it. Empty for an entry point. */
+  importedBy: string[];
+  /** Files already on the board that it imports. Only set for an entry point. */
+  imports?: string[];
+}
+
+/**
+ * A completeness claim nothing disproved and nothing could prove.
+ *
+ * "Found no missing module" and "could not look" are different sentences, and
+ * a claim about every module under a directory holds only if every one of them
+ * was read. A scope holding nothing the licence can read lands here rather than
+ * in `completeHeld` -- the board is not wrong, it is unchecked. This is the
+ * same stance `closedUnproven` takes and for the same reason.
+ */
+export interface CompleteUnprovenFinding {
+  /** The directory the board claimed to be complete about. */
+  about: string;
+  /** Why it could not be answered, in words a reader can act on. */
+  detail: string;
+}
+
 export interface DeletedEdgeFinding {
   from: string;
   to: string;
@@ -701,6 +759,15 @@ export interface DriftReport {
   closedUnproven: ClosedUnprovenFinding[];
   /** Doors listed on a `closed` box that nothing came through. Never affects `clean`. */
   closedUnusedDoors: ClosedUnusedDoorFinding[];
+  /**
+   * Every module a `complete` claim missed, in full. The summary is in `findings`.
+   *
+   * Empty on the overwhelming majority of boards, which claim nothing about
+   * what they leave out.
+   */
+  undrawn: UndrawnFinding[];
+  /** `complete` claims nothing disproved and nothing could prove. Never affects `clean`. */
+  completeUnproven: CompleteUnprovenFinding[];
   /** Nodes not about this repo: an `external` node, or any node on a concept board. */
   excused: number;
   /** Hand-drawn nodes, ignored by design. */
@@ -890,6 +957,44 @@ function sourceFilesUnder(rootAbsolute: string, workspace: Workspace): string[] 
     }
   }
   return found;
+}
+
+/**
+ * How many files are under a directory, and how many of them anything can read.
+ *
+ * `sourceFilesUnder` filters by licence on the way out, which is right for a
+ * walk that nominates modules for boxes and wrong for the one question a
+ * completeness claim must answer before it may go green: *was there anything
+ * here I could not read?* Filtered, a directory of Go looks exactly like an
+ * empty one, and the claim would be reported as held on the strength of a walk
+ * that opened nothing.
+ *
+ * Scoped to the claimed directory rather than the repository, so the cost is
+ * the subtree somebody named. `undefined` past the cap, meaning "do not
+ * report", never "nothing found" -- the same contract as the walk above.
+ */
+function fileCensusUnder(
+  rootAbsolute: string,
+  workspace: Workspace,
+): { total: number; readable: number } | undefined {
+  let total = 0;
+  let readable = 0;
+  const queue = [rootAbsolute];
+  while (queue.length) {
+    const directory = queue.pop()!;
+    for (const entry of workspace.list(directory)) {
+      if (entry.startsWith(".") || NEVER_WALK.has(entry)) continue;
+      const child = `${directory}${path.sep}${entry}`;
+      const kind = workspace.stat(child);
+      if (kind === "directory") queue.push(child);
+      else if (kind === "file") {
+        if (total >= WALK_FILE_CAP) return undefined;
+        total += 1;
+        if (readableSource(entry)) readable += 1;
+      }
+    }
+  }
+  return { total, readable };
 }
 
 /**
@@ -1647,7 +1752,18 @@ function edgeEndpoint(
 export function boardCoverage(
   graph: { nodes: Array<{ ref?: string; refs?: string[]; state?: string }> },
   workspace: Workspace,
-): { onBoard: Map<string, string>; covered: (absolute: string) => boolean } {
+): {
+  onBoard: Map<string, string>;
+  covered: (absolute: string) => boolean;
+  /**
+   * The directory refs, absolute. `covered` answers for files beneath them and
+   * so cannot answer about a directory itself -- a path does not start with
+   * itself plus a separator. The completeness check needs exactly that
+   * question: a box standing for the whole scope makes the claim unfalsifiable,
+   * and it has to be refused rather than answered green.
+   */
+  directories: string[];
+} {
   const onBoard = new Map<string, string>();  // absolute -> repo-relative
   const directories: string[] = [];
 
@@ -1672,7 +1788,7 @@ export function boardCoverage(
     onBoard.has(absolute)
     || directories.some((directory) => absolute.startsWith(directory.replace(/[\\/]?$/, path.sep)));
 
-  return { onBoard, covered };
+  return { onBoard, covered, directories };
 }
 
 export function checkDrift(
@@ -1713,12 +1829,15 @@ export function checkDrift(
   const assertions: AssertionTally = { checked: 0, downgraded: 0, unsupportedLanguage: 0 };
   const claims: ClaimTally = {
     closed: 0, closedHeld: 0, closedTestReaches: 0,
+    complete: 0, completeHeld: 0,
     needs: 0, needsChecked: 0, needsWithheld: {},
     feeds: 0, feedsConfirmed: 0, feedsWithheld: {},
   };
   const closedBreaches: ClosedBreachFinding[] = [];
   const closedUnproven: ClosedUnprovenFinding[] = [];
   const closedUnusedDoors: ClosedUnusedDoorFinding[] = [];
+  const undrawn: UndrawnFinding[] = [];
+  const completeUnproven: CompleteUnprovenFinding[] = [];
   const garbledClaims: GarbledClaimFinding[] = [];
   const skipNode = (reason: NodeSkipReason) => {
     skipped += 1;
@@ -2054,6 +2173,15 @@ export function checkDrift(
       label: node.label || node.id,
       written: node.claimGarbled,
       detail: boxClaimError(node.claimGarbled),
+    });
+  }
+  if (graph.completeGarbled !== undefined) {
+    garbledClaims.push({
+      on: "board",
+      label: graph.title || "this board",
+      written: graph.completeGarbled,
+      detail: "A board's completeness claim is the directory it is complete about, as a string -- "
+        + `complete: "src/engine". ${graph.completeGarbled} is not one, so nothing read it.`,
     });
   }
 
@@ -2828,8 +2956,18 @@ export function checkDrift(
    * missing-file check with it.
    */
   const unrepresented: UnrepresentedFinding[] = [];
-  if (options?.coverage && !concept) {
-    const { onBoard, covered } = boardCoverage(graph, workspace);
+  /*
+   * A `complete` claim runs this walk whether or not `coverage` was asked for.
+   *
+   * The gate above exists because nobody asked the engine which modules deserve
+   * a box. A claim is somebody asking, so the gate does not apply to it -- but
+   * the *suggestions* stay behind the flag either way, which is why the list is
+   * only handed to the report when `coverage` was set. Claiming completeness
+   * about one directory does not turn on nagging about the rest of the tree.
+   */
+  const completeAbout = concept ? undefined : graph.complete?.about;
+  if ((options?.coverage || completeAbout !== undefined) && !concept) {
+    const { onBoard, covered, directories } = boardCoverage(graph, workspace);
 
     const importers = new Map<string, { file: string; by: Set<string> }>();
     for (const [absolute, relative] of onBoard) {
@@ -2903,6 +3041,128 @@ export function checkDrift(
         (a, b) => b.imports!.length - a.imports!.length || a.file.localeCompare(b.file),
       ),
     );
+
+    /*
+     * And the claim, if the board makes one.
+     *
+     * Everything above is unchanged: same walk, same relevance bar, same
+     * exclusions. All this does is narrow the result to a directory somebody
+     * named and call what is left a refutation instead of a suggestion. That is
+     * the whole of #135 -- the computation was never the hard part, the
+     * standing to report it was.
+     */
+    if (completeAbout !== undefined) {
+      claims.complete += 1;
+      const scope = completeAbout.replace(/\\/g, "/").replace(/^\.\//, "").replace(/\/+$/, "");
+      const resolved = workspace.resolve(scope);
+      const scopeDir = resolved && workspace.stat(resolved) === "directory" ? resolved : undefined;
+      const inScope = (file: string) => file === scope || file.startsWith(`${scope}/`);
+      const refuse = (detail: string) =>
+        findings.push({
+          node: "board",
+          label: graph.title || "this board",
+          ref: scope,
+          kind: "incomplete-board",
+          provenance: "recorded",
+          detail,
+        });
+
+      /*
+       * A directory, for the same reason `closed` insists on one: a claim about
+       * a set with one thing in it is not what anybody means by complete, and
+       * reading it as one would turn a completeness claim into a file check.
+       */
+      if (!scopeDir || !root) {
+        refuse(
+          `@complete says this board shows every module under ${scope} that it reaches, and `
+          + `${scope} is not a directory in this repository. Point it at one, or drop the claim.`,
+        );
+      } else if (
+        directories.some(
+          (directory) => scopeDir === directory
+            || scopeDir.startsWith(directory.replace(/[\\/]?$/, path.sep)),
+        )
+      ) {
+        /*
+         * Unfalsifiable, so refused rather than answered.
+         *
+         * A directory ref covers everything beneath it, so a box standing for
+         * the scope -- or for anything above it -- excuses every module inside
+         * from ever being unrepresented. The claim could then only come back
+         * green, which is the "guaranteed green" the admission rule in
+         * `claim.ts` exists to keep out. Better to say so than to print a
+         * verdict that was decided before anything was read.
+         */
+        refuse(
+          `@complete about ${scope} cannot be checked while a box on this board covers that whole `
+          + "directory: everything inside it is drawn by that one box, so nothing could ever come "
+          + "back missing. Draw the modules separately, or scope the claim to a directory no single "
+          + "box stands for.",
+        );
+      } else {
+        const census = fileCensusUnder(scopeDir, workspace);
+        /*
+         * Three ways this cannot be answered, and all three are said out loud
+         * rather than answered green. "Found no missing module" is only the
+         * same sentence as "complete" when everything under the scope was
+         * actually read.
+         */
+        if (census === undefined || candidates === undefined) {
+          completeUnproven.push({
+            about: scope,
+            detail: `There is more code under ${scope} than this walk will read in one pass, so `
+              + "nothing under it was checked for a box.",
+          });
+        } else if (census.total === 0) {
+          refuse(
+            `@complete says this board shows every module under ${scope} that it reaches, and there `
+            + "are no files under it. Point the claim at a directory with code in it, or drop it.",
+          );
+        } else if (census.readable === 0) {
+          /*
+           * Silent on purpose rather than by accident.
+           *
+           * The walk is gated on the licence, so under a directory in a language
+           * no reader is measured for, this claim would find nothing missing and,
+           * left alone, report that as held. Nothing was read, so nothing was
+           * proved. #131 widened the gate from TypeScript to every licensed
+           * language, so this is now a narrower case than the issue expected --
+           * but it is still reachable, and it must not read as a clean bill.
+           */
+          completeUnproven.push({
+            about: scope,
+            detail: `${census.total} ${census.total === 1 ? "file" : "files"} under ${scope}, and `
+              + "the import reader is not measured for any of their languages, so nothing under it "
+              + "was checked for a box.",
+          });
+        } else {
+          undrawn.push(...unrepresented.filter((finding) => inScope(finding.file)));
+          if (undrawn.length === 0) {
+            claims.completeHeld += 1;
+          } else {
+            /*
+             * One finding per board, not per module -- the shape `closed` uses
+             * for breaches, and for the same reason. Twelve undrawn modules
+             * under one directory is one incomplete picture, and twelve rows
+             * saying so is how a report stops being read. The full list is in
+             * `undrawn`, and under `--details`.
+             */
+            const [first, ...rest] = undrawn;
+            const reached = first!.importedBy.length > 0
+              ? `${first!.importedBy[0]} imports it`
+              : `it imports ${first!.imports?.[0] ?? "code this board draws"}`;
+            refuse(
+              `@complete says this board shows every module under ${scope} that it reaches. `
+              + `${first!.file} has no box and ${reached}`
+              + (rest.length > 0
+                ? `, and ${rest.length} more ${rest.length === 1 ? "module is" : "modules are"} missing too`
+                : "")
+              + ". Draw them, or narrow the claim.",
+            );
+          }
+        }
+      }
+    }
   }
 
   /*
@@ -3033,9 +3293,18 @@ export function checkDrift(
     closedBreaches,
     closedUnproven,
     closedUnusedDoors,
-    // A suggestion, never part of `clean`: a diagram that omits a module is a
-    // choice about what is worth showing, not a broken claim.
-    unrepresented,
+    undrawn,
+    completeUnproven,
+    /*
+     * A suggestion, never part of `clean`: a diagram that omits a module is a
+     * choice about what is worth showing, not a broken claim.
+     *
+     * Withheld unless `coverage` was asked for, even when a `complete` claim has
+     * just run the same walk. The claim's answer is in `findings` and `undrawn`;
+     * this list is the engine volunteering the rest of the tree, and nobody
+     * asked for that by claiming one directory.
+     */
+    unrepresented: options?.coverage ? unrepresented : [],
     unannotated,
     deleted,
     ...(deletedEdges.length > 0 ? { deletedEdges } : {}),

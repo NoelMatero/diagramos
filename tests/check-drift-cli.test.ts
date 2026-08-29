@@ -79,6 +79,15 @@ async function board(nodes: Array<{ id: string; label: string; ref?: string }>) 
   return (await createDiagram(emptyBoard(), { name: "arch", nodes, edges: [] })).board;
 }
 
+async function claimingBoard(
+  nodes: Array<{ id: string; label: string; ref?: string }>,
+  complete: string,
+) {
+  return (await createDiagram(emptyBoard(), {
+    name: "arch", title: "App", complete, nodes, edges: [],
+  })).board;
+}
+
 beforeAll(async () => {
   workspace = mkdtempSync(path.join(tmpdir(), "drift-cli-"));
   mkdirSync(path.join(workspace, "docs/diagrams"), { recursive: true });
@@ -88,6 +97,36 @@ beforeAll(async () => {
 
 afterAll(() => {
   if (workspace) rmSync(workspace, { recursive: true, force: true });
+});
+
+describe("a board that claims it is complete", () => {
+  it("names the module nobody drew, and does not call it a file that is gone", async () => {
+    // `main` reaches `helper`, `helper` has no box, and the board says it shows
+    // everything under src/app that it reaches.
+    const dir = path.join(workspace, "src/app");
+    mkdirSync(dir, { recursive: true });
+    writeFileSync(path.join(dir, "main.ts"), 'import { h } from "./helper";\nexport const r = () => h();\n');
+    writeFileSync(path.join(dir, "helper.ts"), "export const h = () => 1;\n");
+    await writeBoard(
+      path.join(workspace, "docs/diagrams/claimed.excalidraw"),
+      await claimingBoard([{ id: "m", label: "Main", ref: "src/app/main.ts" }], "src/app"),
+    );
+
+    const result = await checkDrift();
+    const said = findings(`${result.stdout}${result.stderr}`);
+    expect(said).toContain("src/app/helper.ts has no box");
+    /*
+     * "1 gone" would say a file disappeared from the tree. Nothing did: the
+     * board never drew one. The CLI already keeps `open-box` out of that word
+     * for the same reason, and this is the second finding that needs it.
+     */
+    expect(said).toContain("1 incomplete");
+    expect(said).not.toContain("gone");
+    expect(result.code).not.toBe(0);
+
+    rmSync(path.join(workspace, "docs/diagrams/claimed.excalidraw"));
+    rmSync(dir, { recursive: true, force: true });
+  });
 });
 
 describe("check-drift on the command line", () => {

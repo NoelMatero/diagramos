@@ -40,7 +40,19 @@ const KNOWN_BOX_KINDS = new Set([
   "unsupported-member",
   "missing-route",
   "open-box",
+  "incomplete-board",
 ]);
+
+/**
+ * Findings whose evidence is somewhere other than the box's own anchor.
+ *
+ * "box → its ref" is the right row for a stale anchor and the wrong one for
+ * these: `open-box` is about a file elsewhere reaching in, and
+ * `incomplete-board` is about a module that is not on the board at all. Both
+ * have to say the engine's sentence instead, because the thing that is wrong
+ * has no shape on the canvas to point at.
+ */
+const DETAIL_KINDS = new Set(["open-box", "incomplete-board"]);
 
 /** The arrow verdicts this page knows how to render. */
 const KNOWN_EDGE_KINDS = new Set([
@@ -228,7 +240,13 @@ export function tallyOf(report: DriftView): TallyPart[] {
   const strangeBoxes = report.findings.filter((finding) => !KNOWN_BOX_KINDS.has(finding.kind)).length;
   const strangeEdges = report.edges.filter((finding) => !KNOWN_EDGE_KINDS.has(finding.kind)).length;
   const unrecognised = strangeBoxes + strangeEdges;
-  const gone = report.findings.length - empty - unused - strangeBoxes;
+  /*
+   * Counted by name and taken out of the remainder, for the reason above: it is
+   * not a box whose file went missing, it is the board omitting one. Left in,
+   * a complete claim coming back false would have read as a deleted file.
+   */
+  const incomplete = kind("incomplete-board");
+  const gone = report.findings.length - empty - unused - strangeBoxes - incomplete;
   const parts: TallyPart[] = [];
   /*
    * First, and red, because it is the only part here that is about the page
@@ -241,6 +259,7 @@ export function tallyOf(report: DriftView): TallyPart[] {
     parts.push({ text: "page out of date", tone: "bad" });
   }
   if (gone) parts.push({ text: `${gone} gone`, tone: "bad" });
+  if (incomplete) parts.push({ text: `${incomplete} incomplete`, tone: "bad" });
   if (empty) parts.push({ text: `${empty} empty`, tone: "bad" });
   if (unused) parts.push({ text: `${unused} unused`, tone: "bad" });
   if (report.deleted.length) parts.push({ text: `${report.deleted.length} removed`, tone: "bad" });
@@ -365,13 +384,20 @@ export function rowsOf(report: DriftView): StatusRow[] {
        * verdict visible on an old bundle instead of dressed as this one's.
        */
       text: KNOWN_BOX_KINDS.has(finding.kind)
-        ? finding.kind === "open-box"
+        ? DETAIL_KINDS.has(finding.kind)
           ? `${name(finding.label, finding.node)} · ${finding.detail ?? "something outside reaches in"}`
           : `${name(finding.label, finding.node)} → ${finding.ref}`
         : `${name(finding.label, finding.node)} · ${finding.kind}`
           + `${finding.detail ? `: ${finding.detail}` : ""}`,
       tone: (KNOWN_BOX_KINDS.has(finding.kind) ? "bad" : "dim") as Tone,
-      node: finding.node,
+      /*
+       * No shape to reveal. The claim lives on the title element and the thing
+       * it is about is a module with no box, so `node` is the sentinel
+       * "board" -- which matches no `customData.node` on the canvas. Left in,
+       * the row would offer a "Show on the board" button that selects nothing;
+       * empty disables it, which is the honest state.
+       */
+      node: finding.kind === "incomplete-board" ? "" : finding.node,
     })),
     ...report.edges.map((finding) => ({
       /*
