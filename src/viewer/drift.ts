@@ -108,6 +108,18 @@ export interface DriftView {
     feeds?: number;
     feedsConfirmed?: number;
     feedsWithheld?: Record<string, number>;
+    /**
+     * The same fact about claims written on `planned` arrows. Optional: older
+     * payloads have none.
+     *
+     * Kept apart from the two above and never added to the unanswered count,
+     * because it means something else. Those are questions about today that
+     * nobody answered; this is a question about later that nobody could answer
+     * yet -- the ordinary state of a plan, and the chip must not turn amber
+     * over it. It is said all the same: a plan whose arrows were skipped in
+     * silence looked exactly like a plan that had been checked (#129).
+     */
+    plannedWithheld?: Record<string, number>;
   };
   /**
    * Arrows read and not corroborated. Optional: older payloads have none.
@@ -195,7 +207,34 @@ const WITHHELD_WORDS: Record<string, string> = {
   // `feeds` only: an end anchored at a file has no result to follow.
   "not-symbols": "with an end anchored at a file rather than a symbol",
   "nowhere-to-look": "in a tree too large to walk",
+  // Reached only by a claim on a `planned` arrow: a live one is answered by a
+  // checker before it can get this far.
+  "unlicensed-language": "in a language with no measured reader",
+  "outside-licence": "with an end the reader was not measured over",
+  "no-function-body": "with an end whose body could not be read",
 };
+
+/**
+ * The one reason a plan needs its own words for.
+ *
+ * "with an end whose file is missing" is the sentence for a live claim, and it
+ * means a file was deleted. Nothing was deleted here -- the file has not been
+ * written, which is what the arrow was drawn to say.
+ */
+const PLAN_WORDS: Record<string, string> = { "endpoint-file-missing": "not written yet" };
+
+/** How many of a plan's claims nothing could read, and why, in the CLI's words. */
+function plannedClaims(report: DriftView): { count: number; words: string } {
+  const reasons = Object.entries(report.claims?.plannedWithheld ?? {})
+    .filter(([, count]) => count > 0)
+    .sort((a, b) => b[1] - a[1]);
+  return {
+    count: reasons.reduce((sum, [, count]) => sum + count, 0),
+    words: reasons
+      .map(([why, count]) => `${count} ${PLAN_WORDS[why] ?? WITHHELD_WORDS[why] ?? why}`)
+      .join(", "),
+  };
+}
 
 function claimWithheldWords(report: DriftView): string {
   const reasons = [
@@ -343,6 +382,7 @@ export function tallyOf(report: DriftView): TallyPart[] {
 export function rowsOf(report: DriftView): StatusRow[] {
   const unknown = unknownKindsIn(report);
   const unanswered = unansweredClaims(report);
+  const plan = plannedClaims(report);
   return [
     /*
      * Above everything, because it is about everything below it.
@@ -436,6 +476,23 @@ export function rowsOf(report: DriftView): StatusRow[] {
         text: `${unanswered} needs ${unanswered === 1 ? "arrow" : "arrows"} not checked`
           + `: ${claimWithheldWords(report)}`,
         tone: "warn" as Tone,
+      }]
+      : []),
+    /*
+     * The same admission about the plan, under it and dim.
+     *
+     * Dim rather than amber, and "cannot be checked yet" rather than "not
+     * checked", because nothing here is wrong or late: a plan describes work
+     * that has not happened, and its arrows pointing at files that do not exist
+     * is the plan working. What was wrong was saying nothing at all -- a plan
+     * built under the wrong name left every one of its claims skipped in
+     * silence, and the panel showed dashed boxes reading "not built yet" over
+     * a feature that was finished (#129).
+     */
+    ...(plan.count
+      ? [{
+        text: `${plan.count} of this plan's claims cannot be checked yet: ${plan.words}`,
+        tone: "dim" as Tone,
       }]
       : []),
     // Deleted edges: quiet notes about arrows that were removed but the code still supports

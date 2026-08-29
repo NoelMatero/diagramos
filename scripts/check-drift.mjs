@@ -275,6 +275,33 @@ const FEEDS_NOT_CONFIRMED = {
   reversed: "where the only flow found runs the other way",
 };
 
+/**
+ * Why a claim written on a `planned` arrow could not be read.
+ *
+ * Mostly the sentences the live claims get, because the reader's question is
+ * the same one -- why did nobody check this -- and only the framing above them
+ * differs.
+ *
+ * The last three keys appear on no other line. A live claim is answered by
+ * `checkNeeds` or by the `feeds` block before the walk can reach the licence
+ * gate, so only a plan arrives there uncounted.
+ */
+const PLAN_UNREAD = {
+  ...NEEDS_WITHHELD,
+  /*
+   * The one reason a plan needs its own words for.
+   *
+   * "with an end whose file is missing" is the sentence for a live claim, and it
+   * means a file was deleted. Nothing was deleted here -- the file has not been
+   * written, which is what the arrow was drawn to say. Printing the live wording
+   * over a plan would report the plan working as a file going missing.
+   */
+  "endpoint-file-missing": "not written yet",
+  "unlicensed-language": "in a language with no measured reader",
+  "outside-licence": "with an end the reader was not measured over",
+  "no-function-body": "with an end whose body could not be read",
+};
+
 /** The feeds reasons that mean nobody looked, which are the ones worth a notice. */
 const FEEDS_UNANSWERED = new Set(
   Object.keys(FEEDS_NOT_CONFIRMED).filter((why) => why !== "absent" && why !== "reversed"),
@@ -335,6 +362,37 @@ function unansweredClaimLines(report) {
    * same rule `oneLine` exists for.
    */
   return said;
+}
+
+/**
+ * What the plan asked for and nothing could answer yet.
+ *
+ * Its own sentence, and never folded into the two above (#129). Those say the
+ * live claims on this board went unanswered, which is news; this says the code
+ * has not arrived, which is what a plan is for. Merged, a sketch would report
+ * its own arrows as unchecked every turn of the session that drew it.
+ *
+ * Said all the same. A `@needs` on a `planned` arrow is a specification of what
+ * the dependency will be, and the arrows that carry one were being skipped in
+ * silence -- so a plan built at the wrong path, with every ref pointing at a
+ * file that was never written, read exactly like a plan nobody had started:
+ * nothing red, nothing amber, exit 0.
+ *
+ * "cannot be checked yet" rather than "not checked", for the same reason it is
+ * dim rather than yellow: nothing here is wrong or late. It is the one line on
+ * the board that is expected to be true.
+ */
+function plannedClaimLine(report) {
+  const reasons = withheldReasons(report.claims?.plannedWithheld);
+  const total = reasons.reduce((sum, [, count]) => sum + count, 0);
+  if (total === 0) return undefined;
+  return `${total} of this plan's claims cannot be checked yet: `
+    + reasons.map(([why, count]) => `${count} ${PLAN_UNREAD[why] ?? why}`).join(", ");
+}
+
+/** How many claims a plan is carrying that nothing could read. */
+function plannedClaims(report) {
+  return Object.values(report.claims?.plannedWithheld ?? {}).reduce((sum, count) => sum + count, 0);
 }
 
 /**
@@ -548,6 +606,7 @@ function rowsFor({ report, promoted = [] }, colour, all = false) {
   const followedFor = new Map((report.followed ?? []).map((entry) => [entry.node, entry]));
   const unanswered = unansweredClaimLines(report);
   const unsnapped = unsnappedClaimFix(report);
+  const planned = plannedClaimLine(report);
   const promotedClaim = claimWentLive(promoted);
   return [
     // First, because it is the only row here that says the check could not read
@@ -572,6 +631,13 @@ function rowsFor({ report, promoted = [] }, colour, all = false) {
      */
     ...unanswered.map((line) => paint(line, "yellow", colour)),
     ...(unsnapped ? [paint(unsnapped, "dim", colour)] : []),
+    /*
+     * Under those and dim, which is the whole difference between them: the line
+     * above is a question about today that nobody answered, this one is a
+     * question about later that nobody could answer yet. Painting them the same
+     * would turn the ordinary state of a plan into two lines of amber.
+     */
+    ...(planned ? [paint(planned, "dim", colour)] : []),
     ...report.deleted.map((finding) =>
       paint(`${boxName(finding)} removed, ${parseRef(finding.ref).path} still there`, "red", colour),
     ),
@@ -1280,6 +1346,15 @@ for (const { file, boardFile } of loaded) {
     // deleted arrow does and for the same reason: it is news, and it never
     // touches the exit code. The claim is not failing -- it was never tried.
     && unansweredClaims(report) === 0
+    /*
+     * A plan's unreadable claims keep the board on the *long* list only. There
+     * is no work item to keep it there when the arrow is planned and both its
+     * boxes are built, and a board dropped here is one `--details` never
+     * mentions -- which is the silence #129 is about. `worthANotice` below
+     * deliberately does not repeat this test, so it stays out of the per-turn
+     * notice: it is the expected state of a plan, not news about one.
+     */
+    && plannedClaims(report) === 0
   ) continue;
 
   stale.push({ file, report, promoted });
@@ -1647,6 +1722,11 @@ function renderCoverageAudit(entries, colour) {
         for (const line of unansweredClaimLines(report)) rows.push(paint(line, "yellow", colour));
         const unsnapped = unsnappedClaimFix(report);
         if (unsnapped) rows.push(paint(unsnapped, "dim", colour));
+        // The plan's share, in the view whose whole job is admitting to gaps.
+        // Last of the claim rows and dim, because it is the one line here that
+        // is not a gap in the checking -- it is the code not having arrived.
+        const plannedLine = plannedClaimLine(report);
+        if (plannedLine) rows.push(paint(plannedLine, "dim", colour));
       }
       if (rows.length === 0) rows.push(paint("everything on this board was checked", "dim", colour));
       return {

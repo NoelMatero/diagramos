@@ -269,6 +269,53 @@ describe("claims on the command line", () => {
     expect(`${result.stdout}${result.stderr}`).toContain("1 needs arrow checked for direction");
   }, 120_000);
 
+  /**
+   * A plan whose file is not written yet (#129).
+   *
+   * `src/summary.ts` does not exist, so the arrow's end cannot be read and the
+   * claim on it cannot be answered. That used to be a silent skip: the plan was
+   * a specification nobody checked, and the report did not say so -- which is
+   * how a feature finished under a different name went on reading as one nobody
+   * had started.
+   */
+  async function planned(name: string) {
+    const { board } = await createDiagram(emptyBoard(), {
+      name,
+      nodes: [
+        { id: "reader", label: "Reader", ref: "src/reader.ts" },
+        { id: "summary", label: "Summary", ref: "src/summary.ts", state: "planned" },
+      ],
+      edges: [{ from: "reader", to: "summary", claim: "needs", state: "planned" }],
+    });
+    await writeBoard(path.join(project, `docs/diagrams/${name}.excalidraw`), board);
+  }
+
+  it("says in the long form that the plan's claim could not be checked yet", async () => {
+    await planned("plan");
+    const result = await check("--details");
+    const said = `${result.stdout}${result.stderr}`;
+    expect(said).toContain("1 of this plan's claims cannot be checked yet: 1 not written yet");
+    /*
+     * "not written yet" and not the live claim's "with an end whose file is
+     * missing", which means somebody deleted something. Nothing was deleted --
+     * the file has not been written, which is what the arrow was drawn to say.
+     */
+    expect(said).not.toContain("whose file is missing");
+  }, 120_000);
+
+  it("keeps the plan out of the per-turn notice, and out of the exit code", async () => {
+    /*
+     * The other half of the fix. A sketch's arrows pointing at files that do not
+     * exist is the sketch working, and it would be true for the whole of a design
+     * session -- so this is said where somebody asked, and never as a warning
+     * that fires every turn. A notice nobody can act on is one nobody reads.
+     */
+    await planned("plan");
+    const result = await check();
+    expect(result.code).toBe(0);
+    expect(`${result.stdout}${result.stderr}`).not.toContain("cannot be checked yet");
+  }, 120_000);
+
   it("calls a backwards claim wrong, names the fix, and exits non-zero", async () => {
     // Same two files, arrow turned round: store does not import reader.
     const { board } = await createDiagram(emptyBoard(), {
