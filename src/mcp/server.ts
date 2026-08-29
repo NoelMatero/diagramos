@@ -601,6 +601,17 @@ server.registerTool(
           + "is then excused from drift checking instead of reported as missing a ref. Needs a title, "
           + "since that is where it is recorded.",
         ),
+      complete: z
+        .string()
+        .optional()
+        .describe(
+          "A directory this board asserts it shows completely: every module under it that the board "
+          + "reaches — imported by a box, or importing one — has a box of its own. A module that "
+          + "does not is then a finding rather than a suggestion, which is the only way this tool "
+          + "can catch a diagram that is wrong by omission. Leave it off unless the user wants the "
+          + "picture held to that; most boards should claim nothing. It is refused if a single box "
+          + "already covers the whole directory, since nothing inside could ever come back missing.",
+        ),
       nodes: z.array(nodeSchema).min(1),
       edges: z.array(edgeSchema).default([]),
       direction: z.enum(["RIGHT", "DOWN"]).optional().describe("Layout flow; RIGHT by default"),
@@ -615,7 +626,7 @@ server.registerTool(
         ),
     },
   },
-  async ({ path: boardPath, title, describes, nodes, edges, direction, name, append }) =>
+  async ({ path: boardPath, title, describes, complete, nodes, edges, direction, name, append }) =>
     guard(async () => {
       // The one tool that decides where a diagram comes into existence, so the
       // one that has to be confined to the project's diagram directory.
@@ -626,10 +637,29 @@ server.registerTool(
           + "only place that survives an edit in the live viewer.",
         );
       }
+      // Same reason, same slot: a board-level claim lives on the title element,
+      // so a board with no title has nowhere to keep it and would silently
+      // claim nothing at all.
+      if (complete?.trim() && !title?.trim()) {
+        throw new Error(
+          "A board claiming complete needs a title: the claim is recorded on the title element, "
+          + "which is the only place that survives an edit in the live viewer.",
+        );
+      }
+      // A concept board is not about this repository, so there is nothing under
+      // a path in it to be complete about. Refused here rather than ignored at
+      // check time, so the contradiction is answered while the author is present.
+      if (complete?.trim() && describes === "concept") {
+        throw new Error(
+          "A concept board cannot claim complete: it describes something other than this codebase, "
+          + "so there is no directory here for the claim to be about.",
+        );
+      }
       const board = await readBoard(file);
       const result = await createDiagram(board, {
         title,
         ...(describes ? { describes } : {}),
+        ...(complete?.trim() ? { complete: complete.trim() } : {}),
         nodes,
         edges,
         name,
@@ -858,6 +888,8 @@ server.registerTool(
       const deleted: Array<Record<string, unknown>> = [];
       const followed: Array<Record<string, unknown>> = [];
       const unrepresented: Array<Record<string, unknown>> = [];
+      const undrawn: Array<Record<string, unknown>> = [];
+      const completeUnproven: Array<Record<string, unknown>> = [];
       const unannotated: Array<Record<string, unknown>> = [];
       const unreadEdges: Array<Record<string, unknown>> = [];
       const edges: Array<Record<string, unknown>> = [];
@@ -920,6 +952,22 @@ server.registerTool(
         }
         for (const finding of report.unrepresented) {
           unrepresented.push({ board: relativeToWorkspace(file), ...finding });
+        }
+        /*
+         * The same modules `unrepresented` would suggest, carried separately
+         * because a claim changed who is speaking about them.
+         *
+         * Unconditional, unlike `unrepresented`: this is not the engine
+         * volunteering an opinion about what to draw, it is the answer to an
+         * assertion somebody wrote on the board, and the summary of it is
+         * already a finding. Withholding the list behind `coverage` would name
+         * a defect and hide what it consists of.
+         */
+        for (const finding of report.undrawn) {
+          undrawn.push({ board: relativeToWorkspace(file), ...finding });
+        }
+        for (const gap of report.completeUnproven) {
+          completeUnproven.push({ board: relativeToWorkspace(file), ...gap });
         }
         // Named only when asked. `edgesSkippedWhy` is the per-turn answer and
         // stays a count; the list behind it is for deciding what to fix, which
@@ -1001,6 +1049,11 @@ server.registerTool(
         // what might be worth drawing, so deliberately outside clean.
         ...(unannotated.length ? { unannotated } : {}),
         ...(unrepresented.length ? { unrepresented } : {}),
+        // A claimed-complete board that is not. Inside clean, unlike the two
+        // above: the author asserted this, so it is a broken claim rather than
+        // a suggestion about what might be worth drawing.
+        ...(undrawn.length ? { undrawn } : {}),
+        ...(completeUnproven.length ? { completeUnproven } : {}),
         ...(unreadEdges.length ? { unreadEdges } : {}),
         ...(Object.keys(skippedWhy).length ? { skippedWhy } : {}),
         ...(Object.keys(edgesSkippedWhy).length ? { edgesSkippedWhy } : {}),

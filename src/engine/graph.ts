@@ -13,8 +13,8 @@
  * label needs to know whether it was recorded or guessed.
  */
 import {
-  parseArrowClaim, parseBoxClaim, readLabelClaim,
-  type ArrowClaim, type BoxClaim, type ParsedClaim,
+  parseArrowClaim, parseBoardClaim, parseBoxClaim, readLabelClaim,
+  type ArrowClaim, type BoardClaim, type BoxClaim, type ParsedClaim,
 } from "./claim";
 import type { ExcalidrawElement } from "./normalize";
 import type { BoardFile } from "./board-file";
@@ -207,6 +207,14 @@ export interface RecoveredGraph {
   title?: string;
   /** What the board is about, from its title element. Absent means `repo`. */
   describes?: BoardDescribes;
+  /**
+   * The board's completeness claim, from its title element. Absent means the
+   * board asserts nothing about what it leaves out, which is what every board
+   * drawn before `complete` existed asserts and what most boards should.
+   */
+  complete?: BoardClaim;
+  /** A completeness claim whose shape is wrong, kept so the caller can be loud. */
+  completeGarbled?: string;
   nodes: RecoveredNode[];
   edges: RecoveredEdge[];
   /** Elements that are neither node nor edge: annotations, images, strays. */
@@ -507,6 +515,17 @@ export function readGraph(board: BoardFile): RecoveredGraph {
   const describesRaw = titleElement ? customOf(titleElement).describes : undefined;
   const describes: BoardDescribes | undefined =
     describesRaw === "concept" || describesRaw === "repo" ? describesRaw : undefined;
+  /*
+   * Board-level facts live on the title element, beside `describes`, which is
+   * the slot this codebase already uses for "true of the whole picture" rather
+   * than of any one box. A hand-drawn board has no title element and so can
+   * never carry this, which is correct: a completeness claim is an assertion
+   * somebody makes on purpose, not a default anybody falls into.
+   */
+  const parsedComplete = titleElement ? parseBoardClaim(customOf(titleElement).complete) : undefined;
+  const complete = parsedComplete && "claim" in parsedComplete ? parsedComplete.claim : undefined;
+  const completeGarbled =
+    parsedComplete && "garbled" in parsedComplete ? parsedComplete.garbled : undefined;
   const unattributed = elements
     .filter((element) => !consumed.has(element.id) && element.id !== titleElement?.id)
     .map((element) => ({
@@ -520,6 +539,8 @@ export function readGraph(board: BoardFile): RecoveredGraph {
   return {
     ...(titleElement ? { title: String(titleElement.text ?? "").trim() } : {}),
     ...(describes ? { describes } : {}),
+    ...(complete ? { complete } : {}),
+    ...(completeGarbled !== undefined ? { completeGarbled } : {}),
     nodes,
     edges,
     unattributed,

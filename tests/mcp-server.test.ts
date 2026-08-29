@@ -264,6 +264,56 @@ describe("board MCP server", () => {
   }, 120_000);
 
   /**
+   * The board-level claim, over the wire, and the two contradictions it refuses.
+   *
+   * Both refusals are here rather than at check time on purpose: the claim
+   * lives on the title element, so a board with no title would record nothing
+   * and silently claim nothing at all, and a concept board is not about this
+   * repository, so no path in it could ever be the subject. Answered while the
+   * author is present beats answered on a later run by somebody else.
+   */
+  it("carries a board completeness claim, and refuses the two shapes that cannot hold one", async () => {
+    const board = "docs/diagrams/complete.excalidraw";
+    await call("create_diagram", {
+      path: board,
+      title: "App",
+      complete: "src",
+      nodes: [{ id: "a", label: "A", ref: "src/a.ts" }],
+      edges: [],
+    });
+    const parsed = JSON.parse(await readFile(path.join(workspace, board), "utf8"));
+    const title = parsed.elements.find(
+      (element: { customData?: { role?: string } }) => element.customData?.role === "title",
+    );
+    expect(title.customData.complete).toBe("src");
+
+    const refusal = async (args: Record<string, unknown>) => {
+      try {
+        await call("create_diagram", args);
+        return "";
+      } catch (error) {
+        return (error as Error).message;
+      }
+    };
+
+    expect(await refusal({
+      path: "docs/diagrams/untitled.excalidraw",
+      complete: "src",
+      nodes: [{ id: "a", label: "A" }],
+      edges: [],
+    })).toContain("needs a title");
+
+    expect(await refusal({
+      path: "docs/diagrams/concept.excalidraw",
+      title: "A protocol",
+      describes: "concept",
+      complete: "src",
+      nodes: [{ id: "a", label: "A" }],
+      edges: [],
+    })).toContain("cannot claim complete");
+  }, 120_000);
+
+  /**
    * The claim slot, over the wire.
    *
    * The engine tests cover what a claim is; this covers whether an agent can

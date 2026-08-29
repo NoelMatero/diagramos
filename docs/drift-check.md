@@ -745,6 +745,80 @@ has no breach at all but cannot be *confirmed*, because 7 files elsewhere import
 at runtime. Both of those are facts nobody knew before the claim existed, which
 is the point.
 
+### A board can be wrong by omission: `complete`
+
+Every word above is **local**. `needs` is about one arrow, `closed` about one
+directory's boundary, and each is refuted by reading the one thing it names.
+Which means none of them can catch what a board *leaves out*: delete a box and
+no check notices, grow the code a module the picture never had and the report
+stays clean. The absence of a box has carried no information at all.
+
+| word | on | claim |
+| --- | --- | --- |
+| `complete` | the board, scoped to a directory | every module under it that this board reaches has a box of its own |
+
+That is the weaker half of drift and the half a diagram-driven workflow actually
+needs. The point of drawing the design first is that the code should not quietly
+grow past it.
+
+**The computation is not new; the standing to report it is.** `unrepresented`
+has computed exactly this for most of the project's life — modules a box imports
+that no box covers — and it has always been a suggestion, off unless
+`coverage: true` was asked for. Not because it was wrong. Because nobody asked
+it. Whether a module deserves a box is a judgement about what is worth showing,
+and an engine that volunteers one every turn is one that gets switched off,
+taking the quiet correct checks with it.
+
+A claim changes the speaker. The author says the picture is complete here, the
+engine reads it, and a module nobody drew is that person's own assertion coming
+back wrong. Silence means it held.
+
+```
+The engine · @complete says this board shows every module under src/engine that
+it reaches. src/engine/feeds.ts has no box and src/engine/drift.ts imports it,
+and 3 more modules are missing too. Draw them, or narrow the claim.
+```
+
+One row per board, not per module, for the reason `closed` gives one row per
+box: twelve undrawn modules under one directory is one incomplete picture, and
+twelve rows saying so is how a report stops being read. The full list is in
+`undrawn`.
+
+**The bound, which is what usually sinks a completeness claim.** *"Everything
+that touches `Orangutan`"* is checkable; *"everything that touches `parse`"* is
+not, because the name is everywhere and the walk returns the repository. This
+claim never faces that. Its target is a directory rather than a symbol, and its
+candidates are the ones `unrepresented` already bounds: a module has to be
+connected to something already drawn before it can count as missing, so
+relevance is inherited from whoever drew the diagram rather than invented. A
+helper no box imports is never nominated.
+
+**Three things it refuses rather than answers.** A scope that is not a
+directory. A scope with no files in it. And — the one worth stating — a scope
+that a single box already covers whole:
+
+```
+@complete about src/engine cannot be checked while a box on this board covers
+that whole directory: everything inside it is drawn by that one box, so nothing
+could ever come back missing.
+```
+
+A directory ref covers everything beneath it, so a box standing for the scope
+excuses every module inside from ever being unrepresented. The claim could then
+only come back green, which is precisely the guaranteed-green that `claim.ts`
+admits no word for. Refusing is the only honest answer.
+
+**And one it declines to answer.** A scope holding files in a language no reader
+is measured for is reported *unproven*, never held — the same third state
+`closed` takes, for the same reason. Nothing was read, so nothing was proved,
+and a clean bill earned by a walk that opened nothing is the one thing this tool
+exists not to print. (#131 widened the gate from TypeScript to every licensed
+language, so this is now narrower than it was, but it is still reachable.)
+
+**A concept board cannot claim it.** The board is not about this repository, so
+there is no directory here for the claim to be about. Refused at creation rather
+than ignored at check time, while the author is still present.
+
 ### The coverage ledger: is this a file of the repository at all?
 
 Every gate above asks something about a file's *contents* — is the language

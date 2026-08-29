@@ -309,6 +309,48 @@ describe("a finding kind this page has never heard of", () => {
     ]);
   });
 
+  it("counts an incomplete board apart from files that are gone", () => {
+    const report = reportWith({
+      clean: false,
+      findings: [
+        { node: "a", label: "Cache", ref: "src/cache.ts", kind: "missing-file" },
+        {
+          node: "board",
+          label: "Engine",
+          ref: "src/engine",
+          kind: "incomplete-board",
+          detail: "@complete says this board shows every module under src/engine that it reaches. "
+            + "src/engine/feeds.ts has no box and src/engine/drift.ts imports it. Draw them, or narrow the claim.",
+        },
+      ],
+    });
+    // A board omitting a module is not a box whose file went missing.
+    expect(tallyOf(report)).toEqual([
+      { text: "1 gone", tone: "bad" },
+      { text: "1 incomplete", tone: "bad" },
+    ]);
+  });
+
+  it("gives an incomplete board the engine's sentence and no reveal button", () => {
+    const report = reportWith({
+      clean: false,
+      findings: [
+        {
+          node: "board",
+          label: "Engine",
+          ref: "src/engine",
+          kind: "incomplete-board",
+          detail: "src/engine/feeds.ts has no box",
+        },
+      ],
+    });
+    // "board" matches no shape on the canvas, so the row must not offer to
+    // show one: an empty node is what disables the button.
+    expect(rowsOf(report)).toEqual([
+      { text: "Engine · src/engine/feeds.ts has no box", tone: "bad", node: "" },
+    ]);
+  });
+
   it("says the page is out of date when the server knows a word it does not", () => {
     const report = reportWith({
       vocabulary: ["missing-file", "backwards-edge", "sideways-edge"],

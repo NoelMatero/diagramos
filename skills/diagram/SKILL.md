@@ -370,6 +370,48 @@ show? — call `check_drift` with `coverage: true`. It names modules the board's
 boxes import but no box covers, most-imported first. Suggestions, not drift: worth
 running when deciding what a diagram is missing, not on every pass.
 
+#### `complete: "src/engine"` — and that is all of them
+
+Every claim above is about one thing: this arrow, this directory's boundary. So
+none of them can catch what a diagram *leaves out*. Delete a box and no check
+notices; let the code grow a module the picture never had and the report stays
+clean. A diagram cannot be wrong by omission.
+
+`complete` is the claim that fixes that, and it goes on the **board**, not a box
+— it is passed to `create_diagram` beside `title`:
+
+```
+{ title: "The engine", complete: "src/engine", nodes: [...] }
+```
+
+It says: every module under `src/engine` that this board reaches — imported by
+one of its boxes, or importing one — has a box of its own. A module that does
+not is then a **finding**, not a suggestion.
+
+**It is the same walk `coverage: true` runs.** The difference is who is
+speaking. Unclaimed, a missing module is the engine having an opinion about what
+you should have drawn, which is why it is off by default. Claimed, it is the
+board's own assertion coming back false.
+
+**Do not add it by default.** Most boards should claim nothing about what they
+omit — a diagram is allowed to be a selective view, and that is usually the
+point of one. Add it when the user wants this picture held to the code, or when
+the board is the spec for a subsystem and growing past it silently is the risk.
+
+**Three things it refuses rather than answers**, all of them loudly:
+
+- A scope that is not a directory.
+- A scope one box already covers whole — a directory-anchored box excuses
+  everything beneath it, so nothing inside could ever come back missing, and a
+  claim that can only go green is worse than none. Draw the modules separately,
+  or scope the claim somewhere no single box stands for.
+- A scope in a language no reader is measured for. That is reported unproven,
+  never held: nothing was read, so nothing was proved.
+
+Modules nothing on the board reaches are never nominated — the relevance bar is
+inherited from what you drew, not invented — so a helper no box imports will not
+be held against the claim.
+
 When a box has drifted, work out whether its code *moved* or *went*: repoint the
 first, remove the second. Deleting a box because a path changed loses a real part
 of the picture.
