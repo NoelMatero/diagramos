@@ -2842,6 +2842,18 @@ export function checkDrift(
 
     for (const edge of baselineGraph.edges) {
       const edgeKey = `${edge.from} -> ${edge.to}`;
+      /*
+       * An arrow turned round is not an arrow deleted.
+       *
+       * This compares committed keys against live ones, and reversing an arrow
+       * changes its key -- so the old direction goes missing and every run after
+       * the flip reported the arrow as deleted, forever, until the board was
+       * committed. It is exactly wrong: the arrow is still there, still between
+       * the same two boxes, and now agreeing with the code. `--accept` is the
+       * quickest way to produce one, but dragging an end across on the live
+       * board does it too, so the fix belongs here rather than there.
+       */
+      if (liveEdgeSet.has(`${edge.to} -> ${edge.from}`)) continue;
       // If this edge is not in the working board, check if it should be reported
       if (!liveEdgeSet.has(edgeKey)) {
         const fromNode = baselineNodeById.get(edge.from);

@@ -48,7 +48,7 @@ import {
 import { readBoard, writeBoard } from "../src/engine/board-file.ts";
 import { applyPromotions, clearLivePromotions } from "../src/engine/promote.ts";
 import { applyFollowed } from "../src/engine/repair.ts";
-import { acceptBackwards, backwardsArrows } from "../src/engine/accept.ts";
+import { acceptBackwards } from "../src/engine/accept.ts";
 import { readGraph } from "../src/engine/graph.ts";
 import { CONFIG_FILE, ConfigError, DEFAULT_DIAGRAM_DIR, diagramDir } from "../src/engine/config.ts";
 import { countedWords, coverageLabel } from "../src/engine/summary.ts";
@@ -1149,13 +1149,7 @@ for (const { file, boardFile } of loaded) {
           });
         }
       } else if (result.held) {
-        /*
-         * A refusal names what *can* be accepted. The commonest way to land here
-         * is a typo in an arrow id, and a bare "no" leaves somebody guessing at
-         * a string the tool is holding right there.
-         */
-        const available = backwardsArrows(report);
-        acceptHeld.push({ file, held: result.held, available });
+        acceptHeld.push({ file, held: result.held });
       }
     }
     if (opts.hook) {
@@ -1753,14 +1747,18 @@ const acceptedLines = accepted.length === 0 && acceptHeld.length === 0
             `${applied.was.from} -> ${applied.was.to}  becomes  ${applied.now.from} -> ${applied.now.to}`,
           ],
         })),
-        ...acceptHeld.map(({ file, held, available }) => ({
+        /*
+         * The reason, and only the reason.
+         *
+         * It used to list the arrows that *are* backwards, which read as helpful
+         * and was not: the report printing directly underneath already names
+         * every one of them, and carries the command with the id to paste. Two
+         * boxes saying the same thing is how a refusal starts looking like the
+         * tool having said everything twice.
+         */
+        ...acceptHeld.map(({ file, held }) => ({
           label: `${path.basename(file)}  not accepted`,
-          rows: [
-            paint(held.detail, "red", Boolean(process.stderr.isTTY)),
-            ...(available && available.length > 0
-              ? [`this run says these are backwards: ${available.map((id) => `"${id}"`).join(", ")}`]
-              : []),
-          ],
+          rows: [paint(held.detail, "red", Boolean(process.stderr.isTTY))],
         })),
       ],
       foot: accepted.length > 0

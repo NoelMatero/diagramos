@@ -26,7 +26,7 @@ import path from "node:path";
 
 import { beforeAll, afterAll, describe, expect, it } from "vitest";
 
-import { acceptBackwards, backwardsArrows } from "../src/engine/accept";
+import { acceptBackwards } from "../src/engine/accept";
 import { emptyBoard, writeBoard, type BoardFile } from "../src/engine/board-file";
 import { createDiagram } from "../src/engine/diagram";
 import { checkDrift, type DriftReport, type Workspace } from "../src/engine/drift";
@@ -72,6 +72,10 @@ function check(board: BoardFile): DriftReport {
 }
 
 const arrowOf = (board: BoardFile) => board.elements.find((element) => element.type === "arrow")!;
+
+/** Every arrow a report says is drawn backwards, by the id the accept takes. */
+const backwardsArrows = (report: DriftReport) =>
+  report.edges.filter((finding) => finding.kind === "backwards-edge").map((finding) => finding.node);
 
 /**
  * Which box each end of the drawn line touches, in the order the line is walked.
@@ -266,6 +270,15 @@ describe("--accept on the command line", () => {
     await writeBoard(path.join(repo, at), board);
   }
 
+  function land(message: string): void {
+    execFileSync("git", ["add", "-A"], { cwd: repo, stdio: "ignore" });
+    execFileSync(
+      "git",
+      ["-c", "user.email=t@example.com", "-c", "user.name=Test", "commit", "-q", "-m", message],
+      { cwd: repo, stdio: "ignore" },
+    );
+  }
+
   beforeAll(async () => {
     repo = mkdtempSync(path.join(os.tmpdir(), "accept-"));
     mkdirSync(path.join(repo, "docs/diagrams"), { recursive: true });
@@ -317,7 +330,10 @@ describe("--accept on the command line", () => {
     const refused = run("--accept", "three -> one");
     expect(refused.status).toBe(2);
     expect(refused.out).toContain("does not say three -> one is drawn backwards");
-    expect(refused.out).toContain('this run says these are backwards: "one -> two"');
+    // Said once. The report printing underneath already names every backwards
+    // arrow and carries the id to paste, and a refusal repeating that list read
+    // as the tool having printed itself twice.
+    expect((refused.out.match(/one -> two/g) ?? []).length).toBe(1);
     expect(drawnAs()).toBe("one -> two");
   }, 120_000);
 
@@ -351,6 +367,29 @@ describe("--accept on the command line", () => {
     expect(drawnAs()).toBe("one -> two");
     expect(drawnAs("docs/diagrams/other.excalidraw")).toBe("one -> two");
     rmSync(path.join(repo, "docs/diagrams/other.excalidraw"));
+  }, 120_000);
+
+  it("does not then report the arrow as deleted, run after run", async () => {
+    /*
+     * The deleted-arrow check compares the committed board's edges against the
+     * working one's, keyed by direction -- so turning an arrow round made its
+     * old key go missing and every run after the flip called it a deletion.
+     * Forever, until somebody committed: the board could never go quiet again,
+     * which is the one confirmation an accept has.
+     *
+     * The arrow is still there, between the same two boxes, now agreeing with
+     * the code. `--accept` is the quickest way to produce this, but dragging an
+     * end across on the live board does it too.
+     */
+    await drawBoard();
+    land("the board, drawn backwards");
+    expect(run("--accept", "one -> two").out).toContain("arrow turned round");
+
+    const after = run();
+    expect(after.out).not.toContain("deleted");
+    expect(after.status).toBe(0);
+    // And again, because the complaint was that it repeated on every run.
+    expect(run().out).not.toContain("deleted");
   }, 120_000);
 
   it("turns one round on the board it is named on", async () => {

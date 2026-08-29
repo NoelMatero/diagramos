@@ -87,11 +87,6 @@ export interface AcceptResult {
   held?: HeldFlip;
 }
 
-/** Every arrow the report currently says is drawn backwards, by id. */
-export function backwardsArrows(report: DriftReport): string[] {
-  return report.edges.filter((finding) => finding.kind === "backwards-edge").map((finding) => finding.node);
-}
-
 /**
  * The arrow, drawn the other way.
  *
