@@ -19,6 +19,12 @@ all is a different job — it is unread rather than stale, and giving it one mea
 proposing a claim rather than correcting one, which needs the user's approval.
 `/annotate-diagram` does that.
 
+An arrow reported as **drawn backwards** is a third job, and not this one. That
+finding is not an anchor going stale — it is a claim about direction being
+contradicted, and the usual answer is that the code drifted and the diagram was
+right. If the user decides the opposite, `/accept-arrow` turns that one arrow
+round. Do not redraw a backwards arrow here to make the report go quiet.
+
 ## Decide what each finding means
 
 A finding says a box points at a file or symbol that no longer exists. That has

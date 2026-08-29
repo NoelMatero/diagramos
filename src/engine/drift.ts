@@ -2441,7 +2441,23 @@ export function checkDrift(
                 + `this arrow says ${fromNode.label || fromPath} needs `
                 + `${toNode.label || toPath}, but the dependency runs the other way — `
                 + `${evidence.file} line ${evidence.line} declares "${evidence.specifier}", `
-                + `and ${fromPath} declares nothing on ${toPath}. Turn the arrow round.`,
+                + `and ${fromPath} declares nothing on ${toPath}. Turn the arrow round`
+                /*
+                 * The way out, said where the accusation is (#141).
+                 *
+                 * This is the only finding here that means *wrong*, and until
+                 * there was a command for it the only answers were to change
+                 * the code or hand-edit the board file -- so the loudest thing
+                 * this tool says was the one thing nobody could act on. An
+                 * affordance nobody can see from the finding is not one.
+                 *
+                 * Second, and phrased as the exception, because it is: the
+                 * common case is that the code drifted and the diagram was
+                 * right, and a report that led with "or just accept it" would
+                 * be teaching people to silence the check.
+                 */
+                + ` — or, if the code is right and the arrow was wrong, `
+                + `\`drift --accept "${edge.from} -> ${edge.to}"\` turns it round for you.`,
             } });
             continue;
           }
@@ -2826,6 +2842,18 @@ export function checkDrift(
 
     for (const edge of baselineGraph.edges) {
       const edgeKey = `${edge.from} -> ${edge.to}`;
+      /*
+       * An arrow turned round is not an arrow deleted.
+       *
+       * This compares committed keys against live ones, and reversing an arrow
+       * changes its key -- so the old direction goes missing and every run after
+       * the flip reported the arrow as deleted, forever, until the board was
+       * committed. It is exactly wrong: the arrow is still there, still between
+       * the same two boxes, and now agreeing with the code. `--accept` is the
+       * quickest way to produce one, but dragging an end across on the live
+       * board does it too, so the fix belongs here rather than there.
+       */
+      if (liveEdgeSet.has(`${edge.to} -> ${edge.from}`)) continue;
       // If this edge is not in the working board, check if it should be reported
       if (!liveEdgeSet.has(edgeKey)) {
         const fromNode = baselineNodeById.get(edge.from);

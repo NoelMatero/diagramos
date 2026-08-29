@@ -7,7 +7,9 @@ reasoning behind the complete picture.
 
 Fixing is a `/update-diagram` command, and deliberately not automatic. See
 "Reporting is not the same as being actionable" below for why the exit-2
-auto-fix was designed and then not built.
+auto-fix was designed and then not built. Saying the *diagram* was right — the
+one act that changes what a board claims — is `/accept-arrow`, one arrow at a
+time; see "Accepting a backwards arrow".
 
 What changed while building it:
 
@@ -1341,6 +1343,97 @@ What it will not touch, all of it enforced rather than documented:
 The order matters: repairs run before promotions, so a box whose ref this fixes
 is judged again on its new address rather than promoted on the strength of the
 old one.
+
+## Accepting a backwards arrow
+
+Every write above either corrects an *address* or releases a plan gate the code
+already opened. Neither changes what a diagram claims. `--accept` does, and it
+is the only thing here that does.
+
+For a long time it did not exist, and the finding it answers was the loudest one
+in the tool: `check_drift` would tell you an arrow was drawn backwards, in red,
+with the file and line that proved it, and the only two exits were to change the
+code or to hand-edit the `.excalidraw` file. `/update-diagram` did not cover it
+and said so — that command is scoped to anchors that went stale, not to claims
+that were false. So the most valuable verdict the engine produces was also the
+only one nobody could act on (#141).
+
+The reason it was missing is a good one and it survives intact. A board that
+rewrote itself whenever the code disagreed would be a **mirror rather than a
+spec** — right every time, and therefore never informative. That is the rot this
+whole check exists to prevent. But the argument rules out *silent* rewriting, not
+rewriting on request, and conflating the two is what left the gap.
+
+Three situations produce one finding, and nothing in the engine can tell them
+apart:
+
+| situation | what it means |
+| --- | --- |
+| the claim was transcribed wrong, nobody meant it | accept: turn the arrow round |
+| the architecture deliberately changed | accept — and it is a design decision worth seeing in a diff |
+| the code drifted and is wrong | reject: fix the code. **The default, and the common case.** |
+
+Only a person can pick, so accepting is an act a person performs:
+
+```
+diagramos drift --accept "boards -> engine"
+```
+
+```
+┌─ arch.excalidraw  arrow turned round ──────────────────────────────┐
+│ Boards → Engine  becomes  Engine → Boards                          │
+│ boards -> engine  becomes  engine -> boards                        │
+└─ the diagram now says the dependency runs the other way · read the… ┘
+```
+
+Four rules, and each is a guard rather than a note:
+
+- **Never silently.** `--hook` refuses it outright, the same way it refuses
+  `--repair` and for a sharper reason: the per-turn path runs with nobody
+  watching, and this is the one edit that decides something.
+- **One arrow, named.** There is no bulk form. "Accept everything" is silent
+  rewriting wearing a command's clothes. If the same id is drawn on two boards
+  the run refuses before writing anything and asks which board — settled up
+  front, because the loop writes each board as it reaches it.
+- **Only what this run accuses.** The finding has to be in the report in hand. A
+  stale terminal cannot flip an arrow that stopped being wrong ten minutes ago.
+- **As a visible diff.** One arrow element changes and nothing else, so the
+  commit reads as the decision it is. A relayout would bury that under a
+  thousand coordinates.
+
+Nothing is written onto the board to record that a correction happened. The git
+diff is the record; a board carrying a history of its own corrections is exactly
+the rot above.
+
+**Both halves of the arrow move.** The recorded direction, the two bindings, and
+the route the line takes, walked backwards — so the picture agrees with the file.
+A flip that swapped only the stored direction would leave the arrowhead pointing
+at the old box: the file saying one thing and the canvas showing another, which
+is worse than the finding it answered. The route itself is reused rather than
+recomputed. The same line still touches the same two boxes at the same two
+places, and an arrow that now points *up* a board laid out top-down is the news,
+not a defect to correct.
+
+What it will not touch:
+
+- **A hand-drawn arrow.** Its direction was read off bindings or off where the
+  line happens to sit, never written down, so turning it round means redrawing
+  somebody's sketch. The check still accuses one — being hand-drawn is no
+  defence against the code disagreeing — so this refusal does real work.
+- **An arrow carrying `via`.** The named hops describe a path that only exists
+  one way round. Reversed, the check would be wrong in a new way rather than
+  quiet.
+- **The rest of the board.** No other element is read or rewritten.
+
+`planned` arrows never reach any of this: the wrong verdict is gated on `built`,
+so there is nothing to accept and nothing to accuse.
+
+**The finding carries the way out.** A backwards row in the notice gets one dim
+line under the findings naming the command and an id to paste — once per report,
+not once per arrow, and added after the rows are trimmed. Counted as a finding it
+ate into the six that get listed and inflated "and N more", so a notice about
+twelve arrows claimed twenty-one. An affordance nobody can see from the finding
+is not an affordance.
 
 ## The board page grades the report, and can be older than it
 
