@@ -371,6 +371,143 @@ function namesAny(body: Node, targets: string[]): boolean {
   return targets.some((target) => tokens.has(target));
 }
 
+/** Where the relationship was written, and on which line. */
+export interface DeclarationHit {
+  /** The target name that was found. */
+  name: string;
+  /** 1-based, so it can be quoted at somebody. */
+  line: number;
+  where: "declaration" | "enclosing";
+}
+
+const lineOf = (source: string, index: number): number =>
+  source.slice(0, index).split("\n").length;
+
+/**
+ * Identifier tokens in a declaration but not in its body.
+ *
+ * The body is skipped by node identity rather than by text, so a nested
+ * declaration inside it is skipped with it. What is left is the line or two a
+ * reader would point at: the signature, the parameter types, the field's own
+ * type -- `conns: Slab<Client>` in Rust, `conns: Slab<Client>` on a TypeScript
+ * class, `conns: Slab[Client]` in Python, all the same shape to a walk that
+ * reads tokens and stops at a body.
+ *
+ * Every name outside the body counts, rather than only the ones standing in a
+ * type position. Both readings were measured against the seventeen arrows this
+ * came from and they confirm the same five, so the one with no list of field
+ * names in it wins. It is also the safe direction to be wrong in: this only
+ * ever confirms, and it is asked only where the alternative reading is not
+ * "these are unrelated" but "we read the wrong lines".
+ *
+ * The declared name itself is dropped. A declaration always names itself, and
+ * confirming an arrow on that would be the search finding its own footprint.
+ */
+function declarationTokens(node: Node, body: Node | undefined, nameNode: Node): Set<string> {
+  const tokens = new Set<string>();
+  const walk = (current: Node): void => {
+    if (current.id === body?.id) return;
+    if (isName(current)) {
+      if (current.id !== nameNode.id) tokens.add(current.text);
+      return;
+    }
+    for (let index = 0; index < current.childCount; index += 1) {
+      const child = current.child(index);
+      if (child) walk(child);
+    }
+  };
+  walk(node);
+  return tokens;
+}
+
+/**
+ * The chain of nodes from the root down to one node, excluding it.
+ *
+ * tree-sitter's own node has a `parent`, and this file's `Node` deliberately
+ * does not: the interface in `parse.ts` is the small set of things every
+ * question here needs, and widening it for one caller would be paying in every
+ * other. One walk per declaration, on the data path only, is cheaper than that.
+ */
+function trailTo(tree: Tree, target: Node): Node[] {
+  let found: Node[] | undefined;
+  const walk = (node: Node, trail: Node[]): void => {
+    if (found) return;
+    if (node.id === target.id) { found = [...trail]; return; }
+    trail.push(node);
+    for (let index = 0; index < node.childCount && !found; index += 1) {
+      const child = node.child(index);
+      if (child) walk(child, trail);
+    }
+    trail.pop();
+  };
+  walk(tree.rootNode, []);
+  return found ?? [];
+}
+
+/**
+ * The name of the block a declaration lives inside.
+ *
+ * `impl Client`, `class Foo`, `trait Bar` -- the header line above a method,
+ * which is where a language writes down that the method belongs to the type.
+ * The nearest enclosing declaration wins, and both `type` and `name` are read
+ * because grammars disagree about which one holds it: Rust's `impl_item` calls
+ * it `type`, everything else calls it `name`.
+ */
+function enclosingNames(tree: Tree, node: Node): { tokens: Set<string>; line: number } | undefined {
+  const trail = trailTo(tree, node);
+  for (let index = trail.length - 1; index >= 0; index -= 1) {
+    const ancestor = trail[index]!;
+    if (!DECLARES.some((suffix) => ancestor.type.endsWith(suffix))) continue;
+    const heads = [ancestor.childForFieldName("type"), ancestor.childForFieldName("name")]
+      .filter((head): head is Node => head !== null);
+    if (heads.length === 0) continue;
+    const tokens = new Set<string>();
+    for (const head of heads) each(head, (leaf) => { if (isName(leaf)) tokens.add(leaf.text); });
+    return { tokens, line: ancestor.startIndex };
+  }
+  return undefined;
+}
+
+/**
+ * Where a relationship to data is written, when it is not written in a body.
+ *
+ * The body search answers "does this reach that", and for two functions it is
+ * the whole question. For an end that names a struct, a static or a field it is
+ * the wrong question asked of the wrong lines: the relationship is stated in
+ * the signature (`-> &mut Client`), in the field's own type (`conns:
+ * Slab<Client>`), or in the header of the block the method sits in (`impl
+ * Client`) -- three places this engine already parses and never read.
+ *
+ * Confirm-only, like everything else here. Finding the name proves the two are
+ * related; not finding it proves nothing, and the caller counts that.
+ */
+export function declarationMentions(
+  source: string,
+  symbol: string,
+  targets: string[],
+  language: Language,
+): DeclarationHit | undefined {
+  const tree = treeOf(source, language);
+  if (!tree) return undefined;
+
+  for (const { node, nameNode, soup } of declarationNodes(tree).get(symbol) ?? []) {
+    // Macro soup is tokens waiting for an expansion, not a declaration. There
+    // is no signature in it to read and no block header above it to trust.
+    if (soup) continue;
+
+    const own = declarationTokens(node, bodyNode(node), nameNode);
+    const named = targets.find((target) => own.has(target));
+    if (named) return { name: named, line: lineOf(source, node.startIndex), where: "declaration" };
+
+    const enclosing = enclosingNames(tree, node);
+    const outer = enclosing && targets.find((target) => enclosing.tokens.has(target));
+    if (enclosing && outer) {
+      return { name: outer, line: lineOf(source, enclosing.line), where: "enclosing" };
+    }
+  }
+  return undefined;
+}
+
 /**
  * Walk a route the author named, and say where it stops holding.
  *
