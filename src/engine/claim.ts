@@ -44,6 +44,39 @@
  * and refuses everything else, which is the only reason `@declared` still means
  * one thing; a vocabulary that accepts what it does not check rots into
  * decoration. So an unrecognised word is loud the turn it is written.
+ *
+ * ## What a change to this list does to boards already drawn
+ *
+ * A board is a long-lived file in somebody's repository, and it records nothing
+ * about which version of this list drew it (#134). That reads like a blocker on
+ * every future change to the vocabulary and is not one, because the changes
+ * divide three ways and only the last can hurt:
+ *
+ * - **Additive** -- a new word arrives (`closed`, `feeds`). A board drawn before
+ *   the word does not use it, so nothing about that board changes.
+ * - **Quieting** -- something judged stops being judged (#133). Every board gets
+ *   quieter, which is safe unconditionally: the report loses a row nobody could
+ *   act on and never gains one. #133 shipped to all boards at once for exactly
+ *   this reason, and the seventeen boards in this repository reported
+ *   identically across it.
+ * - **Loudening** -- something unjudged starts being judged. This is the only
+ *   kind that fails work nobody touched, and so the only kind that needs to know
+ *   how old a board is.
+ *
+ * A stamp is therefore not a prerequisite for anything, and writing one today
+ * would put an integer meaning "the reading already in force" onto every board
+ * in every repository -- the churn-for-no-change-in-meaning that keeps
+ * `describes: "repo"` unwritten over in `diagram.ts`. The absence already
+ * carries the fact: **a board with no vocabulary stamp is vocabulary 1**,
+ * permanently, and that reading costs nothing to adopt.
+ *
+ * So a loudening change writes the stamp itself, in the release that makes the
+ * change and never before. Boards drawn from that release carry `2`, boards
+ * drawn by anything earlier carry nothing, and there is no window in which a
+ * new board is unstamped. Hand-drawn boards have no title element to hold one
+ * and so read as vocabulary 1 for good, which is the right answer for precisely
+ * this kind of change: the hand-drawn path is the one people meet first, and it
+ * is never the one that should get louder.
  */
 
 /**
