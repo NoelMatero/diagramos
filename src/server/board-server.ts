@@ -918,12 +918,28 @@ export async function startBoardServer(options: BoardServerOptions): Promise<Run
           // its own edits over it instead of clobbering or losing them.
           return json(response, 409, { error: "stale revision", revision: diskRevision, board: onDisk, file: saveTo });
         }
-        await writeBoard(saveTo, payload.board);
-        state.revision = revisionOf(payload.board);
+        /*
+         * Merged onto what is on disk, not written over it.
+         *
+         * The browser rebuilds the board object from the canvas with a fixed
+         * set of keys -- type, version, source, elements, appState, files --
+         * so anything else at the top level of the file was silently dropped
+         * the first time somebody dragged a box. That is how the board stamp
+         * (#134) would have died: written once at generation, gone the next
+         * time a person touched the live board, and gone quietly.
+         *
+         * The browser still wins on everything it actually sends, which is the
+         * whole of the drawing. This only keeps the keys it has no opinion
+         * about, and it protects any future one for free rather than needing
+         * the viewer taught about each.
+         */
+        const merged = { ...onDisk, ...payload.board };
+        await writeBoard(saveTo, merged);
+        state.revision = revisionOf(merged);
         // Recorded now rather than left to the file watcher's echo, so the
         // entry can say "page": the watcher only knows something wrote the
         // file, not that it was a person drawing.
-        history.record(saveTo, payload.board, state.revision, "page");
+        history.record(saveTo, merged, state.revision, "page");
         announce(saveTo, state.revision);
         return json(response, 200, { revision: state.revision, file: saveTo });
       }

@@ -16,6 +16,7 @@ import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js";
 
 import { emptyBoard, readBoard, writeBoard } from "../engine/board-file";
+import { TOOL_VERSION, schemaOf } from "../engine/version";
 import {
   applyEdits,
   connectNodes,
@@ -363,7 +364,11 @@ async function followBoard(file: string): Promise<void> {
 }
 
 const server = new McpServer(
-  { name: "diagramos", version: "0.1.0" },
+  // Read from package.json rather than restated. Written out by hand this said
+  // "0.1.0" to every client for the whole of the 0.2 line, which is the exact
+  // failure the board stamp exists to avoid -- so it must not be reintroduced
+  // here of all places.
+  { name: "diagramos", version: TOOL_VERSION },
   {
     instructions:
       "Diagrams are .excalidraw files in the repo. A board holds one diagram: create_diagram "
@@ -766,6 +771,18 @@ server.registerTool(
 
       return text({
         file: relativeToWorkspace(file),
+        /*
+         * Which build drew this, and what it means.
+         *
+         * Always answered, including for a board that carries no stamp: the
+         * absence is a reading rather than a gap, so saying `schema: 1,
+         * drawnBy: "before boards were stamped"` tells a caller more than
+         * leaving the field out, which reads as the tool having forgotten.
+         */
+        board: {
+          schema: schemaOf(board.diagramos),
+          drawnBy: board.diagramos?.version ?? "before boards were stamped",
+        },
         ...projectGraph(graph, { geometry, detailed: geometry || includeElements, notShown }),
         // Named here so a caller can address a single diagram (delete_diagram,
         // or create_diagram with append) without having to guess its name from
