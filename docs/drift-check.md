@@ -745,6 +745,58 @@ has no breach at all but cannot be *confirmed*, because 7 files elsewhere import
 at runtime. Both of those are facts nobody knew before the claim existed, which
 is the point.
 
+### What drew this board: the stamp
+
+A board outlives the release that drew it. It sits in a repository for months
+while the tool around it changes, and until recently it recorded nothing at all
+about which version produced it — so a board drawn a year ago and a board drawn
+this morning were byte-for-byte indistinguishable, and any change to what
+something on a board *means* had to be applied blind to both.
+
+Generated boards now carry a stamp at the top level of the file:
+
+```json
+{
+  "type": "excalidraw",
+  "version": 2,
+  "source": "diagramos",
+  "diagramos": { "version": "0.2.0-rc.2", "schema": 1 },
+  "elements": [ ... ]
+}
+```
+
+Two numbers, because they answer different questions at different rates.
+`version` is the npm version — it moves on every release, says nothing about
+meaning, and exists for forensics: *which build wrote this*, when a bug report
+arrives with a board attached. `schema` is the one that carries meaning, bumped
+only when what a board *says* changes, so a difference in it is worth reading.
+
+**Absence is a reading, not a gap.** No stamp means the board predates stamping,
+which is **schema 1** — the meaning in force the day it began. That is correct
+for every board drawn to date and it is the only answer available for a
+hand-drawn file, which has nothing generated to stamp.
+
+**Nothing backfills it.** The stamp is written by `create_diagram`, at the one
+moment it is true. If `readBoard` supplied it as a default then opening an old
+board and saving it would quietly relabel it as current — destroying the exact
+signal the stamp exists to carry, for every board anybody touched. Every other
+writer edits a board somebody else generated and leaves the stamp alone, so
+"drawn by 0.1.0" does not become "drawn by 0.3.0" because a box got dragged.
+
+**Top level, not on an element.** It is a fact about the file rather than about
+anything drawn in it, and two of this repository's own boards have no title
+element to hang it from. That placement has one cost, and it had to be paid:
+the live board's browser rebuilds the file object from the canvas with a fixed
+set of keys, so anything else at the top level was dropped the first time
+somebody dragged a box. The save path now merges onto what is on disk instead of
+writing over it — the browser still wins on everything it actually sends, and
+keys it has no opinion about survive.
+
+**When `schema` gets bumped** is decided in `claim.ts`, beside the rule about
+what a word has to earn. Additive and quieting changes leave it alone and apply
+to every board at once; only a change that makes a board *louder* needs to know
+its age. A bump nothing reads differently is a number for its own sake.
+
 ### A board can be wrong by omission: `complete`
 
 Every word above is **local**. `needs` is about one arrow, `closed` about one

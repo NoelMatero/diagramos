@@ -44,6 +44,35 @@
  * and refuses everything else, which is the only reason `@declared` still means
  * one thing; a vocabulary that accepts what it does not check rots into
  * decoration. So an unrecognised word is loud the turn it is written.
+ *
+ * ## What a change to this list does to boards already drawn
+ *
+ * A board outlives the release that drew it, so every change here has to answer
+ * for the boards already in people's repositories. They divide three ways, and
+ * only the last one can hurt:
+ *
+ * - **Additive** -- a new word arrives (`closed`, `feeds`, `complete`). A board
+ *   drawn before the word does not use it, so nothing about it changes.
+ * - **Quieting** -- something judged stops being judged (#133). Every board gets
+ *   quieter, which is safe unconditionally: the report loses a row nobody could
+ *   act on and never gains one. #133 shipped to all boards at once for exactly
+ *   this reason, and the seventeen boards in this repository reported
+ *   identically across it.
+ * - **Loudening** -- something unjudged starts being judged. This is the only
+ *   kind that fails work nobody touched, and so the only kind that has to know
+ *   how old a board is before it speaks.
+ *
+ * Boards now carry that age themselves: `version.ts` writes a schema number at
+ * generation, and `schemaOf` reads an unstamped board as schema 1 -- the meaning
+ * in force the day stamping began, which is the correct reading for every board
+ * drawn before it and the only one available for a hand-drawn file.
+ *
+ * So the rule is about when to *bump* it, not whether to have it. Additive and
+ * quieting changes leave `BOARD_SCHEMA` alone and apply to every board at once,
+ * because a board that gets quieter or gains a word it does not use has nothing
+ * to be grandfathered from. A loudening change bumps it and gates on it. A bump
+ * that nothing reads differently is a number for its own sake, and this file's
+ * whole argument is that a thing nobody checks becomes decoration.
  */
 
 /**

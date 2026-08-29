@@ -264,6 +264,38 @@ describe("board MCP server", () => {
   }, 120_000);
 
   /**
+   * Which build drew a board, over the wire.
+   *
+   * Answered for every board, including one with no stamp — the absence is a
+   * reading rather than a gap, and omitting the field would read as the tool
+   * having forgotten to look.
+   */
+  it("says which build drew a board, and what an unstamped one means", async () => {
+    const board = "docs/diagrams/stamped.excalidraw";
+    await call("create_diagram", {
+      path: board,
+      nodes: [{ id: "a", label: "A" }],
+      edges: [],
+    });
+    const stamped = jsonOf(await call("read_diagram", { path: board })) as {
+      board: { schema: number; drawnBy: string };
+    };
+    expect(stamped.board.schema).toBe(1);
+    expect(stamped.board.drawnBy).toMatch(/^\d+\.\d+\.\d+/);
+
+    // A board written before stamping existed: no field on disk, still an answer.
+    const old = path.join(workspace, "docs/diagrams/unstamped.excalidraw");
+    const parsed = JSON.parse(await readFile(path.join(workspace, board), "utf8"));
+    delete parsed.diagramos;
+    await writeFile(old, JSON.stringify(parsed, null, 2));
+    const legacy = jsonOf(await call("read_diagram", { path: "docs/diagrams/unstamped.excalidraw" })) as {
+      board: { schema: number; drawnBy: string };
+    };
+    expect(legacy.board.schema).toBe(1);
+    expect(legacy.board.drawnBy).toBe("before boards were stamped");
+  }, 120_000);
+
+  /**
    * The board-level claim, over the wire, and the two contradictions it refuses.
    *
    * Both refusals are here rather than at check time on purpose: the claim

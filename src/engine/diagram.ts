@@ -10,6 +10,7 @@ import { convertSkeletons } from "./convert";
 import { installNodeFontMeasurer } from "./font";
 import { emptyBoard, type BoardFile } from "./board-file";
 import type { ExcalidrawElement } from "./normalize";
+import { currentStamp } from "./version";
 import { NODE_SHAPES, readGraph, type BoardDescribes } from "./graph";
 import {
   planBounds,
@@ -390,7 +391,14 @@ export async function createDiagram(
     diagram: prefix,
   });
   return {
-    board: { ...target, elements: [...target.elements, ...created] },
+    /*
+     * The stamp goes on here, at the one moment it is true: this board is being
+     * generated, now, by this build. Every other writer in the codebase edits a
+     * board somebody else generated and leaves the stamp alone, which is what
+     * keeps "drawn by 0.1.0" from quietly becoming "drawn by 0.3.0" because a
+     * box got dragged.
+     */
+    board: { ...target, diagramos: currentStamp(), elements: [...target.elements, ...created] },
     prefix,
     nodeCount: plan.nodeCount,
     edgeCount: plan.edgeCount,

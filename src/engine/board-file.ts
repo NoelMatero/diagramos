@@ -10,6 +10,7 @@ import { mkdir, readFile, rename, rm, writeFile } from "node:fs/promises";
 import path from "node:path";
 
 import type { ExcalidrawElement } from "./normalize";
+import type { BoardStamp } from "./version";
 
 export const EXCALIDRAW_FILE_TYPE = "excalidraw";
 export const EXCALIDRAW_FILE_VERSION = 2;
@@ -19,8 +20,23 @@ const SOURCE = "diagramos";
 
 export interface BoardFile {
   type: string;
+  /** Excalidraw's file-format number. Nothing to do with this tool's version. */
   version: number;
   source: string;
+  /**
+   * Which build of this tool generated the board, and what it means (#134).
+   *
+   * Optional, and deliberately never defaulted on read: absent means the board
+   * predates stamping, which `schemaOf` reads as schema 1. Written by
+   * `createDiagram` alone -- see `version.ts` for why nothing else may write it.
+   *
+   * Top level rather than on an element, because it is a fact about the file
+   * rather than about anything drawn in it, and because two of this repo's own
+   * boards have no title element to hang it from. `readBoard` spreads whatever
+   * it parsed, so it survives every round-trip through this codebase; the live
+   * viewer's save path is the one that would have dropped it, and merges now.
+   */
+  diagramos?: BoardStamp;
   elements: ExcalidrawElement[];
   appState: Record<string, unknown>;
   files: Record<string, unknown>;
