@@ -118,6 +118,34 @@ describe("the panel's rows", () => {
     expect(rows[4].text).toBe("Next not built yet");
   });
 
+  it("separates a plan the code went the other way on from one nobody started", () => {
+    /*
+     * Both are work items and the report keeps them together, because both mean
+     * the same thing about the board: this is still a sketch. They say opposite
+     * things to somebody looking at the page, though -- one means carry on, the
+     * other means a decision is waiting -- and dim, in a list of things not
+     * started yet, the second reads as one more thing not started yet (#124).
+     *
+     * Amber and not red, for the reason the engine files it as a work item at
+     * all: nothing here is anybody's fault. Something landed and it runs against
+     * the plan, which is a fact about the code, not a verdict about the drawing.
+     */
+    const rows = rowsOf(
+      reportWith({
+        workItems: [
+          { node: "c", label: "Next" },
+          { node: "a -> b", label: "A -> B", kind: "built-backwards" },
+        ],
+      }),
+    );
+    expect(rows.map((row) => row.text)).toEqual([
+      "A -> B · built the other way round",
+      "Next not built yet",
+    ]);
+    expect(rows[0].tone).toBe("warn");
+    expect(rows[1].tone).toBe("dim");
+  });
+
   it("shows a backwards arrow as red and says which way round", () => {
     /*
      * The live board is where somebody is actually looking when this fires, and

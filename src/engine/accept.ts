@@ -29,7 +29,9 @@
  *   clothes.
  * - **Only what the current report accuses.** The finding has to be in the
  *   report being handed in. Flipping an arrow on a stale belief is the same
- *   mistake `repair.ts` refuses to make with a stale ref.
+ *   mistake `repair.ts` refuses to make with a stale ref. Two reports qualify:
+ *   `backwards-edge` on a `built` arrow, and `built-backwards` on a `planned`
+ *   one (#124) -- different news, same arrow, same act.
  * - **As a visible diff.** One arrow changes and nothing else, so the commit
  *   reads as the decision it is: somebody decided the dependency runs the
  *   other way. A relayout would bury that in a thousand changed coordinates.
@@ -145,8 +147,24 @@ function flipArrow(element: ExcalidrawElement, edge: { from: string; to: string 
  */
 export function acceptBackwards(board: BoardFile, report: DriftReport, edgeId: string): AcceptResult {
   const wanted = edgeId.trim();
+  /*
+   * Two reports say an arrow runs against the code, and both are answerable
+   * here (#124).
+   *
+   * `backwards-edge` is a `built` arrow the code contradicts. `built-backwards`
+   * is a `planned` one, filed as a work item rather than a finding because a
+   * plan is not an accusation -- but the way out of it is the same act on the
+   * same arrow, and leaving it to hand-edited JSON would put back exactly the
+   * gap #141 closed, one state over.
+   *
+   * Nothing else differs. A flipped `planned` arrow is not promoted here: the
+   * next check corroborates it in the ordinary way and promotes it in the
+   * ordinary way, which is one behaviour rather than two.
+   */
   const finding = report.edges.find(
     (candidate) => candidate.kind === "backwards-edge" && candidate.node === wanted,
+  ) ?? report.workItems.find(
+    (candidate) => candidate.kind === "built-backwards" && candidate.node === wanted,
   );
   if (!finding) {
     return {
@@ -155,14 +173,15 @@ export function acceptBackwards(board: BoardFile, report: DriftReport, edgeId: s
         node: wanted,
         why: "no-such-finding",
         detail:
-          `this check does not say ${wanted} is drawn backwards. Only a finding `
+          `this check does not say ${wanted} runs against the code. Only a finding `
           + `the current report is making can be accepted — otherwise the board `
           + `would be changed on the strength of something that is no longer true.`,
       },
     };
   }
 
-  const edge = readGraph(board).edges.find((candidate) => `${candidate.from} -> ${candidate.to}` === wanted);
+  const graph = readGraph(board);
+  const edge = graph.edges.find((candidate) => `${candidate.from} -> ${candidate.to}` === wanted);
   if (!edge) {
     return {
       board,
@@ -210,8 +229,11 @@ export function acceptBackwards(board: BoardFile, report: DriftReport, edgeId: s
       node: wanted,
       was: { from: edge.from, to: edge.to },
       now: { from: edge.to, to: edge.from },
-      fromLabel: finding.fromLabel,
-      toLabel: finding.toLabel,
+      // Off the board rather than off the finding: a work item carries the two
+      // labels joined into one string, and the boxes are the authority on their
+      // own names either way.
+      fromLabel: graph.nodes.find((node) => node.id === edge.from)?.label || edge.from,
+      toLabel: graph.nodes.find((node) => node.id === edge.to)?.label || edge.to,
     },
   };
 }
