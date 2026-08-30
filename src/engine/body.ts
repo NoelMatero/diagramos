@@ -319,6 +319,97 @@ export function callsIn(code: string, language: Language): Set<string> {
 }
 
 /**
+ * Leaf node types that are a number the code actually uses.
+ *
+ * The same three-fact trick the rest of this file runs on: every grammar tried
+ * names its numeric leaves something containing `number`, `integer` or `float`
+ * -- `number` in TS and JS, `integer_literal` and `float_literal` in Rust,
+ * `integer` and `float` in Python. So there is one pattern here and no
+ * per-language table.
+ *
+ * What it buys is the thing a regex over the file text cannot have. `255` in a
+ * doc comment is not a leaf of any of these types, and `"777"` in a string is
+ * `string_content`. Both are invisible here for free, which matters because a
+ * board's number claim must be refuted by the code and never by a sentence
+ * about the code -- `src/lib.rs` says "255 chefs" in a comment nine lines above
+ * the `ThreadPool::new(255)` that actually means it, and a text search cannot
+ * tell those apart.
+ */
+const NUMERIC = /number|integer|float/;
+
+/**
+ * One numeric literal as a number, or `undefined` when it is not one.
+ *
+ * Grammars hand back the literal exactly as written, so the same value arrives
+ * in several spellings and all of them have to compare equal: `2_048` and
+ * `2048` are one number, `0x800` is that number too, and Rust writes its type
+ * on the end as `2048u32`. Anything left over after that is not a number this
+ * can reason about and is skipped rather than guessed at.
+ */
+function numberOf(text: string): number | undefined {
+  const cleaned = text.replace(/_/g, "").replace(/[iuf](8|16|32|64|128|size)$/i, "");
+  if (!/^[0-9]/.test(cleaned)) return undefined;
+  const value = Number(cleaned);
+  return Number.isFinite(value) ? value : undefined;
+}
+
+/**
+ * Every number this file actually uses, as values rather than as text.
+ *
+ * `undefined` when the language has no grammar, which the caller counts rather
+ * than reading as an empty file: "there are no numbers here" and "nobody could
+ * look" are the two sentences this engine keeps apart everywhere else.
+ */
+export function numbersIn(source: string, language: Language): Set<number> | undefined {
+  const tree = treeOf(source, language);
+  if (!tree) return undefined;
+  return numbersUnder(tree.rootNode);
+}
+
+function numbersUnder(node: Node): Set<number> {
+  const found = new Set<number>();
+  each(node, (current) => {
+    if (current.childCount > 0 || !NUMERIC.test(current.type)) return;
+    const value = numberOf(current.text);
+    if (value !== undefined) found.add(value);
+  });
+  return found;
+}
+
+/**
+ * The numbers one named declaration uses -- its signature and its body.
+ *
+ * The scope that makes a number claim worth making. Measured on the board this
+ * came from: `src/lib.rs` writes `2048` five times, for a slab, a read buffer
+ * and a doc comment, so a claim checked against the whole file stays green
+ * after the slab it was about changed to 4096. Narrowed to `Orangutan::new`,
+ * the same claim fails the moment the number does, which is the entire point.
+ *
+ * `undefined` means the question could not be asked -- no grammar, or nothing
+ * here declares that name -- and never "no numbers". The second of those is
+ * already the node check's `missing-symbol` finding, and answering it again
+ * here would be one mistake reported as two.
+ */
+export function numbersInSymbol(
+  source: string,
+  symbol: string,
+  language: Language,
+): Set<number> | undefined {
+  const tree = treeOf(source, language);
+  if (!tree) return undefined;
+  const declarations = declarationNodes(tree).get(symbol) ?? [];
+  if (declarations.length === 0) return undefined;
+  const found = new Set<number>();
+  // Every declaration of the name, for the reason `bodiesOf` reads them all: an
+  // `impl` block splitting a method in two is ordinary, and a number in the
+  // half this did not read is a false alarm waiting to happen.
+  for (const { node } of declarations) {
+    for (const value of numbersUnder(node)) found.add(value);
+  }
+  return found;
+}
+
+/**
  * Every name mentioned under a node, once.
  *
  * This is what "the body names the target" means now, and it is stricter than

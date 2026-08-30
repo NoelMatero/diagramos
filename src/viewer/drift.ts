@@ -39,6 +39,7 @@ const KNOWN_BOX_KINDS = new Set([
   "unused-symbol",
   "unsupported-member",
   "missing-route",
+  "stale-number",
   "open-box",
   "incomplete-board",
 ]);

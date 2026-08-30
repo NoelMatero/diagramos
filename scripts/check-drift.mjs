@@ -217,6 +217,7 @@ const REASONS = {
   "unused-symbol": "it is declared, and nothing outside its own declaration uses it",
   "unsupported-member": "the box lists it, and its body shows no trace of the others",
   "missing-route": "the file serves routes, and that one is not among them",
+  "stale-number": "the label states a number the code it points at no longer uses",
 };
 /**
  * Why a `needs` arrow got no direction verdict.
@@ -482,6 +483,20 @@ function incompleteBoard(detail) {
     + (more && scope ? ` under ${scope[1]})` : more ? ")" : "");
 }
 
+/**
+ * A stale number, short enough for a notice that fires every turn.
+ *
+ * The name and the number, and nothing else. `box -> its ref` is the wrong row
+ * here for the reason `open-box` gets its own: the anchor is fine, the picture
+ * is what is wrong, and on the board this came from the label runs to four
+ * lines -- so a row ending in the path truncates away the only part that says
+ * which number to go and look at.
+ */
+function staleNumber(detail) {
+  const said = /says (\S+?)=(\S+?),/.exec(detail);
+  return said ? `says ${said[1]}=${said[2]}, the code does not` : "states a number the code does not";
+}
+
 function brokenHop(detail) {
   if (detail.includes("still connected, but not by this route")) {
     return "connected, but the route is wrong";
@@ -499,6 +514,9 @@ function target(finding) {
   }
   if (finding.kind === "unresolvable-ref") return finding.ref;
   if (finding.kind === "missing-route") return `${symbol} in ${file}`;
+  // The subject is the picture, not the anchor, so the row names the box's own
+  // words rather than a path somebody would go and open.
+  if (finding.kind === "stale-number") return symbol ? `${symbol} in ${file}` : file;
   return file;
 }
 
@@ -643,7 +661,7 @@ function rowsFor({ report, promoted = [] }, colour, all = false) {
     ),
     ...report.findings.flatMap((finding) => [
       /*
-       * The two findings whose evidence is somewhere else.
+       * The findings whose subject is somewhere other than the anchor.
        *
        * Every other row here reads "box → the thing it points at", because every
        * other finding is the anchor going stale. An `open-box` is about somebody
@@ -651,9 +669,16 @@ function rowsFor({ report, promoted = [] }, colour, all = false) {
        * it would point at the directory that is fine rather than at the file
        * that reached into it. `incomplete-board` is further out still: it is not
        * about a box at all, but about a module with no box, so there is nothing
-       * for an arrow to point from. Both say the engine's own sentence instead.
+       * for an arrow to point from. `stale-number` is about the label itself,
+       * and its anchor is not what went wrong. All three say the engine's own
+       * sentence instead.
        */
-      finding.kind === "open-box"
+      finding.kind === "stale-number"
+        // The label is cut, not the sentence. A box carrying a number claim is
+        // a densely written one by nature -- the one this came from runs to
+        // four lines -- and the number is the half worth reading.
+        ? paint(`${fit(boxName(finding), 28)} \u00b7 ${staleNumber(finding.detail)}`, "red", colour)
+        : finding.kind === "open-box"
         ? paint(`${boxName(finding)} \u00b7 ${openBox(finding.detail)}`, "red", colour)
         : finding.kind === "incomplete-board"
           ? paint(`${boxName(finding)} \u00b7 ${incompleteBoard(finding.detail)}`, "red", colour)
