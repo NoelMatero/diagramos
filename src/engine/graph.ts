@@ -13,8 +13,8 @@
  * label needs to know whether it was recorded or guessed.
  */
 import {
-  parseArrowClaim, parseBoardClaim, parseBoxClaim, readLabelClaim,
-  type ArrowClaim, type BoardClaim, type BoxClaim, type ParsedClaim,
+  parseArrowClaim, parseBoardClaim, parseBoxClaim, readLabelClaim, readLabelValues,
+  type ArrowClaim, type BoardClaim, type BoxClaim, type ParsedClaim, type ValueClaim,
 } from "./claim";
 import type { ExcalidrawElement } from "./normalize";
 import type { BoardFile } from "./board-file";
@@ -148,6 +148,18 @@ export interface RecoveredNode {
    * would be the engine agreeing with something it never read.
    */
   claimGarbled?: string;
+  /**
+   * Numbers this box's own label states about the code, read from `@name=value`
+   * tokens in the label text (#142).
+   *
+   * In the label rather than in `customData`, and that is the whole point: what
+   * goes stale is the text somebody reads off the picture. A claim kept beside
+   * the label could be corrected on its own and leave the label still showing
+   * the old number, which is this rot moved one field along.
+   */
+  values?: ValueClaim[];
+  /** `@name=value` tokens whose value is not a number, so nothing checks them. */
+  valuesGarbled?: string[];
 }
 
 /**
@@ -351,9 +363,19 @@ export function readGraph(board: BoardFile): RecoveredGraph {
     const bounds = box(shape);
     const boxClaim = parseBoxClaim(custom.claim);
     const claimGarbled = boxClaim && "garbled" in boxClaim ? boxClaim.garbled : undefined;
+    /*
+     * Only a label somebody put on *this* box is read for numbers -- the same
+     * rule the arrow claim follows, and for the same reason. The inferred
+     * fallback guesses which shape a loose piece of text belongs to, and a
+     * legend two boxes away must not be able to make a claim about code.
+     */
+    const exactLabel = labelByContainer.get(shape.id);
+    const read = exactLabel === undefined ? undefined : readLabelValues(exactLabel);
     nodes.push({
       id,
-      label: labelByContainer.get(shape.id) ?? inferredLabelByShape.get(shape.id) ?? "",
+      label: read
+        ? read.text ?? ""
+        : inferredLabelByShape.get(shape.id) ?? "",
       shape: String(shape.type),
       elementId: shape.id,
       x: bounds.x,
@@ -366,6 +388,8 @@ export function readGraph(board: BoardFile): RecoveredGraph {
       state: stateOf(custom.state),
       ...(boxClaim && "claim" in boxClaim ? { claim: boxClaim.claim } : {}),
       ...(claimGarbled !== undefined ? { claimGarbled } : {}),
+      ...(read?.values.length ? { values: read.values } : {}),
+      ...(read?.garbled.length ? { valuesGarbled: read.garbled } : {}),
     });
     nodeIdByElement.set(shape.id, id);
     consumed.add(shape.id);

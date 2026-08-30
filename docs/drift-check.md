@@ -474,6 +474,86 @@ the arrow check needs one endpoint per box, not a set.
 One new finding: `empty-ref`, for a directory with nothing in it or a glob that
 matches nothing. It is loud, because it is a claim that has stopped being true.
 
+### A number written on the box, checked against the code
+
+Everything above stops at the **ref**. A ref goes stale and the engine says so; a
+**label** goes stale and nothing says anything, ever. Change a slab from 2048 to
+4096 and the box still reading `Slab(2048)` is lying — the ref resolves, the
+arrows hold, the report is clean. Ordinary documentation rot, living inside a
+tool built to prevent documentation rot.
+
+The tempting fix is to scan labels for numbers and compare them to the file.
+Don't: a label saying `Token(2)..Token(2050)` also contains `2`, and pattern-
+matching facts out of prose produces false accusations — the one thing this
+engine has never done, spent on the least important check in it.
+
+So the claim is **declared**, not discovered:
+
+```
+conns: Slab<Client>
+Token(2)..Token(2050)      ← prose, never checked
+Slab @cap=2048             ← the claim
+full slab = backpressure   ← prose, never checked
+```
+
+Nothing is inferred out of a sentence, so nothing can be misread out of one. And
+the prose beside it is the argument for that: 2050 is the author's own arithmetic
+— 2 plus 2048 — and appears in no file in the repository. A checker clever enough
+to find it would have been wrong about it.
+
+**The `=` is what keeps it safe, and it was measured rather than chosen.** Across
+the seventeen boards here, sixteen text elements carry an `@` token and every one
+is a vocabulary word — `@needs`, `@declared`, `@used`. One of them is a *box*
+label, on the board documenting this very feature: `what a ref claims · @declared
+· @used`. Read a bare `@word` in a box label as a claim and that box reports two
+garbled claims the day this ships, on our own diagram, about the syntax it is
+explaining. Not one `@` token anywhere contains an `=`. So `@word` stays
+vocabulary and stays prose in a box label; `@name=value` is the new grammar and
+cannot collide with a board already drawn — which is also why this is additive
+rather than loudening, and needs no `BOARD_SCHEMA` bump.
+
+The name is for the person. Nothing checks what `cap` *means*, because what a
+number means is not a question the code can be asked. The number is the whole of
+the claim.
+
+**Read from the parse, never from the text.** `src/lib.rs` says "255 chefs" in a
+doc comment nine lines above the `ThreadPool::new(255)` that means it. A text
+search cannot tell those apart, so a comment would keep a claim green after the
+real number changed. Numeric literals are nodes; a number in a comment is not a
+node, and a number in a string is string content. Same trick as everywhere else
+here — `number`, `integer` and `float` name the numeric leaf in every grammar, so
+there is one pattern and no per-language table. `2_048`, `0x800` and `2048u32`
+are one number.
+
+**Scoped to the narrowest thing the box points at**, and this is the difference
+between catching the motivating case and missing it. `src/lib.rs` writes `2048`
+five times over — a slab, two read buffers, a comment — so a file-wide question
+stays green after the one number the box is about becomes 4096. Anchored at a
+symbol, the claim is checked against that declaration and its body, and fails the
+moment the number does. A box pointing at a bare file gets the weaker answer it
+asked for, which is the same bargain `missing-symbol` has always struck.
+
+It is refutable, so it may say *wrong*, in red, with the box and the number: the
+numeric literals in a declaration are enumerable, so not finding one is proof
+rather than absence of evidence — the same standing `missing-route` has. Nobody
+gets a red for prose, only for a number they marked on purpose.
+
+`@name=` followed by something that is not a number is **garbled and loud**, not
+ignored. A claim nothing judges reads exactly like a claim that passed, so a
+board saying `@default=utf-8` is told that nothing is checking it. The other
+kinds the issue sketched — string literals, variant sets — each arrive with their
+own checker or not at all.
+
+#### What it does not catch
+
+A name declared more than once in a file widens the scope back out. On the board
+this came from, `new` is both `Client::new` and `Orangutan::new`; a claim of
+`@cap=2048` anchored at `src/lib.rs#new` is answered by whichever of them holds
+2048, so changing the slab alone does not fail it. Refs have no way to say
+`Orangutan::new` today. The engine already tells an author when a name is
+declared in several places, so the weakness is visible rather than silent — but
+it is a real ceiling, and it is where a type-qualified ref would pay for itself.
+
 ### The glob restriction is the security design
 
 `*` is allowed in the **last segment only**, and `**` never. The directory prefix

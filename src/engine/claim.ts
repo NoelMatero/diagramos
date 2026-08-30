@@ -296,6 +296,122 @@ export function readLabelClaim(label: string): { text?: string; parsed?: ParsedC
 }
 
 /**
+ * A number a box label states about the code it is anchored to.
+ *
+ * `name` is for the person -- `cap`, `port`, `workers` -- and nothing checks
+ * it, because what a number *means* is not something the code can be asked.
+ * `value` is the whole of the claim: this number is one the anchored code
+ * actually uses.
+ *
+ * `written` is the number exactly as typed, kept for the report. Being told
+ * `0x800 is no longer in src/lib.rs` when you wrote `0x800` is worth the field.
+ */
+export interface ValueClaim {
+  name: string;
+  value: number;
+  written: string;
+}
+
+export type ParsedValueClaim = { claim: ValueClaim } | { garbled: string };
+
+/**
+ * Why this needs the `=`, and why bare `@2048` was measured and rejected.
+ *
+ * A box label is prose that has never been read for anything, so switching it
+ * on is the one change `claim.ts` calls loudening: it can fail a board nobody
+ * touched. Measured across the seventeen boards in this repository, sixteen
+ * text elements carry an `@` token and every one of them is a vocabulary word
+ * -- `@needs`, `@declared`, `@used`. One is a *box* label, on the board that
+ * documents this very feature: `what a ref claims · @declared · @used`. Read
+ * bare `@word` in box labels as a claim and that box reports two garbled claims
+ * the day this ships, on our own diagram, about the syntax it is explaining.
+ *
+ * Not one `@` token anywhere contains an `=`. So the `=` is what keeps the two
+ * grammars apart -- `@word` is vocabulary and stays prose in a box label,
+ * `@name=value` is a value and is new -- and it is why this is additive rather
+ * than loudening: an old board cannot hold this claim without somebody having
+ * typed it, which is the same argument that let `feeds` and `closed` in without
+ * a schema bump.
+ */
+const VALUE_CLAIM = /^@([A-Za-z_][\w.-]*)=(.+)$/;
+
+/**
+ * One `@name=value` token, or why it cannot be read.
+ *
+ * A value that is not a number is garbled and loud, not ignored. Numbers are
+ * the only kind admitted so far, and the rule this file exists to state is that
+ * a claim nothing judges reads exactly like a claim that passed -- so a board
+ * saying `@default=utf-8` has to be told that nothing is checking it, rather
+ * than being left to look green. The other kinds the issue lists (string
+ * literals, variant sets) each arrive with their own checker or not at all.
+ */
+export function parseValueClaim(token: string): ParsedValueClaim | undefined {
+  const match = VALUE_CLAIM.exec(token.trim());
+  if (!match) return undefined;
+  const [, name, raw] = match as unknown as [string, string, string];
+  const cleaned = raw.replace(/_/g, "");
+  const value = /^[0-9]/.test(cleaned) ? Number(cleaned) : Number.NaN;
+  if (!Number.isFinite(value)) return { garbled: `${name}=${raw}` };
+  return { claim: { name, value, written: raw } };
+}
+
+/**
+ * The numbers a box label claims, and the prose left over.
+ *
+ * Several are allowed here where an arrow allows one claim, and the difference
+ * is real rather than a relaxation. Two words on an arrow are one unanswered
+ * question about which was meant; two numbers on a box are two independent
+ * facts, each with its own answer. The board this came from needs exactly that
+ * -- one box reads `TcpListener::bind · Slab(2048) · ThreadPool(255)`, which is
+ * two numbers about one constructor.
+ *
+ * Vocabulary tokens are left alone. `@declared` in a box label is prose here
+ * and always was, for the reason `VALUE_CLAIM` gives.
+ */
+export function readLabelValues(
+  label: string,
+): { text?: string; values: ValueClaim[]; garbled: string[] } {
+  const values: ValueClaim[] = [];
+  const garbled: string[] = [];
+  /*
+   * A label with no claim in it comes back byte-identical, and that is a rule
+   * rather than an optimisation.
+   *
+   * A box label is hand-written text that wraps -- `board server\nHTTP · SSE ·
+   * watch` is one label with a newline in it -- and an earlier version of this
+   * split on whitespace and rejoined with single spaces, which quietly flattened
+   * every label on every board whether it claimed anything or not. Nothing here
+   * is allowed to rewrite somebody's own words as a side effect of looking for
+   * a number in them.
+   */
+  const marked = label.match(/(?:^|\s)@[A-Za-z_][\w.-]*=\S+/g);
+  if (!marked) return { ...(label ? { text: label } : {}), values, garbled };
+
+  for (const token of marked) {
+    const parsed = parseValueClaim(token.trim());
+    if (!parsed) continue;
+    if ("garbled" in parsed) garbled.push(parsed.garbled);
+    else values.push(parsed.claim);
+  }
+  // Only the claims come out. What is left keeps its line breaks; the gap each
+  // token leaves behind is closed, and a line that held nothing else goes.
+  const text = label
+    .replace(/(?:^|[ \t])@[A-Za-z_][\w.-]*=\S+/g, "")
+    .split("\n")
+    .map((line) => line.replace(/[ \t]{2,}/g, " ").trimEnd())
+    .filter((line, index, lines) => line.trim() !== "" || (index > 0 && index < lines.length - 1))
+    .join("\n")
+    .trim();
+  return { ...(text ? { text } : {}), values, garbled };
+}
+
+/** The sentence shown when a box marks a value nothing can check. */
+export function valueClaimError(written: string): string {
+  return `"@${written}" is not something a box can claim. Only a number can be checked `
+    + `against the code — write @${written.split("=")[0]}=<number>, or drop the @.`;
+}
+
+/**
  * The label to write on the canvas for an arrow with a claim.
  *
  * The claim goes last so the reader's own words come first, and it goes on in

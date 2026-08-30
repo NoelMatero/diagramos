@@ -27,13 +27,15 @@ import {
   chainBreak,
   declarationMentions,
   declarationsOf,
+  numbersIn,
+  numbersInSymbol,
   reaches,
   unsupportedMembers,
 } from "./body";
 import { checkFeeds, type FeedsCandidate, type FeedsWithheld } from "./feeds";
 import { followAnchors, type FollowedRef, type StaleAnchor, type Trail } from "./follow";
 import type { BoardFile } from "./board-file";
-import { arrowClaimError, boxClaimError, type ArrowClaim } from "./claim";
+import { arrowClaimError, boxClaimError, valueClaimError, type ArrowClaim } from "./claim";
 import { checkClosed, type ClosedBreach } from "./closed";
 import { connects, refIsStale, type CodeGraphOption } from "./codegraph";
 import { readDependencies, readerCanPlace } from "./deps";
@@ -58,6 +60,16 @@ export type DriftKind =
   | "unsupported-member"
   /** A route anchor whose literal is no longer served by the file or its imports. */
   | "missing-route"
+  /**
+   * A number written on a box label that the code it points at no longer uses.
+   *
+   * The only finding here whose subject is the *picture* rather than an anchor.
+   * Every other one asks whether a ref still resolves; this one asks whether the
+   * text a person reads off the diagram is still true (#142). Refutable for the
+   * same reason `missing-route` is: the numeric literals in a file are
+   * enumerable, so not finding one is proof rather than absence of evidence.
+   */
+  | "stale-number"
   /**
    * A `closed` box that something outside reaches into.
    *
@@ -145,6 +157,7 @@ export const DRIFT_KINDS = [
   "unused-symbol",
   "unsupported-member",
   "missing-route",
+  "stale-number",
   "open-box",
   "incomplete-board",
 ] as const satisfies readonly DriftKind[];
@@ -814,6 +827,15 @@ export interface DriftReport {
   handDrawn: number;
   /** True when the board says it describes something other than this repository. */
   concept: boolean;
+  /**
+   * Numbers on box labels read against the code, and numbers nobody could read.
+   *
+   * Counted for the reason every other coverage number here is: silence has to
+   * mean "checked and held", never "there was nowhere to look". A claim on a
+   * directory ref or in a language with no grammar lands in the second.
+   */
+  valuesChecked: number;
+  valuesUnread: number;
   edges: EdgeDriftFinding[];
   /** Edges checked for corroboration. */
   edgesChecked: number;
@@ -1882,6 +1904,8 @@ export function checkDrift(
   const workItems: WorkItem[] = [];
   const promotions: Promotion[] = [];
   let checked = 0;
+  let valuesChecked = 0;
+  let valuesUnread = 0;
   let skipped = 0;
   let edgesChecked = 0;
   let edgesSkipped = 0;
@@ -2168,6 +2192,108 @@ export function checkDrift(
             + `${members.filter((other) => other !== orphan).join(", ")}.`,
         });
       }
+    }
+
+    /*
+     * Numbers the label states about the code (#142).
+     *
+     * A ref going stale is reported; a *label* going stale never was. Change a
+     * slab from 2048 to 4096 and the box saying 2048 is now lying, while the
+     * ref still resolves, the arrows still hold and the report is clean --
+     * ordinary documentation rot, living inside a tool built to prevent it.
+     *
+     * What makes this checkable and a regex over prose not is that the claim is
+     * *declared*. Nothing is inferred out of a sentence, so nothing can be
+     * misread out of one: `Token(2)..Token(2050)` beside it stays prose and
+     * stays unchecked, which is right, because 2050 is the author's arithmetic
+     * and appears in no file.
+     *
+     * Read from the file's numeric literals rather than its text, which is the
+     * whole difference between this and a search. `src/lib.rs` says "255 chefs"
+     * in a comment nine lines above the `ThreadPool::new(255)` that means it, so
+     * a text search would keep the claim green after the real number changed.
+     */
+    for (const value of node.values ?? []) {
+      /*
+       * Only the anchors the box actually declares, and any one of them will do.
+       * A box spread across files states one fact about the thing it draws, not
+       * one fact per file -- and a label-derived anchor is a guess about where
+       * the box points, which is not enough to call somebody's number wrong.
+       */
+      const files = [declared, ...(node.refs ?? [])]
+        .map((entry) => entry?.trim())
+        .filter((entry): entry is string => Boolean(entry));
+      let held = false;
+      /** The anchors that could actually be read, for the sentence. */
+      const read: string[] = [];
+      for (const anchor of files) {
+        const { path: target, symbol } = parseRef(anchor);
+        const absolute = workspace.resolve(target);
+        if (!absolute || workspace.stat(absolute) !== "file") continue;
+        const language = languageOf(absolute);
+        if (!language) continue;
+        const parsed = symbol === undefined ? undefined : parseSymbol(symbol);
+        const named = parsed && !("garbled" in parsed) && !routeOf(parsed.symbol)
+          ? parsed.symbol
+          : undefined;
+        /*
+         * The narrowest thing the box points at, which is what decides whether
+         * this claim is worth anything.
+         *
+         * A box anchored at a symbol is asking about that declaration; a box
+         * anchored at a bare file is asking about the file, and gets the weaker
+         * answer it asked for. That is the same bargain `missing-symbol` has
+         * always struck, and here it is the difference between catching the
+         * motivating case and missing it -- `src/lib.rs` holds `2048` five
+         * times over, so only the narrowed question notices when the one this
+         * box is about becomes 4096.
+         */
+        const source = workspace.read(absolute);
+        const numbers = named === undefined
+          ? numbersIn(source, language)
+          : numbersInSymbol(source, named, language);
+        // No grammar, or a name this file does not declare: no answer, never a
+        // no. The missing name is already the node check's own finding.
+        if (!numbers) continue;
+        read.push(anchor);
+        if (numbers.has(value.value)) { held = true; break; }
+      }
+      if (read.length === 0) {
+        // A directory ref, a language with no reader, a file that is gone. The
+        // ref checks above already said so; this stays quiet rather than
+        // reporting the same gap twice in different words.
+        valuesUnread += 1;
+        continue;
+      }
+      valuesChecked += 1;
+      if (held) continue;
+      findings.push({
+        node: node.id,
+        label: node.label,
+        ref: read[0]!,
+        kind: "stale-number",
+        provenance: "recorded",
+        detail:
+          `this box says ${value.name}=${value.written}, and ${read.join(" or ")} `
+          + `no longer uses ${value.written}. Either the code moved on and the `
+          + `label is stale, or the number was never this one.`,
+      });
+    }
+
+    /*
+     * A marked value nothing can check, said out loud rather than ignored.
+     *
+     * The rule `claim.ts` exists to state: a claim nobody judges reads exactly
+     * like a claim that passed. `@default=utf-8` looks checked and is not, so a
+     * board carrying one is told, the turn it is written.
+     */
+    for (const written of node.valuesGarbled ?? []) {
+      garbledClaims.push({
+        on: "box",
+        label: node.label || node.id,
+        written,
+        detail: valueClaimError(written),
+      });
     }
   }
 
@@ -3423,6 +3549,8 @@ export function checkDrift(
     handDrawn,
     concept,
     edges,
+    valuesChecked,
+    valuesUnread,
     edgesChecked,
     edgesSkipped,
     edgesSkippedWhy,
