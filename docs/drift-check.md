@@ -121,6 +121,23 @@ The gate releases itself — the code landing promotes the thing to `built`, and
 the claim goes live. A `@needs` arrow's *direction* is read one step earlier than
 that, on the way in rather than the run after, and the section below says why.
 
+**Nothing grades it, and it is still counted.** Not grading a plan's claim used
+to mean saying nothing at all about it, and the two are different: a claim
+nobody could evaluate has to be visible, or a quiet report stands in for an
+answer. So a `planned` arrow whose ends could not be read — the file is not
+written yet, the end is not snapped to its box, the language has no measured
+reader — lands in `plannedWithheld`, and `--details` says
+`1 of this plan's claims cannot be checked yet: 1 not written yet`.
+
+Its own line, dim, and never in the per-turn notice or the exit code. It reads
+as coverage rather than as a problem because that is what it is: the arrows of a
+plan pointing at files that do not exist is the plan working, and it would be
+true for a whole design session. What it replaces is the silence, which was the
+one thing that could be mistaken for a pass — a feature finished under a
+different name left every claim on the plan unread, and the board reported no
+findings and exited 0. A `planned` arrow that *was* read is not in this number
+whatever the answer was: it got one, and what to do about it is the work item.
+
 **`missing` is deliberately not a state.** State is declared by whoever draws the
 box; existence is observed, free, every run. Recording "missing" would put a fact
 with a shelf life into a committed file, which is the rot this check exists to

@@ -420,6 +420,58 @@ describe("an unanswered claim on the board", () => {
 });
 
 /**
+ * The same admission about a plan (#129).
+ *
+ * A `@needs` on a `planned` arrow is a specification of what the dependency will
+ * be, and the panel used to skip it in silence -- so a plan built under the
+ * wrong name showed dashed boxes reading "not built yet" over work that was
+ * finished, with nothing on screen to be suspicious of.
+ *
+ * Said, and said differently. The plan is not late and not wrong: its arrows
+ * pointing at files that do not exist is the plan doing its job, so this is the
+ * one claim row here that is dim rather than amber, and the one that does not
+ * turn the chip off its all-clear wording.
+ */
+describe("a claim on a plan nothing could read yet", () => {
+  const plan = reportWith({
+    checked: 9,
+    edgesChecked: 11,
+    claims: {
+      needs: 3,
+      needsChecked: 0,
+      needsWithheld: {},
+      plannedWithheld: { "endpoint-file-missing": 3 },
+    },
+  });
+
+  it("names the count and the reason", () => {
+    expect(rowsOf(plan)[0]).toEqual({
+      text: "3 of this plan's claims cannot be checked yet: 3 not written yet",
+      tone: "dim",
+    });
+  });
+
+  it("is not counted among the unanswered live claims", () => {
+    // The amber chip means "somebody asked about today and got no answer". A
+    // plan asked about later, so it stays out of that number -- otherwise every
+    // board with a sketch on it would sit amber for the whole design session.
+    expect(tallyOf(plan)).toEqual([]);
+    // "good" is what `worstToneOf` says when no row is bad or warn, which is the
+    // point: the row is there to read and nothing on the page turns a colour.
+    expect(worstToneOf(rowsOf(plan))).toBe("good");
+  });
+
+  it("is absent from a payload that predates it", () => {
+    const older = reportWith({
+      checked: 9,
+      edgesChecked: 11,
+      claims: { needs: 2, needsChecked: 2, needsWithheld: {} },
+    });
+    expect(rowsOf(older)).toEqual([]);
+  });
+});
+
+/**
  * The preview counter (#130).
  *
  * Read off the scene rather than the report, and that is the only place it could

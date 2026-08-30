@@ -622,9 +622,41 @@ export interface ClaimTally {
    * With edge checking on, every non-`planned` `needs` arrow lands in exactly
    * one of these or in `needsChecked`: there is no third place for a claim to
    * fall out of the walk unremarked, which is the whole point. `needs` itself
-   * counts `planned` arrows too, so it is the larger number.
+   * counts `planned` arrows too, so it is the larger number -- and the ones it
+   * counts and this does not are in `plannedWithheld` below.
    */
   needsWithheld: SkipBreakdown<NeedsWithheld | "cycle" | EdgeSkipReason>;
+  /**
+   * The same fact about the claims on `planned` arrows: nobody could read them.
+   *
+   * Its own map rather than a share of the two above, because it answers a
+   * different question. Those say *the live claims on this board went
+   * unanswered*, which is news every time; this says *the plan has not been
+   * reached yet*, which is the ordinary state of a plan and would print on
+   * every run of a design session. Merged, a fresh sketch would open a notice
+   * saying its own arrows were not checked, every turn, until the code landed
+   * -- and a warning that is always on is one nobody reads.
+   *
+   * Said anyway, because the alternative was silence. A claim on a `planned`
+   * arrow is a specification of what the dependency will be (#123), and the
+   * rule since #113 is that a claim nothing could evaluate has to be visible,
+   * since a quiet report reads as "checked, and fine". Those two were never
+   * joined: a plan built at the wrong path left every arrow pointing at a file
+   * that was not there, every one of them skipped in silence, and the board
+   * reported no findings and exited 0 over a feature that existed under
+   * another name.
+   *
+   * Only `EdgeSkipReason`, and that is the whole of it: every count in here
+   * means the two files could not be read -- an end not snapped to its box, an
+   * end whose file is not there yet, a language no reader is licensed for. A
+   * `planned` arrow that *was* read is deliberately absent whatever the answer
+   * turned out to be, because it got one, and what to do about it is the work
+   * item rather than a number.
+   *
+   * This is a coverage statement and never an accusation. A `planned` arrow is
+   * never wrong about today, and nothing here changes that.
+   */
+  plannedWithheld: SkipBreakdown<EdgeSkipReason>;
 }
 
 /**
@@ -1832,6 +1864,7 @@ export function checkDrift(
     complete: 0, completeHeld: 0,
     needs: 0, needsChecked: 0, needsWithheld: {},
     feeds: 0, feedsConfirmed: 0, feedsWithheld: {},
+    plannedWithheld: {},
   };
   const closedBreaches: ClosedBreachFinding[] = [];
   const closedUnproven: ClosedUnprovenFinding[] = [];
@@ -2400,16 +2433,45 @@ export function checkDrift(
        * claim would never be counted at all -- and the very first claim written
        * by hand, on an arrow that looks right on screen, would report success.
        *
-       * Both words come through here, into their own tally. A `planned` arrow
-       * carries no claim about today, so it is exempt: there is no line to read
-       * yet, and nothing to withhold a verdict about.
+       * Both words come through here, into their own tally.
+       *
+       * A `planned` arrow is exempt from that tally and not from the question
+       * (#129). It makes no claim about today, so counting it among the live
+       * ones would say the board is going unchecked when it is the code that
+       * has not arrived -- but the exemption used to be silence, and silence is
+       * the one answer #113 ruled out. A plan whose ends do not exist yet was
+       * skipped without a word, so a plan built at the wrong path read exactly
+       * like a plan nobody had started: no findings, no arrows checked, exit 0.
+       *
+       * So it goes to `plannedWithheld` instead, which is coverage rather than
+       * accusation, and stays out of every count that opens a notice.
        */
       const claimed = edge.claim !== undefined && edge.state !== "planned";
+      /** The same claim, on an arrow the code has not reached yet. */
+      const plannedClaim = edge.claim !== undefined && edge.state === "planned";
       /** Where an unanswered claim on this arrow gets counted. */
       const withheld = edge.claim === "feeds" ? claims.feedsWithheld : claims.needsWithheld;
-      /** Skip the arrow, and if it carried a claim, say the claim went unanswered. */
+      /**
+       * A claim on a plan that nothing could read, counted as coverage.
+       *
+       * Its own function because it is wanted in two shapes of place: the gates
+       * below, which skip before any checker is reached, and the two further
+       * down where a checker was reached and could not read the files. A live
+       * claim is already counted by then -- `checkNeeds` and the `feeds` block
+       * both answer before those -- and a plan's is not, because neither of
+       * them counts a plan.
+       */
+      const notePlannedClaim = (reason: EdgeSkipReason) => {
+        if (!plannedClaim) return;
+        claims.plannedWithheld[reason] = (claims.plannedWithheld[reason] ?? 0) + 1;
+      };
+      /**
+       * Skip the arrow, and say what became of any claim it carried: a live one
+       * into its word's tally, a plan's into the plan's.
+       */
       const skipClaimedEdge = (reason: EdgeSkipReason) => {
         if (claimed) withheld[reason] = (withheld[reason] ?? 0) + 1;
+        else notePlannedClaim(reason);
         skipEdge(reason, edge, fromNode, toNode);
       };
 
@@ -2595,6 +2657,10 @@ export function checkDrift(
          * claim about today; its direction is read for one question only, and
          * the answer to that question is the work item below rather than a
          * number in a summary.
+         *
+         * `plannedWithheld` is not touched either, and for the opposite reason:
+         * it exists for the plan whose ends nothing could read, and this arrow's
+         * ends were read. Getting here at all means the question was asked.
          */
         if (edge.state === "planned") {
           if (needs.verdict === "backwards") {
@@ -2798,6 +2864,7 @@ export function checkDrift(
         const source = workspace.read(fromFile);
         const broken = chainBreak(source, fromEnd.symbols[0]!, via, toEnd.symbols, language);
         if (broken?.unreadable) {
+          notePlannedClaim("no-function-body");
           skipEdge("no-function-body", edge, fromNode, toNode);
           continue;
         }
@@ -2912,12 +2979,11 @@ export function checkDrift(
             recordEdge(edge, fromNode, toNode, { kind: "confirmed" });
             continue;
           }
-          skipEdge(
-            bothNamed ? "no-function-body" : licensed ? "outside-licence" : "unlicensed-language",
-            edge,
-            fromNode,
-            toNode,
-          );
+          const why: EdgeSkipReason = bothNamed
+            ? "no-function-body"
+            : licensed ? "outside-licence" : "unlicensed-language";
+          notePlannedClaim(why);
+          skipEdge(why, edge, fromNode, toNode);
           continue;
         }
         edgesChecked += 1;
