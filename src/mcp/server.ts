@@ -25,6 +25,7 @@ import {
   listDiagrams,
 } from "../engine/diagram";
 import { readGraph } from "../engine/graph";
+import { relayoutDiagram } from "../engine/relayout";
 import { projectGraph } from "./projection";
 import { createCodeGraphOption } from "../engine/codegraph";
 import { createLedger } from "../engine/ledger";
@@ -376,6 +377,14 @@ const server = new McpServer(
       + "one. Read an existing board before editing it. Nodes keep their semantic ids, so refer to "
       + "them by id later. Hand-drawn elements are reported as inferred: treat them as the spec and "
       + "never redraw them.\n"
+      + "Changing a board that exists is three tools, and picking by habit is expensive rather than "
+      + "wrong: re-sending a 34-node board costs ~1,900 tokens. A ref, a state, a colour or a claim "
+      + "is edit_diagram. The layout flow is relayout_diagram. create_diagram is for structure -- "
+      + "boxes added or removed, a subsystem reworked.\n"
+      + "Drawing is not reproducible and checking is. Two runs of the same request give different "
+      + "boards, because the graph comes from a model; everything downstream of the graph is "
+      + "deterministic, so an unchanged diagram regenerates byte-identically and every check gives "
+      + "the same answer twice. Say so before redrawing a board somebody liked.\n"
       + "The live web view exists only while a board server runs. Use open_board to start it or to "
       + "get the URL for another diagram, board_status to ask what is up. Each board has its own "
       + "URL, so several can be open side by side and opening one never disturbs another; a project "
@@ -587,8 +596,13 @@ server.registerTool(
     description:
       "Lay out a graph into a .excalidraw file. Give nodes and edges, never coordinates: layout, "
       + "sizing, routing, and bindings are automatic. Replaces every diagram previously generated in "
-      + "this file, keeps hand-drawn elements, so regenerating is the normal way to update a board. "
-      + "Use delete_diagram to remove one, not a throwaway graph.",
+      + "this file and keeps hand-drawn elements. "
+      + "This is for drawing a board and for reworking its STRUCTURE -- boxes added or removed, a "
+      + "subsystem redrawn. It is not how you make a small change, and reaching for it by habit is "
+      + "expensive: re-sending a 34-node graph to correct four refs costs ~1,900 tokens to "
+      + "communicate four short strings. Change a ref, a state, a claim or a colour with "
+      + "edit_diagram, and change the layout flow with relayout_diagram; both leave the rest of the "
+      + "board alone. Use delete_diagram to remove one, not a throwaway graph.",
     inputSchema: {
       path: z
         .string()
@@ -620,7 +634,15 @@ server.registerTool(
         ),
       nodes: z.array(nodeSchema).min(1),
       edges: z.array(edgeSchema).default([]),
-      direction: z.enum(["RIGHT", "DOWN"]).optional().describe("Layout flow; RIGHT by default"),
+      direction: z
+        .enum(["RIGHT", "DOWN"])
+        .optional()
+        .describe(
+          "Layout flow. RIGHT by default, and inherited from the board when it already records one, "
+          + "so regenerating a board somebody turned DOWN does not quietly turn it back. To change "
+          + "the flow of a board that already exists, call relayout_diagram instead of re-sending "
+          + "this graph.",
+        ),
       name: z.string().optional().describe("Element id prefix; from the title otherwise"),
       append: z
         .boolean()
@@ -696,6 +718,10 @@ server.registerTool(
         ...claimNote(edges),
         elements: result.elementCount,
         idPrefix: result.prefix,
+        // Said out loud because it can be inherited rather than asked for, and
+        // a setting that applied itself without saying so is one the caller
+        // cannot tell from one that was ignored.
+        direction: result.direction,
         ...drawTimeNotes(drawn),
         ...(result.replacedCount
           ? {
@@ -1194,16 +1220,62 @@ server.registerTool(
   {
     title: "Edit diagram",
     description:
-      "Patch or delete elements by id, hand-drawn ones included: move, resize, recolour, relabel. "
+      "Change a few things on a board without redrawing it. This is the cheap path and the one to "
+      + "reach for first: correcting four refs here costs four short strings, where re-sending the "
+      + "graph to create_diagram costs ~1,900 tokens on a 34-node board. "
+      + "Patches and deletes elements by id, hand-drawn ones included. Use it to re-anchor a box "
+      + "(ref, refs), change what it claims to exist (state), assert or drop a closed boundary, and "
+      + "to move, resize or recolour anything. Everything you do not mention stays as it was, so a "
+      + "ref correction cannot silently unsay a box's state or its second anchor. "
       + "The id can be a node id from read_diagram or a raw Excalidraw element id; a real element id "
       + "wins if something is called both. Deleting a shape takes its bound label. Read the board "
-      + "first; change only what must change.",
+      + "first; change only what must change. "
+      + "Two things this cannot do: change the layout flow, which is relayout_diagram, and add or "
+      + "remove boxes, which is create_diagram. A label change is possible but only re-letters the "
+      + "text -- the box is not re-measured, so a much longer word wants a redraw.",
     inputSchema: {
       path: z.string(),
       updates: z
-        .array(z.object({ id: z.string() }).passthrough())
+        .array(
+          z
+            .object({
+              id: z.string().describe("A node id from read_diagram, or a raw element id"),
+              ref: z
+                .string()
+                .optional()
+                .describe(
+                  "Re-anchor this box at different code, in the same form create_diagram takes. "
+                  + 'Pass "" to remove the anchor. This is the one edit worth making by hand: it is '
+                  + "how a box wrongly anchored at a bundle of siblings gets pointed at the thing it "
+                  + "actually stands for, and the drift check reads the new anchor immediately.",
+                ),
+              refs: z
+                .array(z.string())
+                .optional()
+                .describe("Replace the further anchors on this box. An empty array removes them."),
+              state: z
+                .enum(["planned", "built", "external"])
+                .optional()
+                .describe(
+                  "Change what this box or arrow claims about existing. The stroke is redrawn to "
+                  + "match, so the picture and the record cannot disagree.",
+                ),
+              closed: z
+                .object({ through: z.array(z.string()).optional() })
+                .nullable()
+                .optional()
+                .describe(
+                  "Assert, or with null drop, the closed-boundary claim on a box anchored at a "
+                  + "directory. Checked exactly as it is when written by create_diagram.",
+                ),
+            })
+            .passthrough(),
+        )
         .default([])
-        .describe('e.g. {"id":"api","backgroundColor":"#ffec99","width":220}'),
+        .describe(
+          'Anchors: {"id":"api","ref":"src/api/server.ts"}. '
+          + 'Anything else is an Excalidraw property: {"id":"api","backgroundColor":"#ffec99","width":220}.',
+        ),
       deletes: z.array(z.string()).default([]),
     },
   },
@@ -1229,7 +1301,16 @@ server.registerTool(
       const touchedAnchors = updates.some((update) => {
         const { props } = update as { props?: unknown };
         const payload = (props && typeof props === "object" ? props : update) as Record<string, unknown>;
-        return payload.customData !== undefined;
+        // The named words joined `customData` here the day they existed. The
+        // guard is still an exact test rather than a heuristic -- these are the
+        // only routes to a ref, a state or a claim -- and leaving them out
+        // would have made the tool silent about anchoring exactly when the
+        // anchoring got easy enough to be used.
+        return payload.customData !== undefined
+          || payload.ref !== undefined
+          || payload.refs !== undefined
+          || payload.state !== undefined
+          || payload.closed !== undefined;
       });
       let notes: Record<string, unknown> = {};
       if (touchedAnchors && result.updated.length) {
@@ -1244,6 +1325,87 @@ server.registerTool(
         deleted: result.deleted,
         ...(result.skipped.length ? { skipped: result.skipped, note: "No element has these ids." } : {}),
         ...notes,
+      });
+    }),
+);
+
+server.registerTool(
+  "relayout_diagram",
+  {
+    title: "Re-lay out diagram",
+    description:
+      "Lay a board out again in a different flow, without re-sending the graph. Layout is the one "
+      + "thing this tool decides on its own, and the graph is already recorded in the file, so this "
+      + "costs a word where create_diagram costs every node and every edge -- ~1,900 tokens on a "
+      + "34-node board for a change whose whole content is RIGHT or DOWN. "
+      + "Trying a layout after seeing a board for the first time is the most reasonable thing there "
+      + "is, and it needs no judgement about the code at all: use this rather than settling for the "
+      + "first layout because a redraw felt expensive. "
+      + "Every box keeps its id, ref, state, claims, colour and label, and arrows drawn with "
+      + "connect_nodes are carried across and re-routed; hand-drawn elements are not moved. The "
+      + "flow is recorded on the board, so a later regenerate does not revert it.",
+    inputSchema: {
+      path: z.string(),
+      direction: z
+        .enum(["RIGHT", "DOWN"])
+        .optional()
+        .describe(
+          "The flow to lay out in. RIGHT suits most architecture; DOWN suits a sequence or a "
+          + "pipeline, and is worth trying when a board sprawls sideways or its connectors run long. "
+          + "Omit only to re-run a board that already records a flow; one drawn before flows were "
+          + "recorded says nothing about it, and is refused rather than laid out in the default.",
+        ),
+      name: z
+        .string()
+        .optional()
+        .describe(
+          "Which diagram, as reported by read_diagram. Only needed when a board holds more than "
+          + "one; with one it is unambiguous and is refused rather than guessed with several.",
+        ),
+    },
+  },
+  async ({ path: boardPath, direction, name }) =>
+    guard(async () => {
+      const file = resolveBoardPath(boardPath);
+      const result = await relayoutDiagram(await readBoard(file), {
+        ...(direction ? { direction } : {}),
+        ...(name ? { name } : {}),
+      });
+      await writeBoard(file, result.board);
+      await followBoard(file);
+      return text({
+        wrote: relativeToWorkspace(file),
+        diagram: result.name,
+        direction: result.direction,
+        nodes: result.nodeCount,
+        edges: result.edgeCount,
+        ...(result.keptHandDrawn ? { keptHandDrawnElements: result.keptHandDrawn } : {}),
+        ...(result.connectors ? { connectorsRerouted: result.connectors } : {}),
+        /*
+         * Three sentences, and each is a different fact the caller cannot see.
+         *
+         * A no-op reads exactly like a re-layout that did something, so it says
+         * when nothing moved. And a flow that could not be written down is a
+         * setting that will silently revert on the next redraw, which is worse
+         * than one that says it did not stick.
+         */
+        ...(result.wasDirection === undefined
+          ? {
+              note:
+                "This board had not recorded a flow, so it does not say what it was laid out in "
+                + `before; it is ${result.direction} now and says so. Call render_diagram to see it.`,
+            }
+          : result.direction === result.wasDirection
+            ? { note: `Already laid out ${result.direction}; nothing moved. Call render_diagram to see it.` }
+            : { note: `Was ${result.wasDirection}. Call render_diagram to see it.` }),
+        ...(result.remembered
+          ? {}
+          : {
+              warning:
+                "This board has no title element, which is where the flow is recorded, so nothing "
+                + "remembers it: the next create_diagram on this board will lay it out RIGHT again. "
+                + "Give the board a title to make it stick.",
+            }),
       });
     }),
 );

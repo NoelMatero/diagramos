@@ -12,7 +12,7 @@
 import ELK from "elkjs/lib/elk.bundled.js";
 import { labelWithClaim, type ArrowClaim } from "./claim";
 import { readableInk } from "./contrast";
-import { strokeStyleForState, type NodeState } from "./graph";
+import { strokeStyleForState, type LayoutDirection, type NodeState } from "./graph";
 import type { ElkExtendedEdge, ElkNode } from "elkjs/lib/elk-api";
 
 type JsonObject = Record<string, unknown>;
@@ -65,7 +65,7 @@ export type GraphEdge = {
   claim?: ArrowClaim;
 };
 export type DiagramLayoutOptions = {
-  direction?: "RIGHT" | "DOWN";
+  direction?: LayoutDirection;
   nodeSpacing?: number;
   layerSpacing?: number;
 };

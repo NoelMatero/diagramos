@@ -1,6 +1,6 @@
 ---
 description: Give a ref to the boxes that have none, so the drift check can see them
-allowed-tools: Bash(npm run check:drift -- --coverage), Bash(npx -y diagramos drift --coverage), mcp__diagramos__check_drift, mcp__diagramos__read_diagram, mcp__diagramos__create_diagram, Read, Grep, Glob
+allowed-tools: Bash(npm run check:drift -- --coverage), Bash(npx -y diagramos drift --coverage), mcp__diagramos__check_drift, mcp__diagramos__read_diagram, mcp__diagramos__edit_diagram, mcp__diagramos__create_diagram, Read, Grep, Glob
 ---
 
 A box with no `ref` is invisible. Every check in this tool works off anchors, so
@@ -123,14 +123,23 @@ Do not write on the strength of your own confidence.
 
 ## Write
 
-Once approved, regenerate the board with `create_diagram` on the same path,
-carrying over **every** node and edge and adding only what was approved — the
-anchors, and any claims that came with them.
+Write the approved anchors with `edit_diagram`, one entry per box:
 
-Be honest about the cost: regeneration decides the layout of the generated part
-fresh, so a board somebody arranged by hand comes back arranged by the engine.
-Hand-drawn elements survive. Say this before writing if the board looks
-hand-arranged, and let the user decide whether the anchors are worth it.
+```json
+{"path": "docs/diagrams/architecture.excalidraw",
+ "updates": [{"id": "api", "ref": "src/server/board-server.ts"},
+             {"id": "store", "state": "external"}]}
+```
+
+Nothing you did not name changes. The boxes keep their positions, the board
+keeps its layout, and every other box keeps whatever it already claimed.
+
+**Do not regenerate the board to do this.** It was the old instruction here and
+it is the expensive way to say a short thing: four anchors sent as a
+`create_diagram` call meant re-sending thirty-four nodes and forty-four edges,
+about 1,900 tokens to communicate four strings — and it threw away the layout of
+a board somebody may have been happy with. Regeneration is for structure: boxes
+appearing or disappearing. Anchors are not structure.
 
 Finish by re-running the check and reporting in a sentence or two: how many
 boxes now carry an anchor, how many were marked external, how many claims went

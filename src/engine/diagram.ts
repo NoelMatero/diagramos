@@ -11,7 +11,10 @@ import { installNodeFontMeasurer } from "./font";
 import { emptyBoard, type BoardFile } from "./board-file";
 import type { ExcalidrawElement } from "./normalize";
 import { currentStamp } from "./version";
-import { NODE_SHAPES, readGraph, type BoardDescribes } from "./graph";
+import {
+  DEFAULT_DIRECTION, NODE_SHAPES, NODE_STATES, directionOf, readGraph, strokeStyleForState,
+  type BoardDescribes, type LayoutDirection, type NodeState,
+} from "./graph";
 import {
   planBounds,
   planDiagramLayout,
@@ -261,6 +264,8 @@ function boardBottom(board: BoardFile): number {
 export interface CreateDiagramResult {
   board: BoardFile;
   prefix: string;
+  /** The flow it was laid out with, whether asked for or inherited. */
+  direction: LayoutDirection;
   nodeCount: number;
   edgeCount: number;
   elementCount: number;
@@ -293,6 +298,21 @@ export async function createDiagram(
   // should not have to remember this.
   await installNodeFontMeasurer();
 
+  /*
+   * The flow the caller asked for, or the one the board is already drawn in.
+   *
+   * Read here, off the board as it arrived, because the clear below takes the
+   * title element that records it. Inheriting matters: direction used to be a
+   * call argument and nothing else, so a board somebody had turned DOWN went
+   * back to RIGHT the next time an agent regenerated it without thinking to
+   * repeat the word -- and regenerating is what this tool tells agents to do.
+   *
+   * `directionOf` answers for the whole board and declines when two diagrams on
+   * it disagree, which is right: an inherited default is only safe while there
+   * is one thing to inherit.
+   */
+  const direction = params.layout?.direction ?? directionOf(board) ?? DEFAULT_DIRECTION;
+
   const replacedDiagrams = params.append ? [] : listDiagrams(board).map((summary) => summary.name);
   const target = params.append ? board : clearGeneratedDiagram(board);
   // Live elements only: tombstones get swept too, but reporting them would
@@ -302,7 +322,12 @@ export async function createDiagram(
 
   const prefix = uniquePrefix(target, slugify(params.name ?? params.title ?? "diagram", "diagram"));
   const plan = await planDiagramLayout(
-    { title: params.title, nodes: params.nodes, edges: params.edges ?? [], layout: params.layout },
+    {
+      title: params.title,
+      nodes: params.nodes,
+      edges: params.edges ?? [],
+      layout: { ...params.layout, direction },
+    },
     { x: 0, y: 0 },
     prefix,
   );
@@ -382,6 +407,9 @@ export async function createDiagram(
       // Written only when asserted. There is no default completeness, and a
       // board that says nothing about what it omits is the ordinary case.
       ...(params.complete?.trim() ? { complete: params.complete.trim() } : {}),
+      // The default is never written, so every board drawn before direction was
+      // recorded stays byte-identical -- and so does one turned back to RIGHT.
+      ...(direction === DEFAULT_DIRECTION ? {} : { direction }),
     });
   }
 
@@ -400,6 +428,7 @@ export async function createDiagram(
      */
     board: { ...target, diagramos: currentStamp(), elements: [...target.elements, ...created] },
     prefix,
+    direction,
     nodeCount: plan.nodeCount,
     edgeCount: plan.edgeCount,
     elementCount: created.length,
@@ -598,6 +627,83 @@ export async function connectNodes(
   };
 }
 
+/**
+ * The words an edit may speak about *meaning* rather than about pixels.
+ *
+ * Every other field on a patch is an Excalidraw property and lands on the
+ * element as written. These four are the vocabulary `create_diagram` already
+ * uses, and they exist here because the alternative was measured and is bad:
+ * to change a ref, an agent had to hand-write `customData`, and a patch
+ * replaces a value rather than merging into it, so a box carrying a state, a
+ * second anchor and a closed boundary came back with none of them (#162).
+ *
+ * That failure is quiet in the worst way. A `planned` box relabelled `built`
+ * keeps its dashed stroke, so the picture and the record disagree -- which is
+ * the exact rot this whole tool exists to catch, arriving through its own edit
+ * path. Naming the fields is what makes the common edit safe, and it is what
+ * lets the guidance point four changed refs at this tool instead of at a
+ * forty-six box redraw.
+ */
+const ANCHOR_FIELDS = ["ref", "refs", "state", "closed"] as const;
+
+function trimmedList(value: unknown): string[] {
+  return Array.isArray(value)
+    ? value.filter((entry): entry is string => typeof entry === "string" && entry.trim() !== "")
+      .map((entry) => entry.trim())
+    : [];
+}
+
+/**
+ * A patch's semantic half, folded onto whatever the element already records.
+ *
+ * Merged, never replaced: an edit says what changed, and everything it does not
+ * mention has to still be true afterwards. Clearing is therefore explicit --
+ * `ref: ""`, `refs: []`, `closed: null` -- because an omitted field and a field
+ * being emptied are different requests and reading them the same way is how a
+ * boundary claim disappears without anybody asking.
+ */
+function anchorEdit(
+  element: ExcalidrawElement,
+  patch: Record<string, unknown>,
+): Record<string, unknown> | undefined {
+  const named = ANCHOR_FIELDS.some((field) => patch[field] !== undefined);
+  const raw = patch.customData;
+  if (!named && (raw === undefined || raw === null)) return undefined;
+
+  const existing = (element.customData && typeof element.customData === "object"
+    ? { ...(element.customData as Record<string, unknown>) }
+    : {}) as Record<string, unknown>;
+  // A raw customData patch merges too. It is the shape the old guidance taught,
+  // so boards are still being edited with it, and letting it keep replacing
+  // would leave the documented path as the lossy one.
+  if (raw && typeof raw === "object") Object.assign(existing, raw as Record<string, unknown>);
+
+  if (patch.ref !== undefined) {
+    const ref = typeof patch.ref === "string" ? patch.ref.trim() : "";
+    if (ref) existing.ref = ref;
+    else delete existing.ref;
+  }
+  if (patch.refs !== undefined) {
+    const refs = trimmedList(patch.refs);
+    if (refs.length) existing.refs = refs;
+    else delete existing.refs;
+  }
+  if (patch.state !== undefined) {
+    const state = patch.state;
+    // `built` is the default and is never written, so setting it is how a box
+    // stops claiming anything -- the same rule `createDiagram` follows.
+    if (typeof state === "string" && state !== "built" && (NODE_STATES as readonly string[]).includes(state)) {
+      existing.state = state;
+    } else delete existing.state;
+  }
+  if (patch.closed !== undefined) {
+    const closed = patch.closed as { through?: unknown } | null | false;
+    if (closed) existing.claim = { closed: true, through: trimmedList(closed.through) };
+    else delete existing.claim;
+  }
+  return existing;
+}
+
 export interface EditResult {
   board: BoardFile;
   updated: string[];
@@ -658,9 +764,39 @@ export function applyEdits(
     const patch = patches.get(id);
     if (!patch) return element;
     updated.push(id);
-    // id and type are identity, never patchable.
-    const { id: _ignoredId, type: _ignoredType, ...safe } = patch;
-    return { ...element, ...safe, version: (Number(element.version) || 1) + 1 };
+    // id and type are identity, never patchable. The four anchor words are
+    // spoken about the record rather than about the element, so they are taken
+    // out here and folded in below.
+    const {
+      id: _ignoredId, type: _ignoredType, customData: _ignoredCustom,
+      ref: _ref, refs: _refs, state: _state, closed: _closed, ...safe
+    } = patch;
+    const custom = anchorEdit(element, patch);
+    return {
+      ...element,
+      ...safe,
+      ...(custom ? { customData: custom } : {}),
+      /*
+       * A state is drawn, not only recorded. Skipping this leaves a box that
+       * reads `built` still wearing the dashed stroke of a plan -- a picture
+       * disagreeing with its own record, which is worse than either state on
+       * its own because a reader has no way to tell which half is stale.
+       * `promote.ts` and the viewer's panel write the same stroke for the same
+       * reason.
+       *
+       * `solid` is written out rather than left off, because that is what a
+       * redraw writes: a box created `built` carries `strokeStyle: "solid"`.
+       * An edit that produced a board a regenerate would not is a diff that
+       * appears and disappears depending on which tool touched the box last.
+       */
+      ...(patch.state !== undefined
+        ? {
+            strokeStyle:
+              strokeStyleForState(custom?.state as NodeState | undefined).strokeStyle ?? "solid",
+          }
+        : {}),
+      version: (Number(element.version) || 1) + 1,
+    };
   });
 
   return { board: { ...board, elements }, updated, deleted, skipped };

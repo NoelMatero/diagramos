@@ -34,8 +34,7 @@ project rather than of one diagram: write `{"diagrams": "docs/architecture"}`
 into `.diagramos.json` at the repo root, once, and everything reads it
 afterwards. Do not work around a refusal by picking a different path.
 
-One diagram per file — `create_diagram` replaces what it generated last time,
-which is how you update a board.
+One diagram per file — `create_diagram` replaces what it generated last time.
 
 ## Give meaning, never geometry
 
@@ -54,7 +53,50 @@ and set `strokeColor` on edges in the same call rather than patching arrows
 afterwards, since the next regenerate would revert a patch.
 
 Keep edge labels to one or two words. `direction: "DOWN"` suits a sequence or a
-pipeline; the default `RIGHT` suits most architecture.
+pipeline; the default `RIGHT` suits most architecture. If the first layout comes
+out wrong — sprawling sideways, connectors running long — try the other one with
+`relayout_diagram`, which is a single word and never re-sends the graph. Trying a
+layout is the most reasonable thing to do after seeing a board for the first
+time, and it needs no judgement about the code at all, so do not settle for the
+first one because a redraw felt expensive.
+
+## Changing a board that already exists
+
+Three tools, and the wrong one is expensive rather than wrong. A board of 34
+boxes and 44 arrows costs about **1,900 tokens** to re-send, so reaching for
+`create_diagram` out of habit charges that for a change whose real content is a
+handful of strings.
+
+| what changed | call |
+| --- | --- |
+| a ref, a state, a colour, a closed claim | `edit_diagram` |
+| the layout flow | `relayout_diagram` |
+| boxes added or removed, a subsystem reworked | `create_diagram` |
+
+`edit_diagram` merges: everything you do not name is still true afterwards, so
+re-anchoring a box cannot silently drop its state or its second anchor. Address
+boxes by the node id `read_diagram` gives you.
+
+```json
+{"path": "docs/diagrams/architecture.excalidraw",
+ "updates": [{"id": "api", "ref": "src/server/board-server.ts"},
+             {"id": "store", "state": "planned"}]}
+```
+
+`relayout_diagram` re-runs the layout from the graph already in the file and
+records the flow on the board, so a later regenerate does not turn it back.
+
+```json
+{"path": "docs/diagrams/architecture.excalidraw", "direction": "DOWN"}
+```
+
+**Drawing is not reproducible; checking is.** Two runs of the same request
+produce different boards — a different split, different boxes, a different
+layout — because the graph comes from a model. Everything downstream of the
+graph is deterministic: an unchanged diagram regenerates byte-identically, and
+every check gives the same answer every time. So a user who redraws a board
+expecting the same picture will not get it, and it is worth saying that before
+redrawing one they liked.
 
 ## Point nodes at the code they stand for
 
@@ -359,8 +401,10 @@ A door nobody used is reported too. Not a failure — a subsystem being tidier
 than it promised — but usually a door that *was* used until the import moved,
 and a stale door silently widens the claim.
 
-Run `check_drift` after changing module structure, and regenerate the diagram it
-complains about — `/update-diagram` does exactly that if the user asks for it by name.
+Run `check_drift` after changing module structure, and fix the diagram it
+complains about — usually with `edit_diagram`, since a drift report mostly asks
+for refs to move. `/update-diagram` does exactly that if the user asks for it by
+name.
 A clean report with `checked: 0` means no node had a ref, not that the diagram is
 right. `clean` covers regressions only: `workItems` and `promotions` sit beside it
 because neither is a broken diagram.
