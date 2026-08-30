@@ -1,6 +1,6 @@
 {
   "name": "diagramos",
-  "version": "0.2.0-rc.2",
+  "version": "0.2.0-rc.3",
   "description": "Diagram-driven development: an MCP server that gives Claude read/write access to Excalidraw diagrams that live in the repo, plus a live local board.",
   "keywords": [
     "diagram",
