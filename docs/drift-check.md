@@ -568,13 +568,50 @@ arrow by both box labels and groups them by reason:
 | reason | what it means |
 | --- | --- |
 | `no-call-either-way` | both ends name something with a body, both bodies were read, neither reaches the other. The sharpest "nothing found" available here |
-| `an-end-is-data` | an end names a struct, a static or a field, so there is no body on that side to search from and the relationship is likely a type in a signature, a field, or an enclosing `impl` — all invisible to a body search. **Anchor that end at file level** and the import channels can answer instead |
+| `an-end-is-data` | an end names a struct, a static or a field, so there is no body on that side to search from — and the declarations were read too (below), so the signature, the field's own type and the enclosing block name nothing either. **Anchor that end at file level** and the import channels can answer instead |
 | `nothing-connects-them` | the file-level channels came up empty: no import either way, no shared importer, no shared route, nothing in the code graph |
 
 The second one is the only line in this report that can be acted on into
 *better* coverage rather than a fix, which is why it carries the instruction in
 the sentence rather than in a doc. It is also the one the measurement was mostly
-made of: 11 of the 17.
+made of: 11 of the 17 — five of which have since stopped being unconfirmed at
+all, for the reason below.
+
+#### Where a relationship to data is written
+
+Five of those eleven were not a coverage ceiling. They were the search reading
+the wrong lines.
+
+A call search reads function bodies, and a data relationship is not written in
+one. It is written in a return type (`-> &mut Client`), in a parameter type
+(`fn(&Request) -> Response`), in the field's own declaration (`conns:
+Slab<Client>`), or in the header of the block a method sits in (`impl Client`).
+The engine parses all four; it just never read them.
+
+It does now, and only when one end of the arrow names data. The gate is the
+design, not a caution: between two functions "nothing calls the other" is a
+question with an answer, and letting a shared parameter type confirm those
+arrows would trade the sharpest sentence in the report for a much weaker one.
+Where one end holds no code there is nothing sharp to lose — the alternative
+reading is not *these are unrelated*, it is *we read the wrong lines*.
+
+It is token-level and confirm-only like everything else: a name inside a string
+or a comment is not a use, the declared name cannot confirm itself, and finding
+nothing means nothing.
+
+Measured on the same 50-arrow Rust board: **5 arrows moved from counted to
+confirmed, 12 stayed counted, 0 new findings** — `an-end-is-data` from 11 to 6,
+`no-call-either-way` untouched at 6, which is the gate visible in a number. A
+stricter reading — types only, ignoring the rest of a signature — was measured
+against the same seventeen and confirmed exactly the same five, so the reading
+with no list of grammar field names in it was kept.
+
+What generalises and what does not: the type-in-a-declaration half is every
+language, because a declaration is a node with a name and a body is a field. The
+enclosing-block half earns its keep where a language writes methods outside the
+type they belong to — Rust's `impl`, and the same shape in Go, C++ and
+Objective-C. A TypeScript class already holds its methods, so the body search
+answered that one before any of this.
 
 What this deliberately costs: two of those 17 arrows were genuine diagram
 errors — a parse hop hung off the wrong function, and an arrow from a function

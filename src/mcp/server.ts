@@ -455,9 +455,10 @@ const ARROW_CAP = 8;
  * Everything is counted; only the arrows a reader can act on are named. The two
  * generic reasons -- nothing calls the other, nothing connects them -- are
  * honest and unactionable, so naming them buys a longer message and no
- * decision. `an-end-is-data` is the opposite: it is the anchor, it is by far
- * the commonest (11 of 17 on the board this came from), and moving that end to
- * file level turns an unconfirmable arrow into a checkable one.
+ * decision. `an-end-is-data` is the opposite: it is the anchor, it is still the
+ * commonest (6 of 12 on the board this came from, once the five whose evidence
+ * was in a declaration were confirmed rather than counted -- #144), and moving
+ * that end to file level turns an unconfirmable arrow into a checkable one.
  */
 function unconfirmedArrowNote(unconfirmed: ReadonlyArray<UnconfirmedEdge>): Record<string, unknown> {
   if (unconfirmed.length === 0) return {};

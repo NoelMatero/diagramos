@@ -23,7 +23,13 @@ import { readdir } from "node:fs/promises";
 import path from "node:path";
 
 import { parseSymbol, routeOf, symbolEvidence, type Assertion } from "./assert";
-import { chainBreak, declarationsOf, reaches, unsupportedMembers } from "./body";
+import {
+  chainBreak,
+  declarationMentions,
+  declarationsOf,
+  reaches,
+  unsupportedMembers,
+} from "./body";
 import { checkFeeds, type FeedsCandidate, type FeedsWithheld } from "./feeds";
 import { followAnchors, type FollowedRef, type StaleAnchor, type Trail } from "./follow";
 import type { BoardFile } from "./board-file";
@@ -360,8 +366,10 @@ export interface UnreadEdgeFinding {
  *   sharpest "nothing found" this engine can produce.
  * - `an-end-is-data` is a question that was never the right one. A struct, a
  *   static or a field has no body that calls anything, so a call search over it
- *   answers about the wrong thing -- and the fix is on the board, not in the
- *   code: anchor that end at file level.
+ *   answers about the wrong thing. The declarations either end stands in are
+ *   read before this word is used (#144), so what is left is an arrow with no
+ *   evidence in a body *or* a signature -- and the fix is on the board, not in
+ *   the code: anchor that end at file level.
  * - `nothing-connects-them` is the file-level channels coming up empty: no
  *   import either way, no shared importer, no shared route, nothing in the code
  *   graph.
@@ -1562,7 +1570,8 @@ function checkSymbolEdge(
    * the question a bad one. An end where *nothing* runs is different -- there is
    * no body on that side to search from, and the relationship it stands in is
    * almost always a type in a signature, a field, or an enclosing impl, none of
-   * which is inside any body. That is the shape this exists to name.
+   * which is inside any body. That is the shape this exists to name, and it is
+   * also what licenses the declaration search below.
    *
    * Collected while the search runs, because the search reads the same
    * declarations anyway -- and only ever read on the way out, when nothing was
@@ -1593,6 +1602,31 @@ function checkSymbolEdge(
      */
     if (declared && !runs) dataEnds.push(start.symbols.join(" / "));
   }
+
+  /*
+   * Nothing calls anything, and one end is data -- so the call search was asked
+   * of lines that cannot hold the answer. The declarations can (#144).
+   *
+   * Gated on an end being data, and deliberately so. Between two functions
+   * "nothing calls the other" is a real answer, and letting a shared parameter
+   * type confirm those arrows would trade the sharpest thing this engine says
+   * for a weaker one. Where one end holds no code, there is nothing sharp to
+   * lose: the alternative reading is not "these are unrelated", it is "we read
+   * the wrong lines".
+   */
+  if (dataEnds.length > 0) {
+    for (const [start, target] of [[from, to], [to, from]] as const) {
+      const language = languageOf(start.file);
+      if (!language) continue;
+      const source = workspace.read(start.file);
+      for (const symbol of start.symbols) {
+        if (declarationMentions(source, symbol, target.symbols, language)) {
+          return { verdict: "reached", dataEnds: [] };
+        }
+      }
+    }
+  }
+
   return { verdict: asked ? "unreached" : "unreadable", dataEnds };
 }
 
@@ -2927,9 +2961,11 @@ export function checkDrift(
            * read, so "nothing calls anything" is a fact about the anchor rather
            * than about the design. That is by far the commonest shape in a
            * language with data types on the board: 11 of the 17 ambers this
-           * came from pointed at a Rust struct, with the relationship living in
-           * a signature or a field the body search never looks at. The reader
-           * gets told what to change instead of what is wrong.
+           * came from pointed at a Rust struct. Five of those eleven have their
+           * evidence in a declaration and are confirmed above (#144); what is
+           * left here is the remainder, where the declarations were read too and
+           * still name nothing. The reader gets told what to change instead of
+           * what is wrong.
            */
           const data = symbolResult.dataEnds;
           outcome = data.length > 0
@@ -2937,10 +2973,11 @@ export function checkDrift(
                 kind: "unconfirmed",
                 reason: "an-end-is-data",
                 detail:
-                  `${data.join(" and ")} names data rather than something that runs, so a `
-                  + `search through function bodies cannot see this relationship — a type in a `
-                  + `signature, a field, an enclosing impl are all invisible to it. Anchor that `
-                  + `end at file level and the import channels can answer instead.`,
+                  `${data.join(" and ")} names data rather than something that runs, so there `
+                  + `is no body on that side to search. The declarations were read as well — `
+                  + `the signature, the field's own type, the enclosing block — and none of `
+                  + `them names the other end either. Anchor that end at file level and the `
+                  + `import channels can answer instead.`,
               }
             : {
                 kind: "unconfirmed",

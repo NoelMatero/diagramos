@@ -94,12 +94,19 @@ beforeAll(async () => {
   await arrow("src/lib.rs", "src/lib.rs");
 }, 60_000);
 
+/*
+ * `accept`, not `get_client`, and the swap is the whole of #144.
+ *
+ * `get_client` returns `&mut Client` and used to be the example here: a real
+ * relationship, written in a signature, invisible to a search through bodies.
+ * It is now confirmed by reading the signature (see
+ * `engine-declarations.test.ts`), so the example of an arrow this engine cannot
+ * corroborate had to become one where the declarations are silent too.
+ * `accept` returns a `TcpStream` and mentions `Client` nowhere.
+ */
 describe("an arrow whose end names data", () => {
   it("is counted with the reason and the fix, and is not a finding", async () => {
-    // `get_client` returns `&mut Client`. The relationship is real, it is in a
-    // signature, and no body anywhere names the other end -- which is a fact
-    // about where Rust puts types, not about the diagram being wrong.
-    const found = report(await arrow("src/lib.rs#get_client", "src/lib.rs#Client"));
+    const found = report(await arrow("src/lib.rs#accept", "src/lib.rs#Client"));
 
     expect(found.edges).toEqual([]);
     expect(found.clean).toBe(true);
@@ -118,7 +125,7 @@ describe("an arrow whose end names data", () => {
 
   it("was still read, so it counts as checked and not as skipped", async () => {
     // The distinction the whole report turns on: this is not "nobody looked".
-    const found = report(await arrow("src/lib.rs#get_client", "src/lib.rs#Client"));
+    const found = report(await arrow("src/lib.rs#accept", "src/lib.rs#Client"));
     expect(found.edgesChecked).toBe(1);
     expect(found.edgesSkipped).toBe(0);
     expect(found.unreadEdges).toEqual([]);
@@ -128,7 +135,7 @@ describe("an arrow whose end names data", () => {
     // "owns", "populates", "fills i_buf" -- the part no check reads, and the
     // part a person needs to recognise the arrow they are being told about.
     const found = report(
-      await arrow("src/lib.rs#get_client", "src/lib.rs#Client", { label: "owns" }),
+      await arrow("src/lib.rs#accept", "src/lib.rs#Client", { label: "owns" }),
     );
     expect(found.unconfirmedEdges[0]!.label).toBe("owns");
   });
