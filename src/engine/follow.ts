@@ -74,6 +74,16 @@ export interface Trail {
    * the thing actually lives.
    */
   declaring(symbol: string): string[];
+  /**
+   * Does this one file declare this symbol now?
+   *
+   * A different question from `declaring`, and the difference is the whole of
+   * #168. `declaring` asks the tree about a *name*; this asks a *file* about
+   * itself. Only ever asked about a path git already said this file moved to, so
+   * it is one parse of one file rather than a search, and it cannot be dragged
+   * off course by how popular the name is elsewhere.
+   */
+  declaresAt(file: string, symbol: string): boolean;
 }
 
 /** A stale anchor, in the little of it this needs. Structural on purpose: no import back into `drift.ts`. */
@@ -163,7 +173,20 @@ function followOne(anchor: StaleAnchor, trail: Trail): FollowedRef | undefined {
   const { node, label, ref, symbol, name } = anchor;
   const base = { node, label, ref };
 
-  const declaring = name ? trail.declaring(name) : [];
+  /*
+   * The tree-wide search, run only if something still needs it.
+   *
+   * Since #168 the common answer -- git recorded the move and the name is at the
+   * other end -- is reached without ever asking the tree about the name, and
+   * that question costs a `git grep` and a parse of everything it matched. A
+   * board full of boxes from one big move used to pay it once per name for
+   * nothing.
+   */
+  let searched: string[] | undefined;
+  const declaring = (): string[] => {
+    if (!searched) searched = name ? trail.declaring(name) : [];
+    return searched;
+  };
 
   if (anchor.kind === "missing-file") {
     const moved = trail.renamedTo(anchor.path);
@@ -178,7 +201,30 @@ function followOne(anchor: StaleAnchor, trail: Trail): FollowedRef | undefined {
         detail: `moved to ${moved} \u2014 git recorded the rename.`,
       };
     }
-    if (moved && name && declaring.length === 1 && declaring[0] === moved) {
+    /*
+     * The move outranks the name count, when the name made the trip (#168).
+     *
+     * Two different questions were being answered by one number. git recording
+     * this file moving to this path is evidence about *this file*; `new` being
+     * declared in five places is evidence about *the name*. The second used to
+     * win, so a `git mv` followed the symbols with rare names and abandoned the
+     * ones with common ones -- `new`, `parse`, `run`, `send`, which is to say
+     * most methods. Three of five refs from a single recorded rename is worse
+     * than none: it leaves a partial diff to reconcile by hand.
+     *
+     * Asking the destination directly, rather than checking whether it happens
+     * to be the sole answer to a repo-wide search, is what makes this hold for
+     * exactly those names. A name mentioned across more files than `declaring`
+     * will parse comes back from that search as an empty list, and the empty
+     * list used to be read as "the symbol stayed behind" -- a confident sentence
+     * about a split that never happened.
+     *
+     * The guard the measurement bought is untouched. This asks for a
+     * *declaration* at the destination, so a move-plus-rename that leaves only
+     * call sites behind still finds nothing here and still falls through to the
+     * refusal below.
+     */
+    if (moved && name && trail.declaresAt(moved, name)) {
       return {
         ...base,
         becomes: refOf(moved, symbol),
@@ -188,19 +234,19 @@ function followOne(anchor: StaleAnchor, trail: Trail): FollowedRef | undefined {
     }
     // No rename, or the rename left the symbol behind. The tree itself may still
     // know where the name lives, and one place is an answer.
-    if (name && declaring.length === 1) {
+    if (name && declaring().length === 1) {
       return {
         ...base,
-        becomes: refOf(declaring[0], symbol),
+        becomes: refOf(declaring()[0], symbol),
         via: "symbol",
-        detail: `${name} is now declared in ${declaring[0]}, and nowhere else.`,
+        detail: `${name} is now declared in ${declaring()[0]}, and nowhere else.`,
       };
     }
-    if (name && declaring.length > 1) {
+    if (name && declaring().length > 1) {
       return {
         ...base,
-        candidates: declaring.slice(0, CANDIDATE_CAP).map((file) => refOf(file, symbol)),
-        detail: `${name} is declared in ${declaring.length} places now (${listed(declaring)}) \u2014 nothing here can pick one.`,
+        candidates: declaring().slice(0, CANDIDATE_CAP).map((file) => refOf(file, symbol)),
+        detail: `${name} is declared in ${declaring().length} places now (${listed(declaring())}) \u2014 nothing here can pick one.`,
       };
     }
     if (moved && name) {
@@ -217,19 +263,19 @@ function followOne(anchor: StaleAnchor, trail: Trail): FollowedRef | undefined {
   // missing-symbol: the file is still there, the name is not in it. Only the
   // tree can answer, and only when it answers once.
   if (!name) return undefined;
-  if (declaring.length === 1 && declaring[0] !== anchor.path) {
+  if (declaring().length === 1 && declaring()[0] !== anchor.path) {
     return {
       ...base,
-      becomes: refOf(declaring[0], symbol),
+      becomes: refOf(declaring()[0], symbol),
       via: "symbol",
-      detail: `${name} is declared in ${declaring[0]} now, and nowhere else.`,
+      detail: `${name} is declared in ${declaring()[0]} now, and nowhere else.`,
     };
   }
-  if (declaring.length > 1) {
+  if (declaring().length > 1) {
     return {
       ...base,
-      candidates: declaring.slice(0, CANDIDATE_CAP).map((file) => refOf(file, symbol)),
-      detail: `${name} is declared in ${declaring.length} places now (${listed(declaring)}) \u2014 nothing here can pick one.`,
+      candidates: declaring().slice(0, CANDIDATE_CAP).map((file) => refOf(file, symbol)),
+      detail: `${name} is declared in ${declaring().length} places now (${listed(declaring())}) \u2014 nothing here can pick one.`,
     };
   }
   return undefined;
@@ -278,6 +324,7 @@ export function createGitTrail(root: string): Trail {
 
   const renames = new Map<string, string | undefined>();
   const declarations = new Map<string, string[]>();
+  const declaredAt = new Map<string, boolean>();
 
   /**
    * Renames git has been told about but has not committed.
@@ -312,26 +359,51 @@ export function createGitTrail(root: string): Trail {
     return staged;
   };
 
-  /** One hop: where this exact path went, according to the commit that last touched it. */
+  /**
+   * One hop: where this exact path went, according to the commit that last
+   * touched it -- and only when git has one answer rather than a pick.
+   *
+   * Copy detection is asked for, and it is asked for to be disbelieved. Git's
+   * rename record is a *similarity* verdict, not a receipt: delete a file and
+   * add two near-copies of it in one commit and `--find-renames` alone reports
+   * `R100` to whichever scored best, looking exactly like a `git mv`. Turning
+   * `--find-copies` on makes the difference visible -- a real move leaves the
+   * source with one continuation, a duplication leaves it with several -- and
+   * several means git chose, which is not a thing to re-aim a box on.
+   *
+   * That distinction used to be carried, by accident, by the ambiguity count
+   * this module now overrides for #168. Overriding it without moving the guard
+   * here would have traded one silent mis-aim for another.
+   */
   const hop = (file: string): string | undefined => {
     const stagedMove = stagedRenames().get(file);
     if (stagedMove) return stagedMove;
     try {
       const commit = git(["log", "-n", "1", "--format=%H", "--", file]);
       if (!commit) return undefined;
-      const fields = git(["diff", "--find-renames", "--name-status", "-z", `${commit}^`, commit])
+      const fields = git([
+        "diff", "--find-renames", "--find-copies", "--name-status", "-z", `${commit}^`, commit,
+      ])
         .split("\u0000")
         .filter((field) => field.length > 0);
+      let moved: string | undefined;
+      let continuations = 0;
       for (let index = 0; index < fields.length;) {
         const status = fields[index++];
         if (status.startsWith("R") || status.startsWith("C")) {
           const from = fields[index++];
           const to = fields[index++];
-          if (status.startsWith("R") && from === file) return to;
+          if (from !== file) continue;
+          continuations += 1;
+          // A copy is not a move: the source is still there. Counted all the
+          // same, because a source with a copy *and* a rename is the shape that
+          // has to be refused.
+          if (status.startsWith("R")) moved = to;
         } else {
           index += 1;
         }
       }
+      return continuations === 1 ? moved : undefined;
     } catch {
       // A root commit has no `^`, a shallow clone has no history, an untracked
       // path has no log. All of them mean the same thing here.
@@ -416,6 +488,28 @@ export function createGitTrail(root: string): Trail {
       }
       declarations.set(symbol, found);
       return found;
+    },
+
+    declaresAt(file, symbol) {
+      const key = `${file}\u0000${symbol}`;
+      const cached = declaredAt.get(key);
+      if (cached !== undefined) return cached;
+      let answer = false;
+      try {
+        const language = languageOf(file);
+        // No grammar and no file both mean the same thing a missing declaration
+        // does: nothing here can say the symbol arrived, so the caller falls
+        // through to the search and, failing that, to the finding.
+        if (language && !inNeverWalk(file)) {
+          const source = readFileSync(path.join(root, file), "utf8");
+          answer = symbolCounts(source, symbol, language)?.declared === true;
+        }
+      } catch {
+        // Unreadable or unparseable. Not a declaration, and not an error either:
+        // every failure on this path is silence.
+      }
+      declaredAt.set(key, answer);
+      return answer;
     },
   };
 }
