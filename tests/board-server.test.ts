@@ -159,6 +159,64 @@ describe("board server", () => {
     expect(retry.status).toBe(200);
   }, 20_000);
 
+  /**
+   * #164: a page can send a scene that is not a drawing.
+   *
+   * One Ctrl+Z on a freshly loaded board turned into "delete all 157 elements",
+   * and the file took it. Asserted against the file rather than the response,
+   * because what went wrong was on disk.
+   */
+  it("refuses a save that empties the board, and leaves the file alone", async () => {
+    const before = await readBoard(boardFile);
+    const current = (await (await fetch(api("/api/board"))).json()) as { revision: string };
+    const wiped: BoardFile = {
+      ...before,
+      elements: before.elements.map((element) => ({ ...element, isDeleted: true })) as never,
+    };
+
+    const response = await fetch(api("/api/board"), {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ revision: current.revision, board: wiped }),
+    });
+    expect(response.status).toBe(409);
+
+    const refusal = (await response.json()) as { refused?: boolean; error?: string; board: BoardFile };
+    // Flagged apart from an ordinary stale 409: the page replays its own edits
+    // over a stale board and must do the opposite with a refused one.
+    expect(refusal.refused).toBe(true);
+    expect(refusal.error).toMatch(/would have emptied a board/);
+    // The board comes back with it, so the page can put the file's own scene
+    // back on the canvas instead of sitting on the wreck.
+    expect(refusal.board.elements.filter((element) => element.isDeleted !== true).length)
+      .toBeGreaterThan(0);
+
+    const onDisk = await readBoard(boardFile);
+    expect(onDisk.elements.filter((element) => element.isDeleted !== true))
+      .toEqual(before.elements.filter((element) => element.isDeleted !== true));
+  }, 20_000);
+
+  it("still takes a save that deletes some of the board", async () => {
+    const before = await readBoard(boardFile);
+    const current = (await (await fetch(api("/api/board"))).json()) as { revision: string };
+    const trimmed: BoardFile = {
+      ...before,
+      elements: before.elements.map((element, index) =>
+        index === 0 ? element : { ...element, isDeleted: true },
+      ) as never,
+    };
+
+    const response = await fetch(api("/api/board"), {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ revision: current.revision, board: trimmed }),
+    });
+    expect(response.status).toBe(200);
+
+    const onDisk = await readBoard(boardFile);
+    expect(onDisk.elements.filter((element) => element.isDeleted !== true)).toHaveLength(1);
+  }, 20_000);
+
   it("rejects a payload that is not a board", async () => {
     const response = await fetch(api("/api/board"), {
       method: "POST",

@@ -62,6 +62,33 @@ body,
   color: #e03131;
 }
 
+/* A save the server turned away. Amber rather than red: nothing is broken and
+   nothing was lost -- the board on screen is the board in the file again. */
+.status-refused {
+  color: #e8590c;
+}
+
+/* The refusal itself, above the pill. Wide enough to be a sentence and not a
+   code, and it takes pointer events so the text can be selected and pasted into
+   a bug report -- which is the next thing anybody seeing this will want. */
+.status-note {
+  position: fixed;
+  right: 14px;
+  bottom: 96px;
+  z-index: 10;
+  max-width: 44ch;
+  padding: 8px 11px;
+  border-radius: 10px;
+  border: 1px solid rgb(232 89 12 / 35%);
+  background: rgb(255 244 235 / 97%);
+  box-shadow: 0 1px 6px rgb(0 0 0 / 10%);
+  color: #a8410b;
+  font-size: 12px;
+  line-height: 1.45;
+  pointer-events: auto;
+  user-select: text;
+}
+
 /* The one thing in the pill you can click, so the pill itself stays out of the
    way of the canvas underneath it. */
 .status-file {

@@ -1,4 +1,4 @@
-import { Excalidraw } from "@excalidraw/excalidraw";
+import { CaptureUpdateAction, Excalidraw } from "@excalidraw/excalidraw";
 import type { ExcalidrawImperativeAPI } from "@excalidraw/excalidraw/types";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
@@ -22,6 +22,7 @@ const STATUS_LABEL: Record<SyncStatus, string> = {
   live: "live",
   saving: "saving",
   offline: "offline",
+  refused: "not saved",
 };
 
 const STALE_NOTE = "Not connected — this may no longer be the board being served.";
@@ -45,24 +46,32 @@ function StatusPill({
     : detail ?? file ?? "";
 
   return (
-    <div className={`status status-${status}`} title={title}>
-      <span className="status-dot" />
-      {/* Which board this is showing, and the way to the rest of them. Without
-          the name, a page pointed at another file looks identical to one that
-          simply is not updating; without the link, the index listing every
-          board is reachable only by having been told it exists, which makes it
-          the one part of this nobody finds. */}
-      {file ? (
-        <a
-          className={`status-file${stale ? " status-file-stale" : ""}`}
-          href="/boards"
-          title={`${file} — every board this service is showing`}
-        >
-          {file.split("/").pop()}
-        </a>
-      ) : null}
-      {STATUS_LABEL[status]}
-    </div>
+    <>
+      {/* Written out rather than left in the tooltip, because the pill is
+          `pointer-events: none` and a tooltip nobody can reach is not a way of
+          telling anybody anything. This is the only account a person gets of a
+          save that did not land (#164), so it says the whole sentence and stays
+          up until something ordinary happens to the board. */}
+      {status === "refused" && detail ? <div className="status-note">{detail}</div> : null}
+      <div className={`status status-${status}`} title={title}>
+        <span className="status-dot" />
+        {/* Which board this is showing, and the way to the rest of them. Without
+            the name, a page pointed at another file looks identical to one that
+            simply is not updating; without the link, the index listing every
+            board is reachable only by having been told it exists, which makes it
+            the one part of this nobody finds. */}
+        {file ? (
+          <a
+            className={`status-file${stale ? " status-file-stale" : ""}`}
+            href="/boards"
+            title={`${file} — every board this service is showing`}
+          >
+            {file.split("/").pop()}
+          </a>
+        ) : null}
+        {STATUS_LABEL[status]}
+      </div>
+    </>
   );
 }
 
@@ -238,7 +247,13 @@ export default function App() {
     if (!match) return;
     // Centre without changing zoom: fitting one box to the screen is a lurch.
     api.scrollToContent([match], { animate: true });
-    api.updateScene({ appState: { selectedElementIds: { [match.id]: true } } });
+    // Selecting is not something to undo, and it is observed app state: left
+    // uncaptured it rides along in whatever increment comes next. See the note
+    // on the remote apply below for why an uncaptured update is a hazard here.
+    api.updateScene({
+      appState: { selectedElementIds: { [match.id]: true } },
+      captureUpdate: CaptureUpdateAction.NEVER,
+    });
   }, []);
 
   // Suppresses the onChange that our own updateScene triggers, so applying a
@@ -305,7 +320,26 @@ export default function App() {
           };
 
           const showFrame = (index: number) => {
-            api.updateScene({ elements: frames[index] as unknown as SceneElements });
+            api.updateScene({
+              elements: frames[index] as unknown as SceneElements,
+              // This is what stops an undo from emptying the board (#164).
+              //
+              // Excalidraw's undo is a delta against its own snapshot of the
+              // scene, and `updateScene` defaults to `EVENTUALLY`: it paints the
+              // elements and leaves the snapshot alone, so the snapshot stays
+              // whatever it was when the page loaded -- empty. The next hand
+              // edit is then captured as a delta from *nothing*, meaning "these
+              // 157 elements arrived", and one Ctrl+Z inverts it into "these 157
+              // elements go", tombstoning the whole board and stripping every
+              // container's `boundElements` on the way out. The page saves that,
+              // and a committed diagram is blank.
+              //
+              // `NEVER` is what a remote update is: not undoable by the person
+              // watching, because they did not do it -- and, the half that
+              // matters here, folded into the snapshot, so the next real edit is
+              // measured against the board that is actually on screen.
+              captureUpdate: CaptureUpdateAction.NEVER,
+            });
             if (index === frames.length - 1) {
               revealTimer.current = undefined;
               settle();
@@ -434,7 +468,14 @@ export default function App() {
       type SceneElements = NonNullable<
         Parameters<ExcalidrawImperativeAPI["updateScene"]>[0]["elements"]
       >;
-      api.updateScene({ elements: next as unknown as SceneElements });
+      // A person changed this, so it goes on the undo stack as its own step --
+      // typing a ref and pressing Ctrl+Z should take back the ref, and nothing
+      // else. Left at the default it would instead be swept into the next
+      // increment along with whatever happened after it.
+      api.updateScene({
+        elements: next as unknown as SceneElements,
+        captureUpdate: CaptureUpdateAction.IMMEDIATELY,
+      });
     },
     [selected],
   );

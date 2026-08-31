@@ -18,7 +18,13 @@ export interface BoardPayload {
   files: Record<string, unknown>;
 }
 
-export type SyncStatus = "connecting" | "live" | "saving" | "offline";
+/**
+ * `refused` is its own state rather than a flavour of `offline` (#164): the
+ * connection is fine, the save was turned away for being destructive, and a
+ * board that says "not connected" when it means "I did not write that" sends
+ * somebody to look at their network.
+ */
+export type SyncStatus = "connecting" | "live" | "saving" | "offline" | "refused";
 
 export interface RemoteBoardMeta {
   /** Absolute path of the board being served. */
@@ -246,7 +252,38 @@ export class BoardSync {
       }
 
       if (response.status === 409) {
-        const conflict = (await response.json()) as { revision: string; board: BoardPayload };
+        const conflict = (await response.json()) as {
+          revision: string;
+          board: BoardPayload;
+          error?: string;
+          refused?: boolean;
+        };
+
+        /*
+         * The server refused this save as destructive (#164), rather than
+         * rejecting it as stale.
+         *
+         * The two arrive the same way and must be answered opposite ways. A
+         * stale save is replayed over the newer board, because the human's
+         * strokes are the thing worth keeping. A refused one is the opposite:
+         * the scene we hold is the damage, and merging it back would push the
+         * same wreck at the file again on the next keystroke, forever. So the
+         * server's board is adopted whole and what is on the canvas is dropped
+         * -- the board on screen goes back to being the board in the file, and
+         * the reason is put where a person will read it.
+         */
+        if (conflict.refused) {
+          this.#revision = conflict.revision;
+          this.#generation += 1;
+          this.#pending = undefined;
+          this.#lastSynced = elementMap(conflict.board.elements);
+          this.#lastSentFingerprint = fingerprint(conflict.board.elements);
+          this.handlers.onRemoteBoard(conflict.board, { wholesale: false, livePromotion: false });
+          this.handlers.onStatus("refused", conflict.error ?? "that save was refused");
+          this.#inFlight = false;
+          return;
+        }
+
         const merged = this.#merge(conflict.board, board);
         this.#revision = conflict.revision;
         this.#pending = merged;
@@ -258,7 +295,15 @@ export class BoardSync {
         return void this.#flush();
       }
 
-      if (!response.ok) throw new Error(`POST /api/board -> ${response.status}`);
+      if (!response.ok) {
+        // The server's own sentence when it wrote one: a refusal explains
+        // itself, and `POST /api/board -> 409` explains nothing to anybody.
+        const said = await response
+          .json()
+          .then((body: { error?: string }) => body?.error)
+          .catch(() => undefined);
+        throw new Error(said ?? `POST /api/board -> ${response.status}`);
+      }
       const payload = (await response.json()) as { revision: string };
       this.#revision = payload.revision;
       this.#lastSynced = elementMap(board.elements);

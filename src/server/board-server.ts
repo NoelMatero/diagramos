@@ -29,6 +29,7 @@ import { processAlive, registerServer, updateServer } from "./server-registry";
 import { boardsPage } from "./boards-page";
 import { watchCode, type CodeWatch } from "./code-watch";
 import { reconcileLivePromotions } from "../engine/promote";
+import { wipeRefusal } from "../engine/wipe";
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "../..");
 
@@ -934,6 +935,31 @@ export async function startBoardServer(options: BoardServerOptions): Promise<Run
          * the viewer taught about each.
          */
         const merged = { ...onDisk, ...payload.board };
+        /*
+         * The last thing between a browser and a committed file.
+         *
+         * A page can send a scene that is not a drawing at all: #164 was one
+         * Ctrl+Z on a freshly loaded board turning into "delete all 157
+         * elements", saved over the file with nothing anywhere saying so. The
+         * cause is fixed in the viewer, but the viewer is the part that runs in
+         * somebody else's browser and gets a new Excalidraw every few months,
+         * and this is the one place every hand-made change passes through.
+         *
+         * 409 rather than 400: the page already knows that status as "your save
+         * did not land, here is the board" and pulls afresh, so the canvas stops
+         * showing the wreck instead of sitting on it waiting to be saved again.
+         * The sentence rides along and reaches the status pill.
+         */
+        const refusal = wipeRefusal(onDisk, merged);
+        if (refusal) {
+          return json(response, 409, {
+            error: refusal,
+            revision: diskRevision,
+            board: onDisk,
+            file: saveTo,
+            refused: true,
+          });
+        }
         await writeBoard(saveTo, merged);
         state.revision = revisionOf(merged);
         // Recorded now rather than left to the file watcher's echo, so the
