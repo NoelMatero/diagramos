@@ -3,7 +3,7 @@
  * conflict rule that keeps an agent write from erasing a human stroke.
  */
 import { execFileSync } from "node:child_process";
-import { mkdtempSync, realpathSync, rmSync, writeFileSync } from "node:fs";
+import { mkdirSync, mkdtempSync, realpathSync, rmSync, writeFileSync } from "node:fs";
 import { readFile } from "node:fs/promises";
 import os from "node:os";
 import path from "node:path";
@@ -618,6 +618,32 @@ describe("board server file list (#114, #111)", () => {
     writeFileSync(path.join(repo, ".gitignore"), "ignored.ts\n");
     writeFileSync(path.join(repo, "untracked.ts"), "export const fresh = true;\n");
     writeFileSync(path.join(repo, "ignored.ts"), "export const hidden = true;\n");
+    /*
+     * Build output that nothing ignores, which is the shape #174 is about.
+     *
+     * `.gitignore` names `ignored.ts` and says nothing about `target/`, so
+     * `git ls-files --others` lists every artifact in it -- the ordinary state of
+     * a Rust checkout, and the state this repository's own `rust-test/` is in.
+     * `Cargo.toml` beside it is the corroboration that makes it build output
+     * rather than somebody's module.
+     */
+    writeFileSync(path.join(repo, "Cargo.toml"), "[package]\nname = \"planted\"\n");
+    mkdirSync(path.join(repo, "target/debug/.fingerprint/planted-e44f0492"), { recursive: true });
+    writeFileSync(
+      path.join(repo, "target/debug/.fingerprint/planted-e44f0492/output-test-lib-planted"),
+      '{"$message_type":"diagnostic","message":"empty line after doc comment"}\n',
+    );
+    /*
+     * And a source file whose path names a never-walk directory, which is why the
+     * filter has to ask for a manifest instead of matching a segment. This is
+     * `src/engine/vendor/browser-shim.ts` in the real repository: a file a
+     * name-only rule would refuse forever, with no way for its author to clear it.
+     */
+    mkdirSync(path.join(repo, "src/engine/vendor"), { recursive: true });
+    writeFileSync(
+      path.join(repo, "src/engine/vendor/shim.ts"),
+      "export const shim = true;\n",
+    );
     const board = path.join(repo, "board.excalidraw");
     await writeBoard(board, boardWith("x"));
     repoServer = await startBoardServer({ file: board, port: 0, root: repo });
@@ -646,6 +672,33 @@ describe("board server file list (#114, #111)", () => {
     // Otherwise the picker fills with build output and the one file wanted is
     // buried under out/, which is how a picker stops being faster than typing.
     expect(await listed()).not.toContain("ignored.ts");
+  });
+
+  /*
+   * The bug this endpoint was the likeliest cause of (#174).
+   *
+   * A ref into build output is refused by `check_drift`, in red, exit 1 (#166).
+   * This endpoint is the autocomplete for the panel that anchors a box -- so
+   * while `target/` was unfiltered, the tool was offering as a one-click choice
+   * the exact class of path it would then report as wrong. Measured on this
+   * repository at the time: 426 of 656 paths offered were build output, cargo
+   * fingerprint logs included, sorted ahead of the source they came from.
+   *
+   * That is how "a ref nobody typed" gets into a board file: nobody did type
+   * it. It was picked from a list the tool supplied.
+   */
+  it("does not offer build output the picker's own checker would refuse", async () => {
+    const paths = await listed();
+    expect(paths).not.toContain("target/debug/.fingerprint/planted-e44f0492/output-test-lib-planted");
+    expect(paths.some((entry) => entry.includes("/target/") || entry.startsWith("target/")))
+      .toBe(false);
+  });
+
+  it("still offers source whose path merely names a build directory", async () => {
+    // The reason the filter asks for the manifest beside the directory rather
+    // than matching the name: a refusal nobody can clear is worse than the
+    // green it replaced.
+    expect(await listed()).toContain("src/engine/vendor/shim.ts");
   });
 
   it("refuses a board outside the root, like every other endpoint", async () => {

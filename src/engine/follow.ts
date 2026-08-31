@@ -189,7 +189,33 @@ function followOne(anchor: StaleAnchor, trail: Trail): FollowedRef | undefined {
   };
 
   if (anchor.kind === "missing-file") {
-    const moved = trail.renamedTo(anchor.path);
+    /*
+     * Where git says it went -- unless that is build output (#174).
+     *
+     * The two search channels have always been filtered: `declaring` drops a
+     * `git grep` hit inside `target/`, and `declaresAt` refuses to look there at
+     * all. The rename channel was not, and it is the one channel whose answer is
+     * written to a board file without anybody reading it first -- `repair.ts`
+     * applies an unambiguous `becomes` on sight.
+     *
+     * So `git mv src/request.rs target/debug/request.rs` in a repository that
+     * tracks its build output produced exactly the bug this issue is about: a
+     * ref nobody typed, in a board file, pointing at a compiler artifact.
+     * Reproduced on a three-commit tree before this line existed.
+     *
+     * Filtered here rather than inside `renamedTo`, because the trail's job is
+     * to report what git recorded and this is a judgement about what is worth
+     * following. `inNeverWalk` rather than `generatedRef`: no workspace is
+     * injected here, and the stake is the cheap one this module already pays
+     * everywhere else -- refusing costs a suggestion nobody was promised, and
+     * the finding still stands with its own sentence.
+     *
+     * All three branches below read `moved`, including the one that only
+     * mentions the destination in prose, and none of them should be naming a
+     * path a box may not point at.
+     */
+    const recorded = trail.renamedTo(anchor.path);
+    const moved = recorded && !inNeverWalk(recorded) ? recorded : undefined;
     if (moved && !name) {
       // Either there is no symbol at all, or the symbol is a route literal that
       // cannot be searched for. Both ride along with the file: what git recorded

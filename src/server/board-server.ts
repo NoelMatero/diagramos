@@ -23,6 +23,7 @@ import { BoardHistory, HISTORY_ROUTE } from "./history";
 import { diagramDir } from "../engine/config";
 import { createCodeGraphOption } from "../engine/codegraph";
 import { createLedger, gitKnown } from "../engine/ledger";
+import { generatedRef } from "../engine/generated";
 import { checkDrift, createGitBaseline, createWorkspace, findBoards } from "../engine/drift";
 import { initEngine } from "../engine/parse";
 import { processAlive, registerServer, updateServer } from "./server-registry";
@@ -814,6 +815,29 @@ export async function startBoardServer(options: BoardServerOptions): Promise<Run
        * way -- one `git ls-files` against a tree git has indexed -- and a stale
        * list here reads as "the tool cannot see my file", which is worse than
        * the milliseconds.
+       *
+       * ## Build output is taken out, because the checker refuses it (#174)
+       *
+       * `gitKnown` lists what git can see, and `--others` means untracked files
+       * that nothing ignores. A Rust repository with no `.gitignore` for
+       * `target/` therefore had its entire build tree in here: measured on this
+       * repository, **426 of the 656 paths offered were build output**, cargo
+       * fingerprint logs among them, sorted in alphabetically ahead of the
+       * source files they were built from.
+       *
+       * So the panel that exists to stop a ref being mistyped was offering, as
+       * autocomplete, the one class of path `check_drift` refuses outright
+       * (#166). Pick one -- a click, nothing typed -- and the board acquires a
+       * ref its author never wrote and the next check reports in red. That is
+       * the tool contradicting itself, and it is the likeliest explanation of a
+       * ref appearing in a board file nobody remembers writing.
+       *
+       * `generatedRef` rather than `inNeverWalk`, deliberately: this is the "may
+       * a box point here" question, so it gets the guard that corroborates
+       * against the manifest beside the directory. That is what keeps
+       * `src/engine/vendor/browser-shim.ts` -- a real source file in this
+       * repository -- in the list. The picker and the checker now answer that
+       * question with the same code, which is the property worth having.
        */
       if (request.method === "GET" && url.pathname === "/api/paths") {
         const target = await requestedFile(url);
@@ -823,7 +847,11 @@ export async function startBoardServer(options: BoardServerOptions): Promise<Run
         // error. The panel then lets the path be typed, which is the same
         // affordance it always had, rather than looking broken.
         const known = gitKnown(project) ?? new Set<string>();
-        return json(response, 200, { root: project, paths: [...known].sort() });
+        const workspace = createWorkspace(project);
+        const offer = [...known]
+          .filter((file) => !generatedRef(file, workspace))
+          .sort();
+        return json(response, 200, { root: project, paths: offer });
       }
 
       /*
