@@ -317,6 +317,32 @@ export default function Inspector({
             </span>
           </label>
           {/*
+            The two words for a typed language, and the reason there are two:
+            `Request -> handler` and `handler -> Response` are different
+            statements, and one word would confirm either no matter which way
+            the arrow was drawn (#169).
+          */}
+          <label className="inspect-tick">
+            <input
+              type="checkbox"
+              checked={meaning.claim === "takes"}
+              onChange={(event) => onEdit({ set: "claim", ...(event.target.checked ? { claim: "takes" as const } : {}) })}
+            />
+            <span>
+              <b>{meaning.toLabel}</b> takes a <b>{meaning.fromLabel}</b> as a parameter
+            </span>
+          </label>
+          <label className="inspect-tick">
+            <input
+              type="checkbox"
+              checked={meaning.claim === "returns"}
+              onChange={(event) => onEdit({ set: "claim", ...(event.target.checked ? { claim: "returns" as const } : {}) })}
+            />
+            <span>
+              <b>{meaning.toLabel}</b> returns a <b>{meaning.fromLabel}</b>
+            </span>
+          </label>
+          {/*
             The payoff, said once and only where it applies: an arrow that only
             means "related, somehow" can never be confirmed as anything in
             particular, because finding a connection somewhere says nothing
@@ -340,6 +366,13 @@ export default function Inspector({
               Confirmed by finding the flow — one function binding the first
               result and passing it to the second. Not finding it is never held
               against the arrow.
+            </div>
+          ) : null}
+          {meaning.claim === "takes" || meaning.claim === "returns" ? (
+            <div className="inspect-note">
+              Read off the signature, so a wrong one is reported in red with the
+              signature quoted. If the type is written under another name — an
+              alias, or an import renamed — nothing is reported either way.
             </div>
           ) : null}
           {meaning.claim && !meaning.labelled ? (

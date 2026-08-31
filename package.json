@@ -45,6 +45,7 @@
     "measure:deps": "tsx scripts/measure-deps.mts",
     "measure:licence": "tsx scripts/measure-licence.mts",
     "measure:rebind": "tsx scripts/measure-rebind.mts",
+    "measure:signature": "tsx scripts/measure-signature.mts",
     "pretest": "npm run build:cli",
     "test": "vitest run",
     "test:watch": "vitest",

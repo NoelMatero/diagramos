@@ -115,6 +115,30 @@ other end through a callback or a field no reader follows, so failing to find
 the flow says nothing about the arrow. Finding it does. Both ends need to name a
 symbol (`path#symbol`), because a file has no result.
 
+### `claim: "takes"` / `claim: "returns"` on a planned arrow — the signature you are about to write
+
+`takes` says **the `to` end's parameters will name the `from` end's type**, and
+`returns` says the same about its return type. They read as `@takes` and
+`@returns` on the label:
+
+```
+edges: [
+  { from: "request", to: "handler", state: "planned", claim: "takes" },
+  { from: "get_client", to: "client", state: "planned", claim: "returns" },
+]
+```
+
+The `to` end is the function and the `from` end is the type, so the arrow points
+the way the data will flow. This is the claim for designing an interface before
+writing it: the signature is the contract, and these two words are how a plan
+states one.
+
+Nothing accuses a plan of a signature that does not exist yet. Once the code
+lands the arrow promotes and the signature is read — and from then on a
+disagreement is reported in red, with the signature quoted. Claim the wrong half
+and you are told the type is on the other side rather than accused. The `to` end
+needs to name a symbol (`path#symbol`).
+
 ### `closed: {}` on a planned directory box — the boundary it will hold
 
 `closed` says **nothing outside this box reaches into it**. Only for a box

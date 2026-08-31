@@ -700,13 +700,22 @@ function rowsFor({ report, promoted = [] }, colour, all = false) {
        * nobody spends time re-checking a connection that is simply reversed.
        */
       const backwards = finding.kind === "backwards-edge";
+      /*
+       * The second verdict that means wrong (#169), and red for the same reason.
+       * A different sentence, though: this arrow is not pointing the wrong way,
+       * it is pointing at a function whose signature does not mention the type,
+       * and "should be \u2190" would send somebody to turn round an arrow that is
+       * already the right way round.
+       */
+      const wrongSignature = finding.kind === "signature-absent";
       return paint(
         `${boxName({ label: finding.fromLabel, node: finding.from })}`
         + ` ${backwards ? "\u2192 (should be \u2190)" : "\u2192"} `
         + `${boxName({ label: finding.toLabel, node: finding.to })}`
         + (backwards ? " \u00b7 drawn backwards" : "")
+        + (wrongSignature ? " \u00b7 not in the signature" : "")
         + (hop ? ` \u00b7 ${hop}` : ""),
-        backwards ? "red" : "yellow",
+        backwards || wrongSignature ? "red" : "yellow",
         colour,
       );
     }),
@@ -762,7 +771,7 @@ function rowsFor({ report, promoted = [] }, colour, all = false) {
  * spell every one out, and the twelfth argument is where a counting bug goes to
  * hide.
  */
-function tallyCounts({ gone, generated, empty, unused, open, incomplete, removed, garbled, unanswered, backwards, arrows, stray, promoted, built, planned }, colour) {
+function tallyCounts({ gone, generated, empty, unused, open, incomplete, removed, garbled, unanswered, backwards, signatures, arrows, stray, promoted, built, planned }, colour) {
   return [
     gone ? paint(`${gone} gone`, "red", colour) : "",
     // Its own word, because "gone" is the opposite of what happened: the file
@@ -801,6 +810,15 @@ function tallyCounts({ gone, generated, empty, unused, open, incomplete, removed
      * be colouring the only certain arrow verdict as the uncertain one.
      */
     backwards ? paint(`${backwards} ${backwards === 1 ? "arrow" : "arrows"} backwards`, "red", colour) : "",
+    /*
+     * The second refutable arrow verdict (#169), red and counted apart from the
+     * first for the same reason the first is counted apart from the ambers: both
+     * mean wrong, and they want opposite fixes. "2 arrows backwards" would send
+     * somebody to turn round an arrow that is already the right way round.
+     */
+    signatures
+      ? paint(`${signatures} ${signatures === 1 ? "signature" : "signatures"} disagree`, "red", colour)
+      : "",
     arrows ? paint(`${arrows} ${arrows === 1 ? "arrow" : "arrows"}`, "yellow", colour) : "",
     stray ? paint(`${stray} stray ${stray === 1 ? "arrow" : "arrows"}`, "dim", colour) : "",
     // "promoted" is done -- the board was advanced this run; "built" is still
@@ -833,7 +851,13 @@ function tallyFor({ report, promoted = [] }, colour) {
       garbled: (report.garbledClaims ?? []).length,
       unanswered: unansweredClaims(report),
       backwards: report.edges.filter((finding) => finding.kind === "backwards-edge").length,
-      arrows: report.edges.filter((finding) => finding.kind !== "backwards-edge").length,
+      // Counted with `backwards` rather than with the amber arrows: both mean
+      // wrong, and an arrow definitely wrong must never be summarised as one of
+      // N things worth a look (#169).
+      signatures: report.edges.filter((finding) => finding.kind === "signature-absent").length,
+      arrows: report.edges.filter(
+        (finding) => finding.kind !== "backwards-edge" && finding.kind !== "signature-absent",
+      ).length,
       stray: report.strayArrows ?? 0,
       promoted: promoted.length,
       built: report.promotions.filter((promotion) => !promotedNodes.has(promotion.node)).length,
@@ -900,8 +924,12 @@ function render(stale, colour) {
         unanswered: sum.unanswered + unansweredClaims(report),
         backwards: sum.backwards
           + report.edges.filter((finding) => finding.kind === "backwards-edge").length,
+        signatures: sum.signatures
+          + report.edges.filter((finding) => finding.kind === "signature-absent").length,
         arrows: sum.arrows
-          + report.edges.filter((finding) => finding.kind !== "backwards-edge").length,
+          + report.edges.filter(
+            (finding) => finding.kind !== "backwards-edge" && finding.kind !== "signature-absent",
+          ).length,
         stray: sum.stray + (report.strayArrows ?? 0),
         promoted: sum.promoted + promoted.length,
         built: sum.built
@@ -909,7 +937,7 @@ function render(stale, colour) {
         planned: sum.planned + report.workItems.length,
       };
     },
-    { gone: 0, generated: 0, empty: 0, unused: 0, open: 0, incomplete: 0, removed: 0, garbled: 0, unanswered: 0, backwards: 0, arrows: 0, stray: 0, promoted: 0, built: 0, planned: 0 },
+    { gone: 0, generated: 0, empty: 0, unused: 0, open: 0, incomplete: 0, removed: 0, garbled: 0, unanswered: 0, backwards: 0, signatures: 0, arrows: 0, stray: 0, promoted: 0, built: 0, planned: 0 },
   );
 
   // Too many to list: counts per diagram, and a pointer to the view that has room.
