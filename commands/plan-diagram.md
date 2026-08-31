@@ -1,6 +1,6 @@
 ---
 description: Draw the plan for something before building it — dashed boxes that turn solid as the code lands
-allowed-tools: mcp__diagramos__create_diagram, mcp__diagramos__read_diagram, mcp__diagramos__check_drift, mcp__diagramos__open_board, mcp__diagramos__board_status, mcp__diagramos__connect_nodes, Read, Grep, Glob
+allowed-tools: mcp__diagramos__create_diagram, mcp__diagramos__edit_diagram, mcp__diagramos__relayout_diagram, mcp__diagramos__read_diagram, mcp__diagramos__check_drift, mcp__diagramos__open_board, mcp__diagramos__board_status, mcp__diagramos__connect_nodes, Read, Grep, Glob
 ---
 
 The user wants to plan work as a diagram: draw what *should* exist, before any
@@ -179,6 +179,19 @@ box promised, a piece turns out unnecessary, a new piece appears. The decision
 and the board edit are **one action, not two** — repoint the ref, remove the
 box, or add the new dashed box in the same turn the plan actually changed.
 "I'll update the diagram after" is how a plan becomes a picture of last week.
+
+Repointing a ref is `edit_diagram`, not a redraw:
+
+```json
+{"path": "docs/diagrams/plan.excalidraw",
+ "updates": [{"id": "store", "ref": "src/engine/store/index.ts"}]}
+```
+
+Nothing else on the board moves, and the box keeps its dashed stroke and its
+claims. Save `create_diagram` for a box actually appearing or disappearing —
+regenerating a whole plan to move one string is what makes updating the board
+feel expensive enough to put off, which is the habit this section exists to
+prevent.
 
 The safety net when that is forgotten is deliberate nagging, not silence: a
 dashed box whose work landed somewhere else never promotes, so the end-of-turn

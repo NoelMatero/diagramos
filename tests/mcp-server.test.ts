@@ -87,6 +87,7 @@ describe("board MCP server", () => {
         "open_board",
         "place_image",
         "read_diagram",
+        "relayout_diagram",
         "render_diagram",
       ].sort(),
     );
@@ -821,6 +822,7 @@ describe("board MCP server", () => {
       provenance: "recorded",
       state: "built",
       endpoints: "declared",
+      direction: "RIGHT",
     });
 
     const odd = leanNodes.find((node) => node.id === "odd");
@@ -841,6 +843,84 @@ describe("board MCP server", () => {
       expect(elements[0], key).not.toHaveProperty(key);
     }
     expect(elements[0]).toMatchObject({ id: expect.any(String), type: expect.any(String) });
+  }, 120_000);
+
+  /**
+   * The cost measured in #163: a board came out sprawling, the agent said "trying
+   * RIGHT", and that one word cost a full re-send of thirty-four nodes and
+   * forty-four edges. Here it costs a word, and the board it produces has to be
+   * the same board -- every anchor, every claim, every id still in place -- or
+   * the cheap path is not a path at all.
+   */
+  it("re-lays a board out without being told the graph again", async () => {
+    const board = "docs/diagrams/flow.excalidraw";
+    await writeFile(path.join(workspace, "flow.ts"), "export function run(): number { return 1; }\n");
+    await call("create_diagram", {
+      path: board,
+      title: "Flow",
+      nodes: [
+        { id: "run", label: "run()", ref: "flow.ts#run" },
+        { id: "sink", label: "sink", state: "planned" },
+      ],
+      edges: [{ from: "run", to: "sink", label: "emits" }],
+    });
+
+    const before = jsonOf(await call("read_diagram", { path: board, geometry: true }));
+    const turned = jsonOf(await call("relayout_diagram", { path: board, direction: "DOWN" }));
+    expect(turned.direction).toBe("DOWN");
+    expect(turned.nodes).toBe(2);
+
+    const after = jsonOf(await call("read_diagram", { path: board, geometry: true }));
+    expect(after.direction).toBe("DOWN");
+    expect(after.nodes).not.toEqual(before.nodes);
+    // Same graph, different geometry: what a caller holds still addresses the
+    // same things afterwards.
+    const ids = (read: Record<string, unknown>) =>
+      (read.nodes as Array<Record<string, unknown>>).map((node) => `${node.id}:${node.ref ?? ""}:${node.state ?? ""}`);
+    expect(ids(after)).toEqual(ids(before));
+
+    // A no-op says it is one instead of reading like a re-layout that worked.
+    const again = jsonOf(await call("relayout_diagram", { path: board }));
+    expect(String(again.note)).toContain("nothing moved");
+
+    // And the flow sticks: a redraw that says nothing about direction keeps it.
+    await call("create_diagram", {
+      path: board,
+      title: "Flow",
+      nodes: [{ id: "run", label: "run()", ref: "flow.ts#run" }],
+      edges: [],
+    });
+    expect(jsonOf(await call("read_diagram", { path: board })).direction).toBe("DOWN");
+  }, 120_000);
+
+  /**
+   * The other half of #162: guidance can only point four changed refs at
+   * edit_diagram if edit_diagram carries a ref change without losing the rest.
+   */
+  it("re-anchors a box by name without unsaying the rest of it", async () => {
+    const board = "docs/diagrams/anchored.excalidraw";
+    await writeFile(path.join(workspace, "anchored.ts"), "export const kept = 1;\n");
+    await call("create_diagram", {
+      path: board,
+      title: "Anchored",
+      nodes: [
+        { id: "core", label: "core", ref: "anchored.ts", refs: ["flow.ts"], state: "planned" },
+        { id: "edge", label: "edge" },
+      ],
+      edges: [{ from: "core", to: "edge" }],
+    });
+
+    const edited = jsonOf(await call("edit_diagram", {
+      path: board,
+      updates: [{ id: "core", ref: "anchored.ts#kept" }],
+    }));
+    expect(edited.updated).toEqual(["anchored-node-0"]);
+
+    const read = jsonOf(await call("read_diagram", { path: board }));
+    const core = (read.nodes as Array<Record<string, unknown>>).find((node) => node.id === "core")!;
+    expect(core.ref).toBe("anchored.ts#kept");
+    expect(core.refs).toEqual(["flow.ts"]);
+    expect(core.state).toBe("planned");
   }, 120_000);
 
   it("returns an error result rather than crashing on a bad graph", async () => {

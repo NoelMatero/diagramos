@@ -90,6 +90,11 @@ const DEFAULTS_LEGEND = {
   provenance: "recorded",
   state: "built",
   endpoints: "declared",
+  // Board-level rather than per-item, and it costs nothing to say once. Without
+  // it a caller wondering how a board is laid out has no way to learn from the
+  // response that the question has an answer, let alone that relayout_diagram
+  // can change it for one word instead of a whole graph.
+  direction: "RIGHT",
 } as const;
 
 export function projectGraph(

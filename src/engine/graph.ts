@@ -107,6 +107,62 @@ function stateOf(value: unknown): NodeState {
  */
 export type BoardDescribes = "repo" | "concept";
 
+/**
+ * The flow a diagram was laid out with.
+ *
+ * Here rather than in `layout.ts` for the reason `strokeStyleForState` is here:
+ * the Stop hook and the board service both need to read a board's direction and
+ * neither may import the layout module, which instantiates ELK at load time.
+ */
+export type LayoutDirection = "RIGHT" | "DOWN";
+
+export const LAYOUT_DIRECTIONS: readonly LayoutDirection[] = ["RIGHT", "DOWN"];
+
+/** The default flow, and the one value never written to a board. */
+export const DEFAULT_DIRECTION: LayoutDirection = "RIGHT";
+
+function directionValue(value: unknown): LayoutDirection | undefined {
+  return value === "RIGHT" || value === "DOWN" ? value : undefined;
+}
+
+/**
+ * What a board was last laid out with, recorded on its title element.
+ *
+ * It lives beside `describes` and `complete` for the same reason those do: it
+ * is true of a whole picture rather than of any one box, and `customData` on an
+ * element is the only store that survives a round trip through the live viewer.
+ *
+ * It is recorded at all so that re-laying a board out sticks. Direction used to
+ * be a call argument and nothing else, so a board turned DOWN went back to
+ * RIGHT the next time anybody regenerated it -- the setting lasted exactly
+ * until the next redraw, which is the thing this tool tells authors to do.
+ *
+ * `RIGHT` is the default and is never written, so a board that never asked for
+ * anything else stays byte-identical to one drawn before this existed. Absence
+ * therefore means RIGHT, not unknown, which is the same reading `version.ts`
+ * gives an unstamped board.
+ *
+ * Without `name` this answers for the board, which is only meaningful when
+ * every diagram on it that says anything says the same thing. Two diagrams
+ * disagreeing is not a tie to be broken by document order: it is a question the
+ * caller has to answer by naming one.
+ */
+export function directionOf(board: BoardFile, name?: string): LayoutDirection | undefined {
+  const titles = board.elements.filter(
+    (element) => element.isDeleted !== true && customOf(element).role === "title",
+  );
+  const scoped = name === undefined
+    ? titles
+    : titles.filter((element) => {
+        const diagram = customOf(element).diagram;
+        return typeof diagram === "string" ? diagram === name : String(element.id) === `${name}-title`;
+      });
+  const found = [...new Set(
+    scoped.map((element) => directionValue(customOf(element).direction)).filter(Boolean),
+  )] as LayoutDirection[];
+  return found.length === 1 ? found[0] : undefined;
+}
+
 export interface RecoveredNode {
   id: string;
   label: string;
@@ -219,6 +275,11 @@ export interface RecoveredGraph {
   title?: string;
   /** What the board is about, from its title element. Absent means `repo`. */
   describes?: BoardDescribes;
+  /**
+   * The flow this board was laid out with, from its title element. Absent means
+   * `RIGHT`, which is both the default and the one value never written down.
+   */
+  direction?: LayoutDirection;
   /**
    * The board's completeness claim, from its title element. Absent means the
    * board asserts nothing about what it leaves out, which is what every board
@@ -560,9 +621,11 @@ export function readGraph(board: BoardFile): RecoveredGraph {
       y: Number(element.y) || 0,
     }));
 
+  const direction = directionOf(board);
   return {
     ...(titleElement ? { title: String(titleElement.text ?? "").trim() } : {}),
     ...(describes ? { describes } : {}),
+    ...(direction ? { direction } : {}),
     ...(complete ? { complete } : {}),
     ...(completeGarbled !== undefined ? { completeGarbled } : {}),
     nodes,

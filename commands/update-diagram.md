@@ -54,19 +54,32 @@ Boxes marked `inferred` were hand-drawn, and their ref was *guessed from the
 label*. Treat those as the user's intention, not as a wrong claim: mention them
 and ask, rather than deleting someone's sketch because a guessed path missed.
 
-## Redraw
+## Write the fix
 
-Read the diagram first, then regenerate it with `create_diagram` on the same
-path, carrying over every node and edge that is still right and fixing the ones
-that are not.
+Read the diagram first. Then pick by **what actually changed**, because the two
+paths cost wildly different amounts and one of them throws away the layout.
 
-Two things to be honest about when you report:
+**Refs moved, nothing else** — the common case, and most of what a drift report
+ever asks for. Patch them with `edit_diagram`:
 
-- **Regeneration replaces what was generated before.** Hand-drawn elements
-  survive, but layout of the generated part is decided fresh, so a diagram
-  someone arranged by hand comes back arranged by the engine.
-- Say which boxes you repointed, which you removed, and anything you were unsure
-  about. A diagram silently rewritten is worse than one left stale.
+```json
+{"path": "docs/diagrams/architecture.excalidraw",
+ "updates": [{"id": "layout", "ref": "src/engine/layout/index.ts"},
+             {"id": "store", "state": "planned"}]}
+```
+
+Everything you do not name stays as it was, the board keeps its layout, and a
+box's other anchors and claims survive the edit. Do not regenerate a
+thirty-four box board to correct three strings.
+
+**Boxes appearing or disappearing** — then the shape of the picture changed and
+`create_diagram` is right. Carry over every node and edge that is still correct.
+Be honest about the cost when you report it: hand-drawn elements survive, but
+the generated part is laid out fresh, so a board somebody arranged by hand comes
+back arranged by the engine.
+
+Either way, say which boxes you repointed, which you removed, and anything you
+were unsure about. A diagram silently rewritten is worse than one left stale.
 
 Finish by re-running the check to confirm it is clean, and report in a sentence
 or two. No essay about the architecture.
