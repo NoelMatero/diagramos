@@ -243,11 +243,23 @@ try {
       startedBy: "diagramos board",
     });
     // `started` is true if any of them had to start one; the rest joined it.
-    service = { ...next, started: Boolean(service?.started) || next.started };
+    // Retirements accumulate too: a service covering three projects is stopped
+    // once, and only the ask that caught it would otherwise say so.
+    service = {
+      ...next,
+      started: Boolean(service?.started) || next.started,
+      retired: [...(service?.retired ?? []), ...(next.retired ?? [])],
+    };
   }
 } catch (error) {
   fail(error.message);
 }
+
+/*
+ * Said before the URLs, because it explains something the person may have just
+ * seen: a board that was showing errors this build would never have reported.
+ */
+for (const line of service.retired ?? []) console.log(line);
 
 if (service.port !== wanted) {
   // Worth saying: someone looking for 4747 needs to know why it is not there.

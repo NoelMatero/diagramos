@@ -1736,6 +1736,10 @@ server.registerTool(
         // useful thing to report any more; where it came from is.
         pid: probe.pid,
         startedBy: probe.startedBy,
+        // Which build is answering. A service outlives the install that started
+        // it, so "the version I am" and "the version showing my diagrams" are
+        // two different facts, and only one of them is on the page (#181).
+        version: probe.version ?? "older than 0.2.0-rc.6",
         stopWith: "diagramos stop --list shows every board service; diagramos stop stops them",
       });
     }),
@@ -1796,6 +1800,9 @@ server.registerTool(
         url,
         file: relativeToWorkspace(file),
         note: "Live. Edits in the page and edits from these tools both land in the file.",
+        // Only when it happened, and worth a line when it does: the user may
+        // have been looking at findings this build would never have reported.
+        ...(service.retired?.length ? { replaced: service.retired } : {}),
       });
     }),
 );

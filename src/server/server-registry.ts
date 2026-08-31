@@ -20,6 +20,8 @@ import fs from "node:fs/promises";
 import os from "node:os";
 import path from "node:path";
 
+import type { BuildIdentity } from "./build-identity";
+
 /** What one running board server records about itself. */
 export interface RegisteredServer {
   pid: number;
@@ -55,6 +57,15 @@ export interface RegisteredServer {
   owner?: number;
   /** How it was started, for a listing a person has to read. */
   startedBy?: string;
+  /**
+   * The build it is running.
+   *
+   * A service outlives the install that started it -- that is the point of it --
+   * so the one thing it must be able to say is which install that was. Absent
+   * on a service registered before this was recorded, which `staleService`
+   * reads as stale rather than as unknown (#181).
+   */
+  build?: BuildIdentity;
 }
 
 /**

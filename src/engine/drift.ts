@@ -48,6 +48,7 @@ import { ledgerAdditions, type Ledger } from "./ledger";
 import { checkNeeds, type NeedsWithheld } from "./needs";
 import { signatureNames, type SignatureWithheld } from "./signature";
 import { resolveDependency, type ConfigCache } from "./resolve";
+import { boardIsNewer, newerBuildClaimError } from "./version";
 import type { Workspace } from "./workspace";
 
 export type DriftKind =
@@ -623,6 +624,16 @@ export interface GarbledClaimFinding {
   /** The word as written, without the `@`. */
   written: string;
   detail: string;
+  /**
+   * Whose fault it is.
+   *
+   * `vocabulary` is the ordinary case: somebody wrote a word that is not a
+   * claim. `older-build` is the board saying it was drawn by a newer diagramos
+   * than the one reading it, which makes an unknown word far more likely to be
+   * a claim added since than a typo (#181). Absent means `vocabulary`, so a
+   * reader written before this existed is right about every board it has.
+   */
+  cause?: "vocabulary" | "older-build";
 }
 
 /**
@@ -3754,6 +3765,32 @@ export function checkDrift(
     }
   }
 
+  /*
+   * A word this build does not have, on a board a newer build drew.
+   *
+   * The claim whitelist is closed and falling off it is loud on purpose, which
+   * is right for a typo and wrong for a vocabulary that grew. An older install
+   * reported seven valid `@takes` and `@returns` arrows as malformed and set
+   * `clean: false` on a diagram with nothing wrong with it (#181) -- and it did
+   * that precisely on the release that added the words, when the author had
+   * just written them and was looking at the board to see whether they took.
+   *
+   * The stamp from #134 is what makes the two cases separable. Rewritten here,
+   * once, rather than at each of the four places a vocabulary is checked:
+   * every one of them can grow, and every one of them has the same excuse.
+   */
+  const claimsFromTheFuture = boardIsNewer(board.diagramos);
+  const reportedGarbled = claimsFromTheFuture
+    ? garbledClaims.map((finding) => ({
+      ...finding,
+      cause: "older-build" as const,
+      detail: newerBuildClaimError(
+        finding.on === "arrow" ? `@${finding.written}` : finding.written,
+        board.diagramos,
+      ),
+    }))
+    : garbledClaims;
+
   return {
     // `clean` means "nothing has regressed". Work items and promotions are both
     // deliberately excluded: they drive the CLI's exit code, and neither an
@@ -3762,7 +3799,7 @@ export function checkDrift(
     // line on the board that no check can ever read, and leaving it out would
     // let it sit there quietly forever.
     clean: findings.length === 0 && edges.length === 0 && deleted.length === 0
-      && garbledClaims.length === 0,
+      && reportedGarbled.length === 0,
     findings,
     followed: options?.trail ? followStale(findings, options.trail) : [],
     closedBreaches,
@@ -3790,7 +3827,7 @@ export function checkDrift(
     skippedWhy,
     assertions,
     claims,
-    garbledClaims,
+    garbledClaims: reportedGarbled,
     excused,
     handDrawn,
     concept,

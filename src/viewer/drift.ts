@@ -97,7 +97,19 @@ export interface DriftView {
   deleted: Array<{ node: string; label: string; ref: string }>;
   deletedEdges?: Array<{ fromLabel: string; toLabel: string }>;
   /** Claim words the vocabulary does not have. Optional: older payloads have none. */
-  garbledClaims?: Array<{ on: string; label: string; written: string }>;
+  garbledClaims?: Array<{
+    on: string;
+    label: string;
+    written: string;
+    /**
+     * `older-build` means the board says it was drawn by a newer diagramos than
+     * the one serving this page, so the word is a claim this build has not
+     * learned rather than a typo. Absent on a payload from before the engine
+     * could tell the two apart.
+     */
+    cause?: string;
+    detail?: string;
+  }>;
   /**
    * What became of the board's `@needs` arrows. Optional: older payloads have none.
    *
@@ -317,7 +329,18 @@ export function tallyOf(report: DriftView): TallyPart[] {
   if (unused) parts.push({ text: `${unused} unused`, tone: "bad" });
   if (report.deleted.length) parts.push({ text: `${report.deleted.length} removed`, tone: "bad" });
   if (report.garbledClaims?.length) {
-    parts.push({ text: `${report.garbledClaims.length} unreadable`, tone: "bad" });
+    /*
+     * Two different pieces of news, and only one of them is about the board.
+     *
+     * "4 unreadable" over four perfectly good arrows is what this looked like
+     * before the engine could tell a typo from a word added since (#181), and
+     * it is worse than useless: it points the author at a diagram that is fine.
+     * Counted once and named once, because the cause is the whole board's.
+     */
+    const behind = report.garbledClaims.some((finding) => finding.cause === "older-build");
+    parts.push(behind
+      ? { text: "board drawn by a newer diagramos", tone: "bad" }
+      : { text: `${report.garbledClaims.length} unreadable`, tone: "bad" });
   }
   /*
    * Backwards arrows counted apart, and first.
@@ -432,7 +455,12 @@ export function rowsOf(report: DriftView): StatusRow[] {
     // and the code disagreeing, which is a smaller problem than a claim nothing
     // can ever evaluate.
     ...(report.garbledClaims ?? []).map((finding) => ({
-      text: `${finding.on === "arrow" ? "arrow " : ""}${name(finding.label, finding.label)} · @${finding.written} is not a claim`,
+      text: `${finding.on === "arrow" ? "arrow " : ""}${name(finding.label, finding.label)} · `
+        + (finding.cause === "older-build"
+          // The board is not wrong; this build is behind it. Say which, because
+          // the two remedies are opposite ones.
+          ? `@${finding.written} is a claim this build does not have — update diagramos`
+          : `@${finding.written} is not a claim`),
       tone: "bad" as Tone,
     })),
     // The element is gone from the board, so there is nothing to reveal.
