@@ -1944,3 +1944,64 @@ describe("saying where the code went", () => {
     expect(said).not.toContain("Kept");
   }, 120_000);
 });
+
+/**
+ * A board that renders blank and passes every check (#165).
+ *
+ * This is the case that produced the issue: `read_diagram` returned the whole
+ * graph with correct labels, the drift check printed `0 findings · exit 0`, and
+ * the picture was empty. Only a person looking at it found out.
+ *
+ * A separate project because a damaged board makes the whole run exit 1, and
+ * every other test in this file shares one workspace.
+ */
+describe("a board file that contradicts itself", () => {
+  let project: string;
+
+  beforeAll(async () => {
+    project = mkdtempSync(path.join(tmpdir(), "drift-cli-damage-"));
+    mkdirSync(path.join(project, "docs/diagrams"), { recursive: true });
+    mkdirSync(path.join(project, "src"), { recursive: true });
+    writeFileSync(path.join(project, "src/present.ts"), "export const present = true;\n");
+
+    const drawn = (await createDiagram(emptyBoard(), {
+      name: "arch",
+      nodes: [{ id: "p", label: "Present", ref: "src/present.ts" }],
+      edges: [],
+    })).board;
+    // The corruption, exactly: the direction the renderer reads is stripped and
+    // the direction `readGraph` reads is left alone.
+    await writeBoard(path.join(project, "docs/diagrams/blank.excalidraw"), {
+      ...drawn,
+      elements: drawn.elements.map((element) => ({ ...element, boundElements: null })),
+    });
+  }, 120_000);
+
+  afterAll(() => {
+    if (project) rmSync(project, { recursive: true, force: true });
+  });
+
+  it("says the file is damaged, and does not report it as drift", async () => {
+    const result = await run(TSX, [SCRIPT], { cwd: project }).then(
+      ({ stdout, stderr }) => ({ code: 0, stdout, stderr }),
+      (error: { code?: number; stdout?: string; stderr?: string }) =>
+        ({ code: error.code ?? -1, stdout: error.stdout ?? "", stderr: error.stderr ?? "" }),
+    );
+    const said = `${result.stdout}${result.stderr}`;
+
+    expect(said).toContain("blank.excalidraw");
+    expect(said).toContain("This board is damaged");
+    // Its own voice. Every ref on this board still resolves, so calling any of
+    // this drift would be a claim about the code that nothing checked.
+    expect(said).not.toContain("gone");
+    expect(said).toContain("Nothing here is a claim about your code");
+    // The line that was the whole bug: this used to be 0.
+    expect(result.code).toBe(1);
+  }, 120_000);
+
+  it("tells a hook too, which is the channel that runs every turn", async () => {
+    const { stdout } = await run(TSX, [SCRIPT, "--hook"], { cwd: project });
+    const message = JSON.parse(stdout.trim()).systemMessage as string;
+    expect(message).toContain("This board is damaged");
+  }, 120_000);
+});

@@ -7,6 +7,7 @@
  * against the prose in `docs/`, and a copy of these rules in the audit would
  * quietly start measuring a payload nobody is actually sent.
  */
+import { damageSentence } from "../engine/damage";
 import type { RecoveredGraph } from "../engine/graph";
 
 /**
@@ -101,11 +102,28 @@ export function projectGraph(
   graph: RecoveredGraph,
   { geometry = false, detailed = false, notShown }: ProjectionOptions = {},
 ): Record<string, unknown> {
-  const { nodes, edges, unattributed, ...rest } = graph;
+  const { nodes, edges, unattributed, damage, ...rest } = graph;
   const placed = geometry
     ? nodes
     : nodes.map(({ x: _x, y: _y, width: _w, height: _h, ...node }) => node);
   return {
+    /*
+     * First, and only when there is something to say (#165).
+     *
+     * Everything below it was recovered by following one direction of a binding,
+     * and this is the report that the other direction disagrees -- so a reader
+     * that meets `nodes` before it has already been told a complete, plausible,
+     * unusable answer. A board in this state returned 34 nodes and 44 edges with
+     * every label right while rendering blank, and no channel said a word.
+     */
+    ...(damage.length
+      ? {
+          damaged: {
+            summary: damageSentence(damage),
+            faults: damage,
+          },
+        }
+      : {}),
     ...rest,
     omittedWhenDefault: DEFAULTS_LEGEND,
     nodes: placed.map((node) => shrink(node, NODE_DEFAULTS, detailed)),

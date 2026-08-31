@@ -1026,3 +1026,85 @@ describe("open_board with several boards", () => {
     expect(status.showing).toBe(beta);
   }, 120_000);
 });
+
+/**
+ * The board that reads healthy and draws nothing (#165).
+ *
+ * A label is tied to its box from both ends. `read_diagram` resolves it through
+ * `containerId`; Excalidraw draws it through the box's `boundElements`. A board
+ * arrived with the second one stripped, and the read returned 34 nodes and 44
+ * edges with every label correct while the picture was blank — so this file's
+ * own promise, that a picture and the thing it describes cannot disagree
+ * quietly, failed at the picture and the tool's model of it.
+ *
+ * Both tools are asserted here rather than at the engine, because the defect was
+ * never that the check could not be written. It was that neither channel said
+ * anything.
+ */
+describe("a damaged board", () => {
+  const DAMAGED = "docs/diagrams/damaged.excalidraw";
+
+  beforeAll(async () => {
+    await call("create_diagram", {
+      path: DAMAGED,
+      title: "Blank",
+      nodes: [
+        { id: "client", label: "Client", ref: "src/present.ts" },
+        { id: "api", label: "API", ref: "src/present.ts" },
+      ],
+      edges: [{ from: "client", to: "api" }],
+    });
+    await mkdir(path.join(workspace, "src"), { recursive: true });
+    await writeFile(path.join(workspace, "src/present.ts"), "export const present = true;\n");
+
+    const file = path.join(workspace, DAMAGED);
+    const board = JSON.parse(await readFile(file, "utf8"));
+    await writeFile(file, JSON.stringify({
+      ...board,
+      elements: board.elements.map((element: Record<string, unknown>) => ({
+        ...element,
+        boundElements: null,
+      })),
+    }));
+  }, 120_000);
+
+  it("read_diagram says so before it says anything else", async () => {
+    const graph = jsonOf(await call("read_diagram", { path: DAMAGED }));
+
+    // The half that made this invisible: the graph still reads back whole.
+    const nodes = graph.nodes as Array<{ label: string }>;
+    expect(nodes.map((node) => node.label).sort()).toEqual(["API", "Client"]);
+
+    const damaged = graph.damaged as { summary: string; faults: unknown[] };
+    expect(damaged).toBeDefined();
+    expect(damaged.summary).toMatch(/This board is damaged/);
+    expect(damaged.faults.length).toBeGreaterThan(0);
+    // The one line a caller is certain to read. "2 nodes, 1 edges" is true of a
+    // board that draws nothing, which is why it cannot be all it says.
+    expect(String(graph.summary)).toMatch(/^DAMAGED FILE/);
+    // First in the response, so nothing plausible is read before it.
+    expect(Object.keys(graph)[0]).toBe("damaged");
+  }, 120_000);
+
+  it("check_drift refuses to let a clean answer stand for it", async () => {
+    const report = jsonOf(await call("check_drift", { path: DAMAGED }));
+
+    const damaged = report.damaged as Array<{ board: string; summary: string }>;
+    expect(damaged).toHaveLength(1);
+    expect(damaged[0].board).toBe(DAMAGED);
+    expect(damaged[0].summary).toMatch(/This board is damaged/);
+    expect(String(report.damagedNote)).toMatch(/clean` does not cover it/);
+
+    // Not drift, and deliberately not folded into `clean`: both refs still
+    // resolve, so nothing on this board disagrees with the code. The file
+    // disagrees with itself, which is a different thing and has to read as one.
+    expect(report.findings).toEqual([]);
+    expect(report.clean).toBe(true);
+  }, 120_000);
+
+  it("says nothing about the board it was drawn from", async () => {
+    const graph = jsonOf(await call("read_diagram", { path: BOARD }));
+    expect(graph.damaged).toBeUndefined();
+    expect(String(graph.summary)).not.toContain("DAMAGED");
+  }, 120_000);
+});
