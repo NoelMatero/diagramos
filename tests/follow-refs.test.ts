@@ -36,11 +36,23 @@ installExcalifontMeasurer();
 let repo: string;
 let report: DriftReport;
 
-/** Filler that survives a move, so git scores the move a rename rather than a delete and an add. */
-const BULK = Array.from(
-  { length: 30 },
-  (_unused, index) => `export function filler${index}(): number {\n  return ${index};\n}\n`,
-).join("");
+/**
+ * Filler that survives a move, so git scores the move a rename rather than a
+ * delete and an add.
+ *
+ * Tagged per file, and that is load-bearing rather than tidy. Git pairs a
+ * deletion with an addition by how alike they are and knows nothing about which
+ * `git mv` produced which; give two unrelated files the same filler and they
+ * become 96% matches for each other, so git cheerfully reports this file moving
+ * to that one's destination. Only the case that is *meant* to be a duplication
+ * shares a tag.
+ */
+function bulk(tag: string): string {
+  return Array.from(
+    { length: 30 },
+    (_unused, index) => `export function ${tag}Filler${index}(): number {\n  return ${index};\n}\n`,
+  ).join("");
+}
 
 function git(...args: string[]): void {
   execFileSync("git", args, { cwd: repo, stdio: "ignore" });
@@ -77,7 +89,20 @@ beforeAll(async () => {
   write("src/doomed.ts", "export function doomed(): number {\n  return 4;\n}\n");
   // Bulky on purpose: git calls a move a rename by how much of the file
   // survived it, so a split has to be a small hole in a large file.
-  write("src/splitter.ts", `${BULK}export function stayer(): number {\n  return 5;\n}\n`);
+  write("src/splitter.ts", `${bulk("splitter")}export function stayer(): number {\n  return 5;\n}\n`);
+  // 6. A file that moves carrying a name half the tree also declares. The
+  //    common-method case (#168): `serve` here is `new` or `parse` in the wild.
+  write("src/common.ts", `${bulk("common")}export function serve(): number {\n  return 6;\n}\n`);
+  write("src/alpha.ts", "export function serve(): number {\n  return 61;\n}\n");
+  write("src/beta.ts", "export function serve(): number {\n  return 62;\n}\n");
+  write("src/gamma.ts", "export function serve(): number {\n  return 63;\n}\n");
+  // 7. The trap the guard exists for: a move *and* a rename in one step, where
+  //    the old name survives at the destination only as calls to somebody else's.
+  write("src/trap.ts", `${bulk("trap")}export function capture(text: string): string {\n  return text;\n}\n`);
+  // 8. A file about to be duplicated rather than moved. No symbol on the box,
+  //    so only git's own record can answer for it -- and git's record will be a
+  //    pick between two near-copies.
+  write("src/dup.ts", `${bulk("dup")}export function harvest(): number {\n  return 8;\n}\n`);
   commit("the starting tree");
 
   // 1. A whole file moved, unchanged. Git records this one itself.
@@ -96,7 +121,27 @@ beforeAll(async () => {
   //    dropped on the way. The rest of the file survives, so it is still a
   //    rename; the box's claim did not make the trip.
   git("mv", "src/splitter.ts", "src/engine/splitter.ts");
-  write("src/engine/splitter.ts", BULK);
+  write("src/engine/splitter.ts", bulk("splitter"));
+  // 6. Recorded move, and `serve` is at the destination -- along with three
+  //    other declarations of the same name that have nothing to do with it.
+  git("mv", "src/common.ts", "src/relocated.ts");
+  // 7. Recorded move, and `capture` was renamed to `grab` on the way. It is
+  //    still written three times at the destination, every one of them a call
+  //    into a package this tree does not contain. Mentions, never a declaration.
+  git("mv", "src/trap.ts", "src/trapped.ts");
+  write(
+    "src/trapped.ts",
+    `${bulk("trap")}import { outside } from "outside-lib";\n\n`
+      + "export function grab(text: string): string {\n  return outside.capture(text);\n}\n\n"
+      + "export function grabAll(texts: string[]): string[] {\n  return texts.map((text) => outside.capture(text));\n}\n\n"
+      + "export function grabFirst(texts: string[]): string {\n  return outside.capture(texts[0] ?? \"\");\n}\n",
+  );
+  // 8. Deleted and landed twice. `--find-renames` on its own calls this an
+  //    R100 to whichever copy scores best, indistinguishable from a `git mv`.
+  rmSync(path.join(repo, "src/dup.ts"));
+  // Same tag as `src/dup.ts`: these two are meant to be its near-copies.
+  write("src/dupA.ts", `${bulk("dup")}export function harvest(): number {\n  return 8;\n}\n`);
+  write("src/dupB.ts", `${bulk("dup")}export function harvest(): number {\n  return 80;\n}\n`);
   commit("the refactor");
 
   const { board } = await createDiagram(emptyBoard(), {
@@ -107,11 +152,17 @@ beforeAll(async () => {
       { id: "twin", label: "Twin", ref: "src/twinned.ts#twin" },
       { id: "doomed", label: "Doomed", ref: "src/doomed.ts#doomed" },
       { id: "split", label: "Split", ref: "src/splitter.ts#stayer" },
+      { id: "common", label: "Common", ref: "src/common.ts#serve" },
+      { id: "trap", label: "Trap", ref: "src/trap.ts#capture" },
+      { id: "dup", label: "Dup", ref: "src/dup.ts" },
     ],
     edges: [],
   });
   report = checkDrift(board, createWorkspace(repo), { trail: createGitTrail(repo) });
-});
+  // Same budget the MCP block below asks for. Seven planted refactors, each one
+  // a real git history and a real parse; the default 30s is a machine-load
+  // gamble rather than a statement about this suite.
+}, 120_000);
 
 afterAll(() => {
   if (repo) rmSync(repo, { recursive: true, force: true });
@@ -149,11 +200,149 @@ describe("following a stale ref to where the code went", () => {
     expect(split?.detail).toContain("needs a person");
   });
 
+  /*
+   * #168. A `git mv` used to follow the symbols with rare names and abandon the
+   * ones with common names, out of the same commit and the same file, because a
+   * repo-wide count of the name outranked git's record that this file moved.
+   * They are answers to two different questions and the specific one wins.
+   */
+  it("follows a recorded move even when the name is declared all over the tree", () => {
+    const common = forNode("common");
+    expect(common?.becomes).toBe("src/relocated.ts#serve");
+    expect(common?.via).toBe("rename");
+    expect(common?.detail).toContain("git recorded the rename");
+    // The thing that used to sink it: the name is genuinely ambiguous tree-wide.
+    expect(report.followed.some((entry) => entry.node === "common" && entry.candidates))
+      .toBe(false);
+  });
+
+  /*
+   * The other half of #168, and the reason the rule asks the destination about a
+   * *declaration* rather than about the word. A move and a rename in one step
+   * leaves the old name at the destination as calls into somebody else's
+   * function, and following that would silently re-aim the box at a call site.
+   */
+  it("still refuses a recorded move that renamed the symbol on the way", () => {
+    const trap = forNode("trap");
+    expect(trap?.becomes).toBeUndefined();
+    expect(trap?.via).toBeUndefined();
+    expect(trap?.detail).toContain("needs a person");
+  });
+
+  /*
+   * What #168 cost, and where it was paid back.
+   *
+   * Git's rename record is a similarity verdict, not a receipt. A file deleted
+   * and landed twice reports `R100` to whichever copy scored best, and that used
+   * to be caught downstream by the very ambiguity count #168 overrides -- so
+   * inverting the precedence without moving this guard would have swapped one
+   * silent mis-aim for another. It is asked of git directly now: a source with
+   * more than one continuation is a choice git made, not a move it recorded.
+   */
+  it("refuses a move git had to choose between two copies", () => {
+    expect(forNode("dup")).toBeUndefined();
+  });
+
   it("leaves the finding standing either way", () => {
     // Every node above is still wrong, and a suggestion is not a repair. A
     // followed ref that quietly stopped counting would turn a stale board green.
     expect(report.clean).toBe(false);
-    expect(report.findings.length).toBe(5);
+    expect(report.findings.length).toBe(8);
+  });
+});
+
+/**
+ * The precedence rule of #168, stated against injected trails so each half is
+ * one fact rather than a repository.
+ *
+ * The repo-built cases above prove the rule end to end; these pin *why* it is
+ * asked the way it is. `declaring` giving up is not the same as `declaring`
+ * finding nothing, and the destination is the only one of the two that can tell
+ * the difference.
+ */
+describe("git's record of a move against a count of the name", () => {
+  const anchor = {
+    node: "n",
+    label: "Route",
+    ref: "src/route.rs#parse",
+    path: "src/route.rs",
+    symbol: "parse",
+    name: "parse",
+    kind: "missing-file" as const,
+  };
+
+  it("takes the destination over a tree full of the same name", () => {
+    const [followed] = followAnchors([anchor], {
+      renamedTo: () => "src/router.rs",
+      declaring: () => ["src/query.rs", "src/router.rs", "src/store.rs"],
+      declaresAt: (file, symbol) => file === "src/router.rs" && symbol === "parse",
+    });
+    expect(followed.becomes).toBe("src/router.rs#parse");
+    expect(followed.via).toBe("rename");
+  });
+
+  /*
+   * A name mentioned in more files than the search will parse comes back empty,
+   * which is indistinguishable from a name that is genuinely nowhere. That empty
+   * list used to be read as "the symbol stayed behind" and printed as a split
+   * -- a confident sentence about a refactor that never happened.
+   */
+  it("does not read a search that gave up as a symbol left behind", () => {
+    const [followed] = followAnchors([anchor], {
+      renamedTo: () => "src/router.rs",
+      declaring: () => [],
+      declaresAt: () => true,
+    });
+    expect(followed.becomes).toBe("src/router.rs#parse");
+    expect(followed.detail).not.toContain("was split");
+  });
+
+  it("still calls it a split when the destination really does not declare it", () => {
+    const [followed] = followAnchors([anchor], {
+      renamedTo: () => "src/router.rs",
+      declaring: () => [],
+      declaresAt: () => false,
+    });
+    expect(followed.becomes).toBeUndefined();
+    expect(followed.detail).toContain("needs a person");
+  });
+
+  /*
+   * The search costs a `git grep` and a parse of everything it matched, and
+   * since #168 the common answer does not need it. A big move used to pay that
+   * once per name on its way to an answer git had already given.
+   */
+  it("does not search the tree for a name the move already placed", () => {
+    let searched = 0;
+    followAnchors([anchor], {
+      renamedTo: () => "src/router.rs",
+      declaring: () => {
+        searched += 1;
+        return [];
+      },
+      declaresAt: () => true,
+    });
+    expect(searched).toBe(0);
+  });
+
+  /*
+   * A move is evidence about the file that moved, and nothing else. Without a
+   * recorded rename the destination is never asked about, so this stays the
+   * two-channel follower the measurement allowed.
+   */
+  it("asks the destination nothing when git recorded no move", () => {
+    let asked = 0;
+    const [followed] = followAnchors([anchor], {
+      renamedTo: () => undefined,
+      declaring: () => ["src/query.rs", "src/store.rs"],
+      declaresAt: () => {
+        asked += 1;
+        return true;
+      },
+    });
+    expect(asked).toBe(0);
+    expect(followed.becomes).toBeUndefined();
+    expect(followed.candidates).toEqual(["src/query.rs#parse", "src/store.rs#parse"]);
   });
 });
 
@@ -177,6 +366,7 @@ describe("what the follower will not do", () => {
     const lookalike: Trail = {
       renamedTo: () => undefined,
       declaring: () => [],
+      declaresAt: () => false,
     };
     const followed = followAnchors(
       [{

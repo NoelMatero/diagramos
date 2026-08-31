@@ -1555,6 +1555,34 @@ sorted every answer by where it came from.
 More than one candidate and the follower declines and says why, which is a better
 report than silence and still not an instruction.
 
+**A recorded move outranks a count of the name (#168).** The two channels answer
+different questions and the count used to win both, which broke a `git mv` in
+half: `RouteDef` and `ParamType` followed to the new path, while `new` and
+`parse` were abandoned as "declared in 5 places now" — out of the same commit and
+the same file. The symbols it failed on were exactly the ones with ordinary
+method names, which is to say most methods, and `--repair` landed three of five
+refs and left a partial diff to reconcile by hand.
+
+Git recording *this file* moving to *this path* is evidence about the file. The
+name being common is evidence about the name. So when git records the move, the
+follower asks the destination directly whether it declares the symbol, and takes
+that over anything the tree-wide search has to say. Asking the destination rather
+than consulting the search is what makes it hold for common names: a name
+mentioned in more files than the search will parse comes back empty, and an empty
+result used to be reported as the symbol having stayed behind — a confident
+sentence about a split that never happened.
+
+**The guard survives, and moved to where the fact is made.** It still takes a
+*declaration* at the destination, so a move-and-rename in one step — where the old
+name survives at the far end only as calls into somebody else's function — finds
+nothing and still declines. And git's rename record is a similarity verdict
+rather than a receipt: delete a file, add two near-copies of it, and
+`--find-renames` reports `R100` to whichever scored best, indistinguishable from
+a `git mv`. Copy detection is now asked for in order to be disbelieved — a real
+move leaves the source with one continuation, a duplication leaves it with
+several, and several means git chose. That distinction used to be carried by
+accident by the very count this rule overrides.
+
 **Nothing is rewritten.** The suggestion sits under the finding; the finding still
 counts, `clean` is still false, and the exit code does not move. That restraint is
 the conclusion of the measurement rather than caution for its own sake: a wrong
