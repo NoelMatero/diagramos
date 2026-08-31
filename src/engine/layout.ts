@@ -90,7 +90,12 @@ export interface DiagramPlan {
 
 export const MODEL_GRID_SIZE = 20;
 
-const NODE_FONT_SIZE = 20;
+/**
+ * Node label size. Exported because `viewable.ts` divides it by the render
+ * scale to say how big a label actually arrives, and two copies of this number
+ * would let the warning describe type nobody is looking at.
+ */
+export const NODE_FONT_SIZE = 20;
 const EDGE_LABEL_FONT_SIZE = 16;
 // fontFamily 5 in Excalidraw's FONT_FAMILY map; the editor loads this face,
 // so canvas measureText below measures the genuinely rendered font.

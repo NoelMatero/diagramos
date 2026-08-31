@@ -45,6 +45,8 @@ import { computeHonestGaps } from "../engine/gaps";
 import { loadConverter } from "../engine/convert";
 import { initEngine } from "../engine/parse";
 import { renderBoardToPng } from "../engine/render";
+import { NODE_FONT_SIZE } from "../engine/layout";
+import type { ViewabilityReport } from "../engine/viewable";
 import {
   probeBoard,
   resolveBoardPort,
@@ -642,6 +644,33 @@ function drawTimeNotes(drawn: {
   };
 }
 
+/**
+ * Whether the board just laid out can be looked at, said before anyone renders.
+ *
+ * Two fields, and both are cheap. `size` is one short string on every draw,
+ * because a caller that knows the board is 9,637px wide already knows something
+ * a render was previously the only way to learn. `viewable` carries the verdict,
+ * and it is a sentence only when there is something wrong -- a healthy board
+ * gets six words.
+ *
+ * This is the whole of #183. The session that provoked it drew a board, rendered
+ * it, re-laid it out, rendered it again, split it, and rendered a third time --
+ * $1.94 to discover, at the end, that a 46-node graph does not fit sideways.
+ * Every one of those calls was asking the question this answers for free.
+ */
+function viewableNotes(view: ViewabilityReport): Record<string, unknown> {
+  return {
+    size: `${view.width}x${view.height}`,
+    viewable: !view.note
+      ? `legible \u2014 renders whole at scale ${view.scale}, labels ${view.labelPx}px`
+      // A note on a legible board is the engine explaining a flow it chose, not
+      // a complaint, so it is not shouted at.
+      : view.verdict === "legible"
+        ? view.note
+        : `${view.verdict.toUpperCase()} \u2014 ${view.note}`,
+  };
+}
+
 server.registerTool(
   "create_diagram",
   {
@@ -655,7 +684,13 @@ server.registerTool(
       + "expensive: re-sending a 34-node graph to correct four refs costs ~1,900 tokens to "
       + "communicate four short strings. Change a ref, a state, a claim or a colour with "
       + "edit_diagram, and change the layout flow with relayout_diagram; both leave the rest of the "
-      + "board alone. Use delete_diagram to remove one, not a throwaway graph.",
+      + "board alone. Use delete_diagram to remove one, not a throwaway graph. "
+      + "The response says whether the board it just drew can be READ once rendered: its pixel size, "
+      + "the scale a render will be forced down to, and how big the labels come out at that scale. "
+      + "A big graph often lands as a ribbon whose text renders at 4px, and no image of that is worth "
+      + "paying for. So do not render to find out whether the layout worked -- this already said, and "
+      + "when it says the board is unviewable it also says which single call fixes it. On a first "
+      + "draw with no direction given it goes further and picks the flow that reads; see direction.",
     inputSchema: {
       path: z
         .string()
@@ -691,10 +726,13 @@ server.registerTool(
         .enum(["RIGHT", "DOWN"])
         .optional()
         .describe(
-          "Layout flow. RIGHT by default, and inherited from the board when it already records one, "
-          + "so regenerating a board somebody turned DOWN does not quietly turn it back. To change "
-          + "the flow of a board that already exists, call relayout_diagram instead of re-sending "
-          + "this graph.",
+          "Layout flow. Inherited from the board when it already records one, so regenerating a "
+          + "board somebody turned DOWN does not quietly turn it back. To change the flow of a board "
+          + "that already exists, call relayout_diagram instead of re-sending this graph. "
+          + "Omit it on a board being drawn for the first time and the flow is chosen by measurement: "
+          + "RIGHT is laid out, and if it would render too small to read while DOWN would not, DOWN "
+          + "is drawn instead and the response says so with both sets of numbers. Naming a flow here "
+          + "turns that off -- an explicit RIGHT stays RIGHT however wide it comes out.",
         ),
       name: z.string().optional().describe("Element id prefix; from the title otherwise"),
       append: z
@@ -789,7 +827,17 @@ server.registerTool(
             }
           : {}),
         ...(result.keptHandDrawn ? { keptHandDrawnElements: result.keptHandDrawn } : {}),
-        note: "Call render_diagram to see it.",
+        ...viewableNotes(result.viewable),
+        /*
+         * "Call render_diagram to see it" is wrong advice on a board that cannot
+         * be seen, and it was the advice that cost $1.94: the picture comes back
+         * illegible, the layout gets judged from it anyway, and the next call is
+         * another draw. On an unviewable board the next move is the fix, not the
+         * photograph.
+         */
+        note: result.viewable.verdict === "unviewable"
+          ? "Do not render this yet -- fix the layout first, per viewable above."
+          : "Call render_diagram to see it.",
       });
     }),
 );
@@ -1244,7 +1292,11 @@ server.registerTool(
       "Rasterise a board to PNG and return the image, so you can look at the result and judge "
       + "layout, overlap, and readability directly rather than inferring them from the data. "
       + "One look after the diagram is finished is usually enough; rendering after every tweak "
-      + "costs an image each time.",
+      + "costs an image each time. "
+      + "This is not how you find out whether a board is too big to read -- create_diagram and "
+      + "relayout_diagram both say that in words, before any image exists. A board they called "
+      + "unviewable renders into text a few pixels tall, so a render of it answers nothing and the "
+      + "next call after it is another redraw.",
     inputSchema: {
       path: z.string(),
       // Scale 1 is legible enough to judge layout and overlap, and costs less
@@ -1263,8 +1315,11 @@ server.registerTool(
        * so it asks again, pays again, and gets the same image.
        */
       const fitted = render.scale < render.requested
-        ? ` — scale ${render.requested} would exceed ${render.width >= render.height ? "width" : "height"} ` +
-          `limits, so this is scale ${render.scale.toFixed(2)}; the board is too large to draw sharper`
+        ? ` — scale ${render.requested} would exceed ${render.width >= render.height ? "width" : "height"} `
+          + `limits, so this is scale ${render.scale.toFixed(2)}, which puts ${NODE_FONT_SIZE}px labels at `
+          + `${(NODE_FONT_SIZE * render.scale).toFixed(0)}px. The board is too large to draw sharper, so `
+          + "judging its layout from this image means judging one you cannot read: change the flow or "
+          + "split the graph rather than rendering it again"
         : "";
       return {
         content: [
@@ -1483,7 +1538,9 @@ server.registerTool(
       + "first layout because a redraw felt expensive. "
       + "Every box keeps its id, ref, state, claims, colour and label, and arrows drawn with "
       + "connect_nodes are carried across and re-routed; hand-drawn elements are not moved. The "
-      + "flow is recorded on the board, so a later regenerate does not revert it.",
+      + "flow is recorded on the board, so a later regenerate does not revert it. "
+      + "Like create_diagram, the response says whether the result is legible once rendered, so you "
+      + "can tell whether the flow helped without paying for an image to look at.",
     inputSchema: {
       path: z.string(),
       direction: z
@@ -1513,6 +1570,11 @@ server.registerTool(
       });
       await writeBoard(file, result.board);
       await followBoard(file);
+      // Same reason as create_diagram: sending a caller to look at a board that
+      // renders as grey smears is what the redraw loop is made of.
+      const lookAdvice = result.viewable.verdict === "unviewable"
+        ? "Do not render it yet -- see viewable above."
+        : "Call render_diagram to see it.";
       return text({
         wrote: relativeToWorkspace(file),
         diagram: result.name,
@@ -1521,6 +1583,9 @@ server.registerTool(
         edges: result.edgeCount,
         ...(result.keptHandDrawn ? { keptHandDrawnElements: result.keptHandDrawn } : {}),
         ...(result.connectors ? { connectorsRerouted: result.connectors } : {}),
+        // Whether the flow just tried actually helped, which is the only reason
+        // anybody tries one. Answered without a render (#183).
+        ...viewableNotes(result.viewable),
         /*
          * Three sentences, and each is a different fact the caller cannot see.
          *
@@ -1533,11 +1598,11 @@ server.registerTool(
           ? {
               note:
                 "This board had not recorded a flow, so it does not say what it was laid out in "
-                + `before; it is ${result.direction} now and says so. Call render_diagram to see it.`,
+                + `before; it is ${result.direction} now and says so. ${lookAdvice}`,
             }
           : result.direction === result.wasDirection
-            ? { note: `Already laid out ${result.direction}; nothing moved. Call render_diagram to see it.` }
-            : { note: `Was ${result.wasDirection}. Call render_diagram to see it.` }),
+            ? { note: `Already laid out ${result.direction}; nothing moved. ${lookAdvice}` }
+            : { note: `Was ${result.wasDirection}. ${lookAdvice}` }),
         ...(result.remembered
           ? {}
           : {

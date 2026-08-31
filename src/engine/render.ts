@@ -16,6 +16,9 @@ import { fileURLToPath } from "node:url";
 
 import type { BoardFile } from "./board-file";
 import { excalidrawFontsDir } from "./excalidraw-assets";
+// The display limit and the draw-time verdict divide by the same number, or the
+// warning describes an image nobody will receive. See MAX_SIDE below.
+import { MAX_RENDER_SIDE } from "./viewable";
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "../..");
 const BROWSER_BUNDLE = path.join(ROOT, "vendor/excalidraw-browser.js");
@@ -79,8 +82,11 @@ const MIME_BY_EXT: Record<string, string> = {
  * cannot be drawn at the scale requested is drawn at the largest scale that
  * fits, and the caller is told what it got -- silently returning a smaller
  * image would make two boards look like the same size at different zooms.
+ *
+ * The number itself lives in `viewable.ts`, which divides by it at draw time so
+ * a board is told it is unviewable before anybody pays for the picture (#183).
  */
-const MAX_SIDE = 2000;
+const MAX_SIDE = MAX_RENDER_SIDE;
 
 /**
  * A PNG's pixel dimensions, read from its header.
@@ -189,9 +195,20 @@ export async function renderBoardToPng(
         let used = scale;
         const blob = await api.exportToBlob({
           elements,
-          appState: { ...appState, exportBackground: background, exportPadding: padding },
+          appState: { ...appState, exportBackground: background },
           files: files ?? {},
           mimeType: "image/png",
+          /*
+           * Top level, not on appState.
+           *
+           * `exportToBlob` reads `exportPadding` from its own options and never
+           * looks at the one on appState, so for as long as this was passed
+           * there the option did nothing and every render came out with
+           * Excalidraw's default 10. Found by checking a predicted image size
+           * against a real one: they were off by exactly 28px, twice the
+           * difference between 24 and 10, on every board regardless of content.
+           */
+          exportPadding: padding,
           // The canvas must grow with the scale factor. Returning the
           // unscaled size draws 2x content into a 1x canvas, which silently
           // crops everything outside the top-left quadrant.

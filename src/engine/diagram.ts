@@ -16,13 +16,13 @@ import {
   type BoardDescribes, type LayoutDirection, type NodeState,
 } from "./graph";
 import {
-  planBounds,
   planDiagramLayout,
-  translatePlan,
   type GraphEdge,
   type GraphNode,
   type DiagramLayoutOptions,
+  type LayoutParams,
 } from "./layout";
+import { chooseFlow, reportViewability, type ViewabilityReport } from "./viewable";
 
 /** Vertical breathing room between an existing board and a new diagram. */
 const STACK_GAP = 160;
@@ -279,6 +279,15 @@ export interface CreateDiagramResult {
   replacedDiagrams: string[];
   /** Hand-drawn elements carried through untouched. */
   keptHandDrawn: number;
+  /**
+   * Whether the board just drawn can be looked at.
+   *
+   * Answered here because here is where it is known and free: the layout has
+   * run, so the size is decided, and the render scale follows from the size. It
+   * used to take a render to find out, and a bad answer then cost a redraw and
+   * another render to act on (#183).
+   */
+  viewable: ViewabilityReport;
 }
 
 /**
@@ -311,7 +320,17 @@ export async function createDiagram(
    * it disagree, which is right: an inherited default is only safe while there
    * is one thing to inherit.
    */
-  const direction = params.layout?.direction ?? directionOf(board) ?? DEFAULT_DIRECTION;
+  const asked = params.layout?.direction ?? directionOf(board);
+  const direction = asked ?? DEFAULT_DIRECTION;
+  /*
+   * Whether this call is allowed to pick the flow for itself (#183).
+   *
+   * Only on a first draw: nothing was asked for, nothing is recorded, and there
+   * is no diagram here to rearrange. Anything else and the flow belongs to
+   * somebody -- to the caller who named it, or to whoever turned this board DOWN
+   * last week -- and a tool that overrides either is worse than a wide board.
+   */
+  const mayChooseFlow = asked === undefined && listDiagrams(board).length === 0;
 
   const replacedDiagrams = params.append ? [] : listDiagrams(board).map((summary) => summary.name);
   const target = params.append ? board : clearGeneratedDiagram(board);
@@ -321,23 +340,37 @@ export async function createDiagram(
   const replacedCount = liveElements(board).length - liveElements(target).length;
 
   const prefix = uniquePrefix(target, slugify(params.name ?? params.title ?? "diagram", "diagram"));
-  const plan = await planDiagramLayout(
-    {
-      title: params.title,
-      nodes: params.nodes,
-      edges: params.edges ?? [],
-      layout: { ...params.layout, direction },
-    },
-    { x: 0, y: 0 },
-    prefix,
-  );
-
-  // Drop the new graph clear of whatever survived instead of on top of it.
+  // Held in a variable rather than inlined: the same graph is what the
+  // viewability probe lays out the other way, and a probe fed a different graph
+  // than the one drawn would be measuring somebody else's board.
+  const layoutParams: LayoutParams = {
+    title: params.title,
+    nodes: params.nodes,
+    edges: params.edges ?? [],
+    layout: { ...params.layout, direction },
+  };
   const existing = liveElements(target);
-  if (existing.length > 0) {
-    const bounds = planBounds(plan);
-    translatePlan(plan, -bounds.minX, boardBottom(target) + STACK_GAP - bounds.minY);
-  }
+  const stackBelow = boardBottom(target) + STACK_GAP;
+  /*
+   * The layout, and on a first draw the flow as well.
+   *
+   * `chooseFlow` lays out the flow it was given and keeps it unless it would
+   * render illegibly and the other one would not, so the ordinary board runs
+   * exactly one layout pass and comes out exactly as it did before.
+   */
+  const choice = await chooseFlow({
+    params: layoutParams,
+    direction,
+    prefix,
+    survivors: existing,
+    stackBelow,
+    mayChoose: mayChooseFlow,
+  });
+  const flow = choice.direction;
+  // Already dropped clear of whatever survived instead of on top of it:
+  // chooseFlow has to measure the plan where it will actually sit, so it does
+  // the move rather than measuring one arrangement and writing another.
+  const plan = choice.plan;
 
   const customData = new Map<string, Record<string, unknown>>();
   // Refs are recorded rather than derived from the label, so drift detection
@@ -409,7 +442,7 @@ export async function createDiagram(
       ...(params.complete?.trim() ? { complete: params.complete.trim() } : {}),
       // The default is never written, so every board drawn before direction was
       // recorded stays byte-identical -- and so does one turned back to RIGHT.
-      ...(direction === DEFAULT_DIRECTION ? {} : { direction }),
+      ...(flow === DEFAULT_DIRECTION ? {} : { direction: flow }),
     });
   }
 
@@ -417,6 +450,22 @@ export async function createDiagram(
     customData,
     origin: "diagram",
     diagram: prefix,
+  });
+  const drawn: BoardFile = {
+    ...target,
+    diagramos: currentStamp(),
+    elements: [...target.elements, ...created],
+  };
+  // Measured on the board as it will be written, because that is the thing the
+  // renderer frames -- hand-drawn work beside the graph shrinks the graph too.
+  const viewable = await reportViewability({
+    board: drawn,
+    params: layoutParams,
+    direction: flow,
+    survivors: existing,
+    stackBelow,
+    nodeCount: plan.nodeCount,
+    ...(choice.instead ? { instead: choice.instead } : {}),
   });
   return {
     /*
@@ -426,15 +475,16 @@ export async function createDiagram(
      * keeps "drawn by 0.1.0" from quietly becoming "drawn by 0.3.0" because a
      * box got dragged.
      */
-    board: { ...target, diagramos: currentStamp(), elements: [...target.elements, ...created] },
+    board: drawn,
     prefix,
-    direction,
+    direction: flow,
     nodeCount: plan.nodeCount,
     edgeCount: plan.edgeCount,
     elementCount: created.length,
     replacedCount,
     replacedDiagrams,
     keptHandDrawn: target.elements.filter(isHandDrawn).length,
+    viewable,
   };
 }
 

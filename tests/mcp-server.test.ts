@@ -377,6 +377,56 @@ describe("board MCP server", () => {
     expect(texts).toContain("@needs");
   }, 120_000);
 
+  /*
+   * #183: the price of drawing two boards was $1.94, and none of it went on
+   * drawing. It went on finding out whether what had been drawn could be looked
+   * at -- render, re-lay out, render, split, render. Every one of those calls
+   * asked a question `create_diagram` could already answer, so the test is that
+   * the answer is in the response to the draw itself.
+   */
+  it("says whether the board it drew can be read, without rendering it", async () => {
+    const board = "docs/diagrams/ribbon.excalidraw";
+    const nodes = Array.from({ length: 14 }, (_, index) => ({
+      id: `n${index}`,
+      label: `authentication middleware layer ${index}`,
+    }));
+    const wrote = jsonOf(await call("create_diagram", {
+      path: board,
+      title: "Ribbon",
+      nodes,
+      edges: nodes.slice(1).map((node, index) => ({ from: `n${index}`, to: node.id })),
+      direction: "RIGHT",
+    }));
+
+    // The size, which the layout knew and never said.
+    expect(String(wrote.size)).toMatch(/^\d+x\d+$/);
+    expect(String(wrote.viewable)).toContain("UNVIEWABLE");
+    // Not a suggestion: the other flow was laid out and measured, so the advice
+    // is one call rather than an experiment.
+    expect(String(wrote.viewable)).toContain("relayout_diagram");
+    expect(String(wrote.viewable)).toContain("DOWN");
+    // And it must not send the caller to look at a picture it just said is
+    // unreadable. That instruction is what the loop was made of.
+    expect(String(wrote.note)).not.toContain("Call render_diagram");
+
+    // Taking the advice answers, in the same currency, whether it worked.
+    const turned = jsonOf(await call("relayout_diagram", { path: board, direction: "DOWN" }));
+    expect(String(turned.viewable)).toContain("legible");
+    expect(String(turned.note)).toContain("Call render_diagram");
+  }, 120_000);
+
+  it("keeps quiet about a board that renders fine", async () => {
+    const wrote = jsonOf(await call("create_diagram", {
+      path: "docs/diagrams/tidy.excalidraw",
+      title: "Tidy",
+      nodes: [{ id: "a", label: "A" }, { id: "b", label: "B" }],
+      edges: [{ from: "a", to: "b" }],
+    }));
+    expect(String(wrote.viewable)).toContain("legible");
+    expect(String(wrote.viewable)).not.toContain("split");
+    expect(String(wrote.note)).toContain("Call render_diagram");
+  }, 120_000);
+
   it("refuses a claim word that is not in the vocabulary", async () => {
     const board = "docs/diagrams/bad-claim.excalidraw";
     // Through the schema there is nothing to argue about: the enum rejects it.
