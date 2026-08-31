@@ -35,3 +35,32 @@ plus a live local board for editing them alongside a human.
 - A tool that cannot report its own state forces the caller to guess. When a
   failure comes from an agent misusing a tool, first ask whether the tool made
   the truth observable.
+
+## Running the tests
+
+`npm test` is a three-minute command. It is the gate before you hand work over,
+not a thing to reach for after every edit — a session that runs it eight times
+has spent half an hour watching files it never touched.
+
+- **While you are working, run the files you are working on.** `npm run
+  build:cli` once, then `npx vitest run tests/<file>.test.ts` for as many
+  targeted runs as you like. The build is what `pretest` does; without it four
+  files fail on a stale `out/cli` and the failures look like real ones.
+- **Run the whole suite once**, when the change is finished.
+- **`npm run test:e2e:board` needs `npm run build:viewer` first**, or it tests
+  the last bundle instead of yours. Two minutes, and it drives a real browser —
+  worth it for anything touching `src/viewer`, wasted on anything else.
+
+### A red suite is not always a broken change
+
+Several sessions share this checkout and its worktrees, and vitest saturates the
+machine. Under that load the 30-second timeout in `vitest.config.ts` starts
+firing on files that pass alone: a run measured at 93 seconds idle took 340 with
+four other vitest processes going, and reported eleven failures, every one of
+them a timeout in a file the change never touched.
+
+So before blaming your change, look at *how* it failed. `Test timed out in
+30000ms` in unrelated files is the machine, and re-running costs three more
+minutes to learn the same thing. An assertion failure is yours. If you genuinely
+cannot tell, run the one suspect file alone rather than the suite again, and say
+plainly in your summary what you ran and what you saw.
