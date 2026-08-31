@@ -81,8 +81,20 @@
  * `needs` is refutable and can fail a build. `feeds` confirms only. Both say
  * something the code can answer about the direction they were drawn in, which
  * is what admission turns on -- see the rule above.
+ *
+ * `takes` and `returns` say the most ordinary thing a typed language writes
+ * down: *this function's signature names that type* (#169). Both are refutable,
+ * for the reason `needs` is -- a signature is a closed region, so a type absent
+ * from it is genuinely absent -- and `signature.ts` is written almost entirely
+ * out of the reasons that stops being true.
+ *
+ * Two words rather than one, and this is the one place the split is visible:
+ * collapsing them would make an arrow's orientation carry no information
+ * exactly where a diagram is trying to show flow. `Request -> handler` and
+ * `handler -> Response` are different statements, and one word would confirm
+ * either no matter which way it was drawn.
  */
-export const ARROW_CLAIMS = ["needs", "feeds"] as const;
+export const ARROW_CLAIMS = ["needs", "feeds", "takes", "returns"] as const;
 
 export type ArrowClaim = (typeof ARROW_CLAIMS)[number];
 

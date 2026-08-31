@@ -62,7 +62,18 @@ const KNOWN_EDGE_KINDS = new Set([
   "broken-chain",
   "backwards-edge",
   "built-backwards",
+  "signature-absent",
 ]);
+
+/**
+ * The arrow verdicts that mean **wrong** rather than *worth a look*.
+ *
+ * A set rather than a comparison against one word, which is what this was: a
+ * second refutable kind arrived (#169) and every place that tested `kind ===
+ * "backwards-edge"` would have painted it amber, burying the only two arrow
+ * verdicts worth acting on at once among the maybes.
+ */
+const WRONG_EDGE_KINDS = new Set(["backwards-edge", "signature-absent"]);
 
 /**
  * The subset of the engine's DriftReport the panel reads. Structural on
@@ -78,7 +89,7 @@ export interface DriftView {
   }>;
   edges: Array<{
     from: string; to: string; fromLabel: string; toLabel: string; node: string;
-    /** `backwards-edge` is red, the rest of `KNOWN_EDGE_KINDS` amber, anything else dim. */
+    /** `WRONG_EDGE_KINDS` are red, the rest of `KNOWN_EDGE_KINDS` amber, anything else dim. */
     kind: string;
     /** Shown verbatim when the kind is one this page has never heard of. */
     detail?: string;
@@ -316,12 +327,26 @@ export function tallyOf(report: DriftView): TallyPart[] {
    * how a red finding gets read as a maybe.
    */
   const backwards = report.edges.filter((finding) => finding.kind === "backwards-edge").length;
+  const wrongSignature = report.edges.filter((finding) => finding.kind === "signature-absent").length;
   const unsupported = report.edges.filter(
-    (finding) => finding.kind !== "backwards-edge" && KNOWN_EDGE_KINDS.has(finding.kind),
+    (finding) => !WRONG_EDGE_KINDS.has(finding.kind) && KNOWN_EDGE_KINDS.has(finding.kind),
   ).length;
   if (backwards) {
     parts.push({
       text: `${backwards} ${backwards === 1 ? "arrow" : "arrows"} backwards`,
+      tone: "bad",
+    });
+  }
+  /*
+   * Its own chip rather than added to `backwards`. Both are red and both mean
+   * wrong, and they want different fixes: one arrow points the opposite way to
+   * the import, the other points at a function whose signature does not mention
+   * the type. "2 arrows backwards" would send somebody to turn round an arrow
+   * that is pointing the right way.
+   */
+  if (wrongSignature) {
+    parts.push({
+      text: `${wrongSignature} ${wrongSignature === 1 ? "signature" : "signatures"} disagree`,
       tone: "bad",
     });
   }
@@ -456,10 +481,11 @@ export function rowsOf(report: DriftView): StatusRow[] {
        */
       text: `${name(finding.fromLabel, finding.from)} → ${name(finding.toLabel, finding.to)}`
         + (finding.kind === "backwards-edge" ? " · drawn backwards" : "")
+        + (finding.kind === "signature-absent" ? " · not in the signature" : "")
         + (KNOWN_EDGE_KINDS.has(finding.kind)
           ? ""
           : ` · ${finding.kind}${finding.detail ? `: ${finding.detail}` : ""}`),
-      tone: (finding.kind === "backwards-edge"
+      tone: (WRONG_EDGE_KINDS.has(finding.kind)
         ? "bad"
         : KNOWN_EDGE_KINDS.has(finding.kind) ? "warn" : "dim") as Tone,
       // The finding's own from/to are file paths (the evidence); `node` is the

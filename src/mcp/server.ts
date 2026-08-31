@@ -219,10 +219,10 @@ const edgeSchema = z.object({
       + "break names the hop that stopped holding. Only for arrows whose ends both name symbols.",
     ),
   claim: z
-    .enum(["needs", "feeds"])
+    .enum(["needs", "feeds", "takes", "returns"])
     .optional()
     .describe(
-      "What this arrow asserts, when it asserts anything. Two words, and an arrow may carry one. "
+      "What this arrow asserts, when it asserts anything. Four words, and an arrow may carry one. "
       + "'needs': the from end declares a dependency on the to end — an import, a require, an "
       + "include. Write it ONLY when you have read that line in the code: it is a transcription of "
       + "something you saw, never a guess about what the relationship probably is. Shown on the "
@@ -237,6 +237,18 @@ const edgeSchema = z.object({
       + "-- a value can reach the other end through a callback or a field no reader follows, so "
       + "not finding the flow is never held against the arrow, and there is no red for it. Both "
       + "ends must anchor a symbol (path#symbol), because a file has no result. "
+      + "'takes' and 'returns': the TO end is a function and the FROM end is a type, and the "
+      + "arrow says that function's signature names that type -- 'takes' for a parameter, "
+      + "'returns' for the return type. This is the ordinary shape of a typed diagram (struct "
+      + "Request -> handler(&Request)) and neither needs nor feeds is true of it. Both are "
+      + "CHECKED and both can fail: a function's parameters and return type can be listed in "
+      + "full, so a type absent from both is genuinely absent, and the arrow is reported in red "
+      + "with the signature quoted. Two words rather than one so the arrow's direction still "
+      + "means something -- claim the wrong half and you get told the type is on the other side "
+      + "rather than a red. Nothing is reported either way when the type would have to be "
+      + "recognised under another name (a type alias, an import renamed on the way in): a "
+      + "signature that could be hiding it proves nothing, so the check withholds instead of "
+      + "accusing. The TO end must anchor a symbol and the FROM end must name the type. "
       + "A relationship you cannot point at is an arrow with no claim, which is fine and is what "
       + "most arrows are: an unclaimed arrow is looked for and counted, never judged, so it cannot "
       + "come back as a finding against you. "
@@ -401,27 +413,44 @@ const server = new McpServer(
  * A claim nobody saw go on is a claim nobody can refuse -- the board shows it,
  * and this is for whoever is reading the transcript rather than the canvas.
  *
- * Grouped by word rather than counted together, because the two words carry
- * opposite consequences: `needs` can come back wrong and fail a build, `feeds`
- * can only ever come back confirmed. One sentence covering both would tell an
- * author the wrong thing about half of what they wrote.
+ * Grouped by word rather than counted together, because the words carry
+ * different consequences: `needs`, `takes` and `returns` can come back wrong and
+ * fail a build, `feeds` can only ever come back confirmed. One sentence covering
+ * all of them would tell an author the wrong thing about most of what they wrote.
+ *
+ * A table rather than a conditional, because a conditional had a default: the
+ * `else` branch said the `feeds` sentence, so adding a word (#169) would have
+ * quietly promised an author that their refutable claim could never fail. There
+ * is no default here, and a word with no entry says nothing beyond the count --
+ * which is wrong but not a lie.
  */
+const CLAIM_CONSEQUENCE: Record<string, string> = {
+  needs:
+    " Each one is now checked for direction: an arrow drawn against the dependency is reported"
+    + " as backwards.",
+  feeds:
+    " Each one is now checked by looking for the flow — a function binding the first result and"
+    + " passing it into the second. Finding it confirms the arrow; not finding it is counted and"
+    + " never held against it.",
+  takes:
+    " Each one is now read off the signature: if the parameters of the to end do not name the"
+    + " from end's type, the arrow is reported in red with the signature quoted. Nothing is"
+    + " reported either way when the type could be written there under another name.",
+  returns:
+    " Each one is now read off the signature: if the return type of the to end does not name the"
+    + " from end's type, the arrow is reported in red with the signature quoted. Nothing is"
+    + " reported either way when the type could be written there under another name.",
+};
+
 function claimNote(arrows: ReadonlyArray<{ claim?: string }>): { claims?: string } {
   const byWord = new Map<string, number>();
   for (const arrow of arrows) {
     if (arrow.claim) byWord.set(arrow.claim, (byWord.get(arrow.claim) ?? 0) + 1);
   }
   if (byWord.size === 0) return {};
-  const said = [...byWord].map(([word, count]) => {
-    const opening = `${count} ${count === 1 ? "arrow claims" : "arrows claim"} ${word}, `
-      + `shown on the board as @${word}.`;
-    return word === "needs"
-      ? `${opening} Each one is now checked for direction: an arrow drawn against the dependency`
-        + " is reported as backwards."
-      : `${opening} Each one is now checked by looking for the flow — a function binding the first`
-        + " result and passing it into the second. Finding it confirms the arrow; not finding it is"
-        + " counted and never held against it.";
-  });
+  const said = [...byWord].map(([word, count]) =>
+    `${count} ${count === 1 ? "arrow claims" : "arrows claim"} ${word}, `
+    + `shown on the board as @${word}.${CLAIM_CONSEQUENCE[word] ?? ""}`);
   return { claims: said.join(" ") };
 }
 
@@ -1255,10 +1284,10 @@ server.registerTool(
             label: z.string().optional(),
             bidirectional: z.boolean().optional(),
             claim: z
-              .enum(["needs", "feeds"])
+              .enum(["needs", "feeds", "takes", "returns"])
               .optional()
               .describe(
-      "What this arrow asserts, when it asserts anything. Two words, and an arrow may carry one. "
+      "What this arrow asserts, when it asserts anything. Four words, and an arrow may carry one. "
       + "'needs': the from end declares a dependency on the to end — an import, a require, an "
       + "include. Write it ONLY when you have read that line in the code: it is a transcription of "
       + "something you saw, never a guess about what the relationship probably is. Shown on the "
@@ -1273,6 +1302,18 @@ server.registerTool(
       + "-- a value can reach the other end through a callback or a field no reader follows, so "
       + "not finding the flow is never held against the arrow, and there is no red for it. Both "
       + "ends must anchor a symbol (path#symbol), because a file has no result. "
+      + "'takes' and 'returns': the TO end is a function and the FROM end is a type, and the "
+      + "arrow says that function's signature names that type -- 'takes' for a parameter, "
+      + "'returns' for the return type. This is the ordinary shape of a typed diagram (struct "
+      + "Request -> handler(&Request)) and neither needs nor feeds is true of it. Both are "
+      + "CHECKED and both can fail: a function's parameters and return type can be listed in "
+      + "full, so a type absent from both is genuinely absent, and the arrow is reported in red "
+      + "with the signature quoted. Two words rather than one so the arrow's direction still "
+      + "means something -- claim the wrong half and you get told the type is on the other side "
+      + "rather than a red. Nothing is reported either way when the type would have to be "
+      + "recognised under another name (a type alias, an import renamed on the way in): a "
+      + "signature that could be hiding it proves nothing, so the check withholds instead of "
+      + "accusing. The TO end must anchor a symbol and the FROM end must name the type. "
       + "A relationship you cannot point at is an arrow with no claim, which is fine and is what "
       + "most arrows are: an unclaimed arrow is looked for and counted, never judged, so it cannot "
       + "come back as a finding against you. "

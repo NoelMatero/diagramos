@@ -362,9 +362,43 @@ dangerous — write it only from a line you read. `feeds` is safe and weaker:
 write it wherever the arrow really means a pipeline, and the check will confirm
 the ones it can see.
 
-The two are mutually exclusive on one arrow: an arrow asserts one thing, and two
-claims is one unanswered question about which was meant, which the check refuses
-rather than resolving.
+#### `claim: "takes"` / `claim: "returns"` — that function's signature names this type
+
+The most ordinary arrow on a typed diagram is neither of the two above. You draw
+a box for a type and a box for a function, and what you mean is *that function's
+signature mentions this type*:
+
+```
+edges: [
+  { from: "request", to: "handler", claim: "takes" },
+  { from: "get_client", to: "client", claim: "returns" },
+]
+```
+
+The `to` end is the function and the `from` end is the type, so the arrow points
+the way the data flows. `takes` reads the parameters; `returns` reads the return
+type. The `to` end must anchor a symbol (`path#symbol`) and the `from` end must
+name the type.
+
+**Both can come back red.** A function's parameters and return type can be
+listed in full, so a type absent from both is genuinely absent — there is no
+helper or macro for it to hide behind. The report names the arrow and quotes the
+signature it read.
+
+The two words are separate so the arrow's direction still carries information.
+Claim the wrong half and you do not get a red: you get told the type is on the
+other side, which usually means the arrow is drawn the wrong way round.
+
+Nothing is reported either way when the type could be written under a different
+name — a type alias, or an import renamed on the way in. A signature that might
+be hiding it proves nothing, so the check withholds instead of accusing.
+
+So the same rule as `needs` applies, for the same reason: write it from a
+signature you read.
+
+The claims are mutually exclusive on one arrow: an arrow asserts one thing, and
+two claims is one unanswered question about which was meant, which the check
+refuses rather than resolving.
 
 #### `closed: {}` — nothing outside reaches into this box
 

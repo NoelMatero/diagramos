@@ -46,6 +46,7 @@ import { licenceFor } from "./licence";
 import { languageOf, type Language } from "./parse";
 import { ledgerAdditions, type Ledger } from "./ledger";
 import { checkNeeds, type NeedsWithheld } from "./needs";
+import { signatureNames, type SignatureWithheld } from "./signature";
 import { resolveDependency, type ConfigCache } from "./resolve";
 import type { Workspace } from "./workspace";
 
@@ -148,7 +149,19 @@ export type EdgeFindingKind =
   | "unsupported-edge"
   | "broken-chain"
   | "backwards-edge"
-  | "built-backwards";
+  | "built-backwards"
+  /**
+   * A `takes` or `returns` arrow whose signature does not name the type (#169).
+   *
+   * The second member here that means **wrong** rather than *worth a look*, and
+   * admitted on the same grounds as `backwards-edge`: a function's parameters
+   * and return type can be enumerated, so a type absent from both is genuinely
+   * absent rather than merely unfound. `signature.ts` refuses to answer at all
+   * on any signature where that stops holding -- a type alias, a renamed import
+   * -- because the cost of being wrong here is the tool telling somebody their
+   * correct diagram is wrong.
+   */
+  | "signature-absent";
 
 /**
  * Every verdict word this engine can put in a report, as data (#116).
@@ -184,6 +197,7 @@ export const EDGE_FINDING_KINDS = [
   "broken-chain",
   "backwards-edge",
   "built-backwards",
+  "signature-absent",
 ] as const satisfies readonly EdgeFindingKind[];
 
 /*
@@ -418,7 +432,20 @@ export type EdgeUnconfirmedReason =
    * disproof. What it is, is a named line somebody can go and read -- which is
    * more use than a colour.
    */
-  | "feeds-runs-the-other-way";
+  | "feeds-runs-the-other-way"
+  /**
+   * A `takes` or `returns` arrow whose type is in the *other* half of the
+   * signature (#169).
+   *
+   * Not a refutation, and the strongest thing here that is not one: it rests on
+   * a name that was found rather than on one that was missing. The type is
+   * there, so the relationship the arrow draws is real -- it is the position
+   * that is wrong, which usually means the arrow is drawn the other way round.
+   * Kept out of `findings` because "your arrow points the wrong way for this
+   * word" is a thing a reader should look at and decide, not a thing that fails
+   * a build.
+   */
+  | "signature-other-half";
 
 /**
  * Why an arrow came back unconfirmed, in words -- the one place they are written.
@@ -443,6 +470,7 @@ export const UNCONFIRMED_WORDS: Record<EdgeUnconfirmedReason, string> = {
   "an-end-is-data": "an end names data, not something that runs — anchor that end at file level",
   "nothing-connects-them": "no import, shared importer or shared route connects them",
   "feeds-runs-the-other-way": "the only flow found runs the other way",
+  "signature-other-half": "the type is in the other half of the signature — the arrow may be the wrong way round",
 };
 
 /**
@@ -635,6 +663,31 @@ export interface ClaimTally {
   needs: number;
   /** Arrows asserting that the tail's result goes into the head. */
   feeds: number;
+  /** Arrows asserting that the head's parameters name the tail's type. */
+  takes: number;
+  /** Arrows asserting that the head's return type names the tail's type. */
+  returns: number;
+  /**
+   * Of those, how many the signature actually said so.
+   *
+   * One number for both words: the question "is this board's typing being held
+   * to anything" is one question, and splitting it would make a summary that
+   * nobody can read the total off. Which word an individual arrow carried is on
+   * the arrow.
+   */
+  signatureConfirmed: number;
+  /**
+   * Why the rest got no verdict, by reason.
+   *
+   * `absent` is not in here -- unlike `feeds`, an absence is a finding for these
+   * two words, and it is in `edges` where a finding belongs. What lands here is
+   * every reason `signature.ts` declined to look, and `aliased` is the one worth
+   * watching: it is the refusal that exists because a name in a signature can
+   * stand for something else, and it is the price of being allowed to refute at
+   * all. Measured across this repository and rust-test it fired on 58 of 643
+   * functions.
+   */
+  signatureWithheld: SkipBreakdown<SignatureWithheld | "misplaced" | EdgeSkipReason>;
   /**
    * Of those, how many were confirmed by a flow somebody can go and read.
    *
@@ -1556,6 +1609,17 @@ function poolShows(pool: Set<string>, route: string): boolean {
  * the whole of concept membership: a box's `refs` are the symbols whose
  * invocation counts as using it, and one caller naming any member is enough.
  */
+/**
+ * A label as one line, for a sentence that has to contain it.
+ *
+ * Box labels carry the newlines the author typed, which is right on a canvas and
+ * wrong inside prose: a finding that quotes a four-line label breaks its own
+ * sentence in half and the reader loses the thread of the accusation.
+ */
+function oneLine(label: string): string {
+  return label.replace(/\s+/g, " ").trim();
+}
+
 function symbolsOf(node: { ref?: string; refs?: string[] }, file: string): string[] {
   if (!languageOf(file)) return [];
   const anchors = [node.ref, ...(node.refs ?? [])];
@@ -1981,6 +2045,7 @@ export function checkDrift(
     closed: 0, closedHeld: 0, closedTestReaches: 0,
     complete: 0, completeHeld: 0,
     needs: 0, needsChecked: 0, needsWithheld: {},
+    takes: 0, returns: 0, signatureConfirmed: 0, signatureWithheld: {},
     feeds: 0, feedsConfirmed: 0, feedsWithheld: {},
     plannedWithheld: {},
   };
@@ -3007,6 +3072,118 @@ export function checkDrift(
       const fromEnd = { file: fromFile, path: fromPath, symbols: symbolsOf(fromNode, fromFile) };
       const toEnd = { file: toFile, path: toPath, symbols: symbolsOf(toNode, toFile) };
       const bothNamed = fromEnd.symbols.length > 0 && toEnd.symbols.length > 0;
+
+      /*
+       * `@takes` / `@returns`: does the head's signature name the tail's type?
+       *
+       * Placed with `needs` rather than with `feeds`, because it belongs to the
+       * same family: it can say **wrong**. The tail is a type and the head is a
+       * function, so the arrow reads head-inward -- `Request -> user_handler`,
+       * which is the direction an agent draws dataflow -- and the question is
+       * asked of the head's declaration.
+       *
+       * Three answers and they are three different kinds of thing. Naming the
+       * type in the claimed half confirms the arrow. Naming it in the other half
+       * is `signature-other-half`, counted and named and never a finding: the
+       * relationship is real and the position is wrong, which is a thing to look
+       * at rather than a thing to fail a build over. Not naming it anywhere, in
+       * a signature every name of which means itself, is the finding -- and
+       * `signature.ts` withholds on every signature where that last clause stops
+       * being true.
+       *
+       * A `planned` arrow is refused the accusation and keeps the confirmation,
+       * the same way `needs` is: sketching a signature that does not exist yet is
+       * the entire point of a plan, and a red finding about it would be a lie
+       * about one.
+       */
+      const signatureClaim = edge.claim === "takes" || edge.claim === "returns"
+        ? edge.claim
+        : undefined;
+      if (signatureClaim && (claimed || edge.state === "planned")) {
+        const position = signatureClaim === "takes" ? "parameter" as const : "return" as const;
+        const language = languageOf(toFile);
+        const noteWithheld = (why: SignatureWithheld | "misplaced" | EdgeSkipReason) => {
+          if (claimed) claims.signatureWithheld[why] = (claims.signatureWithheld[why] ?? 0) + 1;
+        };
+
+        if (toEnd.symbols.length === 0 || fromEnd.symbols.length === 0) {
+          // One end anchors a file rather than a name, so there is no signature
+          // to read or no type name to look for. The node check already says
+          // what a bare path is; this only declines to guess.
+          noteWithheld("endpoint-has-no-ref");
+        } else if (!language) {
+          noteWithheld("unreadable");
+        } else {
+          const verdict = signatureNames(
+            workspace.read(toFile), toEnd.symbols[0]!, fromEnd.symbols, position, language,
+          );
+
+          if (verdict.verdict === "confirmed") {
+            if (claimed) claims.signatureConfirmed += 1;
+            edgesChecked += 1;
+            recordEdge(edge, fromNode, toNode, { kind: "confirmed" });
+            continue;
+          }
+          if (verdict.verdict === "misplaced") {
+            noteWithheld("misplaced");
+            edgesChecked += 1;
+            const { evidence } = verdict;
+            const claimedHalf = position === "parameter" ? "takes" : "returns";
+            const otherHalf = position === "parameter" ? "returns" : "takes";
+            recordEdge(edge, fromNode, toNode, {
+              kind: "unconfirmed",
+              reason: "signature-other-half",
+              detail:
+                `this arrow says ${oneLine(toNode.label) || toPath} ${claimedHalf} `
+                + `${oneLine(fromNode.label) || fromPath}, and the signature names it on the other side: `
+                + `${toPath} line ${evidence.line} is \`${evidence.signature}\`. `
+                + `Either the arrow wants @${otherHalf}, or it is drawn the wrong way round.`,
+            });
+            continue;
+          }
+          if (verdict.verdict === "withheld") {
+            noteWithheld(verdict.why);
+          } else if (edge.state === "planned") {
+            /*
+             * A plan whose signature has not been written yet. Counted so the
+             * report can say the question was asked, and then left alone: the
+             * ordinary channels below decide whether the arrow promotes.
+             */
+            noteWithheld("no-function-body");
+          } else {
+            edgesChecked += 1;
+            const claimedHalf = position === "parameter" ? "parameters" : "return type";
+            /*
+             * A claim written this turn gets its own opening, for the reason the
+             * `needs` accusation does: the first check to see it runs moments
+             * after an agent wrote it, and a bare "this is wrong" then reads as
+             * the tool accusing somebody of something it wrote itself.
+             */
+            const wasClaimed = baselineGraph?.edges.some(
+              (was) => was.from === edge.from && was.to === edge.to
+                && was.claim === signatureClaim,
+            );
+            const fresh = baselineGraph !== undefined && !wasClaimed;
+            recordEdge(edge, fromNode, toNode, { kind: "finding", finding: {
+              from: fromPath,
+              to: toPath,
+              fromLabel: fromNode.label,
+              toLabel: toNode.label,
+              fromRef,
+              toRef,
+              kind: "signature-absent",
+              detail:
+                (fresh ? "a claim written this turn is already wrong: " : "")
+                + `this arrow says the ${claimedHalf} of ${oneLine(toNode.label) || toPath} `
+                + `${signatureClaim === "takes" ? "take" : "return"} `
+                + `${oneLine(fromNode.label) || fromPath}, and ${toPath} line ${verdict.line} declares `
+                + `\`${verdict.signature}\`, which does not name it. `
+                + `Either the arrow points at the wrong function, or the signature changed.`,
+            } });
+            continue;
+          }
+        }
+      }
 
       /*
        * A named route is checked as written, and never falls back.
