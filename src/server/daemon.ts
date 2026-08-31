@@ -19,7 +19,8 @@ import path from "node:path";
 import { fileURLToPath } from "node:url";
 
 import { probeBoard, type BoardProbe } from "./board-server";
-import { listServers, registryDir, type RegisteredServer } from "./server-registry";
+import { staleService } from "./build-identity";
+import { listServers, registryDir, stopServer, type RegisteredServer } from "./server-registry";
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "../..");
 
@@ -93,6 +94,15 @@ export interface EnsuredServer {
   /** Whether this call is what started it. Worth saying out loud the first time. */
   started: boolean;
   probe?: BoardProbe;
+  /**
+   * Services stopped because they were the wrong build, one sentence each.
+   *
+   * Surfaced rather than swallowed: a board that blinked and came back is
+   * something the person watching it deserves an explanation for, and the
+   * explanation is also the answer to "why was my diagram covered in errors a
+   * minute ago".
+   */
+  retired?: string[];
 }
 
 /**
@@ -133,8 +143,19 @@ function servesRoot(entry: RegisteredServer, root: string): boolean {
 export async function ensureBoardServer(options: EnsureOptions): Promise<EnsuredServer> {
   const root = await normalizeRoot(options.root);
 
+  /*
+   * Before anything else, get rid of a service for this project that is not
+   * this build. It is not merely out of date -- it answers questions, and it
+   * answers them with the vocabulary it shipped with, so a board using a word
+   * added since is reported as malformed rather than as fine (#181).
+   *
+   * Stopping loses nothing: a board service holds no state a file does not, and
+   * the replacement is up before this function returns.
+   */
+  const retired = await retireStale(root);
+
   const existing = await findServing(root);
-  if (existing) return { ...existing, started: false };
+  if (existing) return { ...existing, started: false, ...(retired.length ? { retired } : {}) };
 
   /*
    * Nothing serves this project yet, but something may serve another one. Ask it
@@ -143,7 +164,7 @@ export async function ensureBoardServer(options: EnsureOptions): Promise<Ensured
    * `diagramos stop` a single answer instead of a list.
    */
   const adopted = await adoptInto(root);
-  if (adopted) return { ...adopted, started: false };
+  if (adopted) return { ...adopted, started: false, ...(retired.length ? { retired } : {}) };
 
   /*
    * Only one starter at a time. Two sessions opening a board in the same second
@@ -155,11 +176,49 @@ export async function ensureBoardServer(options: EnsureOptions): Promise<Ensured
   try {
     // Someone may have won the lock and started one while we waited for it.
     const raced = (await findServing(root)) ?? (await adoptInto(root));
-    if (raced) return { ...raced, started: false };
-    return { ...(await spawnService(root, options)), started: true };
+    if (raced) return { ...raced, started: false, ...(retired.length ? { retired } : {}) };
+    return { ...(await spawnService(root, options)), started: true, ...(retired.length ? { retired } : {}) };
   } finally {
     await release();
   }
+}
+
+/**
+ * Stops any service for this project that is not this build.
+ *
+ * Scoped to services that serve *this* project, not every stale service on the
+ * machine. Killing one that serves somebody else's repository would take down a
+ * board nobody asked about, and this call was asked about one project.
+ *
+ * A service serving several projects, one of which is ours, is stopped anyway:
+ * it was giving all of them the same wrong answers, and each one gets a correct
+ * service back the next time it is asked for.
+ */
+async function retireStale(root: string): Promise<string[]> {
+  const { running } = await listServers();
+  const retired: string[] = [];
+  for (const entry of running) {
+    if (!servesRoot(entry, root)) continue;
+    const why = staleService(entry.build);
+    if (!why) continue;
+    const { how } = await stopServer(entry);
+    /*
+     * `refused` means it is this process or the one that started it -- an
+     * in-process server, or the terminal we were typed into. Neither is a
+     * detached service that outlived its install, and signalling either would
+     * be worse than the staleness.
+     */
+    if (how === "refused") continue;
+    /*
+     * `gone` means somebody else got there first -- two callers can retire the
+     * same service in the same moment. Claiming to have stopped it would put a
+     * line in front of a person for something that did not happen on their
+     * behalf, and this listing is only worth having if every line is true.
+     */
+    if (how === "gone") continue;
+    retired.push(`stopped the board service on port ${entry.port} because ${why}`);
+  }
+  return retired;
 }
 
 /**
@@ -174,6 +233,9 @@ export async function findServing(root: string): Promise<{ port: number; pid: nu
   const resolved = await normalizeRoot(root);
   const { running } = await listServers();
   for (const entry of running.filter((candidate) => servesRoot(candidate, resolved))) {
+    // A service of another build is not a service for this caller. It answers,
+    // and that is the problem: it answers as the build it is.
+    if (staleService(entry.build)) continue;
     const probe = await probeBoard(entry.port);
     // Registered but not answering: the process is alive and the port is not,
     // which is a service still starting or one wedged. Either way it is not a
@@ -201,6 +263,9 @@ async function adoptInto(root: string): Promise<{ port: number; pid: number; pro
   // beats spreading them over whichever happened to start last.
   for (const entry of running) {
     if (!entry.token) continue;
+    // Handing this project to a service of another build is how a project that
+    // had no stale service acquires one.
+    if (staleService(entry.build)) continue;
     const probe = await probeBoard(entry.port);
     // A service that cannot say what it serves cannot be asked to serve more.
     if (!probe?.multiBoard || probe.roots === undefined) continue;

@@ -523,3 +523,42 @@ describe("boxes shown as built before the turn recorded them", () => {
     expect(livePromotionNote(3)).toBe("3 shown early — not recorded until the turn ends");
   });
 });
+
+/**
+ * The board page's reading of a claim word it does not have (#181).
+ *
+ * This is where the bug was actually seen. A service left running by an older
+ * install served the page "4 unreadable" in red over four arrows that were
+ * perfectly good, while the terminal — a fresh process on the same file — said
+ * the board was fine. The page has to be able to tell the two apart, or fixing
+ * the engine's wording fixes a sentence nobody reads.
+ */
+describe("a claim word this build does not have", () => {
+  const written = { on: "arrow", label: "Request → handler", written: "takes" };
+
+  it("blames the board when the board is not from the future", () => {
+    const report = reportWith({ clean: false, garbledClaims: [written] });
+    expect(tallyOf(report)).toContainEqual({ text: "1 unreadable", tone: "bad" });
+    expect(rowsOf(report)[0]?.text).toMatch(/@takes is not a claim/);
+  });
+
+  it("blames the build when the board says it was drawn by a newer one", () => {
+    const report = reportWith({
+      clean: false,
+      garbledClaims: [{ ...written, cause: "older-build" }],
+    });
+    // Not a count. The cause is the whole board's, and "1 unreadable" over a
+    // correct diagram is what sent somebody looking for a typo that was not
+    // there.
+    expect(tallyOf(report)).toContainEqual({ text: "board drawn by a newer diagramos", tone: "bad" });
+    expect(rowsOf(report)[0]?.text).toMatch(/@takes is a claim this build does not have — update diagramos/);
+  });
+
+  it("stays red either way, because nothing checked the claim", () => {
+    const report = reportWith({
+      clean: false,
+      garbledClaims: [{ ...written, cause: "older-build" }],
+    });
+    expect(worstToneOf(rowsOf(report))).toBe("bad");
+  });
+});

@@ -120,6 +120,9 @@ if (listOnly) {
         `pid ${String(entry.pid).padEnd(7)}`,
         `port ${String(entry.port).padEnd(6)}`,
         `up ${age(entry.startedAt).padEnd(11)}`,
+        // Which build is answering for these boards. A service outlives the
+        // install that started it, so this is not the version you have (#181).
+        `${(entry.build?.version ?? "pre-0.2.0-rc.6").padEnd(14)}`,
         projects[0] ?? "no project",
         entry.owner ? `(owned by pid ${entry.owner})` : "",
       ]
@@ -128,7 +131,7 @@ if (listOnly) {
     );
     // Adopted projects underneath, so a service covering four repositories does
     // not look like one covering the first.
-    for (const project of projects.slice(1)) console.log(`${" ".repeat(38)}${project}`);
+    for (const project of projects.slice(1)) console.log(`${" ".repeat(56)}${project}`);
   }
   console.log("");
   console.log("diagramos stop  stops all of them");

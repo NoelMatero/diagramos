@@ -79,3 +79,95 @@ export function currentStamp(): BoardStamp {
 export function schemaOf(stamp: BoardStamp | undefined): number {
   return typeof stamp?.schema === "number" ? stamp.schema : 1;
 }
+
+/**
+ * Semver ordering, enough of it to answer "is that board newer than me".
+ *
+ * Hand-written rather than a dependency because one question is asked of it:
+ * whether a version string from somewhere else is ahead of this build's. The
+ * prerelease rule is the part worth having and the part a naive string compare
+ * gets wrong -- `0.2.0-rc.10` sorts before `0.2.0-rc.9` as text, and
+ * `0.2.0-rc.5` sorts *after* `0.2.0` as text when it precedes it in fact. This
+ * whole line has shipped as `-rc.N`, so both mistakes were live.
+ *
+ * Anything unparseable compares equal to everything, which is the safe answer:
+ * "newer" is what unlocks an excuse, and a version nobody can read should not
+ * earn one.
+ */
+function parts(version: string): { release: number[]; pre: string[] } | undefined {
+  const match = /^v?(\d+)\.(\d+)\.(\d+)(?:-([0-9A-Za-z.-]+))?/.exec(version.trim());
+  if (!match) return undefined;
+  return {
+    release: [Number(match[1]), Number(match[2]), Number(match[3])],
+    pre: match[4] ? match[4].split(".") : [],
+  };
+}
+
+/** -1, 0 or 1, and 0 whenever either side cannot be read. */
+export function compareVersions(left: string, right: string): number {
+  const a = parts(left);
+  const b = parts(right);
+  if (!a || !b) return 0;
+  for (let index = 0; index < 3; index += 1) {
+    if (a.release[index] !== b.release[index]) return a.release[index] < b.release[index] ? -1 : 1;
+  }
+  // A prerelease precedes the release it leads to: 0.2.0-rc.5 < 0.2.0.
+  if (a.pre.length === 0 || b.pre.length === 0) {
+    if (a.pre.length === b.pre.length) return 0;
+    return a.pre.length === 0 ? 1 : -1;
+  }
+  for (let index = 0; index < Math.max(a.pre.length, b.pre.length); index += 1) {
+    const one = a.pre[index];
+    const two = b.pre[index];
+    // A shorter set of identifiers precedes a longer one with the same prefix.
+    if (one === undefined) return -1;
+    if (two === undefined) return 1;
+    if (one === two) continue;
+    const numeric = /^\d+$/.test(one) && /^\d+$/.test(two);
+    if (numeric) return Number(one) < Number(two) ? -1 : 1;
+    // Numeric identifiers rank below alphanumeric ones, per semver.
+    if (/^\d+$/.test(one)) return -1;
+    if (/^\d+$/.test(two)) return 1;
+    return one < two ? -1 : 1;
+  }
+  return 0;
+}
+
+/**
+ * Whether a board was drawn by a build ahead of this one.
+ *
+ * The question `claim.ts` cannot answer on its own. The claim whitelist is
+ * closed, and falling off it is loud on purpose -- but "this word is not a
+ * claim" and "this word is not a claim *yet, here*" are different facts, and an
+ * old build shipping the first about a board that deserves the second invents a
+ * red on a diagram that is completely fine (#181).
+ *
+ * An unstamped board is not newer: stamping began mid-line, so absence means
+ * old, exactly as `schemaOf` reads it.
+ */
+export function boardIsNewer(stamp: BoardStamp | undefined): boolean {
+  const written = typeof stamp?.version === "string" ? stamp.version : undefined;
+  if (!written) return false;
+  return compareVersions(written, TOOL_VERSION) > 0;
+}
+
+/**
+ * What to say about a word this build does not have, on a board a newer build
+ * drew.
+ *
+ * `shown` is the word as its own vocabulary spells it -- `@needs` for an arrow,
+ * `closed` for a box -- because a reader matching the message against the board
+ * should not have to know that one of them carries the `@` and the other does
+ * not.
+ *
+ * Still a finding, and still loud: nothing checked the claim, and that remains
+ * true whoever's fault it is. What changes is the diagnosis. "This is not a
+ * word" told an author to go and fix a board that was already correct; this
+ * tells them their tool is behind, which is both true and the thing they can
+ * act on.
+ */
+export function newerBuildClaimError(shown: string, stamp: BoardStamp | undefined): string {
+  return `"${shown}" is not a word this build knows, but this board was drawn by diagramos `
+    + `${stamp?.version} and you are running ${TOOL_VERSION}. It is almost certainly a claim added `
+    + `since. Nothing checked it here — update diagramos rather than changing the board.`;
+}

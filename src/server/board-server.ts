@@ -26,6 +26,7 @@ import { createLedger, gitKnown } from "../engine/ledger";
 import { generatedRef } from "../engine/generated";
 import { checkDrift, createGitBaseline, createWorkspace, findBoards } from "../engine/drift";
 import { initEngine } from "../engine/parse";
+import { buildIdentity } from "./build-identity";
 import { processAlive, registerServer, updateServer } from "./server-registry";
 import { boardsPage } from "./boards-page";
 import { watchCode, type CodeWatch } from "./code-watch";
@@ -320,6 +321,14 @@ export async function startBoardServer(options: BoardServerOptions): Promise<Run
   const root = options.root ? await realPathOf(path.resolve(options.root)) : undefined;
   let file = await realPathOf(path.resolve(options.file));
   const startedAt = new Date().toISOString();
+  /*
+   * Which build this is, read as early as this process can say it truthfully.
+   * A rebuild landing between the module load above and this line would be
+   * recorded as ours and never noticed -- a window of milliseconds against a
+   * mistake that self-corrects on the next rebuild, which is a better trade
+   * than a top-level directory walk on every import of this module.
+   */
+  const build = buildIdentity();
   /*
    * Every project this service will serve. It starts as the one it was told
    * about and grows when another asks to be adopted, which is what lets one
@@ -690,6 +699,9 @@ export async function startBoardServer(options: BoardServerOptions): Promise<Run
           // ignores the query and silently serves the wrong board.
           multiBoard: true,
           boards: [...boards.keys()],
+          // So "which build is answering me" is a question anything can ask,
+          // including a page and including a tool that cannot read the registry.
+          version: build.version,
         });
       }
 
@@ -1078,6 +1090,9 @@ export async function startBoardServer(options: BoardServerOptions): Promise<Run
     startedAt,
     ...(options.ownerPid ? { owner: options.ownerPid } : {}),
     ...(options.startedBy ? { startedBy: options.startedBy } : {}),
+    // Recorded here, at the one moment it is certainly true: this process has
+    // already loaded its code and cannot pick up a rebuild afterwards.
+    build,
   });
 
   /*
@@ -1189,6 +1204,11 @@ export interface BoardProbe {
   roots?: string[];
   /** ISO 8601, so a listing can say how long it has been running. */
   startedAt?: string;
+  /**
+   * The npm version it is running. Absent on a service from before builds
+   * identified themselves, which is itself the answer: older than this check.
+   */
+  version?: string;
   /** The process it belongs to and will not outlive, when it has one. */
   owner?: number;
   /**

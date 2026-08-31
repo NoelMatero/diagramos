@@ -635,8 +635,13 @@ function rowsFor({ report, promoted = [] }, colour, all = false) {
     // the board rather than that the board and the code disagree.
     ...(report.garbledClaims ?? []).map((finding) =>
       paint(
-        `${finding.on === "arrow" ? "arrow " : ""}${oneLine(finding.label)}`
-        + ` \u00b7 @${finding.written} is not a claim`,
+        `${finding.on === "arrow" ? "arrow " : ""}${oneLine(finding.label)} \u00b7 `
+        // A board stamped by a newer diagramos is not a board with a typo on
+        // it, and telling its author to fix the diagram is an invented red
+        // (#181). Same row, opposite instruction.
+        + (finding.cause === "older-build"
+          ? `@${finding.written} is a claim this build does not have \u2014 update diagramos`
+          : `@${finding.written} is not a claim`),
         "red",
         colour,
       ),
