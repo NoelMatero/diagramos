@@ -171,6 +171,110 @@ describe("writing a followed ref back to the board", () => {
   }, 120_000);
 });
 
+/**
+ * The bug #174 was filed about, driven end to end on a real board file.
+ *
+ * `follow-refs.test.ts` pins that the destination is refused. This pins the
+ * consequence, which is the thing the issue actually asked for: *a board file
+ * that acquires a ref nobody typed, reproduced once.* Every link is the real
+ * one -- a git history, `checkDrift`, `applyFollowed`, and the JSON on disk read
+ * back afterwards -- because the two halves being separately correct is what was
+ * already known and is not the same as watching it happen.
+ *
+ * Its own repository rather than the tree above, so the shape being tested is
+ * visible in one place: a Rust project that commits its build output, which is
+ * the ordinary state of a checkout with no `.gitignore` for `target/`.
+ *
+ * Verified to fail without the guard. With `follow.ts` reverted, the board on
+ * disk came back reading
+ * `target/debug/.fingerprint/output-test-lib-lib_shared` where its author had
+ * typed `src/request.rs`.
+ */
+describe("a board file must not acquire a ref nobody typed (#174)", () => {
+  const AUTHORED = "src/request.rs";
+  let rust: string;
+
+  /** Every ref actually written in the file, read back as JSON rather than as a graph. */
+  function refsOnDisk(file: string): string[] {
+    const raw = JSON.parse(readFileSync(file, "utf8")) as {
+      elements: Array<{ customData?: { ref?: string } }>;
+    };
+    return raw.elements.flatMap((element) => {
+      const ref = element.customData?.ref;
+      return ref ? [ref] : [];
+    });
+  }
+
+  beforeAll(async () => {
+    rust = mkdtempSync(path.join(os.tmpdir(), "repair-rust-"));
+    const run = (...args: string[]) => execFileSync("git", args, { cwd: rust, stdio: "ignore" });
+    const land = (message: string) => {
+      run("add", "-A");
+      execFileSync(
+        "git",
+        ["-c", "user.email=t@example.com", "-c", "user.name=Test", "commit", "-q", "-m", message],
+        { cwd: rust, stdio: "ignore" },
+      );
+    };
+    run("init", "-q");
+    // Bulky, so git scores the move a rename rather than a delete and an add.
+    const bulk = Array.from(
+      { length: 30 },
+      (_unused, index) => `pub fn filler${index}() -> u32 { ${index} }\n`,
+    ).join("");
+    mkdirSync(path.join(rust, "src"), { recursive: true });
+    // The manifest is what makes `target/` build output rather than a module.
+    writeFileSync(path.join(rust, "Cargo.toml"), '[package]\nname = "lib_shared"\n');
+    writeFileSync(path.join(rust, "src/request.rs"), `${bulk}pub fn from_str() -> u32 { 1 }\n`);
+    land("the project");
+
+    /*
+     * Cargo copies a source file into `target/`, and to git's similarity
+     * detection that is an R100 -- indistinguishable from a deliberate `git mv`.
+     * Nothing here is a contrived move: this is what committing build output
+     * looks like from the outside.
+     */
+    mkdirSync(path.join(rust, "target/debug/.fingerprint"), { recursive: true });
+    run("mv", "src/request.rs", "target/debug/.fingerprint/output-test-lib-lib_shared");
+    land("build output committed");
+  }, 120_000);
+
+  afterAll(() => {
+    if (rust) rmSync(rust, { recursive: true, force: true });
+  });
+
+  it("leaves the authored ref exactly as it was written", async () => {
+    const file = path.join(rust, "board.excalidraw");
+    /*
+     * A file-only anchor, and that is the shape rather than a simplification.
+     * A `path#symbol` ref was already safe -- the symbol branch asks
+     * `declaresAt`, which refuses to read inside build output at all -- so the
+     * one reachable hole was the box anchored at a whole file, where git's
+     * record rode straight through.
+     */
+    const { board } = await createDiagram(emptyBoard(), {
+      name: "rust",
+      nodes: [{ id: "req", label: "Request", ref: AUTHORED }],
+      edges: [],
+    });
+    await writeBoard(file, board);
+    expect(refsOnDisk(file)).toEqual([AUTHORED]);
+
+    const onDisk = await readBoard(file);
+    const report = checkDrift(onDisk, createWorkspace(rust), { trail: createGitTrail(rust) });
+    const repaired = applyFollowed(onDisk, report);
+    if (repaired.applied.length > 0) await writeBoard(file, repaired.board);
+
+    // Nothing offered, nothing applied, and the file still says what a person
+    // typed into it. The stale finding stands on its own -- a refusal to suggest
+    // must never become a refusal to report.
+    expect(report.followed.map((entry) => entry.becomes)).toEqual([]);
+    expect(repaired.applied).toEqual([]);
+    expect(refsOnDisk(file)).toEqual([AUTHORED]);
+    expect(report.findings.some((finding) => finding.node === "req")).toBe(true);
+  }, 120_000);
+});
+
 describe("--repair on the command line", () => {
   /**
    * Both streams, because the report goes to stderr and the exit code is 1

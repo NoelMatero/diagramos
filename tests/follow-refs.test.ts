@@ -103,6 +103,17 @@ beforeAll(async () => {
   //    so only git's own record can answer for it -- and git's record will be a
   //    pick between two near-copies.
   write("src/dup.ts", `${bulk("dup")}export function harvest(): number {\n  return 8;\n}\n`);
+  /*
+   * 9. A file whose recorded move lands in build output (#174).
+   *
+   * `Cargo.toml` beside it is what makes `target/` build output rather than
+   * somebody's module, and it is the same corroboration `generatedRef` wants.
+   * The move is a real `git mv`, so git records an R100 and the rename channel
+   * -- the one channel whose answer `repair.ts` writes to a board unread -- had
+   * every reason to offer it.
+   */
+  write("Cargo.toml", "[package]\nname = \"planted\"\n");
+  write("src/artifact.ts", `${bulk("artifact")}export function cached(): number {\n  return 9;\n}\n`);
   commit("the starting tree");
 
   // 1. A whole file moved, unchanged. Git records this one itself.
@@ -142,6 +153,11 @@ beforeAll(async () => {
   // Same tag as `src/dup.ts`: these two are meant to be its near-copies.
   write("src/dupA.ts", `${bulk("dup")}export function harvest(): number {\n  return 8;\n}\n`);
   write("src/dupB.ts", `${bulk("dup")}export function harvest(): number {\n  return 80;\n}\n`);
+  // 9. Into `target/`, which is what a repository that commits its build output
+  //    looks like to git: an ordinary recorded rename to an address no box may
+  //    point at.
+  mkdirSync(path.join(repo, "target/debug"), { recursive: true });
+  git("mv", "src/artifact.ts", "target/debug/artifact.ts");
   commit("the refactor");
 
   const { board } = await createDiagram(emptyBoard(), {
@@ -155,6 +171,8 @@ beforeAll(async () => {
       { id: "common", label: "Common", ref: "src/common.ts#serve" },
       { id: "trap", label: "Trap", ref: "src/trap.ts#capture" },
       { id: "dup", label: "Dup", ref: "src/dup.ts" },
+      { id: "artifact", label: "Artifact", ref: "src/artifact.ts" },
+      { id: "artifactSymbol", label: "Artifact symbol", ref: "src/artifact.ts#cached" },
     ],
     edges: [],
   });
@@ -247,7 +265,15 @@ describe("following a stale ref to where the code went", () => {
     // Every node above is still wrong, and a suggestion is not a repair. A
     // followed ref that quietly stopped counting would turn a stale board green.
     expect(report.clean).toBe(false);
-    expect(report.findings.length).toBe(8);
+    // One per box on the board, and every box is planted stale. Counted rather
+    // than sampled because the number going *down* is the regression that
+    // matters: a refusal to suggest must never become a refusal to report, which
+    // is exactly what the build-output guard below could have broken (#174).
+    expect(report.findings.length).toBe(10);
+    expect(report.findings.map((finding) => finding.node).sort()).toEqual([
+      "artifact", "artifactSymbol", "common", "doomed", "dup",
+      "lodger", "mover", "split", "trap", "twin",
+    ]);
   });
 });
 
@@ -379,6 +405,57 @@ describe("what the follower will not do", () => {
       lookalike,
     );
     expect(followed).toEqual([]);
+  });
+
+  /*
+   * The hole #174 was about: the one channel that writes a ref nobody read.
+   *
+   * `repair.ts` applies an unambiguous `becomes` on sight, so a destination this
+   * module offers is a string that lands in a board file with no human between.
+   * The two search channels were filtered from the start; the rename channel was
+   * not, and a repository that commits its build output turns cargo's own copy
+   * of a source file into an R100 git reports as a move.
+   *
+   * Both shapes of anchor, because all three branches read the same destination
+   * and the prose-only one must not name it either -- an address a box may not
+   * point at is not an address to print at somebody.
+   */
+  it("will not follow a recorded move into build output", () => {
+    expect(forNode("artifact")).toBeUndefined();
+    expect(forNode("artifactSymbol")).toBeUndefined();
+  });
+
+  it("still reports the move itself, so the trail is not the thing lying", () => {
+    // The judgement belongs to the follower, not to the trail: git really did
+    // record this, and a `Trail` that edited git's answer would be the wrong
+    // layer to fix it in.
+    expect(createGitTrail(repo).renamedTo("src/artifact.ts")).toBe("target/debug/artifact.ts");
+  });
+
+  it("follows a move whose destination merely looks generated", () => {
+    /*
+     * The other half, and the reason this is `inNeverWalk` and not a substring
+     * test. `vendor` is on the never-walk list and `src/engine/vendor/` is a real
+     * directory of real source in this repository -- but a *segment* called
+     * `target` deep inside `src/` is somebody's module, and refusing to follow
+     * into it would be a suggestion silently withheld forever.
+     */
+    const intoSource: Trail = {
+      renamedTo: () => "src/compiler/targets/wasm.ts",
+      declaring: () => [],
+      declaresAt: () => true,
+    };
+    const followed = followAnchors(
+      [{
+        node: "n",
+        label: "Targets",
+        ref: "src/targets/wasm.ts",
+        path: "src/targets/wasm.ts",
+        kind: "missing-file",
+      }],
+      intoSource,
+    );
+    expect(followed[0]?.becomes).toBe("src/compiler/targets/wasm.ts");
   });
 
   it("survives a directory that is not a git repository", () => {

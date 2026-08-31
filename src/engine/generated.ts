@@ -34,6 +34,43 @@
  * is worse than the green this replaces. A directory beside the `package.json`
  * or `Cargo.toml` that generates it is build output; the same name three levels
  * down inside `src/` is somebody's module.
+ *
+ * ## Where such a ref came from, which #166 did not answer (#174)
+ *
+ * Refusing the ref was containment. The other half — how a path nobody typed got
+ * into a board file — was split out, and the audit asked of every writer of
+ * `customData.ref` whether it can produce a string that was not handed to it:
+ *
+ * | writer | verdict |
+ * | --- | --- |
+ * | `create_diagram`, `edit_diagram` | caller's string, stored verbatim. Cleared. |
+ * | `promote.ts` | writes `strokeStyle`, `state`, a marker. Never `ref`. Cleared. |
+ * | `accept.ts` | writes `customData.edge.from`/`to`. Never `ref`. Cleared. |
+ * | `POST /api/board` | the browser's scene, whose refs come from the panel below. |
+ * | `repair.ts` | applies `follow.ts`'s `becomes` unread. **Was a hole.** |
+ * | `/api/paths` → the anchor panel | offered build output as autocomplete. **Was a hole.** |
+ *
+ * Both holes were reproduced rather than argued, and both are now filtered:
+ *
+ * - **The picker offered what the checker refuses.** `/api/paths` lists
+ *   `gitKnown`, and `--others` means untracked files nothing ignores — so a Rust
+ *   tree with no `.gitignore` for `target/` put its whole build directory in the
+ *   panel that exists to stop refs being mistyped. Measured on this repository:
+ *   **426 of 656 paths offered were build output**, cargo fingerprint logs among
+ *   them, sorted in ahead of the source they were built from. Picking one is a
+ *   click and types nothing, which makes it the likeliest account of the original
+ *   ref. `board-server.ts` now filters that list through `generatedRef`, so the
+ *   picker and the checker answer one question with one piece of code.
+ * - **The rename channel could write one.** `follow.ts` filtered its two search
+ *   channels from the start and not its rename channel, which is the one whose
+ *   answer `repair.ts` applies on sight. A repository that commits its build
+ *   output makes cargo's own copy of a source file look like an `R100` to git, so
+ *   `git mv src/request.rs target/debug/request.rs` produced exactly the reported
+ *   bug: a ref nobody typed, pointing at an artifact. Now filtered by
+ *   `inNeverWalk` where the destination is chosen.
+ *
+ * `follow.ts`'s search channels were checked and were already sound: `git grep`
+ * reads tracked files only, and both channels filter `inNeverWalk` on top of that.
  */
 import type { Workspace } from "./workspace";
 
