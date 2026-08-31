@@ -65,20 +65,69 @@ const MIME_BY_EXT: Record<string, string> = {
   ".svg": "image/svg+xml",
 };
 
+/**
+ * The largest side a rendered board may have.
+ *
+ * Not a rendering limit -- Excalidraw will happily draw larger -- but the point
+ * past which the image cannot be shown to the caller that asked for it. A model
+ * client refuses an image over 2000px on a side, so a render above this is work
+ * done, paid for, and then thrown away with an error the caller cannot act on:
+ * the board is too big, and the only knob it was given is a scale it already
+ * set to the lowest useful value.
+ *
+ * So the scale is treated as a ceiling rather than a promise. A board that
+ * cannot be drawn at the scale requested is drawn at the largest scale that
+ * fits, and the caller is told what it got -- silently returning a smaller
+ * image would make two boards look like the same size at different zooms.
+ */
+const MAX_SIDE = 2000;
+
+/**
+ * A PNG's pixel dimensions, read from its header.
+ *
+ * The IHDR chunk is fixed-position -- 8 bytes of signature, 8 of chunk header,
+ * then width and height as big-endian 32-bit integers -- so this needs no image
+ * library. Read from the bytes rather than trusted from the scale that was
+ * asked for, because the whole point here is that the two can differ.
+ */
+export function pngSize(png: Buffer): { width: number; height: number } {
+  return { width: png.readUInt32BE(16), height: png.readUInt32BE(20) };
+}
+
 export interface RenderOptions {
-  /** Pixel ratio; 2 gives a crisp image on retina displays. */
+  /**
+   * Pixel ratio; 2 gives a crisp image on retina displays.
+   *
+   * A ceiling, not a guarantee: see `MAX_SIDE`. Read the `scale` on the result
+   * to find out what was actually used.
+   */
   scale?: number;
   background?: boolean;
   padding?: number;
 }
 
-export async function renderBoardToPng(board: BoardFile, options: RenderOptions = {}): Promise<Buffer> {
+export interface RenderResult {
+  png: Buffer;
+  /** Pixel dimensions of the image actually produced. */
+  width: number;
+  height: number;
+  /** The scale used, which is `requested` unless the cap reduced it. */
+  scale: number;
+  requested: number;
+}
+
+export async function renderBoardToPng(
+  board: BoardFile,
+  options: RenderOptions = {},
+): Promise<RenderResult> {
   const visible = board.elements.filter((element) => element.isDeleted !== true);
   if (visible.length === 0) throw new Error("Cannot render an empty board");
 
   if (!existsSync(BROWSER_BUNDLE)) {
     throw new Error(`Missing ${path.relative(ROOT, BROWSER_BUNDLE)}. Run \`npm run build:vendor\`.`);
   }
+
+  const requested = options.scale ?? 2;
 
   const browser = await launchChromium();
   try {
@@ -133,10 +182,11 @@ export async function renderBoardToPng(board: BoardFile, options: RenderOptions 
     // bundle as a JS string per render is enough to exhaust the heap.
     await page.addScriptTag({ url: "/excalidraw-browser.js" });
 
-    const dataUrl = await page.evaluate(
-      async ({ elements, appState, files, scale, background, padding }) => {
+    const drawn = await page.evaluate(
+      async ({ elements, appState, files, scale, background, padding, maxSide }) => {
         const api = (window as unknown as { ExcalidrawExport: { exportToBlob: (args: unknown) => Promise<Blob> } })
           .ExcalidrawExport;
+        let used = scale;
         const blob = await api.exportToBlob({
           elements,
           appState: { ...appState, exportBackground: background, exportPadding: padding },
@@ -145,32 +195,45 @@ export async function renderBoardToPng(board: BoardFile, options: RenderOptions 
           // The canvas must grow with the scale factor. Returning the
           // unscaled size draws 2x content into a 1x canvas, which silently
           // crops everything outside the top-left quadrant.
-          getDimensions: (width: number, height: number) => ({
-            width: width * scale,
-            height: height * scale,
-            scale,
-          }),
+          //
+          // And it must stop growing at `maxSide`, or a large board renders
+          // into an image nobody can be shown. The fitted scale is recorded so
+          // the caller learns it was not given what it asked for.
+          getDimensions: (width: number, height: number) => {
+            const fits = maxSide / Math.max(width, height);
+            const effective = Math.min(scale, fits);
+            used = effective;
+            return {
+              width: Math.max(1, Math.round(width * effective)),
+              height: Math.max(1, Math.round(height * effective)),
+              scale: effective,
+            };
+          },
         });
-        return await new Promise<string>((resolve, reject) => {
+        const dataUrl = await new Promise<string>((resolve, reject) => {
           const reader = new FileReader();
           reader.onload = () => resolve(String(reader.result));
           reader.onerror = () => reject(new Error("Could not read exported blob"));
           reader.readAsDataURL(blob);
         });
+        return { dataUrl, scale: used };
       },
       {
         elements: visible,
         appState: board.appState ?? {},
         files: board.files ?? {},
-        scale: options.scale ?? 2,
+        scale: requested,
         background: options.background ?? true,
         padding: options.padding ?? 24,
+        maxSide: MAX_SIDE,
       },
     );
 
-    const base64 = dataUrl.slice(dataUrl.indexOf(",") + 1);
+    const base64 = drawn.dataUrl.slice(drawn.dataUrl.indexOf(",") + 1);
     if (!base64) throw new Error("Excalidraw returned an empty image");
-    return Buffer.from(base64, "base64");
+    const png = Buffer.from(base64, "base64");
+    const size = pngSize(png);
+    return { png, width: size.width, height: size.height, scale: drawn.scale, requested };
   } finally {
     await browser.close();
   }
