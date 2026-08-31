@@ -218,6 +218,7 @@ const REASONS = {
   "unsupported-member": "the box lists it, and its body shows no trace of the others",
   "missing-route": "the file serves routes, and that one is not among them",
   "stale-number": "the label states a number the code it points at no longer uses",
+  "generated-ref": "it points into build output, which no change to your code will ever disturb",
 };
 /**
  * Why a `needs` arrow got no direction verdict.
@@ -246,6 +247,7 @@ const NEEDS_WITHHELD = {
   "endpoint-external": "with an end marked external",
   "endpoint-has-no-ref": "with an end that has no ref",
   "endpoint-outside-repo": "with an end pointing outside the repo",
+  "endpoint-generated": "with an end pointing into build output",
   "endpoint-file-missing": "with an end whose file is missing",
   "directory-ref": "with an end that refs a directory, not a file",
   "glob-ref": "with an end that refs a glob, not a file",
@@ -269,6 +271,7 @@ const FEEDS_NOT_CONFIRMED = {
   "endpoint-external": "with an end marked external",
   "endpoint-has-no-ref": "with an end that has no ref",
   "endpoint-outside-repo": "with an end pointing outside the repo",
+  "endpoint-generated": "with an end pointing into build output",
   "endpoint-file-missing": "with an end whose file is missing",
   "directory-ref": "with an end that refs a directory, not a file",
   "glob-ref": "with an end that refs a glob, not a file",
@@ -759,9 +762,15 @@ function rowsFor({ report, promoted = [] }, colour, all = false) {
  * spell every one out, and the twelfth argument is where a counting bug goes to
  * hide.
  */
-function tallyCounts({ gone, empty, unused, open, incomplete, removed, garbled, unanswered, backwards, arrows, stray, promoted, built, planned }, colour) {
+function tallyCounts({ gone, generated, empty, unused, open, incomplete, removed, garbled, unanswered, backwards, arrows, stray, promoted, built, planned }, colour) {
   return [
     gone ? paint(`${gone} gone`, "red", colour) : "",
+    // Its own word, because "gone" is the opposite of what happened: the file
+    // is there, it is simply a build artifact, and a reader told "gone" goes
+    // looking for a deletion nobody made.
+    generated
+      ? paint(`${generated} ${generated === 1 ? "points" : "point"} at build output`, "red", colour)
+      : "",
     empty ? paint(`${empty} empty`, "red", colour) : "",
     // Its own word, because "1 gone" was actively wrong for it: nothing is gone,
     // a boundary the board claimed is being reached through.
@@ -810,10 +819,12 @@ function tallyFor({ report, promoted = [] }, colour) {
   // Out of "gone" for the reason "open-box" is: nothing here is missing from
   // the tree, the board is missing something from the picture.
   const incomplete = count("incomplete-board");
+  const generated = count("generated-ref");
   const promotedNodes = new Set(promoted.map((promotion) => promotion.node));
   return tallyCounts(
     {
-      gone: report.findings.length - empty - unused - open - incomplete,
+      gone: report.findings.length - empty - unused - open - incomplete - generated,
+      generated,
       empty,
       unused,
       open,
@@ -874,8 +885,11 @@ function render(stale, colour) {
       return {
         gone: sum.gone + report.findings.filter(
           (finding) => finding.kind !== "empty-ref" && finding.kind !== "unused-symbol"
-            && finding.kind !== "open-box" && finding.kind !== "incomplete-board",
+            && finding.kind !== "open-box" && finding.kind !== "incomplete-board"
+            && finding.kind !== "generated-ref",
         ).length,
+        generated: sum.generated
+          + report.findings.filter((finding) => finding.kind === "generated-ref").length,
         open: sum.open + report.findings.filter((finding) => finding.kind === "open-box").length,
         incomplete: sum.incomplete
           + report.findings.filter((finding) => finding.kind === "incomplete-board").length,
@@ -895,7 +909,7 @@ function render(stale, colour) {
         planned: sum.planned + report.workItems.length,
       };
     },
-    { gone: 0, empty: 0, unused: 0, open: 0, incomplete: 0, removed: 0, garbled: 0, unanswered: 0, backwards: 0, arrows: 0, stray: 0, promoted: 0, built: 0, planned: 0 },
+    { gone: 0, generated: 0, empty: 0, unused: 0, open: 0, incomplete: 0, removed: 0, garbled: 0, unanswered: 0, backwards: 0, arrows: 0, stray: 0, promoted: 0, built: 0, planned: 0 },
   );
 
   // Too many to list: counts per diagram, and a pointer to the view that has room.
@@ -1481,6 +1495,7 @@ function renderUnannotated(entries, colour) {
 const SKIP_WORDS = {
   "no-ref": "no ref",
   "ref-outside-repo": "ref points outside the repo",
+  "ref-generated": "a label naming build output",
   "anchor-too-large": "a directory anchor too large to read",
   "no-route-literals": "a route anchor on a file that serves none",
   "ends-not-bound": "ends not snapped to their boxes",
@@ -1488,6 +1503,7 @@ const SKIP_WORDS = {
   "endpoint-external": "an end is marked external",
   "endpoint-has-no-ref": "an end has no ref",
   "endpoint-outside-repo": "an end points outside the repo",
+  "endpoint-generated": "an end points into build output",
   "endpoint-file-missing": "an end's file is missing",
   "directory-ref": "an end refs a directory",
   "glob-ref": "an end refs a glob",

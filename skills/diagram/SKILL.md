@@ -119,6 +119,13 @@ the reader and is never verified. A file that writes no route literals at all is
 counted as unread rather than reported as broken, so pointing this at a helper
 module is quiet, not a false alarm.
 
+A ref must point at source, never at build output. `target/`, `dist/`, `out/`,
+`build/` and `node_modules/` are refused outright, and the reason is that they
+would otherwise pass: the file is really there, so the box goes green and stays
+green while the code it was drawn for is renamed, moved or deleted. The trap is
+that these directories quote your source — a Rust fingerprint log holds whole
+function signatures — so a search for a symbol returns one and it looks right.
+
 When one box stands for several things — a feature spread over files, a constant
 and the function using it — add `refs: [...]` beside `ref`. Every anchor is
 checked, and the box is loud when any of them breaks. Pick `ref` for the main one;

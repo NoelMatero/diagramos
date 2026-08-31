@@ -127,6 +127,34 @@ function exists(relative: string, workspace: Workspace): boolean {
 }
 
 /**
+ * A file that exists *and is spelled the way the path asked for it*.
+ *
+ * `stat` is case-insensitive on macOS and on Windows, and a module name here is
+ * built out of a segment of somebody's `use` line. So `use crate::Request;`
+ * where the type `Request` lives in `src/request.rs` finds a file: the module
+ * walk accepts `src/Request.rs`, reports an edge to a module that does not
+ * exist, and prints a path that no case-sensitive machine will ever have (#166).
+ *
+ * Wrong in both directions at once, which is why it is worth a listing. The
+ * edge is invented -- modules and types are separate namespaces, and `Request`
+ * is a type -- and the invention is invisible to the person who wrote the line,
+ * because their file really is there under a different capital.
+ *
+ * An unreadable directory lists as empty, and there the `stat` answer stands.
+ * Refusing on a listing that could not be read would trade an invented edge for
+ * a missed one, and `licence.ts` is clear that both end in a false accusation.
+ */
+function existsExactly(relative: string, workspace: Workspace): boolean {
+  if (!exists(relative, workspace)) return false;
+  const slash = relative.lastIndexOf("/");
+  const directory = slash < 0 ? "." : relative.slice(0, slash);
+  const absolute = workspace.resolve(directory);
+  if (!absolute) return false;
+  const entries = workspace.list(absolute);
+  return entries.length === 0 || entries.includes(relative.slice(slash + 1));
+}
+
+/**
  * The `[package]` fields a path needs, out of Cargo's manifest.
  *
  * Read by hand rather than with a TOML parser, and narrowly: three keys, from
@@ -395,9 +423,9 @@ export function moduleDirectory(file: string, layout: RustLayout): string {
 /** The child module named `segment` under `directory`, if it has a file. */
 export function childModule(directory: string, segment: string, workspace: Workspace): RustTarget | undefined {
   const flat = join(directory, `${segment}.rs`);
-  if (exists(flat, workspace)) return { file: flat, directory: join(directory, segment) };
+  if (existsExactly(flat, workspace)) return { file: flat, directory: join(directory, segment) };
   const folded = join(join(directory, segment), "mod.rs");
-  if (exists(folded, workspace)) return { file: folded, directory: join(directory, segment) };
+  if (existsExactly(folded, workspace)) return { file: folded, directory: join(directory, segment) };
   return undefined;
 }
 

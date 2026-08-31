@@ -534,16 +534,28 @@ function unconfirmedArrowNote(unconfirmed: ReadonlyArray<UnconfirmedEdge>): Reco
  * and the arrows are information about anchoring rather than anything wrong.
  */
 function drawTimeNotes(drawn: {
-  findings: ReadonlyArray<{ node: string; label?: string; ref: string }>;
+  findings: ReadonlyArray<{ node: string; label?: string; ref: string; kind: string; detail: string }>;
   garbledClaims: ReadonlyArray<{ detail: string }>;
   workItems: ReadonlyArray<unknown>;
   unconfirmedEdges: ReadonlyArray<UnconfirmedEdge>;
   followed: ReadonlyArray<FollowedRef>;
 }): Record<string, unknown> {
+  /*
+   * Build output is reported apart from the rest, because the advice differs.
+   *
+   * Everything under `pointsAtNothing` is a typo or a plan, and the fix line
+   * says so. A ref into `target/` or `dist/` is neither: the file is there, so
+   * `state: "planned"` would be a lie, and re-reading the same address would
+   * turn the box green again with nothing behind it. The one thing to do is
+   * move the anchor to the source, and the finding's own detail says which
+   * directory generated what (#166).
+   */
+  const generated = drawn.findings.filter((finding) => finding.kind === "generated-ref");
+  const missing = drawn.findings.filter((finding) => finding.kind !== "generated-ref");
   return {
-    ...(drawn.findings.length
+    ...(missing.length
       ? {
-          pointsAtNothing: drawn.findings.map(
+          pointsAtNothing: missing.map(
             (finding) => `${finding.label || finding.node} → ${finding.ref}`,
           ),
           fix:
@@ -551,6 +563,17 @@ function drawTimeNotes(drawn: {
             + 'state: "planned" -- drawn dashed, reported as a work item, and flipped to built '
             + "on its own when the code lands. Left as is, the end-of-turn check reports it to "
             + "the user in red.",
+        }
+      : {}),
+    ...(generated.length
+      ? {
+          pointsAtBuildOutput: generated.map(
+            (finding) => `${finding.label || finding.node} → ${finding.ref}: ${finding.detail}`,
+          ),
+          fixBuildOutput:
+            "Do not mark these planned and do not re-read the artifact. Find the source file the "
+            + "build was made from and anchor the box there. A ref into build output passes every "
+            + "check forever and reports nothing when the code behind it changes.",
         }
       : {}),
     /*

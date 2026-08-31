@@ -32,6 +32,14 @@ The label is the only evidence of intent, and it is weak evidence. Use the rest:
   candidate that does not is worth a second look before you propose it.
 - **Search the repo** for the label's words as filenames and as symbols. Glob
   and Grep, not intuition.
+- **Never take a hit inside build output** — `target/`, `dist/`, `out/`,
+  `build/`, `node_modules/`. Those directories hold generated files, and some of
+  them quote your source verbatim: a Rust `target/debug/.fingerprint/*/output-*`
+  is a JSON diagnostics log with whole function signatures copied into it, so a
+  symbol search *will* return one and it will look like a match. A box anchored
+  there resolves forever and reports nothing when the code behind it changes,
+  which is worse than the unanchored box you started with. Anchor at the source
+  the artifact was built from, or leave the box unresolved.
 
 Then pick **one of three answers**. The third one is not a failure, and a
 command that could not give it would be worse than useless:

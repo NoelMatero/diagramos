@@ -46,6 +46,7 @@ import { existsSync, readFileSync } from "node:fs";
 import path from "node:path";
 
 import { symbolCounts } from "./body";
+import { inNeverWalk } from "./generated";
 import { languageOf } from "./parse";
 
 /** Which channel answered. Recorded so a reader can distrust one and not the other. */
@@ -257,17 +258,7 @@ export function followAnchors(
   return followed;
 }
 
-/** Directories no destination ever comes from. The list the drift walk and the measurement both use. */
-const NEVER_WALK = new Set([
-  "node_modules", "out", "dist", "build", "coverage", "vendor", ".git",
-  "test-results", "playwright-report", ".corpus", "graphify-out",
-]);
-
 const REGEX_SPECIAL = /[.*+?^${}()|[\]\\]/g;
-
-function inNeverWalk(file: string): boolean {
-  return file.split("/").some((segment) => NEVER_WALK.has(segment));
-}
 
 /**
  * The real repository, read through git.
