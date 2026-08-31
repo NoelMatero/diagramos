@@ -17,6 +17,9 @@ if (!input) {
 }
 const outfile = output ?? `${input.replace(/\.excalidraw$/, "")}.png`;
 
-const png = await renderBoardToPng(await readBoard(input));
-await writeFile(outfile, png);
-console.log(`wrote ${path.relative(process.cwd(), outfile)} (${(png.byteLength / 1024).toFixed(0)} KB)`);
+const render = await renderBoardToPng(await readBoard(input));
+await writeFile(outfile, render.png);
+console.log(
+  `wrote ${path.relative(process.cwd(), outfile)} ${render.width}x${render.height} `
+    + `(${(render.png.byteLength / 1024).toFixed(0)} KB)`,
+);

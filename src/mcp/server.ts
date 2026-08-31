@@ -1255,11 +1255,25 @@ server.registerTool(
   async ({ path: boardPath, scale }) =>
     guard(async () => {
       const file = resolveBoardPath(boardPath);
-      const png = await renderBoardToPng(await readBoard(file), { scale });
+      const render = await renderBoardToPng(await readBoard(file), { scale });
+      /*
+       * The dimensions, not just the byte count. A board too big to draw at the
+       * scale asked for is drawn smaller, and a caller told only "4357 KB" has
+       * no way to know its next render at the same scale will not be sharper --
+       * so it asks again, pays again, and gets the same image.
+       */
+      const fitted = render.scale < render.requested
+        ? ` — scale ${render.requested} would exceed ${render.width >= render.height ? "width" : "height"} ` +
+          `limits, so this is scale ${render.scale.toFixed(2)}; the board is too large to draw sharper`
+        : "";
       return {
         content: [
-          { type: "text" as const, text: `${relativeToWorkspace(file)} (${(png.byteLength / 1024).toFixed(0)} KB)` },
-          { type: "image" as const, data: png.toString("base64"), mimeType: "image/png" },
+          {
+            type: "text" as const,
+            text: `${relativeToWorkspace(file)} ${render.width}x${render.height} `
+              + `(${(render.png.byteLength / 1024).toFixed(0)} KB)${fitted}`,
+          },
+          { type: "image" as const, data: render.png.toString("base64"), mimeType: "image/png" },
         ],
       };
     }),
