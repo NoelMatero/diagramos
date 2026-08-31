@@ -513,14 +513,14 @@ try {
     `${placedAfterDrag?.x} -> ${placedAfterUndo?.x}, expected ${placedBefore?.x}`,
   );
   /*
-   * The second line, from the page's side: a save that would empty the board is
-   * turned away, and the person is told so in words.
+   * Clearing a board by hand still works.
    *
-   * Driven by select-all-and-delete, which is the one gesture that legitimately
-   * produces the shape being refused -- so this also pins down what that costs.
-   * The board must come back on the canvas rather than sitting there blank
-   * waiting to be saved again, and the reason has to be *rendered*: the pill is
-   * `pointer-events: none`, so anything left in a tooltip is unreadable.
+   * Here because the first fix for #164 refused it: the guard was phrased as
+   * "this save empties the board", which cannot tell select-all-and-Delete apart
+   * from the wreck, and broke an obvious gesture to defend against a bug that
+   * was already fixed a layer up. The guard now asks about the one thing the
+   * wreck did that no deletion does -- tearing a label off a box going down with
+   * it -- and this is what stops that from being widened back.
    */
   await undoPage.mouse.click(700, 400);
   await undoPage.keyboard.press(`${modifier}+a`);
@@ -528,24 +528,20 @@ try {
   await undoPage.keyboard.press("Delete");
   await undoPage.waitForTimeout(2500);
 
-  const refusedShape = bindings(await readBoard(undoFile));
+  const cleared = bindings(await readBoard(undoFile));
   check(
-    "a save that would empty the board never reaches the file",
-    refusedShape.live === undoBefore.live,
-    `${undoBefore.live} -> ${refusedShape.live} elements`,
+    "selecting everything and deleting it clears the board",
+    cleared.live === 0,
+    `${undoBefore.live} -> ${cleared.live} elements left`,
   );
-  const restored = await scene(undoPage);
+  const clearedCanvas = await scene(undoPage);
   check(
-    "the canvas goes back to what the file holds",
-    restored.count === undoBefore.live,
-    `${restored.count} on the canvas, ${undoBefore.live} in the file`,
+    "the cleared board is not pushed back onto the canvas",
+    clearedCanvas.count === 0,
+    `${clearedCanvas.count} on the canvas`,
   );
-  const refusalNote = await undoPage.$eval(".status-note", (el) => el.textContent).catch(() => "");
-  check(
-    "the refusal is written on the page, not hidden in a tooltip",
-    refusalNote.includes("emptied a board") && refusalNote.includes("delete_diagram"),
-    refusalNote.trim(),
-  );
+  const noRefusal = await undoPage.$(".status-note");
+  check("clearing a board is not refused", noRefusal === null);
 
   await undoPage.screenshot({ path: shot("6-after-undo") });
   await undoPage.close();

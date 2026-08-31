@@ -1,12 +1,12 @@
 /**
- * The rule that a save may not empty the board it lands on (#164).
+ * The rule that a save may not tear a label off its box (#164).
  *
- * The shapes here are the ones measured off a live board while reproducing it:
- * an undo that inverted the whole diagram tombstoned every element *and*
- * stripped every container's `boundElements`, while a hand-made
- * select-all-and-delete tombstoned every element and left the bindings alone.
- * Both must be refused; only the first is corruption, and the tests say which
- * is which so a later change cannot quietly stop telling them apart.
+ * Every shape here was measured in a browser against a live board, because the
+ * whole question is which of them a person can produce on purpose. An undo on a
+ * freshly opened board tombstoned every element *and* stripped every container's
+ * `boundElements`; every ordinary deletion left the bindings exactly where they
+ * were. That difference is the rule, and these tests are what stop a later
+ * change from quietly widening it back into "the board got smaller".
  */
 import { describe, expect, it } from "vitest";
 
@@ -52,10 +52,7 @@ const drawn = boardOf(
   label("b-label", "b"),
 );
 
-const tombstoned = (board: BoardFile): BoardFile => ({
-  ...board,
-  elements: board.elements.map((element) => ({ ...element, isDeleted: true })) as never,
-});
+const tombstone = (element: Element): Element => ({ ...element, isDeleted: true });
 
 describe("wipeRefusal", () => {
   it("says nothing about an ordinary edit", () => {
@@ -68,67 +65,73 @@ describe("wipeRefusal", () => {
     expect(wipeRefusal(drawn, moved)).toBeUndefined();
   });
 
-  it("says nothing about deleting some of the board", () => {
-    const half = boardOf(
-      box("a", "a-label"),
-      label("a-label", "a"),
-      { ...box("b", "b-label"), isDeleted: true },
-      { ...label("b-label", "b"), isDeleted: true },
+  /*
+   * The gestures below are the measured output of real interactions. They are
+   * the point of this rule: all of them must go through.
+   */
+
+  it("lets you delete one labelled box", () => {
+    // Measured: box and label tombstoned, the binding left listed.
+    const deleted = boardOf(
+      tombstone(box("a", "a-label")),
+      tombstone(label("a-label", "a")),
+      box("b", "b-label"),
+      label("b-label", "b"),
     );
-    expect(wipeRefusal(drawn, half)).toBeUndefined();
+    expect(wipeRefusal(drawn, deleted)).toBeUndefined();
   });
 
-  it("refuses the undo that tombstoned every element and stripped every binding", () => {
-    // The measured shape of #164: containers keep their ids and lose their
-    // `boundElements`, while the labels still name them.
-    const wiped: BoardFile = {
+  it("lets you select everything and delete it", () => {
+    // Measured: every element tombstoned, every binding still listed. This is
+    // an obvious thing to do on a board and refusing it was the wrong trade.
+    const cleared: BoardFile = {
+      ...drawn,
+      elements: drawn.elements.map((element) => tombstone(element as Element)) as never,
+    };
+    expect(wipeRefusal(drawn, cleared)).toBeUndefined();
+  });
+
+  it("lets you clear a label off a box that stays", () => {
+    // Measured: the label is tombstoned, the box is still live, and the box
+    // drops it from `boundElements`. The only legitimate way a binding goes.
+    const unlabelled = boardOf(
+      { ...box("a"), boundElements: [] },
+      tombstone(label("a-label", "a")),
+      box("b", "b-label"),
+      label("b-label", "b"),
+    );
+    expect(wipeRefusal(drawn, unlabelled)).toBeUndefined();
+  });
+
+  /* And the one shape nothing legitimate produces. */
+
+  it("refuses the undo that tombstoned everything and stripped every binding", () => {
+    // Measured: the #164 wreck. Boxes keep their ids, lose their
+    // `boundElements`, and go down with the labels that still name them.
+    const wrecked: BoardFile = {
       ...drawn,
       elements: drawn.elements.map((element) => {
-        const { boundElements: _dropped, ...rest } = element as Element;
+        const { boundElements: _stripped, ...rest } = element as Element;
         return { ...rest, isDeleted: true };
       }) as never,
     };
-    expect(wipeRefusal(drawn, wiped)).toMatch(/emptied a board with 4 elements on it/);
+    const refusal = wipeRefusal(drawn, wrecked);
+    expect(refusal).toMatch(/torn 2 labels off the boxes that hold them/);
   });
 
-  it("refuses a save that empties the board even with its bindings intact", () => {
-    // A hand-made select-all-and-delete looks like this. It is the one thing
-    // refused that somebody could have meant, so the sentence names the way to
-    // do it on purpose.
-    const refusal = wipeRefusal(drawn, tombstoned(drawn));
-    expect(refusal).toMatch(/would have emptied a board/);
-    expect(refusal).toMatch(/delete_diagram/);
-  });
-
-  it("says nothing when the board was already empty", () => {
-    expect(wipeRefusal(tombstoned(drawn), tombstoned(drawn))).toBeUndefined();
-    expect(wipeRefusal(emptyBoard(), emptyBoard())).toBeUndefined();
-  });
-
-  it("refuses a save that orphans a live label from its box", () => {
+  it("refuses a save that orphans a live label from a live box", () => {
     const orphaned = boardOf(
       { ...box("a", "a-label"), boundElements: [] },
       label("a-label", "a"),
       box("b", "b-label"),
       label("b-label", "b"),
     );
-    const refusal = wipeRefusal(drawn, orphaned);
-    expect(refusal).toMatch(/1 label attached to a box that no longer lists them/);
-  });
-
-  it("counts every label a save orphans, not just the first", () => {
-    const orphaned = boardOf(
-      { ...box("a", "a-label"), boundElements: [] },
-      label("a-label", "a"),
-      { ...box("b", "b-label"), boundElements: [] },
-      label("b-label", "b"),
-    );
-    expect(wipeRefusal(drawn, orphaned)).toMatch(/2 labels/);
+    expect(wipeRefusal(drawn, orphaned)).toMatch(/torn 1 label off the box that holds it/);
   });
 
   it("does not hold a board hostage over damage it arrived with", () => {
-    // A file that is already broken must stay editable, or the one way out of a
-    // corrupted board would be to hand-edit the JSON.
+    // A file that is already broken must stay editable, or the only way out of
+    // a corrupted board is to hand-edit the JSON.
     const broken = boardOf(
       { ...box("a", "a-label"), boundElements: [] },
       label("a-label", "a"),
@@ -144,16 +147,7 @@ describe("wipeRefusal", () => {
     expect(wipeRefusal(broken, movedAnyway)).toBeUndefined();
   });
 
-  it("reads a deleted label dropped from its box as a deletion, not damage", () => {
-    // Removing a label is an ordinary thing to do, and it leaves exactly the
-    // asymmetry this rule is about -- on a tombstoned element, which is what
-    // tells the two apart.
-    const removed = boardOf(
-      { ...box("a", "a-label"), boundElements: [] },
-      { ...label("a-label", "a"), isDeleted: true },
-      box("b", "b-label"),
-      label("b-label", "b"),
-    );
-    expect(wipeRefusal(drawn, removed)).toBeUndefined();
+  it("says nothing about an empty board, or one that stays empty", () => {
+    expect(wipeRefusal(emptyBoard(), emptyBoard())).toBeUndefined();
   });
 });
