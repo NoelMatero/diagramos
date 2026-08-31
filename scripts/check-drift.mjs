@@ -50,6 +50,7 @@ import { applyPromotions, clearLivePromotions } from "../src/engine/promote.ts";
 import { applyFollowed } from "../src/engine/repair.ts";
 import { acceptBackwards } from "../src/engine/accept.ts";
 import { readGraph } from "../src/engine/graph.ts";
+import { damageSentence } from "../src/engine/damage.ts";
 import { CONFIG_FILE, ConfigError, DEFAULT_DIAGRAM_DIR, diagramDir } from "../src/engine/config.ts";
 import { countedWords, coverageLabel } from "../src/engine/summary.ts";
 import {
@@ -1367,6 +1368,22 @@ for (const { file, boardFile } of loaded) {
     continue;
   }
   examined.push({ file, report, promoted });
+
+  /*
+   * A board that contradicts itself, said before anything else about it (#165).
+   *
+   * It goes in `problems` rather than in the drift report, and that placement is
+   * the point. `problems` already means "this run could not honestly answer for
+   * this file", and it is the one channel here that reaches the exit code
+   * without pretending to be drift. Nothing about the code has changed; the
+   * board simply does not draw the way it reads, so the clean report this run
+   * would otherwise print about it is worth nothing -- which is exactly what
+   * happened to the board that prompted this, checked clean while blank.
+   */
+  const damage = damageSentence(report.damage ?? []);
+  if (damage) {
+    problems.push(`${path.relative(root, file)}: ${damage}`);
+  }
 
   // Suggestions are collected apart from drift: they are not a claim going wrong,
   // and a board with nothing but suggestions is still a clean board.

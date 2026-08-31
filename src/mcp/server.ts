@@ -24,6 +24,7 @@ import {
   deleteDiagram,
   listDiagrams,
 } from "../engine/diagram";
+import { damageSentence, type BindingFault } from "../engine/damage";
 import { readGraph } from "../engine/graph";
 import { relayoutDiagram } from "../engine/relayout";
 import { projectGraph } from "./projection";
@@ -781,7 +782,10 @@ server.registerTool(
       + "edges both carry one. No unattributed means the board has no strays. "
       + "Edit or delete by the node id listed here -- edit_diagram resolves it -- "
       + "and ask for geometry or includeElements if you need the raw Excalidraw elementId. "
-      + "When the board has anchored refs, notShown describes what it leaves out: files drawn on sibling boards and files on no board.",
+      + "When the board has anchored refs, notShown describes what it leaves out: files drawn on sibling boards and files on no board. "
+      + "A damaged block means the file contradicts itself and will not draw the way it reads -- the graph "
+      + "below it is what the file says, not what anyone sees. Stop and repair the board rather than acting "
+      + "on the rest of the response.",
     inputSchema: {
       path: z.string(),
       geometry: z
@@ -819,7 +823,24 @@ server.registerTool(
         diagramDir(WORKSPACE_ROOT),
       );
 
+      const projected = projectGraph(graph, {
+        geometry,
+        detailed: geometry || includeElements,
+        notShown,
+      });
+      const { damaged, ...projection } = projected as { damaged?: unknown };
+
       return text({
+        /*
+         * Before the filename, before anything (#165).
+         *
+         * Everything else in this response was recovered by following one
+         * direction of a binding, and this is the report that the other
+         * direction disagrees -- so a reader that meets `nodes` first has
+         * already been handed a complete, plausible, unusable answer. That is
+         * what happened: 34 nodes, 44 edges, every label right, blank picture.
+         */
+        ...(damaged ? { damaged } : {}),
         file: relativeToWorkspace(file),
         /*
          * Which build drew this, and what it means.
@@ -833,12 +854,22 @@ server.registerTool(
           schema: schemaOf(board.diagramos),
           drawnBy: board.diagramos?.version ?? "before boards were stamped",
         },
-        ...projectGraph(graph, { geometry, detailed: geometry || includeElements, notShown }),
+        ...projection,
         // Named here so a caller can address a single diagram (delete_diagram,
         // or create_diagram with append) without having to guess its name from
         // element id prefixes.
         ...(diagrams.length ? { diagrams } : {}),
-        summary: `${graph.nodes.length} nodes, ${graph.edges.length} edges`
+        /*
+         * Damage leads, because the summary is the one line a caller is certain
+         * to read and "34 nodes, 44 edges" is a true sentence about a board that
+         * draws nothing (#165).
+         */
+        summary: (graph.damage.length
+          ? `DAMAGED FILE — ${graph.damage.length} broken `
+            + `${graph.damage.length === 1 ? "connection" : "connections"}; `
+            + "the graph below is what the file says, not what it draws. "
+          : "")
+          + `${graph.nodes.length} nodes, ${graph.edges.length} edges`
           + (inferred.length ? `, ${inferred.length} inferred from hand-drawn elements` : ""),
         ...(includeElements
           ? {
@@ -871,7 +902,10 @@ server.registerTool(
       + "falls "
       + "back to a plain mention and is counted in assertions. A route anchor (path#/api/board) instead "
       + "asks that the literal still be served by that file or one it imports; a file writing no route "
-      + "literals at all is counted as unread rather than reported broken. When both ends of an arrow name symbols, the arrow is checked inside one function body rather than by imports — so an arrow drawn from the wrong function is caught. Give the arrow via: [...] when the call goes through named intermediaries, and a break reports which hop stopped holding.",
+      + "literals at all is counted as unread rather than reported broken. When both ends of an arrow name symbols, the arrow is checked inside one function body rather than by imports — so an arrow drawn from the wrong function is caught. Give the arrow via: [...] when the call goes through named intermediaries, and a break reports which hop stopped holding. "
+      + "A damaged entry is not drift: the board file contradicts itself and will not draw the way it "
+      + "reads, so clean says nothing about it. Repair or restore that board before acting on anything "
+      + "else in the response.",
     inputSchema: {
       path: z
         .string()
@@ -966,6 +1000,9 @@ server.registerTool(
       const workItems: Array<Record<string, unknown>> = [];
       const promotions: Array<Record<string, unknown>> = [];
       const conceptBoards: string[] = [];
+      // Boards that contradict themselves. Kept per board rather than pooled:
+      // the one thing a caller must do with this is open that file.
+      const damaged: Array<{ board: string; summary: string; faults: BindingFault[] }> = [];
       // Grammars load once per process; everything below this line is synchronous.
       await initEngine();
       const codeGraph = createCodeGraphOption(WORKSPACE_ROOT);
@@ -994,6 +1031,19 @@ server.registerTool(
         assertions.downgraded += report.assertions.downgraded;
         assertions.unsupportedLanguage += report.assertions.unsupportedLanguage;
         if (report.concept) conceptBoards.push(relativeToWorkspace(file));
+        /*
+         * Not a finding, and deliberately not folded into `clean` (#165).
+         *
+         * `clean` answers "has anything on this board stopped matching the
+         * code", and nothing here is about the code. This is the file
+         * disagreeing with itself, which makes every other answer in this
+         * response -- including a clean one -- an answer about a board nobody
+         * can see. It is carried first in the response for that reason.
+         */
+        const sentence = damageSentence(report.damage);
+        if (sentence) {
+          damaged.push({ board: relativeToWorkspace(file), summary: sentence, faults: report.damage });
+        }
         // Named per finding rather than grouped: a caller acting on one needs to
         // know which file to redraw, and flat is cheaper than nesting.
         for (const finding of report.findings) {
@@ -1077,6 +1127,18 @@ server.registerTool(
 
       return text({
         boards: files.map((file) => relativeToWorkspace(file)),
+        // First in the object, so a reader meets it before `clean`. A board
+        // that renders blank can pass every check below this line.
+        ...(damaged.length
+          ? {
+              damaged,
+              damagedNote:
+                "These board files contradict themselves, so they do not draw the way they read. "
+                + "Nothing below is a claim about your code and `clean` does not cover it: the boards "
+                + "named here could be checked, and the answer means nothing. Repair or restore them "
+                + "before trusting any other result in this response.",
+            }
+          : {}),
         clean: findings.length === 0 && edges.length === 0 && deleted.length === 0
           && garbledClaims.length === 0,
         findings,

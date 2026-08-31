@@ -39,6 +39,7 @@ import { arrowClaimError, boxClaimError, valueClaimError, type ArrowClaim } from
 import { checkClosed, type ClosedBreach } from "./closed";
 import { connects, refIsStale, type CodeGraphOption } from "./codegraph";
 import { readDependencies, readerCanPlace } from "./deps";
+import type { BindingFault } from "./damage";
 import { generatedRef, NEVER_WALK } from "./generated";
 import { readGraph, type Provenance, type RecoveredGraph } from "./graph";
 import { licenceFor } from "./licence";
@@ -890,6 +891,23 @@ export interface DriftReport {
    * These are incomplete strokes, not checked specifications.
    */
   strayArrows?: number;
+  /**
+   * Places the board file contradicts itself, and therefore cannot be trusted
+   * to have told this check anything (#165).
+   *
+   * Deliberately not in `findings` and deliberately not part of `clean`, which
+   * both mean "a claim on this board disagrees with the code". Nothing here is
+   * about the code. It is the file being unreadable in a way that reads fine:
+   * the board this was written for returned 34 nodes, 44 edges and a clean
+   * check while rendering blank, because the read walks one direction of a
+   * binding and the renderer walks the other.
+   *
+   * A caller must treat a non-empty list as invalidating the rest of this
+   * report rather than as one more thing wrong with the diagram. `check-drift`
+   * puts it with the boards it could not check, which is the nearest true
+   * thing: this one could be checked and the answer means nothing.
+   */
+  damage: BindingFault[];
   /**
    * Every verdict word this engine could have used, whether or not it did.
    *
@@ -3608,6 +3626,9 @@ export function checkDrift(
     unreadEdges,
     unconfirmedEdges,
     ...(graph.strayArrows > 0 ? { strayArrows: graph.strayArrows } : {}),
+    // Read off the graph rather than recomputed: one answer, so no two channels
+    // can ever disagree about whether a board is damaged.
+    damage: graph.damage,
     // Unconditional, and unconditionally the whole list: a vocabulary sent only
     // when it is used would tell a stale reader nothing on the one board where
     // nothing is wrong, which is where it matters most.

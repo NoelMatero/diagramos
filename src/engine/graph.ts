@@ -16,6 +16,7 @@ import {
   parseArrowClaim, parseBoardClaim, parseBoxClaim, readLabelClaim, readLabelValues,
   type ArrowClaim, type BoardClaim, type BoxClaim, type ParsedClaim, type ValueClaim,
 } from "./claim";
+import { bindingDamage, type BindingFault } from "./damage";
 import type { ExcalidrawElement } from "./normalize";
 import type { BoardFile } from "./board-file";
 
@@ -297,6 +298,18 @@ export interface RecoveredGraph {
    * These never make it into edges[] and are the truly dangling arrows.
    */
   strayArrows: number;
+  /**
+   * Places the file contradicts itself, so nothing below can be trusted (#165).
+   *
+   * Not a finding and not a provenance: every fact in `nodes` and `edges` was
+   * read through one direction of a binding, and this is the report of that
+   * direction disagreeing with the other one. A board that renders blank can
+   * fill this array and still return a complete, correct-looking graph -- which
+   * is exactly what happened, and why this is answered here rather than left to
+   * each caller to think of. Empty on every board that is whole, which is
+   * almost all of them.
+   */
+  damage: BindingFault[];
 }
 
 interface Box {
@@ -632,5 +645,9 @@ export function readGraph(board: BoardFile): RecoveredGraph {
     edges,
     unattributed,
     strayArrows,
+    // One extra pass over the elements, on the hot path on purpose: a caller
+    // that has to remember to ask is a caller that will not, and the whole
+    // defect was every channel reporting a wrecked board as healthy.
+    damage: bindingDamage(board),
   };
 }
