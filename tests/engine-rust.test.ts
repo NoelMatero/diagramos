@@ -86,6 +86,45 @@ function flagsOf(files: Record<string, string>, file: string): string[] {
   return readDependencies(file, files[file]!, workspace, new Map())?.dynamic ?? [];
 }
 
+/**
+ * The same tree on a filesystem that does not care about capitals.
+ *
+ * macOS and Windows both answer `stat("src/Request.rs")` about `src/request.rs`,
+ * and `list` still reports the real spelling — so this is not a caricature, it
+ * is what the two most common development machines actually do. Written as a
+ * workspace because the alternative is a test that passes on Linux CI and
+ * cannot fail anywhere the bug lives.
+ */
+function caseBlindWorkspace(files: Record<string, string>): Workspace {
+  const real = fakeWorkspace(files);
+  const folded = new Map(Object.keys(files).map((file) => [file.toLowerCase(), file]));
+  const actual = (target: string) => folded.get(target.replace(/^\.\//, "").toLowerCase());
+  return {
+    ...real,
+    stat: (target) => {
+      const found = real.stat(target);
+      if (found !== "missing") return found;
+      return actual(target) ? "file" : "missing";
+    },
+    read: (target) => {
+      const found = actual(target);
+      return found ? files[found]! : real.read(target);
+    },
+  };
+}
+
+function depsOnCaseBlindDisk(files: Record<string, string>, file: string): string[] {
+  const workspace = caseBlindWorkspace(files);
+  const read = readDependencies(file, files[file]!, workspace, new Map());
+  if (!read) throw new Error(`no reader for ${file}`);
+  const out: string[] = [];
+  for (const dependency of read.dependencies) {
+    if (!dependency.file || dependency.file === file) continue;
+    if (!out.includes(dependency.file)) out.push(dependency.file);
+  }
+  return out;
+}
+
 describe("the module tree, which is where a Rust path lands", () => {
   it("reads `mod x;` as the file it creates", () => {
     const files = {
@@ -180,6 +219,39 @@ describe("the module tree, which is where a Rust path lands", () => {
     };
     expect(depsOf(files, "src/lib.rs")).toEqual(["src/match.rs"]);
     expect(depsOf(files, "src/user.rs")).toEqual(["src/lib.rs", "src/match.rs"]);
+  });
+});
+
+describe("a filesystem that ignores capitals", () => {
+  it("does not turn a type into the module that shares its name", () => {
+    /*
+     * `use crate::Request;` names a *type*. Modules and types are separate
+     * namespaces, so there is no module `Request` and no edge to draw. On a
+     * case-insensitive disk the walk asked for `src/Request.rs`, got
+     * `src/request.rs` back, and reported an edge to a path that exists on
+     * nobody's machine -- which is how `read_diagram` came to name
+     * `lib_shared/src/Request.rs` in its gaps (#166).
+     */
+    const files = {
+      "Cargo.toml": MANIFEST,
+      "src/lib.rs": "mod request;\npub use request::Request;\n",
+      "src/request.rs": "pub struct Request;\n",
+      "src/handler.rs": "use crate::Request;\n",
+    };
+    // `crate::` names the crate root, which is a real edge and stays. What must
+    // not be here is a second entry, `src/Request.rs`, for a module nobody wrote.
+    expect(depsOnCaseBlindDisk(files, "src/handler.rs")).toEqual(["src/lib.rs"]);
+  });
+
+  it("still reads the module when the capitals do match", () => {
+    // The other half: the fix must not cost the ordinary edge it sits next to.
+    const files = {
+      "Cargo.toml": MANIFEST,
+      "src/lib.rs": "mod request;\n",
+      "src/request.rs": "pub struct Request;\n",
+      "src/handler.rs": "use crate::request::Request;\n",
+    };
+    expect(depsOnCaseBlindDisk(files, "src/handler.rs")).toEqual(["src/lib.rs", "src/request.rs"]);
   });
 });
 

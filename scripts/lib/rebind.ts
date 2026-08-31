@@ -48,6 +48,7 @@ import { parseSymbol, routeOf } from "../../src/engine/assert";
 import { symbolCounts } from "../../src/engine/body";
 import type { BoardFile } from "../../src/engine/board-file";
 import { parseRef } from "../../src/engine/drift";
+import { inNeverWalk } from "../../src/engine/generated";
 import { readGraph, type RecoveredGraph } from "../../src/engine/graph";
 import { languageOf } from "../../src/engine/parse";
 
@@ -114,12 +115,6 @@ export interface RebindMeasurement {
   rows: StaleRef[];
 }
 
-/** Directories no candidate ever comes from: dependencies, build output, VCS. The list the drift walk uses. */
-const NEVER_WALK = new Set([
-  "node_modules", "out", "dist", "build", "coverage", "vendor", ".git",
-  "test-results", "playwright-report", ".corpus", "graphify-out",
-]);
-
 const CANDIDATE_CAP = 8;
 const REGEX_SPECIAL = /[.*+?^${}()|[\]\\]/g;
 
@@ -134,10 +129,6 @@ let root: string | undefined;
 
 function git(args: string[]): string {
   return execFileSync("git", args, { cwd: root, encoding: "utf8", maxBuffer: 1 << 28 }).trimEnd();
-}
-
-function inNeverWalk(file: string): boolean {
-  return file.split("/").some((segment) => NEVER_WALK.has(segment));
 }
 
 /** Word-boundary match, the same leniency `drift.ts` uses to decide a symbol is still there. */

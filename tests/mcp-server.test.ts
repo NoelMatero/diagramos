@@ -505,6 +505,37 @@ describe("board MCP server", () => {
     expect(result.plannedWork).toBeUndefined();
   }, 120_000);
 
+  /**
+   * A ref into build output, said at draw time and said differently.
+   *
+   * The advice for `pointsAtNothing` is "correct the typo or mark it planned",
+   * and both are wrong here: the file is there, so planned would be a lie, and
+   * the artifact will resolve forever whatever happens to the source. So it
+   * gets its own key and its own sentence (#166).
+   */
+  it("says at draw time when a box points into build output, and says not to plan it", async () => {
+    const board = "docs/diagrams/build-output.excalidraw";
+    await mkdir(path.join(workspace, "dist"), { recursive: true });
+    await writeFile(path.join(workspace, "package.json"), '{ "name": "demo" }\n');
+    await writeFile(path.join(workspace, "dist/bundle.js"), "export const bundled = 1;\n");
+    await writeFile(path.join(workspace, "already.ts"), "export const already = 1;\n");
+    const result = jsonOf(
+      await call("create_diagram", {
+        path: board,
+        nodes: [
+          { id: "real", label: "Already here", ref: "already.ts" },
+          { id: "built", label: "Bundle", ref: "dist/bundle.js" },
+        ],
+      }),
+    );
+    expect(result.pointsAtNothing).toBeUndefined();
+    expect(result.fix).toBeUndefined();
+    const said = (result.pointsAtBuildOutput as string[]).join(" ");
+    expect(said).toContain("Bundle → dist/bundle.js");
+    expect(said).toContain("package.json");
+    expect(String(result.fixBuildOutput)).toContain("Do not mark these planned");
+  }, 120_000);
+
   it("reports planned boxes as tracked work, not as a problem", async () => {
     const board = "docs/diagrams/plan.excalidraw";
     await writeFile(path.join(workspace, "already.ts"), "export const already = 1;\n");

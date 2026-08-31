@@ -39,6 +39,7 @@ import { arrowClaimError, boxClaimError, valueClaimError, type ArrowClaim } from
 import { checkClosed, type ClosedBreach } from "./closed";
 import { connects, refIsStale, type CodeGraphOption } from "./codegraph";
 import { readDependencies, readerCanPlace } from "./deps";
+import { generatedRef, NEVER_WALK } from "./generated";
 import { readGraph, type Provenance, type RecoveredGraph } from "./graph";
 import { licenceFor } from "./licence";
 import { languageOf, type Language } from "./parse";
@@ -52,6 +53,20 @@ export type DriftKind =
   | "missing-symbol"
   | "unresolvable-ref"
   | "empty-ref"
+  /**
+   * A ref pointing into build output: `target/`, `dist/`, `node_modules/`.
+   *
+   * Not `unresolvable-ref`, which says "that is not a path in this repo at all",
+   * and would be a false statement here — the path is in the repo, the file is
+   * on disk, and that is exactly the problem. A generated file resolves, passes,
+   * and keeps passing while the source it was compiled from is renamed, moved or
+   * deleted, so the box goes green once and never speaks again (#166).
+   *
+   * The only finding here that is about the *ref* rather than about the code:
+   * nothing in the tree has drifted, and no edit to the code can clear it. The
+   * anchor has to be moved to the source the artifact was built from.
+   */
+  | "generated-ref"
   /** `@declared` claimed, and no declaration of that name is in the file. */
   | "missing-declaration"
   /** `@used` claimed, and every occurrence is the declaration itself. */
@@ -153,6 +168,7 @@ export const DRIFT_KINDS = [
   "missing-symbol",
   "unresolvable-ref",
   "empty-ref",
+  "generated-ref",
   "missing-declaration",
   "unused-symbol",
   "unsupported-member",
@@ -478,6 +494,8 @@ type EdgeOutcome =
 export type NodeSkipReason =
   | "no-ref"
   | "ref-outside-repo"
+  /** An inferred anchor read off a label that names build output. */
+  | "ref-generated"
   /** A directory or glob anchor with more entries than the cap allows reading. */
   | "anchor-too-large"
   /** A route anchor on a file that writes no route literals at all. */
@@ -494,6 +512,17 @@ export type EdgeSkipReason =
   | "endpoint-external"
   | "endpoint-has-no-ref"
   | "endpoint-outside-repo"
+  /**
+   * An end points into build output, so there is no source there to read.
+   *
+   * Its own reason rather than `unlicensed-language`, which is what a
+   * fingerprint file used to be counted as: `languageOf` has no answer for
+   * `output-test-lib-lib_shared`, so an arrow onto one was reported as a
+   * language this engine cannot read. That reads as a gap in the tool and sent
+   * somebody looking for a Rust bug, when the arrow was pointing at a build
+   * artifact and the box check has already said so (#166).
+   */
+  | "endpoint-generated"
   | "endpoint-file-missing"
   | "directory-ref"
   /**
@@ -957,18 +986,6 @@ type Inspection = DriftFinding | "ok" | { skip: NodeSkipReason };
 const ANCHOR_ENTRY_CAP = 50;
 
 /**
- * Directories the coverage walk never enters: dependencies, build output, VCS.
- *
- * Not a security boundary -- `workspace.resolve` is still the only way in and
- * out. This is about cost and noise. Generated code is not something a diagram
- * was ever going to draw.
- */
-const NEVER_WALK = new Set([
-  "node_modules", "out", "dist", "build", "coverage", "vendor", ".git",
-  "test-results", "playwright-report",
-]);
-
-/**
  * A test file, by the conventions every JS project shares.
  *
  * Tests are the largest group of entry points in any repository and the least
@@ -1224,6 +1241,31 @@ function inspect(
   const found = workspace.stat(absolute);
   if (found === "missing") {
     return { ...base, kind: "missing-file", detail: `${lookup} no longer exists.` };
+  }
+
+  /*
+   * Present on disk is not the same as worth pointing at.
+   *
+   * This is the only check here that fires on a ref that *works*: everything
+   * above and below asks whether the code moved, and this asks whether the box
+   * was ever aimed at code. It sits after the `missing` branch on purpose --
+   * a `target/` path that is also gone is more usefully reported as gone, and a
+   * repository whose build directory has been cleaned should not start
+   * reporting a different word for the same broken ref.
+   */
+  const generated = generatedRef(lookup, workspace);
+  if (generated) {
+    // An inferred ref is a reading of somebody's label, not a claim they made,
+    // and it is dropped here for the same reason `ref-outside-repo` drops one:
+    // there is no anchor to correct, only a guess to withdraw.
+    if (provenance === "inferred") return { skip: "ref-generated" };
+    return {
+      ...base,
+      kind: "generated-ref",
+      detail: `${lookup} is inside ${generated.path}, which ${generated.manifest} generates. `
+        + "A build artifact resolves forever and says nothing when the source behind it changes. "
+        + "Point the box at the source it was built from.",
+    };
   }
 
   if (glob) {
@@ -2696,6 +2738,15 @@ export function checkDrift(
       // Skip if either anchor is outside the repo
       if (!fromFile || !toFile) {
         skipClaimedEdge("endpoint-outside-repo");
+        continue;
+      }
+
+      // An end in build output has no source to read, and the box check has
+      // already reported it. Saying so by name keeps it out of
+      // `unlicensed-language`, where a fingerprint file reads as a hole in the
+      // engine rather than a misaimed ref.
+      if (generatedRef(fromAnchor, workspace) || generatedRef(toAnchor, workspace)) {
+        skipClaimedEdge("endpoint-generated");
         continue;
       }
       const fromStat = workspace.stat(fromFile);

@@ -50,6 +50,12 @@ wrong answer is easy — a box saying `src/engine/layout.ts` when the file is no
 `src/engine/layout/index.ts` is a ref to update, not a subsystem to delete, and
 matching on a filename is exactly how that goes wrong in the other direction.
 
+When you do search, ignore anything under `target/`, `dist/`, `out/`, `build/` or
+`node_modules/`. Build output quotes source: a Rust fingerprint log copies whole
+function signatures into JSON, so a grep for a symbol returns one and it reads as
+a hit. A ref there resolves forever and goes quiet about every change to the code
+it was meant to describe, so the check now refuses one outright.
+
 Boxes marked `inferred` were hand-drawn, and their ref was *guessed from the
 label*. Treat those as the user's intention, not as a wrong claim: mention them
 and ask, rather than deleting someone's sketch because a guessed path missed.
