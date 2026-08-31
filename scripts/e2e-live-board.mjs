@@ -417,6 +417,136 @@ try {
   await meaningPage.close();
 
   /*
+   * Undo, on a board that was just opened (#164).
+   *
+   * This is the one that emptied a committed file. Excalidraw's undo is a delta
+   * against its own snapshot of the scene; the viewer painted the board in
+   * without telling it, so the snapshot stayed empty and the first Ctrl+Z
+   * inverted "the whole diagram arrived" into "the whole diagram goes" --
+   * 157 elements tombstoned, every container stripped of its `boundElements`,
+   * saved over the file, and nothing anywhere said so.
+   *
+   * Its own board and its own tab, because the page has to be *freshly loaded*
+   * for this: that is what makes the snapshot empty, and it is why the report
+   * said a refresh came first.
+   *
+   * Asserted against the file, and against both halves of the binding, because
+   * both halves are what went. The undo also has to still be an undo -- a fix
+   * that made Ctrl+Z do nothing would pass a "the board survived" check.
+   */
+  const undoFile = path.join(workspace, "undo.excalidraw");
+  const undoNodes = Array.from({ length: 6 }, (_, index) => ({
+    id: `u${index}`,
+    label: `Box ${index}`,
+  }));
+  const undoBoard = await createDiagram(emptyBoard(), {
+    title: "Undo",
+    name: "u",
+    nodes: undoNodes,
+    edges: undoNodes.slice(1).map((node, index) => ({
+      from: undoNodes[index].id,
+      to: node.id,
+      label: `step ${index}`,
+    })),
+  });
+  await writeBoard(undoFile, undoBoard.board);
+
+  /** Labels the board carries, and labels whose box has stopped listing them. */
+  const bindings = (board) => {
+    const live = board.elements.filter((element) => !element.isDeleted);
+    const byId = new Map(live.map((element) => [String(element.id), element]));
+    const labelled = live.filter((element) => typeof element.containerId === "string");
+    const orphaned = labelled.filter((element) => {
+      const container = byId.get(element.containerId);
+      if (!container) return true;
+      return !(container.boundElements ?? []).some((entry) => String(entry?.id) === String(element.id));
+    });
+    return { live: live.length, labels: labelled.length, orphaned: orphaned.length };
+  };
+
+  const undoPage = await browser.newPage({ viewport: { width: 1400, height: 800 } });
+  undoPage.on("pageerror", (error) => errors.push(String(error)));
+  await undoPage.goto(server.urlFor(undoFile), { waitUntil: "load" });
+  await undoPage.waitForFunction(() => typeof window.__boardScene === "function", undefined, { timeout: 20_000 });
+  await waitForScene(undoPage, (value) => value.count > 0 && settled(value));
+
+  const undoBefore = bindings(await readBoard(undoFile));
+  const placedBefore = (await readBoard(undoFile)).elements.find((element) => element.customData?.node === "u0");
+
+  // One ordinary edit, made the way a person makes it: select the diagram and
+  // drag it. A hand edit is what arms the undo -- it is the first thing
+  // Excalidraw captures, and before the fix it captured the whole board with it.
+  const modifier = process.platform === "darwin" ? "Meta" : "Control";
+  await undoPage.mouse.click(700, 400);
+  await undoPage.keyboard.press(`${modifier}+a`);
+  await undoPage.waitForTimeout(300);
+  await undoPage.mouse.move(700, 400);
+  await undoPage.mouse.down();
+  await undoPage.mouse.move(760, 430, { steps: 10 });
+  await undoPage.mouse.up();
+  await undoPage.waitForTimeout(1500);
+  const placedAfterDrag = (await readBoard(undoFile)).elements.find((element) => element.customData?.node === "u0");
+  check(
+    "the drag reaches the file",
+    placedAfterDrag && placedBefore && placedAfterDrag.x !== placedBefore.x,
+    `${placedBefore?.x} -> ${placedAfterDrag?.x}`,
+  );
+
+  await undoPage.keyboard.press(`${modifier}+z`);
+  await undoPage.waitForTimeout(2500);
+
+  const undoAfter = bindings(await readBoard(undoFile));
+  check(
+    "an undo on a freshly opened board does not empty it",
+    undoAfter.live === undoBefore.live,
+    `${undoBefore.live} -> ${undoAfter.live} elements`,
+  );
+  check(
+    "an undo does not strip the boxes of their labels",
+    undoAfter.orphaned === 0 && undoAfter.labels === undoBefore.labels,
+    `${undoAfter.orphaned} orphaned of ${undoAfter.labels} labels`,
+  );
+  const placedAfterUndo = (await readBoard(undoFile)).elements.find((element) => element.customData?.node === "u0");
+  check(
+    "the undo is still an undo",
+    placedAfterUndo && placedBefore && placedAfterUndo.x === placedBefore.x,
+    `${placedAfterDrag?.x} -> ${placedAfterUndo?.x}, expected ${placedBefore?.x}`,
+  );
+  /*
+   * Clearing a board by hand still works.
+   *
+   * Here because the first fix for #164 refused it: the guard was phrased as
+   * "this save empties the board", which cannot tell select-all-and-Delete apart
+   * from the wreck, and broke an obvious gesture to defend against a bug that
+   * was already fixed a layer up. The guard now asks about the one thing the
+   * wreck did that no deletion does -- tearing a label off a box going down with
+   * it -- and this is what stops that from being widened back.
+   */
+  await undoPage.mouse.click(700, 400);
+  await undoPage.keyboard.press(`${modifier}+a`);
+  await undoPage.waitForTimeout(300);
+  await undoPage.keyboard.press("Delete");
+  await undoPage.waitForTimeout(2500);
+
+  const cleared = bindings(await readBoard(undoFile));
+  check(
+    "selecting everything and deleting it clears the board",
+    cleared.live === 0,
+    `${undoBefore.live} -> ${cleared.live} elements left`,
+  );
+  const clearedCanvas = await scene(undoPage);
+  check(
+    "the cleared board is not pushed back onto the canvas",
+    clearedCanvas.count === 0,
+    `${clearedCanvas.count} on the canvas`,
+  );
+  const noRefusal = await undoPage.$(".status-note");
+  check("clearing a board is not refused", noRefusal === null);
+
+  await undoPage.screenshot({ path: shot("6-after-undo") });
+  await undoPage.close();
+
+  /*
    * The way from a board to every other board.
    *
    * The index exists and is printed by the command, but a page you can only

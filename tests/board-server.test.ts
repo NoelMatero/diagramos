@@ -159,6 +159,94 @@ describe("board server", () => {
     expect(retry.status).toBe(200);
   }, 20_000);
 
+  /**
+   * #164: a page can send a scene that is not a drawing.
+   *
+   * One Ctrl+Z on a freshly loaded board turned into "delete all 157 elements",
+   * with every box stripped of the label still naming it, and the file took it.
+   * Asserted against the file rather than the response, because what went wrong
+   * was on disk.
+   */
+  it("refuses a save that tears the labels off their boxes, and leaves the file alone", async () => {
+    const labelled: BoardFile = {
+      ...emptyBoard(),
+      elements: [
+        { ...elementNamed("box"), boundElements: [{ type: "text", id: "box-label" }] },
+        {
+          id: "box-label",
+          type: "text",
+          x: 10,
+          y: 10,
+          width: 60,
+          height: 20,
+          version: 1,
+          isDeleted: false,
+          containerId: "box",
+          text: "box",
+        },
+      ] as never,
+    };
+    await writeBoard(boardFile, labelled);
+    const current = (await (await fetch(api("/api/board"))).json()) as { revision: string };
+
+    // The measured shape of the wreck: tombstoned, and rewritten on the way.
+    const wrecked: BoardFile = {
+      ...labelled,
+      elements: labelled.elements.map((element) => {
+        const { boundElements: _stripped, ...rest } = element as Record<string, unknown>;
+        return { ...rest, isDeleted: true };
+      }) as never,
+    };
+
+    const response = await fetch(api("/api/board"), {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ revision: current.revision, board: wrecked }),
+    });
+    expect(response.status).toBe(409);
+
+    const refusal = (await response.json()) as { refused?: boolean; error?: string; board: BoardFile };
+    // Flagged apart from an ordinary stale 409: the page replays its own edits
+    // over a stale board and must do the opposite with a refused one.
+    expect(refusal.refused).toBe(true);
+    expect(refusal.error).toMatch(/torn 1 label off the box that holds it/);
+    // The board comes back with it, so the page can put the file's own scene
+    // back on the canvas instead of sitting on the wreck.
+    expect(refusal.board.elements.filter((element) => element.isDeleted !== true).length)
+      .toBeGreaterThan(0);
+
+    const onDisk = await readBoard(boardFile);
+    expect(onDisk.elements.filter((element) => element.isDeleted !== true)).toHaveLength(2);
+  }, 20_000);
+
+  /**
+   * The other half of the same rule, and the reason it is phrased about
+   * bindings rather than about how much was deleted: clearing a board by hand
+   * is an obvious thing to do and must go through.
+   */
+  it("takes a save that deletes the whole board by hand", async () => {
+    const before = await readBoard(boardFile);
+    const current = (await (await fetch(api("/api/board"))).json()) as { revision: string };
+    // What select-all-and-Delete produces: tombstoned, bindings untouched.
+    const cleared: BoardFile = {
+      ...before,
+      elements: before.elements.map((element) => ({ ...element, isDeleted: true })) as never,
+    };
+
+    const response = await fetch(api("/api/board"), {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ revision: current.revision, board: cleared }),
+    });
+    expect(response.status).toBe(200);
+
+    const onDisk = await readBoard(boardFile);
+    expect(onDisk.elements.filter((element) => element.isDeleted !== true)).toEqual([]);
+
+    // Put the fixture back for whatever runs next.
+    await writeBoard(boardFile, boardWith("a", "b", "c", "d"));
+  }, 20_000);
+
   it("rejects a payload that is not a board", async () => {
     const response = await fetch(api("/api/board"), {
       method: "POST",
