@@ -22,6 +22,50 @@ largest cost of a diagram task and almost never what was wanted.
 Worth mentioning after a write: anything you inferred rather than were told,
 anything you left out, and the live URL if you started a board. Nothing else.
 
+## How to draw one
+
+Everything below this section is a reference for what the fields mean. This part
+is the order to do things in, and it exists because inventing an order is what a
+diagram task actually spends money on: 21 boards in this repo were each drawn by
+a session deciding for itself how many boxes to draw and what a box should stand
+for, and across them 47% of boxes carry no code anchor, 5% of arrows carry a
+claim, and 9 do not render legibly.
+
+**1. Survey the scope before you read any code.** `survey_scope` takes a
+directory and hands back a draft graph: which boxes, anchored at paths that
+exist, and the arrows between them already carrying `needs` and the `file:line`
+each one was read from. It is the answer to *how many boxes* — it lays candidate
+boards out and keeps whatever detail still renders legibly — and to *is this one
+board or four*, which it returns as `separateBoards`. Working the same thing out
+by reading costs 2–37× more tokens, and it is how a session ends up drawing a
+board, rendering it, and drawing it again.
+
+Skip it only when the user has already told you what the boxes are, when the
+diagram is not about this repository, or when it refuses the scope.
+
+**2. Rename what came back. This is your half.** The draft's labels are
+filenames, and a board of filenames is a dependency graph rather than an
+architecture diagram. Say what each box *does* — `layout` becomes "ELK layout /
+real font metrics" — merge boxes that are one idea, and drop what the user did
+not ask about. Keep `ref`, `claim` and `seen` exactly as they came: those were
+read out of the code, and rewriting them turns a transcription back into a guess.
+
+**3. Draw it in one `create_diagram` call**, edges included. The response says
+whether it renders legibly and which arrows nothing corroborated, so there is
+nothing to find out by looking.
+
+**4. For a flow rather than a structure, none of the above applies.** "How does a
+request become a picture" is a path through the code, not a directory, and no
+survey produces it — read the code and name the boxes yourself. Those are the
+boards worth the most and the ones nothing can draft for you.
+
+**When it is done:** every box has a `ref` or a stated reason not to
+(`state: "planned"`, `state: "external"`, `describes: "concept"`), the draw-time
+response says legible, and `check_drift` is clean. If `separateBoards` came back
+non-empty, say which boards are still undrawn rather than leaving the picture
+looking whole. Do not render to check any of this — every one of those answers
+arrives in words, and the image is the most expensive call here.
+
 ## Path
 
 Write to `docs/diagrams/<topic>.excalidraw`. `create_diagram` refuses anywhere
@@ -52,13 +96,16 @@ Colour carries meaning cheaply: give each subsystem its own `backgroundColor`,
 and set `strokeColor` on edges in the same call rather than patching arrows
 afterwards, since the next regenerate would revert a patch.
 
-Keep edge labels to one or two words. `direction: "DOWN"` suits a sequence or a
-pipeline; the default `RIGHT` suits most architecture. If the first layout comes
-out wrong — sprawling sideways, connectors running long — try the other one with
-`relayout_diagram`, which is a single word and never re-sends the graph. Trying a
-layout is the most reasonable thing to do after seeing a board for the first
-time, and it needs no judgement about the code at all, so do not settle for the
-first one because a redraw felt expensive.
+Keep edge labels to one or two words. On a board being drawn for the first time,
+**leave `direction` off**: both flows are measured and the one that reads is
+drawn, and the response says which it picked and what the other would have come
+to. Naming a flow turns that off, so name one only when the board is a sequence
+and you want `DOWN` whatever it costs.
+
+To change the flow of a board that already exists, `relayout_diagram` is a single
+word and never re-sends the graph. Reach for it when the picture is wrong in a way
+the numbers did not catch — not to find out whether it was, which the draw-time
+response already said.
 
 ## Changing a board that already exists
 
@@ -501,11 +548,19 @@ When a box has drifted, work out whether its code *moved* or *went*: repoint the
 first, remove the second. Deleting a box because a path changed loses a real part
 of the picture.
 
-## Check your work once
+## Do not render to find out whether it worked
 
-`render_diagram` returns an image you can actually look at — use it to catch
-overlap, crowding, or an unreadable label. Once, after the diagram is finished.
-Rendering after every tweak costs an image each time and rarely changes anything.
+**Whether a board can be read is a number, and you already have it.**
+`create_diagram` and `relayout_diagram` both report the size the board came to,
+the scale a render will be forced down to, and how big the labels end up at that
+scale — crowding and unreadable labels are arithmetic, not something to look at.
+A board they call unviewable renders into text a few pixels tall, so the image
+answers nothing and the call after it is another redraw. That loop is what cost
+$1.94 for two diagrams once.
+
+`render_diagram` is for showing a person the board, or for judging something
+genuinely visual that the numbers do not cover. Once, at the end, and never as
+the way to check your own work.
 
 ## Reading, and honouring, what is already there
 

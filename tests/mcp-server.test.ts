@@ -89,6 +89,7 @@ describe("board MCP server", () => {
         "read_diagram",
         "relayout_diagram",
         "render_diagram",
+        "survey_scope",
       ].sort(),
     );
   });
@@ -1156,5 +1157,85 @@ describe("a damaged board", () => {
     const graph = jsonOf(await call("read_diagram", { path: BOARD }));
     expect(graph.damaged).toBeUndefined();
     expect(String(graph.summary)).not.toContain("DAMAGED");
+  }, 120_000);
+});
+
+/**
+ * The shape of a board, over the wire, before a box is drawn (#186).
+ *
+ * These go through the transport rather than calling the engine, because the
+ * whole point of this tool is what a session receives: if the draft arrives in a
+ * shape that has to be rebuilt before `create_diagram` will take it, the refs
+ * and the claims are exactly what gets dropped on the way.
+ */
+describe("survey_scope", () => {
+  const SCOPE = "app";
+
+  beforeAll(async () => {
+    await mkdir(path.join(workspace, SCOPE, "core"), { recursive: true });
+    await mkdir(path.join(workspace, SCOPE, "api"), { recursive: true });
+    await writeFile(path.join(workspace, SCOPE, "main.ts"), "import './api/route';\n");
+    await writeFile(path.join(workspace, SCOPE, "api/route.ts"), "import '../core/parse';\n");
+    await writeFile(path.join(workspace, SCOPE, "api/auth.ts"), "import '../core/parse';\n");
+    await writeFile(path.join(workspace, SCOPE, "core/parse.ts"), "import './token';\n");
+    await writeFile(path.join(workspace, SCOPE, "core/token.ts"), "export const token = 1;\n");
+  }, 120_000);
+
+  it("hands back a graph create_diagram will take as it stands", async () => {
+    const survey = jsonOf(await call("survey_scope", { scope: SCOPE }));
+
+    // Named rather than asserted on `nodes.length`, so a refusal reports its own
+    // reason instead of arriving as "cannot read properties of undefined".
+    expect(survey.refused, JSON.stringify(survey)).toBeUndefined();
+    const nodes = survey.nodes as Array<{ id: string; label: string; ref: string }>;
+    const edges = survey.edges as Array<{ from: string; to: string; claim?: string; seen: string }>;
+    expect(nodes.length).toBeGreaterThan(1);
+
+    // Every box anchored, which is the number this tool exists to move: across
+    // this repo's own boards it is 47%.
+    expect(nodes.every((node) => !!node.ref)).toBe(true);
+    // Every arrow carrying the line it came from, and a claim wherever that line
+    // reads as an import -- which is the only condition under which writing
+    // `needs` is a transcription. TypeScript always declares one, so on this
+    // fixture that is every arrow.
+    expect(edges.length).toBeGreaterThan(0);
+    expect(edges.every((edge) => /^app\/.+\.ts:\d+$/.test(edge.seen))).toBe(true);
+    expect(edges.every((edge) => edge.claim === "needs")).toBe(true);
+
+    // Drawn straight through, no restructuring, and it comes back clean.
+    await call("create_diagram", {
+      path: "docs/diagrams/surveyed.excalidraw",
+      title: "surveyed",
+      nodes: nodes.map(({ id, label, ref }) => ({ id, label, ref })),
+      edges: edges.map(({ from, to, claim }) => (claim ? { from, to, claim } : { from, to })),
+    });
+    const report = jsonOf(await call("check_drift", { path: "docs/diagrams/surveyed.excalidraw" }));
+    expect(report.findings).toEqual([]);
+    expect(report.checked).toBe(nodes.length);
+  }, 120_000);
+
+  it("says how the board will render, before the graph is sent", async () => {
+    const survey = jsonOf(await call("survey_scope", { scope: SCOPE }));
+    expect(String(survey.size)).toMatch(/^\d+x\d+$/);
+    expect(String(survey.viewable)).toMatch(/legible/);
+  }, 120_000);
+
+  it("says out loud that the labels are filenames and need replacing", async () => {
+    const survey = jsonOf(await call("survey_scope", { scope: SCOPE }));
+    expect(String(survey.rename)).toMatch(/filenames/);
+  }, 120_000);
+
+  it("refuses a scope in a language it has no dependency reader for", async () => {
+    await mkdir(path.join(workspace, "pyapp"), { recursive: true });
+    for (const name of ["main", "views", "models", "urls", "forms"]) {
+      await writeFile(path.join(workspace, "pyapp", `${name}.py`), "import os\n");
+    }
+    const survey = jsonOf(await call("survey_scope", { scope: "pyapp" }));
+    expect(String(survey.refused)).toMatch(/python/);
+    expect(survey.nodes).toBeUndefined();
+  }, 120_000);
+
+  it("will not read source outside the workspace", async () => {
+    await expect(call("survey_scope", { scope: "../.." })).rejects.toThrow();
   }, 120_000);
 });
