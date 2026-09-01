@@ -107,6 +107,16 @@ function textTypeNames(signature: string): Set<string> {
       }
     }
   }
+  /*
+   * A fourth, and the one that came out of #193: `Self` is not a name, it is a
+   * stand-in for one. Nothing declares a type called `Self` and no box is ever
+   * drawn for it, so asking "did the reader find the token `Self`" measures a
+   * question production never asks -- the reader resolves it to the type the
+   * `impl` names, which is the fix that issue asked for. Left in, the referee
+   * reported 43 misses on the Rust corpus, every one of them the reader doing
+   * exactly the right thing.
+   */
+  names.delete("Self");
   return names;
 }
 
