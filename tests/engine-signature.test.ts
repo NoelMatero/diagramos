@@ -73,6 +73,106 @@ describe("a signature that names the type", () => {
   });
 });
 
+describe("a Rust constructor, which ends `-> Self`", () => {
+  /*
+   * The third time a correct board went red (#169, #188, #193), and the worst:
+   * the other two were a word that did not exist. This one is `returns`, used
+   * correctly, on an arrow that is right -- and the reader looked for `Error`,
+   * found `Self`, and called it absent. Four of thirteen arrows on a generated
+   * `anyhow` board went red this way, and nine per cent of every returning
+   * function in the Rust corpus writes `Self` in its return type.
+   */
+  it("reads `Self` as the type the impl names", () => {
+    const source = "struct Error;\nimpl Error { pub fn new<E>(error: E) -> Self { todo!() } }";
+    const verdict = signatureNames(source, "new", ["Error"], "return", "rust");
+    expect(verdict.verdict).toBe("confirmed");
+    if (verdict.verdict !== "confirmed") return;
+    // Quoted as written. The reader resolved it; the report still shows the
+    // line the author would go and look at.
+    expect(verdict.evidence.signature).toContain("Self");
+  });
+
+  it("reads `Self` in a trait impl as the concrete type, not the trait", () => {
+    const source = "impl Display for Error { fn clone_it(&self, other: Self) -> u8 { 0 } }";
+    expect(verdictOf(signatureNames(source, "clone_it", ["Error"], "parameter", "rust")))
+      .toBe("confirmed");
+    expect(verdictOf(signatureNames(source, "clone_it", ["Display"], "parameter", "rust")))
+      .toBe("absent");
+  });
+
+  it("reads `Self` inside a generic return type", () => {
+    const source = "impl Error { fn opt() -> Option<Self> { None } }";
+    expect(verdictOf(signatureNames(source, "opt", ["Error"], "return", "rust")))
+      .toBe("confirmed");
+  });
+
+  it("still says the arrow is the wrong way round", () => {
+    // Resolving `Self` has to keep the orientation verdict, or the fix would
+    // buy silence back at the price of the thing `takes`/`returns` are for.
+    const source = "impl Error { fn new(e: u8) -> Self { todo!() } }";
+    expect(verdictOf(signatureNames(source, "new", ["Error"], "parameter", "rust")))
+      .toBe("misplaced");
+  });
+
+  it("still refutes an arrow that is genuinely wrong", () => {
+    const source = "impl Error { fn new(e: u8) -> Self { todo!() } }";
+    expect(verdictOf(signatureNames(source, "new", ["Database"], "return", "rust")))
+      .toBe("absent");
+  });
+
+  /*
+   * The two shapes where the enclosing type is not a plain name. Resolving is
+   * strictly better where it works; where it does not, this is back to the rule
+   * the rest of the file follows -- an accusation only from evidence that is
+   * unambiguous, and silence everywhere else.
+   */
+  it("withholds when the impl is generic", () => {
+    const source = "impl<T> Wrapper<T> { fn wrap(t: T) -> Self { todo!() } }";
+    expect(verdictOf(signatureNames(source, "wrap", ["Wrapper"], "return", "rust")))
+      .toBe("withheld/self-type");
+  });
+
+  it("withholds on a trait's own default method, where `Self` is whoever implements it", () => {
+    const source = "trait Maker { fn make() -> Self where Self: Sized; }";
+    expect(verdictOf(signatureNames(source, "make", ["Maker"], "return", "rust")))
+      .toBe("withheld/self-type");
+  });
+
+  it("lets one unresolvable `Self` silence a readable declaration of the same name", () => {
+    const source = [
+      "impl Error { fn make() -> u8 { 0 } }",
+      "impl<T> Wrapper<T> { fn make() -> Self { todo!() } }",
+    ].join("\n");
+    expect(verdictOf(signatureNames(source, "make", ["Database"], "return", "rust")))
+      .toBe("withheld/self-type");
+  });
+
+  /*
+   * Python spells the same idea `typing.Self` and does not reserve the word, so
+   * the treatment is dropped for a file that declares a `Self` of its own.
+   * TypeScript has no such word at all: `Self` there is an ordinary imported
+   * name, and reading it as the enclosing class would invent the false red this
+   * is removing.
+   */
+  it("reads Python's `Self` as the enclosing class", () => {
+    const source = "class Node:\n    def clone(self) -> Self:\n        return self";
+    expect(verdictOf(signatureNames(source, "clone", ["Node"], "return", "python")))
+      .toBe("confirmed");
+  });
+
+  it("leaves a `Self` the file declares for itself alone", () => {
+    const source = "class Self:\n    pass\n\nclass Node:\n    def clone(self) -> Self:\n        return self";
+    expect(verdictOf(signatureNames(source, "clone", ["Self"], "return", "python")))
+      .toBe("confirmed");
+  });
+
+  it("leaves TypeScript's `Self` alone, where it is an ordinary name", () => {
+    const source = "class Box { grab(a: Self): number { return 1 } }";
+    expect(verdictOf(signatureNames(source, "grab", ["Self"], "parameter", "ts")))
+      .toBe("confirmed");
+  });
+});
+
 describe("a signature that names the type in the other half", () => {
   /*
    * The strongest thing here that is not a refutation: it rests on a name that

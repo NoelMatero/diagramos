@@ -110,7 +110,13 @@ export type SignatureWithheld =
   /** The declaration came out of macro soup: tokens awaiting an expansion. */
   | "macro"
   /** `returns` asked of a language that writes no return types. */
-  | "untyped-return";
+  | "untyped-return"
+  /**
+   * The signature says `Self` and there is no plain type to read it as -- a
+   * generic `impl`, or a trait's own default method. Same reason as `aliased`:
+   * a name that stands for something else, and nothing here can name it.
+   */
+  | "self-type";
 
 /** Where the type was named, so a report can quote a file and a line. */
 export interface SignatureEvidence {
@@ -215,6 +221,69 @@ interface Tree {
   rootNode: Node;
 }
 
+/**
+ * `Self`, and why it is neither a confirmation nor an absence on its own.
+ *
+ * A Rust constructor almost always ends `-> Self`, and every word in that is
+ * doing its job: the diagram saying `Error --returns--> Error::new` is right,
+ * `returns` is the right word for it, and the reader used to look for the token
+ * `Error`, find `Self`, and call the correct board wrong -- in red, with a file
+ * and a line. Nine per cent of every returning function in the #96 Rust corpus
+ * writes `Self` in its return type, thirty per cent in clap.
+ *
+ * `Self` is the same shape as the alias this file was built around: a name in a
+ * signature standing for something other than itself. The difference is that it
+ * is usually readable. Inside `impl Error`, `Self` is `Error`; inside `impl
+ * Display for Error` it is still `Error`, because the `type` half of an impl is
+ * the concrete type either way. So it is resolved where the `impl` names a plain
+ * type and withheld everywhere else, which keeps the accusation to the cases
+ * where the evidence is unambiguous:
+ *
+ *   impl Error                 ->  Self is Error, and the answer is given
+ *   impl Display for Error     ->  Self is Error
+ *   impl<T> Wrapper<T>         ->  the enclosing type is generic: withheld
+ *   trait Maker { fn make() }  ->  Self is whoever implements it: withheld
+ *
+ * The cost is on the record. Over `anyhow` and `serde_json` -- 1234 Rust
+ * functions -- the reader would refute on 817 rather than 874, and `self-type`
+ * is 127 of its 417 refusals. Reading the generic ones too would buy most of
+ * that back, and is deliberately not done: withholding costs an answer and
+ * never spends trust, which is the direction every refusal in this file runs.
+ */
+const SELF = "Self";
+
+/**
+ * Languages where `Self` in a type position means the enclosing type.
+ *
+ * Rust reserves the word, so there is nothing else it could be. Python spells
+ * the same idea `typing.Self` and it is only conventionally reserved, so the
+ * guard below drops the whole treatment for a file that declares a `Self` of
+ * its own. TypeScript has no such word -- `Self` there is an ordinary imported
+ * name, and reading it as anything else could invent the false red this is
+ * removing.
+ */
+const SELF_MEANS_ENCLOSING = new Set<Language>(["rust", "python"]);
+
+/** A type-position child that is one whole word, or nothing. */
+function plainType(node: Node | null): string | undefined {
+  return node && node.childCount === 0 && WORD.test(node.text) ? node.text : undefined;
+}
+
+/**
+ * What `Self` means at a node, carried down the tree rather than looked up.
+ *
+ * `undefined` covers both "no enclosing type" and "an enclosing type this
+ * cannot name", because the caller does the same thing with either. A `trait`
+ * deliberately clears an outer impl's meaning: a trait's own `name` is not what
+ * `Self` stands for inside it.
+ */
+function selfTypeOf(node: Node, inherited: string | undefined): string | undefined {
+  if (node.type === "impl_item") return plainType(node.childForFieldName("type"));
+  if (node.type === "trait_item") return undefined;
+  if (node.type === "class_definition") return plainType(node.childForFieldName("name"));
+  return inherited;
+}
+
 /** The function-shaped node a name was bound to, which may be one level down. */
 const FUNCTIONISH = /function|arrow|lambda|closure|method|fn/;
 
@@ -284,12 +353,33 @@ export function signatureNames(
   let sawName = false;
   let sawSignature = false;
 
-  const declarations: Node[] = [];
+  /*
+   * `Self` is only read as the enclosing type where the language reserves it
+   * and this file has not declared one of its own. A file with `class Self` in
+   * it means that class, and substituting the enclosing type there would invent
+   * exactly the false red this treatment exists to remove.
+   */
+  let declaresSelf = false;
   each(tree.rootNode, (node) => {
-    if (node.type === "token_tree") return;
-    const name = node.childForFieldName("name") ?? node.childForFieldName("left");
-    if (name && name.childCount === 0 && name.text === symbol) declarations.push(node);
+    const name = node.childForFieldName("name");
+    if (name && name.childCount === 0 && name.text === SELF) declaresSelf = true;
   });
+  const selfMeansEnclosing = SELF_MEANS_ENCLOSING.has(language) && !declaresSelf;
+
+  /* Every declaration of the name, with what `Self` meant where it was written. */
+  const declarations: Array<{ node: Node; self: string | undefined }> = [];
+  const collect = (node: Node, self: string | undefined): void => {
+    const here = selfTypeOf(node, self);
+    if (node.type !== "token_tree") {
+      const name = node.childForFieldName("name") ?? node.childForFieldName("left");
+      if (name && name.childCount === 0 && name.text === symbol) declarations.push({ node, self: here });
+    }
+    for (let index = 0; index < node.childCount; index += 1) {
+      const child = node.child(index);
+      if (child) collect(child, here);
+    }
+  };
+  collect(tree.rootNode, undefined);
 
   /*
    * Every declaration of the name, and the safest answer wins.
@@ -310,7 +400,7 @@ export function signatureNames(
   let withheld: SignatureVerdict | undefined;
   let absent: SignatureVerdict | undefined;
 
-  for (const declaration of declarations) {
+  for (const { node: declaration, self } of declarations) {
     sawName = true;
     const signature = signatureNode(declaration);
     if (!signature) continue;
@@ -321,6 +411,20 @@ export function signatureNames(
     const inParameters = parameters ? parameterTypes(parameters) : new Set<string>();
     const inReturn = new Set<string>();
     typeNames(returned, inReturn);
+
+    /*
+     * `Self` reads as the type the `impl` names, and where there is no such
+     * name it is struck out and remembered: a signature with an unresolvable
+     * `Self` in it may be naming the target under that spelling, so it can
+     * still confirm and can no longer refute.
+     */
+    let selfHeld = false;
+    if (selfMeansEnclosing) {
+      for (const half of [inParameters, inReturn]) {
+        if (!half.delete(SELF)) continue;
+        if (self) half.add(self); else selfHeld = true;
+      }
+    }
 
     const here = position === "parameter" ? inParameters : inReturn;
     const there = position === "parameter" ? inReturn : inParameters;
@@ -347,6 +451,10 @@ export function signatureNames(
     }
     if (elsewhere) continue;
 
+    if (selfHeld) {
+      withheld ??= { verdict: "withheld", why: "self-type" };
+      continue;
+    }
     /*
      * Read to the end and the name is not in it -- but only worth saying when
      * every name that *is* in it means itself. One alias in the signature and
