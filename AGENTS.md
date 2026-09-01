@@ -36,6 +36,68 @@ plus a live local board for editing them alongside a human.
   failure comes from an agent misusing a tool, first ask whether the tool made
   the truth observable.
 
+## Finishing a piece of work
+
+**Every issue carries a definition of done, and every item on it is something a
+person could watch happen.** Not "the reader handles `Self`" — that is a
+description of code. "A `-> Self` constructor no longer goes red on a correct
+board" is the same change stated as the thing that stopped being wrong, and the
+difference is that one of them can be checked by somebody who has not read the
+diff.
+
+Four items, and #193 is the worked example of all four:
+
+1. **The bad outcome is gone**, written the way the person who hit it would
+   describe it.
+2. **A test per shape.** Not per code path — per *distinct way the thing occurs
+   in real source*. `Self` appears inside `impl Foo`, inside `impl<T> Foo<T>`,
+   and in a trait default method, and those are three different problems wearing
+   one word. A single test on the easy shape is how a fix ships half-done and
+   reads as finished.
+3. **The measurement re-run, with the cost on the record.** Whatever the fix
+   spends — a higher refusal rate, an answer withheld more often — goes in the
+   issue as a number, per language. A fix whose cost nobody wrote down cannot be
+   argued with later.
+4. **The thing that found it now shows it fixed.** If a probe or a script
+   surfaced the bug, name the command and the number it should print. A bug
+   found by hand and fixed by hand is a bug that comes back.
+
+An item nothing can observe is not an item. Delete it rather than tick it.
+
+### Write the failing test first, one at a time
+
+The test that reproduces the bad outcome comes before the fix, and it must fail
+for the stated reason before anything is changed — a test that passes on the
+unfixed code is testing something else, and you will not find that out later.
+
+**One test, one fix, repeat.** Writing every test and then every fix produces
+tests of imagined behaviour: they end up asserting the shape of things rather
+than what a person sees, and they survive changes that break the product. Each
+test should be written knowing what the last one taught you.
+
+This is also why item 2 above is per shape rather than per branch. Shapes come
+from reading real source; branches come from reading your own diff.
+
+### The measurement gate, which outranks all of this
+
+**Nothing new may say "wrong" until a script has measured how often its reader
+is mistaken, against a referee that shares no machinery with it.** A false
+accusation is not recoverable by being right afterwards, which is the whole
+argument of `licence.ts` and the reason `needs.ts` is written almost entirely as
+reasons not to answer.
+
+The pattern is `scripts/measure-*.mts`: count the shape one way, count it again
+by a completely different mechanism, and report the disagreement. It is not
+ceremony. #169's measurement found three reader bugs that no amount of reasoning
+would have, two of them false-red generators. The referee in
+`measure-vocabulary.mts` found three more in its own census on the first run,
+one of which was #169's bug repeated by somebody who had read that file the same
+hour.
+
+A word that confirms and stays quiet needs no licence. A word that accuses needs
+a number first, and the number goes in the repository where it can be argued
+with.
+
 ## Running the tests
 
 `npm test` is a three-minute command. It is the gate before you hand work over,
