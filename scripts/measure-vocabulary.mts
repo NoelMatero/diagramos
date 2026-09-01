@@ -452,10 +452,33 @@ function factsIn(source: string, language: Language): { facts: Fact[]; declared:
       if (field && field.childCount === 0) add("accesses", "member", [field.text]);
     }
 
-    // Constructing a value. Python spells it as a call and is undercounted here.
+    /*
+     * Making one of something.
+     *
+     * Three spellings, and the first census counted only the first two, which
+     * read `constructs` at 0.3% of all code and made it look like a relation
+     * nobody performs. The missing one is JSX: `<MenuContent />` is a component
+     * making another component, it is the most common thing on any React board,
+     * and half the arrows on the tsx board in `probe-generative.mts` are it.
+     *
+     * Counted here as one relation rather than as a separate `renders`, because
+     * that is what it is -- `<MenuContent />` compiles to a call that makes a
+     * MenuContent. A vocabulary meant to hold across languages should not carry
+     * a word for one framework's spelling of a thing it already has.
+     *
+     * Python is still undercounted and there is no fixing it here: it constructs
+     * by calling a class name, which is syntactically a call and lands in
+     * `invokes`. Said rather than papered over.
+     */
     if (node.type === "new_expression" || node.type === "struct_expression") {
       const constructed = node.childForFieldName("constructor") ?? node.childForFieldName("name");
       if (constructed) add("constructs", "new", typeNamesIn(constructed));
+    }
+    if (node.type === "jsx_opening_element" || node.type === "jsx_self_closing_element") {
+      const element = node.childForFieldName("name");
+      // A lowercase name is a host element -- `div`, `span` -- not a component
+      // anybody draws a box for.
+      if (element && /^[A-Z]/.test(element.text)) add("constructs", "element", [element.text]);
     }
 
     // Counted only so the decision to leave it out has a number under it.
