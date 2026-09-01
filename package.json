@@ -47,6 +47,8 @@
     "measure:rebind": "tsx scripts/measure-rebind.mts",
     "measure:signature": "tsx scripts/measure-signature.mts",
     "measure:survey": "tsx scripts/measure-survey.mts",
+    "measure:vocabulary": "tsx scripts/measure-vocabulary.mts",
+    "probe:generative": "tsx scripts/probe-generative.mts",
     "pretest": "npm run build:cli",
     "test": "vitest run",
     "test:watch": "vitest",
