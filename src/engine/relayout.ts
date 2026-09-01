@@ -36,6 +36,7 @@ import type { BoardDescribes, LayoutDirection, NodeState } from "./graph";
 import { DEFAULT_DIRECTION, NODE_SHAPES, NODE_STATES, directionOf } from "./graph";
 import type { ExcalidrawElement } from "./normalize";
 import type { GraphEdge, GraphNode, GraphShape } from "./layout";
+import type { ViewabilityReport } from "./viewable";
 
 function customOf(element: ExcalidrawElement): Record<string, unknown> {
   const custom = element.customData;
@@ -280,6 +281,16 @@ export interface RelayoutResult {
    * says it did not.
    */
   remembered: boolean;
+  /**
+   * Whether the board now reads once rendered.
+   *
+   * The reason to answer it here as well as in `create_diagram`: trying a flow
+   * is the cheapest move this engine offers, and until now the only way to see
+   * whether it helped was to render. Taken from the layout pass rather than
+   * re-measured after the connectors are re-drawn, because a `connect_nodes`
+   * arrow runs between two boxes that are already inside the frame.
+   */
+  viewable: ViewabilityReport;
 }
 
 /**
@@ -376,5 +387,6 @@ export async function relayoutDiagram(
     keptHandDrawn: result.keptHandDrawn,
     connectors: connectors.length,
     remembered,
+    viewable: result.viewable,
   };
 }
