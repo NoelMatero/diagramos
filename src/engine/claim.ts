@@ -94,7 +94,20 @@
  * `handler -> Response` are different statements, and one word would confirm
  * either no matter which way it was drawn.
  */
-export const ARROW_CLAIMS = ["needs", "feeds", "takes", "returns"] as const;
+/*
+ * `holds` says the ordinary thing a data type does: one of its fields is of the
+ * other end's type (#188). Refutable for the reason `takes` is -- a field list
+ * is a closed region, so a type absent from it is genuinely absent -- and
+ * `holds.ts` is written almost entirely out of the reasons that stops being
+ * true, the same way `signature.ts` is.
+ *
+ * It is the only word here drawn holder-first rather than declaration-last, and
+ * that is a decision rather than an oversight: the one hand-drawn claim in this
+ * project's corpus was somebody drawing exactly this arrow that way round, and
+ * UML has pointed whole to part for thirty years. `holds.ts` carries the
+ * argument in full.
+ */
+export const ARROW_CLAIMS = ["needs", "feeds", "takes", "returns", "holds"] as const;
 
 export type ArrowClaim = (typeof ARROW_CLAIMS)[number];
 

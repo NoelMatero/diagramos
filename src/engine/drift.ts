@@ -46,6 +46,7 @@ import { licenceFor } from "./licence";
 import { languageOf, type Language } from "./parse";
 import { ledgerAdditions, type Ledger } from "./ledger";
 import { checkNeeds, type NeedsWithheld } from "./needs";
+import { heldTypes, type HoldsWithheld } from "./holds";
 import { signatureNames, type SignatureWithheld } from "./signature";
 import { resolveDependency, type ConfigCache } from "./resolve";
 import { boardIsNewer, newerBuildClaimError } from "./version";
@@ -162,7 +163,19 @@ export type EdgeFindingKind =
    * -- because the cost of being wrong here is the tool telling somebody their
    * correct diagram is wrong.
    */
-  | "signature-absent";
+  | "signature-absent"
+  /**
+   * A `holds` arrow whose field list does not name the type (#188).
+   *
+   * The third member that means **wrong** rather than *worth a look*, admitted
+   * on the same grounds as `signature-absent`: a type's fields can be listed in
+   * full, so a type absent from all of them is genuinely absent rather than
+   * merely unfound. `holds.ts` refuses to answer at all wherever that stops
+   * holding -- an alias, a quoted annotation, a macro-generated body -- because
+   * the cost of being wrong is telling somebody their correct diagram is wrong,
+   * which is the failure this word was added to remove.
+   */
+  | "holds-absent";
 
 /**
  * Every verdict word this engine can put in a report, as data (#116).
@@ -199,6 +212,7 @@ export const EDGE_FINDING_KINDS = [
   "backwards-edge",
   "built-backwards",
   "signature-absent",
+  "holds-absent",
 ] as const satisfies readonly EdgeFindingKind[];
 
 /*
@@ -699,6 +713,20 @@ export interface ClaimTally {
    * functions.
    */
   signatureWithheld: SkipBreakdown<SignatureWithheld | "misplaced" | EdgeSkipReason>;
+  /** Arrows asserting that one of the tail's fields is of the head's type. */
+  holds: number;
+  /** Of those, how many a field list actually said so. */
+  holdsConfirmed: number;
+  /**
+   * Why the rest got no verdict, by reason.
+   *
+   * `absent` is not in here for the reason it is not in `signatureWithheld`: an
+   * absence is a finding for this word, and it belongs in `edges`. `quoted` is
+   * the one worth watching -- 552 of Python's field lists in the corpus
+   * `measure-holds.mts` runs over, every one of them a type written as a string
+   * that no reader can see into. That is the number #195 and #198 are about.
+   */
+  holdsWithheld: SkipBreakdown<HoldsWithheld | EdgeSkipReason>;
   /**
    * Of those, how many were confirmed by a flow somebody can go and read.
    *
@@ -2057,6 +2085,7 @@ export function checkDrift(
     complete: 0, completeHeld: 0,
     needs: 0, needsChecked: 0, needsWithheld: {},
     takes: 0, returns: 0, signatureConfirmed: 0, signatureWithheld: {},
+    holds: 0, holdsConfirmed: 0, holdsWithheld: {},
     feeds: 0, feedsConfirmed: 0, feedsWithheld: {},
     plannedWithheld: {},
   };
@@ -3190,6 +3219,88 @@ export function checkDrift(
                 + `${oneLine(fromNode.label) || fromPath}, and ${toPath} line ${verdict.line} declares `
                 + `\`${verdict.signature}\`, which does not name it. `
                 + `Either the arrow points at the wrong function, or the signature changed.`,
+            } });
+            continue;
+          }
+        }
+      }
+
+      /*
+       * `@holds`: is one of the tail's fields of the head's type?
+       *
+       * Read at the **from** end, which is the one place in this file a claim is
+       * answered by the tail's declaration rather than the head's. That is the
+       * direction decision recorded in `holds.ts` -- the author of the only
+       * hand-drawn claim in this project's corpus drew containment holder-first,
+       * and UML has pointed whole to part for thirty years. Getting it wrong
+       * here would make every field arrow on every board read backwards.
+       *
+       * A `planned` arrow is refused the accusation and keeps the confirmation,
+       * exactly as `needs` and the signature words are: sketching a type whose
+       * fields do not exist yet is what a plan is for, and a red about one would
+       * be a lie about a plan.
+       */
+      if (edge.claim === "holds" && (claimed || edge.state === "planned")) {
+        const language = languageOf(fromFile);
+        const noteHeld = (why: HoldsWithheld | EdgeSkipReason) => {
+          if (claimed) claims.holdsWithheld[why] = (claims.holdsWithheld[why] ?? 0) + 1;
+        };
+
+        if (fromEnd.symbols.length === 0 || toEnd.symbols.length === 0) {
+          // One end names a file rather than a type, so there is no field list
+          // to read or no name to look for.
+          noteHeld("endpoint-has-no-ref");
+        } else if (!language) {
+          noteHeld("unreadable");
+        } else {
+          /*
+           * The far end's source is passed so the sort of the thing being
+           * claimed can be checked. A field list can never name a function, so
+           * an arrow drawn from a type to a routine is a category error and
+           * gets silence rather than a red -- see `not-a-type` in `holds.ts`.
+           */
+          const toLanguage = languageOf(toFile);
+          const verdict = heldTypes(
+            workspace.read(fromFile), fromEnd.symbols[0]!, toEnd.symbols, language,
+            toLanguage ? { source: workspace.read(toFile), language: toLanguage } : undefined,
+          );
+
+          if (verdict.verdict === "confirmed") {
+            if (claimed) claims.holdsConfirmed += 1;
+            edgesChecked += 1;
+            recordEdge(edge, fromNode, toNode, { kind: "confirmed" });
+            continue;
+          }
+          if (verdict.verdict === "withheld") {
+            noteHeld(verdict.why);
+          } else if (edge.state === "planned") {
+            noteHeld("no-function-body");
+          } else {
+            edgesChecked += 1;
+            /*
+             * A claim written this turn gets its own opening, for the reason the
+             * signature accusation does: the first check to see it runs moments
+             * after an agent wrote it, and a bare "this is wrong" then reads as
+             * the tool accusing somebody of something it wrote itself.
+             */
+            const wasClaimed = baselineGraph?.edges.some(
+              (was) => was.from === edge.from && was.to === edge.to && was.claim === "holds",
+            );
+            const fresh = baselineGraph !== undefined && !wasClaimed;
+            recordEdge(edge, fromNode, toNode, { kind: "finding", finding: {
+              from: fromPath,
+              to: toPath,
+              fromLabel: fromNode.label,
+              toLabel: toNode.label,
+              fromRef,
+              toRef,
+              kind: "holds-absent",
+              detail:
+                (fresh ? "a claim written this turn is already wrong: " : "")
+                + `this arrow says a field of ${oneLine(fromNode.label) || fromPath} holds `
+                + `${oneLine(toNode.label) || toPath}, and ${fromPath} declares `
+                + `\`${verdict.fields}\`, which does not name it. `
+                + `Either the arrow points at the wrong type, or the fields changed.`,
             } });
             continue;
           }

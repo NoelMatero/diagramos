@@ -100,7 +100,21 @@ export type HoldsWithheld =
    * The same shape #195 found in the signature reader. Found independently here
    * by `measure-holds.mts`, which is the argument for both existing.
    */
-  | "quoted";
+  | "quoted"
+  /**
+   * The far end of the arrow is a routine, not a type.
+   *
+   * A category error rather than a false statement, and #190's layer 1 doing
+   * real work the first time anything asked it. The live arrow this word was
+   * added for is exactly this: `RouteInfo` has a field typed `fn(&Request) ->
+   * Response` and the box at the other end is `hello_handler`, a function that
+   * *fits* that type rather than a type the field is of.
+   *
+   * A field list can never name a function, so the question has no answer and
+   * an absence is not evidence of anything. Silence -- the engine must not
+   * answer a question it was never going to be able to answer.
+   */
+  | "not-a-type";
 
 /** Where the type was named, so a report can quote a file and a line. */
 export interface HoldsEvidence {
@@ -246,6 +260,26 @@ function quotedTypeIn(body: Node): boolean {
   return quoted;
 }
 
+/**
+ * Whether a name is declared as a routine in this source.
+ *
+ * `parse.ts`'s generic rule: a function is a declaration that also has a `body`.
+ * Deliberately narrow -- it answers only about names this file declares, and a
+ * name it cannot find is not a routine as far as anybody here knows, which
+ * leaves the ordinary path untouched.
+ */
+function isRoutine(source: string, language: Language, name: string): boolean {
+  const tree = parseSource(source, language);
+  if (!tree) return false;
+  let routine = false;
+  each(tree.rootNode, (node) => {
+    if (routine) return;
+    if (nameOf(node) !== name) return;
+    if (node.childForFieldName("body") && node.childForFieldName("parameters")) routine = true;
+  });
+  return routine;
+}
+
 /** 1-based line of a byte offset, counted the way an editor counts. */
 const lineOf = (source: string, offset: number) =>
   source.slice(0, offset).split("\n").length;
@@ -261,6 +295,16 @@ export function heldTypes(
   holder: string,
   targets: string[],
   language: Language,
+  /**
+   * The far end's own source, when the caller has it, so the sort of the thing
+   * being claimed can be checked before its absence is read as evidence.
+   *
+   * Optional because the reader is useful without it -- every test that names
+   * two types in one file passes it nothing -- and because a caller that cannot
+   * produce the file should get the same answer it always did rather than a
+   * refusal it cannot act on.
+   */
+  target?: { source: string; language: Language },
 ): HoldsVerdict {
   const tree = parseSource(source, language);
   if (!tree) return { verdict: "withheld", why: "unreadable" };
@@ -277,6 +321,15 @@ export function heldTypes(
     if (named && nameOf(node) === holder) declarations.push(node);
   });
   if (declarations.length === 0) return { verdict: "withheld", why: "not-declared" };
+
+  /*
+   * The sort check, before anything else is read. A routine at the far end
+   * makes this claim a category error, and an absence found afterwards would be
+   * an accusation about a question that has no answer.
+   */
+  if (target && targets.some((name) => isRoutine(target.source, target.language, name))) {
+    return { verdict: "withheld", why: "not-a-type" };
+  }
 
   const shadows = shadowNames(tree.rootNode);
   const wanted = new Set(targets);

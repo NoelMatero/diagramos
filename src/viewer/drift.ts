@@ -63,6 +63,7 @@ const KNOWN_EDGE_KINDS = new Set([
   "backwards-edge",
   "built-backwards",
   "signature-absent",
+  "holds-absent",
 ]);
 
 /**
@@ -73,7 +74,7 @@ const KNOWN_EDGE_KINDS = new Set([
  * "backwards-edge"` would have painted it amber, burying the only two arrow
  * verdicts worth acting on at once among the maybes.
  */
-const WRONG_EDGE_KINDS = new Set(["backwards-edge", "signature-absent"]);
+const WRONG_EDGE_KINDS = new Set(["backwards-edge", "signature-absent", "holds-absent"]);
 
 /**
  * The subset of the engine's DriftReport the panel reads. Structural on
@@ -351,6 +352,7 @@ export function tallyOf(report: DriftView): TallyPart[] {
    */
   const backwards = report.edges.filter((finding) => finding.kind === "backwards-edge").length;
   const wrongSignature = report.edges.filter((finding) => finding.kind === "signature-absent").length;
+  const wrongHolds = report.edges.filter((finding) => finding.kind === "holds-absent").length;
   const unsupported = report.edges.filter(
     (finding) => !WRONG_EDGE_KINDS.has(finding.kind) && KNOWN_EDGE_KINDS.has(finding.kind),
   ).length;
@@ -370,6 +372,17 @@ export function tallyOf(report: DriftView): TallyPart[] {
   if (wrongSignature) {
     parts.push({
       text: `${wrongSignature} ${wrongSignature === 1 ? "signature" : "signatures"} disagree`,
+      tone: "bad",
+    });
+  }
+  /*
+   * Its own chip too, and for the same reason as the row above it: a field
+   * arrow that disagrees is fixed by looking at a type's fields, not at a
+   * signature and not by turning an arrow round.
+   */
+  if (wrongHolds) {
+    parts.push({
+      text: `${wrongHolds} ${wrongHolds === 1 ? "field" : "fields"} disagree`,
       tone: "bad",
     });
   }
@@ -510,6 +523,7 @@ export function rowsOf(report: DriftView): StatusRow[] {
       text: `${name(finding.fromLabel, finding.from)} → ${name(finding.toLabel, finding.to)}`
         + (finding.kind === "backwards-edge" ? " · drawn backwards" : "")
         + (finding.kind === "signature-absent" ? " · not in the signature" : "")
+        + (finding.kind === "holds-absent" ? " · not in the fields" : "")
         + (KNOWN_EDGE_KINDS.has(finding.kind)
           ? ""
           : ` · ${finding.kind}${finding.detail ? `: ${finding.detail}` : ""}`),

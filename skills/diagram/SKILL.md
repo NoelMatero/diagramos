@@ -447,6 +447,39 @@ The claims are mutually exclusive on one arrow: an arrow asserts one thing, and
 two claims is one unanswered question about which was meant, which the check
 refuses rather than resolving.
 
+#### `claim: "holds"` — this type has a field of that type
+
+The most ordinary thing a data type does is hold another one — a struct field, an
+interface property, a dataclass attribute:
+
+```
+edges: [
+  { from: "route_info", to: "response", claim: "holds" },
+]
+```
+
+**Read the direction carefully, because it is the other way round from `takes`.**
+The `from` end is the type that has the field and the `to` end is the type the
+field is of: *RouteInfo holds a Response*. Containment points whole to part,
+which is how everybody draws it and how the one hand-drawn claim in this
+project's history was drawn. Both ends must name a type (`path#symbol`).
+
+**It can come back red.** A type's fields can be listed in full, so a type absent
+from all of them is genuinely absent. The report names the arrow and quotes the
+field list it read.
+
+The generic wrappers are read through, so all of these confirm: `Vec<RouteInfo>`,
+`Promise<Response>`, `Optional[Handler]`, `list[Route]`, `Client[]`. A field
+holding a collection of the thing still holds the thing.
+
+Nothing is reported either way when a field's type could be written under
+another name — a type alias, an import renamed on the way in, or a Python
+annotation written as a string (`x: "Path | FileSlice"`, which is how a forward
+reference is spelled). A field list that might be hiding it proves nothing, so
+the check withholds instead of accusing.
+
+Same rule as the others: write it from a field list you read.
+
 #### `closed: {}` — nothing outside reaches into this box
 
 This is the claim architecture diagrams actually make and could never say: you
