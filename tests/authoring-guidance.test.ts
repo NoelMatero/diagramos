@@ -131,3 +131,54 @@ describe("the commands that author boards mention the claims", () => {
     expect(annotate).toContain("closed");
   });
 });
+
+describe("the skill teaches an order of operations, not only a vocabulary", () => {
+  /*
+   * The gap #186 measured, pinned the same way #110's was.
+   *
+   * That issue's finding was not that the guidance was wrong -- every entry in it
+   * is precise -- but that it was entirely a dictionary. It defined `ref`,
+   * `needs`, `closed`, `complete`, `via` and the rest, and never said how to turn
+   * a repository into a board: no target box count, no rule for what a box stands
+   * for, no criterion for when one board should be two, and no completion
+   * condition. So 21 sessions each invented one, and 47% of boxes came out with
+   * no anchor and 5% of arrows with a claim.
+   *
+   * A tool that answers those questions is worth nothing if the guidance does not
+   * tell an author to call it first, which is exactly how `needs` and `closed`
+   * shipped and went unwritten. These are shallow on purpose -- a grep cannot
+   * judge a procedure -- but they make its absence impossible.
+   */
+  const SKILL_TEXT = SKILL;
+
+  it("tells an author to survey the scope before reading code", () => {
+    expect(SKILL_CODE).toContain("survey_scope");
+  });
+
+  it("answers all four decisions a session would otherwise invent", () => {
+    // How many boxes, and what a box stands for.
+    expect(SKILL_TEXT).toMatch(/how many boxes/i);
+    // Whether this is one board or several.
+    expect(SKILL_CODE).toContain("separateBoards");
+    // When the diagram is finished.
+    expect(SKILL_TEXT).toMatch(/When it is done/);
+  });
+
+  it("says whose job the naming is, since a survey will not do it", () => {
+    expect(SKILL_TEXT).toMatch(/filenames/);
+  });
+
+  it("does not send an author to render a board to find out whether it reads", () => {
+    // The passage #186 quoted as the documented method was "use it to catch
+    // overlap, crowding, or an unreadable label" -- two of which are arithmetic
+    // the layout already has, and #185 now reports at draw time.
+    expect(SKILL_TEXT).not.toMatch(/use it to catch\s+overlap, crowding, or an unreadable label/);
+    expect(SKILL_TEXT).toMatch(/Do not render to find out/);
+  });
+
+  it("does not present drawing and looking as the way to pick a layout", () => {
+    // Also quoted in #186: "If the first layout comes out wrong ... try the other
+    // one." The flow is chosen by measurement on a first draw now.
+    expect(SKILL_TEXT).not.toMatch(/If the first layout comes\s+out wrong/);
+  });
+});

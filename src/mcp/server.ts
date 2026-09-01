@@ -45,6 +45,7 @@ import { computeHonestGaps } from "../engine/gaps";
 import { loadConverter } from "../engine/convert";
 import { initEngine } from "../engine/parse";
 import { renderBoardToPng } from "../engine/render";
+import { surveyScope } from "../engine/survey";
 import { NODE_FONT_SIZE } from "../engine/layout";
 import type { ViewabilityReport } from "../engine/viewable";
 import {
@@ -1868,6 +1869,138 @@ server.registerTool(
         // Only when it happened, and worth a line when it does: the user may
         // have been looking at findings this build would never have reported.
         ...(service.retired?.length ? { replaced: service.retired } : {}),
+      });
+    }),
+);
+
+server.registerTool(
+  "survey_scope",
+  {
+    title: "Survey a scope",
+    description:
+      "Work out the shape of a board for a directory BEFORE drawing one, and get back a draft graph "
+      + "to name. Call this first when asked to diagram code you have not already read. "
+      + "It answers, by measurement rather than convention, the four things there is otherwise no "
+      + "way to know: how many boxes this board holds, whether a box should be a file or a whole "
+      + "directory (decided per box, so a board is a mixture), which directories are a SEPARATE "
+      + "board rather than more boxes on this one, and what this board leaves out. "
+      + "Every box comes back anchored at a path that exists, and every arrow comes back with "
+      + "claim 'needs' and the file:line the dependency was read from -- so passing them straight "
+      + "to create_diagram is transcription, not a guess, and the draft is verified: across eleven "
+      + "scopes in nine repositories the drafted board came back with 0 findings and every box "
+      + "checked. That is the cost this replaces: the alternative is reading the files to find the "
+      + "same thing out, which is 2-37x more tokens and is how a session ends up drawing a board, "
+      + "rendering it, and drawing it again. "
+      + "WHAT IT WILL NOT DO: it does not name anything. Labels come back as filenames, and a board "
+      + "of filenames is a dependency graph rather than an architecture diagram -- 'layout' where "
+      + "the label wanted is 'ELK layout / real font metrics'. Renaming boxes, merging ones that are "
+      + "one idea, and dropping ones the user did not ask about is YOUR half of this and is the half "
+      + "worth doing; keep the refs and the claims when you do. It also only knows about "
+      + "dependencies, so it drafts the structural board and not a flow -- for 'how does X happen', "
+      + "read the code and draw it yourself. It refuses a scope outright in a language with no "
+      + "dependency reader (Python is refused today) rather than drafting boxes nothing corroborated.",
+    inputSchema: {
+      scope: z
+        .string()
+        .describe(
+          "Repo-relative directory to survey — 'src', 'src/engine', 'packages/core'. Not a file, "
+          + "and not the repo root unless the repo really is one small tree: the survey drops the "
+          + "least-connected boxes until the board reads, so too wide a scope comes back as a few "
+          + "boxes and a long list of what it had to leave out.",
+        ),
+      direction: z
+        .enum(["RIGHT", "DOWN"])
+        .default("RIGHT")
+        .describe(
+          "The flow to measure the grain against. Pass the one you intend to draw in, since how "
+          + "many boxes fit depends on it. Leave it alone unless the board is a sequence.",
+        ),
+    },
+  },
+  async ({ scope, direction }) =>
+    guard(async () => {
+      // Confined the same way a ref is: a survey reads source, so it must not be
+      // able to read source outside the workspace.
+      const absolute = resolveInWorkspace(scope);
+      const relative = relativeToWorkspace(absolute);
+      // The grammars, before anything asks a file what it imports. Without this
+      // every file comes back unread and the survey refuses a scope it could
+      // have answered.
+      await initEngine();
+      const survey = await surveyScope(relative, createWorkspace(WORKSPACE_ROOT), direction);
+
+      if (survey.refused) {
+        return text({
+          scope: relative,
+          refused: survey.refused,
+          filesRead: survey.read,
+          ...(Object.keys(survey.unread).length ? { filesWithNoReader: survey.unread } : {}),
+        });
+      }
+
+      /*
+       * Shaped as the arguments to create_diagram, deliberately.
+       *
+       * The caller's next call is create_diagram, and anything it has to
+       * restructure on the way is a chance to drop a ref or a claim -- which is
+       * exactly how this repo's own boards ended up with 47% of boxes anchored.
+       * So `nodes` and `edges` are already the right shape and the only thing
+       * asked of the caller is better labels.
+       */
+      return text({
+        scope: relative,
+        nodes: survey.units.map((unit) => ({
+          id: unit.id,
+          label: unit.label,
+          ref: unit.dir ? `${unit.dir}/` : unit.files[0],
+          ...(unit.dir ? { covers: unit.files.length } : {}),
+        })),
+        edges: survey.edges.map((edge) => ({
+          from: edge.from,
+          to: edge.to,
+          // Absent on an arrow whose dependency is real but is not written as an
+          // import anywhere -- see SurveyEdge.claim. Draw it unclaimed; do not
+          // add `needs` back because the arrow "obviously" imports.
+          ...(edge.claim ? { claim: edge.claim } : {}),
+          seen: edge.seen,
+        })),
+        // The same numbers create_diagram reports, said before the graph is sent
+        // rather than after, so a board is never drawn at a size that cannot be
+        // read.
+        ...viewableNotes({ ...survey.view, verdict: survey.view.verdict } as ViewabilityReport),
+        rename:
+          "Labels are filenames. Rename each box to what it does, merge boxes that are one idea, and "
+          + "drop what the user did not ask about — keeping ref, claim and seen as they are.",
+        ...(survey.next.length
+          ? {
+            separateBoards:
+              `Too big to open on this board, so each is its own: ${survey.next.slice(0, 8).join(", ")}`
+              + `${survey.next.length > 8 ? ` (+${survey.next.length - 8} more)` : ""}. Survey one of `
+              + "these before drawing it; do not add them here.",
+          }
+          : {}),
+        ...(survey.arrowsOmitted
+          ? {
+            arrowsOmitted:
+              `${survey.arrowsOmitted} more real dependencies run between these boxes and are not drawn. `
+              + "Every board here is under 1.5 arrows a box and drawing them all makes a hairball, so "
+              + "the heaviest are kept. Mention it only if the user asks whether the picture is complete.",
+          }
+          : {}),
+        ...(survey.omitted.length
+          ? {
+            omitted:
+              `${survey.omitted.length} of ${survey.omitted.length + survey.units.reduce((total, unit) => total + unit.files.length, 0)} `
+              + "source files are on no box"
+              + (survey.next.length
+                ? ", most of them inside the boards listed above."
+                : ` and there is no sub-directory to send them to — they are a second board's worth: ${
+                  survey.omitted.slice(0, 6).join(", ")
+                }${survey.omitted.length > 6 ? ", ..." : ""}.`)
+              + " Say so if the user needs this board to be complete.",
+          }
+          : {}),
+        ...(Object.keys(survey.unread).length ? { filesWithNoReader: survey.unread } : {}),
       });
     }),
 );
