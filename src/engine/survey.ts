@@ -174,11 +174,8 @@ export interface SurveyResult {
   /** How the board this implies will render, from the same measure `create_diagram` uses. */
   view: Viewability;
   /**
-   * The flow this shape was measured in, and the one to pass to `create_diagram`.
-   *
-   * How many boxes fit depends on it, so it is part of the answer rather than a
-   * separate decision: a chain of dependencies laid out RIGHT gets wide, and the
-   * same chain DOWN gets tall, and one of the two usually holds more boxes.
+   * The flow the grain was measured in. Not an instruction: `create_diagram`
+   * chooses the drawn flow itself, from the real labels.
    */
   direction: LayoutDirection;
   /**
@@ -200,18 +197,23 @@ export interface SurveyResult {
   /** Layouts spent choosing the grain. Reported because it is the only cost here. */
   layouts: number;
   /**
-   * The flow that was measured and rejected, when both were tried. Reported for
-   * the same reason `create_diagram` reports it: a board laid out in a shape
-   * nobody asked for looks like a bug, and the caller cannot see the loser.
-   */
-  instead?: { direction: LayoutDirection; boxes: number; labelPx: number };
-  /**
    * Set when no grain fits. `units` is then the best that was reached and must
    * not be drawn as it stands -- almost always because the language has no
    * measured reader, so there were no arrows to lay out in the first place.
    */
   refused?: string;
 }
+
+/**
+ * Order two ids the same way on every machine.
+ *
+ * `localeCompare` was here and is not wrong today -- `identifier` strips ids to
+ * ASCII lowercase, and eight locales order those identically. But it reads the
+ * host's ICU tables, so the guarantee rests on the ids never changing shape and
+ * on Node being built with full ICU. Neither is worth depending on for a
+ * tie-break: a plain comparison is the same answer everywhere, for free.
+ */
+const byId = (a: string, b: string) => (a < b ? -1 : a > b ? 1 : 0);
 
 const identifier = (text: string) =>
   text.replace(/[^a-z0-9]/gi, "-").replace(/^-+|-+$/g, "").toLowerCase() || "box";
@@ -534,7 +536,7 @@ function thin(edges: SurveyEdge[], boxes: number): { edges: SurveyEdge[]; droppe
   if (edges.length <= budget) return { edges, dropped: 0 };
 
   const order = (a: SurveyEdge, b: SurveyEdge) =>
-    b.weight - a.weight || `${a.from} ${a.to}`.localeCompare(`${b.from} ${b.to}`);
+    b.weight - a.weight || byId(`${a.from} ${a.to}`, `${b.from} ${b.to}`);
 
   const best = new Map<string, SurveyEdge>();
   for (const edge of [...edges].sort(order)) {
@@ -563,11 +565,24 @@ function acceptable(measured: { view: Viewability; isolated: number }, boxes: nu
     && measured.isolated <= Math.max(1, Math.floor(boxes * 0.15));
 }
 
-/** The shape of a board for one directory, in one named flow. */
-async function surveyInFlow(
+/**
+ * Work out the shape of a board for one directory.
+ *
+ * The grain is measured in one flow, and `create_diagram` picks the flow the
+ * board is finally drawn in -- it does that with the *real* labels, which is
+ * strictly better information than this has.
+ *
+ * Surveying both flows and handing over the winner was built and then removed.
+ * It doubled the layouts -- ripgrep went from 3.2s to 6.4s -- and across eleven
+ * scopes it changed the box count on none of them, because the box ceiling binds
+ * long before the flow does. Every one of those boards then came out legible
+ * when `create_diagram` chose. Pass a direction only when the board is a
+ * sequence and you already know you want DOWN; how much fits does depend on it.
+ */
+export async function surveyScope(
   scope: string,
   workspace: Workspace,
-  direction: LayoutDirection,
+  direction: LayoutDirection = "RIGHT",
 ): Promise<SurveyResult> {
   const { files, deps, read, unread } = scanScope(scope, workspace);
   const base = {
@@ -606,7 +621,7 @@ async function surveyInFlow(
       degree.set(edge.to, (degree.get(edge.to) ?? 0) + 1);
     }
     const byTraffic = [...units].sort(
-      (a, b) => (degree.get(a.id) ?? 0) - (degree.get(b.id) ?? 0) || a.id.localeCompare(b.id),
+      (a, b) => (degree.get(a.id) ?? 0) - (degree.get(b.id) ?? 0) || byId(a.id, b.id),
     );
     const cut = Math.max(1, Math.round(units.length * 0.15));
     declined.push(...byTraffic.slice(0, cut));
@@ -627,7 +642,7 @@ async function surveyInFlow(
       if (units.length >= MAX_BOXES) break;
       const openable = units
         .filter((unit) => unit.dir && !closed.includes(unit) && childrenOf(unit.dir, files).length > 1)
-        .sort((a, b) => b.files.length - a.files.length || a.id.localeCompare(b.id));
+        .sort((a, b) => b.files.length - a.files.length || byId(a.id, b.id));
       if (openable.length === 0) break;
       const pick = openable[0];
       const opened = withUniqueIds([
@@ -672,43 +687,3 @@ async function surveyInFlow(
   return result;
 }
 
-/**
- * Work out the shape of a board for one directory.
- *
- * With no `direction`, both flows are surveyed and the one that holds more boxes
- * wins -- the same reasoning `create_diagram` applies on a first draw, applied
- * one step earlier, where it changes how much of the codebase the board can show
- * rather than only whether the picture reads. It doubles the layouts, which is
- * seconds on the largest scope measured and is paid once per board.
- *
- * Naming a flow surveys only that one, for a caller who already knows the board
- * is a sequence.
- */
-export async function surveyScope(
-  scope: string,
-  workspace: Workspace,
-  direction?: LayoutDirection,
-): Promise<SurveyResult> {
-  if (direction) return surveyInFlow(scope, workspace, direction);
-
-  const right = await surveyInFlow(scope, workspace, "RIGHT");
-  // A refusal is about the scope, not the flow -- no reader, or no source -- so
-  // the second layout would answer the same thing twice.
-  if (right.refused) return right;
-
-  const down = await surveyInFlow(scope, workspace, "DOWN");
-  if (down.refused) return right;
-
-  // More boxes is a strictly better board at equal legibility, and the tie-break
-  // is the bigger label rather than the smaller board: both fit, so what is left
-  // to want is readability.
-  const better = down.units.length > right.units.length
-    || (down.units.length === right.units.length && down.view.labelPx > right.view.labelPx);
-  const chosen = better ? down : right;
-  const other = better ? right : down;
-  return {
-    ...chosen,
-    layouts: right.layouts + down.layouts,
-    instead: { direction: other.direction, boxes: other.units.length, labelPx: other.view.labelPx },
-  };
-}

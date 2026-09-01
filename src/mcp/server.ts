@@ -1910,10 +1910,12 @@ server.registerTool(
         ),
       direction: z
         .enum(["RIGHT", "DOWN"])
-        .default("RIGHT")
+        .optional()
         .describe(
-          "The flow to measure the grain against. Pass the one you intend to draw in, since how "
-          + "many boxes fit depends on it. Leave it alone unless the board is a sequence.",
+          "The flow to measure the grain against. Leave it off: how many boxes fit barely depends "
+          + "on it, and create_diagram picks the flow the board is actually drawn in, from the real "
+          + "labels rather than the filenames here. Pass DOWN only when you already know the board "
+          + "is a sequence.",
         ),
     },
   },

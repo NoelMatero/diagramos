@@ -40,6 +40,22 @@ sequence that existed because nothing could answer a question before the fact.
 The fix is not to write the loop down. It is to make the questions answerable
 from a **directory** instead of from a board.
 
+**And that answer is deterministic, which the drawing itself can never be.** The
+graph on a board comes from a model, so two runs of the same request give two
+different boards — the skill says so, and it stays true. What a survey computes
+is not that: it is the import graph read out of source by `deps.ts`, plus
+arithmetic over layouts. No model, no sampling, no clock. Two runs of a survey on
+one commit are byte-identical, and so are two people's on two machines: the file
+walk goes through `Workspace` and is sorted, every tie-break is total on ids that
+`identifier` has already reduced to ASCII, and nothing calls `localeCompare`,
+whose answer depends on the host's ICU build. `tests/engine-survey.test.ts` holds
+all three — including surveying the same scope through four shuffled directory
+listings, since entry order differs by filesystem and would otherwise hand two
+people different boards with no way to tell why.
+
+The model is still what makes it a diagram. It just no longer has to invent the
+shape first.
+
 ## What was built
 
 `survey_scope` takes a directory and returns a draft graph — before any code is
@@ -158,8 +174,8 @@ infer. It is a floor, not a session — a real one does not know which files to
 open, which is the thing it is trying to find out. Even against that floor the
 survey is 5.7–44.5× cheaper, median ~19×.
 
-**On time.** A survey lays out both flows and walks the grain, which is 0.2–1.6s
-on most scopes and **6–9.5s** on ripgrep, clap and regex-automata. Paid once per
+**On time.** 0.1–0.8s on most scopes and 3.2–4.7s on ripgrep, clap and
+regex-automata, which are the ones with the most files to read. Paid once per
 board, against a redraw that costs a graph payload and a render.
 
 ## The three things #186 said to settle first
@@ -218,6 +234,14 @@ So a survey draws the structural board and says so, and flows stay hand-drawn.
 **Folding the survey into `create_diagram` as a `scope` argument.** One call
 instead of two, and it removes the model from the only step that needed it. A
 board of filenames is not a diagram.
+
+**Surveying both flows and handing over the winner.** Built, measured, removed.
+It doubled the layouts — ripgrep 3.2s → 6.4s — and across eleven scopes it
+changed the box count on **none** of them, because the box ceiling binds long
+before the flow does. `create_diagram` already picks the flow at draw time from
+the *real* labels, which is strictly better information than a survey holding
+filenames has; every one of those eleven boards came out legible when it chose.
+Keeping it would have been paying double for a worse answer.
 
 ## Known gaps
 

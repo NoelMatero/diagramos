@@ -14,6 +14,8 @@
  * nobody measured is exactly the false red the rest of this engine is built to
  * avoid.
  */
+import { readFileSync } from "node:fs";
+
 import { beforeAll, describe, expect, it } from "vitest";
 
 import { emptyBoard } from "../src/engine/board-file";
@@ -294,12 +296,56 @@ describe("the board a survey drafts, against this repository", () => {
     expect(report.claims.needsChecked).toBeGreaterThan(0);
   }, 60_000);
 
+  /**
+   * The claim the whole design rests on, attacked from the three directions it
+   * could fail.
+   *
+   * "Same answer twice" is easy to say and easy to be wrong about: a survey walks
+   * the filesystem, whose listing order is not guaranteed, and every tie-break in
+   * it decides which boxes end up on the board.
+   */
   it("gives the same answer twice, because nothing in it comes from a model", async () => {
     const workspace = createWorkspace(process.cwd());
-    const first = await surveyScope("src/mcp", workspace);
-    const second = await surveyScope("src/mcp", workspace);
-    expect(second).toEqual(first);
+    for (const scope of ["src", "src/engine", "src/mcp"]) {
+      const first = await surveyScope(scope, workspace);
+      const second = await surveyScope(scope, workspace);
+      expect(second, scope).toEqual(first);
+    }
   }, 60_000);
+
+  it("gives the same answer whatever order the filesystem lists a directory in", async () => {
+    // `list` returns entry order, which differs by filesystem and by machine. If
+    // any tie-break here leaned on it, two people surveying the same commit would
+    // get different boards and neither could tell why.
+    const plain = createWorkspace(process.cwd());
+    const expected = await surveyScope("src/engine", plain);
+
+    for (const seed of [1, 2, 3, 4]) {
+      let state = seed;
+      const shuffled = {
+        ...plain,
+        list: (target: string) => {
+          const entries = [...plain.list(target)];
+          for (let i = entries.length - 1; i > 0; i--) {
+            state = (state * 1103515245 + 12345) & 0x7fffffff;
+            const j = state % (i + 1);
+            [entries[i], entries[j]] = [entries[j], entries[i]];
+          }
+          return entries;
+        },
+      };
+      expect(await surveyScope("src/engine", shuffled), `seed ${seed}`).toEqual(expected);
+    }
+  }, 60_000);
+
+  it("orders its tie-breaks without asking the host what locale it is in", () => {
+    // `localeCompare` reads the host's ICU tables. It happens to agree with a
+    // plain comparison on the ASCII ids `identifier` produces, but that is the
+    // ids never changing shape rather than a guarantee, so nothing here uses it.
+    const source = readFileSync("src/engine/survey.ts", "utf8");
+    const calls = source.split("\n").filter((line) => /\.localeCompare\(/.test(line));
+    expect(calls).toEqual([]);
+  });
 
   /**
    * The property the claims rest on, checked against real source.
@@ -354,7 +400,6 @@ describe("a survey's promise has to survive being drawn", () => {
 
     const named = await createDiagram(emptyBoard(), {
       title: "named",
-      direction: survey.direction,
       nodes: survey.units.map((unit) => ({
         id: unit.id,
         // Two lines of 18, which is the median label on this repository's boards.
@@ -409,19 +454,34 @@ describe("a survey's promise has to survive being drawn", () => {
     }
   }, 60_000);
 
-  it("picks the flow that holds more boxes, and names the one it rejected", async () => {
+  it("leaves the drawn flow to create_diagram, which measures the real labels", async () => {
+    // Surveying both flows was built and removed: it doubled the layouts and
+    // changed the box count on none of eleven scopes, because the box ceiling
+    // binds before the flow does. What matters is that the graph it hands over
+    // comes out legible once create_diagram picks -- with real labels, not the
+    // filenames the survey was holding.
     const survey = await surveyScope("src/engine", workspace);
     expect(survey.refused).toBeUndefined();
-    expect(["RIGHT", "DOWN"]).toContain(survey.direction);
-    if (survey.instead) {
-      expect(survey.instead.direction).not.toBe(survey.direction);
-      expect(survey.units.length).toBeGreaterThanOrEqual(survey.instead.boxes);
-    }
+    expect(survey.direction).toBe("RIGHT");
+
+    const drawn = await createDiagram(emptyBoard(), {
+      title: "drawn",
+      nodes: survey.units.map((unit) => ({
+        id: unit.id,
+        label: `${"x".repeat(18)}\n${"x".repeat(18)}`,
+        ref: unit.dir ? `${unit.dir}/` : unit.files[0],
+      })),
+      edges: survey.edges.map((edge) => ({
+        from: edge.from,
+        to: edge.to,
+        ...(edge.claim ? { claim: edge.claim } : {}),
+      })),
+    });
+    expect(drawn.viewable?.verdict).toBe("legible");
   }, 60_000);
 
-  it("surveys only the named flow when one is named", async () => {
+  it("measures against the flow it was given, when one is given", async () => {
     const down = await surveyScope("src/engine", workspace, "DOWN");
     expect(down.direction).toBe("DOWN");
-    expect(down.instead).toBeUndefined();
   }, 60_000);
 });
