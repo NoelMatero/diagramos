@@ -59,26 +59,77 @@
  *
  * ## The number, and how to argue with it
  *
- * `npm run measure:signature` re-runs it. Over this repository and rust-test --
- * 644 functions, 1711 type names written in their signatures -- the reader found
- * every one, and refused to answer on 64 of the 644 (58 for an alias, 6 for a
- * recovered parse). The referee is a text scan of the signature source, chosen
- * because it shares no machinery with the syntax walk here: two unrelated
- * readings agreeing says something, and one reading agreeing with itself does
- * not.
+ * `npm run measure:signature` re-runs it. Over this repository, rust-test and
+ * graphify -- 2236 functions, 5874 type names written in their signatures -- the
+ * reader finds every one, and refuses to answer on 208 of them. Per language,
+ * which is the number that matters, because a reader can be perfect on three and
+ * blind on the fourth:
  *
- * The measurement found two reader bugs before shipping, both of which would
- * have produced a false red:
+ *     python  1543 functions, 4002 names, 0 missed, withholds 139 (71 aliased, 68 quoted)
+ *     ts       572 functions, 1677 names, 0 missed, withholds  64 (58 aliased, 6 incomplete)
+ *     rust      63 functions,  154 names, 0 missed, withholds   5 (self-type)
+ *     tsx        7 functions,   41 names, 0 missed, withholds   0
+ *
+ * The referee is a text scan of the signature source, chosen because it shares
+ * no machinery with the syntax walk here: two unrelated readings agreeing says
+ * something, and one reading agreeing with itself does not.
+ *
+ * The measurement found three reader bugs, all of which produce a false red. The
+ * first two were caught before shipping; the third was not, because the corpus
+ * had no Python in it and the referee blanked a quoted annotation the way it
+ * blanks any other string -- so a reader that could not read 122 of the type
+ * names in graphify's signatures measured as perfect. Both halves of that are
+ * fixed, and the number above is what the corrected referee reports.
  *
  *   - reading only `identifier` leaves left it blind to every built-in, because
  *     TypeScript calls `string` a `predefined_type` and Rust calls `bool` a
  *     `primitive_type` -- a third of every signature;
  *   - reading only the *first* declaration of a name judged the wrong signature
  *     whenever a name is declared twice, which is `new`, `parse`, `from`, and
- *     any method on two `impl` blocks.
+ *     any method on two `impl` blocks;
+ *   - reading a Python annotation as a syntax tree found nothing at all in
+ *     `unit: "Path | FileSlice"`, because a quoted type is text to the grammar
+ *     -- 122 names across graphify, every one of them an arrow that could be
+ *     drawn and called wrong.
  *
- * Neither was reachable by thinking about it, which is the argument for the
- * script existing rather than for a number in a comment.
+ * None of the three was reachable by thinking about it, which is the argument for
+ * the script existing rather than for a number in a comment -- and the third is
+ * the argument for the corpus covering every language the reader is allowed to
+ * speak in.
+ *
+ * ## Why this file does not call `licenceFor`, decided at #195
+ *
+ * Every other refutation in the engine asks `licence.ts` first, and this one
+ * does not, which #195 raised as the thing that let Python -- the language with
+ * no licence -- ship the only unchecked accusation in the tool. The complaint
+ * was right about the state and this is the decision about the mechanism.
+ *
+ * `licence.ts` is not a badge saying a language is supported. It is one
+ * measurement of one reader: does `deps.ts` resolve an import to the same file
+ * the compiler resolves it to, judged by `tsc` and by rust-analyzer. Nothing in
+ * that number is evidence about whether a parameter list names a type. Calling
+ * it from here would let Rust's import measurement authorise Rust's signature
+ * reader -- which is exactly the authorisation that would have been in force
+ * during #193, when `-> Self` was turning correct Rust boards red on a language
+ * that had held a licence the whole time. A borrowed number does not become
+ * evidence by being about the same language.
+ *
+ * What a refutation needs is a measurement of *itself*, and this one has had one
+ * since it shipped: `scripts/measure-signature.mts`, refereed by a text scan
+ * that shares no machinery with the syntax walk here. The defect #195 objects to
+ * was never the missing `licenceFor` call. It was that the corpus had no Python
+ * in it, so the reader was measured at 100% on three languages and unmeasured on
+ * the fourth, and read as licensed. Python is in the corpus now, and the referee
+ * was taught to read a quoted annotation rather than blank it as a string --
+ * without which it would have gone on agreeing with a reader that could not see
+ * 122 of the type names a person can read in graphify's signatures.
+ *
+ * The cheaper option -- gate this file on `licenceFor` and let Python go silent
+ * -- was rejected for costing every correct Python verdict to buy silence on one
+ * wrong shape, when the shape itself can be named and silenced. If this reader
+ * ever needs a referee stronger than a text scan, `mypy` or `pyright` is a
+ * referee for *this* measurement, added to that script. It is not a call to
+ * `licenceFor`.
  */
 import { parseSource, type Language, type Node } from "./parse";
 
@@ -116,7 +167,15 @@ export type SignatureWithheld =
    * generic `impl`, or a trait's own default method. Same reason as `aliased`:
    * a name that stands for something else, and nothing here can name it.
    */
-  | "self-type";
+  | "self-type"
+  /**
+   * The claimed half of the signature writes a type inside a string --
+   * `def unit_path(unit: "Path | FileSlice")`. The names in there are read, so
+   * the arrow can still be confirmed; what cannot be done is refuted, because
+   * everything inside the quotes was read by scanning text rather than by
+   * parsing a type, and "I did not find it in that text" is not an absence.
+   */
+  | "quoted-annotation";
 
 /** Where the type was named, so a report can quote a file and a line. */
 export interface SignatureEvidence {
@@ -264,6 +323,40 @@ const SELF = "Self";
  */
 const SELF_MEANS_ENCLOSING = new Set<Language>(["rust", "python"]);
 
+/**
+ * Languages where a type may be written inside a string, and #195, which is the
+ * reason this exists.
+ *
+ *     def unit_path(unit: "Path | FileSlice") -> Path:
+ *
+ * `unit_path` takes a `FileSlice`. The reader walked the parameter, found a
+ * `string` node whose contents are not identifiers to a grammar, saw no names at
+ * all, and called a correct arrow wrong -- in red, with a file and a line. It is
+ * the same shape as `Self` in #193: the type is there, the reader cannot see it,
+ * and absence gets treated as proof.
+ *
+ * Not an oddity of one file either. The quoted form is how Python writes a
+ * forward reference, and the only way to write a type imported under `if
+ * TYPE_CHECKING:` -- which is to say, exactly the places a diagram wants to draw
+ * an arrow. 49 of the 82 files in the graphify corpus have one.
+ *
+ * So the words inside the quotes are read, which is enough to confirm, and the
+ * half that contains them may not refute. They are read by a scan for words, not
+ * by a parse: `"Path | FileSlice"` is a piece of text to every grammar here, and
+ * the honest reading of a text scan is that finding a name proves it is there
+ * while not finding one proves nothing.
+ *
+ * Deliberately Python only. A quoted thing in a type position means something
+ * else in the other languages this engine loads -- in TypeScript it is a literal
+ * type, `mode: "read" | "write"`, which means itself and nothing else, and
+ * treating those as unreadable would withhold on ordinary TypeScript for no
+ * reason at all.
+ */
+const QUOTED_TYPES = new Set<Language>(["python"]);
+
+/** Identifiers inside a quoted annotation, read as words rather than parsed. */
+const WORDS = /[A-Za-z_][A-Za-z0-9_]*/g;
+
 /** A type-position child that is one whole word, or nothing. */
 function plainType(node: Node | null): string | undefined {
   return node && node.childCount === 0 && WORD.test(node.text) ? node.text : undefined;
@@ -314,20 +407,36 @@ function signatureNode(node: Node): Node | undefined {
  * type there, and Rust's `&mut self` has no such field, so a receiver
  * contributes nothing. Names are read as whole identifiers, never as substrings,
  * so `Client` cannot match `ClientPool`.
+ *
+ * Returns whether a quoted annotation was read on the way, because that decides
+ * what this half is allowed to say afterwards -- see `QUOTED_TYPES`.
  */
-function typeNames(node: Node | null | undefined, into: Set<string>): void {
-  if (!node) return;
-  each(node, (leaf) => { if (isTypeWord(leaf)) into.add(leaf.text); });
+function typeNames(
+  node: Node | null | undefined,
+  into: Set<string>,
+  quoting: boolean,
+): boolean {
+  if (!node) return false;
+  let quoted = false;
+  each(node, (part) => {
+    if (quoting && part.type === "string") {
+      quoted = true;
+      for (const word of part.text.matchAll(WORDS)) into.add(word[0]);
+      return;
+    }
+    if (isTypeWord(part)) into.add(part.text);
+  });
+  return quoted;
 }
 
-function parameterTypes(parameters: Node): Set<string> {
-  const names = new Set<string>();
+function parameterTypes(parameters: Node, into: Set<string>, quoting: boolean): boolean {
+  let quoted = false;
   for (let index = 0; index < parameters.childCount; index += 1) {
     const parameter = parameters.child(index);
     if (!parameter || parameter.childCount === 0) continue;
-    typeNames(parameter.childForFieldName("type"), names);
+    if (typeNames(parameter.childForFieldName("type"), into, quoting)) quoted = true;
   }
-  return names;
+  return quoted;
 }
 
 /**
@@ -365,6 +474,7 @@ export function signatureNames(
     if (name && name.childCount === 0 && name.text === SELF) declaresSelf = true;
   });
   const selfMeansEnclosing = SELF_MEANS_ENCLOSING.has(language) && !declaresSelf;
+  const quoting = QUOTED_TYPES.has(language);
 
   /* Every declaration of the name, with what `Self` meant where it was written. */
   const declarations: Array<{ node: Node; self: string | undefined }> = [];
@@ -408,9 +518,11 @@ export function signatureNames(
 
     const parameters = signature.childForFieldName("parameters");
     const returned = signature.childForFieldName("return_type");
-    const inParameters = parameters ? parameterTypes(parameters) : new Set<string>();
+    const inParameters = new Set<string>();
+    const quotedParameters = parameters
+      ? parameterTypes(parameters, inParameters, quoting) : false;
     const inReturn = new Set<string>();
-    typeNames(returned, inReturn);
+    const quotedReturn = typeNames(returned, inReturn, quoting);
 
     /*
      * `Self` reads as the type the `impl` names, and where there is no such
@@ -453,6 +565,20 @@ export function signatureNames(
 
     if (selfHeld) {
       withheld ??= { verdict: "withheld", why: "self-type" };
+      continue;
+    }
+    /*
+     * A type written inside a string in the half being claimed. The words in it
+     * were read and the target is not among them -- but they were read by
+     * scanning text, so that is the reader failing to find a name rather than
+     * the signature failing to have one.
+     *
+     * Asked of the claimed half only. An absence is a statement about the half
+     * the arrow names, and a quoted parameter has no bearing on whether the
+     * return type says what it says.
+     */
+    if (position === "parameter" ? quotedParameters : quotedReturn) {
+      withheld ??= { verdict: "withheld", why: "quoted-annotation" };
       continue;
     }
     /*
