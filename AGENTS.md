@@ -35,6 +35,13 @@ plus a live local board for editing them alongside a human.
 - A tool that cannot report its own state forces the caller to guess. When a
   failure comes from an agent misusing a tool, first ask whether the tool made
   the truth observable.
+- **Before touching a claim word, read
+  [docs/claim-vocabulary.md](docs/claim-vocabulary.md).** It carries the part
+  that does not fit in a header: which words may say *wrong* and on which of
+  three footings, why two of them point the opposite way from the other two,
+  what each language has earned the right to accuse about, and the four times a
+  measurement contradicted the design. Three of those four were found by
+  building one word rather than by reviewing the plan.
 
 ## Finishing a piece of work
 
