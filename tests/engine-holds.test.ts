@@ -213,22 +213,26 @@ describe("refuses rather than accuses", () => {
       .toBe("withheld/incomplete");
   });
 
-  it("withholds an absence in a language whose reader has no licence", () => {
+  it("refutes an absence in Python, now that its reader has been measured", () => {
     /*
-     * Python has a grammar and no measured corpus, so nothing has ever checked
-     * how often this reader is wrong about Python -- and an accusation resting
+     * This test asserted `withheld/unlicensed` for as long as Python had no
+     * measured corpus, which was the right answer then: an accusation resting
      * on an unmeasured reader is the thing `licence.ts` exists to forbid.
      *
-     * Confirming is fine and stays: finding the name is evidence of the name
-     * being there whoever is reading. It is the *absence* that needs a licence,
-     * because absence is a claim about the whole of something.
+     * #198 measured it. `npm run measure:holds` reads 2,177 Python field
+     * declarations against a referee that shares no machinery with this walk
+     * and misses none of them, and `npm run measure:licence -- --only=python`
+     * puts a pinned corpus behind the language. So the absence is now a
+     * refutation, and `tests/engine-licence.test.ts` holds the guard that no
+     * language reaches this point unmeasured.
      */
     const source = ["class RouteInfo:", "    path: str"].join("\n");
-    expect(verdictOf(heldTypes(source, "RouteInfo", ["Response"], "python")))
-      .toBe("withheld/unlicensed");
+    expect(verdictOf(heldTypes(source, "RouteInfo", ["Response"], "python"))).toBe("absent");
   });
 
-  it("still confirms in a language with no licence", () => {
+  it("confirms in Python without the licence having anything to do with it", () => {
+    // Confirming never needed a licence: finding the name is evidence of the
+    // name being there whoever is reading. This passed before #198 and after.
     const source = ["class RouteInfo:", "    handler: Response"].join("\n");
     expect(verdictOf(heldTypes(source, "RouteInfo", ["Response"], "python"))).toBe("confirmed");
   });

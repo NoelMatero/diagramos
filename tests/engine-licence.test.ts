@@ -22,9 +22,9 @@ import path from "node:path";
 
 import { readDependencies } from "../src/engine/deps";
 import { createWorkspace, type Workspace } from "../src/engine/drift";
-import { initEngine } from "../src/engine/parse";
+import { initEngine, type Language } from "../src/engine/parse";
 import { resolveDependency } from "../src/engine/resolve";
-import { LICENCES, licenceFor, licenceTotals } from "../src/engine/licence";
+import { LICENCES, licenceFor, licenceTotals, mayAccuse } from "../src/engine/licence";
 import { measureLicence } from "../scripts/lib/licence";
 
 beforeAll(async () => {
@@ -203,6 +203,7 @@ describe("the licence on record", () => {
   it("covers a file this tool would actually read", () => {
     expect(licenceFor("src/engine/drift.ts")?.language).toBe("typescript");
     expect(licenceFor("src/engine/board.rs")?.language).toBe("rust");
+    expect(licenceFor("src/engine/board.py")?.language).toBe("python");
     expect(licenceFor("src/main.go")).toBeUndefined();
     expect(licenceFor("docs/notes.md")).toBeUndefined();
   });
@@ -220,6 +221,73 @@ describe("the licence on record", () => {
     // Two entries for three disagreements: vite's miss and its invention are the
     // same specifier in the same fixture, resolved two defensible ways.
     expect(licence.known.length).toBe(2);
+  });
+});
+
+describe("the Python licence on record", () => {
+  const licence = LICENCES.find((one) => one.language === "python")!;
+
+  it("pins every corpus entry to a commit", () => {
+    expect(licence.corpus.length).toBe(5);
+    for (const entry of licence.corpus) {
+      expect(entry.commit, entry.name).toMatch(/^[0-9a-f]{40}$/);
+      expect(entry.url, entry.name).toMatch(/^https:\/\//);
+    }
+  });
+
+  it("adds up to the numbers it claims", () => {
+    const totals = licenceTotals(licence);
+    expect(totals.edges).toBe(12693);
+    expect(totals.missed).toBe(41);
+    // Nothing invented in 12,693 edges. That is the direction that matters: an
+    // edge the reader makes up is an accusation resting on evidence nobody had.
+    expect(totals.invented).toBe(0);
+    expect(totals.recall).toBeGreaterThan(0.996);
+    expect(totals.precision).toBe(1);
+  });
+
+  it("states the remainder rather than netting it off", () => {
+    // pydantic excludes `pydantic/v1` from its own pyright config, so the
+    // referee never bound those files and has no opinion to disagree with.
+    const stated = licence.corpus.reduce((into, entry) => into + (entry.unmeasured ?? 0), 0);
+    expect(stated).toBe(134);
+  });
+
+  it("names the disagreements it does not expect to close", () => {
+    // Every one of the 41 misses is the first entry: a wildcard import followed
+    // through a package's re-exports to modules the text never names.
+    expect(licence.known.length).toBe(3);
+  });
+});
+
+describe("which languages may accuse", () => {
+  it("has a measured licence for every language it has a grammar for", () => {
+    /*
+     * Written as an exhaustive record on purpose: add a sixth `Language` to
+     * `parse.ts` and this stops compiling, which is the moment somebody has to
+     * decide whether it has been measured. The alternative -- a list of five
+     * strings -- goes stale silently, and a language that reaches `mayAccuse`
+     * unmeasured is #195 happening again.
+     *
+     * Every entry is `true` today, and that is the finding rather than the
+     * design: Python was the last `false` and #198 moved it. It also means the
+     * `withheld/unlicensed` branch in `signature.ts` and `holds.ts` is
+     * unreachable through any language this engine parses, which is why the
+     * tests that used to exercise it with a `.py` fixture are gone rather than
+     * ported.
+     */
+    const expected: Record<Language, boolean> = {
+      ts: true, tsx: true, js: true, rust: true, python: true,
+    };
+    for (const [language, may] of Object.entries(expected)) {
+      expect(mayAccuse(language as Language), language).toBe(may);
+    }
+  });
+
+  it("says nothing about a language nobody measured", () => {
+    // The licence is a measurement, not a list of languages somebody liked.
+    expect(licenceFor("src/main.go")).toBeUndefined();
+    expect(licenceFor("src/Main.java")).toBeUndefined();
   });
 });
 

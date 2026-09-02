@@ -24,10 +24,13 @@ import { execFileSync } from "node:child_process";
 import { LICENCES, licenceTotals, type CorpusEntry, type Licence } from "../src/engine/licence";
 import { measureLicence, type LicenceMeasurement } from "./lib/licence";
 import { measureRustLicence } from "./lib/licence-rust";
+import { measurePythonLicence } from "./lib/licence-python";
 
 /** The harness for a language. One per referee, because a referee is per language. */
 function harnessFor(language: string): (root: string) => Promise<LicenceMeasurement> {
-  return language === "rust" ? measureRustLicence : measureLicence;
+  if (language === "rust") return measureRustLicence;
+  if (language === "python") return measurePythonLicence;
+  return measureLicence;
 }
 
 /**
@@ -38,7 +41,16 @@ function harnessFor(language: string): (root: string) => Promise<LicenceMeasurem
  * wrong -- a repository holding both is a real thing, and this picks one.
  */
 function languageOfTree(root: string): string {
-  return existsSync(path.join(root, "Cargo.toml")) ? "rust" : "typescript";
+  if (existsSync(path.join(root, "Cargo.toml"))) return "rust";
+  /*
+   * A Python manifest, in the four spellings a repository actually uses. None
+   * of them is conclusive -- a TypeScript project can carry a tox.ini for its
+   * docs build -- which is why `--only=<language>` exists and why a repository
+   * holding both is expected to say so rather than be guessed at.
+   */
+  const pythonManifests = ["pyproject.toml", "setup.py", "setup.cfg", "Pipfile"];
+  if (pythonManifests.some((name) => existsSync(path.join(root, name)))) return "python";
+  return "typescript";
 }
 
 const CORPUS_DIRECTORY = path.resolve(".corpus");
@@ -79,7 +91,7 @@ async function report(root: string, label: string, language?: string): Promise<v
   console.log(`\n${label}  (${chosen})`);
   console.log(`  files ${measured.files.length}  referee ${measured.refereeEdges.size}  reader ${measured.ourEdges.size}`);
   console.log(`  agreed ${agreed}  missed ${measured.missed.length}  invented ${measured.invented.length}`);
-  console.log(`  incomplete ${measured.incomplete.length}  dynamic ${measured.dynamic.length}  no grammar ${measured.skipped.length}  no crate ${measured.unloaded?.length ?? 0}  oversized ${measured.oversized.length}`);
+  console.log(`  incomplete ${measured.incomplete.length}  dynamic ${measured.dynamic.length}  no grammar ${measured.skipped.length}  referee skipped ${measured.unloaded?.length ?? 0}  oversized ${measured.oversized.length}`);
   for (const edge of measured.missed) console.log(`    missed   ${edge}`);
   for (const edge of measured.invented) console.log(`    invented ${edge}`);
 }

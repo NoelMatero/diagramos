@@ -58,11 +58,16 @@
  * `checkDrift -> body` are both real and neither is in it. So flows are not
  * offered rather than offered wrongly.
  *
- * **It is silent in a language it cannot read.** `deps.ts` reads TypeScript,
- * TSX, JavaScript and Rust. Python is 82 files and 0 edges in graphify, and the
- * survey refuses the scope instead of drafting a board of unconnected boxes. A
- * draft nothing corroborated would be exactly the false confidence the rest of
- * this engine is built to avoid.
+ * **It is silent in a language it cannot read.** The refusal is not a list of
+ * languages: a scope where no file has a dependency reader has no arrows to
+ * draw and no way to tell which modules matter, so it is refused rather than
+ * drafted as unconnected boxes. A draft nothing corroborated would be exactly
+ * the false confidence the rest of this engine is built to avoid.
+ *
+ * Python used to be the whole of that refusal -- 82 files and 0 edges in
+ * graphify -- and #198 ended it by giving `deps.ts` a Python reader. Nothing
+ * here changed to let it through, which is the point of asking the reader
+ * rather than keeping a list.
  */
 import { dirname } from "node:path";
 

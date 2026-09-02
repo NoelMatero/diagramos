@@ -27,17 +27,19 @@
  *   reader can follow. One flag on either endpoint has to be enough to withhold
  *   a verdict, so they are collected per file and never per repo.
  *
- * Rust is read by `deps-rust.ts` and returned in the same shape, because what
- * a caller wants is the same three answers whatever the language. Almost
- * nothing else is shared: a TypeScript dependency is a string literal in one
- * of four statements, and a Rust one is a path into a module tree no single
- * file contains.
+ * Rust is read by `deps-rust.ts` and Python by `deps-python.ts`, both returned
+ * in the same shape, because what a caller wants is the same three answers
+ * whatever the language. Almost nothing else is shared: a TypeScript dependency
+ * is a string literal in one of four statements, a Rust one is a path into a
+ * module tree no single file contains, and a Python one is a position in a
+ * module tree that depends on a `sys.path` no file states.
  */
 import { licenceFor } from "./licence";
 import { each, languageOf, parseSource, type Node } from "./parse";
 import { resolveDependency, type ConfigCache } from "./resolve";
 import { crateOf, readRustLayout, type RustLayout } from "./rust";
 import { readRustDependencies } from "./deps-rust";
+import { readPythonDependencies } from "./deps-python";
 import type { Workspace } from "./workspace";
 
 /**
@@ -236,11 +238,14 @@ export function readDependencies(
   if (language === "rust") {
     return readRustDependencies(filePath, source, workspace, rustLayoutFor(workspace, configs));
   }
+  if (language === "python") {
+    return readPythonDependencies(filePath, source, workspace);
+  }
   if (!language || (language !== "ts" && language !== "tsx" && language !== "js")) {
-    // Deliberately TypeScript and JavaScript only, plus Rust above. Every other
-    // grammar this engine loads declares dependencies differently, and a reader
-    // that guesses at a language it was not measured on is the thing the licence
-    // step exists to prevent.
+    // Deliberately TypeScript and JavaScript only, plus Rust and Python above.
+    // Every other grammar this engine loads declares dependencies differently,
+    // and a reader that guesses at a language it was not measured on is the
+    // thing the licence step exists to prevent.
     return undefined;
   }
   const tree = parseSource(source, language);

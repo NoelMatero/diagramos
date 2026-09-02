@@ -1225,13 +1225,38 @@ describe("survey_scope", () => {
     expect(String(survey.rename)).toMatch(/filenames/);
   }, 120_000);
 
-  it("refuses a scope in a language it has no dependency reader for", async () => {
+  it("drafts a Python scope, which it used to refuse outright", async () => {
+    /*
+     * The whole of #198 as somebody sees it: point this at a Python package and
+     * you used to get "draw this one by hand" and nothing else, however plainly
+     * the imports were written. It now comes back as a board.
+     */
     await mkdir(path.join(workspace, "pyapp"), { recursive: true });
-    for (const name of ["main", "views", "models", "urls", "forms"]) {
-      await writeFile(path.join(workspace, "pyapp", `${name}.py`), "import os\n");
-    }
+    await writeFile(path.join(workspace, "pyapp", "__init__.py"), "");
+    await writeFile(path.join(workspace, "pyapp", "models.py"), "from pyapp import forms\n");
+    await writeFile(path.join(workspace, "pyapp", "views.py"), "from pyapp import models\n");
+    await writeFile(path.join(workspace, "pyapp", "urls.py"), "from pyapp import views\n");
+    await writeFile(path.join(workspace, "pyapp", "forms.py"), "");
+    await writeFile(
+      path.join(workspace, "pyapp", "main.py"),
+      "from pyapp import urls\nfrom pyapp.views import render\n",
+    );
     const survey = jsonOf(await call("survey_scope", { scope: "pyapp" }));
-    expect(String(survey.refused)).toMatch(/python/);
+    expect(survey.refused).toBeUndefined();
+    expect(Array.isArray(survey.nodes) ? survey.nodes.length : 0).toBeGreaterThan(0);
+  }, 120_000);
+
+  it("still refuses a Python scope where nothing points at anything", async () => {
+    // The refusal did not go away, it stopped being about the language. Five
+    // files that import only the standard library have no arrows between them,
+    // and a board of five unconnected boxes is the false confidence the survey
+    // exists to avoid.
+    await mkdir(path.join(workspace, "loose"), { recursive: true });
+    for (const name of ["main", "views", "models", "urls", "forms"]) {
+      await writeFile(path.join(workspace, "loose", `${name}.py`), "import os\n");
+    }
+    const survey = jsonOf(await call("survey_scope", { scope: "loose" }));
+    expect(String(survey.refused)).toMatch(/connected|by hand/);
     expect(survey.nodes).toBeUndefined();
   }, 120_000);
 

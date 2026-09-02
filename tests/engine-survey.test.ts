@@ -67,15 +67,42 @@ describe("what a survey reads", () => {
     expect(files).toEqual(["src/a.ts", "src/b.ts", "src/nested/c.ts"]);
   });
 
-  it("counts what it could not read, by language, instead of pretending the scope is empty", () => {
+  it("has a dependency reader for every language it has a grammar for", () => {
+    /*
+     * This is what empties the `unread` bucket, and it is why the two tests
+     * that used to exercise it are gone.
+     *
+     * `scanScope` only collects a file whose extension `languageOf` knows, so
+     * `unread` counts a narrow thing: a language with a *grammar* and no
+     * dependency reader. Python was the only one, for as long as the survey's
+     * header said Python was refused. #198 ended that, and there is now no
+     * language on either side of the gap -- which makes the counting
+     * unreachable rather than passing, and a test that constructs it anyway
+     * would be testing a shape nothing can produce.
+     *
+     * So the invariant is asserted instead. Add a grammar to `parse.ts`
+     * without adding a reader to `deps.ts` and this fails, which is the moment
+     * somebody needs to be told -- not later, when a survey quietly reports a
+     * third of a scope as the whole of it.
+     */
+    const sample: Record<string, string> = {
+      "app/a.ts": "", "app/a.tsx": "", "app/a.js": "", "app/a.rs": "", "app/a.py": "",
+    };
+    const workspace = fakeWorkspace(sample);
+    const { read, unread } = scanScope("app", workspace);
+    expect(unread).toEqual({});
+    expect(read).toBe(Object.keys(sample).length);
+  });
+
+  it("reads a Python scope, which it used to be the example of refusing", () => {
     const workspace = fakeWorkspace({
-      "app/main.py": "import helpers",
+      "app/main.py": "from app import helpers",
       "app/helpers.py": "",
-      "app/util.ts": "",
+      "app/__init__.py": "",
     });
     const { read, unread } = scanScope("app", workspace);
-    expect(read).toBe(1);
-    expect(unread).toEqual({ python: 2 });
+    expect(read).toBe(3);
+    expect(unread).toEqual({});
   });
 
   it("keeps only dependencies that land inside the scope, since a board cannot point at a box it lacks", () => {
@@ -218,18 +245,21 @@ describe("choosing the grain", () => {
 });
 
 describe("what a survey admits", () => {
-  it("refuses a scope in a language with no dependency reader, and says which language", async () => {
+  it("drafts a Python scope instead of refusing it", async () => {
+    // The bad outcome #198 removed: a Python codebase got "draw this one by
+    // hand" and nothing else, however plainly its imports were written.
     const workspace = fakeWorkspace({
-      "app/main.py": "import helpers",
+      "app/__init__.py": "",
+      "app/main.py": "from app import models, views\nfrom app.urls import routes\n",
+      "app/models.py": "from app import helpers\n",
+      "app/views.py": "from app import models\n",
+      "app/urls.py": "from app import views\n",
       "app/helpers.py": "",
-      "app/models.py": "",
-      "app/views.py": "",
-      "app/urls.py": "",
     });
     const survey = await surveyScope("app", workspace);
-    expect(survey.refused).toContain("python");
-    expect(survey.refused).toMatch(/by hand/);
-    expect(survey.read).toBe(0);
+    expect(survey.refused).toBeUndefined();
+    expect(survey.read).toBe(6);
+    expect(survey.edges?.length ?? 0).toBeGreaterThan(0);
   });
 
   it("refuses a scope with no source in it at all", async () => {

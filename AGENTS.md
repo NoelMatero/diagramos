@@ -39,9 +39,9 @@ plus a live local board for editing them alongside a human.
   [docs/claim-vocabulary.md](docs/claim-vocabulary.md).** It carries the part
   that does not fit in a header: which words may say *wrong* and on which of
   three footings, why two of them point the opposite way from the other two,
-  what each language has earned the right to accuse about, and the four times a
-  measurement contradicted the design. Three of those four were found by
-  building one word rather than by reviewing the plan.
+  what each language has earned the right to accuse about, and the six times a
+  measurement contradicted the design. Four of those six were found by
+  building one word or one reader rather than by reviewing the plan.
 
 ## Finishing a piece of work
 

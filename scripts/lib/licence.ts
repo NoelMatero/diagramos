@@ -52,12 +52,19 @@ export interface LicenceMeasurement {
   /** Files that reach out at runtime, which a verdict already refuses to use. */
   dynamic: string[];
   /**
-   * Source files no compilation unit declares, so the referee never opened them.
+   * Source files the referee never formed an opinion about.
    *
-   * Rust only, and not the same thing as `skipped`: a skipped file has no
-   * grammar, an unloaded one has no crate. Kept apart because they say different
-   * things about what the licence covers -- the first is a language we cannot
-   * read, the second is code nothing compiles.
+   * Not the same thing as `skipped`: a skipped file has no grammar, an unloaded
+   * one has no referee. Kept apart because they say different things about what
+   * the licence covers -- the first is a language we cannot read, the second is
+   * code the ground truth never looked at.
+   *
+   * Rust and Python, for unrelated reasons. In Rust it is a file no crate
+   * declares, which is a file rustc never compiles. In Python it is a file the
+   * project's own `[tool.pyright]` excludes -- pydantic excludes `pydantic/v1`,
+   * 134 files -- and those are reported as importing nothing at all rather than
+   * left out, so reading the report naively turns a referee's silence into the
+   * reader inventing every edge in them.
    */
   unloaded?: string[];
 }

@@ -164,9 +164,12 @@ export function vouchedFor(ledger: Ledger | undefined, file: string): boolean {
  * box that then goes green on a walk that never looked. The ledger says what is
  * in the places we will not go, without our having to go there.
  *
- * Only licensed files come back. A Python fixture cannot import a TypeScript
- * module, so counting it against the box would be pessimism with nothing behind
- * it -- and it is invisible to the walk today for the same reason. Files the
+ * Only licensed files come back, and a language is on that list once somebody
+ * has measured its reader -- Python joined in #198, so a Python file in a
+ * vendored directory now counts against a Python box the way a TypeScript one
+ * always has. What does not change is the cross-language case: a Python fixture
+ * cannot import a TypeScript module, so counting it against that box would be
+ * pessimism with nothing behind it. Files the
  * ledger names that no longer exist are dropped too: a deleted file imports
  * nothing, and treating a ledger built one commit ago as evidence of a hole
  * would make every `closed` box unprovable the moment somebody removed a file.
