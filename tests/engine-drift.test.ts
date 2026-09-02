@@ -1731,12 +1731,16 @@ describe("saying what was not looked at", () => {
         "endpoint-file-missing",
       ],
       [
+        // Written with a `.py` end for as long as Python had no licence. Go
+        // takes over: what is being tested is that an arrow into a language
+        // nobody measured is skipped and *said* to be skipped, not that Python
+        // in particular is untrusted.
         "an end in another language",
         () => boardOf(
-          [{ id: "a", label: "A", ref: "src/a.ts" }, { id: "b", label: "B", ref: "src/b.py" }],
+          [{ id: "a", label: "A", ref: "src/a.ts" }, { id: "b", label: "B", ref: "src/b.go" }],
           [{ from: "a", to: "b" }],
         ),
-        { "src/a.ts": "x", "src/b.py": "y" },
+        { "src/a.ts": "x", "src/b.go": "y" },
         "unlicensed-language",
       ],
     ];

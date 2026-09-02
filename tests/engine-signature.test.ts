@@ -295,25 +295,27 @@ describe("a Python annotation written inside a string", () => {
       .toBe("absent");
   });
 
-  it("leaves an ordinary Python signature confirmable, and does not accuse on it", () => {
+  it("confirms an ordinary Python signature, and now accuses on a real absence", () => {
     /*
-     * The confirmation is the half #200 was about and it still holds. The
-     * absence does not: Python has a grammar and no measured licence, so
-     * nothing has ever checked how often this reader is blind about Python --
-     * and #195 found one such blindness by hand. That a known blindness is
-     * fixed is not evidence there are no others, which is the whole of what
-     * "measured against a referee" buys and the thing Python has none of.
+     * This is #198 arriving, and it is worth reading against what it replaced.
      *
-     * So the decision #195 left open is taken here, for this reader and
-     * `holds.ts` together: an absence needs a licence, a confirmation does not.
-     * It reverses what #200 left in place, deliberately, and #198 is what
-     * un-reverses it.
+     * #195 left the absence withheld because nothing had checked how often this
+     * reader is blind about Python, and a fixed blindness is not evidence there
+     * are no others. That is exactly what a referee buys, and Python had none.
+     * It has one now: `npm run measure:signature` reads 4,002 Python type names
+     * in 1,543 functions and misses none, and `licence.ts` carries a pinned
+     * Python corpus behind the language.
+     *
+     * So `is_splittable_text` takes a `Path` and does not take a `FileSlice`,
+     * and the board may be told so. The number this bought is on the record:
+     * the reader went from refuting 0 of 1,543 Python functions to 1,404, and
+     * still withholds 139 -- 71 aliased, 68 quoted.
      */
     const source = "def is_splittable_text(path: Path) -> bool: ...";
     expect(verdictOf(signatureNames(source, "is_splittable_text", ["Path"], "parameter", "python")))
       .toBe("confirmed");
     expect(verdictOf(signatureNames(source, "is_splittable_text", ["FileSlice"], "parameter", "python")))
-      .toBe("withheld/unlicensed");
+      .toBe("absent");
   });
 
   it("leaves a TypeScript literal type alone, where the quotes mean themselves", () => {
@@ -334,21 +336,19 @@ describe("a Python annotation written inside a string", () => {
  * false accusation.
  */
 describe("refuses rather than accuses", () => {
-  it("withholds an absence in a language whose reader has no licence", () => {
-    /*
-     * Python has a grammar and no measured corpus, so this reader has never
-     * been checked against a referee on Python -- and #195 found it getting an
-     * ordinary Python signature wrong while shipping the accusation anyway.
-     *
-     * Confirming is unaffected: finding the name is the same evidence a
-     * measured reader would have found. The absence is what needs the licence.
-     */
+  it("refutes an absence in Python, now that its reader has been measured", () => {
+    // `go` takes a `Request`. It does not take a `Client`, the parameter list is
+    // right there, and since #198 the reader has a referee behind it that says
+    // how often it is blind. `tests/engine-licence.test.ts` holds the guard that
+    // no language reaches this point unmeasured.
     const source = "def go(r: Request) -> Response:\n    pass\n";
     expect(verdictOf(signatureNames(source, "go", ["Client"], "parameter", "python")))
-      .toBe("withheld/unlicensed");
+      .toBe("absent");
   });
 
-  it("still confirms in a language with no licence", () => {
+  it("confirms in Python without the licence having anything to do with it", () => {
+    // Confirming never needed a licence: finding the name is the same evidence
+    // a measured reader would have found. This passed before #198 and after.
     const source = "def go(r: Request) -> Response:\n    pass\n";
     expect(verdictOf(signatureNames(source, "go", ["Request"], "parameter", "python")))
       .toBe("confirmed");

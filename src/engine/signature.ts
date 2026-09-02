@@ -130,6 +130,14 @@
  * ever needs a referee stronger than a text scan, `mypy` or `pyright` is a
  * referee for *this* measurement, added to that script. It is not a call to
  * `licenceFor`.
+ *
+ * #198 has since put pyright in the repository, as the referee for the *import*
+ * reader, and that does not change the paragraph above. A licence entry says a
+ * language has been measured; it does not say which reader. Python now accuses
+ * here on the strength of this script's own numbers -- 4,002 type names, 0
+ * missed -- and the day a word arrives whose Python reader nobody measured, it
+ * will inherit that permission without having earned it. That hole has a name
+ * in `docs/claim-vocabulary.md` and is the licence grid.
  */
 import { mayAccuse } from "./licence";
 import { parseSource, type Language, type Node } from "./parse";

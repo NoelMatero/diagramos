@@ -1912,7 +1912,9 @@ server.registerTool(
       + "worth doing; keep the refs and the claims when you do. It also only knows about "
       + "dependencies, so it drafts the structural board and not a flow -- for 'how does X happen', "
       + "read the code and draw it yourself. It refuses a scope outright in a language with no "
-      + "dependency reader (Python is refused today) rather than drafting boxes nothing corroborated.",
+      + "dependency reader rather than drafting boxes nothing corroborated. Python was that refusal "
+      + "until #198 gave it a reader and a measured licence; TypeScript, JavaScript, Rust and "
+      + "Python are all drafted now.",
     inputSchema: {
       scope: z
         .string()

@@ -1040,20 +1040,27 @@ describe("code graph — the fifth corroboration channel", () => {
   });
 
   it("checks an arrow between files the channels cannot read", async () => {
-    const pyFiles = {
-      "src/x.py": "from y import go\ngo()\n",
-      "src/y.py": "def go(): pass\n",
+    /*
+     * Written with a pair of `.py` files until #198 gave Python a reader, a
+     * referee and a licence -- at which point the arrow was read directly and
+     * the rescue this test is about never happened. Go takes over. The subject
+     * was never Python: it is that a language the channels cannot read is where
+     * the code graph earns its place.
+     */
+    const goFiles = {
+      "src/x.go": 'import "y"\n\nfunc main() { y.Go() }\n',
+      "src/y.go": "package y\n\nfunc Go() {}\n",
     };
     const graph = fixtureGraph(
-      [["x", "src/x.py"], ["y_go", "src/y.py"]],
+      [["x", "src/x.go"], ["y_go", "src/y.go"]],
       [["x", "y_go", "imports"]],
     );
-    const board = await arrowAB("src/x.py", "src/y.py");
+    const board = await arrowAB("src/x.go", "src/y.go");
 
-    const without = checkDrift(board, fakeWorkspace(pyFiles), { edges: true });
+    const without = checkDrift(board, fakeWorkspace(goFiles), { edges: true });
     expect(without.edgesSkippedWhy["unlicensed-language"]).toBe(1);
 
-    const withGraph = checkDrift(board, fakeWorkspace(pyFiles), {
+    const withGraph = checkDrift(board, fakeWorkspace(goFiles), {
       edges: true,
       codeGraph: { graph, modified: new Set() },
     });
@@ -1117,17 +1124,19 @@ describe("code graph — the fifth corroboration channel", () => {
   });
 
   it("a graph that proves nothing leaves the skip in place, never an alarm", async () => {
-    const pyFiles = {
-      "src/x.py": "print(1)\n",
-      "src/y.py": "print(2)\n",
+    // Go, for the same reason as above: Python is read directly since #198, and
+    // this is about what happens when nothing can read the files at all.
+    const goFiles = {
+      "src/x.go": "package main\n",
+      "src/y.go": "package y\n",
     };
     // The graph knows both files but no chain between them.
     const graph = fixtureGraph(
-      [["x", "src/x.py"], ["y", "src/y.py"]],
+      [["x", "src/x.go"], ["y", "src/y.go"]],
       [],
     );
-    const board = await arrowAB("src/x.py", "src/y.py");
-    const report = checkDrift(board, fakeWorkspace(pyFiles), {
+    const board = await arrowAB("src/x.go", "src/y.go");
+    const report = checkDrift(board, fakeWorkspace(goFiles), {
       edges: true,
       codeGraph: { graph, modified: new Set() },
     });

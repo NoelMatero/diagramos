@@ -1,7 +1,7 @@
 # The claim vocabulary: what exists, what it may say, and what is open
 
 Written for a session picking this up cold. It is the state of #190's programme
-after #187, #188, #193, #195 and #199 — what the words are, what each is
+after #187, #188, #193, #195, #198 and #199 — what the words are, what each is
 *allowed* to say and why, which numbers decided that, and what is genuinely
 still undecided.
 
@@ -96,7 +96,7 @@ accuse by being measured against an independent referee over a pinned corpus.
 |---|---|---|
 | TypeScript (+ tsx, js) | yes | the TypeScript compiler |
 | Rust | yes | rust-analyzer, via LSIF |
-| Python | **no** | none yet — #198 |
+| Python | yes | pyright, via `--dependencies` |
 
 **An unlicensed language confirms and may not accuse.** Every reader that can
 say *wrong* consults `mayAccuse` at its last gate, so losing the licence costs
@@ -107,7 +107,32 @@ claim about the whole of something.
 That rule was applied late and it reversed an earlier decision. `signature.ts`
 gated on having a *grammar*, and Python has one, so Python was the only language
 shipping accusations from a reader no referee had ever seen — while getting an
-ordinary Python signature wrong (#195). #198 is what re-licenses it.
+ordinary Python signature wrong (#195). #198 re-licensed it, and the next
+section is what that cost.
+
+### What Python is allowed to accuse about, and what stays withheld
+
+Settled by #198, and worth reading as four separate answers rather than one:
+
+| word | Python may accuse | on what evidence |
+|---|---|---|
+| `@needs` | yes | 12,693 dependency edges over five repositories: 41 missed, **0 invented** |
+| `@holds` | yes | 2,177 field asks, 0 missed, 0 invented; refuses a quarter of them |
+| `@takes` / `@returns` | yes | 4,002 type names in 1,543 functions, 0 missed |
+| `@builds` | **no** | not a licence question — Python spells making one of something as a call, so `constructs.ts` withholds it before any licence is consulted |
+
+The three yeses are three separate measurements against three unrelated
+referees, which is the only reason one licence entry covers four words. What
+the licence still does *not* have is a per-relation axis: if a fourth word
+arrives whose Python reader has not been measured, it inherits an accusation it
+did not earn. That is the hole #190 calls the licence grid, and Python's licence
+is the thing that finally makes it worth building.
+
+The cost is on the record and it is not small. Before the licence, the Python
+signature reader withheld all 1,543 functions it read, 1,404 of them for no
+reason but the missing licence. It now refutes those and goes on withholding
+139 — 71 aliased, 68 quoted. `@holds` refuses 25.4% of Python asks, all of them
+quoted annotations, and that number did not move.
 
 ## The measurement harness
 
@@ -120,7 +145,7 @@ and never fail.
 | `npm run measure:holds` | can the field reader be trusted with a red |
 | `npm run measure:constructs` | can the construction reader be trusted to say backwards |
 | `npm run measure:signature` | the same for parameters and return types |
-| `npm run measure:licence` | reproduces the per-language licence numbers |
+| `npm run measure:licence` | reproduces the per-language licence numbers — `--only=python` for one |
 | `npx tsx scripts/probe-generative.mts` | draws boards of unseen code and counts what could not be said |
 
 The pattern in all of them is a **referee**: count the shape one way, count it
@@ -155,10 +180,10 @@ declared in the same repository. The first counts every `console.log` and
 
 Still wordless: `invokes` (#189), `conforms`, `accesses`.
 
-## Four times a measurement contradicted the design
+## Six times a measurement contradicted the design
 
-Kept because the pattern is the point: three of the four came from building one
-word, not from reviewing the design.
+Kept because the pattern is the point: four of the six came from building one
+word or one reader, not from reviewing the design.
 
 1. **The substrate was empty.** #190's first draft proposed graphify as the
    fact supplier on the strength of 8,167 `contains` edges. `contains` there is
@@ -174,18 +199,32 @@ word, not from reviewing the design.
 4. **Python was accusing when the issue said it could not.** #190 called Python
    structurally unable to refute. `signature.ts` never consulted a licence, so
    Python was the one language accusing unmeasured (#195).
+5. **The referee was the thing that was wrong, twice.** Measuring Python
+   (#198) turned up four reader bugs and two harness bugs, and the harness ones
+   were the expensive pair: resolving the referee's paths through `realpath`
+   renamed a symlinked directory and manufactured 95 disagreements the reader
+   had right, and reading a file pyright had never bound as a file with *no
+   imports* turned the referee's silence into the reader inventing everything in
+   it. A referee is a program somebody wrote, and it can be read wrongly.
+6. **Fixing recall is how precision breaks.** The same measurement, in
+   sequence: the Python reader looked an absolute import up only at the
+   repository root, which lost every arrow in flask's six example projects.
+   Making it walk up from the file fixed all eleven — and made `import typing as
+   t` beside `src/flask/typing.py` invent sixteen edges in one line, because it
+   had started shadowing the standard library. Neither half was visible without
+   the other, and running the measurement once would have shipped one of them.
 
 `renders` was also raised as a possible missing relation and turned out not to
 be one: `<MenuContent />` is a routine making a MenuContent, which is `@builds`.
 
 ## Open, in the order worth doing
 
-1. **#198 — Python's licence.** Nothing else unblocks four words at once, and
-   Python is ~80% of the call population. A referee has to be chosen; pyright
-   looks likeliest and nothing has been tried.
-2. **#189 — `invokes`.** Bigger than it reads: cross-file call resolution is
+1. **#189 — `invokes`.** Bigger than it reads: cross-file call resolution is
    also the substrate for everything in #203, so it is a call graph rather than
-   a word.
+   a word. #198 was its blocker and is now done, so its largest population is a
+   language that can refute.
+2. **The licence grid**, which #198 turned from a someday into a hole with a
+   name. See below.
 3. **#203 — the engine has no notion of a value.** Dataflow, points-to, escape
    analysis. The honest prediction is that it makes confirmation much better and
    refutation only slightly better, for the reason `@feeds` exists.
@@ -193,12 +232,19 @@ be one: `<MenuContent />` is a routine making a MenuContent, which is `@builds`.
    thing worth recording there is the three footings above — the table's `may
    accuse` column reads as a yes/no and it is not.
 
+**#198 — Python's licence** is done: pyright, five pinned repositories, 12,693
+dependency edges, 41 missed and 0 invented. What it bought is above, and
+`surveyScope` will now draft a Python board instead of refusing the scope.
+
 ## What is deliberately not being built
 
-- **A per-(relation, language) licence grid.** #190 wants a second axis on
-  `licence.ts`. Two licensed languages and one new relation do not need it;
-  build it when a third relation or Python's licence makes the holes worth
-  naming.
+- ~~**A per-(relation, language) licence grid.**~~ This was the one thing on
+  this list with a stated trigger — "build it when a third relation or Python's
+  licence makes the holes worth naming" — and #198 pulled it. One `Licence`
+  entry now speaks for four words on the strength of three separate
+  measurements, and nothing in the type says which. The next word to arrive
+  inherits a Python accusation it has not earned, silently, which is #195
+  again with a different reader. It has moved to the open list above.
 - **`@type-arg`**, despite type arguments being the second most common
   relationship in all code. Almost all of it is `Vec<T>`, `Promise<T>`,
   `list[str]`, which nobody draws as two boxes.

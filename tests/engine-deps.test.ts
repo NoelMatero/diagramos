@@ -117,10 +117,25 @@ describe("what a file declares", () => {
   });
 
   it("says nothing at all about a language it was not measured on", () => {
+    /*
+     * Silence, not an empty answer: an absence of dependencies is a claim, and
+     * this reader is not entitled to make it about a language nobody measured.
+     *
+     * This used to be asserted about Python, which is no longer the example --
+     * #198 gave Python a reader, a referee and a licence. Go stands in because
+     * the property is about *not having been measured*, and the day Go is
+     * measured this test should move again rather than be deleted.
+     */
+    const workspace = fakeWorkspace({ "src/a.go": 'import "os"\n' });
+    expect(readDependencies("src/a.go", 'import "os"\n', workspace)).toBeUndefined();
+  });
+
+  it("reads Python, now that there is a licence behind it", () => {
+    // The other half of the same rule: a language that *was* measured is read,
+    // and `deps-python.ts` owns the shape of that answer.
     const workspace = fakeWorkspace({ "src/a.py": "import os\n" });
-    // Silence, not an empty answer: an absence of dependencies is a claim, and
-    // this reader is not entitled to make it about Python.
-    expect(readDependencies("src/a.py", "import os\n", workspace)).toBeUndefined();
+    const found = readDependencies("src/a.py", "import os\n", workspace);
+    expect(found?.dependencies.map((entry) => entry.specifier)).toEqual(["os"]);
   });
 });
 

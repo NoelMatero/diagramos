@@ -93,6 +93,15 @@ export const NEVER_WALK: ReadonlySet<string> = new Set([
   "test-results", "playwright-report",
   // Rust.
   "target",
+  /*
+   * Python. Three, because Python spreads over all three and the dangerous one
+   * is not the obvious one: `__pycache__` holds bytecode a walk should not pay
+   * for, but `venv` is a whole interpreter's worth of third-party `.py` files
+   * that a reader would happily count as this repository's source. `.venv` and
+   * `.tox` are already skipped for starting with a dot; `venv` is not, and it
+   * is just as common.
+   */
+  "__pycache__", "site-packages", "venv",
   // Version control, and this tool's own output.
   ".git", ".corpus", "graphify-out",
 ]);

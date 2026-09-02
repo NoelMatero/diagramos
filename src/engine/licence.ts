@@ -152,6 +152,75 @@ export const LICENCES: readonly Licence[] = [
         "of ripgrep's.",
     ],
   },
+  {
+    language: "python",
+    extensions: [".py"],
+    measured: "2026-09-02",
+    referee:
+      "pyright, asked for `--dependencies --verbose`: the import graph a real " +
+      "type checker resolved, printed file by file. It shares nothing with a " +
+      "tree-sitter walk, needs no virtualenv, no installed dependencies and no " +
+      "successful run of the code, and it answers the same way for a bare clone " +
+      "as for a configured one -- which is what mypy could not promise, its " +
+      "import resolution being sensitive to a config somebody wrote for their " +
+      "own CI. A referee that has to be configured per repository is a second " +
+      "opinion rather than a ground truth.",
+    /*
+     * Python is the language with the most to say here and, until this was
+     * measured, the least right to say it: no reader at all, so `@needs` was
+     * silent, `surveyScope` refused a Python scope outright, and #195 had just
+     * had to mute an accusation `signature.ts` was making unmeasured.
+     *
+     * The corpus is chosen for the shapes that break readers rather than the
+     * ones that flatter them, which #198 asked for and which the numbers then
+     * justified: flask holds six small projects rooted below its own root,
+     * httpx writes `from __future__ import annotations` throughout and
+     * re-exports through wildcards, pydantic excludes 134 of its own files from
+     * pyright and symlinks a test package into a sibling checkout, poetry is
+     * src-layout, and django is 2,928 files with no `src` at all.
+     *
+     * Four reader bugs and two referee bugs came out of it, and not one was
+     * reachable by thinking about it. The reader looked up an absolute import
+     * only at the repository root, so every one of flask's example projects
+     * lost its arrows; fixing that made it shadow the standard library, and
+     * `import typing as t` beside `src/flask/typing.py` invented sixteen edges
+     * in one line. The harness put the referee's paths through `realpath`,
+     * which renamed a symlinked directory and manufactured 95 disagreements out
+     * of edges the reader had right. And it read a file pyright had never bound
+     * as a file with no imports, which turns a referee's silence into the
+     * reader inventing everything.
+     */
+    corpus: [
+      { name: "pallets/flask", url: "https://github.com/pallets/flask.git", commit: "d318b683471101618febed18996405ad26462110", files: 83, edges: 196, missed: 0, invented: 0 },
+      { name: "encode/httpx", url: "https://github.com/encode/httpx.git", commit: "b5addb64f0161ff6bfe94c124ef76f6a1fba5254", files: 60, edges: 128, missed: 5, invented: 0 },
+      { name: "python-poetry/poetry", url: "https://github.com/python-poetry/poetry.git", commit: "e33ce99067f6a28537aebd23caabc2c49aae5ed8", files: 445, edges: 1136, missed: 0, invented: 0 },
+      { name: "pydantic/pydantic", url: "https://github.com/pydantic/pydantic.git", commit: "27f473c24ed63a475903d8289c84fb81987f04e9", files: 423, edges: 957, missed: 0, invented: 0, unmeasured: 134 },
+      { name: "django/django", url: "https://github.com/django/django.git", commit: "05aec0a4aa111b54b50daec64059fd18ac70b437", files: 2928, edges: 10276, missed: 36, invented: 0 },
+    ],
+    known: [
+      "A wildcard import from a package, followed through to the modules that " +
+        "package re-exports from. `from django.db.models import *` sends pyright " +
+        "to the twenty files `django/db/models/__init__.py` pulls its own names " +
+        "out of; the reader stops at the package the text spells. Same call as " +
+        "Rust's `pub use`, and for the same reason -- a board is drawn about the " +
+        "text, and `django/contrib/gis/db/models/__init__.py` does not name " +
+        "`aggregates` anywhere. All 41 misses in the corpus are this one shape, " +
+        "36 of them django's and 5 httpx's.",
+      "A file the project's own `[tool.pyright]` excludes. pydantic excludes " +
+        "`pydantic/v1`, and those files still appear in the report listed as " +
+        "importing nothing at all -- not zero imports, but never bound. They are " +
+        "counted as unmeasured rather than netted off, which is 134 of pydantic's " +
+        "557 files. The referee is deliberately left running under each " +
+        "project's own configuration: overriding it would make this repository " +
+        "the thing deciding what the referee looks at.",
+      "The standard library list moves between Python versions. It is " +
+        "`sys.stdlib_module_names` for one interpreter plus `__main__`, so a " +
+        "repository vendoring a module some later Python deleted -- `distutils`, " +
+        "`imp` -- would be read as the standard library's and lose the edge. " +
+        "Nothing in this corpus does it, and pyright's typeshed has the same " +
+        "shape of exposure.",
+    ],
+  },
 ];
 
 /** Totals across a licence's corpus. */
