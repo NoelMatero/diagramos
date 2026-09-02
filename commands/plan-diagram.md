@@ -160,6 +160,26 @@ the arrow promotes and the field list is read, and from then on a disagreement i
 reported in red with the fields quoted. Both ends need to name a type
 (`path#symbol`).
 
+### `claim: "builds"` on a planned arrow — the thing it will make
+
+`builds` says **the `from` end will make one of the `to` end's type**. It reads
+as `@builds` on the label:
+
+```
+edges: [
+  { from: "build", to: "widget", state: "planned", claim: "builds" },
+]
+```
+
+The maker comes first, the thing made second — the same way round as `returns`.
+This is the claim for sketching a factory or a component tree before either
+exists.
+
+Nothing accuses a plan of a construction that has not been written. Once the
+code lands the arrow promotes and the routine is read: finding the construction
+confirms it, not finding it is never held against it, and finding it at the far
+end only means the arrow is backwards.
+
 ### `closed: {}` on a planned directory box — the boundary it will hold
 
 `closed` says **nothing outside this box reaches into it**. Only for a box

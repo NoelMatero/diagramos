@@ -53,9 +53,9 @@ export const STATE_WORDS: Record<NodeState, string> = {
  * The sentences are the panel's own, because the panel is where a person reads
  * them: a claim nobody understands is a claim nobody should be ticking.
  */
-export type ArrowClaim = "needs" | "feeds" | "takes" | "returns" | "holds";
+export type ArrowClaim = "needs" | "feeds" | "takes" | "returns" | "holds" | "builds";
 
-const CLAIM_WORDS: readonly ArrowClaim[] = ["needs", "feeds", "takes", "returns", "holds"];
+const CLAIM_WORDS: readonly ArrowClaim[] = ["needs", "feeds", "takes", "returns", "holds", "builds"];
 
 /** The shapes that count as a box, matching what the engine reads as a node. */
 const NODE_SHAPES = ["rectangle", "diamond", "ellipse"];

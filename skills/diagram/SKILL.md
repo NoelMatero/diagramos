@@ -480,6 +480,41 @@ the check withholds instead of accusing.
 
 Same rule as the others: write it from a field list you read.
 
+#### `claim: "builds"` — this makes one of those
+
+A routine that makes a value of a type. `new QueryCache()`, `RouteInfo { .. }`,
+and — the one most boards need — one component rendering another:
+
+```
+edges: [
+  { from: "build", to: "widget", claim: "builds" },
+  { from: "menu", to: "menu_content", claim: "builds" },
+]
+```
+
+The `from` end is the thing doing the work and the `to` end is what comes out,
+so it runs the same way as `returns` and the opposite way from `holds`. The
+`from` end may name a routine, or a **type whose routines do the making** — draw
+`QueryClient` and mean "this makes Queries", which is how anybody would draw it.
+
+**It cannot be red for an absence, and that is deliberate.** A routine that
+never writes `new Widget` can still hand you one by calling a factory, so not
+finding the construction says nothing about the arrow. Finding it does.
+
+**What can come back wrong is the direction.** If the construction is found at
+the far end and only there, the arrow is drawn backwards and you get told, with
+a file and a line. That is the one accusation this word makes.
+
+`<Menu />` counts; `<div />` does not — a lowercase tag is not something anybody
+draws a box for.
+
+Nothing is reported either way when the construction could be hiding: a Rust
+macro that expands to it, or a constructor whose name is built at runtime
+(`new registry[kind]()`). **Python gets no verdict at all**, in either
+direction: `Response(body)` and `render(body)` are the same syntax there, and
+guessing on the capital letter would be a naming convention pretending to be
+evidence.
+
 #### `closed: {}` — nothing outside reaches into this box
 
 This is the claim architecture diagrams actually make and could never say: you

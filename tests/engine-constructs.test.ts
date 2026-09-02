@@ -210,6 +210,34 @@ describe("a method is a routine, and its text is not a program", () => {
   });
 });
 
+describe("a box at the tail can be a type whose routines do the making", () => {
+  it("reads a class's methods when the box names the class", () => {
+    /*
+     * The ordinary shape on a real board. Nobody draws a box for
+     * `QueryClient.prototype.build`; they draw `QueryClient` and mean "this
+     * thing makes Queries". So a tail that names a type is scanned through its
+     * routines rather than refused for having no body of its own.
+     */
+    const source = "class Factory { build() { return new Widget(); } other() {} }";
+    expect(verdictOf(constructions(source, "Factory", ["Widget"], "ts"))).toBe("confirmed");
+  });
+
+  it("reads a Rust impl block the same way", () => {
+    const source = [
+      "struct Factory;",
+      "impl Factory { fn build() -> Widget { Widget { id: 1 } } }",
+    ].join("\n");
+    expect(verdictOf(constructions(source, "Factory", ["Widget"], "rust"))).toBe("confirmed");
+  });
+
+  it("still refuses a name that is data rather than a maker", () => {
+    // `const build = 3` has no routine anywhere in it. The distinction matters:
+    // scanning it would answer a question about a constant.
+    expect(verdictOf(constructions("const build = 3;", "build", ["Widget"], "ts")))
+      .toBe("withheld/no-body");
+  });
+});
+
 describe("a macro in the room does not hide what is plainly written", () => {
   it("confirms a struct literal in a routine that also invokes a macro", () => {
     // Rust routines are full of `println!`, `vec![]`, `todo!()`. If any macro

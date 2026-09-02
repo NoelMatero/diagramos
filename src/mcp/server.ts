@@ -222,7 +222,7 @@ const edgeSchema = z.object({
       + "break names the hop that stopped holding. Only for arrows whose ends both name symbols.",
     ),
   claim: z
-    .enum(["needs", "feeds", "takes", "returns", "holds"])
+    .enum(["needs", "feeds", "takes", "returns", "holds", "builds"])
     .optional()
     .describe(
       "What this arrow asserts, when it asserts anything. Four words, and an arrow may carry one. "
@@ -443,6 +443,13 @@ const CLAIM_CONSEQUENCE: Record<string, string> = {
     " Each one is now read off the signature: if the return type of the to end does not name the"
     + " from end's type, the arrow is reported in red with the signature quoted. Nothing is"
     + " reported either way when the type could be written there under another name.",
+  builds:
+    " Each one is now read out of the tail's own routines: `new X`, `X { .. }` and `<X />` all"
+    + " count. Finding the construction confirms the arrow. NOT finding it is never held against"
+    + " it -- a factory one call away is invisible to this, so there is no red for an absence."
+    + " What does get reported is finding the construction at the FAR end and only there, which"
+    + " means the arrow is drawn backwards. Python gets no verdict either way: it spells making"
+    + " one of something as an ordinary call.",
   holds:
     " Each one is now read off the field list of the FROM end -- the opposite end from takes,"
     + " because containment points whole to part: if no field of the from end's type is of the to"
@@ -1361,7 +1368,7 @@ server.registerTool(
             label: z.string().optional(),
             bidirectional: z.boolean().optional(),
             claim: z
-              .enum(["needs", "feeds", "takes", "returns", "holds"])
+              .enum(["needs", "feeds", "takes", "returns", "holds", "builds"])
               .optional()
               .describe(
       "What this arrow asserts, when it asserts anything. Four words, and an arrow may carry one. "

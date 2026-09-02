@@ -720,6 +720,12 @@ function rowsFor({ report, promoted = [] }, colour, all = false) {
        * is fixed by looking at the fields rather than at a signature.
        */
       const wrongHolds = finding.kind === "holds-absent";
+      /*
+       * The fourth (#199). Its own sentence for the same reason: this arrow is
+       * pointing the wrong way, and what makes it wrong is who calls `new`
+       * rather than who imports whom.
+       */
+      const wrongBuilds = finding.kind === "builds-backwards";
       return paint(
         `${boxName({ label: finding.fromLabel, node: finding.from })}`
         + ` ${backwards ? "\u2192 (should be \u2190)" : "\u2192"} `
@@ -727,8 +733,9 @@ function rowsFor({ report, promoted = [] }, colour, all = false) {
         + (backwards ? " \u00b7 drawn backwards" : "")
         + (wrongSignature ? " \u00b7 not in the signature" : "")
         + (wrongHolds ? " \u00b7 not in the fields" : "")
+        + (wrongBuilds ? " \u00b7 built the other way" : "")
         + (hop ? ` \u00b7 ${hop}` : ""),
-        backwards || wrongSignature || wrongHolds ? "red" : "yellow",
+        backwards || wrongSignature || wrongHolds || wrongBuilds ? "red" : "yellow",
         colour,
       );
     }),
@@ -792,9 +799,11 @@ function rowsFor({ report, promoted = [] }, colour, all = false) {
  * one counts a red arrow among the ambers -- which is the one summary mistake
  * #169 exists to prevent.
  */
-const WRONG_EDGE_KINDS = new Set(["backwards-edge", "signature-absent", "holds-absent"]);
+const WRONG_EDGE_KINDS = new Set([
+  "backwards-edge", "signature-absent", "holds-absent", "builds-backwards",
+]);
 
-function tallyCounts({ gone, generated, empty, unused, open, incomplete, removed, garbled, unanswered, backwards, signatures, fields, arrows, stray, promoted, built, planned }, colour) {
+function tallyCounts({ gone, generated, empty, unused, open, incomplete, removed, garbled, unanswered, backwards, signatures, fields, builtBackwards, arrows, stray, promoted, built, planned }, colour) {
   return [
     gone ? paint(`${gone} gone`, "red", colour) : "",
     // Its own word, because "gone" is the opposite of what happened: the file
@@ -842,6 +851,9 @@ function tallyCounts({ gone, generated, empty, unused, open, incomplete, removed
     fields
       ? paint(`${fields} ${fields === 1 ? "field" : "fields"} disagree`, "red", colour)
       : null,
+    builtBackwards
+      ? paint(`${builtBackwards} built backwards`, "red", colour)
+      : null,
     signatures
       ? paint(`${signatures} ${signatures === 1 ? "signature" : "signatures"} disagree`, "red", colour)
       : "",
@@ -882,6 +894,7 @@ function tallyFor({ report, promoted = [] }, colour) {
       // N things worth a look (#169).
       signatures: report.edges.filter((finding) => finding.kind === "signature-absent").length,
       fields: report.edges.filter((finding) => finding.kind === "holds-absent").length,
+      builtBackwards: report.edges.filter((finding) => finding.kind === "builds-backwards").length,
       arrows: report.edges.filter((finding) => !WRONG_EDGE_KINDS.has(finding.kind)).length,
       stray: report.strayArrows ?? 0,
       promoted: promoted.length,
@@ -953,6 +966,8 @@ function render(stale, colour) {
           + report.edges.filter((finding) => finding.kind === "signature-absent").length,
         fields: sum.fields
           + report.edges.filter((finding) => finding.kind === "holds-absent").length,
+        builtBackwards: sum.builtBackwards
+          + report.edges.filter((finding) => finding.kind === "builds-backwards").length,
         arrows: sum.arrows
           + report.edges.filter((finding) => !WRONG_EDGE_KINDS.has(finding.kind)).length,
         stray: sum.stray + (report.strayArrows ?? 0),
@@ -962,7 +977,7 @@ function render(stale, colour) {
         planned: sum.planned + report.workItems.length,
       };
     },
-    { gone: 0, generated: 0, empty: 0, unused: 0, open: 0, incomplete: 0, removed: 0, garbled: 0, unanswered: 0, backwards: 0, signatures: 0, fields: 0, arrows: 0, stray: 0, promoted: 0, built: 0, planned: 0 },
+    { gone: 0, generated: 0, empty: 0, unused: 0, open: 0, incomplete: 0, removed: 0, garbled: 0, unanswered: 0, backwards: 0, signatures: 0, fields: 0, builtBackwards: 0, arrows: 0, stray: 0, promoted: 0, built: 0, planned: 0 },
   );
 
   // Too many to list: counts per diagram, and a pointer to the view that has room.

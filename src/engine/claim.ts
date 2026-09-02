@@ -107,7 +107,25 @@
  * UML has pointed whole to part for thirty years. `holds.ts` carries the
  * argument in full.
  */
-export const ARROW_CLAIMS = ["needs", "feeds", "takes", "returns", "holds"] as const;
+/*
+ * `builds` says a routine makes one of a type: `new QueryCache()`, `RouteInfo {
+ * .. }`, `<MenuContent />` (#199). It is the only way a component tree can be
+ * described at all, and the relation nearly did not make the vocabulary because
+ * the census counted it at 0.3% -- twenty times short, because JSX was not being
+ * counted (#197).
+ *
+ * Admitted on the third footing this list has, and it is worth naming because it
+ * is neither of the other two. `needs`, `takes`, `returns` and `holds` refute
+ * from an **absence**, and each has a closed region to justify it: a file's
+ * imports, a signature, a field list. `feeds` refutes never. This one refutes
+ * from a **presence** -- the construction found running the other way, which is
+ * `needs.ts`'s backwards verdict and the strongest thing here.
+ *
+ * The reason it cannot do what `holds` does is that a body is not a declaration.
+ * A routine that never writes `new T` can still hand you a `T` from a factory,
+ * so an absence here proves nothing and never becomes a finding.
+ */
+export const ARROW_CLAIMS = ["needs", "feeds", "takes", "returns", "holds", "builds"] as const;
 
 export type ArrowClaim = (typeof ARROW_CLAIMS)[number];
 

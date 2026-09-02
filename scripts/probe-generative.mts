@@ -48,7 +48,7 @@ const CORPUS = [
   `${process.cwd()}/.claude/worktrees/96-rust/.corpus`,
 ].find((candidate) => existsSync(candidate)) ?? "";
 
-type Claim = "needs" | "feeds" | "takes" | "returns" | "holds";
+type Claim = "needs" | "feeds" | "takes" | "returns" | "holds" | "builds";
 
 interface Arrow {
   from: string;
@@ -107,8 +107,8 @@ const ANYHOW: Board = {
     { from: "chain", to: "chain-new", claim: "returns", wants: "produces" },
     { from: "context-error", to: "error", claim: "holds", wants: "contains", label: "error field" },
     // A routine building a value. No word.
-    { from: "msg", to: "message-error", wants: "constructs", label: "wraps" },
-    { from: "context", to: "context-error", wants: "constructs", label: "wraps" },
+    { from: "msg", to: "message-error", claim: "builds", wants: "constructs", label: "wraps" },
+    { from: "context", to: "context-error", claim: "builds", wants: "constructs", label: "wraps" },
     { from: "adhoc", to: "adhoc-new", wants: "invokes", label: "kind dispatch" },
     // A routine calling a routine. No word.
     { from: "chain-of", to: "chain-new", wants: "invokes", label: "calls" },
@@ -186,12 +186,12 @@ const DROPDOWN: Board = {
   edges: [
     // A component rendering another component. There is no relation for this at
     // all in #190's layer 2, let alone a word -- and it is most of any UI board.
-    { from: "menu", to: "content", wants: "renders", label: "renders" },
-    { from: "menu", to: "trigger", wants: "renders", label: "renders" },
-    { from: "content", to: "group", wants: "renders", label: "renders" },
-    { from: "group", to: "item", wants: "renders", label: "renders" },
-    { from: "item", to: "badge", wants: "renders", label: "renders" },
-    { from: "sub", to: "content", wants: "renders", label: "renders" },
+    { from: "menu", to: "content", claim: "builds", wants: "renders", label: "renders" },
+    { from: "menu", to: "trigger", claim: "builds", wants: "renders", label: "renders" },
+    { from: "content", to: "group", claim: "builds", wants: "renders", label: "renders" },
+    { from: "group", to: "item", claim: "builds", wants: "renders", label: "renders" },
+    { from: "item", to: "badge", claim: "builds", wants: "renders", label: "renders" },
+    { from: "sub", to: "content", claim: "builds", wants: "renders", label: "renders" },
     // Props: a type a component accepts. `takes` is exactly this.
     { from: "item-props", to: "item", claim: "takes", wants: "accepts", label: "props" },
     { from: "item-props", to: "checkbox", claim: "takes", wants: "accepts", label: "props" },
@@ -254,8 +254,8 @@ const HAS_A_WORD: Record<string, Claim | undefined> = {
   conforms: undefined,
   invokes: undefined,
   accesses: undefined,
-  constructs: undefined,
-  renders: undefined,
+  constructs: "builds",
+  renders: "builds",
 };
 
 await initEngine();
@@ -299,8 +299,24 @@ for (const board of BOARDS) {
   const couldClaim = board.edges.filter((edge) => HAS_A_WORD[edge.wants]).length;
   const red = report.edges.filter((finding) =>
     finding.kind === "backwards-edge" || finding.kind === "signature-absent").length;
-  const held = Object.values(report.claims.signatureWithheld ?? {})
-    .concat(Object.values(report.claims.needsWithheld ?? {}))
+  /*
+   * Every claim's counters, not a hand-picked two.
+   *
+   * This summed `signature` and `needs` and nothing else, so the arrival of
+   * `@holds` and `@builds` moved the claimed column and left `confirmed`
+   * frozen at 14 -- the probe reporting that eight new claims had produced no
+   * verdicts when they had produced plenty. A per-word list in a summary is a
+   * thing that goes stale silently, which is the argument for reading the
+   * report's own tally instead.
+   */
+  const confirmed = report.claims.needsChecked
+    + report.claims.signatureConfirmed
+    + report.claims.holdsConfirmed
+    + report.claims.buildsConfirmed;
+  const held = [
+    report.claims.needsWithheld, report.claims.signatureWithheld,
+    report.claims.holdsWithheld, report.claims.buildsWithheld,
+  ].flatMap((breakdown) => Object.values(breakdown ?? {}))
     .reduce<number>((sum, value) => sum + Number(value), 0);
   const stale = report.findings.length;
 
@@ -308,7 +324,7 @@ for (const board of BOARDS) {
   totals.claimed += claimed;
   totals.couldClaim += couldClaim;
   totals.noWord += board.edges.length - couldClaim;
-  totals.confirmed += report.claims.signatureConfirmed + report.claims.needsChecked;
+  totals.confirmed += confirmed;
   totals.red += red;
   totals.withheld += held;
   totals.boxes += board.nodes.length;
@@ -342,7 +358,7 @@ for (const board of BOARDS) {
   console.log(`      authored : ${board.nodes.length} boxes, ${board.edges.length} arrows, `
     + `${claimed} claimed (${((claimed / board.edges.length) * 100).toFixed(0)}%), `
     + `${couldClaim} had a word available`);
-  console.log(`      verdicts : ${report.claims.signatureConfirmed + report.claims.needsChecked} confirmed, `
+  console.log(`      verdicts : ${confirmed} confirmed, `
     + `${red} red, ${held} withheld, ${stale} box findings`);
   console.log(`      surveyed : ${surveyed}`);
   console.log();

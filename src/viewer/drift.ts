@@ -64,6 +64,7 @@ const KNOWN_EDGE_KINDS = new Set([
   "built-backwards",
   "signature-absent",
   "holds-absent",
+  "builds-backwards",
 ]);
 
 /**
@@ -74,7 +75,9 @@ const KNOWN_EDGE_KINDS = new Set([
  * "backwards-edge"` would have painted it amber, burying the only two arrow
  * verdicts worth acting on at once among the maybes.
  */
-const WRONG_EDGE_KINDS = new Set(["backwards-edge", "signature-absent", "holds-absent"]);
+const WRONG_EDGE_KINDS = new Set([
+  "backwards-edge", "signature-absent", "holds-absent", "builds-backwards",
+]);
 
 /**
  * The subset of the engine's DriftReport the panel reads. Structural on
@@ -353,6 +356,7 @@ export function tallyOf(report: DriftView): TallyPart[] {
   const backwards = report.edges.filter((finding) => finding.kind === "backwards-edge").length;
   const wrongSignature = report.edges.filter((finding) => finding.kind === "signature-absent").length;
   const wrongHolds = report.edges.filter((finding) => finding.kind === "holds-absent").length;
+  const wrongBuilds = report.edges.filter((finding) => finding.kind === "builds-backwards").length;
   const unsupported = report.edges.filter(
     (finding) => !WRONG_EDGE_KINDS.has(finding.kind) && KNOWN_EDGE_KINDS.has(finding.kind),
   ).length;
@@ -383,6 +387,18 @@ export function tallyOf(report: DriftView): TallyPart[] {
   if (wrongHolds) {
     parts.push({
       text: `${wrongHolds} ${wrongHolds === 1 ? "field" : "fields"} disagree`,
+      tone: "bad",
+    });
+  }
+  /*
+   * Counted with the other reds and apart from `backwards`, for the reason the
+   * two rows above it are apart: both mean the arrow points the wrong way, and
+   * one is fixed by looking at an import while the other is fixed by looking at
+   * who calls `new`.
+   */
+  if (wrongBuilds) {
+    parts.push({
+      text: `${wrongBuilds} ${wrongBuilds === 1 ? "arrow" : "arrows"} built backwards`,
       tone: "bad",
     });
   }
@@ -524,6 +540,7 @@ export function rowsOf(report: DriftView): StatusRow[] {
         + (finding.kind === "backwards-edge" ? " · drawn backwards" : "")
         + (finding.kind === "signature-absent" ? " · not in the signature" : "")
         + (finding.kind === "holds-absent" ? " · not in the fields" : "")
+        + (finding.kind === "builds-backwards" ? " · built the other way" : "")
         + (KNOWN_EDGE_KINDS.has(finding.kind)
           ? ""
           : ` · ${finding.kind}${finding.detail ? `: ${finding.detail}` : ""}`),

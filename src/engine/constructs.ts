@@ -196,7 +196,19 @@ function routinesNamed(
   const routines: Node[] = [];
   let declared = false;
   each(tree.rootNode, (node) => {
-    const name = node.childForFieldName("name") ?? node.childForFieldName("left");
+    /*
+     * Rust puts a type's routines somewhere else entirely: `impl Factory { .. }`
+     * names the type on a `type` field and has no `name` at all, so a lookup by
+     * name found only the bare `struct Factory;` -- no routines, refused. The
+     * methods are in a separate node the struct does not contain.
+     *
+     * The one place in this file that knows a language apart, and it is here
+     * rather than in `parse.ts` because it is not a fact about declarations in
+     * general: it is where Rust keeps the methods.
+     */
+    const name = node.type === "impl_item"
+      ? node.childForFieldName("type")
+      : node.childForFieldName("name") ?? node.childForFieldName("left");
     if (!name || name.childCount !== 0 || name.text !== routine) return;
     declared = true;
     // The parameters may sit on the declaration or on the value assigned to it:
@@ -204,7 +216,22 @@ function routinesNamed(
     const value = node.childForFieldName("value");
     const takesParameters = node.childForFieldName("parameters")
       ?? value?.childForFieldName("parameters");
-    if (takesParameters) routines.push(node);
+    if (takesParameters) { routines.push(node); return; }
+
+    /*
+     * A type whose routines do the making.
+     *
+     * The ordinary shape on a real board: nobody draws a box for
+     * `QueryClient.prototype.build`, they draw `QueryClient` and mean "this
+     * thing makes Queries". So a name that is a type gets scanned through its
+     * own routines rather than refused for having no body of its own -- and
+     * scanning the declaration covers them, since every method is inside it.
+     *
+     * Guarded on there actually being a routine in there, which is what keeps
+     * `const build = 3` from being scanned as a maker. Answering a question
+     * about a constant is worse than declining it.
+     */
+    if (holdsRoutines(node)) routines.push(node);
   });
   return { routines, declared, unreadable: false };
 }
@@ -251,6 +278,47 @@ function madeIn(
   });
 
   return { made, why };
+}
+
+/** Whether this declaration has a routine anywhere inside it. */
+function holdsRoutines(node: Node): boolean {
+  let found = false;
+  each(node, (child) => {
+    if (found || child.id === node.id) return;
+    if (child.childForFieldName("parameters")) found = true;
+  });
+  return found;
+}
+
+/**
+ * Every routine name declared in a file.
+ *
+ * The far end of a `builds` arrow is a *type*, and the backwards question is
+ * whether any of that type's own routines makes the thing at the tail. A box
+ * standing for a type names the type, not its methods, so the caller has no list
+ * to offer -- and asking "which methods does `Widget` have" is a question this
+ * reader would have to answer anyway.
+ *
+ * Every routine in the file rather than only the type's own methods, and that is
+ * deliberate in the safe direction: a wider search can only find *more*
+ * constructions, and finding one is what makes the accusation. A narrower search
+ * that missed the method actually doing the building would answer `absent`,
+ * which is silence -- so the cost of being wide is a stronger verdict on
+ * evidence that is still real, and the cost of being narrow is missing it.
+ */
+export function routineNamesIn(source: string, language: Language): string[] {
+  const tree = parseSource(source, language);
+  if (!tree) return [];
+  const names = new Set<string>();
+  each(tree.rootNode, (node) => {
+    const name = node.childForFieldName("name") ?? node.childForFieldName("left");
+    if (!name || name.childCount !== 0) return;
+    const value = node.childForFieldName("value");
+    if (node.childForFieldName("parameters") ?? value?.childForFieldName("parameters")) {
+      names.add(name.text);
+    }
+  });
+  return [...names];
 }
 
 /**
