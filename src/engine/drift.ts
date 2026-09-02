@@ -46,6 +46,7 @@ import { licenceFor } from "./licence";
 import { languageOf, type Language } from "./parse";
 import { ledgerAdditions, type Ledger } from "./ledger";
 import { checkNeeds, type NeedsWithheld } from "./needs";
+import { constructions, routineNamesIn, type ConstructsWithheld } from "./constructs";
 import { heldTypes, type HoldsWithheld } from "./holds";
 import { signatureNames, type SignatureWithheld } from "./signature";
 import { resolveDependency, type ConfigCache } from "./resolve";
@@ -175,7 +176,18 @@ export type EdgeFindingKind =
    * the cost of being wrong is telling somebody their correct diagram is wrong,
    * which is the failure this word was added to remove.
    */
-  | "holds-absent";
+  | "holds-absent"
+  /**
+   * A `builds` arrow whose construction runs the other way (#199).
+   *
+   * The fourth member that means **wrong**, and the only one of the four that
+   * rests on a presence rather than an absence -- which is why there is no
+   * `builds-absent` beside it and never will be. A routine that never writes
+   * `new T` can still get a `T` from a factory, so not finding the construction
+   * proves nothing; finding it at the far end, and only there, is proof the
+   * arrow is drawn backwards. Same footing as `backwards-edge`.
+   */
+  | "builds-backwards";
 
 /**
  * Every verdict word this engine can put in a report, as data (#116).
@@ -213,6 +225,7 @@ export const EDGE_FINDING_KINDS = [
   "built-backwards",
   "signature-absent",
   "holds-absent",
+  "builds-backwards",
 ] as const satisfies readonly EdgeFindingKind[];
 
 /*
@@ -727,6 +740,19 @@ export interface ClaimTally {
    * that no reader can see into. That is the number #195 and #198 are about.
    */
   holdsWithheld: SkipBreakdown<HoldsWithheld | EdgeSkipReason>;
+  /** Arrows asserting that the tail makes one of the head's type. */
+  builds: number;
+  /** Of those, how many a routine actually made one. */
+  buildsConfirmed: number;
+  /**
+   * Why the rest got no verdict, by reason.
+   *
+   * There is no `buildsWrong` and there will not be one: an absence here is not
+   * a finding, so the only accusation is `builds-backwards` and it lands in
+   * `edges`. `call-shaped` is the one worth watching -- it is every Python arrow,
+   * because construction and calling are the same syntax there.
+   */
+  buildsWithheld: SkipBreakdown<ConstructsWithheld | EdgeSkipReason>;
   /**
    * Of those, how many were confirmed by a flow somebody can go and read.
    *
@@ -2086,6 +2112,7 @@ export function checkDrift(
     needs: 0, needsChecked: 0, needsWithheld: {},
     takes: 0, returns: 0, signatureConfirmed: 0, signatureWithheld: {},
     holds: 0, holdsConfirmed: 0, holdsWithheld: {},
+    builds: 0, buildsConfirmed: 0, buildsWithheld: {},
     feeds: 0, feedsConfirmed: 0, feedsWithheld: {},
     plannedWithheld: {},
   };
@@ -3335,6 +3362,90 @@ export function checkDrift(
             } });
             continue;
           }
+        }
+      }
+
+      /*
+       * `@builds`: does the tail make one of the head's type?
+       *
+       * Read at the **from** end, like `holds`, but for a different reason: the
+       * tail is the routine doing the work and the head is what comes out, which
+       * is the same direction `returns` runs.
+       *
+       * The one accusation available is `backwards`, and it is asked for by
+       * handing the reader the far end's own routines to read. There is no
+       * absence finding here and there must not be one -- a routine that never
+       * writes `new T` can still get a `T` from a factory, so silence is the
+       * only honest answer when nothing is found either way.
+       *
+       * A `planned` arrow keeps the confirmation and is refused the accusation,
+       * as every other claim here is.
+       */
+      if (edge.claim === "builds" && (claimed || edge.state === "planned")) {
+        const language = languageOf(fromFile);
+        const noteBuilt = (why: ConstructsWithheld | EdgeSkipReason) => {
+          if (claimed) claims.buildsWithheld[why] = (claims.buildsWithheld[why] ?? 0) + 1;
+        };
+
+        if (fromEnd.symbols.length === 0 || toEnd.symbols.length === 0) {
+          noteBuilt("endpoint-has-no-ref");
+        } else if (!language) {
+          noteBuilt("unreadable");
+        } else {
+          /*
+           * The far end's routines, so the backwards verdict can rest on
+           * something found. Every symbol the head's box stands for is offered
+           * as a routine to read; the reader ignores the ones that are not.
+           */
+          const toLanguage = languageOf(toFile);
+          const verdict = constructions(
+            workspace.read(fromFile), fromEnd.symbols[0]!, toEnd.symbols, language,
+            toLanguage && edge.state !== "planned"
+              ? {
+                source: workspace.read(toFile),
+                routines: routineNamesIn(workspace.read(toFile), toLanguage),
+                language: toLanguage,
+                names: fromEnd.symbols,
+              }
+              : undefined,
+          );
+
+          if (verdict.verdict === "confirmed") {
+            if (claimed) claims.buildsConfirmed += 1;
+            edgesChecked += 1;
+            recordEdge(edge, fromNode, toNode, { kind: "confirmed" });
+            continue;
+          }
+          if (verdict.verdict === "withheld") {
+            noteBuilt(verdict.why);
+          } else if (verdict.verdict === "backwards") {
+            edgesChecked += 1;
+            const wasClaimed = baselineGraph?.edges.some(
+              (was) => was.from === edge.from && was.to === edge.to && was.claim === "builds",
+            );
+            const fresh = baselineGraph !== undefined && !wasClaimed;
+            recordEdge(edge, fromNode, toNode, { kind: "finding", finding: {
+              from: fromPath,
+              to: toPath,
+              fromLabel: fromNode.label,
+              toLabel: toNode.label,
+              fromRef,
+              toRef,
+              kind: "builds-backwards",
+              detail:
+                (fresh ? "a claim written this turn is already wrong: " : "")
+                + `this arrow says ${oneLine(fromNode.label) || fromPath} makes `
+                + `${oneLine(toNode.label) || toPath}, and it is the other way round -- `
+                + `${toPath} line ${verdict.evidence.line} writes `
+                + `\`${verdict.evidence.wrote}\`. Turn the arrow round.`,
+            } });
+            continue;
+          }
+          /*
+           * `absent` and `cycle` both fall through to the ordinary channels,
+           * untouched. That is the point of the word: not finding a
+           * construction is not evidence there is none.
+           */
         }
       }
 
