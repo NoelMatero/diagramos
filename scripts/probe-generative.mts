@@ -48,7 +48,7 @@ const CORPUS = [
   `${process.cwd()}/.claude/worktrees/96-rust/.corpus`,
 ].find((candidate) => existsSync(candidate)) ?? "";
 
-type Claim = "needs" | "feeds" | "takes" | "returns" | "holds" | "builds";
+type Claim = "needs" | "feeds" | "takes" | "returns" | "holds" | "builds" | "calls";
 
 interface Arrow {
   from: string;
@@ -109,9 +109,9 @@ const ANYHOW: Board = {
     // A routine building a value. No word.
     { from: "msg", to: "message-error", claim: "builds", wants: "constructs", label: "wraps" },
     { from: "context", to: "context-error", claim: "builds", wants: "constructs", label: "wraps" },
-    { from: "adhoc", to: "adhoc-new", wants: "invokes", label: "kind dispatch" },
-    // A routine calling a routine. No word.
-    { from: "chain-of", to: "chain-new", wants: "invokes", label: "calls" },
+    { from: "adhoc", to: "adhoc-new", claim: "calls", wants: "invokes", label: "kind dispatch" },
+    // A routine calling a routine, which #189 gave a word.
+    { from: "chain-of", to: "chain-new", claim: "calls", wants: "invokes" },
   ],
 };
 
@@ -252,7 +252,7 @@ const HAS_A_WORD: Record<string, Claim | undefined> = {
   produces: "returns",
   contains: "holds",
   conforms: undefined,
-  invokes: undefined,
+  invokes: "calls",
   accesses: undefined,
   constructs: "builds",
   renders: "builds",
@@ -264,6 +264,25 @@ if (!CORPUS || !existsSync(CORPUS)) {
   console.log("The #96 corpus is not on disk; nothing foreign to draw. Skipped.");
   process.exit(0);
 }
+
+/**
+ * The finding kinds that mean **wrong** rather than *worth a look*.
+ *
+ * Listed once, because it was listed twice and both copies said
+ * `backwards-edge` and `signature-absent` only. `@holds` and `@builds` arrived
+ * without being added to either, so this probe was counting four of the nine
+ * accusations these boards produce and printing four of them -- a red reported
+ * as a silence, on the script whose job is to notice that.
+ *
+ * They are not all the same shape: `holds-absent` and `signature-absent` refute
+ * from an absence, `backwards-edge`, `builds-backwards` and `calls-backwards`
+ * from a presence. The list is what they have in common, which is that somebody
+ * is being told their diagram is wrong.
+ */
+const ACCUSES = new Set([
+  "backwards-edge", "signature-absent", "holds-absent",
+  "builds-backwards", "calls-backwards",
+]);
 
 const totals = {
   arrows: 0, claimed: 0, confirmed: 0, red: 0, withheld: 0,
@@ -297,26 +316,29 @@ for (const board of BOARDS) {
 
   const claimed = board.edges.filter((edge) => edge.claim).length;
   const couldClaim = board.edges.filter((edge) => HAS_A_WORD[edge.wants]).length;
-  const red = report.edges.filter((finding) =>
-    finding.kind === "backwards-edge" || finding.kind === "signature-absent").length;
+  const red = report.edges.filter((finding) => ACCUSES.has(finding.kind)).length;
   /*
-   * Every claim's counters, not a hand-picked two.
+   * Every claim's counters, read off the tally by shape rather than by name.
    *
    * This summed `signature` and `needs` and nothing else, so the arrival of
-   * `@holds` and `@builds` moved the claimed column and left `confirmed`
-   * frozen at 14 -- the probe reporting that eight new claims had produced no
-   * verdicts when they had produced plenty. A per-word list in a summary is a
-   * thing that goes stale silently, which is the argument for reading the
-   * report's own tally instead.
+   * `@holds` and `@builds` moved the claimed column and left `confirmed` frozen
+   * at 14 -- the probe reporting that eight new claims had produced no verdicts
+   * when they had produced plenty. It was then rewritten as a longer list of
+   * names, which went stale again the moment `@calls` arrived.
+   *
+   * So the list is gone. Every `*Confirmed` key is a confirmation and every
+   * `*Withheld` key is a refusal, which is a fact about how the tally is named
+   * rather than about which words exist -- and a word added without touching
+   * this file is now counted by it.
    */
-  const confirmed = report.claims.needsChecked
-    + report.claims.signatureConfirmed
-    + report.claims.holdsConfirmed
-    + report.claims.buildsConfirmed;
-  const held = [
-    report.claims.needsWithheld, report.claims.signatureWithheld,
-    report.claims.holdsWithheld, report.claims.buildsWithheld,
-  ].flatMap((breakdown) => Object.values(breakdown ?? {}))
+  const tally = report.claims as unknown as Record<string, unknown>;
+  const sumOf = (suffix: string) => Object.entries(tally)
+    .filter(([key]) => key.endsWith(suffix))
+    .reduce<number>((sum, [, value]) => sum + Number(value ?? 0), 0);
+  const confirmed = report.claims.needsChecked + sumOf("Confirmed");
+  const held = Object.entries(tally)
+    .filter(([key]) => key.endsWith("Withheld"))
+    .flatMap(([, breakdown]) => Object.values((breakdown ?? {}) as Record<string, number>))
     .reduce<number>((sum, value) => sum + Number(value), 0);
   const stale = report.findings.length;
 
@@ -337,7 +359,7 @@ for (const board of BOARDS) {
     wanted.set(edge.wants, row);
   }
   for (const finding of report.edges) {
-    if (finding.kind !== "backwards-edge" && finding.kind !== "signature-absent") continue;
+    if (!ACCUSES.has(finding.kind)) continue;
     reds.push(`  ${board.name}: ${finding.fromLabel.replace(/\s+/g, " ")} -> `
       + `${finding.toLabel.replace(/\s+/g, " ")}\n      ${finding.detail}`);
   }

@@ -46,6 +46,7 @@ import { licenceFor } from "./licence";
 import { languageOf, type Language } from "./parse";
 import { ledgerAdditions, type Ledger } from "./ledger";
 import { checkNeeds, type NeedsWithheld } from "./needs";
+import { callsBetween, type CallSide, type CallsWithheld } from "./calls";
 import { constructions, routineNamesIn, type ConstructsWithheld } from "./constructs";
 import { heldTypes, type HoldsWithheld } from "./holds";
 import { signatureNames, type SignatureWithheld } from "./signature";
@@ -187,7 +188,23 @@ export type EdgeFindingKind =
    * proves nothing; finding it at the far end, and only there, is proof the
    * arrow is drawn backwards. Same footing as `backwards-edge`.
    */
-  | "builds-backwards";
+  | "builds-backwards"
+  /**
+   * A `calls` arrow whose call runs the other way (#189).
+   *
+   * The fifth member that means **wrong**, and the second of the five resting on
+   * a presence rather than an absence -- which is why there is no `calls-absent`
+   * beside it and never will be. A routine that never writes `b()` can still
+   * reach `b` through a callback, a trait object or a dispatch table, so not
+   * finding the call proves nothing; finding it at the far end, and only there,
+   * is proof the arrow is drawn backwards. Same footing as `builds-backwards`.
+   *
+   * This is the one the engine has been missing longest. Backwards-arrow
+   * detection is the highest-value thing here -- it is the entire argument for
+   * `needs` in `needs.ts` -- and until #189 it did not cover the most common
+   * edge on any diagram.
+   */
+  | "calls-backwards";
 
 /**
  * Every verdict word this engine can put in a report, as data (#116).
@@ -226,6 +243,7 @@ export const EDGE_FINDING_KINDS = [
   "signature-absent",
   "holds-absent",
   "builds-backwards",
+  "calls-backwards",
 ] as const satisfies readonly EdgeFindingKind[];
 
 /*
@@ -753,6 +771,27 @@ export interface ClaimTally {
    * because construction and calling are the same syntax there.
    */
   buildsWithheld: SkipBreakdown<ConstructsWithheld | EdgeSkipReason>;
+  /** Arrows asserting that the tail calls the head. */
+  calls: number;
+  /** Of those, how many a call somebody can go and read. */
+  callsConfirmed: number;
+  /**
+   * Why the rest got no verdict, by reason.
+   *
+   * There is no `callsWrong` and there will not be one: an absence here is not a
+   * finding, so the only accusation is `calls-backwards` and it lands in
+   * `edges`. Two are worth watching, and they are the two the measurement in
+   * `measure-calls.mts` found dominate every language:
+   *
+   * - `receiver` -- `thing.render()`, where the text does not say what `thing`
+   *   is. Dynamic dispatch, and the reason the corpus splits its population in
+   *   two: 1,245 of the 1,995 receiver-written calls there could not be placed
+   *   by the referee either.
+   * - `unbound` -- the name is called and nothing in the file says where it came
+   *   from. A wildcard import, a global, an ambient declaration. 255 of
+   *   Python's 5,525 asks.
+   */
+  callsWithheld: SkipBreakdown<CallsWithheld | EdgeSkipReason>;
   /**
    * Of those, how many were confirmed by a flow somebody can go and read.
    *
@@ -1587,6 +1626,54 @@ function getImports(
 }
 
 /**
+ * One end of a `@calls` question: a file, its text, and what its imports point at.
+ *
+ * Deliberately **not** `getImports`. That channel is the over-eager regex one,
+ * survivable because it only ever confirms; this word can say *wrong*, so its
+ * evidence comes from `deps.ts`, the reader three languages have been measured
+ * against. A specifier the regex invented has no business inside an accusation.
+ *
+ * `open` hands the reader one more file, which is what lets it follow a name
+ * through a barrel or a re-export. It reads through the same workspace and the
+ * same config cache, so following a name costs a parse and never a second
+ * resolver.
+ *
+ * `undefined` when the file has no grammar, or the dependency reader declines
+ * it -- and the caller reports that as a refusal rather than as an absence.
+ */
+function callSide(
+  file: string,
+  workspace: Workspace,
+  configs: ConfigCache,
+): CallSide | undefined {
+  const readSide = (target: string): CallSide | undefined => {
+    const language = languageOf(target);
+    if (!language) return undefined;
+    const absolute = workspace.resolve(target);
+    if (!absolute || workspace.stat(absolute) !== "file") return undefined;
+    const source = workspace.read(absolute);
+    const declared = readDependencies(target, source, workspace, configs)?.dependencies;
+    if (!declared) return undefined;
+    return {
+      file: target,
+      source,
+      language,
+      imports: declared.map((one) => ({
+        specifier: one.specifier,
+        ...(one.file ? { file: one.file } : {}),
+      })),
+      open: (wanted) => {
+        const other = readSide(wanted);
+        return other
+          ? { source: other.source, language: other.language, imports: other.imports }
+          : undefined;
+      },
+    };
+  };
+  return readSide(file);
+}
+
+/**
  * The regex channel's imports for one file, exposed for measurement only.
  *
  * The licence step compares a parsed reader against this, and the comparison is
@@ -2113,6 +2200,7 @@ export function checkDrift(
     takes: 0, returns: 0, signatureConfirmed: 0, signatureWithheld: {},
     holds: 0, holdsConfirmed: 0, holdsWithheld: {},
     builds: 0, buildsConfirmed: 0, buildsWithheld: {},
+    calls: 0, callsConfirmed: 0, callsWithheld: {},
     feeds: 0, feedsConfirmed: 0, feedsWithheld: {},
     plannedWithheld: {},
   };
@@ -3446,6 +3534,109 @@ export function checkDrift(
            * untouched. That is the point of the word: not finding a
            * construction is not evidence there is none.
            */
+        }
+      }
+
+      /*
+       * `@calls`: does the tail call the head?
+       *
+       * Read at the **from** end, like `builds`, and for the same reason: the
+       * tail is the routine doing the work. This is the direction every diagram
+       * already draws and the one the arrow already carries, which is why there
+       * is no second word here -- "is called by" is the same fact read
+       * backwards.
+       *
+       * The one accusation available is `backwards`, and it is asked for by
+       * handing the reader the far end's own source and the names its box stands
+       * for. There is no absence finding here and there must not be one -- a
+       * routine that never writes `b()` can still reach `b` through a callback,
+       * so silence is the only honest answer when nothing is found either way.
+       *
+       * `open` is what makes this word work at all. A name is very often
+       * imported from a file that does not declare it -- a barrel, a re-export --
+       * and without a way to read that one more file the reader answered
+       * `absent` on 250 calls in one repository that are written in plain sight.
+       * Each one of those is half of a false accusation.
+       *
+       * A `planned` arrow keeps the confirmation and is refused the accusation,
+       * as every other claim here is.
+       */
+      if (edge.claim === "calls" && (claimed || edge.state === "planned")) {
+        const noteCalled = (why: CallsWithheld | EdgeSkipReason) => {
+          if (claimed) claims.callsWithheld[why] = (claims.callsWithheld[why] ?? 0) + 1;
+        };
+
+        if (fromEnd.symbols.length === 0 || toEnd.symbols.length === 0) {
+          // One end names a file rather than a routine, so there is no body to
+          // read or no name to look for.
+          noteCalled("endpoint-has-no-ref");
+        } else {
+          /*
+           * The **anchors**, which are repo-relative, and not `fromFile` /
+           * `toFile`, which are absolute. `callSide` resolves through the
+           * workspace, and the workspace refuses an absolute path by design --
+           * so passing those made every real board answer `unreadable` while
+           * every unit test passed, because a fake workspace resolves a
+           * relative path to itself. The probe on this repository's own code is
+           * what caught it.
+           *
+           * The identity matters twice over: a `CallSide.file` is compared
+           * against the repo-relative file a dependency resolved to, so an
+           * absolute one would never match even if it could be read.
+           */
+          const tail = callSide(fromAnchor, workspace, importCache.configs);
+          const head = callSide(toAnchor, workspace, importCache.configs);
+          if (!tail || !head) {
+            noteCalled("unreadable");
+          } else {
+            const verdict = callsBetween(
+              { ...tail, routine: fromEnd.symbols[0]! },
+              { ...head, names: toEnd.symbols },
+            );
+
+            if (verdict.verdict === "confirmed") {
+              if (claimed) claims.callsConfirmed += 1;
+              edgesChecked += 1;
+              recordEdge(edge, fromNode, toNode, { kind: "confirmed" });
+              continue;
+            }
+            if (verdict.verdict === "withheld") {
+              noteCalled(verdict.why);
+            } else if (verdict.verdict === "backwards" && edge.state !== "planned") {
+              /*
+               * A `planned` arrow reaching here is a sketch whose code went in
+               * the other direction, and it falls through to silence -- the
+               * accusation is refused for a plan exactly as it is for every
+               * other claim, because a red about a plan is a lie about a plan.
+               */
+              edgesChecked += 1;
+              const wasClaimed = baselineGraph?.edges.some(
+                (was) => was.from === edge.from && was.to === edge.to && was.claim === "calls",
+              );
+              const fresh = baselineGraph !== undefined && !wasClaimed;
+              recordEdge(edge, fromNode, toNode, { kind: "finding", finding: {
+                from: fromPath,
+                to: toPath,
+                fromLabel: fromNode.label,
+                toLabel: toNode.label,
+                fromRef,
+                toRef,
+                kind: "calls-backwards",
+                detail:
+                  (fresh ? "a claim written this turn is already wrong: " : "")
+                  + `this arrow says ${oneLine(fromNode.label) || fromPath} calls `
+                  + `${oneLine(toNode.label) || toPath}, and it is the other way round -- `
+                  + `${toPath} line ${verdict.evidence.line} writes `
+                  + `\`${verdict.evidence.wrote}\`. Turn the arrow round.`,
+              } });
+              continue;
+            }
+            /*
+             * `absent` falls through to the ordinary channels, untouched. That is
+             * the point of the word: not finding a call is not evidence there is
+             * none.
+             */
+          }
         }
       }
 

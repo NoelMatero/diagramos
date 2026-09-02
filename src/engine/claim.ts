@@ -125,7 +125,37 @@
  * A routine that never writes `new T` can still hand you a `T` from a factory,
  * so an absence here proves nothing and never becomes a finding.
  */
-export const ARROW_CLAIMS = ["needs", "feeds", "takes", "returns", "holds", "builds"] as const;
+/*
+ * `calls` says the most common thing there is: this routine calls that one
+ * (#189). 162,051 call relationships across the #187 census, 53.2% of
+ * everything the syntax shows and four times the next relation -- and until
+ * this word existed an arrow could not claim any of them.
+ *
+ * The two things worth knowing before reading `calls.ts`:
+ *
+ * **It is the first word here whose fact is not readable in one file.** A
+ * signature, a field list and a file's imports are all local. `foo()` is a
+ * name, and which `foo` it means is a question about bindings somewhere else --
+ * so this is the one word that needs a second file to answer at all, and half
+ * of what `calls.ts` does is decide what a called name is bound to.
+ *
+ * **It refutes from a presence, like `builds`, and never from an absence.** A
+ * routine that never writes `b()` can still reach `b` through a callback, a
+ * trait object or a dispatch table, so not finding a call proves nothing.
+ * Finding it at the far end, and only there, is proof the arrow is backwards.
+ *
+ * One word rather than two, where `takes` and `returns` needed each other:
+ * "is called by" is the same fact read backwards and the arrow already carries
+ * the direction. There is nothing a second word would say.
+ *
+ * The searches already looking for a call are unchanged and stay unchanged. An
+ * unclaimed arrow's corroboration search is a call search, and its reason word
+ * `nothing calls the other, either way` still means what it meant: something
+ * was looked for and not found, about an arrow that asserted nothing. This word
+ * is the other case -- somebody asserted the call, so an answer either way is
+ * about what they said.
+ */
+export const ARROW_CLAIMS = ["needs", "feeds", "takes", "returns", "holds", "builds", "calls"] as const;
 
 export type ArrowClaim = (typeof ARROW_CLAIMS)[number];
 
