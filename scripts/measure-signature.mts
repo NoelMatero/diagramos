@@ -2,7 +2,7 @@
 /**
  * How often the signature reader is wrong, measured before it is allowed a red.
  *
- *   npm run measure:signature                 -- this repository and rust-test
+ *   npm run measure:signature                 -- this repository, rust-test, graphify
  *   npm run measure:signature -- <path>...    -- any trees you like
  *
  * `signature.ts` is the first thing in this engine that refutes from an
@@ -26,6 +26,7 @@
  *      exactly like a claim that passed. `aliased` is the interesting one -- it
  *      is the refusal that exists because a name in a signature can stand for
  *      something else, and it is the cost of being allowed to refute at all.
+ *      `quoted-annotation` is the same cost in Python, added by #195.
  *
  * Nothing here decides anything. It prints the numbers so the decision about
  * what `absent` is allowed to say can be argued with.
@@ -45,6 +46,11 @@ const trees = roots.length > 0 ? roots : [
   path.resolve("scripts"),
   "/Users/noelmatero/board-ai/rust-test/src",
   "/Users/noelmatero/board-ai/rust-test/orangutan_macro/lib_shared/src",
+  // Python, added by #195. The reader was allowed to refute in Python for
+  // several releases with no Python in this corpus at all, and the false red
+  // that found was in the shape no other language writes -- a type spelled
+  // inside a string. A corpus with no Python in it could not have said so.
+  "/Users/noelmatero/board-ai/graphify/graphify",
 ];
 
 /** Files under a tree that this engine has a grammar for. */
@@ -80,7 +86,7 @@ function each(node: Node, visit: (node: Node) => void): void {
  * signature. Crude on purpose -- a referee that shared the reader's machinery
  * would agree with it for the wrong reason.
  */
-function textTypeNames(signature: string): Set<string> {
+function textTypeNames(signature: string, language: Language): Set<string> {
   const names = new Set<string>();
   const parameters = signature.slice(signature.indexOf("("), signature.lastIndexOf(")") + 1);
   const returned = signature.slice(signature.lastIndexOf(")") + 1);
@@ -100,7 +106,25 @@ function textTypeNames(signature: string): Set<string> {
     .replace(/\/\*[\s\S]*?\*\/|\/\/[^\n]*/g, " ")
     .replace(/"[^"]*"|'[^']*'|`[^`]*`/g, '""')
     .replace(/=\s*[^,)]*/g, "");
-  for (const region of [withoutProse(parameters), withoutProse(returned)]) {
+  /*
+   * Python is the exception, and #195 is why.
+   *
+   * A quoted annotation -- `def unit_path(unit: "Path | FileSlice")` -- is how
+   * Python writes a forward reference, and how a type imported only under `if
+   * TYPE_CHECKING:` has to be written. The names in it are types, in the source,
+   * in the signature, where anybody reading the file can see them. A referee
+   * that blanks them the way it blanks a string in a default value cannot report
+   * a miss for a name it never looked at, so it agreed with a reader that was
+   * calling correct arrows wrong -- 49 of graphify's `def`s write one. Here the
+   * quotes come off and the words inside are counted, after the default values
+   * have already been removed, so what is left in a type position is a type.
+   */
+  const unquoted = (text: string) => text
+    .replace(/#[^\n]*/g, " ")
+    .replace(/=\s*[^,)]*/g, "")
+    .replace(/["'`]/g, " ");
+  const readable = language === "python" ? unquoted : withoutProse;
+  for (const region of [readable(parameters), readable(returned)]) {
     for (const match of region.matchAll(typePart)) {
       for (const word of (match[1] ?? "").matchAll(/[A-Za-z_][A-Za-z0-9_]*/g)) {
         names.add(word[0]);
@@ -168,7 +192,7 @@ for (const root of trees) {
       // Question 1: every type name a person can read in this signature should
       // be findable by the reader. Asked one name at a time, which is exactly
       // how the verdict will be asked in production.
-      for (const name of textTypeNames(signatureText)) {
+      for (const name of textTypeNames(signatureText, language)) {
         const verdict = signatureNames(source, symbol, [name], "parameter", language);
         const other = signatureNames(source, symbol, [name], "return", language);
         const saw = verdict.verdict === "confirmed" || verdict.verdict === "misplaced"
