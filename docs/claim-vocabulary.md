@@ -146,6 +146,7 @@ and never fail.
 | `npm run measure:constructs` | can the construction reader be trusted to say backwards |
 | `npm run measure:signature` | the same for parameters and return types |
 | `npm run measure:licence` | reproduces the per-language licence numbers — `--only=python` for one |
+| `npm run measure:dataflow` | what following a value through one body buys, confirming and refuting |
 | `npx tsx scripts/probe-generative.mts` | draws boards of unseen code and counts what could not be said |
 
 The pattern in all of them is a **referee**: count the shape one way, count it
@@ -180,9 +181,9 @@ declared in the same repository. The first counts every `console.log` and
 
 Still wordless: `invokes` (#189), `conforms`, `accesses`.
 
-## Six times a measurement contradicted the design
+## Seven times a measurement contradicted the design
 
-Kept because the pattern is the point: four of the six came from building one
+Kept because the pattern is the point: five of the seven came from building one
 word or one reader, not from reviewing the design.
 
 1. **The substrate was empty.** #190's first draft proposed graphify as the
@@ -213,6 +214,13 @@ word or one reader, not from reviewing the design.
    t` beside `src/flask/typing.py` invent sixteen edges in one line, because it
    had started shadowing the standard library. Neither half was visible without
    the other, and running the measurement once would have shipped one of them.
+7. **#203's prediction was wrong, and backwards.** It said dataflow would make
+   confirming *dramatically* better and refuting only *slightly* better, which
+   is why it was written as a note rather than a programme. Measured (#208):
+   confirming gained **4.0%** of the flows in the corpus and refuting reached
+   **11.5%** of all values. The ratio is the opposite of the one predicted, and
+   the shape of it is one number: **41.7% of values escape by being handed to a
+   routine** — which is #189, not dataflow.
 
 `renders` was also raised as a possible missing relation and turned out not to
 be one: `<MenuContent />` is a routine making a MenuContent, which is `@builds`.
@@ -226,8 +234,12 @@ be one: `<MenuContent />` is a routine making a MenuContent, which is `@builds`.
 2. **The licence grid**, which #198 turned from a someday into a hole with a
    name. See below.
 3. **#203 — the engine has no notion of a value.** Dataflow, points-to, escape
-   analysis. The honest prediction is that it makes confirmation much better and
-   refutation only slightly better, for the reason `@feeds` exists.
+   analysis. Its prediction has been measured and did not hold, in the direction
+   that makes it *more* interesting rather than less — see item 7 above and
+   `npm run measure:dataflow`. What that changes is the order: the escaping is
+   concentrated in one shape, and closing that shape is #189. So #203 is worth
+   revisiting **after** the call graph rather than instead of it, and the number
+   to beat is 11.5%.
 4. **#190's layer 2.** The relation list is settled as-is by the owner. The one
    thing worth recording there is the three footings above — the table's `may
    accuse` column reads as a yes/no and it is not.

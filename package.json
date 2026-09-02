@@ -43,6 +43,7 @@
     "typecheck": "tsc --noEmit",
     "check:drift": "tsx scripts/check-drift.mjs",
     "measure:constructs": "tsx scripts/measure-constructs.mts",
+    "measure:dataflow": "tsx scripts/measure-dataflow.mts",
     "measure:deps": "tsx scripts/measure-deps.mts",
     "measure:holds": "tsx scripts/measure-holds.mts",
     "measure:licence": "tsx scripts/measure-licence.mts",
