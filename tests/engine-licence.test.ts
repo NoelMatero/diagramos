@@ -19,6 +19,7 @@
  */
 import { describe, expect, it, beforeAll } from "vitest";
 import path from "node:path";
+import { readFileSync } from "node:fs";
 
 import { readDependencies } from "../src/engine/deps";
 import { createWorkspace, type Workspace } from "../src/engine/drift";
@@ -266,6 +267,34 @@ describe("the Python licence on record", () => {
 
 const LANGUAGES: Language[] = ["ts", "tsx", "js", "rust", "python"];
 
+/**
+ * The first markdown table under a heading in `docs/claim-vocabulary.md`, as
+ * rows of trimmed cells with the emphasis markers taken off.
+ *
+ * Found by its heading rather than by its header row, because two tables in that
+ * file start `| word |` and picking the wrong one is a test that passes for the
+ * wrong reason.
+ */
+function tableUnder(heading: string): string[][] {
+  const doc = readFileSync(
+    path.resolve(__dirname, "..", "docs", "claim-vocabulary.md"), "utf8",
+  ).split("\n");
+  const at = doc.indexOf(heading);
+  expect(at, `docs/claim-vocabulary.md has no "${heading}"`).toBeGreaterThan(-1);
+  const start = doc.findIndex((line, index) => index > at && line.startsWith("|"));
+  expect(start, `no table under "${heading}"`).toBeGreaterThan(-1);
+
+  const rows: string[][] = [];
+  for (let line = start; line < doc.length && doc[line].startsWith("|"); line += 1) {
+    if (doc[line].includes("---")) continue;
+    rows.push(doc[line].split("|").slice(1, -1).map((cell) => cell.replaceAll("*", "").trim()));
+  }
+  return rows;
+}
+
+/** The word a `| \`@needs\` |` cell names. */
+const wordIn = (cell: string): string => cell.replaceAll("`", "").replace("@", "");
+
 describe("which words may accuse, and in which languages", () => {
   it("has a measurement behind every square that says yes", () => {
     /*
@@ -386,6 +415,64 @@ describe("which words may accuse, and in which languages", () => {
       expect(totals.missed, licence.language).toBeGreaterThan(0);
       expect(licence.known.length, licence.language).toBeGreaterThan(0);
     }
+  });
+
+  it("says the same thing in the doc as it does in the code", () => {
+    /*
+     * The grid is written twice: once as data in `licence.ts`, once as a table
+     * in `docs/claim-vocabulary.md` for somebody reading rather than running.
+     * Two lists of one fact drift, and the one that drifts silently is the one
+     * nothing reads -- which this file says about the engine and was true of
+     * its own documentation until this test existed.
+     *
+     * The doc stays hand-written, because it carries prose the data cannot. The
+     * table inside it does not get to disagree.
+     *
+     * A column nothing recognises fails rather than being skipped: adding a
+     * language to that table has to be a decision, the same way adding one to
+     * `parse.ts` is.
+     */
+    const columns: Record<string, readonly Language[]> = {
+      "TS / TSX": ["ts", "tsx"],
+      JavaScript: ["js"],
+      Rust: ["rust"],
+      Python: ["python"],
+    };
+
+    const [header, ...rows] = tableUnder("### The grid");
+
+    // Every word, in the order the code lists them: a new one has to reach the
+    // table too, not just the type.
+    expect(rows.map((row) => wordIn(row[0]))).toEqual([...ACCUSING_RELATIONS]);
+
+    for (const [column, title] of header.entries()) {
+      // First column is the word, last is prose about the referee.
+      if (column === 0 || column === header.length - 1) continue;
+      const languages = columns[title];
+      expect(languages, `unknown column "${title}" in the doc's grid`).toBeDefined();
+      for (const row of rows) {
+        const relation = wordIn(row[0]) as AccusingRelation;
+        const said = row[column];
+        expect(said, `${relation} / ${title}`).toMatch(/^(yes|no)$/);
+        for (const language of languages) {
+          expect(mayAccuse(relation, language), `${relation} in ${language}, per the doc`)
+            .toBe(said === "yes");
+        }
+      }
+    }
+  });
+
+  it("agrees with the six-words table about which words accuse at all", () => {
+    /*
+     * The other table in the same document, and the same drift risk. Its "may
+     * say wrong" column is the list `ACCUSING_RELATIONS` is: a word that never
+     * accuses needs no licence, and one that does needs a row in every one.
+     */
+    const [header, ...rows] = tableUnder("## The six words, and the three footings");
+    const column = header.indexOf("may say wrong");
+    expect(column, "the six-words table lost its `may say wrong` column").toBeGreaterThan(-1);
+    const accusing = rows.filter((row) => row[column] === "yes").map((row) => wordIn(row[0]));
+    expect(accusing).toEqual([...ACCUSING_RELATIONS]);
   });
 
   it("says nothing about a language nobody measured", () => {

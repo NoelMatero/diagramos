@@ -111,12 +111,16 @@ is what that then made necessary.
 
 ### The grid
 
-Written by hand and **not generated**, so this table can go stale and nothing
-will say so. `npm run measure:licence` prints the live grid out of `licence.ts`
-at the end of its run — that is the authority, and where the two disagree the
-code is right. `tests/engine-licence.test.ts` pins every square of the code's
-grid, which is what stops the *engine* drifting; nothing checks this paragraph
-against it.
+Written by hand, and **checked**. `tests/engine-licence.test.ts` reads this
+table out of this file and compares every square against `licence.ts`, so the
+two cannot disagree without the suite going red — a flipped yes, a dropped row
+and a column nobody taught it about all fail by name. The code is still the
+authority where they differ, and `npm run measure:licence` prints the live grid
+at the end of its run.
+
+Hand-written rather than generated on purpose: the table is three lines of a
+section that is mostly prose, and prose is the thing a person came here for.
+What it may not do is drift.
 
 | word | TS / TSX | JavaScript | Rust | Python | what measured it |
 |---|---|---|---|---|---|
