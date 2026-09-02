@@ -139,6 +139,27 @@ disagreement is reported in red, with the signature quoted. Claim the wrong half
 and you are told the type is on the other side rather than accused. The `to` end
 needs to name a symbol (`path#symbol`).
 
+### `claim: "holds"` on a planned arrow — the shape you are about to give a type
+
+`holds` says **a field of the `from` end will be of the `to` end's type**. It
+reads as `@holds` on the label:
+
+```
+edges: [
+  { from: "route_info", to: "response", state: "planned", claim: "holds" },
+]
+```
+
+Note the direction, which is the opposite of `takes`: the type that *has* the
+field comes first, because containment points whole to part. This is the claim
+for designing a data model before writing it — what a type is made of is a
+contract in the same way a signature is.
+
+Nothing accuses a plan of a field that does not exist yet. Once the code lands
+the arrow promotes and the field list is read, and from then on a disagreement is
+reported in red with the fields quoted. Both ends need to name a type
+(`path#symbol`).
+
 ### `closed: {}` on a planned directory box — the boundary it will hold
 
 `closed` says **nothing outside this box reaches into it**. Only for a box

@@ -222,7 +222,7 @@ const edgeSchema = z.object({
       + "break names the hop that stopped holding. Only for arrows whose ends both name symbols.",
     ),
   claim: z
-    .enum(["needs", "feeds", "takes", "returns"])
+    .enum(["needs", "feeds", "takes", "returns", "holds"])
     .optional()
     .describe(
       "What this arrow asserts, when it asserts anything. Four words, and an arrow may carry one. "
@@ -443,6 +443,13 @@ const CLAIM_CONSEQUENCE: Record<string, string> = {
     " Each one is now read off the signature: if the return type of the to end does not name the"
     + " from end's type, the arrow is reported in red with the signature quoted. Nothing is"
     + " reported either way when the type could be written there under another name.",
+  holds:
+    " Each one is now read off the field list of the FROM end -- the opposite end from takes,"
+    + " because containment points whole to part: if no field of the from end's type is of the to"
+    + " end's type, the arrow is reported in red with the fields quoted. Generic wrappers are read"
+    + " through, so Vec<T>, Promise<T> and Optional[T] all confirm. Nothing is reported either way"
+    + " when a field's type could be written under another name, including a Python annotation"
+    + " written as a string.",
 };
 
 function claimNote(arrows: ReadonlyArray<{ claim?: string }>): { claims?: string } {
@@ -1354,7 +1361,7 @@ server.registerTool(
             label: z.string().optional(),
             bidirectional: z.boolean().optional(),
             claim: z
-              .enum(["needs", "feeds", "takes", "returns"])
+              .enum(["needs", "feeds", "takes", "returns", "holds"])
               .optional()
               .describe(
       "What this arrow asserts, when it asserts anything. Four words, and an arrow may carry one. "

@@ -48,7 +48,7 @@ const CORPUS = [
   `${process.cwd()}/.claude/worktrees/96-rust/.corpus`,
 ].find((candidate) => existsSync(candidate)) ?? "";
 
-type Claim = "needs" | "feeds" | "takes" | "returns";
+type Claim = "needs" | "feeds" | "takes" | "returns" | "holds";
 
 interface Arrow {
   from: string;
@@ -102,10 +102,10 @@ const ANYHOW: Board = {
     { from: "error", to: "msg", claim: "returns", wants: "produces", label: "-> Self" },
     { from: "error", to: "context", claim: "returns", wants: "produces", label: "-> Self" },
     // A type holding another type. No word.
-    { from: "error", to: "error-impl", wants: "contains", label: "one field" },
-    { from: "error-impl", to: "own", wants: "contains", label: "vtable" },
+    { from: "error", to: "error-impl", claim: "holds", wants: "contains", label: "one field" },
+    { from: "error-impl", to: "own", claim: "holds", wants: "contains", label: "vtable" },
     { from: "chain", to: "chain-new", claim: "returns", wants: "produces" },
-    { from: "context-error", to: "error", wants: "contains", label: "error field" },
+    { from: "context-error", to: "error", claim: "holds", wants: "contains", label: "error field" },
     // A routine building a value. No word.
     { from: "msg", to: "message-error", wants: "constructs", label: "wraps" },
     { from: "context", to: "context-error", wants: "constructs", label: "wraps" },
@@ -142,13 +142,13 @@ const QUERY_CORE: Board = {
   ],
   edges: [
     // Fields. The most ordinary thing on this board, and none of it can be said.
-    { from: "cache", to: "client", wants: "contains", label: "#queryCache" },
-    { from: "mutation-cache", to: "client", wants: "contains", label: "#mutationCache" },
-    { from: "cache", to: "query", wants: "contains", label: "#cache" },
-    { from: "client", to: "query", wants: "contains", label: "#client" },
-    { from: "query-state", to: "query", wants: "contains", label: "state" },
-    { from: "query-store", to: "cache", wants: "contains", label: "#queries" },
-    { from: "retryer", to: "query", wants: "contains", label: "#retryer" },
+    { from: "cache", to: "client", claim: "holds", wants: "contains", label: "#queryCache" },
+    { from: "mutation-cache", to: "client", claim: "holds", wants: "contains", label: "#mutationCache" },
+    { from: "cache", to: "query", claim: "holds", wants: "contains", label: "#cache" },
+    { from: "client", to: "query", claim: "holds", wants: "contains", label: "#client" },
+    { from: "query-state", to: "query", claim: "holds", wants: "contains", label: "state" },
+    { from: "query-store", to: "cache", claim: "holds", wants: "contains", label: "#queries" },
+    { from: "retryer", to: "query", claim: "holds", wants: "contains", label: "#retryer" },
     // Inheritance. Also no word.
     { from: "subscribable", to: "cache", wants: "conforms", label: "extends" },
     { from: "removable", to: "query", wants: "conforms", label: "extends" },
@@ -233,9 +233,9 @@ const GRAPHIFY: Board = {
     { from: "manifest", to: "build", claim: "needs", wants: "depends" },
     { from: "dedup", to: "build", claim: "needs", wants: "depends" },
     // Fields on a frozen dataclass: the Python spelling of the #188 relation.
-    { from: "file-slice", to: "extract", wants: "contains", label: "path, start, end" },
-    { from: "file-type", to: "detect", wants: "contains", label: "enum" },
-    { from: "affected-hit", to: "affected", wants: "contains", label: "node_id, depth" },
+    { from: "file-slice", to: "extract", claim: "holds", wants: "contains", label: "path, start, end" },
+    { from: "file-type", to: "detect", claim: "holds", wants: "contains", label: "enum" },
+    { from: "affected-hit", to: "affected", claim: "holds", wants: "contains", label: "node_id, depth" },
     // Flow.
     { from: "extract", to: "dedup", wants: "flows", label: "nodes, edges" },
     { from: "dedup", to: "build", wants: "flows", label: "deduped" },
@@ -250,7 +250,7 @@ const HAS_A_WORD: Record<string, Claim | undefined> = {
   flows: "feeds",
   accepts: "takes",
   produces: "returns",
-  contains: undefined,
+  contains: "holds",
   conforms: undefined,
   invokes: undefined,
   accesses: undefined,

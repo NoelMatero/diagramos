@@ -20,6 +20,8 @@
  * a repository and re-run.
  */
 
+import { languageOf, type Language } from "./parse";
+
 /** One repository, at the commit it was measured at. */
 export interface CorpusEntry {
   name: string;
@@ -187,5 +189,29 @@ export function licenceTotals(licence: Licence): {
 export function licenceFor(filePath: string): Licence | undefined {
   return LICENCES.find((licence) =>
     licence.extensions.some((extension) => filePath.endsWith(extension)),
+  );
+}
+
+/**
+ * Whether a reader for this language has earned the right to say **wrong**.
+ *
+ * The same question `licenceFor` answers, asked of a language rather than a
+ * path, because a reader that was handed source text and a grammar has no path
+ * to ask about. `signature.ts` and `holds.ts` are both in that position.
+ *
+ * The answer only ever gates an **absence**. Confirming needs no licence:
+ * finding a name is evidence the name is there whoever does the reading, and it
+ * is the same evidence a measured reader would have found. Absence is the claim
+ * about the whole of something, and it is the one that turns a reader's
+ * blindness into somebody else's wrong diagram.
+ *
+ * Answered by running the licence's own extensions back through `languageOf`
+ * rather than by a second table of language-to-extension. That table is the
+ * specialization layer #190 warns about -- two lists of the same fact drift, and
+ * the one that drifts silently is the one nothing reads.
+ */
+export function mayAccuse(language: Language): boolean {
+  return LICENCES.some((licence) =>
+    licence.extensions.some((extension) => languageOf(`x${extension}`) === language),
   );
 }
