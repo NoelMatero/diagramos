@@ -39,9 +39,11 @@ plus a live local board for editing them alongside a human.
   [docs/claim-vocabulary.md](docs/claim-vocabulary.md).** It carries the part
   that does not fit in a header: which words may say *wrong* and on which of
   three footings, why two of them point the opposite way from the other two,
-  what each language has earned the right to accuse about, and the six times a
-  measurement contradicted the design. Four of those six were found by
-  building one word or one reader rather than by reviewing the plan.
+  which (word, language) pairs have earned the right to accuse and which have
+  not, and the times a measurement contradicted the design. Most of those were
+  found by building one word or one reader rather than by reviewing the plan --
+  including the two empty squares on that grid, which nobody saw until the
+  squares had to be filled in one at a time.
 
 ## Finishing a piece of work
 

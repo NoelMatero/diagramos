@@ -21,7 +21,10 @@ import { existsSync } from "node:fs";
 import path from "node:path";
 import { execFileSync } from "node:child_process";
 
-import { LICENCES, licenceTotals, type CorpusEntry, type Licence } from "../src/engine/licence";
+import {
+  ACCUSING_RELATIONS, LICENCES, isMeasured, licenceTotals,
+  type CorpusEntry, type Licence,
+} from "../src/engine/licence";
 import { measureLicence, type LicenceMeasurement } from "./lib/licence";
 import { measureRustLicence } from "./lib/licence-rust";
 import { measurePythonLicence } from "./lib/licence-python";
@@ -201,6 +204,75 @@ for (const licence of LICENCES) {
   if (only && licence.language !== only) continue;
   await measureOne(licence);
 }
+
+/**
+ * The other axis, which the numbers above are only one row of.
+ *
+ * A licence is per language *and* per word. The corpus above measures the
+ * dependency reader and nothing else -- `holds`, `takes`, `returns` and
+ * `builds` each read something different, against a referee of their own, and
+ * three of them are measured by a different command. Printing only the
+ * dependency number here is how one entry came to speak for four words.
+ *
+ * Printed from the licence rather than re-measured: reproducing a row means
+ * running the command in its last column. What this table is for is showing
+ * which squares have a number at all, and an empty one is the interesting kind.
+ */
+/** Greedy wrap, so a reason reads as prose rather than running off the terminal. */
+function wrap(text: string, width: number): string[] {
+  const lines: string[] = [];
+  let line = "";
+  for (const word of text.split(/\s+/)) {
+    if (line.length + word.length + 1 > width) { lines.push(line); line = word; }
+    else line = line === "" ? word : `${line} ${word}`;
+  }
+  if (line !== "") lines.push(line);
+  return lines;
+}
+
+function printGrid(): void {
+  console.log("");
+  console.log("what each word may accuse about, and what earned it");
+  console.log("");
+  console.log(
+    "word".padEnd(9) + "language".padEnd(12) + "asked".padStart(8)
+    + "missed".padStart(8) + "invented".padStart(10) + "  reproduce",
+  );
+  for (const relation of ACCUSING_RELATIONS) {
+    for (const licence of LICENCES) {
+      if (only && licence.language !== only) continue;
+      const row = licence.relations[relation];
+      const head = relation.padEnd(9) + licence.language.padEnd(12);
+      if (!isMeasured(row)) {
+        console.log(head + "—".padStart(8) + "—".padStart(8) + "—".padStart(10)
+          + "  may not accuse");
+        // The reason in full rather than a first sentence: "no" without one is
+        // the shrug this grid exists to replace.
+        for (const line of wrap(row.unmeasured, 74)) console.log("    " + line);
+        continue;
+      }
+      const totals = row.counts === "corpus"
+        ? (() => {
+            const all = licenceTotals(licence);
+            return { asked: all.edges, missed: all.missed, invented: all.invented };
+          })()
+        : row.counts;
+      // An absent `invented` is not a zero: `measure:signature` counts misses
+      // and nothing else, and a dash says so where a 0 would lie.
+      const invented = totals.invented === undefined ? "—" : String(totals.invented);
+      console.log(
+        head + String(totals.asked).padStart(8) + String(totals.missed).padStart(8)
+        + invented.padStart(10) + "  " + row.reproduce,
+      );
+    }
+  }
+  console.log("");
+  console.log("An empty square is a word that may not accuse in that language. It is not a");
+  console.log("gap to be filled in with a yes: the reason is in `relations` in licence.ts,");
+  console.log("and the square stays empty until a run of the command puts a number in it.");
+}
+
+printGrid();
 
 if (check && moved) {
   console.error("\nthe measurement has moved. Update src/engine/licence.ts, or find out why.");

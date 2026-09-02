@@ -36,6 +36,10 @@ took longest to see and it is not in #190:
 Plus `@closed` on a box (nothing outside reaches in) and `@complete` on a board
 (nothing reachable is missing). Both refute from absence.
 
+The **may say wrong** column is about the word, not about any particular board.
+Whether it may say so *here* is a second question with its own answer per
+language — [the grid](#the-grid) below.
+
 ### Refuting from an absence
 
 Available when the reader has a **closed region** — somewhere absence is
@@ -87,52 +91,108 @@ hand-drawn claim in this project's board corpus drew containment holder-first
 unprompted, UML has pointed whole to part for thirty years, and forcing one
 convention on both would make one of them read backwards on every board.
 
-## Licences: what a language has earned
+## Licences: what a word has earned, in what language
 
-`licenceFor` and `mayAccuse` in `licence.ts`. A language earns the right to
-accuse by being measured against an independent referee over a pinned corpus.
+`licenceFor` and `mayAccuse` in `licence.ts`. A **word** earns the right to
+accuse **in a language** by being measured against an independent referee. Two
+axes, and until #207 there was only one.
 
-| language | licence | referee |
-|---|---|---|
-| TypeScript (+ tsx, js) | yes | the TypeScript compiler |
-| Rust | yes | rust-analyzer, via LSIF |
-| Python | yes | pyright, via `--dependencies` |
-
-**An unlicensed language confirms and may not accuse.** Every reader that can
-say *wrong* consults `mayAccuse` at its last gate, so losing the licence costs
-the accusation and nothing else — confirmations and ordinary refusals are
-untouched. Finding a name is the same evidence whoever reads it; absence is the
-claim about the whole of something.
+**An unlicensed pair confirms and may not accuse.** Every reader that can say
+*wrong* consults `mayAccuse` at its last gate, so losing a licence costs the
+accusation and nothing else — confirmations and ordinary refusals are untouched.
+Finding a name is the same evidence whoever reads it; absence is the claim about
+the whole of something.
 
 That rule was applied late and it reversed an earlier decision. `signature.ts`
 gated on having a *grammar*, and Python has one, so Python was the only language
 shipping accusations from a reader no referee had ever seen — while getting an
-ordinary Python signature wrong (#195). #198 re-licensed it, and the next
-section is what that cost.
+ordinary Python signature wrong (#195). #198 re-licensed it, and the grid below
+is what that then made necessary.
 
-### What Python is allowed to accuse about, and what stays withheld
+### The grid
 
-Settled by #198, and worth reading as four separate answers rather than one:
+Written by hand and **not generated**, so this table can go stale and nothing
+will say so. `npm run measure:licence` prints the live grid out of `licence.ts`
+at the end of its run — that is the authority, and where the two disagree the
+code is right. `tests/engine-licence.test.ts` pins every square of the code's
+grid, which is what stops the *engine* drifting; nothing checks this paragraph
+against it.
 
-| word | Python may accuse | on what evidence |
-|---|---|---|
-| `@needs` | yes | 12,693 dependency edges over five repositories: 41 missed, **0 invented** |
-| `@holds` | yes | 2,177 field asks, 0 missed, 0 invented; refuses a quarter of them |
-| `@takes` / `@returns` | yes | 4,002 type names in 1,543 functions, 0 missed |
-| `@builds` | **no** | not a licence question — Python spells making one of something as a call, so `constructs.ts` withholds it before any licence is consulted |
+| word | TS / TSX | JavaScript | Rust | Python | what measured it |
+|---|---|---|---|---|---|
+| `@needs` | yes | yes | yes | yes | a compiler, five pinned repositories per language |
+| `@takes` | yes | **no** | yes | yes | a text scan of the same signatures |
+| `@returns` | yes | **no** | yes | yes | the same run |
+| `@holds` | yes | **no** | yes | yes | a text scan of the same field lists |
+| `@builds` | yes | **no** | yes | **no** | a text scan of the same routine bodies |
 
-The three yeses are three separate measurements against three unrelated
-referees, which is the only reason one licence entry covers four words. What
-the licence still does *not* have is a per-relation axis: if a fourth word
-arrives whose Python reader has not been measured, it inherits an accusation it
-did not earn. That is the hole #190 calls the licence grid, and Python's licence
-is the thing that finally makes it worth building.
+`@feeds` is not on it. It never accuses, so there is nothing to license.
+
+**Every no is a finding rather than a design**, and none of them was visible
+until the squares had to be filled in one at a time.
+
+`measure:constructs` asks `@builds` about Python **0 times over 442 files**,
+because Python spells making one of something as an ordinary call. There is no
+measurement, so there is no permission. `constructs.ts` refuses Python before
+any licence is consulted anyway, so nothing changes today — what changed is that
+the square used to read *yes*.
+
+**JavaScript is the one that was not already known, and it was not free.** It
+lives inside the TypeScript licence, and that licence's *imports* were measured
+over five repositories — but `measure:holds`, `measure:signature` and
+`measure:constructs` ask JavaScript **0 questions between them**: 21 files, 51
+functions, not one type name and not one construction. Four squares were saying
+yes on TypeScript's numbers.
+
+`@holds` was inert there, because JavaScript writes no type on a field and the
+reader refuses before the licence is reached. `@takes` was not. A JavaScript
+function declares no parameter types at all, so every parameter claim on one read
+as an *absence* — and `measure:signature` reports the reader was prepared to
+refute **51 of 51** JavaScript functions in the corpus, on a referee that has
+never seen the language. Those are withheld now. `@builds` is the remaining
+gap rather than a finding: `new Foo()` is a construction the reader could read
+in JavaScript, and there is simply none in the corpus to ask about.
+
+The numbers behind each square, and the command that reproduces it, are in
+`relations` in `licence.ts`. In short, for Python: 12,693 dependency edges with
+41 missed and 0 invented; 2,177 field asks with 0 missed; 4,002 type names in
+1,543 functions with 0 missed. Three separate runs against three unrelated
+referees, which is exactly why one entry saying "yes" for all of them was the
+wrong shape.
+
+### What an unlisted square does
+
+**It may not accuse, and it does not compile.** Both, decided at #207.
+
+`relations` is an exhaustive `Record`, so adding a seventh word to
+`ARROW_CLAIMS` stops the build in every licence and in the test that pins the
+grid, until somebody writes down what measured it. The answer is allowed to be
+"nothing" — it is just not allowed to be silence. And `mayAccuse` still answers
+*no* to anything it cannot find, because a compile error only catches the person
+adding the word, and a cast walks past a type.
+
+Defaulting a blank square to *yes* was never live. A grid whose empty square
+means "may accuse" is the bug it exists to prevent, wearing a table.
+
+`@closed` and `@complete` are not on the grid. They accuse from an absence too,
+and they read the imports — the same reader `@needs` uses and the same corpus
+measures — so they ask `licenceFor` about a path, which is that question in the
+form they can put it.
+
+### What Python's licence cost
 
 The cost is on the record and it is not small. Before the licence, the Python
 signature reader withheld all 1,543 functions it read, 1,404 of them for no
 reason but the missing licence. It now refutes those and goes on withholding
 139 — 71 aliased, 68 quoted. `@holds` refuses 25.4% of Python asks, all of them
 quoted annotations, and that number did not move.
+
+What #207 cost is on the record too, and it is one number: 51 JavaScript
+functions that `@takes` would have refuted are withheld instead. No board in the
+corpus changes verdict — `npm run measure:vocabulary` still reports 1 failed
+claim across 17 boards, and it is the same Rust one — and `measure:holds`,
+`measure:constructs` and `measure:signature` report 0 missed and 0 invented as
+before.
 
 ## The measurement harness
 
@@ -145,7 +205,7 @@ and never fail.
 | `npm run measure:holds` | can the field reader be trusted with a red |
 | `npm run measure:constructs` | can the construction reader be trusted to say backwards |
 | `npm run measure:signature` | the same for parameters and return types |
-| `npm run measure:licence` | reproduces the per-language licence numbers — `--only=python` for one |
+| `npm run measure:licence` | reproduces the per-language dependency numbers, then prints the whole (word, language) grid — `--only=python` for one |
 | `npx tsx scripts/probe-generative.mts` | draws boards of unseen code and counts what could not be said |
 
 The pattern in all of them is a **referee**: count the shape one way, count it
@@ -223,12 +283,10 @@ be one: `<MenuContent />` is a routine making a MenuContent, which is `@builds`.
    also the substrate for everything in #203, so it is a call graph rather than
    a word. #198 was its blocker and is now done, so its largest population is a
    language that can refute.
-2. **The licence grid**, which #198 turned from a someday into a hole with a
-   name. See below.
-3. **#203 — the engine has no notion of a value.** Dataflow, points-to, escape
+2. **#203 — the engine has no notion of a value.** Dataflow, points-to, escape
    analysis. The honest prediction is that it makes confirmation much better and
    refutation only slightly better, for the reason `@feeds` exists.
-4. **#190's layer 2.** The relation list is settled as-is by the owner. The one
+3. **#190's layer 2.** The relation list is settled as-is by the owner. The one
    thing worth recording there is the three footings above — the table's `may
    accuse` column reads as a yes/no and it is not.
 
@@ -236,15 +294,19 @@ be one: `<MenuContent />` is a routine making a MenuContent, which is `@builds`.
 dependency edges, 41 missed and 0 invented. What it bought is above, and
 `surveyScope` will now draft a Python board instead of refusing the scope.
 
+**#207 — the licence grid** is done, and it is bookkeeping rather than a rescue:
+nothing was accusing on evidence that did not exist. `mayAccuse` now takes the
+word as well as the language, one square is a stated *no*, and the next word
+cannot be added without somebody answering for it in every language.
+
 ## What is deliberately not being built
 
-- ~~**A per-(relation, language) licence grid.**~~ This was the one thing on
-  this list with a stated trigger — "build it when a third relation or Python's
-  licence makes the holes worth naming" — and #198 pulled it. One `Licence`
-  entry now speaks for four words on the strength of three separate
-  measurements, and nothing in the type says which. The next word to arrive
-  inherits a Python accusation it has not earned, silently, which is #195
-  again with a different reader. It has moved to the open list above.
+- ~~**A per-(relation, language) licence grid.**~~ Built at #207. It was the one
+  thing on this list with a stated trigger — "build it when a third relation or
+  Python's licence makes the holes worth naming" — and #198 pulled it. See
+  [the grid](#the-grid) above. Nothing was accusing wrongly when it was built;
+  the hole was the *next* word, which would have inherited Python's permission
+  from three measurements of other words.
 - **`@type-arg`**, despite type arguments being the second most common
   relationship in all code. Almost all of it is `Vec<T>`, `Promise<T>`,
   `list[str]`, which nobody draws as two boxes.

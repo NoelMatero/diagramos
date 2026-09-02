@@ -24,7 +24,11 @@ import { readDependencies } from "../src/engine/deps";
 import { createWorkspace, type Workspace } from "../src/engine/drift";
 import { initEngine, type Language } from "../src/engine/parse";
 import { resolveDependency } from "../src/engine/resolve";
-import { LICENCES, licenceFor, licenceTotals, mayAccuse } from "../src/engine/licence";
+import { ARROW_CLAIMS } from "../src/engine/claim";
+import {
+  ACCUSING_RELATIONS, LICENCES, isMeasured, licenceFor, licenceTotals, mayAccuse,
+  relationLicence, relationTotals, type AccusingRelation,
+} from "../src/engine/licence";
 import { measureLicence } from "../scripts/lib/licence";
 
 beforeAll(async () => {
@@ -260,27 +264,127 @@ describe("the Python licence on record", () => {
   });
 });
 
-describe("which languages may accuse", () => {
-  it("has a measured licence for every language it has a grammar for", () => {
+const LANGUAGES: Language[] = ["ts", "tsx", "js", "rust", "python"];
+
+describe("which words may accuse, and in which languages", () => {
+  it("has a measurement behind every square that says yes", () => {
     /*
-     * Written as an exhaustive record on purpose: add a sixth `Language` to
-     * `parse.ts` and this stops compiling, which is the moment somebody has to
-     * decide whether it has been measured. The alternative -- a list of five
-     * strings -- goes stale silently, and a language that reaches `mayAccuse`
-     * unmeasured is #195 happening again.
+     * Exhaustive on both axes on purpose, and that is the whole of #207.
      *
-     * Every entry is `true` today, and that is the finding rather than the
-     * design: Python was the last `false` and #198 moved it. It also means the
-     * `withheld/unlicensed` branch in `signature.ts` and `holds.ts` is
-     * unreachable through any language this engine parses, which is why the
-     * tests that used to exercise it with a `.py` fixture are gone rather than
-     * ported.
+     * Add a sixth `Language` to `parse.ts` or a seventh word to `ARROW_CLAIMS`
+     * and this stops compiling, which is the moment somebody has to decide
+     * whether it has been measured. The alternative -- a list that quietly
+     * covers what it happens to cover -- is how one Python entry came to speak
+     * for four words on the strength of three unrelated runs.
+     *
+     * Both blocks of `false` are findings rather than design, and neither was
+     * visible before the squares had to be filled in one at a time.
+     *
+     * `builds` has never been measured in Python: `measure:constructs` asks it 0
+     * times over 442 files, because Python spells making one of something as an
+     * ordinary call.
+     *
+     * JavaScript has never been measured for any of the three words the
+     * dependency corpus does not cover. It sits inside the TypeScript licence,
+     * and that licence's imports were measured over five repositories -- but
+     * `measure:holds`, `measure:signature` and `measure:constructs` ask it 0
+     * questions between them. Until this grid existed all four squares read
+     * `yes`, on TypeScript's numbers.
      */
-    const expected: Record<Language, boolean> = {
-      ts: true, tsx: true, js: true, rust: true, python: true,
+    const grid: Record<AccusingRelation, Record<Language, boolean>> = {
+      needs: { ts: true, tsx: true, js: true, rust: true, python: true },
+      takes: { ts: true, tsx: true, js: false, rust: true, python: true },
+      returns: { ts: true, tsx: true, js: false, rust: true, python: true },
+      holds: { ts: true, tsx: true, js: false, rust: true, python: true },
+      builds: { ts: true, tsx: true, js: false, rust: true, python: false },
     };
-    for (const [language, may] of Object.entries(expected)) {
-      expect(mayAccuse(language as Language), language).toBe(may);
+    for (const relation of ACCUSING_RELATIONS) {
+      for (const language of LANGUAGES) {
+        expect(mayAccuse(relation, language), `${relation} in ${language}`)
+          .toBe(grid[relation][language]);
+      }
+    }
+  });
+
+  it("stays silent about a word nobody has measured anywhere", () => {
+    /*
+     * The shape that matters, stated as a test: an *unlisted* pair must answer
+     * "may not accuse", never "may". `invokes` is #189's word and has no reader
+     * yet, so it stands in for whatever arrives next -- and the point is that it
+     * inherits nothing from the three measurements Python already has.
+     */
+    const next = "invokes" as AccusingRelation;
+    for (const language of LANGUAGES) {
+      expect(mayAccuse(next, language), language).toBe(false);
+      expect(relationLicence(next, language), language).toBeUndefined();
+    }
+  });
+
+  it("asks about every word that can accuse, and only those", () => {
+    // Filtered from `ARROW_CLAIMS` rather than typed out, so a report that walks
+    // it cannot quietly stop mentioning a word.
+    expect([...ACCUSING_RELATIONS]).toEqual(ARROW_CLAIMS.filter((word) => word !== "feeds"));
+  });
+
+  it("gives a reason where it says no, rather than a shrug", () => {
+    const row = relationLicence("builds", "python");
+    expect(row).toBeDefined();
+    expect(row && isMeasured(row)).toBe(false);
+    expect(row && !isMeasured(row) ? row.unmeasured : "").toMatch(/ordinary call/);
+  });
+
+  it("leaves no square empty, whatever the type is doing", () => {
+    // The type already makes this impossible. Asserted anyway, because the
+    // guard that only the compiler enforces is the one a cast walks past.
+    for (const licence of LICENCES) {
+      for (const relation of ACCUSING_RELATIONS) {
+        expect(licence.relations[relation], `${licence.language}.${relation}`).toBeDefined();
+      }
+    }
+  });
+
+  it("reads the `needs` numbers off the corpus rather than a second copy", () => {
+    // Two lists of one fact drift, and the one that drifts silently is the one
+    // nothing reads. So the row cites the table above instead of restating it.
+    const python = LICENCES.find((one) => one.language === "python")!;
+    const corpus = licenceTotals(python);
+    expect(relationTotals("needs", "python")).toEqual({
+      asked: corpus.edges, missed: corpus.missed, invented: corpus.invented,
+    });
+    expect(corpus.edges).toBe(12693);
+  });
+
+  it("keeps a miss of zero on every word measured against a text scan", () => {
+    /*
+     * The bar, in one place, and it is not the same bar everywhere.
+     *
+     * `holds`, `takes`, `returns` and `builds` are measured against a text scan
+     * of the same declarations over trees taken as they sit on disk, and there
+     * the bar is zero: a miss is the referee seeing a name the reader did not,
+     * and a miss paired with a hit the other way is a false red.
+     *
+     * `needs` is the exception and it is deliberate. Its referee is a real
+     * compiler over five pinned repositories, and its 48 misses across three
+     * languages are all understood -- they are the `known` list on each licence,
+     * every one of them a place where the reader and the referee mean different
+     * things by an edge. A zero there would mean the corpus was too small.
+     */
+    for (const relation of ACCUSING_RELATIONS) {
+      for (const language of LANGUAGES) {
+        const row = relationLicence(relation, language);
+        if (!row || !isMeasured(row) || row.counts === "corpus") continue;
+        expect(row.counts.missed, `${relation} in ${language}`).toBe(0);
+      }
+    }
+  });
+
+  it("says what the dependency corpus misses instead of pretending it does not", () => {
+    // The other side of the rule above: `needs` has misses, they are counted,
+    // and each licence names the shapes they are.
+    for (const licence of LICENCES) {
+      const totals = licenceTotals(licence);
+      expect(totals.missed, licence.language).toBeGreaterThan(0);
+      expect(licence.known.length, licence.language).toBeGreaterThan(0);
     }
   });
 

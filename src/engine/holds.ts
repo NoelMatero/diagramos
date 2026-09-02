@@ -455,6 +455,6 @@ export function heldTypes(
   if (withheld) return { verdict: "withheld", why: withheld };
   if (!sawFields) return { verdict: "withheld", why: "no-fields" };
   // The last gate, and the only one that is about us rather than about the code.
-  if (!mayAccuse(language)) return { verdict: "withheld", why: "unlicensed" };
+  if (!mayAccuse("holds", language)) return { verdict: "withheld", why: "unlicensed" };
   return { verdict: "absent", fields: quoted };
 }

@@ -294,7 +294,7 @@ for (const language of LANGUAGES) {
     + String(ok).padStart(8)
     + percent(ok, total).padStart(8)
     + percent(refused, total).padStart(9)
-    + (mayAccuse(language) ? "yes" : "no").padStart(9)
+    + (mayAccuse("builds", language) ? "yes" : "no").padStart(9)
     + "  " + ([...byReason.entries()].sort((a, b) => b[1] - a[1])
       .map(([why, count]) => `${why} ${count}`).join(", ") || "—"));
 }
@@ -303,6 +303,10 @@ console.log();
 console.log("  Python is absent from the `asked` column by construction: it spells making one");
 console.log("  of something as an ordinary call, so the referee has no pattern and the reader");
 console.log("  has no verdict. That is the finding, not a gap in the corpus.");
+console.log("  It is why the `accuses` column says no for Python: the licence is asked per");
+console.log("  word now (#207), and nothing measured this one there. JavaScript says no for");
+console.log("  the opposite reason -- `new Foo()` is a construction this reader could read,");
+console.log("  and the corpus has none to ask about. That square is a gap, not a finding.");
 
 console.log();
 /*
