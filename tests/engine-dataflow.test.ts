@@ -16,7 +16,7 @@
  */
 import { beforeAll, describe, expect, it } from "vitest";
 
-import { chainFrom, contained, readBodies, readBody } from "../src/engine/dataflow";
+import { chainFrom, contained, readBodies, readBody, settleCalls } from "../src/engine/dataflow";
 import { initEngine, type Language } from "../src/engine/parse";
 
 beforeAll(async () => {
@@ -487,5 +487,188 @@ describe("what a collection means for whether a value stayed", () => {
     expect(w.escapes).toEqual(["left-inside-a-collection"]);
     expect(v.spilled).toBe(true);
     expect(contained(v)).toBe(true);
+  });
+});
+
+/**
+ * Reading past the body in front of you, which is the first thing here that
+ * does.
+ *
+ * 42% of every value in the corpus escapes for one reason: it was handed to a
+ * routine, and nothing could follow the call. #189 made a call's *name*
+ * resolvable, so the question becomes answerable -- does the callee let the
+ * argument out?
+ *
+ * Conservative in one direction throughout, and most of what follows is the
+ * conservative side. A value stops escaping only when every call it was handed
+ * to resolves, reads cleanly, and keeps its argument. One unresolved call and
+ * the value is gone, because it is.
+ */
+describe("a call that provably keeps what it is given", () => {
+  /** A resolver over routines written in one string, the way one file reads. */
+  function within(source: string, language: Language = "ts") {
+    const { bodies } = readBodies(source, language);
+    return {
+      bodies,
+      resolve: (callee: string) => {
+        const found = bodies.find((one) => one.routine === callee);
+        return found ? { body: found, file: "one.ts" } : undefined;
+      },
+    };
+  }
+
+  it("frees a value handed to a routine that only reads it", () => {
+    const source =
+      "function width(text) {\n  return text.length;\n}\n"
+      + "function f() {\n  const w = make();\n  width(w);\n}\n";
+    const { bodies, resolve } = within(source);
+    const f = bodies.find((one) => one.routine === "f")!;
+    const w = f.locals.find((one) => one.name === "w")!;
+    expect(w.escapes).toEqual(["passed-to-a-call"]);
+
+    const settled = settleCalls(f, resolve);
+    expect(settled.freed).toBe(1);
+    expect(contained(w)).toBe(true);
+    /*
+     * And marked as having had something read out of it. `return text.length`
+     * hands out a property, so `w` stayed and what was in it did not -- two
+     * different claims, and the second one is what `spilled` carries. Treating
+     * them as one answered no for every callee in the corpus.
+     */
+    expect(settled.freedSpilling).toBe(1);
+    expect(w.spilled).toBe(true);
+  });
+
+  it("frees a value cleanly when the callee reads nothing out of it", () => {
+    const source =
+      "function count(x) {\n  let total = 0;\n  return total;\n}\n"
+      + "function f() {\n  const w = make();\n  count(w);\n}\n";
+    const { bodies, resolve } = within(source);
+    const f = bodies.find((one) => one.routine === "f")!;
+    const settled = settleCalls(f, resolve);
+    expect(settled.freed).toBe(1);
+    expect(settled.freedSpilling).toBe(0);
+    expect(f.locals.find((one) => one.name === "w")!.spilled).toBeUndefined();
+  });
+
+  it("follows a chain of wrappers that each only pass it on", () => {
+    const source =
+      "function inner(x) {\n  return x.length;\n}\n"
+      + "function outer(y) {\n  return inner(y);\n}\n"
+      + "function f() {\n  const w = make();\n  outer(w);\n}\n";
+    const { bodies, resolve } = within(source);
+    const f = bodies.find((one) => one.routine === "f")!;
+    expect(settleCalls(f, resolve).freed).toBe(1);
+  });
+
+  it("will not free a value the callee returns", () => {
+    const source =
+      "function keep(x) {\n  return x;\n}\n"
+      + "function f() {\n  const w = make();\n  keep(w);\n}\n";
+    const { bodies, resolve } = within(source);
+    const f = bodies.find((one) => one.routine === "f")!;
+    const settled = settleCalls(f, resolve);
+    expect(settled.freed).toBe(0);
+    expect(settled.why.get("callee-lets-it-out")).toBe(1);
+  });
+
+  it("will not free a value the callee stores in a field", () => {
+    const source =
+      "function stash(x) {\n  this.held = x;\n}\n"
+      + "function f() {\n  const w = make();\n  stash(w);\n}\n";
+    const { bodies, resolve } = within(source);
+    const f = bodies.find((one) => one.routine === "f")!;
+    expect(settleCalls(f, resolve).freed).toBe(0);
+  });
+
+  it("will not free a value handed to a callee it cannot resolve", () => {
+    const source = "function f() {\n  const w = make();\n  storeSomewhere(w);\n}\n";
+    const { bodies, resolve } = within(source);
+    const f = bodies.find((one) => one.routine === "f")!;
+    const settled = settleCalls(f, resolve);
+    expect(settled.freed).toBe(0);
+    expect(settled.why.get("callee-not-resolved")).toBe(1);
+  });
+
+  it("will not free a value handed to a method, whose target needs a type", () => {
+    // `registry.store(w)` -- which routine that reaches depends on what
+    // `registry` is, and nothing in the text says. Counted under its own name,
+    // because it is a different missing capability from an unresolved name.
+    const source = "function f(registry) {\n  const w = make();\n  registry.store(w);\n}\n";
+    const { bodies, resolve } = within(source);
+    const f = bodies.find((one) => one.routine === "f")!;
+    settleCalls(f, resolve);
+    expect(contained(f.locals.find((one) => one.name === "w")!)).toBe(false);
+  });
+
+  it("needs every call to keep it, not just one", () => {
+    const source =
+      "function width(x) {\n  return x.length;\n}\n"
+      + "function keep(x) {\n  return x;\n}\n"
+      + "function f() {\n  const w = make();\n  width(w);\n  keep(w);\n}\n";
+    const { bodies, resolve } = within(source);
+    const f = bodies.find((one) => one.routine === "f")!;
+    expect(settleCalls(f, resolve).freed).toBe(0);
+  });
+
+  it("answers per argument position, not per callee", () => {
+    // `pair` keeps its first argument and lets the second out. Which one the
+    // value arrived as is the whole question.
+    const source =
+      "function pair(a, b) {\n  return b;\n}\n"
+      + "function f() {\n  const kept = make();\n  const gone = make();\n"
+      + "  pair(kept, gone);\n}\n";
+    const { bodies, resolve } = within(source);
+    const f = bodies.find((one) => one.routine === "f")!;
+    settleCalls(f, resolve);
+    expect(contained(f.locals.find((one) => one.name === "kept")!)).toBe(true);
+    expect(contained(f.locals.find((one) => one.name === "gone")!)).toBe(false);
+  });
+
+  it("stops on a cycle rather than assuming what it is proving", () => {
+    const source =
+      "function ping(x) {\n  return pong(x);\n}\n"
+      + "function pong(x) {\n  return ping(x);\n}\n"
+      + "function f() {\n  const w = make();\n  ping(w);\n}\n";
+    const { bodies, resolve } = within(source);
+    const f = bodies.find((one) => one.routine === "f")!;
+    const settled = settleCalls(f, resolve);
+    expect(settled.freed).toBe(0);
+    expect(settled.why.get("callee-lets-it-out") ?? settled.why.get("too-deep")).toBeGreaterThan(0);
+  });
+
+  it("works the same in Python and Rust", () => {
+    const python = within(
+      "def check(flag):\n    if flag:\n        return 1\n    return 0\n\n"
+      + "def f():\n    w = make()\n    check(w)\n",
+      "python",
+    );
+    const pf = python.bodies.find((one) => one.routine === "f")!;
+    expect(settleCalls(pf, python.resolve).freed).toBe(1);
+
+    const rust = within(
+      "fn bump(n: usize) -> usize {\n  n + 1\n}\n"
+      + "fn f() {\n  let w = make();\n  bump(w);\n}\n",
+      "rust",
+    );
+    const rf = rust.bodies.find((one) => one.routine === "f")!;
+    expect(settleCalls(rf, rust.resolve).freed).toBe(1);
+  });
+
+  it("will not free a value handed to a builtin, which is not in the corpus", () => {
+    /*
+     * `return len(text)` reads nothing out of `text` and still blocks, because
+     * `len` is not a routine any file here declares. Honest and worth naming:
+     * Python code calls builtins constantly, so this is a large share of what
+     * stays unresolved and it is not the same gap as a missing call graph.
+     */
+    const source =
+      "def width(text):\n    return len(text)\n\n"
+      + "def f():\n    w = make()\n    width(w)\n";
+    const { bodies, resolve } = within(source, "python");
+    const f = bodies.find((one) => one.routine === "f")!;
+    const settled = settleCalls(f, resolve);
+    expect(settled.freed).toBe(0);
+    expect(settled.why.get("callee-not-resolved")).toBe(1);
   });
 });

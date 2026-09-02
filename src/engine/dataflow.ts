@@ -183,6 +183,15 @@ export interface Local {
    * goes through `inside` like any other value put in.
    */
   readKey?: true;
+  /**
+   * Freed by `settleCalls`: every call it was handed to provably keeps it.
+   *
+   * Recorded because it changes what a referee can say. The claim rests on
+   * having read another routine's body, which a text scan cannot do without
+   * becoming this analysis, so the measurement counts these disagreements apart
+   * rather than as the reader being too generous.
+   */
+  freedByCall?: true;
   /** Every way the value left the body. Empty means it provably did not. */
   escapes: Escape[];
   /** Uses this reader could not account for, named by the syntax around them. */
@@ -199,6 +208,14 @@ export interface CallSite {
   line: number;
   /** Locals passed as a direct argument. */
   passed: string[];
+  /**
+   * The local at each argument position, or `undefined` where it is not one.
+   *
+   * Position is what makes a call resolvable: to ask whether the callee lets a
+   * value out, you have to know *which* parameter it arrived as. `passed` alone
+   * says a value went in and loses which slot.
+   */
+  args: Array<string | undefined>;
   /**
    * The producers those locals were carrying **at this line**, with the path.
    *
@@ -237,6 +254,18 @@ export interface Body {
   locals: Local[];
   /** Every call this body makes, in source order. */
   calls: CallSite[];
+  /**
+   * The routine's parameters, in order, tracked exactly as a local is.
+   *
+   * Kept apart from `locals` on purpose: a parameter was made somewhere else,
+   * so it is not a value this body could refute anything about, and counting it
+   * would move the denominator every other number here is quoted against.
+   *
+   * What it is for is the question one body cannot answer -- whether *another*
+   * routine lets an argument out. `escapesParameter` is that question, and a
+   * caller resolving `store(w)` needs it before it can say `w` stayed.
+   */
+  parameters: Local[];
   /** Bindings refused because the pattern was not one name. */
   destructured: number;
 }
@@ -277,7 +306,7 @@ const OPENS_BODY = /function|method|arrow|lambda|closure|constructor/;
  * (see `unread`), and every entry here is a shape somebody has looked at.
  */
 const TRANSPARENT =
-  /^(program|source_file|module|block|statement_block|expression_statement|declaration_list|if_|else_|elif_|while_|for_|loop_|do_|switch_|match_|case_|when_|with_|try_statement|catch_|except_|finally_|parenthesized|binary|unary|not_operator|boolean_operator|comparison_operator|await|try_expression|reference_expression|as_expression|satisfies_expression|non_null_expression|type_assertion|ternary_expression|conditional_expression|template_|string_interpolation|interpolation|format_|sequence_expression|comment|range_expression|compound_statement|let_condition|condition|assert|string$|spread_element|update_expression|expression_list|slice|computed_property_name|concatenated_string|generator_expression|lexical_declaration|variable_declaration)/;
+  /^(program|source_file|module|block|statement_block|expression_statement|declaration_list|if_|else_|elif_|while_|for_|loop_|do_|switch_|match_|case_|when_|with_|try_statement|catch_|except_|finally_|parenthesized|boolean_operator|await|try_expression|reference_expression|as_expression|satisfies_expression|non_null_expression|type_assertion|ternary_expression|conditional_expression|template_|string_interpolation|interpolation|format_|sequence_expression|comment|range_expression|compound_statement|let_condition|condition|assert|string$|spread_element|update_expression|expression_list|slice|computed_property_name|concatenated_string|generator_expression|lexical_declaration|variable_declaration)/;
 
 /*
  * The shapes above past `assert` were all added on evidence rather than by
@@ -288,6 +317,67 @@ const TRANSPARENT =
  * already in. Leaving one out is not wrong -- it costs a value counted out of a
  * floor -- which is exactly why the column exists.
  */
+
+/**
+ * Operators that produce a *new* value out of their operands.
+ *
+ * `return n + 1` does not return `n`, and `if (a > b)` returns nothing at all.
+ * Left inherited, the operand read as having left through the expression, and
+ * the cost showed up immediately: a Rust routine whose whole body is `n + 1`
+ * reported its parameter as returned, so no caller could ever be told its
+ * argument stayed.
+ *
+ * Split three ways rather than one, because the three are not the same:
+ *
+ * - a **comparison** yields a boolean, so nothing about the operand gets out
+ * - **arithmetic** yields a new value that may hold what the operands held, so
+ *   the operand stays and its contents become doubtful -- `spilled`, the same
+ *   split as a property read
+ * - a **logical** operator hands back *one of the operands* in every language
+ *   here (`a || b`, `a or b`, `a ?? b`), so it is not in either list and keeps
+ *   the position it was given
+ */
+const COMPARES = /^(comparison_operator|binary_expression_comparison)$/;
+/*
+ * Python spells arithmetic `binary_operator` and comparison
+ * `comparison_operator`, neither of which starts with `binary_expression`. Left
+ * out of this list they fell through to the doubt branch instead: 1,087 Python
+ * comparisons counted as a use nobody had looked at, which pushed Python's
+ * containment *down* from 15.0% to 11.8% while TypeScript's went up. A language
+ * table that covers one spelling of a thing and not another is the shape of bug
+ * this repository has now had five times.
+ */
+const ARITHMETIC =
+  /^(binary_expression|binary_operator|binary|comparison_operator|unary_expression|unary_operator|unary|not_operator|arithmetic)/;
+
+/** Comparison operators, which are the ones that yield a boolean. */
+const COMPARISON = new Set([
+  "<", ">", "<=", ">=", "==", "!=", "===", "!==", "in", "not in", "is", "is not",
+]);
+
+/**
+ * Operators that hand back one of their operands rather than a new value.
+ *
+ * `return owner ?? root` returns `owner` when there is one, so the operand
+ * plainly escapes. Python spells these as `boolean_operator` and is handled by
+ * node type; TypeScript spells them as an ordinary `binary_expression`, so
+ * without this list `??` read as arithmetic and a returned value came back as
+ * never having left.
+ */
+const LOGICAL = new Set(["||", "&&", "??", "or", "and", "|", "&"]);
+
+/** Whether a binary node is a comparison rather than arithmetic. */
+function comparesOnly(node: Node): boolean {
+  if (COMPARES.test(node.type)) return true;
+  const operator = node.childForFieldName("operator");
+  return operator ? COMPARISON.has(operator.text) : false;
+}
+
+/** Whether a binary node hands back an operand. */
+function handsBackOperand(node: Node): boolean {
+  const operator = node.childForFieldName("operator");
+  return operator ? LOGICAL.has(operator.text) : false;
+}
 
 /**
  * Where a value can be, as it is walked down to.
@@ -608,6 +698,7 @@ function readRoutine(
     line: lineOf(source, node.startIndex),
     locals: [],
     calls: [],
+    parameters: [],
     destructured: 0,
   };
 
@@ -798,7 +889,8 @@ function readRoutine(
             for (const pair of held(name)!.carries) reached.push(pair);
           }
           body.calls.push({
-            callee, line: lineOf(source, inside.startIndex), passed, reached, inline: [],
+            callee, line: lineOf(source, inside.startIndex),
+            passed, args: [...passed], reached, inline: [],
           });
         }
       });
@@ -818,6 +910,7 @@ function readRoutine(
         callee: callee ?? "",
         line: lineOf(source, current.startIndex),
         passed: [],
+        args: [],
         reached: [],
         inline: [],
       };
@@ -896,12 +989,20 @@ function readRoutine(
         }
       }
       for (const argument of argumentsOf(current)) {
+        // Punctuation carries no position, and counting it would shift every
+        // argument index by one -- which is the whole of what makes a call
+        // resolvable.
+        if (/^[(),]$/.test(argument.type)) continue;
         const peeled = unwrap(argument);
         if (isCall(peeled) && !readsOutOf(argument)) {
           const nested = calleeName(peeled);
           if (nested) site.inline.push(nested);
+          site.args.push(undefined);
         } else if (isName(peeled) && held(peeled.text)) {
           site.passed.push(peeled.text);
+          site.args.push(peeled.text);
+        } else {
+          site.args.push(undefined);
         }
         /*
          * What the argument carries, whatever shape it is: a bare name, a read
@@ -1133,10 +1234,48 @@ function readRoutine(
         walk(object, PLAIN, depth + 1);
         return;
       }
+      /*
+       * `return text.length` hands out a property, not the object it came from.
+       *
+       * The object does not leave -- something *out of* it does, and which is
+       * the same split already drawn for a collection read: the value stays and
+       * its contents become doubtful. Counting the object as gone instead
+       * collapsed the two, and the cost was not subtle: `return x.length` is by
+       * far the commonest shape of a routine that only looks at its argument,
+       * so with it the interprocedural question could never be answered yes for
+       * anybody.
+       *
+       * `spilled` is what carries the doubt onward, and it is the whole reason
+       * this is not simply generous.
+       */
+      if (object && isName(object) && property && position.kind === "escape") {
+        const from = held(object.text);
+        if (from) {
+          from.spilled = true;
+          walk(object, PLAIN, depth + 1);
+          return;
+        }
+      }
       if (object) walk(object, position, depth + 1);
       const index = current.childForFieldName("index") ?? current.childForFieldName("subscript");
       if (index) walk(index, PLAIN, depth + 1);
       return;
+    }
+
+    /*
+     * An operator that makes a new value out of its operands. The operand's
+     * identity does not get out through it; what the operands *held* may, for
+     * arithmetic but not for a comparison.
+     */
+    if (ARITHMETIC.test(current.type) && !handsBackOperand(current)) {
+      if (position.kind === "escape" && !comparesOnly(current)) {
+        each(current, (inside) => {
+          if (!isName(inside)) return;
+          const from = held(inside.text);
+          if (from) from.spilled = true;
+        });
+      }
+      return descend(current, PLAIN, depth);
     }
 
     if (TRANSPARENT.test(current.type)) return descend(current, position, depth);
@@ -1201,6 +1340,33 @@ function readRoutine(
     if (namesSomethingOuter(target, node)) return { kind: "escape", as: "assigned-to-an-outer" };
     return inherited;
   };
+
+  /*
+   * The parameters, registered as locals before the body is walked.
+   *
+   * They are this body's answer to a question no single body can settle: a
+   * caller writing `store(w)` cannot know whether `w` stayed until somebody has
+   * read `store`. Registering them in the same scope as the locals means the
+   * ordinary walk records what happens to them for free -- returned, stored in
+   * a field, handed on again -- and `escapesParameter` reads it off afterwards.
+   */
+  const parameterList = node.childForFieldName("parameters")
+    ?? node.childForFieldName("value")?.childForFieldName("parameters");
+  if (parameterList) {
+    for (const named of parameterNames(parameterList)) {
+      const parameter: Local = {
+        name: named.text,
+        line: lineOf(source, named.startIndex),
+        carries: new Map(),
+        holds: new Map(),
+        inside: [],
+        escapes: [],
+        unread: [],
+      };
+      body.parameters.push(parameter);
+      scopes[0]!.set(parameter.name, parameter);
+    }
+  }
 
   /*
    * Rust returns its last expression without saying so, and a value handed back
@@ -1277,6 +1443,56 @@ function tailExpression(block: Node): Node | undefined {
   return last;
 }
 
+/**
+ * The parameter names of a parameter list, in order, skipping punctuation.
+ *
+ * Order is the point: an argument's position is how a caller and a callee agree
+ * about which value is which, so a punctuation node counted as a parameter
+ * shifts every answer by one.
+ *
+ * By field and by leaf, the way the rest of this engine reads a grammar. Five
+ * spellings and no branches: `x`, `x: T`, `x = 1`, `mut x: T`, `*args`. A
+ * destructured parameter has children under its pattern and is skipped -- which
+ * part of it a caller's argument became is the judgement this file does not
+ * make, and skipping it keeps the *positions* of the rest honest because the
+ * slot is still counted.
+ */
+function parameterNames(list: Node): Node[] {
+  const found: Node[] = [];
+  for (let index = 0; index < list.childCount; index += 1) {
+    const child = list.child(index);
+    if (!child || /^[(),|]$/.test(child.type) || child.type === "comment") continue;
+    if (isName(child)) { found.push(child); continue; }
+    const name = child.childForFieldName("pattern")
+      ?? child.childForFieldName("name")
+      ?? child.child(0);
+    if (name && isName(name)) { found.push(name); continue; }
+    // A slot this reader cannot name, and the position still belongs to it.
+    found.push(child);
+  }
+  return found;
+}
+
+/**
+ * Whether a routine lets its nth argument out of its body.
+ *
+ * The conservative answer everywhere it is not sure: a parameter this reader
+ * could not name, an index past the list, a value it refused to follow. Only a
+ * parameter read cleanly and seen to stay counts as staying, because the whole
+ * point of asking is to let a *caller* stop treating a call as an exit -- and a
+ * wrong answer here is a wrong answer about somebody else's code.
+ */
+export function escapesParameter(body: Body, index: number): boolean {
+  const parameter = body.parameters[index];
+  if (!parameter || !isName_(parameter)) return true;
+  return !contained(parameter);
+}
+
+/** A parameter slot this reader could name. */
+function isName_(parameter: Local): boolean {
+  return /^[A-Za-z_$][\w$]*$/.test(parameter.name);
+}
+
 /** Read the body of one named routine. */
 export function readBody(source: string, routine: string, language: Language): BodyReading {
   const tree = parseSource(source, language);
@@ -1347,6 +1563,188 @@ export function chainFrom(
     }
   }
   return undefined;
+}
+
+/* ---------------------------------------------------------- across a call */
+
+/**
+ * What a caller needs to know about the thing it called.
+ *
+ * `undefined` means unresolvable, and unresolvable means escape. A resolver is
+ * handed in rather than built here for the reason `calls.ts` states about its
+ * own `open`: turning a name into a file is three different problems in three
+ * languages, and `deps.ts`, `deps-rust.ts` and `deps-python.ts` have each been
+ * measured at it. This file's job is the half nothing else does -- what happens
+ * to the value once it is inside.
+ */
+export interface Callee {
+  /** The routine's body, already read. */
+  body: Body;
+  /** Where it was found, for the evidence a report quotes. */
+  file: string;
+}
+
+/** Turn a called name, as written in this file, into the routine it names. */
+export type Resolver = (callee: string) => Callee | undefined;
+
+/** Why a call could not stop being an exit. Each is counted by name. */
+export type Unresolved =
+  /** The name is bound twice, imported with a wildcard, or not bound at all. */
+  | "callee-not-resolved"
+  /** A method call: which routine `x.store()` reaches needs the type of `x`. */
+  | "callee-is-a-method"
+  /** Resolved, read, and the callee does let the argument out. */
+  | "callee-lets-it-out"
+  /**
+   * Resolved, and the callee reads something *out of* the argument and passes
+   * that on. The argument itself stayed; what was in it did not, so the caller
+   * cannot claim its contents are enumerable either.
+   */
+  | "callee-spills-it"
+  /** The chain of calls went deeper than this pass follows. */
+  | "too-deep";
+
+/** What settling the calls in one body changed, and what it could not. */
+export interface Settled {
+  /** Values whose every exit was a call that provably keeps them. */
+  freed: number;
+  /**
+   * Of those, the ones a callee read something out of.
+   *
+   * The value stayed and its contents were published, and the two are different
+   * claims: "this value never left its region" still holds, "everything in it
+   * is enumerable" does not. Reported apart rather than either dropped or
+   * counted as an escape, because collapsing them is what made the first
+   * reading of the interprocedural question answer no for everybody.
+   */
+  freedSpilling: number;
+  /** Why the rest are still exits, by name. */
+  why: Map<Unresolved, number>;
+}
+
+/**
+ * How deep a chain of calls is followed before the answer is "escaped".
+ *
+ * A cap rather than a fixpoint over the whole program, because that is the line
+ * this experiment does not cross: whole-program analysis is where the cost
+ * explodes and where the leaks are the ones nobody can close (#203). Four hops
+ * is past every real wrapper and it terminates on a cycle, which is the one
+ * thing a walk must do.
+ */
+const DEEPEST_CALL = 4;
+
+/**
+ * Stop treating a call as an exit, where the callee provably keeps the value.
+ *
+ * This is the first thing in this file that reads past the body in front of it,
+ * and it is the point of the exercise: 42% of every value in the corpus escapes
+ * for one reason, and the reason is that a call could not be followed. Whether
+ * removing it moves the number is now a measurement rather than an argument.
+ *
+ * Conservative in one direction throughout. A value stops escaping only when
+ * **every** call it was handed to resolves, is read cleanly, and keeps its
+ * argument. One unresolvable call and the value is gone, because it is.
+ */
+export function settleCalls(body: Body, resolve: Resolver): Settled {
+  const settled: Settled = { freed: 0, freedSpilling: 0, why: new Map() };
+  const note = (why: Unresolved) => settled.why.set(why, (settled.why.get(why) ?? 0) + 1);
+
+  /**
+   * Whether a call keeps whatever arrives at one position, and at what grade.
+   *
+   * `kept: true, spills: true` is the interesting answer and the reason this
+   * returns a shape rather than a blocker: the argument stayed and something
+   * out of it was handed on. Both facts travel to the caller.
+   */
+  type Keeps = { kept: true; spills: boolean } | { kept: false; why: Unresolved };
+  const keeps = (
+    callee: string,
+    index: number,
+    depth: number,
+    seen: Set<string>,
+  ): Keeps => {
+    if (depth >= DEEPEST_CALL) return { kept: false, why: "too-deep" };
+    const found = resolve(callee);
+    if (!found) return { kept: false, why: "callee-not-resolved" };
+    /*
+     * A cycle. Answering "keeps it" here would be assuming the thing being
+     * proved, so the honest answer is the conservative one.
+     */
+    const key = `${found.file}#${found.body.routine}#${index}`;
+    if (seen.has(key)) return { kept: false, why: "too-deep" };
+
+    const parameter = found.body.parameters[index];
+    if (!parameter) return { kept: false, why: "callee-not-resolved" };
+    /*
+     * A callee that reads a property out of the argument and hands it on has
+     * published the argument's contents without letting the argument itself
+     * leave. The caller's value is in the same state, so the doubt crosses the
+     * boundary rather than being dropped here -- which is the difference
+     * between a measurement and a generous one.
+     */
+    if (contained(parameter)) return { kept: true, spills: parameter.spilled === true };
+
+    if (parameter.why || parameter.unread.length > 0) {
+      return { kept: false, why: "callee-lets-it-out" };
+    }
+    if (parameter.escapes.some((one) => one !== "passed-to-a-call")) {
+      return { kept: false, why: "callee-lets-it-out" };
+    }
+    /*
+     * The callee's only way out was another call, so the same question applies
+     * one level down. This is what makes a chain of wrappers followable, and it
+     * is where the depth cap earns its place.
+     */
+    const onwards = found.body.calls.filter((call) => call.args.includes(parameter.name));
+    if (onwards.length === 0) return { kept: false, why: "callee-lets-it-out" };
+    const deeper = new Set(seen).add(key);
+    let spills = parameter.spilled === true;
+    for (const call of onwards) {
+      if (!call.callee) return { kept: false, why: "callee-is-a-method" };
+      for (const [at, name] of call.args.entries()) {
+        if (name !== parameter.name) continue;
+        const answer = keeps(call.callee, at, depth + 1, deeper);
+        if (!answer.kept) return answer;
+        spills = spills || answer.spills;
+      }
+    }
+    return { kept: true, spills };
+  };
+
+  for (const local of body.locals) {
+    /*
+     * Only the values whose *only* problem is a call. A value that was also
+     * returned, or stored in a field, or captured by a closure is gone whatever
+     * the callee does, and asking would be wasted work.
+     */
+    if (local.why || local.unread.length > 0) continue;
+    if (local.escapes.length === 0) continue;
+    if (local.escapes.some((one) => one !== "passed-to-a-call")) continue;
+
+    const sites = body.calls.filter((call) => call.args.includes(local.name));
+    if (sites.length === 0) continue;
+
+    let blocked: Unresolved | undefined;
+    let spills = false;
+    for (const call of sites) {
+      if (!call.callee) { blocked ??= "callee-is-a-method"; continue; }
+      for (const [at, name] of call.args.entries()) {
+        if (name !== local.name) continue;
+        const answer = keeps(call.callee, at, 0, new Set());
+        if (!answer.kept) blocked ??= answer.why;
+        else spills = spills || answer.spills;
+      }
+    }
+    if (blocked) { note(blocked); continue; }
+    local.escapes = [];
+    local.freedByCall = true;
+    settled.freed += 1;
+    if (spills) {
+      local.spilled = true;
+      settled.freedSpilling += 1;
+    }
+  }
+  return settled;
 }
 
 /** Whether a value provably never left the body it was made in. */

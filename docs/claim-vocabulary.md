@@ -310,9 +310,9 @@ the probe's own two lists were replaced with a shape rule in the same change.
 Still wordless: `conforms`, `accesses`. `invokes` was the largest of the three
 and #189 gave it `@calls`.
 
-## Eight times a measurement contradicted the design
+## Nine times a measurement contradicted the design
 
-Kept because the pattern is the point: six of the eight came from building one
+Kept because the pattern is the point: seven of the nine came from building one
 word or one reader, not from reviewing the design.
 
 1. **The substrate was empty.** #190's first draft proposed graphify as the
@@ -359,6 +359,21 @@ word or one reader, not from reviewing the design.
    collections, so the first reading was understating both. The finding is not
    the 1.5 points: it is that the second abstraction cost an afternoon and
    generalised, which is what a framework means.
+9. **The call graph was worth a fifth of what the questions it raised were.**
+   With #189 merged, resolving a callee and asking whether it keeps its
+   argument took refuting from 13.0% to **19.1%** — and only **1.1 points of
+   that is the call resolution**. 279 values were freed by reading a callee's
+   body. The other ~1,240 came from two rules the exercise *forced*, both of
+   them local: a property read hands out the property rather than the object,
+   and arithmetic makes a new value out of its operands. Without those, no
+   callee ever "keeps" its argument — `return x.length` is the commonest shape
+   of a routine that only looks at one — so the interprocedural question read
+   zero for everybody, and getting it to answer at all meant getting value
+   semantics right first.
+
+   The other half of that finding: **65.1% of calls still cannot be resolved to
+   a routine in the corpus**, most of them builtins and library calls. `@calls`
+   made a call's name resolvable; it did not make the world enumerable.
 
 7. **The hardest word was the one that refused least.** #189 predicted `@calls`
    might have to ship confirm-only, because a call is not obviously refutable
@@ -384,18 +399,17 @@ be one: `<MenuContent />` is a routine making a MenuContent, which is `@builds`.
    analysis. Its prediction has been measured and did not hold, in the direction
    that makes it *more* interesting rather than less — see items 7 and 8 above
    and `npm run measure:dataflow`. Two abstractions are built, both generalised,
-   and the number to beat is **13.0%**.
+   and the number to beat is **19.1%**.
 
    What it must not be revisited as is a case-by-case reader. The shapes are
    unbounded and the lists that recognise them go stale silently — which is the
    fourth item below, and has now happened four times in this programme.
 
-   The blocker is not what #189 was expected to remove. **`@calls` is a call
-   checker rather than a call graph**: its resolver answers "is this call to
-   that file's routine", not "what does every call in this repository point
-   at", and the second question is the one dataflow needs. So the 57.3% of
-   values that escape through a call or a receiver is still 57.3%, and closing
-   it is a separate build on top of `calls.ts` rather than a re-run.
+   `@calls` is a call checker rather than a call graph, so this took a build on
+   top of `bindingsIn` rather than a re-run — and the build is done and
+   measured (item 9). What it says is that the call graph was the *smaller*
+   half of its own question, and that two thirds of calls still resolve to
+   nothing this corpus holds.
 3. **#190's layer 2.** The relation list is settled as-is by the owner. The one
    thing worth recording there is the three footings above — the table's `may
    accuse` column reads as a yes/no and it is not.
