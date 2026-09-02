@@ -185,6 +185,56 @@ describe("refuses rather than accusing", () => {
     expect(report.claims.signatureWithheld).toEqual({});
   });
 
+  /*
+   * The one that shipped (#195). `unit_path` takes a `FileSlice` -- it says so
+   * in its own parameter list -- and the reader read the annotation as a piece
+   * of text, saw no names in it, and told the author their diagram was wrong.
+   * Python is not a corner of this engine: 49 of graphify's 82 files write an
+   * annotation this way, because it is how a forward reference and a
+   * `TYPE_CHECKING`-only import have to be written.
+   */
+  it("confirms a Python parameter whose type is written inside a string", async () => {
+    const board = await boardOf(
+      "graphify/file_slice.py#FileSlice", "graphify/file_slice.py#unit_path",
+      { claim: "takes" },
+    );
+    const report = checkDrift(board, fakeWorkspace({
+      "graphify/file_slice.py": [
+        "class FileSlice:",
+        "    pass",
+        "",
+        'def unit_path(unit: "Path | FileSlice") -> Path:',
+        "    return unit",
+        "",
+      ].join("\n"),
+    }), { edges: true });
+
+    expect(report.edges.filter((edge) => edge.kind === "signature-absent")).toEqual([]);
+    expect(report.clean).toBe(true);
+    expect(report.claims.signatureConfirmed).toBe(1);
+  });
+
+  it("stays silent rather than refuting a quoted annotation it cannot read", async () => {
+    const board = await boardOf(
+      "graphify/file_slice.py#Database", "graphify/file_slice.py#unit_path",
+      { claim: "takes" },
+    );
+    const report = checkDrift(board, fakeWorkspace({
+      "graphify/file_slice.py": [
+        "class Database:",
+        "    pass",
+        "",
+        'def unit_path(unit: "Path | FileSlice") -> Path:',
+        "    return unit",
+        "",
+      ].join("\n"),
+    }), { edges: true });
+
+    expect(report.edges.filter((edge) => edge.kind === "signature-absent")).toEqual([]);
+    expect(report.clean).toBe(true);
+    expect(report.claims.signatureWithheld["quoted-annotation"]).toBe(1);
+  });
+
   it("declines when the function end anchors a file rather than a name", async () => {
     // A bare path is a file, and a file has no signature. The node check already
     // says what a bare path is; this only refuses to guess.

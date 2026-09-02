@@ -222,6 +222,90 @@ describe("a signature that does not name the type", () => {
 });
 
 /**
+ * Python writes a type inside a string, and #195 is what that cost.
+ *
+ * `def unit_path(unit: "Path | FileSlice")` takes a `FileSlice`. To every
+ * grammar here the annotation is a piece of text, so the reader saw no names at
+ * all and called the correct arrow wrong. The quoted form is not an oddity: it
+ * is how Python writes a forward reference and the only way to write a type
+ * imported under `if TYPE_CHECKING:`, which are exactly the places a diagram
+ * wants to draw an arrow.
+ */
+describe("a Python annotation written inside a string", () => {
+  it("confirms the case from the issue", () => {
+    const source = 'def unit_path(unit: "Path | FileSlice") -> Path:\n    return unit';
+    const verdict = signatureNames(source, "unit_path", ["FileSlice"], "parameter", "python");
+    expect(verdict.verdict).toBe("confirmed");
+    if (verdict.verdict !== "confirmed") return;
+    expect(verdict.evidence.name).toBe("FileSlice");
+    // Quoted as written, the way a resolved `Self` is: the report shows the
+    // line the author would go and look at.
+    expect(verdict.evidence.signature).toContain('"Path | FileSlice"');
+  });
+
+  it("reads a quoted type inside a generic", () => {
+    const source = 'def g(x: list["Foo"]) -> None: ...';
+    expect(verdictOf(signatureNames(source, "g", ["Foo"], "parameter", "python")))
+      .toBe("confirmed");
+  });
+
+  it("reads a quoted return type", () => {
+    const source = 'def h(x: Path) -> "Bar": ...';
+    expect(verdictOf(signatureNames(source, "h", ["Bar"], "return", "python")))
+      .toBe("confirmed");
+  });
+
+  it("reads a type imported only under TYPE_CHECKING", () => {
+    // The one shape where the quotes are compulsory: the name does not exist at
+    // runtime, so it cannot be written any other way.
+    const source = [
+      "from typing import TYPE_CHECKING",
+      "",
+      "if TYPE_CHECKING:",
+      "    from .slice import FileSlice",
+      "",
+      'def take(unit: "FileSlice") -> None: ...',
+    ].join("\n");
+    expect(verdictOf(signatureNames(source, "take", ["FileSlice"], "parameter", "python")))
+      .toBe("confirmed");
+  });
+
+  it("refuses to refute the half that has one", () => {
+    // The words inside the quotes were read by scanning text, not by parsing a
+    // type. Finding a name proves it is there; not finding one proves nothing.
+    const source = 'def unit_path(unit: "Path | FileSlice") -> Path:\n    return unit';
+    expect(verdictOf(signatureNames(source, "unit_path", ["Database"], "parameter", "python")))
+      .toBe("withheld/quoted-annotation");
+  });
+
+  it("still refutes the half that is written plainly", () => {
+    // Asked of the claimed half only. A quoted parameter has no bearing on
+    // whether the return type says what it says, and silencing both halves
+    // would spend refutations this has no reason to spend.
+    const source = 'def unit_path(unit: "Path | FileSlice") -> Path:\n    return unit';
+    expect(verdictOf(signatureNames(source, "unit_path", ["Database"], "return", "python")))
+      .toBe("absent");
+  });
+
+  it("leaves an ordinary Python signature refutable", () => {
+    const source = "def is_splittable_text(path: Path) -> bool: ...";
+    expect(verdictOf(signatureNames(source, "is_splittable_text", ["Path"], "parameter", "python")))
+      .toBe("confirmed");
+    expect(verdictOf(signatureNames(source, "is_splittable_text", ["FileSlice"], "parameter", "python")))
+      .toBe("absent");
+  });
+
+  it("leaves a TypeScript literal type alone, where the quotes mean themselves", () => {
+    // `mode: "read" | "write"` is a type that means itself. Reading TypeScript's
+    // quotes the way Python's are read would withhold on ordinary code and buy
+    // nothing back.
+    const source = 'function h(mode: "read" | "write") { }';
+    expect(verdictOf(signatureNames(source, "h", ["Request"], "parameter", "ts")))
+      .toBe("absent");
+  });
+});
+
+/**
  * The half this whole design exists for.
  *
  * Each of these signatures is fully enumerable, does not contain the type, and
