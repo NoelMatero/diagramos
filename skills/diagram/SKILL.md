@@ -313,17 +313,22 @@ Same field on an edge. A connection you intend but have not wired yet is
 `state: "planned"`, which is the honest way to draw the arrow before the import
 exists.
 
-### The two claims that can come back wrong
+### The claims that can come back wrong
 
-Everything above can be *unconfirmed*. These two can be **refuted** — reported
-in red, with a file and a line, as a thing the diagram states and the code
-contradicts. That is the point of them, and it is also why they are the only
-two places here where guessing has a real cost.
+Everything above can be *unconfirmed*. A claim can be **refuted** — reported in
+red, with a file and a line, as a thing the diagram states and the code
+contradicts. That is the point of them, and it is also the only place here where
+guessing has a real cost.
 
-Both are optional. An arrow with no claim and a box with no claim are the
+Every word below can come back wrong except `feeds`, which confirms and
+otherwise stays quiet. Two of them — `builds` and `calls` — can only ever be
+wrong about the **direction**, never about an absence, and each says why under
+its own heading.
+
+They are all optional. An arrow with no claim and a box with no claim are the
 normal case, not a shortfall.
 
-Both are also about `built` things, and the rules below say so as if that were
+They are also about `built` things, and the rules below say so as if that were
 the only case. It is not. On a `planned` arrow or box there is no line to read,
 so a claim there is a specification rather than a transcription — *when this is
 built, it will work this way* — and nothing grades it until the code lands and
@@ -514,6 +519,48 @@ macro that expands to it, or a constructor whose name is built at runtime
 direction: `Response(body)` and `render(body)` are the same syntax there, and
 guessing on the capital letter would be a naming convention pretending to be
 evidence.
+
+#### `claim: "calls"` — this calls that
+
+The most common thing one piece of code does to another, and the thing your
+boards have been trying to say in prose. If you were about to write `calls` or
+`will call` on a label, write the claim instead:
+
+```
+edges: [
+  { from: "run", to: "render", claim: "calls" },
+]
+```
+
+The `from` end is the caller, which is the direction every diagram already
+draws. There is no second word for "is called by" — that is the same fact read
+backwards, and the arrow already carries the direction.
+
+Both ends must anchor a symbol (`path#symbol`). A file does not call anything.
+
+The called name is traced back to the file it came from, so a name imported
+through a barrel or a re-export still confirms: `from graphify.extract import
+extract_objc` confirms against the file that actually declares it, not the one
+that passes it on.
+
+**It cannot be red for an absence, and that is deliberate.** A routine that
+never writes `render()` can still reach it through a callback, a trait object or
+a dispatch table, so not finding the call says nothing about the arrow.
+
+**What can come back wrong is the direction.** If the call is found at the far
+end and only there, the arrow is drawn backwards and you get told, with a file
+and a line. That is the one accusation this word makes — and it is the case
+worth catching, because a call arrow drawn backwards used to pass every check
+this tool had.
+
+Nothing is reported either way when the name cannot be placed: a method on a
+value whose type is not written down (`thing.render()`), a name a wildcard
+import brought in, a name from a package, or a call inside a Rust macro.
+Measured across five repositories that is 7% of Python asks and 2% of
+TypeScript's.
+
+Do not reach for this when what you mean is that a **value** flows from one to
+the other. That is `feeds`, and it frequently points the opposite way.
 
 #### `closed: {}` — nothing outside reaches into this box
 
