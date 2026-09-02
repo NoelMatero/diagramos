@@ -862,11 +862,26 @@ for (const scope of CODE_ROOTS) {
 
 const LANGUAGES: Language[] = ["rust", "ts", "tsx", "python", "js"];
 
-/** Which relation each of the six words already claims. */
+/**
+ * Which relation each word already claims.
+ *
+ * Kept honest by hand and it has not been: this said `depends`, `accepts` and
+ * `produces` and nothing else, so `@holds` (#188) and `@builds` (#199) shipped
+ * without being added, and the coverage figure below has been understating
+ * itself by two whole words ever since: the reported 17.2% was really 35.3%.
+ *
+ * `flows` is here too and was never in it. `@feeds` confirms rather than
+ * refutes, which is a fact about what its verdict may say and not about whether
+ * an arrow can carry the word -- and this table is about the second question.
+ */
 const WORD_FOR: Record<string, string> = {
   depends: "@needs",
   accepts: "@takes",
   produces: "@returns",
+  contains: "@holds",
+  constructs: "@builds",
+  invokes: "@calls",
+  flows: "@feeds",
 };
 
 function rows(source: Map<string, number>) {

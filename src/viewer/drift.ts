@@ -65,6 +65,7 @@ const KNOWN_EDGE_KINDS = new Set([
   "signature-absent",
   "holds-absent",
   "builds-backwards",
+  "calls-backwards",
 ]);
 
 /**
@@ -77,6 +78,7 @@ const KNOWN_EDGE_KINDS = new Set([
  */
 const WRONG_EDGE_KINDS = new Set([
   "backwards-edge", "signature-absent", "holds-absent", "builds-backwards",
+  "calls-backwards",
 ]);
 
 /**
@@ -357,6 +359,7 @@ export function tallyOf(report: DriftView): TallyPart[] {
   const wrongSignature = report.edges.filter((finding) => finding.kind === "signature-absent").length;
   const wrongHolds = report.edges.filter((finding) => finding.kind === "holds-absent").length;
   const wrongBuilds = report.edges.filter((finding) => finding.kind === "builds-backwards").length;
+  const wrongCalls = report.edges.filter((finding) => finding.kind === "calls-backwards").length;
   const unsupported = report.edges.filter(
     (finding) => !WRONG_EDGE_KINDS.has(finding.kind) && KNOWN_EDGE_KINDS.has(finding.kind),
   ).length;
@@ -399,6 +402,17 @@ export function tallyOf(report: DriftView): TallyPart[] {
   if (wrongBuilds) {
     parts.push({
       text: `${wrongBuilds} ${wrongBuilds === 1 ? "arrow" : "arrows"} built backwards`,
+      tone: "bad",
+    });
+  }
+  /*
+   * Its own chip, beside `built backwards` rather than folded into it. Both are
+   * an arrow pointing the wrong way and both are red, and they send somebody to
+   * different lines: one to whoever calls `new`, one to whoever makes the call.
+   */
+  if (wrongCalls) {
+    parts.push({
+      text: `${wrongCalls} ${wrongCalls === 1 ? "call" : "calls"} backwards`,
       tone: "bad",
     });
   }
@@ -541,6 +555,7 @@ export function rowsOf(report: DriftView): StatusRow[] {
         + (finding.kind === "signature-absent" ? " · not in the signature" : "")
         + (finding.kind === "holds-absent" ? " · not in the fields" : "")
         + (finding.kind === "builds-backwards" ? " · built the other way" : "")
+        + (finding.kind === "calls-backwards" ? " · called the other way" : "")
         + (KNOWN_EDGE_KINDS.has(finding.kind)
           ? ""
           : ` · ${finding.kind}${finding.detail ? `: ${finding.detail}` : ""}`),

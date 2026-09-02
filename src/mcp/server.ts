@@ -222,10 +222,10 @@ const edgeSchema = z.object({
       + "break names the hop that stopped holding. Only for arrows whose ends both name symbols.",
     ),
   claim: z
-    .enum(["needs", "feeds", "takes", "returns", "holds", "builds"])
+    .enum(["needs", "feeds", "takes", "returns", "holds", "builds", "calls"])
     .optional()
     .describe(
-      "What this arrow asserts, when it asserts anything. Four words, and an arrow may carry one. "
+      "What this arrow asserts, when it asserts anything. Seven words, and an arrow may carry one. "
       + "'needs': the from end declares a dependency on the to end — an import, a require, an "
       + "include. Write it ONLY when you have read that line in the code: it is a transcription of "
       + "something you saw, never a guess about what the relationship probably is. Shown on the "
@@ -252,6 +252,21 @@ const edgeSchema = z.object({
       + "recognised under another name (a type alias, an import renamed on the way in): a "
       + "signature that could be hiding it proves nothing, so the check withholds instead of "
       + "accusing. The TO end must anchor a symbol and the FROM end must name the type. "
+      + "'holds': one of the FROM end's fields is of the TO end's type — the container first, the "
+      + "opposite end from takes, because containment points whole to part. CHECKED and it can "
+      + "fail: a field list can be read in full, so a type absent from it is genuinely absent. "
+      + "Generic wrappers are read through, so Vec<T>, Promise<T> and Optional[T] all confirm. "
+      + "'builds': the FROM end makes one of the TO end's type — `new X`, `X { .. }`, `<X />`. It "
+      + "is the only way to describe a component tree. NOT finding the construction is never held "
+      + "against the arrow (a factory one call away is invisible); what fails is finding it at the "
+      + "far end and only there, which means the arrow is backwards. "
+      + "'calls': the FROM end calls the TO end. The most common thing one piece of code does to "
+      + "another, and the called name is traced back to the file it came from, through a barrel or "
+      + "a re-export if there is one. Same footing as builds: NOT finding the call is never held "
+      + "against the arrow, because a callback or a dispatch table is invisible to it; what fails "
+      + "is finding the call at the far end and only there. Both ends must anchor a symbol. Do not "
+      + "reach for 'calls' when what you mean is that a value flows — that is 'feeds', and it "
+      + "often points the other way. "
       + "A relationship you cannot point at is an arrow with no claim, which is fine and is what "
       + "most arrows are: an unclaimed arrow is looked for and counted, never judged, so it cannot "
       + "come back as a finding against you. "
@@ -457,6 +472,14 @@ const CLAIM_CONSEQUENCE: Record<string, string> = {
     + " through, so Vec<T>, Promise<T> and Optional[T] all confirm. Nothing is reported either way"
     + " when a field's type could be written under another name, including a Python annotation"
     + " written as a string.",
+  calls:
+    " Each one is now read out of the tail's own body, and the called name is traced back to the"
+    + " file it came from -- through a barrel or a re-export if there is one. Finding the call"
+    + " confirms the arrow. NOT finding it is never held against it: a callback or a dispatch"
+    + " table is invisible to this, so there is no red for an absence. What does get reported is"
+    + " finding the call at the FAR end and only there, which means the arrow is drawn backwards."
+    + " Nothing is reported either way when the name cannot be placed -- a method on a value whose"
+    + " type is not written down, a wildcard import, a name from a package.",
 };
 
 function claimNote(arrows: ReadonlyArray<{ claim?: string }>): { claims?: string } {
@@ -1368,10 +1391,10 @@ server.registerTool(
             label: z.string().optional(),
             bidirectional: z.boolean().optional(),
             claim: z
-              .enum(["needs", "feeds", "takes", "returns", "holds", "builds"])
+              .enum(["needs", "feeds", "takes", "returns", "holds", "builds", "calls"])
               .optional()
               .describe(
-      "What this arrow asserts, when it asserts anything. Four words, and an arrow may carry one. "
+      "What this arrow asserts, when it asserts anything. Seven words, and an arrow may carry one. "
       + "'needs': the from end declares a dependency on the to end — an import, a require, an "
       + "include. Write it ONLY when you have read that line in the code: it is a transcription of "
       + "something you saw, never a guess about what the relationship probably is. Shown on the "
@@ -1398,6 +1421,21 @@ server.registerTool(
       + "recognised under another name (a type alias, an import renamed on the way in): a "
       + "signature that could be hiding it proves nothing, so the check withholds instead of "
       + "accusing. The TO end must anchor a symbol and the FROM end must name the type. "
+      + "'holds': one of the FROM end's fields is of the TO end's type — the container first, the "
+      + "opposite end from takes, because containment points whole to part. CHECKED and it can "
+      + "fail: a field list can be read in full, so a type absent from it is genuinely absent. "
+      + "Generic wrappers are read through, so Vec<T>, Promise<T> and Optional[T] all confirm. "
+      + "'builds': the FROM end makes one of the TO end's type — `new X`, `X { .. }`, `<X />`. It "
+      + "is the only way to describe a component tree. NOT finding the construction is never held "
+      + "against the arrow (a factory one call away is invisible); what fails is finding it at the "
+      + "far end and only there, which means the arrow is backwards. "
+      + "'calls': the FROM end calls the TO end. The most common thing one piece of code does to "
+      + "another, and the called name is traced back to the file it came from, through a barrel or "
+      + "a re-export if there is one. Same footing as builds: NOT finding the call is never held "
+      + "against the arrow, because a callback or a dispatch table is invisible to it; what fails "
+      + "is finding the call at the far end and only there. Both ends must anchor a symbol. Do not "
+      + "reach for 'calls' when what you mean is that a value flows — that is 'feeds', and it "
+      + "often points the other way. "
       + "A relationship you cannot point at is an arrow with no claim, which is fine and is what "
       + "most arrows are: an unclaimed arrow is looked for and counted, never judged, so it cannot "
       + "come back as a finding against you. "

@@ -180,6 +180,26 @@ code lands the arrow promotes and the routine is read: finding the construction
 confirms it, not finding it is never held against it, and finding it at the far
 end only means the arrow is backwards.
 
+### `claim: "calls"` on a planned arrow — the call it will make
+
+`calls` says **the `from` end will call the `to` end**. It reads as `@calls` on
+the label:
+
+```
+edges: [
+  { from: "run", to: "render", state: "planned", claim: "calls" },
+]
+```
+
+The caller comes first, which is the direction the arrow already carries. This
+is the claim for sketching a flow of control before any of it exists, and it is
+the most common thing a plan wants to say.
+
+Nothing accuses a plan of a call that has not been written. Once the code lands
+the arrow promotes and the body is read: finding the call confirms it, not
+finding it is never held against it, and finding it at the far end only means
+the arrow is backwards. Both ends need to name a routine (`path#symbol`).
+
 ### `closed: {}` on a planned directory box — the boundary it will hold
 
 `closed` says **nothing outside this box reaches into it**. Only for a box
