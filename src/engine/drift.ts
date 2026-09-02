@@ -3273,6 +3273,37 @@ export function checkDrift(
           }
           if (verdict.verdict === "withheld") {
             noteHeld(verdict.why);
+            /*
+             * A category error is loud, and this is the one refusal here that
+             * is. Every other reason to withhold means "the code might be
+             * hiding the answer" -- an alias, a quoted annotation, a macro --
+             * and the arrow could go green tomorrow without anybody touching
+             * the board. `not-a-type` never can: a field list cannot name a
+             * function, so this arrow will be silent forever.
+             *
+             * That is the definition `garbledClaims` already carries -- "a line
+             * on the board that no check can ever read, and leaving it out
+             * would let it sit there quietly forever" -- and it is what #190
+             * means by catching a category error when the arrow is drawn rather
+             * than silently withholding it. The first version of this went
+             * quiet, which is precisely the checker-that-was-never-going-to-
+             * answer the sorts layer exists to replace.
+             *
+             * Not a red: a red says the code disagrees, and the code has not
+             * been asked anything. The board is wrong, not the code.
+             */
+            if (verdict.why === "not-a-type" && claimed) {
+              garbledClaims.push({
+                on: "arrow",
+                label: `${oneLine(fromNode.label) || edge.from} → ${oneLine(toNode.label) || edge.to}`,
+                written: "holds",
+                detail: `@holds says a field of ${oneLine(fromNode.label) || fromPath} is of `
+                  + `${oneLine(toNode.label) || toPath}'s type, and `
+                  + `${oneLine(toNode.label) || toPath} is a function rather than a type. `
+                  + `A field list can never name a function, so nothing can ever read this claim. `
+                  + `Point the arrow at the type the field is of, or drop the claim.`,
+              });
+            }
           } else if (edge.state === "planned") {
             noteHeld("no-function-body");
           } else {

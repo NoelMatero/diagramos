@@ -147,9 +147,25 @@ describe("a category error is not a wrong diagram", () => {
     });
     const report = checkDrift(board, fakeWorkspace(files), { edges: true });
 
+    // Not red -- a red says the code disagrees, and the code does not disagree
+    // with anything here; nothing was ever asked of it.
     expect(report.edges.filter((finding) => finding.kind === "holds-absent")).toEqual([]);
     expect(report.claims.holdsWithheld["not-a-type"]).toBe(1);
-    expect(report.clean).toBe(true);
+
+    /*
+     * But loud. The first version of this went silent, and that was backwards:
+     * a claim that can never be satisfied is a line on the board no check can
+     * ever read, which is exactly what `garbledClaims` is for and exactly the
+     * comment on `clean` -- "leaving it out would let it sit there quietly
+     * forever". #190 says a category error should be caught the moment the
+     * arrow is drawn rather than silently withheld, and silence is what a
+     * checker that was never going to answer looks like.
+     */
+    const garbled = report.garbledClaims.find((claim) => claim.written === "holds");
+    expect(garbled).toBeDefined();
+    expect(garbled?.on).toBe("arrow");
+    expect(garbled?.detail).toContain("hello_handler");
+    expect(report.clean).toBe(false);
   });
 });
 
