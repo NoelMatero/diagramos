@@ -131,6 +131,7 @@
  * referee for *this* measurement, added to that script. It is not a call to
  * `licenceFor`.
  */
+import { mayAccuse } from "./licence";
 import { parseSource, type Language, type Node } from "./parse";
 
 /** Which half of a signature a claim is about. */
@@ -162,6 +163,23 @@ export type SignatureWithheld =
   | "macro"
   /** `returns` asked of a language that writes no return types. */
   | "untyped-return"
+  /**
+   * The language has a grammar and no measured licence, so nothing has ever
+   * checked how often this reader is wrong about it.
+   *
+   * The gap #195 found: this file gates on having a *grammar*, and Python has
+   * one, so Python was the only language here shipping an accusation from a
+   * reader no referee had ever seen -- and getting an ordinary signature wrong
+   * while doing it. `needs.ts` and `deps.ts` have consulted `licenceFor` from
+   * the start; this reader and `holds.ts` now do too, which makes it one rule
+   * rather than a property of which file you happened to land in.
+   *
+   * Confirming is unaffected. Finding a name is evidence the name is there
+   * whoever reads it, and it is the same evidence a measured reader would have
+   * found. Absence is the claim about the whole of a signature, and it is what
+   * turns a reader's blindness into somebody's wrong diagram.
+   */
+  | "unlicensed"
   /**
    * The signature says `Self` and there is no plain type to read it as -- a
    * generic `impl`, or a trait's own default method. Same reason as `aliased`:
@@ -602,7 +620,13 @@ export function signatureNames(
 
   if (misplaced) return misplaced;
   if (withheld) return withheld;
-  if (absent) return absent;
+  /*
+   * The last gate, and the only one here that is about us rather than about the
+   * code. Placed after every other answer so a language with no licence still
+   * gets its confirmations, its `misplaced` verdict and its ordinary refusals --
+   * losing the licence should cost the accusation and nothing else.
+   */
+  if (absent) return mayAccuse(language) ? absent : { verdict: "withheld", why: "unlicensed" };
 
   if (!sawName) return { verdict: "withheld", why: "not-declared" };
   return { verdict: "withheld", why: sawSignature ? "unreadable" : "no-signature" };

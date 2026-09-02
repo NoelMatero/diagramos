@@ -279,20 +279,41 @@ describe("a Python annotation written inside a string", () => {
   });
 
   it("still refutes the half that is written plainly", () => {
-    // Asked of the claimed half only. A quoted parameter has no bearing on
-    // whether the return type says what it says, and silencing both halves
-    // would spend refutations this has no reason to spend.
-    const source = 'def unit_path(unit: "Path | FileSlice") -> Path:\n    return unit';
-    expect(verdictOf(signatureNames(source, "unit_path", ["Database"], "return", "python")))
+    /*
+     * Asked of the claimed half only. A quoted parameter has no bearing on
+     * whether the return type says what it says, and silencing both halves
+     * would spend refutations this has no reason to spend.
+     *
+     * Shown in TypeScript, which is where a refutation is currently available:
+     * the half-independence this is about is a property of the reader, and
+     * whether the language may accuse at all is a separate question answered by
+     * `mayAccuse` below. Written in Python it tested the two at once, and the
+     * licence gate would have looked like it broke this rule when it does not.
+     */
+    const quoted = 'declare function unitPath(unit: "Path" | FileSlice): Path;';
+    expect(verdictOf(signatureNames(quoted, "unitPath", ["Database"], "return", "ts")))
       .toBe("absent");
   });
 
-  it("leaves an ordinary Python signature refutable", () => {
+  it("leaves an ordinary Python signature confirmable, and does not accuse on it", () => {
+    /*
+     * The confirmation is the half #200 was about and it still holds. The
+     * absence does not: Python has a grammar and no measured licence, so
+     * nothing has ever checked how often this reader is blind about Python --
+     * and #195 found one such blindness by hand. That a known blindness is
+     * fixed is not evidence there are no others, which is the whole of what
+     * "measured against a referee" buys and the thing Python has none of.
+     *
+     * So the decision #195 left open is taken here, for this reader and
+     * `holds.ts` together: an absence needs a licence, a confirmation does not.
+     * It reverses what #200 left in place, deliberately, and #198 is what
+     * un-reverses it.
+     */
     const source = "def is_splittable_text(path: Path) -> bool: ...";
     expect(verdictOf(signatureNames(source, "is_splittable_text", ["Path"], "parameter", "python")))
       .toBe("confirmed");
     expect(verdictOf(signatureNames(source, "is_splittable_text", ["FileSlice"], "parameter", "python")))
-      .toBe("absent");
+      .toBe("withheld/unlicensed");
   });
 
   it("leaves a TypeScript literal type alone, where the quotes mean themselves", () => {
@@ -313,6 +334,26 @@ describe("a Python annotation written inside a string", () => {
  * false accusation.
  */
 describe("refuses rather than accuses", () => {
+  it("withholds an absence in a language whose reader has no licence", () => {
+    /*
+     * Python has a grammar and no measured corpus, so this reader has never
+     * been checked against a referee on Python -- and #195 found it getting an
+     * ordinary Python signature wrong while shipping the accusation anyway.
+     *
+     * Confirming is unaffected: finding the name is the same evidence a
+     * measured reader would have found. The absence is what needs the licence.
+     */
+    const source = "def go(r: Request) -> Response:\n    pass\n";
+    expect(verdictOf(signatureNames(source, "go", ["Client"], "parameter", "python")))
+      .toBe("withheld/unlicensed");
+  });
+
+  it("still confirms in a language with no licence", () => {
+    const source = "def go(r: Request) -> Response:\n    pass\n";
+    expect(verdictOf(signatureNames(source, "go", ["Request"], "parameter", "python")))
+      .toBe("confirmed");
+  });
+
   it("a local type alias standing in for the type", () => {
     const source = "type Req = Request;\nfn h(r: &Req) { }";
     expect(verdictOf(signatureNames(source, "h", ["Request"], "parameter", "rust")))

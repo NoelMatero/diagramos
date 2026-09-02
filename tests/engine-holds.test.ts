@@ -213,6 +213,26 @@ describe("refuses rather than accuses", () => {
       .toBe("withheld/incomplete");
   });
 
+  it("withholds an absence in a language whose reader has no licence", () => {
+    /*
+     * Python has a grammar and no measured corpus, so nothing has ever checked
+     * how often this reader is wrong about Python -- and an accusation resting
+     * on an unmeasured reader is the thing `licence.ts` exists to forbid.
+     *
+     * Confirming is fine and stays: finding the name is evidence of the name
+     * being there whoever is reading. It is the *absence* that needs a licence,
+     * because absence is a claim about the whole of something.
+     */
+    const source = ["class RouteInfo:", "    path: str"].join("\n");
+    expect(verdictOf(heldTypes(source, "RouteInfo", ["Response"], "python")))
+      .toBe("withheld/unlicensed");
+  });
+
+  it("still confirms in a language with no licence", () => {
+    const source = ["class RouteInfo:", "    handler: Response"].join("\n");
+    expect(verdictOf(heldTypes(source, "RouteInfo", ["Response"], "python"))).toBe("confirmed");
+  });
+
   it("withholds when nothing here declares the name", () => {
     expect(verdictOf(heldTypes("struct Other { a: u8 }", "RouteInfo", ["Response"], "rust")))
       .toBe("withheld/not-declared");

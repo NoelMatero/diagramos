@@ -60,6 +60,7 @@
  * The last clause is not decoration: a method declared in a class body carries a
  * return type, and counting it would make every method a field.
  */
+import { mayAccuse } from "./licence";
 import { each, parseSource, type Language, type Node } from "./parse";
 
 /**
@@ -114,7 +115,20 @@ export type HoldsWithheld =
    * an absence is not evidence of anything. Silence -- the engine must not
    * answer a question it was never going to be able to answer.
    */
-  | "not-a-type";
+  | "not-a-type"
+  /**
+   * The language has a grammar and no measured licence, so nothing has ever
+   * checked how often this reader is wrong about it.
+   *
+   * Confirming is unaffected and stays: finding a name is evidence the name is
+   * there whoever reads it. It is the absence that needs a licence, because an
+   * absence is a claim about the whole of a declaration and it is what turns a
+   * reader's blindness into somebody's wrong diagram (`licence.ts`).
+   *
+   * Python is the live case. It is the largest field population in the corpus
+   * and the only language here with no referee, which is #198.
+   */
+  | "unlicensed";
 
 /** Where the type was named, so a report can quote a file and a line. */
 export interface HoldsEvidence {
@@ -440,5 +454,7 @@ export function heldTypes(
 
   if (withheld) return { verdict: "withheld", why: withheld };
   if (!sawFields) return { verdict: "withheld", why: "no-fields" };
+  // The last gate, and the only one that is about us rather than about the code.
+  if (!mayAccuse(language)) return { verdict: "withheld", why: "unlicensed" };
   return { verdict: "absent", fields: quoted };
 }

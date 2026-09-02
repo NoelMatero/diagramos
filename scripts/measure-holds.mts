@@ -39,6 +39,7 @@ import { existsSync, readFileSync } from "node:fs";
 import path from "node:path";
 
 import { heldTypes } from "../src/engine/holds";
+import { mayAccuse } from "../src/engine/licence";
 import { initEngine, languageOf, type Language } from "../src/engine/parse";
 
 await initEngine();
@@ -262,8 +263,15 @@ console.log("MEASURE HOLDS -- can the field reader be trusted with a red?");
 console.log(`  ${trees.length} trees, ${[...files.values()].reduce((a, b) => a + b, 0)} files,`
   + ` ${types} type declarations the referee could read`);
 console.log();
+/*
+ * `may accuse` is on the table rather than in a footnote, because the recall
+ * number reads as a licence when it is not one. "python 74.6%" invites the
+ * reading that the other three quarters are refutable; they are not, and
+ * nothing in the table said so until this column existed.
+ */
 console.log("  " + "language".padEnd(10) + "files".padStart(7) + "asked".padStart(8)
-  + "agreed".padStart(8) + "recall".padStart(8) + "refused".padStart(9) + "  reasons");
+  + "agreed".padStart(8) + "recall".padStart(8) + "refused".padStart(9)
+  + "accuses".padStart(9) + "  reasons");
 for (const language of LANGUAGES) {
   const total = asked.get(language) ?? 0;
   if (total === 0 && (files.get(language) ?? 0) === 0) continue;
@@ -276,8 +284,19 @@ for (const language of LANGUAGES) {
     + String(ok).padStart(8)
     + percent(ok, total).padStart(8)
     + percent(refused, total).padStart(9)
+    + (mayAccuse(language) ? "yes" : "no").padStart(9)
     + "  " + ([...byReason.entries()].sort((a, b) => b[1] - a[1])
       .map(([why, count]) => `${why} ${count}`).join(", ") || "—"));
+}
+
+console.log();
+const unlicensed = LANGUAGES.filter((language) =>
+  (asked.get(language) ?? 0) > 0 && !mayAccuse(language));
+if (unlicensed.length > 0) {
+  console.log();
+  console.log(`  ${unlicensed.join(", ")} has a grammar and no measured licence, so an absence`);
+  console.log("  there is withheld however good the recall looks. Confirming is unaffected.");
+  console.log("  The recall above is what a licence would be measuring, not a licence. See #198.");
 }
 
 console.log();
