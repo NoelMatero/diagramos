@@ -181,9 +181,9 @@ declared in the same repository. The first counts every `console.log` and
 
 Still wordless: `invokes` (#189), `conforms`, `accesses`.
 
-## Seven times a measurement contradicted the design
+## Eight times a measurement contradicted the design
 
-Kept because the pattern is the point: five of the seven came from building one
+Kept because the pattern is the point: six of the eight came from building one
 word or one reader, not from reviewing the design.
 
 1. **The substrate was empty.** #190's first draft proposed graphify as the
@@ -219,8 +219,17 @@ word or one reader, not from reviewing the design.
    is why it was written as a note rather than a programme. Measured (#208):
    confirming gained **4.0%** of the flows in the corpus and refuting reached
    **11.5%** of all values. The ratio is the opposite of the one predicted, and
-   the shape of it is one number: **41.7% of values escape by being handed to a
+   the shape of it is one number: **42.4% of values escape by being handed to a
    routine** — which is #189, not dataflow.
+8. **One more abstraction moved both numbers, which is the argument for a
+   framework.** The first reading of #208 modelled nothing but locals, so
+   `v.push(widget); use(v[i])` — #203's own example — was invisible. Adding a
+   single abstraction, a collection as one thing with the index deliberately
+   forgotten, took confirming from 4.0% to **5.9%** and refuting from 11.5% to
+   **13.0%**. It also surfaced two bugs that had nothing to do with
+   collections, so the first reading was understating both. The finding is not
+   the 1.5 points: it is that the second abstraction cost an afternoon and
+   generalised, which is what a framework means.
 
 `renders` was also raised as a possible missing relation and turned out not to
 be one: `<MenuContent />` is a routine making a MenuContent, which is `@builds`.
@@ -239,7 +248,9 @@ be one: `<MenuContent />` is a routine making a MenuContent, which is `@builds`.
    `npm run measure:dataflow`. What that changes is the order: the escaping is
    concentrated in one shape, and closing that shape is #189. So #203 is worth
    revisiting **after** the call graph rather than instead of it, and the number
-   to beat is 11.5%.
+   to beat is 13.0%. What it should *not* be revisited as is a case-by-case
+   reader: two abstractions are built and both generalised, and the shapes are
+   unbounded (see item 8).
 4. **#190's layer 2.** The relation list is settled as-is by the owner. The one
    thing worth recording there is the three footings above — the table's `may
    accuse` column reads as a yes/no and it is not.

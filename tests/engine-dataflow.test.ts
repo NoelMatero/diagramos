@@ -114,6 +114,67 @@ describe("a value followed through the locals of one body", () => {
     expect(chainFrom(top, ["languageOf"], ["bump"])?.through).toEqual(["language"]);
   });
 
+  it("follows a name declared empty and assigned later", () => {
+    // `let source: string; try { source = readFileSync(..) }` — three of this
+    // repo's own measurement scripts open exactly that way, and the assignment
+    // read as writing to a name from an enclosing scope, so the local was never
+    // recorded and every flow out of it was lost.
+    const read = body(
+      "function f(file) {\n"
+      + "  let source;\n"
+      + "  try {\n"
+      + "    source = readFileSync(file);\n"
+      + "  } catch {\n"
+      + "    return;\n"
+      + "  }\n"
+      + "  refereeTypes(source);\n"
+      + "}\n",
+      "f",
+    );
+    expect(chainFrom(read, ["readFileSync"], ["refereeTypes"])?.through).toEqual(["source"]);
+  });
+
+  it("still follows a rebound name's current value, which is what the arrow asks", () => {
+    /*
+     * `G = load_graph(gp)` in graphify's `cli.py`, assigned in several branches
+     * of one long routine. The escape question about `G` is unanswerable -- the
+     * name does not stand for one value -- and the flow question is not: at the
+     * line of the call it holds the last thing written to it. Treating the two
+     * refusals as one cost 63 flows the shipped reader confirms.
+     */
+    const read = body(
+      "def f(gp):\n"
+      + "    G = load_graph(gp)\n"
+      + "    G = load_graph(other)\n"
+      + "    gods = _god_nodes(G)\n",
+      "f",
+      "python",
+    );
+    expect(chainFrom(read, ["load_graph"], ["_god_nodes"])?.through).toEqual(["G"]);
+    const g = read.locals.find((one) => one.name === "G")!;
+    expect(g.why).toBe("rebound");
+    expect(contained(g)).toBe(false);
+  });
+
+  it("says nothing about a shadowed name, where the value genuinely is unknown", () => {
+    const read = body(
+      "function f() {\n"
+      + "  const v = A();\n"
+      + "  if (x) { const v = other(); }\n"
+      + "  B(v);\n"
+      + "}\n",
+      "f",
+    );
+    expect(chainFrom(read, ["A"], ["B"])).toBeUndefined();
+  });
+
+  it("still calls a second assignment a rebind, not another filling", () => {
+    const v = local(
+      "function f() {\n  let w;\n  w = make();\n  w = other();\n}\n", "f", "w",
+    );
+    expect(v.why).toBe("rebound");
+  });
+
   it("follows a loop variable, which is a binding as much as a `const` is", () => {
     // `for (const child of children(node))` in `rust.ts`. Found by the
     // measurement, as a flow the shipped one-hop reader confirms and this one
@@ -241,5 +302,190 @@ describe("locals this reader refuses to follow at all", () => {
     );
     expect(v.why).toBe("shadowed");
     expect(contained(v)).toBe(false);
+  });
+});
+
+/**
+ * The vector case, which is #203's own motivating example and the shape a
+ * pattern-matching reader can never cover:
+ *
+ *     v.push(widget);
+ *     use(v[i]);
+ *
+ * A person sees one thing going in and the same thing coming out. Every reader
+ * in this engine sees two unrelated statements, and the first version of this
+ * one saw a method called on `v` and gave up.
+ *
+ * The trick is *not* to know which index `i` is -- that is undecidable in
+ * general, and knowing it is not needed. The collection is abstracted as one
+ * thing and what is tracked is "everything in v". That deliberate forgetting is
+ * what turns an impossible question into a computable one.
+ */
+describe("a value put into a collection and taken back out", () => {
+  it("follows a value through a collection, without knowing the index", () => {
+    const read = body(
+      "function f(i) {\n"
+      + "  const v = [];\n"
+      + "  v.push(widget());\n"
+      + "  use(v[i]);\n"
+      + "}\n",
+      "f",
+    );
+    expect(chainFrom(read, ["widget"], ["use"])).toEqual({
+      producer: "widget",
+      consumer: "use",
+      through: ["v"],
+      line: 4,
+    });
+  });
+
+  it("follows it in all four languages", () => {
+    const python = body(
+      "def f(i):\n"
+      + "    v = []\n"
+      + "    v.append(widget())\n"
+      + "    use(v[i])\n",
+      "f",
+      "python",
+    );
+    expect(chainFrom(python, ["widget"], ["use"])?.through).toEqual(["v"]);
+
+    const rust = body(
+      "fn f(i: usize) {\n"
+      + "  let v = Vec::new();\n"
+      + "  v.push(widget());\n"
+      + "  use_it(v[i]);\n"
+      + "}\n",
+      "f",
+      "rust",
+    );
+    expect(chainFrom(rust, ["widget"], ["use_it"])?.through).toEqual(["v"]);
+
+    const map = body(
+      "function f(k) {\n"
+      + "  const seen = new Map();\n"
+      + "  seen.set(k, widget());\n"
+      + "  use(seen.get(k));\n"
+      + "}\n",
+      "f",
+    );
+    expect(chainFrom(map, ["widget"], ["use"])?.through).toEqual(["seen"]);
+  });
+
+  it("follows a value out through iteration, which is how real code reads one", () => {
+    const read = body(
+      "function f() {\n"
+      + "  const rows = [];\n"
+      + "  rows.push(parse());\n"
+      + "  for (const row of rows) {\n"
+      + "    render(row);\n"
+      + "  }\n"
+      + "}\n",
+      "f",
+    );
+    expect(chainFrom(read, ["parse"], ["render"])?.through).toEqual(["rows", "row"]);
+  });
+
+  it("will not model a collection whose making it never saw", () => {
+    // A parameter. `v.push(x)` might be a list taking a value or somebody's own
+    // method storing it globally, and nothing in the text says which -- so the
+    // value is counted as gone, and no flow is claimed.
+    const read = body(
+      "function f(v, i) {\n  v.push(widget());\n  use(v[i]);\n}\n", "f",
+    );
+    expect(chainFrom(read, ["widget"], ["use"])).toBeUndefined();
+  });
+
+  it("will not model one bound from an ordinary call either", () => {
+    // `load()` may return anything. Reading `push` as a list write here would be
+    // taking a method name for evidence, which is what `constructs.ts` refuses
+    // Python over.
+    const read = body(
+      "function f(i) {\n"
+      + "  const v = load();\n"
+      + "  v.push(widget());\n"
+      + "  use(v[i]);\n"
+      + "}\n",
+      "f",
+    );
+    expect(chainFrom(read, ["widget"], ["use"])).toBeUndefined();
+  });
+});
+
+describe("what a collection means for whether a value stayed", () => {
+  it("counts a value in a collection that never leaves as still contained", () => {
+    // The refutation case, and the one #203 says is impossible: `w` is inside
+    // `v`, `v` never leaves the body, so nothing that went into `v` left either
+    // — and what is in `v` is enumerable.
+    const read = body(
+      "function f() {\n"
+      + "  const v = [];\n"
+      + "  const w = make();\n"
+      + "  v.push(w);\n"
+      + "  return v.length;\n"
+      + "}\n",
+      "f",
+    );
+    const w = read.locals.find((one) => one.name === "w")!;
+    const v = read.locals.find((one) => one.name === "v")!;
+    expect(w.inside).toEqual(["v"]);
+    expect(contained(w)).toBe(true);
+    expect(contained(v)).toBe(true);
+    expect([...v.holds.keys()]).toEqual(["make"]);
+  });
+
+  it("takes the contents with it when the collection leaves", () => {
+    const read = body(
+      "function f() {\n"
+      + "  const v = [];\n"
+      + "  const w = make();\n"
+      + "  v.push(w);\n"
+      + "  return v;\n"
+      + "}\n",
+      "f",
+    );
+    const w = read.locals.find((one) => one.name === "w")!;
+    expect(w.escapes).toEqual(["left-inside-a-collection"]);
+    expect(contained(w)).toBe(false);
+  });
+
+  it("takes the contents with it when the collection is drained, not just indexed", () => {
+    // `listDiagrams` in `diagram.ts`: `return [...summaries.values()]` keeps the
+    // Map — a new array is what leaves — and hands over everything in it.
+    // Marking that only on the `v[i]` shape reported every value in a drained
+    // Map as never having left, and the referee caught it.
+    const read = body(
+      "function f() {\n"
+      + "  const seen = new Map();\n"
+      + "  const w = make();\n"
+      + "  seen.set(1, w);\n"
+      + "  return [...seen.values()];\n"
+      + "}\n",
+      "f",
+    );
+    const w = read.locals.find((one) => one.name === "w")!;
+    const seen = read.locals.find((one) => one.name === "seen")!;
+    expect(seen.spilled).toBe(true);
+    expect(contained(seen)).toBe(true);
+    expect(w.escapes).toEqual(["left-inside-a-collection"]);
+  });
+
+  it("takes the contents with it when something is read out and handed away", () => {
+    // `v` itself never leaves — it is only read. What came out of it did, and
+    // which one came out is the question not being asked, so all of it counts.
+    const read = body(
+      "function f(i) {\n"
+      + "  const v = [];\n"
+      + "  const w = make();\n"
+      + "  v.push(w);\n"
+      + "  store(v[i]);\n"
+      + "}\n",
+      "f",
+    );
+    const w = read.locals.find((one) => one.name === "w")!;
+    const v = read.locals.find((one) => one.name === "v")!;
+    expect(w.escapes).toEqual(["left-inside-a-collection"]);
+    expect(v.spilled).toBe(true);
+    expect(contained(v)).toBe(true);
   });
 });

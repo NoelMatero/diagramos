@@ -84,6 +84,16 @@ export type Escape =
   | "captured-by-a-closure"
   /** Placed in an array, object, tuple or struct literal, whose fate is untracked. */
   | "into-a-structure"
+  /**
+   * Put into a collection, and the collection itself then left.
+   *
+   * Distinct from `into-a-structure` on purpose: the value was followed *into*
+   * the collection and the collection is what failed to stay. Naming it
+   * separately is what makes the vector case legible in the breakdown -- it
+   * says how often following a value into a container bought nothing because
+   * the container went out anyway.
+   */
+  | "left-inside-a-collection"
   /** Assigned to a name bound outside this body. */
   | "assigned-to-an-outer"
   /** Given a second name, and this reader follows the first. */
@@ -113,6 +123,66 @@ export interface Local {
    * `rows -> shaped`.
    */
   carries: Map<string, string[]>;
+  /**
+   * Whether this local is a collection whose creation was seen in this body.
+   *
+   * The gate is a *literal*: `[]`, `{}`, `new Map()`, `vec![]`, `dict()`. What
+   * that buys is the type, from syntax alone rather than from a naming
+   * convention -- so `v.push(x)` is known to be a collection taking a value in
+   * rather than an arbitrary method that might store it anywhere. A value bound
+   * from an ordinary call gets no collection modelling, on the same footing
+   * `constructs.ts` withholds Python: a convention is not evidence.
+   */
+  collection?: true;
+  /**
+   * Producers whose result is inside this collection, and the path in.
+   *
+   * The index is deliberately not tracked. Knowing *which* slot a value sits in
+   * needs the value of `i`, which is undecidable in general -- and it is not
+   * needed. The collection is one thing and this is everything in it, which is
+   * the abstraction that makes the question computable.
+   */
+  holds: Map<string, string[]>;
+  /**
+   * Collections this value was put into, by name.
+   *
+   * Where it went is not yet whether it left: a value inside a collection that
+   * never leaves the body has not left the body either. Resolved after the walk,
+   * because the collection's own fate may not be known when the write is read.
+   */
+  inside: string[];
+  /**
+   * Something was taken out of this collection and handed somewhere unfollowable.
+   *
+   * The collection itself has not left -- `use(v[i])` reads it and nothing more
+   * -- but whatever came out is gone, so everything that went in has to be
+   * counted as gone. Kept apart from `escapes` because the two answers differ:
+   * `v` stays contained and its contents do not.
+   */
+  spilled?: true;
+  /**
+   * Declared without a value, and not yet given one.
+   *
+   * `let source: string;` followed by `source = readFileSync(..)` inside a
+   * `try` is an ordinary shape, and without this the assignment read as writing
+   * to a name from an enclosing scope -- so the local was never recorded and
+   * every flow out of it was lost. The first assignment fills it; a second one
+   * is a real rebind.
+   */
+  pending?: true;
+  /**
+   * Handed to a *read* of a modelled collection, as the key or index.
+   *
+   * `node_section.get(src)` looks `src` up and does not retain it, so the key
+   * does not leave -- which is right, and is the one thing the text referee
+   * cannot check without being told what a dict is. Recorded so the
+   * measurement can count those disagreements under their own name instead of
+   * reporting them as the reader being too generous.
+   *
+   * A *write* is the opposite and needs no flag: `v.set(k, x)` keeps `k`, so it
+   * goes through `inside` like any other value put in.
+   */
+  readKey?: true;
   /** Every way the value left the body. Empty means it provably did not. */
   escapes: Escape[];
   /** Uses this reader could not account for, named by the syntax around them. */
@@ -242,6 +312,50 @@ function calleeName(node: Node): string | undefined {
   return undefined;
 }
 
+/**
+ * The method and receiver of `v.push(x)`, when a call is a method call.
+ *
+ * Separate from `calleeName`, which deliberately answers only for `self.foo()`
+ * and `this.foo()` -- following an arbitrary receiver is how a body search
+ * starts confirming arrows about libraries. Here the receiver is the point: the
+ * question is what is being done *to* `v`.
+ */
+function methodOn(node: Node): { name: string; object: Node } | undefined {
+  const callee = calleeOf(node);
+  if (!callee || callee.childCount === 0) return undefined;
+  const object = callee.childForFieldName("object") ?? callee.child(0);
+  const member = callee.childForFieldName("property")
+    ?? callee.childForFieldName("attribute")
+    ?? callee.childForFieldName("field")
+    ?? callee.childForFieldName("name");
+  if (!object || !member || member.childCount !== 0) return undefined;
+  return { name: member.text, object };
+}
+
+/**
+ * Whether an expression makes an empty collection, with the type in the text.
+ *
+ * A literal by node type; `new Map()`, `list()` and `Vec::new()` by the name
+ * they name. `Vec::new()` is read off the head of the scoped call rather than
+ * its tail, because the tail is `new`.
+ */
+function makesCollection(node: Node): boolean {
+  const inner = node;
+  if (COLLECTION_LITERAL.test(inner.type)) return true;
+  if (inner.type === "new_expression") {
+    const made = inner.childForFieldName("constructor");
+    return made ? COLLECTION_MAKERS.has(made.text.split(/::|\./)[0]!) : false;
+  }
+  // `vec![]` and `HashMap::from([..])` alike: a macro or a scoped call whose
+  // first segment names the type.
+  if (isCall(inner)) {
+    const callee = calleeOf(inner)!;
+    const head = callee.text.split(/::|\./)[0]!.replace(/!$/, "");
+    return COLLECTION_MAKERS.has(head);
+  }
+  return false;
+}
+
 /** The callee expression of a call, whatever shape it has. */
 const calleeOf = (node: Node): Node | undefined =>
   node.childForFieldName("function") ?? node.childForFieldName("macro") ?? undefined;
@@ -316,6 +430,14 @@ const BINDS = /(declarator|_declaration$|assignment|const_item|static_item|let_|
  */
 const DECLARES = /(declarator|let_declaration|const_item|static_item|^for_)/;
 
+/** A declaration of a name with nothing assigned to it yet. */
+function declaredEmpty(node: Node): Node | undefined {
+  if (!DECLARES.test(node.type)) return undefined;
+  if (node.childForFieldName("value") ?? node.childForFieldName("right")) return undefined;
+  const name = node.childForFieldName("name") ?? node.childForFieldName("pattern");
+  return name && name.childCount === 0 && /identifier$/.test(name.type) ? name : undefined;
+}
+
 /** The value a binding binds, when the binding is one name and nothing clever. */
 function bindingOf(node: Node): { name: Node; value: Node } | undefined {
   if (!BINDS.test(node.type)) return undefined;
@@ -337,6 +459,9 @@ const isName = (node: Node): boolean =>
  * `self.cache = v` and `rows[i] = v` both put the value somewhere that outlives
  * the body; `v = other` does not.
  */
+/** An access by index rather than by name: the shape that reads out an element. */
+const SUBSCRIPT = /^(subscript_expression|index_expression|subscript)$/;
+
 const isFieldTarget = (node: Node): boolean =>
   /^(member_expression|field_expression|subscript_expression|index_expression|attribute|subscript)$/
     .test(node.type);
@@ -349,6 +474,71 @@ const STRUCTURE =
 const THROWN = /^(throw|raise)/;
 const YIELDED = /^yield/;
 const RETURNED = /^return/;
+
+/**
+ * Expressions that make an empty collection, spelled so the *type* is visible.
+ *
+ * This is the whole gate on collection modelling, and it is a gate about
+ * evidence rather than about convenience. `const v = []` says v is a list in the
+ * grammar; `const v = load()` says nothing, and treating `v.push(x)` as a list
+ * write there would be reading a naming convention as a fact -- which is the
+ * mistake `constructs.ts` refuses Python over.
+ *
+ * By node type for the literals, and by name for the three constructor spellings
+ * that are equally unambiguous: `new Map()` cannot be anything else.
+ */
+const COLLECTION_LITERAL =
+  /^(array|object|dictionary|set|list|array_expression|struct_expression)$/;
+
+/** Constructors and factories whose result is a collection and nothing else. */
+const COLLECTION_MAKERS = new Set([
+  // TypeScript, JavaScript
+  "Map", "Set", "WeakMap", "WeakSet", "Array",
+  // Python, where the builtin name is the type
+  "list", "dict", "set", "frozenset", "tuple", "defaultdict", "OrderedDict", "Counter",
+  // Rust, read off `Vec::new()` as the tail of a scoped call
+  "Vec", "HashMap", "HashSet", "BTreeMap", "BTreeSet", "VecDeque",
+]);
+
+/**
+ * Methods that put a value into a collection.
+ *
+ * Four languages in one list, and the overlap is real rather than lucky: `push`
+ * is TypeScript and Rust, `add` is JavaScript and Python, `insert` is Python and
+ * Rust. Only consulted when the receiver is a known collection, so a user type
+ * with its own `add` is never read as one.
+ */
+const PUTS_IN = new Set([
+  "push", "unshift", "add", "set", "append", "insert", "extend", "update",
+  "setdefault", "push_back", "push_front", "put", "addAll", "insert_str",
+]);
+
+/**
+ * Methods that take a value back out.
+ *
+ * A read out of a collection yields *something* that was put in -- not a
+ * particular one, because there is no index being tracked. That is exactly the
+ * abstraction: whatever comes out is one of the things that went in.
+ */
+const TAKES_OUT = new Set([
+  "get", "pop", "at", "shift", "find", "values", "entries", "keys", "items",
+  "getOrDefault", "peek", "front", "back", "last", "first", "iter", "into_iter",
+]);
+
+/**
+ * Properties that are a fact *about* a collection rather than a thing in it.
+ *
+ * `return v.length` does not return `v`, and reading it as though it did counted
+ * every length check as the collection leaving -- which is most real uses of
+ * one. Safe here for the same reason `PUTS_IN` is: the collection's type came
+ * from watching it be made, so what `.size` means is in the language rather than
+ * in somebody's code. Not applied to any other value, where a named property
+ * might well be the contents.
+ */
+const MEASURES_OF = new Set([
+  "length", "size", "len", "count", "capacity", "byteLength",
+  "isEmpty", "is_empty", "empty",
+]);
 
 /** How long a def-use chain may get. A cap, because a walk must terminate. */
 const LONGEST_CHAIN = 8;
@@ -431,6 +621,35 @@ function readRoutine(
     return undefined;
   };
 
+  /**
+   * Whether a local's *current value* is unknown, as opposed to its history.
+   *
+   * The two refusals are not the same and treating them the same cost 63 flows
+   * the shipped reader confirms. `shadowed` means a use of the name might mean
+   * either of two values, so nothing can be said. `rebound` means the name
+   * stopped standing for one value across the whole body -- which settles the
+   * escape question and says nothing about the flow one, because at any given
+   * line the name holds the last thing written to it. That is straight-line
+   * last-write-wins, and it is what `feeds.ts` already does.
+   */
+  const unknowable = (local: Local): boolean => local.why === "shadowed";
+
+  /**
+   * Note every local named inside a collection read's key.
+   *
+   * Whole subtree rather than a bare name, because the key is often a field read
+   * -- `health.get(c.provider)`. Nothing in that expression is retained by the
+   * lookup, including `c`, and the text referee has no way to see that: its rule
+   * is that a name inside a call's arguments was handed over.
+   */
+  const markKeys = (expression: Node): void => {
+    each(expression, (node) => {
+      if (!isName(node)) return;
+      const key = held(node.text);
+      if (key) key.readKey = true;
+    });
+  };
+
   /** Record a use of whatever local this name refers to, in this position. */
   const use = (name: string, position: Position): void => {
     const local = held(name);
@@ -442,10 +661,72 @@ function readRoutine(
     }
   };
 
+  /**
+   * The collection a name refers to, if this body watched it being made.
+   *
+   * `undefined` for a parameter, for a value bound from an ordinary call, and
+   * for a name this body never bound -- all three being cases where the type is
+   * not in the text and a method name would be a guess.
+   */
+  const collectionNamed = (name: string): Local | undefined => {
+    const local = held(name);
+    return local && local.collection && !unknowable(local) ? local : undefined;
+  };
+
+  /**
+   * The collection being read out of, when an expression is a read out of one.
+   *
+   * Three spellings, and no index in any of them: `v[i]`, `v.get(k)`, and the
+   * bare `v` an iteration walks. What comes back is one of the things that went
+   * in, and which one is the question deliberately not being asked.
+   */
+  const readsOutOf = (expression: Node, iterating = false): Local | undefined => {
+    const inner = unwrap(expression);
+    /*
+     * Iterating is the third way out, and in real code it is the common one:
+     * `for (const row of rows)` binds an element without naming an index at
+     * all. Gated on being the iterable of a loop, because a bare `rows`
+     * anywhere else is the collection itself -- `const other = rows` aliases it
+     * rather than taking something out.
+     */
+    if (iterating && isName(inner)) return collectionNamed(inner.text);
+    /*
+     * A subscript takes an element out. A named property does not: `v.length`
+     * and `v.size` are facts *about* the collection, and reading one as taking
+     * a value out counted every length check as the contents escaping -- which
+     * made a collection that plainly stays put report its contents as gone.
+     */
+    if (SUBSCRIPT.test(inner.type)) {
+      const object = inner.childForFieldName("object")
+        ?? inner.childForFieldName("value") ?? inner.child(0);
+      if (object && isName(object)) return collectionNamed(object.text);
+      return undefined;
+    }
+    if (isCall(inner)) {
+      const method = methodOn(inner);
+      if (method && TAKES_OUT.has(method.name) && isName(method.object)) {
+        return collectionNamed(method.object.text);
+      }
+    }
+    return undefined;
+  };
+
   /** What one expression carries: the producers whose result reached it. */
-  const carriedBy = (expression: Node): Map<string, string[]> => {
+  const carriedBy = (expression: Node, iterating = false): Map<string, string[]> => {
     const carried = new Map<string, string[]>();
     const inner = unwrap(expression);
+    /*
+     * Out of a collection first, because `v[i]` and `v.get(k)` are also a field
+     * read and a call, and the ordinary readings of those carry nothing.
+     */
+    const from = readsOutOf(expression, iterating);
+    if (from) {
+      for (const [producer, hops] of from.holds) {
+        if (carried.size >= MOST_CARRIED) break;
+        if (hops.length < LONGEST_CHAIN) carried.set(producer, [...hops, from.name]);
+      }
+      return carried;
+    }
     if (isCall(inner)) {
       const callee = calleeName(inner);
       if (callee) carried.set(callee, []);
@@ -458,7 +739,7 @@ function readRoutine(
         }
         if (!isName(peeled)) continue;
         const from = held(peeled.text);
-        if (!from || from.why) continue;
+        if (!from || unknowable(from)) continue;
         for (const [producer, hops] of from.carries) {
           if (carried.size >= MOST_CARRIED) break;
           if (!carried.has(producer) && hops.length < LONGEST_CHAIN) carried.set(producer, hops);
@@ -469,7 +750,7 @@ function readRoutine(
     // A bare name on the right is an alias, and it carries what that name did.
     if (isName(inner)) {
       const from = held(inner.text);
-      if (from && !from.why) {
+      if (from && !unknowable(from)) {
         for (const [producer, hops] of from.carries) {
           if (carried.size >= MOST_CARRIED) break;
           if (hops.length < LONGEST_CHAIN) carried.set(producer, hops);
@@ -542,6 +823,70 @@ function readRoutine(
       };
       const list = argumentList(current);
       const receiver = calleeOf(current);
+
+      /*
+       * A write into a collection this body made: `v.push(widget())`.
+       *
+       * The receiver is not an escape here, which is the whole difference. It
+       * used to be -- a method might store the thing it was called on -- and
+       * that is still true of an unknown receiver. What a *known* collection's
+       * `push` does is in the language rather than in somebody's code, and
+       * `readsOutOf` is the other half of the same fact.
+       */
+      const method = methodOn(current);
+      const into = method && PUTS_IN.has(method.name) && isName(method.object)
+        ? collectionNamed(method.object.text)
+        : undefined;
+      if (into) {
+        for (const argument of argumentsOf(current)) {
+          if (/^[(),]$/.test(argument.type)) continue;
+          for (const [producer, hops] of carriedBy(argument)) {
+            if (into.holds.size >= MOST_CARRIED) break;
+            if (!into.holds.has(producer) && hops.length < LONGEST_CHAIN) {
+              into.holds.set(producer, hops);
+            }
+          }
+          const peeled = unwrap(argument);
+          /*
+           * Recorded as *inside* rather than gone. Whether it left the body is
+           * now the collection's question, and the collection may not have been
+           * answered yet -- so it is resolved after the walk.
+           */
+          if (isName(peeled)) {
+            const put = held(peeled.text);
+            if (put && !put.why && !put.inside.includes(into.name)) {
+              put.inside.push(into.name);
+            }
+          } else {
+            walk(argument, { kind: "escape", as: "passed-to-a-call" }, depth + 1);
+          }
+        }
+        return;
+      }
+
+      /*
+       * A read out of one: `v[i]`, `v.get(k)`. The receiver is read and nothing
+       * leaves, so the call is not walked as an escape at all -- and the
+       * argument is an index, which is a use of the index and not of anything in
+       * the collection.
+       */
+      const out = readsOutOf(current);
+      if (out) {
+        /*
+         * And what came out is gone if this position lets anything go.
+         * `return [...summaries.values()]` keeps `summaries` -- a new array is
+         * what leaves -- and hands over everything that was in it. Marking that
+         * only on the `v[i]` shape and not on this one reported every value in
+         * a Map that gets drained as never having left.
+         */
+        if (position.kind === "escape") out.spilled = true;
+        for (const argument of argumentsOf(current)) {
+          markKeys(argument);
+          walk(argument, PLAIN, depth + 1);
+        }
+        return;
+      }
+
       if (receiver && !isName(receiver)) {
         const object = receiver.childForFieldName("object") ?? receiver.child(0);
         if (object && isName(object)) {
@@ -552,16 +897,20 @@ function readRoutine(
       }
       for (const argument of argumentsOf(current)) {
         const peeled = unwrap(argument);
-        if (isCall(peeled)) {
+        if (isCall(peeled) && !readsOutOf(argument)) {
           const nested = calleeName(peeled);
           if (nested) site.inline.push(nested);
-        } else if (isName(peeled)) {
-          const from = held(peeled.text);
-          if (from) {
-            site.passed.push(peeled.text);
-            for (const [producer, hops] of from.carries) site.reached.push([producer, hops]);
-          }
+        } else if (isName(peeled) && held(peeled.text)) {
+          site.passed.push(peeled.text);
         }
+        /*
+         * What the argument carries, whatever shape it is: a bare name, a read
+         * out of a collection, a nested call's result. Read through one
+         * function rather than per shape, because the per-shape version knew
+         * about names only -- so `use(v[i])` handed over something the reader
+         * had watched go into `v` and reported carrying nothing.
+         */
+        for (const pair of carriedBy(argument)) site.reached.push(pair);
         walk(argument, { kind: "escape", as: "passed-to-a-call" }, depth + 1);
       }
       if (callee) body.calls.push(site);
@@ -576,6 +925,22 @@ function readRoutine(
     }
 
     // A binding, or an assignment, which are the same node in Python.
+    const empty = declaredEmpty(current);
+    if (empty && !held(empty.text)) {
+      body.locals.push({
+        name: empty.text,
+        line: lineOf(source, empty.startIndex),
+        carries: new Map(),
+        holds: new Map(),
+        inside: [],
+        escapes: [],
+        unread: [],
+        pending: true,
+      });
+      scopes[scopes.length - 1]!.set(empty.text, body.locals[body.locals.length - 1]!);
+      return;
+    }
+
     const binding = bindingOf(current);
     if (binding && !isCall(current)) {
       const target = binding.name;
@@ -593,7 +958,17 @@ function readRoutine(
           walk(child, position, depth + 1);
         }
       };
-      walk(binding.value, positionForAssignment(target, current, position), depth + 1);
+      /*
+       * A loop's iterable is read rather than handed anywhere: `for (const row
+       * of rows)` does not pass `rows` to anything. Its contents do leave the
+       * collection into `row`, and `row`'s own uses are what decide their fate.
+       */
+      const iterable = /^for_/.test(current.type) && readsOutOf(binding.value, true);
+      if (iterable) {
+        walk(binding.value, PLAIN, depth + 1);
+      } else {
+        walk(binding.value, positionForAssignment(target, current, position), depth + 1);
+      }
       if (namesSomethingOuter(target, current)) {
         // The name is not this body's, so there is no local to record. The value
         // has already been counted as leaving through it.
@@ -648,6 +1023,18 @@ function readRoutine(
          * a rebind there and a shadow in TypeScript, and it is the grammar that
          * says which.
          */
+        if (existing.pending) {
+          // The value it was declared to hold, arriving. Not a rebind: there was
+          // no earlier value for the name to stop standing for.
+          delete existing.pending;
+          existing.carries = carriedBy(binding.value, /^for_/.test(current.type));
+          for (const [producer, hops] of existing.carries) {
+            existing.carries.set(producer, [...hops, existing.name]);
+          }
+          if (makesCollection(unwrap(binding.value))) existing.collection = true;
+          rest();
+          return;
+        }
         existing.why = DECLARES.test(current.type) ? "shadowed" : "rebound";
         if (!DECLARES.test(current.type)) {
           /*
@@ -657,7 +1044,7 @@ function readRoutine(
            * bound here and now, which the shipped reader also answers
            * last-write-wins.
            */
-          existing.carries = carriedBy(binding.value);
+          existing.carries = carriedBy(binding.value, /^for_/.test(current.type));
           for (const [producer, hops] of existing.carries) {
             existing.carries.set(producer, [...hops, existing.name]);
           }
@@ -668,10 +1055,13 @@ function readRoutine(
       const local: Local = {
         name: target.text,
         line: lineOf(source, target.startIndex),
-        carries: carriedBy(binding.value),
+        carries: carriedBy(binding.value, /^for_/.test(current.type)),
+        holds: new Map(),
+        inside: [],
         escapes: [],
         unread: [],
       };
+      if (makesCollection(unwrap(binding.value))) local.collection = true;
       // Append this local to every path that reached it.
       for (const [producer, hops] of local.carries) {
         local.carries.set(producer, [...hops, local.name]);
@@ -701,12 +1091,48 @@ function readRoutine(
       return;
     }
 
+    /*
+     * A read out of a collection, in a position that lets something go.
+     *
+     * `use(v[i])` does not hand over `v` -- it hands over one of the things in
+     * `v`, and which one is the question not being asked. So the collection is
+     * an ordinary read and its *contents* are what left. Without this the
+     * collection itself was reported as passed to a call, and the vector case
+     * came out no better than before.
+     */
+    const spilling = position.kind === "escape" ? readsOutOf(current) : undefined;
+    if (spilling) {
+      spilling.spilled = true;
+      const object = current.childForFieldName("object")
+        ?? current.childForFieldName("value") ?? current.child(0);
+      if (object) walk(object, PLAIN, depth + 1);
+      const index = current.childForFieldName("index") ?? current.childForFieldName("subscript");
+      if (index) {
+        markKeys(index);
+        walk(index, PLAIN, depth + 1);
+      }
+      return;
+    }
+
     // A field or index read: the object is read in whatever position we are in,
     // and the property name is not a value at all.
     if (isFieldTarget(current)) {
       const object = current.childForFieldName("object")
         ?? current.childForFieldName("value")
         ?? current.child(0);
+      const property = current.childForFieldName("property")
+        ?? current.childForFieldName("attribute")
+        ?? current.childForFieldName("field");
+      /*
+       * A measurement of a collection this body made. Nothing the collection
+       * refers to is in a number, so neither the collection nor its contents
+       * went anywhere -- and the collection stays readable as one.
+       */
+      if (object && isName(object) && property && MEASURES_OF.has(property.text)
+        && collectionNamed(object.text)) {
+        walk(object, PLAIN, depth + 1);
+        return;
+      }
       if (object) walk(object, position, depth + 1);
       const index = current.childForFieldName("index") ?? current.childForFieldName("subscript");
       if (index) walk(index, PLAIN, depth + 1);
@@ -796,6 +1222,43 @@ function readRoutine(
     } else {
       walk(routineBody, { kind: "escape", as: "returned" }, 0);
     }
+  }
+
+  /*
+   * Now settle the values that went into a collection.
+   *
+   * A value inside a collection that never leaves the body has not left the
+   * body either -- that is the whole point of following it in. But the
+   * collection's own fate is only known once the walk is finished, and a
+   * collection can sit inside another one, so this runs to a fixpoint.
+   *
+   * Capped, because a walk must terminate and a cycle of collections holding
+   * each other is legal code. Hitting the cap leaves the values escaped, which
+   * is the safe direction: an unresolved value counted as contained would be the
+   * one thing this file must never do.
+   */
+  const byName = new Map<string, Local>();
+  for (const local of body.locals) if (!byName.has(local.name)) byName.set(local.name, local);
+
+  const escaped = (local: Local): boolean =>
+    local.why !== undefined || local.escapes.length > 0 || local.unread.length > 0;
+
+  for (let round = 0; round < 4; round += 1) {
+    let changed = false;
+    for (const local of body.locals) {
+      if (local.inside.length === 0 || local.escapes.includes("left-inside-a-collection")) continue;
+      for (const name of local.inside) {
+        const container = byName.get(name);
+        // A collection this body cannot account for takes its contents with it,
+        // and so does one that was read out of into somewhere unfollowable.
+        if (!container || escaped(container) || container.spilled) {
+          local.escapes.push("left-inside-a-collection");
+          changed = true;
+          break;
+        }
+      }
+    }
+    if (!changed) break;
   }
 
   return body;

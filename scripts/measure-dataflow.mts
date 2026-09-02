@@ -368,10 +368,41 @@ const refusals = new Map<string, number>();
 const unreadShapes = new Map<string, number>();
 /** Bodies with at least one value that never left them. */
 const bodiesWithHeld = new Map<Language, number>();
+
+/**
+ * The vector case, counted separately.
+ *
+ * `v.push(widget); use(v[i])` is #203's own example of the wall, and the
+ * question it raises is not "can a reader be written" -- it can, and it is --
+ * but **how much of a real codebase is that shape**. Collections modelled,
+ * values followed into one, and how many of those stayed: three numbers, because
+ * following a value into a container buys nothing if the container leaves.
+ */
+const collections = new Map<Language, number>();
+const collectionsHeld = new Map<Language, number>();
+const putIn = new Map<Language, number>();
+const putInHeld = new Map<Language, number>();
+/** Values whose only escape is the collection they sit in leaving. */
+const lostWithContainer = new Map<Language, number>();
 const bodiesRead = new Map<Language, number>();
 
 /** The referee disagreeing in the direction that can do damage. */
 const leaked: Array<{ file: string; routine: string; name: string; line: number; saw: string }> = [];
+/**
+ * Disagreements the referee cannot settle, because the thing in dispute is the
+ * collection abstraction itself.
+ *
+ * `const byId = new Map(); byId.set(k, v)` -- the reader says the Map did not
+ * escape, and it is right: `set` puts something in and the Map stays. The
+ * referee's rule is that a method call on a value might store it anywhere, and
+ * it cannot know better without being told what a Map is.
+ *
+ * Teaching it would end its independence on exactly the axis it is meant to
+ * check, so these are counted under their own name instead. **This is the one
+ * part of the measurement no independent mechanism verifies**, and the number is
+ * how much of the containment rests on it.
+ */
+const disputed: Array<{ file: string; routine: string; name: string; saw: string }> = [];
 /** The reader saying gone where the referee sees nothing. Safe, and counted by reason. */
 const unseenByReferee = new Map<string, number>();
 
@@ -411,6 +442,22 @@ for (const tree of trees) {
       const twin = refereed.find((one) => one.name === body.routine);
       for (const local of body.locals) {
         bump(values, language);
+        /*
+         * The vector case, tallied before the three outcomes below, because a
+         * collection is also an ordinary value and gets counted in both.
+         */
+        if (local.collection) {
+          bump(collections, language);
+          if (contained(local) && !local.spilled) bump(collectionsHeld, language);
+        }
+        if (local.inside.length > 0) {
+          bump(putIn, language);
+          if (contained(local)) bump(putInHeld, language);
+          else if (local.escapes.length === 1
+            && local.escapes[0] === "left-inside-a-collection") {
+            bump(lostWithContainer, language);
+          }
+        }
         if (local.why) {
           bump(withheldValues, language);
           bump(refusals, local.why);
@@ -436,7 +483,22 @@ for (const tree of trees) {
         // The one disagreement that matters: the reader says nothing can have
         // left, and the text says something did.
         const saw = twin ? refereeEscape(twin, local) : undefined;
-        if (saw) leaked.push({ file, routine: body.routine, name: local.name, line: local.line, saw });
+        if (!saw) continue;
+        /*
+         * Two shapes of disagreement are the abstraction rather than a leak: a
+         * write method called on a modelled collection, and a value handed to
+         * one of those writes. Both are cases where the referee's rule is
+         * right in general and wrong about a Map.
+         */
+        const aboutCollections =
+          (local.collection && saw === "used-as-a-receiver")
+          || (local.inside.length > 0 && saw === "passed-to-a-call")
+          || (local.readKey && saw === "passed-to-a-call");
+        if (aboutCollections) {
+          disputed.push({ file, routine: body.routine, name: local.name, saw });
+          continue;
+        }
+        leaked.push({ file, routine: body.routine, name: local.name, line: local.line, saw });
       }
       if (anyHeld) bump(bodiesWithHeld, language);
     }
@@ -593,6 +655,40 @@ console.log("  " + "all".padEnd(10)
   + "  " + percent(total(bodiesWithHeld), total(bodiesRead)));
 
 console.log();
+console.log("  THE VECTOR CASE -- `v.push(widget); use(v[i])`, which is #203's own example");
+console.log("  A collection is modelled only where this body watched it being made, so its");
+console.log("  type is in the text. One bound from an ordinary call gets nothing.");
+console.log();
+console.log("  " + "language".padEnd(10) + "collections".padStart(12) + "stayed".padStart(8)
+  + "share".padStart(8) + "  " + "values put in".padStart(14) + "stayed".padStart(8)
+  + "share".padStart(8) + "  lost with it");
+for (const language of LANGUAGES) {
+  const made = collections.get(language) ?? 0;
+  if (made === 0 && (putIn.get(language) ?? 0) === 0) continue;
+  const inside = putIn.get(language) ?? 0;
+  console.log("  " + language.padEnd(10)
+    + String(made).padStart(12)
+    + String(collectionsHeld.get(language) ?? 0).padStart(8)
+    + percent(collectionsHeld.get(language) ?? 0, made).padStart(8)
+    + "  " + String(inside).padStart(14)
+    + String(putInHeld.get(language) ?? 0).padStart(8)
+    + percent(putInHeld.get(language) ?? 0, inside).padStart(8)
+    + "  " + String(lostWithContainer.get(language) ?? 0).padStart(6));
+}
+console.log("  " + "all".padEnd(10)
+  + String(total(collections)).padStart(12)
+  + String(total(collectionsHeld)).padStart(8)
+  + percent(total(collectionsHeld), total(collections)).padStart(8)
+  + "  " + String(total(putIn)).padStart(14)
+  + String(total(putInHeld)).padStart(8)
+  + percent(total(putInHeld), total(putIn)).padStart(8)
+  + "  " + String(total(lostWithContainer)).padStart(6));
+console.log();
+console.log("  `lost with it` is the price of the whole idea: a value followed into a container");
+console.log("  and then counted as gone anyway, because the container did not stay. Following");
+console.log("  it in bought nothing for those, and they are what says whether this is worth it.");
+
+console.log();
 console.log("  WHERE THE VALUES WENT -- by name, because one shape and twenty are different facts");
 const everyReason = new Map<string, number>();
 for (const byLanguage of reasons.values()) {
@@ -627,6 +723,17 @@ for (const one of leaked.slice(0, 20)) {
   console.log(`    ${one.file}:${one.line} ${one.routine} / ${one.name} -- text reads ${one.saw}`);
 }
 if (leaked.length > 20) console.log(`    ... and ${leaked.length - 20} more`);
+console.log();
+console.log(`  UNREFEREED -- the collection abstraction itself: ${disputed.length}`);
+console.log("    The referee says a method call on a value might store it, which is right in");
+console.log("    general and wrong about a Map. Teaching it what a Map is would end its");
+console.log("    independence on the one axis it is here to check, so these are named rather");
+console.log("    than settled. This is the part of the measurement nothing else verifies.");
+for (const one of disputed.slice(0, 8)) {
+  console.log(`    ${path.relative(HOME, one.file)} ${one.routine} / ${one.name}`
+    + ` -- text reads ${one.saw}`);
+}
+if (disputed.length > 8) console.log(`    ... and ${disputed.length - 8} more`);
 console.log();
 const unseen = [...unseenByReferee.values()].reduce((a, b) => a + b, 0);
 console.log(`  Reader said gone where the text sees nothing: ${unseen}`
