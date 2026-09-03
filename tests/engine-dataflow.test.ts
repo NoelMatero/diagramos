@@ -16,8 +16,10 @@
  */
 import { beforeAll, describe, expect, it } from "vitest";
 
-import { chainFrom, contained, readBodies, readBody, settleCalls } from "../src/engine/dataflow";
-import { initEngine, type Language } from "../src/engine/parse";
+import {
+  chainFrom, contained, operates, operatorOf, readBodies, readBody, settleCalls,
+} from "../src/engine/dataflow";
+import { each, initEngine, parseSource, type Language, type Node } from "../src/engine/parse";
 
 beforeAll(async () => {
   await initEngine();
@@ -670,5 +672,175 @@ describe("a call that provably keeps what it is given", () => {
     const settled = settleCalls(f, resolve);
     expect(settled.freed).toBe(0);
     expect(settled.why.get("callee-not-resolved")).toBe(1);
+  });
+});
+
+/** The operator node of a one-operator body, for reading its symbol directly. */
+function onlyOperator(source: string, language: Language) {
+  const tree = parseSource(source, language)!;
+  let found: Node | undefined;
+  each(tree.rootNode, (node) => {
+    if (found || node.childCount === 0) return;
+    if (operatorOf(node) !== undefined && !/declarat|assignment|statement|item/.test(node.type)) {
+      found = node;
+    }
+  });
+  if (!found) throw new Error("no operator node");
+  return found;
+}
+
+/**
+ * Operators, read by their symbol rather than by what a grammar calls the node.
+ *
+ * The bug this replaces was silent and it read like a fact about a language:
+ * Python spells comparison `comparison_operator`, the hand-written list of node
+ * types did not have it, so every Python comparison counted as a use nobody had
+ * looked at and Python's containment reported 11.8% instead of 19.7%.
+ *
+ * The node's name could not have answered the question anyway. TypeScript calls
+ * `a + b`, `a > b`, `a ?? b` and `a && b` all `binary_expression`, and those are
+ * three different answers. So the symbol has to be read whatever the node is
+ * called -- and once it is, the name is not needed.
+ *
+ * Every test below asserts the *same* answer in four languages. That is the
+ * whole guard: if a per-grammar list creeps back in, one column breaks.
+ */
+describe("what an operator does, in four languages at once", () => {
+  /** The one local of a body that only does arithmetic with its value. */
+  const computed = (source: string, language: Language) =>
+    local(source, "f", "w", language);
+
+  it("does not let a value out through arithmetic, whatever the node is called", () => {
+    // ts and js call this `binary_expression`, python `binary_operator`,
+    // rust `binary_expression`. One answer.
+    const shapes: Array<[Language, string]> = [
+      ["ts", "function f() {\n  const w = make();\n  return w + 1;\n}\n"],
+      ["js", "function f() {\n  const w = make();\n  return w * 2;\n}\n"],
+      ["python", "def f():\n    w = make()\n    return w + 1\n"],
+      ["rust", "fn f() -> i32 {\n  let w = make();\n  w + 1\n}\n"],
+    ];
+    for (const [language, source] of shapes) {
+      const value = computed(source, language);
+      expect(value.escapes, language).toEqual([]);
+      // Arithmetic can carry what the operands held into the new value, so the
+      // contents are doubtful even though the value stayed.
+      expect(value.spilled, language).toBe(true);
+    }
+  });
+
+  it("does not let a value out through a comparison, and does not even doubt it", () => {
+    // The one Python spells `comparison_operator` and TypeScript spells
+    // `binary_expression`, which is the pair that broke.
+    const shapes: Array<[Language, string]> = [
+      ["ts", "function f(b) {\n  const w = make();\n  return w > b;\n}\n"],
+      ["js", "function f(b) {\n  const w = make();\n  return w === b;\n}\n"],
+      ["python", "def f(b):\n    w = make()\n    return w > b\n"],
+      ["rust", "fn f(b: i32) -> bool {\n  let w = make();\n  w > b\n}\n"],
+    ];
+    for (const [language, source] of shapes) {
+      const value = computed(source, language);
+      expect(value.escapes, language).toEqual([]);
+      expect(contained(value), language).toBe(true);
+      // A boolean holds nothing, so there is no doubt to carry.
+      expect(value.spilled, language).toBeUndefined();
+    }
+  });
+
+  it("does let a value out through an operator that hands back an operand", () => {
+    // `??`, `||` and `or` return one of their operands, so a returned one has
+    // plainly left. TypeScript gives this the same node name as `a + b`.
+    const shapes: Array<[Language, string]> = [
+      ["ts", "function f(b) {\n  const w = make();\n  return w ?? b;\n}\n"],
+      ["js", "function f(b) {\n  const w = make();\n  return w || b;\n}\n"],
+      ["python", "def f(b):\n    w = make()\n    return w or b\n"],
+    ];
+    for (const [language, source] of shapes) {
+      const value = computed(source, language);
+      expect(value.escapes, language).toEqual(["returned"]);
+      expect(contained(value), language).toBe(false);
+    }
+  });
+
+  it("reads the symbol where the grammar keeps no field for it", () => {
+    // Rust's unary and Python's `not` have no `operator` field at all -- the
+    // symbol is an anonymous token child, and that is the case the old
+    // node-type list existed to paper over.
+    expect(operatorOf(onlyOperator("fn f() -> i32 { let w = make(); -w }", "rust")))
+      .toBe("-");
+    expect(operatorOf(onlyOperator("def f():\n    w = make()\n    return not w\n", "python")))
+      .toBe("not");
+    // Python's comparison keeps it under `operators`, plural, because it chains.
+    expect(operatorOf(onlyOperator("def f(b):\n    w = make()\n    return w > b\n", "python")))
+      .toBe(">");
+  });
+
+  it("classifies every word operator it recognises, so the gate cannot drift", () => {
+    /*
+     * The gate that decides "is this token an operator or a keyword" and the
+     * table that says what an operator does used to be two lists. `is not` was
+     * in the table and not in the gate, so 1,071 Python comparisons came back
+     * as "not an operator" -- the duplicate-list failure, committed while
+     * fixing the duplicate-list failure.
+     *
+     * They are one list now, and this is what keeps them one: every word this
+     * reader will accept as an operator has to have an answer.
+     */
+    const words = [
+      "and", "or", "not", "in", "is", "is not", "not in", "instanceof",
+      "typeof", "void", "delete",
+    ];
+    const sources: Record<string, [Language, string]> = {
+      and: ["python", "def f(a, b):\n    return a and b\n"],
+      or: ["python", "def f(a, b):\n    return a or b\n"],
+      not: ["python", "def f(a):\n    return not a\n"],
+      in: ["python", "def f(a, b):\n    return a in b\n"],
+      is: ["python", "def f(a, b):\n    return a is b\n"],
+      "is not": ["python", "def f(a):\n    return a is not None\n"],
+      "not in": ["python", "def f(a, b):\n    return a not in b\n"],
+      instanceof: ["ts", "function f(a, b) { return a instanceof b; }"],
+      typeof: ["ts", "function f(a) { return typeof a; }"],
+      void: ["ts", "function f(a) { return void a; }"],
+      delete: ["ts", "function f(a) { delete a.x; }"],
+    };
+    for (const word of words) {
+      const [language, source] = sources[word]!;
+      const node = onlyOperator(source, language);
+      expect(operatorOf(node), word).toBe(word);
+      expect(operates(node), word).not.toBe("unknown");
+    }
+  });
+
+  it("says `unknown` for a symbol nobody has classified, rather than assuming", () => {
+    /*
+     * Two real ones in this corpus's own languages: Rust's range `..` and
+     * Python's walrus `:=`. Neither is arithmetic, a comparison, or an operator
+     * that hands an operand back, and the answer has to be "nobody has decided"
+     * rather than silence -- silence is how the last bug read as a fact about
+     * Python.
+     */
+    expect(operates(onlyOperator("fn f(a: usize, b: usize) { for i in a..b {} }", "rust")))
+      .toBe("unknown");
+    expect(operates(onlyOperator("def f(a):\n    if (w := a):\n        return w\n", "python")))
+      .toBe("unknown");
+  });
+
+  it("counts a value used with an unclassified symbol against it staying", () => {
+    /*
+     * The conservative direction, and what makes the answer above safe: an
+     * operator nobody has looked at is a use nobody has accounted for. Named by
+     * its symbol, which is the point -- the version this replaces recorded the
+     * *node type*, so the report said `binary_expression` for four different
+     * operators.
+     *
+     * Rust's `..` would have served here and does not: `range_expression` is
+     * already on the list of things that hold a value without moving it, and
+     * that list is consulted first. Python's walrus is on no list at all.
+     */
+    const value = local(
+      "def f():\n    w = make()\n    if (x := w):\n        return 1\n    return 0\n",
+      "f", "w", "python",
+    );
+    expect(value.unread).toEqual([":="]);
+    expect(contained(value)).toBe(false);
   });
 });

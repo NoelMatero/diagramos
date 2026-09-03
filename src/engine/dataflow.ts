@@ -337,46 +337,192 @@ const TRANSPARENT =
  *   here (`a || b`, `a or b`, `a ?? b`), so it is not in either list and keeps
  *   the position it was given
  */
-const COMPARES = /^(comparison_operator|binary_expression_comparison)$/;
-/*
- * Python spells arithmetic `binary_operator` and comparison
- * `comparison_operator`, neither of which starts with `binary_expression`. Left
- * out of this list they fell through to the doubt branch instead: 1,087 Python
- * comparisons counted as a use nobody had looked at, which pushed Python's
- * containment *down* from 15.0% to 11.8% while TypeScript's went up. A language
- * table that covers one spelling of a thing and not another is the shape of bug
- * this repository has now had five times.
+/**
+ * What an operator does to the values on either side of it, read by the symbol
+ * rather than by the grammar's name for the node.
+ *
+ * This was a hand-written list of node types and it went stale silently, which
+ * is the failure mode `parse.ts` opens by warning about: "a declaration is a
+ * node with a `name` field ... so adding a language is one row and one fixture,
+ * not a new lexer". Matching `binary_expression|binary_operator|...` is the
+ * opposite of that, and it cost a wrong number that read like a fact about a
+ * language -- Python spells comparison `comparison_operator`, the list did not
+ * have it, so 1,087 Python comparisons counted as a use nobody had looked at and
+ * Python's containment reported 11.8% instead of 19.7%.
+ *
+ * The node's name could not have answered the question anyway, which is the
+ * part worth keeping in mind. TypeScript calls all four of these
+ * `binary_expression`:
+ *
+ *     a + b     makes a new value       -- the operands do not get out
+ *     a > b     makes a boolean         -- nor do they
+ *     a ?? b    hands back an operand   -- so it does get out
+ *     a && b    hands back an operand   -- so does this
+ *
+ * Python is the helpful one here and splits them three ways. So the symbol has
+ * to be read whatever the node is called, and once it is being read the node's
+ * name is not needed for anything.
+ *
+ * `>` is `>` in every language, so a new grammar cannot introduce a new
+ * spelling of comparison. What it can introduce is a new *symbol*, and that is
+ * why `unknown` exists and is counted rather than assumed away.
  */
-const ARITHMETIC =
-  /^(binary_expression|binary_operator|binary|comparison_operator|unary_expression|unary_operator|unary|not_operator|arithmetic)/;
+export type Operates =
+  /** `+ - * /`: a new value. The operands stay; what they held may not. */
+  | "computes"
+  /** `> == in`: a boolean. Nothing about the operands gets out at all. */
+  | "compares"
+  /** `|| ?? or`: one of the operands comes back out, so it plainly escapes. */
+  | "hands-back"
+  /** A symbol nobody has classified. Counted, and treated as an escape. */
+  | "unknown";
 
-/** Comparison operators, which are the ones that yield a boolean. */
-const COMPARISON = new Set([
-  "<", ">", "<=", ">=", "==", "!=", "===", "!==", "in", "not in", "is", "is not",
+/** Symbols that yield a boolean or a string, so nothing about the operand gets out. */
+const COMPARES = new Set([
+  "<", ">", "<=", ">=", "==", "!=", "===", "!==", "<>",
+  // Python writes each of these as one token, `is not` included.
+  "in", "not in", "is", "is not", "instanceof",
+  // Yields a string and a nothing respectively. Neither can hold the operand.
+  "typeof", "void",
+]);
+
+/** Symbols that hand back one of their operands. */
+const HANDS_BACK = new Set(["||", "&&", "??", "or", "and", "?:"]);
+
+/**
+ * Symbols that make a new value out of what they are given.
+ *
+ * `|` and `&` are here rather than with the logical ones on purpose: in every
+ * language this reads they are bitwise, and `a | b` is a new number. TypeScript
+ * also uses `|` in a *type* position, which is not an expression and never
+ * reaches this.
+ */
+const COMPUTES = new Set([
+  "+", "-", "*", "/", "%", "**", "//", "@",
+  "|", "&", "^", "~", "<<", ">>", ">>>",
+  "!", "not", "+=", "-=", "*=", "/=", "%=", "++", "--",
+  // Mutates a property of the operand rather than reading one, so the
+  // conservative reading is that what it held is no longer enumerable.
+  "delete",
 ]);
 
 /**
- * Operators that hand back one of their operands rather than a new value.
+ * Punctuation that groups or separates rather than computing.
  *
- * `return owner ?? root` returns `owner` when there is one, so the operand
- * plainly escapes. Python spells these as `boolean_operator` and is handled by
- * node type; TypeScript spells them as an ordinary `binary_expression`, so
- * without this list `??` read as arithmetic and a returned value came back as
- * never having left.
+ * A ternary's `?` and `:` are here so `a ? b : c` is not read as an operator:
+ * it hands back an operand, and the ordinary walk already carries the position
+ * into both branches, which is the right answer for it.
  */
-const LOGICAL = new Set(["||", "&&", "??", "or", "and", "|", "&"]);
+const GROUPING = new Set([
+  "(", ")", "[", "]", "{", "}", ",", ";", ":", ".", "?", "=>", "->", "...", "=",
+  // A template literal's own punctuation. `` ` `` and `${` are anonymous tokens
+  // exactly as `+` is, and without them here every interpolated string read as
+  // an operator nobody had classified -- 390 of them in one corpus.
+  "`", "${", "\"", "'", "#",
+]);
 
-/** Whether a binary node is a comparison rather than arithmetic. */
-function comparesOnly(node: Node): boolean {
-  if (COMPARES.test(node.type)) return true;
-  const operator = node.childForFieldName("operator");
-  return operator ? COMPARISON.has(operator.text) : false;
+/**
+ * Every operator spelled as a word, across the four languages read here.
+ *
+ * This exists because keywords are anonymous tokens too: `const`, `def`,
+ * `return` and `if` are all a node whose type is its own text, exactly as `+`
+ * is. Without a positive list, `const w = make()` read as an operator called
+ * `const`.
+ *
+ * **It is the union of the three sets above and nothing else**, which is the
+ * mistake this is the second attempt at. The first had a separate gate list,
+ * `is not` was in `COMPARES` and not in the gate, and 1,071 Python comparisons
+ * came back as "not an operator" -- the same duplicate-list failure, committed
+ * while fixing the duplicate-list failure. `tests/engine-dataflow.test.ts`
+ * asserts every member classifies, so the two cannot drift again.
+ */
+const WORD_OPERATORS = new Set(
+  [...COMPARES, ...HANDS_BACK, ...COMPUTES].filter((symbol) => /^[A-Za-z_]/.test(symbol)),
+);
+
+/**
+ * The operator symbol of a node, wherever the grammar keeps it.
+ *
+ * Three places, because four grammars use three: a field called `operator`
+ * (TypeScript, JavaScript, Rust, Python's arithmetic), a field called
+ * `operators` (Python's comparison, which can chain), and no field at all
+ * (Rust's unary, Python's `not`) -- where it is simply a token child.
+ *
+ * The last case is what makes this general rather than another list. An
+ * operator token in tree-sitter is *anonymous*: its type is its own text, so
+ * `>` is a node of type `>`, where an identifier is a node of type
+ * `identifier`. That is a property of the parser and not of any one grammar.
+ */
+export function operatorOf(node: Node): string | undefined {
+  /*
+   * The field is authoritative when there is one, children or not. Python wraps
+   * its two-word comparisons in a node of their own -- `a is not None` puts a
+   * single `is not` child with two children of its own under `operators` -- and
+   * requiring a leaf here skipped it, then skipped it again in the loop below
+   * for the same reason. 1,071 Python comparisons came back as "not an
+   * operator", which is the third spelling of this one bug.
+   */
+  const field = node.childForFieldName("operator") ?? node.childForFieldName("operators");
+  if (field) return wordGate(field.text.replace(/\s+/g, " ").trim(), true);
+  for (let index = 0; index < node.childCount; index += 1) {
+    const child = node.child(index);
+    if (!child || child.childCount !== 0) continue;
+    // Anonymous: the grammar had no name for it, so its type is its text.
+    if (child.type !== child.text) continue;
+    if (GROUPING.has(child.type)) continue;
+    /*
+     * Python writes two of its comparisons as two tokens -- `a not in b`,
+     * `a is not None` -- and reading only the first gets `not in` wrong in a way
+     * that matters: `not` computes and `not in` compares, and only the second is
+     * true here. Joined when the pair is one this reader knows.
+     */
+    const next = node.child(index + 1);
+    if (next && next.childCount === 0 && next.type === next.text) {
+      const pair = `${child.type} ${next.type}`;
+      if (WORD_OPERATORS.has(pair)) return pair;
+    }
+    const symbol = wordGate(child.type, false);
+    if (symbol) return symbol;
+    // A keyword -- `const`, `def`, `return`. Not an operator, and not a reason
+    // to keep reading this node for one.
+    return undefined;
+  }
+  return undefined;
 }
 
-/** Whether a binary node hands back an operand. */
-function handsBackOperand(node: Node): boolean {
-  const operator = node.childForFieldName("operator");
-  return operator ? LOGICAL.has(operator.text) : false;
+/**
+ * A symbol, unless it is a word that is not an operator.
+ *
+ * Applied to the field path as well as the token path, which the first version
+ * was not: TypeScript keeps `typeof` and `delete` on an `operator` field, so
+ * they went straight through the gate the token path applied.
+ */
+function wordGate(symbol: string, vouched: boolean): string | undefined {
+  if (!/^[A-Za-z_]/.test(symbol)) return symbol;
+  if (WORD_OPERATORS.has(symbol)) return symbol;
+  /*
+   * A word nobody has classified. What to do about it depends on who said it
+   * was the operator.
+   *
+   * `vouched` means the grammar put it on a field called `operator`, which is
+   * the grammar saying so -- an unknown word there is an operator this reader
+   * has not met, and it should be counted as one rather than ignored.
+   *
+   * A bare token is this reader's own guess, and keywords are bare tokens too.
+   * Accepting an unknown word there read `def` as an operator and every Python
+   * routine with it, which is the strictness this needs and the field does not.
+   */
+  return vouched ? symbol : undefined;
+}
+
+/** What a node does with its operands, or `undefined` if it is not an operator. */
+export function operates(node: Node): Operates | undefined {
+  const symbol = operatorOf(node);
+  if (symbol === undefined) return undefined;
+  if (COMPARES.has(symbol)) return "compares";
+  if (HANDS_BACK.has(symbol)) return "hands-back";
+  if (COMPUTES.has(symbol)) return "computes";
+  return "unknown";
 }
 
 /**
@@ -1262,13 +1408,31 @@ function readRoutine(
       return;
     }
 
+
     /*
-     * An operator that makes a new value out of its operands. The operand's
-     * identity does not get out through it; what the operands *held* may, for
-     * arithmetic but not for a comparison.
+     * Anything that holds a value without moving it decides before the operator
+     * rule gets a look. A template literal's backtick is an anonymous token in
+     * exactly the way `+` is, so with the operator rule first every interpolated
+     * string read as an operator nobody had classified.
      */
-    if (ARITHMETIC.test(current.type) && !handsBackOperand(current)) {
-      if (position.kind === "escape" && !comparesOnly(current)) {
+    if (TRANSPARENT.test(current.type)) return descend(current, position, depth);
+
+    /*
+     * An operator, classified by its symbol rather than by what the grammar
+     * calls the node. Three answers and a refusal, and the refusal is the point:
+     * a symbol nobody has classified is counted and treated as an escape, so
+     * the next grammar to arrive with a new one says so instead of quietly
+     * reading as nothing happening.
+     */
+    const does = operates(current);
+    if (does === "computes" || does === "compares") {
+      /*
+       * The operand's identity does not get out through either. What the
+       * operands *held* may, for arithmetic -- `a + b` on two lists is a new
+       * list holding what they held -- and cannot for a comparison, which
+       * yields a boolean.
+       */
+      if (position.kind === "escape" && does === "computes") {
         each(current, (inside) => {
           if (!isName(inside)) return;
           const from = held(inside.text);
@@ -1277,8 +1441,30 @@ function readRoutine(
       }
       return descend(current, PLAIN, depth);
     }
-
-    if (TRANSPARENT.test(current.type)) return descend(current, position, depth);
+    if (does === "hands-back") {
+      /*
+       * `a ?? b` gives back one of its operands, so whatever position this node
+       * is in is the position both operands are in. Falling through instead put
+       * them in the doubt branch, which is a different and wrong answer: a
+       * returned operand has plainly left, and `unread` says nobody looked.
+       */
+      return descend(current, position, depth);
+    }
+    if (does === "unknown") {
+      /*
+       * Named by the symbol, which is what makes it findable. The old version
+       * of this recorded the *node type* instead, so the report said
+       * `binary_expression` -- true, useless, and the same word for four
+       * different operators.
+       */
+      const symbol = operatorOf(current)!;
+      each(current, (inside) => {
+        if (!isName(inside)) return;
+        const from = held(inside.text);
+        if (from && !from.unread.includes(symbol)) from.unread.push(symbol);
+      });
+      return descend(current, position, depth);
+    }
 
     /*
      * A shape nobody has looked at. Walked with doubt rather than with `plain`,
