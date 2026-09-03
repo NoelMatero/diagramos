@@ -194,12 +194,21 @@ describe("typing a claim onto an arrow the engine drew", () => {
     expect(readGraph(edited).edges[0]).toMatchObject({ label: "geometry", claim: "needs" });
   });
 
+  /*
+   * `@conforms` rather than `@calls`, and the swap is the point of this comment:
+   * this test used `@calls` until #189 made it a real word, at which point the
+   * test failed for the best possible reason. `conforms` is a relation the
+   * census counts and the vocabulary has deliberately not admitted -- so it is
+   * a plausible thing to type and still nothing the checker can read, which is
+   * exactly the case being tested. If it ever ships, this fails again and wants
+   * the same swap.
+   */
   it("refuses a word that is not a claim typed into a generated label", async () => {
     const { board, label } = await labelled();
     const edited = { ...board, elements: board.elements.map(
-      (element) => (element.id === label.id ? { ...element, text: "geometry @calls" } : element),
+      (element) => (element.id === label.id ? { ...element, text: "geometry @conforms" } : element),
     ) };
-    expect(readGraph(edited).edges[0].claimGarbled).toBe("calls");
+    expect(readGraph(edited).edges[0].claimGarbled).toBe("conforms");
   });
 
   /**
@@ -304,10 +313,10 @@ describe("typing a claim onto an arrow the engine drew", () => {
           text: "reads",
           customData: { edgeLabelFor: "arrow" },
         }),
-        drawn({ id: "typed", type: "text", containerId: "arrow", text: "reads @calls" }),
+        drawn({ id: "typed", type: "text", containerId: "arrow", text: "reads @conforms" }),
       ]),
     );
-    expect(graph.edges[0].claimGarbled).toBe("calls");
+    expect(graph.edges[0].claimGarbled).toBe("conforms");
   });
 });
 

@@ -150,6 +150,25 @@ export interface RelationMeasured {
   covers?: readonly Language[];
   /** Anything true about the sample that the counts alone would hide. */
   note?: string;
+  /**
+   * Disagreements that are understood, one line each, and the only thing that
+   * lets `missed` be anything but zero.
+   *
+   * The same field `Licence.known` is, for the same reason and with the same
+   * rule behind it. A word measured over trees **as they sit on disk** is held
+   * to a miss of zero: the corpus is whatever happened to be checked out, so a
+   * miss there is a reader that cannot read something rather than a fact about
+   * the world. A word measured over **pinned repositories** is not, and a zero
+   * there would mean the corpus was too small -- which is exactly what `needs`
+   * records, and why `rust`'s `calls` row grew this field the moment it stopped
+   * being measured on two toy projects.
+   *
+   * What may go in here is a disagreement somebody has read and understood. It
+   * is not a place to park a miss nobody has looked at, and the test that reads
+   * it checks the count rather than the prose, so a fifth miss cannot hide
+   * behind four explanations.
+   */
+  known?: readonly string[];
 }
 
 /** A word this language has no number for. It may not accuse, and this says why. */
@@ -200,6 +219,18 @@ const TEXT_SCAN = (what: string): string =>
   `a text scan of the ${what} source, run over the same trees. It shares no `
   + "tree-sitter query with the reader, so agreeing means two unrelated readings "
   + "agree rather than one reading agreeing with itself.";
+
+/**
+ * The referee for `calls`, which is a text scan like the three above but not the
+ * same one: it has to find where a routine ends before it can say whose call a
+ * call is, and the other three never need to. Named separately for that reason
+ * rather than folded into `TEXT_SCAN`, because a square that says yes has to
+ * name the thing that earned it and these are two different things.
+ */
+const CALL_SCAN =
+  "a text scan of the same source that bounds each routine by braces, or by "
+  + "indentation in Python, and reads the calls inside it. It shares no "
+  + "tree-sitter query and no import resolution with the reader.";
 
 /**
  * One run of `measure:signature` covers `takes` and `returns` together, and the
@@ -317,6 +348,22 @@ export const LICENCES: readonly Licence[] = [
           "stops a JavaScript `@builds` arrow, so the empty square is the only " +
           "thing standing between an unmeasured reader and a red.",
       },
+      calls: {
+        reproduce: "npm run measure:calls",
+        measured: "2026-09-03",
+        referee: CALL_SCAN,
+        unit: "calls between routines the corpus declares exactly once",
+        counts: { asked: 1091, missed: 0, invented: 0 },
+        covers: ["ts", "tsx"],
+        note:
+          "780 TypeScript at 97.9% recall and 311 TSX at 87.5%. JavaScript is " +
+          "inside this licence and was asked **2 questions** over 7 files, which " +
+          "is the square #207 was written for and #211 landed on: `calls` shipped " +
+          "reading the old per-language gate, so a JavaScript arrow could be told " +
+          "to turn round on a reader nothing had measured in JavaScript. Nothing " +
+          "structural stops a JavaScript call the way `no-fields` stops a " +
+          "JavaScript `holds`, so this `covers` is the only thing withholding it.",
+      },
     },
   },
   {
@@ -397,6 +444,41 @@ export const LICENCES: readonly Licence[] = [
           "It refuses 81.8% of them, and 96% of the refusals are one generated " +
           "query module whose every routine is a macro. Safe and nearly useless " +
           "in that file; the bar this row is about is the zero misses.",
+      },
+      calls: {
+        reproduce:
+          "npm run measure:calls -- .corpus/ripgrep .corpus/anyhow rust-test ~/orangutan",
+        measured: "2026-09-03",
+        referee: CALL_SCAN,
+        unit: "calls between routines the corpus declares exactly once",
+        counts: { asked: 574, missed: 4, invented: 0 },
+        known: [
+          "anyhow declares `pub fn Ok`, and `Ok` is also the prelude variant. " +
+          "`tests/test_ensure.rs` imports the variant and not the function, so " +
+          "its three `Ok(..)` calls are the variant -- which the reader says, " +
+          "and the referee, seeing one declaration of the name in the corpus, " +
+          "asks about anyway.",
+          "`trim_line_terminator` is declared twice in ripgrep's printer, once " +
+          "as a free function and once as a method, and the referee credited " +
+          "`util.rs`'s call to the method in `standard.rs`. The reader is right " +
+          "that the call it can see is the local one.",
+        ],
+        note:
+          "The default corpus asks Rust 36 questions, which is thin enough that " +
+          "a zero in the miss column says very little. So this row is measured " +
+          "over the two repositories the `needs` corpus above already pins -- " +
+          "ripgrep and anyhow at their recorded commits -- and Rust is a " +
+          "different language there: recall falls from 94.4% to 66.0%, and two " +
+          "thirds of the refusals are `macro`. A refusal is not a miss. The four " +
+          "misses were each read and the reader is right about all four -- they " +
+          "are the referee asking about a name it cannot place, which is the " +
+          "class #189 already recorded five of. `Ok` is anyhow\'s own " +
+          "`pub fn Ok` and also the prelude variant, and `test_ensure.rs` " +
+          "imports the one it does not mean; `trim_line_terminator` is declared " +
+          "both as a free function and as a method, and the referee credited the " +
+          "call to the wrong one. What the accusation rests on is the ACCUSED " +
+          "and INVENTED columns, and both are zero across all 574. Reproducing " +
+          "it needs the clones, which `measure:licence` makes in `.corpus/`.",
       },
     },
   },
@@ -496,6 +578,19 @@ export const LICENCES: readonly Licence[] = [
           "`constructs.ts` withholds Python before any licence is consulted, so " +
           "nothing changes by saying so here -- but until #207 this square read " +
           "`yes`, on the strength of three measurements of other words.",
+      },
+      calls: {
+        reproduce: "npm run measure:calls",
+        measured: "2026-09-03",
+        referee: CALL_SCAN,
+        unit: "calls between routines the corpus declares exactly once",
+        counts: { asked: 5525, missed: 0, invented: 0 },
+        note:
+          "83% of the whole population, at 92.9% recall over 683 files, which is " +
+          "the right shape: Python is where the census says most calls are and " +
+          "where a call is hardest to place statically. Two thirds of the 7.1% " +
+          "refused are `unbound` and `unplaced` -- a name a wildcard import or a " +
+          "module resolving to no file brought in -- and neither is a reader bug.",
       },
     },
   },

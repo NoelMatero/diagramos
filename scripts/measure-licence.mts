@@ -25,6 +25,7 @@ import {
   ACCUSING_RELATIONS, LICENCES, isMeasured, licenceTotals,
   type CorpusEntry, type Licence,
 } from "../src/engine/licence";
+import { languageOf, type Language } from "../src/engine/parse";
 import { measureLicence, type LicenceMeasurement } from "./lib/licence";
 import { measureRustLicence } from "./lib/licence-rust";
 import { measurePythonLicence } from "./lib/licence-python";
@@ -264,6 +265,25 @@ function printGrid(): void {
         head + String(totals.asked).padStart(8) + String(totals.missed).padStart(8)
         + invented.padStart(10) + "  " + row.reproduce,
       );
+      /*
+       * A licence covers several extensions and a run may not have asked about
+       * all of them, so the languages left out are printed under the row. Four
+       * words say yes for TypeScript and no for JavaScript on the same line of
+       * this table, and without this the table cannot show it.
+       */
+      if (row.covers) {
+        const outside = licence.extensions
+          .map((extension) => languageOf(`x${extension}`))
+          .filter((language): language is Language =>
+            language !== undefined && !row.covers!.includes(language));
+        if (outside.length > 0) {
+          console.log(`    not ${[...new Set(outside)].join(", ")} — inside this licence, outside this number`);
+        }
+      }
+      // A miss is only allowed if somebody read it, so say how many were read.
+      for (const line of row.known ?? []) {
+        for (const wrapped of wrap(line, 70)) console.log("      " + wrapped);
+      }
     }
   }
   console.log("");
