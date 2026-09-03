@@ -277,7 +277,7 @@ function refereePairs(routine: RefereeBody): RefereePair[] {
 function refereeEscape(routine: RefereeBody, local: Local): string | undefined {
   const name = local.name.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
   const after = routine.lines.slice(Math.max(0, local.line - routine.line));
-  for (const line of after) {
+  for (const [where, line] of after.entries()) {
     /*
      * A second declaration of the name ends the scan rather than skipping the
      * line. The referee has no notion of scope, so past that point `custom`
@@ -322,7 +322,14 @@ function refereeEscape(routine: RefereeBody, local: Local): string | undefined {
      * computed from `scaled`, and `return owner.root` returns a property --
      * both were read as the value itself being handed out.
      */
-    if (!invoked) {
+    /*
+     * And not the head of a method chain that runs onto the next line.
+     * `return reasons` followed by `.filter(..).join(",")` returns a string
+     * built from `reasons`, not `reasons` -- and the referee reads one line at a
+     * time, so the continuation is the only thing that says so.
+     */
+    const continues = /^\s*[.?]/.test(after[where + 1] ?? "");
+    if (!invoked && !continues) {
       const whole = (keyword: string) =>
         new RegExp(`\\b${keyword}\\s+${name}\\s*;?\\s*$`).test(values.trimEnd());
       if (whole("return")) return "returned";
@@ -461,6 +468,20 @@ const putIn = new Map<Language, number>();
 const putInHeld = new Map<Language, number>();
 /** Values whose only escape is the collection they sit in leaving. */
 const lostWithContainer = new Map<Language, number>();
+/**
+ * Methods on a known collection that no table in `dataflow.ts` classifies.
+ *
+ * The tables saying `push` appends and `get` reads are the part of this that no
+ * structural rule reaches -- library knowledge, not grammar -- so they cannot
+ * be derived and can only be shown. An unclassified method falls through to
+ * "a method was called on it, which might store it", which counts the
+ * collection as escaping: a missing entry quietly *lowers* the number for
+ * whichever language spells that operation differently.
+ *
+ * Printed by name and by count, so the edge of the table is a number somebody
+ * can argue with. `docs/reading-a-grammar.md` is why.
+ */
+const unknownMethods = new Map<string, number>();
 const bodiesRead = new Map<Language, number>();
 
 /** The referee disagreeing in the direction that can do damage. */
@@ -791,6 +812,7 @@ for (const tree of trees) {
         }
         leaked.push({ file, routine: body.routine, name: local.name, line: local.line, saw });
       }
+      for (const method of body.unknownMethods) bump(unknownMethods, method.name);
       if (anyHeld) bump(bodiesWithHeld, language);
     }
 
@@ -974,6 +996,21 @@ console.log("  " + "all".padEnd(10)
   + String(total(putInHeld)).padStart(8)
   + percent(total(putInHeld), total(putIn)).padStart(8)
   + "  " + String(total(lostWithContainer)).padStart(6));
+console.log();
+const unknownTotal = [...unknownMethods.values()].reduce((a, b) => a + b, 0);
+console.log(`  THE TABLE'S OWN EDGE -- methods on a collection nothing here classifies: ${unknownTotal}`);
+console.log("  That `push` appends and `get` reads is knowledge about a standard library, not");
+console.log("  about a grammar, so it is a table and no structural rule derives one. What a");
+console.log("  table can do is show where it stops. Each of these falls through to \"a method");
+console.log("  was called on it\", which counts the collection as gone -- so a missing entry");
+console.log("  lowers the number rather than raising it, and does so silently.");
+for (const [name, count] of [...unknownMethods.entries()].sort((a, b) => b[1] - a[1]).slice(0, 15)) {
+  console.log(`    ${name.padEnd(24)} ${String(count).padStart(6)}`);
+}
+if (unknownMethods.size > 15) {
+  console.log(`    ... and ${unknownMethods.size - 15} more distinct methods`);
+}
+
 console.log();
 console.log("  `lost with it` is the price of the whole idea: a value followed into a container");
 console.log("  and then counted as gone anyway, because the container did not stay. Following");

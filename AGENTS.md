@@ -42,6 +42,14 @@ plus a live local board for editing them alongside a human.
   what each language has earned the right to accuse about, and the six times a
   measurement contradicted the design. Four of those six were found by
   building one word or one reader rather than by reviewing the plan.
+- **Before writing a reader that matches tree-sitter node types, read
+  [docs/reading-a-grammar.md](docs/reading-a-grammar.md).** One reader made the
+  same mistake four times in a sitting, three of them while fixing it, and every
+  instance was a hand-written list of node names that one language spelled
+  differently. It never throws — it produces a number that is wrong in one
+  language and right in the rest, which reads as a finding about that language.
+  Read the *field*, and where there is none read the structure: an operator
+  token is anonymous, so its type is its own text.
 
 ## Finishing a piece of work
 

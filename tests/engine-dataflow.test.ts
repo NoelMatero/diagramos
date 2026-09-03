@@ -451,6 +451,48 @@ describe("what a collection means for whether a value stayed", () => {
     expect(contained(w)).toBe(false);
   });
 
+  it("lets a question about a collection leave it alone entirely", () => {
+    /*
+     * `seen.has(k)` yields a boolean: neither the Set nor anything in it comes
+     * back. Found by the report rather than by imagining it -- an unclassified
+     * method falls through to "a method was called on it, which might store
+     * it", so `has` was counting 33 collections in this repository's own `src`
+     * as having escaped.
+     */
+    const read = body(
+      "function f(k) {\n"
+      + "  const seen = new Set();\n"
+      + "  const w = make();\n"
+      + "  seen.add(w);\n"
+      + "  if (seen.has(k)) { return 1; }\n"
+      + "  return 0;\n"
+      + "}\n",
+      "f",
+    );
+    const seen = read.locals.find((one) => one.name === "seen")!;
+    const w = read.locals.find((one) => one.name === "w")!;
+    expect(contained(seen)).toBe(true);
+    // Not spilled either: a question is not a read, and nothing came back out.
+    expect(seen.spilled).toBeUndefined();
+    expect(contained(w)).toBe(true);
+  });
+
+  it("names a method on a collection that no table classifies", () => {
+    // The table's own edge, reported rather than guessed at. That `push`
+    // appends is knowledge about a standard library and no structural rule
+    // derives it, so what a table can do is show where it stops.
+    const read = body(
+      "function f() {\n"
+      + "  const rows = [];\n"
+      + "  rows.zzUnclassified(1);\n"
+      + "}\n",
+      "f",
+    );
+    expect(read.unknownMethods.map((one) => one.name)).toEqual(["zzUnclassified"]);
+    // And still counted against the collection, which is the safe direction.
+    expect(contained(read.locals.find((one) => one.name === "rows")!)).toBe(false);
+  });
+
   it("takes the contents with it when the collection is drained, not just indexed", () => {
     // `listDiagrams` in `diagram.ts`: `return [...summaries.values()]` keeps the
     // Map — a new array is what leaves — and hands over everything in it.

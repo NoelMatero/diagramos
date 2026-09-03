@@ -230,6 +230,29 @@ export interface CallSite {
   inline: string[];
 }
 
+/**
+ * A method called on a collection that no table here classifies.
+ *
+ * The tables that say `push` appends and `get` reads are the part of this file
+ * that no structural rule reaches: they are knowledge about a standard library,
+ * not about a grammar, and no amount of reading the tree derives them. What a
+ * table can do is show its own edge -- so every unrecognised method on a value
+ * this reader believes is a collection is recorded here and printed, and an
+ * incomplete table becomes a number rather than a quietly wrong answer.
+ *
+ * The wrong answer it prevents is specific. An unclassified method falls
+ * through to `used-as-a-receiver`, which counts the collection as escaping, so
+ * a missing entry silently *lowers* containment for whichever language spells
+ * that operation differently -- the same shape as the node-type lists, one
+ * layer up. See `docs/reading-a-grammar.md`.
+ */
+export interface UnknownMethod {
+  /** The method, as written. */
+  name: string;
+  /** 1-based line it is called on. */
+  line: number;
+}
+
 /** One function body, read. */
 export interface Body {
   /** The routine's name, or `<module>` for a file's top level. */
@@ -268,6 +291,8 @@ export interface Body {
   parameters: Local[];
   /** Bindings refused because the pattern was not one name. */
   destructured: number;
+  /** Methods called on a known collection that no table classifies. */
+  unknownMethods: UnknownMethod[];
 }
 
 export type BodyReading =
@@ -750,6 +775,25 @@ const PUTS_IN = new Set([
 ]);
 
 /**
+ * Methods that ask the collection a question and let nothing out.
+ *
+ * `seen.has(k)` yields a boolean, `rows.join(",")` a string, `rows.sort()` the
+ * same array reordered. None of them hands a reference to anything inside back
+ * to the caller, so neither the collection nor its contents go anywhere.
+ *
+ * Every entry here was found by the report rather than by imagining it: an
+ * unclassified method falls through to "a method was called on it, which might
+ * store it", so a missing one *lowers* containment silently. `has` alone
+ * appeared 33 times in this repository's own `src`.
+ */
+const ASKS = new Set([
+  "has", "includes", "contains", "indexOf", "lastIndexOf", "count", "index",
+  "startsWith", "endsWith", "isEmpty", "is_empty", "any", "all", "every",
+  "join", "sort", "reverse", "clear", "delete", "remove", "discard",
+  "position", "find_index", "contains_key", "len", "size",
+]);
+
+/**
  * Methods that take a value back out.
  *
  * A read out of a collection yields *something* that was put in -- not a
@@ -759,6 +803,14 @@ const PUTS_IN = new Set([
 const TAKES_OUT = new Set([
   "get", "pop", "at", "shift", "find", "values", "entries", "keys", "items",
   "getOrDefault", "peek", "front", "back", "last", "first", "iter", "into_iter",
+  /*
+   * And the ones that hand back a *new* collection over the same elements.
+   * `rows.filter(..)` does not let `rows` out and does let everything in it
+   * out, which is exactly what taking one element out means here -- the
+   * container is new and what it holds is not.
+   */
+  "filter", "map", "slice", "concat", "flatMap", "flat", "splice",
+  "sorted", "reversed", "collect", "take", "chain", "cloned", "copied",
 ]);
 
 /**
@@ -846,6 +898,7 @@ function readRoutine(
     calls: [],
     parameters: [],
     destructured: 0,
+    unknownMethods: [],
   };
 
   /** Locals by name, innermost scope last. Only this body's, never a closure's. */
@@ -1076,6 +1129,20 @@ function readRoutine(
       const into = method && PUTS_IN.has(method.name) && isName(method.object)
         ? collectionNamed(method.object.text)
         : undefined;
+      /*
+       * A method on a collection this body watched being made, and no table
+       * here says what it does. `sort`, `clear`, `splice`, `retain`. Recorded so
+       * the table's edge is visible; the value still falls through to
+       * `used-as-a-receiver` below, which is the conservative answer.
+       */
+      if (method && !into && isName(method.object) && collectionNamed(method.object.text)
+        && !TAKES_OUT.has(method.name) && !MEASURES_OF.has(method.name)
+        && !ASKS.has(method.name)) {
+        body.unknownMethods.push({
+          name: method.name,
+          line: lineOf(source, current.startIndex),
+        });
+      }
       if (into) {
         for (const argument of argumentsOf(current)) {
           if (/^[(),]$/.test(argument.type)) continue;
@@ -1099,6 +1166,22 @@ function readRoutine(
           } else {
             walk(argument, { kind: "escape", as: "passed-to-a-call" }, depth + 1);
           }
+        }
+        return;
+      }
+
+      /*
+       * A question about it: `seen.has(k)`, `rows.join(",")`. The collection is
+       * read and nothing at all comes back out, so unlike a read this does not
+       * spill either. The argument is a key and is not handed anywhere.
+       */
+      const asked = method && ASKS.has(method.name) && isName(method.object)
+        ? collectionNamed(method.object.text)
+        : undefined;
+      if (asked) {
+        for (const argument of argumentsOf(current)) {
+          markKeys(argument);
+          walk(argument, PLAIN, depth + 1);
         }
         return;
       }
