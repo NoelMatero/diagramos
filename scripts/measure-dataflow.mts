@@ -13,12 +13,10 @@
  *   > slightly better.
  *
  * This is the cheapest thing that can answer it (#208). **No word ships from
- * it.** `@feeds` keeps the behaviour it has whatever these numbers say, nothing
- * here is wired into `drift.ts`, and no call is resolved -- a value that leaves
- * the body is counted as escaping rather than chased, which is what keeps this
- * out of #189.
+ * it.** `@feeds` keeps the behaviour it has whatever these numbers say, and
+ * nothing here is wired into `drift.ts`.
  *
- * Two numbers, and the second is the experiment:
+ * Three numbers, and each is a step further from the single body:
  *
  *   1  CONFIRMATION GAIN  how many more `@feeds` arrows confirm once the reader
  *      follows a value through the locals of a body instead of one hop
@@ -28,9 +26,20 @@
  *      the region it was made in, everything that can be in it is enumerable,
  *      and an absence is proof on the footing a signature is.
  *
- * A few percent on the second and #203's prediction holds, which makes #203 a
- * note rather than a framework. A high number and the closed-region argument
- * generalises from declarations to scopes, which is a significant finding.
+ *   3  ACROSS A CALL      what resolving a callee and reading its body adds to
+ *      the second number. This one crosses a function boundary, which #208 set
+ *      out not to do; it was built after #189 merged and made a call's name
+ *      resolvable. It is reported apart from the second number precisely so the
+ *      step outward can be priced on its own -- and it comes to 1.4%.
+ *
+ * **What the three say together is not what this file was expecting.** Each
+ * step further from the single function body bought less than the one before:
+ * locals are worth most of the total, modelling a collection as one value is
+ * worth some, following values *into* a collection is worth 38 values in the
+ * whole corpus, and crossing a call boundary is worth 1.4% with half of that
+ * flagged as the weaker kind of claim. That is an argument for keeping this
+ * small, and it is closer to what #203 said than to what the first reading of
+ * these numbers concluded.
  *
  * ## The referee
  *
@@ -937,7 +946,8 @@ console.log();
 console.log("MEASURE DATAFLOW -- what following a value through one body buys");
 console.log(`  ${trees.length} trees, ${total(files)} files, ${total(routines)} bodies read`);
 console.log("  A body is a routine or a file's top level. The escape half reads routines only.");
-console.log("  Locals only. No call is resolved; a value handed to a routine is counted as gone.");
+console.log("  Sections 1 and 2 resolve no calls: a value handed to a routine is counted as gone.");
+console.log("  Section 3 does resolve them, and is reported apart so its cost is separable.");
 console.log();
 
 console.log("1 · CONFIRMATION GAIN -- @feeds arrows that go from unconfirmed to confirmed");
