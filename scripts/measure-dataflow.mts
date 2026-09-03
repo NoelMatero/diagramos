@@ -274,9 +274,28 @@ function refereePairs(routine: RefereeBody): RefereePair[] {
  * catch the reader being too generous. Text shapes, in the order a person would
  * scan for them.
  */
-function refereeEscape(routine: RefereeBody, local: Local): string | undefined {
+/** What the referee made of one value: whether it saw it, and whether it left. */
+interface RefereeReading {
+  /**
+   * Whether the name is used at all after its binding, in the lines this
+   * referee is willing to read.
+   *
+   * The number this exists for: "the referee found nothing" is two situations
+   * wearing one answer. It looked, saw the value used, and every use was
+   * harmless -- that is agreement, and it is the only kind worth counting. Or
+   * it never saw the name again, in which case it has no opinion, and counting
+   * that as agreement inflates the check into saying nothing at all.
+   */
+  seen: boolean;
+  /** How it left, if the text shows it leaving. */
+  left?: string;
+}
+
+function refereeEscape(routine: RefereeBody, local: Local): RefereeReading {
   const name = local.name.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
   const after = routine.lines.slice(Math.max(0, local.line - routine.line));
+  const mentions = new RegExp(`(?<![.\\w])${name}(?![\\w])`);
+  let seen = false;
   for (const [where, line] of after.entries()) {
     /*
      * A second declaration of the name ends the scan rather than skipping the
@@ -307,6 +326,9 @@ function refereeEscape(routine: RefereeBody, local: Local): string | undefined {
      * over `channels[ch][i]` leaves a bare `[i]` behind that reads as a list.
      */
     const values = line.replace(/\w+(?:\s*\[[^\]]*\])+/g, (at) => " ".repeat(at.length));
+    // Read on the whole line rather than on `values`: a value used only as
+    // an index is still one this referee looked at and had an opinion about.
+    if (mentions.test(line)) seen = true;
     /* `return provider()` hands back what it produced, not the routine itself. */
     const invoked = new RegExp(`\\b${name}\\s*\\(`).test(values);
 
@@ -332,9 +354,9 @@ function refereeEscape(routine: RefereeBody, local: Local): string | undefined {
     if (!invoked && !continues) {
       const whole = (keyword: string) =>
         new RegExp(`\\b${keyword}\\s+${name}\\s*;?\\s*$`).test(values.trimEnd());
-      if (whole("return")) return "returned";
-      if (whole("throw") || whole("raise")) return "thrown";
-      if (whole("yield")) return "yielded";
+      if (whole("return")) return { seen, left: "returned" };
+      if (whole("throw") || whole("raise")) return { seen, left: "thrown" };
+      if (whole("yield")) return { seen, left: "yielded" };
     }
     /*
      * `a.b = v` stores v. `a.b = dims.width = v` does not store `dims` -- it
@@ -351,7 +373,7 @@ function refereeEscape(routine: RefereeBody, local: Local): string | undefined {
     if (!isTarget
       && new RegExp(`[\\w\\]]\\s*\\.\\s*\\w+\\s*=\\s*${name}\\s*;?\\s*$`)
         .test(values.trimEnd())) {
-      return "stored-in-a-field";
+      return { seen, left: "stored-in-a-field" };
     }
     /*
      * And not a name that is itself somebody's property. `parent.parent.resolve()`
@@ -360,7 +382,7 @@ function refereeEscape(routine: RefereeBody, local: Local): string | undefined {
      * being used as a receiver.
      */
     if (new RegExp(`(?<![.\\w])${name}\\s*\\.\\s*\\w+\\s*\\(`).test(values)) {
-      return "used-as-a-receiver";
+      return { seen, left: "used-as-a-receiver" };
     }
     /*
      * Read through the same call scan the pair half uses, rather than with a
@@ -382,7 +404,7 @@ function refereeEscape(routine: RefereeBody, local: Local): string | undefined {
     for (const call of values.matchAll(CALLED)) {
       if (NOT_A_CALL.has(call[1]!)) continue;
       const given = (call[2] ?? "").split(",").map((one) => one.trim());
-      if (given.includes(local.name)) return "passed-to-a-call";
+      if (given.includes(local.name)) return { seen, left: "passed-to-a-call" };
     }
     /*
      * `[v, 1]` and `{ v }` put a value in a structure. Two things that look
@@ -415,14 +437,14 @@ function refereeEscape(routine: RefereeBody, local: Local): string | undefined {
      * puts `n` inside the parentheses of a call and passes it to nothing.
      */
     if (opensCall && !NOT_A_CALL.has(opensCall[1]!) && !/\bfor\b/.test(opensCall[2] ?? "")) {
-      return "passed-to-a-call";
+      return { seen, left: "passed-to-a-call" };
     }
     if (new RegExp(`(?<![\\w\\])$])[[{]\\s*${name}\\s*[,\\]}]`).test(values)) {
-      return "into-a-structure";
+      return { seen, left: "into-a-structure" };
     }
-    if (new RegExp(`,\\s*${name}\\s*[,\\]}]`).test(values)) return "into-a-structure";
+    if (new RegExp(`,\\s*${name}\\s*[,\\]}]`).test(values)) return { seen, left: "into-a-structure" };
   }
-  return undefined;
+  return { seen };
 }
 
 /* ------------------------------------------------------------------- tally */
@@ -452,6 +474,15 @@ const refusals = new Map<string, number>();
 const unreadShapes = new Map<string, number>();
 /** Bodies with at least one value that never left them. */
 const bodiesWithHeld = new Map<Language, number>();
+/**
+ * Contained values that are actually used somewhere after being made.
+ *
+ * The share above quietly includes every value bound and then never touched
+ * again. Those never leave, correctly and for no interesting reason -- nothing
+ * can be refuted about a value nobody uses. This is the number a word would
+ * rest on, and it is the smaller one.
+ */
+const heldAndUsed = new Map<Language, number>();
 
 /**
  * The vector case, counted separately.
@@ -513,6 +544,19 @@ const disputed: Array<{ file: string; routine: string; name: string; saw: string
 const acrossACall: Array<{ file: string; routine: string; name: string }> = [];
 /** The reader saying gone where the referee sees nothing. Safe, and counted by reason. */
 const unseenByReferee = new Map<string, number>();
+/**
+ * What the referee did about each value the reader called contained.
+ *
+ * `agreed` is the only one that is a check: the referee read the routine, saw
+ * the value used, and every use it recognised was harmless. `no opinion` is the
+ * referee never seeing the name again after its binding, which is not agreement
+ * and was previously being counted alongside it -- so "0 disagreements" was
+ * being quoted without the denominator that makes it mean anything.
+ *
+ * `no routine` is the referee's own crude reader failing to find the routine at
+ * all, which is a gap in the referee rather than a fact about the value.
+ */
+const refereeSaid = new Map<string, number>();
 
 const bump = <K,>(map: Map<K, number>, key: K, by = 1) =>
   map.set(key, (map.get(key) ?? 0) + by);
@@ -771,15 +815,23 @@ for (const tree of trees) {
             byReason.set(reason, (byReason.get(reason) ?? 0) + 1);
           }
           reasons.set(language, byReason);
-          if (twin && !refereeEscape(twin, local)) bump(unseenByReferee, local.escapes[0]!);
+          if (twin && !refereeEscape(twin, local).left) {
+            bump(unseenByReferee, local.escapes[0]!);
+          }
           continue;
         }
         bump(heldValues, language);
+        if (local.everRead) bump(heldAndUsed, language);
         anyHeld = true;
         // The one disagreement that matters: the reader says nothing can have
         // left, and the text says something did.
-        const saw = twin ? refereeEscape(twin, local) : undefined;
-        if (!saw) continue;
+        const reading = twin ? refereeEscape(twin, local) : undefined;
+        if (!reading) { bump(refereeSaid, "no routine"); continue; }
+        const saw = reading.left;
+        if (!saw) {
+          bump(refereeSaid, reading.seen ? "agreed" : "no opinion");
+          continue;
+        }
         /*
          * Two shapes of disagreement are the abstraction rather than a leak: a
          * write method called on a modelled collection, and a value handed to
@@ -968,6 +1020,28 @@ console.log("  " + "all".padEnd(10)
   + "  " + percent(total(bodiesWithHeld), total(bodiesRead)));
 
 console.log();
+console.log("  AND OF THOSE, THE ONES ANYTHING IS EVER DONE WITH");
+console.log("  " + "language".padEnd(10) + "contained".padStart(11) + "also used".padStart(11)
+  + "share of all".padStart(14));
+for (const language of LANGUAGES) {
+  const held = heldValues.get(language) ?? 0;
+  if (held === 0) continue;
+  console.log("  " + language.padEnd(10)
+    + String(held).padStart(11)
+    + String(heldAndUsed.get(language) ?? 0).padStart(11)
+    + percent(heldAndUsed.get(language) ?? 0, values.get(language) ?? 0).padStart(14));
+}
+console.log("  " + "all".padEnd(10)
+  + String(total(heldValues)).padStart(11)
+  + String(total(heldAndUsed)).padStart(11)
+  + percent(total(heldAndUsed), total(values)).padStart(14));
+console.log();
+console.log("  A value bound and never touched again never leaves, correctly and for no");
+console.log("  interesting reason -- nothing can be refuted about a value nobody uses. The");
+console.log("  right-hand column is what a word built on this would actually rest on, and it");
+console.log("  is the smaller number. Quote it rather than the one above.");
+
+console.log();
 console.log("  THE VECTOR CASE -- `v.push(widget); use(v[i])`, which is #203's own example");
 console.log("  A collection is modelled only where this body watched it being made, so its");
 console.log("  type is in the text. One bound from an ordinary call gets nothing.");
@@ -1114,6 +1188,28 @@ console.log("    The *escape* half has no referee and cannot have one: reading a
 console.log("    to see whether it keeps an argument is this analysis, so a second mechanism");
 console.log("    doing it would share the machinery it is meant to check. Every value in the");
 console.log("    `freed` column above rests on that, and this is the sentence saying so.");
+
+console.log();
+const refereeAgreed = refereeSaid.get("agreed") ?? 0;
+const noOpinion = refereeSaid.get("no opinion") ?? 0;
+const noRoutine = refereeSaid.get("no routine") ?? 0;
+const checkable = refereeAgreed + leaked.length + acrossACall.length + disputed.length;
+console.log("  AND HOW MUCH IT CHECKED, without which the `0` above says nothing");
+console.log(`    ${String(refereeAgreed).padStart(6)}  agreed -- read the routine, saw the value used, and every`);
+console.log("            use it recognised was harmless. This is the check.");
+console.log(`    ${String(noOpinion).padStart(6)}  never seen again -- the name does not appear after its`);
+console.log("            binding, or the scan stopped at a re-binding before it did");
+console.log(`    ${String(noRoutine).padStart(6)}  no routine -- the referee's own crude reader could not find`);
+console.log("            the body at all, which is a gap in the referee");
+console.log(`    ${String(checkable).padStart(6)}  of ${total(heldValues)} contained values it had any opinion about`
+  + ` (${percent(checkable, total(heldValues)).trim()})`);
+console.log();
+console.log("    The middle row is not a failure and not a check either, and it is worth being");
+console.log("    exact about which. A value whose name never appears again cannot have gone");
+console.log("    anywhere, so the reader is right about it -- trivially, and for the same");
+console.log("    reason the referee has nothing to say. It counts towards `contained` and it");
+console.log("    is the least interesting kind: nothing can be refuted about a value nobody");
+console.log("    touches. Read the headline share with that in mind.");
 
 console.log();
 console.log(`  UNREFEREED -- having read another routine's body: ${acrossACall.length}`);

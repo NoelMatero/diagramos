@@ -192,6 +192,17 @@ export interface Local {
    * rather than as the reader being too generous.
    */
   freedByCall?: true;
+  /**
+   * The name appears at least once after its binding.
+   *
+   * Without this, "provably never leaves this body" quietly includes every
+   * value that is bound and then never touched again. Those are contained and
+   * they are contained for no interesting reason -- nothing can be refuted
+   * about a value nobody uses, so they inflate the headline share and buy
+   * nothing. Measured rather than estimated, because the referee's silence has
+   * two causes and only one of them is this.
+   */
+  everRead?: true;
   /** Every way the value left the body. Empty means it provably did not. */
   escapes: Escape[];
   /** Uses this reader could not account for, named by the syntax around them. */
@@ -944,6 +955,7 @@ function readRoutine(
   const use = (name: string, position: Position): void => {
     const local = held(name);
     if (!local || local.why) return;
+    local.everRead = true;
     if (position.kind === "escape") {
       if (!local.escapes.includes(position.as)) local.escapes.push(position.as);
     } else if (position.kind === "unread") {
