@@ -383,7 +383,7 @@ export function constructions(
    * other way -- which is the only accusation this word is entitled to, and the
    * only one that rests on something found.
    */
-  if (reverse && mayAccuse(reverse.language)) {
+  if (reverse && mayAccuse("builds", reverse.language)) {
     const theirs = new Set(reverse.names);
     for (const routineName of reverse.routines) {
       for (const body of routinesNamed(reverse.source, routineName, reverse.language).routines) {

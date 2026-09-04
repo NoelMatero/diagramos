@@ -633,8 +633,14 @@ export function signatureNames(
    * code. Placed after every other answer so a language with no licence still
    * gets its confirmations, its `misplaced` verdict and its ordinary refusals --
    * losing the licence should cost the accusation and nothing else.
+   *
+   * Asked as two words rather than one, because they are two words. One run of
+   * `measure:signature` covers both, so today they answer the same -- but the
+   * grid records that as two rows citing one measurement, which is a different
+   * thing from one row that both of them read (#207).
    */
-  if (absent) return mayAccuse(language) ? absent : { verdict: "withheld", why: "unlicensed" };
+  const word = position === "return" ? "returns" : "takes";
+  if (absent) return mayAccuse(word, language) ? absent : { verdict: "withheld", why: "unlicensed" };
 
   if (!sawName) return { verdict: "withheld", why: "not-declared" };
   return { verdict: "withheld", why: sawSignature ? "unreadable" : "no-signature" };
