@@ -61,6 +61,9 @@ import { execFileSync } from "node:child_process";
 import { existsSync, readFileSync } from "node:fs";
 import path from "node:path";
 
+import { boardCorpus } from "./lib/boards";
+
+import { readBoard } from "../src/engine/board-file";
 import { bindingsIn, callsBetween, type Bindings, type CallSide } from "../src/engine/calls";
 import { type ConfigCache } from "../src/engine/resolve";
 import {
@@ -70,6 +73,7 @@ import {
 import { readDependencies } from "../src/engine/deps";
 import { createWorkspace } from "../src/engine/drift";
 import { checkFeeds } from "../src/engine/feeds";
+import { readGraph } from "../src/engine/graph";
 import { initEngine, languageOf, type Language } from "../src/engine/parse";
 
 await initEngine();
@@ -479,6 +483,18 @@ const heldValues = new Map<Language, number>();
 const escapedValues = new Map<Language, number>();
 const withheldValues = new Map<Language, number>();
 const reasons = new Map<Language, Map<string, number>>();
+/**
+ * Values whose every exit was a call, which is the population section 3 works on.
+ *
+ * The heading of that section printed `42%` as a literal, in a report where
+ * every figure beside it is live -- the same shape as the board sentence #214
+ * is about, and found by the guard written for it. It is a real number from an
+ * earlier run over a smaller corpus, and it had drifted. Counted here instead.
+ *
+ * Every exit, not any: a value also written onto a field can never be freed by
+ * resolving a call, so counting it would overstate what section 3 could reach.
+ */
+const escapedOnlyByCall = new Map<Language, number>();
 const refusals = new Map<string, number>();
 const unreadShapes = new Map<string, number>();
 /** Bodies with at least one value that never left them. */
@@ -824,6 +840,9 @@ for (const tree of trees) {
             byReason.set(reason, (byReason.get(reason) ?? 0) + 1);
           }
           reasons.set(language, byReason);
+          if (local.escapes.every((reason) => reason === "passed-to-a-call")) {
+            bump(escapedOnlyByCall, language);
+          }
           if (twin && !refereeEscape(twin, local).left) {
             bump(unseenByReferee, local.escapes[0]!);
           }
@@ -942,6 +961,47 @@ const percent = (part: number, whole: number) =>
   whole === 0 ? "   n/a" : `${((part / whole) * 100).toFixed(1)}%`.padStart(6);
 const total = (map: Map<Language, number>) => [...map.values()].reduce((a, b) => a + b, 0);
 
+/*
+ * The boards, counted rather than remembered.
+ *
+ * This section used to open with a hand-written sentence claiming the corpus
+ * carried no `@feeds` arrows and naming a board total, in a report where every
+ * other figure is live. The script read no boards, so it could not have counted
+ * them, and all three numbers had drifted -- and the sentence was quoted into
+ * #203 as a measured finding. (#214)
+ *
+ * The corpus is `scripts/lib/boards.ts`, the same one `measure:vocabulary`
+ * reads, so the two commands cannot disagree about how many claims exist.
+ */
+const claimsSeen = new Map<string, number>();
+let boardsRead = 0;
+let boardsUnreadable = 0;
+let arrowsTotal = 0;
+let claimsTotal = 0;
+
+for (const file of boardCorpus((root) => console.log(`  (no boards under ${root} -- skipped)`))) {
+  let board;
+  try {
+    board = await readBoard(file);
+  } catch {
+    boardsUnreadable += 1;
+    continue;
+  }
+  boardsRead += 1;
+  for (const edge of readGraph(board).edges) {
+    arrowsTotal += 1;
+    if (!edge.claim) continue;
+    claimsTotal += 1;
+    claimsSeen.set(edge.claim, (claimsSeen.get(edge.claim) ?? 0) + 1);
+  }
+}
+const claimsWritten = [...claimsSeen.entries()]
+  .sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0]))
+  // Stored without the sigil, printed with it, the same way
+  // `measure-vocabulary.mts` prints them -- so the two reports read alike.
+  .map(([claim, seen]) => `@${claim} ${seen}`);
+const feedsDrawn = claimsSeen.get("feeds") ?? 0;
+
 console.log();
 console.log("MEASURE DATAFLOW -- what following a value through one body buys");
 console.log(`  ${trees.length} trees, ${total(files)} files, ${total(routines)} bodies read`);
@@ -952,9 +1012,15 @@ console.log();
 
 console.log("1 · CONFIRMATION GAIN -- @feeds arrows that go from unconfirmed to confirmed");
 console.log();
-console.log("  Boards: the corpus carries 0 @feeds arrows -- 13 claims across 19 boards, all of");
-console.log("  them @takes, @needs and @returns. There is no board number to report, and that is");
-console.log("  itself the finding: the word nobody draws is the one dataflow would improve.");
+console.log(`  Boards: ${boardsRead} read${boardsUnreadable > 0 ? ` (${boardsUnreadable} unreadable)` : ""}`
+  + `, ${arrowsTotal} arrows, ${claimsTotal} carrying a claim -- `
+  + (claimsWritten.length > 0 ? claimsWritten.join(", ") : "none"));
+console.log(`  So the corpus this gain would apply to is ${feedsDrawn} @feeds `
+  + `${feedsDrawn === 1 ? "arrow" : "arrows"}, and the table below is a`);
+console.log("  ceiling rather than a forecast. Read that count as a fact about when boards were");
+console.log("  drawn, not as a fact about the word: @feeds shipped after most of these were made,");
+console.log("  and no board here has been redrawn since. Nothing gave the number a chance to be");
+console.log("  larger, so it says nothing about whether anyone wants the word.");
 console.log();
 console.log("  " + "language".padEnd(10) + "files".padStart(7) + "pairs".padStart(8)
   + "2+ hops".padStart(9) + "one-hop".padStart(9) + "this".padStart(8)
@@ -1128,7 +1194,9 @@ for (const [shape, count] of [...unreadShapes.entries()].sort((a, b) => b[1] - a
 }
 
 console.log();
-console.log("3 · ACROSS A CALL -- the 42% that escaped because no call could be followed");
+console.log("3 · ACROSS A CALL -- the "
+  + percent(total(escapedOnlyByCall), total(values)).trim()
+  + " that escaped because no call could be followed");
 console.log("  #189 made a call's name resolvable, so the question is answerable: does the");
 console.log("  callee let the argument out? A value stops escaping only when EVERY call it was");
 console.log("  handed to resolves, reads cleanly, and keeps its argument.");
@@ -1183,10 +1251,11 @@ console.log();
 const asked = resolutionChecked.get("asked") ?? 0;
 const agreed = resolutionChecked.get("agreed") ?? 0;
 console.log(`  RESOLUTION -- checked against \`calls.ts\`, which has its own licence: ${agreed}/${asked}`);
-console.log("    A 5% sample of the calls this resolver followed, put to #189's reader -- 6,654");
-console.log("    calls at 0 missed and 0 wrongly accused, and the only independent check");
-console.log("    available for the half that has one. A disagreement is this resolver naming");
-console.log("    the wrong routine.");
+console.log("    A 5% sample of the calls this resolver followed, put to #189's reader --");
+console.log("    the only independent check available for the half that has one. A");
+console.log("    disagreement is this resolver naming the wrong routine. (#189's own recall,");
+console.log("    6,654 calls at 0 missed and 0 wrongly accused, is quoted from");
+console.log("    docs/claim-vocabulary.md and is not measured by this run.)");
 for (const one of resolutionDisputed.slice(0, 8)) {
   console.log(`    ${one.file} ${one.routine} -> ${one.callee}`);
 }
