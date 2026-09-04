@@ -935,3 +935,217 @@ export function callsBetween(
 
   return { verdict: "absent" };
 }
+
+/* ------------------------------------------- one body's call sites (#217) */
+
+/**
+ * Why one call site could not be placed. The same vocabulary `resolves` uses.
+ *
+ * Deliberately the same words rather than a private set: the question below is
+ * a different question asked of the same reader, and a reason that does not
+ * appear in `CallsWithheld` would be a reason `@calls` could never report.
+ */
+export type SiteUnresolved = Extract<
+  CallsWithheld,
+  "computed" | "dynamic" | "receiver" | "unbound" | "ambiguous" | "unplaced" | "elsewhere" | "macro"
+>;
+
+/** One call written in a body, and whether the reader can say what it reaches. */
+export interface CallSitePlaced {
+  /** The callee as written, empty when the name is not in the text. */
+  name: string;
+  /** 1-based, in the file the call was written in. */
+  line: number;
+  /** The file the callee was placed in, when it was placed. */
+  file?: string;
+  /** Why it was not placed. Absent exactly when `file` is present. */
+  why?: SiteUnresolved;
+}
+
+/** Every call site in one routine, placed or refused. */
+export interface BodyCallSites {
+  routine: string;
+  /** 1-based line the routine opens on. */
+  line: number;
+  /** Lines the routine spans, so a report can weigh a closure by body size. */
+  lines: number;
+  sites: CallSitePlaced[];
+}
+
+export type CallSitesReading =
+  | { read: true; bodies: BodyCallSites[] }
+  | { read: false; why: Extract<CallsWithheld, "unreadable"> };
+
+/**
+ * Whether a forwarded name comes to rest on a file that declares it.
+ *
+ * `arrivesAt` asks whether a name reaches **one named** far end, which is the
+ * question a claim asks. This asks the target-free version -- does it come to
+ * rest anywhere at all -- and it is the stricter half of the closure question:
+ * a barrel file that re-exports a name places the *specifier* without placing
+ * the *declaration*, and counting that as placed would make a call set look
+ * enumerable when the reader cannot name what is in it.
+ *
+ * Same budget as `arrivesAt` and the same shape of answer, so a chain of
+ * barrels runs out into a doubt rather than into a claim.
+ */
+function comesToRest(
+  name: string,
+  file: string,
+  side: CallSide,
+  seen: Set<string>,
+): string | undefined {
+  if (seen.has(file) || seen.size >= FOLLOW_LIMIT) return undefined;
+  seen.add(file);
+
+  const opened = side.open?.(file);
+  /*
+   * No opener, so the specifier is placed and what is in that file is unknown.
+   * Counted as placed: this reader's own `resolves` treats a resolved specifier
+   * as an answer, and being stricter here than the word itself would measure
+   * something `@calls` does not do.
+   */
+  if (!opened) return file;
+  const bindings = bindingsIn(opened.source, opened.language);
+  if (!bindings) return file;
+  if (bindings.ambiguous.has(name)) return undefined;
+  if (bindings.local.has(name)) return file;
+
+  const onward = bindings.imported.get(name) ?? bindings.forwarded.get(name);
+  if (!onward) return bindings.wildcard ? undefined : file;
+
+  const { files } = filesFor(onward.specifier, opened.imports);
+  if (files.size === 0) return undefined;
+  for (const next of files) {
+    const rest = comesToRest(name, next, side, seen);
+    if (rest) return rest;
+  }
+  return undefined;
+}
+
+/**
+ * Where one call site's callee lives, or why the reader cannot say.
+ *
+ * The target-free twin of `resolves`, and every branch below is the same branch
+ * in the same order -- the reasons have to match, or a body counted closed here
+ * would be a body `@calls` still refuses on.
+ */
+function placeOf(
+  callee: Callee,
+  side: CallSide,
+  bindings: Bindings,
+): string | { why: SiteUnresolved } {
+  if (callee.kind === "computed") return { why: "computed" };
+  if (REACHES_ANYTHING.has(callee.name)) return { why: "dynamic" };
+
+  // A member of `self` is a member of whatever this routine belongs to, and
+  // that is in this file.
+  if (callee.kind === "own") return side.file;
+
+  const bound = callee.kind === "through" ? callee.through : callee.name;
+  // An expression receiver -- `make().run()`, `a.b.c()` -- names nothing to
+  // look up. Dynamic dispatch, and the reader cannot say whose method it is.
+  if (!bound) return { why: "receiver" };
+  if (bindings.ambiguous.has(bound)) return { why: "ambiguous" };
+
+  const imported = bindings.imported.get(bound);
+  if (!imported) {
+    if (!bindings.local.has(bound)) {
+      return { why: callee.kind === "through" ? "receiver" : "unbound" };
+    }
+    /*
+     * Declared here. A bare name means this file's own; a member reached
+     * *through* a local value is that value's method, and its type is not in
+     * the text even though the name it is bound to is.
+     */
+    return callee.kind === "through" ? { why: "receiver" } : side.file;
+  }
+
+  const { files, known } = filesFor(imported.specifier, side.imports);
+  if (files.size === 0) return { why: known ? "unplaced" : "unbound" };
+  for (const file of files) {
+    const rest = comesToRest(callee.name, file, side, new Set());
+    if (rest) return rest;
+  }
+  return { why: "elsewhere" };
+}
+
+/**
+ * Every call site in every routine of one file, each placed or refused.
+ *
+ * **A measurement, not a word (#217).** `callsBetween` asks whether one body
+ * calls one named far end, and reports its doubts per *ask*. This asks the
+ * question the other way round -- what does this body call, all of it -- because
+ * that is the question a closed region needs. A body with no unplaced call site
+ * has an enumerable call set, and only then does "this routine does not call
+ * that one" become refutable from an absence rather than silence.
+ *
+ * Nothing consumes this but `scripts/measure-closed-bodies.mts`. It puts no
+ * colour on a diagram and no word rests on it.
+ */
+export function callSitesIn(side: CallSide): CallSitesReading {
+  const bindings = bindingsIn(side.source, side.language);
+  if (!bindings) return { read: false, why: "unreadable" };
+  const tree = parseSource(side.source, side.language);
+  if (!tree) return { read: false, why: "unreadable" };
+
+  const bodies: BodyCallSites[] = [];
+  each(tree.rootNode, (node) => {
+    const name = node.type === "impl_item"
+      ? node.childForFieldName("type")
+      : node.childForFieldName("name") ?? node.childForFieldName("left");
+    if (!name || name.childCount !== 0) return;
+    const value = node.childForFieldName("value");
+    /*
+     * `parameters` is the test `routinesNamed` uses, and using the same one is
+     * the point: the population here has to be the population `@calls` would be
+     * asked about. An `impl` block passes `holdsRoutines` there and is not a
+     * body, so it is left out -- its methods are found on their own.
+     */
+    if (!(node.childForFieldName("parameters") ?? value?.childForFieldName("parameters"))) return;
+    /*
+     * And it must actually have a body. A method *signature* -- in a TS
+     * interface, a Rust trait, an overload declaration -- has parameters and no
+     * body, and counting one is not a small error: it reads as a routine that
+     * makes no calls, so it lands in the trivially-closed column and inflates
+     * the very number this is here to measure. `board-server.ts` alone declared
+     * `setFile` and `close` twice that way. The referee found it.
+     */
+    if (!(node.childForFieldName("body") ?? value?.childForFieldName("body"))) return;
+
+    const opened = lineOf(side.source, node.startIndex);
+    const body: BodyCallSites = {
+      routine: name.text,
+      line: opened,
+      lines: node.text.split("\n").length,
+      sites: [],
+    };
+    each(node, (inner) => {
+      /*
+       * A macro's arguments are loose tokens rather than a tree, so a call
+       * written inside one is invisible. That is a doubt about the whole body
+       * here -- unlike `callsTo`, which only raises it when the name asked
+       * after is in the tokens. A body cannot be closed around calls nobody
+       * can see.
+       */
+      if (inner.type === "token_tree") {
+        body.sites.push({
+          name: "",
+          line: lineOf(side.source, inner.startIndex),
+          why: "macro",
+        });
+        return;
+      }
+      const callee = calleeOf(inner);
+      if (!callee) return;
+      const where = placeOf(callee, side, bindings);
+      body.sites.push({
+        name: callee.kind === "computed" ? "" : callee.name,
+        line: lineOf(side.source, inner.startIndex),
+        ...(typeof where === "string" ? { file: where } : { why: where.why }),
+      });
+    });
+    bodies.push(body);
+  });
+  return { read: true, bodies };
+}
