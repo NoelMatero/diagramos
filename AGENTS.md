@@ -118,6 +118,37 @@ A word that confirms and stays quiet needs no licence. A word that accuses needs
 a number first, and the number goes in the repository where it can be argued
 with.
 
+### Reading a number, which is where the gate is usually lost
+
+The gate is about producing numbers. These two rules are about consuming them,
+and both were broken in one sentence of one summary, which is why they are here.
+
+**Check that a number is a measurement before you quote it.** A script that
+prints `the corpus carries 0 @feeds arrows` may be counting arrows, or it may be
+a `console.log` somebody wrote by hand when it happened to be true. That one was
+the second kind: `measure-dataflow.mts` reads no boards at all. It was quoted
+into an issue as a finding, and a recommendation was built on top of it, before
+anybody opened the file. If you did not see the line that computes it, you have
+read a claim and not a number.
+
+**A zero has two causes and they look identical.** The thing did not happen, or
+nothing could have made it happen. Before concluding anything from an absence,
+ask what would have had to occur for the count to be non-zero, and check whether
+it had the chance.
+
+The example worth remembering: `@holds`, `@builds` and `@calls` appear on zero
+boards. Read as preference, that says nobody wants them. In fact every board
+here predates the words, and no board has been redrawn since. The zero is a fact
+about drawing dates. Reading it as a verdict on the vocabulary -- and then
+recommending against confirm-only words on that basis -- is the shape of the
+mistake, and it is easy to make because the number is real, the source is this
+repository, and it points somewhere convenient.
+
+This is the same error the gate exists to prevent, one step later. The gate stops
+a reader accusing on evidence it does not have. Nothing stops a person doing it
+from a table, so it has to be a habit: **name the mechanism that would have made
+the number different, or do not draw the conclusion.**
+
 ## Running the tests
 
 `npm test` is a three-minute command. It is the gate before you hand work over,
