@@ -222,10 +222,10 @@ const edgeSchema = z.object({
       + "break names the hop that stopped holding. Only for arrows whose ends both name symbols.",
     ),
   claim: z
-    .enum(["needs", "feeds", "takes", "returns", "holds", "builds", "calls"])
+    .enum(["needs", "feeds", "takes", "returns", "holds", "builds", "calls", "accesses"])
     .optional()
     .describe(
-      "What this arrow asserts, when it asserts anything. Seven words, and an arrow may carry one. "
+      "What this arrow asserts, when it asserts anything. Eight words, and an arrow may carry one. "
       + "'needs': the from end declares a dependency on the to end — an import, a require, an "
       + "include. Write it ONLY when you have read that line in the code: it is a transcription of "
       + "something you saw, never a guess about what the relationship probably is. Shown on the "
@@ -267,6 +267,22 @@ const edgeSchema = z.object({
       + "is finding the call at the far end and only there. Both ends must anchor a symbol. Do not "
       + "reach for 'calls' when what you mean is that a value flows — that is 'feeds', and it "
       + "often points the other way. "
+      + "'accesses': the FROM end reads a named member off the TO end's type -- a field, a "
+      + "property, a method. The largest relationship a diagram could draw, and the one your "
+      + "prose labels have been reaching for when they say reads, writes, key, value or looks "
+      + "up. It is the ONLY claim that takes an argument: put the member name in the arrow's "
+      + "`label`, so `label: 'width', claim: 'accesses'` reads as `width @accesses` on the "
+      + "board. An accesses arrow with prose on its label, or none, names nothing to look for "
+      + "and is reported as a claim nothing can read. Its two ends are held to different "
+      + "standards and this is the thing to know before writing one: a member list can be "
+      + "listed in full, so a member the TYPE does not declare is a red with the member list "
+      + "quoted -- rename a field and every board still naming it goes red -- while the "
+      + "ROUTINE end can never be a red, because knowing everything a body touches needs the "
+      + "type of every value in it. A green needs both: the type declares it AND the routine "
+      + "can be seen reading it. Nothing is reported either way when the member list is not "
+      + "closed -- a type that extends another, an index signature, a Python __getattr__, an "
+      + "alias for a shape declared elsewhere, or a Rust struct whose impl is in another file. "
+      + "Both ends must anchor a symbol. "
       + "A relationship you cannot point at is an arrow with no claim, which is fine and is what "
       + "most arrows are: an unclaimed arrow is looked for and counted, never judged, so it cannot "
       + "come back as a finding against you. "
@@ -480,6 +496,14 @@ const CLAIM_CONSEQUENCE: Record<string, string> = {
     + " finding the call at the FAR end and only there, which means the arrow is drawn backwards."
     + " Nothing is reported either way when the name cannot be placed -- a method on a value whose"
     + " type is not written down, a wildcard import, a name from a package.",
+  accesses:
+    " Each one is now read at both ends, and only one of them can say wrong. If the TO end's type"
+    + " does not declare the member named on the arrow's label, the arrow is reported in red with"
+    + " the member list quoted -- a member list can be read in full, so a name absent from it is"
+    + " genuinely absent. The FROM end can never be a red: not seeing the routine read the member"
+    + " is not evidence it does not, so it is silence. A green needs both halves. Nothing is"
+    + " reported either way when the member list is not closed -- a type with a parent, an index"
+    + " signature, a Python __getattr__, an alias, or a Rust impl block in another file.",
 };
 
 function claimNote(arrows: ReadonlyArray<{ claim?: string }>): { claims?: string } {
@@ -1391,10 +1415,10 @@ server.registerTool(
             label: z.string().optional(),
             bidirectional: z.boolean().optional(),
             claim: z
-              .enum(["needs", "feeds", "takes", "returns", "holds", "builds", "calls"])
+              .enum(["needs", "feeds", "takes", "returns", "holds", "builds", "calls", "accesses"])
               .optional()
               .describe(
-      "What this arrow asserts, when it asserts anything. Seven words, and an arrow may carry one. "
+      "What this arrow asserts, when it asserts anything. Eight words, and an arrow may carry one. "
       + "'needs': the from end declares a dependency on the to end — an import, a require, an "
       + "include. Write it ONLY when you have read that line in the code: it is a transcription of "
       + "something you saw, never a guess about what the relationship probably is. Shown on the "
@@ -1436,6 +1460,22 @@ server.registerTool(
       + "is finding the call at the far end and only there. Both ends must anchor a symbol. Do not "
       + "reach for 'calls' when what you mean is that a value flows — that is 'feeds', and it "
       + "often points the other way. "
+      + "'accesses': the FROM end reads a named member off the TO end's type -- a field, a "
+      + "property, a method. The largest relationship a diagram could draw, and the one your "
+      + "prose labels have been reaching for when they say reads, writes, key, value or looks "
+      + "up. It is the ONLY claim that takes an argument: put the member name in the arrow's "
+      + "`label`, so `label: 'width', claim: 'accesses'` reads as `width @accesses` on the "
+      + "board. An accesses arrow with prose on its label, or none, names nothing to look for "
+      + "and is reported as a claim nothing can read. Its two ends are held to different "
+      + "standards and this is the thing to know before writing one: a member list can be "
+      + "listed in full, so a member the TYPE does not declare is a red with the member list "
+      + "quoted -- rename a field and every board still naming it goes red -- while the "
+      + "ROUTINE end can never be a red, because knowing everything a body touches needs the "
+      + "type of every value in it. A green needs both: the type declares it AND the routine "
+      + "can be seen reading it. Nothing is reported either way when the member list is not "
+      + "closed -- a type that extends another, an index signature, a Python __getattr__, an "
+      + "alias for a shape declared elsewhere, or a Rust struct whose impl is in another file. "
+      + "Both ends must anchor a symbol. "
       + "A relationship you cannot point at is an arrow with no claim, which is fine and is what "
       + "most arrows are: an unclaimed arrow is looked for and counted, never judged, so it cannot "
       + "come back as a finding against you. "
