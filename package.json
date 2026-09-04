@@ -43,6 +43,7 @@
     "typecheck": "tsc --noEmit",
     "check:drift": "tsx scripts/check-drift.mjs",
     "measure:calls": "tsx scripts/measure-calls.mts",
+    "measure:closed-bodies": "tsx scripts/measure-closed-bodies.mts",
     "measure:constructs": "tsx scripts/measure-constructs.mts",
     "measure:dataflow": "tsx scripts/measure-dataflow.mts",
     "measure:deps": "tsx scripts/measure-deps.mts",

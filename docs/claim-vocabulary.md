@@ -411,9 +411,9 @@ the probe's own two lists were replaced with a shape rule in the same change.
 Still wordless: `conforms`, `accesses`. `invokes` was the largest of the three
 and #189 gave it `@calls`.
 
-## Nine times a measurement contradicted the design
+## Ten times a measurement contradicted the design
 
-Kept because the pattern is the point: seven of the nine came from building one
+Kept because the pattern is the point: eight of the ten came from building one
 word or one reader, not from reviewing the design.
 
 1. **The substrate was empty.** #190's first draft proposed graphify as the
@@ -487,6 +487,43 @@ word or one reader, not from reviewing the design.
    sank the word was not a hazard on that list at all. It was counting an
    `import` as a local declaration, which made every cross-file call in
    TypeScript unanswerable and had nothing to do with calls.
+
+10. **The closed region in `@calls` is real and nearly empty.** #217 names the
+    largest hole in the vocabulary: `@calls`, `@builds` and `@needs` refute from
+    a **presence**, so an arrow drawn between two things that are simply
+    unrelated gets silence — and `invokes` is the biggest population there is.
+    The escape offered itself. A routine's call sites are syntactically
+    enumerable, so if *every* call in a body resolved, the call set is complete
+    and "does not call" becomes refutable from an absence, on a signature's
+    footing.
+
+    `measure:closed-bodies` reports the refusal reasons per **body** rather than
+    per ask, which is what the claim needs, and the answer is no. **15.1%** of
+    the 11,360 bodies that call anything have a call set the reader can
+    enumerate completely — and it is in the wrong place: **33.3%** of bodies of
+    five lines or fewer close, **0.5%** of bodies over fifty, 4 of 853. A
+    refutation available only on short functions is not worth a word, because
+    the arrow somebody draws between two large routines is the one it would
+    stay silent on.
+
+    The reason is a single reason, which is why no amount of reader work fixes
+    it: `receiver` is the *sole* blocker in 2,772 open bodies, 28.8% of them and
+    more than every other reason combined. `x.foo()` is how ordinary code is
+    written and placing it means knowing the type of `x`. That is a type system,
+    not a claim word — the same wall #203 names.
+
+    Recommended against, and the per-site figure is the trap worth recording:
+    **30.6%** of individual call sites resolve, which reads twice as encouraging
+    as the per-body number. Closure is conjunctive. One unplaced call in a body
+    of twenty opens the body, and a measurement that reported sites instead of
+    bodies would have argued for building this.
+
+    Two of the three numbers above were wrong on the first run, and the referee
+    found both. The reader counted TypeScript interface and Rust trait method
+    **signatures** as routines — parameters, no body — so 1,618 declarations
+    that cannot call anything were being counted as bodies that call nothing.
+    And the comparison paired two reader bodies of one name against one of the
+    referee's, blaming the reader for a disagreement the pairing invented.
 
 `renders` was also raised as a possible missing relation and turned out not to
 be one: `<MenuContent />` is a routine making a MenuContent, which is `@builds`.
