@@ -50,6 +50,11 @@ plus a live local board for editing them alongside a human.
   language and right in the rest, which reads as a finding about that language.
   Read the *field*, and where there is none read the structure: an operator
   token is anonymous, so its type is its own text.
+  which (word, language) pairs have earned the right to accuse and which have
+  not, and the times a measurement contradicted the design. Most of those were
+  found by building one word or one reader rather than by reviewing the plan --
+  including the two empty squares on that grid, which nobody saw until the
+  squares had to be filled in one at a time.
 
 ## Finishing a piece of work
 

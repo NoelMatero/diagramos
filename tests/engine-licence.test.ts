@@ -19,12 +19,17 @@
  */
 import { describe, expect, it, beforeAll } from "vitest";
 import path from "node:path";
+import { readFileSync } from "node:fs";
 
 import { readDependencies } from "../src/engine/deps";
 import { createWorkspace, type Workspace } from "../src/engine/drift";
 import { initEngine, type Language } from "../src/engine/parse";
 import { resolveDependency } from "../src/engine/resolve";
-import { LICENCES, licenceFor, licenceTotals, mayAccuse } from "../src/engine/licence";
+import { ARROW_CLAIMS } from "../src/engine/claim";
+import {
+  ACCUSING_RELATIONS, LICENCES, isMeasured, licenceFor, licenceTotals, mayAccuse,
+  relationLicence, relationTotals, type AccusingRelation,
+} from "../src/engine/licence";
 import { measureLicence } from "../scripts/lib/licence";
 
 beforeAll(async () => {
@@ -260,28 +265,252 @@ describe("the Python licence on record", () => {
   });
 });
 
-describe("which languages may accuse", () => {
-  it("has a measured licence for every language it has a grammar for", () => {
+const LANGUAGES: Language[] = ["ts", "tsx", "js", "rust", "python"];
+
+/**
+ * The first markdown table under a heading in `docs/claim-vocabulary.md`, as
+ * rows of trimmed cells with the emphasis markers taken off.
+ *
+ * Found by its heading rather than by its header row, because two tables in that
+ * file start `| word |` and picking the wrong one is a test that passes for the
+ * wrong reason.
+ */
+function tableUnder(heading: string | RegExp): string[][] {
+  const doc = readFileSync(
+    path.resolve(__dirname, "..", "docs", "claim-vocabulary.md"), "utf8",
+  ).split("\n");
+  const at = typeof heading === "string"
+    ? doc.indexOf(heading)
+    : doc.findIndex((line) => heading.test(line));
+  expect(at, `docs/claim-vocabulary.md has no "${heading}"`).toBeGreaterThan(-1);
+  const start = doc.findIndex((line, index) => index > at && line.startsWith("|"));
+  expect(start, `no table under "${heading}"`).toBeGreaterThan(-1);
+
+  const rows: string[][] = [];
+  for (let line = start; line < doc.length && doc[line].startsWith("|"); line += 1) {
+    if (doc[line].includes("---")) continue;
+    rows.push(doc[line].split("|").slice(1, -1).map((cell) => cell.replaceAll("*", "").trim()));
+  }
+  return rows;
+}
+
+/** The word a `| \`@needs\` |` cell names. */
+const wordIn = (cell: string): string => cell.replaceAll("`", "").replace("@", "");
+
+describe("which words may accuse, and in which languages", () => {
+  it("has a measurement behind every square that says yes", () => {
     /*
-     * Written as an exhaustive record on purpose: add a sixth `Language` to
-     * `parse.ts` and this stops compiling, which is the moment somebody has to
-     * decide whether it has been measured. The alternative -- a list of five
-     * strings -- goes stale silently, and a language that reaches `mayAccuse`
-     * unmeasured is #195 happening again.
+     * Exhaustive on both axes on purpose, and that is the whole of #207.
      *
-     * Every entry is `true` today, and that is the finding rather than the
-     * design: Python was the last `false` and #198 moved it. It also means the
-     * `withheld/unlicensed` branch in `signature.ts` and `holds.ts` is
-     * unreachable through any language this engine parses, which is why the
-     * tests that used to exercise it with a `.py` fixture are gone rather than
-     * ported.
+     * Add a sixth `Language` to `parse.ts` or a seventh word to `ARROW_CLAIMS`
+     * and this stops compiling, which is the moment somebody has to decide
+     * whether it has been measured. The alternative -- a list that quietly
+     * covers what it happens to cover -- is how one Python entry came to speak
+     * for four words on the strength of three unrelated runs.
+     *
+     * Both blocks of `false` are findings rather than design, and neither was
+     * visible before the squares had to be filled in one at a time.
+     *
+     * `builds` has never been measured in Python: `measure:constructs` asks it 0
+     * times over 442 files, because Python spells making one of something as an
+     * ordinary call.
+     *
+     * JavaScript has never been measured for any of the four words the
+     * dependency corpus does not cover. It sits inside the TypeScript licence,
+     * and that licence's imports were measured over five repositories -- but
+     * `measure:holds`, `measure:signature` and `measure:constructs` ask it 0
+     * questions between them, and `measure:calls` asks it 2. Until this grid
+     * existed all five squares read `yes`, on TypeScript's numbers.
+     *
+     * `calls` is the one that arrived after the grid was written and before it
+     * had landed, which is the whole argument for the grid rather than an
+     * illustration of it: #211 shipped a refutable word reading the old
+     * per-language gate, so a JavaScript arrow was refutable on 2 asks. Nothing
+     * structural stopped it the way `no-fields` stops a JavaScript `holds`.
      */
-    const expected: Record<Language, boolean> = {
-      ts: true, tsx: true, js: true, rust: true, python: true,
+    const grid: Record<AccusingRelation, Record<Language, boolean>> = {
+      needs: { ts: true, tsx: true, js: true, rust: true, python: true },
+      takes: { ts: true, tsx: true, js: false, rust: true, python: true },
+      returns: { ts: true, tsx: true, js: false, rust: true, python: true },
+      holds: { ts: true, tsx: true, js: false, rust: true, python: true },
+      builds: { ts: true, tsx: true, js: false, rust: true, python: false },
+      calls: { ts: true, tsx: true, js: false, rust: true, python: true },
     };
-    for (const [language, may] of Object.entries(expected)) {
-      expect(mayAccuse(language as Language), language).toBe(may);
+    for (const relation of ACCUSING_RELATIONS) {
+      for (const language of LANGUAGES) {
+        expect(mayAccuse(relation, language), `${relation} in ${language}`)
+          .toBe(grid[relation][language]);
+      }
     }
+  });
+
+  it("stays silent about a word nobody has measured anywhere", () => {
+    /*
+     * The shape that matters, stated as a test: an *unlisted* pair must answer
+     * "may not accuse", never "may". `handles` is #206's word and has no reader
+     * yet, so it stands in for whatever arrives next -- and the point is that it
+     * inherits nothing from the four measurements Python already has.
+     *
+     * `invokes` stood here until #189 shipped it as `calls`, and what happened
+     * in between is why the cast matters: the word arrived, the type made the
+     * hole visible in four places, and every one of them had to be answered by
+     * hand. The cast is the other half -- a word that routes around the type
+     * still gets a no.
+     */
+    const next = "handles" as AccusingRelation;
+    for (const language of LANGUAGES) {
+      expect(mayAccuse(next, language), language).toBe(false);
+      expect(relationLicence(next, language), language).toBeUndefined();
+    }
+  });
+
+  it("asks about every word that can accuse, and only those", () => {
+    // Filtered from `ARROW_CLAIMS` rather than typed out, so a report that walks
+    // it cannot quietly stop mentioning a word.
+    expect([...ACCUSING_RELATIONS]).toEqual(ARROW_CLAIMS.filter((word) => word !== "feeds"));
+  });
+
+  it("gives a reason where it says no, rather than a shrug", () => {
+    const row = relationLicence("builds", "python");
+    expect(row).toBeDefined();
+    expect(row && isMeasured(row)).toBe(false);
+    expect(row && !isMeasured(row) ? row.unmeasured : "").toMatch(/ordinary call/);
+  });
+
+  it("leaves no square empty, whatever the type is doing", () => {
+    // The type already makes this impossible. Asserted anyway, because the
+    // guard that only the compiler enforces is the one a cast walks past.
+    for (const licence of LICENCES) {
+      for (const relation of ACCUSING_RELATIONS) {
+        expect(licence.relations[relation], `${licence.language}.${relation}`).toBeDefined();
+      }
+    }
+  });
+
+  it("reads the `needs` numbers off the corpus rather than a second copy", () => {
+    // Two lists of one fact drift, and the one that drifts silently is the one
+    // nothing reads. So the row cites the table above instead of restating it.
+    const python = LICENCES.find((one) => one.language === "python")!;
+    const corpus = licenceTotals(python);
+    expect(relationTotals("needs", "python")).toEqual({
+      asked: corpus.edges, missed: corpus.missed, invented: corpus.invented,
+    });
+    expect(corpus.edges).toBe(12693);
+  });
+
+  it("keeps a miss of zero, or names every miss it keeps", () => {
+    /*
+     * The bar, in one place, and it is not the same bar everywhere.
+     *
+     * `holds`, `takes`, `returns` and `builds` are measured against a text scan
+     * of the same declarations over trees taken as they sit on disk, and there
+     * the bar is zero: a miss is the referee seeing a name the reader did not,
+     * and a miss paired with a hit the other way is a false red.
+     *
+     * `needs` is the exception and it is deliberate. Its referee is a real
+     * compiler over five pinned repositories, and its 48 misses across three
+     * languages are all understood -- they are the `known` list on each licence,
+     * every one of them a place where the reader and the referee mean different
+     * things by an edge. A zero there would mean the corpus was too small.
+     *
+     * `rust`'s `calls` row is the case that made that distinction structural
+     * rather than a sentence in this comment. Measured on the trees to hand it
+     * asks 36 questions and misses none, which is the too-small zero the
+     * paragraph above warns about; measured over the two repositories the
+     * dependency corpus already pins it asks 574 and misses 4. So the rule is
+     * the one `needs` always had: a miss is allowed when somebody has read it
+     * and written down what it is, and `known` is where that goes.
+     *
+     * The count is checked rather than the prose, so a fifth miss cannot hide
+     * behind four explanations -- and `known` may not be carried by a row with
+     * nothing to explain, so it cannot rot into decoration either.
+     */
+    for (const relation of ACCUSING_RELATIONS) {
+      for (const language of LANGUAGES) {
+        const row = relationLicence(relation, language);
+        if (!row || !isMeasured(row) || row.counts === "corpus") continue;
+        const where = `${relation} in ${language}`;
+        if (row.counts.missed === 0) {
+          expect(row.known, `${where} explains misses it does not have`).toBeUndefined();
+          continue;
+        }
+        expect(row.known ?? [], `${where} misses ${row.counts.missed} and says why`)
+          .not.toHaveLength(0);
+      }
+    }
+  });
+
+  it("says what the dependency corpus misses instead of pretending it does not", () => {
+    // The other side of the rule above: `needs` has misses, they are counted,
+    // and each licence names the shapes they are.
+    for (const licence of LICENCES) {
+      const totals = licenceTotals(licence);
+      expect(totals.missed, licence.language).toBeGreaterThan(0);
+      expect(licence.known.length, licence.language).toBeGreaterThan(0);
+    }
+  });
+
+  it("says the same thing in the doc as it does in the code", () => {
+    /*
+     * The grid is written twice: once as data in `licence.ts`, once as a table
+     * in `docs/claim-vocabulary.md` for somebody reading rather than running.
+     * Two lists of one fact drift, and the one that drifts silently is the one
+     * nothing reads -- which this file says about the engine and was true of
+     * its own documentation until this test existed.
+     *
+     * The doc stays hand-written, because it carries prose the data cannot. The
+     * table inside it does not get to disagree.
+     *
+     * A column nothing recognises fails rather than being skipped: adding a
+     * language to that table has to be a decision, the same way adding one to
+     * `parse.ts` is.
+     */
+    const columns: Record<string, readonly Language[]> = {
+      "TS / TSX": ["ts", "tsx"],
+      JavaScript: ["js"],
+      Rust: ["rust"],
+      Python: ["python"],
+    };
+
+    const [header, ...rows] = tableUnder("### The grid");
+
+    // Every word, in the order the code lists them: a new one has to reach the
+    // table too, not just the type.
+    expect(rows.map((row) => wordIn(row[0]))).toEqual([...ACCUSING_RELATIONS]);
+
+    for (const [column, title] of header.entries()) {
+      // First column is the word, last is prose about the referee.
+      if (column === 0 || column === header.length - 1) continue;
+      const languages = columns[title];
+      expect(languages, `unknown column "${title}" in the doc's grid`).toBeDefined();
+      for (const row of rows) {
+        const relation = wordIn(row[0]) as AccusingRelation;
+        const said = row[column];
+        expect(said, `${relation} / ${title}`).toMatch(/^(yes|no)$/);
+        for (const language of languages) {
+          expect(mayAccuse(relation, language), `${relation} in ${language}, per the doc`)
+            .toBe(said === "yes");
+        }
+      }
+    }
+  });
+
+  it("agrees with the vocabulary table about which words accuse at all", () => {
+    /*
+     * The other table in the same document, and the same drift risk. Its "may
+     * say wrong" column is the list `ACCUSING_RELATIONS` is: a word that never
+     * accuses needs no licence, and one that does needs a row in every one.
+     *
+     * Matched on the stable half of the heading, because the count in it moves
+     * every time a word ships -- it said "six" until #189 made it seven -- and a
+     * test that breaks on the *title* of the section it is checking teaches
+     * whoever adds the eighth word to edit the test rather than read it.
+     */
+    const [header, ...rows] = tableUnder(/^## The \w+ words, and the three footings$/);
+    const column = header.indexOf("may say wrong");
+    expect(column, "the vocabulary table lost its `may say wrong` column").toBeGreaterThan(-1);
+    const accusing = rows.filter((row) => row[column] === "yes").map((row) => wordIn(row[0]));
+    expect(accusing).toEqual([...ACCUSING_RELATIONS]);
   });
 
   it("says nothing about a language nobody measured", () => {

@@ -284,19 +284,21 @@ for (const language of LANGUAGES) {
     + String(ok).padStart(8)
     + percent(ok, total).padStart(8)
     + percent(refused, total).padStart(9)
-    + (mayAccuse(language) ? "yes" : "no").padStart(9)
+    + (mayAccuse("holds", language) ? "yes" : "no").padStart(9)
     + "  " + ([...byReason.entries()].sort((a, b) => b[1] - a[1])
       .map(([why, count]) => `${why} ${count}`).join(", ") || "—"));
 }
 
 console.log();
 const unlicensed = LANGUAGES.filter((language) =>
-  (asked.get(language) ?? 0) > 0 && !mayAccuse(language));
+  (asked.get(language) ?? 0) > 0 && !mayAccuse("holds", language));
 if (unlicensed.length > 0) {
   console.log();
-  console.log(`  ${unlicensed.join(", ")} has a grammar and no measured licence, so an absence`);
-  console.log("  there is withheld however good the recall looks. Confirming is unaffected.");
-  console.log("  The recall above is what a licence would be measuring, not a licence. See #198.");
+  console.log(`  ${unlicensed.join(", ")} has a grammar and no measured licence for \`holds\`, so`);
+  console.log("  an absence there is withheld however good the recall looks. Confirming is");
+  console.log("  unaffected. The recall above is what a licence would be measuring, not a");
+  console.log("  licence -- and it is asked per word now, so a yes here says this reader was");
+  console.log("  measured rather than that some reader was (#198, #207).");
 }
 
 console.log();

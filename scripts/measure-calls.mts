@@ -135,6 +135,14 @@ const NOT_CALLS = new Set([
  * Strings go before line comments so a `//` inside a URL survives, and Rust's
  * single quotes are left alone: `&'a str` is a lifetime, and reading it as a
  * character literal eats the rest of the line.
+ *
+ * Rust's raw strings are the same lesson as the template literal, found the same
+ * way. `r#".."#` spans lines and honours no escape, so the per-line rule below
+ * never closes one: ripgrep writes every flag's help text as a multi-line raw
+ * string, and the prose in them read as code. `enabled`, `files` and `dot` are
+ * ordinary English words and each is also a routine ripgrep declares exactly
+ * once, so five calls were credited to `doc_long` and counted as the reader
+ * missing them. Blanked with the block forms, before the line split.
  */
 function stripNoise(source: string, language: Language): string {
   const blank = (block: string) => block.replace(/[^\n]/g, " ");
@@ -147,7 +155,19 @@ function stripNoise(source: string, language: Language): string {
    * `transform: rotate(45deg)` in there read as a call to a `rotate` declared
    * on the other side of the monorepo.
    */
-  const spanning = language === "python" ? text : text.replace(/`(?:[^`\\]|\\.)*`/g, blank);
+  const spanned = language === "python" ? text : text.replace(/`(?:[^`\\]|\\.)*`/g, blank);
+  /*
+   * Most hashes first, because `r#"` is a prefix of `r##"` and the shorter
+   * pattern would close on the longer one's opening quote. Three is past what
+   * any of this corpus writes; a fourth would read as an ordinary string and
+   * fail the way it does today rather than a new way.
+   */
+  const spanning = language === "rust"
+    ? spanned.replace(
+        /\bb?r###"[\s\S]*?"###|\bb?r##"[\s\S]*?"##|\bb?r#"[\s\S]*?"#|\bb?r"[^"]*"/g,
+        blank,
+      )
+    : spanned;
   const quoted = language === "rust"
     ? /"(?:[^"\\\n]|\\.)*"/g
     : /"(?:[^"\\\n]|\\.)*"|'(?:[^'\\\n]|\\.)*'/g;
@@ -502,7 +522,7 @@ console.log("    " + [...throughReceiver.entries()].sort((a, b) => b[1] - a[1])
 
 console.log();
 console.log("  every language above carries a licence: "
-  + LANGUAGES.filter((one) => mayAccuse(one)).join(", "));
+  + LANGUAGES.filter((one) => mayAccuse("calls", one)).join(", "));
 
 console.log();
 const heldFiles = new Map<string, number>();

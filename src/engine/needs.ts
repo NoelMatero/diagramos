@@ -30,7 +30,8 @@
  */
 import { readDependencies } from "./deps";
 import { vouchedFor, type Ledger } from "./ledger";
-import { licenceFor } from "./licence";
+import { licenceFor, mayAccuse } from "./licence";
+import { languageOf } from "./parse";
 import type { ConfigCache } from "./resolve";
 import type { Workspace } from "./workspace";
 
@@ -145,6 +146,18 @@ export function checkNeeds(
 
   if (forward && backward) return { verdict: "cycle" };
   if (forward) return { verdict: "confirmed", evidence: forward };
-  if (backward) return { verdict: "backwards", evidence: backward };
+  /*
+   * The accusation, and the last gate before it. `declares` has already refused
+   * both files unless a licence names their extensions, so this is true
+   * wherever we get to it today -- it is asked anyway because the question it
+   * asks is the right one: not "is this language licensed" but "was *this*
+   * word's reader measured here" (#207). Both files, because saying backwards
+   * rests on finding the import in `to` and on not finding it in `from`.
+   */
+  const bothMeasured = [from, to].every((file) => {
+    const language = languageOf(file);
+    return language !== undefined && mayAccuse("needs", language);
+  });
+  if (backward && bothMeasured) return { verdict: "backwards", evidence: backward };
   return { verdict: "absent" };
 }

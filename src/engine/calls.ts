@@ -862,7 +862,7 @@ export function callsBetween(
   if (forward.evidence) return { verdict: "confirmed", evidence: forward.evidence };
   if (forward.why) return { verdict: "withheld", why: forward.why };
 
-  if (!mayAccuse(from.language) || !mayAccuse(to.language)) {
+  if (!mayAccuse("calls", from.language) || !mayAccuse("calls", to.language)) {
     return { verdict: "withheld", why: "unlicensed" };
   }
 

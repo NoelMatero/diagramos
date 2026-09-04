@@ -10,17 +10,57 @@
  * for an absence. Neither is recoverable once someone has stopped believing the
  * tool.
  *
- * Hence a licence, per language, with the number in the repo where it can be
- * argued with. `scripts/measure-licence.mts` reproduces it. Nothing here decides
- * anything yet: this records what was measured, and the verdict that consults it
- * is a separate change.
+ * Hence a licence, with the number in the repo where it can be argued with.
+ * `scripts/measure-licence.mts` reproduces it.
  *
  * The number is not a promise about all TypeScript. It is a measurement over
  * named repositories at named commits, and the way to disagree with it is to add
  * a repository and re-run.
+ *
+ * ## Two axes, not one (#207)
+ *
+ * A licence is per language **and per word**, and for most of this file's life
+ * only the first half was true -- because only one reader could accuse. That
+ * stopped being true at #198: one Python entry came to speak for four words on
+ * the strength of three unrelated measurements, and nothing in the type said
+ * which measurement had earned which word. Nothing was accusing wrongly. The
+ * hole was the *next* word, which would have inherited Python's permission from
+ * a measurement of something else, silently -- which is #195 with a different
+ * reader, and #195 is why this file exists.
+ *
+ * So the corpus below measures the **dependency** reader and says so, and
+ * `relations` on each licence records what measured `holds`, `takes`, `returns`
+ * and `builds` -- three other referees, three other commands, three other
+ * corpora. `mayAccuse` takes both.
  */
 
 import { languageOf, type Language } from "./parse";
+import { ARROW_CLAIMS, type ArrowClaim } from "./claim";
+
+/**
+ * A word that may say **wrong**, which is every arrow word but `feeds`.
+ *
+ * Written as an exclusion rather than a list of five strings, and that is the
+ * whole mechanism of the grid below. Add a seventh word to `ARROW_CLAIMS` and
+ * this type grows a member, every licence's `relations` record stops being
+ * exhaustive, and the build fails until somebody writes down what measured it.
+ * A list would have gone stale in silence, which is #195 and #207 both: a
+ * reader shipping an accusation because it inherited permission.
+ *
+ * A confirm-only word breaks the build too, and that is intended -- `feeds` is
+ * excluded here because somebody decided it, and the next one deserves the same
+ * decision rather than a default.
+ */
+export type AccusingRelation = Exclude<ArrowClaim, "feeds">;
+
+/**
+ * The same list at runtime, filtered from `ARROW_CLAIMS` rather than typed out.
+ *
+ * Complete by construction, so a report that walks it cannot quietly stop
+ * mentioning a word.
+ */
+export const ACCUSING_RELATIONS: readonly AccusingRelation[] =
+  ARROW_CLAIMS.filter((word): word is AccusingRelation => word !== "feeds");
 
 /** One repository, at the commit it was measured at. */
 export interface CorpusEntry {
@@ -52,6 +92,98 @@ export interface CorpusEntry {
   unmeasured?: number;
 }
 
+/**
+ * What one word's reader was measured at, in one language.
+ *
+ * The licence above is a measurement of the *dependency* reader, and for most
+ * of this project's life that was the only reader that could accuse. It is not
+ * any more: `holds.ts`, `signature.ts` and `constructs.ts` each read something
+ * else, against a referee of their own, on a corpus of their own. One licence
+ * entry saying "yes" for all four is the same mistake as one language entry
+ * saying "yes" for all languages, one axis over.
+ */
+export interface RelationMeasured {
+  /** The command that reproduces it. */
+  reproduce: string;
+  /** ISO date this reader was last measured for this word in this language. */
+  measured: string;
+  /** What produced the ground truth, and why it is not this reader. */
+  referee: string;
+  /** What the referee counted, in its own units. */
+  unit: string;
+  /*
+   * A note on reproducing these. The dependency corpus is five repositories at
+   * pinned commits, so its numbers are exact. The other three commands read
+   * trees as they sit on disk -- this repository among them -- so their counts
+   * move by a handful with every commit, this one included. What has to hold is
+   * the miss column, which is the number an accusation rests on.
+   */
+  /**
+   * The counts, or `"corpus"` for the table above.
+   *
+   * `needs` is what that corpus measures, and writing 12,693 out a second time
+   * beside it is exactly the two-lists-of-one-fact drift this file warns about
+   * thirty lines down. `relationTotals` resolves it.
+   *
+   * `invented` is left out where the run does not count it -- `measure:signature`
+   * counts misses and refusals and nothing else -- and an absent number is not a
+   * zero. A miss is the one that turns into a false red, which is why the bar
+   * every one of these rows is held to is the miss column.
+   */
+  counts: "corpus" | { asked: number; missed: number; invented?: number };
+  /**
+   * The languages inside this licence that the run actually asked about.
+   *
+   * Omitted means all of them, which is the honest answer for `needs`: its
+   * corpus is five whole repositories and the referee compiles every extension
+   * the licence names.
+   *
+   * It is not the honest answer for the other three. One licence entry covers
+   * TypeScript, TSX **and JavaScript**, and `measure:holds`, `measure:signature`
+   * and `measure:constructs` between them ask JavaScript 0 questions -- 21
+   * files, 51 functions, not one type name and not one construction. So the
+   * entry is right that its extensions were measured for imports and wrong that
+   * they were measured for field lists, and saying "yes" on JavaScript's behalf
+   * is #207 one axis over: permission inherited from a measurement of something
+   * else. Found while filling this grid in, which is what the grid is for.
+   */
+  covers?: readonly Language[];
+  /** Anything true about the sample that the counts alone would hide. */
+  note?: string;
+  /**
+   * Disagreements that are understood, one line each, and the only thing that
+   * lets `missed` be anything but zero.
+   *
+   * The same field `Licence.known` is, for the same reason and with the same
+   * rule behind it. A word measured over trees **as they sit on disk** is held
+   * to a miss of zero: the corpus is whatever happened to be checked out, so a
+   * miss there is a reader that cannot read something rather than a fact about
+   * the world. A word measured over **pinned repositories** is not, and a zero
+   * there would mean the corpus was too small -- which is exactly what `needs`
+   * records, and why `rust`'s `calls` row grew this field the moment it stopped
+   * being measured on two toy projects.
+   *
+   * What may go in here is a disagreement somebody has read and understood. It
+   * is not a place to park a miss nobody has looked at, and the test that reads
+   * it checks the count rather than the prose, so a fifth miss cannot hide
+   * behind four explanations.
+   */
+  known?: readonly string[];
+}
+
+/** A word this language has no number for. It may not accuse, and this says why. */
+export interface RelationUnmeasured {
+  /** Printed where a number would be, because "no" without a reason is a shrug. */
+  unmeasured: string;
+}
+
+export type RelationLicence = RelationMeasured | RelationUnmeasured;
+
+/** Whether a row is a measurement rather than a stated absence of one. */
+export function isMeasured(row: RelationLicence): row is RelationMeasured {
+  return !("unmeasured" in row);
+}
+
 export interface Licence {
   language: string;
   /** File extensions this licence covers. */
@@ -63,7 +195,87 @@ export interface Licence {
   corpus: readonly CorpusEntry[];
   /** Disagreements that are understood and not expected to close. */
   known: readonly string[];
+  /**
+   * Which words this language may accuse with, and what earned each one.
+   *
+   * Exhaustive by type, so the hole is impossible rather than merely visible:
+   * a new accusing word does not compile until every licence has an answer for
+   * it, and the answer can be `unmeasured`. That was the decision at #207 --
+   * see the header of `mayAccuse`.
+   */
+  relations: Record<AccusingRelation, RelationLicence>;
 }
+
+/**
+ * The referee for the three words the dependency corpus does not cover.
+ *
+ * A text scan of the same source, sharing no tree-sitter query with the reader
+ * -- so agreeing means two unrelated readings agree rather than one reading
+ * agreeing with itself, which is the mistake that got two orders of magnitude
+ * into #190. Named once because it is one referee wearing three hats, and a
+ * reader comparing squares should be able to see that.
+ */
+const TEXT_SCAN = (what: string): string =>
+  `a text scan of the ${what} source, run over the same trees. It shares no `
+  + "tree-sitter query with the reader, so agreeing means two unrelated readings "
+  + "agree rather than one reading agreeing with itself.";
+
+/**
+ * The referee for `calls`, which is a text scan like the three above but not the
+ * same one: it has to find where a routine ends before it can say whose call a
+ * call is, and the other three never need to. Named separately for that reason
+ * rather than folded into `TEXT_SCAN`, because a square that says yes has to
+ * name the thing that earned it and these are two different things.
+ */
+const CALL_SCAN =
+  "a text scan of the same source that bounds each routine by braces, or by "
+  + "indentation in Python, and reads the calls inside it. It shares no "
+  + "tree-sitter query and no import resolution with the reader.";
+
+/**
+ * One run of `measure:signature` covers `takes` and `returns` together, and the
+ * grid records that as two rows citing one measurement rather than one row that
+ * both words read. The difference is what #207 is about: a square that says yes
+ * has to name the thing that earned it, and two squares may name the same thing.
+ */
+const TYPESCRIPT_SIGNATURE: RelationMeasured = {
+  reproduce: "npm run measure:signature",
+  measured: "2026-09-02",
+  referee: TEXT_SCAN("signature"),
+  unit: "type names in function signatures",
+  counts: { asked: 1842, missed: 0 },
+  covers: ["ts", "tsx"],
+  note:
+    "1,801 of them TypeScript and 41 TSX. JavaScript is inside this licence and " +
+    "outside this number, and it is the one square here that was costing " +
+    "something: its 51 functions declare no type at all, so every parameter " +
+    "claim on one read as an absence and was refutable -- 51 of 51 -- by a " +
+    "reader no referee has ever checked in JavaScript. They are withheld now.",
+};
+
+const RUST_SIGNATURE: RelationMeasured = {
+  reproduce: "npm run measure:signature",
+  measured: "2026-09-02",
+  referee: TEXT_SCAN("signature"),
+  unit: "type names in function signatures",
+  counts: { asked: 154, missed: 0 },
+  note:
+    "Across 63 functions, withholding 5 of them for `Self` (#193). A " +
+    "small sample beside TypeScript's and Python's, and the smallest " +
+    "number on this grid.",
+};
+
+const PYTHON_SIGNATURE: RelationMeasured = {
+  reproduce: "npm run measure:signature",
+  measured: "2026-09-02",
+  referee: TEXT_SCAN("signature"),
+  unit: "type names in function signatures",
+  counts: { asked: 4002, missed: 0 },
+  note:
+    "Across 1,543 functions, of which it would refute 1,404 and withhold " +
+    "139 -- 71 aliased, 68 quoted. Before #198 it withheld all 1,543, " +
+    "1,404 of them for no reason but a missing licence.",
+};
 
 export const LICENCES: readonly Licence[] = [
   {
@@ -99,6 +311,60 @@ export const LICENCES: readonly Licence[] = [
         "there is no third answer in the text. One vite test fixture does this, " +
         "which is both the miss and the invention in that row.",
     ],
+    relations: {
+      needs: {
+        reproduce: "npm run measure:licence -- --only=typescript",
+        measured: "2026-08-21",
+        referee: "the corpus above, and the referee named beside it",
+        unit: "dependency edges",
+        counts: "corpus",
+      },
+      takes: TYPESCRIPT_SIGNATURE,
+      returns: TYPESCRIPT_SIGNATURE,
+      holds: {
+        reproduce: "npm run measure:holds",
+        measured: "2026-09-02",
+        referee: TEXT_SCAN("field list"),
+        unit: "field asks",
+        counts: { asked: 1195, missed: 0, invented: 0 },
+        covers: ["ts", "tsx"],
+        note:
+          "1,018 of them TypeScript and 177 TSX. JavaScript writes no type on a " +
+          "field, so its 21 files in the corpus ask nothing -- and `holds` " +
+          "refuses them as `no-fields` well before the licence is read, which " +
+          "is why saying no here costs nothing and says something true.",
+      },
+      builds: {
+        reproduce: "npm run measure:constructs",
+        measured: "2026-09-02",
+        referee: TEXT_SCAN("routine body"),
+        unit: "construction asks",
+        counts: { asked: 225, missed: 0, invented: 0 },
+        covers: ["ts", "tsx"],
+        note:
+          "55 of them TypeScript and 170 TSX. JavaScript is the real gap on this " +
+          "grid: `new Foo()` is a construction this reader could read there, and " +
+          "the corpus simply has none to ask about. Unlike `holds`, nothing else " +
+          "stops a JavaScript `@builds` arrow, so the empty square is the only " +
+          "thing standing between an unmeasured reader and a red.",
+      },
+      calls: {
+        reproduce: "npm run measure:calls",
+        measured: "2026-09-03",
+        referee: CALL_SCAN,
+        unit: "calls between routines the corpus declares exactly once",
+        counts: { asked: 1091, missed: 0, invented: 0 },
+        covers: ["ts", "tsx"],
+        note:
+          "780 TypeScript at 97.9% recall and 311 TSX at 87.5%. JavaScript is " +
+          "inside this licence and was asked **2 questions** over 7 files, which " +
+          "is the square #207 was written for and #211 landed on: `calls` shipped " +
+          "reading the old per-language gate, so a JavaScript arrow could be told " +
+          "to turn round on a reader nothing had measured in JavaScript. Nothing " +
+          "structural stops a JavaScript call the way `no-fields` stops a " +
+          "JavaScript `holds`, so this `covers` is the only thing withholding it.",
+      },
+    },
   },
   {
     language: "rust",
@@ -151,6 +417,70 @@ export const LICENCES: readonly Licence[] = [
         "resolve paths in a definition nobody has expanded. anyhow's one and two " +
         "of ripgrep's.",
     ],
+    relations: {
+      needs: {
+        reproduce: "npm run measure:licence -- --only=rust",
+        measured: "2026-08-22",
+        referee: "the corpus above, and the referee named beside it",
+        unit: "dependency edges",
+        counts: "corpus",
+      },
+      takes: RUST_SIGNATURE,
+      returns: RUST_SIGNATURE,
+      holds: {
+        reproduce: "npm run measure:holds",
+        measured: "2026-09-02",
+        referee: TEXT_SCAN("field list"),
+        unit: "field asks",
+        counts: { asked: 47, missed: 0, invented: 0 },
+      },
+      builds: {
+        reproduce: "npm run measure:constructs",
+        measured: "2026-09-02",
+        referee: TEXT_SCAN("routine body"),
+        unit: "construction asks",
+        counts: { asked: 66, missed: 0, invented: 0 },
+        note:
+          "It refuses 81.8% of them, and 96% of the refusals are one generated " +
+          "query module whose every routine is a macro. Safe and nearly useless " +
+          "in that file; the bar this row is about is the zero misses.",
+      },
+      calls: {
+        reproduce:
+          "npm run measure:calls -- .corpus/ripgrep .corpus/anyhow rust-test ~/orangutan",
+        measured: "2026-09-03",
+        referee: CALL_SCAN,
+        unit: "calls between routines the corpus declares exactly once",
+        counts: { asked: 574, missed: 4, invented: 0 },
+        known: [
+          "anyhow declares `pub fn Ok`, and `Ok` is also the prelude variant. " +
+          "`tests/test_ensure.rs` imports the variant and not the function, so " +
+          "its three `Ok(..)` calls are the variant -- which the reader says, " +
+          "and the referee, seeing one declaration of the name in the corpus, " +
+          "asks about anyway.",
+          "`trim_line_terminator` is declared twice in ripgrep's printer, once " +
+          "as a free function and once as a method, and the referee credited " +
+          "`util.rs`'s call to the method in `standard.rs`. The reader is right " +
+          "that the call it can see is the local one.",
+        ],
+        note:
+          "The default corpus asks Rust 36 questions, which is thin enough that " +
+          "a zero in the miss column says very little. So this row is measured " +
+          "over the two repositories the `needs` corpus above already pins -- " +
+          "ripgrep and anyhow at their recorded commits -- and Rust is a " +
+          "different language there: recall falls from 94.4% to 66.0%, and two " +
+          "thirds of the refusals are `macro`. A refusal is not a miss. The four " +
+          "misses were each read and the reader is right about all four -- they " +
+          "are the referee asking about a name it cannot place, which is the " +
+          "class #189 already recorded five of. `Ok` is anyhow\'s own " +
+          "`pub fn Ok` and also the prelude variant, and `test_ensure.rs` " +
+          "imports the one it does not mean; `trim_line_terminator` is declared " +
+          "both as a free function and as a method, and the referee credited the " +
+          "call to the wrong one. What the accusation rests on is the ACCUSED " +
+          "and INVENTED columns, and both are zero across all 574. Reproducing " +
+          "it needs the clones, which `measure:licence` makes in `.corpus/`.",
+      },
+    },
   },
   {
     language: "python",
@@ -220,6 +550,49 @@ export const LICENCES: readonly Licence[] = [
         "Nothing in this corpus does it, and pyright's typeshed has the same " +
         "shape of exposure.",
     ],
+    relations: {
+      needs: {
+        reproduce: "npm run measure:licence -- --only=python",
+        measured: "2026-09-02",
+        referee: "the corpus above, and the referee named beside it",
+        unit: "dependency edges",
+        counts: "corpus",
+      },
+      takes: PYTHON_SIGNATURE,
+      returns: PYTHON_SIGNATURE,
+      holds: {
+        reproduce: "npm run measure:holds",
+        measured: "2026-09-02",
+        referee: TEXT_SCAN("field list"),
+        unit: "field asks",
+        counts: { asked: 2177, missed: 0, invented: 0 },
+        note:
+          "It refuses 25.4% of them, every one a quoted annotation. A refusal " +
+          "is not a miss, and the bar this row is about is the zero misses.",
+      },
+      builds: {
+        unmeasured:
+          "Python spells making one of something as an ordinary call, so the " +
+          "referee has no pattern to count and the reader has no verdict to " +
+          "give: `measure:constructs` asks it 0 times over 442 files. " +
+          "`constructs.ts` withholds Python before any licence is consulted, so " +
+          "nothing changes by saying so here -- but until #207 this square read " +
+          "`yes`, on the strength of three measurements of other words.",
+      },
+      calls: {
+        reproduce: "npm run measure:calls",
+        measured: "2026-09-03",
+        referee: CALL_SCAN,
+        unit: "calls between routines the corpus declares exactly once",
+        counts: { asked: 5525, missed: 0, invented: 0 },
+        note:
+          "83% of the whole population, at 92.9% recall over 683 files, which is " +
+          "the right shape: Python is where the census says most calls are and " +
+          "where a call is hardest to place statically. Two thirds of the 7.1% " +
+          "refused are `unbound` and `unplaced` -- a name a wildcard import or a " +
+          "module resolving to no file brought in -- and neither is a reader bug.",
+      },
+    },
   },
 ];
 
@@ -261,26 +634,94 @@ export function licenceFor(filePath: string): Licence | undefined {
   );
 }
 
+/** The licence covering a language, if any. */
+function licenceOf(language: Language): Licence | undefined {
+  /*
+   * Answered by running the licence's own extensions back through `languageOf`
+   * rather than by a second table of language-to-extension. That table is the
+   * specialization layer #190 warns about -- two lists of the same fact drift,
+   * and the one that drifts silently is the one nothing reads.
+   */
+  return LICENCES.find((licence) =>
+    licence.extensions.some((extension) => languageOf(`x${extension}`) === language),
+  );
+}
+
+/** What a word's reader was measured at in a language, if it was. */
+export function relationLicence(
+  relation: AccusingRelation,
+  language: Language,
+): RelationLicence | undefined {
+  return licenceOf(language)?.relations[relation];
+}
+
 /**
- * Whether a reader for this language has earned the right to say **wrong**.
+ * The counts behind one row, with `needs` resolved to the corpus above.
  *
- * The same question `licenceFor` answers, asked of a language rather than a
- * path, because a reader that was handed source text and a grammar has no path
- * to ask about. `signature.ts` and `holds.ts` are both in that position.
+ * Undefined for a word with no measurement, which is the same answer
+ * `mayAccuse` gives and for the same reason.
+ */
+export function relationTotals(
+  relation: AccusingRelation,
+  language: Language,
+): { asked: number; missed: number; invented?: number } | undefined {
+  const licence = licenceOf(language);
+  const row = licence?.relations[relation];
+  if (!licence || !row || !isMeasured(row)) return undefined;
+  if (row.counts !== "corpus") return row.counts;
+  const totals = licenceTotals(licence);
+  return { asked: totals.edges, missed: totals.missed, invented: totals.invented };
+}
+
+/**
+ * Whether **this word's reader** has earned the right to say **wrong** in this
+ * language.
+ *
+ * The question used to be asked of the language alone, and for two words and
+ * two languages that was the same question. It stopped being one at #198: a
+ * single Python entry came to speak for four words on the strength of three
+ * unrelated measurements -- pyright for the imports, a text scan for the field
+ * lists, another for the signatures -- and nothing in the type said which. The
+ * fifth word would have accused in Python on the strength of somebody else's
+ * measurement of something else, silently. That is #195 again with a different
+ * reader, and #195 is the reason this file exists.
+ *
+ * ## An unlisted pair is a compile error, and also a silent no
+ *
+ * Decided at #207, and it is both rather than either. `relations` is an
+ * exhaustive `Record`, so a word that no licence has an answer for does not
+ * build -- the hole cannot be left, only filled in with `unmeasured`. And this
+ * function still answers `false` for anything it does not find, because a
+ * compile error only catches the person adding the word. The type is the part
+ * that makes the hole impossible; the `false` is the part that makes it safe if
+ * the type is ever routed around.
+ *
+ * The alternative -- default to `true` and list the exceptions -- was never
+ * live. A grid whose blank square means "may accuse" is the bug it is meant to
+ * prevent, wearing a table.
+ *
+ * `covers` is the same rule inside an entry. A licence names several extensions
+ * and a run may not have asked about all of them, so a row that was measured on
+ * TypeScript and TSX says so, and JavaScript gets the same `false` an unlisted
+ * word gets. Found while filling this grid in: JavaScript had three squares
+ * saying yes on TypeScript's numbers.
+ *
+ * ## What it gates, which has not changed
  *
  * The answer only ever gates an **absence**. Confirming needs no licence:
  * finding a name is evidence the name is there whoever does the reading, and it
  * is the same evidence a measured reader would have found. Absence is the claim
  * about the whole of something, and it is the one that turns a reader's
- * blindness into somebody else's wrong diagram.
+ * blindness into somebody else's wrong diagram. Every caller asks at its last
+ * gate, so losing a licence costs the accusation and nothing else.
  *
- * Answered by running the licence's own extensions back through `languageOf`
- * rather than by a second table of language-to-extension. That table is the
- * specialization layer #190 warns about -- two lists of the same fact drift, and
- * the one that drifts silently is the one nothing reads.
+ * `closed` and `complete` are not here. They accuse from an absence too, and
+ * they read the imports -- the same reader `needs` uses and the corpus above
+ * measures -- so they ask `licenceFor` about a path, which is that same
+ * question in the form they can put it.
  */
-export function mayAccuse(language: Language): boolean {
-  return LICENCES.some((licence) =>
-    licence.extensions.some((extension) => languageOf(`x${extension}`) === language),
-  );
+export function mayAccuse(relation: AccusingRelation, language: Language): boolean {
+  const row = relationLicence(relation, language);
+  if (row === undefined || !isMeasured(row)) return false;
+  return row.covers === undefined || row.covers.includes(language);
 }
