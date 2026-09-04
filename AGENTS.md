@@ -39,6 +39,17 @@ plus a live local board for editing them alongside a human.
   [docs/claim-vocabulary.md](docs/claim-vocabulary.md).** It carries the part
   that does not fit in a header: which words may say *wrong* and on which of
   three footings, why two of them point the opposite way from the other two,
+  what each language has earned the right to accuse about, and the six times a
+  measurement contradicted the design. Four of those six were found by
+  building one word or one reader rather than by reviewing the plan.
+- **Before writing a reader that matches tree-sitter node types, read
+  [docs/reading-a-grammar.md](docs/reading-a-grammar.md).** One reader made the
+  same mistake four times in a sitting, three of them while fixing it, and every
+  instance was a hand-written list of node names that one language spelled
+  differently. It never throws — it produces a number that is wrong in one
+  language and right in the rest, which reads as a finding about that language.
+  Read the *field*, and where there is none read the structure: an operator
+  token is anonymous, so its type is its own text.
   which (word, language) pairs have earned the right to accuse and which have
   not, and the times a measurement contradicted the design. Most of those were
   found by building one word or one reader rather than by reviewing the plan --

@@ -356,6 +356,8 @@ and never fail.
 | `npm run measure:calls` | can the call reader be trusted to say backwards, and how often it can answer |
 | `npm run measure:constructs` | can the construction reader be trusted to say backwards |
 | `npm run measure:signature` | the same for parameters and return types |
+| `npm run measure:licence` | reproduces the per-language licence numbers — `--only=python` for one |
+| `npm run measure:dataflow` | what following a value through one body buys, confirming and refuting |
 | `npm run measure:licence` | reproduces the per-language dependency numbers, then prints the whole (word, language) grid — `--only=python` for one |
 | `npx tsx scripts/probe-generative.mts` | draws boards of unseen code and counts what could not be said |
 
@@ -409,9 +411,9 @@ the probe's own two lists were replaced with a shape rule in the same change.
 Still wordless: `conforms`, `accesses`. `invokes` was the largest of the three
 and #189 gave it `@calls`.
 
-## Seven times a measurement contradicted the design
+## Nine times a measurement contradicted the design
 
-Kept because the pattern is the point: five of the seven came from building one
+Kept because the pattern is the point: seven of the nine came from building one
 word or one reader, not from reviewing the design.
 
 1. **The substrate was empty.** #190's first draft proposed graphify as the
@@ -442,6 +444,37 @@ word or one reader, not from reviewing the design.
    t` beside `src/flask/typing.py` invent sixteen edges in one line, because it
    had started shadowing the standard library. Neither half was visible without
    the other, and running the measurement once would have shipped one of them.
+7. **#203's prediction was wrong, and backwards.** It said dataflow would make
+   confirming *dramatically* better and refuting only *slightly* better, which
+   is why it was written as a note rather than a programme. Measured (#208):
+   confirming gained **4.0%** of the flows in the corpus and refuting reached
+   **11.5%** of all values. The ratio is the opposite of the one predicted, and
+   the shape of it is one number: **42.4% of values escape by being handed to a
+   routine** — which is #189, not dataflow.
+8. **One more abstraction moved both numbers, which is the argument for a
+   framework.** The first reading of #208 modelled nothing but locals, so
+   `v.push(widget); use(v[i])` — #203's own example — was invisible. Adding a
+   single abstraction, a collection as one thing with the index deliberately
+   forgotten, took confirming from 4.0% to **5.9%** and refuting from 11.5% to
+   **13.0%**. It also surfaced two bugs that had nothing to do with
+   collections, so the first reading was understating both. The finding is not
+   the 1.5 points: it is that the second abstraction cost an afternoon and
+   generalised, which is what a framework means.
+9. **The call graph was worth a fifth of what the questions it raised were.**
+   With #189 merged, resolving a callee and asking whether it keeps its
+   argument took refuting from 13.0% to **19.1%** — and only **1.1 points of
+   that is the call resolution**. 279 values were freed by reading a callee's
+   body. The other ~1,240 came from two rules the exercise *forced*, both of
+   them local: a property read hands out the property rather than the object,
+   and arithmetic makes a new value out of its operands. Without those, no
+   callee ever "keeps" its argument — `return x.length` is the commonest shape
+   of a routine that only looks at one — so the interprocedural question read
+   zero for everybody, and getting it to answer at all meant getting value
+   semantics right first.
+
+   The other half of that finding: **65.1% of calls still cannot be resolved to
+   a routine in the corpus**, most of them builtins and library calls. `@calls`
+   made a call's name resolvable; it did not make the world enumerable.
 
 7. **The hardest word was the one that refused least.** #189 predicted `@calls`
    might have to ship confirm-only, because a call is not obviously refutable
@@ -460,6 +493,25 @@ be one: `<MenuContent />` is a routine making a MenuContent, which is `@builds`.
 
 ## Open, in the order worth doing
 
+1. **The licence grid**, which #198 turned from a someday into a hole with a
+   name and #189 has now widened: one `Licence` entry speaks for **seven** words
+   on the strength of four separate measurements. See below.
+2. **#203 — the engine has no notion of a value.** Dataflow, points-to, escape
+   analysis. Its prediction has been measured and did not hold, in the direction
+   that makes it *more* interesting rather than less — see items 7 and 8 above
+   and `npm run measure:dataflow`. Two abstractions are built, both generalised,
+   and the number to beat is **19.1%**.
+
+   What it must not be revisited as is a case-by-case reader. The shapes are
+   unbounded and the lists that recognise them go stale silently — which is the
+   fourth item below, and has now happened four times in this programme.
+
+   `@calls` is a call checker rather than a call graph, so this took a build on
+   top of `bindingsIn` rather than a re-run — and the build is done and
+   measured (item 9). What it says is that the call graph was the *smaller*
+   half of its own question, and that two thirds of calls still resolve to
+   nothing this corpus holds.
+3. **#190's layer 2.** The relation list is settled as-is by the owner. The one
 1. **#203 — the engine has no notion of a value.** Dataflow, points-to, escape
    analysis. #203's own prediction — confirmation much better, refutation only
    slightly — is being measured rather than argued at #208, which is the right
