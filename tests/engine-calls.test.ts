@@ -469,4 +469,28 @@ describe("what a name in a file is bound to", () => {
     expect(bindingsIn("use crate::a::*;\n", "rust")!.wildcard).toBe(true);
     expect(bindingsIn('export * from "./b";\n', "ts")!.wildcard).toBe(true);
   });
+
+  /*
+   * The answers above are remembered between questions, because `measure:calls`
+   * asked for them 19,320 times about 775 files and each ask walked the file's
+   * whole tree. What a cache can get wrong is which answer it hands back, so
+   * these are about the key rather than about bindings.
+   */
+  it("does not hand one file's bindings to another", () => {
+    const first = bindingsIn('import { render } from "./b";\n', "ts")!;
+    const second = bindingsIn('import { render } from "./c";\n', "ts")!;
+    expect(first.imported.get("render")?.specifier).toBe("./b");
+    expect(second.imported.get("render")?.specifier).toBe("./c");
+    // And asking again does not return whatever was asked last.
+    expect(bindingsIn('import { render } from "./b";\n', "ts")!.imported.get("render")?.specifier)
+      .toBe("./b");
+  });
+
+  it("keeps the same text in two languages apart", () => {
+    // `import a.b` is Python binding the module `a`; the same line read as
+    // TypeScript is not that at all. One key for both would answer the second
+    // question with the first answer.
+    expect(bindingsIn("import a.b\n", "python")!.imported.get("a")?.namespace).toBe(true);
+    expect(bindingsIn("import a.b\n", "ts")!.imported.has("a")).toBe(false);
+  });
 });

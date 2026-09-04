@@ -66,7 +66,7 @@
  *   macros                 the call site is generated, not written   -> `macro`
  */
 import { mayAccuse } from "./licence";
-import { each, parseSource, type Language, type Node } from "./parse";
+import { each, parseSource, type Language, type Node, type Tree } from "./parse";
 
 /**
  * Why no verdict was reached. Every one of these is a reason to stay quiet, and
@@ -490,6 +490,23 @@ function declaredNames(node: Node, into: Set<string>): void {
   }
 }
 
+const BINDINGS_LIMIT = 512;
+/**
+ * What a file binds, remembered across the questions asked about it.
+ *
+ * Nothing here has a shelf life: the key is the file's whole text, so an edited
+ * file is a different question and a stale answer cannot be returned. What it
+ * buys is that the answer is a fact about a *file* while the caller asks it once
+ * per *call site*. `measure:calls` asked this 19,320 times about 775 files --
+ * every one of those a full walk of the tree, and every node on that walk a
+ * crossing into WebAssembly and back.
+ *
+ * Bounded and holding only strings. `parseSource` has to keep its own cache
+ * small because a tree is WebAssembly memory that only `delete()` returns; this
+ * one holds names, so it can afford to remember more files than that.
+ */
+const bindings_ = new Map<string, Bindings | undefined>();
+
 /**
  * What every name in a file is bound to.
  *
@@ -498,6 +515,23 @@ function declaredNames(node: Node, into: Set<string>): void {
  * not say which layer produced it.
  */
 export function bindingsIn(source: string, language: Language): Bindings | undefined {
+  const remembered = `${language}:${source}`;
+  if (bindings_.has(remembered)) {
+    const cached = bindings_.get(remembered);
+    bindings_.delete(remembered);
+    bindings_.set(remembered, cached);
+    return cached;
+  }
+  const found = readBindings(source, language);
+  bindings_.set(remembered, found);
+  if (bindings_.size > BINDINGS_LIMIT) {
+    const oldest = bindings_.keys().next();
+    if (!oldest.done) bindings_.delete(oldest.value);
+  }
+  return found;
+}
+
+function readBindings(source: string, language: Language): Bindings | undefined {
   const tree = parseSource(source, language);
   if (!tree) return undefined;
   const bindings: Bindings = {
@@ -586,6 +620,9 @@ const REACHES_ANYTHING = new Set([
   "apply", "call", "Function",
 ]);
 
+type Named = { routines: Node[]; declared: boolean; unreadable: boolean };
+const named_ = new WeakMap<Tree, Map<string, Named>>();
+
 /**
  * Every routine of this name in this source.
  *
@@ -599,9 +636,22 @@ function routinesNamed(
   source: string,
   routine: string,
   language: Language,
-): { routines: Node[]; declared: boolean; unreadable: boolean } {
+): Named {
   const tree = parseSource(source, language);
   if (!tree) return { routines: [], declared: false, unreadable: true };
+
+  /*
+   * Held against the tree rather than against the text, because what is
+   * remembered here are nodes *inside* that tree -- they mean nothing once it
+   * is freed. A weak key is exactly that lifetime: `parseSource` evicting a
+   * tree makes every answer about it unreachable, so a stale node cannot come
+   * back. The same file gets asked about a dozen different routines and every
+   * one of those walked the whole tree again.
+   */
+  const found_ = named_.get(tree) ?? new Map<string, Named>();
+  named_.set(tree, found_);
+  const remembered = found_.get(routine);
+  if (remembered) return remembered;
 
   const routines: Node[] = [];
   let declared = false;
@@ -618,7 +668,9 @@ function routinesNamed(
     }
     if (holdsRoutines(node)) routines.push(node);
   });
-  return { routines, declared, unreadable: false };
+  const answer = { routines, declared, unreadable: false };
+  found_.set(routine, answer);
+  return answer;
 }
 
 /** Whether this declaration has a routine anywhere inside it. */
