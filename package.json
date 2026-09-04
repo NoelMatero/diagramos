@@ -42,6 +42,7 @@
     "graph:refresh": "node scripts/refresh-code-graph.mjs",
     "typecheck": "tsc --noEmit",
     "check:drift": "tsx scripts/check-drift.mjs",
+    "measure:accesses": "tsx scripts/measure-accesses.mts",
     "measure:calls": "tsx scripts/measure-calls.mts",
     "measure:constructs": "tsx scripts/measure-constructs.mts",
     "measure:dataflow": "tsx scripts/measure-dataflow.mts",

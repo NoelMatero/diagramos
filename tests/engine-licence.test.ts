@@ -327,6 +327,12 @@ describe("which words may accuse, and in which languages", () => {
      * illustration of it: #211 shipped a refutable word reading the old
      * per-language gate, so a JavaScript arrow was refutable on 2 asks. Nothing
      * structural stopped it the way `no-fields` stops a JavaScript `holds`.
+     *
+     * `accesses` is the first word to arrive with the grid already there, and
+     * JavaScript is a `no` in it for the reason `holds` is: `measure:accesses`
+     * asks it **0 questions** over 21 files, because a JavaScript class writes
+     * no member list a text scan can read off. The other four are measured, at
+     * zero accusations across 5,833 asks.
      */
     const grid: Record<AccusingRelation, Record<Language, boolean>> = {
       needs: { ts: true, tsx: true, js: true, rust: true, python: true },
@@ -335,6 +341,7 @@ describe("which words may accuse, and in which languages", () => {
       holds: { ts: true, tsx: true, js: false, rust: true, python: true },
       builds: { ts: true, tsx: true, js: false, rust: true, python: false },
       calls: { ts: true, tsx: true, js: false, rust: true, python: true },
+      accesses: { ts: true, tsx: true, js: false, rust: true, python: true },
     };
     for (const relation of ACCUSING_RELATIONS) {
       for (const language of LANGUAGES) {

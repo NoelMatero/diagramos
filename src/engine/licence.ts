@@ -233,6 +233,19 @@ const CALL_SCAN =
   + "tree-sitter query and no import resolution with the reader.";
 
 /**
+ * The referee for `accesses`, which is a text scan like the three above and asks
+ * a different question of it: not what a member's type is but what the member is
+ * called, and separately what a body reads. Named apart for the reason
+ * `CALL_SCAN` is -- a square that says yes has to name the thing that earned it,
+ * and these are not the same thing.
+ */
+const MEMBER_SCAN =
+  "a text scan of the same source that reads a type's declared member names off "
+  + "its header and the lines under it, and separately reads the `.name` tokens "
+  + "inside each routine. It shares no tree-sitter query with the reader. Only "
+  + "the type end is counted here, because only the type end can accuse.";
+
+/**
  * One run of `measure:signature` covers `takes` and `returns` together, and the
  * grid records that as two rows citing one measurement rather than one row that
  * both words read. The difference is what #207 is about: a square that says yes
@@ -364,6 +377,22 @@ export const LICENCES: readonly Licence[] = [
           "structural stops a JavaScript call the way `no-fields` stops a " +
           "JavaScript `holds`, so this `covers` is the only thing withholding it.",
       },
+      accesses: {
+        reproduce: "npm run measure:accesses",
+        measured: "2026-09-04",
+        referee: MEMBER_SCAN,
+        unit: "member asks at the type end",
+        counts: { asked: 5181, missed: 0, invented: 0 },
+        covers: ["ts", "tsx"],
+        note:
+          "4,823 of them TypeScript and 358 TSX, and the count is of the **type** " +
+          "end only -- the end that can accuse. TypeScript refuses 1.9% of its " +
+          "asks, every one of them a type with an index signature, which is a " +
+          "member list that answers to any name at all. TSX refuses none. " +
+          "JavaScript is inside this licence and was asked **0 questions**: it " +
+          "writes no member list a text scan can find, so `covers` withholds it " +
+          "-- the same square #211 shipped a `yes` in.",
+      },
     },
   },
   {
@@ -480,6 +509,22 @@ export const LICENCES: readonly Licence[] = [
           "and INVENTED columns, and both are zero across all 574. Reproducing " +
           "it needs the clones, which `measure:licence` makes in `.corpus/`.",
       },
+      accesses: {
+        reproduce: "npm run measure:accesses",
+        measured: "2026-09-04",
+        referee: MEMBER_SCAN,
+        unit: "member asks at the type end",
+        counts: { asked: 284, missed: 0, invented: 0 },
+        note:
+          "Refuses none of them, which is the one language where the member list " +
+          "really is a declaration: a struct has no parent to inherit from and no " +
+          "index signature. What Rust costs instead is at the other end, which " +
+          "never accuses -- the confirming half reads 87.3% of the accesses the " +
+          "referee sees, the lowest of the five, because `format!(\"{}\", " +
+          "self.status)` and `log_line!(.., sock.peer_addr())` put the access " +
+          "inside a macro and a macro's arguments are an unparsed token tree. " +
+          "That is a confirmation nobody gets, never a red.",
+      },
     },
   },
   {
@@ -591,6 +636,22 @@ export const LICENCES: readonly Licence[] = [
           "where a call is hardest to place statically. Two thirds of the 7.1% " +
           "refused are `unbound` and `unplaced` -- a name a wildcard import or a " +
           "module resolving to no file brought in -- and neither is a reader bug.",
+      },
+      accesses: {
+        reproduce: "npm run measure:accesses",
+        measured: "2026-09-04",
+        referee: MEMBER_SCAN,
+        unit: "member asks at the type end",
+        counts: { asked: 368, missed: 0, invented: 0 },
+        note:
+          "The smallest population on this row and the reason is the design " +
+          "working: a Python class with a base class has no closed member list, " +
+          "so the reader withholds and the referee does not offer it. Nearly " +
+          "every Python class in the corpus has one. What is left is the classes " +
+          "that declare their own members outright, and the reader reads 100% of " +
+          "them -- including the attributes `__init__` assigns to `self`, which " +
+          "is where most Python attributes are and which a reader stopping at " +
+          "the class body would refute every one of.",
       },
     },
   },

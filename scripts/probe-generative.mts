@@ -48,7 +48,8 @@ const CORPUS = [
   `${process.cwd()}/.claude/worktrees/96-rust/.corpus`,
 ].find((candidate) => existsSync(candidate)) ?? "";
 
-type Claim = "needs" | "feeds" | "takes" | "returns" | "holds" | "builds" | "calls";
+type Claim =
+  | "needs" | "feeds" | "takes" | "returns" | "holds" | "builds" | "calls" | "accesses";
 
 interface Arrow {
   from: string;
@@ -156,7 +157,7 @@ const QUERY_CORE: Board = {
     { from: "cache", to: "get-cache", claim: "returns", wants: "produces" },
     { from: "query", to: "add", claim: "takes", wants: "accepts" },
     { from: "retryer", to: "create-retryer", claim: "returns", wants: "produces" },
-    { from: "observer", to: "query", wants: "accesses", label: "observers" },
+    { from: "observer", to: "query", claim: "accesses", wants: "accesses", label: "observers" },
   ],
 };
 
@@ -253,7 +254,7 @@ const HAS_A_WORD: Record<string, Claim | undefined> = {
   contains: "holds",
   conforms: undefined,
   invokes: "calls",
-  accesses: undefined,
+  accesses: "accesses",
   constructs: "builds",
   renders: "builds",
 };

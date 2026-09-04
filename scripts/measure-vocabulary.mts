@@ -881,6 +881,7 @@ const WORD_FOR: Record<string, string> = {
   contains: "@holds",
   constructs: "@builds",
   invokes: "@calls",
+  accesses: "@accesses",
   flows: "@feeds",
 };
 

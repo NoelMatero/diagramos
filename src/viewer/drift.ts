@@ -66,6 +66,7 @@ const KNOWN_EDGE_KINDS = new Set([
   "holds-absent",
   "builds-backwards",
   "calls-backwards",
+  "accesses-absent",
 ]);
 
 /**
@@ -78,7 +79,7 @@ const KNOWN_EDGE_KINDS = new Set([
  */
 const WRONG_EDGE_KINDS = new Set([
   "backwards-edge", "signature-absent", "holds-absent", "builds-backwards",
-  "calls-backwards",
+  "calls-backwards", "accesses-absent",
 ]);
 
 /**
@@ -360,6 +361,7 @@ export function tallyOf(report: DriftView): TallyPart[] {
   const wrongHolds = report.edges.filter((finding) => finding.kind === "holds-absent").length;
   const wrongBuilds = report.edges.filter((finding) => finding.kind === "builds-backwards").length;
   const wrongCalls = report.edges.filter((finding) => finding.kind === "calls-backwards").length;
+  const wrongMembers = report.edges.filter((finding) => finding.kind === "accesses-absent").length;
   const unsupported = report.edges.filter(
     (finding) => !WRONG_EDGE_KINDS.has(finding.kind) && KNOWN_EDGE_KINDS.has(finding.kind),
   ).length;
@@ -413,6 +415,18 @@ export function tallyOf(report: DriftView): TallyPart[] {
   if (wrongCalls) {
     parts.push({
       text: `${wrongCalls} ${wrongCalls === 1 ? "call" : "calls"} backwards`,
+      tone: "bad",
+    });
+  }
+  /*
+   * Its own chip, and the only red here that is not about a direction. Every
+   * other one sends somebody to turn an arrow round or to look at a signature;
+   * this one says the member on the arrow is not on the type any more, which is
+   * usually a rename that landed this turn.
+   */
+  if (wrongMembers) {
+    parts.push({
+      text: `${wrongMembers} ${wrongMembers === 1 ? "member" : "members"} gone`,
       tone: "bad",
     });
   }
@@ -556,6 +570,7 @@ export function rowsOf(report: DriftView): StatusRow[] {
         + (finding.kind === "holds-absent" ? " · not in the fields" : "")
         + (finding.kind === "builds-backwards" ? " · built the other way" : "")
         + (finding.kind === "calls-backwards" ? " · called the other way" : "")
+        + (finding.kind === "accesses-absent" ? " · no such member" : "")
         + (KNOWN_EDGE_KINDS.has(finding.kind)
           ? ""
           : ` · ${finding.kind}${finding.detail ? `: ${finding.detail}` : ""}`),

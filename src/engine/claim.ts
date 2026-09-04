@@ -155,7 +155,44 @@
  * is the other case -- somebody asserted the call, so an answer either way is
  * about what they said.
  */
-export const ARROW_CLAIMS = ["needs", "feeds", "takes", "returns", "holds", "builds", "calls"] as const;
+/*
+ * `accesses` says a routine reads a named member off a type: `Renderer --[width
+ * @accesses]--> Config` (#213). It is the largest relationship a diagram could
+ * draw and had no word for -- 53,362 drawable in the census against 1,946 for
+ * the next uncovered one, a factor of twenty-seven -- and eighteen arrows in
+ * this repository's own boards write it as prose instead: `reads`, `write`,
+ * `key`, `value`, `drain socket`.
+ *
+ * Two things about it are new to this list.
+ *
+ * **Its two ends stand on different footings**, which no other word here does.
+ * The type end is a declaration, so a member list is a closed region and a
+ * member absent from all of it refutes the arrow -- the footing `holds` stands
+ * on. The routine end is a body, and working out everything a body touches
+ * needs every receiver's type, which is the whole program; so that end confirms
+ * and is otherwise silent, which is the footing `feeds` stands on. Refuting
+ * from one end and staying quiet at the other is not a compromise between them:
+ * it is what `builds` already does, an accusation that rests on what was found
+ * beside an absence that is never a finding.
+ *
+ * Confirming needs both halves, which is this file's admission rule applied to
+ * a word that has two. "Config declares `width`" would go green whatever
+ * routine sat at the far end, and "this routine writes `.width`" says nothing
+ * about Config. Neither is evidence of the specific thing asserted; together
+ * they are.
+ *
+ * **It takes an argument**, and no other word here does. The member name goes
+ * on the arrow's label, which keeps one syntax in both directions the way
+ * `labelWithClaim` does for the word itself -- strip `customData` off a board
+ * and the arrow still says what it claimed *and what it claimed about*. An
+ * `@accesses` arrow that names no member can be read at neither end, so it is
+ * reported as garbled rather than withheld quietly: a claim nothing can ever
+ * read looks exactly like a claim that passed, which is the whole of the rule
+ * at the top of this file.
+ */
+export const ARROW_CLAIMS = [
+  "needs", "feeds", "takes", "returns", "holds", "builds", "calls", "accesses",
+] as const;
 
 export type ArrowClaim = (typeof ARROW_CLAIMS)[number];
 
