@@ -251,6 +251,55 @@ describe("a value that provably never leaves the body", () => {
     expect(v.escapes).toEqual(["captured-by-a-closure"]);
   });
 
+  it("counts a value read inside an immediately-invoked body as captured", () => {
+    // #213. The escape was found by `measure:dataflow` and the trigger is the
+    // callee position, not the closure: `const g = () => w; g();` was already
+    // right. A body sitting where the callee goes was never walked, so the
+    // capture inside it never happened and the value came back contained --
+    // an absence offered as proof, on a value handed away in plain sight.
+    const v = local(
+      "function f() {\n  const w = make();\n  const t = (() => store(w))();\n}\n", "f", "w",
+    );
+    expect(v.escapes).toEqual(["captured-by-a-closure"]);
+  });
+
+  it("counts a value read inside an immediately-invoked function expression as captured", () => {
+    // The same escape wearing the older spelling. Both shapes occur in this
+    // repo's own corpus, and a test on the arrow alone would have shipped the
+    // fix half done.
+    const v = local(
+      "function f() {\n"
+      + "  const w = make();\n"
+      + "  const t = (function () { return store(w); })();\n"
+      + "}\n", "f", "w",
+    );
+    expect(v.escapes).toEqual(["captured-by-a-closure"]);
+  });
+
+  it("counts a value read inside an immediately-invoked lambda as captured, in Python", () => {
+    const v = local(
+      "def f():\n    w = make()\n    t = (lambda: store(w))()\n", "f", "w", "python",
+    );
+    expect(v.escapes).toEqual(["captured-by-a-closure"]);
+  });
+
+  it("counts a value read inside an immediately-invoked closure as captured, in Rust", () => {
+    const v = local(
+      "fn f() {\n    let w = make();\n    let t = (|| store(w))();\n}\n", "f", "w", "rust",
+    );
+    expect(v.escapes).toEqual(["captured-by-a-closure"]);
+  });
+
+  it("still reads a path call's callee as a path rather than as a body", () => {
+    // The guard on the fix above. `foo::bar(x)` and `Foo::new(x)` also arrive
+    // with a callee that is not a bare name, and reaching into them would turn
+    // every path segment into a use of a local that happens to share its name.
+    expect(local("fn f() {\n  let w = make();\n  foo::bar(w);\n}\n", "f", "w", "rust").escapes)
+      .toEqual(["passed-to-a-call"]);
+    expect(local("fn f() {\n  let w = make();\n  Foo::new(w);\n}\n", "f", "w", "rust").escapes)
+      .toEqual(["passed-to-a-call"]);
+  });
+
   it("counts a value published to a name outside the body as gone", () => {
     // `font.ts`'s module-level `faces`. An assignment to it reads exactly like a
     // fresh binding, and the value was being counted as a local that never left

@@ -33,73 +33,15 @@ import path from "node:path";
 
 import { readFileSync } from "node:fs";
 
+import { boardCorpus } from "./lib/boards";
+
 import { readBoard } from "../src/engine/board-file";
 import { checkDrift, createWorkspace, type DriftFinding, type EdgeDriftFinding } from "../src/engine/drift";
 import { readGraph } from "../src/engine/graph";
 import { each, initEngine, languageOf, parseSource, type Language, type Node } from "../src/engine/parse";
 
+
 const HOME = process.env.HOME ?? "/Users/noelmatero";
-
-/**
- * Where boards are looked for.
- *
- * There are 1,902 `.excalidraw` files on the machine this was written on and
- * roughly two dozen distinct boards. The rest are copies: 1,171 live in
- * throwaway worktrees under `.claude`, several hundred are test fixtures, and
- * six sibling checkouts -- `board-ai-anchors`, `board-ai-daemon` and friends --
- * each hold an older copy of the same thirteen boards this repository has now.
- *
- * Counting those is not more data. It is the same board six times at six
- * different ages, which inflates every total by about six and makes staleness
- * look like signal. So the corpus is named rather than discovered, and a root
- * that is not on disk is skipped and said to be skipped.
- */
-const BOARD_ROOTS = [
-  path.resolve(process.cwd()),
-  `${HOME}/orangutan`,
-  `${HOME}/Downloads`,
-];
-
-/**
- * Copies and fixtures rather than boards.
- *
- * `demo-124` and `demo-141` are the awkward ones and they are excluded for a
- * reason worth stating: they hold a *deliberately* backwards arrow, drawn to
- * demonstrate what a red looks like. Counting them puts a permanent one in the
- * failed-claim number, which is meant to be a regression signal that sits near
- * zero -- a floor nothing can ever clear reads exactly like a bug nobody fixed.
- */
-const NOT_A_BOARD = [
-  "/node_modules/",
-  "/.claude/",
-  "/tests/",
-  "/fixtures/",
-  "/out/",
-  "/.git/",
-  "/demo-",
-];
-
-function boardsUnder(root: string): string[] {
-  if (!existsSync(root)) return [];
-  try {
-    return execFileSync("find", [root, "-name", "*.excalidraw", "-type", "f"], { encoding: "utf8" })
-      .split("\n")
-      .filter(Boolean)
-      /*
-       * Matched against the path *below* the root, never the whole path. A
-       * worktree of this repository lives under `.claude` itself, so filtering
-       * the absolute path threw away every board in the checkout the run was
-       * started from -- and reported four boards as if that were the corpus.
-       */
-      .filter((file) => {
-        const below = `/${path.relative(root, file)}`;
-        return !NOT_A_BOARD.some((fragment) => below.includes(fragment));
-      })
-      .sort();
-  } catch {
-    return [];
-  }
-}
 
 /**
  * The repository a board describes, which is the tree its refs resolve against.
@@ -548,11 +490,7 @@ function refereeCounts(source: string, language: Language): Map<string, number> 
 
 await initEngine();
 
-const boards = BOARD_ROOTS.flatMap((root) => {
-  const found = boardsUnder(root);
-  if (found.length === 0) console.log(`  (no boards under ${root} -- skipped)`);
-  return found;
-});
+const boards = boardCorpus((root) => console.log(`  (no boards under ${root} -- skipped)`));
 
 const reds: Red[] = [];
 const prose = new Map<string, Map<string, number>>();
