@@ -200,6 +200,32 @@ the arrow promotes and the body is read: finding the call confirms it, not
 finding it is never held against it, and finding it at the far end only means
 the arrow is backwards. Both ends need to name a routine (`path#symbol`).
 
+### `claim: "accesses"` on a planned arrow — the member it will read
+
+`accesses` says **the `from` end will read a named member off the `to` end's
+type**. It is the one claim that needs an argument, and the argument is the
+member name, written as the arrow's own label:
+
+```
+edges: [
+  { from: "renderer", to: "config", state: "planned",
+    label: "width", claim: "accesses" },
+]
+```
+
+That reads as `width @accesses` on the arrow. Without the member name there is
+nothing to check at either end, and the check says so rather than going quiet.
+
+The reader comes first and the type second, the same way round as `calls`. Both
+ends need `path#symbol`: a file reads nothing and a file has no members.
+
+Nothing accuses a plan of a member that has not been written. Once the code
+lands the arrow promotes and both ends are read — and only one of them can ever
+say wrong. If the type has no member of that name, that is red, because a member
+list can be listed in full. If the type has it and the routine cannot be seen
+reading it, nothing is said: a routine can reach a member through a helper or a
+value whose type is not written down.
+
 ### `closed: {}` on a planned directory box — the boundary it will hold
 
 `closed` says **nothing outside this box reaches into it**. Only for a box

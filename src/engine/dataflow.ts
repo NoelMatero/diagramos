@@ -721,6 +721,43 @@ function bindingOf(node: Node): { name: Node; value: Node } | undefined {
   return value ? { name, value } : undefined;
 }
 
+/**
+ * A function body sitting where the callee goes: `(() => use(x))()`.
+ *
+ * The `OPENS_BODY` guard in the walk already turns a read of one of our locals
+ * from inside a nested body into a capture, and it is right. It never fired
+ * here because the walk does not reach the node: the receiver handling below
+ * reads `childForFieldName("object") ?? child(0)`, and on a bracketed
+ * expression `child(0)` is the bracket, while the tail loop skips the callee
+ * outright. So the calls inside an immediately-invoked body did not exist as
+ * far as this reader was concerned and the value handed to one came back
+ * `contained` -- an absence offered as proof, which is the one direction that
+ * must never be wrong. (#213)
+ *
+ * Peeled by node type rather than per grammar, so the three shapes that spell
+ * this -- a JS arrow or function expression, a Python `lambda`, a Rust closure
+ * -- are one rule. Anything else in the callee position is left to the
+ * receiver handling, which is why a path call like `foo::bar(x)` is untouched.
+ */
+function invokedBody(node: Node): Node | undefined {
+  let current = node;
+  for (let depth = 0; depth < 4; depth += 1) {
+    if (OPENS_BODY.test(current.type) && current.childForFieldName("body")) return current;
+    if (!WRAPS.test(current.type)) return undefined;
+    let inner: Node | undefined;
+    let found = 0;
+    for (let index = 0; index < current.childCount; index += 1) {
+      const child = current.child(index);
+      if (!child || /^[(),]$/.test(child.type)) continue;
+      inner = child;
+      found += 1;
+    }
+    if (found !== 1 || !inner) return undefined;
+    current = inner;
+  }
+  return undefined;
+}
+
 /** Whether a node is a bare name a reader would recognise as one. */
 const isName = (node: Node): boolean =>
   node.childCount === 0 && /identifier$/.test(node.type);
@@ -1221,7 +1258,15 @@ function readRoutine(
         return;
       }
 
-      if (receiver && !isName(receiver)) {
+      /*
+       * A body invoked on the spot. Walked at `depth + 1` so the nested-body
+       * guard above fires on it and reads every use inside as a capture, which
+       * is what the equivalent named closure has always got. (#213)
+       */
+      const invoked = receiver ? invokedBody(receiver) : undefined;
+      if (invoked) {
+        walk(invoked, { kind: "escape", as: "captured-by-a-closure" }, depth + 1);
+      } else if (receiver && !isName(receiver)) {
         const object = receiver.childForFieldName("object") ?? receiver.child(0);
         if (object && isName(object)) {
           use(object.text, { kind: "escape", as: "used-as-a-receiver" });

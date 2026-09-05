@@ -322,8 +322,9 @@ guessing has a real cost.
 
 Every word below can come back wrong except `feeds`, which confirms and
 otherwise stays quiet. Two of them — `builds` and `calls` — can only ever be
-wrong about the **direction**, never about an absence, and each says why under
-its own heading.
+wrong about the **direction**, never about an absence. One of them —
+`accesses` — can only ever be wrong about one of its two ends. Each says why
+under its own heading.
 
 They are all optional. An arrow with no claim and a box with no claim are the
 normal case, not a shortfall.
@@ -561,6 +562,55 @@ TypeScript's.
 
 Do not reach for this when what you mean is that a **value** flows from one to
 the other. That is `feeds`, and it frequently points the opposite way.
+
+#### `claim: "accesses"` — this reads that member off that type
+
+The largest thing your boards could say and had no word for: a routine reading a
+field, a property or a method off a type. If you were about to label an arrow
+`reads`, `writes`, `key`, `value` or `looks up`, this is the claim.
+
+It is the only claim that takes an **argument**, and the argument is the member
+name, written as the arrow's label:
+
+```
+edges: [
+  { from: "renderer", to: "config", label: "width", claim: "accesses" },
+]
+```
+
+That comes out as `width @accesses` on the arrow. The reader is the `from` end
+and the type is the `to` end, the same way round as `calls`. Both ends must
+anchor a symbol (`path#symbol`).
+
+**Write the member.** An `@accesses` arrow with prose on its label, or with no
+label at all, names nothing to look for and is reported as a claim nothing can
+read — not as a claim that passed.
+
+**Its two ends are checked to different standards, and this is worth knowing
+before you draw one.**
+
+*It can come back red* — but only about the type. A type's members can be listed
+in full, so a member absent from all of them is genuinely absent, and the report
+names the arrow and quotes the member list it read. This is what the word is
+for: rename a field and every diagram still naming the old one goes red the turn
+the rename lands.
+
+*It can never be red about the routine.* Working out everything a body touches
+needs to know the type of every value in it, which is the whole program. So a
+routine that cannot be seen reading the member is reported as nothing at all.
+
+A green needs both halves: the type declares it **and** the routine can be seen
+reading it. The type having a `width` is not evidence that this routine touches
+it.
+
+Nothing is reported either way when the member list is not closed — a type that
+extends another (`class Config extends Base`, `class Config(BaseModel)`), one
+with an index signature (`[key: string]: unknown`), a Python class defining
+`__getattr__`, a type alias for a shape declared elsewhere, or a Rust struct
+whose `impl` block is in another file. Every one of those is a member list that
+might be hiding the name, and a list that might be hiding it proves nothing.
+
+Same rule as the others: write it from a member list you read.
 
 #### `closed: {}` — nothing outside reaches into this box
 

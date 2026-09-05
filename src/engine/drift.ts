@@ -48,6 +48,7 @@ import { ledgerAdditions, type Ledger } from "./ledger";
 import { checkNeeds, type NeedsWithheld } from "./needs";
 import { callsBetween, type CallSide, type CallsWithheld } from "./calls";
 import { constructions, routineNamesIn, type ConstructsWithheld } from "./constructs";
+import { memberAccesses, type AccessesWithheld } from "./accesses";
 import { heldTypes, type HoldsWithheld } from "./holds";
 import { signatureNames, type SignatureWithheld } from "./signature";
 import { resolveDependency, type ConfigCache } from "./resolve";
@@ -204,7 +205,24 @@ export type EdgeFindingKind =
    * `needs` in `needs.ts` -- and until #189 it did not cover the most common
    * edge on any diagram.
    */
-  | "calls-backwards";
+  | "calls-backwards"
+  /**
+   * An `accesses` arrow naming a member the type does not have (#213).
+   *
+   * The sixth member that means **wrong**, and it is read at the end of the
+   * arrow the other five are not. `accesses` has two ends on two footings: the
+   * routine end is a body and can only confirm, and the type end is a
+   * declaration, so a member list is a closed region and a name absent from all
+   * of it is genuinely absent. This finding is the type end alone.
+   *
+   * There is no `accesses-unread` beside it and there must not be. Not seeing
+   * the routine touch the member is not evidence it does not -- that would need
+   * every receiver's type, which is the whole program.
+   *
+   * What it buys is the case the word exists for: rename a field and every
+   * diagram still naming the old one goes red, the turn the rename lands.
+   */
+  | "accesses-absent";
 
 /**
  * Every verdict word this engine can put in a report, as data (#116).
@@ -244,6 +262,7 @@ export const EDGE_FINDING_KINDS = [
   "holds-absent",
   "builds-backwards",
   "calls-backwards",
+  "accesses-absent",
 ] as const satisfies readonly EdgeFindingKind[];
 
 /*
@@ -792,6 +811,28 @@ export interface ClaimTally {
    *   Python's 5,525 asks.
    */
   callsWithheld: SkipBreakdown<CallsWithheld | EdgeSkipReason>;
+  /**
+   * Arrows asserting that the tail reads a named member off the head's type.
+   *
+   * The one word here whose two ends stand on different footings, so its numbers
+   * read differently from every other pair above. `accessesConfirmed` needs both
+   * halves -- the type declares the member and the routine is seen reading it --
+   * because the type declaring it is not evidence that this routine touches it,
+   * and a green that any large type would earn is decoration.
+   */
+  accesses: number;
+  /** Of those, how many a routine can be seen reading. */
+  accessesConfirmed: number;
+  /**
+   * Why the rest got no verdict, by reason.
+   *
+   * `no-such-member` is not in here: that is the accusation and it belongs in
+   * `edges`, the same way `holds-absent` does. What is in here includes the one
+   * refusal that has no counterpart anywhere else in this file -- `inherited`.
+   * A member list is a closed region only while the type has no parent, and a
+   * type that extends another has members this reader never sees.
+   */
+  accessesWithheld: SkipBreakdown<AccessesWithheld | EdgeSkipReason>;
   /**
    * Of those, how many were confirmed by a flow somebody can go and read.
    *
@@ -2199,6 +2240,7 @@ export function checkDrift(
     needs: 0, needsChecked: 0, needsWithheld: {},
     takes: 0, returns: 0, signatureConfirmed: 0, signatureWithheld: {},
     holds: 0, holdsConfirmed: 0, holdsWithheld: {},
+    accesses: 0, accessesConfirmed: 0, accessesWithheld: {},
     builds: 0, buildsConfirmed: 0, buildsWithheld: {},
     calls: 0, callsConfirmed: 0, callsWithheld: {},
     feeds: 0, feedsConfirmed: 0, feedsWithheld: {},
@@ -3637,6 +3679,136 @@ export function checkDrift(
              * none.
              */
           }
+        }
+      }
+
+      /*
+       * `@accesses`: does the tail read the member the arrow names off the
+       * head's type?
+       *
+       * The one claim here whose two ends stand on different footings, and the
+       * only one whose accusation is read at the **to** end while its
+       * confirmation needs both. The tail is the routine doing the reading and
+       * the head is the type the member belongs to, so the arrow runs the same
+       * way `builds` and `calls` do -- the thing doing the work first.
+       *
+       * The member is on the arrow's **label**, which is the one place in this
+       * file a claim takes an argument from the prose: `width @accesses`. There
+       * is no second field to keep in sync and no `customData` spelling of it,
+       * for the reason `claim.ts` gives about the label being the human's way in
+       * -- strip `customData` off a board and the arrow still says what it
+       * claimed, and here that includes what it claimed *about*.
+       *
+       * An `@accesses` arrow with no member on it can never be read at either
+       * end, so it is loud rather than quiet: the same treatment `holds` gives a
+       * category error, and for the same reason. A claim nothing can ever read
+       * looks exactly like a claim that passed.
+       *
+       * A `planned` arrow is refused the accusation and keeps the confirmation,
+       * exactly as every other claim here is: sketching a member that does not
+       * exist yet is what a plan is for.
+       */
+      if (edge.claim === "accesses" && (claimed || edge.state === "planned")) {
+        const language = languageOf(fromFile);
+        const toLanguage = languageOf(toFile);
+        const noteRead = (why: AccessesWithheld | EdgeSkipReason) => {
+          if (claimed) claims.accessesWithheld[why] = (claims.accessesWithheld[why] ?? 0) + 1;
+        };
+
+        if (fromEnd.symbols.length === 0 || toEnd.symbols.length === 0) {
+          // One end names a file rather than a routine or a type, so there is
+          // no body to read or no member list to look in.
+          noteRead("endpoint-has-no-ref");
+        } else if (!language || !toLanguage) {
+          noteRead("unreadable");
+        } else {
+          const verdict = memberAccesses(
+            workspace.read(fromFile), fromEnd.symbols[0]!, edge.label, language,
+            { source: workspace.read(toFile), names: toEnd.symbols, language: toLanguage },
+          );
+
+          if (verdict.verdict === "confirmed") {
+            if (claimed) claims.accessesConfirmed += 1;
+            edgesChecked += 1;
+            recordEdge(edge, fromNode, toNode, { kind: "confirmed" });
+            continue;
+          }
+          if (verdict.verdict === "withheld") {
+            noteRead(verdict.why);
+            /*
+             * The two refusals that can never come good, and so the two that
+             * are said out loud. Every other reason here means the code might
+             * be hiding the answer -- an alias, a parent class, an index
+             * signature -- and the arrow could go green tomorrow without
+             * anybody touching the board.
+             *
+             * These cannot. A routine has no members however it is edited, and
+             * an arrow that names nothing has nothing to name however the code
+             * changes. Both are the board being wrong rather than the code, so
+             * neither is a red: a red says the code disagrees, and the code has
+             * not been asked anything.
+             */
+            if (verdict.why === "not-a-type" && claimed) {
+              garbledClaims.push({
+                on: "arrow",
+                label: `${oneLine(fromNode.label) || edge.from} → ${oneLine(toNode.label) || edge.to}`,
+                written: "accesses",
+                detail: `@accesses says ${oneLine(fromNode.label) || fromPath} reads a member off `
+                  + `${oneLine(toNode.label) || toPath}, and ${oneLine(toNode.label) || toPath} is a `
+                  + `function rather than a type. A function has no members, so nothing can ever `
+                  + `read this claim. Point the arrow at the type the member belongs to, or drop it.`,
+              });
+            }
+            if (verdict.why === "no-member-named" && claimed) {
+              garbledClaims.push({
+                on: "arrow",
+                label: `${oneLine(fromNode.label) || edge.from} → ${oneLine(toNode.label) || edge.to}`,
+                written: "accesses",
+                detail: "@accesses has to name the member, on the arrow's label — "
+                  + `\`width @accesses\`. ${edge.label ? `"${oneLine(edge.label)}" is prose rather than `
+                    + "a member name" : "This arrow's label names none"}, so there is nothing to look `
+                  + "for at either end and nothing is checking it. Write the member, or drop the claim.",
+              });
+            }
+          } else if (edge.state === "planned") {
+            noteRead("no-function-body");
+          } else if (verdict.verdict === "no-such-member") {
+            edgesChecked += 1;
+            /*
+             * A claim written this turn gets its own opening, for the reason
+             * every other accusation here does: the first check to see it runs
+             * moments after an agent wrote it, and a bare "this is wrong" then
+             * reads as the tool accusing somebody of something it wrote itself.
+             */
+            const wasClaimed = baselineGraph?.edges.some(
+              (was) => was.from === edge.from && was.to === edge.to && was.claim === "accesses",
+            );
+            const fresh = baselineGraph !== undefined && !wasClaimed;
+            recordEdge(edge, fromNode, toNode, { kind: "finding", finding: {
+              from: fromPath,
+              to: toPath,
+              fromLabel: fromNode.label,
+              toLabel: toNode.label,
+              fromRef,
+              toRef,
+              kind: "accesses-absent",
+              detail:
+                (fresh ? "a claim written this turn is already wrong: " : "")
+                + `this arrow says ${oneLine(fromNode.label) || fromPath} reads `
+                + `\`${oneLine(edge.label ?? "")}\` off ${oneLine(toNode.label) || toPath}, and `
+                + `${toPath} declares ${verdict.members ? `\`${verdict.members}\`` : "nothing"}, `
+                + "which does not include it. Either the member was renamed, or the arrow points "
+                + "at the wrong type.",
+            } });
+            continue;
+          }
+          /*
+           * `absent` falls through to the ordinary channels, untouched, and
+           * that is the half of this word that must never change. The type has
+           * the member and this routine was not seen reading it -- which needs
+           * every receiver's type to turn into evidence, and that is the whole
+           * program.
+           */
         }
       }
 

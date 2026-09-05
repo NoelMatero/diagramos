@@ -19,9 +19,9 @@ The rule in `AGENTS.md`: nothing new may say *wrong* until a script has measured
 how often its reader is mistaken, against a referee that shares no machinery
 with it.
 
-## The seven words, and the three footings
+## The eight words, and the three footings
 
-Seven words, and they do not all refute the same way. This is the distinction
+Eight words, and they do not all refute the same way. This is the distinction
 that took longest to see and it is not in #190:
 
 | word | relation | what it reads | may say wrong | how |
@@ -32,6 +32,7 @@ that took longest to see and it is not in #190:
 | `@holds` | contains | a type's field list | yes | **absence** |
 | `@builds` | constructs | a routine's body | yes | **presence** |
 | `@calls` | invokes | a routine's body, and what its names are bound to | yes | **presence** |
+| `@accesses` | accesses | a type's member list — **and** a routine's body | yes | **absence**, at the type end only |
 | `@feeds` | flows | a body, for a value's journey | **no** | — |
 
 Plus `@closed` on a box (nothing outside reaches in) and `@complete` on a board
@@ -71,6 +72,37 @@ invented for `@builds` — it is the footing the oldest refutable word stands on
 a callback, a field or a queue no reader follows. Not finding the journey is
 never evidence there is none. It confirms and stays quiet.
 
+### The one word whose two ends are on different footings
+
+`@accesses` is the first word here that reads two things rather than one, and
+they cannot be believed to the same degree. `Renderer --[width @accesses]-->
+Config` says this routine reads that member off that type, and the two halves of
+that sentence have different evidence behind them:
+
+- The **type** end is a declaration. A member list is a closed region, so a type
+  that does not declare `width` refutes the arrow — exactly the footing
+  `@holds` stands on, and the value of the word: rename a field and every
+  diagram still naming the old one goes red the turn the rename lands.
+- The **routine** end is a body. Working out what a body touches needs every
+  receiver's type, which needs the whole program — the may-analysis #203
+  measured and rejected. Not finding the access is not evidence there is none,
+  so this end confirms and is otherwise silent.
+
+So the word refutes from one end and stays silent at the other, and that is not
+a compromise between the two footings above. It is the split `@builds` already
+uses one relation over: the accusation rests on what was found, and the absence
+beside it is never a finding.
+
+Confirming needs **both** halves, which is `claim.ts`'s admission rule applied
+to a word with two of them. "Config declares `width`" would come back green
+whatever routine sat at the far end. "This routine writes `.width`" says nothing
+about Config. Together they are the strongest evidence available without a type
+checker.
+
+It is also the only word whose claim takes an **argument**: the member name,
+written on the arrow's label. An `@accesses` arrow that names no member can be
+read at neither end, so it is reported as garbled rather than withheld quietly.
+
 ### The one word whose fact is not in one file
 
 `@calls` is the exception to something every other reader here relies on. A
@@ -97,9 +129,11 @@ handler  --@returns-->  Response
 build    --@builds-->   Widget         the thing doing the work is at the FROM end
 run      --@calls-->    render         the caller is at the FROM end
 RouteInfo --@holds-->   Response       the container is at the FROM end
+Renderer --[width @accesses]--> Config  the reader is at the FROM end, and the
+                                        member is on the label
 ```
 
-`@holds`, `@builds` and `@calls` put the subject first. `@takes` and `@returns` put the
+`@holds`, `@builds`, `@calls` and `@accesses` put the subject first. `@takes` and `@returns` put the
 declaration being read last. The inconsistency was a decision: the one
 hand-drawn claim in this project's board corpus drew containment holder-first
 unprompted, UML has pointed whole to part for thirty years, and forcing one
@@ -144,11 +178,17 @@ What it may not do is drift.
 | `@holds` | yes | **no** | yes | yes | a text scan of the same field lists |
 | `@builds` | yes | **no** | yes | **no** | a text scan of the same routine bodies |
 | `@calls` | yes | **no** | yes | yes | a text scan that bounds each routine and reads its calls |
+| `@accesses` | yes | **no** | yes | yes | a text scan of the same member lists |
 
 `@feeds` is not on it. It never accuses, so there is nothing to license.
 
 **Every no is a finding rather than a design**, and none of them was visible
 until the squares had to be filled in one at a time.
+
+`measure:accesses` asks `@accesses` about JavaScript **0 times over 21 files**,
+for the reason `@holds` is a no there: a JavaScript class writes no member list
+a text scan can read off, so there is nothing to measure and so no permission.
+The other four squares are measured at **0 accusations across 5,833 asks**.
 
 `measure:constructs` asks `@builds` about Python **0 times over 442 files**,
 because Python spells making one of something as an ordinary call. There is no
@@ -219,9 +259,12 @@ shape.
 
 **It may not accuse, and it does not compile.** Both, decided at #207.
 
-`relations` is an exhaustive `Record`, so adding a seventh word to
+`relations` is an exhaustive `Record`, so adding an eighth word to
 `ARROW_CLAIMS` stops the build in every licence and in the test that pins the
-grid, until somebody writes down what measured it. The answer is allowed to be
+grid, until somebody writes down what measured it. `@accesses` is the first word
+to arrive with the grid already in place, and it stopped the build in four
+places on the line that added it to `ARROW_CLAIMS` — which is what the grid is
+for. The answer is allowed to be
 "nothing" — it is just not allowed to be silence. And `mayAccuse` still answers
 *no* to anything it cannot find, because a compile error only catches the person
 adding the word, and a cast walks past a type.
@@ -352,6 +395,7 @@ and never fail.
 | command | what it answers |
 |---|---|
 | `npm run measure:vocabulary` | how much of a diagram can be judged at all — failed claims, arrow prose, relation census |
+| `npm run measure:accesses` | can the member reader be trusted with a red |
 | `npm run measure:holds` | can the field reader be trusted with a red |
 | `npm run measure:calls` | can the call reader be trusted to say backwards, and how often it can answer |
 | `npm run measure:constructs` | can the construction reader be trusted to say backwards |
@@ -363,7 +407,7 @@ and never fail.
 
 The pattern in all of them is a **referee**: count the shape one way, count it
 again by a completely different mechanism, report the disagreement. It is not
-ceremony. Between them these scripts have found nine reader bugs and eleven
+ceremony. Between them these scripts have found ten reader bugs and seventeen
 referee bugs, and not one was reachable by thinking about it.
 
 ### The corpus
@@ -382,12 +426,12 @@ written on; the rest are the same thirteen boards at six different ages.
 
 ```
 npx tsx scripts/probe-generative.mts     — four boards of code no board here describes
-  arrows carrying a claim    90%     (was 43% before @holds and @builds)
-  arrows with no word at all   3     (was 26)
+  arrows carrying a claim    92%     (was 43% before @holds and @builds)
+  arrows with no word at all   2     (was 26)
 ```
 
-Coverage of what the code says, from `measure:vocabulary`: **57.8%** against
-everything the syntax shows, **56.1%** against relationships whose both ends are
+Coverage of what the code says, from `measure:vocabulary`: **84.7%** against
+everything the syntax shows, **87.9%** against relationships whose both ends are
 declared in the same repository. The first counts every `console.log` and
 `.map()`, so it is a floor rather than an estimate.
 
@@ -401,15 +445,23 @@ since #188. Corrected, the honest sequence is:
 |---|---:|---:|
 | as reported before #189 | 17.2% | 21.2% |
 | with `@holds` and `@builds` counted at last | 35.3% | 32.6% |
-| with `@calls` | **57.8%** | **56.1%** |
+| with `@calls` | 57.8% | 56.1% |
+| with `@accesses` | **84.7%** | **87.9%** |
 
 `invokes` was 61,499 of the 273,694 relationships the census reads, so it is the
 largest single thing any one word here has ever covered. It is also the fourth
 time a hand-maintained list in this programme went stale silently, which is why
 the probe's own two lists were replaced with a shape rule in the same change.
 
-Still wordless: `conforms`, `accesses`. `invokes` was the largest of the three
-and #189 gave it `@calls`.
+`accesses` was the largest of the three by a factor of twenty-seven — 53,362
+drawable against 1,946 for the next one — and #213 gave it `@accesses`.
+
+## Ten times a measurement contradicted the design
+
+
+Still wordless: `conforms`, at 1,946 drawable, and `type-argument`, which is
+deliberate: almost all of it is `Vec<T>`, `Promise<T>`, `list[str]`, which
+nobody draws as two boxes.
 
 ## Ten times a measurement contradicted the design
 
@@ -524,15 +576,45 @@ word or one reader, not from reviewing the design.
     that cannot call anything were being counted as bodies that call nothing.
     And the comparison paired two reader bodies of one name against one of the
     referee's, blaming the reader for a disagreement the pairing invented.
+10. **The referee was wrong 320 times out of 321.** `measure:accesses`'s first
+   run reported 321 places where the reader refused a member a person could read
+   off the declaration, which is 321 false reds waiting to happen. One was the
+   reader: TypeScript writes a private member `#pending` and the grammar hands
+   the name back with the hash on it, so 22 of the 321 were arrows about a
+   private field. Every other shape was the referee — a `#` stripped as a
+   comment in a language where it is a field sigil, so `async #flush() {` lost
+   its brace and a whole method body read as a member list; a Python class body
+   with no indent rule, so every local variable in every method read as an
+   attribute; a docstring read as a declaration; a one-line `interface Row { .. }`
+   that never closed; and a `class` nested inside a test method that column
+   zero could not end.
+
+   The number is the finding. A referee is a program somebody wrote, which
+   #198 already recorded — what this adds is the ratio, and that the ratio was
+   only visible because the accusation column is separate from everything else
+   in the report. A single recall figure would have read 93% and hidden all of
+   it.
+
+   The other half is the shape a referee **cannot** find, and it is the reason
+   this word did not ship on the strength of a zero. `constructor(private width:
+   number)` declares a member in TypeScript's parameter list, and both the text
+   scan and the tree walk read a parameter list as a parameter list — they
+   agree, the measurement reports no disagreement, and the reader goes on
+   refuting a correct arrow. It was found by reading the language rather than a
+   number, and it is the one class of hole a shared-blindness referee will never
+   report.
 
 `renders` was also raised as a possible missing relation and turned out not to
 be one: `<MenuContent />` is a routine making a MenuContent, which is `@builds`.
 
 ## Open, in the order worth doing
 
-1. **The licence grid**, which #198 turned from a someday into a hole with a
-   name and #189 has now widened: one `Licence` entry speaks for **seven** words
-   on the strength of four separate measurements. See below.
+1. ~~**The licence grid.**~~ Built at #207 and shipped at #209. `@accesses` is
+   the first word to arrive with it already in place, and adding the word to
+   `ARROW_CLAIMS` stopped the build in four places until every licence had an
+   answer for it — which is exactly what it was built to do. One `Licence` entry
+   now speaks for **eight** words on the strength of five separate
+   measurements, and the type says which.
 2. **#203 — the engine has no notion of a value.** Dataflow, points-to, escape
    analysis. Its prediction has been measured and did not hold, in the direction
    that makes it *more* interesting rather than less — see items 7 and 8 above
