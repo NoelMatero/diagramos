@@ -732,6 +732,17 @@ function rowsFor({ report, promoted = [] }, colour, all = false) {
        * makes the call rather than who calls `new` or who imports whom.
        */
       const wrongCalls = finding.kind === "calls-backwards";
+      /*
+       * The sixth (#213), and the one that was missing here.
+       *
+       * It shipped into the board page and not into this file, so the browser
+       * called a refuted member arrow red and the terminal printed it in amber
+       * among the arrows nothing corroborated -- with no sentence on the row, so
+       * the only surface a Stop hook uses could not say what was wrong. Its own
+       * sentence for the same reason the others have one: nothing here points
+       * the wrong way, the type does not have the member.
+       */
+      const wrongMembers = finding.kind === "accesses-absent";
       return paint(
         `${boxName({ label: finding.fromLabel, node: finding.from })}`
         + ` ${backwards ? "\u2192 (should be \u2190)" : "\u2192"} `
@@ -741,8 +752,13 @@ function rowsFor({ report, promoted = [] }, colour, all = false) {
         + (wrongHolds ? " \u00b7 not in the fields" : "")
         + (wrongBuilds ? " \u00b7 built the other way" : "")
         + (wrongCalls ? " \u00b7 called the other way" : "")
+        // The same words the board page uses, so one board does not read as two
+        // different findings depending on where somebody looked at it.
+        + (wrongMembers ? " \u00b7 no such member" : "")
         + (hop ? ` \u00b7 ${hop}` : ""),
-        backwards || wrongSignature || wrongHolds || wrongBuilds || wrongCalls ? "red" : "yellow",
+        backwards || wrongSignature || wrongHolds || wrongBuilds || wrongCalls || wrongMembers
+          ? "red"
+          : "yellow",
         colour,
       );
     }),
@@ -808,10 +824,10 @@ function rowsFor({ report, promoted = [] }, colour, all = false) {
  */
 const WRONG_EDGE_KINDS = new Set([
   "backwards-edge", "signature-absent", "holds-absent", "builds-backwards",
-  "calls-backwards",
+  "calls-backwards", "accesses-absent",
 ]);
 
-function tallyCounts({ gone, generated, empty, unused, open, incomplete, removed, garbled, unanswered, backwards, signatures, fields, builtBackwards, callsBackwards, arrows, stray, promoted, built, planned }, colour) {
+function tallyCounts({ gone, generated, empty, unused, open, incomplete, removed, garbled, unanswered, backwards, signatures, fields, builtBackwards, callsBackwards, members, arrows, stray, promoted, built, planned }, colour) {
   return [
     gone ? paint(`${gone} gone`, "red", colour) : "",
     // Its own word, because "gone" is the opposite of what happened: the file
@@ -865,6 +881,11 @@ function tallyCounts({ gone, generated, empty, unused, open, incomplete, removed
     callsBackwards
       ? paint(`${callsBackwards} ${callsBackwards === 1 ? "call" : "calls"} backwards`, "red", colour)
       : null,
+    // The board page's own words for it, for the reason the row above borrows
+    // them: two surfaces describing one board have to agree.
+    members
+      ? paint(`${members} ${members === 1 ? "member" : "members"} gone`, "red", colour)
+      : null,
     signatures
       ? paint(`${signatures} ${signatures === 1 ? "signature" : "signatures"} disagree`, "red", colour)
       : "",
@@ -907,6 +928,7 @@ function tallyFor({ report, promoted = [] }, colour) {
       fields: report.edges.filter((finding) => finding.kind === "holds-absent").length,
       builtBackwards: report.edges.filter((finding) => finding.kind === "builds-backwards").length,
       callsBackwards: report.edges.filter((finding) => finding.kind === "calls-backwards").length,
+      members: report.edges.filter((finding) => finding.kind === "accesses-absent").length,
       arrows: report.edges.filter((finding) => !WRONG_EDGE_KINDS.has(finding.kind)).length,
       stray: report.strayArrows ?? 0,
       promoted: promoted.length,
@@ -982,6 +1004,8 @@ function render(stale, colour) {
           + report.edges.filter((finding) => finding.kind === "builds-backwards").length,
         callsBackwards: sum.callsBackwards
           + report.edges.filter((finding) => finding.kind === "calls-backwards").length,
+        members: sum.members
+          + report.edges.filter((finding) => finding.kind === "accesses-absent").length,
         arrows: sum.arrows
           + report.edges.filter((finding) => !WRONG_EDGE_KINDS.has(finding.kind)).length,
         stray: sum.stray + (report.strayArrows ?? 0),
@@ -991,7 +1015,7 @@ function render(stale, colour) {
         planned: sum.planned + report.workItems.length,
       };
     },
-    { gone: 0, generated: 0, empty: 0, unused: 0, open: 0, incomplete: 0, removed: 0, garbled: 0, unanswered: 0, backwards: 0, signatures: 0, fields: 0, builtBackwards: 0, callsBackwards: 0, arrows: 0, stray: 0, promoted: 0, built: 0, planned: 0 },
+    { gone: 0, generated: 0, empty: 0, unused: 0, open: 0, incomplete: 0, removed: 0, garbled: 0, unanswered: 0, backwards: 0, signatures: 0, fields: 0, builtBackwards: 0, callsBackwards: 0, members: 0, arrows: 0, stray: 0, promoted: 0, built: 0, planned: 0 },
   );
 
   // Too many to list: counts per diagram, and a pointer to the view that has room.

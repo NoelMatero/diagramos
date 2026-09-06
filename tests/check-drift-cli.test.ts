@@ -338,6 +338,43 @@ describe("claims on the command line", () => {
     expect(output).toContain("should be");
   }, 120_000);
 
+  it("calls a member the type does not have wrong, in red, and names it", async () => {
+    /*
+     * #219 shipped the `accesses-absent` verdict and wired it into the board
+     * page, and not into here. So a refuted member arrow printed in amber among
+     * the arrows the code merely failed to corroborate, with no sentence on the
+     * row -- the browser said one thing and the terminal another about the same
+     * board, and the terminal is the surface the Stop hook uses.
+     *
+     * The exit code was always right, which is why it went unnoticed: the run
+     * failed, it just would not say what for.
+     */
+    writeFileSync(path.join(project, "src/config.ts"), "export class Config { width = 0; }\n");
+    writeFileSync(
+      path.join(project, "src/render.ts"),
+      "import { Config } from './config';\n"
+      + "export function render(config: Config) { return config.height; }\n",
+    );
+    const { board } = await createDiagram(emptyBoard(), {
+      name: "member",
+      nodes: [
+        { id: "render", label: "render", ref: "src/render.ts#render" },
+        { id: "config", label: "Config", ref: "src/config.ts#Config" },
+      ],
+      edges: [{ from: "render", to: "config", label: "height", claim: "accesses" }],
+    });
+    await writeBoard(path.join(project, "docs/diagrams/member.excalidraw"), board);
+
+    const result = await check();
+    const output = `${result.stdout}${result.stderr}`;
+    expect(result.code).toBe(1);
+    // The row says what is wrong with it, in the same words the board page uses.
+    expect(output).toContain("no such member");
+    // And it is counted as wrong rather than as one of N arrows worth a look.
+    expect(output).toContain("1 member gone");
+    expect(output).not.toContain("1 arrow  ");
+  }, 120_000);
+
   it("says nothing about a backwards arrow that carries no claim", async () => {
     const { board } = await createDiagram(emptyBoard(), {
       name: "unclaimed",
