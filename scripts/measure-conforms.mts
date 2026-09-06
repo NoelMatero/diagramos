@@ -6,6 +6,20 @@
  *   npm run measure:conforms -- <path>...    -- any trees you like
  *   npm run measure:conforms -- --all        -- print every disagreement, not the first 25
  *
+ * The default corpus holds 22 Rust files, and the Rust row is the one this word
+ * had to be sure about. So it is also run over the five clones the dependency
+ * licence already pins, the way `measure:calls` widened its own Rust row:
+ *
+ *   npm run measure:conforms -- .claude/worktrees/96-rust/.corpus/BurntSushi-ripgrep \
+ *     .claude/worktrees/96-rust/.corpus/dtolnay-anyhow \
+ *     .claude/worktrees/96-rust/.corpus/clap-rs-clap \
+ *     .claude/worktrees/96-rust/.corpus/rust-lang-regex \
+ *     .claude/worktrees/96-rust/.corpus/serde-rs-json
+ *
+ * 775 files and 4,975 asks against the default corpus's 308, and it is what
+ * found the derive half of the relation: the reader saw `impl Trait for Type`
+ * and nothing else, and `#[derive(..)]` is two and a half times the population.
+ *
  * `conforms` reads a declaration, so unlike `accesses` it has one end rather
  * than two -- and unlike every other word on the list, one of its languages is
  * on a different footing from the rest. Three blocks:
@@ -210,6 +224,10 @@ const PYTHON_CLASS = /^[ \t]*class[ \t]+(\w+)[ \t]*\(([^)]*)\)[ \t]*:/;
 const TS_DECLARATION = /\b(?:class|interface)\s+([A-Za-z_$][\w$]*)/;
 const RUST_IMPL = /^\s*impl(?:\s*<[^>]*>)?\s+([\w:]+(?:\s*<[^>]*>)?)\s+for\s+([A-Za-z_]\w*)/;
 const RUST_TRAIT = /^\s*(?:pub(?:\([^)]*\))?\s+)?(?:unsafe\s+)?trait\s+([A-Za-z_]\w*)(?:\s*<[^>]*>)?\s*:\s*([^{]+)/;
+/** `#[derive(..)]`, which is where most Rust conformance is actually written. */
+const RUST_DERIVE = /^\s*#\[derive\(/;
+/** The declaration a derive list is attached to. */
+const RUST_TYPE = /^\s*(?:pub(?:\([^)]*\))?\s+)?(?:struct|enum|union)\s+([A-Za-z_]\w*)/;
 
 function refereeHeritage(source: string, language: Language): Heritage[] {
   const lines = blanked(source, language).split("\n");
@@ -233,6 +251,35 @@ function refereeHeritage(source: string, language: Language): Heritage[] {
       // A lifetime and a `?Sized` are bounds rather than supertraits, and
       // `plainName` drops them: neither is a type anybody draws a box for.
       if (trait) add(trait[1]!, trait[2]!.replace(/'\w+/g, ""), index + 1);
+      /*
+       * A derive list, and the declaration it is attached to.
+       *
+       * Two and a half times the written-impl population -- 3,741 against 1,401
+       * over the five pinned clones -- and the reader could see none of it until
+       * this block existed to ask about it. That is what widening the Rust
+       * corpus was for: the default corpus holds 21 of these facts, and a
+       * measurement over 21 asks cannot tell you which half of a relation you
+       * are missing.
+       */
+      if (RUST_DERIVE.test(line)) {
+        let attribute = line;
+        for (let ahead = 1; ahead < 12; ahead += 1) {
+          const opens = (attribute.match(/\(/g) ?? []).length;
+          const closes = (attribute.match(/\)/g) ?? []).length;
+          if (opens <= closes) break;
+          attribute += ` ${lines[index + ahead] ?? ""}`;
+        }
+        const traits = attribute.slice(attribute.indexOf("(") + 1, attribute.lastIndexOf(")"));
+        // The declaration underneath, past any other attributes on the way.
+        for (let ahead = 1; ahead < 12; ahead += 1) {
+          const next = lines[index + ahead];
+          if (next === undefined) break;
+          const declaration = RUST_TYPE.exec(next);
+          if (declaration) { add(declaration[1]!, traits, index + 1); break; }
+          // A blank line or anything that is not another attribute ends the run.
+          if (next.trim() !== "" && !next.trimStart().startsWith("#[")) break;
+        }
+      }
       continue;
     }
 

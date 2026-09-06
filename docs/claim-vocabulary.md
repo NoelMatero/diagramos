@@ -225,12 +225,20 @@ What it may not do is drift.
 until the squares had to be filled in one at a time.
 
 **Except one.** `@conforms` in Rust is the first square here that is a *design*,
-and the only one a measurement cannot change: `impl Trait for Type` may sit in
-any file in the crate, so the reader has no region to close and refuses in its
-own words rather than waiting for a number. `measure:conforms` asks Rust 21
-questions and the reader answers 7 of them — the other 14 are an `impl` in a file
-that does not declare the type, which is the design working. A crate-wide reader
-would change that; measuring this one would not.
+and the only one a measurement cannot change. It is also **measured**, which no
+other `no` here is: 4,975 asks over the five pinned Rust clones, 92.9% recall, 0
+accused, 0 invented, and 0 confirmations when the same pairs are asked
+backwards. On any other row those numbers would be a licence.
+
+They are not one here because a Rust type does not carry what it implements.
+Three separate places do — `impl Trait for Type` anywhere in the crate,
+`#[derive(..)]` on the declaration, and a `macro_rules!` body, which is an
+unparsed token tree and is where anyhow keeps some of its own. Refuting needs
+all three to be complete and the third cannot be read at all, so an absence is a
+statement about where somebody looked. A crate-wide index of `impl` items would
+not fix that; it would produce a confident wrong answer about every derived and
+every macro-generated conformance, which is a false red in the language this
+project understands worst.
 
 `measure:conforms` asks `@conforms` about JavaScript **0 times over 21 files**,
 which is the third square JavaScript has failed to earn for the same reason: 21
@@ -533,10 +541,10 @@ to pass every check this tool had.
 deliberate: almost all of it is `Vec<T>`, `Promise<T>`, `list[str]`, which
 nobody draws as two boxes.
 
-## Twelve times a measurement contradicted the design
+## Thirteen times a measurement contradicted the design
 
-Kept because the pattern is the point: ten of the twelve came from building one
-word or one reader, not from reviewing the design.
+Kept because the pattern is the point: eleven of the thirteen came from building
+one word or one reader, not from reviewing the design.
 
 1. **The substrate was empty.** #190's first draft proposed graphify as the
    fact supplier on the strength of 8,167 `contains` edges. `contains` there is
@@ -711,6 +719,34 @@ word or one reader, not from reviewing the design.
     `Entry`. Two words, the same syntax, opposite answers — and the census still
     counts it the loose way, which is why its 2,919 is a little generous.
 
+11. **Rust does not write conformance where the design assumed it did.**
+    `@conforms` shipped reading `impl Trait for Type`, on the reasoning that
+    this is how Rust says a type implements a trait. It is how Rust says it when
+    a human writes it out. Most of the time nobody does.
+
+    The default corpus holds 22 Rust files, so the Rust row was re-run over the
+    five clones the dependency licence already pins — 775 files — the way #189
+    widened its own Rust row. **1,401 written trait impls. 3,741 conformances
+    from `#[derive(..)]`.** Two and a half times as many, and the reader could
+    see none of them: `#[derive(Clone, Debug)]` generates the impls at compile
+    time, so there is no `impl Clone for Config` anywhere in the source to find.
+    A board saying `Config --@conforms--> Serialize` about a derived Serialize
+    got silence, with the answer written on the line above the declaration.
+
+    Reading the derive list took Rust from 86.8% to **92.9%** recall, all of it
+    confirmations. Nothing about the accusation changed, and the finding is why:
+    a derive list is *on* the declaration and looks closed, and it is not,
+    because the same trait can be implemented by hand in any file in the crate.
+    Three sources, one of them a `macro_rules!` token tree nobody can parse, and
+    refuting needs all three.
+
+    So the measurement did two opposite things at once, which is the part worth
+    keeping. It made the word much better in Rust — the larger half of the
+    relation went from unconfirmable to confirmed — and it made the argument
+    against ever letting Rust accuse **stronger** rather than weaker. A crate-wide
+    index of `impl` items, the obvious next build, would have refuted 3,741 true
+    arrows.
+
 `renders` was also raised as a possible missing relation and turned out not to
 be one: `<MenuContent />` is a routine making a MenuContent, which is `@builds`.
 
@@ -792,12 +828,17 @@ language.
 - **Transitive conformance.** `A extends B extends C` confirms `A -> B` and says
   nothing about `A -> C`. Resolving every base in a tree is a cross-file walk
   with its own measurement, and nobody has asked for it.
-- **A crate-wide Rust reader**, which is the one thing that would let
-  `@conforms` accuse in Rust. Every `impl` in the crate, indexed, so the region
-  is the crate rather than the file. Deliberately not built: the Rust corpus
-  here holds 23 `conforms` facts and `measure:dataflow` reads 24 Rust values in
-  all of it, so a Rust number would not be trustworthy — and an untrustworthy
-  number is how a false red gets a licence.
+- **A crate-wide Rust reader**, which is the obvious thing that would let
+  `@conforms` accuse in Rust: every `impl` in the crate, indexed, so the region
+  is the crate rather than the file. It was measured before being declined, over
+  775 Rust files rather than the 22 in the default corpus, and the number is why
+  it is not being built. **1,401 written trait impls against 3,741 conformances
+  from `#[derive(..)]`** — so an index of `impl` items would hold the smaller
+  half of the relation and refute the larger one, and `anyhow` writes some of its
+  own inside a `macro_rules!` body, which is an unparsed token tree. A reader
+  that must union three sources and can only read two cannot close a region, and
+  a confident wrong answer in Rust is the false red this project can least
+  afford.
 - **A relation for "this function fits that field's function-pointer type"**,
   which is what the orangutan arrow actually wants. Real, and probably not worth
   a word.

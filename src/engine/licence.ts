@@ -171,7 +171,15 @@ export interface RelationMeasured {
   known?: readonly string[];
 }
 
-/** A word this language has no number for. It may not accuse, and this says why. */
+/**
+ * A word this language may not accuse with, and why.
+ *
+ * Usually because nobody has run the numbers. Not always: `conforms` in Rust is
+ * measured at 4,975 asks and still sits here, because what a Rust type
+ * implements is not written on the type and no measurement of any reader changes
+ * that. So the reason may cite a measurement -- what it may not do is leave the
+ * `no` unexplained, which is the whole point of the field.
+ */
 export interface RelationUnmeasured {
   /** Printed where a number would be, because "no" without a reason is a shrug. */
   unmeasured: string;
@@ -564,20 +572,44 @@ export const LICENCES: readonly Licence[] = [
           "That is a confirmation nobody gets, never a red.",
       },
       conforms: {
+        /*
+         * Measured, and still a no. The only row in this file where those two
+         * things are compatible, and the reason the grid needs a language axis
+         * at all rather than just a word axis.
+         *
+         * `npm run measure:conforms -- <the five pinned clones>` asks this
+         * reader **4,975** questions over 775 Rust files: 92.9% recall, 0
+         * wrongly accused, 0 invented, and 0 confirmations when the same pairs
+         * are asked backwards. On any other row those numbers would be a
+         * licence.
+         */
         unmeasured:
-          "Not a licence question, and measuring this reader would not make it " +
-          "one. `impl Trait for Type` is a free-standing item that may sit in " +
-          "any file in the crate, next to neither the trait nor the type, so " +
-          "reading `struct Type` enumerates nothing and an absence is a fact " +
-          "about where somebody happened to look. `conforms.ts` says that in " +
-          "its own words -- `region-is-the-crate` -- rather than leaving it to " +
-          "this row, because \"we never measured it\" and \"the fact is not in " +
-          "front of us\" are different sentences. A `trait Foo: Bar` does write " +
-          "its supertraits on the declaration and that list is closed, so that " +
-          "one shape is a measurement away rather than a reader away; it is 23 " +
-          "facts in the whole corpus and `measure:dataflow` reads 24 Rust " +
-          "values in it, which is an argument for shipping confirm-only and " +
-          "saying why rather than for a number nobody could trust.",
+          "Not a licence question, and the measurement says so rather than " +
+          "being absent. 4,975 asks over the five pinned Rust clones, 92.9% " +
+          "recall, 0 accused and 0 invented -- and Rust still may not accuse, " +
+          "because a Rust type does not carry what it implements. Three " +
+          "separate places do: `impl Trait for Type`, which is a free-standing " +
+          "item that may sit in any file in the crate; `#[derive(..)]`, which " +
+          "is on the declaration; and a `macro_rules!` body, which is an " +
+          "unparsed token tree and is where anyhow keeps some of its own. " +
+          "Refuting needs all three to be complete and the third cannot be " +
+          "read, so an absence is a fact about where somebody looked. " +
+          "`conforms.ts` says that as `region-is-the-crate` rather than " +
+          "leaving it to this row, because \"nobody measured it\" and \"the " +
+          "fact is not in front of us\" are different sentences. " +
+          "The derive half is the finding that widening the corpus bought: " +
+          "3,741 derived conformances against 1,401 written trait impls, so " +
+          "**most of this relation in Rust is a derive list**, and the first " +
+          "reader could see none of it. Reading it took Rust's recall from " +
+          "86.8% to 92.9%, all of it confirmations. What is left is 3.5% an " +
+          "impl in a file that does not declare the type, 3.3% a file the " +
+          "grammar cannot finish -- 164 of those 165 are three clap test files " +
+          "using `str![[r#\"..\"#]]` -- and 13 types with no impl and no derive " +
+          "beside them. A `trait Foo: Bar` does write its supertraits on the " +
+          "declaration and that one shape is closed, which is a measurement " +
+          "away rather than a reader away; it is 42 facts in the whole census " +
+          "against 2,877 that are not, and a per-shape axis is not worth " +
+          "buying for that.",
       },
     },
   },

@@ -404,6 +404,87 @@ function implementedFor(root: Node, holder: string): Array<{ name: string; at: n
   return found;
 }
 
+/**
+ * The traits a Rust type derives.
+ *
+ * `#[derive(Clone, Debug)]` generates the impls at compile time, so there is no
+ * `impl Clone for Config` anywhere in the source and a reader that only looks
+ * for impl blocks sees none of it. Measured over the five pinned Rust clones
+ * that is the **larger half of the relation**: 1,401 written trait impls
+ * against 3,741 derived conformances.
+ *
+ * A confirmation and never anything else, which is the whole of Rust here. A
+ * derive list is written on the declaration, so it looks like a closed region
+ * and is not one: the trait may be implemented by hand in any file in the
+ * crate, so a name missing from the derives proves nothing at all.
+ *
+ * The attributes are **siblings** of the declaration rather than children of
+ * it, and this `Node` exposes no parent -- so the run of `attribute_item`s
+ * immediately before an item is tracked on the way down. Anything that is not
+ * an attribute resets the run, which is what stops one type's derives being
+ * lent to the type declared after it.
+ */
+function derivedBy(root: Node, subject: string): Array<{ name: string; at: number }> {
+  const found: Array<{ name: string; at: number }> = [];
+  const visit = (node: Node) => {
+    let attributes: Node[] = [];
+    for (let index = 0; index < node.childCount; index += 1) {
+      const child = node.child(index);
+      if (!child) continue;
+      if (child.type === "attribute_item") {
+        attributes.push(child);
+        continue;
+      }
+      if (TYPE_DECLARATION.test(child.type) && nameOf(child) === subject) {
+        for (const attribute of attributes) found.push(...derivesIn(attribute));
+      }
+      attributes = [];
+      visit(child);
+    }
+  };
+  visit(root);
+  return found;
+}
+
+/**
+ * The trait names in one `#[derive(..)]`, or nothing if it is another attribute.
+ *
+ * The argument list is a `token_tree` -- an unparsed run of tokens, so
+ * `serde::Serialize` arrives as two identifiers and a `::` between them and
+ * there is no node standing for the path. Read as text for that reason, which
+ * is the one place in this file that happens: the grammar has not parsed it, so
+ * there is nothing else to read.
+ *
+ * `#[serde(rename_all = "kebab-case")]` is configuration rather than a
+ * conformance, and confirming `rename_all` off it would be a green on a claim
+ * nothing could ever refute. So only `derive` is read, by name.
+ */
+function derivesIn(attribute: Node): Array<{ name: string; at: number }> {
+  let arguments_: Node | undefined;
+  let isDerive = false;
+  const inner = (node: Node) => {
+    for (let index = 0; index < node.childCount; index += 1) {
+      const child = node.child(index);
+      if (!child) continue;
+      if (child.type === "attribute") {
+        const name = child.child(0);
+        isDerive = name?.text === "derive";
+        inner(child);
+        continue;
+      }
+      if (child.type === "token_tree") arguments_ ??= child;
+    }
+  };
+  inner(attribute);
+  if (!isDerive || !arguments_) return [];
+  return arguments_.text
+    .replace(/^\(|\)$/g, "")
+    .split(",")
+    .map((written) => written.trim().split("::").pop()?.trim() ?? "")
+    .filter((name) => /^[A-Za-z_]\w*$/.test(name))
+    .map((name) => ({ name, at: arguments_!.startIndex }));
+}
+
 /** 1-based line of a byte offset, counted the way an editor counts. */
 const lineOf = (source: string, offset: number) =>
   source.slice(0, offset).split("\n").length;
@@ -488,6 +569,11 @@ export function declaredBases(
     if (implemented.length > 0) {
       bases.push(...implemented);
       written.push(implemented.map((candidate) => candidate.name).join(", "));
+    }
+    const derived = derivedBy(tree.rootNode, subject);
+    if (derived.length > 0) {
+      bases.push(...derived);
+      written.push(`derive(${derived.map((candidate) => candidate.name).join(", ")})`);
     }
   }
 

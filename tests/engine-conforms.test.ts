@@ -254,3 +254,63 @@ describe("a base with type arguments on it", () => {
     expect(conformedTypes(source, "Handler", ["ABC"], "python").verdict).toBe("confirmed");
   });
 });
+
+describe("a Rust type that derives its conformance", () => {
+  /*
+   * Found by widening the Rust corpus to the five pinned clones the dependency
+   * licence already uses (#216, after the word had shipped). `impl Trait for
+   * Type` is not how most Rust conformance is written:
+   *
+   *     1,401 written trait impls
+   *     3,741 conformances from #[derive(..)]
+   *
+   * Two and a half times as many, and the first reader could see none of them.
+   * `#[derive(Clone, Debug)]` generates the impls at compile time, so there is
+   * no `impl Clone for Config` anywhere in the source to find -- and a board
+   * saying `Config --@conforms--> Serialize` about a derived Serialize was
+   * getting silence when the answer was written on the declaration.
+   *
+   * Confirmation only, like every other Rust answer here. A derive list is
+   * written on the type and a manual `impl` can be anywhere in the crate, so
+   * neither is closed and their union is not either.
+   */
+  it("confirms a trait the type derives", () => {
+    const source = "#[derive(Clone, Debug)]\npub struct Config {\n    pub width: u32,\n}\n";
+
+    expect(conformedTypes(source, "Config", ["Clone"], "rust").verdict).toBe("confirmed");
+    expect(conformedTypes(source, "Config", ["Debug"], "rust").verdict).toBe("confirmed");
+  });
+
+  it("confirms a derive written as a path, by the name a box would carry", () => {
+    const source = "#[derive(serde::Serialize)]\npub struct Config;\n";
+    expect(conformedTypes(source, "Config", ["Serialize"], "rust").verdict).toBe("confirmed");
+  });
+
+  it("confirms a derive on an enum, and reads past an attribute that is not one", () => {
+    const source = '#[derive(Debug)]\n#[serde(rename_all = "kebab-case")]\npub enum Mode {\n    Fast,\n}\n';
+
+    expect(conformedTypes(source, "Mode", ["Debug"], "rust").verdict).toBe("confirmed");
+    // `serde(..)` is configuration, not a conformance. Confirming `rename_all`
+    // would be a green on a claim nothing could ever refute.
+    expect(conformedTypes(source, "Mode", ["rename_all"], "rust").verdict).not.toBe("confirmed");
+    expect(conformedTypes(source, "Mode", ["serde"], "rust").verdict).not.toBe("confirmed");
+  });
+
+  it("does not lend one type's derives to the type declared after it", () => {
+    const source = "#[derive(Clone)]\npub struct Config;\n\npub struct Other;\n";
+
+    expect(conformedTypes(source, "Config", ["Clone"], "rust").verdict).toBe("confirmed");
+    expect(conformedTypes(source, "Other", ["Clone"], "rust").verdict).not.toBe("confirmed");
+  });
+
+  it("still never accuses, even with a derive list right there", () => {
+    // A derive list is not a closed region: a manual `impl` may be in any file
+    // in the crate, so a trait missing from the derives proves nothing.
+    const source = "#[derive(Clone)]\npub struct Config;\n";
+    const verdict = conformedTypes(source, "Config", ["Router"], "rust");
+
+    expect(verdict.verdict).toBe("withheld");
+    if (verdict.verdict !== "withheld") return;
+    expect(verdict.why).toBe("region-is-the-crate");
+  });
+});
