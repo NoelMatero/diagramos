@@ -195,20 +195,26 @@ describe("typing a claim onto an arrow the engine drew", () => {
   });
 
   /*
-   * `@conforms` rather than `@calls`, and the swap is the point of this comment:
-   * this test used `@calls` until #189 made it a real word, at which point the
-   * test failed for the best possible reason. `conforms` is a relation the
-   * census counts and the vocabulary has deliberately not admitted -- so it is
-   * a plausible thing to type and still nothing the checker can read, which is
-   * exactly the case being tested. If it ever ships, this fails again and wants
-   * the same swap.
+   * `@type-arg` rather than `@conforms`, and the swap is the point of this
+   * comment: this test used `@calls` until #189 made it a real word and
+   * `@conforms` until #216 did, and both times it failed for the best possible
+   * reason.
+   *
+   * `type-arg` is a better choice than either of those was, because it is the
+   * one relation this vocabulary has a *stated decision* never to admit:
+   * `docs/claim-vocabulary.md` keeps it under "deliberately not being built",
+   * at 12.6% of all code, on the grounds that almost all of it is `Vec<T>`,
+   * `Promise<T>` and `list[str]` and nobody draws those as two boxes. So it is
+   * a plausible thing for somebody to type and still nothing the checker will
+   * ever read. If that decision is reversed, this fails again and wants the
+   * same swap.
    */
   it("refuses a word that is not a claim typed into a generated label", async () => {
     const { board, label } = await labelled();
     const edited = { ...board, elements: board.elements.map(
-      (element) => (element.id === label.id ? { ...element, text: "geometry @conforms" } : element),
+      (element) => (element.id === label.id ? { ...element, text: "geometry @type-arg" } : element),
     ) };
-    expect(readGraph(edited).edges[0].claimGarbled).toBe("conforms");
+    expect(readGraph(edited).edges[0].claimGarbled).toBe("type-arg");
   });
 
   /**
@@ -313,10 +319,10 @@ describe("typing a claim onto an arrow the engine drew", () => {
           text: "reads",
           customData: { edgeLabelFor: "arrow" },
         }),
-        drawn({ id: "typed", type: "text", containerId: "arrow", text: "reads @conforms" }),
+        drawn({ id: "typed", type: "text", containerId: "arrow", text: "reads @type-arg" }),
       ]),
     );
-    expect(graph.edges[0].claimGarbled).toBe("conforms");
+    expect(graph.edges[0].claimGarbled).toBe("type-arg");
   });
 });
 

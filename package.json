@@ -45,6 +45,7 @@
     "measure:accesses": "tsx scripts/measure-accesses.mts",
     "measure:calls": "tsx scripts/measure-calls.mts",
     "measure:closed-bodies": "tsx scripts/measure-closed-bodies.mts",
+    "measure:conforms": "tsx scripts/measure-conforms.mts",
     "measure:constructs": "tsx scripts/measure-constructs.mts",
     "measure:dataflow": "tsx scripts/measure-dataflow.mts",
     "measure:deps": "tsx scripts/measure-deps.mts",

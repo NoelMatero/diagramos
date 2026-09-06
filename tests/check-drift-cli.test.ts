@@ -375,6 +375,65 @@ describe("claims on the command line", () => {
     expect(output).not.toContain("1 arrow  ");
   }, 120_000);
 
+  it("calls a base list that does not name the type wrong, and says which way round", async () => {
+    /*
+     * The arrow #216 exists for. `Base -> Handler` and `Handler -> Base` used to
+     * be the same arrow here: inheritance brings an import with it, the
+     * corroboration search found the import, and the backwards one passed.
+     */
+    writeFileSync(path.join(project, "src/base.py"), "class Base:\n    pass\n");
+    writeFileSync(
+      path.join(project, "src/handler.py"),
+      "from .base import Base\n\n\nclass Handler(Base):\n    pass\n",
+    );
+    const { board } = await createDiagram(emptyBoard(), {
+      name: "conforms",
+      nodes: [
+        { id: "base", label: "Base", ref: "src/base.py#Base" },
+        { id: "handler", label: "Handler", ref: "src/handler.py#Handler" },
+      ],
+      edges: [{ from: "base", to: "handler", claim: "conforms" }],
+    });
+    await writeBoard(path.join(project, "docs/diagrams/conforms.excalidraw"), board);
+
+    const result = await check();
+    const output = `${result.stdout}${result.stderr}`;
+    expect(result.code).toBe(1);
+    expect(output).toContain("not a base");
+    expect(output).toContain("1 base disagrees");
+  }, 120_000);
+
+  it("says why a Rust conformance could not be answered, instead of nothing", async () => {
+    /*
+     * `impl Trait for Type` may sit in any file in the crate, so this is silence
+     * by design -- and silence on its own is indistinguishable from a claim that
+     * passed, which is the whole argument of the check. Exit 0, nothing red, and
+     * the reason available to anybody who asks for the long form.
+     */
+    writeFileSync(path.join(project, "src/router.rs"), "pub trait Router {\n    fn route(&self);\n}\n");
+    writeFileSync(path.join(project, "src/app.rs"), "pub struct Orangutan;\n");
+    writeFileSync(
+      path.join(project, "src/wiring.rs"),
+      "impl Router for Orangutan {\n    fn route(&self) {}\n}\n",
+    );
+    const { board } = await createDiagram(emptyBoard(), {
+      name: "rustconforms",
+      nodes: [
+        { id: "app", label: "Orangutan", ref: "src/app.rs#Orangutan" },
+        { id: "router", label: "Router", ref: "src/router.rs#Router" },
+      ],
+      edges: [{ from: "app", to: "router", claim: "conforms" }],
+    });
+    await writeBoard(path.join(project, "docs/diagrams/rustconforms.excalidraw"), board);
+
+    const result = await check("--details");
+    const output = `${result.stdout}${result.stderr}`;
+    expect(output).toContain("any file in the crate");
+    // Never red, and never a reason to fail a build.
+    expect(output).not.toContain("not a base");
+    expect(result.code).toBe(0);
+  }, 120_000);
+
   it("says nothing about a backwards arrow that carries no claim", async () => {
     const { board } = await createDiagram(emptyBoard(), {
       name: "unclaimed",

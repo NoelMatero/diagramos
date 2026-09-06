@@ -190,8 +190,39 @@
  * read looks exactly like a claim that passed, which is the whole of the rule
  * at the top of this file.
  */
+/*
+ * `conforms` says a type is one of another type: `class Handler(Base)`, `class
+ * Store extends Cache`, `interface Props extends Base`, `impl Router for
+ * Orangutan` (#216). The second of the two relations the #187 census left with
+ * no word, and the one where frequency was never the argument -- 2,919 of them
+ * against `accesses`'s 53,362.
+ *
+ * The argument is the footing. It is read from a **declaration**, so a base list
+ * is a closed region and a base absent from it is genuinely absent: the same
+ * ground `holds` and `takes` stand on, and the strongest thing a word here can
+ * have.
+ *
+ * Except in one language, which is the first time that has been true of any word
+ * on this list. `impl Trait for Type` is a free-standing Rust item that may sit
+ * in any file in the crate, so reading `struct Type` enumerates nothing and an
+ * absence there is a fact about where somebody happened to look. Rust confirms
+ * and stays quiet; Python and TypeScript may accuse. One word, two footings,
+ * and the #209 licence grid is the thing that records which -- a word that had
+ * to be per-language before it could exist at all.
+ *
+ * The direction is subject-first, the way `holds` and `builds` are drawn:
+ * `Handler -> Base`. Drawing it the other way round is the mistake it is worth
+ * having the word for, so the reverse is never confirmed -- it is named on the
+ * refutation, and the report says which way round it should have been.
+ *
+ * What it does not say: that an object satisfies an interface without naming it
+ * (structural, written down nowhere), that `A extends B extends C` makes `A ->
+ * C` true, or that `fn f<T: Display>` is a conformance. Each is a separate
+ * question with its own measurement, and none is on offer here.
+ */
 export const ARROW_CLAIMS = [
   "needs", "feeds", "takes", "returns", "holds", "builds", "calls", "accesses",
+  "conforms",
 ] as const;
 
 export type ArrowClaim = (typeof ARROW_CLAIMS)[number];

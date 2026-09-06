@@ -215,6 +215,23 @@ export interface Licence {
  * into #190. Named once because it is one referee wearing three hats, and a
  * reader comparing squares should be able to see that.
  */
+/**
+ * The referee for `conforms`, which reads headers and never a body.
+ *
+ * Its own name rather than `TEXT_SCAN("base list")` because it is a different
+ * shape of referee, and a reader comparing squares should be able to see that: a
+ * declaration header is one line of text, so there is no class body to scope, no
+ * indentation to track and no docstring to blank out -- which is where every
+ * other scan in this file spends its complexity and where two of them found
+ * their own bugs.
+ */
+const HEADER_SCAN =
+  "a text scan of the declaration headers in the same source, run over the same "
+  + "trees. It shares no tree-sitter query with the reader, so agreeing means two "
+  + "unrelated readings agree rather than one reading agreeing with itself. It "
+  + "reads headers only: a base list written on one line, or the referee does not "
+  + "offer the pair at all -- a smaller sample, never a wrong one.";
+
 const TEXT_SCAN = (what: string): string =>
   `a text scan of the ${what} source, run over the same trees. It shares no `
   + "tree-sitter query with the reader, so agreeing means two unrelated readings "
@@ -393,6 +410,27 @@ export const LICENCES: readonly Licence[] = [
           "writes no member list a text scan can find, so `covers` withholds it " +
           "-- the same square #211 shipped a `yes` in.",
       },
+      conforms: {
+        reproduce: "npm run measure:conforms",
+        measured: "2026-09-06",
+        referee: HEADER_SCAN,
+        unit: "base asks",
+        counts: { asked: 376, missed: 0, invented: 0 },
+        covers: ["ts", "tsx"],
+        note:
+          "213 TypeScript and 163 TSX, refusing none of them, and every one of " +
+          "the 163 is `interface X extends Y` -- there is not one class heritage " +
+          "clause in any .tsx file in the corpus. JavaScript is inside this " +
+          "licence and was asked **0 questions**, so `covers` withholds it, the " +
+          "same square #211 shipped a `yes` in. Asked the 122 readable pairs " +
+          "backwards, it confirmed **0**, which is the number the word exists " +
+          "for. The run found one reader bug before it could report any of this: " +
+          "TypeScript hangs a class's type arguments off the clause as a sibling " +
+          "of the base name, and with no rule for that node every declaration " +
+          "carrying them held a doubt that silences absences -- a word that " +
+          "would have shipped and never fired on `class A extends B<C>`, " +
+          "invisible from the confirming side.",
+      },
     },
   },
   {
@@ -525,6 +563,22 @@ export const LICENCES: readonly Licence[] = [
           "inside a macro and a macro's arguments are an unparsed token tree. " +
           "That is a confirmation nobody gets, never a red.",
       },
+      conforms: {
+        unmeasured:
+          "Not a licence question, and measuring this reader would not make it " +
+          "one. `impl Trait for Type` is a free-standing item that may sit in " +
+          "any file in the crate, next to neither the trait nor the type, so " +
+          "reading `struct Type` enumerates nothing and an absence is a fact " +
+          "about where somebody happened to look. `conforms.ts` says that in " +
+          "its own words -- `region-is-the-crate` -- rather than leaving it to " +
+          "this row, because \"we never measured it\" and \"the fact is not in " +
+          "front of us\" are different sentences. A `trait Foo: Bar` does write " +
+          "its supertraits on the declaration and that list is closed, so that " +
+          "one shape is a measurement away rather than a reader away; it is 23 " +
+          "facts in the whole corpus and `measure:dataflow` reads 24 Rust " +
+          "values in it, which is an argument for shipping confirm-only and " +
+          "saying why rather than for a number nobody could trust.",
+      },
     },
   },
   {
@@ -652,6 +706,24 @@ export const LICENCES: readonly Licence[] = [
           "them -- including the attributes `__init__` assigns to `self`, which " +
           "is where most Python attributes are and which a reader stopping at " +
           "the class body would refute every one of.",
+      },
+      conforms: {
+        reproduce: "npm run measure:conforms",
+        measured: "2026-09-06",
+        referee: HEADER_SCAN,
+        unit: "base asks",
+        counts: { asked: 2276, missed: 0, invented: 0 },
+        note:
+          "The largest population of this relation anywhere -- 2,276 asks over " +
+          "442 files, 78% of every `conforms` fact in the corpus -- and it " +
+          "refuses none of them. A base list sits in the declaration in the one " +
+          "language `holds` and `accesses` both had to withhold most of, which " +
+          "is worth saying plainly: what stops those two is a class body, and " +
+          "this word never reads one. Asked its 7 readable pairs backwards it " +
+          "confirmed 0. Only 7 because a Python base is nearly always imported, " +
+          "so the far end is not in the same file -- the reverse question is " +
+          "answered from the board's other end instead, which `drift.ts` has and " +
+          "a single-file run does not.",
       },
     },
   },

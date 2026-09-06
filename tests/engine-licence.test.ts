@@ -333,6 +333,14 @@ describe("which words may accuse, and in which languages", () => {
      * asks it **0 questions** over 21 files, because a JavaScript class writes
      * no member list a text scan can read off. The other four are measured, at
      * zero accusations across 5,833 asks.
+     *
+     * `conforms` is the first word where **Rust** is the `no`, and it is the
+     * only square in this grid that a measurement cannot change (#216). Every
+     * other `false` here says nobody has run the numbers. This one says the
+     * fact is not in the file: `impl Trait for Type` may sit anywhere in the
+     * crate, so a Rust absence is a statement about where somebody looked. It
+     * is the reason the grid has to be per-language rather than per-word, one
+     * axis further than #207 needed.
      */
     const grid: Record<AccusingRelation, Record<Language, boolean>> = {
       needs: { ts: true, tsx: true, js: true, rust: true, python: true },
@@ -342,6 +350,7 @@ describe("which words may accuse, and in which languages", () => {
       builds: { ts: true, tsx: true, js: false, rust: true, python: false },
       calls: { ts: true, tsx: true, js: false, rust: true, python: true },
       accesses: { ts: true, tsx: true, js: false, rust: true, python: true },
+      conforms: { ts: true, tsx: true, js: false, rust: false, python: true },
     };
     for (const relation of ACCUSING_RELATIONS) {
       for (const language of LANGUAGES) {

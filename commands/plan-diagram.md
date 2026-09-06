@@ -226,6 +226,33 @@ list can be listed in full. If the type has it and the routine cannot be seen
 reading it, nothing is said: a routine can reach a member through a helper or a
 value whose type is not written down.
 
+### `claim: "conforms"` on a planned arrow — the hierarchy it will have
+
+`conforms` says **the `from` end will be one of the `to` end** — a class that
+will extend a base, a struct that will implement a trait, an interface that will
+extend another:
+
+```
+edges: [
+  { from: "handler", to: "base", state: "planned", claim: "conforms" },
+]
+```
+
+Subtype first, the same way round as `holds` and `builds`. Both ends need
+`path#symbol`: a file is not one of anything.
+
+This is worth writing at plan time for a reason the other claims do not have. A
+hierarchy is the design decision most often *inverted* while it is being built —
+the base ends up holding the thing that was supposed to extend it — and drawing
+it planned means the arrow is checked for direction the run after the code
+lands, rather than read as documentation nobody grades.
+
+Nothing accuses a plan of a base that has not been written. Once the code lands
+the arrow promotes and the declaration is read: a base list can be listed in
+full in Python and TypeScript, so a type absent from it is red, and the report
+says when the arrow is the right fact drawn backwards. In Rust it confirms and
+never accuses, because `impl Trait for Type` may sit in any file in the crate.
+
 ### `closed: {}` on a planned directory box — the boundary it will hold
 
 `closed` says **nothing outside this box reaches into it**. Only for a box

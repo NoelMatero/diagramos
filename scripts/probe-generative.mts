@@ -37,7 +37,7 @@
 import { existsSync, readFileSync, rmSync, writeFileSync } from "node:fs";
 
 import { createDiagram } from "../src/engine/diagram";
-import { checkDrift, createWorkspace } from "../src/engine/drift";
+import { ACCUSING_EDGE_KINDS, checkDrift, createWorkspace } from "../src/engine/drift";
 import { emptyBoard } from "../src/engine/board-file";
 import { initEngine } from "../src/engine/parse";
 import { surveyScope } from "../src/engine/survey";
@@ -49,7 +49,8 @@ const CORPUS = [
 ].find((candidate) => existsSync(candidate)) ?? "";
 
 type Claim =
-  | "needs" | "feeds" | "takes" | "returns" | "holds" | "builds" | "calls" | "accesses";
+  | "needs" | "feeds" | "takes" | "returns" | "holds" | "builds" | "calls" | "accesses"
+  | "conforms";
 
 interface Arrow {
   from: string;
@@ -150,9 +151,20 @@ const QUERY_CORE: Board = {
     { from: "query-state", to: "query", claim: "holds", wants: "contains", label: "state" },
     { from: "query-store", to: "cache", claim: "holds", wants: "contains", label: "#queries" },
     { from: "retryer", to: "query", claim: "holds", wants: "contains", label: "#retryer" },
-    // Inheritance. Also no word.
-    { from: "subscribable", to: "cache", wants: "conforms", label: "extends" },
-    { from: "removable", to: "query", wants: "conforms", label: "extends" },
+    /*
+     * Inheritance, which had no word when this board was written and has one
+     * now (#216).
+     *
+     * Turned round as well as claimed, and that is worth recording rather than
+     * quietly fixing. Both were drawn base-first -- `subscribable -> cache`,
+     * labelled `extends` -- which is the wrong way round for the fact: the code
+     * says `class QueryCache extends Subscribable<QueryCacheListener>` and
+     * `class Query<..> extends Removable`. Written that way with the word on
+     * them they go red, correctly, which is the whole argument for the word.
+     * A wordless arrow could be drawn either way and nothing noticed.
+     */
+    { from: "cache", to: "subscribable", claim: "conforms", wants: "conforms", label: "extends" },
+    { from: "query", to: "removable", claim: "conforms", wants: "conforms", label: "extends" },
     // What the vocabulary does cover.
     { from: "cache", to: "get-cache", claim: "returns", wants: "produces" },
     { from: "query", to: "add", claim: "takes", wants: "accepts" },
@@ -252,7 +264,7 @@ const HAS_A_WORD: Record<string, Claim | undefined> = {
   accepts: "takes",
   produces: "returns",
   contains: "holds",
-  conforms: undefined,
+  conforms: "conforms",
   invokes: "calls",
   accesses: "accesses",
   constructs: "builds",
@@ -269,21 +281,16 @@ if (!CORPUS || !existsSync(CORPUS)) {
 /**
  * The finding kinds that mean **wrong** rather than *worth a look*.
  *
- * Listed once, because it was listed twice and both copies said
- * `backwards-edge` and `signature-absent` only. `@holds` and `@builds` arrived
- * without being added to either, so this probe was counting four of the nine
- * accusations these boards produce and printing four of them -- a red reported
- * as a silence, on the script whose job is to notice that.
- *
- * They are not all the same shape: `holds-absent` and `signature-absent` refute
- * from an absence, `backwards-edge`, `builds-backwards` and `calls-backwards`
- * from a presence. The list is what they have in common, which is that somebody
- * is being told their diagram is wrong.
+ * The engine's list now, and the history is the argument for that. It was
+ * written twice in this file and both copies said `backwards-edge` and
+ * `signature-absent` only, so `@holds` and `@builds` arrived without being added
+ * to either and the probe counted four of the nine accusations these boards
+ * produce -- a red reported as a silence, on the script whose job is to notice
+ * that. Merging the two copies fixed the symptom and kept the cause: when
+ * `accesses-absent` shipped at #213 this list was not touched, and it was wrong
+ * again the same week.
  */
-const ACCUSES = new Set([
-  "backwards-edge", "signature-absent", "holds-absent",
-  "builds-backwards", "calls-backwards",
-]);
+const ACCUSES = new Set<string>(ACCUSING_EDGE_KINDS);
 
 const totals = {
   arrows: 0, claimed: 0, confirmed: 0, red: 0, withheld: 0,
