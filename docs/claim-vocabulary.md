@@ -665,6 +665,29 @@ word or one reader, not from reviewing the design.
     build a tier-1 fallback on when a project's build is broken and tier 2 goes
     silent. It is not a substitute for tier 2 as the primary source.
 
+    **#217/#221, re-read against this number: reaffirmed, on the same footing
+    #221 measured, with the follow-up it did not have the tool to ask.** #221
+    recommended against a closed-call-set `@calls` on a per-*body* ceiling of
+    15.1%, receiver calls the sole blocker in 28.8% of what stayed open. #227
+    measures the step underneath that — per *receiver*, not per body — at 9.5%,
+    for a structural reason (`not-a-name`, 32–52% of refusals) that reading more
+    declarations cannot close. Two independent measurements of adjacent
+    questions land on the same wall, which is corroboration, not restatement.
+
+    What neither measurement asked, because tier 2 did not exist to ask it:
+    whether a real checker closes the 28.8% that syntax cannot. `tsc`/pyright
+    plainly resolve past what `resolution.ts` does — that is the entire
+    referee this issue's own measurement leans on — but resolving a receiver in
+    isolation and closing a *body's whole call set* are different questions,
+    and #221's per-body number was never re-run against a compiler-backed
+    receiver. So: the recommendation stands, and it stands on syntax's ceiling
+    specifically, not on the idea generally. The number that would move it is
+    `measure:closed-bodies` re-run with tier 2 wired into the receiver
+    position, once tier 2 exists — not before, and not assumed in its favor
+    now. Leaving that unmeasured and treating today's "don't build it" as final
+    would be the same mistake item 9's zero warns against: reading an absence
+    of evidence as evidence of absence.
+
 `renders` was also raised as a possible missing relation and turned out not to
 be one: `<MenuContent />` is a routine making a MenuContent, which is `@builds`.
 
