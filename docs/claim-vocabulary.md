@@ -688,6 +688,67 @@ word or one reader, not from reviewing the design.
     would be the same mistake item 9's zero warns against: reading an absence
     of evidence as evidence of absence.
 
+12. **Tier 2's actual ceiling, measured: 97.8% (ts/tsx/js), and two harness bugs
+    stood between that number and a wrong one.** Item 11 argued tier 2 was
+    necessary from what tier 1 could not reach; nobody had asked a real
+    compiler the same question with no gate at all. `measure:resolution`'s
+    new section 6 does — every receiver, `not-a-name` included, `tsc` asked
+    directly.
+
+    The first honest-looking answer was **35.7%**, and it was wrong, in the
+    AGENTS.md sense of a number nobody checked before quoting. Two causes,
+    found by asking why rather than reporting the figure:
+
+    - `mundane` and `infrarouter`, two of the seven corpus trees, had never had
+      `npm install`/`bun install` run in them. No `node_modules` means the
+      compiler has no idea what an imported package exports, so it falls back
+      to `any` for anything that touches one — collapsing `tsx` (React props,
+      almost entirely imported types) to 11.4% and plain `js` to 0.2%. A low
+      number here did not mean the compiler could not help; it meant the
+      compiler was never given the chance to. Installing dependencies in both
+      trees was the fix, not a reader change.
+    - `createTsReferee` built **one `ts.Program` from the tree's own root**,
+      using `ts.findConfigFile`, which searches upward from wherever it
+      starts and never down into a subdirectory. A monorepo's real config
+      lives in each package — `mundane` alone has 22 `tsconfig.json` files,
+      none of them at its root — so every file in one built with generic
+      defaults, no `paths`, no aliases, silently. `scripts/lib/licence.ts`
+      had already solved this for a different question (module-resolution
+      options, not a type checker); the same nearest-config-per-file walk,
+      ported here, is the fix. Verified against the compiler directly on the
+      old code before touching it: an aliased import (`@lib/thing` via a
+      package-local `paths` entry) resolved to `any` before the fix and to
+      the real constructed type after it, on the same fixture — now
+      `tests/resolution-referee.test.ts`, two shapes: one package's alias
+      reachable from below the tree root, and two sibling packages kept
+      apart rather than one answering for the other.
+
+    A third bug surfaced fixing the other two: giving `mundane` real
+    dependencies grew it to 126,371 files, and `measure-resolution.mts`'s own
+    file walker piped `find` through `execFileSync`, which throws `ENOBUFS`
+    past a certain output size — caught by a blanket `catch { return []; }}`
+    that read the crash as "no files here." The whole tree silently dropped
+    out of the corpus with no error printed; the fix was the same
+    prune-while-walking `readdirSync` recursion `resolution-ts.ts` and
+    `licence.ts` already use, which never lists `node_modules` in the first
+    place rather than listing and filtering it.
+
+    With both fixed: **97.8%** of ts/tsx/js receivers resolve against the real
+    compiler with no reader gate — ts 98.4%, tsx 99.9%, combined with tier 1
+    98.1%. `js` stays low, 16.7%, and is not chased here: `checkJs` is off (the
+    same setting `dataflow.ts` and `resolution.ts` both hold to for untyped
+    JS), the population is small — 420 of 31,853 receivers — and the honest
+    open question is whether `checkJs: true` helps or just adds noise, not
+    answered by this measurement.
+
+    This is not "tier 2 is closer to a hard requirement" any more; it is a
+    number. Reading text alone reaches 8.1% of what a real compiler reaches on
+    the same population, once the compiler is actually given a fair run.
+    `npm run measure:resolution` now needs `NODE_OPTIONS=--max-old-space-size=
+    8192` (wired into the npm script) — one real `ts.Program` per package,
+    built one or two at a time rather than all at once, still peaks well past
+    Node's 2 GiB default on a package the size of one of `mundane`'s apps.
+
 `renders` was also raised as a possible missing relation and turned out not to
 be one: `<MenuContent />` is a routine making a MenuContent, which is `@builds`.
 
