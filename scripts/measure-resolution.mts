@@ -7,6 +7,13 @@
  *   npm run measure:resolution -- <path>...    -- any trees you like
  *   npm run measure:resolution -- --all        -- every disagreement, not the first few
  *
+ * The npm script raises Node's heap to 8 GiB. Section 6 (#226) builds a real
+ * `ts.Program` per package in every monorepo tree, and a package the size of
+ * one of `mundane`'s -- everything a real app pulls from `node_modules` --
+ * has run past the 2 GiB default on its own. Run this file directly with
+ * `tsx` instead of through the npm script and that section is the one that
+ * crashes, with a heap trace and no other clue why.
+ *
  * **A measurement. No word ships from it and nothing here is wired into
  * `drift.ts` or `claim.ts`.** Sub-issue of #226, which found the wall: the
  * engine has no notion of a value's type, and #221 found the cost of that --
@@ -32,8 +39,7 @@
  * on the two columns it can support -- resolved and withheld -- rather than
  * against an invented referee.
  */
-import { execFileSync } from "node:child_process";
-import { existsSync, realpathSync } from "node:fs";
+import { existsSync, readdirSync, realpathSync, statSync } from "node:fs";
 import path from "node:path";
 
 import { createTsReferee } from "./lib/resolution-ts";
@@ -68,16 +74,41 @@ const trees = (roots.length > 0 ? roots : [
   `${HOME}/infrarouter`,
 ]).filter((tree) => existsSync(tree)).map(real);
 
+/**
+ * `find`, piped through `execFileSync`, silently returned nothing for any
+ * tree big enough to overflow its stdout buffer -- `ENOBUFS`, caught by the
+ * blanket `catch` below, read as "no files here" rather than "the walk
+ * failed." Installing a monorepo's dependencies for the first time (#226)
+ * is exactly what pushes a tree over that line: `mundane` alone put 126,371
+ * files under `find`'s stdout once its `node_modules` existed, and the whole
+ * tree vanished from the corpus with no error printed. Skipping
+ * `node_modules` (and friends) *during* the walk, the way
+ * `scripts/lib/resolution-ts.ts` and `scripts/lib/licence.ts` already do,
+ * never lists those files in the first place -- there is no buffer to
+ * overflow because the walk never descends into them.
+ */
+const SKIP_DIRECTORIES = new Set([
+  "node_modules", ".git", "target", "dist", "build", "out", "vendor", ".venv", ".claude",
+  "coverage", ".next", ".nuxt", ".output", ".turbo", ".yarn", ".cache",
+]);
+
 function sourceFiles(root: string): string[] {
-  try {
-    return execFileSync("find", [root, "-type", "f"], { encoding: "utf8" })
-      .split("\n")
-      .filter(Boolean)
-      .filter((file) => !/\/(target|node_modules|\.git|dist|out|vendor|\.venv|\.claude)\//.test(file))
-      .filter((file) => languageOf(file) !== undefined);
-  } catch {
-    return [];
-  }
+  const files: string[] = [];
+  const walk = (directory: string): void => {
+    let entries: string[];
+    try { entries = readdirSync(directory); } catch { return; }
+    for (const entry of entries) {
+      if (entry.startsWith(".") && entry !== ".") continue;
+      if (SKIP_DIRECTORIES.has(entry)) continue;
+      const full = path.join(directory, entry);
+      let info;
+      try { info = statSync(full); } catch { continue; }
+      if (info.isDirectory()) walk(full);
+      else if (languageOf(entry) !== undefined) files.push(full);
+    }
+  };
+  walk(root);
+  return files;
 }
 
 const LANGUAGES: Language[] = ["rust", "ts", "tsx", "python", "js"];
@@ -104,6 +135,22 @@ interface WrongCase { tree: string; file: string; line: number; ours: string; re
 const wrongCases: WrongCase[] = [];
 const unrefereedLanguages = new Set<Language>();
 
+/**
+ * #226's actual open question, not yet asked anywhere: of every receiver, not
+ * only the ones tier 1 already named, how many does a real compiler answer?
+ * Section 4 above only ever queries the referee about sites tier 1 resolved --
+ * it measures tier 1's accuracy, not tier 2's reach. `total` is every ts/tsx/js
+ * receiver site in the corpus; `tier1` is how many of those tier 1 already
+ * named (matches section 1's ts/tsx/js share); `tier2` is how many the same
+ * `tsReferee` used in section 4 answers with something other than
+ * any/unknown/error, asked with no gate at all -- `not-a-name` sites included,
+ * since a compiler can type an arbitrary expression a bound-name reader
+ * cannot. `either` is the ceiling a fallback chain (tier 2, tier 1 when tier 2
+ * is unavailable) would actually reach.
+ */
+interface Tier2Tally { total: number; tier1: number; tier2: number; either: number }
+const tier2 = new Map<Language, Tier2Tally>();
+
 /** Resolved sites collected per tree, so the referee can be asked once per tree. */
 interface Collected {
   file: string; absolute: string; line: number; start: number; end: number;
@@ -115,6 +162,11 @@ for (const tree of trees) {
   const collectedTs: Collected[] = [];
   const collectedPy: Collected[] = [];
   const pySources = new Map<string, string>();
+  /** Every ts/tsx/js receiver site in this tree, resolved or not -- see the
+   *  `tier2` tally's own doc for why this is a separate list from `collectedTs`. */
+  const collectedTier2: Array<{
+    absolute: string; start: number; end: number; tier1Resolved: boolean; language: Language;
+  }> = [];
 
   for (const file of sourceFiles(tree)) {
     const rel = path.relative(tree, file);
@@ -151,6 +203,12 @@ for (const tree of trees) {
           } else {
             bumpNested(byWithheld, language, site.verdict.why);
           }
+          if (language === "ts" || language === "tsx" || language === "js") {
+            collectedTier2.push({
+              absolute, start: site.at.start, end: site.at.end,
+              tier1Resolved: site.verdict.verdict === "resolved", language,
+            });
+          }
         }
       }
     }
@@ -165,7 +223,7 @@ for (const tree of trees) {
   }
 
   /* --------------------------------------------------------- the referee, TS */
-  if (collectedTs.length > 0) {
+  if (collectedTs.length > 0 || collectedTier2.length > 0) {
     let tsReferee;
     try {
       tsReferee = createTsReferee(tree);
@@ -189,6 +247,20 @@ for (const tree of trees) {
           });
         }
         referee.set(site.language, tally);
+      }
+
+      // The tier-2 ceiling: the same compiler, asked with no gate at all --
+      // not just the sites tier 1 already resolved. See the `tier2` tally's doc.
+      for (const site of collectedTier2) {
+        const tally = tier2.get(site.language) ?? { total: 0, tier1: 0, tier2: 0, either: 0 };
+        tally.total += 1;
+        if (site.tier1Resolved) tally.tier1 += 1;
+        const answer = tsReferee.typeAt(site.absolute, site.start, site.end);
+        const tier2Resolved = !!answer && answer.head !== "any" && answer.head !== "unknown"
+          && !/error/i.test(answer.head);
+        if (tier2Resolved) tally.tier2 += 1;
+        if (site.tier1Resolved || tier2Resolved) tally.either += 1;
+        tier2.set(site.language, tally);
       }
     }
   }
@@ -327,7 +399,35 @@ console.log("  this is the count of times that preference actually chose between
 console.log("  that were both true, rather than confirming one and ignoring the other.");
 console.log();
 
-console.log("6 · WHAT THIS ANSWERS");
+console.log("6 · TIER 2 CEILING -- what a real compiler answers, asked at every receiver (ts/tsx/js)");
+console.log();
+console.log("  Not gated on tier 1: every receiver site is asked, `not-a-name` included -- a");
+console.log("  compiler can type an arbitrary expression a bound-name reader cannot. Section 4");
+console.log("  above measures tier 1's accuracy where it already had an opinion; this measures");
+console.log("  tier 2's reach where tier 1 had none, which is the number #226 needs before tier");
+console.log("   2 is more than a recommendation with no ceiling attached to it.");
+console.log();
+console.log("  " + "language".padEnd(10) + "receivers".padStart(11) + "tier1".padStart(15)
+  + "tier2".padStart(15) + "combined".padStart(15));
+const tier2All: Tier2Tally = { total: 0, tier1: 0, tier2: 0, either: 0 };
+const cell = (count: number, whole: number) => `${String(count).padStart(6)} ${percent(count, whole)}`;
+for (const language of ["ts", "tsx", "js"] as Language[]) {
+  const tally = tier2.get(language);
+  if (!tally) continue;
+  tier2All.total += tally.total; tier2All.tier1 += tally.tier1;
+  tier2All.tier2 += tally.tier2; tier2All.either += tally.either;
+  console.log("  " + language.padEnd(10) + String(tally.total).padStart(11)
+    + cell(tally.tier1, tally.total).padStart(15) + cell(tally.tier2, tally.total).padStart(15)
+    + cell(tally.either, tally.total).padStart(15));
+}
+if (tier2All.total > 0) {
+  console.log("  " + "all".padEnd(10) + String(tier2All.total).padStart(11)
+    + cell(tier2All.tier1, tier2All.total).padStart(15) + cell(tier2All.tier2, tier2All.total).padStart(15)
+    + cell(tier2All.either, tier2All.total).padStart(15));
+}
+console.log();
+
+console.log("7 · WHAT THIS ANSWERS");
 console.log();
 const headline = percent(total(resolvedCount), total(receiverSites));
 console.log(`  ${headline.trim()} of receiver call sites in this corpus resolve from the text alone,`);
@@ -340,3 +440,9 @@ const askedTotal = [...referee.values()].reduce((a, b) => a + b.agreed + b.refus
 console.log(`  Against a real type checker: ${wrongTotal} wrong of ${askedTotal} checked `
   + `(${percent(wrongTotal, askedTotal).trim()}). ${wrongTotal === 0 ? "Zero -- every checked answer this reader gave a real checker also gives." : "Read every WRONG case above before trusting this reader's evidence rules."}`);
 console.log();
+if (tier2All.total > 0) {
+  console.log(`  Tier 2 (ts/tsx/js): ${percent(tier2All.tier2, tier2All.total).trim()} of receivers answer from`);
+  console.log(`  the compiler alone, no reader gate, vs ${percent(tier2All.tier1, tier2All.total).trim()} tier 1 reaches on the`);
+  console.log(`  same population. Combined ceiling: ${percent(tier2All.either, tier2All.total).trim()}.`);
+  console.log();
+}

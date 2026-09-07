@@ -105,16 +105,55 @@ export function headOfPython(typeText: string): string {
   return typeText.trim().split(/[<[(]/)[0]!.trim();
 }
 
-/** One program per tree, built from its own `tsconfig.json` when there is one. */
-export function createTsReferee(root: string): TsReferee {
-  const configPath = ts.findConfigFile(root, ts.sys.fileExists, "tsconfig.json");
-  let options: ts.CompilerOptions = {
-    allowJs: true, checkJs: false, target: ts.ScriptTarget.Latest,
-    module: ts.ModuleKind.ESNext, moduleResolution: ts.ModuleResolutionKind.Bundler,
-    skipLibCheck: true, noEmit: true, jsx: ts.JsxEmit.Preserve,
-  };
-  let rootNames = sourceFiles(root);
+const DEFAULT_OPTIONS: ts.CompilerOptions = {
+  allowJs: true, checkJs: false, target: ts.ScriptTarget.Latest,
+  module: ts.ModuleKind.ESNext, moduleResolution: ts.ModuleResolutionKind.Bundler,
+  skipLibCheck: true, noEmit: true, jsx: ts.JsxEmit.Preserve,
+};
 
+/**
+ * The nearest enclosing `tsconfig.json` to `file`, walking up and caching by
+ * directory -- the same algorithm `scripts/lib/licence.ts`'s `optionsFinder`
+ * already uses for a different question (module resolution options), ported
+ * here because `ts.findConfigFile` searches upward from wherever it starts
+ * and never descends into a subdirectory. Calling it once on the *tree root*
+ * -- what this file did before -- finds a package's own config only when the
+ * root itself is a package. A monorepo's config lives in each package
+ * (`apps/app/tsconfig.json`, `packages/ui/tsconfig.json`, ...), all of them
+ * children of the root that search would never reach, so every file in one
+ * silently built with no `paths`, no aliases, nothing but this file's
+ * defaults -- and `measure:resolution`'s first monorepo run under-reported
+ * tier 2 for exactly this reason before it was named.
+ */
+function configFinder(): (file: string) => string | undefined {
+  const byDirectory = new Map<string, string | undefined>();
+  return (file: string): string | undefined => {
+    let directory = path.dirname(file);
+    const seen: string[] = [];
+    for (;;) {
+      if (byDirectory.has(directory)) {
+        const cached = byDirectory.get(directory);
+        for (const each of seen) byDirectory.set(each, cached);
+        return cached;
+      }
+      seen.push(directory);
+      const candidate = path.join(directory, "tsconfig.json");
+      if (ts.sys.fileExists(candidate)) {
+        for (const each of seen) byDirectory.set(each, candidate);
+        return candidate;
+      }
+      const parent = path.dirname(directory);
+      if (parent === directory) break;
+      directory = parent;
+    }
+    for (const each of seen) byDirectory.set(each, undefined);
+    return undefined;
+  };
+}
+
+function programFrom(configPath: string | undefined, fallbackFiles: string[]): ts.Program {
+  let options = DEFAULT_OPTIONS;
+  let rootNames = fallbackFiles;
   if (configPath) {
     const read = ts.readConfigFile(configPath, ts.sys.readFile);
     if (!read.error && read.config) {
@@ -123,11 +162,66 @@ export function createTsReferee(root: string): TsReferee {
       if (parsed.fileNames.length > 0) rootNames = parsed.fileNames;
     }
   }
+  return ts.createProgram(rootNames, options);
+}
 
-  const program = ts.createProgram(rootNames, options);
-  const checker = program.getTypeChecker();
+/**
+ * One program per package, not per tree -- see `configFinder`'s doc for why a
+ * single program silently loses every monorepo package's own config. Every
+ * source file under `root` is grouped by its nearest enclosing `tsconfig.json`
+ * (or the shared no-config bucket when it has none), so a package's `paths`
+ * reach the files that declared them and nowhere else -- the same scope a
+ * real build would give them.
+ *
+ * Built lazily, one or two at a time, not all up front. A monorepo can have
+ * dozens of packages, and building every one's full program eagerly --
+ * binding it against everything its own `node_modules` pulls in -- is what
+ * turned this measurement's first real monorepo run (`mundane`, 22 packages)
+ * into an out-of-memory crash the moment it had real dependencies installed.
+ * `typeAt`'s own callers ask about one package's receivers together before
+ * moving to the next -- the same locality the directory walk that grouped
+ * these files already has -- so a cache of two is enough to keep the common
+ * case fast without ever holding the whole monorepo's checkers in memory at
+ * once.
+ */
+export function createTsReferee(root: string): TsReferee {
+  const files = sourceFiles(root);
+  const findConfig = configFinder();
+
+  const configOf = new Map<string, string>();
+  const filesByConfig = new Map<string, string[]>();
+  for (const file of files) {
+    const config = findConfig(file) ?? "";
+    configOf.set(file, config);
+    const list = filesByConfig.get(config) ?? [];
+    list.push(file);
+    filesByConfig.set(config, list);
+  }
+
+  const PROGRAM_CACHE_SIZE = 2;
+  const programCache = new Map<string, { program: ts.Program; checker: ts.TypeChecker }>();
+
+  function programFor(configPath: string): { program: ts.Program; checker: ts.TypeChecker } {
+    const cached = programCache.get(configPath);
+    if (cached) {
+      programCache.delete(configPath); // re-insert to mark most-recently-used
+      programCache.set(configPath, cached);
+      return cached;
+    }
+    const program = programFrom(configPath || undefined, filesByConfig.get(configPath) ?? []);
+    const entry = { program, checker: program.getTypeChecker() };
+    programCache.set(configPath, entry);
+    if (programCache.size > PROGRAM_CACHE_SIZE) {
+      const oldest = programCache.keys().next().value;
+      if (oldest !== undefined) programCache.delete(oldest);
+    }
+    return entry;
+  }
 
   function typeAt(file: string, start: number, end: number): TsTypeAnswer | undefined {
+    const configPath = configOf.get(file);
+    if (configPath === undefined) return undefined; // not a file this tree's walk ever saw
+    const { program, checker } = programFor(configPath);
     const sourceFile = program.getSourceFile(file);
     if (!sourceFile) return undefined;
     const node = findNodeAt(sourceFile, start, end);
