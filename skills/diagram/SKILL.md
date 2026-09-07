@@ -323,8 +323,10 @@ guessing has a real cost.
 Every word below can come back wrong except `feeds`, which confirms and
 otherwise stays quiet. Two of them — `builds` and `calls` — can only ever be
 wrong about the **direction**, never about an absence. One of them —
-`accesses` — can only ever be wrong about one of its two ends. Each says why
-under its own heading.
+`accesses` — can only ever be wrong about one of its two ends. One of them —
+`conforms` — can be wrong in Python and TypeScript and never in Rust, because
+what a Rust type implements is not written on the type. Each says why under its
+own heading.
 
 They are all optional. An arrow with no claim and a box with no claim are the
 normal case, not a shortfall.
@@ -611,6 +613,55 @@ whose `impl` block is in another file. Every one of those is a member list that
 might be hiding the name, and a list that might be hiding it proves nothing.
 
 Same rule as the others: write it from a member list you read.
+
+#### `claim: "conforms"` — this is one of those
+
+A class extending a base, a class or struct implementing an interface or trait,
+an interface extending another. The relation every class diagram draws and this
+one could not say:
+
+```
+edges: [
+  { from: "handler", to: "base", claim: "conforms" },
+]
+```
+
+**Subtype first.** `Handler -> Base`, the same way round as `holds` and
+`builds`, and the way generalisation has been drawn for thirty years. Both ends
+must anchor a symbol (`path#symbol`).
+
+Drawing it the other way round is the mistake this word exists for. Before it,
+`Base -> Handler` and `Handler -> Base` were the same arrow to this tool —
+inheritance brings an import with it, the corroboration search found the import,
+and the backwards one passed. Now the backwards one is red, and the report says
+it is the right fact drawn backwards rather than sending you to look for a base
+that was never missing.
+
+*It can come back red in Python and TypeScript.* A base list is written in the
+declaration and can be read in full, so a type absent from it is genuinely
+absent, and the report quotes what the declaration does say.
+
+*It can never come back red in Rust*, and this is the one place in this file
+where the language changes what a word may say. `impl Trait for Type` is a
+free-standing item that may sit in any file in the crate, next to neither the
+trait nor the type — so reading `struct Type` enumerates nothing, and an absence
+would be a statement about where the reader happened to look. Rust confirms an
+`impl` it can find and reports the arrow as unread otherwise, with the reason
+said out loud.
+
+**Type arguments are not bases.** `class Store extends Cache<Entry>` says Store
+is one of Cache and says nothing about Entry. That is the opposite of `holds`,
+where `Vec<RouteInfo>` really does hold a RouteInfo.
+
+**Structural conformance is not on offer.** An object that satisfies an
+interface without naming it, or a function that fits a protocol, is written down
+nowhere — so an arrow from or at a function is reported as a claim nothing can
+read, not as one that passed. Nor is it transitive: `A extends B extends C`
+confirms `A -> B` and says nothing about `A -> C`.
+
+Nothing is reported either way when a base could stand for another name (`import
+{ Base as B }`), when it is an expression rather than a name (`extends
+mixin(B)`), or when the tail is an alias for a type declared elsewhere.
 
 #### `closed: {}` — nothing outside reaches into this box
 

@@ -95,6 +95,17 @@ export interface Node {
   hasError: boolean;
   /** Byte offset of the node's first character, for naming the line evidence sits on. */
   startIndex: number;
+  /**
+   * False for the punctuation and keywords a grammar keeps in the tree -- `,`,
+   * `(`, `extends`, `for`.
+   *
+   * Needed by a reader that refuses by default. `conforms.ts` accepts a base
+   * only where it can see a plain name and treats anything else as unreadable,
+   * so it has to be able to tell the `extends` keyword from the expression after
+   * it; matching on the type text cannot, because a keyword's node type *is* the
+   * keyword.
+   */
+  isNamed: boolean;
   child(index: number): Node | null;
   childForFieldName(field: string): Node | null;
 }

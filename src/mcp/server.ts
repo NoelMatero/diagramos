@@ -222,10 +222,11 @@ const edgeSchema = z.object({
       + "break names the hop that stopped holding. Only for arrows whose ends both name symbols.",
     ),
   claim: z
-    .enum(["needs", "feeds", "takes", "returns", "holds", "builds", "calls", "accesses"])
+    .enum(["needs", "feeds", "takes", "returns", "holds", "builds", "calls",
+      "accesses", "conforms"])
     .optional()
     .describe(
-      "What this arrow asserts, when it asserts anything. Eight words, and an arrow may carry one. "
+      "What this arrow asserts, when it asserts anything. Nine words, and an arrow may carry one. "
       + "'needs': the from end declares a dependency on the to end — an import, a require, an "
       + "include. Write it ONLY when you have read that line in the code: it is a transcription of "
       + "something you saw, never a guess about what the relationship probably is. Shown on the "
@@ -283,6 +284,20 @@ const edgeSchema = z.object({
       + "closed -- a type that extends another, an index signature, a Python __getattr__, an "
       + "alias for a shape declared elsewhere, or a Rust struct whose impl is in another file. "
       + "Both ends must anchor a symbol. "
+      + "'conforms': the FROM end is one of the TO end -- a class extending a base, a class or "
+      + "struct implementing an interface or trait, an interface extending another. Subtype "
+      + "first, the way holds and builds are drawn, and the way a class diagram has drawn "
+      + "generalisation for thirty years. CHECKED and it can fail in Python and TypeScript: a "
+      + "base list is written in the declaration, so a type absent from it is genuinely absent, "
+      + "and an arrow drawn from the base DOWN to the subclass is a red that tells you to turn "
+      + "it round. Type arguments are NOT read as bases -- `class Store extends Cache<Entry>` "
+      + "says Store is one of Cache and nothing about Entry. In RUST it confirms and can never "
+      + "fail, because `impl Trait for Type` may sit in any file in the crate, so a struct with "
+      + "no impl beside it is reported unread rather than wrong. Nothing is reported either way "
+      + "when a base could stand for another name, or is an expression like `extends mixin(B)`. "
+      + "Structural conformance is not on offer: an object that satisfies an interface without "
+      + "naming it, or a function that fits a protocol, is written down nowhere -- an arrow at a "
+      + "function is reported as a claim nothing can read. Both ends must anchor a symbol. "
       + "A relationship you cannot point at is an arrow with no claim, which is fine and is what "
       + "most arrows are: an unclaimed arrow is looked for and counted, never judged, so it cannot "
       + "come back as a finding against you. "
@@ -496,6 +511,15 @@ const CLAIM_CONSEQUENCE: Record<string, string> = {
     + " finding the call at the FAR end and only there, which means the arrow is drawn backwards."
     + " Nothing is reported either way when the name cannot be placed -- a method on a value whose"
     + " type is not written down, a wildcard import, a name from a package.",
+  conforms:
+    " Each one is now read off the base list of the FROM end -- the subtype first. In Python and"
+    + " TypeScript that list is written in the declaration and can be read in full, so a type"
+    + " absent from it is genuinely absent: the arrow is reported in red with the bases quoted,"
+    + " and if the other end turns out to be the subtype it says the arrow is the right fact"
+    + " drawn backwards. Type arguments are not bases, so extends Cache<Entry> says nothing about"
+    + " Entry. Rust confirms and can never fail: impl Trait for Type may sit in any file in the"
+    + " crate, so a struct with no impl beside it is reported unread rather than wrong. Nothing is"
+    + " reported either way when a base could stand for another name or is an expression.",
   accesses:
     " Each one is now read at both ends, and only one of them can say wrong. If the TO end's type"
     + " does not declare the member named on the arrow's label, the arrow is reported in red with"
@@ -1415,10 +1439,11 @@ server.registerTool(
             label: z.string().optional(),
             bidirectional: z.boolean().optional(),
             claim: z
-              .enum(["needs", "feeds", "takes", "returns", "holds", "builds", "calls", "accesses"])
+              .enum(["needs", "feeds", "takes", "returns", "holds", "builds", "calls",
+                "accesses", "conforms"])
               .optional()
               .describe(
-      "What this arrow asserts, when it asserts anything. Eight words, and an arrow may carry one. "
+      "What this arrow asserts, when it asserts anything. Nine words, and an arrow may carry one. "
       + "'needs': the from end declares a dependency on the to end — an import, a require, an "
       + "include. Write it ONLY when you have read that line in the code: it is a transcription of "
       + "something you saw, never a guess about what the relationship probably is. Shown on the "
@@ -1476,6 +1501,20 @@ server.registerTool(
       + "closed -- a type that extends another, an index signature, a Python __getattr__, an "
       + "alias for a shape declared elsewhere, or a Rust struct whose impl is in another file. "
       + "Both ends must anchor a symbol. "
+      + "'conforms': the FROM end is one of the TO end -- a class extending a base, a class or "
+      + "struct implementing an interface or trait, an interface extending another. Subtype "
+      + "first, the way holds and builds are drawn, and the way a class diagram has drawn "
+      + "generalisation for thirty years. CHECKED and it can fail in Python and TypeScript: a "
+      + "base list is written in the declaration, so a type absent from it is genuinely absent, "
+      + "and an arrow drawn from the base DOWN to the subclass is a red that tells you to turn "
+      + "it round. Type arguments are NOT read as bases -- `class Store extends Cache<Entry>` "
+      + "says Store is one of Cache and nothing about Entry. In RUST it confirms and can never "
+      + "fail, because `impl Trait for Type` may sit in any file in the crate, so a struct with "
+      + "no impl beside it is reported unread rather than wrong. Nothing is reported either way "
+      + "when a base could stand for another name, or is an expression like `extends mixin(B)`. "
+      + "Structural conformance is not on offer: an object that satisfies an interface without "
+      + "naming it, or a function that fits a protocol, is written down nowhere -- an arrow at a "
+      + "function is reported as a claim nothing can read. Both ends must anchor a symbol. "
       + "A relationship you cannot point at is an arrow with no claim, which is fine and is what "
       + "most arrows are: an unclaimed arrow is looked for and counted, never judged, so it cannot "
       + "come back as a finding against you. "

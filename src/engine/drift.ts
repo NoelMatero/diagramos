@@ -50,6 +50,7 @@ import { callsBetween, type CallSide, type CallsWithheld } from "./calls";
 import { constructions, routineNamesIn, type ConstructsWithheld } from "./constructs";
 import { memberAccesses, type AccessesWithheld } from "./accesses";
 import { heldTypes, type HoldsWithheld } from "./holds";
+import { conformedTypes, type ConformsWithheld } from "./conforms";
 import { signatureNames, type SignatureWithheld } from "./signature";
 import { resolveDependency, type ConfigCache } from "./resolve";
 import { boardIsNewer, newerBuildClaimError } from "./version";
@@ -222,7 +223,25 @@ export type EdgeFindingKind =
    * What it buys is the case the word exists for: rename a field and every
    * diagram still naming the old one goes red, the turn the rename lands.
    */
-  | "accesses-absent";
+  | "accesses-absent"
+  /**
+   * A `conforms` arrow whose base list does not name the type (#216).
+   *
+   * Refuted from an absence, the footing `holds-absent` stands on: a base list
+   * is written in the declaration, so a base that is not in it is not a base.
+   * There is no `conforms-backwards` beside it, and that is a decision rather
+   * than a gap -- an arrow drawn from the base down to the subclass *is* this
+   * finding, because the base's own declaration does not name the subclass. The
+   * detail says so when the reader can see the reverse, so the row sends
+   * somebody to turn the arrow round rather than to go looking for a base that
+   * was never missing.
+   *
+   * Rust cannot produce this and must not. `impl Trait for Type` may sit in any
+   * file in the crate, so an absence there is a fact about where the reader
+   * looked; `conforms.ts` withholds with `region-is-the-crate` and the licence
+   * grid carries the same `no` a second time.
+   */
+  | "conforms-absent";
 
 /**
  * Every verdict word this engine can put in a report, as data (#116).
@@ -263,13 +282,66 @@ export const EDGE_FINDING_KINDS = [
   "builds-backwards",
   "calls-backwards",
   "accesses-absent",
+  "conforms-absent",
 ] as const satisfies readonly EdgeFindingKind[];
+
+/**
+ * The edge verdicts that mean **wrong**, and the ones that mean *worth a look*.
+ *
+ * Split here, in the engine, because it was split in four places outside it: the
+ * CLI, the board page, the generative probe and the summary each kept a copy,
+ * and a copy is a list that goes stale silently. It did. `accesses-absent`
+ * shipped at #213 into the board page and into neither the CLI nor the probe --
+ * so for three days a refuted member arrow printed amber in the terminal, red in
+ * the browser, and was counted among the arrows nothing corroborated by the one
+ * script whose job is to notice that.
+ *
+ * The two lists are exhaustive over `EdgeFindingKind` and the check below is a
+ * compile error, not a test: a tenth word's verdict does not build until
+ * somebody says which of the two it is. That is the guarantee `licence.ts` gets
+ * from `relations`, and the only kind that survives somebody in a hurry.
+ *
+ * They are not all the same shape. `signature-absent`, `holds-absent`,
+ * `accesses-absent` and `conforms-absent` refute from an absence;
+ * `backwards-edge`, `builds-backwards` and `calls-backwards` from a presence.
+ * What the list is about is neither: it is whether somebody is being told their
+ * diagram is wrong.
+ */
+export const ACCUSING_EDGE_KINDS = [
+  "backwards-edge",
+  "signature-absent",
+  "holds-absent",
+  "builds-backwards",
+  "calls-backwards",
+  "accesses-absent",
+  "conforms-absent",
+] as const satisfies readonly EdgeFindingKind[];
+
+/** The rest: an observation about an arrow, never an accusation about one. */
+export const ADVISORY_EDGE_KINDS = [
+  "unsupported-edge",
+  "broken-chain",
+  "built-backwards",
+] as const satisfies readonly EdgeFindingKind[];
+
+/** Whether a verdict says the diagram is wrong rather than worth a look. */
+export function accuses(kind: string): boolean {
+  return (ACCUSING_EDGE_KINDS as readonly string[]).includes(kind);
+}
 
 /*
  * The half `satisfies` cannot do: it proves every listed word is a real kind,
  * not that every real kind is listed. Add one to a union and forget the array,
  * and `never` stops being assignable here.
  */
+const _everyEdgeKindIsSorted: never =
+  undefined as unknown as Exclude<
+    EdgeFindingKind,
+    (typeof ACCUSING_EDGE_KINDS)[number] | (typeof ADVISORY_EDGE_KINDS)[number]
+  >;
+void _everyEdgeKindIsSorted;
+
+
 const _everyKindIsListed: never =
   undefined as unknown as Exclude<
     DriftKind | EdgeFindingKind,
@@ -833,6 +905,26 @@ export interface ClaimTally {
    * type that extends another has members this reader never sees.
    */
   accessesWithheld: SkipBreakdown<AccessesWithheld | EdgeSkipReason>;
+  /** Arrows asserting that the tail's declaration says it is one of the head. */
+  conforms: number;
+  /** Of those, how many a base list actually said so. */
+  conformsConfirmed: number;
+  /**
+   * Why the rest got no verdict, by reason.
+   *
+   * `absent` is not in here -- that is the accusation and it belongs in `edges`,
+   * the same way `holds-absent` does. Two of these are worth watching and they
+   * are worth watching for opposite reasons:
+   *
+   * - `region-is-the-crate` is every Rust arrow that has no `impl` beside its
+   *   type, and it is not a reader failing. It is the one refusal in this file
+   *   that no measurement could ever remove, so it is reported in its own words
+   *   rather than as a number nobody can act on.
+   * - `computed-base` is `class A extends mixin(B)`. Rare -- 0 in 2,652 asks
+   *   across the corpus after the reader learned to read type arguments -- and
+   *   the price of refusing by default rather than guessing at an expression.
+   */
+  conformsWithheld: SkipBreakdown<ConformsWithheld | EdgeSkipReason>;
   /**
    * Of those, how many were confirmed by a flow somebody can go and read.
    *
@@ -2241,6 +2333,7 @@ export function checkDrift(
     takes: 0, returns: 0, signatureConfirmed: 0, signatureWithheld: {},
     holds: 0, holdsConfirmed: 0, holdsWithheld: {},
     accesses: 0, accessesConfirmed: 0, accessesWithheld: {},
+    conforms: 0, conformsConfirmed: 0, conformsWithheld: {},
     builds: 0, buildsConfirmed: 0, buildsWithheld: {},
     calls: 0, callsConfirmed: 0, callsWithheld: {},
     feeds: 0, feedsConfirmed: 0, feedsWithheld: {},
@@ -3489,6 +3582,134 @@ export function checkDrift(
                 + `${oneLine(toNode.label) || toPath}, and ${fromPath} declares `
                 + `\`${verdict.fields}\`, which does not name it. `
                 + `Either the arrow points at the wrong type, or the fields changed.`,
+            } });
+            continue;
+          }
+        }
+      }
+
+      /*
+       * `@conforms`: does the tail's declaration say it is one of the head?
+       *
+       * Read at the **from** end, like `holds`: the tail is the subtype and its
+       * own declaration is where the answer is written. `class Handler(Base)`,
+       * `class Store extends Cache`, `interface Props extends Base`.
+       *
+       * The one word here whose footing changes with the language, which is why
+       * `conforms.ts` exists as a file rather than as a branch in this one. A
+       * base list is a closed region in Python and TypeScript, so an absence
+       * refutes. In Rust `impl Trait for Type` is a free-standing item that may
+       * sit in any file in the crate, so the reader confirms what it finds and
+       * withholds with `region-is-the-crate` -- and the licence grid says `no`
+       * for Rust a second time, so a bug here could not turn into a red anyway.
+       *
+       * The far end's source is passed for two things: the sort of what sits
+       * there, so an arrow drawn at a routine is a category error rather than an
+       * absence, and whether the far end names *this* end as its base -- which
+       * is the arrow drawn backwards, and the case the word is worth having for.
+       *
+       * A `planned` arrow keeps the confirmation and is refused the accusation,
+       * as every other claim here is: sketching a class hierarchy before writing
+       * it is what a plan is for, and a red about one would be a lie about a plan.
+       */
+      if (edge.claim === "conforms" && (claimed || edge.state === "planned")) {
+        const language = languageOf(fromFile);
+        const noteConforms = (why: ConformsWithheld | EdgeSkipReason) => {
+          if (claimed) claims.conformsWithheld[why] = (claims.conformsWithheld[why] ?? 0) + 1;
+        };
+
+        if (fromEnd.symbols.length === 0 || toEnd.symbols.length === 0) {
+          // One end names a file rather than a type, so there is no base list to
+          // read or no name to look for.
+          noteConforms("endpoint-has-no-ref");
+        } else if (!language) {
+          noteConforms("unreadable");
+        } else {
+          const toLanguage = languageOf(toFile);
+          const verdict = conformedTypes(
+            workspace.read(fromFile), fromEnd.symbols[0]!, toEnd.symbols, language,
+            toLanguage ? { source: workspace.read(toFile), language: toLanguage } : undefined,
+          );
+
+          if (verdict.verdict === "confirmed") {
+            if (claimed) claims.conformsConfirmed += 1;
+            edgesChecked += 1;
+            recordEdge(edge, fromNode, toNode, { kind: "confirmed" });
+            continue;
+          }
+          if (verdict.verdict === "withheld") {
+            noteConforms(verdict.why);
+            /*
+             * The two refusals that can never come good, and so the two that are
+             * said out loud. Every other reason here means the code might be
+             * hiding the answer -- an alias, a mixin, a base in another file --
+             * and the arrow could go green tomorrow without anybody touching the
+             * board.
+             *
+             * A routine at either end never can. Nothing is ever one of a
+             * function, and a function is never one of anything, so this arrow
+             * will be silent forever -- which is the definition `garbledClaims`
+             * carries. It is also the claim this word will meet most: a function
+             * that satisfies a protocol is structural typing, which is written
+             * down nowhere and is not on offer.
+             *
+             * Not a red: a red says the code disagrees, and the code has not
+             * been asked anything. The board is wrong, not the code.
+             */
+            const sort = verdict.why === "not-a-type"
+              ? { end: oneLine(toNode.label) || toPath, fix: "Point the arrow at the type it is one of" }
+              : verdict.why === "subject-not-a-type"
+                ? { end: oneLine(fromNode.label) || fromPath, fix: "Draw it from the type that has the base" }
+                : undefined;
+            if (sort && claimed) {
+              garbledClaims.push({
+                on: "arrow",
+                label: `${oneLine(fromNode.label) || edge.from} → ${oneLine(toNode.label) || edge.to}`,
+                written: "conforms",
+                detail: `@conforms says ${oneLine(fromNode.label) || fromPath} is one of `
+                  + `${oneLine(toNode.label) || toPath}, and ${sort.end} is a function rather than `
+                  + `a type. A function has no bases and nothing is ever one of a function, so `
+                  + `nothing can ever read this claim. ${sort.fix}, or drop the claim.`,
+              });
+            }
+          } else if (edge.state === "planned") {
+            noteConforms("no-function-body");
+          } else {
+            edgesChecked += 1;
+            /*
+             * A claim written this turn gets its own opening, for the reason
+             * every other accusation here does: the first check to see it runs
+             * moments after an agent wrote it, and a bare "this is wrong" then
+             * reads as the tool accusing somebody of something it wrote itself.
+             */
+            const wasClaimed = baselineGraph?.edges.some(
+              (was) => was.from === edge.from && was.to === edge.to && was.claim === "conforms",
+            );
+            const fresh = baselineGraph !== undefined && !wasClaimed;
+            recordEdge(edge, fromNode, toNode, { kind: "finding", finding: {
+              from: fromPath,
+              to: toPath,
+              fromLabel: fromNode.label,
+              toLabel: toNode.label,
+              fromRef,
+              toRef,
+              kind: "conforms-absent",
+              detail:
+                (fresh ? "a claim written this turn is already wrong: " : "")
+                + `this arrow says ${oneLine(fromNode.label) || fromPath} is one of `
+                + `${oneLine(toNode.label) || toPath}, and ${fromPath} declares `
+                + `${verdict.bases ? `\`${verdict.bases}\`` : "no base at all"}, which does not `
+                + "name it. "
+                /*
+                 * The reverse, when the reader could see it. Without this the row
+                 * says "wrong" about the commonest way to get this arrow wrong
+                 * and leaves somebody looking for a base that was never missing.
+                 */
+                + (verdict.reversed
+                  ? `${oneLine(toNode.label) || toPath} is one of `
+                    + `${oneLine(fromNode.label) || fromPath} instead — the arrow is the right `
+                    + "fact drawn backwards, so turn it round."
+                  : "Either the arrow points at the wrong type, or the declaration changed."),
             } });
             continue;
           }

@@ -54,6 +54,7 @@ import { damageSentence } from "../src/engine/damage.ts";
 import { CONFIG_FILE, ConfigError, DEFAULT_DIAGRAM_DIR, diagramDir } from "../src/engine/config.ts";
 import { countedWords, coverageLabel } from "../src/engine/summary.ts";
 import {
+  ACCUSING_EDGE_KINDS,
   checkDrift,
   createGitBaseline,
   createWorkspace,
@@ -312,6 +313,42 @@ const FEEDS_UNANSWERED = new Set(
   Object.keys(FEEDS_NOT_CONFIRMED).filter((why) => why !== "absent" && why !== "reversed"),
 );
 
+/**
+ * Why a `conforms` claim got no verdict (#216).
+ *
+ * The first word on this list whose refusals split into two kinds, and the
+ * split is the whole of its design rather than a detail:
+ *
+ * - Most of these mean **the code might come good**. An alias, a mixin, a base
+ *   in a file nobody read: the arrow could go green tomorrow with nobody
+ *   touching the board, so they are news in amber the way a `@needs` nobody
+ *   answered is.
+ * - `region-is-the-crate` never can. `impl Trait for Type` is a free-standing
+ *   Rust item that may sit next to neither the trait nor the type, so no
+ *   measurement and no edit makes this readable from one file. It is the
+ *   expected state of a correct Rust board, which is exactly the shape of a
+ *   plan's unread claims -- said in dim, to whoever asks, and never in a notice
+ *   that fires every turn.
+ */
+const CONFORMS_WITHHELD = {
+  ...NEEDS_WITHHELD,
+  unreadable: "in a language with no reader",
+  "not-declared": "with an end nothing in that file declares",
+  aliased: "where a base could stand for another name",
+  "computed-base": "where the base is an expression, not a name",
+  incomplete: "in a file that could only be parsed in part",
+  "unlicensed": "in a language with no measured reader",
+  "no-function-body": "with an end whose body could not be read",
+};
+
+/** The one reason that is not news, because nothing could ever change it. */
+const CRATE_REGION = "region-is-the-crate";
+
+/** The conforms reasons worth a notice: everything the code could still fix. */
+const CONFORMS_UNANSWERED = new Set(
+  [...Object.keys(CONFORMS_WITHHELD)].filter((why) => why !== CRATE_REGION),
+);
+
 /** Reasons with a count, commonest first, so a sentence can list them. */
 function withheldReasons(table, only) {
   return Object.entries(table ?? {})
@@ -334,7 +371,8 @@ function withheldReasons(table, only) {
 function unansweredClaims(report) {
   const needs = withheldReasons(report.claims?.needsWithheld);
   const feeds = withheldReasons(report.claims?.feedsWithheld, FEEDS_UNANSWERED);
-  return [...needs, ...feeds].reduce((sum, [, count]) => sum + count, 0);
+  const conforms = withheldReasons(report.claims?.conformsWithheld, CONFORMS_UNANSWERED);
+  return [...needs, ...feeds, ...conforms].reduce((sum, [, count]) => sum + count, 0);
 }
 
 /**
@@ -353,6 +391,11 @@ function unansweredClaimLines(report) {
   for (const [word, reasons, table] of [
     ["needs", withheldReasons(report.claims?.needsWithheld), NEEDS_WITHHELD],
     ["feeds", withheldReasons(report.claims?.feedsWithheld, FEEDS_UNANSWERED), FEEDS_NOT_CONFIRMED],
+    [
+      "conforms",
+      withheldReasons(report.claims?.conformsWithheld, CONFORMS_UNANSWERED),
+      CONFORMS_WITHHELD,
+    ],
   ]) {
     const total = reasons.reduce((sum, [, count]) => sum + count, 0);
     if (total === 0) continue;
@@ -393,6 +436,35 @@ function plannedClaimLine(report) {
   if (total === 0) return undefined;
   return `${total} of this plan's claims cannot be checked yet: `
     + reasons.map(([why, count]) => `${count} ${PLAN_UNREAD[why] ?? why}`).join(", ");
+}
+
+/**
+ * The Rust conformances nothing in one file could ever answer.
+ *
+ * Its own sentence and its own colour, beside the plan's rather than among the
+ * ambers, because it is the same kind of thing: a question that is not failing
+ * and was never going to be answered. The alternative was measured on the
+ * design and rejected -- an amber that fires every turn on a correct Rust board
+ * is the colour this project spent #133 removing, coming back under a new name.
+ *
+ * Said all the same. Silence and a claim that passed look identical, which is
+ * the whole argument of the check.
+ */
+function crateRegionLine(report) {
+  const count = report.claims?.conformsWithheld?.[CRATE_REGION] ?? 0;
+  if (count === 0) return undefined;
+  /*
+   * Short on purpose. The notice frame is 72 columns and truncates a row with
+   * an ellipsis, so a sentence that explains itself past the cut explains
+   * nothing -- the first draft of this line ended "an impl may be in an…".
+   */
+  return `${count} conforms ${count === 1 ? "arrow" : "arrows"} unread: `
+    + "an impl may be in any file in the crate";
+}
+
+/** How many Rust conformances are waiting on a reader nobody has built. */
+function crateRegionClaims(report) {
+  return report.claims?.conformsWithheld?.[CRATE_REGION] ?? 0;
 }
 
 /** How many claims a plan is carrying that nothing could read. */
@@ -629,6 +701,7 @@ function rowsFor({ report, promoted = [] }, colour, all = false) {
   const unanswered = unansweredClaimLines(report);
   const unsnapped = unsnappedClaimFix(report);
   const planned = plannedClaimLine(report);
+  const crate = crateRegionLine(report);
   const promotedClaim = claimWentLive(promoted);
   return [
     // First, because it is the only row here that says the check could not read
@@ -665,6 +738,7 @@ function rowsFor({ report, promoted = [] }, colour, all = false) {
      * would turn the ordinary state of a plan into two lines of amber.
      */
     ...(planned ? [paint(planned, "dim", colour)] : []),
+    ...(crate ? [paint(crate, "dim", colour)] : []),
     ...report.deleted.map((finding) =>
       paint(`${boxName(finding)} removed, ${parseRef(finding.ref).path} still there`, "red", colour),
     ),
@@ -732,6 +806,25 @@ function rowsFor({ report, promoted = [] }, colour, all = false) {
        * makes the call rather than who calls `new` or who imports whom.
        */
       const wrongCalls = finding.kind === "calls-backwards";
+      /*
+       * The sixth (#213), and the one that was missing here.
+       *
+       * It shipped into the board page and not into this file, so the browser
+       * called a refuted member arrow red and the terminal printed it in amber
+       * among the arrows nothing corroborated -- with no sentence on the row, so
+       * the only surface a Stop hook uses could not say what was wrong. Its own
+       * sentence for the same reason the others have one: nothing here points
+       * the wrong way, the type does not have the member.
+       */
+      const wrongMembers = finding.kind === "accesses-absent";
+      /*
+       * The seventh (#216). Its own sentence for the reason the others have one:
+       * this arrow is not pointing the wrong way *round the file* -- what makes
+       * it wrong is a base list that does not name the other end, and the row
+       * for the commonest version of it says which way round it should have
+       * been in the detail.
+       */
+      const wrongBase = finding.kind === "conforms-absent";
       return paint(
         `${boxName({ label: finding.fromLabel, node: finding.from })}`
         + ` ${backwards ? "\u2192 (should be \u2190)" : "\u2192"} `
@@ -741,8 +834,15 @@ function rowsFor({ report, promoted = [] }, colour, all = false) {
         + (wrongHolds ? " \u00b7 not in the fields" : "")
         + (wrongBuilds ? " \u00b7 built the other way" : "")
         + (wrongCalls ? " \u00b7 called the other way" : "")
+        // The same words the board page uses, so one board does not read as two
+        // different findings depending on where somebody looked at it.
+        + (wrongMembers ? " \u00b7 no such member" : "")
+        + (wrongBase ? " \u00b7 not a base" : "")
         + (hop ? ` \u00b7 ${hop}` : ""),
-        backwards || wrongSignature || wrongHolds || wrongBuilds || wrongCalls ? "red" : "yellow",
+        backwards || wrongSignature || wrongHolds || wrongBuilds || wrongCalls || wrongMembers
+          || wrongBase
+          ? "red"
+          : "yellow",
         colour,
       );
     }),
@@ -801,17 +901,18 @@ function rowsFor({ report, promoted = [] }, colour, all = false) {
 /**
  * The arrow verdicts that mean **wrong** rather than *worth a look*.
  *
- * A set rather than a chain of `!==`, which is what this was: every arrival of a
- * refutable kind meant remembering to extend two filters, and forgetting either
- * one counts a red arrow among the ambers -- which is the one summary mistake
- * #169 exists to prevent.
+ * The engine's list rather than a copy of it, which is what this was: every
+ * arrival of a refutable kind meant remembering to extend it here too, and
+ * forgetting counts a red arrow among the ambers -- the one summary mistake #169
+ * exists to prevent, and the one that happened anyway when `accesses-absent`
+ * shipped into the board page and not into this file.
+ *
+ * `ACCUSING_EDGE_KINDS` is exhaustive over the verdict union by a compile error,
+ * so there is now one place to forget and it does not build.
  */
-const WRONG_EDGE_KINDS = new Set([
-  "backwards-edge", "signature-absent", "holds-absent", "builds-backwards",
-  "calls-backwards",
-]);
+const WRONG_EDGE_KINDS = new Set(ACCUSING_EDGE_KINDS);
 
-function tallyCounts({ gone, generated, empty, unused, open, incomplete, removed, garbled, unanswered, backwards, signatures, fields, builtBackwards, callsBackwards, arrows, stray, promoted, built, planned }, colour) {
+function tallyCounts({ gone, generated, empty, unused, open, incomplete, removed, garbled, unanswered, backwards, signatures, fields, builtBackwards, callsBackwards, members, bases, arrows, stray, promoted, built, planned }, colour) {
   return [
     gone ? paint(`${gone} gone`, "red", colour) : "",
     // Its own word, because "gone" is the opposite of what happened: the file
@@ -865,6 +966,14 @@ function tallyCounts({ gone, generated, empty, unused, open, incomplete, removed
     callsBackwards
       ? paint(`${callsBackwards} ${callsBackwards === 1 ? "call" : "calls"} backwards`, "red", colour)
       : null,
+    // The board page's own words for it, for the reason the row above borrows
+    // them: two surfaces describing one board have to agree.
+    members
+      ? paint(`${members} ${members === 1 ? "member" : "members"} gone`, "red", colour)
+      : null,
+    bases
+      ? paint(`${bases} ${bases === 1 ? "base disagrees" : "bases disagree"}`, "red", colour)
+      : null,
     signatures
       ? paint(`${signatures} ${signatures === 1 ? "signature" : "signatures"} disagree`, "red", colour)
       : "",
@@ -907,6 +1016,8 @@ function tallyFor({ report, promoted = [] }, colour) {
       fields: report.edges.filter((finding) => finding.kind === "holds-absent").length,
       builtBackwards: report.edges.filter((finding) => finding.kind === "builds-backwards").length,
       callsBackwards: report.edges.filter((finding) => finding.kind === "calls-backwards").length,
+      members: report.edges.filter((finding) => finding.kind === "accesses-absent").length,
+      bases: report.edges.filter((finding) => finding.kind === "conforms-absent").length,
       arrows: report.edges.filter((finding) => !WRONG_EDGE_KINDS.has(finding.kind)).length,
       stray: report.strayArrows ?? 0,
       promoted: promoted.length,
@@ -982,6 +1093,10 @@ function render(stale, colour) {
           + report.edges.filter((finding) => finding.kind === "builds-backwards").length,
         callsBackwards: sum.callsBackwards
           + report.edges.filter((finding) => finding.kind === "calls-backwards").length,
+        members: sum.members
+          + report.edges.filter((finding) => finding.kind === "accesses-absent").length,
+        bases: sum.bases
+          + report.edges.filter((finding) => finding.kind === "conforms-absent").length,
         arrows: sum.arrows
           + report.edges.filter((finding) => !WRONG_EDGE_KINDS.has(finding.kind)).length,
         stray: sum.stray + (report.strayArrows ?? 0),
@@ -991,7 +1106,7 @@ function render(stale, colour) {
         planned: sum.planned + report.workItems.length,
       };
     },
-    { gone: 0, generated: 0, empty: 0, unused: 0, open: 0, incomplete: 0, removed: 0, garbled: 0, unanswered: 0, backwards: 0, signatures: 0, fields: 0, builtBackwards: 0, callsBackwards: 0, arrows: 0, stray: 0, promoted: 0, built: 0, planned: 0 },
+    { gone: 0, generated: 0, empty: 0, unused: 0, open: 0, incomplete: 0, removed: 0, garbled: 0, unanswered: 0, backwards: 0, signatures: 0, fields: 0, builtBackwards: 0, callsBackwards: 0, members: 0, bases: 0, arrows: 0, stray: 0, promoted: 0, built: 0, planned: 0 },
   );
 
   // Too many to list: counts per diagram, and a pointer to the view that has room.
@@ -1492,6 +1607,13 @@ for (const { file, boardFile } of loaded) {
      * notice: it is the expected state of a plan, not news about one.
      */
     && plannedClaims(report) === 0
+    /*
+     * And the same for a Rust conformance, for the same reason: a board dropped
+     * here is one `--details` never mentions, and this claim is checked by
+     * nothing. It stays out of the per-turn notice -- `worthANotice` does not
+     * repeat this test -- because it is the expected state of a correct board.
+     */
+    && crateRegionClaims(report) === 0
   ) continue;
 
   stale.push({ file, report, promoted });

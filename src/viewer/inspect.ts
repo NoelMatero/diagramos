@@ -54,10 +54,12 @@ export const STATE_WORDS: Record<NodeState, string> = {
  * them: a claim nobody understands is a claim nobody should be ticking.
  */
 export type ArrowClaim =
-  | "needs" | "feeds" | "takes" | "returns" | "holds" | "builds" | "calls" | "accesses";
+  | "needs" | "feeds" | "takes" | "returns" | "holds" | "builds" | "calls" | "accesses"
+  | "conforms";
 
 const CLAIM_WORDS: readonly ArrowClaim[] = [
   "needs", "feeds", "takes", "returns", "holds", "builds", "calls", "accesses",
+  "conforms",
 ];
 
 /** The shapes that count as a box, matching what the engine reads as a node. */

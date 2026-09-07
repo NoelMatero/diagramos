@@ -37,6 +37,7 @@ import { boardCorpus } from "./lib/boards";
 
 import { readBoard } from "../src/engine/board-file";
 import { checkDrift, createWorkspace, type DriftFinding, type EdgeDriftFinding } from "../src/engine/drift";
+import { type ArrowClaim } from "../src/engine/claim";
 import { readGraph } from "../src/engine/graph";
 import { each, initEngine, languageOf, parseSource, type Language, type Node } from "../src/engine/parse";
 
@@ -343,15 +344,53 @@ function factsIn(source: string, language: Language): { facts: Fact[]; declared:
       };
       fields(body, 0);
     }
-    // Python and TypeScript both name their parents on the declaration itself.
+    /*
+     * Python and TypeScript both name their parents on the declaration itself,
+     * and which *kind* of conformance it is has to be read off the spelling
+     * rather than off the language.
+     *
+     * The first version of this bucketed every TypeScript heritage clause as
+     * `implements`, because its `inherits` bucket was only reachable through
+     * Python's `superclasses` field. Nothing was miscounted -- the totals were
+     * right and `class A extends B` was in them -- but the table it printed read
+     * **0 inherits in TypeScript**, in a language that spells inheritance
+     * `extends`, which is exactly the shape of a detector missing a language and
+     * printing a confident wrong answer (#216). Three contexts, read from what
+     * was written:
+     *
+     *   `inherits`   -- a class naming a base class: `class H(Base)`, `class A extends B`
+     *   `implements` -- a nominal contract: `class A implements C`, `impl Trait for Type`
+     *   `extends-interface` -- `interface X extends Y`, which is the whole of
+     *                          the tsx population and not class inheritance at all
+     *
+     * The last one is split out because merging it into either of the others
+     * hides what the biggest TypeScript-side number actually is.
+     */
+    const heritage = (clause: Node) => {
+      if (clause.type === "extends_clause") add("conforms", "inherits", typeNamesIn(clause));
+      else if (clause.type === "implements_clause") add("conforms", "implements", typeNamesIn(clause));
+      else if (clause.type === "extends_type_clause") {
+        add("conforms", "extends-interface", typeNamesIn(clause));
+      }
+    };
     const parents = node.childForFieldName("superclasses");
     if (parents) add("conforms", "inherits", typeNamesIn(parents));
     for (let index = 0; index < node.childCount; index += 1) {
       const child = node.child(index);
-      if (child && (child.type === "class_heritage" || child.type === "implements_clause"
-        || child.type === "extends_clause" || child.type === "extends_type_clause")) {
-        add("conforms", "implements", typeNamesIn(child));
-      }
+      if (!child) continue;
+      /*
+       * `class_heritage` is a wrapper holding the clause that says which kind
+       * this is, so it is read through rather than counted whole. Its children
+       * sum to exactly what counting the wrapper gave, so nothing is lost and
+       * nothing is counted twice -- the clauses are never direct children of the
+       * declaration in this grammar.
+       */
+      if (child.type === "class_heritage") {
+        for (let inner = 0; inner < child.childCount; inner += 1) {
+          const clause = child.child(inner);
+          if (clause) heritage(clause);
+        }
+      } else heritage(child);
     }
   });
   // Rust says it on the impl block instead: `impl Trait for Type`.
@@ -801,27 +840,41 @@ for (const scope of CODE_ROOTS) {
 const LANGUAGES: Language[] = ["rust", "ts", "tsx", "python", "js"];
 
 /**
- * Which relation each word already claims.
+ * Which relation each word claims, keyed by the word so the list cannot go
+ * stale.
  *
- * Kept honest by hand and it has not been: this said `depends`, `accepts` and
- * `produces` and nothing else, so `@holds` (#188) and `@builds` (#199) shipped
- * without being added, and the coverage figure below has been understating
- * itself by two whole words ever since: the reported 17.2% was really 35.3%.
+ * Kept honest by hand for most of its life and it was not honest: it said
+ * `depends`, `accepts` and `produces` and nothing else, so `@holds` (#188) and
+ * `@builds` (#199) shipped without being added and the coverage figure
+ * understated itself by two whole words for months -- the reported 17.2% was
+ * really 35.3%. That is the fourth hand-maintained list in this programme to go
+ * stale silently, and the probe's own two were replaced with a shape rule for
+ * the same reason.
  *
- * `flows` is here too and was never in it. `@feeds` confirms rather than
+ * So it is keyed the other way round now, as an exhaustive `Record` over
+ * `ARROW_CLAIMS`. A new word does not compile until it says which relation it
+ * covers, which is the guarantee `licence.ts` gets from `relations` and the only
+ * kind that survives somebody in a hurry.
+ *
+ * `feeds` is in it and was never in the old list. `@feeds` confirms rather than
  * refutes, which is a fact about what its verdict may say and not about whether
  * an arrow can carry the word -- and this table is about the second question.
  */
-const WORD_FOR: Record<string, string> = {
-  depends: "@needs",
-  accepts: "@takes",
-  produces: "@returns",
-  contains: "@holds",
-  constructs: "@builds",
-  invokes: "@calls",
-  accesses: "@accesses",
-  flows: "@feeds",
+const RELATION_FOR: Record<ArrowClaim, string> = {
+  needs: "depends",
+  takes: "accepts",
+  returns: "produces",
+  holds: "contains",
+  builds: "constructs",
+  calls: "invokes",
+  accesses: "accesses",
+  conforms: "conforms",
+  feeds: "flows",
 };
+
+const WORD_FOR: Record<string, string> = Object.fromEntries(
+  Object.entries(RELATION_FOR).map(([word, relation]) => [relation, `@${word}`]),
+);
 
 function rows(source: Map<string, number>) {
   const byRelation = new Map<string, Map<Language, number>>();

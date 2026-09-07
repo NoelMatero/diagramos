@@ -67,6 +67,7 @@ const KNOWN_EDGE_KINDS = new Set([
   "builds-backwards",
   "calls-backwards",
   "accesses-absent",
+  "conforms-absent",
 ]);
 
 /**
@@ -79,7 +80,7 @@ const KNOWN_EDGE_KINDS = new Set([
  */
 const WRONG_EDGE_KINDS = new Set([
   "backwards-edge", "signature-absent", "holds-absent", "builds-backwards",
-  "calls-backwards", "accesses-absent",
+  "calls-backwards", "accesses-absent", "conforms-absent",
 ]);
 
 /**
@@ -362,6 +363,7 @@ export function tallyOf(report: DriftView): TallyPart[] {
   const wrongBuilds = report.edges.filter((finding) => finding.kind === "builds-backwards").length;
   const wrongCalls = report.edges.filter((finding) => finding.kind === "calls-backwards").length;
   const wrongMembers = report.edges.filter((finding) => finding.kind === "accesses-absent").length;
+  const wrongBases = report.edges.filter((finding) => finding.kind === "conforms-absent").length;
   const unsupported = report.edges.filter(
     (finding) => !WRONG_EDGE_KINDS.has(finding.kind) && KNOWN_EDGE_KINDS.has(finding.kind),
   ).length;
@@ -427,6 +429,19 @@ export function tallyOf(report: DriftView): TallyPart[] {
   if (wrongMembers) {
     parts.push({
       text: `${wrongMembers} ${wrongMembers === 1 ? "member" : "members"} gone`,
+      tone: "bad",
+    });
+  }
+  /*
+   * Its own chip beside the member one, and for the same reason every red here
+   * has its own: this arrow points at a type the other end is not one of, and
+   * "1 arrow backwards" would send somebody to turn round an arrow that may
+   * already be the right way round. When it is backwards, the row's detail says
+   * so -- but a chip is a count and cannot.
+   */
+  if (wrongBases) {
+    parts.push({
+      text: `${wrongBases} ${wrongBases === 1 ? "base disagrees" : "bases disagree"}`,
       tone: "bad",
     });
   }
@@ -571,6 +586,7 @@ export function rowsOf(report: DriftView): StatusRow[] {
         + (finding.kind === "builds-backwards" ? " · built the other way" : "")
         + (finding.kind === "calls-backwards" ? " · called the other way" : "")
         + (finding.kind === "accesses-absent" ? " · no such member" : "")
+        + (finding.kind === "conforms-absent" ? " · not a base" : "")
         + (KNOWN_EDGE_KINDS.has(finding.kind)
           ? ""
           : ` · ${finding.kind}${finding.detail ? `: ${finding.detail}` : ""}`),

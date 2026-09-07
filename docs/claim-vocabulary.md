@@ -1,7 +1,7 @@
 # The claim vocabulary: what exists, what it may say, and what is open
 
 Written for a session picking this up cold. It is the state of #190's programme
-after #187, #188, #189, #193, #195, #198 and #199 — what the words are, what each is
+after #187, #188, #189, #193, #195, #198, #199 and #216 — what the words are, what each is
 *allowed* to say and why, which numbers decided that, and what is genuinely
 still undecided.
 
@@ -19,9 +19,9 @@ The rule in `AGENTS.md`: nothing new may say *wrong* until a script has measured
 how often its reader is mistaken, against a referee that shares no machinery
 with it.
 
-## The eight words, and the three footings
+## The nine words, and the three footings
 
-Eight words, and they do not all refute the same way. This is the distinction
+Nine words, and they do not all refute the same way. This is the distinction
 that took longest to see and it is not in #190:
 
 | word | relation | what it reads | may say wrong | how |
@@ -33,6 +33,7 @@ that took longest to see and it is not in #190:
 | `@builds` | constructs | a routine's body | yes | **presence** |
 | `@calls` | invokes | a routine's body, and what its names are bound to | yes | **presence** |
 | `@accesses` | accesses | a type's member list — **and** a routine's body | yes | **absence**, at the type end only |
+| `@conforms` | conforms | a type's base list, where the language writes one | yes | **absence** |
 | `@feeds` | flows | a body, for a value's journey | **no** | — |
 
 Plus `@closed` on a box (nothing outside reaches in) and `@complete` on a board
@@ -40,7 +41,9 @@ Plus `@closed` on a box (nothing outside reaches in) and `@complete` on a board
 
 The **may say wrong** column is about the word, not about any particular board.
 Whether it may say so *here* is a second question with its own answer per
-language — [the grid](#the-grid) below.
+language — [the grid](#the-grid) below. `@conforms` is where that distinction
+stops being a technicality: the word may say wrong, and in Rust it never will,
+because what a Rust type implements is not written on the type.
 
 ### Refuting from an absence
 
@@ -119,6 +122,40 @@ layer can answer at all.
 evidence of **the specific thing it asserts**. A word whose green is guaranteed
 whichever way the arrow was drawn is decoration in a verdict's clothes.
 
+### The one word whose footing changes with the language
+
+Every other word here stands on the same ground in every language it is licensed
+for. `@conforms` does not, and that is a fact about the languages rather than
+about the reader (#216).
+
+- **Python and TypeScript write it on the declaration.** `class Handler(Base)`,
+  `class A extends B implements C`, `interface X extends Y`. The base list is
+  closed: read the declaration and "this is not one of that" is a statement
+  about the whole of it. Same footing as `@holds`, and it may accuse.
+- **Rust writes it somewhere else entirely.** `impl Trait for Type` is a
+  free-standing item that may sit in **any file in the crate**, next to neither
+  the trait nor the type. Reading `struct Type` tells you nothing about what it
+  implements, so there is no region to close and an absence in one file proves
+  nothing. It confirms an `impl` it can see and reports the arrow unread
+  otherwise.
+
+That is what makes the grid's two axes load-bearing rather than tidy. Every
+other **no** in it means *nobody has run the numbers*; this one means *the fact
+is not in the file*, and no measurement of any reader would change it. The
+refusal is reported in its own words — `region-is-the-crate` — because
+"unmeasured" would be a different and untrue sentence.
+
+Getting this one wrong in the permissive direction would put a false red in the
+language this project has the least of and understands worst, which is the
+reason it was worth a per-language answer rather than a global one.
+
+One more thing it does not do, and it is the opposite of `@holds`: **type
+arguments are not bases.** `class Store extends Cache<Entry>` says Store is one
+of Cache and nothing about Entry, where a field typed `Vec<RouteInfo>` really
+does hold a RouteInfo. `type-argument` is 12.6% of all code and deliberately
+outside this vocabulary, and reading through here would have answered it with
+the wrong word.
+
 ## Direction, which is the one thing an author can get wrong from habit
 
 Two conventions, and they disagree on purpose:
@@ -129,11 +166,12 @@ handler  --@returns-->  Response
 build    --@builds-->   Widget         the thing doing the work is at the FROM end
 run      --@calls-->    render         the caller is at the FROM end
 RouteInfo --@holds-->   Response       the container is at the FROM end
+Handler  --@conforms--> Base           the subtype is at the FROM end
 Renderer --[width @accesses]--> Config  the reader is at the FROM end, and the
                                         member is on the label
 ```
 
-`@holds`, `@builds`, `@calls` and `@accesses` put the subject first. `@takes` and `@returns` put the
+`@holds`, `@builds`, `@calls`, `@accesses` and `@conforms` put the subject first. `@takes` and `@returns` put the
 declaration being read last. The inconsistency was a decision: the one
 hand-drawn claim in this project's board corpus drew containment holder-first
 unprompted, UML has pointed whole to part for thirty years, and forcing one
@@ -179,11 +217,36 @@ What it may not do is drift.
 | `@builds` | yes | **no** | yes | **no** | a text scan of the same routine bodies |
 | `@calls` | yes | **no** | yes | yes | a text scan that bounds each routine and reads its calls |
 | `@accesses` | yes | **no** | yes | yes | a text scan of the same member lists |
+| `@conforms` | yes | **no** | **no** | yes | a text scan of the same declaration headers |
 
 `@feeds` is not on it. It never accuses, so there is nothing to license.
 
 **Every no is a finding rather than a design**, and none of them was visible
 until the squares had to be filled in one at a time.
+
+**Except one.** `@conforms` in Rust is the first square here that is a *design*,
+and the only one a measurement cannot change. It is also **measured**, which no
+other `no` here is: 4,975 asks over the five pinned Rust clones, 92.9% recall, 0
+accused, 0 invented, and 0 confirmations when the same pairs are asked
+backwards. On any other row those numbers would be a licence.
+
+They are not one here because a Rust type does not carry what it implements.
+Three separate places do — `impl Trait for Type` anywhere in the crate,
+`#[derive(..)]` on the declaration, and a `macro_rules!` body, which is an
+unparsed token tree and is where anyhow keeps some of its own. Refuting needs
+all three to be complete and the third cannot be read at all, so an absence is a
+statement about where somebody looked. A crate-wide index of `impl` items would
+not fix that; it would produce a confident wrong answer about every derived and
+every macro-generated conformance, which is a false red in the language this
+project understands worst.
+
+`measure:conforms` asks `@conforms` about JavaScript **0 times over 21 files**,
+which is the third square JavaScript has failed to earn for the same reason: 21
+files, and not one of them writes a class heritage clause. Python and TypeScript
+are measured at **0 accusations and 0 inventions across 2,652 asks**, and asked
+the same pairs backwards they confirmed **0** — which is the number the word
+exists for, because before it an arrow drawn from the base down to the subclass
+passed every check this tool had.
 
 `measure:accesses` asks `@accesses` about JavaScript **0 times over 21 files**,
 for the reason `@holds` is a no there: a JavaScript class writes no member list
@@ -259,9 +322,11 @@ shape.
 
 **It may not accuse, and it does not compile.** Both, decided at #207.
 
-`relations` is an exhaustive `Record`, so adding an eighth word to
+`relations` is an exhaustive `Record`, so adding a ninth word to
 `ARROW_CLAIMS` stops the build in every licence and in the test that pins the
-grid, until somebody writes down what measured it. `@accesses` is the first word
+grid, until somebody writes down what measured it. `@conforms` is the second
+word to arrive with the grid in place and it stopped the build in three
+licences, one test and the census's coverage table. `@accesses` is the first word
 to arrive with the grid already in place, and it stopped the build in four
 places on the line that added it to `ARROW_CLAIMS` — which is what the grid is
 for. The answer is allowed to be
@@ -396,18 +461,18 @@ and never fail.
 |---|---|
 | `npm run measure:vocabulary` | how much of a diagram can be judged at all — failed claims, arrow prose, relation census |
 | `npm run measure:accesses` | can the member reader be trusted with a red |
+| `npm run measure:conforms` | can the base-list reader be trusted with a red, and what confirm-only Rust costs — `--all` prints every disagreement |
 | `npm run measure:holds` | can the field reader be trusted with a red |
 | `npm run measure:calls` | can the call reader be trusted to say backwards, and how often it can answer |
 | `npm run measure:constructs` | can the construction reader be trusted to say backwards |
 | `npm run measure:signature` | the same for parameters and return types |
-| `npm run measure:licence` | reproduces the per-language licence numbers — `--only=python` for one |
 | `npm run measure:dataflow` | what following a value through one body buys, confirming and refuting |
 | `npm run measure:licence` | reproduces the per-language dependency numbers, then prints the whole (word, language) grid — `--only=python` for one |
 | `npx tsx scripts/probe-generative.mts` | draws boards of unseen code and counts what could not be said |
 
 The pattern in all of them is a **referee**: count the shape one way, count it
 again by a completely different mechanism, report the disagreement. It is not
-ceremony. Between them these scripts have found ten reader bugs and seventeen
+ceremony. Between them these scripts have found eleven reader bugs and nineteen
 referee bugs, and not one was reachable by thinking about it.
 
 ### The corpus
@@ -426,12 +491,19 @@ written on; the rest are the same thirteen boards at six different ages.
 
 ```
 npx tsx scripts/probe-generative.mts     — four boards of code no board here describes
-  arrows carrying a claim    92%     (was 43% before @holds and @builds)
-  arrows with no word at all   2     (was 26)
+  arrows carrying a claim    96%     (was 43% before @holds and @builds)
+  arrows with no word at all   0     (was 26)
 ```
 
-Coverage of what the code says, from `measure:vocabulary`: **84.7%** against
-everything the syntax shows, **87.9%** against relationships whose both ends are
+The last two were the TanStack board's inheritance arrows, and giving them the
+word turned up something worth keeping: both were drawn **base-first** —
+`Subscribable -> QueryCache`, labelled `extends` — and the code says `class
+QueryCache extends Subscribable<QueryCacheListener>`. Wordless, an arrow can be
+drawn either way round and nothing notices. With the word on it and the
+direction left alone it goes red, which is the whole argument for having it.
+
+Coverage of what the code says, from `measure:vocabulary`: **85.8%** against
+everything the syntax shows, **89.3%** against relationships whose both ends are
 declared in the same repository. The first counts every `console.log` and
 `.map()`, so it is a floor rather than an estimate.
 
@@ -446,7 +518,8 @@ since #188. Corrected, the honest sequence is:
 | as reported before #189 | 17.2% | 21.2% |
 | with `@holds` and `@builds` counted at last | 35.3% | 32.6% |
 | with `@calls` | 57.8% | 56.1% |
-| with `@accesses` | **84.7%** | **87.9%** |
+| with `@accesses` | 84.7% | 87.9% |
+| with `@conforms` | **85.8%** | **89.3%** |
 
 `invokes` was 61,499 of the 273,694 relationships the census reads, so it is the
 largest single thing any one word here has ever covered. It is also the fourth
@@ -456,17 +529,22 @@ the probe's own two lists were replaced with a shape rule in the same change.
 `accesses` was the largest of the three by a factor of twenty-seven — 53,362
 drawable against 1,946 for the next one — and #213 gave it `@accesses`.
 
-## Ten times a measurement contradicted the design
+`conforms` was the last one left and #216 gave it `@conforms`, at 2,352
+drawable. It is the one word here that frequency did not argue for — two orders
+of magnitude below `accesses` — and #187 had already settled that frequency
+cannot decide inclusion, since `type-argument` is 12.6% of all code and is
+deliberately out. What argued for it is the footing and the failure: it is read
+from a declaration, and the arrow drawn from the base down to the subclass used
+to pass every check this tool had.
 
-
-Still wordless: `conforms`, at 1,946 drawable, and `type-argument`, which is
+**Nothing the census counts is wordless now** except `type-argument`, which is
 deliberate: almost all of it is `Vec<T>`, `Promise<T>`, `list[str]`, which
 nobody draws as two boxes.
 
-## Ten times a measurement contradicted the design
+## Thirteen times a measurement contradicted the design
 
-Kept because the pattern is the point: eight of the ten came from building one
-word or one reader, not from reviewing the design.
+Kept because the pattern is the point: eleven of the thirteen came from building
+one word or one reader, not from reviewing the design.
 
 1. **The substrate was empty.** #190's first draft proposed graphify as the
    fact supplier on the strength of 8,167 `contains` edges. `contains` there is
@@ -604,6 +682,70 @@ word or one reader, not from reviewing the design.
    number, and it is the one class of hole a shared-blindness referee will never
    report.
 
+10. **A base is not its type arguments, and three programs disagreed about
+    that.** `measure:conforms`'s first two runs, in order, and the order is the
+    lesson.
+
+    Run one: TypeScript read **13** pairs where the census reads 296 and tsx read
+    **0** where it reads 313. The referee's `extends` pattern was
+    `[^]]*?` — and in JavaScript `[^]` means *any character*, so `[^]]` is any
+    character followed by a literal `]` and the pattern could never match a
+    heritage clause at all. A regex that matches nothing reports perfect recall
+    over the handful of pairs it does find, which is why the run prints its
+    sample size next to a number the census can be compared to.
+
+    Run two, with the pattern fixed: one refusal in 214, on `class ListboxStore
+    extends ReactStore<\n ListboxState,\n ListboxContext,\n typeof selectors\n>`.
+    Two bugs met there. TypeScript hangs a class's type arguments off the clause
+    as a **sibling** of the base name rather than wrapping the two together the
+    way it does in an interface's heritage — so the reader, which refuses by
+    default, read the argument list as an expression it could not parse and put a
+    permanent doubt on the declaration. A doubt silences *absences*, so
+    `@conforms` would have shipped unable to refute any arrow on any class with
+    a generic base, and it would have looked fine from the confirming side.
+    Meanwhile the referee had followed the header only three lines, held an
+    unbalanced `<`, and split the type arguments into three separate bases.
+
+    Fixing the reader made **three new accusations appear**, which is item 6
+    again: `class MoodMiddleware(AgentMiddleware[AgentState, ContextT,
+    ResponseT])` splits into four things at the commas and three of them are
+    arguments of the first. The reader had just been taught not to read through
+    them and was right; the referee was reading a type argument as a base, one
+    language over from where it had just been fixed.
+
+    The design question underneath was settled by having to fix it: reading
+    through a generic is right for `@holds`, where `Vec<RouteInfo>` really does
+    hold a RouteInfo, and wrong here, where `Store` is one of `Cache` and not of
+    `Entry`. Two words, the same syntax, opposite answers — and the census still
+    counts it the loose way, which is why its 2,919 is a little generous.
+
+11. **Rust does not write conformance where the design assumed it did.**
+    `@conforms` shipped reading `impl Trait for Type`, on the reasoning that
+    this is how Rust says a type implements a trait. It is how Rust says it when
+    a human writes it out. Most of the time nobody does.
+
+    The default corpus holds 22 Rust files, so the Rust row was re-run over the
+    five clones the dependency licence already pins — 775 files — the way #189
+    widened its own Rust row. **1,401 written trait impls. 3,741 conformances
+    from `#[derive(..)]`.** Two and a half times as many, and the reader could
+    see none of them: `#[derive(Clone, Debug)]` generates the impls at compile
+    time, so there is no `impl Clone for Config` anywhere in the source to find.
+    A board saying `Config --@conforms--> Serialize` about a derived Serialize
+    got silence, with the answer written on the line above the declaration.
+
+    Reading the derive list took Rust from 86.8% to **92.9%** recall, all of it
+    confirmations. Nothing about the accusation changed, and the finding is why:
+    a derive list is *on* the declaration and looks closed, and it is not,
+    because the same trait can be implemented by hand in any file in the crate.
+    Three sources, one of them a `macro_rules!` token tree nobody can parse, and
+    refuting needs all three.
+
+    So the measurement did two opposite things at once, which is the part worth
+    keeping. It made the word much better in Rust — the larger half of the
+    relation went from unconfirmable to confirmed — and it made the argument
+    against ever letting Rust accuse **stronger** rather than weaker. A crate-wide
+    index of `impl` items, the obvious next build, would have refuted 3,741 true
+    arrows.
 11. **#227 — a receiver's type resolves from the text alone 9.5% of the time,
     and reading the text is not the wall.** #221's `receiver` blocker (item 10
     above) asks whether `x.foo()` can be placed; #227 asks the question one
@@ -791,6 +933,12 @@ be one: `<MenuContent />` is a routine making a MenuContent, which is `@builds`.
 dependency edges, 41 missed and 0 invented. What it bought is above, and
 `surveyScope` will now draft a Python board instead of refusing the scope.
 
+**#216 — `@conforms`** is done, and it is the word that made the grid's second
+axis do something no other word needed: `mayAccuse("conforms", "rust")` is a
+stated **no** on a language whose reader works, because the fact is in another
+file. Python and TypeScript were measured at 0 accusations and 0 inventions over
+2,652 asks, and 0 confirmations when the same pairs were asked backwards.
+
 **#207 — the licence grid** is done. It was argued for as bookkeeping — nothing
 was accusing on evidence that did not exist — and stopped being bookkeeping
 before it landed, because #189's `@calls` arrived in between and was accusing in
@@ -816,6 +964,25 @@ language.
 - **`@type-arg`**, despite type arguments being the second most common
   relationship in all code. Almost all of it is `Vec<T>`, `Promise<T>`,
   `list[str]`, which nobody draws as two boxes.
+- **Structural conformance**, and it is the same shape as the item below. A
+  TypeScript object that satisfies an interface without naming it, or a Python
+  class that satisfies a `Protocol` the same way, is written down nowhere — so
+  `@conforms` refuses an arrow at a routine rather than answering it. What
+  would be needed is a type checker, which is `#203`'s wall.
+- **Transitive conformance.** `A extends B extends C` confirms `A -> B` and says
+  nothing about `A -> C`. Resolving every base in a tree is a cross-file walk
+  with its own measurement, and nobody has asked for it.
+- **A crate-wide Rust reader**, which is the obvious thing that would let
+  `@conforms` accuse in Rust: every `impl` in the crate, indexed, so the region
+  is the crate rather than the file. It was measured before being declined, over
+  775 Rust files rather than the 22 in the default corpus, and the number is why
+  it is not being built. **1,401 written trait impls against 3,741 conformances
+  from `#[derive(..)]`** — so an index of `impl` items would hold the smaller
+  half of the relation and refute the larger one, and `anyhow` writes some of its
+  own inside a `macro_rules!` body, which is an unparsed token tree. A reader
+  that must union three sources and can only read two cannot close a region, and
+  a confident wrong answer in Rust is the false red this project can least
+  afford.
 - **A relation for "this function fits that field's function-pointer type"**,
   which is what the orangutan arrow actually wants. Real, and probably not worth
   a word.
