@@ -796,11 +796,11 @@ const RETURNED = /^return/;
  * By node type for the literals, and by name for the three constructor spellings
  * that are equally unambiguous: `new Map()` cannot be anything else.
  */
-const COLLECTION_LITERAL =
+export const COLLECTION_LITERAL =
   /^(array|object|dictionary|set|list|array_expression|struct_expression)$/;
 
 /** Constructors and factories whose result is a collection and nothing else. */
-const COLLECTION_MAKERS = new Set([
+export const COLLECTION_MAKERS = new Set([
   // TypeScript, JavaScript
   "Map", "Set", "WeakMap", "WeakSet", "Array",
   // Python, where the builtin name is the type

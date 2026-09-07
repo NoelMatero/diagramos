@@ -51,6 +51,7 @@
     "measure:holds": "tsx scripts/measure-holds.mts",
     "measure:licence": "tsx scripts/measure-licence.mts",
     "measure:rebind": "tsx scripts/measure-rebind.mts",
+    "measure:resolution": "tsx scripts/measure-resolution.mts",
     "measure:signature": "tsx scripts/measure-signature.mts",
     "measure:survey": "tsx scripts/measure-survey.mts",
     "measure:vocabulary": "tsx scripts/measure-vocabulary.mts",
