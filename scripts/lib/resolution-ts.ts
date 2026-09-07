@@ -26,6 +26,20 @@ export interface TsTypeAnswer {
   text: string;
   /** The head of that string -- the part a resolver's own head-name is compared to. */
   head: string;
+  /**
+   * Where the type's own declaration lives, when the compiler can say --
+   * `undefined` for a bare primitive (`string`, `number`) with no declaration
+   * to point at. Absolute path, exactly as the compiler's own source file
+   * object names it: inside `node_modules` for anything from a package,
+   * inside the tree for anything the repository declares itself.
+   *
+   * Answers a question the type's printed *name* cannot: `Assertion` (from
+   * `vitest`) and a repo's own `Assertion` class would print identically, and
+   * only the declaring file tells them apart. This is what a resolver needs
+   * to say "definitely not from this repository" without re-deriving it from
+   * a name a person happened to write down somewhere in the file's own text.
+   */
+  declaringFile?: string;
 }
 
 export interface TsReferee {
@@ -233,7 +247,14 @@ export function createTsReferee(root: string): TsReferee {
       return undefined;
     }
     const text = checker.typeToString(type, node, ts.TypeFormatFlags.NoTruncation);
-    return { text, head: headOfTs(text) };
+    let declaringFile: string | undefined;
+    try {
+      const symbol = type.getSymbol() ?? type.aliasSymbol;
+      declaringFile = symbol?.getDeclarations()?.[0]?.getSourceFile().fileName;
+    } catch {
+      declaringFile = undefined;
+    }
+    return { text, head: headOfTs(text), declaringFile };
   }
 
   return { typeAt };

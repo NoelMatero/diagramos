@@ -208,16 +208,32 @@ export interface CallSide {
    * A receiver's type, from its exact byte range -- tier 1 (`resolution.ts`)
    * or tier 2 (a real checker), when a caller has one. Optional, and consulted
    * in exactly one place: `placeOf`'s three `receiver` dead ends, where the
-   * text names a value (`x.foo()`) but not what it is. Given a type name,
-   * `placeOf` places it exactly the way it would a bare name -- local,
-   * imported, or neither -- so a resolver only ever *narrows* `receiver` into
-   * one of the reasons this reader already has words for. `resolves`/
-   * `callsTo`, the live per-claim path `drift.ts` uses, never reads this
-   * field: wiring a resolver in is additive to the closed-bodies question
-   * (#226) and changes nothing about what `@calls` reports on a board today.
+   * text names a value (`x.foo()`) but not what it is.
+   *
+   * Two shapes, both narrowing `receiver` and never inventing a new refusal:
+   *
+   *   `{ kind: "type"; name }`      placed exactly the way a bare name would
+   *                                 be -- local, imported, or `unbound` when
+   *                                 the name matches neither.
+   *   `{ kind: "external" }`        the resolver knows *where the type is
+   *                                 declared* and that place is not this
+   *                                 repository (a language builtin, a package
+   *                                 in `node_modules`) -- placed immediately,
+   *                                 without a name match, because a call that
+   *                                 provably lands outside the repository
+   *                                 provably is not any repo routine either.
+   *
+   * `resolves`/`callsTo`, the live per-claim path `drift.ts` uses, never
+   * reads this field: wiring a resolver in is additive to the closed-bodies
+   * question (#226) and changes nothing about what `@calls` reports today.
    */
-  resolveReceiver?: (at: { start: number; end: number }) => string | undefined;
+  resolveReceiver?: (at: { start: number; end: number }) => ReceiverResolution | undefined;
 }
+
+/** What `resolveReceiver` may answer with. See `CallSide.resolveReceiver`'s doc. */
+export type ReceiverResolution =
+  | { kind: "type"; name: string }
+  | { kind: "external" };
 
 /* ------------------------------------------------------------------ bindings */
 
@@ -1060,11 +1076,25 @@ function placeName(name: string, side: CallSide, bindings: Bindings): string | {
 }
 
 /**
+ * The file a call is placed at when a resolver can say for certain the
+ * receiver's type is declared outside this repository. Never a real path --
+ * nothing on disk is named this -- and never read by `resolves`/`callsTo`,
+ * so it can never be compared against a claim's own target file. Its only
+ * job is to make a body's `blocking` filter (`callSitesIn`) see a placed
+ * site rather than a `why`, which is the one thing "provably not a repo
+ * routine" and "known to be this repo routine" have in common: neither one
+ * leaves the call's destination in doubt.
+ */
+const EXTERNAL_RECEIVER = "<external-to-repository>";
+
+/**
  * `receiver`'s narrower answer, when a caller supplied one. `side.resolveReceiver`
- * is asked for the receiver's type at its exact range; a type name it returns is
- * placed by `placeName`, exactly as a bare name would be. `undefined` -- no
- * resolver, no range, or the resolver had nothing to say -- leaves the caller to
- * fall back to the plain `receiver` refusal this reader always had.
+ * is asked for the receiver's type at its exact range: a named type is placed by
+ * `placeName`, exactly as a bare name would be; a resolver that instead says the
+ * type's own declaration lives outside the repository is placed immediately, with
+ * no name match attempted. `undefined` -- no resolver, no range, or the resolver
+ * had nothing to say -- leaves the caller to fall back to the plain `receiver`
+ * refusal this reader always had.
  */
 function placeThroughChecker(
   at: { start: number; end: number } | undefined,
@@ -1072,8 +1102,10 @@ function placeThroughChecker(
   bindings: Bindings,
 ): string | { why: SiteUnresolved } | undefined {
   if (!at || !side.resolveReceiver) return undefined;
-  const type = side.resolveReceiver(at);
-  return type ? placeName(type, side, bindings) : undefined;
+  const resolved = side.resolveReceiver(at);
+  if (!resolved) return undefined;
+  if (resolved.kind === "external") return EXTERNAL_RECEIVER;
+  return placeName(resolved.name, side, bindings);
 }
 
 /**

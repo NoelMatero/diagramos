@@ -56,7 +56,7 @@ import path from "node:path";
 import { refereeRoutines, stripNoise } from "./lib/call-scan";
 import { createTsReferee } from "./lib/resolution-ts";
 
-import { callSitesIn, type BodyCallSites, type CallSide } from "../src/engine/calls";
+import { callSitesIn, type BodyCallSites, type CallSide, type ReceiverResolution } from "../src/engine/calls";
 import { readDependencies } from "../src/engine/deps";
 import { createWorkspace } from "../src/engine/drift";
 import { mayAccuse } from "../src/engine/licence";
@@ -121,6 +121,20 @@ function sourceFiles(root: string): string[] {
 }
 
 const LANGUAGES: Language[] = ["rust", "ts", "tsx", "python", "js"];
+
+/**
+ * Whether a type's own declaration, an absolute path the compiler names,
+ * sits outside this tree entirely -- a language builtin (`lib.*.d.ts`, itself
+ * inside some `node_modules/typescript`) or a package's own declaration file.
+ * Checked by path rather than by name: `Assertion` from `vitest` and a
+ * repository's own `Assertion` class print identically, and only where they
+ * are actually declared tells the two apart.
+ */
+function isOutsideTree(declaringFile: string, tree: string): boolean {
+  if (declaringFile.includes(`${path.sep}node_modules${path.sep}`)) return true;
+  const rel = path.relative(tree, declaringFile);
+  return rel.startsWith("..") || path.isAbsolute(rel);
+}
 
 /* ------------------------------------------------------------------ the run */
 
@@ -254,12 +268,13 @@ for (const tree of trees) {
   // as a resolver rather than as a check on a syntax-only answer.
   let tsChecker: ReturnType<typeof createTsReferee> | undefined;
   try { tsChecker = createTsReferee(tree); } catch { tsChecker = undefined; }
-  const resolveReceiver = (at: { start: number; end: number }, file: string): string | undefined => {
+  const resolveReceiver = (at: { start: number; end: number }, file: string): ReceiverResolution | undefined => {
     const answer = tsChecker?.typeAt(file, at.start, at.end);
     if (!answer || answer.head === "any" || answer.head === "unknown" || /error/i.test(answer.head)) {
       return undefined;
     }
-    return answer.head;
+    if (answer.declaringFile && isOutsideTree(answer.declaringFile, tree)) return { kind: "external" };
+    return { kind: "type", name: answer.head };
   };
 
   for (const file of sourceFiles(tree)) {
@@ -596,7 +611,12 @@ const receiverSole = totalOf(soleBlocker, "receiver");
 
 console.log("6 · TIER 2 (#226) -- does a real checker flip the ceiling section 1 found?");
 console.log();
-console.log("  ts/tsx/js only. The same reading, run a second time with a real compiler");
+console.log("  ts/tsx/js only, and this run also asks *where* a resolved type is declared:");
+console.log("  a receiver whose type provably lives outside this tree (a language builtin,");
+console.log("  a `node_modules` package) is placed immediately, on the same footing as one");
+console.log("  the text names -- neither leaves the call's destination in doubt.");
+console.log();
+console.log("  The same reading, run a second time with a real compiler");
 console.log("  (`createTsReferee`, the checker #226 measured at 97.8% of receivers resolved)");
 console.log("  wired in as the receiver resolver -- every `x.foo()` `placeOf` would otherwise");
 console.log("  give up on gets asked of the compiler before it is counted `receiver`.");
@@ -653,13 +673,16 @@ for (const reason of reasonNamesTier2) {
     + String(totalOf(anyBlockerTier2, reason)).padStart(16));
 }
 console.log();
-console.log("  A receiver a resolver names a type for is placed exactly like a bare name");
-console.log("  would be (`placeName`, `calls.ts`) -- local, imported, or `unbound`. Most");
-console.log("  real receivers resolve to a type nothing in the file's own text imports or");
-console.log("  declares (a standard-library type, a package never named as a dependency of");
-console.log("  *this* call), so resolving `x`'s type mostly trades one open reason for");
-console.log("  another rather than closing the body. `receiver` was never the only wall;");
-console.log("  it was standing in front of `unbound`.");
+console.log("  Most of what used to land here is now placed immediately instead: a type");
+console.log("  whose own declaration the compiler can point to outside this tree (a");
+console.log("  language builtin, a `node_modules` package) closes the call without a name");
+console.log("  match at all -- see the closed-share jump above. What still lands in");
+console.log("  `unbound`/`unplaced` needs its own count before it is explained rather than");
+console.log("  guessed at: a receiver's `getSymbol()` returns nothing for a union");
+console.log("  (`Node | null`) or a bare primitive, so those never reach the `external`");
+console.log("  check at all -- confirmed at ~3,000 sites corpus-wide. Whether the rest is a");
+console.log("  further structural ceiling or a fixable gap in `placeName`'s own name match");
+console.log("  is not yet checked and should not be assumed either way.");
 console.log();
 
 console.log("7 · WHAT THIS ANSWERS");

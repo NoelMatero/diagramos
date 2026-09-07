@@ -201,7 +201,7 @@ describe("what the enumeration reports about a body", () => {
 describe("a receiver placed by a resolver, not by the text", () => {
   it("places a receiver once a resolver names a type declared in this file", () => {
     const source = "class Foo {\n  run() {}\n}\nfunction f(x) {\n  x.run();\n}\n";
-    const body = sitesIn(source, "ts", { resolveReceiver: () => "Foo" })
+    const body = sitesIn(source, "ts", { resolveReceiver: () => ({ kind: "type", name: "Foo" }) })
       .find((one) => one.routine === "f")!;
     expect(body.sites.map((one) => one.file)).toEqual(["a.ts"]);
   });
@@ -225,7 +225,7 @@ describe("a receiver placed by a resolver, not by the text", () => {
       {
         imports: [{ specifier: "./foo", file: "foo.ts" }],
         open: () => ({ source: "export class Foo {}\n", language: "ts", imports: [] }),
-        resolveReceiver: () => "Foo",
+        resolveReceiver: () => ({ kind: "type", name: "Foo" }),
       },
     ).find((one) => one.routine === "f")!;
     expect(body.sites.map((one) => one.file)).toEqual(["foo.ts"]);
@@ -241,8 +241,9 @@ describe("a receiver placed by a resolver, not by the text", () => {
     // like a bare name, and a name neither declared nor imported has always
     // been `unbound` -- true here too, a global or a type from an untracked
     // import, same as it would be for a value name in that position.
-    expect(why("function f(x) {\n  x.run();\n}\n", "f", "ts", { resolveReceiver: () => "Nowhere" }))
-      .toEqual(["unbound"]);
+    expect(why("function f(x) {\n  x.run();\n}\n", "f", "ts", {
+      resolveReceiver: () => ({ kind: "type", name: "Nowhere" }),
+    })).toEqual(["unbound"]);
   });
 
   it("places even a complex expression receiver, since a resolver reads the expression, not a name", () => {
@@ -250,7 +251,7 @@ describe("a receiver placed by a resolver, not by the text", () => {
     // name for (`through: ""`) -- the whole reason `at` is carried regardless.
     // `make()` is declared too, so the only site left to check is `.run()`'s.
     const source = "class Foo {\n  run() {}\n}\nfunction make() {}\nfunction f() {\n  make().run();\n}\n";
-    const body = sitesIn(source, "ts", { resolveReceiver: () => "Foo" })
+    const body = sitesIn(source, "ts", { resolveReceiver: () => ({ kind: "type", name: "Foo" }) })
       .find((one) => one.routine === "f")!;
     const receiverSite = body.sites.find((one) => one.name === "run")!;
     expect(receiverSite.file).toBe("a.ts");
@@ -262,8 +263,17 @@ describe("a receiver placed by a resolver, not by the text", () => {
     const body = sitesIn(
       "class K {\n  run() {\n    this.step();\n  }\n  step() {}\n}\n",
       "ts",
-      { resolveReceiver: () => "SomewhereElse" },
+      { resolveReceiver: () => ({ kind: "type", name: "SomewhereElse" }) },
     ).find((one) => one.routine === "run")!;
     expect(body.sites.map((one) => one.file)).toEqual(["a.ts"]);
+  });
+
+  it("places a receiver immediately when the resolver knows the type is declared outside the repository", () => {
+    // No name match attempted at all -- `external` is placed before
+    // `placeName` would ever be consulted, and would stay unbound if it
+    // were: nothing here declares or imports a type called "Array".
+    expect(why("function f(x) {\n  x.push(1);\n}\n", "f", "ts", {
+      resolveReceiver: () => ({ kind: "external" }),
+    })).toEqual([]);
   });
 });
