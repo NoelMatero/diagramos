@@ -50,11 +50,11 @@
  *
  * A run is a measurement, not a test: it prints and never fails.
  */
-import { execFileSync } from "node:child_process";
-import { existsSync, realpathSync } from "node:fs";
+import { existsSync, readdirSync, realpathSync, statSync } from "node:fs";
 import path from "node:path";
 
 import { refereeRoutines, stripNoise } from "./lib/call-scan";
+import { createTsReferee } from "./lib/resolution-ts";
 
 import { callSitesIn, type BodyCallSites, type CallSide } from "../src/engine/calls";
 import { readDependencies } from "../src/engine/deps";
@@ -87,16 +87,37 @@ const trees = (roots.length > 0 ? roots : [
   `${HOME}/infrarouter`,
 ]).filter((tree) => existsSync(tree)).map(real);
 
+/**
+ * Prunes while walking rather than listing then filtering -- `execFileSync`d
+ * `find` piped to a JS filter threw `ENOBUFS` and lost a whole tree silently
+ * (a blanket `catch` read the crash as "no files here") the moment
+ * `measure-resolution.mts` hit the same bug on this same corpus (#226): a
+ * monorepo with real dependencies installed is enough files that `find`'s
+ * stdout overflows the default buffer. This never lists `node_modules` in the
+ * first place, so there is no buffer to overflow.
+ */
+const SKIP_DIRECTORIES = new Set([
+  "node_modules", ".git", "target", "dist", "build", "out", "vendor", ".venv", ".claude",
+  "coverage", ".next", ".nuxt", ".output", ".turbo", ".yarn", ".cache",
+]);
+
 function sourceFiles(root: string): string[] {
-  try {
-    return execFileSync("find", [root, "-type", "f"], { encoding: "utf8" })
-      .split("\n")
-      .filter(Boolean)
-      .filter((file) => !/\/(target|node_modules|\.git|dist|out|vendor|\.venv|\.claude)\//.test(file))
-      .filter((file) => languageOf(file) !== undefined);
-  } catch {
-    return [];
-  }
+  const found: string[] = [];
+  const walk = (directory: string): void => {
+    let entries: string[];
+    try { entries = readdirSync(directory); } catch { return; }
+    for (const entry of entries) {
+      if (entry.startsWith(".") && entry !== ".") continue;
+      if (SKIP_DIRECTORIES.has(entry)) continue;
+      const full = path.join(directory, entry);
+      let info;
+      try { info = statSync(full); } catch { continue; }
+      if (info.isDirectory()) walk(full);
+      else if (languageOf(entry) !== undefined) found.push(full);
+    }
+  };
+  walk(root);
+  return found;
 }
 
 const LANGUAGES: Language[] = ["rust", "ts", "tsx", "python", "js"];
@@ -112,6 +133,40 @@ const BANDS = [
 ];
 
 const bump = <K,>(map: Map<K, number>, key: K, by = 1) => map.set(key, (map.get(key) ?? 0) + by);
+
+/**
+ * The closure/blocker tally section 1 and 2 compute inline for the baseline
+ * reading, factored out so the tier-2 reading (#226) counts the same way
+ * without repeating it -- the two numbers have to mean the same thing or the
+ * comparison is meaningless.
+ */
+function bumpClosure(
+  bodiesRead: BodyCallSites[], language: Language,
+  bodiesMap: Map<Language, number>, closedMap: Map<Language, number>,
+  calllessMap: Map<Language, number>, openMap: Map<Language, number>,
+  soleMap: Map<Language, Map<string, number>>, anyMap: Map<Language, Map<string, number>>,
+): void {
+  for (const body of bodiesRead) {
+    bump(bodiesMap, language);
+    const blocking = body.sites.filter((one) => one.why);
+    const isClosed = body.sites.length > 0 && blocking.length === 0;
+    if (body.sites.length === 0) bump(calllessMap, language);
+    else if (isClosed) bump(closedMap, language);
+    else bump(openMap, language);
+
+    if (blocking.length > 0) {
+      const reasons = new Set(blocking.map((one) => one.why!));
+      const perAny = anyMap.get(language) ?? new Map<string, number>();
+      for (const reason of reasons) bump(perAny, reason);
+      anyMap.set(language, perAny);
+      if (reasons.size === 1) {
+        const per = soleMap.get(language) ?? new Map<string, number>();
+        bump(per, [...reasons][0]!);
+        soleMap.set(language, per);
+      }
+    }
+  }
+}
 
 const files = new Map<Language, number>();
 const bodies = new Map<Language, number>();
@@ -130,6 +185,22 @@ const placedSites = new Map<Language, number>();
 const byBand = new Map<string, { withCalls: number; closed: number }>();
 /** The same, per language, for the band the report names. */
 const unlicensed = new Set<Language>();
+
+/**
+ * #226's follow-up, named in `docs/claim-vocabulary.md` when #221's
+ * recommendation was reaffirmed: does a real checker close what syntax
+ * alone could not? ts/tsx/js only, mirroring the same `resolveReceiver`
+ * reading run a second time with tier 2 wired in as the receiver resolver --
+ * every tally below has the same meaning as its untagged twin above, just
+ * counted on that second reading.
+ */
+const bodiesTier2 = new Map<Language, number>();
+const closedTier2 = new Map<Language, number>();
+const calllessTier2 = new Map<Language, number>();
+const openTier2 = new Map<Language, number>();
+const soleBlockerTier2 = new Map<Language, Map<string, number>>();
+const anyBlockerTier2 = new Map<Language, Map<string, number>>();
+const TIER2_LANGUAGES = new Set<Language>(["ts", "tsx", "js"]);
 
 /** Referee disagreement about how many call sites a body has. */
 interface Disagreement {
@@ -178,6 +249,19 @@ for (const tree of trees) {
     return { source, language, imports: imports(rel, source) };
   };
 
+  // Built once per tree, lazily per package inside it (see `createTsReferee`'s
+  // own doc) -- the same referee #226's tier-2 measurement uses, asked here
+  // as a resolver rather than as a check on a syntax-only answer.
+  let tsChecker: ReturnType<typeof createTsReferee> | undefined;
+  try { tsChecker = createTsReferee(tree); } catch { tsChecker = undefined; }
+  const resolveReceiver = (at: { start: number; end: number }, file: string): string | undefined => {
+    const answer = tsChecker?.typeAt(file, at.start, at.end);
+    if (!answer || answer.head === "any" || answer.head === "unknown" || /error/i.test(answer.head)) {
+      return undefined;
+    }
+    return answer.head;
+  };
+
   for (const file of sourceFiles(tree)) {
     const rel = path.relative(tree, file);
     const source = read(rel);
@@ -190,6 +274,19 @@ for (const tree of trees) {
     });
     if (!reading.read) { bump(refusedFiles, reading.why); continue; }
     bump(files, language);
+
+    if (TIER2_LANGUAGES.has(language)) {
+      const tier2Reading = callSitesIn({
+        file: rel, source, language, imports: imports(rel, source), open,
+        resolveReceiver: (at) => resolveReceiver(at, file),
+      });
+      if (tier2Reading.read) {
+        bumpClosure(
+          tier2Reading.bodies, language, bodiesTier2, closedTier2, calllessTier2, openTier2,
+          soleBlockerTier2, anyBlockerTier2,
+        );
+      }
+    }
 
     /*
      * The referee's reading of the same file, indexed by routine name. A name
@@ -497,7 +594,75 @@ const bigBand = byBand.get("51+ lines");
 const smallBand = byBand.get("1-5 lines");
 const receiverSole = totalOf(soleBlocker, "receiver");
 
-console.log("6 · WHAT THIS ANSWERS");
+console.log("6 · TIER 2 (#226) -- does a real checker flip the ceiling section 1 found?");
+console.log();
+console.log("  ts/tsx/js only. The same reading, run a second time with a real compiler");
+console.log("  (`createTsReferee`, the checker #226 measured at 97.8% of receivers resolved)");
+console.log("  wired in as the receiver resolver -- every `x.foo()` `placeOf` would otherwise");
+console.log("  give up on gets asked of the compiler before it is counted `receiver`.");
+console.log();
+const tsxLangs = [...TIER2_LANGUAGES];
+const baselineBodies = tsxLangs.reduce((sum, one) => sum + (bodies.get(one) ?? 0), 0);
+const baselineCallless = tsxLangs.reduce((sum, one) => sum + (callless.get(one) ?? 0), 0);
+const baselineClosed = tsxLangs.reduce((sum, one) => sum + (closed.get(one) ?? 0), 0);
+const baselineOpen = tsxLangs.reduce((sum, one) => sum + (open_.get(one) ?? 0), 0);
+const baselineWithCalls = baselineBodies - baselineCallless;
+const tier2Bodies = total(bodiesTier2);
+const tier2Callless = total(calllessTier2);
+const tier2Closed = total(closedTier2);
+const tier2Open = total(openTier2);
+const tier2WithCalls = tier2Bodies - tier2Callless;
+console.log("  " + "".padEnd(10) + "with calls".padStart(12) + "closed".padStart(8) + "  share");
+console.log("  " + "tier 1".padEnd(10) + String(baselineWithCalls).padStart(12)
+  + String(baselineClosed).padStart(8) + "  " + percent(baselineClosed, baselineWithCalls).padStart(8));
+console.log("  " + "tier 2".padEnd(10) + String(tier2WithCalls).padStart(12)
+  + String(tier2Closed).padStart(8) + "  " + percent(tier2Closed, tier2WithCalls).padStart(8));
+console.log();
+if (tier2Bodies !== baselineBodies) {
+  console.log(`  Population mismatch: tier 1 read ${baselineBodies} ts/tsx/js bodies, tier 2's`);
+  console.log(`  pass read ${tier2Bodies} -- a file the checker's own walk skipped or one added`);
+  console.log("  by a project's tsconfig `include`. Read as a caveat on the comparison above,");
+  console.log("  not as a second finding.");
+  console.log();
+}
+const receiverSoleTier2 = totalOf(soleBlockerTier2, "receiver");
+const receiverSoleBaseline = tsxLangs.reduce(
+  (sum, one) => sum + ((soleBlocker.get(one)?.get("receiver")) ?? 0), 0,
+);
+console.log(`  \`receiver\` as the sole blocker: ${receiverSoleBaseline} bodies at tier 1, `
+  + `${receiverSoleTier2} at tier 2`);
+console.log(`  (${percent(receiverSoleBaseline, baselineOpen).trim()} of open bodies, then `
+  + `${percent(receiverSoleTier2, tier2Open).trim()}). This is the number #221's`);
+console.log("  \"don't build it\" rested on, and the one the reaffirm note in");
+console.log("  `docs/claim-vocabulary.md` named as unmeasured until tier 2 existed.");
+console.log();
+console.log(`  But the closed share above only moved ${baselineClosed} -> ${tier2Closed}, `
+  + `+${tier2Closed - baselineClosed} bodies -- nowhere near`);
+console.log(`  the ${receiverSoleBaseline - receiverSoleTier2} bodies whose sole blocker stopped being \`receiver\`. Where did`);
+console.log("  the rest go? Every reason a resolved receiver can narrow into, same reading:");
+console.log();
+console.log("  " + "reason".padEnd(12) + "sole blocker".padStart(14) + "  of open"
+  + "present at all".padStart(16));
+const reasonNamesTier2 = [...new Set([
+  ...[...anyBlockerTier2.values()].flatMap((per) => [...per.keys()]),
+])].sort((a, b) => totalOf(soleBlockerTier2, b) - totalOf(soleBlockerTier2, a));
+for (const reason of reasonNamesTier2) {
+  console.log("  " + reason.padEnd(12)
+    + String(totalOf(soleBlockerTier2, reason)).padStart(14)
+    + "  " + percent(totalOf(soleBlockerTier2, reason), tier2Open).padStart(8)
+    + String(totalOf(anyBlockerTier2, reason)).padStart(16));
+}
+console.log();
+console.log("  A receiver a resolver names a type for is placed exactly like a bare name");
+console.log("  would be (`placeName`, `calls.ts`) -- local, imported, or `unbound`. Most");
+console.log("  real receivers resolve to a type nothing in the file's own text imports or");
+console.log("  declares (a standard-library type, a package never named as a dependency of");
+console.log("  *this* call), so resolving `x`'s type mostly trades one open reason for");
+console.log("  another rather than closing the body. `receiver` was never the only wall;");
+console.log("  it was standing in front of `unbound`.");
+console.log();
+
+console.log("7 · WHAT THIS ANSWERS");
 console.log();
 console.log(`  ${shut} of ${withCalls} bodies that call anything have a call set this reader can`);
 console.log(`  enumerate completely: ${percent(shut, withCalls).trim()}. That is the ceiling on how much of`);

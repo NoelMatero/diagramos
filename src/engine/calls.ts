@@ -204,6 +204,19 @@ export interface CallSide {
    * out of this reader. Without it a forwarded name withholds.
    */
   open?: (file: string) => { source: string; language: Language; imports: CallSide["imports"] } | undefined;
+  /**
+   * A receiver's type, from its exact byte range -- tier 1 (`resolution.ts`)
+   * or tier 2 (a real checker), when a caller has one. Optional, and consulted
+   * in exactly one place: `placeOf`'s three `receiver` dead ends, where the
+   * text names a value (`x.foo()`) but not what it is. Given a type name,
+   * `placeOf` places it exactly the way it would a bare name -- local,
+   * imported, or neither -- so a resolver only ever *narrows* `receiver` into
+   * one of the reasons this reader already has words for. `resolves`/
+   * `callsTo`, the live per-claim path `drift.ts` uses, never reads this
+   * field: wiring a resolver in is additive to the closed-bodies question
+   * (#226) and changes nothing about what `@calls` reports on a board today.
+   */
+  resolveReceiver?: (at: { start: number; end: number }) => string | undefined;
 }
 
 /* ------------------------------------------------------------------ bindings */
@@ -558,8 +571,14 @@ type Callee =
   | { kind: "bare"; name: string }
   /** `self.foo()`, `this.foo()` -- a member of the thing the routine belongs to. */
   | { kind: "own"; name: string }
-  /** `ns.foo()`, `Type::foo()` -- a member of something else that is named. */
-  | { kind: "through"; through: string; name: string }
+  /**
+   * `ns.foo()`, `Type::foo()` -- a member of something else that is named.
+   * `at` is the receiver expression's own byte range as written -- `ns` in
+   * `ns.foo()` -- present whenever `through` is, empty string included: a
+   * complex receiver (`make().run()`) has no name to place but still has an
+   * expression a real type checker could be asked about.
+   */
+  | { kind: "through"; through: string; name: string; at: { start: number; end: number } }
   /** `table[k]()` -- the name is not in the text. */
   | { kind: "computed" };
 
@@ -602,7 +621,10 @@ function calleeOfNode(callee: Node): Callee {
   // as a computed callee: the member *is* readable, so the doubt it raises is
   // only about the name it is a member of.
   const through = object.childCount === 0 ? object.text : "";
-  return { kind: "through", through, name: member.text };
+  return {
+    kind: "through", through, name: member.text,
+    at: { start: object.startIndex, end: object.startIndex + object.text.length },
+  };
 }
 
 /** 1-based line of a byte offset, counted the way an editor counts. */
@@ -1023,12 +1045,45 @@ function comesToRest(
   return undefined;
 }
 
+/** `placeOf`'s local/imported/comesToRest lookup, factored out so a type name a resolver hands back gets placed by the exact same rule a value name would be. */
+function placeName(name: string, side: CallSide, bindings: Bindings): string | { why: SiteUnresolved } {
+  if (bindings.ambiguous.has(name)) return { why: "ambiguous" };
+  const imported = bindings.imported.get(name);
+  if (!imported) return bindings.local.has(name) ? side.file : { why: "unbound" };
+  const { files, known } = filesFor(imported.specifier, side.imports);
+  if (files.size === 0) return { why: known ? "unplaced" : "unbound" };
+  for (const file of files) {
+    const rest = comesToRest(name, file, side, new Set());
+    if (rest) return rest;
+  }
+  return { why: "elsewhere" };
+}
+
+/**
+ * `receiver`'s narrower answer, when a caller supplied one. `side.resolveReceiver`
+ * is asked for the receiver's type at its exact range; a type name it returns is
+ * placed by `placeName`, exactly as a bare name would be. `undefined` -- no
+ * resolver, no range, or the resolver had nothing to say -- leaves the caller to
+ * fall back to the plain `receiver` refusal this reader always had.
+ */
+function placeThroughChecker(
+  at: { start: number; end: number } | undefined,
+  side: CallSide,
+  bindings: Bindings,
+): string | { why: SiteUnresolved } | undefined {
+  if (!at || !side.resolveReceiver) return undefined;
+  const type = side.resolveReceiver(at);
+  return type ? placeName(type, side, bindings) : undefined;
+}
+
 /**
  * Where one call site's callee lives, or why the reader cannot say.
  *
  * The target-free twin of `resolves`, and every branch below is the same branch
  * in the same order -- the reasons have to match, or a body counted closed here
- * would be a body `@calls` still refuses on.
+ * would be a body `@calls` still refuses on. `resolves`/`callsTo` never calls
+ * `placeThroughChecker`: a resolver only narrows what this function reports,
+ * never what the live `@calls` word does.
  */
 function placeOf(
   callee: Callee,
@@ -1043,22 +1098,27 @@ function placeOf(
   if (callee.kind === "own") return side.file;
 
   const bound = callee.kind === "through" ? callee.through : callee.name;
+  const at = callee.kind === "through" ? callee.at : undefined;
   // An expression receiver -- `make().run()`, `a.b.c()` -- names nothing to
-  // look up. Dynamic dispatch, and the reader cannot say whose method it is.
-  if (!bound) return { why: "receiver" };
+  // look up. Dynamic dispatch, and the reader cannot say whose method it is --
+  // unless a resolver can, from the expression itself rather than its name.
+  if (!bound) return placeThroughChecker(at, side, bindings) ?? { why: "receiver" };
   if (bindings.ambiguous.has(bound)) return { why: "ambiguous" };
 
   const imported = bindings.imported.get(bound);
   if (!imported) {
     if (!bindings.local.has(bound)) {
-      return { why: callee.kind === "through" ? "receiver" : "unbound" };
+      if (callee.kind !== "through") return { why: "unbound" };
+      return placeThroughChecker(at, side, bindings) ?? { why: "receiver" };
     }
     /*
      * Declared here. A bare name means this file's own; a member reached
      * *through* a local value is that value's method, and its type is not in
-     * the text even though the name it is bound to is.
+     * the text even though the name it is bound to is -- unless a resolver
+     * says what it is.
      */
-    return callee.kind === "through" ? { why: "receiver" } : side.file;
+    if (callee.kind !== "through") return side.file;
+    return placeThroughChecker(at, side, bindings) ?? { why: "receiver" };
   }
 
   const { files, known } = filesFor(imported.specifier, side.imports);

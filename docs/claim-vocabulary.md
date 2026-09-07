@@ -830,6 +830,10 @@ one word or one reader, not from reviewing the design.
     would be the same mistake item 9's zero warns against: reading an absence
     of evidence as evidence of absence.
 
+    **Run: see item 13.** Tier 2 exists now, the re-measurement is done, and
+    the recommendation held — for a different, structural reason than the one
+    that opened this question.
+
 12. **Tier 2's actual ceiling, measured: 97.8% (ts/tsx/js), and two harness bugs
     stood between that number and a wrong one.** Item 11 argued tier 2 was
     necessary from what tier 1 could not reach; nobody had asked a real
@@ -890,6 +894,49 @@ one word or one reader, not from reviewing the design.
     8192` (wired into the npm script) — one real `ts.Program` per package,
     built one or two at a time rather than all at once, still peaks well past
     Node's 2 GiB default on a package the size of one of `mundane`'s apps.
+
+13. **#221, re-measured with tier 2 actually wired in: reaffirmed, and now for
+    a different reason than the one that opened the question.** Item 12's
+    reaffirm note named the exact test this required: re-run
+    `measure:closed-bodies` with a real checker as the receiver resolver,
+    since `receiver` was 28.8% of what kept a body open and tier 2 resolves
+    97.8% of receivers. That test is now run.
+
+    `calls.ts` gained one optional field on `CallSide` — `resolveReceiver` —
+    consulted at `placeOf`'s three `receiver` dead ends and nowhere else;
+    `resolves`/`callsTo`, the live path `drift.ts` uses, never sees it. A type
+    a resolver names is placed exactly the way a bare name already is:
+    declared here, imported and traced, or neither. No new refusal reason —
+    a resolver only narrows `receiver` into a word this reader already had.
+
+    The closed share moved **10.5% → 12.6%** (ts/tsx/js, 2,541 bodies with
+    calls) — real, and nowhere near what the receiver numbers alone predicted.
+    `receiver` as the *sole* blocker fell from 1,255 open bodies to 46 — the
+    resolver works, exactly as measured in item 12 — and only 51 bodies
+    actually closed. The other ~1,200 did not vanish; they moved almost
+    entirely into `unbound`, which rose to 1,355 sole-blocker bodies, 61.0% of
+    what stayed open.
+
+    The mechanism, checked rather than assumed: `placeName` can place a
+    resolved type only when *this file's own text* imports or declares it.
+    Most receivers resolve to `Array`, `Promise`, `string`, a class from a
+    package never named as a dependency of the call being asked about — real,
+    correct answers that no file's import list was ever going to contain,
+    because nothing imports a language builtin. `receiver` was never the wall
+    on its own. It was standing in front of `unbound`, and resolving the
+    first exposes the second rather than removing it — the same shape item 9
+    found for `@calls` itself, one layer up: an abstraction that looks like
+    the blocker turns out to be hiding the real one underneath.
+
+    So tier 2 does what it was measured to do — it answers `x`'s type nearly
+    every time — and the closed-body question was never really asking that.
+    It needs the type *placed to a file*, and a builtin or an untracked
+    package dependency has no file this reader's population will ever supply
+    one for. #221's "don't build it" stands, now on a structural reason a
+    better resolver cannot reach, rather than on tier 1's reach being too
+    small to try. `docs/claim-vocabulary.md`'s own #226 record can stop
+    flagging this as open: the number that was going to decide it has been
+    run, and it decided against.
 
 `renders` was also raised as a possible missing relation and turned out not to
 be one: `<MenuContent />` is a routine making a MenuContent, which is `@builds`.
