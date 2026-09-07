@@ -604,6 +604,90 @@ word or one reader, not from reviewing the design.
    number, and it is the one class of hole a shared-blindness referee will never
    report.
 
+11. **#227 — a receiver's type resolves from the text alone 9.5% of the time,
+    and reading the text is not the wall.** #221's `receiver` blocker (item 10
+    above) asks whether `x.foo()` can be placed; #227 asks the question one
+    step upstream, before #226's proposal to build a real type-checker
+    integration (tier 2): given only syntax, what can `x` be worked out to be?
+
+    `measure:resolution` walked seven trees, five languages, 65,452 receiver
+    call sites. **6,206 resolve** — 9.5% overall, and unevenly: rust 14.2%,
+    ts 13.4%, python 11.0%, js 11.4%, tsx 1.3%. The gap between ts and tsx is
+    the same gap #217 found in `@calls`: tsx's population skews toward JSX
+    props threaded through many components, which import types rather than
+    declare them locally, and `imported-type` is tsx's largest single refusal
+    at 44.2%.
+
+    The number that matters more than the headline: **`not-a-name` is the
+    largest refusal in every language but rust**, 32–52% of everything
+    withheld. Most receivers in real code are not a bound name to begin with —
+    `row["bucket"].isoformat()`, `datetime.now().isoformat()`, `gpu_type.lower()
+    == gpu_type.lower()`. No amount of reading declarations closes that gap; it
+    is a different question, chaining and indexing rather than binding, and
+    #227 keeps it explicitly out of scope. So the ceiling on a syntax-only
+    resolver is nowhere near 100% even in principle, which is the strongest
+    argument in #226's file for tier 2 being closer to a hard requirement than
+    an upgrade.
+
+    **The referee, run for real against the resolved sites** — `tsc` for
+    ts/tsx/js, pyright via `reveal_type` for python, both through the same
+    corpus: 1.1–2.0% wrong on TypeScript, 1.4% on Python, after six rounds of
+    reading every disagreement and fixing what was actually a reader bug
+    rather than a narrowing artifact. Four of those six were the same shape
+    #169 and #217 both name in this file already: a shape nobody had written a
+    fixture for yet. `Foo[]` read as `Foo`; `readonly Foo[]` read as `Array`
+    instead of `ReadonlyArray`; a nested tuple type read three levels down to
+    its innermost element; an inline object type read as its first field's
+    type; a Python `module.Class` annotation read as `module`; and a plain
+    method call on a variable named `list` or `dict` read as constructing a
+    fresh one, because `collectionHeadOf` split a callee's text on `.` the same
+    way `dataflow.ts`'s own `makesCollection` does, which is right for Rust's
+    `::` and wrong for everyone else's receiver dot.
+
+    What is left after those fixes is almost entirely one shape, not a list of
+    unrelated misses: the annotation says what a value was **declared** to be,
+    and the referee's `reveal_type` at the exact use point says what it has
+    **narrowed to** — `dict` annotated, `defaultdict` constructed and never
+    reassigned before use; `object` or `Any` annotated, `isinstance(x, dict)`
+    checked first; `unknown` annotated, `typeof x === "string"` checked first.
+    Both answers are true, about different questions, and closing that gap
+    is control-flow analysis — the same wall item 7's dataflow work already
+    stopped short of for a related reason. It is recorded here rather than
+    chased, on the same grounds #227 keeps a call graph out of scope: the
+    question changes shape as soon as flow enters it.
+
+    Recommendation to #226, with the number behind it: **tier 2 is closer to a
+    hard requirement than a nice-to-have.** Reading the text alone gets under
+    10% of receivers, and the reason is structural — most receivers are not a
+    name — not a reader gap that more shapes would close. Where this reader
+    does answer, it is now measured trustworthy (under 2% wrong, against a
+    real checker, in every language that has one), so it is sound evidence to
+    build a tier-1 fallback on when a project's build is broken and tier 2 goes
+    silent. It is not a substitute for tier 2 as the primary source.
+
+    **#217/#221, re-read against this number: reaffirmed, on the same footing
+    #221 measured, with the follow-up it did not have the tool to ask.** #221
+    recommended against a closed-call-set `@calls` on a per-*body* ceiling of
+    15.1%, receiver calls the sole blocker in 28.8% of what stayed open. #227
+    measures the step underneath that — per *receiver*, not per body — at 9.5%,
+    for a structural reason (`not-a-name`, 32–52% of refusals) that reading more
+    declarations cannot close. Two independent measurements of adjacent
+    questions land on the same wall, which is corroboration, not restatement.
+
+    What neither measurement asked, because tier 2 did not exist to ask it:
+    whether a real checker closes the 28.8% that syntax cannot. `tsc`/pyright
+    plainly resolve past what `resolution.ts` does — that is the entire
+    referee this issue's own measurement leans on — but resolving a receiver in
+    isolation and closing a *body's whole call set* are different questions,
+    and #221's per-body number was never re-run against a compiler-backed
+    receiver. So: the recommendation stands, and it stands on syntax's ceiling
+    specifically, not on the idea generally. The number that would move it is
+    `measure:closed-bodies` re-run with tier 2 wired into the receiver
+    position, once tier 2 exists — not before, and not assumed in its favor
+    now. Leaving that unmeasured and treating today's "don't build it" as final
+    would be the same mistake item 9's zero warns against: reading an absence
+    of evidence as evidence of absence.
+
 `renders` was also raised as a possible missing relation and turned out not to
 be one: `<MenuContent />` is a routine making a MenuContent, which is `@builds`.
 
