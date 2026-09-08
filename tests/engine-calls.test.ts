@@ -31,7 +31,9 @@
  */
 import { beforeAll, describe, expect, it } from "vitest";
 
-import { bindingsIn, callsBetween, type CallSide, type CallsVerdict } from "../src/engine/calls";
+import {
+  bindingsIn, callsBetween, type CallSide, type CallsVerdict, type ReceiverResolution,
+} from "../src/engine/calls";
 import { initEngine, type Language } from "../src/engine/parse";
 
 beforeAll(async () => { await initEngine(); }, 120_000);
@@ -50,7 +52,11 @@ function verdictOf(verdict: CallsVerdict): string {
  * thing than the one that runs.
  */
 function ask(
-  files: Record<string, { source: string; language: Language; imports?: Array<[string, string?]> }>,
+  files: Record<string, {
+    source: string; language: Language; imports?: Array<[string, string?]>;
+    /** #233: a live per-receiver resolver, exactly as `drift.ts` would wire one in. */
+    resolveReceiver?: (at: { start: number; end: number }) => ReceiverResolution | undefined;
+  }>,
   from: { file: string; routine: string },
   to: { file: string; names: string[] },
 ): CallsVerdict {
@@ -76,6 +82,7 @@ function ask(
           })),
         };
       },
+      ...(one.resolveReceiver ? { resolveReceiver: one.resolveReceiver } : {}),
     };
   };
   return callsBetween({ ...sideOf(from.file), routine: from.routine }, { ...sideOf(to.file), names: to.names });
@@ -163,15 +170,121 @@ describe("the arrow drawn the wrong way round", () => {
     expect(verdict.evidence.line).toBe(2);
   });
 
-  it("stays quiet when neither end calls the other", () => {
-    // Both readable, neither calling. `absent`, which is silence -- a callback
-    // could be wiring them together in a third file nobody read.
+  it("stays quiet when the body is open, even with neither end calling the other", () => {
+    /*
+     * `run` reaches a name nothing in this file binds -- a callback could be
+     * wiring `render` in from a third file nobody read, so the honest answer
+     * stays `absent` rather than closing a body #233's own reader cannot
+     * enumerate completely. (A closed body in the same shape no longer stays
+     * silent -- see "the closed body that provably calls nothing else"
+     * below, which is the behaviour this test used to describe.)
+     */
+    const verdict = ask({
+      "src/a.ts": { source: "export function run() { return callback(); }\n", language: "ts" },
+      "src/b.ts": { source: "export function render() { return 2; }\n", language: "ts" },
+    }, { file: "src/a.ts", routine: "run" }, { file: "src/b.ts", names: ["render"] });
+
+    expect(verdictOf(verdict)).toBe("absent");
+  });
+});
+
+describe("the closed body that provably calls nothing else (#233)", () => {
+  /*
+   * A second, independent way `@calls` may say wrong, licensed separately
+   * from `backwards` (docs/claim-vocabulary.md items 12-15): not finding the
+   * call running the other way, but enumerating every call the tail's
+   * routine makes and finding none of them reach the head at all. TS/TSX
+   * only -- #232 never licensed this axis anywhere else.
+   */
+  it("refutes an arrow into a routine with no calls at all", () => {
+    // Trivially closed: zero call sites is a fully enumerated, empty set.
     const verdict = ask({
       "src/a.ts": { source: "export function run() { return 1; }\n", language: "ts" },
       "src/b.ts": { source: "export function render() { return 2; }\n", language: "ts" },
     }, { file: "src/a.ts", routine: "run" }, { file: "src/b.ts", names: ["render"] });
 
+    expect(verdict.verdict).toBe("refuted");
+    if (verdict.verdict !== "refuted") return;
+    expect(verdict.evidence.sites).toBe(0);
+  });
+
+  it("stays absent, not refuted, when a call site is unplaced", () => {
+    // The one call resolves to a package this reader cannot see inside --
+    // an open body, exactly as before #233, and refuted must not paper over
+    // the same doubt `backwards` already declines to accuse through.
+    const verdict = ask({
+      "src/a.ts": {
+        source: 'import { helper } from "some-package";\n'
+          + "export function run() { return helper(); }\n",
+        language: "ts",
+        imports: [["some-package", undefined]],
+      },
+      "src/b.ts": { source: "export function render() { return 2; }\n", language: "ts" },
+    }, { file: "src/a.ts", routine: "run" }, { file: "src/b.ts", names: ["render"] });
+
     expect(verdictOf(verdict)).toBe("absent");
+  });
+
+  it("withholds under the interface guard rather than refuting on an ambiguous placement", () => {
+    /*
+     * Item 14's own caveat: a receiver typed as an interface can agree with a
+     * wrong placement, because the concrete method actually reached at
+     * runtime can live on a different class than the one the declared type
+     * names. A closed-body accusation must never rest on a site like this,
+     * so the whole body stays `absent` rather than `refuted` even though
+     * every site is otherwise placed.
+     */
+    const verdict = ask({
+      "src/a.ts": {
+        source: "export function run(store) { return store.run(); }\n",
+        language: "ts",
+        resolveReceiver: () => ({ kind: "declared", file: "src/store.ts", concrete: false }),
+      },
+      "src/b.ts": { source: "export function render() { return 2; }\n", language: "ts" },
+    }, { file: "src/a.ts", routine: "run" }, { file: "src/b.ts", names: ["render"] });
+
+    expect(verdictOf(verdict)).toBe("absent");
+  });
+
+  it("refutes when every receiver site is concrete", () => {
+    // Same shape as the guard test above, but the resolver reports a real
+    // class -- nothing withholds it, and the closed body is refutable.
+    const verdict = ask({
+      "src/a.ts": {
+        source: "export function run(store) { return store.run(); }\n",
+        language: "ts",
+        resolveReceiver: () => ({ kind: "declared", file: "src/store.ts", concrete: true }),
+      },
+      "src/b.ts": { source: "export function render() { return 2; }\n", language: "ts" },
+    }, { file: "src/a.ts", routine: "run" }, { file: "src/b.ts", names: ["render"] });
+
+    expect(verdict.verdict).toBe("refuted");
+  });
+
+  it("never refutes for js, rust or python, however closed the body is", () => {
+    /*
+     * #232's absence licence covers ts/tsx only. A trivially-empty body in
+     * any other language must never be accused from -- rust and python reach
+     * that as `absent`, the same silence #233 leaves untouched everywhere it
+     * does not apply; `js` never gets that far, because `@calls` has never
+     * held even the older, presence-based licence there (#211) and is
+     * withheld before either check runs.
+     */
+    const expected = { js: "withheld/unlicensed", rust: "absent", python: "absent" } as const;
+    for (const language of ["js", "rust", "python"] as const) {
+      const source = language === "python"
+        ? "def run():\n    return 1\n"
+        : language === "rust" ? "fn run() -> u32 { 1 }\n" : "function run() { return 1; }\n";
+      const renderSource = language === "python"
+        ? "def render():\n    return 2\n"
+        : language === "rust" ? "fn render() -> u32 { 2 }\n" : "function render() { return 2; }\n";
+      const verdict = ask({
+        "src/a": { source, language },
+        "src/b": { source: renderSource, language },
+      }, { file: "src/a", routine: "run" }, { file: "src/b", names: ["render"] });
+
+      expect(verdictOf(verdict), language).toBe(expected[language]);
+    }
   });
 });
 
@@ -356,6 +469,11 @@ describe("a name imported from a file that only passes it on", () => {
      * The one place a forwarding search gets to say no, and it is what keeps a
      * genuine name collision quiet instead of raising a doubt: `src/c.ts`
      * declares its own `render`, so the call is definitely not the far end's.
+     *
+     * `run`'s one call is fully placed at `src/c.ts`, which is a closed body
+     * (#233) rather than an open question -- so the arrow is refuted, not
+     * merely left silent, and this is now the sharper of the two answers
+     * this test was written to tell apart.
      */
     const verdict = ask({
       "src/a.ts": {
@@ -367,7 +485,10 @@ describe("a name imported from a file that only passes it on", () => {
       "src/b.ts": { source: "export function render(n: number) { return n; }\n", language: "ts" },
     }, { file: "src/a.ts", routine: "run" }, { file: "src/b.ts", names: ["render"] });
 
-    expect(verdictOf(verdict)).toBe("absent");
+    expect(verdict.verdict).toBe("refuted");
+    if (verdict.verdict !== "refuted") return;
+    expect(verdict.evidence.routine).toBe("run");
+    expect(verdict.evidence.sites).toBe(1);
   });
 });
 

@@ -261,6 +261,17 @@ const placementReferee = new Map<Language, PlacementTally>();
 interface PlacementWrong { tree: string; file: string; line: number; placed: string; referee: string }
 const placementWrongCases: PlacementWrong[] = [];
 
+/**
+ * #233's cost: of the bodies tier 2 finds closed, how many carry at least one
+ * `declared` placement whose type is not concrete (an interface, an abstract
+ * class, a bare type parameter) -- the shape the WRONG check above cannot see
+ * because it asks the same compiler the same question. `callsBetween`'s
+ * closed-body absence licence refuses every one of these rather than accuse
+ * on a placement that could be agreeing with a wrong one, so this is the
+ * refusal rate that guard actually spends, not an estimate of it.
+ */
+const closedBlockedByGuard = new Map<Language, number>();
+
 /** Referee disagreement about how many call sites a body has. */
 interface Disagreement {
   file: string;
@@ -329,7 +340,7 @@ for (const tree of trees) {
       // function that produced it.
       const relDeclared = path.relative(tree, answer.declaringFile);
       tally.declared += 1;
-      return { kind: "declared", file: relDeclared };
+      return { kind: "declared", file: relDeclared, concrete: answer.concrete };
     }
     tally.type += 1;
     return { kind: "type", name: answer.head };
@@ -359,6 +370,13 @@ for (const tree of trees) {
           soleBlockerTier2, anyBlockerTier2, siteReasonTier2,
         );
         for (const body of tier2Reading.bodies) {
+          // The same closure test `bumpClosure` runs, asked again here rather
+          // than threaded out of it: a body only spends the guard's cost if
+          // `callsBetween` would otherwise have been free to accuse from it.
+          const isClosed = body.sites.length > 0 && body.sites.every((one) => !one.why);
+          if (isClosed && body.sites.some((one) => one.receiver && one.concrete === false)) {
+            bump(closedBlockedByGuard, language);
+          }
           for (const site of body.sites) {
             if (!site.receiver || !site.file || !site.memberAt) continue;
             const refereeDecl = tsChecker?.symbolDeclarationAt(file, site.memberAt.start, site.memberAt.end);
@@ -834,6 +852,31 @@ console.log("  the placement and this check both ultimately ask the same compile
 console.log("  neither can see -- the concrete class behind an interface-typed receiver,");
 console.log("  decided only at runtime -- would not show up as WRONG here even though it is a");
 console.log("  real gap. This catches plumbing bugs, not that specific blind spot.");
+console.log();
+
+console.log("7b · THE INTERFACE GUARD'S COST (#233)");
+console.log();
+console.log("  Section 7's blind spot is not hypothetical once something accuses on a closed");
+console.log("  body: `callsBetween` refuses to, for any closed body carrying a `declared`");
+console.log("  placement whose type is an interface, an abstract class, or a bare type");
+console.log("  parameter, rather than risk agreeing with a wrong one. This is that refusal,");
+console.log("  measured rather than assumed:");
+console.log();
+console.log("  " + "language".padEnd(10) + "closed".padStart(8) + "blocked".padStart(9) + "  share");
+let guardClosed = 0, guardBlocked = 0;
+for (const language of ["ts", "tsx", "js"] as Language[]) {
+  const closed = closedTier2.get(language) ?? 0;
+  const blocked = closedBlockedByGuard.get(language) ?? 0;
+  guardClosed += closed; guardBlocked += blocked;
+  if (closed === 0) continue;
+  console.log("  " + language.padEnd(10) + String(closed).padStart(8) + String(blocked).padStart(9)
+    + "  " + percent(blocked, closed).padStart(8));
+}
+console.log();
+console.log(`  ${percent(guardBlocked, guardClosed).trim()} of closed bodies (${guardBlocked} of `
+  + `${guardClosed}) carry the one known shape that could make a closed-body accusation`);
+console.log("  wrong, and stay withheld rather than refuted. Coverage spent on trust, per");
+console.log("  AGENTS.md's own argument for why that is the right trade.");
 console.log();
 
 console.log("8 · WHAT THIS ANSWERS");

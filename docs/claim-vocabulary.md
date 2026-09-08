@@ -1079,6 +1079,59 @@ one word or one reader, not from reviewing the design.
     and building the gate and the thing it gates in the same change is how
     the gate ends up untested against its own "no".
 
+16. **The gate item 15 built now gates something real, and the interface
+    guard it was required to carry has a measured cost: 11.7% of closed
+    bodies (#233).** `callsBetween` gained a fourth verdict, `refuted`,
+    returned in place of `absent` only when `mayAccuse("calls", from.language,
+    "absence")` says yes and `callSitesIn` -- the same reader items 12-14
+    measured, now given a live `resolveReceiver` backed by
+    `scripts/lib/resolution-ts.ts`'s `createTsReferee` for the first time --
+    finds `from`'s whole call set enumerable and none of it reaching `to`.
+    `drift.ts` turns it into `calls-refuted`, a new accusing `EdgeFindingKind`
+    beside `calls-backwards` rather than a replacement for it: the two rest
+    on different readers (a call found running the other way, versus every
+    alternative closed off) and neither implies the other.
+
+    Verified against a real board rather than only against the reader in
+    isolation: a scratch repo with two TypeScript functions that share
+    nothing goes red on `npm run check:drift` with `calls-refuted`, quoting
+    "every call `run` makes was checked -- 0 of them, none reaching
+    `src/b.ts`." A third function reaching the same target only through a
+    receiver typed as an interface stays silent, checked against the real
+    compiler rather than a mock -- the one shape item 14 named as unsafe to
+    accuse from, confirmed unsafe again end to end before this reached a
+    live path.
+
+    **The guard's cost, measured rather than assumed** (`npm run
+    measure:closed-bodies`'s new section 7b): of the bodies tier 2 finds
+    closed, **11.7% (148 of 1265)** carry at least one `declared` placement
+    whose type is not concrete, and stay withheld rather than refuted --
+    13.0% of closed TypeScript bodies, 4.0% of TSX, 0% of the five closed
+    JavaScript bodies. Coverage spent on trust, which is the trade item 4 of
+    #233 asked for and `licence.ts`'s own opening paragraph argues for
+    generally: a false accusation is not recoverable by being right
+    afterwards.
+
+    **A finding this measurement re-run surfaced that is not about #233's
+    code:** the overall closed-share this run reads -- 1488 of 11444 bodies,
+    13.0% -- is far below item 12-14's recorded 49.6%. Read naively that
+    looks like a regression. It is not one: re-running the identical
+    measurement at the commit immediately before this issue's changes
+    (#232's merge, before a single line of #233 landed) reads 1488 of 11440,
+    the same 13.0%, on the same machine against the same `~/mundane` and
+    `~/infrarouter` checkouts. `@calls`' closed-body reader did not change
+    shape; the two corpora item 12 already named as unpinned, live, local
+    directories did -- they are not the five commit-pinned repositories the
+    `needs` licence corpus above is measured against, and nothing here
+    reproduces them at the commit items 12-14 read. The 49.6%/97.8%/0.7%
+    figures already formalized into `LICENCES` (#231/#232) are not
+    corrected by this entry: they are what was measured on 2026-09-08 and
+    remain the licence of record until somebody re-measures deliberately,
+    the same way `needs`'s pinned corpora are the reason that licence *can*
+    hold a real zero. This entry's own number -- the guard's 11.7% -- is a
+    *share of whatever closes*, which is far steadier under that drift than
+    an absolute count, and is why it is reported as one.
+
 `renders` was also raised as a possible missing relation and turned out not to
 be one: `<MenuContent />` is a routine making a MenuContent, which is `@builds`.
 
