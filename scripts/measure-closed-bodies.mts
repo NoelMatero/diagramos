@@ -694,9 +694,10 @@ console.log("  a `node_modules` package) is placed immediately, on the same foot
 console.log("  the text names -- neither leaves the call's destination in doubt.");
 console.log();
 console.log("  The same reading, run a second time with a real compiler");
-console.log("  (`createTsReferee`, the checker #226 measured at 97.8% of receivers resolved)");
-console.log("  wired in as the receiver resolver -- every `x.foo()` `placeOf` would otherwise");
-console.log("  give up on gets asked of the compiler before it is counted `receiver`.");
+console.log("  (`createTsReferee`, the checker resolving 97.8% of receivers -- quoted from #226");
+console.log("  and not measured by this run) wired in as the receiver resolver -- every");
+console.log("  `x.foo()` `placeOf` would otherwise give up on gets asked of the compiler");
+console.log("  before it is counted `receiver`.");
 console.log();
 const tsxLangs = [...TIER2_LANGUAGES];
 const baselineBodies = tsxLangs.reduce((sum, one) => sum + (bodies.get(one) ?? 0), 0);
