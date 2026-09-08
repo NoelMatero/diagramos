@@ -38,12 +38,28 @@
  * Rust has no comparable harness here (#227 says so plainly) and is reported
  * on the two columns it can support -- resolved and withheld -- rather than
  * against an invented referee.
+ *
+ * ## Sections 8-9 (#235): Python's version of the #227 -> #230 numbers
+ *
+ * Everything above answers "what type is this receiver called," through
+ * `reveal_type`. It has no opinion on where anything is *declared* -- the
+ * question that took TypeScript from item 11's 9.5% (syntax alone) to item
+ * 12's 97.8% (a real compiler, no reader gate) and, further, to item 13's
+ * 50.3% of whole call bodies closed. `scripts/lib/resolution-python-lsp.ts`
+ * asks pyright the same question over LSP (`pyright-langserver --stdio`):
+ * `textDocument/typeDefinition` on a receiver for where its *type* is
+ * declared (section 8, `typeAt().declaringFile`'s counterpart), and
+ * `textDocument/definition` on the method name itself for where the method
+ * actually called is declared (section 9's safety check, `symbolDeclarationAt`'s
+ * counterpart) -- confirmed against a live server, not assumed from pyright's
+ * docs, that both LSP methods answer the way TypeScript's compiler API does.
  */
 import { existsSync, readdirSync, realpathSync, statSync } from "node:fs";
 import path from "node:path";
 
 import { createTsReferee } from "./lib/resolution-ts";
 import { refereePythonTypes, type ResolutionQuery } from "./lib/resolution-python";
+import { createPyrightLspReferee, isOutsideTree as isOutsidePyTree, memberRangeAfter } from "./lib/resolution-python-lsp";
 
 import { createWorkspace } from "../src/engine/drift";
 import { initEngine, languageOf, type Language } from "../src/engine/parse";
@@ -151,6 +167,27 @@ const unrefereedLanguages = new Set<Language>();
 interface Tier2Tally { total: number; tier1: number; tier2: number; either: number }
 const tier2 = new Map<Language, Tier2Tally>();
 
+/**
+ * #235's version of the `tier2` tally above, for Python's declaring-file
+ * question rather than TypeScript's. `lsp` is how many of every Python
+ * receiver site (tier 1's `reveal_type` gate or not) `typeDeclarationAt`
+ * answers with a real file.
+ */
+interface PyLspCoverage { total: number; tier1: number; lsp: number; either: number }
+const pyLspCoverage: PyLspCoverage = { total: 0, tier1: 0, lsp: 0, either: 0 };
+let pyLspUnavailable = false;
+
+/**
+ * #235's version of item 14: does the type-of-the-receiver question and the
+ * what-does-the-method-resolve-to question agree once both answer? Counted
+ * only where both `typeDeclarationAt` and `methodDeclarationAt` name
+ * something -- one refusing is section 8's coverage gap, not a disagreement.
+ */
+interface PyLspSafety { agree: number; disagree: number }
+const pyLspSafety: PyLspSafety = { agree: 0, disagree: 0 };
+interface PyDisagreement { tree: string; file: string; line: number; method: string; typeSaid: string; methodSaid: string }
+const pyDisagreements: PyDisagreement[] = [];
+
 /** Resolved sites collected per tree, so the referee can be asked once per tree. */
 interface Collected {
   file: string; absolute: string; line: number; start: number; end: number;
@@ -167,6 +204,13 @@ for (const tree of trees) {
   const collectedTier2: Array<{
     absolute: string; start: number; end: number; tier1Resolved: boolean; language: Language;
   }> = [];
+  /** #235's version of `collectedTier2`: every Python receiver site, resolved
+   *  or not, plus what `pyLspCoverage`/`pyLspSafety` need that `Collected`
+   *  does not carry -- the method name, to find its own byte range later. */
+  const collectedPyAll: Array<{
+    file: string; absolute: string; line: number; start: number; end: number; method: string; tier1Resolved: boolean;
+  }> = [];
+  const pySourcesAll = new Map<string, string>();
 
   for (const file of sourceFiles(tree)) {
     const rel = path.relative(tree, file);
@@ -208,6 +252,13 @@ for (const tree of trees) {
               absolute, start: site.at.start, end: site.at.end,
               tier1Resolved: site.verdict.verdict === "resolved", language,
             });
+          }
+          if (language === "python") {
+            collectedPyAll.push({
+              file: rel, absolute, line: site.line, start: site.at.start, end: site.at.end,
+              method: site.method, tier1Resolved: site.verdict.verdict === "resolved",
+            });
+            pySourcesAll.set(rel, source);
           }
         }
       }
@@ -294,6 +345,81 @@ for (const tree of trees) {
       }
       referee.set("python", tally);
     });
+  }
+
+  /* ------------------------------------------------------ the referee, Python LSP (#235) */
+  if (collectedPyAll.length > 0) {
+    let lspReferee: Awaited<ReturnType<typeof createPyrightLspReferee>> | undefined;
+    try {
+      lspReferee = await createPyrightLspReferee(tree);
+    } catch (error) {
+      pyLspUnavailable = true;
+      console.error(`  pyright LSP referee failed to start on ${path.basename(tree)}: ${(error as Error).message}`);
+    }
+    if (lspReferee) {
+      const startedAt = Date.now();
+      const first = collectedPyAll[0]!;
+      await lspReferee.warmUp(first.absolute, pySourcesAll.get(first.file)!, first.start);
+
+      /*
+       * A progress line, not silence: every other referee in this file
+       * answers its whole tree in well under a second, so nothing else here
+       * prints until the final report. This one does not -- one LSP round
+       * trip per receiver, not one pyright invocation per tree, is the cost
+       * of asking a *position* rather than reading a batched diagnostics
+       * report (see this file's module doc, sections 8-9). At `graphify`'s
+       * own size (22,449 receiver sites) a silent multi-minute wait reads
+       * indistinguishably from a hang; `PROGRESS_EVERY` queries is often
+       * enough to show it is moving without spamming stderr on a small tree.
+       */
+      const PROGRESS_EVERY = 200;
+      console.error(`  [python-lsp] ${collectedPyAll.length} receiver sites to ask on ${path.basename(tree)}`);
+      let asked = 0;
+      const CONCURRENCY = 32;
+      let cursor = 0;
+      async function worker(): Promise<void> {
+        for (;;) {
+          const i = cursor++;
+          if (i >= collectedPyAll.length) return;
+          const site = collectedPyAll[i]!;
+          asked++;
+          if (asked % PROGRESS_EVERY === 0) {
+            console.error(`  [python-lsp] ${asked}/${collectedPyAll.length} (${Math.round((Date.now() - startedAt) / 1000)}s)`);
+          }
+          const source = pySourcesAll.get(site.file)!;
+          pyLspCoverage.total += 1;
+          if (site.tier1Resolved) pyLspCoverage.tier1 += 1;
+
+          const typeDeclaring = await lspReferee!.typeDeclarationAt(site.absolute, source, site.start, site.end);
+          const lspResolved = typeDeclaring !== undefined;
+          if (lspResolved) pyLspCoverage.lsp += 1;
+          if (site.tier1Resolved || lspResolved) pyLspCoverage.either += 1;
+
+          if (typeDeclaring === undefined) continue;
+          const memberRange = memberRangeAfter(source, site.end, site.method);
+          if (!memberRange) continue; // a shape `memberRangeAfter` did not expect -- withheld, not guessed at.
+          const methodDeclaring = await lspReferee!.methodDeclarationAt(
+            site.absolute, source, memberRange.start, memberRange.end,
+          );
+          if (methodDeclaring === undefined) continue; // section 8's coverage gap, not a disagreement.
+
+          const classify = (file: string) => (isOutsidePyTree(file, tree) ? "external" : path.relative(tree, file));
+          const typeSaid = classify(typeDeclaring);
+          const methodSaid = classify(methodDeclaring);
+          if (typeSaid === methodSaid) {
+            pyLspSafety.agree += 1;
+          } else {
+            pyLspSafety.disagree += 1;
+            if (pyDisagreements.length < 50) {
+              pyDisagreements.push({ tree: path.basename(tree), file: site.file, line: site.line, method: site.method, typeSaid, methodSaid });
+            }
+          }
+        }
+      }
+      await Promise.all(Array.from({ length: Math.min(CONCURRENCY, collectedPyAll.length) }, worker));
+      console.error(`  [python-lsp] done: ${collectedPyAll.length} sites in ${Math.round((Date.now() - startedAt) / 1000)}s`);
+      lspReferee.close();
+    }
   }
 }
 
@@ -446,3 +572,52 @@ if (tier2All.total > 0) {
   console.log(`  same population. Combined ceiling: ${percent(tier2All.either, tier2All.total).trim()}.`);
   console.log();
 }
+
+console.log("8 · PYTHON DECLARING FILE -- pyright's LSP, asked at every receiver (#235)");
+console.log();
+console.log("  Not \"what type is this\" (sections 1-4) -- \"where is that type's own");
+console.log("  declaration.\" `textDocument/typeDefinition`, asked at every receiver, `not-a-name`");
+console.log("  included, the same no-gate shape as section 6's ts/tsx/js tier2 tally. This is");
+console.log("  Python's version of the number that took TypeScript from syntax alone to a real compiler.");
+console.log();
+if (pyLspCoverage.total > 0) {
+  console.log("  " + "receivers".padStart(11) + "tier1".padStart(15) + "lsp".padStart(15) + "combined".padStart(15));
+  console.log("  " + String(pyLspCoverage.total).padStart(11)
+    + cell(pyLspCoverage.tier1, pyLspCoverage.total).padStart(15)
+    + cell(pyLspCoverage.lsp, pyLspCoverage.total).padStart(15)
+    + cell(pyLspCoverage.either, pyLspCoverage.total).padStart(15));
+} else {
+  console.log("  No Python receiver sites in this corpus.");
+}
+if (pyLspUnavailable) {
+  console.log();
+  console.log("  The LSP referee failed to start on at least one tree -- see stderr above.");
+}
+console.log();
+
+console.log("9 · PYTHON SAFETY CHECK -- does the receiver's type and the method actually");
+console.log("    called agree on where they live? (#235's version of TypeScript's own safety check)");
+console.log();
+console.log("  Restricted to sites where BOTH questions answered -- one refusing is section 8's");
+console.log("  coverage gap, not a disagreement here. `external` counts as one answer regardless");
+console.log("  of which typeshed file it names, the same collapse `isOutsideTree` already makes");
+console.log("  for TypeScript.");
+console.log();
+const pySafetyTotal = pyLspSafety.agree + pyLspSafety.disagree;
+if (pySafetyTotal > 0) {
+  console.log(`  ${pySafetyTotal} sites checked, ${pyLspSafety.disagree} disagreed `
+    + `(${percent(pyLspSafety.disagree, pySafetyTotal).trim()}).`);
+  if (pyDisagreements.length > 0) {
+    console.log();
+    for (const one of pyDisagreements.slice(0, cap(pyDisagreements.length))) {
+      console.log(`    ${one.tree}/${one.file}:${one.line} .${one.method}(...) -- receiver's type says `
+        + `${one.typeSaid}, the method itself says ${one.methodSaid}`);
+    }
+    if (pyDisagreements.length > cap(pyDisagreements.length)) {
+      console.log(`    ... and ${pyDisagreements.length - cap(pyDisagreements.length)} more`);
+    }
+  }
+} else {
+  console.log("  No site had both questions answered -- nothing to check yet.");
+}
+console.log();

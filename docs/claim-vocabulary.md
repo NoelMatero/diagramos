@@ -1135,6 +1135,93 @@ one word or one reader, not from reviewing the design.
 `renders` was also raised as a possible missing relation and turned out not to
 be one: `<MenuContent />` is a routine making a MenuContent, which is `@builds`.
 
+17. **Python's version of items 12-14, run for real: 89.6% get a declaring
+    file, 2.8% of the ones that answer twice disagree (#235).** Items 11-14
+    built this whole ladder for TypeScript against `tsc`'s compiler API; #235
+    is the same ladder for pyright, and the premise it opens on -- that
+    getting a *file*, not just a type's printed name, requires pyright's
+    language-server mode (`pyright-langserver --stdio`, real
+    `textDocument/definition` requests) rather than the `reveal_type`
+    diagnostics trick `resolution-python.ts` already used for #227 -- was
+    checked against a running server before any client code was written, per
+    `AGENTS.md`'s "reproduce before reasoning" rule. Two things the issue's
+    own framing did not get quite right, both found that way:
+
+    - **`textDocument/definition` alone is the wrong tool for half the
+      question.** Asked at a receiver's own position (`c` in `c.load()`), it
+      follows `c` to *its own assignment* -- correct LSP behaviour, wrong
+      question. Getting where `c`'s *type* is declared -- TypeScript's
+      `typeAt().declaringFile`, the thing item 12's 97.8% is actually about --
+      needs `textDocument/typeDefinition`, a capability pyright also
+      advertises (`typeDefinitionProvider` in its own `initialize` response)
+      that the issue never named. `symbolDeclarationAt`'s counterpart --
+      where the method actually *called* is declared -- is answered by
+      `textDocument/definition` after all, asked at the method's own
+      position rather than the receiver's. `scripts/lib/resolution-python-lsp.ts`
+      wires both, one LSP method per question, and
+      `tests/resolution-python-lsp.test.ts` pins the distinction down with a
+      server rather than a comment: asking `definition` at the receiver's own
+      position on purpose, in one test, to show it lands somewhere else
+      entirely.
+    - **No `didOpen` is needed, and no readiness notification exists to wait
+      on because of it.** Confirmed live: pyright answers both LSP methods
+      against on-disk files it was never told to open, because it indexes a
+      workspace from `rootUri` on its own. The cost of skipping `didOpen`:
+      pyright never emits `pyright/beginProgress`/`endProgress` for a
+      document it does not know is open, so there is no signal for "the tree
+      is indexed" to wait on. The first cut of the client retried every
+      `null` answer with the same long backoff, on the theory that `null`
+      always meant "not warmed up yet" -- true for the first few queries,
+      false for the rest of a real corpus. On `graphify` (22,449 receiver
+      sites) that read as throughput collapsing from ~14/s to ~3/s as the run
+      went on: an increasing share of what remained was a position pyright
+      genuinely has no answer for, each one paying the full ~15.75s ladder
+      meant for "not ready yet." One explicit `warmUp` call per tree, before
+      the real batch, followed by a short retry for everything after,
+      brought the same run down to under nine minutes -- the fix `#234`
+      already made for a different reason (pay the expensive part once, not
+      per query) applied to a different bottleneck.
+
+    **Section 8's number, no reader gate, `not-a-name` included, the same
+    shape item 12 measured for TypeScript:** two real Python corpora,
+    `graphify` (22,449 receiver sites) and `infrarouter` (1,172) --
+    `~/mundane`'s own share of this corpus was left out of this run, not
+    measured at zero: its `tsconfig.json`-per-package TypeScript analysis
+    (items 12-14's own long pole, the reason `measure:resolution` needs an
+    8 GiB heap at all) took over 30 minutes with no Python query yet issued,
+    for a monorepo reason `#235`'s LSP client does not touch. **89.6%
+    combined (21,154 of 23,621) get a declaring file** -- 89.4% on
+    `graphify` alone, 92.2% on `infrarouter` -- against tier 1's 14.2%/15.5%,
+    the same shape as TypeScript's 97.8% against tier 1's own much smaller
+    reach in item 12, lower here but not by a structural margin.
+
+    **Section 9's safety check, item 14's counterpart:** `memberRangeAfter`
+    finds the method name's own byte range after a receiver's -- a
+    mechanical text scan sharing no machinery with the reader, the same
+    stance `call-scan.ts` takes -- and `methodDeclarationAt` asks the same
+    server a second, more direct question about it, the same two-questions
+    structure item 14 checked `tsc` with. **2.8% disagree (410 of 14,480
+    sites where both questions answered)** -- 2.7% on `graphify`, 5.4% on
+    `infrarouter` -- against TypeScript's 0.7%. Read, not just counted: every
+    sampled disagreement is the same shape, `.get(...)`, `.items(...)`,
+    `.lower(...)`, `.upper(...)`, `.append(...)` -- the receiver's declared
+    type names a file this corpus owns, and the method actually resolves to
+    something external (a dict, a list, a str). That is item 14's own named
+    limitation restated in Python rather than a new one: a receiver typed
+    with a repo class that is `Optional[...]`, a `Union`, or otherwise wider
+    than the value actually flowing through it narrows to a builtin at the
+    call site, and `typeDefinition` on the receiver answers about the
+    declared type, not the narrowed one -- the same reader-and-referee-share-
+    one-blind-spot honesty item 14 named for TypeScript's own interface case.
+
+    **Explicitly not decided here, the same way item 12's own number was a
+    separate decision from #231/#233 building on it:** whether 89.6%/2.8% is
+    good enough to wire a live Python `declaringFile` into `resolveReceiver`
+    or a Python `symbolDeclarationAt` into `@calls`'s closed-body check.
+    2.8% wrong is four times TypeScript's measured 0.7%, on a real reader
+    finding a real, named, non-mysterious limitation -- a decision for
+    whoever reads this number next, not a recommendation this entry makes.
+
 ## Open, in the order worth doing
 
 1. ~~**The licence grid.**~~ Built at #207 and shipped at #209. `@accesses` is
