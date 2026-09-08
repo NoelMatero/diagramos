@@ -1135,6 +1135,53 @@ one word or one reader, not from reviewing the design.
 `renders` was also raised as a possible missing relation and turned out not to
 be one: `<MenuContent />` is a routine making a MenuContent, which is `@builds`.
 
+17. **#236, recommended against: Python's `@calls` absence axis stays
+    `NOT_DESIGNED_YET`.** #235 measured pyright's LSP the way items 12-14
+    measured `tsc`: 89.6% of Python receivers get a declaring file (against
+    tier 1's 14-16%, and not far off `tsc`'s own 97.8%), but of the sites
+    checked two ways -- a receiver's declared type against the method
+    actually called, item 14's own check repeated -- **2.8% disagree (410 of
+    14,480)**. TypeScript's version of that same check cleared **0.7%**
+    after two rounds of fixing real reader bugs, and this repo has already
+    shipped a word on 1.1-2.0% (item 12's tier-1 resolver). 2.8% is worse
+    than both ends of that already-accepted range, on a corpus half the size
+    of TypeScript's own (14,480 checked sites against TypeScript's 8,964,
+    but two real codebases rather than one, `graphify` at 2.7% and
+    `infrarouter` at 5.4%) -- not a rounding difference from the bar, a
+    number on the other side of it.
+
+    #236 names the exact instruction this is following: "the right outcome
+    may be closing this issue with that written down, not building
+    anything... a bad number is a legitimate, useful answer." Coverage is
+    not the problem -- 89.6% is close enough to TypeScript's own reach that
+    it would not have been the reason to stop. The wrongness number is, and
+    unlike TypeScript's residual 0.7% -- named in item 14 as a floor
+    concentrated in one third-party library's own generic pattern, not
+    spread through the corpus -- every sampled Python disagreement in #235
+    is the same shape spread across both codebases: `.get`, `.items`,
+    `.lower`, `.upper`, `.append`, a declared type this corpus owns
+    disagreeing with a method that actually resolves to a builtin. That is
+    TypeScript's own named limitation (a declared type wider than the value
+    actually flowing through it -- `Optional`, `Union`, an abstract base)
+    showing up nearly four times as often, which reads as Python code
+    leaning on wide/optional annotations more than TypeScript's corpus
+    happened to, not as a bug this issue's own reader introduced.
+
+    Not a plumbing problem either, checked before writing this off as a
+    number rather than a fixable reader: `CallSide.resolveReceiver` (#233)
+    is already a generic hook -- `(at) => ReceiverResolution | undefined`,
+    no TypeScript assumption baked into `calls.ts` itself -- so supplying a
+    Python resolver would have been exactly the small, well-scoped change
+    #236 hoped for if the number had cleared the bar. It did not, so that
+    plumbing stays unused for Python rather than being exercised on a
+    reader now measured to accuse wrongly around 1 time in 36.
+
+    `~/mundane`'s own share of #235's corpus was left unmeasured (its
+    pre-existing TypeScript analysis made a same-session run impractical,
+    #235's own item 17 says so) -- a third data point could move 2.8% some,
+    but not past a floor this consistent across two independently-sized
+    codebases into a range this repo has already called acceptable.
+
 ## Open, in the order worth doing
 
 1. ~~**The licence grid.**~~ Built at #207 and shipped at #209. `@accesses` is
