@@ -340,4 +340,20 @@ describe("a receiver placed by a resolver, not by the text", () => {
     ).find((one) => one.routine === "f")!;
     expect(body.sites.find((one) => one.name === "run")!.file).toBe("thing.ts");
   });
+
+  it("carries the method's own byte range for a receiver site, and neither field for a bare call", () => {
+    // The range a safety measurement needs to ask a real checker what `run`
+    // itself resolves to, independently of how the receiver was placed --
+    // not present at all for a call with no receiver to ask about.
+    const source = "function helper() {}\nfunction f(x) {\n  helper();\n  x.run();\n}\n";
+    const body = sitesIn(source).find((one) => one.routine === "f")!;
+    const bare = body.sites.find((one) => one.name === "helper")!;
+    const receiver = body.sites.find((one) => one.name === "run")!;
+    expect(bare.receiver).toBe(false);
+    expect(bare.memberAt).toBeUndefined();
+    expect(receiver.receiver).toBe(true);
+    expect(receiver.memberAt).toEqual({
+      start: source.indexOf("run"), end: source.indexOf("run") + "run".length,
+    });
+  });
 });

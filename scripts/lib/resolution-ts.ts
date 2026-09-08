@@ -45,6 +45,20 @@ export interface TsTypeAnswer {
 export interface TsReferee {
   /** `undefined` when no node in the program spans exactly this range: the file was not part of the program, or the range does not land on an expression the checker has an opinion about (whitespace, a comment, a syntax error). */
   typeAt(file: string, start: number, end: number): TsTypeAnswer | undefined;
+  /**
+   * Where the symbol *at this exact position* is declared -- `getSymbolAtLocation`,
+   * the same call a "go to definition" makes, not `getTypeAtLocation`. The
+   * two ask different questions: `typeAt` on `x` in `x.foo()` says what kind
+   * of thing `x` is; this, asked at `foo`'s own range, says where the method
+   * actually being called is declared. They can legitimately disagree --
+   * `x`'s declared type can be an interface one file declares while the
+   * concrete method invoked at runtime lives on whatever class implements
+   * it elsewhere, a gap no static checker closes either. `undefined` for the
+   * same reasons `typeAt` returns it, plus a symbol the checker resolves to
+   * more than one declaration (an overloaded signature) reporting only the
+   * first.
+   */
+  symbolDeclarationAt(file: string, start: number, end: number): string | undefined;
 }
 
 const SKIP_DIRECTORIES = new Set([
@@ -249,15 +263,42 @@ export function createTsReferee(root: string): TsReferee {
     const text = checker.typeToString(type, node, ts.TypeFormatFlags.NoTruncation);
     let declaringFile: string | undefined;
     try {
-      const symbol = type.getSymbol() ?? type.aliasSymbol;
-      declaringFile = symbol?.getDeclarations()?.[0]?.getSourceFile().fileName;
+      /*
+       * `type.getSymbol()` only -- never `type.aliasSymbol`. A type alias's
+       * own declaration site is not where a *value* of that type lives: a
+       * `type Bucket = "a" | "b" | "c"` alias declared in one file backs a
+       * receiver that is, underneath, a plain string everywhere it is used,
+       * and `row.bucket.padEnd(10)` calls `String.prototype.padEnd` --
+       * external, whatever file `Bucket` itself happens to be written in.
+       * Found by this measurement's own safety check (#226): the alias
+       * fallback placed that call at the alias's file, and the referee,
+       * asking about `padEnd` directly, correctly said external.
+       */
+      declaringFile = type.getSymbol()?.getDeclarations()?.[0]?.getSourceFile().fileName;
     } catch {
       declaringFile = undefined;
     }
     return { text, head: headOfTs(text), declaringFile };
   }
 
-  return { typeAt };
+  function symbolDeclarationAt(file: string, start: number, end: number): string | undefined {
+    const configPath = configOf.get(file);
+    if (configPath === undefined) return undefined;
+    const { program, checker } = programFor(configPath);
+    const sourceFile = program.getSourceFile(file);
+    if (!sourceFile) return undefined;
+    const node = findNodeAt(sourceFile, start, end);
+    if (!node) return undefined;
+    try {
+      const symbol = checker.getSymbolAtLocation(node);
+      const real = symbol && (symbol.flags & ts.SymbolFlags.Alias) ? checker.getAliasedSymbol(symbol) : symbol;
+      return real?.getDeclarations()?.[0]?.getSourceFile().fileName;
+    } catch {
+      return undefined;
+    }
+  }
+
+  return { typeAt, symbolDeclarationAt };
 }
 
 /**

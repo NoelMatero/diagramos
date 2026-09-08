@@ -609,7 +609,21 @@ type Callee =
    * complex receiver (`make().run()`) has no name to place but still has an
    * expression a real type checker could be asked about.
    */
-  | { kind: "through"; through: string; name: string; at: { start: number; end: number } }
+  | {
+      kind: "through"; through: string; name: string; at: { start: number; end: number };
+      /**
+       * The *method* name's own byte range -- `foo` in `x.foo()`, not `x`.
+       * Exists so a referee can ask a real checker what `x.foo` itself
+       * resolves to (`getSymbolAtLocation` on the member, the way a "go to
+       * definition" would), independently of how `resolveReceiver` derived
+       * a placement from `x`'s type alone. Two different questions: `x`'s
+       * type names a class, and the method actually reached could still live
+       * on a different one an interface merges in or a subclass overrides --
+       * `at` cannot see that, and this is the range that lets something else
+       * check it.
+       */
+      memberAt: { start: number; end: number };
+    }
   /** `table[k]()` -- the name is not in the text. */
   | { kind: "computed" };
 
@@ -655,6 +669,7 @@ function calleeOfNode(callee: Node): Callee {
   return {
     kind: "through", through, name: member.text,
     at: { start: object.startIndex, end: object.startIndex + object.text.length },
+    memberAt: { start: member.startIndex, end: member.startIndex + member.text.length },
   };
 }
 
@@ -1023,6 +1038,14 @@ export interface CallSitePlaced {
    * population being compared.
    */
   receiver: boolean;
+  /**
+   * The method name's own byte range -- `foo` in `x.foo()` -- present
+   * exactly when `receiver` is true. Lets a caller ask an independent
+   * checker what the call itself resolves to, separately from how this
+   * reader placed it: the safety measurement a `receiver`-based verdict
+   * needs before anything may accuse on the strength of one.
+   */
+  memberAt?: { start: number; end: number };
 }
 
 /** Every call site in one routine, placed or refused. */
@@ -1109,8 +1132,11 @@ function placeName(name: string, side: CallSide, bindings: Bindings): string | {
  * site rather than a `why`, which is the one thing "provably not a repo
  * routine" and "known to be this repo routine" have in common: neither one
  * leaves the call's destination in doubt.
+ *
+ * Exported so a safety measurement can tell this placement apart from a
+ * real file without hardcoding the string a second time.
  */
-const EXTERNAL_RECEIVER = "<external-to-repository>";
+export const EXTERNAL_RECEIVER = "<external-to-repository>";
 
 /**
  * `receiver`'s narrower answer, when a caller supplied one. `side.resolveReceiver`
@@ -1175,6 +1201,22 @@ function placeOf(
   }
 
   const imported = bindings.imported.get(bound);
+  /*
+   * `x.foo()` where `x` happens to be imported: only a question about
+   * `imported.specifier`'s own file when `x` is a *namespace* import
+   * (`import * as x`) -- `foo` genuinely is a member of that module then.
+   * An ordinary named import (`import { x }`) used as a receiver is a
+   * method call on a value, never a namespace access, whatever file `x`
+   * itself came from happens to declare under the name `foo`. Treating the
+   * two the same is how this measurement's own safety check (#226) caught
+   * `PUNCTUATION.has(...)` -- `PUNCTUATION`, a `Set` imported by name --
+   * "placed" at the file `PUNCTUATION` comes from: `comesToRest` found no
+   * `has` declared there, found no wildcard either, and its own permissive
+   * "probably declared there anyway" fallback answered instead of refusing.
+   * That fallback is right for a genuine namespace; it was never asked
+   * whether this was one.
+   */
+  if (imported && callee.kind === "through" && !imported.namespace) return throughChecker();
   if (!imported) {
     if (!bindings.local.has(bound)) {
       if (callee.kind !== "through") return { why: "unbound" };
@@ -1281,6 +1323,7 @@ export function callSitesIn(side: CallSide): CallSitesReading {
         name: callee.kind === "computed" ? "" : callee.name,
         line: lineOf(side.source, inner.startIndex),
         receiver: callee.kind === "through",
+        ...(callee.kind === "through" ? { memberAt: callee.memberAt } : {}),
         ...(typeof where === "string" ? { file: where } : { why: where.why }),
       });
     });

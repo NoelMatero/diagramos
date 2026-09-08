@@ -958,6 +958,75 @@ one word or one reader, not from reviewing the design.
     contradiction) are untouched by any of this — but the ceiling itself is
     no longer "real and nearly empty."
 
+14. **Item 13's reversal, checked against AGENTS.md's own gate: 0.7% wrong,
+    and two of the bugs that measurement found were in this session's own
+    code, not in a hazard nobody anticipated.** "50.3% closed" says how much
+    of ts/tsx/js the mechanism reads. Nothing yet said how often it is
+    right, and AGENTS.md's rule is exact: nothing new may say *wrong* until
+    that number exists, from a referee sharing no machinery with the reader.
+    (One of the two fixes below moved the closed share itself, slightly:
+    **49.6%**, 10.3% at tier 1, after both are applied — a more honest
+    number than item 13's, not a different one; the shape of the finding is
+    unchanged.)
+
+    The check: `calls.ts` gained a second field per receiver site,
+    `memberAt` -- the method's own byte range (`foo` in `x.foo()`), not the
+    receiver's (`x`). For every call `declared`/`external`/`type` actually
+    placed, `symbolDeclarationAt` asks the same compiler a more direct
+    question -- `getSymbolAtLocation` on the method itself, the call a real
+    "go to definition" makes -- and the two answers are compared.
+
+    First run: **2.5% wrong** (227 of 9,092), almost all one shape:
+    `PUNCTUATION.has(entry.type)` -- `PUNCTUATION`, a `Set` genuinely
+    *imported by name* into the file -- placed at `PUNCTUATION`'s own file,
+    `engine/rust.ts`. The mechanism: `bindings.imported` already marks an
+    import `namespace: true`/`false` (`import * as x` against `import { x
+    }`), and `placeOf`'s pre-existing name-search branch never checked it --
+    any receiver whose bare name happened to be imported at all was tried as
+    a *namespace* first (`ns.foo()`: is `foo` declared in `ns`'s file?),
+    permissively answering "probably" when the target file had no wildcard
+    export to rule it out. Right for a real namespace import; never
+    consulted a resolver at all for an ordinary named one used as a value.
+    Fixed by skipping straight to the resolver whenever `through` names a
+    plain (non-namespace) import — a bug in the reader `calls.ts` already
+    had, exposed rather than created by giving receivers a resolver to fall
+    back to.
+
+    Second run: **0.8%** (75 of 9,092). Remaining shape:
+    `row.bucket.padEnd(10)` -- `row.bucket`'s type is a string-literal union
+    (`type Bucket = "a" | "b" | ...`) declared in one file; `typeAt`'s
+    `declaringFile` fell back to `type.aliasSymbol` when `getSymbol()` found
+    nothing, which for a union answers with the *alias's own* declaration
+    site -- true about where `Bucket` is written, false about where a value
+    of that type lives once its calls resolve straight through to
+    `String.prototype`. Fixed by dropping the `aliasSymbol` fallback for
+    `declaringFile` entirely -- a type alias's declaration is not evidence
+    about what a value of that type's *methods* resolve to, only about
+    where the alias itself happens to be spelled.
+
+    Third run, after both fixes: **0.7%** (62 of 8,964) -- ts alone at
+    **0.1%** (8 of 7,423), tsx at 3.5% (54 of 1,541), concentrated almost
+    entirely in one third-party menu component library's own internal
+    generic store pattern in one test tree (`mundane`'s `ListboxStore`), not
+    spread across the corpus. For comparison, the number this repo already
+    shipped a word on: item 12's tier-1 resolver measured 1.1–2.0% wrong on
+    TypeScript before any of this. This mechanism is now measured *below*
+    an already-accepted bar, not merely "seems fine."
+
+    The honest limit stays honest rather than getting explained away: this
+    referee asks the *same compiler* the reader does, at a *more specific*
+    position, so it catches wrong plumbing and wrong node-finding, but a
+    receiver whose declared type is an interface or a generic wrapper, where
+    the concrete implementation is decided by something the type system
+    itself cannot see, would agree with the reader's mistake rather than
+    catch it. `mundane`'s remaining tsx cases are exactly this shape --
+    `use-listbox-item.ts` reached through a type declared as
+    `use-popup-menu-item.ts`'s own hook -- and no compiler-based referee
+    closes that gap, because the reader and the referee share the one
+    limitation neither can see past. Named rather than measured away: the
+    number above is a floor on how wrong this is, not a ceiling on how
+    right.
+
 `renders` was also raised as a possible missing relation and turned out not to
 be one: `<MenuContent />` is a routine making a MenuContent, which is `@builds`.
 

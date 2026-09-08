@@ -56,7 +56,9 @@ import path from "node:path";
 import { refereeRoutines, stripNoise } from "./lib/call-scan";
 import { createTsReferee } from "./lib/resolution-ts";
 
-import { callSitesIn, type BodyCallSites, type CallSide, type ReceiverResolution } from "../src/engine/calls";
+import {
+  callSitesIn, EXTERNAL_RECEIVER, type BodyCallSites, type CallSide, type ReceiverResolution,
+} from "../src/engine/calls";
 import { readDependencies } from "../src/engine/deps";
 import { createWorkspace } from "../src/engine/drift";
 import { mayAccuse } from "../src/engine/licence";
@@ -238,6 +240,27 @@ const resolverAnswers = new Map<Language, ResolverTally>();
  *  unit `resolverAnswers` counts in. */
 const siteReasonTier2 = new Map<Language, Map<string, number>>();
 
+/**
+ * The safety measurement this whole feature needs before anything may
+ * accuse on it (AGENTS.md's gate): of every receiver call this session's
+ * `declared`/`external`/`type` mechanism actually *placed*, how often does
+ * an independent question -- `getSymbolAtLocation` on the method itself,
+ * not `getTypeAtLocation` on the receiver -- land somewhere else?
+ *
+ * Not fully independent, and said so rather than overclaimed: both the
+ * placement and this check ultimately ask the same compiler, so a shape
+ * neither one can see (the concrete class behind an interface-typed
+ * receiver, decided only at runtime) will not show up as WRONG here even
+ * though it is a real gap. What this *does* catch is everything else --
+ * a plumbing bug in this session's own node-finding or path conversion,
+ * an inherited method the receiver's declared type does not itself carry,
+ * an overload resolving to a different signature than the one assumed.
+ */
+interface PlacementTally { agreed: number; wrong: number; refused: number }
+const placementReferee = new Map<Language, PlacementTally>();
+interface PlacementWrong { tree: string; file: string; line: number; placed: string; referee: string }
+const placementWrongCases: PlacementWrong[] = [];
+
 /** Referee disagreement about how many call sites a body has. */
 interface Disagreement {
   file: string;
@@ -335,6 +358,25 @@ for (const tree of trees) {
           tier2Reading.bodies, language, bodiesTier2, closedTier2, calllessTier2, openTier2,
           soleBlockerTier2, anyBlockerTier2, siteReasonTier2,
         );
+        for (const body of tier2Reading.bodies) {
+          for (const site of body.sites) {
+            if (!site.receiver || !site.file || !site.memberAt) continue;
+            const refereeDecl = tsChecker?.symbolDeclarationAt(file, site.memberAt.start, site.memberAt.end);
+            const tally = placementReferee.get(language) ?? { agreed: 0, wrong: 0, refused: 0 };
+            placementReferee.set(language, tally);
+            if (!refereeDecl) { tally.refused += 1; continue; }
+            const refereeOutside = isOutsideTree(refereeDecl, tree);
+            const refereeRel = refereeOutside ? EXTERNAL_RECEIVER : path.relative(tree, refereeDecl);
+            if (refereeRel === site.file) { tally.agreed += 1; continue; }
+            tally.wrong += 1;
+            if (placementWrongCases.length < 30) {
+              placementWrongCases.push({
+                tree: path.basename(tree), file: rel, line: site.line,
+                placed: site.file, referee: refereeRel,
+              });
+            }
+          }
+        }
       }
     }
 
@@ -752,7 +794,48 @@ if (siteUnboundOrUnplaced <= noFileOrNone) {
 }
 console.log();
 
-console.log("7 · WHAT THIS ANSWERS");
+console.log("7 · IS IT WRONG -- the gate AGENTS.md requires before anything may accuse on this");
+console.log();
+console.log("  Every closed-share and ceiling number above says how *much* this reads. This");
+console.log("  is the only section that asks how often it is *right*. For every receiver call");
+console.log("  this session's placement actually placed, a second, more direct question --");
+console.log("  what does the method itself (`getSymbolAtLocation` on `foo` in `x.foo()`)");
+console.log("  resolve to, not what kind of thing `x` is -- is asked of the same compiler and");
+console.log("  compared against what was placed.");
+console.log();
+console.log("  " + "language".padEnd(10) + "agreed".padStart(9) + "wrong".padStart(8)
+  + "refused".padStart(10) + "  wrong share");
+let placementAgreed = 0, placementWrong = 0, placementRefused = 0;
+for (const language of ["ts", "tsx", "js"] as Language[]) {
+  const tally = placementReferee.get(language);
+  if (!tally) continue;
+  placementAgreed += tally.agreed; placementWrong += tally.wrong; placementRefused += tally.refused;
+  const asked = tally.agreed + tally.wrong;
+  console.log("  " + language.padEnd(10) + String(tally.agreed).padStart(9) + String(tally.wrong).padStart(8)
+    + String(tally.refused).padStart(10) + "  " + percent(tally.wrong, asked).padStart(8));
+}
+console.log();
+if (placementWrongCases.length > 0) {
+  console.log(`  WRONG -- read every one before trusting this reader's placements: ${placementWrong}`);
+  for (const one of placementWrongCases.slice(0, cap(placementWrongCases.length))) {
+    console.log(`    ${one.tree}/${one.file}:${one.line} placed ${one.placed}, referee says ${one.referee}`);
+  }
+  if (placementWrong > placementWrongCases.length) {
+    console.log(`    ... and ${placementWrong - placementWrongCases.length} more`);
+  }
+  console.log();
+}
+console.log(`  ${placementWrong} wrong of ${placementAgreed + placementWrong} checked `
+  + `(${percent(placementWrong, placementAgreed + placementWrong).trim()}), ${placementRefused} the referee itself`);
+console.log("  could not answer (an overload, a computed member, a position it has no opinion");
+console.log("  on) and are not counted either way. Caveat that has to travel with this number:");
+console.log("  the placement and this check both ultimately ask the same compiler, so a shape");
+console.log("  neither can see -- the concrete class behind an interface-typed receiver,");
+console.log("  decided only at runtime -- would not show up as WRONG here even though it is a");
+console.log("  real gap. This catches plumbing bugs, not that specific blind spot.");
+console.log();
+
+console.log("8 · WHAT THIS ANSWERS");
 console.log();
 console.log(`  ${shut} of ${withCalls} bodies that call anything have a call set this reader can`);
 console.log(`  enumerate completely: ${percent(shut, withCalls).trim()}. That is the ceiling on how much of`);
