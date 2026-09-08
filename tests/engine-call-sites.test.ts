@@ -191,3 +191,169 @@ describe("what the enumeration reports about a body", () => {
     expect(body.sites.some((one) => one.name === "inner")).toBe(true);
   });
 });
+
+/**
+ * `resolveReceiver` (#226): a caller can narrow `receiver` into a real place
+ * by naming the type a resolver worked out, from tier 1 (`resolution.ts`) or
+ * tier 2 (a real checker) -- `placeOf` never invents a new reason, it only
+ * places the name a resolver hands back exactly as it would a bare one.
+ */
+describe("a receiver placed by a resolver, not by the text", () => {
+  it("places a receiver once a resolver names a type declared in this file", () => {
+    const source = "class Foo {\n  run() {}\n}\nfunction f(x) {\n  x.run();\n}\n";
+    const body = sitesIn(source, "ts", { resolveReceiver: () => ({ kind: "type", name: "Foo" }) })
+      .find((one) => one.routine === "f")!;
+    expect(body.sites.map((one) => one.file)).toEqual(["a.ts"]);
+  });
+
+  it("asks the resolver at the receiver's own byte range, not the whole call", () => {
+    const source = "function f(x) {\n  x.run();\n}\n";
+    const seen: Array<{ start: number; end: number }> = [];
+    sitesIn(source, "ts", {
+      resolveReceiver: (at) => { seen.push(at); return undefined; },
+    });
+    expect(seen).toEqual([{ start: source.indexOf("x.run"), end: source.indexOf("x.run") + 1 }]);
+  });
+
+  it("places a receiver once a resolver names an imported type", () => {
+    // `Foo` has to be an import *in the source* -- `bindings.imported` reads
+    // the text, not `CallSide.imports` (that only resolves a specifier once
+    // some name is already known to come from it).
+    const body = sitesIn(
+      'import { Foo } from "./foo";\nfunction f(x) {\n  x.run();\n}\n',
+      "ts",
+      {
+        imports: [{ specifier: "./foo", file: "foo.ts" }],
+        open: () => ({ source: "export class Foo {}\n", language: "ts", imports: [] }),
+        resolveReceiver: () => ({ kind: "type", name: "Foo" }),
+      },
+    ).find((one) => one.routine === "f")!;
+    expect(body.sites.map((one) => one.file)).toEqual(["foo.ts"]);
+  });
+
+  it("leaves a receiver open when the resolver has nothing to say", () => {
+    expect(why("function f(x) {\n  x.run();\n}\n", "f", "ts", { resolveReceiver: () => undefined }))
+      .toEqual(["receiver"]);
+  });
+
+  it("narrows into `unbound`, not `receiver`, when the resolver names a type nothing here declares or imports", () => {
+    // A real narrowing, not a bug: `placeName` treats a resolved type exactly
+    // like a bare name, and a name neither declared nor imported has always
+    // been `unbound` -- true here too, a global or a type from an untracked
+    // import, same as it would be for a value name in that position.
+    expect(why("function f(x) {\n  x.run();\n}\n", "f", "ts", {
+      resolveReceiver: () => ({ kind: "type", name: "Nowhere" }),
+    })).toEqual(["unbound"]);
+  });
+
+  it("places even a complex expression receiver, since a resolver reads the expression, not a name", () => {
+    // Without a resolver this is the one shape `through` never even has a
+    // name for (`through: ""`) -- the whole reason `at` is carried regardless.
+    // `make()` is declared too, so the only site left to check is `.run()`'s.
+    const source = "class Foo {\n  run() {}\n}\nfunction make() {}\nfunction f() {\n  make().run();\n}\n";
+    const body = sitesIn(source, "ts", { resolveReceiver: () => ({ kind: "type", name: "Foo" }) })
+      .find((one) => one.routine === "f")!;
+    const receiverSite = body.sites.find((one) => one.name === "run")!;
+    expect(receiverSite.file).toBe("a.ts");
+  });
+
+  it("never lets a resolver override a call the text already placed", () => {
+    // `this.step()` is `own`, placed before any resolver is consulted -- a
+    // resolver that always answers must not be able to move it.
+    const body = sitesIn(
+      "class K {\n  run() {\n    this.step();\n  }\n  step() {}\n}\n",
+      "ts",
+      { resolveReceiver: () => ({ kind: "type", name: "SomewhereElse" }) },
+    ).find((one) => one.routine === "run")!;
+    expect(body.sites.map((one) => one.file)).toEqual(["a.ts"]);
+  });
+
+  it("places a receiver immediately when the resolver knows the type is declared outside the repository", () => {
+    // No name match attempted at all -- `external` is placed before
+    // `placeName` would ever be consulted, and would stay unbound if it
+    // were: nothing here declares or imports a type called "Array".
+    expect(why("function f(x) {\n  x.push(1);\n}\n", "f", "ts", {
+      resolveReceiver: () => ({ kind: "external" }),
+    })).toEqual([]);
+  });
+
+  it("places a receiver at the file the resolver names directly, with no name search at all", () => {
+    // The shape a name search alone can never close: `x`'s real type
+    // (`Thing`, declared in "thing.ts") is never imported by name here --
+    // only `make`, the function that produced it, is. `placeName("Thing", ..)`
+    // would find nothing in this file's own bindings and refuse; `declared`
+    // skips that search because the resolver already knows the file.
+    const body = sitesIn(
+      'import { make } from "./make";\nfunction f() {\n  const x = make();\n  x.run();\n}\n',
+      "ts",
+      { resolveReceiver: () => ({ kind: "declared", file: "thing.ts" }) },
+    ).find((one) => one.routine === "f")!;
+    const receiverSite = body.sites.find((one) => one.name === "run")!;
+    expect(receiverSite.file).toBe("thing.ts");
+  });
+
+  /**
+   * Three shapes `placeOf` used to give up on *before* ever consulting a
+   * resolver, found re-measuring #221 the morning after: whenever the
+   * receiver's own bare name (`x` in `x.foo()`) happened to also match
+   * something in `bindings.imported` -- ambiguous, an unresolved specifier,
+   * or a re-export chain that ran out of road -- the reader tried to place
+   * `x` as a *namespace* first and, on failure, refused outright. A resolver
+   * answers the *value* question directly and was never asked. Confirmed at
+   * ~880 receiver sites corpus-wide before this fix (`measure:closed-bodies`
+   * section 6's own site-for-site count).
+   */
+  it("falls back to the resolver when the receiver's bare name is itself ambiguous", () => {
+    // `x` is both imported and locally declared here -- ambiguous as a
+    // *value* name. The resolver, asked at one exact position, has no such
+    // doubt.
+    const body = sitesIn(
+      'import { x } from "./mod";\nfunction x() {}\nclass Foo {\n  run() {}\n}\nfunction f() {\n  x.run();\n}\n',
+      "ts",
+      { resolveReceiver: () => ({ kind: "type", name: "Foo" }) },
+    ).find((one) => one.routine === "f")!;
+    expect(body.sites.find((one) => one.name === "run")!.file).toBe("a.ts");
+  });
+
+  it("falls back to the resolver when the receiver's bare name is an import that never resolved to a file", () => {
+    const body = sitesIn(
+      'import { x } from "unittest.mock";\nfunction f() {\n  x.run();\n}\n',
+      "ts",
+      { imports: [{ specifier: "unittest.mock" }], resolveReceiver: () => ({ kind: "external" }) },
+    ).find((one) => one.routine === "f")!;
+    expect(body.sites.find((one) => one.name === "run")!.file).toBe("<external-to-repository>");
+  });
+
+  it("falls back to the resolver when the receiver's bare name resolves but the re-export chain runs out", () => {
+    const body = sitesIn(
+      'import { x } from "./barrel";\nfunction f() {\n  x.run();\n}\n',
+      "ts",
+      {
+        imports: [{ specifier: "./barrel", file: "barrel.ts" }],
+        open: () => ({
+          source: 'export * from "./deeper";\n',
+          language: "ts",
+          imports: [{ specifier: "./deeper" }],
+        }),
+        resolveReceiver: () => ({ kind: "declared", file: "thing.ts" }),
+      },
+    ).find((one) => one.routine === "f")!;
+    expect(body.sites.find((one) => one.name === "run")!.file).toBe("thing.ts");
+  });
+
+  it("carries the method's own byte range for a receiver site, and neither field for a bare call", () => {
+    // The range a safety measurement needs to ask a real checker what `run`
+    // itself resolves to, independently of how the receiver was placed --
+    // not present at all for a call with no receiver to ask about.
+    const source = "function helper() {}\nfunction f(x) {\n  helper();\n  x.run();\n}\n";
+    const body = sitesIn(source).find((one) => one.routine === "f")!;
+    const bare = body.sites.find((one) => one.name === "helper")!;
+    const receiver = body.sites.find((one) => one.name === "run")!;
+    expect(bare.receiver).toBe(false);
+    expect(bare.memberAt).toBeUndefined();
+    expect(receiver.receiver).toBe(true);
+    expect(receiver.memberAt).toEqual({
+      start: source.indexOf("run"), end: source.indexOf("run") + "run".length,
+    });
+  });
+});

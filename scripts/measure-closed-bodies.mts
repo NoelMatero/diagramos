@@ -50,13 +50,15 @@
  *
  * A run is a measurement, not a test: it prints and never fails.
  */
-import { execFileSync } from "node:child_process";
-import { existsSync, realpathSync } from "node:fs";
+import { existsSync, readdirSync, realpathSync, statSync } from "node:fs";
 import path from "node:path";
 
 import { refereeRoutines, stripNoise } from "./lib/call-scan";
+import { createTsReferee } from "./lib/resolution-ts";
 
-import { callSitesIn, type BodyCallSites, type CallSide } from "../src/engine/calls";
+import {
+  callSitesIn, EXTERNAL_RECEIVER, type BodyCallSites, type CallSide, type ReceiverResolution,
+} from "../src/engine/calls";
 import { readDependencies } from "../src/engine/deps";
 import { createWorkspace } from "../src/engine/drift";
 import { mayAccuse } from "../src/engine/licence";
@@ -87,19 +89,54 @@ const trees = (roots.length > 0 ? roots : [
   `${HOME}/infrarouter`,
 ]).filter((tree) => existsSync(tree)).map(real);
 
+/**
+ * Prunes while walking rather than listing then filtering -- `execFileSync`d
+ * `find` piped to a JS filter threw `ENOBUFS` and lost a whole tree silently
+ * (a blanket `catch` read the crash as "no files here") the moment
+ * `measure-resolution.mts` hit the same bug on this same corpus (#226): a
+ * monorepo with real dependencies installed is enough files that `find`'s
+ * stdout overflows the default buffer. This never lists `node_modules` in the
+ * first place, so there is no buffer to overflow.
+ */
+const SKIP_DIRECTORIES = new Set([
+  "node_modules", ".git", "target", "dist", "build", "out", "vendor", ".venv", ".claude",
+  "coverage", ".next", ".nuxt", ".output", ".turbo", ".yarn", ".cache",
+]);
+
 function sourceFiles(root: string): string[] {
-  try {
-    return execFileSync("find", [root, "-type", "f"], { encoding: "utf8" })
-      .split("\n")
-      .filter(Boolean)
-      .filter((file) => !/\/(target|node_modules|\.git|dist|out|vendor|\.venv|\.claude)\//.test(file))
-      .filter((file) => languageOf(file) !== undefined);
-  } catch {
-    return [];
-  }
+  const found: string[] = [];
+  const walk = (directory: string): void => {
+    let entries: string[];
+    try { entries = readdirSync(directory); } catch { return; }
+    for (const entry of entries) {
+      if (entry.startsWith(".") && entry !== ".") continue;
+      if (SKIP_DIRECTORIES.has(entry)) continue;
+      const full = path.join(directory, entry);
+      let info;
+      try { info = statSync(full); } catch { continue; }
+      if (info.isDirectory()) walk(full);
+      else if (languageOf(entry) !== undefined) found.push(full);
+    }
+  };
+  walk(root);
+  return found;
 }
 
 const LANGUAGES: Language[] = ["rust", "ts", "tsx", "python", "js"];
+
+/**
+ * Whether a type's own declaration, an absolute path the compiler names,
+ * sits outside this tree entirely -- a language builtin (`lib.*.d.ts`, itself
+ * inside some `node_modules/typescript`) or a package's own declaration file.
+ * Checked by path rather than by name: `Assertion` from `vitest` and a
+ * repository's own `Assertion` class print identically, and only where they
+ * are actually declared tells the two apart.
+ */
+function isOutsideTree(declaringFile: string, tree: string): boolean {
+  if (declaringFile.includes(`${path.sep}node_modules${path.sep}`)) return true;
+  const rel = path.relative(tree, declaringFile);
+  return rel.startsWith("..") || path.isAbsolute(rel);
+}
 
 /* ------------------------------------------------------------------ the run */
 
@@ -112,6 +149,50 @@ const BANDS = [
 ];
 
 const bump = <K,>(map: Map<K, number>, key: K, by = 1) => map.set(key, (map.get(key) ?? 0) + by);
+
+/**
+ * The closure/blocker tally section 1 and 2 compute inline for the baseline
+ * reading, factored out so the tier-2 reading (#226) counts the same way
+ * without repeating it -- the two numbers have to mean the same thing or the
+ * comparison is meaningless.
+ */
+function bumpClosure(
+  bodiesRead: BodyCallSites[], language: Language,
+  bodiesMap: Map<Language, number>, closedMap: Map<Language, number>,
+  calllessMap: Map<Language, number>, openMap: Map<Language, number>,
+  soleMap: Map<Language, Map<string, number>>, anyMap: Map<Language, Map<string, number>>,
+  /** Per *site*, not per body -- the unit `resolverAnswers` counts in, so the
+   *  two can be compared directly instead of comparing a body count against
+   *  a query count and calling it a check. */
+  siteReasonMap: Map<Language, Map<string, number>>,
+): void {
+  for (const body of bodiesRead) {
+    bump(bodiesMap, language);
+    const blocking = body.sites.filter((one) => one.why);
+    const isClosed = body.sites.length > 0 && blocking.length === 0;
+    if (body.sites.length === 0) bump(calllessMap, language);
+    else if (isClosed) bump(closedMap, language);
+    else bump(openMap, language);
+
+    // Receiver sites only -- a bare, unimported `foo()` can land in the same
+    // `unbound`/`unplaced` buckets and has nothing to do with a resolver.
+    const perSite = siteReasonMap.get(language) ?? new Map<string, number>();
+    for (const site of blocking) { if (site.receiver) bump(perSite, site.why!); }
+    siteReasonMap.set(language, perSite);
+
+    if (blocking.length > 0) {
+      const reasons = new Set(blocking.map((one) => one.why!));
+      const perAny = anyMap.get(language) ?? new Map<string, number>();
+      for (const reason of reasons) bump(perAny, reason);
+      anyMap.set(language, perAny);
+      if (reasons.size === 1) {
+        const per = soleMap.get(language) ?? new Map<string, number>();
+        bump(per, [...reasons][0]!);
+        soleMap.set(language, per);
+      }
+    }
+  }
+}
 
 const files = new Map<Language, number>();
 const bodies = new Map<Language, number>();
@@ -130,6 +211,55 @@ const placedSites = new Map<Language, number>();
 const byBand = new Map<string, { withCalls: number; closed: number }>();
 /** The same, per language, for the band the report names. */
 const unlicensed = new Set<Language>();
+
+/**
+ * #226's follow-up, named in `docs/claim-vocabulary.md` when #221's
+ * recommendation was reaffirmed: does a real checker close what syntax
+ * alone could not? ts/tsx/js only, mirroring the same `resolveReceiver`
+ * reading run a second time with tier 2 wired in as the receiver resolver --
+ * every tally below has the same meaning as its untagged twin above, just
+ * counted on that second reading.
+ */
+const bodiesTier2 = new Map<Language, number>();
+const closedTier2 = new Map<Language, number>();
+const calllessTier2 = new Map<Language, number>();
+const openTier2 = new Map<Language, number>();
+const soleBlockerTier2 = new Map<Language, Map<string, number>>();
+const anyBlockerTier2 = new Map<Language, Map<string, number>>();
+const TIER2_LANGUAGES = new Set<Language>(["ts", "tsx", "js"]);
+
+/**
+ * What `resolveReceiver` actually answered, every query, no correlation
+ * needed after the fact -- counted right where the answer is decided,
+ * which is the fix for the imprecise line-matching an earlier session's
+ * probe used and got wrong on its very first sample.
+ */
+interface ResolverTally { type: number; declared: number; external: number; none: number }
+const resolverAnswers = new Map<Language, ResolverTally>();
+/** Per-site (not per-body) reason tally for the tier-2 reading -- the same
+ *  unit `resolverAnswers` counts in. */
+const siteReasonTier2 = new Map<Language, Map<string, number>>();
+
+/**
+ * The safety measurement this whole feature needs before anything may
+ * accuse on it (AGENTS.md's gate): of every receiver call this session's
+ * `declared`/`external`/`type` mechanism actually *placed*, how often does
+ * an independent question -- `getSymbolAtLocation` on the method itself,
+ * not `getTypeAtLocation` on the receiver -- land somewhere else?
+ *
+ * Not fully independent, and said so rather than overclaimed: both the
+ * placement and this check ultimately ask the same compiler, so a shape
+ * neither one can see (the concrete class behind an interface-typed
+ * receiver, decided only at runtime) will not show up as WRONG here even
+ * though it is a real gap. What this *does* catch is everything else --
+ * a plumbing bug in this session's own node-finding or path conversion,
+ * an inherited method the receiver's declared type does not itself carry,
+ * an overload resolving to a different signature than the one assumed.
+ */
+interface PlacementTally { agreed: number; wrong: number; refused: number }
+const placementReferee = new Map<Language, PlacementTally>();
+interface PlacementWrong { tree: string; file: string; line: number; placed: string; referee: string }
+const placementWrongCases: PlacementWrong[] = [];
 
 /** Referee disagreement about how many call sites a body has. */
 interface Disagreement {
@@ -178,6 +308,33 @@ for (const tree of trees) {
     return { source, language, imports: imports(rel, source) };
   };
 
+  // Built once per tree, lazily per package inside it (see `createTsReferee`'s
+  // own doc) -- the same referee #226's tier-2 measurement uses, asked here
+  // as a resolver rather than as a check on a syntax-only answer.
+  let tsChecker: ReturnType<typeof createTsReferee> | undefined;
+  try { tsChecker = createTsReferee(tree); } catch { tsChecker = undefined; }
+  const resolveReceiver = (at: { start: number; end: number }, file: string, language: Language): ReceiverResolution | undefined => {
+    const tally = resolverAnswers.get(language) ?? { type: 0, declared: 0, external: 0, none: 0 };
+    resolverAnswers.set(language, tally);
+    const answer = tsChecker?.typeAt(file, at.start, at.end);
+    if (!answer || answer.head === "any" || answer.head === "unknown" || /error/i.test(answer.head)) {
+      tally.none += 1;
+      return undefined;
+    }
+    if (answer.declaringFile) {
+      if (isOutsideTree(answer.declaringFile, tree)) { tally.external += 1; return { kind: "external" }; }
+      // Repo-local, and the compiler already knows exactly which file --
+      // stronger than a name search, and it catches what one cannot: a
+      // receiver's type this file never imports by name at all, only the
+      // function that produced it.
+      const relDeclared = path.relative(tree, answer.declaringFile);
+      tally.declared += 1;
+      return { kind: "declared", file: relDeclared };
+    }
+    tally.type += 1;
+    return { kind: "type", name: answer.head };
+  };
+
   for (const file of sourceFiles(tree)) {
     const rel = path.relative(tree, file);
     const source = read(rel);
@@ -190,6 +347,38 @@ for (const tree of trees) {
     });
     if (!reading.read) { bump(refusedFiles, reading.why); continue; }
     bump(files, language);
+
+    if (TIER2_LANGUAGES.has(language)) {
+      const tier2Reading = callSitesIn({
+        file: rel, source, language, imports: imports(rel, source), open,
+        resolveReceiver: (at) => resolveReceiver(at, file, language),
+      });
+      if (tier2Reading.read) {
+        bumpClosure(
+          tier2Reading.bodies, language, bodiesTier2, closedTier2, calllessTier2, openTier2,
+          soleBlockerTier2, anyBlockerTier2, siteReasonTier2,
+        );
+        for (const body of tier2Reading.bodies) {
+          for (const site of body.sites) {
+            if (!site.receiver || !site.file || !site.memberAt) continue;
+            const refereeDecl = tsChecker?.symbolDeclarationAt(file, site.memberAt.start, site.memberAt.end);
+            const tally = placementReferee.get(language) ?? { agreed: 0, wrong: 0, refused: 0 };
+            placementReferee.set(language, tally);
+            if (!refereeDecl) { tally.refused += 1; continue; }
+            const refereeOutside = isOutsideTree(refereeDecl, tree);
+            const refereeRel = refereeOutside ? EXTERNAL_RECEIVER : path.relative(tree, refereeDecl);
+            if (refereeRel === site.file) { tally.agreed += 1; continue; }
+            tally.wrong += 1;
+            if (placementWrongCases.length < 30) {
+              placementWrongCases.push({
+                tree: path.basename(tree), file: rel, line: site.line,
+                placed: site.file, referee: refereeRel,
+              });
+            }
+          }
+        }
+      }
+    }
 
     /*
      * The referee's reading of the same file, indexed by routine name. A name
@@ -497,7 +686,157 @@ const bigBand = byBand.get("51+ lines");
 const smallBand = byBand.get("1-5 lines");
 const receiverSole = totalOf(soleBlocker, "receiver");
 
-console.log("6 · WHAT THIS ANSWERS");
+console.log("6 · TIER 2 (#226) -- does a real checker flip the ceiling section 1 found?");
+console.log();
+console.log("  ts/tsx/js only, and this run also asks *where* a resolved type is declared:");
+console.log("  a receiver whose type provably lives outside this tree (a language builtin,");
+console.log("  a `node_modules` package) is placed immediately, on the same footing as one");
+console.log("  the text names -- neither leaves the call's destination in doubt.");
+console.log();
+console.log("  The same reading, run a second time with a real compiler");
+console.log("  (`createTsReferee`, the checker resolving 97.8% of receivers -- quoted from #226");
+console.log("  and not measured by this run) wired in as the receiver resolver -- every");
+console.log("  `x.foo()` `placeOf` would otherwise give up on gets asked of the compiler");
+console.log("  before it is counted `receiver`.");
+console.log();
+const tsxLangs = [...TIER2_LANGUAGES];
+const baselineBodies = tsxLangs.reduce((sum, one) => sum + (bodies.get(one) ?? 0), 0);
+const baselineCallless = tsxLangs.reduce((sum, one) => sum + (callless.get(one) ?? 0), 0);
+const baselineClosed = tsxLangs.reduce((sum, one) => sum + (closed.get(one) ?? 0), 0);
+const baselineOpen = tsxLangs.reduce((sum, one) => sum + (open_.get(one) ?? 0), 0);
+const baselineWithCalls = baselineBodies - baselineCallless;
+const tier2Bodies = total(bodiesTier2);
+const tier2Callless = total(calllessTier2);
+const tier2Closed = total(closedTier2);
+const tier2Open = total(openTier2);
+const tier2WithCalls = tier2Bodies - tier2Callless;
+console.log("  " + "".padEnd(10) + "with calls".padStart(12) + "closed".padStart(8) + "  share");
+console.log("  " + "tier 1".padEnd(10) + String(baselineWithCalls).padStart(12)
+  + String(baselineClosed).padStart(8) + "  " + percent(baselineClosed, baselineWithCalls).padStart(8));
+console.log("  " + "tier 2".padEnd(10) + String(tier2WithCalls).padStart(12)
+  + String(tier2Closed).padStart(8) + "  " + percent(tier2Closed, tier2WithCalls).padStart(8));
+console.log();
+if (tier2Bodies !== baselineBodies) {
+  console.log(`  Population mismatch: tier 1 read ${baselineBodies} ts/tsx/js bodies, tier 2's`);
+  console.log(`  pass read ${tier2Bodies} -- a file the checker's own walk skipped or one added`);
+  console.log("  by a project's tsconfig `include`. Read as a caveat on the comparison above,");
+  console.log("  not as a second finding.");
+  console.log();
+}
+const receiverSoleTier2 = totalOf(soleBlockerTier2, "receiver");
+const receiverSoleBaseline = tsxLangs.reduce(
+  (sum, one) => sum + ((soleBlocker.get(one)?.get("receiver")) ?? 0), 0,
+);
+console.log(`  \`receiver\` as the sole blocker: ${receiverSoleBaseline} bodies at tier 1, `
+  + `${receiverSoleTier2} at tier 2`);
+console.log(`  (${percent(receiverSoleBaseline, baselineOpen).trim()} of open bodies, then `
+  + `${percent(receiverSoleTier2, tier2Open).trim()}). This is the number #221's`);
+console.log("  \"don't build it\" rested on, and the one the reaffirm note in");
+console.log("  `docs/claim-vocabulary.md` named as unmeasured until tier 2 existed.");
+console.log();
+console.log(`  But the closed share above only moved ${baselineClosed} -> ${tier2Closed}, `
+  + `+${tier2Closed - baselineClosed} bodies -- nowhere near`);
+console.log(`  the ${receiverSoleBaseline - receiverSoleTier2} bodies whose sole blocker stopped being \`receiver\`. Where did`);
+console.log("  the rest go? Every reason a resolved receiver can narrow into, same reading:");
+console.log();
+console.log("  " + "reason".padEnd(12) + "sole blocker".padStart(14) + "  of open"
+  + "present at all".padStart(16));
+const reasonNamesTier2 = [...new Set([
+  ...[...anyBlockerTier2.values()].flatMap((per) => [...per.keys()]),
+])].sort((a, b) => totalOf(soleBlockerTier2, b) - totalOf(soleBlockerTier2, a));
+for (const reason of reasonNamesTier2) {
+  console.log("  " + reason.padEnd(12)
+    + String(totalOf(soleBlockerTier2, reason)).padStart(14)
+    + "  " + percent(totalOf(soleBlockerTier2, reason), tier2Open).padStart(8)
+    + String(totalOf(anyBlockerTier2, reason)).padStart(16));
+}
+console.log();
+console.log("  Most of what used to land here is now placed immediately instead: a type");
+console.log("  whose own declaration the compiler can point to -- inside this tree");
+console.log("  (`declared`) or outside it (`external`) -- closes the call without a name");
+console.log("  match at all. What's left in `unbound`/`unplaced` is exactly the queries");
+console.log("  where the resolver could not get a declaring file at all (`type`, the");
+console.log("  fallback) plus the small remainder `placeName`'s own name search still");
+console.log("  could not close even with a repo-relative file in hand -- counted by what");
+console.log("  the resolver actually answered, not reconstructed after the fact:");
+console.log();
+console.log("  " + "language".padEnd(10) + "declared".padStart(10) + "external".padStart(10)
+  + "type (no file)".padStart(16) + "none".padStart(8));
+for (const language of ["ts", "tsx", "js"] as Language[]) {
+  const tally = resolverAnswers.get(language);
+  if (!tally) continue;
+  console.log("  " + language.padEnd(10) + String(tally.declared).padStart(10) + String(tally.external).padStart(10)
+    + String(tally.type).padStart(16) + String(tally.none).padStart(8));
+}
+console.log();
+console.log("  `type (no file)` is the honest ceiling on this whole approach: a union or a");
+console.log("  bare primitive has no single declaration for `getSymbol()` to return, so no");
+console.log("  amount of import-tracing or file-matching reaches it. Compared site-for-site,");
+console.log("  not body-against-query -- the mismatch an earlier session's check made:");
+console.log();
+const siteUnboundOrUnplaced = tsxLangs.reduce((sum, one) => {
+  const per = siteReasonTier2.get(one);
+  return sum + (per?.get("unbound") ?? 0) + (per?.get("unplaced") ?? 0);
+}, 0);
+const noFileOrNone = tsxLangs.reduce((sum, one) => {
+  const tally = resolverAnswers.get(one);
+  return sum + (tally?.type ?? 0) + (tally?.none ?? 0);
+}, 0);
+console.log(`  unbound + unplaced sites: ${siteUnboundOrUnplaced}`);
+console.log(`  type (no file) + none, same population: ${noFileOrNone}`);
+if (siteUnboundOrUnplaced <= noFileOrNone) {
+  console.log("  The site count is at or below the ceiling -- `declared`/`external` are not");
+  console.log("  leaving a further name-search gap behind them at any real size. What's left");
+  console.log("  is the structural residue this approach was never going to reach.");
+} else {
+  console.log(`  ${siteUnboundOrUnplaced - noFileOrNone} more sites are unbound/unplaced than the resolver's own`);
+  console.log("  ceiling accounts for -- a real remaining gap, worth a fixture and a fix");
+  console.log("  rather than accepting the number as final.");
+}
+console.log();
+
+console.log("7 · IS IT WRONG -- the gate AGENTS.md requires before anything may accuse on this");
+console.log();
+console.log("  Every closed-share and ceiling number above says how *much* this reads. This");
+console.log("  is the only section that asks how often it is *right*. For every receiver call");
+console.log("  this session's placement actually placed, a second, more direct question --");
+console.log("  what does the method itself (`getSymbolAtLocation` on `foo` in `x.foo()`)");
+console.log("  resolve to, not what kind of thing `x` is -- is asked of the same compiler and");
+console.log("  compared against what was placed.");
+console.log();
+console.log("  " + "language".padEnd(10) + "agreed".padStart(9) + "wrong".padStart(8)
+  + "refused".padStart(10) + "  wrong share");
+let placementAgreed = 0, placementWrong = 0, placementRefused = 0;
+for (const language of ["ts", "tsx", "js"] as Language[]) {
+  const tally = placementReferee.get(language);
+  if (!tally) continue;
+  placementAgreed += tally.agreed; placementWrong += tally.wrong; placementRefused += tally.refused;
+  const asked = tally.agreed + tally.wrong;
+  console.log("  " + language.padEnd(10) + String(tally.agreed).padStart(9) + String(tally.wrong).padStart(8)
+    + String(tally.refused).padStart(10) + "  " + percent(tally.wrong, asked).padStart(8));
+}
+console.log();
+if (placementWrongCases.length > 0) {
+  console.log(`  WRONG -- read every one before trusting this reader's placements: ${placementWrong}`);
+  for (const one of placementWrongCases.slice(0, cap(placementWrongCases.length))) {
+    console.log(`    ${one.tree}/${one.file}:${one.line} placed ${one.placed}, referee says ${one.referee}`);
+  }
+  if (placementWrong > placementWrongCases.length) {
+    console.log(`    ... and ${placementWrong - placementWrongCases.length} more`);
+  }
+  console.log();
+}
+console.log(`  ${placementWrong} wrong of ${placementAgreed + placementWrong} checked `
+  + `(${percent(placementWrong, placementAgreed + placementWrong).trim()}), ${placementRefused} the referee itself`);
+console.log("  could not answer (an overload, a computed member, a position it has no opinion");
+console.log("  on) and are not counted either way. Caveat that has to travel with this number:");
+console.log("  the placement and this check both ultimately ask the same compiler, so a shape");
+console.log("  neither can see -- the concrete class behind an interface-typed receiver,");
+console.log("  decided only at runtime -- would not show up as WRONG here even though it is a");
+console.log("  real gap. This catches plumbing bugs, not that specific blind spot.");
+console.log();
+
+console.log("8 · WHAT THIS ANSWERS");
 console.log();
 console.log(`  ${shut} of ${withCalls} bodies that call anything have a call set this reader can`);
 console.log(`  enumerate completely: ${percent(shut, withCalls).trim()}. That is the ceiling on how much of`);

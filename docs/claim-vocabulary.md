@@ -830,6 +830,10 @@ one word or one reader, not from reviewing the design.
     would be the same mistake item 9's zero warns against: reading an absence
     of evidence as evidence of absence.
 
+    **Run: see item 13.** Tier 2 exists now, the re-measurement is done, and
+    the recommendation held — for a different, structural reason than the one
+    that opened this question.
+
 12. **Tier 2's actual ceiling, measured: 97.8% (ts/tsx/js), and two harness bugs
     stood between that number and a wrong one.** Item 11 argued tier 2 was
     necessary from what tier 1 could not reach; nobody had asked a real
@@ -890,6 +894,138 @@ one word or one reader, not from reviewing the design.
     8192` (wired into the npm script) — one real `ts.Program` per package,
     built one or two at a time rather than all at once, still peaks well past
     Node's 2 GiB default on a package the size of one of `mundane`'s apps.
+
+13. **#221, re-measured with tier 2 actually wired in: reversed. 10.6% →
+    50.3%, and the first two readings on the way there were both wrong in a
+    checkable way, which is the reason this entry is longer than a number.**
+    Item 12's reaffirm note named the exact test this required: re-run
+    `measure:closed-bodies` with a real checker as the receiver resolver,
+    since `receiver` was 28.8% of what kept a body open and tier 2 resolves
+    97.8% of receivers. Three readings, each one found by checking the
+    previous one rather than trusting it:
+
+    **Reading one, 12.6%.** `calls.ts` gained `CallSide.resolveReceiver`,
+    consulted at `placeOf`'s `receiver` dead ends; a resolved type was placed
+    exactly as a bare name would be — declared here, imported and traced, or
+    `unbound`. `receiver` as sole blocker fell from 1,255 bodies to 46, and
+    only 51 bodies actually closed. Read as "the closed-body question was
+    never really asking what tier 2 answers" — a type needs to be placed
+    *to a file*, and a name search over one file's own text was never going
+    to place `Array`, `Promise`, or a package never imported by that literal
+    name at that call.
+
+    **Reading two, 43.4% → 44.7%.** That framing conflated two different
+    dead ends under one word. `getSymbol()` on a resolved type gives the
+    compiler's own answer to *where it is declared* — a question a name
+    search never asked. `ReceiverResolution` gained `{ kind: "external" }`
+    (declared outside the tree — closes the call on the spot, no name match:
+    a call that provably lands outside the repository provably is not any
+    repo routine) and `{ kind: "declared"; file }` (declared *inside* the
+    tree, at a file the compiler names directly — closes what a name search
+    structurally cannot: `const x = make(); x.run()` binds no name to `x`'s
+    real type anywhere in the file's own text, only to `make`, the function
+    that produced it).
+
+    **Reading three, 50.3%, and checked closed.** A per-*query* tally
+    (`resolverAnswers`) counted what the resolver actually answered —
+    `declared`/`external`/`type`(no file)/`none` — against a matching
+    per-*site* reason count, restricted to receiver sites only
+    (`CallSitePlaced.receiver`, added because comparing a query count against
+    a body count, and later against a site count that silently included bare
+    unimported calls, produced two more wrong-looking gaps before this one
+    held up). That check found a real bug: `placeOf` only asked the resolver
+    at two of the four points a `through` callee could dead-end at. Whenever
+    the receiver's own bare name happened to *also* match something in
+    `bindings.imported` — ambiguous, an unresolved specifier, a re-export
+    chain that ran out of road — the reader tried to place the name as a
+    *namespace* first and, on failure, gave up without ever asking what the
+    receiver's *value* actually was. Fixed at all three points; confirmed by
+    the same tally afterward: **1,646 remaining receiver sites, at or under
+    the 2,076-site structural ceiling** (`type`-with-no-declaring-file plus
+    no answer at all) — the check that closes the loop, not a second guess.
+
+    Two things stayed genuinely unreachable, both structural rather than a
+    reader gap: a union or bare primitive has no single declaration for
+    `getSymbol()` to return (`string`, `Node | null`), and `js` resolves
+    nothing new at all (`checkJs` is off, unchanged from item 12).
+
+    #221's "don't build it" is **reversed**: half of ts/tsx/js bodies that
+    call anything now have a call set this reader can enumerate completely,
+    against 10.6% reading text alone. Whether that is worth turning into an
+    actual `@calls`-refutes-absence word is a separate decision — it still
+    needs the licence grid (#209), a per-language measurement of how often
+    *this* reader is wrong, and #217's other two shapes (altitude, label
+    contradiction) are untouched by any of this — but the ceiling itself is
+    no longer "real and nearly empty."
+
+14. **Item 13's reversal, checked against AGENTS.md's own gate: 0.7% wrong,
+    and two of the bugs that measurement found were in this session's own
+    code, not in a hazard nobody anticipated.** "50.3% closed" says how much
+    of ts/tsx/js the mechanism reads. Nothing yet said how often it is
+    right, and AGENTS.md's rule is exact: nothing new may say *wrong* until
+    that number exists, from a referee sharing no machinery with the reader.
+    (One of the two fixes below moved the closed share itself, slightly:
+    **49.6%**, 10.3% at tier 1, after both are applied — a more honest
+    number than item 13's, not a different one; the shape of the finding is
+    unchanged.)
+
+    The check: `calls.ts` gained a second field per receiver site,
+    `memberAt` -- the method's own byte range (`foo` in `x.foo()`), not the
+    receiver's (`x`). For every call `declared`/`external`/`type` actually
+    placed, `symbolDeclarationAt` asks the same compiler a more direct
+    question -- `getSymbolAtLocation` on the method itself, the call a real
+    "go to definition" makes -- and the two answers are compared.
+
+    First run: **2.5% wrong** (227 of 9,092), almost all one shape:
+    `PUNCTUATION.has(entry.type)` -- `PUNCTUATION`, a `Set` genuinely
+    *imported by name* into the file -- placed at `PUNCTUATION`'s own file,
+    `engine/rust.ts`. The mechanism: `bindings.imported` already marks an
+    import `namespace: true`/`false` (`import * as x` against `import { x
+    }`), and `placeOf`'s pre-existing name-search branch never checked it --
+    any receiver whose bare name happened to be imported at all was tried as
+    a *namespace* first (`ns.foo()`: is `foo` declared in `ns`'s file?),
+    permissively answering "probably" when the target file had no wildcard
+    export to rule it out. Right for a real namespace import; never
+    consulted a resolver at all for an ordinary named one used as a value.
+    Fixed by skipping straight to the resolver whenever `through` names a
+    plain (non-namespace) import — a bug in the reader `calls.ts` already
+    had, exposed rather than created by giving receivers a resolver to fall
+    back to.
+
+    Second run: **0.8%** (75 of 9,092). Remaining shape:
+    `row.bucket.padEnd(10)` -- `row.bucket`'s type is a string-literal union
+    (`type Bucket = "a" | "b" | ...`) declared in one file; `typeAt`'s
+    `declaringFile` fell back to `type.aliasSymbol` when `getSymbol()` found
+    nothing, which for a union answers with the *alias's own* declaration
+    site -- true about where `Bucket` is written, false about where a value
+    of that type lives once its calls resolve straight through to
+    `String.prototype`. Fixed by dropping the `aliasSymbol` fallback for
+    `declaringFile` entirely -- a type alias's declaration is not evidence
+    about what a value of that type's *methods* resolve to, only about
+    where the alias itself happens to be spelled.
+
+    Third run, after both fixes: **0.7%** (62 of 8,964) -- ts alone at
+    **0.1%** (8 of 7,423), tsx at 3.5% (54 of 1,541), concentrated almost
+    entirely in one third-party menu component library's own internal
+    generic store pattern in one test tree (`mundane`'s `ListboxStore`), not
+    spread across the corpus. For comparison, the number this repo already
+    shipped a word on: item 12's tier-1 resolver measured 1.1–2.0% wrong on
+    TypeScript before any of this. This mechanism is now measured *below*
+    an already-accepted bar, not merely "seems fine."
+
+    The honest limit stays honest rather than getting explained away: this
+    referee asks the *same compiler* the reader does, at a *more specific*
+    position, so it catches wrong plumbing and wrong node-finding, but a
+    receiver whose declared type is an interface or a generic wrapper, where
+    the concrete implementation is decided by something the type system
+    itself cannot see, would agree with the reader's mistake rather than
+    catch it. `mundane`'s remaining tsx cases are exactly this shape --
+    `use-listbox-item.ts` reached through a type declared as
+    `use-popup-menu-item.ts`'s own hook -- and no compiler-based referee
+    closes that gap, because the reader and the referee share the one
+    limitation neither can see past. Named rather than measured away: the
+    number above is a floor on how wrong this is, not a ceiling on how
+    right.
 
 `renders` was also raised as a possible missing relation and turned out not to
 be one: `<MenuContent />` is a routine making a MenuContent, which is `@builds`.
