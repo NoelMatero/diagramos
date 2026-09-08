@@ -99,3 +99,57 @@ describe("createTsReferee against a monorepo", () => {
     expect(bAnswer?.head).toBe("FromB");
   });
 });
+
+/**
+ * `concrete` (#233): whether a resolved type's first declaration is a class
+ * a `callsBetween` closed-body accusation may actually rest on, or an
+ * interface/abstract class/type parameter where the method reached at
+ * runtime can live on a different class than the one named. Every existing
+ * test of the guard (`tests/engine-calls.test.ts`) supplies `concrete` as a
+ * mock boolean and checks that `closedBodyRefutes` respects it -- none of
+ * them exercise `isConcreteDeclaration` itself against a real compiler,
+ * which is the one function this whole safety property rests on.
+ */
+describe("createTsReferee's concrete field", () => {
+  it("is true for an ordinary class", () => {
+    const source = "class Foo {\n  run(): void {}\n}\nconst f = new Foo();\nf.run();\n";
+    write("a.ts", source);
+    const referee = createTsReferee(repo);
+    const { start } = rangeOf(source, "f.run()");
+    const answer = referee.typeAt(path.join(repo, "a.ts"), start, start + 1);
+    expect(answer?.head).toBe("Foo");
+    expect(answer?.concrete).toBe(true);
+  });
+
+  it("is false for an interface -- the shape the guard exists for", () => {
+    const source =
+      "interface Foo {\n  run(): void;\n}\nfunction use(f: Foo) {\n  f.run();\n}\n";
+    write("a.ts", source);
+    const referee = createTsReferee(repo);
+    const { start } = rangeOf(source, "f.run()");
+    const answer = referee.typeAt(path.join(repo, "a.ts"), start, start + 1);
+    expect(answer?.head).toBe("Foo");
+    expect(answer?.concrete).toBe(false);
+  });
+
+  it("is false for an abstract class", () => {
+    const source =
+      "abstract class Foo {\n  abstract run(): void;\n}\nfunction use(f: Foo) {\n  f.run();\n}\n";
+    write("a.ts", source);
+    const referee = createTsReferee(repo);
+    const { start } = rangeOf(source, "f.run()");
+    const answer = referee.typeAt(path.join(repo, "a.ts"), start, start + 1);
+    expect(answer?.head).toBe("Foo");
+    expect(answer?.concrete).toBe(false);
+  });
+
+  it("is false for a bare type parameter", () => {
+    const source =
+      "function use<T extends { run(): void }>(f: T) {\n  f.run();\n}\n";
+    write("a.ts", source);
+    const referee = createTsReferee(repo);
+    const { start } = rangeOf(source, "f.run()");
+    const answer = referee.typeAt(path.join(repo, "a.ts"), start, start + 1);
+    expect(answer?.concrete).toBe(false);
+  });
+});
