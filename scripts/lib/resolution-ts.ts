@@ -240,11 +240,43 @@ function programFrom(configPath: string | undefined, fallbackFiles: string[]): t
  * binding it against everything its own `node_modules` pulls in -- is what
  * turned this measurement's first real monorepo run (`mundane`, 22 packages)
  * into an out-of-memory crash the moment it had real dependencies installed.
- * `typeAt`'s own callers ask about one package's receivers together before
- * moving to the next -- the same locality the directory walk that grouped
- * these files already has -- so a cache of two is enough to keep the common
- * case fast without ever holding the whole monorepo's checkers in memory at
- * once.
+ *
+ * ## The cache, and why it grew past two (#234)
+ *
+ * `typeAt`'s own callers usually ask about one package's receivers together
+ * before moving to the next, which is the locality a cache of two was sized
+ * for. A live `@calls` check does not: `mundane` alone has 23 packages, and
+ * measured cold, spreading 24 queries across the tree the way a diagram
+ * spanning several packages would cost **~10 seconds**, almost all of it
+ * repeatedly building and discarding programs the cache had already built
+ * once and evicted before the next query needed it back. `PROGRAM_CACHE_SIZE`
+ * is bigger for exactly that reason -- large enough to hold a realistic
+ * repository's packages at once, not so large that a pathological one (a
+ * true monorepo of hundreds) holds every checker in memory forever.
+ *
+ * ## Staying correct while staying warm
+ *
+ * A cached program answers questions about the source text as it stood the
+ * moment the program was built, and a long-lived caller keeps asking after
+ * that text has changed -- editing is the whole point of an editor. Silently
+ * answering from stale text is worse than being slow (a wrong answer nobody
+ * can see is wrong), so every `programFor` call re-verifies a cache hit
+ * before trusting it: `mtimeMs` on every one of that program's own in-tree
+ * source files, checked against the snapshot taken when it was built. A
+ * `node_modules` file is left out of the snapshot on purpose -- it does not
+ * change without a reinstall, which invalidates far more than one cached
+ * program and is not this cache's job to detect -- so the check stays cheap:
+ * a `stat` per file the program actually declares, not a reparse of any of
+ * them, which is what makes it worth doing on every query rather than on a
+ * timer or a filesystem watch. TypeScript's own incremental/watch APIs
+ * (`ts.createWatchProgram`) were the first thing checked instead of building
+ * this: they buy correct, efficient re-binding of only what changed, at the
+ * cost of a live OS-level file watch per program that a one-shot CLI
+ * invocation would have to tear down cleanly before it could exit, for a
+ * problem this cache does not have yet -- nothing here keeps a process
+ * alive on its own. Worth revisiting if a persistent caller (the MCP
+ * server) ever holds one of these across many edits without exiting
+ * between them.
  */
 export function createTsReferee(root: string): TsReferee {
   const files = sourceFiles(root);
@@ -260,18 +292,56 @@ export function createTsReferee(root: string): TsReferee {
     filesByConfig.set(config, list);
   }
 
-  const PROGRAM_CACHE_SIZE = 2;
-  const programCache = new Map<string, { program: ts.Program; checker: ts.TypeChecker }>();
+  const PROGRAM_CACHE_SIZE = 24;
+  interface CachedProgram {
+    program: ts.Program;
+    checker: ts.TypeChecker;
+    /** `mtimeMs` of every in-tree file this program was built from, at build time. */
+    snapshot: Map<string, number>;
+  }
+  const programCache = new Map<string, CachedProgram>();
+
+  /** The in-tree files a built program actually declares, `node_modules` left out. */
+  function snapshotOf(program: ts.Program): Map<string, number> {
+    const snapshot = new Map<string, number>();
+    for (const sourceFile of program.getSourceFiles()) {
+      const fileName = sourceFile.fileName;
+      if (isOutsideTree(fileName, root)) continue;
+      try {
+        snapshot.set(fileName, statSync(fileName).mtimeMs);
+      } catch {
+        // Deleted between the walk and now: absence itself is the signal a
+        // fresh build would also see, so it is left out rather than guessed at.
+      }
+    }
+    return snapshot;
+  }
+
+  /** Whether every file a cached program was built from still reads the way it did then. */
+  function stillFresh(snapshot: Map<string, number>): boolean {
+    for (const [fileName, mtimeMs] of snapshot) {
+      try {
+        if (statSync(fileName).mtimeMs !== mtimeMs) return false;
+      } catch {
+        return false; // deleted since the program was built
+      }
+    }
+    return true;
+  }
+
+  function build(configPath: string): CachedProgram {
+    const program = programFrom(configPath || undefined, filesByConfig.get(configPath) ?? []);
+    return { program, checker: program.getTypeChecker(), snapshot: snapshotOf(program) };
+  }
 
   function programFor(configPath: string): { program: ts.Program; checker: ts.TypeChecker } {
     const cached = programCache.get(configPath);
-    if (cached) {
+    if (cached && stillFresh(cached.snapshot)) {
       programCache.delete(configPath); // re-insert to mark most-recently-used
       programCache.set(configPath, cached);
       return cached;
     }
-    const program = programFrom(configPath || undefined, filesByConfig.get(configPath) ?? []);
-    const entry = { program, checker: program.getTypeChecker() };
+    const entry = build(configPath);
     programCache.set(configPath, entry);
     if (programCache.size > PROGRAM_CACHE_SIZE) {
       const oldest = programCache.keys().next().value;

@@ -9,7 +9,7 @@
  * alias resolves when its config is one level down, and two sibling packages
  * each get their own answer rather than one bleeding into the other.
  */
-import { mkdirSync, mkdtempSync, rmSync, writeFileSync } from "node:fs";
+import { mkdirSync, mkdtempSync, rmSync, utimesSync, writeFileSync } from "node:fs";
 import os from "node:os";
 import path from "node:path";
 
@@ -151,5 +151,50 @@ describe("createTsReferee's concrete field", () => {
     const { start } = rangeOf(source, "f.run()");
     const answer = referee.typeAt(path.join(repo, "a.ts"), start, start + 1);
     expect(answer?.concrete).toBe(false);
+  });
+});
+
+/**
+ * The one thing #234 must never regress: a `createTsReferee` instance kept
+ * alive across calls -- the whole point of #234's cache -- has to answer a
+ * later query about edited source with the edit, not with whatever it
+ * learned the first time it built a program for that file. A cache that
+ * stays warm by staying wrong is a worse failure than the slowness it
+ * replaced (docs/claim-vocabulary.md's own argument, one level up: a false
+ * answer nobody can see is not recoverable by being fast).
+ *
+ * `foo.ts` is edited here, not `a.ts` -- the file the query is actually
+ * asked about never changes. This is the harder, more honest version of the
+ * test: it is not enough for the cache to notice the one file it was just
+ * asked about changed, because `a`'s receiver's *type* lives in a file nowhere
+ * near the query's own byte range. The whole program `a.ts` was built inside
+ * has to be checked, not just `a.ts` itself.
+ */
+describe("a cached program invalidates when a file it was built from changes (#234)", () => {
+  it("answers a later query about the edit, not about what the file used to say", () => {
+    write("foo.ts", "export class Foo {\n  run(): void {}\n}\n");
+    const source = 'import { Foo } from "./foo";\nfunction use(f: Foo) {\n  f.run();\n}\n';
+    write("a.ts", source);
+
+    // One referee, kept alive across both queries -- a fresh one per query
+    // would trivially "pass" this by never having a stale answer to give.
+    const referee = createTsReferee(repo);
+    const { start } = rangeOf(source, "f.run()");
+    const before = referee.typeAt(path.join(repo, "a.ts"), start, start + 1);
+    expect(before?.concrete).toBe(true);
+
+    // `foo.ts` changes from a class to an interface -- `a.ts` itself is
+    // untouched, and its own mtime does not move.
+    write("foo.ts", "export interface Foo {\n  run(): void;\n}\n");
+    // Forced forward rather than trusted to the filesystem's own clock: some
+    // filesystems only carry mtime to the nearest second, and a real edit a
+    // person makes is not reliably a full second apart from the read before
+    // it. The cache's own freshness check reads real mtimes either way; only
+    // the fixture's clock is being made deterministic here.
+    const bumped = new Date(Date.now() + 60_000);
+    utimesSync(path.join(repo, "foo.ts"), bumped, bumped);
+
+    const after = referee.typeAt(path.join(repo, "a.ts"), start, start + 1);
+    expect(after?.concrete).toBe(false);
   });
 });
