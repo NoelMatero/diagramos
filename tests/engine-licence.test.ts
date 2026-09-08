@@ -399,6 +399,12 @@ describe("which words may accuse, and in which languages", () => {
     for (const licence of LICENCES) {
       for (const relation of ACCUSING_RELATIONS) {
         expect(licence.relations[relation], `${licence.language}.${relation}`).toBeDefined();
+        // #231's second axis: a word may leave `absence` unmeasured, but
+        // never undefined -- the same rule `relation` itself is held to.
+        expect(licence.relations[relation].presence, `${licence.language}.${relation}.presence`)
+          .toBeDefined();
+        expect(licence.relations[relation].absence, `${licence.language}.${relation}.absence`)
+          .toBeDefined();
       }
     }
   });
@@ -443,15 +449,17 @@ describe("which words may accuse, and in which languages", () => {
      */
     for (const relation of ACCUSING_RELATIONS) {
       for (const language of LANGUAGES) {
-        const row = relationLicence(relation, language);
-        if (!row || !isMeasured(row) || row.counts === "corpus") continue;
-        const where = `${relation} in ${language}`;
-        if (row.counts.missed === 0) {
-          expect(row.known, `${where} explains misses it does not have`).toBeUndefined();
-          continue;
+        for (const axis of ["presence", "absence"] as const) {
+          const row = relationLicence(relation, language, axis);
+          if (!row || !isMeasured(row) || row.counts === "corpus") continue;
+          const where = `${relation}/${axis} in ${language}`;
+          if (row.counts.missed === 0) {
+            expect(row.known, `${where} explains misses it does not have`).toBeUndefined();
+            continue;
+          }
+          expect(row.known ?? [], `${where} misses ${row.counts.missed} and says why`)
+            .not.toHaveLength(0);
         }
-        expect(row.known ?? [], `${where} misses ${row.counts.missed} and says why`)
-          .not.toHaveLength(0);
       }
     }
   });
@@ -533,6 +541,48 @@ describe("which words may accuse, and in which languages", () => {
     // The licence is a measurement, not a list of languages somebody liked.
     expect(licenceFor("src/main.go")).toBeUndefined();
     expect(licenceFor("src/Main.java")).toBeUndefined();
+  });
+});
+
+describe("the licence's second axis (#231)", () => {
+  it("gives @calls a closed-body absence licence in ts/tsx only", () => {
+    // Item 12-14's numbers: a tier-2 compiler resolver can close a body's
+    // whole call set, so "not among them" is provable rather than a guess --
+    // for TypeScript and TSX. `js` stays excluded: `checkJs` is off, so tier 2
+    // resolves almost nothing there, by scope decision rather than oversight.
+    expect(mayAccuse("calls", "ts", "absence")).toBe(true);
+    expect(mayAccuse("calls", "tsx", "absence")).toBe(true);
+    expect(mayAccuse("calls", "js", "absence")).toBe(false);
+    expect(mayAccuse("calls", "rust", "absence")).toBe(false);
+    expect(mayAccuse("calls", "python", "absence")).toBe(false);
+  });
+
+  it("leaves every other word's absence axis unmeasured, everywhere", () => {
+    // Only @calls has an analogous closed-region reader. Every other square
+    // on this axis is a stated absence of a measurement, not a silent yes.
+    for (const relation of ACCUSING_RELATIONS.filter((one) => one !== "calls")) {
+      for (const language of LANGUAGES) {
+        expect(mayAccuse(relation, language, "absence"), `${relation} in ${language}`)
+          .toBe(false);
+        const row = relationLicence(relation, language, "absence");
+        expect(row && !isMeasured(row), `${relation} in ${language}`).toBe(true);
+      }
+    }
+  });
+
+  it("does not change what any existing caller already gets", () => {
+    // #231's whole point: the axis is additive. Every call site in the engine
+    // passes two arguments, and the third has to default to today's behaviour.
+    for (const relation of ACCUSING_RELATIONS) {
+      for (const language of LANGUAGES) {
+        expect(mayAccuse(relation, language)).toBe(mayAccuse(relation, language, "presence"));
+      }
+    }
+  });
+
+  it("reads the 0.7% wrong-rate number off the licence rather than a copy", () => {
+    // docs/claim-vocabulary.md item 14's final figure, formalized here.
+    expect(relationTotals("calls", "ts", "absence")).toEqual({ asked: 8964, missed: 62 });
   });
 });
 

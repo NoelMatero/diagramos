@@ -242,7 +242,9 @@ function printGrid(): void {
   for (const relation of ACCUSING_RELATIONS) {
     for (const licence of LICENCES) {
       if (only && licence.language !== only) continue;
-      const row = licence.relations[relation];
+      // The presence axis, which is the grid this report has always printed
+      // (#231 added a second, absence, axis that only `@calls` uses so far).
+      const row = licence.relations[relation].presence;
       const head = relation.padEnd(9) + licence.language.padEnd(12);
       if (!isMeasured(row)) {
         console.log(head + "—".padStart(8) + "—".padStart(8) + "—".padStart(10)
