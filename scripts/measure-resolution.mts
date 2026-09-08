@@ -410,7 +410,7 @@ for (const tree of trees) {
             pyLspSafety.agree += 1;
           } else {
             pyLspSafety.disagree += 1;
-            if (pyDisagreements.length < 50) {
+            if (showAll || pyDisagreements.length < 50) {
               pyDisagreements.push({ tree: path.basename(tree), file: site.file, line: site.line, method: site.method, typeSaid, methodSaid });
             }
           }

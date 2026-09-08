@@ -19,7 +19,7 @@ import path from "node:path";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
 
 import {
-  createPyrightLspReferee, isOutsideTree, memberRangeAfter, type PyrightLspReferee,
+  createPyrightLspReferee, isOutsideTree, memberRangeAfter, typeAnchorFor, type PyrightLspReferee,
 } from "../scripts/lib/resolution-python-lsp";
 
 function write(root: string, relative: string, contents: string): void {
@@ -43,16 +43,43 @@ describe("createPyrightLspReferee", () => {
 
   beforeAll(async () => {
     repo = mkdtempSync(path.join(os.tmpdir(), "resolution-python-lsp-"));
-    write(repo, "pkg/decl.py", "class Config:\n    def load(self) -> \"Config\":\n        return self\n");
+    write(
+      repo,
+      "pkg/decl.py",
+      "class Config:\n    def load(self) -> \"Config\":\n        return self\n\n"
+      + "class Builder:\n"
+      + "    def step(self) -> \"Builder\":\n"
+      + "        return self\n"
+      + "    def finish(self) -> Config:\n"
+      + "        return Config()\n",
+    );
     useSource =
-      "from pkg.decl import Config\n\n"
+      "from pkg.decl import Builder, Config\n\n"
       + "def make() -> Config:\n"
       + "    c = Config()\n"
       + "    r = c.load()\n"
       + "    s = \"hello\".upper()\n"
       + "    return r\n\n"
       + "def take_str(w: str) -> None:\n"
-      + "    w.upper()\n";
+      + "    w.upper()\n\n"
+      // `self.cache` here is what item 17's real bug looked like: the
+      // receiver is a field, not a plain name, and its declared type
+      // (Config, in pkg/decl.py) is not the class this method lives on
+      // (Holder, right here in pkg/use.py).
+      + "class Holder:\n"
+      + "    def __init__(self) -> None:\n"
+      + "        self.cache: Config = Config()\n"
+      + "    def use_field(self) -> None:\n"
+      + "        self.cache.load()\n\n"
+      // The exact shape #235's own measurement found wrong on infrarouter:
+      // a multi-call chain where the receiver for the *last* call spans
+      // everything before it, and the first token of that range (`self`)
+      // is not what the chain evaluates to.
+      + "class Runner:\n"
+      + "    def _make(self) -> Builder:\n"
+      + "        return Builder()\n"
+      + "    def run(self) -> Config:\n"
+      + "        return self._make().step().finish()\n";
     write(repo, "pkg/use.py", useSource);
     useFile = path.join(repo, "pkg/use.py");
 
@@ -105,6 +132,63 @@ describe("createPyrightLspReferee", () => {
     const { start } = rangeOf(useSource, "return r");
     const declaring = await referee.typeDeclarationAt(useFile, useSource, start, start + 1);
     expect(declaring).toBeUndefined();
+  });
+
+  /**
+   * #235's own bug, found by a real disagreement rather than by reading the
+   * grammar first: `typeDeclarationAt` used to ask about `[start, end)`'s
+   * *first* character, which is the right token for a plain name but the
+   * *wrong* one for a field (`self.cache` -- `self`, not `cache`) or a chain
+   * (`self._make().step()` -- `self`, not what `.step()` actually returns).
+   * `typeAnchorFor` fixed it by anchoring on the range's *last* identifier
+   * instead. These two tests are the shapes that found the bug.
+   */
+  it("typeDeclarationAt on a field receiver follows the field's own type, not the enclosing class", async () => {
+    const { start, end } = rangeOf(useSource, "self.cache");
+    const declaring = await referee.typeDeclarationAt(useFile, useSource, start, end);
+    // Before the fix this returned `useFile` -- `self`'s own type, Holder,
+    // declared right here -- instead of Config's file.
+    expect(declaring && path.relative(repo, declaring)).toBe(path.join("pkg", "decl.py"));
+  });
+
+  it("typeDeclarationAt on a chained call's receiver follows the chain's actual type, not the enclosing method's `self`", async () => {
+    const { start, end } = rangeOf(useSource, "self._make().step()");
+    const declaring = await referee.typeDeclarationAt(useFile, useSource, start, end);
+    // Before the fix this returned `useFile` -- `self`'s own type, Runner --
+    // instead of following `.step()` to where it (and Builder) are declared.
+    expect(declaring && path.relative(repo, declaring)).toBe(path.join("pkg", "decl.py"));
+  });
+});
+
+describe("typeAnchorFor", () => {
+  it("anchors a plain name on itself", () => {
+    const source = "x.foo()";
+    const range = typeAnchorFor(source, 0, 1);
+    expect(range && source.slice(range.start, range.end)).toBe("x");
+  });
+
+  it("anchors a field access on the field, not the object it's read off of", () => {
+    const source = "self.cache";
+    const range = typeAnchorFor(source, 0, source.length);
+    expect(range && source.slice(range.start, range.end)).toBe("cache");
+  });
+
+  it("anchors a call chain on its last callee name, past the matching parens", () => {
+    const source = "self._make().step()";
+    const range = typeAnchorFor(source, 0, source.length);
+    expect(range && source.slice(range.start, range.end)).toBe("step");
+  });
+
+  it("withholds rather than guessing when the range ends in a subscript", () => {
+    const source = "table[key]";
+    expect(typeAnchorFor(source, 0, source.length)).toBeUndefined();
+  });
+
+  it("withholds rather than guessing on unbalanced brackets", () => {
+    // Ends in `)` with no matching `(` inside the range -- an extra close
+    // paren, the shape the depth count is there to catch.
+    const source = "foo(bar))";
+    expect(typeAnchorFor(source, 0, source.length)).toBeUndefined();
   });
 });
 

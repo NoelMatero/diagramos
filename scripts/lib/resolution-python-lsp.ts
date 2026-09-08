@@ -124,6 +124,65 @@ export function memberRangeAfter(
   return { start: i, end: i + method.length };
 }
 
+/**
+ * Where within `[start, end)` to actually put the cursor for a
+ * `typeDefinition` question about "the type of this whole expression" --
+ * found the hard way, by a real disagreement `measure:resolution` printed
+ * rather than by reasoning about the grammar first.
+ *
+ * LSP has no "ask about this exact node" request the way `resolution-ts.ts`'s
+ * `checker.getTypeAtLocation(node)` does; every position-based request finds
+ * the *smallest* node touching that position and answers about that. For a
+ * plain name (`x` in `x.foo()`) `[start, end)` already bounds exactly one
+ * token, so asking anywhere in it is asking about the right thing. It is not
+ * for a "not-a-name" receiver `resolveReceiversIn` still hands over un-gated
+ * (`self.cache`, or a whole chain like `self._market(...).expect(...)`) --
+ * `start` there is the *first* token, `self`, and asking there answers a
+ * different, smaller question: what `self` is, not what the receiver
+ * expression evaluates to. On `infrarouter`'s own corpus this placed a
+ * chained builder call's type at the *test file doing the chaining* rather
+ * than the harness class actually returned, a wrong answer with a name
+ * plausible enough to read as a real disagreement rather than a placement
+ * bug -- until `expect`'s own position, asked instead of `self`'s, agreed
+ * with the independent `methodDeclarationAt` answer exactly.
+ *
+ * The fix generalises: whatever this range evaluates to is decided by its
+ * *last* operation, so the anchor is the last call's callee name (working
+ * backward past one matching `(...)`) or, with no trailing call, the last
+ * attribute name in the chain (`cache` in `self.cache`, not `self`).
+ * Undefined -- withheld, not guessed at, `memberRangeAfter`'s own stance --
+ * for a subscript (`x[i]`, where the element type is not this scan's to
+ * name) or unbalanced brackets it cannot place confidently.
+ */
+export function typeAnchorFor(
+  source: string,
+  start: number,
+  end: number,
+): { start: number; end: number } | undefined {
+  let i = end;
+  if (i > start && (source[i - 1] === ")" || source[i - 1] === "]")) {
+    const close = source[i - 1];
+    const open = close === ")" ? "(" : "[";
+    let depth = 0;
+    let j = i - 1;
+    for (; j >= start; j--) {
+      if (source[j] === close) depth++;
+      else if (source[j] === open) {
+        depth--;
+        if (depth === 0) break;
+      }
+    }
+    if (depth !== 0 || j < start) return undefined; // unbalanced -- withhold.
+    if (close === "]") return undefined; // a subscript's element type isn't this callee's name.
+    i = j; // the matching opening `(`.
+  }
+  while (i > start && /\s/.test(source[i - 1]!)) i--;
+  const idEnd = i;
+  while (i > start && /[A-Za-z0-9_]/.test(source[i - 1]!)) i--;
+  if (i === idEnd) return undefined; // nothing identifier-shaped immediately before it.
+  return { start: i, end: idEnd };
+}
+
 export interface PyrightLspReferee {
   /** `textDocument/typeDefinition` at `[start, end)` -- where the *type* of that expression is declared. */
   typeDeclarationAt(file: string, source: string, start: number, end: number): Promise<string | undefined>;
@@ -270,10 +329,15 @@ export async function createPyrightLspReferee(root: string): Promise<PyrightLspR
   }
 
   return {
-    // `end` is unused -- an LSP position is a single point -- kept on the
-    // public signature so callers pass the same `{ start, end }` range
-    // `resolution-ts.ts`'s `typeAt`/`symbolDeclarationAt` already take.
-    typeDeclarationAt: (file, source, start) => ask("typeDefinition", file, source, start, STEADY_RETRY_MS),
+    // `typeAnchorFor` is the reason `end` matters here: `[start, end)` can
+    // span an entire expression (a chain, `self.cache`), and only its last
+    // token says what the whole thing evaluates to. `methodDeclarationAt`
+    // takes no such range -- its caller already hands over the method
+    // name's own exact position via `memberRangeAfter`.
+    typeDeclarationAt: (file, source, start, end) => {
+      const anchor = typeAnchorFor(source, start, end);
+      return anchor ? ask("typeDefinition", file, source, anchor.start, STEADY_RETRY_MS) : Promise.resolve(undefined);
+    },
     methodDeclarationAt: (file, source, start) => ask("definition", file, source, start, STEADY_RETRY_MS),
     warmUp: (file, source, start) => ask("typeDefinition", file, source, start, WARMUP_RETRY_MS).then(() => {}),
     close: () => {
