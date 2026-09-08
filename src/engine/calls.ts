@@ -158,6 +158,25 @@ export interface CallsEvidence {
   wrote: string;
 }
 
+/**
+ * Why a `refuted` verdict is entitled to say wrong, in place of the one
+ * routine's worth of evidence `backwards` quotes (#233).
+ *
+ * There is no single call to point at -- the accusation rests on an absence
+ * of one across every call the routine makes, which is the opposite shape of
+ * evidence from `CallsEvidence`. `sites` is what a report shows in its place:
+ * how much was actually checked, so "not among them" reads as a count rather
+ * than an assertion.
+ */
+export interface CallsRefutedEvidence {
+  /** The routine whose entire call set was enumerated and found closed. */
+  routine: string;
+  /** 1-based line the routine opens on. */
+  line: number;
+  /** Every call the routine makes, checked and placed somewhere else. */
+  sites: number;
+}
+
 export type CallsVerdict =
   /** The tail calls the routine the arrow points at. */
   | { verdict: "confirmed"; evidence: CallsEvidence }
@@ -166,6 +185,16 @@ export type CallsVerdict =
    * tail. The arrow is backwards.
    */
   | { verdict: "backwards"; evidence: CallsEvidence }
+  /**
+   * Every call the tail's routine makes was enumerated, resolved, and none of
+   * them reaches the head -- a closed-body absence (#233), licensed
+   * separately from `backwards` and resting on a different reader
+   * (`callSitesIn`'s tier-2 resolver, docs/claim-vocabulary.md items 12-14).
+   * `absent` below is still the answer everywhere this licence does not
+   * apply; this is not a replacement for it, only a second way to earn the
+   * same "wrong".
+   */
+  | { verdict: "refuted"; evidence: CallsRefutedEvidence }
   /**
    * Neither end calls the other, as far as the text shows.
    *
@@ -218,7 +247,7 @@ export interface CallSide {
    *                                   neither. The fallback: a resolver that
    *                                   only knows a printed type name and
    *                                   nothing about where it lives.
-   *   `{ kind: "declared"; file }`    the resolver knows *the exact
+   *   `{ kind: "declared"; file; concrete }`  the resolver knows *the exact
    *                                   repo-relative file* the type is
    *                                   declared in -- placed there directly,
    *                                   bypassing a name search entirely.
@@ -229,6 +258,15 @@ export interface CallSide {
    *                                   so a name search finds nothing to
    *                                   place even though the compiler already
    *                                   knows exactly where `x`'s type lives.
+   *                                   `concrete` is `false` when that type is
+   *                                   an interface, an abstract class, or a
+   *                                   bare type parameter -- item 14's own
+   *                                   caveat (docs/claim-vocabulary.md): the
+   *                                   method actually reached at runtime can
+   *                                   live on a different class than the one
+   *                                   the declared type names, so a closed-body
+   *                                   accusation (#233) may not rest on this
+   *                                   site even though it is placed.
    *   `{ kind: "external" }`          the resolver knows *where the type is
    *                                   declared* and that place is not this
    *                                   repository (a language builtin, a
@@ -237,9 +275,11 @@ export interface CallSide {
    *                                   provably lands outside the repository
    *                                   provably is not any repo routine either.
    *
-   * `resolves`/`callsTo`, the live per-claim path `drift.ts` uses, never
-   * reads this field: wiring a resolver in is additive to the closed-bodies
-   * question (#226) and changes nothing about what `@calls` reports today.
+   * `resolves`/`callsTo`, the direction-and-backwards half of the live
+   * per-claim path `drift.ts` uses, never reads this field: wiring a resolver
+   * in was additive to the closed-bodies question (#226) and changed nothing
+   * about what `@calls` reported then. `callsBetween`'s closed-body absence
+   * check (#233) is the first live caller that does, through `callSitesIn`.
    */
   resolveReceiver?: (at: { start: number; end: number }) => ReceiverResolution | undefined;
 }
@@ -247,7 +287,7 @@ export interface CallSide {
 /** What `resolveReceiver` may answer with. See `CallSide.resolveReceiver`'s doc. */
 export type ReceiverResolution =
   | { kind: "type"; name: string }
-  | { kind: "declared"; file: string }
+  | { kind: "declared"; file: string; concrete: boolean }
   | { kind: "external" };
 
 /* ------------------------------------------------------------------ bindings */
@@ -1001,7 +1041,60 @@ export function callsBetween(
     if (reverse.evidence) return { verdict: "backwards", evidence: reverse.evidence };
   }
 
+  /*
+   * Still nothing found either way. Before falling through to silence, ask
+   * the other question this word can now answer (#233): not "did the text
+   * happen to show a call", but "did the tail's whole call set get read, and
+   * is the head genuinely absent from it". That is a licence of its own --
+   * `from.language` only, since the reading being closed is entirely about
+   * `from`'s body and `to.file` is only ever compared as a string here, never
+   * read.
+   */
+  if (mayAccuse("calls", from.language, "absence")) {
+    const refuted = closedBodyRefutes(from, to);
+    if (refuted) return { verdict: "refuted", evidence: refuted };
+  }
+
   return { verdict: "absent" };
+}
+
+/**
+ * Whether every call `from.routine` makes was read, resolved, and none of
+ * them reaches `to.file` -- the closed-body absence `callsBetween` may now
+ * accuse from (#233), independent of the backwards check above.
+ *
+ * `undefined` for anything short of certain: an unreadable file, a routine
+ * `callSitesIn` never saw, any call site left unplaced (an open body, exactly
+ * as today), any placement landing at `to.file` (genuinely present, not this
+ * word's business here), or any placed site whose receiver resolved to a
+ * type that is not concrete (item 14's own caveat, docs/claim-vocabulary.md)
+ * -- the one known way a closed reading can still be wrong, so it withholds
+ * rather than accuses on the strength of one.
+ *
+ * `routinesNamed` allows more than one declaration to share a name (an
+ * overload set); this asks the same question `callsTo` does, over all of
+ * them, because "the routine has no call reaching `to`" is not established
+ * until none of its declarations does.
+ */
+function closedBodyRefutes(
+  from: CallSide & { routine: string },
+  to: CallSide & { names: string[] },
+): CallsRefutedEvidence | undefined {
+  const reading = callSitesIn(from);
+  if (!reading.read) return undefined;
+  const bodies = reading.bodies.filter((body) => body.routine === from.routine);
+  if (bodies.length === 0) return undefined;
+
+  let sites = 0;
+  for (const body of bodies) {
+    for (const site of body.sites) {
+      if (site.file === undefined) return undefined; // open: something unplaced
+      if (site.receiver && site.concrete === false) return undefined; // item 14's guard
+      if (site.file === to.file) return undefined; // genuinely present
+      sites += 1;
+    }
+  }
+  return { routine: from.routine, line: bodies[0]!.line, sites };
 }
 
 /* ------------------------------------------- one body's call sites (#217) */
@@ -1046,6 +1139,19 @@ export interface CallSitePlaced {
    * needs before anything may accuse on the strength of one.
    */
   memberAt?: { start: number; end: number };
+  /**
+   * Whether this site's `file` came from a `resolveReceiver` answer whose
+   * type is a concrete class -- `false` for an interface, an abstract class,
+   * or a bare type parameter, `undefined` when the placement did not go
+   * through that question at all (a bare name, an ordinary import, `external`,
+   * the weaker `type`-name fallback).
+   *
+   * #233's guard: a closed-body absence accusation may not rest on any site
+   * where this is `false`, because the file the type is declared in is not
+   * necessarily the file the method actually reached at runtime lives in
+   * (docs/claim-vocabulary.md item 14's own caveat).
+   */
+  concrete?: boolean;
 }
 
 /** Every call site in one routine, placed or refused. */
@@ -1109,16 +1215,19 @@ function comesToRest(
   return undefined;
 }
 
+/** Where one call site's callee lives, when it can be placed at all. */
+type Placement = { file: string; concrete?: boolean };
+
 /** `placeOf`'s local/imported/comesToRest lookup, factored out so a type name a resolver hands back gets placed by the exact same rule a value name would be. */
-function placeName(name: string, side: CallSide, bindings: Bindings): string | { why: SiteUnresolved } {
+function placeName(name: string, side: CallSide, bindings: Bindings): Placement | { why: SiteUnresolved } {
   if (bindings.ambiguous.has(name)) return { why: "ambiguous" };
   const imported = bindings.imported.get(name);
-  if (!imported) return bindings.local.has(name) ? side.file : { why: "unbound" };
+  if (!imported) return bindings.local.has(name) ? { file: side.file } : { why: "unbound" };
   const { files, known } = filesFor(imported.specifier, side.imports);
   if (files.size === 0) return { why: known ? "unplaced" : "unbound" };
   for (const file of files) {
     const rest = comesToRest(name, file, side, new Set());
-    if (rest) return rest;
+    if (rest) return { file: rest };
   }
   return { why: "elsewhere" };
 }
@@ -1151,12 +1260,12 @@ function placeThroughChecker(
   at: { start: number; end: number } | undefined,
   side: CallSide,
   bindings: Bindings,
-): string | { why: SiteUnresolved } | undefined {
+): Placement | { why: SiteUnresolved } | undefined {
   if (!at || !side.resolveReceiver) return undefined;
   const resolved = side.resolveReceiver(at);
   if (!resolved) return undefined;
-  if (resolved.kind === "external") return EXTERNAL_RECEIVER;
-  if (resolved.kind === "declared") return resolved.file;
+  if (resolved.kind === "external") return { file: EXTERNAL_RECEIVER };
+  if (resolved.kind === "declared") return { file: resolved.file, concrete: resolved.concrete };
   return placeName(resolved.name, side, bindings);
 }
 
@@ -1173,19 +1282,19 @@ function placeOf(
   callee: Callee,
   side: CallSide,
   bindings: Bindings,
-): string | { why: SiteUnresolved } {
+): Placement | { why: SiteUnresolved } {
   if (callee.kind === "computed") return { why: "computed" };
   if (REACHES_ANYTHING.has(callee.name)) return { why: "dynamic" };
 
   // A member of `self` is a member of whatever this routine belongs to, and
   // that is in this file.
-  if (callee.kind === "own") return side.file;
+  if (callee.kind === "own") return { file: side.file };
 
   const bound = callee.kind === "through" ? callee.through : callee.name;
   const at = callee.kind === "through" ? callee.at : undefined;
   // A resolver is only ever a fallback for a `through` callee -- `bare` and
   // `own` calls have no receiver expression for one to be asked about.
-  const throughChecker = (): { why: SiteUnresolved } | string =>
+  const throughChecker = (): { why: SiteUnresolved } | Placement =>
     placeThroughChecker(at, side, bindings) ?? { why: "receiver" };
 
   // An expression receiver -- `make().run()`, `a.b.c()` -- names nothing to
@@ -1228,7 +1337,7 @@ function placeOf(
      * the text even though the name it is bound to is -- unless a resolver
      * says what it is.
      */
-    if (callee.kind !== "through") return side.file;
+    if (callee.kind !== "through") return { file: side.file };
     return throughChecker();
   }
 
@@ -1244,7 +1353,7 @@ function placeOf(
   }
   for (const file of files) {
     const rest = comesToRest(callee.name, file, side, new Set());
-    if (rest) return rest;
+    if (rest) return { file: rest };
   }
   return callee.kind === "through" ? throughChecker() : { why: "elsewhere" };
 }
@@ -1324,7 +1433,9 @@ export function callSitesIn(side: CallSide): CallSitesReading {
         line: lineOf(side.source, inner.startIndex),
         receiver: callee.kind === "through",
         ...(callee.kind === "through" ? { memberAt: callee.memberAt } : {}),
-        ...(typeof where === "string" ? { file: where } : { why: where.why }),
+        ...("file" in where
+          ? { file: where.file, ...(where.concrete !== undefined ? { concrete: where.concrete } : {}) }
+          : { why: where.why }),
       });
     });
     bodies.push(body);

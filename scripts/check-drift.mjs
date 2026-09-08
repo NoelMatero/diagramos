@@ -68,8 +68,32 @@ import { initEngine } from "../src/engine/parse.ts";
 import { createCodeGraphOption, TESTED_VERSION_PREFIX } from "../src/engine/codegraph.ts";
 import { createLedger } from "../src/engine/ledger.ts";
 import { goodNewsIds, goodNewsLine, goodNewsSince, novelGoodNews } from "../src/engine/goodnews.ts";
+import { createTsReferee, receiverResolutionFrom } from "./lib/resolution-ts.ts";
 
 const root = process.cwd();
+
+/**
+ * `@calls`' closed-body absence licence (#233), wired into the one live path
+ * this check runs -- a real `ts.Program`, built once for the whole run and
+ * asked per receiver rather than kept warm across separate invocations of
+ * this script. Correctness first: keeping it warm across the MCP server's
+ * own long-running process is a real performance question and a separate
+ * issue once this one proves the feature worth being fast for.
+ *
+ * `undefined` on construction failure -- no `tsconfig.json` anywhere findable,
+ * a corrupt one, anything `createTsReferee` itself cannot recover from --
+ * costs nothing beyond what `@calls` already withheld before this axis
+ * existed: `checkDrift` treats an absent referee exactly like one that never
+ * resolves a receiver.
+ */
+let tsReferee;
+try { tsReferee = createTsReferee(root); } catch { tsReferee = undefined; }
+const closedBodyReferee = tsReferee ? {
+  resolveReceiver: (file, at) => {
+    const absolute = path.resolve(root, file);
+    return receiverResolutionFrom(tsReferee.typeAt(absolute, at.start, at.end), root);
+  },
+} : undefined;
 
 const USAGE = [
   "usage: diagramos drift [board.excalidraw ...] [options]",
@@ -807,6 +831,13 @@ function rowsFor({ report, promoted = [] }, colour, all = false) {
        */
       const wrongCalls = finding.kind === "calls-backwards";
       /*
+       * A second, later way the fifth can be wrong (#233): not pointing the
+       * wrong way, but pointing at a routine whose entire call set was
+       * checked and does not include this one -- fixed by drawing the arrow
+       * at whatever the tail actually calls, not by turning it round.
+       */
+      const wrongCallsRefuted = finding.kind === "calls-refuted";
+      /*
        * The sixth (#213), and the one that was missing here.
        *
        * It shipped into the board page and not into this file, so the browser
@@ -834,13 +865,14 @@ function rowsFor({ report, promoted = [] }, colour, all = false) {
         + (wrongHolds ? " \u00b7 not in the fields" : "")
         + (wrongBuilds ? " \u00b7 built the other way" : "")
         + (wrongCalls ? " \u00b7 called the other way" : "")
+        + (wrongCallsRefuted ? " \u00b7 never called" : "")
         // The same words the board page uses, so one board does not read as two
         // different findings depending on where somebody looked at it.
         + (wrongMembers ? " \u00b7 no such member" : "")
         + (wrongBase ? " \u00b7 not a base" : "")
         + (hop ? ` \u00b7 ${hop}` : ""),
-        backwards || wrongSignature || wrongHolds || wrongBuilds || wrongCalls || wrongMembers
-          || wrongBase
+        backwards || wrongSignature || wrongHolds || wrongBuilds || wrongCalls || wrongCallsRefuted
+          || wrongMembers || wrongBase
           ? "red"
           : "yellow",
         colour,
@@ -1016,6 +1048,7 @@ function tallyFor({ report, promoted = [] }, colour) {
       fields: report.edges.filter((finding) => finding.kind === "holds-absent").length,
       builtBackwards: report.edges.filter((finding) => finding.kind === "builds-backwards").length,
       callsBackwards: report.edges.filter((finding) => finding.kind === "calls-backwards").length,
+      callsRefuted: report.edges.filter((finding) => finding.kind === "calls-refuted").length,
       members: report.edges.filter((finding) => finding.kind === "accesses-absent").length,
       bases: report.edges.filter((finding) => finding.kind === "conforms-absent").length,
       arrows: report.edges.filter((finding) => !WRONG_EDGE_KINDS.has(finding.kind)).length,
@@ -1093,6 +1126,8 @@ function render(stale, colour) {
           + report.edges.filter((finding) => finding.kind === "builds-backwards").length,
         callsBackwards: sum.callsBackwards
           + report.edges.filter((finding) => finding.kind === "calls-backwards").length,
+        callsRefuted: sum.callsRefuted
+          + report.edges.filter((finding) => finding.kind === "calls-refuted").length,
         members: sum.members
           + report.edges.filter((finding) => finding.kind === "accesses-absent").length,
         bases: sum.bases
@@ -1106,7 +1141,7 @@ function render(stale, colour) {
         planned: sum.planned + report.workItems.length,
       };
     },
-    { gone: 0, generated: 0, empty: 0, unused: 0, open: 0, incomplete: 0, removed: 0, garbled: 0, unanswered: 0, backwards: 0, signatures: 0, fields: 0, builtBackwards: 0, callsBackwards: 0, members: 0, bases: 0, arrows: 0, stray: 0, promoted: 0, built: 0, planned: 0 },
+    { gone: 0, generated: 0, empty: 0, unused: 0, open: 0, incomplete: 0, removed: 0, garbled: 0, unanswered: 0, backwards: 0, signatures: 0, fields: 0, builtBackwards: 0, callsBackwards: 0, callsRefuted: 0, members: 0, bases: 0, arrows: 0, stray: 0, promoted: 0, built: 0, planned: 0 },
   );
 
   // Too many to list: counts per diagram, and a pointer to the view that has room.
@@ -1430,6 +1465,7 @@ for (const { file, boardFile } of loaded) {
       ...(baseline ? { baseline } : {}),
       ...(codeGraphOption ? { codeGraph: codeGraphOption } : {}),
       ...(ledger ? { ledger } : {}),
+      ...(closedBodyReferee ? { closedBodyReferee } : {}),
     });
     // Read before promotions are applied below, so a flip the hook makes this
     // run is announced once as "promoted" and never again as news.
@@ -1481,6 +1517,7 @@ for (const { file, boardFile } of loaded) {
             ...(baseline ? { baseline } : {}),
             ...(codeGraphOption ? { codeGraph: codeGraphOption } : {}),
             ...(ledger ? { ledger } : {}),
+            ...(closedBodyReferee ? { closedBodyReferee } : {}),
           });
         } catch {
           // An unwritable tree: keep reporting the suggestion instead of it.
@@ -1515,6 +1552,7 @@ for (const { file, boardFile } of loaded) {
             ...(baseline ? { baseline } : {}),
             ...(codeGraphOption ? { codeGraph: codeGraphOption } : {}),
             ...(ledger ? { ledger } : {}),
+            ...(closedBodyReferee ? { closedBodyReferee } : {}),
           });
         } catch (error) {
           acceptHeld.push({

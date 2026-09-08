@@ -40,6 +40,40 @@ export interface TsTypeAnswer {
    * a name a person happened to write down somewhere in the file's own text.
    */
   declaringFile?: string;
+  /**
+   * Whether the type's own first declaration is a concrete class -- `false`
+   * for an interface, an abstract class, or a bare type parameter, `true`
+   * for everything else including when there is no declaration to inspect.
+   *
+   * #233's guard, not #227's: a receiver typed as an interface can name a
+   * file that agrees with a wrong placement, because the method actually
+   * reached at runtime can live on a different class than the one the
+   * declared type names (docs/claim-vocabulary.md item 14's own caveat). A
+   * placement resting on this answer being `false` is a placement resting on
+   * asking the wrong question, not a wrong answer to the right one.
+   */
+  concrete: boolean;
+}
+
+/**
+ * Whether a type's first declaration names a concrete class rather than an
+ * interface, an abstract class, or a bare type parameter (#233).
+ *
+ * Scoped to exactly the shape item 14 named, not a broader "can this be
+ * trusted" heuristic: a type alias, an enum, a plain object type and a
+ * function all count as concrete here, because none of them is the specific
+ * hazard this guards against -- a declared type whose *methods* can be
+ * satisfied by more than one class, so the file the type is declared in is
+ * not necessarily the file its call lands in.
+ */
+function isConcreteDeclaration(declaration: ts.Declaration): boolean {
+  if (ts.isInterfaceDeclaration(declaration) || ts.isTypeParameterDeclaration(declaration)) {
+    return false;
+  }
+  if (ts.isClassDeclaration(declaration) || ts.isClassExpression(declaration)) {
+    return !(ts.getCombinedModifierFlags(declaration) & ts.ModifierFlags.Abstract);
+  }
+  return true;
 }
 
 export interface TsReferee {
@@ -262,6 +296,7 @@ export function createTsReferee(root: string): TsReferee {
     }
     const text = checker.typeToString(type, node, ts.TypeFormatFlags.NoTruncation);
     let declaringFile: string | undefined;
+    let concrete = true;
     try {
       /*
        * `type.getSymbol()` only -- never `type.aliasSymbol`. A type alias's
@@ -274,11 +309,13 @@ export function createTsReferee(root: string): TsReferee {
        * fallback placed that call at the alias's file, and the referee,
        * asking about `padEnd` directly, correctly said external.
        */
-      declaringFile = type.getSymbol()?.getDeclarations()?.[0]?.getSourceFile().fileName;
+      const declaration = type.getSymbol()?.getDeclarations()?.[0];
+      declaringFile = declaration?.getSourceFile().fileName;
+      if (declaration) concrete = isConcreteDeclaration(declaration);
     } catch {
       declaringFile = undefined;
     }
-    return { text, head: headOfTs(text), declaringFile };
+    return { text, head: headOfTs(text), declaringFile, concrete };
   }
 
   function symbolDeclarationAt(file: string, start: number, end: number): string | undefined {
@@ -320,4 +357,47 @@ function findNodeAt(sourceFile: ts.SourceFile, start: number, end: number): ts.N
   };
   visit(sourceFile);
   return found;
+}
+
+/**
+ * Whether a declaring file lives outside `tree` -- a language builtin
+ * (`node_modules/typescript`'s own lib files) or a package's own declaration
+ * file. Checked by path rather than by name: `Assertion` from `vitest` and a
+ * repository's own `Assertion` class print identically, and only where they
+ * are actually declared tells the two apart.
+ *
+ * Exported so a live resolver (`scripts/check-drift.mjs`) and a measurement
+ * (`measure-closed-bodies.mts`) ask the same question the same way rather
+ * than keeping two copies of it that could drift apart.
+ */
+export function isOutsideTree(declaringFile: string, tree: string): boolean {
+  if (declaringFile.includes(`${path.sep}node_modules${path.sep}`)) return true;
+  const rel = path.relative(tree, declaringFile);
+  return rel.startsWith("..") || path.isAbsolute(rel);
+}
+
+/**
+ * `TsTypeAnswer` narrowed into the three shapes `CallSide.resolveReceiver`
+ * may answer with (`src/engine/calls.ts`'s `ReceiverResolution`), without
+ * this file importing that type: the engine does not depend on
+ * `scripts/lib`, and a caller on the other side of that boundary
+ * (`check-drift.mjs`) gets a plain object shaped to match it structurally.
+ *
+ * `undefined` for the same three reasons `typeAt` itself is silent on a
+ * position, plus a type the compiler could print but call neither concrete
+ * nor placeable (`any`, `unknown`, an error type) -- a resolver saying
+ * "I don't know" here is the honest answer, not a refusal to compute one.
+ */
+export function receiverResolutionFrom(
+  answer: TsTypeAnswer | undefined,
+  tree: string,
+): { kind: "type"; name: string } | { kind: "declared"; file: string; concrete: boolean } | { kind: "external" } | undefined {
+  if (!answer || answer.head === "any" || answer.head === "unknown" || /error/i.test(answer.head)) {
+    return undefined;
+  }
+  if (answer.declaringFile) {
+    if (isOutsideTree(answer.declaringFile, tree)) return { kind: "external" };
+    return { kind: "declared", file: path.relative(tree, answer.declaringFile), concrete: answer.concrete };
+  }
+  return { kind: "type", name: answer.head };
 }

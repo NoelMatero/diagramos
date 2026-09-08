@@ -66,6 +66,7 @@ const KNOWN_EDGE_KINDS = new Set([
   "holds-absent",
   "builds-backwards",
   "calls-backwards",
+  "calls-refuted",
   "accesses-absent",
   "conforms-absent",
 ]);
@@ -80,7 +81,7 @@ const KNOWN_EDGE_KINDS = new Set([
  */
 const WRONG_EDGE_KINDS = new Set([
   "backwards-edge", "signature-absent", "holds-absent", "builds-backwards",
-  "calls-backwards", "accesses-absent", "conforms-absent",
+  "calls-backwards", "calls-refuted", "accesses-absent", "conforms-absent",
 ]);
 
 /**
@@ -362,6 +363,7 @@ export function tallyOf(report: DriftView): TallyPart[] {
   const wrongHolds = report.edges.filter((finding) => finding.kind === "holds-absent").length;
   const wrongBuilds = report.edges.filter((finding) => finding.kind === "builds-backwards").length;
   const wrongCalls = report.edges.filter((finding) => finding.kind === "calls-backwards").length;
+  const refutedCalls = report.edges.filter((finding) => finding.kind === "calls-refuted").length;
   const wrongMembers = report.edges.filter((finding) => finding.kind === "accesses-absent").length;
   const wrongBases = report.edges.filter((finding) => finding.kind === "conforms-absent").length;
   const unsupported = report.edges.filter(
@@ -417,6 +419,18 @@ export function tallyOf(report: DriftView): TallyPart[] {
   if (wrongCalls) {
     parts.push({
       text: `${wrongCalls} ${wrongCalls === 1 ? "call" : "calls"} backwards`,
+      tone: "bad",
+    });
+  }
+  /*
+   * Its own chip too, and deliberately not folded into `backwards`: that one
+   * is fixed by turning the arrow round, this one by drawing it at a
+   * different box entirely -- the tail's whole call set was checked and this
+   * head was never among it (#233).
+   */
+  if (refutedCalls) {
+    parts.push({
+      text: `${refutedCalls} ${refutedCalls === 1 ? "call" : "calls"} refuted`,
       tone: "bad",
     });
   }
@@ -585,6 +599,7 @@ export function rowsOf(report: DriftView): StatusRow[] {
         + (finding.kind === "holds-absent" ? " · not in the fields" : "")
         + (finding.kind === "builds-backwards" ? " · built the other way" : "")
         + (finding.kind === "calls-backwards" ? " · called the other way" : "")
+        + (finding.kind === "calls-refuted" ? " · never called" : "")
         + (finding.kind === "accesses-absent" ? " · no such member" : "")
         + (finding.kind === "conforms-absent" ? " · not a base" : "")
         + (KNOWN_EDGE_KINDS.has(finding.kind)

@@ -286,7 +286,7 @@ describe("a receiver placed by a resolver, not by the text", () => {
     const body = sitesIn(
       'import { make } from "./make";\nfunction f() {\n  const x = make();\n  x.run();\n}\n',
       "ts",
-      { resolveReceiver: () => ({ kind: "declared", file: "thing.ts" }) },
+      { resolveReceiver: () => ({ kind: "declared", file: "thing.ts", concrete: true }) },
     ).find((one) => one.routine === "f")!;
     const receiverSite = body.sites.find((one) => one.name === "run")!;
     expect(receiverSite.file).toBe("thing.ts");
@@ -335,7 +335,7 @@ describe("a receiver placed by a resolver, not by the text", () => {
           language: "ts",
           imports: [{ specifier: "./deeper" }],
         }),
-        resolveReceiver: () => ({ kind: "declared", file: "thing.ts" }),
+        resolveReceiver: () => ({ kind: "declared", file: "thing.ts", concrete: true }),
       },
     ).find((one) => one.routine === "f")!;
     expect(body.sites.find((one) => one.name === "run")!.file).toBe("thing.ts");

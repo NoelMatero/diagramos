@@ -82,11 +82,17 @@ describe("@calls on an arrow the code confirms", () => {
 describe("absent is not a finding, and this is the test that keeps it true", () => {
   it("says nothing when a callback could be wiring them together out of sight", async () => {
     /*
-     * Neither end calls the other in the text, and a third file could be handing
-     * `render` to `run` as an argument. A reader that called this wrong would be
-     * accusing on the strength of not having followed a value.
+     * `run` reaches a name nothing in this file binds -- a third file could be
+     * handing `render` in as a callback, so the body cannot be enumerated
+     * completely and #233's closed-body check must not fire on it either. A
+     * reader that called this wrong would be accusing on the strength of not
+     * having followed a value.
+     *
+     * (A `run` with no calls at all -- the shape this test used to be -- is a
+     * closed body now, and correctly a finding: see "an arrow into a routine
+     * whose whole call set is checked" below.)
      */
-    const caller = "export function run() { return 1; }\n";
+    const caller = "export function run() { return callback(); }\n";
     const board = await boardOf("src/a.ts#run", "src/b.ts#render", { claim: "calls" });
     const report = checkDrift(board, fakeWorkspace({
       "src/a.ts": caller, "src/b.ts": CALLEE,
@@ -95,7 +101,40 @@ describe("absent is not a finding, and this is the test that keeps it true", () 
     expect(report.claims.calls).toBe(1);
     expect(report.claims.callsConfirmed).toBe(0);
     expect(report.edges.filter((finding) => finding.kind === "calls-backwards")).toEqual([]);
+    expect(report.edges.filter((finding) => finding.kind === "calls-refuted")).toEqual([]);
     expect(report.clean).toBe(true);
+  });
+});
+
+describe("an arrow into a routine whose whole call set is checked (#233)", () => {
+  it("is refuted when the routine provably calls nothing at the far end", async () => {
+    // No receiver dead ends here, so this closes even with no live compiler
+    // wired in -- the tier-1 shape docs/claim-vocabulary.md items 12-13
+    // already measured, not something this test needs #232's compiler for.
+    const caller = "export function run() { return 1; }\n";
+    const board = await boardOf("src/a.ts#run", "src/b.ts#render", { claim: "calls" });
+    const report = checkDrift(board, fakeWorkspace({
+      "src/a.ts": caller, "src/b.ts": CALLEE,
+    }), { edges: true });
+
+    expect(report.claims.calls).toBe(1);
+    const refuted = report.edges.filter((finding) => finding.kind === "calls-refuted");
+    expect(refuted).toHaveLength(1);
+    expect(refuted[0]!.detail).toContain("run");
+    expect(report.clean).toBe(false);
+  });
+
+  it("keeps a planned arrow silent rather than refuting a sketch", async () => {
+    // Same shape, drawn as a plan: the code has not caught up to it yet, and
+    // a red about a plan is a lie about a plan -- same rule `backwards` is
+    // held to for a `planned` edge.
+    const caller = "export function run() { return 1; }\n";
+    const board = await boardOf("src/a.ts#run", "src/b.ts#render", { claim: "calls", state: "planned" });
+    const report = checkDrift(board, fakeWorkspace({
+      "src/a.ts": caller, "src/b.ts": CALLEE,
+    }), { edges: true });
+
+    expect(report.edges.filter((finding) => finding.kind === "calls-refuted")).toEqual([]);
   });
 });
 

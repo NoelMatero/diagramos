@@ -46,7 +46,7 @@ import { licenceFor } from "./licence";
 import { languageOf, type Language } from "./parse";
 import { ledgerAdditions, type Ledger } from "./ledger";
 import { checkNeeds, type NeedsWithheld } from "./needs";
-import { callsBetween, type CallSide, type CallsWithheld } from "./calls";
+import { callsBetween, type CallSide, type CallsWithheld, type ReceiverResolution } from "./calls";
 import { constructions, routineNamesIn, type ConstructsWithheld } from "./constructs";
 import { memberAccesses, type AccessesWithheld } from "./accesses";
 import { heldTypes, type HoldsWithheld } from "./holds";
@@ -194,12 +194,15 @@ export type EdgeFindingKind =
   /**
    * A `calls` arrow whose call runs the other way (#189).
    *
-   * The fifth member that means **wrong**, and the second of the five resting on
-   * a presence rather than an absence -- which is why there is no `calls-absent`
-   * beside it and never will be. A routine that never writes `b()` can still
-   * reach `b` through a callback, a trait object or a dispatch table, so not
-   * finding the call proves nothing; finding it at the far end, and only there,
-   * is proof the arrow is drawn backwards. Same footing as `builds-backwards`.
+   * The fifth member that means **wrong**, resting on a presence rather than
+   * an absence: a routine that never writes `b()` can still reach `b` through
+   * a callback, a trait object or a dispatch table, so not finding the call
+   * proves nothing on its own; finding it at the far end, and only there, is
+   * proof the arrow is drawn backwards. Same footing as `builds-backwards`.
+   *
+   * There is no `calls-absent` beside it, but `calls-refuted` is -- see its
+   * own doc for why that is a different question with a different footing,
+   * not the word this one used to say could never exist (#233).
    *
    * This is the one the engine has been missing longest. Backwards-arrow
    * detection is the highest-value thing here -- it is the entire argument for
@@ -207,6 +210,28 @@ export type EdgeFindingKind =
    * edge on any diagram.
    */
   | "calls-backwards"
+  /**
+   * A `calls` arrow into a routine whose entire call set was enumerated and
+   * does not reach it (#233).
+   *
+   * `calls-backwards` above rests on finding the call running the other way.
+   * This rests on a different reader closing off every alternative instead:
+   * `callSitesIn`'s tier-2 receiver resolver can read some function bodies
+   * completely enough to enumerate every call they make, and when it can,
+   * "not among them" is a fact rather than a guess -- the same shift from
+   * presence to absence `signature-absent`/`holds-absent` made for their own
+   * words, except this reader had to earn the closure itself first
+   * (docs/claim-vocabulary.md items 12-15) rather than reading it off a
+   * declaration already sitting in the text.
+   *
+   * ts/tsx only, and only when every placed call site's receiver resolved to
+   * a concrete type: an interface or an abstract class can agree with a
+   * wrong placement, because the method actually reached at runtime can live
+   * on a different class than the declared one names, so a site like that
+   * withholds the whole body's closure rather than let a doubt become an
+   * accusation (item 14's own caveat).
+   */
+  | "calls-refuted"
   /**
    * An `accesses` arrow naming a member the type does not have (#213).
    *
@@ -281,6 +306,7 @@ export const EDGE_FINDING_KINDS = [
   "holds-absent",
   "builds-backwards",
   "calls-backwards",
+  "calls-refuted",
   "accesses-absent",
   "conforms-absent",
 ] as const satisfies readonly EdgeFindingKind[];
@@ -302,10 +328,10 @@ export const EDGE_FINDING_KINDS = [
  * from `relations`, and the only kind that survives somebody in a hurry.
  *
  * They are not all the same shape. `signature-absent`, `holds-absent`,
- * `accesses-absent` and `conforms-absent` refute from an absence;
- * `backwards-edge`, `builds-backwards` and `calls-backwards` from a presence.
- * What the list is about is neither: it is whether somebody is being told their
- * diagram is wrong.
+ * `accesses-absent`, `conforms-absent` and `calls-refuted` refute from an
+ * absence; `backwards-edge`, `builds-backwards` and `calls-backwards` from a
+ * presence. What the list is about is neither: it is whether somebody is
+ * being told their diagram is wrong.
  */
 export const ACCUSING_EDGE_KINDS = [
   "backwards-edge",
@@ -313,6 +339,7 @@ export const ACCUSING_EDGE_KINDS = [
   "holds-absent",
   "builds-backwards",
   "calls-backwards",
+  "calls-refuted",
   "accesses-absent",
   "conforms-absent",
 ] as const satisfies readonly EdgeFindingKind[];
@@ -1778,6 +1805,7 @@ function callSide(
   file: string,
   workspace: Workspace,
   configs: ConfigCache,
+  closedBodyReferee?: ClosedBodyReferee,
 ): CallSide | undefined {
   const readSide = (target: string): CallSide | undefined => {
     const language = languageOf(target);
@@ -1801,9 +1829,28 @@ function callSide(
           ? { source: other.source, language: other.language, imports: other.imports }
           : undefined;
       },
+      ...(closedBodyReferee ? { resolveReceiver: (at) => closedBodyReferee.resolveReceiver(target, at) } : {}),
     };
   };
   return readSide(file);
+}
+
+/**
+ * A live receiver resolver for `@calls`' closed-body absence check (#233).
+ *
+ * Defined here, in the engine, rather than as `scripts/lib/resolution-ts.ts`'s
+ * `TsReferee` directly: the engine does not depend on that file or on the
+ * `typescript` package it wraps, and a caller that does -- today, only
+ * `scripts/check-drift.mjs` -- adapts one to this shape instead of the engine
+ * reaching upward for it. `file` is repo-relative, matching `CallSide.file`,
+ * because the engine never holds an absolute path.
+ *
+ * `undefined` on this interface is not distinguished from "no referee at all"
+ * anywhere `checkDrift` reads it: a receiver `callSitesIn` cannot place stays
+ * a plain `receiver` refusal either way, exactly as it always has.
+ */
+export interface ClosedBodyReferee {
+  resolveReceiver(file: string, at: { start: number; end: number }): ReceiverResolution | undefined;
 }
 
 /**
@@ -2307,6 +2354,15 @@ export function checkDrift(
      * off, not that nothing was read -- see `ledger.ts`.
      */
     ledger?: Ledger;
+    /**
+     * A live receiver resolver for `@calls`' closed-body absence check
+     * (#233). Absent means that licence never fires, whatever
+     * `licence.ts` says -- a body `callSitesIn` cannot fully place stays a
+     * plain `receiver` refusal, the same silence it was before this axis
+     * existed. Built once per check, not cached across runs: see
+     * `scripts/check-drift.mjs` for where a real one comes from.
+     */
+    closedBodyReferee?: ClosedBodyReferee;
   },
 ): DriftReport {
   const findings: DriftFinding[] = [];
@@ -3809,11 +3865,18 @@ export function checkDrift(
        * is no second word here -- "is called by" is the same fact read
        * backwards.
        *
-       * The one accusation available is `backwards`, and it is asked for by
-       * handing the reader the far end's own source and the names its box stands
-       * for. There is no absence finding here and there must not be one -- a
-       * routine that never writes `b()` can still reach `b` through a callback,
-       * so silence is the only honest answer when nothing is found either way.
+       * `backwards` is asked for by handing the reader the far end's own source
+       * and the names its box stands for -- a routine that never writes `b()`
+       * can still reach `b` through a callback, so silence is the only honest
+       * answer when nothing is found *by this question*.
+       *
+       * `refuted` (#233) is a second, later question, asked only when
+       * `backwards` finds nothing: not "did the text happen to show a call"
+       * but "was the tail's whole call set read, and is the head genuinely
+       * absent from it". TS/TSX only, and it is a licence of its own
+       * (docs/claim-vocabulary.md items 12-15) -- everywhere it does not
+       * apply, silence is still the only honest answer when nothing is found
+       * either way.
        *
        * `open` is what makes this word work at all. A name is very often
        * imported from a file that does not declare it -- a barrel, a re-export --
@@ -3847,8 +3910,8 @@ export function checkDrift(
            * against the repo-relative file a dependency resolved to, so an
            * absolute one would never match even if it could be read.
            */
-          const tail = callSide(fromAnchor, workspace, importCache.configs);
-          const head = callSide(toAnchor, workspace, importCache.configs);
+          const tail = callSide(fromAnchor, workspace, importCache.configs, options?.closedBodyReferee);
+          const head = callSide(toAnchor, workspace, importCache.configs, options?.closedBodyReferee);
           if (!tail || !head) {
             noteCalled("unreadable");
           } else {
@@ -3891,6 +3954,35 @@ export function checkDrift(
                   + `${oneLine(toNode.label) || toPath}, and it is the other way round -- `
                   + `${toPath} line ${verdict.evidence.line} writes `
                   + `\`${verdict.evidence.wrote}\`. Turn the arrow round.`,
+              } });
+              continue;
+            }
+            if (verdict.verdict === "refuted" && edge.state !== "planned") {
+              /*
+               * A `planned` arrow reaching here is a sketch the code has not
+               * caught up to; refused for the same reason `backwards` is
+               * above -- a red about a plan is a lie about a plan.
+               */
+              edgesChecked += 1;
+              const wasClaimed = baselineGraph?.edges.some(
+                (was) => was.from === edge.from && was.to === edge.to && was.claim === "calls",
+              );
+              const fresh = baselineGraph !== undefined && !wasClaimed;
+              recordEdge(edge, fromNode, toNode, { kind: "finding", finding: {
+                from: fromPath,
+                to: toPath,
+                fromLabel: fromNode.label,
+                toLabel: toNode.label,
+                fromRef,
+                toRef,
+                kind: "calls-refuted",
+                detail:
+                  (fresh ? "a claim written this turn is already wrong: " : "")
+                  + `this arrow says ${oneLine(fromNode.label) || fromPath} calls `
+                  + `${oneLine(toNode.label) || toPath}, and every call `
+                  + `${verdict.evidence.routine} makes was checked -- ${verdict.evidence.sites} of `
+                  + `them, none reaching ${toPath}. ${fromPath} line ${verdict.evidence.line} is `
+                  + `where ${verdict.evidence.routine} is declared.`,
               } });
               continue;
             }
