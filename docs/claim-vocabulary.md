@@ -895,48 +895,68 @@ one word or one reader, not from reviewing the design.
     built one or two at a time rather than all at once, still peaks well past
     Node's 2 GiB default on a package the size of one of `mundane`'s apps.
 
-13. **#221, re-measured with tier 2 actually wired in: reaffirmed, and now for
-    a different reason than the one that opened the question.** Item 12's
-    reaffirm note named the exact test this required: re-run
+13. **#221, re-measured with tier 2 actually wired in: reversed. 10.6% →
+    50.3%, and the first two readings on the way there were both wrong in a
+    checkable way, which is the reason this entry is longer than a number.**
+    Item 12's reaffirm note named the exact test this required: re-run
     `measure:closed-bodies` with a real checker as the receiver resolver,
     since `receiver` was 28.8% of what kept a body open and tier 2 resolves
-    97.8% of receivers. That test is now run.
+    97.8% of receivers. Three readings, each one found by checking the
+    previous one rather than trusting it:
 
-    `calls.ts` gained one optional field on `CallSide` — `resolveReceiver` —
-    consulted at `placeOf`'s three `receiver` dead ends and nowhere else;
-    `resolves`/`callsTo`, the live path `drift.ts` uses, never sees it. A type
-    a resolver names is placed exactly the way a bare name already is:
-    declared here, imported and traced, or neither. No new refusal reason —
-    a resolver only narrows `receiver` into a word this reader already had.
+    **Reading one, 12.6%.** `calls.ts` gained `CallSide.resolveReceiver`,
+    consulted at `placeOf`'s `receiver` dead ends; a resolved type was placed
+    exactly as a bare name would be — declared here, imported and traced, or
+    `unbound`. `receiver` as sole blocker fell from 1,255 bodies to 46, and
+    only 51 bodies actually closed. Read as "the closed-body question was
+    never really asking what tier 2 answers" — a type needs to be placed
+    *to a file*, and a name search over one file's own text was never going
+    to place `Array`, `Promise`, or a package never imported by that literal
+    name at that call.
 
-    The closed share moved **10.5% → 12.6%** (ts/tsx/js, 2,541 bodies with
-    calls) — real, and nowhere near what the receiver numbers alone predicted.
-    `receiver` as the *sole* blocker fell from 1,255 open bodies to 46 — the
-    resolver works, exactly as measured in item 12 — and only 51 bodies
-    actually closed. The other ~1,200 did not vanish; they moved almost
-    entirely into `unbound`, which rose to 1,355 sole-blocker bodies, 61.0% of
-    what stayed open.
+    **Reading two, 43.4% → 44.7%.** That framing conflated two different
+    dead ends under one word. `getSymbol()` on a resolved type gives the
+    compiler's own answer to *where it is declared* — a question a name
+    search never asked. `ReceiverResolution` gained `{ kind: "external" }`
+    (declared outside the tree — closes the call on the spot, no name match:
+    a call that provably lands outside the repository provably is not any
+    repo routine) and `{ kind: "declared"; file }` (declared *inside* the
+    tree, at a file the compiler names directly — closes what a name search
+    structurally cannot: `const x = make(); x.run()` binds no name to `x`'s
+    real type anywhere in the file's own text, only to `make`, the function
+    that produced it).
 
-    The mechanism, checked rather than assumed: `placeName` can place a
-    resolved type only when *this file's own text* imports or declares it.
-    Most receivers resolve to `Array`, `Promise`, `string`, a class from a
-    package never named as a dependency of the call being asked about — real,
-    correct answers that no file's import list was ever going to contain,
-    because nothing imports a language builtin. `receiver` was never the wall
-    on its own. It was standing in front of `unbound`, and resolving the
-    first exposes the second rather than removing it — the same shape item 9
-    found for `@calls` itself, one layer up: an abstraction that looks like
-    the blocker turns out to be hiding the real one underneath.
+    **Reading three, 50.3%, and checked closed.** A per-*query* tally
+    (`resolverAnswers`) counted what the resolver actually answered —
+    `declared`/`external`/`type`(no file)/`none` — against a matching
+    per-*site* reason count, restricted to receiver sites only
+    (`CallSitePlaced.receiver`, added because comparing a query count against
+    a body count, and later against a site count that silently included bare
+    unimported calls, produced two more wrong-looking gaps before this one
+    held up). That check found a real bug: `placeOf` only asked the resolver
+    at two of the four points a `through` callee could dead-end at. Whenever
+    the receiver's own bare name happened to *also* match something in
+    `bindings.imported` — ambiguous, an unresolved specifier, a re-export
+    chain that ran out of road — the reader tried to place the name as a
+    *namespace* first and, on failure, gave up without ever asking what the
+    receiver's *value* actually was. Fixed at all three points; confirmed by
+    the same tally afterward: **1,646 remaining receiver sites, at or under
+    the 2,076-site structural ceiling** (`type`-with-no-declaring-file plus
+    no answer at all) — the check that closes the loop, not a second guess.
 
-    So tier 2 does what it was measured to do — it answers `x`'s type nearly
-    every time — and the closed-body question was never really asking that.
-    It needs the type *placed to a file*, and a builtin or an untracked
-    package dependency has no file this reader's population will ever supply
-    one for. #221's "don't build it" stands, now on a structural reason a
-    better resolver cannot reach, rather than on tier 1's reach being too
-    small to try. `docs/claim-vocabulary.md`'s own #226 record can stop
-    flagging this as open: the number that was going to decide it has been
-    run, and it decided against.
+    Two things stayed genuinely unreachable, both structural rather than a
+    reader gap: a union or bare primitive has no single declaration for
+    `getSymbol()` to return (`string`, `Node | null`), and `js` resolves
+    nothing new at all (`checkJs` is off, unchanged from item 12).
+
+    #221's "don't build it" is **reversed**: half of ts/tsx/js bodies that
+    call anything now have a call set this reader can enumerate completely,
+    against 10.6% reading text alone. Whether that is worth turning into an
+    actual `@calls`-refutes-absence word is a separate decision — it still
+    needs the licence grid (#209), a per-language measurement of how often
+    *this* reader is wrong, and #217's other two shapes (altitude, label
+    contradiction) are untouched by any of this — but the ceiling itself is
+    no longer "real and nearly empty."
 
 `renders` was also raised as a possible missing relation and turned out not to
 be one: `<MenuContent />` is a routine making a MenuContent, which is `@builds`.

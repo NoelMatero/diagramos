@@ -159,6 +159,10 @@ function bumpClosure(
   bodiesMap: Map<Language, number>, closedMap: Map<Language, number>,
   calllessMap: Map<Language, number>, openMap: Map<Language, number>,
   soleMap: Map<Language, Map<string, number>>, anyMap: Map<Language, Map<string, number>>,
+  /** Per *site*, not per body -- the unit `resolverAnswers` counts in, so the
+   *  two can be compared directly instead of comparing a body count against
+   *  a query count and calling it a check. */
+  siteReasonMap: Map<Language, Map<string, number>>,
 ): void {
   for (const body of bodiesRead) {
     bump(bodiesMap, language);
@@ -167,6 +171,12 @@ function bumpClosure(
     if (body.sites.length === 0) bump(calllessMap, language);
     else if (isClosed) bump(closedMap, language);
     else bump(openMap, language);
+
+    // Receiver sites only -- a bare, unimported `foo()` can land in the same
+    // `unbound`/`unplaced` buckets and has nothing to do with a resolver.
+    const perSite = siteReasonMap.get(language) ?? new Map<string, number>();
+    for (const site of blocking) { if (site.receiver) bump(perSite, site.why!); }
+    siteReasonMap.set(language, perSite);
 
     if (blocking.length > 0) {
       const reasons = new Set(blocking.map((one) => one.why!));
@@ -215,6 +225,18 @@ const openTier2 = new Map<Language, number>();
 const soleBlockerTier2 = new Map<Language, Map<string, number>>();
 const anyBlockerTier2 = new Map<Language, Map<string, number>>();
 const TIER2_LANGUAGES = new Set<Language>(["ts", "tsx", "js"]);
+
+/**
+ * What `resolveReceiver` actually answered, every query, no correlation
+ * needed after the fact -- counted right where the answer is decided,
+ * which is the fix for the imprecise line-matching an earlier session's
+ * probe used and got wrong on its very first sample.
+ */
+interface ResolverTally { type: number; declared: number; external: number; none: number }
+const resolverAnswers = new Map<Language, ResolverTally>();
+/** Per-site (not per-body) reason tally for the tier-2 reading -- the same
+ *  unit `resolverAnswers` counts in. */
+const siteReasonTier2 = new Map<Language, Map<string, number>>();
 
 /** Referee disagreement about how many call sites a body has. */
 interface Disagreement {
@@ -268,12 +290,25 @@ for (const tree of trees) {
   // as a resolver rather than as a check on a syntax-only answer.
   let tsChecker: ReturnType<typeof createTsReferee> | undefined;
   try { tsChecker = createTsReferee(tree); } catch { tsChecker = undefined; }
-  const resolveReceiver = (at: { start: number; end: number }, file: string): ReceiverResolution | undefined => {
+  const resolveReceiver = (at: { start: number; end: number }, file: string, language: Language): ReceiverResolution | undefined => {
+    const tally = resolverAnswers.get(language) ?? { type: 0, declared: 0, external: 0, none: 0 };
+    resolverAnswers.set(language, tally);
     const answer = tsChecker?.typeAt(file, at.start, at.end);
     if (!answer || answer.head === "any" || answer.head === "unknown" || /error/i.test(answer.head)) {
+      tally.none += 1;
       return undefined;
     }
-    if (answer.declaringFile && isOutsideTree(answer.declaringFile, tree)) return { kind: "external" };
+    if (answer.declaringFile) {
+      if (isOutsideTree(answer.declaringFile, tree)) { tally.external += 1; return { kind: "external" }; }
+      // Repo-local, and the compiler already knows exactly which file --
+      // stronger than a name search, and it catches what one cannot: a
+      // receiver's type this file never imports by name at all, only the
+      // function that produced it.
+      const relDeclared = path.relative(tree, answer.declaringFile);
+      tally.declared += 1;
+      return { kind: "declared", file: relDeclared };
+    }
+    tally.type += 1;
     return { kind: "type", name: answer.head };
   };
 
@@ -293,12 +328,12 @@ for (const tree of trees) {
     if (TIER2_LANGUAGES.has(language)) {
       const tier2Reading = callSitesIn({
         file: rel, source, language, imports: imports(rel, source), open,
-        resolveReceiver: (at) => resolveReceiver(at, file),
+        resolveReceiver: (at) => resolveReceiver(at, file, language),
       });
       if (tier2Reading.read) {
         bumpClosure(
           tier2Reading.bodies, language, bodiesTier2, closedTier2, calllessTier2, openTier2,
-          soleBlockerTier2, anyBlockerTier2,
+          soleBlockerTier2, anyBlockerTier2, siteReasonTier2,
         );
       }
     }
@@ -674,15 +709,47 @@ for (const reason of reasonNamesTier2) {
 }
 console.log();
 console.log("  Most of what used to land here is now placed immediately instead: a type");
-console.log("  whose own declaration the compiler can point to outside this tree (a");
-console.log("  language builtin, a `node_modules` package) closes the call without a name");
-console.log("  match at all -- see the closed-share jump above. What still lands in");
-console.log("  `unbound`/`unplaced` needs its own count before it is explained rather than");
-console.log("  guessed at: a receiver's `getSymbol()` returns nothing for a union");
-console.log("  (`Node | null`) or a bare primitive, so those never reach the `external`");
-console.log("  check at all -- confirmed at ~3,000 sites corpus-wide. Whether the rest is a");
-console.log("  further structural ceiling or a fixable gap in `placeName`'s own name match");
-console.log("  is not yet checked and should not be assumed either way.");
+console.log("  whose own declaration the compiler can point to -- inside this tree");
+console.log("  (`declared`) or outside it (`external`) -- closes the call without a name");
+console.log("  match at all. What's left in `unbound`/`unplaced` is exactly the queries");
+console.log("  where the resolver could not get a declaring file at all (`type`, the");
+console.log("  fallback) plus the small remainder `placeName`'s own name search still");
+console.log("  could not close even with a repo-relative file in hand -- counted by what");
+console.log("  the resolver actually answered, not reconstructed after the fact:");
+console.log();
+console.log("  " + "language".padEnd(10) + "declared".padStart(10) + "external".padStart(10)
+  + "type (no file)".padStart(16) + "none".padStart(8));
+for (const language of ["ts", "tsx", "js"] as Language[]) {
+  const tally = resolverAnswers.get(language);
+  if (!tally) continue;
+  console.log("  " + language.padEnd(10) + String(tally.declared).padStart(10) + String(tally.external).padStart(10)
+    + String(tally.type).padStart(16) + String(tally.none).padStart(8));
+}
+console.log();
+console.log("  `type (no file)` is the honest ceiling on this whole approach: a union or a");
+console.log("  bare primitive has no single declaration for `getSymbol()` to return, so no");
+console.log("  amount of import-tracing or file-matching reaches it. Compared site-for-site,");
+console.log("  not body-against-query -- the mismatch an earlier session's check made:");
+console.log();
+const siteUnboundOrUnplaced = tsxLangs.reduce((sum, one) => {
+  const per = siteReasonTier2.get(one);
+  return sum + (per?.get("unbound") ?? 0) + (per?.get("unplaced") ?? 0);
+}, 0);
+const noFileOrNone = tsxLangs.reduce((sum, one) => {
+  const tally = resolverAnswers.get(one);
+  return sum + (tally?.type ?? 0) + (tally?.none ?? 0);
+}, 0);
+console.log(`  unbound + unplaced sites: ${siteUnboundOrUnplaced}`);
+console.log(`  type (no file) + none, same population: ${noFileOrNone}`);
+if (siteUnboundOrUnplaced <= noFileOrNone) {
+  console.log("  The site count is at or below the ceiling -- `declared`/`external` are not");
+  console.log("  leaving a further name-search gap behind them at any real size. What's left");
+  console.log("  is the structural residue this approach was never going to reach.");
+} else {
+  console.log(`  ${siteUnboundOrUnplaced - noFileOrNone} more sites are unbound/unplaced than the resolver's own`);
+  console.log("  ceiling accounts for -- a real remaining gap, worth a fixture and a fix");
+  console.log("  rather than accepting the number as final.");
+}
 console.log();
 
 console.log("7 · WHAT THIS ANSWERS");

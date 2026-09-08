@@ -276,4 +276,68 @@ describe("a receiver placed by a resolver, not by the text", () => {
       resolveReceiver: () => ({ kind: "external" }),
     })).toEqual([]);
   });
+
+  it("places a receiver at the file the resolver names directly, with no name search at all", () => {
+    // The shape a name search alone can never close: `x`'s real type
+    // (`Thing`, declared in "thing.ts") is never imported by name here --
+    // only `make`, the function that produced it, is. `placeName("Thing", ..)`
+    // would find nothing in this file's own bindings and refuse; `declared`
+    // skips that search because the resolver already knows the file.
+    const body = sitesIn(
+      'import { make } from "./make";\nfunction f() {\n  const x = make();\n  x.run();\n}\n',
+      "ts",
+      { resolveReceiver: () => ({ kind: "declared", file: "thing.ts" }) },
+    ).find((one) => one.routine === "f")!;
+    const receiverSite = body.sites.find((one) => one.name === "run")!;
+    expect(receiverSite.file).toBe("thing.ts");
+  });
+
+  /**
+   * Three shapes `placeOf` used to give up on *before* ever consulting a
+   * resolver, found re-measuring #221 the morning after: whenever the
+   * receiver's own bare name (`x` in `x.foo()`) happened to also match
+   * something in `bindings.imported` -- ambiguous, an unresolved specifier,
+   * or a re-export chain that ran out of road -- the reader tried to place
+   * `x` as a *namespace* first and, on failure, refused outright. A resolver
+   * answers the *value* question directly and was never asked. Confirmed at
+   * ~880 receiver sites corpus-wide before this fix (`measure:closed-bodies`
+   * section 6's own site-for-site count).
+   */
+  it("falls back to the resolver when the receiver's bare name is itself ambiguous", () => {
+    // `x` is both imported and locally declared here -- ambiguous as a
+    // *value* name. The resolver, asked at one exact position, has no such
+    // doubt.
+    const body = sitesIn(
+      'import { x } from "./mod";\nfunction x() {}\nclass Foo {\n  run() {}\n}\nfunction f() {\n  x.run();\n}\n',
+      "ts",
+      { resolveReceiver: () => ({ kind: "type", name: "Foo" }) },
+    ).find((one) => one.routine === "f")!;
+    expect(body.sites.find((one) => one.name === "run")!.file).toBe("a.ts");
+  });
+
+  it("falls back to the resolver when the receiver's bare name is an import that never resolved to a file", () => {
+    const body = sitesIn(
+      'import { x } from "unittest.mock";\nfunction f() {\n  x.run();\n}\n',
+      "ts",
+      { imports: [{ specifier: "unittest.mock" }], resolveReceiver: () => ({ kind: "external" }) },
+    ).find((one) => one.routine === "f")!;
+    expect(body.sites.find((one) => one.name === "run")!.file).toBe("<external-to-repository>");
+  });
+
+  it("falls back to the resolver when the receiver's bare name resolves but the re-export chain runs out", () => {
+    const body = sitesIn(
+      'import { x } from "./barrel";\nfunction f() {\n  x.run();\n}\n',
+      "ts",
+      {
+        imports: [{ specifier: "./barrel", file: "barrel.ts" }],
+        open: () => ({
+          source: 'export * from "./deeper";\n',
+          language: "ts",
+          imports: [{ specifier: "./deeper" }],
+        }),
+        resolveReceiver: () => ({ kind: "declared", file: "thing.ts" }),
+      },
+    ).find((one) => one.routine === "f")!;
+    expect(body.sites.find((one) => one.name === "run")!.file).toBe("thing.ts");
+  });
 });

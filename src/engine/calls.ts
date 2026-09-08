@@ -210,18 +210,32 @@ export interface CallSide {
    * in exactly one place: `placeOf`'s three `receiver` dead ends, where the
    * text names a value (`x.foo()`) but not what it is.
    *
-   * Two shapes, both narrowing `receiver` and never inventing a new refusal:
+   * Three shapes, all narrowing `receiver` and never inventing a new refusal:
    *
-   *   `{ kind: "type"; name }`      placed exactly the way a bare name would
-   *                                 be -- local, imported, or `unbound` when
-   *                                 the name matches neither.
-   *   `{ kind: "external" }`        the resolver knows *where the type is
-   *                                 declared* and that place is not this
-   *                                 repository (a language builtin, a package
-   *                                 in `node_modules`) -- placed immediately,
-   *                                 without a name match, because a call that
-   *                                 provably lands outside the repository
-   *                                 provably is not any repo routine either.
+   *   `{ kind: "type"; name }`        placed exactly the way a bare name
+   *                                   would be -- local, imported, or
+   *                                   `unbound` when the name matches
+   *                                   neither. The fallback: a resolver that
+   *                                   only knows a printed type name and
+   *                                   nothing about where it lives.
+   *   `{ kind: "declared"; file }`    the resolver knows *the exact
+   *                                   repo-relative file* the type is
+   *                                   declared in -- placed there directly,
+   *                                   bypassing a name search entirely.
+   *                                   Stronger than `type`, and catches what
+   *                                   it cannot: `const x = make(); x.run()`
+   *                                   binds no name this file ever imports
+   *                                   for `x`'s real type, only for `make`,
+   *                                   so a name search finds nothing to
+   *                                   place even though the compiler already
+   *                                   knows exactly where `x`'s type lives.
+   *   `{ kind: "external" }`          the resolver knows *where the type is
+   *                                   declared* and that place is not this
+   *                                   repository (a language builtin, a
+   *                                   package in `node_modules`) -- placed
+   *                                   immediately, because a call that
+   *                                   provably lands outside the repository
+   *                                   provably is not any repo routine either.
    *
    * `resolves`/`callsTo`, the live per-claim path `drift.ts` uses, never
    * reads this field: wiring a resolver in is additive to the closed-bodies
@@ -233,6 +247,7 @@ export interface CallSide {
 /** What `resolveReceiver` may answer with. See `CallSide.resolveReceiver`'s doc. */
 export type ReceiverResolution =
   | { kind: "type"; name: string }
+  | { kind: "declared"; file: string }
   | { kind: "external" };
 
 /* ------------------------------------------------------------------ bindings */
@@ -998,6 +1013,16 @@ export interface CallSitePlaced {
   file?: string;
   /** Why it was not placed. Absent exactly when `file` is present. */
   why?: SiteUnresolved;
+  /**
+   * Whether this call went through `resolveReceiver` at all -- `x.foo()`,
+   * not a bare `foo()`. Without this, a `why` tally cannot be checked
+   * against what a resolver actually answered: a bare unimported call and a
+   * receiver call land in the same `unbound`/`unplaced` buckets, and
+   * comparing a resolver's own query count against the combined bucket
+   * always looks like a huge unexplained gap that is really just the wrong
+   * population being compared.
+   */
+  receiver: boolean;
 }
 
 /** Every call site in one routine, placed or refused. */
@@ -1105,6 +1130,7 @@ function placeThroughChecker(
   const resolved = side.resolveReceiver(at);
   if (!resolved) return undefined;
   if (resolved.kind === "external") return EXTERNAL_RECEIVER;
+  if (resolved.kind === "declared") return resolved.file;
   return placeName(resolved.name, side, bindings);
 }
 
@@ -1131,17 +1157,28 @@ function placeOf(
 
   const bound = callee.kind === "through" ? callee.through : callee.name;
   const at = callee.kind === "through" ? callee.at : undefined;
+  // A resolver is only ever a fallback for a `through` callee -- `bare` and
+  // `own` calls have no receiver expression for one to be asked about.
+  const throughChecker = (): { why: SiteUnresolved } | string =>
+    placeThroughChecker(at, side, bindings) ?? { why: "receiver" };
+
   // An expression receiver -- `make().run()`, `a.b.c()` -- names nothing to
   // look up. Dynamic dispatch, and the reader cannot say whose method it is --
   // unless a resolver can, from the expression itself rather than its name.
-  if (!bound) return placeThroughChecker(at, side, bindings) ?? { why: "receiver" };
-  if (bindings.ambiguous.has(bound)) return { why: "ambiguous" };
+  if (!bound) return throughChecker();
+  if (bindings.ambiguous.has(bound)) {
+    // Ambiguous as a *value* name (declared twice over) does not mean the
+    // resolver is confused -- it asked the compiler at one exact position,
+    // which binding governs there is not in doubt for it the way it is for
+    // a linear text read.
+    return callee.kind === "through" ? throughChecker() : { why: "ambiguous" };
+  }
 
   const imported = bindings.imported.get(bound);
   if (!imported) {
     if (!bindings.local.has(bound)) {
       if (callee.kind !== "through") return { why: "unbound" };
-      return placeThroughChecker(at, side, bindings) ?? { why: "receiver" };
+      return throughChecker();
     }
     /*
      * Declared here. A bare name means this file's own; a member reached
@@ -1150,16 +1187,24 @@ function placeOf(
      * says what it is.
      */
     if (callee.kind !== "through") return side.file;
-    return placeThroughChecker(at, side, bindings) ?? { why: "receiver" };
+    return throughChecker();
   }
 
   const { files, known } = filesFor(imported.specifier, side.imports);
-  if (files.size === 0) return { why: known ? "unplaced" : "unbound" };
+  if (files.size === 0) {
+    // `bound` reads as a namespace/module import whose specifier did not
+    // resolve -- correct for `ns.foo()`, and not the last word for a
+    // `through` callee: `bound` naming an import is not proof the receiver
+    // is a namespace rather than an ordinary value that merely shares its
+    // name with one, and a resolver answers the value question directly.
+    if (callee.kind === "through") return throughChecker();
+    return { why: known ? "unplaced" : "unbound" };
+  }
   for (const file of files) {
     const rest = comesToRest(callee.name, file, side, new Set());
     if (rest) return rest;
   }
-  return { why: "elsewhere" };
+  return callee.kind === "through" ? throughChecker() : { why: "elsewhere" };
 }
 
 /**
@@ -1225,6 +1270,7 @@ export function callSitesIn(side: CallSide): CallSitesReading {
           name: "",
           line: lineOf(side.source, inner.startIndex),
           why: "macro",
+          receiver: false,
         });
         return;
       }
@@ -1234,6 +1280,7 @@ export function callSitesIn(side: CallSide): CallSitesReading {
       body.sites.push({
         name: callee.kind === "computed" ? "" : callee.name,
         line: lineOf(side.source, inner.startIndex),
+        receiver: callee.kind === "through",
         ...(typeof where === "string" ? { file: where } : { why: where.why }),
       });
     });
