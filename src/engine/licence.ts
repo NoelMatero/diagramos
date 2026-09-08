@@ -192,6 +192,73 @@ export function isMeasured(row: RelationLicence): row is RelationMeasured {
   return !("unmeasured" in row);
 }
 
+/**
+ * Which kind of absence a word's accusation rests on (#231).
+ *
+ * `presence` is every accusation this grid answered before #231: the reader
+ * found something -- a name, a call running the other way -- and drew a
+ * verdict from what it found. `absence` is a newly-possible second kind,
+ * where a reader can enumerate everything a piece of code could mean and
+ * say "not among them" as a fact rather than a guess.
+ *
+ * They are measured separately because they rest on different readers
+ * earning different rights. `@calls`' presence licence rests on a text scan
+ * finding a call running the other way (`calls.ts`'s `backwards` verdict);
+ * its absence licence rests on a real compiler closing a body's entire call
+ * set (docs/claim-vocabulary.md items 12-14, `measure:closed-bodies`). A
+ * licence for one says nothing about the other, which is why this is an
+ * axis rather than a flag beside the existing one.
+ */
+export type AccusalAxis = "presence" | "absence";
+
+/**
+ * What one word may accuse with, on one axis, in one language.
+ *
+ * Exhaustive over both fields for the same reason `relations` below is
+ * exhaustive over every word: a hole here is the hole #207 already closed,
+ * reopened one axis over. Most words have no absence-based reader yet, and
+ * `absence` says so with `NOT_DESIGNED_YET` rather than by being missing --
+ * "unmeasured is an answer, blank is not" is `RelationUnmeasured`'s rule,
+ * carried up one level.
+ */
+export interface AccusalLicence {
+  presence: RelationLicence;
+  absence: RelationLicence;
+}
+
+/**
+ * The answer for every word that has no absence-based reader yet.
+ *
+ * `@calls` is the only word #231 gave one to: a tier-2 receiver resolver
+ * that can close a whole body's call set (docs/claim-vocabulary.md items
+ * 12-14). No other word has an analogous closed-region reader, so this is
+ * the honest answer until one is built -- not a placeholder standing in for
+ * a "yes" nobody has checked.
+ */
+const NOT_DESIGNED_YET: RelationUnmeasured = {
+  unmeasured:
+    "No absence-based accusation is designed for this word yet. #231 gave " +
+    "the licence grid a second axis for @calls, whose tier-2 receiver " +
+    "resolver can close a body's entire call set (docs/claim-vocabulary.md " +
+    "items 12-14); no other word has an analogous closed-region reader.",
+};
+
+/**
+ * `@calls`' absence licence outside TypeScript/TSX.
+ *
+ * #230 built the closed-body resolver against `tsc` alone; rust and python
+ * have no compiler-backed receiver resolver wired in, so this axis is
+ * unmeasured for them by an explicit scope decision (#231), not oversight.
+ */
+const NO_CLOSED_BODY_RESOLVER: RelationUnmeasured = {
+  unmeasured:
+    "#230 measured the closed-body resolver for ts/tsx/js only, using " +
+    "`tsc` as the receiver resolver. Rust and Python have no compiler-backed " +
+    "resolver wired in for this, so this axis is unmeasured for them by " +
+    "scope decision, not oversight (#231, docs/claim-vocabulary.md items " +
+    "12-14).",
+};
+
 export interface Licence {
   language: string;
   /** File extensions this licence covers. */
@@ -209,9 +276,11 @@ export interface Licence {
    * Exhaustive by type, so the hole is impossible rather than merely visible:
    * a new accusing word does not compile until every licence has an answer for
    * it, and the answer can be `unmeasured`. That was the decision at #207 --
-   * see the header of `mayAccuse`.
+   * see the header of `mayAccuse`. #231 added `AccusalLicence`'s second axis
+   * on top of the same guarantee: a word with no absence-based reader still
+   * needs an explicit `unmeasured` rather than a missing field.
    */
-  relations: Record<AccusingRelation, RelationLicence>;
+  relations: Record<AccusingRelation, AccusalLicence>;
 }
 
 /**
@@ -351,93 +420,153 @@ export const LICENCES: readonly Licence[] = [
     ],
     relations: {
       needs: {
-        reproduce: "npm run measure:licence -- --only=typescript",
-        measured: "2026-08-21",
-        referee: "the corpus above, and the referee named beside it",
-        unit: "dependency edges",
-        counts: "corpus",
+        presence: {
+          reproduce: "npm run measure:licence -- --only=typescript",
+          measured: "2026-08-21",
+          referee: "the corpus above, and the referee named beside it",
+          unit: "dependency edges",
+          counts: "corpus",
+        },
+        absence: NOT_DESIGNED_YET,
       },
-      takes: TYPESCRIPT_SIGNATURE,
-      returns: TYPESCRIPT_SIGNATURE,
+      takes: { presence: TYPESCRIPT_SIGNATURE, absence: NOT_DESIGNED_YET },
+      returns: { presence: TYPESCRIPT_SIGNATURE, absence: NOT_DESIGNED_YET },
       holds: {
-        reproduce: "npm run measure:holds",
-        measured: "2026-09-02",
-        referee: TEXT_SCAN("field list"),
-        unit: "field asks",
-        counts: { asked: 1195, missed: 0, invented: 0 },
-        covers: ["ts", "tsx"],
-        note:
-          "1,018 of them TypeScript and 177 TSX. JavaScript writes no type on a " +
-          "field, so its 21 files in the corpus ask nothing -- and `holds` " +
-          "refuses them as `no-fields` well before the licence is read, which " +
-          "is why saying no here costs nothing and says something true.",
+        presence: {
+          reproduce: "npm run measure:holds",
+          measured: "2026-09-02",
+          referee: TEXT_SCAN("field list"),
+          unit: "field asks",
+          counts: { asked: 1195, missed: 0, invented: 0 },
+          covers: ["ts", "tsx"],
+          note:
+            "1,018 of them TypeScript and 177 TSX. JavaScript writes no type on a " +
+            "field, so its 21 files in the corpus ask nothing -- and `holds` " +
+            "refuses them as `no-fields` well before the licence is read, which " +
+            "is why saying no here costs nothing and says something true.",
+        },
+        absence: NOT_DESIGNED_YET,
       },
       builds: {
-        reproduce: "npm run measure:constructs",
-        measured: "2026-09-02",
-        referee: TEXT_SCAN("routine body"),
-        unit: "construction asks",
-        counts: { asked: 225, missed: 0, invented: 0 },
-        covers: ["ts", "tsx"],
-        note:
-          "55 of them TypeScript and 170 TSX. JavaScript is the real gap on this " +
-          "grid: `new Foo()` is a construction this reader could read there, and " +
-          "the corpus simply has none to ask about. Unlike `holds`, nothing else " +
-          "stops a JavaScript `@builds` arrow, so the empty square is the only " +
-          "thing standing between an unmeasured reader and a red.",
+        presence: {
+          reproduce: "npm run measure:constructs",
+          measured: "2026-09-02",
+          referee: TEXT_SCAN("routine body"),
+          unit: "construction asks",
+          counts: { asked: 225, missed: 0, invented: 0 },
+          covers: ["ts", "tsx"],
+          note:
+            "55 of them TypeScript and 170 TSX. JavaScript is the real gap on this " +
+            "grid: `new Foo()` is a construction this reader could read there, and " +
+            "the corpus simply has none to ask about. Unlike `holds`, nothing else " +
+            "stops a JavaScript `@builds` arrow, so the empty square is the only " +
+            "thing standing between an unmeasured reader and a red.",
+        },
+        absence: NOT_DESIGNED_YET,
       },
       calls: {
-        reproduce: "npm run measure:calls",
-        measured: "2026-09-03",
-        referee: CALL_SCAN,
-        unit: "calls between routines the corpus declares exactly once",
-        counts: { asked: 1091, missed: 0, invented: 0 },
-        covers: ["ts", "tsx"],
-        note:
-          "780 TypeScript at 97.9% recall and 311 TSX at 87.5%. JavaScript is " +
-          "inside this licence and was asked **2 questions** over 7 files, which " +
-          "is the square #207 was written for and #211 landed on: `calls` shipped " +
-          "reading the old per-language gate, so a JavaScript arrow could be told " +
-          "to turn round on a reader nothing had measured in JavaScript. Nothing " +
-          "structural stops a JavaScript call the way `no-fields` stops a " +
-          "JavaScript `holds`, so this `covers` is the only thing withholding it.",
+        presence: {
+          reproduce: "npm run measure:calls",
+          measured: "2026-09-03",
+          referee: CALL_SCAN,
+          unit: "calls between routines the corpus declares exactly once",
+          counts: { asked: 1091, missed: 0, invented: 0 },
+          covers: ["ts", "tsx"],
+          note:
+            "780 TypeScript at 97.9% recall and 311 TSX at 87.5%. JavaScript is " +
+            "inside this licence and was asked **2 questions** over 7 files, which " +
+            "is the square #207 was written for and #211 landed on: `calls` shipped " +
+            "reading the old per-language gate, so a JavaScript arrow could be told " +
+            "to turn round on a reader nothing had measured in JavaScript. Nothing " +
+            "structural stops a JavaScript call the way `no-fields` stops a " +
+            "JavaScript `holds`, so this `covers` is the only thing withholding it.",
+        },
+        /*
+         * The new axis (#231). `presence` above rests on finding a call
+         * running the other way; this rests on a tier-2 compiler resolver
+         * closing a body's entire call set, so "not among them" is a fact
+         * rather than a blind spot (docs/claim-vocabulary.md items 12-14).
+         */
+        absence: {
+          reproduce: "npm run measure:closed-bodies",
+          measured: "2026-09-08",
+          referee:
+            "a second question put to the same compiler, at the call's own " +
+            "method position rather than its receiver's -- `getSymbolAtLocation` " +
+            "on `foo` in `x.foo()`, the question a real \"go to definition\" " +
+            "asks -- compared against where `placeOf` already said the call " +
+            "landed. It shares the compiler with the reader, so agreeing does " +
+            "not mean two unrelated readings agree; it means a more specific " +
+            "question of the same source of truth did not disagree with the " +
+            "reader's plumbing.",
+          unit: "placed calls checked against the method's own declaration",
+          counts: { asked: 8964, missed: 62 },
+          covers: ["ts", "tsx"],
+          note:
+            "0.7% wrong (62 of 8,964) -- ts alone 0.1% (8 of 7,423), tsx 3.5% " +
+            "(54 of 1,541) -- below the 1.1-2.0% this repo already shipped a " +
+            "word on (item 12's tier-1 resolver). Item 13's closed share, once " +
+            "both fixes this check found were applied, is 49.6% of ts/tsx/js " +
+            "bodies that call anything (10.3% at tier 1 alone) -- a more honest " +
+            "number than item 13's headline 50.3%, not a different finding. " +
+            "`js` is excluded from `covers`: `checkJs` is off, so tier 2 " +
+            "resolves almost nothing there, and it is out of scope by decision " +
+            "rather than left for later (#231).",
+          known: [
+            "A receiver whose declared type is an interface or a generic " +
+              "wrapper, where the concrete implementation is decided by " +
+              "something the type system itself cannot see, agrees with the " +
+              "reader's mistake rather than catching it -- this referee asks " +
+              "the same compiler the reader does, so the two share the one " +
+              "limitation neither can see past. Concentrated almost entirely " +
+              "in one third-party menu library's generic store pattern in one " +
+              "test tree, not spread across the corpus. A floor on how wrong " +
+              "this is, not a ceiling on how right.",
+          ],
+        },
       },
       accesses: {
-        reproduce: "npm run measure:accesses",
-        measured: "2026-09-04",
-        referee: MEMBER_SCAN,
-        unit: "member asks at the type end",
-        counts: { asked: 5181, missed: 0, invented: 0 },
-        covers: ["ts", "tsx"],
-        note:
-          "4,823 of them TypeScript and 358 TSX, and the count is of the **type** " +
-          "end only -- the end that can accuse. TypeScript refuses 1.9% of its " +
-          "asks, every one of them a type with an index signature, which is a " +
-          "member list that answers to any name at all. TSX refuses none. " +
-          "JavaScript is inside this licence and was asked **0 questions**: it " +
-          "writes no member list a text scan can find, so `covers` withholds it " +
-          "-- the same square #211 shipped a `yes` in.",
+        presence: {
+          reproduce: "npm run measure:accesses",
+          measured: "2026-09-04",
+          referee: MEMBER_SCAN,
+          unit: "member asks at the type end",
+          counts: { asked: 5181, missed: 0, invented: 0 },
+          covers: ["ts", "tsx"],
+          note:
+            "4,823 of them TypeScript and 358 TSX, and the count is of the **type** " +
+            "end only -- the end that can accuse. TypeScript refuses 1.9% of its " +
+            "asks, every one of them a type with an index signature, which is a " +
+            "member list that answers to any name at all. TSX refuses none. " +
+            "JavaScript is inside this licence and was asked **0 questions**: it " +
+            "writes no member list a text scan can find, so `covers` withholds it " +
+            "-- the same square #211 shipped a `yes` in.",
+        },
+        absence: NOT_DESIGNED_YET,
       },
       conforms: {
-        reproduce: "npm run measure:conforms",
-        measured: "2026-09-06",
-        referee: HEADER_SCAN,
-        unit: "base asks",
-        counts: { asked: 376, missed: 0, invented: 0 },
-        covers: ["ts", "tsx"],
-        note:
-          "213 TypeScript and 163 TSX, refusing none of them, and every one of " +
-          "the 163 is `interface X extends Y` -- there is not one class heritage " +
-          "clause in any .tsx file in the corpus. JavaScript is inside this " +
-          "licence and was asked **0 questions**, so `covers` withholds it, the " +
-          "same square #211 shipped a `yes` in. Asked the 122 readable pairs " +
-          "backwards, it confirmed **0**, which is the number the word exists " +
-          "for. The run found one reader bug before it could report any of this: " +
-          "TypeScript hangs a class's type arguments off the clause as a sibling " +
-          "of the base name, and with no rule for that node every declaration " +
-          "carrying them held a doubt that silences absences -- a word that " +
-          "would have shipped and never fired on `class A extends B<C>`, " +
-          "invisible from the confirming side.",
+        presence: {
+          reproduce: "npm run measure:conforms",
+          measured: "2026-09-06",
+          referee: HEADER_SCAN,
+          unit: "base asks",
+          counts: { asked: 376, missed: 0, invented: 0 },
+          covers: ["ts", "tsx"],
+          note:
+            "213 TypeScript and 163 TSX, refusing none of them, and every one of " +
+            "the 163 is `interface X extends Y` -- there is not one class heritage " +
+            "clause in any .tsx file in the corpus. JavaScript is inside this " +
+            "licence and was asked **0 questions**, so `covers` withholds it, the " +
+            "same square #211 shipped a `yes` in. Asked the 122 readable pairs " +
+            "backwards, it confirmed **0**, which is the number the word exists " +
+            "for. The run found one reader bug before it could report any of this: " +
+            "TypeScript hangs a class's type arguments off the clause as a sibling " +
+            "of the base name, and with no rule for that node every declaration " +
+            "carrying them held a doubt that silences absences -- a word that " +
+            "would have shipped and never fired on `class A extends B<C>`, " +
+            "invisible from the confirming side.",
+        },
+        absence: NOT_DESIGNED_YET,
       },
     },
   },
@@ -494,82 +623,97 @@ export const LICENCES: readonly Licence[] = [
     ],
     relations: {
       needs: {
-        reproduce: "npm run measure:licence -- --only=rust",
-        measured: "2026-08-22",
-        referee: "the corpus above, and the referee named beside it",
-        unit: "dependency edges",
-        counts: "corpus",
+        presence: {
+          reproduce: "npm run measure:licence -- --only=rust",
+          measured: "2026-08-22",
+          referee: "the corpus above, and the referee named beside it",
+          unit: "dependency edges",
+          counts: "corpus",
+        },
+        absence: NOT_DESIGNED_YET,
       },
-      takes: RUST_SIGNATURE,
-      returns: RUST_SIGNATURE,
+      takes: { presence: RUST_SIGNATURE, absence: NOT_DESIGNED_YET },
+      returns: { presence: RUST_SIGNATURE, absence: NOT_DESIGNED_YET },
       holds: {
-        reproduce: "npm run measure:holds",
-        measured: "2026-09-02",
-        referee: TEXT_SCAN("field list"),
-        unit: "field asks",
-        counts: { asked: 47, missed: 0, invented: 0 },
+        presence: {
+          reproduce: "npm run measure:holds",
+          measured: "2026-09-02",
+          referee: TEXT_SCAN("field list"),
+          unit: "field asks",
+          counts: { asked: 47, missed: 0, invented: 0 },
+        },
+        absence: NOT_DESIGNED_YET,
       },
       builds: {
-        reproduce: "npm run measure:constructs",
-        measured: "2026-09-02",
-        referee: TEXT_SCAN("routine body"),
-        unit: "construction asks",
-        counts: { asked: 66, missed: 0, invented: 0 },
-        note:
-          "It refuses 81.8% of them, and 96% of the refusals are one generated " +
-          "query module whose every routine is a macro. Safe and nearly useless " +
-          "in that file; the bar this row is about is the zero misses.",
+        presence: {
+          reproduce: "npm run measure:constructs",
+          measured: "2026-09-02",
+          referee: TEXT_SCAN("routine body"),
+          unit: "construction asks",
+          counts: { asked: 66, missed: 0, invented: 0 },
+          note:
+            "It refuses 81.8% of them, and 96% of the refusals are one generated " +
+            "query module whose every routine is a macro. Safe and nearly useless " +
+            "in that file; the bar this row is about is the zero misses.",
+        },
+        absence: NOT_DESIGNED_YET,
       },
       calls: {
-        reproduce:
-          "npm run measure:calls -- .corpus/ripgrep .corpus/anyhow rust-test ~/orangutan",
-        measured: "2026-09-03",
-        referee: CALL_SCAN,
-        unit: "calls between routines the corpus declares exactly once",
-        counts: { asked: 574, missed: 4, invented: 0 },
-        known: [
-          "anyhow declares `pub fn Ok`, and `Ok` is also the prelude variant. " +
-          "`tests/test_ensure.rs` imports the variant and not the function, so " +
-          "its three `Ok(..)` calls are the variant -- which the reader says, " +
-          "and the referee, seeing one declaration of the name in the corpus, " +
-          "asks about anyway.",
-          "`trim_line_terminator` is declared twice in ripgrep's printer, once " +
-          "as a free function and once as a method, and the referee credited " +
-          "`util.rs`'s call to the method in `standard.rs`. The reader is right " +
-          "that the call it can see is the local one.",
-        ],
-        note:
-          "The default corpus asks Rust 36 questions, which is thin enough that " +
-          "a zero in the miss column says very little. So this row is measured " +
-          "over the two repositories the `needs` corpus above already pins -- " +
-          "ripgrep and anyhow at their recorded commits -- and Rust is a " +
-          "different language there: recall falls from 94.4% to 66.0%, and two " +
-          "thirds of the refusals are `macro`. A refusal is not a miss. The four " +
-          "misses were each read and the reader is right about all four -- they " +
-          "are the referee asking about a name it cannot place, which is the " +
-          "class #189 already recorded five of. `Ok` is anyhow\'s own " +
-          "`pub fn Ok` and also the prelude variant, and `test_ensure.rs` " +
-          "imports the one it does not mean; `trim_line_terminator` is declared " +
-          "both as a free function and as a method, and the referee credited the " +
-          "call to the wrong one. What the accusation rests on is the ACCUSED " +
-          "and INVENTED columns, and both are zero across all 574. Reproducing " +
-          "it needs the clones, which `measure:licence` makes in `.corpus/`.",
+        presence: {
+          reproduce:
+            "npm run measure:calls -- .corpus/ripgrep .corpus/anyhow rust-test ~/orangutan",
+          measured: "2026-09-03",
+          referee: CALL_SCAN,
+          unit: "calls between routines the corpus declares exactly once",
+          counts: { asked: 574, missed: 4, invented: 0 },
+          known: [
+            "anyhow declares `pub fn Ok`, and `Ok` is also the prelude variant. " +
+            "`tests/test_ensure.rs` imports the variant and not the function, so " +
+            "its three `Ok(..)` calls are the variant -- which the reader says, " +
+            "and the referee, seeing one declaration of the name in the corpus, " +
+            "asks about anyway.",
+            "`trim_line_terminator` is declared twice in ripgrep's printer, once " +
+            "as a free function and once as a method, and the referee credited " +
+            "`util.rs`'s call to the method in `standard.rs`. The reader is right " +
+            "that the call it can see is the local one.",
+          ],
+          note:
+            "The default corpus asks Rust 36 questions, which is thin enough that " +
+            "a zero in the miss column says very little. So this row is measured " +
+            "over the two repositories the `needs` corpus above already pins -- " +
+            "ripgrep and anyhow at their recorded commits -- and Rust is a " +
+            "different language there: recall falls from 94.4% to 66.0%, and two " +
+            "thirds of the refusals are `macro`. A refusal is not a miss. The four " +
+            "misses were each read and the reader is right about all four -- they " +
+            "are the referee asking about a name it cannot place, which is the " +
+            "class #189 already recorded five of. `Ok` is anyhow\'s own " +
+            "`pub fn Ok` and also the prelude variant, and `test_ensure.rs` " +
+            "imports the one it does not mean; `trim_line_terminator` is declared " +
+            "both as a free function and as a method, and the referee credited the " +
+            "call to the wrong one. What the accusation rests on is the ACCUSED " +
+            "and INVENTED columns, and both are zero across all 574. Reproducing " +
+            "it needs the clones, which `measure:licence` makes in `.corpus/`.",
+        },
+        absence: NO_CLOSED_BODY_RESOLVER,
       },
       accesses: {
-        reproduce: "npm run measure:accesses",
-        measured: "2026-09-04",
-        referee: MEMBER_SCAN,
-        unit: "member asks at the type end",
-        counts: { asked: 284, missed: 0, invented: 0 },
-        note:
-          "Refuses none of them, which is the one language where the member list " +
-          "really is a declaration: a struct has no parent to inherit from and no " +
-          "index signature. What Rust costs instead is at the other end, which " +
-          "never accuses -- the confirming half reads 87.3% of the accesses the " +
-          "referee sees, the lowest of the five, because `format!(\"{}\", " +
-          "self.status)` and `log_line!(.., sock.peer_addr())` put the access " +
-          "inside a macro and a macro's arguments are an unparsed token tree. " +
-          "That is a confirmation nobody gets, never a red.",
+        presence: {
+          reproduce: "npm run measure:accesses",
+          measured: "2026-09-04",
+          referee: MEMBER_SCAN,
+          unit: "member asks at the type end",
+          counts: { asked: 284, missed: 0, invented: 0 },
+          note:
+            "Refuses none of them, which is the one language where the member list " +
+            "really is a declaration: a struct has no parent to inherit from and no " +
+            "index signature. What Rust costs instead is at the other end, which " +
+            "never accuses -- the confirming half reads 87.3% of the accesses the " +
+            "referee sees, the lowest of the five, because `format!(\"{}\", " +
+            "self.status)` and `log_line!(.., sock.peer_addr())` put the access " +
+            "inside a macro and a macro's arguments are an unparsed token tree. " +
+            "That is a confirmation nobody gets, never a red.",
+        },
+        absence: NOT_DESIGNED_YET,
       },
       conforms: {
         /*
@@ -583,33 +727,36 @@ export const LICENCES: readonly Licence[] = [
          * are asked backwards. On any other row those numbers would be a
          * licence.
          */
-        unmeasured:
-          "Not a licence question, and the measurement says so rather than " +
-          "being absent. 4,975 asks over the five pinned Rust clones, 92.9% " +
-          "recall, 0 accused and 0 invented -- and Rust still may not accuse, " +
-          "because a Rust type does not carry what it implements. Three " +
-          "separate places do: `impl Trait for Type`, which is a free-standing " +
-          "item that may sit in any file in the crate; `#[derive(..)]`, which " +
-          "is on the declaration; and a `macro_rules!` body, which is an " +
-          "unparsed token tree and is where anyhow keeps some of its own. " +
-          "Refuting needs all three to be complete and the third cannot be " +
-          "read, so an absence is a fact about where somebody looked. " +
-          "`conforms.ts` says that as `region-is-the-crate` rather than " +
-          "leaving it to this row, because \"nobody measured it\" and \"the " +
-          "fact is not in front of us\" are different sentences. " +
-          "The derive half is the finding that widening the corpus bought: " +
-          "3,741 derived conformances against 1,401 written trait impls, so " +
-          "**most of this relation in Rust is a derive list**, and the first " +
-          "reader could see none of it. Reading it took Rust's recall from " +
-          "86.8% to 92.9%, all of it confirmations. What is left is 3.5% an " +
-          "impl in a file that does not declare the type, 3.3% a file the " +
-          "grammar cannot finish -- 164 of those 165 are three clap test files " +
-          "using `str![[r#\"..\"#]]` -- and 13 types with no impl and no derive " +
-          "beside them. A `trait Foo: Bar` does write its supertraits on the " +
-          "declaration and that one shape is closed, which is a measurement " +
-          "away rather than a reader away; it is 42 facts in the whole census " +
-          "against 2,877 that are not, and a per-shape axis is not worth " +
-          "buying for that.",
+        presence: {
+          unmeasured:
+            "Not a licence question, and the measurement says so rather than " +
+            "being absent. 4,975 asks over the five pinned Rust clones, 92.9% " +
+            "recall, 0 accused and 0 invented -- and Rust still may not accuse, " +
+            "because a Rust type does not carry what it implements. Three " +
+            "separate places do: `impl Trait for Type`, which is a free-standing " +
+            "item that may sit in any file in the crate; `#[derive(..)]`, which " +
+            "is on the declaration; and a `macro_rules!` body, which is an " +
+            "unparsed token tree and is where anyhow keeps some of its own. " +
+            "Refuting needs all three to be complete and the third cannot be " +
+            "read, so an absence is a fact about where somebody looked. " +
+            "`conforms.ts` says that as `region-is-the-crate` rather than " +
+            "leaving it to this row, because \"nobody measured it\" and \"the " +
+            "fact is not in front of us\" are different sentences. " +
+            "The derive half is the finding that widening the corpus bought: " +
+            "3,741 derived conformances against 1,401 written trait impls, so " +
+            "**most of this relation in Rust is a derive list**, and the first " +
+            "reader could see none of it. Reading it took Rust's recall from " +
+            "86.8% to 92.9%, all of it confirmations. What is left is 3.5% an " +
+            "impl in a file that does not declare the type, 3.3% a file the " +
+            "grammar cannot finish -- 164 of those 165 are three clap test files " +
+            "using `str![[r#\"..\"#]]` -- and 13 types with no impl and no derive " +
+            "beside them. A `trait Foo: Bar` does write its supertraits on the " +
+            "declaration and that one shape is closed, which is a measurement " +
+            "away rather than a reader away; it is 42 facts in the whole census " +
+            "against 2,877 that are not, and a per-shape axis is not worth " +
+            "buying for that.",
+        },
+        absence: NOT_DESIGNED_YET,
       },
     },
   },
@@ -683,79 +830,97 @@ export const LICENCES: readonly Licence[] = [
     ],
     relations: {
       needs: {
-        reproduce: "npm run measure:licence -- --only=python",
-        measured: "2026-09-02",
-        referee: "the corpus above, and the referee named beside it",
-        unit: "dependency edges",
-        counts: "corpus",
+        presence: {
+          reproduce: "npm run measure:licence -- --only=python",
+          measured: "2026-09-02",
+          referee: "the corpus above, and the referee named beside it",
+          unit: "dependency edges",
+          counts: "corpus",
+        },
+        absence: NOT_DESIGNED_YET,
       },
-      takes: PYTHON_SIGNATURE,
-      returns: PYTHON_SIGNATURE,
+      takes: { presence: PYTHON_SIGNATURE, absence: NOT_DESIGNED_YET },
+      returns: { presence: PYTHON_SIGNATURE, absence: NOT_DESIGNED_YET },
       holds: {
-        reproduce: "npm run measure:holds",
-        measured: "2026-09-02",
-        referee: TEXT_SCAN("field list"),
-        unit: "field asks",
-        counts: { asked: 2177, missed: 0, invented: 0 },
-        note:
-          "It refuses 25.4% of them, every one a quoted annotation. A refusal " +
-          "is not a miss, and the bar this row is about is the zero misses.",
+        presence: {
+          reproduce: "npm run measure:holds",
+          measured: "2026-09-02",
+          referee: TEXT_SCAN("field list"),
+          unit: "field asks",
+          counts: { asked: 2177, missed: 0, invented: 0 },
+          note:
+            "It refuses 25.4% of them, every one a quoted annotation. A refusal " +
+            "is not a miss, and the bar this row is about is the zero misses.",
+        },
+        absence: NOT_DESIGNED_YET,
       },
       builds: {
-        unmeasured:
-          "Python spells making one of something as an ordinary call, so the " +
-          "referee has no pattern to count and the reader has no verdict to " +
-          "give: `measure:constructs` asks it 0 times over 442 files. " +
-          "`constructs.ts` withholds Python before any licence is consulted, so " +
-          "nothing changes by saying so here -- but until #207 this square read " +
-          "`yes`, on the strength of three measurements of other words.",
+        presence: {
+          unmeasured:
+            "Python spells making one of something as an ordinary call, so the " +
+            "referee has no pattern to count and the reader has no verdict to " +
+            "give: `measure:constructs` asks it 0 times over 442 files. " +
+            "`constructs.ts` withholds Python before any licence is consulted, so " +
+            "nothing changes by saying so here -- but until #207 this square read " +
+            "`yes`, on the strength of three measurements of other words.",
+        },
+        absence: NOT_DESIGNED_YET,
       },
       calls: {
-        reproduce: "npm run measure:calls",
-        measured: "2026-09-03",
-        referee: CALL_SCAN,
-        unit: "calls between routines the corpus declares exactly once",
-        counts: { asked: 5525, missed: 0, invented: 0 },
-        note:
-          "83% of the whole population, at 92.9% recall over 683 files, which is " +
-          "the right shape: Python is where the census says most calls are and " +
-          "where a call is hardest to place statically. Two thirds of the 7.1% " +
-          "refused are `unbound` and `unplaced` -- a name a wildcard import or a " +
-          "module resolving to no file brought in -- and neither is a reader bug.",
+        presence: {
+          reproduce: "npm run measure:calls",
+          measured: "2026-09-03",
+          referee: CALL_SCAN,
+          unit: "calls between routines the corpus declares exactly once",
+          counts: { asked: 5525, missed: 0, invented: 0 },
+          note:
+            "83% of the whole population, at 92.9% recall over 683 files, which is " +
+            "the right shape: Python is where the census says most calls are and " +
+            "where a call is hardest to place statically. Two thirds of the 7.1% " +
+            "refused are `unbound` and `unplaced` -- a name a wildcard import or a " +
+            "module resolving to no file brought in -- and neither is a reader bug.",
+        },
+        absence: NO_CLOSED_BODY_RESOLVER,
       },
       accesses: {
-        reproduce: "npm run measure:accesses",
-        measured: "2026-09-04",
-        referee: MEMBER_SCAN,
-        unit: "member asks at the type end",
-        counts: { asked: 368, missed: 0, invented: 0 },
-        note:
-          "The smallest population on this row and the reason is the design " +
-          "working: a Python class with a base class has no closed member list, " +
-          "so the reader withholds and the referee does not offer it. Nearly " +
-          "every Python class in the corpus has one. What is left is the classes " +
-          "that declare their own members outright, and the reader reads 100% of " +
-          "them -- including the attributes `__init__` assigns to `self`, which " +
-          "is where most Python attributes are and which a reader stopping at " +
-          "the class body would refute every one of.",
+        presence: {
+          reproduce: "npm run measure:accesses",
+          measured: "2026-09-04",
+          referee: MEMBER_SCAN,
+          unit: "member asks at the type end",
+          counts: { asked: 368, missed: 0, invented: 0 },
+          note:
+            "The smallest population on this row and the reason is the design " +
+            "working: a Python class with a base class has no closed member list, " +
+            "so the reader withholds and the referee does not offer it. Nearly " +
+            "every Python class in the corpus has one. What is left is the classes " +
+            "that declare their own members outright, and the reader reads 100% of " +
+            "them -- including the attributes `__init__` assigns to `self`, which " +
+            "is where most Python attributes are and which a reader stopping at " +
+            "the class body would refute every one of.",
+        },
+        absence: NOT_DESIGNED_YET,
       },
       conforms: {
-        reproduce: "npm run measure:conforms",
-        measured: "2026-09-06",
-        referee: HEADER_SCAN,
-        unit: "base asks",
-        counts: { asked: 2276, missed: 0, invented: 0 },
-        note:
-          "The largest population of this relation anywhere -- 2,276 asks over " +
-          "442 files, 78% of every `conforms` fact in the corpus -- and it " +
-          "refuses none of them. A base list sits in the declaration in the one " +
-          "language `holds` and `accesses` both had to withhold most of, which " +
-          "is worth saying plainly: what stops those two is a class body, and " +
-          "this word never reads one. Asked its 7 readable pairs backwards it " +
-          "confirmed 0. Only 7 because a Python base is nearly always imported, " +
-          "so the far end is not in the same file -- the reverse question is " +
-          "answered from the board's other end instead, which `drift.ts` has and " +
-          "a single-file run does not.",
+        presence: {
+          reproduce: "npm run measure:conforms",
+          measured: "2026-09-06",
+          referee: HEADER_SCAN,
+          unit: "base asks",
+          counts: { asked: 2276, missed: 0, invented: 0 },
+          note:
+            "The largest population of this relation anywhere -- 2,276 asks over " +
+            "442 files, 78% of every `conforms` fact in the corpus -- and it " +
+            "refuses none of them. A base list sits in the declaration in the one " +
+            "language `holds` and `accesses` both had to withhold most of, which " +
+            "is worth saying plainly: what stops those two is a class body, and " +
+            "this word never reads one. Asked its 7 readable pairs backwards it " +
+            "confirmed 0. Only 7 because a Python base is nearly always imported, " +
+            "so the far end is not in the same file -- the reverse question is " +
+            "answered from the board's other end instead, which `drift.ts` has and " +
+            "a single-file run does not.",
+        },
+        absence: NOT_DESIGNED_YET,
       },
     },
   },
@@ -812,12 +977,20 @@ function licenceOf(language: Language): Licence | undefined {
   );
 }
 
-/** What a word's reader was measured at in a language, if it was. */
+/**
+ * What a word's reader was measured at in a language, on one axis, if it was.
+ *
+ * `axis` defaults to `"presence"`, which is every call site this function had
+ * before #231 -- adding the parameter rather than a second function keeps
+ * every one of them unchanged while `mayAccuse("calls", "ts", "absence")`
+ * reaches the new row.
+ */
 export function relationLicence(
   relation: AccusingRelation,
   language: Language,
+  axis: AccusalAxis = "presence",
 ): RelationLicence | undefined {
-  return licenceOf(language)?.relations[relation];
+  return licenceOf(language)?.relations[relation]?.[axis];
 }
 
 /**
@@ -829,9 +1002,10 @@ export function relationLicence(
 export function relationTotals(
   relation: AccusingRelation,
   language: Language,
+  axis: AccusalAxis = "presence",
 ): { asked: number; missed: number; invented?: number } | undefined {
   const licence = licenceOf(language);
-  const row = licence?.relations[relation];
+  const row = licence?.relations[relation]?.[axis];
   if (!licence || !row || !isMeasured(row)) return undefined;
   if (row.counts !== "corpus") return row.counts;
   const totals = licenceTotals(licence);
@@ -884,9 +1058,27 @@ export function relationTotals(
  * they read the imports -- the same reader `needs` uses and the corpus above
  * measures -- so they ask `licenceFor` about a path, which is that same
  * question in the form they can put it.
+ *
+ * ## Two words for "absence", and they are not the same one (#231)
+ *
+ * Everything above uses "absence" the way it always has: the claim a
+ * `wrong` verdict rests on, whichever evidence grounds it. `axis` below is
+ * narrower -- it names *which* evidence grounds that claim, and only
+ * `@calls` has earned a second one. `axis: "presence"` (the default, and
+ * every call site before #231) is a `wrong` resting on something *found*: a
+ * name, a call running the other way. `axis: "absence"` is a `wrong`
+ * resting on a reader that closed off every alternative and found none --
+ * `@calls`' tier-2 receiver resolver, measured in docs/claim-vocabulary.md
+ * items 12-14. Asking for an axis no word has is not a special case: an
+ * unmeasured `NOT_DESIGNED_YET` row answers `false` the same way an
+ * unlisted word does.
  */
-export function mayAccuse(relation: AccusingRelation, language: Language): boolean {
-  const row = relationLicence(relation, language);
+export function mayAccuse(
+  relation: AccusingRelation,
+  language: Language,
+  axis: AccusalAxis = "presence",
+): boolean {
+  const row = relationLicence(relation, language, axis);
   if (row === undefined || !isMeasured(row)) return false;
   return row.covers === undefined || row.covers.includes(language);
 }

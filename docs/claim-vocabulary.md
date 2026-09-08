@@ -1027,6 +1027,58 @@ one word or one reader, not from reviewing the design.
     number above is a floor on how wrong this is, not a ceiling on how
     right.
 
+    Whether any of this becomes a real `@calls`-refutes-absence word was the
+    open design question this entry left standing. Item 15 answers it.
+
+15. **The licence grid got a second axis rather than a second gate, and
+    `@calls` is the only word to use it (#231).** Items 12-14 measured two
+    things -- 49.6% of ts/tsx/js bodies with a closed call set (10.3% at
+    tier 1 alone, once both of item 14's bugs are accounted for), and that
+    set wrong 0.7% of the time -- and neither one is a licence by itself. A
+    licence is what `mayAccuse` checks, and `mayAccuse` answered only one
+    question before this: has *this* word's reader earned the right to say
+    *wrong*, in *this* language. Closed-body absence is not a refinement of
+    that answer. `@calls` already had a way to say wrong -- finding a call
+    running the other way (`calls.ts`'s `backwards` verdict) -- and this is
+    a second, independent way the same word can be wrong, resting on a
+    different reader and a different number.
+
+    Two shapes were open, and the choice was made with a person rather than
+    guessed at, because it changes what "exhaustive" means for every future
+    word:
+
+    - **Extend the grid.** Give every `(word, language)` answer a second
+      dimension -- does it license an accusation resting on something
+      *found* (`presence`), on something a reader *closed off*
+      (`absence`), or both -- and keep the one guarantee #207 already
+      bought: a licence with a hole in either dimension does not compile.
+    - **A parallel gate.** A standalone `mayAccuseFromAbsence(language)`,
+      checked only by the new code path. Smaller, but now two gates that
+      nothing stops from drifting apart as words and languages are added --
+      close to the exact bug #207 made impossible for the first gate,
+      reopened for the second.
+
+    The grid won. `AccusalLicence` replaces each word's single row with
+    `{ presence, absence }`, both `RelationLicence`, both required --
+    `NOT_DESIGNED_YET` is the honest `absence` answer for every word but
+    `@calls`, and `NO_CLOSED_BODY_RESOLVER` is `@calls`' own answer outside
+    ts/tsx, so a hole reads as a stated absence of a measurement rather
+    than a missing field. `mayAccuse` gained a third, defaulted parameter
+    (`axis: AccusalAxis = "presence"`) instead of a sibling function, so
+    every one of the eleven existing call sites -- `calls.ts`, `holds.ts`,
+    `accesses.ts`, `signature.ts`, `constructs.ts`, `conforms.ts`,
+    `needs.ts`, and the five `measure-*.mts` scripts that print this grid --
+    reaches the same row it always has, unchanged. `mayAccuse("calls", "ts",
+    "absence")` and `("calls", "tsx", "absence")` are the two squares that
+    say yes; everything else on this axis, everywhere, still says no.
+
+    Wiring that licence into an actual board verdict -- `calls.ts` treating
+    a closed body's `absent` as a `wrong` rather than silence -- is
+    explicitly **not** this issue. #231 is the gate only, on purpose:
+    nothing past it can be built on a permission that does not exist yet,
+    and building the gate and the thing it gates in the same change is how
+    the gate ends up untested against its own "no".
+
 `renders` was also raised as a possible missing relation and turned out not to
 be one: `<MenuContent />` is a routine making a MenuContent, which is `@builds`.
 
