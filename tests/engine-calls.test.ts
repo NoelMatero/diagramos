@@ -275,6 +275,43 @@ describe("the closed body that provably calls nothing else (#233)", () => {
     expect(verdict.verdict).toBe("refuted");
   });
 
+  it("withholds a Python receiver typed as an ABC/Protocol the same way (#243)", () => {
+    /*
+     * Python's own version of item 14's caveat, confirmed live rather than
+     * assumed (`tests/resolution-python-live.test.ts`): a receiver typed as
+     * an `abc.ABC` or `typing.Protocol` subclass resolves to that class's
+     * own declaration, never the concrete class actually satisfying it at
+     * runtime -- the same shared-limitation shape, one protocol over. The
+     * guard is the same generic `concrete` field TypeScript's own resolver
+     * answers with; this pins that Python's resolver plugs into it exactly
+     * the way TS's already does, without spinning up a real pyright server
+     * to prove it -- that live path has its own test file.
+     */
+    const verdict = ask({
+      "app/a.py": {
+        source: "def run(store):\n    return store.run()\n",
+        language: "python",
+        resolveReceiver: () => ({ kind: "declared", file: "app/store.py", concrete: false }),
+      },
+      "app/b.py": { source: "def render():\n    return 2\n", language: "python" },
+    }, { file: "app/a.py", routine: "run" }, { file: "app/b.py", names: ["render"] });
+
+    expect(verdictOf(verdict)).toBe("absent");
+  });
+
+  it("refutes a Python routine when every receiver site is concrete (#243)", () => {
+    const verdict = ask({
+      "app/a.py": {
+        source: "def run(store):\n    return store.run()\n",
+        language: "python",
+        resolveReceiver: () => ({ kind: "declared", file: "app/store.py", concrete: true }),
+      },
+      "app/b.py": { source: "def render():\n    return 2\n", language: "python" },
+    }, { file: "app/a.py", routine: "run" }, { file: "app/b.py", names: ["render"] });
+
+    expect(verdict.verdict).toBe("refuted");
+  });
+
   it("never refutes for js or rust, however closed the body is", () => {
     /*
      * ts/tsx and, since #242, python hold this axis's licence. A
