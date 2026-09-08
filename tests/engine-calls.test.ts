@@ -194,7 +194,8 @@ describe("the closed body that provably calls nothing else (#233)", () => {
    * from `backwards` (docs/claim-vocabulary.md items 12-15): not finding the
    * call running the other way, but enumerating every call the tail's
    * routine makes and finding none of them reach the head at all. TS/TSX
-   * only -- #232 never licensed this axis anywhere else.
+   * from #231; Python joined at #242 (docs/claim-vocabulary.md item 17). Rust
+   * and js still hold no licence on this axis.
    */
   it("refutes an arrow into a routine with no calls at all", () => {
     // Trivially closed: zero call sites is a fully enumerated, empty set.
@@ -202,6 +203,19 @@ describe("the closed body that provably calls nothing else (#233)", () => {
       "src/a.ts": { source: "export function run() { return 1; }\n", language: "ts" },
       "src/b.ts": { source: "export function render() { return 2; }\n", language: "ts" },
     }, { file: "src/a.ts", routine: "run" }, { file: "src/b.ts", names: ["render"] });
+
+    expect(verdict.verdict).toBe("refuted");
+    if (verdict.verdict !== "refuted") return;
+    expect(verdict.evidence.sites).toBe(0);
+  });
+
+  it("refutes an arrow into a python routine with no calls at all (#242)", () => {
+    // Same trivial closure as the ts case above, now that #242 licensed
+    // Python's own absence axis (docs/claim-vocabulary.md item 17).
+    const verdict = ask({
+      "src/a.py": { source: "def run():\n    return 1\n", language: "python" },
+      "src/b.py": { source: "def render():\n    return 2\n", language: "python" },
+    }, { file: "src/a.py", routine: "run" }, { file: "src/b.py", names: ["render"] });
 
     expect(verdict.verdict).toBe("refuted");
     if (verdict.verdict !== "refuted") return;
@@ -261,23 +275,19 @@ describe("the closed body that provably calls nothing else (#233)", () => {
     expect(verdict.verdict).toBe("refuted");
   });
 
-  it("never refutes for js, rust or python, however closed the body is", () => {
+  it("never refutes for js or rust, however closed the body is", () => {
     /*
-     * #232's absence licence covers ts/tsx only. A trivially-empty body in
-     * any other language must never be accused from -- rust and python reach
-     * that as `absent`, the same silence #233 leaves untouched everywhere it
+     * ts/tsx and, since #242, python hold this axis's licence. A
+     * trivially-empty body in rust must still never be accused from -- it
+     * reaches `absent`, the same silence #233 leaves untouched everywhere it
      * does not apply; `js` never gets that far, because `@calls` has never
      * held even the older, presence-based licence there (#211) and is
      * withheld before either check runs.
      */
-    const expected = { js: "withheld/unlicensed", rust: "absent", python: "absent" } as const;
-    for (const language of ["js", "rust", "python"] as const) {
-      const source = language === "python"
-        ? "def run():\n    return 1\n"
-        : language === "rust" ? "fn run() -> u32 { 1 }\n" : "function run() { return 1; }\n";
-      const renderSource = language === "python"
-        ? "def render():\n    return 2\n"
-        : language === "rust" ? "fn render() -> u32 { 2 }\n" : "function render() { return 2; }\n";
+    const expected = { js: "withheld/unlicensed", rust: "absent" } as const;
+    for (const language of ["js", "rust"] as const) {
+      const source = language === "rust" ? "fn run() -> u32 { 1 }\n" : "function run() { return 1; }\n";
+      const renderSource = language === "rust" ? "fn render() -> u32 { 2 }\n" : "function render() { return 2; }\n";
       const verdict = ask({
         "src/a": { source, language },
         "src/b": { source: renderSource, language },
