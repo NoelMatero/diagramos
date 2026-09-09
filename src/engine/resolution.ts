@@ -354,6 +354,20 @@ function headTypeOf(
         return;
       }
     }
+    /*
+     * A lifetime is not a type, and it is spelled with a plain `identifier`.
+     * `&'static dyn Flag` parses as `reference_type(lifetime(identifier
+     * "static"), dynamic_type(type_identifier "Flag"))`, and the lifetime
+     * comes *first* in child order, so the leaf fallback below took it: every
+     * reference carrying an explicit lifetime named the lifetime as its type
+     * -- `'static` as `static`, `'a` as `a` -- confidently, with no refusal.
+     *
+     * Found by #246's rust-analyzer referee (`trait Flag` where this reader
+     * said `static`), reproduced from the parse tree rather than reasoned
+     * about, per `docs/reading-a-grammar.md`: the fix is structural, because
+     * no list of type-node names would ever have mentioned `lifetime`.
+     */
+    if (child.type === "lifetime") return;
     if (child.childCount === 0) {
       if (child.type === "identifier") found = { name: child.text, at: child.startIndex };
       return;
@@ -949,7 +963,24 @@ function walk(
     return;
   }
   if (language === "rust" && node.type === "impl_item") {
-    const typeName = node.childForFieldName("type");
+    /*
+     * `impl Foo` puts a bare `type_identifier` on the `type` field, but
+     * `impl<'a> Holder<'a>` and `impl<T> Foo<T>` put a `generic_type` there --
+     * which has children, so requiring a childless node found no declaration
+     * and every `self.field.method()` inside a generic type's impl block was
+     * withheld as `no-fields`. Not a wrong answer, so nothing ever went red
+     * over it; it silently cost coverage on exactly the types most likely to
+     * carry fields worth resolving.
+     *
+     * Found while testing the lifetime fix above (#246). The applied name of a
+     * `generic_type` is its own `type` field -- the same rule
+     * `conforms.ts`'s `baseNameIn` already reads for this node type, reused
+     * rather than reinvented.
+     */
+    const typeNode = node.childForFieldName("type");
+    const typeName = typeNode?.type === "generic_type"
+      ? typeNode.childForFieldName("type") ?? typeNode.child(0)
+      : typeNode;
     let nextFields = new Map<string, Classified>();
     if (typeName && typeName.childCount === 0) {
       const declared = declarationNamed(tree, typeName.text);

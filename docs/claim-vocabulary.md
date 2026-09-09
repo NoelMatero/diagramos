@@ -1284,6 +1284,231 @@ be one: `<MenuContent />` is a routine making a MenuContent, which is `@builds`.
     `symbolDeclarationAt` into `@calls`'s closed-body check is #236's own
     question to answer now that it is reopened, not decided here.
 
+18. **Rust's version of the same ladder, and the safety check items 14 and 17
+    used turns out to measure nothing in Rust -- so a different one was built,
+    and it found three reader bugs (#246, after #237's spike).** The client is
+    `scripts/lib/resolution-rust-lsp.ts`, rust-analyzer over `vscode-jsonrpc`
+    per #237's recommendation, scoped to "only when rust-analyzer is already on
+    the machine" -- no binary fetcher, silent skip on absence, `parse.ts`'s own
+    stance for a missing grammar. Corpus: `rust-test`, `.corpus/anyhow` and
+    `.corpus/ripgrep`, **9,098 receiver sites**.
+
+    **Readiness cannot be inferred from the answers, and inferring it made the
+    number worthless.** #237 named `-32801 content modified` as the not-ready
+    signal and this issue's brief inherited it as *the* one to retry past. It
+    is the last and shortest of several: `-32603 file not found` (the VFS has
+    not loaded the file) and a plain `null` (loaded, not yet analysed) come
+    first, so a client retrying only `-32801` records refusals for receivers
+    rust-analyzer resolves correctly a second later. The first cut went further
+    wrong by inferring readiness from answer *shape*: unlike pyright, whose
+    "not ready" and "no answer" are the same `null`, rust-analyzer returns an
+    empty array for a position it genuinely cannot place -- so `[]` could be
+    final and fast and item 17's two-ladder retry would be unnecessary. Three
+    workspaces polled at 100ms never showed `[]` before the first real answer,
+    which read as confirmation and was three lucky samples: two runs of
+    `measure:resolution` on identical input then reported **68.7% coverage and
+    then 13.6%**, and one 50-site sample disagreed 30 times in one run and once
+    in the other. rust-analyzer *publishes* readiness -- `$/progress` under
+    `rustAnalyzer/cachePriming`, sent only when `window.workDoneProgress` is
+    declared -- and its `end` is the moment queries answer. Waiting for it
+    makes the first query correct every time (anyhow 3.3s over three runs,
+    ripgrep 1.3s, `rust-test/orangutan_macro` 2.7s) and the run byte-identical
+    across three. **A number that changes between two identical runs is not a
+    slow number, it is not a number.**
+
+    **Coverage: 74.3%, with a second denominator that is Rust's own.** Of
+    9,098 receiver sites, **8,990 (98.8%) are inside a crate**, and that
+    distinction is not a hedge: pyright answers about any `.py` file under a
+    root, rust-analyzer only about files a `Cargo.toml` claims, and a tree can
+    hold real Rust no crate owns (`rust-test/src` -- three `.rs` files, no
+    manifest above them). Of those, **6,676 (74.3%) get a declaring file**
+    against 21.9% for the syntactic reader, combined ceiling 77.3% -- the same
+    shape of gap items 12 and 17 found.
+
+    **The file-comparison safety check does not measure wrongness in Rust, and
+    reading it is the only way that shows.** The check items 14 and 17 rest on
+    -- where is the receiver's type declared, where is the method actually
+    called declared, do they agree -- is good evidence in TypeScript and Python
+    because a class and its methods share a file there. Rust separates them
+    routinely and legally. Read one by one, **all 29 disagreements** on an
+    early `rust-test`+`anyhow` run were **29 pairs of correct answers**, in
+    three mechanisms: 24 an inherent `impl` block in another file (`anyhow`'s
+    `pub struct Error` is `src/lib.rs:390`, `mod error;` is a different file
+    and every method on `Error` lives in it), 4 a `core` trait's provided
+    method on a repo type (`chain.skip(1)` -- receiver `anyhow`'s own `Chain`,
+    `skip` declared in `core`), and 1 the inverse, a repo trait implemented for
+    an external type (`x.parse().context(...)` -- receiver `Result` from
+    `core`, `context` from `anyhow`'s own `src/context.rs`). Two further
+    cautions came out of the same reading: that run's headline **11.5% was an
+    artifact of measuring one small crate** whose author splits struct from
+    impl -- with ripgrep in the corpus the same check reads **2.5% (166 of
+    6,644)** -- and a first write-up of it claimed "0 wrong of 252" on the
+    strength of having inspected the 29 disagreements, which does not follow:
+    the other 223 were agreements nobody looked inside, and agreement is not
+    evidence once the check is known not to discriminate.
+
+    **What does not split is the type's identity, so that is what the real
+    check compares -- over every answered site, not only the flagged ones.**
+    `textDocument/typeDefinition` points at the type's own name token, so its
+    target line is the declaration header and states the name. Two parts:
+
+    - **Did it land on a type declaration at all?** It should always; an answer
+      that is not one means the anchor resolved to something that is not a
+      type, which is item 17's Python placement bug restated. **11 of 6,676
+      (0.2%)**, and they are a named set rather than a mystery: a
+      `lazy_static!` body, and `core`'s own `trait Into`/`trait AsRef` and
+      `AtomicUsize` declarations, whose headers `declaredTypeOnLine` does not
+      parse. By kind, the other 6,665 are 5,410 `struct`, 1,081 `enum`, 168
+      `trait`, 6 `union`.
+    - **Does it name the same type the syntactic reader read?** This is the
+      referee proper and independent in the way `AGENTS.md`'s gate requires:
+      `resolution.ts` reads a name out of text with no compiler, rust-analyzer
+      resolves a declaration. **1,673 sites where both named a type, 53
+      disagreed (3.2%)** -- and of those 53, **39 (73.6%) are one type wearing
+      two names**, leaving **14, or 0.8% of sites checked**, as the figure
+      actually comparable to item 12's 0.7% and item 17's 1.76%.
+
+    **Two honest limits on that check, both worth stating before the number
+    is.** It covers **1,673 of 6,676 answered sites (25.1%)**, and that is a
+    ceiling rather than an oversight: an independent check needs the syntactic
+    reader to have named a type too, and it names one for about a fifth of
+    receivers, so three quarters of the answers have nothing independent to
+    weigh them against. Asking rust-analyzer a second way does not fix it --
+    `textDocument/hover` at the same position was tried and prints
+    `range: &Match` for a `Range`-typed receiver, resolving through the same
+    aliases and agreeing with `typeDefinition` by construction. A second
+    opinion from the same server is not a referee.
+
+    **A third limit, in the other direction, found reviewing this entry: the
+    comparison is of bare names, so where a name is not unique the check
+    cannot fully discriminate.** Everything above is about false
+    *disagreements* -- aliases, qualified names, shapes, `cfg` arms -- and
+    each is argued down carefully. The converse is not argued at all: an
+    `agreed` verdict says the reader's name and the declaration's name are
+    the same string, and in Rust a great many strings are not unique.
+    Measured on this corpus, **129 of 524 type declarations (24.6%) share a
+    bare name with a declaration in another file** -- `Error` in 15 files,
+    `Config` in 8, `Match` in 4 -- and of the sites this referee can check,
+    **164 of 1,757 (9.3%) name one of them**, `DirEntry` (49 sites) and
+    `Match` (42) most of all. `Match` is the same type the alias paragraph
+    below spends itself on, so this is not a hypothetical corner.
+    A placement error that happened to land on a same-named declaration
+    elsewhere would be scored `agreed` rather than caught, which makes the
+    0.8% a **lower bound** on wrongness rather than an estimate of it -- the
+    less comfortable direction for a figure being read against a 0.7% bar.
+    It does not move the number: nothing here says any counted agreement
+    *was* wrong, only that ~9% of them rest on weaker evidence than the
+    other 91%. Closing it needs the referee to compare a type's identity
+    rather than its name -- the declaring file and line
+    `typeDeclarationLocationAt` already returns, which this comparison reads
+    the header off but does not itself weigh -- and that is a change to the
+    check rather than to the reader, so it is recorded here rather than
+    fixed in the issue that found it.
+
+    **The 39 are a type alias or an import rename, and separating them
+    mechanically rather than by eye is what makes the 0.8% trustworthy.**
+    `type Range = Match;` in `crates/searcher/src/searcher/mod.rs` accounts for
+    **32 by itself** -- one line of ripgrep was 60% of a number about to be
+    compared against 0.7%. With `type BagOfWords<'a> = BTreeSet<...>` and the
+    import renames (`ContextSeparator as Separator`, `Worker as Deque`) it is
+    39. rust-analyzer resolves through all of them and never reports the local
+    name; the reader reports what the text says. Calling that a misread says
+    the reader got wrong something it read correctly. **What it does not settle
+    is the file**, which is what a board consumes: `Range`'s alias and
+    `struct Match` are declared in different crates, and which one an arrow
+    should point at is a design question, so both counts are printed rather
+    than one being discounted.
+
+    **The remaining 14 read through, and a third of them are already a filed
+    bug.** Five are #247's shadowed parameter (`fn select(&mut self, name:
+    &str)` shadowed by `for name in ...`; `caps: &mut RegexCaptures` rebound by
+    `let caps = caps.captures_mut()`; `lines: &str` by `let mut lines:
+    Vec<&str>`), so the comparable figure falls to about 0.5% once that is
+    fixed. Three are an associated-type projection (`Self::Captures` against
+    the `trait Matcher` that declares it), two a generic bound versus the
+    concrete type behind it (`impl AsRef<Path>` naming the trait), two
+    conditional compilation (below), and two narrowing through a chain
+    (`.into_iter()`, `.peekable()`) -- item 14's own named shape restated in
+    Rust. None of the nine non-#247 cases is a wrong file claimed about a type
+    that does not exist; each is two answers to questions that differ.
+
+    **A first reading of that check said 12.6%, and two thirds of that was the
+    comparison being naive rather than either side being wrong** -- the same
+    trap as the 11.5%, one level in. `resolution.ts` deliberately keeps a
+    qualified name whole (`fmt::Formatter`, `process::Command`) while a
+    declaration header states the bare name, so every qualified annotation read
+    as a disagreement; and `Array` is a *shape* the reader names for `[T; N]`,
+    which has no declaration for rust-analyzer to land on, so comparing them is
+    a category error. Normalising the first and setting aside the second (16
+    sites) leaves the 3.2%.
+
+    **Three real reader defects came out of the reading, and all three were
+    reproduced from a parse tree or a minimal case rather than inferred from
+    the pattern:**
+
+    - **A lifetime read as the type. Fixed.** `&'static dyn Flag` parses as
+      `reference_type(lifetime(identifier "static"), dynamic_type(...))`, the
+      lifetime comes first in child order, and `headTypeOf`'s leaf-`identifier`
+      fallback took it -- so *every* reference carrying an explicit lifetime
+      named the lifetime as its type: `'static` as `static`, `'a` as `a`,
+      confidently, with no refusal. `docs/reading-a-grammar.md`'s rule exactly:
+      the fix is structural (a `lifetime` is never a type), because no list of
+      type-node names would have mentioned `lifetime`.
+    - **A generic type's `impl` block lost its fields. Fixed.**
+      `impl<'a> Holder<'a>` and `impl<T> Foo<T>` put a `generic_type` on the
+      `type` field, and the declaration lookup required a childless node -- so
+      every `self.field.method()` inside a generic type's impl was withheld as
+      `no-fields`. Honest rather than wrong, so nothing ever went red over it;
+      it cost coverage silently on exactly the types most likely to carry
+      fields worth reading. `conforms.ts`'s `baseNameIn` already reads the
+      applied name of a `generic_type`; reused rather than reinvented. **The
+      two fixes together took tier 1 from 19.0% to 21.9% of in-crate
+      receivers, 264 more sites resolved.**
+    - **A shadowed parameter outranks the binding that shadows it. Found,
+      reproduced, NOT fixed here -- and it is not a Rust bug.**
+      `resolveReceiver` consults `scope.params` *before* `scope.bindings`, so
+      `fn g(cwd: Thing) { let cwd = Other::new(); cwd.run(); }` reports
+      `Thing`. Confirmed in TypeScript with the same shape, so items 12-14 and
+      17's own numbers were measured with this defect present and it is a share
+      of their 0.7% and 1.76% rather than something Rust exposed. ripgrep's
+      `fn select(&mut self, name: &str)` shadowed by `for name in
+      self.types.keys()` is the corpus instance, and `impl Into<PathBuf>`
+      rebound by `let cwd = cwd.into()` is a second. The conservative fix is to
+      withhold as `reassigned` when a parameter name is also bound in the body
+      -- but it is left to its own issue on purpose, because it changes the
+      TypeScript and Python readings too and `AGENTS.md` wants that cost
+      measured per language rather than folded into a Rust issue.
+
+    One more divergence worth recording because it is Rust-only and not a bug
+    on either side: **conditional compilation.** `crates/ignore/src/pathutil.rs`
+    declares `fn imp` twice, `#[cfg(unix)]` and `#[cfg(not(unix))]`.
+    rust-analyzer resolves only the active arm; the syntactic reader reads both
+    bodies, having no notion of a cfg. Answers about an inactive arm are
+    therefore not comparable, which is a limit on any referee built this way
+    rather than an error to fix.
+
+    **What #246 settles, and what it does not.** Settled: the client works,
+    across crate boundaries and through macro expansion; the numbers are
+    reproducible across three runs; **74.3%** of in-crate receivers get a
+    declaring file; and the wrongness figure comparable to the other two
+    languages is **0.8%** (14 of 1,673), falling to about **0.5%** once #247 is
+    fixed -- at TypeScript's 0.7% and below Python's 1.76%, with every one of
+    the 53 disagreements read and every one of the 14 attributed to a named
+    cause. Not settled, and deliberately not decided here:
+
+    - **Which file an aliased type should be attributed to.** 39 of the 53 are
+      a local name for a type declared elsewhere, and a board points at a file.
+      Nothing here decides whether that arrow belongs at the alias or at the
+      underlying declaration, and the answer is not obviously the same for a
+      `type X = Y` as for a `use ... as X`.
+    - **Whether 25.1% check coverage is enough to wire anything on.** The
+      figure above is sound for the sites it covers; three quarters of the
+      answered sites are unrefereed, and no second question asked of the same
+      server can change that. Raising it means a stronger *independent* reader,
+      which is #203's territory rather than this issue's.
+    - **#247**, the shadowed parameter, which is not a Rust bug at all and
+      whose fix moves TypeScript's and Python's published numbers too.
+
 ## Open, in the order worth doing
 
 1. ~~**The licence grid.**~~ Built at #207 and shipped at #209. `@accesses` is

@@ -364,3 +364,102 @@ describe("unreadable", () => {
     expect(reading.read).toBe(false);
   });
 });
+
+/**
+ * A reference with an explicit lifetime, which resolved to the *lifetime* --
+ * found by #246's Rust referee, which named `trait Flag` where this reader
+ * said the type was `static`.
+ *
+ * `&'static dyn Flag` parses as `reference_type(lifetime(identifier "static"),
+ * dynamic_type(type_identifier "Flag"))`, and `headTypeOf`'s leaf fallback
+ * takes any childless `identifier` it reaches first. The lifetime precedes the
+ * type in child order, so every annotation of this shape named the lifetime --
+ * `'static` as `static`, `'a` as `a` -- and named it *confidently*, which is
+ * the shape `docs/claim-vocabulary.md` calls a false red rather than a gap.
+ * `docs/reading-a-grammar.md`'s rule applies exactly: read the structure, and
+ * a `lifetime` is never a type.
+ *
+ * One test per way a lifetime actually appears in real source, not per branch.
+ */
+describe("a lifetime is not a type (#246)", () => {
+  it("reads through `&'static dyn Trait` to the trait, not the lifetime", () => {
+    const source = "fn g(flag: &'static dyn Flag) {\n    flag.name_short();\n}";
+    expect(verdictOf(onlySite(resolveReceiversIn(source, "rust")).verdict))
+      .toBe("resolved/annotated-parameter/Flag");
+  });
+
+  it("reads through a named lifetime the same way", () => {
+    const source = "fn g<'a>(flag: &'a dyn Flag) {\n    flag.name_short();\n}";
+    expect(verdictOf(onlySite(resolveReceiversIn(source, "rust")).verdict))
+      .toBe("resolved/annotated-parameter/Flag");
+  });
+
+  it("reads through a lifetime to a primitive type", () => {
+    const source = "fn g(s: &'static str) {\n    s.len();\n}";
+    expect(verdictOf(onlySite(resolveReceiversIn(source, "rust")).verdict))
+      .toBe("resolved/annotated-parameter/str");
+  });
+
+  it("reads through a lifetime to a plain named type", () => {
+    const source = "fn g(f: &'static Config) {\n    f.run();\n}";
+    expect(verdictOf(onlySite(resolveReceiversIn(source, "rust")).verdict))
+      .toBe("resolved/annotated-parameter/Config");
+  });
+
+  it("reads through a lifetime on a mutable reference", () => {
+    const source = "fn g<'a>(f: &'a mut Config) {\n    f.run();\n}";
+    expect(verdictOf(onlySite(resolveReceiversIn(source, "rust")).verdict))
+      .toBe("resolved/annotated-parameter/Config");
+  });
+
+  it("names the type, not the lifetime, when the lifetime is a generic argument", () => {
+    const source = "fn g(c: Cow<'a, str>) {\n    c.len();\n}";
+    expect(verdictOf(onlySite(resolveReceiversIn(source, "rust")).verdict))
+      .toBe("resolved/annotated-parameter/Cow");
+  });
+
+  it("still resolves a reference with no lifetime, which already worked", () => {
+    const source = "fn g(f: &Config) {\n    f.run();\n}";
+    expect(verdictOf(onlySite(resolveReceiversIn(source, "rust")).verdict))
+      .toBe("resolved/annotated-parameter/Config");
+  });
+
+  it("does not read a struct field's lifetime as the field's type", () => {
+    const source = "struct Holder<'a> {\n    inner: &'a Config,\n}\n"
+      + "impl<'a> Holder<'a> {\n    fn go(&self) {\n        self.inner.run();\n    }\n}";
+    expect(verdictOf(onlySite(resolveReceiversIn(source, "rust")).verdict))
+      .toBe("resolved/declared-field/Config");
+  });
+});
+
+/**
+ * Fields of a generic type's `impl` block, which were not found at all --
+ * `impl<'a> Holder<'a>` and `impl<T> Foo<T>` put a `generic_type` on the
+ * `type` field, and the lookup required a childless node. Every
+ * `self.field.method()` inside one was withheld as `no-fields`: honest, so
+ * nothing went red, but it cost coverage silently on exactly the types most
+ * likely to have fields worth reading. Found while testing the lifetime fix
+ * above (#246).
+ */
+describe("fields reach a generic type's impl block (#246)", () => {
+  it("resolves a field receiver inside `impl<T> Foo<T>`", () => {
+    const source = "struct Holder<T> {\n    inner: Config,\n    items: T,\n}\n"
+      + "impl<T> Holder<T> {\n    fn go(&self) {\n        self.inner.run();\n    }\n}";
+    expect(verdictOf(onlySite(resolveReceiversIn(source, "rust")).verdict))
+      .toBe("resolved/declared-field/Config");
+  });
+
+  it("resolves a field receiver inside a lifetime-parameterised impl", () => {
+    const source = "struct Holder<'a> {\n    inner: Config,\n}\n"
+      + "impl<'a> Holder<'a> {\n    fn go(&self) {\n        self.inner.run();\n    }\n}";
+    expect(verdictOf(onlySite(resolveReceiversIn(source, "rust")).verdict))
+      .toBe("resolved/declared-field/Config");
+  });
+
+  it("still resolves a field receiver inside a plain `impl Foo`, which already worked", () => {
+    const source = "struct Holder {\n    inner: Config,\n}\n"
+      + "impl Holder {\n    fn go(&self) {\n        self.inner.run();\n    }\n}";
+    expect(verdictOf(onlySite(resolveReceiversIn(source, "rust")).verdict))
+      .toBe("resolved/declared-field/Config");
+  });
+});
