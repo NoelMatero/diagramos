@@ -1364,11 +1364,49 @@ be one: `<MenuContent />` is a routine making a MenuContent, which is `@builds`.
       referee proper and independent in the way `AGENTS.md`'s gate requires:
       `resolution.ts` reads a name out of text with no compiler, rust-analyzer
       resolves a declaration. **1,673 sites where both named a type, 53
-      disagreed (3.2%)** -- against item 12's 0.7% and item 17's 1.76%, and for
-      the first time comparable to them rather than measuring a different
-      thing.
+      disagreed (3.2%)** -- and of those 53, **39 (73.6%) are one type wearing
+      two names**, leaving **14, or 0.8% of sites checked**, as the figure
+      actually comparable to item 12's 0.7% and item 17's 1.76%.
 
-    **A first reading of that check said 12.6%, and two thirds of it was the
+    **Two honest limits on that check, both worth stating before the number
+    is.** It covers **1,673 of 6,676 answered sites (25.1%)**, and that is a
+    ceiling rather than an oversight: an independent check needs the syntactic
+    reader to have named a type too, and it names one for about a fifth of
+    receivers, so three quarters of the answers have nothing independent to
+    weigh them against. Asking rust-analyzer a second way does not fix it --
+    `textDocument/hover` at the same position was tried and prints
+    `range: &Match` for a `Range`-typed receiver, resolving through the same
+    aliases and agreeing with `typeDefinition` by construction. A second
+    opinion from the same server is not a referee.
+
+    **The 39 are a type alias or an import rename, and separating them
+    mechanically rather than by eye is what makes the 0.8% trustworthy.**
+    `type Range = Match;` in `crates/searcher/src/searcher/mod.rs` accounts for
+    **32 by itself** -- one line of ripgrep was 60% of a number about to be
+    compared against 0.7%. With `type BagOfWords<'a> = BTreeSet<...>` and the
+    import renames (`ContextSeparator as Separator`, `Worker as Deque`) it is
+    39. rust-analyzer resolves through all of them and never reports the local
+    name; the reader reports what the text says. Calling that a misread says
+    the reader got wrong something it read correctly. **What it does not settle
+    is the file**, which is what a board consumes: `Range`'s alias and
+    `struct Match` are declared in different crates, and which one an arrow
+    should point at is a design question, so both counts are printed rather
+    than one being discounted.
+
+    **The remaining 14 read through, and a third of them are already a filed
+    bug.** Five are #247's shadowed parameter (`fn select(&mut self, name:
+    &str)` shadowed by `for name in ...`; `caps: &mut RegexCaptures` rebound by
+    `let caps = caps.captures_mut()`; `lines: &str` by `let mut lines:
+    Vec<&str>`), so the comparable figure falls to about 0.5% once that is
+    fixed. Three are an associated-type projection (`Self::Captures` against
+    the `trait Matcher` that declares it), two a generic bound versus the
+    concrete type behind it (`impl AsRef<Path>` naming the trait), two
+    conditional compilation (below), and two narrowing through a chain
+    (`.into_iter()`, `.peekable()`) -- item 14's own named shape restated in
+    Rust. None of the nine non-#247 cases is a wrong file claimed about a type
+    that does not exist; each is two answers to questions that differ.
+
+    **A first reading of that check said 12.6%, and two thirds of that was the
     comparison being naive rather than either side being wrong** -- the same
     trap as the 11.5%, one level in. `resolution.ts` deliberately keeps a
     qualified name whole (`fmt::Formatter`, `process::Command`) while a
@@ -1378,16 +1416,9 @@ be one: `<MenuContent />` is a routine making a MenuContent, which is `@builds`.
     a category error. Normalising the first and setting aside the second (16
     sites) leaves the 3.2%.
 
-    **The 53 read through, and 70% of them are one Rust feature: the type
-    alias.** `type Range = Match;` in `crates/searcher/src/searcher/mod.rs`
-    accounts for **32 of the 53 on its own** -- the reader names the local
-    alias, rust-analyzer resolves through it, both correct. With
-    `type BagOfWords<'a> = BTreeSet<...>` and the import renames
-    (`ContextSeparator as Separator`, `Worker as Deque`) it is ~37. Another ~5
-    are a generic bound versus the concrete type behind it (`impl AsRef<Path>`
-    naming the trait), ~3 an associated-type projection (`Self::Captures`
-    against the `trait Matcher` that declares it). **The remaining ~8 are real
-    reader defects, and three were reproduced and named:**
+    **Three real reader defects came out of the reading, and all three were
+    reproduced from a parse tree or a minimal case rather than inferred from
+    the pattern:**
 
     - **A lifetime read as the type. Fixed.** `&'static dyn Flag` parses as
       `reference_type(lifetime(identifier "static"), dynamic_type(...))`, the
@@ -1432,17 +1463,25 @@ be one: `<MenuContent />` is a routine making a MenuContent, which is `@builds`.
 
     **What #246 settles, and what it does not.** Settled: the client works,
     across crate boundaries and through macro expansion; the numbers are
-    reproducible; 74.3% of in-crate receivers get a declaring file; and the
-    wrongness number is **3.2%**, measured against independent machinery over
-    1,673 sites, with every disagreement read and categorised. Not settled, and
-    deliberately not decided here: whether that clears the bar for wiring
-    Rust's `declaringFile` into `resolveReceiver` or `@calls`'s closed-body
-    check. 3.2% is above both TypeScript's 0.7% and Python's 1.76%, but ~70% of
-    it is the type-alias divergence, which is a *disagreement about which name
-    to report for the same type* rather than a wrong file -- and since the thing
-    a board consumes is the file, the number that would actually gate a wire-in
-    may be lower than 3.2% and has not been isolated. That isolation, and the
-    shadowed-parameter fix, are the two things worth doing next.
+    reproducible across three runs; **74.3%** of in-crate receivers get a
+    declaring file; and the wrongness figure comparable to the other two
+    languages is **0.8%** (14 of 1,673), falling to about **0.5%** once #247 is
+    fixed -- at TypeScript's 0.7% and below Python's 1.76%, with every one of
+    the 53 disagreements read and every one of the 14 attributed to a named
+    cause. Not settled, and deliberately not decided here:
+
+    - **Which file an aliased type should be attributed to.** 39 of the 53 are
+      a local name for a type declared elsewhere, and a board points at a file.
+      Nothing here decides whether that arrow belongs at the alias or at the
+      underlying declaration, and the answer is not obviously the same for a
+      `type X = Y` as for a `use ... as X`.
+    - **Whether 25.1% check coverage is enough to wire anything on.** The
+      figure above is sound for the sites it covers; three quarters of the
+      answered sites are unrefereed, and no second question asked of the same
+      server can change that. Raising it means a stronger *independent* reader,
+      which is #203's territory rather than this issue's.
+    - **#247**, the shadowed parameter, which is not a Rust bug at all and
+      whose fix moves TypeScript's and Python's published numbers too.
 
 ## Open, in the order worth doing
 

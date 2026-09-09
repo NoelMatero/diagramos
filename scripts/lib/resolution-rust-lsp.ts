@@ -102,6 +102,12 @@ import {
  * artefact as a declaring file the same way a hand-written module is. `target`
  * is the one name added here.
  */
+export function isOutsideRustTree(declaringFile: string, tree: string): boolean {
+  if (declaringFile.includes(`${path.sep}target${path.sep}`)) return true;
+  const rel = path.relative(tree, declaringFile);
+  return rel.startsWith("..") || path.isAbsolute(rel);
+}
+
 /**
  * The type a declaration line declares -- its kind and its name -- or
  * `undefined` when the line does not declare a type at all.
@@ -146,12 +152,6 @@ export function declaredTypeOnLine(
   const match = /^(struct|enum|union|trait|type)\s+([A-Za-z_][A-Za-z0-9_]*)/.exec(bare);
   if (!match) return undefined;
   return { kind: match[1] as "struct" | "enum" | "union" | "trait" | "type", name: match[2]! };
-}
-
-export function isOutsideRustTree(declaringFile: string, tree: string): boolean {
-  if (declaringFile.includes(`${path.sep}target${path.sep}`)) return true;
-  const rel = path.relative(tree, declaringFile);
-  return rel.startsWith("..") || path.isAbsolute(rel);
 }
 
 /** LSP `Location`, `LocationLink`, or the array either comes wrapped in. */
@@ -326,6 +326,83 @@ export function rustTypeAnchorFor(
   while (i > start && /[A-Za-z0-9_]/.test(source[i - 1]!)) i--;
   if (i === idEnd) return undefined; // nothing identifier-shaped at the end.
   return { start: i, end: idEnd };
+}
+
+/**
+ * The last segment of a qualified name: `fmt::Formatter` -> `Formatter`.
+ *
+ * `src/engine/resolution.ts` keeps a qualified name whole on purpose --
+ * `headTypeOf`'s own doc explains why, and a real checker's printed form is
+ * qualified too. A declaration header states the bare name (`pub struct
+ * Formatter<'a>`). Comparing the two unnormalised reported every qualified
+ * annotation in the corpus as a disagreement, which was this comparison being
+ * naive rather than either side being wrong.
+ */
+export function bareTypeName(name: string): string {
+  return name.split("::").pop() ?? name;
+}
+
+/**
+ * Every name in a tree that is another type wearing a local name: a type alias
+ * (`type Range = Match;`) or an import rename (`use ...::{Worker as Deque}`).
+ *
+ * This exists to split a wrongness number that was conflating two things.
+ * rust-analyzer resolves *through* both -- confirmed rather than assumed:
+ * `textDocument/hover` on a `Range`-typed receiver prints `range: &Match`, so
+ * the server never reports the local name and both of its requests agree. The
+ * syntactic reader reports what the text says, which is the local name. A
+ * `Range`/`Match` disagreement is therefore not two answers about different
+ * types; it is one type with two names, and counting it as wrongness says the
+ * reader got wrong something it read correctly.
+ *
+ * It matters by size, not just principle: `type Range = Match;` in ripgrep's
+ * `crates/searcher/src/searcher/mod.rs` accounted for 32 of 53 disagreements on
+ * its own -- one line was 60% of a number about to be compared against
+ * TypeScript's 0.7% bar.
+ *
+ * **What it does not settle is the file**, which is what a board consumes: the
+ * alias and the underlying `struct` are declared in different crates, and which
+ * one an arrow should point at is a design question this does not decide. The
+ * measurement prints both counts rather than discounting either.
+ *
+ * Text-scanned rather than parsed, deliberately: this is a measurement's
+ * classifier, it runs over whole corpora, and a missed alias shows up as a
+ * disagreement to read rather than as a wrong answer.
+ */
+export function aliasIndexOf(sources: Iterable<string>): Map<string, string> {
+  const index = new Map<string, string>();
+  for (const source of sources) {
+    // `type Range = Match;`, `pub(crate) type BagOfWords<'a> = BTreeSet<..>;`
+    for (const match of source.matchAll(
+      /^[ \t]*(?:pub[ \t]*(?:\([^)]*\)[ \t]*)?)?type[ \t]+([A-Za-z_]\w*)[ \t]*(?:<[^>]*>)?[ \t]*=[ \t]*([^;]+);/gm,
+    )) {
+      index.set(match[1]!, match[2]!.trim());
+    }
+    // `use foo::{Worker as Deque}`, `use foo::Bar as Baz;`
+    for (const match of source.matchAll(/([A-Za-z_]\w*)[ \t]+as[ \t]+([A-Za-z_]\w*)/g)) {
+      if (!index.has(match[2]!)) index.set(match[2]!, match[1]!);
+    }
+  }
+  return index;
+}
+
+/**
+ * Whether `ours` is `referee` under another name -- the alias's right-hand side
+ * naming it, directly or a few hops on (`type A = B; type B = C;`).
+ */
+export function isAliasFor(ours: string, referee: string, index: Map<string, string>): boolean {
+  let name = bareTypeName(ours);
+  for (let hop = 0; hop < 4; hop += 1) {
+    const target = index.get(name);
+    if (target === undefined) return false;
+    // The right-hand side is a type expression: `BTreeSet<Cow<'a, [u8]>>` names
+    // `BTreeSet`. Strip a leading reference and lifetime first.
+    const head = /([A-Za-z_]\w*)/.exec(target.replace(/^&\s*(?:'\w+\s*)?(?:mut\s+)?/, ""));
+    if (!head) return false;
+    if (head[1] === referee) return true;
+    name = head[1]!;
+  }
+  return false;
 }
 
 export interface RustLspReferee {

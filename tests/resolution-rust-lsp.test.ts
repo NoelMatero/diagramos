@@ -26,7 +26,8 @@ import path from "node:path";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
 
 import {
-  createRustAnalyzerReferee, declaredTypeOnLine, isOutsideRustTree, rustMemberRangeAfter, rustTypeAnchorFor,
+  aliasIndexOf, bareTypeName, createRustAnalyzerReferee, declaredTypeOnLine, isAliasFor,
+  isOutsideRustTree, rustMemberRangeAfter, rustTypeAnchorFor,
   type RustLspReferee,
 } from "../scripts/lib/resolution-rust-lsp";
 
@@ -405,5 +406,96 @@ describe("declaredTypeOnLine", () => {
 
   it("withholds a name that merely begins with a keyword", () => {
     expect(declaredTypeOnLine("pub structural_thing()")).toBeUndefined();
+  });
+});
+
+/**
+ * The alias classifier, which carries the headline number: of 53 disagreements
+ * on the real corpus it accounted for 39, taking the figure comparable to the
+ * other languages' bars from 3.2% to 0.8%. A classifier that decides most of a
+ * published number is worth pinning.
+ *
+ * rust-analyzer resolves through aliases and renames and never reports the
+ * local name -- confirmed live via `hover` -- so a `Range`/`Match`
+ * disagreement is one type with two names, not two answers.
+ */
+describe("aliasIndexOf and isAliasFor", () => {
+  it("reads a plain type alias", () => {
+    const index = aliasIndexOf(["type Range = Match;"]);
+    expect(isAliasFor("Range", "Match", index)).toBe(true);
+  });
+
+  it("reads a generic alias and takes the head of its right-hand side", () => {
+    // ripgrep's own `type BagOfWords<'a> = BTreeSet<Cow<'a, [u8]>>;`
+    const index = aliasIndexOf(["type BagOfWords<'a> = BTreeSet<Cow<'a, [u8]>>;"]);
+    expect(isAliasFor("BagOfWords", "BTreeSet", index)).toBe(true);
+    // Not the argument type buried inside it.
+    expect(isAliasFor("BagOfWords", "Cow", index)).toBe(false);
+  });
+
+  it("reads a visibility-qualified alias", () => {
+    const index = aliasIndexOf(["pub(crate) type Sep = ContextSeparator;"]);
+    expect(isAliasFor("Sep", "ContextSeparator", index)).toBe(true);
+  });
+
+  it("reads an import rename in a brace list", () => {
+    const index = aliasIndexOf(["use crossbeam_deque::{Stealer, Worker as Deque};"]);
+    expect(isAliasFor("Deque", "Worker", index)).toBe(true);
+  });
+
+  it("reads a bare import rename", () => {
+    const index = aliasIndexOf(["use crate::flags::lowargs::ContextSeparator as Separator;"]);
+    expect(isAliasFor("Separator", "ContextSeparator", index)).toBe(true);
+  });
+
+  it("follows a chain of aliases", () => {
+    const index = aliasIndexOf(["type A = B;", "type B = C;"]);
+    expect(isAliasFor("A", "C", index)).toBe(true);
+  });
+
+  it("gives up rather than looping on a cyclic alias", () => {
+    const index = aliasIndexOf(["type A = B;", "type B = A;"]);
+    expect(isAliasFor("A", "Nowhere", index)).toBe(false);
+  });
+
+  it("strips a reference and lifetime from the right-hand side", () => {
+    // `&'a [u8]` -- without stripping the `&'a` the head scan would find the
+    // lifetime, which is the same mistake `headTypeOf` was making (#246).
+    const index = aliasIndexOf(["type Slice<'a> = &'a [u8];"]);
+    expect(isAliasFor("Slice", "u8", index)).toBe(true);
+    expect(isAliasFor("Slice", "a", index)).toBe(false);
+  });
+
+  it("matches a qualified name by its last segment", () => {
+    const index = aliasIndexOf(["type Range = Match;"]);
+    expect(isAliasFor("searcher::Range", "Match", index)).toBe(true);
+  });
+
+  it("says no when the name is not an alias at all", () => {
+    const index = aliasIndexOf(["type Range = Match;"]);
+    expect(isAliasFor("Config", "Match", index)).toBe(false);
+  });
+
+  it("says no when the alias resolves to a different type than the referee named", () => {
+    // The case that must stay a real disagreement: an alias exists, but not to
+    // what rust-analyzer landed on.
+    const index = aliasIndexOf(["type Range = Match;"]);
+    expect(isAliasFor("Range", "Peekable", index)).toBe(false);
+  });
+
+  it("does not treat a `type` inside a longer word as an alias", () => {
+    const index = aliasIndexOf(["    let mytype = Foo;", "// type Range = Match;"]);
+    expect(isAliasFor("mytype", "Foo", index)).toBe(false);
+  });
+});
+
+describe("bareTypeName", () => {
+  it("takes the last segment of a qualified name", () => {
+    expect(bareTypeName("fmt::Formatter")).toBe("Formatter");
+    expect(bareTypeName("process::Command")).toBe("Command");
+  });
+
+  it("leaves an unqualified name alone", () => {
+    expect(bareTypeName("Config")).toBe("Config");
   });
 });

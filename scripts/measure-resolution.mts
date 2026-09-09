@@ -61,7 +61,8 @@ import { createTsReferee } from "./lib/resolution-ts";
 import { refereePythonTypes, type ResolutionQuery } from "./lib/resolution-python";
 import { createPyrightLspReferee, isOutsideTree as isOutsidePyTree, memberRangeAfter } from "./lib/resolution-python-lsp";
 import {
-  createRustAnalyzerReferee, declaredTypeOnLine, isOutsideRustTree, rustMemberRangeAfter,
+  aliasIndexOf, bareTypeName, createRustAnalyzerReferee, declaredTypeOnLine, isAliasFor,
+  isOutsideRustTree, rustMemberRangeAfter,
 } from "./lib/resolution-rust-lsp";
 
 import { createWorkspace } from "../src/engine/drift";
@@ -269,9 +270,11 @@ const rustDisagreements: RustDisagreement[] = [];
  */
 interface RustPlacement {
   answered: number; notAType: number; agreed: number; wrong: number; shapeName: number;
+  /** Of `wrong`, the ones that are one type under two names -- see `aliasIndexOf`. */
+  aliased: number;
 }
 const rustPlacement: RustPlacement = {
-  answered: 0, notAType: 0, agreed: 0, wrong: 0, shapeName: 0,
+  answered: 0, notAType: 0, agreed: 0, wrong: 0, shapeName: 0, aliased: 0,
 };
 
 /**
@@ -284,17 +287,9 @@ const rustPlacement: RustPlacement = {
  */
 const SHAPE_NAMES = new Set(["Array", "Object", "ReadonlyArray"]);
 
-/**
- * The reader keeps a qualified name whole (`fmt::Formatter`, `process::Command`)
- * on purpose -- `headTypeOf`'s own doc explains why, and a real checker's
- * printed form is qualified too. rust-analyzer lands on the declaration, whose
- * line states the bare name (`pub struct Formatter<'a>`). Comparing those
- * as-is reported every qualified annotation in the corpus as a disagreement,
- * which is this comparison being naive and not either side being wrong.
- */
-const bareName = (name: string) => name.split("::").pop() ?? name;
 interface RustPlacementCase {
-  tree: string; file: string; line: number; ours: string; referee: string; shape: string; where: string;
+  tree: string; file: string; line: number; ours: string; referee: string; shape: string;
+  where: string; aliased: boolean;
 }
 const rustPlacementWrong: RustPlacementCase[] = [];
 const rustNotATypeCases: Array<{ tree: string; file: string; line: number; target: string }> = [];
@@ -562,6 +557,11 @@ for (const tree of trees) {
      * excluded from `indexable`, and never asked.
      */
     const roots = cargoRoots(tree);
+    /* One scan per tree, not per disagreement -- an alias may be declared in a
+     * file that holds no receiver site of its own. */
+    const aliases = aliasIndexOf(sourceFiles(tree)
+      .filter((one) => languageOf(path.basename(one)) === "rust")
+      .map((one) => { try { return readFileSync(one, "utf8"); } catch { return ""; } }));
     const sitesByRoot = new Map<string, typeof collectedRustAll>();
     for (const site of collectedRustAll) {
       rustLspCoverage.total += 1;
@@ -651,15 +651,18 @@ for (const tree of trees) {
             if (site.tier1Type && SHAPE_NAMES.has(site.tier1Type)) {
               rustPlacement.shapeName += 1;
             } else if (site.tier1Type) {
-              if (bareName(site.tier1Type) === declared.name) rustPlacement.agreed += 1;
+              if (bareTypeName(site.tier1Type) === declared.name) rustPlacement.agreed += 1;
               else {
                 rustPlacement.wrong += 1;
+                const aliased = isAliasFor(site.tier1Type, declared.name, aliases);
+                if (aliased) rustPlacement.aliased += 1;
                 if (showAll || rustPlacementWrong.length < 100) {
                   rustPlacementWrong.push({
                     tree: path.basename(tree), file: site.file, line: site.line,
                     ours: site.tier1Type, referee: `${declared.kind} ${declared.name}`,
                     shape: site.tier1Shape ?? "?",
                     where: `${path.relative(tree, declaringLocation.file)}:${declaringLocation.line + 1}`,
+                    aliased,
                   });
                 }
               }
@@ -990,11 +993,33 @@ if (rustPlacement.answered > 0) {
       + `${rustPlacement.wrong} disagreed (${percent(rustPlacement.wrong, placementChecked).trim()}).`);
     console.log(`     Set aside, not counted either way: ${rustPlacement.shapeName} where the reader`);
     console.log("     named a shape (`Array`) rather than a type -- see SHAPE_NAMES.");
+    console.log();
+    console.log(`     This checks ${placementChecked} of ${rustPlacement.answered} answered sites `
+      + `(${percent(placementChecked, rustPlacement.answered).trim()}), and that is a ceiling, not`);
+    console.log("     an oversight: an independent check needs the syntactic reader to have named");
+    console.log("     a type too, and it names one for about a fifth of receivers. The rest have an");
+    console.log("     answer with nothing independent to weigh it against. Asking rust-analyzer a");
+    console.log("     second way does not fix that -- `hover` at the same position resolves through");
+    console.log("     the same aliases and agrees by construction, confirmed live.");
+    console.log();
+    const unexplained = rustPlacement.wrong - rustPlacement.aliased;
+    console.log("  c) Of the disagreements, how many are one type under two names? A type alias");
+    console.log("     (`type Range = Match;`) or an import rename: rust-analyzer resolves through");
+    console.log("     both and never reports the local name, while the reader reports what the");
+    console.log("     text says. Not a misread -- but the two names do live in different files,");
+    console.log("     and a board points at a file, so this is reported rather than discounted.");
+    console.log(`     alias or rename: ${rustPlacement.aliased} of ${rustPlacement.wrong}`
+      + ` (${percent(rustPlacement.aliased, rustPlacement.wrong).trim()} of disagreements)`);
+    console.log(`     everything else:  ${unexplained} `
+      + `-- ${percent(unexplained, placementChecked).trim()} of sites checked`);
+    console.log("     That second figure is the one comparable to the other languages' bars; the");
+    console.log("     first is a naming difference this measurement cannot call an error.");
     if (rustPlacementWrong.length > 0) {
       console.log();
       for (const one of rustPlacementWrong.slice(0, cap(rustPlacementWrong.length))) {
         console.log(`       ${one.tree}/${one.file}:${one.line} [${one.shape}] we said `
-          + `${one.ours}, it landed on ${one.referee} (${one.where})`);
+          + `${one.ours}, it landed on ${one.referee} (${one.where})`
+          + `${one.aliased ? " -- alias/rename" : ""}`);
       }
       if (rustPlacementWrong.length > cap(rustPlacementWrong.length)) {
         console.log(`       ... and ${rustPlacementWrong.length - cap(rustPlacementWrong.length)} more`);
