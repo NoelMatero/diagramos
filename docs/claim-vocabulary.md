@@ -1506,8 +1506,101 @@ be one: `<MenuContent />` is a routine making a MenuContent, which is `@builds`.
       answered sites are unrefereed, and no second question asked of the same
       server can change that. Raising it means a stronger *independent* reader,
       which is #203's territory rather than this issue's.
-    - **#247**, the shadowed parameter, which is not a Rust bug at all and
-      whose fix moves TypeScript's and Python's published numbers too.
+    - **#247**, the shadowed parameter. Predicted here to move TypeScript's and
+      Python's published numbers too; item 19 measured it and **it moves
+      neither** -- the shape is not valid TypeScript, and Python's rebindings in
+      this corpus are type-preserving. Rust's own figure went 0.8% -> 0.4%.
+
+19. **A shadowed parameter outranked the binding that shadows it, and fixing it
+    halved Rust's wrongness while costing Python 103 correct answers for no
+    measured gain (#247).** `resolveReceiver` consulted `scope.params` before
+    `scope.bindings`, so `fn g(c: Thing) { let c = Other::new(); c.run(); }`
+    reported `Thing` -- confidently, no refusal. Found by item 18's
+    rust-analyzer referee, which is what that check was built for.
+
+    Two defects behind one symptom, and the second only showed up because the
+    first fix did not close the corpus case. **Precedence:** a name that is both
+    a parameter and a body binding is two candidate types, and this reader has
+    no positional scoping to say which is live at the call, so it now answers
+    `reassigned` -- the word already used when one name has two bindings.
+    **Invisible bindings:** a `for` pattern was never collected as a binding at
+    all, so a bare loop variable came back `unbound` (untrue -- it is plainly
+    bound) and a parameter shadowed by a loop variable had nothing competing
+    with it. That was ripgrep's `fn select(&mut self, name: &str)` shadowed by
+    `for name in self.types.keys()`. The loop variable is recorded with **no
+    type on purpose**: `for c in v.iter()` binds an *element*, and classifying
+    it from the iterable would name the receiver `Iter`, trading one wrong
+    answer for another.
+
+    **Blast radius, checked before the numbers: none of this ships.**
+    `resolveReceiversIn` has exactly one caller, `scripts/measure-resolution.mts`
+    -- `drift.ts`'s own `noteWithheld` takes a `SignatureWithheld`, a different
+    type, and the live Python guard (#243) goes through pyright's LSP, not this
+    reader. `calls.ts` resolves *names to files* with its own `Bindings`, which
+    is a `Set<string>` plus an `ambiguous` set and never a type, so it does not
+    share the defect. So this bug never drew a wrong arrow. What it corrupted is
+    the numbers this document uses to decide whether a language may accuse --
+    including two of the bars themselves.
+
+    **The cost, per language, measured rather than estimated.** Corpus: this
+    repo's `src` and `scripts`, `rust-test`, `graphify`, `infrarouter`,
+    `ripgrep`, `anyhow` -- 39,250 receiver sites. Baseline and fixed runs
+    differed in exactly one file, with the harness commit and the measured
+    sources held byte-identical.
+
+    | language | tier-1 coverage | wrongness |
+    |---|---|---|
+    | rust | 22.2% -> 21.3% (-76 sites) | item 18's placement check **14 -> 7 (0.8% -> 0.4%)** |
+    | ts | 26.0% -> 26.0% (unchanged) | 13 -> 13 (0.8%, unchanged) |
+    | tsx / js | unchanged | 0 -> 0 |
+    | python | 14.2% -> 13.8% (-108 sites) | 43 -> 43 (1.3%, unchanged) |
+
+    **Rust is the whole benefit, and it is a real one:** every one of the seven
+    disagreements removed was this bug, and the seven that remain contain no
+    shadowing at all -- three associated-type projections, two `#[cfg]` arms,
+    two narrowings through a chain. Two of the seven had been filed under
+    "generic bound versus concrete type" in item 18 and were shadowing as well
+    (`impl Into<PathBuf>` rebound by `let cwd = cwd.into()`), so that item's own
+    categorisation was slightly wrong and the fix caught more than it predicted.
+
+    **TypeScript does not have this bug, and #247 was filed saying it did.** The
+    reproduction that convinced me -- `function g(c: Thing) { const c = new
+    Other(); }` -- is not valid TypeScript: a parameter cannot be redeclared.
+    Plain reassignment (`c = x`) is collected and would be caught, and occurs
+    nowhere in this corpus. Nothing in ts/tsx/js moved, in either direction.
+    Item 12's 0.7% is untouched.
+
+    **Python pays and gets nothing, and that is the finding worth arguing
+    with.** Of the 108 sites it stopped resolving, **103 were sites where
+    pyright agreed with the parameter's type** and 5 were already refused --
+    **zero wrong answers removed.** Python rebinding is usually
+    type-preserving (`x = x.strip()` is still `str`), and nothing distinguishes
+    that from `cwd = cwd.into()`, which is not: both are a parameter plus a
+    binding this reader cannot type. Falling back to the parameter when the
+    binding is unresolvable would restore all 103 *and* restore the Rust bug,
+    because `let cwd = cwd.into()` is exactly that shape. So the refusal stands
+    on the argument `licence.ts` is built on rather than on a number: a
+    confident wrong answer is not recoverable and a refusal is. **On this
+    corpus, in Python, it buys nothing measurable.** A corpus where a Python
+    rebinding does change the type would show it; this one has none.
+
+    Item 17's 85.5%/1.76% cannot move and were not re-measured, which is a
+    structural fact rather than an omission: sections 8-9 compare two pyright
+    answers to each other and never consult this reader (`tier1Resolved` feeds
+    only the reported tier1/combined columns). Confirmed in the code before
+    being relied on, and `measure:resolution` grew a `--no-python-lsp` flag so
+    the next change to this reader need not spend the 687 seconds and 22,449
+    round trips that pass costs on `graphify` alone. `~/mundane` is out of this
+    run for item 17's own stated reason -- its per-package TypeScript analysis
+    runs past thirty minutes before any other section starts -- which leaves the
+    TypeScript sample smaller than item 12's and is why "unchanged" above is
+    stated for this corpus rather than for TypeScript at large.
+
+    **The remaining limit, pinned as a test rather than left to be
+    rediscovered:** a destructuring pattern (`for (a, b) in ...`) has children
+    and is skipped the way every other binding shape here skips one, so a
+    parameter shadowed by a tuple pattern is still reported as the parameter.
+
 
 ## Open, in the order worth doing
 
