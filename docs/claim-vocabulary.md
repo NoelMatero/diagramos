@@ -1135,6 +1135,155 @@ one word or one reader, not from reviewing the design.
 `renders` was also raised as a possible missing relation and turned out not to
 be one: `<MenuContent />` is a routine making a MenuContent, which is `@builds`.
 
+17. **Python's version of items 12-14, run for real: two readings, the first
+    wrong in a checkable way -- 89.6%/2.8%, then 85.5%/1.76% once a real
+    placement bug was found and fixed (#235, #236).** Items 11-14 built this
+    whole ladder for TypeScript against `tsc`'s compiler API; #235 is the
+    same ladder for pyright, and the premise it opens on -- that getting a
+    *file*, not just a type's printed name, requires pyright's
+    language-server mode (`pyright-langserver --stdio`, real
+    `textDocument/definition` requests) rather than the `reveal_type`
+    diagnostics trick `resolution-python.ts` already used for #227 -- was
+    checked against a running server before any client code was written, per
+    `AGENTS.md`'s "reproduce before reasoning" rule. Two things the issue's
+    own framing did not get quite right, both found that way:
+
+    - **`textDocument/definition` alone is the wrong tool for half the
+      question.** Asked at a receiver's own position (`c` in `c.load()`), it
+      follows `c` to *its own assignment* -- correct LSP behaviour, wrong
+      question. Getting where `c`'s *type* is declared -- TypeScript's
+      `typeAt().declaringFile`, the thing item 12's 97.8% is actually about --
+      needs `textDocument/typeDefinition`, a capability pyright also
+      advertises (`typeDefinitionProvider` in its own `initialize` response)
+      that the issue never named. `symbolDeclarationAt`'s counterpart --
+      where the method actually *called* is declared -- is answered by
+      `textDocument/definition` after all, asked at the method's own
+      position rather than the receiver's. `scripts/lib/resolution-python-lsp.ts`
+      wires both, one LSP method per question, and
+      `tests/resolution-python-lsp.test.ts` pins the distinction down with a
+      server rather than a comment: asking `definition` at the receiver's own
+      position on purpose, in one test, to show it lands somewhere else
+      entirely.
+    - **No `didOpen` is needed, and no readiness notification exists to wait
+      on because of it.** Confirmed live: pyright answers both LSP methods
+      against on-disk files it was never told to open, because it indexes a
+      workspace from `rootUri` on its own. The cost of skipping `didOpen`:
+      pyright never emits `pyright/beginProgress`/`endProgress` for a
+      document it does not know is open, so there is no signal for "the tree
+      is indexed" to wait on. The first cut of the client retried every
+      `null` answer with the same long backoff, on the theory that `null`
+      always meant "not warmed up yet" -- true for the first few queries,
+      false for the rest of a real corpus. On `graphify` (22,449 receiver
+      sites) that read as throughput collapsing from ~14/s to ~3/s as the run
+      went on: an increasing share of what remained was a position pyright
+      genuinely has no answer for, each one paying the full ~15.75s ladder
+      meant for "not ready yet." One explicit `warmUp` call per tree, before
+      the real batch, followed by a short retry for everything after,
+      brought the same run down to under nine minutes -- the fix `#234`
+      already made for a different reason (pay the expensive part once, not
+      per query) applied to a different bottleneck.
+
+    **Section 8's number, no reader gate, `not-a-name` included, the same
+    shape item 12 measured for TypeScript:** two real Python corpora,
+    `graphify` (22,449 receiver sites) and `infrarouter` (1,172) --
+    `~/mundane`'s own share of this corpus was left out of this run, not
+    measured at zero: its `tsconfig.json`-per-package TypeScript analysis
+    (items 12-14's own long pole, the reason `measure:resolution` needs an
+    8 GiB heap at all) took over 30 minutes with no Python query yet issued,
+    for a monorepo reason `#235`'s LSP client does not touch.
+
+    **Reading one, 89.6%/2.8%, and read closely rather than just counted --
+    which is what caught it.** `#236` was opened to decide whether that
+    wrongness number cleared the bar TypeScript's own version cleared
+    (0.7%/1.1-2.0%), read it as clearly not clearing it, and closed itself
+    with that written down. What kept this from being the end of the story:
+    a handful of the printed disagreements had a shape the "declared type
+    wider than the narrowed value" explanation did not actually fit --
+    `self._market("inference").expect(...).build()` disagreed on *both*
+    `.expect(...)` and `.build(...)`, and the file `typeDeclarationAt` named
+    for both was the *test file doing the chaining*, not anything from the
+    harness the chain is actually built from. A wrong answer with a
+    plausible-sounding name is exactly the failure `docs/reading-a-grammar.md`
+    warns never announces itself -- it takes reading the disagreement, not
+    just its count, to notice a receiver's own declared type should never be
+    the file of the *test currently running*.
+
+    **The bug, found the same way item 14's two TypeScript bugs were --
+    reproducing one specific disagreement rather than reasoning about the
+    check in general:** LSP has no "ask about this exact node" request the
+    way `resolution-ts.ts`'s `checker.getTypeAtLocation(node)` does --
+    `typeDeclarationAt` had to pick *one position* inside a receiver's
+    `[start, end)` range and ask there, and it picked `start`. For a plain
+    name that is the only token in the range, so it was never wrong there.
+    For a **field** (`self.cache` -- `self`, not `cache`) or a **chain**
+    (`self._make().step()` -- `self`, not what `.step()` returns) it is the
+    *first* token of a multi-token expression, and asking there answers what
+    `self` is -- the enclosing class, declared wherever the calling method
+    happens to live -- not what the receiver expression actually evaluates
+    to. `self`'s own declaring file is very often the *same file the call
+    site is in*, which is exactly the shape that read as "declared type
+    names a repo file" instead of failing loudly.
+
+    The fix, `typeAnchorFor`: the last operation in the range decides what
+    it evaluates to, so the anchor is the last call's callee name (matching
+    backward past one balanced `(...)`) or, with no trailing call, the last
+    attribute name (`cache`, not `self`). Confirmed against the real
+    disagreement before being treated as fixed: `self._make().step()`'s
+    anchor is `step`, and asking there now agrees with `methodDeclarationAt`
+    exactly. A field-kind regression this measurement's own fixtures had
+    never exercised (`tests/resolution-python-lsp.test.ts` had no `self.x`
+    test before this) turned out to share the identical bug -- every `field`
+    receiver in the whole corpus had been asking about the wrong token.
+    Withholding rather than guessing when the range ends in a subscript
+    (`x[i]`'s element type is not this scan's to name) or in unbalanced
+    brackets is `memberRangeAfter`'s own stance, reused rather than
+    reinvented.
+
+    **Reading two, after the fix: 85.5% get a declaring file, 1.76% of the
+    ones that answer twice disagree.** Coverage moved down four points
+    (89.6% -> 85.5%, 20,188 of 23,621) -- the subscript/unbalanced-bracket
+    withhold trades a share of "an answer, possibly wrong" for "no answer,
+    honestly." Wrongness moved from four times TypeScript's own 0.7% bar to
+    *inside* the range this repo already ships a word on (item 12's
+    1.1-2.0%): **1.76% (249 of 14,134)** -- 1.8% on `graphify` (244 of
+    13,239), **0.6% on `infrarouter`** (5 of 895), better than TypeScript's
+    own 0.7%. Read again rather than declared fixed on the strength of the
+    percentage alone: every remaining disagreement on both corpora was
+    pulled and categorised, not sampled. 81.6% (199 of 244 on `graphify`,
+    all 5 of `infrarouter`'s) are item 14's own named shape restated in
+    Python -- `.strip`, `.lower`, `.split`, `.get`: a receiver typed with a
+    repo class narrows to a builtin at the call site, and `typeDefinition`
+    on the receiver answers about the declared type, not the narrowed one.
+    The rest -- `.expect(...)`/`.request(...)`/`.gpu(...)` on
+    `infrarouter`'s own fluent-builder tests, `._platform_skill_destination`
+    and similar private helpers on `graphify` -- are `typeAnchorFor`'s own
+    honest remaining limit: a helper whose return type pyright infers
+    rather than reads off an explicit annotation has no textual "Market" or
+    equivalent anywhere in the *calling* file to point `typeDefinition` at,
+    so asking about the callee's own name resolves to where the callee
+    itself is declared -- correct when a fluent method returns `Self` (the
+    fix's own win, confirmed live: hovering that exact position prints the
+    full signature, return type included, and it is *only the file* that
+    is unavailable through this protocol, not the type), wrong when a
+    factory method returns a different class than its own. Confirmed by
+    direct `hover`/`typeDefinition` probes at the exact position, not
+    inferred from the pattern: no position in the caller's own text answers
+    that second case honestly, the same "the reader and the referee share
+    one limitation neither can see past" shape item 14 named for
+    TypeScript's interface case, found here as a protocol limitation rather
+    than a shared-checker one.
+
+    **#236, reopened rather than left closed.** It was closed on reading
+    one's number, per its own explicit instructions -- a bad number is a
+    legitimate answer, and 2.8% against a 0.7-2.0% bar was one. Reading two
+    is a different number, inside the bar rather than four times past it,
+    found by treating "closed with the number written down" as reversible
+    the same way #221's own TypeScript "no" was reversed by #230 once a
+    better measurement existed. Whether 85.5%/1.76% is good enough to wire a
+    live Python `declaringFile` into `resolveReceiver` or a Python
+    `symbolDeclarationAt` into `@calls`'s closed-body check is #236's own
+    question to answer now that it is reopened, not decided here.
+
 ## Open, in the order worth doing
 
 1. ~~**The licence grid.**~~ Built at #207 and shipped at #209. `@accesses` is
