@@ -71,14 +71,29 @@ export { isOutsideTree };
 type DefinitionResult =
   | null
   | undefined
-  | { uri?: string; targetUri?: string }
-  | Array<{ uri?: string; targetUri?: string }>;
+  | { uri?: string; targetUri?: string; range?: LspRange; targetRange?: LspRange; targetSelectionRange?: LspRange }
+  | Array<{ uri?: string; targetUri?: string; range?: LspRange; targetRange?: LspRange; targetSelectionRange?: LspRange }>;
 
-function firstFile(result: DefinitionResult): string | undefined {
+interface LspRange { start: { line: number; character: number } }
+
+/**
+ * A declaration's file and the 0-based line its own range starts on --
+ * #243's addition, over `firstFile`'s file-only answer. `firstFile` still
+ * exists below, as this function's own file-only projection, so
+ * `typeDeclarationAt`/`methodDeclarationAt` keep answering exactly what
+ * they always have for the measurement (`measure-resolution.mts`) and its
+ * tests, neither of which needs a line.
+ */
+function firstLocation(result: DefinitionResult): { file: string; line: number } | undefined {
   const first = Array.isArray(result) ? result[0] : result;
   const uri = first?.uri ?? first?.targetUri;
   if (!uri) return undefined;
-  try { return fileURLToPath(uri); } catch { return undefined; }
+  const range = first?.targetSelectionRange ?? first?.targetRange ?? first?.range;
+  try { return { file: fileURLToPath(uri), line: range?.start.line ?? 0 }; } catch { return undefined; }
+}
+
+function firstFile(result: DefinitionResult): string | undefined {
+  return firstLocation(result)?.file;
 }
 
 /** Byte offset -> LSP `{ line, character }`, both 0-based. */
@@ -188,6 +203,20 @@ export interface PyrightLspReferee {
   typeDeclarationAt(file: string, source: string, start: number, end: number): Promise<string | undefined>;
   /** `textDocument/definition` at `[start, end)` -- where the symbol *at that exact position* is declared. */
   methodDeclarationAt(file: string, source: string, start: number, end: number): Promise<string | undefined>;
+  /**
+   * `typeDeclarationAt`'s own question, with the declaration's line kept
+   * rather than thrown away (#243).
+   *
+   * The measurement only ever needed a file -- item 17's WRONG/AGREED/REFUSED
+   * columns compare file paths, never lines. The live concrete-guard question
+   * (`isConcreteClassAt`, `scripts/lib/resolution-python-live.ts`) needs to
+   * read the actual `class Foo(Bases):` header the declaration points at,
+   * and a file with more than one class in it has no other way to say which
+   * one pyright meant.
+   */
+  typeDeclarationLocationAt(
+    file: string, source: string, start: number, end: number,
+  ): Promise<{ file: string; line: number } | undefined>;
   /**
    * Pays this referee's one warm-up cost -- pyright's own binder needs real
    * time before it answers a position it would otherwise get right, and
@@ -307,9 +336,9 @@ export async function createPyrightLspReferee(root: string): Promise<PyrightLspR
   const WARMUP_RETRY_MS = [250, 500, 1000, 2000, 4000, 8000];
   const STEADY_RETRY_MS = [300, 800];
 
-  async function ask(
+  async function askLocation(
     method: "typeDefinition" | "definition", file: string, source: string, start: number, retryMs: number[],
-  ): Promise<string | undefined> {
+  ): Promise<{ file: string; line: number } | undefined> {
     if (closed) return undefined;
     const uri = pathToFileURL(file).toString();
     const position = positionAt(source, start);
@@ -321,11 +350,17 @@ export async function createPyrightLspReferee(root: string): Promise<PyrightLspR
       } catch {
         return undefined;
       }
-      const declaring = firstFile(result);
+      const declaring = firstLocation(result);
       if (declaring !== undefined) return declaring;
       if (attempt >= retryMs.length || closed) return undefined;
       await new Promise((resolve) => setTimeout(resolve, retryMs[attempt]));
     }
+  }
+
+  async function ask(
+    method: "typeDefinition" | "definition", file: string, source: string, start: number, retryMs: number[],
+  ): Promise<string | undefined> {
+    return (await askLocation(method, file, source, start, retryMs))?.file;
   }
 
   return {
@@ -337,6 +372,12 @@ export async function createPyrightLspReferee(root: string): Promise<PyrightLspR
     typeDeclarationAt: (file, source, start, end) => {
       const anchor = typeAnchorFor(source, start, end);
       return anchor ? ask("typeDefinition", file, source, anchor.start, STEADY_RETRY_MS) : Promise.resolve(undefined);
+    },
+    typeDeclarationLocationAt: (file, source, start, end) => {
+      const anchor = typeAnchorFor(source, start, end);
+      return anchor
+        ? askLocation("typeDefinition", file, source, anchor.start, STEADY_RETRY_MS)
+        : Promise.resolve(undefined);
     },
     methodDeclarationAt: (file, source, start) => ask("definition", file, source, start, STEADY_RETRY_MS),
     warmUp: (file, source, start) => ask("typeDefinition", file, source, start, WARMUP_RETRY_MS).then(() => {}),

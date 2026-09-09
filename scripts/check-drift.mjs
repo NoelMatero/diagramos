@@ -69,6 +69,8 @@ import { createCodeGraphOption, TESTED_VERSION_PREFIX } from "../src/engine/code
 import { createLedger } from "../src/engine/ledger.ts";
 import { goodNewsIds, goodNewsLine, goodNewsSince, novelGoodNews } from "../src/engine/goodnews.ts";
 import { createTsReferee, receiverResolutionFrom } from "./lib/resolution-ts.ts";
+import { resolvePythonReceivers } from "./lib/resolution-python-live.ts";
+import { languageOf } from "../src/engine/parse.ts";
 
 const root = process.cwd();
 
@@ -85,15 +87,12 @@ const root = process.cwd();
  * costs nothing beyond what `@calls` already withheld before this axis
  * existed: `checkDrift` treats an absent referee exactly like one that never
  * resolves a receiver.
+ *
+ * Python's own version of this (#243) needs the boards loaded first --
+ * `closedBodyReferee` itself is assembled further down, once `loaded` exists.
  */
 let tsReferee;
 try { tsReferee = createTsReferee(root); } catch { tsReferee = undefined; }
-const closedBodyReferee = tsReferee ? {
-  resolveReceiver: (file, at) => {
-    const absolute = path.resolve(root, file);
-    return receiverResolutionFrom(tsReferee.typeAt(absolute, at.start, at.end), root);
-  },
-} : undefined;
 
 const USAGE = [
   "usage: diagramos drift [board.excalidraw ...] [options]",
@@ -1308,6 +1307,84 @@ for (const file of checking) {
     problems.push(`${path.relative(root, file)}: could not read (${error.message})`);
   }
 }
+
+/*
+ * Python's own closed-body absence check (#243), assembled here because it
+ * needs `loaded` in hand and nothing after it does.
+ *
+ * `CallSide.resolveReceiver` is synchronous -- called deep inside `calls.ts`'s
+ * own synchronous walk -- and pyright's own language-server protocol
+ * (`resolution-python-lsp.ts`) is not: every answer is a round trip to a
+ * spawned process. `scripts/lib/resolution-python-live.ts`'s own header has
+ * the full reasoning; the shape of it here is two passes. First, a silent
+ * run of every loaded board with a resolver that answers `undefined` but
+ * remembers what it was asked, for Python files only -- this report is
+ * thrown away, only the questions it asked matter. Then, once, every one of
+ * those questions is put to a single live pyright process and cached. The
+ * real run further down reads that cache synchronously, the same shape
+ * `tsReferee` already answers TypeScript's half of this question with.
+ *
+ * Skipped entirely, at zero cost, when nothing loaded names a Python file:
+ * pyright's own startup is not free, and a TypeScript or Rust repository
+ * must not pay for a tool nothing here needs.
+ */
+const anyPython = loaded.some(({ boardFile }) =>
+  readGraph(boardFile).nodes.some((node) => {
+    const target = node.ref?.split("#")[0];
+    return target !== undefined && languageOf(target) === "python";
+  }),
+);
+let pythonCache;
+if (anyPython) {
+  const pythonQueries = [];
+  const recordingReferee = {
+    resolveReceiver: (file, at) => {
+      if (languageOf(file) === "python") pythonQueries.push({ file, at });
+      return undefined;
+    },
+  };
+  for (const { boardFile } of loaded) {
+    try {
+      // `edges`/`coverage`/`trail` are left out on purpose: this pass's own
+      // report is never read, only the `resolveReceiver` questions it asks
+      // matter, and `edges` defaults to on regardless. `trail` in particular
+      // is not yet built at this point in the script -- see it further down.
+      checkDrift(boardFile, workspace, { closedBodyReferee: recordingReferee });
+    } catch {
+      // The recording pass's only job is to harvest queries. Whatever this
+      // board's own real, printed check further down finds is unaffected --
+      // it runs again from the same unmodified board and workspace.
+    }
+  }
+  const resolved = await resolvePythonReceivers(root, pythonQueries);
+  pythonCache = resolved.cache;
+  /*
+   * Closed here, immediately, rather than left running for the rest of the
+   * script: a live pyright process is an open child-process handle, and
+   * Node will not reach its own natural exit while one is still alive --
+   * found live, the hard way, as this script hanging until something else
+   * killed it even after printing its report and reaching its own final
+   * `process.exit()` call further down. Every query this run will ever ask
+   * is already in `pythonCache` by this line; nothing after it needs the
+   * process still running.
+   */
+  resolved.close();
+}
+
+/**
+ * The merged live resolver `checkDrift` actually reports through -- TypeScript
+ * still answered by `tsReferee` in-process and synchronously, Python by a
+ * lookup into what the pass above already resolved. Neither half knows the
+ * other exists; only `languageOf(file)` decides which one a query reaches.
+ */
+const closedBodyReferee = (tsReferee || pythonCache) ? {
+  resolveReceiver: (file, at) => {
+    if (languageOf(file) === "python") return pythonCache?.get(file, at);
+    if (!tsReferee) return undefined;
+    const absolute = path.resolve(root, file);
+    return receiverResolutionFrom(tsReferee.typeAt(absolute, at.start, at.end), root);
+  },
+} : undefined;
 
 /*
  * The graph, built here when this project has none.
