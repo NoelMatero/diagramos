@@ -545,7 +545,7 @@ describe("which words may accuse, and in which languages", () => {
 });
 
 describe("the licence's second axis (#231)", () => {
-  it("gives @calls a closed-body absence licence in ts/tsx only", () => {
+  it("gives @calls a closed-body absence licence in ts/tsx and python", () => {
     // Item 12-14's numbers: a tier-2 compiler resolver can close a body's
     // whole call set, so "not among them" is provable rather than a guess --
     // for TypeScript and TSX. `js` stays excluded: `checkJs` is off, so tier 2
@@ -554,7 +554,10 @@ describe("the licence's second axis (#231)", () => {
     expect(mayAccuse("calls", "tsx", "absence")).toBe(true);
     expect(mayAccuse("calls", "js", "absence")).toBe(false);
     expect(mayAccuse("calls", "rust", "absence")).toBe(false);
-    expect(mayAccuse("calls", "python", "absence")).toBe(false);
+    // Item 17 (#235, #242): pyright over its own LSP closes the same
+    // question for Python, at 1.76% wrong once a real anchoring bug was
+    // found and fixed -- inside the bar ts/tsx's own reading cleared.
+    expect(mayAccuse("calls", "python", "absence")).toBe(true);
   });
 
   it("leaves every other word's absence axis unmeasured, everywhere", () => {

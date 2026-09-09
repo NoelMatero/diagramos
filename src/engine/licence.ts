@@ -244,19 +244,21 @@ const NOT_DESIGNED_YET: RelationUnmeasured = {
 };
 
 /**
- * `@calls`' absence licence outside TypeScript/TSX.
+ * `@calls`' absence licence outside TypeScript/TSX, and now Python (#242).
  *
- * #230 built the closed-body resolver against `tsc` alone; rust and python
- * have no compiler-backed receiver resolver wired in, so this axis is
- * unmeasured for them by an explicit scope decision (#231), not oversight.
+ * #230 built the closed-body resolver against `tsc` alone; rust has no
+ * compiler-backed receiver resolver wired in for this, so this axis stays
+ * unmeasured for it by an explicit scope decision (#231), not oversight.
+ * Python had the same gap until #235 measured pyright over its own
+ * language-server protocol (docs/claim-vocabulary.md item 17) and #242 gave
+ * it a real entry below.
  */
 const NO_CLOSED_BODY_RESOLVER: RelationUnmeasured = {
   unmeasured:
     "#230 measured the closed-body resolver for ts/tsx/js only, using " +
-    "`tsc` as the receiver resolver. Rust and Python have no compiler-backed " +
-    "resolver wired in for this, so this axis is unmeasured for them by " +
-    "scope decision, not oversight (#231, docs/claim-vocabulary.md items " +
-    "12-14).",
+    "`tsc` as the receiver resolver. Rust has no compiler-backed resolver " +
+    "wired in for this, so this axis is unmeasured for it by scope decision, " +
+    "not oversight (#231, docs/claim-vocabulary.md items 12-14).",
 };
 
 export interface Licence {
@@ -880,7 +882,66 @@ export const LICENCES: readonly Licence[] = [
             "refused are `unbound` and `unplaced` -- a name a wildcard import or a " +
             "module resolving to no file brought in -- and neither is a reader bug.",
         },
-        absence: NO_CLOSED_BODY_RESOLVER,
+        /*
+         * The new axis (#231), Python's version. #235 measured whether
+         * pyright can answer the same two questions `resolution-ts.ts` asks
+         * `tsc` -- where a receiver's type is declared, and where the method
+         * actually called is declared -- over its own language-server
+         * protocol rather than its compiler API. The first reading, 89.6%
+         * answered / 2.8% wrong, did not clear the bar and #236 closed on it;
+         * a real anchoring bug (`typeDeclarationAt` was asking about the
+         * first token of `self.cache` or `self._make().step()`, i.e. `self`,
+         * not the field or the chain) turned out to be findable and fixable,
+         * and the corrected reading below is the one #236 reopened on
+         * (docs/claim-vocabulary.md item 17).
+         */
+        absence: {
+          reproduce: "npm run measure:resolution -- ~/board-ai/graphify ~/infrarouter",
+          measured: "2026-09-08",
+          referee:
+            "pyright, asked over its own language-server protocol rather than " +
+            "its compiler API: `textDocument/typeDefinition` on a receiver's " +
+            "own anchor for where its declared type lives, and " +
+            "`textDocument/definition` on the method name for where the " +
+            "method actually called is declared -- confirmed against a live " +
+            "server before either was trusted, not assumed from pyright's " +
+            "docs. It shares nothing with the reader's own tree-sitter walk, " +
+            "so agreeing means two unrelated readings agree rather than one " +
+            "reading agreeing with itself.",
+          unit: "receivers checked two ways: the receiver's declared type against the method actually called",
+          counts: { asked: 14134, missed: 249 },
+          note:
+            "1.76% wrong (249 of 14,134) -- inside the 1.1-2.0% this repo " +
+            "already shipped ts/tsx's own absence licence on, after a real " +
+            "anchoring bug pushed the first reading to 2.8% (four times the " +
+            "bar) by asking about `self` instead of the field or chained " +
+            "call actually being read. 85.5% of every receiver gets a " +
+            "declaring file at all (20,188 of 23,621), four points below the " +
+            "first reading's 89.6% -- the fix withholds rather than guesses " +
+            "when a receiver ends in a subscript or an unbalanced bracket. " +
+            "Measured across two real Python codebases, `graphify` (22,449 " +
+            "receiver sites) and `infrarouter` (1,172); `~/mundane` is left " +
+            "out of both readings because its own TypeScript analysis makes " +
+            "a same-session run impractical, not because of anything in this " +
+            "check.",
+          known: [
+            "A receiver typed as a repo class that narrows to a builtin at " +
+              "the call site -- `.strip`, `.lower`, `.split`, `.get` -- so " +
+              "`typeDefinition` answers about the declared type rather than " +
+              "the narrowed one. 81.6% of every disagreement (199 of 244 on " +
+              "`graphify`, all 5 of `infrarouter`'s), the same shape item 14 " +
+              "already named for TypeScript's own interface case.",
+            "A factory or fluent-builder method whose return type pyright " +
+              "infers rather than reads off an explicit annotation, with no " +
+              "name in the caller's own text to point `typeDefinition` at -- " +
+              "so asking about the callee's own name resolves to where the " +
+              "callee itself is declared. Correct when the method returns " +
+              "`Self`; wrong when it returns a different class. The " +
+              "remaining share of every disagreement, concentrated in " +
+              "`infrarouter`'s fluent-builder tests and a handful of " +
+              "`graphify`'s private helpers.",
+          ],
+        },
       },
       accesses: {
         presence: {
