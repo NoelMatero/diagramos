@@ -463,3 +463,127 @@ describe("fields reach a generic type's impl block (#246)", () => {
       .toBe("resolved/declared-field/Config");
   });
 });
+
+/**
+ * A parameter that is rebound inside the body reported the *parameter's* type
+ * at every call site, including after the rebinding (#247).
+ *
+ * `resolveReceiver` consulted `scope.params` before `scope.bindings`, so the
+ * parameter always won and the binding that shadowed it was never reached. It
+ * answered confidently, with no refusal, which is the false-red shape rather
+ * than a coverage gap -- and it is not a Rust bug: the same shape reproduces in
+ * TypeScript and Python, so a share of items 12-14's 0.7% and item 17's 1.76%
+ * was always this.
+ *
+ * Found by #246's Rust referee, which named `String` where the reader said
+ * `str` on ripgrep's `fn select(&mut self, name: &str)` shadowed by
+ * `for name in self.types.keys()`.
+ *
+ * The answer is `reassigned`, not the shadowing type: this reader has no
+ * positional scoping, so it cannot tell whether the binding precedes the call,
+ * and "one of two possible types" is exactly what `reassigned` already means
+ * for two bindings of the same name.
+ *
+ * One test per way the shadowing is actually written, in each language that has
+ * that spelling -- not per branch.
+ */
+describe("a rebound parameter is not still the parameter (#247)", () => {
+  it("withholds in Rust when a `let` rebinds the parameter", () => {
+    const source = "fn g(c: Thing) {\n    let c = Other::new();\n    c.run();\n}";
+    expect(verdictOf(onlySite(resolveReceiversIn(source, "rust")).verdict))
+      .toBe("withheld/reassigned");
+  });
+
+  it("withholds in Rust when a `for` pattern rebinds the parameter", () => {
+    // The corpus instance. A `for` pattern was not collected as a binding at
+    // all, so the shadowing was invisible and the parameter won by default --
+    // a second defect behind the same symptom.
+    const source = "fn g(c: Thing) {\n    for c in items() {\n        c.run();\n    }\n}";
+    expect(verdictOf(onlySite(resolveReceiversIn(source, "rust")).verdict))
+      .toBe("withheld/reassigned");
+  });
+
+  it("withholds in TypeScript when a `const` rebinds the parameter", () => {
+    const source = "function g(c: Thing) {\n  const c = new Other();\n  c.run();\n}";
+    expect(verdictOf(onlySite(resolveReceiversIn(source, "ts")).verdict))
+      .toBe("withheld/reassigned");
+  });
+
+  it("withholds in Python when an assignment rebinds the parameter", () => {
+    const source = "def g(c: Thing) -> None:\n    c = Other()\n    c.run()";
+    expect(verdictOf(onlySite(resolveReceiversIn(source, "python")).verdict))
+      .toBe("withheld/reassigned");
+  });
+
+  it("withholds in Python when a `for` target rebinds the parameter", () => {
+    const source = "def g(c: Thing) -> None:\n    for c in items():\n        c.run()";
+    expect(verdictOf(onlySite(resolveReceiversIn(source, "python")).verdict))
+      .toBe("withheld/reassigned");
+  });
+
+  /* The regression guards. A parameter that is *not* shadowed must keep
+   * resolving exactly as it did, in every language -- the whole cost of this
+   * fix is meant to fall on the shadowed case and nowhere else. */
+
+  it("still resolves an unshadowed Rust parameter", () => {
+    const source = "fn g(c: Thing) {\n    c.run();\n}";
+    expect(verdictOf(onlySite(resolveReceiversIn(source, "rust")).verdict))
+      .toBe("resolved/annotated-parameter/Thing");
+  });
+
+  it("still resolves an unshadowed TypeScript parameter", () => {
+    const source = "function g(c: Thing) {\n  c.run();\n}";
+    expect(verdictOf(onlySite(resolveReceiversIn(source, "ts")).verdict))
+      .toBe("resolved/annotated-parameter/Thing");
+  });
+
+  it("still resolves an unshadowed Python parameter", () => {
+    const source = "def g(c: Thing) -> None:\n    c.run()";
+    expect(verdictOf(onlySite(resolveReceiversIn(source, "python")).verdict))
+      .toBe("resolved/annotated-parameter/Thing");
+  });
+
+  it("still resolves a body binding that shadows no parameter", () => {
+    const source = "fn g() {\n    let c = Other::new();\n    c.run();\n}";
+    expect(verdictOf(onlySite(resolveReceiversIn(source, "rust")).verdict))
+      .toBe("resolved/rust-constructor/Other");
+  });
+
+  it("resolves a parameter whose name merely resembles a binding's", () => {
+    const source = "fn g(c: Thing) {\n    let cc = Other::new();\n    c.run();\n}";
+    expect(verdictOf(onlySite(resolveReceiversIn(source, "rust")).verdict))
+      .toBe("resolved/annotated-parameter/Thing");
+  });
+});
+
+/**
+ * A loop variable's own withheld reason, which #247 changed as a side effect
+ * worth pinning: it used to come back `unbound`, meaning "this name was never
+ * bound anywhere", which was simply untrue -- the name is bound by the loop.
+ * It is now `no-annotation`: bound, with nothing in the text naming its type.
+ *
+ * Still withheld either way, so nothing that consumes a verdict changes
+ * behaviour; the reason column in `measure:resolution`'s section 3 does.
+ */
+describe("a loop variable is bound, with no annotation (#247)", () => {
+  for (const [language, source] of [
+    ["rust", "fn g() {\n    for c in items() {\n        c.run();\n    }\n}"],
+    ["python", "def g() -> None:\n    for c in items():\n        c.run()"],
+    ["ts", "function g() {\n  for (const c of items()) {\n    c.run();\n  }\n}"],
+  ] as Array<["rust" | "python" | "ts", string]>) {
+    it(`says no-annotation rather than unbound in ${language}`, () => {
+      const site = resolveReceiversIn(source, language);
+      const found = sitesOf(site).find((one) => one.receiver === "c");
+      expect(found && verdictOf(found.verdict)).toBe("withheld/no-annotation");
+    });
+  }
+
+  it("does not record a destructuring pattern, so a parameter it shadows stays wrong", () => {
+    // The honest remaining limit, stated as a test rather than left to be
+    // rediscovered: a tuple pattern has children and is skipped, the same way
+    // every other binding shape here skips one.
+    const source = "fn g(c: Thing) {\n    for (c, d) in items() {\n        c.run();\n    }\n}";
+    const found = sitesOf(resolveReceiversIn(source, "rust")).find((one) => one.receiver === "c");
+    expect(found && verdictOf(found.verdict)).toBe("resolved/annotated-parameter/Thing");
+  });
+});
