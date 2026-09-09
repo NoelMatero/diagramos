@@ -1379,6 +1379,32 @@ be one: `<MenuContent />` is a routine making a MenuContent, which is `@builds`.
     aliases and agreeing with `typeDefinition` by construction. A second
     opinion from the same server is not a referee.
 
+    **A third limit, in the other direction, found reviewing this entry: the
+    comparison is of bare names, so where a name is not unique the check
+    cannot fully discriminate.** Everything above is about false
+    *disagreements* -- aliases, qualified names, shapes, `cfg` arms -- and
+    each is argued down carefully. The converse is not argued at all: an
+    `agreed` verdict says the reader's name and the declaration's name are
+    the same string, and in Rust a great many strings are not unique.
+    Measured on this corpus, **129 of 524 type declarations (24.6%) share a
+    bare name with a declaration in another file** -- `Error` in 15 files,
+    `Config` in 8, `Match` in 4 -- and of the sites this referee can check,
+    **164 of 1,757 (9.3%) name one of them**, `DirEntry` (49 sites) and
+    `Match` (42) most of all. `Match` is the same type the alias paragraph
+    below spends itself on, so this is not a hypothetical corner.
+    A placement error that happened to land on a same-named declaration
+    elsewhere would be scored `agreed` rather than caught, which makes the
+    0.8% a **lower bound** on wrongness rather than an estimate of it -- the
+    less comfortable direction for a figure being read against a 0.7% bar.
+    It does not move the number: nothing here says any counted agreement
+    *was* wrong, only that ~9% of them rest on weaker evidence than the
+    other 91%. Closing it needs the referee to compare a type's identity
+    rather than its name -- the declaring file and line
+    `typeDeclarationLocationAt` already returns, which this comparison reads
+    the header off but does not itself weigh -- and that is a change to the
+    check rather than to the reader, so it is recorded here rather than
+    fixed in the issue that found it.
+
     **The 39 are a type alias or an import rename, and separating them
     mechanically rather than by eye is what makes the 0.8% trustworthy.**
     `type Range = Match;` in `crates/searcher/src/searcher/mod.rs` accounts for
