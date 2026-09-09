@@ -4,6 +4,7 @@
  *
  *   npm run measure:accesses                 -- this repo, rust-test, orangutan, mundane, infrarouter
  *   npm run measure:accesses -- <path>...    -- any trees you like
+ *   npm run measure:accesses -- --all        -- every disagreement, not the first few
  *
  * `accesses.ts` has two ends and they are not on the same footing, so this
  * script has two measurements rather than one. Reporting a single recall over
@@ -64,7 +65,20 @@ import { initEngine, languageOf, type Language } from "../src/engine/parse";
 await initEngine();
 
 const HOME = process.env.HOME ?? "/Users/noelmatero";
+const flags = new Set(process.argv.slice(2).filter((argument) => argument.startsWith("--")));
 const roots = process.argv.slice(2).filter((argument) => !argument.startsWith("--"));
+/**
+ * `--all` prints every accusation, every miss and every invention rather than
+ * the first handful.
+ *
+ * The default caps were how #222 stayed invisible for a release: the visible 15
+ * misses read as a plausible tail of hard cases, and reading all of them --
+ * which needed editing this file -- showed that eight sites were a fifth of the
+ * list and whole clusters were not member reads at all. A refusal rate nobody
+ * can audit is a number, not a measurement.
+ */
+const showAll = flags.has("--all");
+const cap = (count: number, few: number) => (showAll ? count : Math.min(count, few));
 
 /*
  * Four languages, never one. A member is spelled four different ways and a
@@ -576,23 +590,30 @@ for (const language of LANGUAGES) {
 console.log();
 console.log(`  ACCUSED -- referee read the member off the declaration, reader refutes it: ${accused.length}`);
 console.log("    The bar is zero. Each one is an arrow that would be called wrong when it is right.");
-for (const one of accused.slice(0, 25)) {
+for (const one of accused.slice(0, cap(accused.length, 25))) {
   console.log(`    ${path.relative(HOME, one.file)}:${one.line} ${one.type} has no ${one.member}`);
 }
-if (accused.length > 25) console.log(`    ... and ${accused.length - 25} more`);
+if (accused.length > cap(accused.length, 25)) {
+  console.log(`    ... and ${accused.length - cap(accused.length, 25)} more (--all prints every one)`);
+}
 
 console.log();
 console.log(`  MISSED -- referee read the access, reader did not: ${missed.length}`);
 console.log("    Not a red. Each one is a confirmation nobody gets, which is what a word");
 console.log("    that ships and never fires is made of.");
-for (const one of missed.slice(0, 15)) {
+for (const one of missed.slice(0, cap(missed.length, 15))) {
   console.log(`    ${path.relative(HOME, one.file)}:${one.line} ${one.routine} reads ${one.member}`);
 }
-if (missed.length > 15) console.log(`    ... and ${missed.length - 15} more`);
+if (missed.length > cap(missed.length, 15)) {
+  console.log(`    ... and ${missed.length - cap(missed.length, 15)} more (--all prints every one)`);
+}
 
 console.log();
 console.log(`  INVENTED -- reader affirmed a name that is not there: ${invented.length}`);
-for (const one of invented.slice(0, 10)) {
+for (const one of invented.slice(0, cap(invented.length, 10))) {
   console.log(`    ${one.end.padEnd(8)} ${path.relative(HOME, one.file)} ${one.where}`);
+}
+if (invented.length > cap(invented.length, 10)) {
+  console.log(`    ... and ${invented.length - cap(invented.length, 10)} more (--all prints every one)`);
 }
 console.log();
