@@ -54,8 +54,7 @@
  * A run is a measurement, not a test: it prints and never fails. The bugs it
  * finds become tests.
  */
-import { execFileSync } from "node:child_process";
-import { existsSync, readFileSync } from "node:fs";
+import { existsSync, readdirSync, readFileSync, type Dirent } from "node:fs";
 import path from "node:path";
 
 import { accessesIn, declaresMember, memberAccesses } from "../src/engine/accesses";
@@ -95,17 +94,54 @@ const trees = roots.length > 0 ? roots : [
   `${HOME}/infrarouter`,
 ].filter((tree) => existsSync(tree));
 
+/** Directories whose contents are somebody else's source, or not source at all. */
+const SKIP_DIRECTORIES = new Set([
+  "node_modules", ".git", "target", "dist", "build", "out", "vendor", ".venv", ".claude",
+  "coverage", ".next", ".nuxt", ".output", ".turbo", ".yarn", ".cache",
+]);
+
+/**
+ * Every source file under a tree, walked rather than shelled out to.
+ *
+ * `execFileSync("find", [root, "-type", "f"])` was here, and on two of the
+ * seven trees it threw `ENOBUFS` -- `find` printed more than the default
+ * stdout buffer holds, which `mundane` does at 126,863 files once its
+ * dependencies are installed. A blanket `catch` turned that into "no files
+ * here" and the report went on saying **7 trees** with a straight face.
+ *
+ * The corpus this word was licensed on was 5,833 asks. The same command today
+ * asks 1,232, and none of that is a change to the reader: two of the seven
+ * trees stopped being read and nothing said so. `measure-resolution.mts`
+ * carries this fix already and says the same thing about it; the difference
+ * here is that the number it quietly changed is on a licence.
+ *
+ * Skipping the heavy directories *during* the walk means the listing never
+ * gets big enough to be a problem in the first place.
+ */
 function sourceFiles(root: string): string[] {
-  try {
-    return execFileSync("find", [root, "-type", "f"], { encoding: "utf8" })
-      .split("\n")
-      .filter(Boolean)
-      .filter((file) => !/\/(target|node_modules|\.git|dist|out|vendor|\.venv)\//.test(file))
-      .filter((file) => languageOf(file) !== undefined);
-  } catch {
-    return [];
-  }
+  const files: string[] = [];
+  const walk = (directory: string): void => {
+    let entries: Dirent[];
+    try {
+      entries = readdirSync(directory, { withFileTypes: true });
+    } catch {
+      unreadable.push(directory);
+      return;
+    }
+    for (const entry of entries) {
+      if (entry.name.startsWith(".")) continue;
+      if (SKIP_DIRECTORIES.has(entry.name)) continue;
+      const full = path.join(directory, entry.name);
+      if (entry.isDirectory()) walk(full);
+      else if (entry.isFile() && languageOf(entry.name) !== undefined) files.push(full);
+    }
+  };
+  walk(root);
+  return files;
 }
+
+/** Directories the walk could not open. Reported, never swallowed. */
+const unreadable: string[] = [];
 
 /* ------------------------------------------------------------------ *
  * The referee, part one: what a type declares.
@@ -171,9 +207,60 @@ function headerHasParent(line: string, language: Language): boolean {
  */
 function blanked(source: string, language: Language): string {
   const hollow = (block: string) => block.replace(/[^\n]/g, " ");
-  const withoutComments = source.replace(/\/\*[\s\S]*?\*\//g, hollow);
+  /*
+   * Python first, and it never sees the block-comment pass. A slash-star pair
+   * is not a comment in Python, and running that pass there cost this
+   * measurement its worst single site.
+   * `graphify/extractors/_strip_jsonc` has a docstring that *describes*
+   * stripping them: the unclosed slash-star on its third line paired with the
+   * one in the regex ten lines below, blanking the docstring's own closing
+   * quotes on the way. The next docstring in the file then paired with the
+   * opening one, two `def` lines went out with it, and `_strip_jsonc` stayed
+   * open for the rest of the file -- 24 member reads on one line, none of them
+   * in that function. Every other Python routine below it stopped existing.
+   */
   if (language === "python") {
-    return withoutComments.replace(/"""[\s\S]*?"""|'''[\s\S]*?'''/g, hollow);
+    /*
+     * Walked, for the same reason the other languages are. A triple quote
+     * inside an ordinary string opens nothing, and matching on the text alone
+     * cannot tell: `text.strip('"""').strip("\'\'\'")` in graphify's
+     * `extract.py` paired its inner triple quote with a docstring 80 lines
+     * below, blanked every `def` in between, and handed six reads from a
+     * docstring to a routine that had ended long before.
+     */
+    let out = "";
+    let at = 0;
+    while (at < source.length) {
+      const triple = source.startsWith('"""', at) ? '"""' : source.startsWith("'''", at) ? "'''" : "";
+      if (triple !== "") {
+        const found = source.indexOf(triple, at + 3);
+        const end = found === -1 ? source.length : found + 3;
+        out += hollow(source.slice(at, end));
+        at = end;
+        continue;
+      }
+      const here = source[at]!;
+      if (here === "#") {
+        const line = source.indexOf("\n", at);
+        const end = line === -1 ? source.length : line;
+        out += hollow(source.slice(at, end));
+        at = end;
+        continue;
+      }
+      if (here === '"' || here === "'") {
+        let end = at + 1;
+        while (end < source.length && source[end] !== here && source[end] !== "\n") {
+          end += source[end] === "\\" ? 2 : 1;
+        }
+        end = Math.min(end + 1, source.length);
+        out += source.slice(at, end);
+        at = end;
+        continue;
+      }
+      out += here;
+      at += 1;
+    }
+    return out;
   }
   /*
    * A template literal is a string, and this repository keeps whole scripts
@@ -181,8 +268,101 @@ function blanked(source: string, language: Language): string {
    * in `boards-page.ts` read as fourteen routines the reader could not find,
    * because in the tree they are one string. Blanked, not parsed: what a
    * browser eventually runs is not a declaration in this file.
+   *
+   * Walked rather than matched, and that is not tidiness. Two regexes doing
+   * this found their opening marks inside other literals: `const routeRegex =
+   * /([\'"`])(\/[\w]+)\1/g` in `drift.ts` has a backtick inside a character
+   * class, and the template-literal pass read it as the start of one -- so it
+   * blanked from there to the next backtick in the file, 1,000 lines away, and
+   * `getRouteLiterals` never closed. Eleven of the misses left after the
+   * literal fixes were that one line. A scanner that consumes a comment, a
+   * string and a regular expression in the order it meets them cannot be
+   * fooled that way, because it is never inside one without knowing.
    */
-  return withoutComments.replace(/`(?:[^`\\]|\\.)*`/g, hollow);
+  let out = "";
+  let at = 0;
+  while (at < source.length) {
+    const here = source[at]!;
+
+    if (here === "/" && source[at + 1] === "*") {
+      // Rust nests block comments; the others do not, and `indexOf` is right
+      // for them.
+      let end = at + 2;
+      let open = 1;
+      while (end < source.length && open > 0) {
+        if (language === "rust" && source.startsWith("/*", end)) { open += 1; end += 2; continue; }
+        if (source.startsWith("*/", end)) { open -= 1; end += 2; continue; }
+        end += 1;
+      }
+      out += hollow(source.slice(at, end));
+      at = end;
+      continue;
+    }
+
+    if (here === "/" && source[at + 1] === "/") {
+      const line = source.indexOf("\n", at);
+      const end = line === -1 ? source.length : line;
+      out += hollow(source.slice(at, end));
+      at = end;
+      continue;
+    }
+
+    if (here === "`") {
+      let end = at + 1;
+      while (end < source.length && source[end] !== "`") end += source[end] === "\\" ? 2 : 1;
+      end = Math.min(end + 1, source.length);
+      out += hollow(source.slice(at, end));
+      at = end;
+      continue;
+    }
+
+    /*
+     * A Rust raw string, kept whole. Its hashes are not attributes and its
+     * quotes do not pair with anything outside it.
+     */
+    if (language === "rust") {
+      const raw = /^b?r(#*)"/.exec(source.slice(at, at + 16));
+      if (raw) {
+        const closing = `"${raw[1]!}`;
+        const found = source.indexOf(closing, at + raw[0]!.length);
+        const end = found === -1 ? source.length : found + closing.length;
+        out += hollow(source.slice(at, end));
+        at = end;
+        continue;
+      }
+    }
+
+    /*
+     * A string, kept as written: `strip` empties it line by line, and the
+     * declaration scan needs the line it sits on to keep its shape. It is
+     * consumed here only so a quote inside it cannot open something else.
+     */
+    if (here === '"' || (here === "'" && charLiteralHere(source, at, language))) {
+      let end = at + 1;
+      while (end < source.length && source[end] !== here && source[end] !== "\n") {
+        end += source[end] === "\\" ? 2 : 1;
+      }
+      end = Math.min(end + 1, source.length);
+      out += source.slice(at, end);
+      at = end;
+      continue;
+    }
+
+    if (language !== "rust" && here === "/" && regexMayStart(out)) {
+      const line = source.indexOf("\n", at);
+      const to = line === -1 ? source.length : line;
+      const end = endOfRegex(source.slice(at, to), 0);
+      if (end !== -1) {
+        out += source.slice(at, at + end);
+        at += end;
+        continue;
+      }
+    }
+
+    out += here;
+    at += 1;
+  }
+  return out;
 }
 
 /**
@@ -197,13 +377,149 @@ function blanked(source: string, language: Language): string {
  * end, and `measure-holds.mts`'s referee carries the same line today.
  */
 function strip(line: string, language: Language): string {
-  const comment = language === "python" || language === "rust"
-    ? /\s+(#|\/\/).*$/
-    : /\s+\/\/.*$/;
-  return line
-    .replace(comment, "")
-    .replace(/"(?:[^"\\]|\\.)*"/g, '""')
-    .replace(/'(?:[^'\\]|\\.)*'/g, "''");
+  const hash = language === "python" || language === "rust";
+  const doubleSlash = language !== "python";
+  const regexes = language === "ts" || language === "tsx" || language === "js";
+
+  let out = "";
+  let at = 0;
+
+  while (at < line.length) {
+    const here = line[at]!;
+
+    /*
+     * A Rust raw string, whose hashes are part of the literal. Read as an
+     * attribute they take the rest of the line with them, and the closing
+     * bracket of whatever call the string sits in goes too.
+     */
+    if (language === "rust") {
+      const raw = /^b?r(#*)"/.exec(line.slice(at));
+      if (raw) {
+        const closing = `"${raw[1]!}`;
+        const end = line.indexOf(closing, at + raw[0]!.length);
+        out += '""';
+        at = end === -1 ? line.length : end + closing.length;
+        continue;
+      }
+    }
+
+    if (here === '"' || (here === "'" && charLiteralHere(line, at, language))) {
+      out += `${here}${here}`;
+      at = endOfQuoted(line, at);
+      continue;
+    }
+
+    if (hash && here === "#") break;
+    if (doubleSlash && here === "/" && line[at + 1] === "/") break;
+
+    /*
+     * A regular expression literal, which is neither a member read nor a
+     * brace. Both halves of that mattered: `/\.(py|lua|cpp)/` handed the
+     * referee three member reads called `py`, `lua` and `cpp`, and a `\{`
+     * inside one counted as an opening brace that nothing ever closed --
+     * which is how `refereeTypes` in `measure-holds.mts` stayed open for 130
+     * lines and collected every member read below it.
+     */
+    if (regexes && here === "/" && regexMayStart(out)) {
+      const end = endOfRegex(line, at);
+      if (end !== -1) { out += " "; at = end; continue; }
+    }
+
+    out += here;
+    at += 1;
+  }
+  return out;
+}
+
+/**
+ * Whether a `/` here opens a regular expression rather than dividing.
+ *
+ * The last thing written decides it: a value can be divided, a keyword or an
+ * operator cannot. `return /\)\s*\{/.test(code)` is the case the last-character
+ * rule alone gets wrong -- `return` ends in a word character and reads exactly
+ * like a variable being divided.
+ */
+function regexMayStart(before: string): boolean {
+  const trimmed = before.replace(/\s+$/, "");
+  if (trimmed === "") return true;
+  if (/\b(return|typeof|instanceof|case|in|of|new|delete|void|do|else|yield|await)$/.test(trimmed)) {
+    return true;
+  }
+  return !/[\w$)\]]/.test(trimmed.slice(-1));
+}
+
+/** One past the closing quote, or the end of the line if it never closes. */
+function endOfQuoted(line: string, at: number): number {
+  const quote = line[at]!;
+  let i = at + 1;
+  while (i < line.length) {
+    if (line[i] === "\\") { i += 2; continue; }
+    if (line[i] === quote) return i + 1;
+    i += 1;
+  }
+  return line.length;
+}
+
+/**
+ * One past a regular expression literal and its flags, or -1 if it never
+ * closes -- in which case the `/` was something else and is kept.
+ */
+function endOfRegex(line: string, at: number): number {
+  let i = at + 1;
+  let inClass = false;
+  while (i < line.length) {
+    const here = line[i]!;
+    if (here === "\\") { i += 2; continue; }
+    if (here === "[") inClass = true;
+    else if (here === "]") inClass = false;
+    else if (here === "/" && !inClass) {
+      return i + 1 + (/^[dgimsuvy]*/.exec(line.slice(i + 1))?.[0].length ?? 0);
+    }
+    i += 1;
+  }
+  return -1;
+}
+
+/**
+ * Whether a `'` here opens a literal rather than naming a Rust lifetime.
+ *
+ * `&'a str` and `'x'` start the same way and only one of them is a literal.
+ * Reading a lifetime as a quote swallows the rest of the line up to the next
+ * apostrophe, which in Rust is usually the next lifetime.
+ */
+function charLiteralHere(line: string, at: number, language: Language): boolean {
+  if (language !== "rust") return true;
+  return /^'(?:\\.|[^'\\])'/.test(line.slice(at));
+}
+
+/**
+ * The pieces of a one-line declaration body that belong to *that* declaration.
+ *
+ * Splitting the whole body on semicolons reaches into any type nested in it.
+ * `interface LspRange { start: { line: number; character: number } }` handed
+ * `character` to LspRange, and the reader -- correctly -- said LspRange has no
+ * member of that name. Two of those were the whole ACCUSED column, whose bar
+ * is zero, and the multi-line path had guarded against exactly this since it
+ * was written.
+ */
+function ownParts(body: string): string[] {
+  const parts: string[] = [];
+  let depth = 0;
+  let piece = "";
+  for (const character of body) {
+    if (character === "{" || character === "(" || character === "[") depth += 1;
+    else if (character === "}" || character === ")" || character === "]") depth -= 1;
+    // The declaration's own closing brace. Everything after it is somebody else.
+    if (depth < 0) break;
+    if (depth === 0 && (character === ";" || character === ",")) {
+      parts.push(piece);
+      piece = "";
+      continue;
+    }
+    piece += character;
+  }
+  parts.push(piece);
+  return parts;
 }
 
 function refereeTypes(source: string, language: Language): RefereeType[] {
@@ -255,7 +571,7 @@ function refereeTypes(source: string, language: Language): RefereeType[] {
        * off it here and the declaration closes where it was written.
        */
       if (depth <= 0 && language !== "python") {
-        for (const one of code.slice(code.indexOf("{") + 1).split(/[;,]/)) {
+        for (const one of ownParts(code.slice(code.indexOf("{") + 1))) {
           const hit = member.exec(` ${one.trim()}`);
           if (hit) current.members.push(hit[1]!);
         }
@@ -358,12 +674,65 @@ const OPENS = new Map<Language, RegExp>([
  * The lookbehind is spread syntax, which is three dots and no member: `{
  * ...raced, started: false }` read as `raced` reading a member called `raced`,
  * and JavaScript object literals are full of it.
+ *
+ * `.await` is excluded because it is not one either: Rust puts its await after
+ * the value, and a postfix keyword written with a dot reads exactly like a
+ * field. Nothing declares a member called `await` for the reader to find.
  */
-const READ = /(?<!\.)\.([A-Za-z_$][\w$]*)/g;
+const READ = /(?<!\.)\.(?!await\b)([A-Za-z_$][\w$]*)/g;
+
+/**
+ * A line that says where a name comes from rather than reading one off a value.
+ *
+ * `from graphify.paths import out_path` is not a routine reading a member
+ * called `paths` off something called `graphify`. This was the single largest
+ * cluster in the 450: `cli.py` alone contributed 30, every one of them a module
+ * path in an import written inside a function body.
+ *
+ * Only Python needs it. TypeScript and JavaScript write the module as a string,
+ * which is blanked already, and Rust separates a path with colons.
+ */
+const IMPORT = new Map<Language, RegExp>([
+  ["python", /^\s*(?:from\s+[.\w]+\s+import\b|import\s+[.\w]+)/],
+]);
+
+/**
+ * A dotted name standing where a type goes, which names a type and reads no
+ * member.
+ *
+ * `ts.Program`, `React.ComponentProps<"div">`, `TabsPrimitive.Root.Props`,
+ * `NodeJS.ErrnoException`. 86 of the 450 were this, and none of them is a
+ * member read: nothing is being read off anything at runtime.
+ *
+ * Two conditions, and both are needed. The name has to follow something that
+ * introduces a type -- an annotation colon, `as`, `satisfies`, `extends`,
+ * `implements`, an opening angle bracket, or Python's arrow -- **and** the part
+ * after the last dot has to be capitalised. The colon alone is not enough,
+ * because an object literal writes one too: `{ routine: routine.name }` reads
+ * `name` off a value and the recall would lose every such read in the corpus.
+ *
+ * The cost is written down rather than hidden: a genuinely capitalised member
+ * in a type position -- an enum case in `{ mode: Mode.Fast }` -- stops being
+ * counted. Members are lowercase in all four languages by convention, and this
+ * word is for ordinary ones.
+ *
+ * A comma is deliberately **not** a marker, though adding one is the obvious
+ * way to catch the second argument of a generic -- `Map<string,
+ * ts.CompilerOptions>`. Measured: it removes 2 invented reads and 67 real
+ * ones, 54 of them Python, because a comma separates ordinary arguments far
+ * more often than it separates type arguments. The four that survive it are
+ * named in the pull request rather than paid for at that rate.
+ */
+const DOTTED_TYPE =
+  /(?<=[:<]|\bas\b|\bsatisfies\b|\bextends\b|\bimplements\b|->|=>)\s*[A-Za-z_$][\w$]*(?:\.[A-Za-z_$][\w$]*)*\.[A-Z][\w$]*/g;
+
+/** `import.meta` is a language construct, not an object with a member. */
+const IMPORT_META = /\bimport\.meta\b/g;
 
 interface RefereeRoutine {
   name: string;
-  reads: string[];
+  /** Each member read, with the line it was read on rather than the routine's. */
+  reads: Array<{ name: string; line: number }>;
   line: number;
 }
 
@@ -378,6 +747,14 @@ function refereeRoutines(source: string, language: Language): RefereeRoutine[] {
   let depth = 0;
   let opened = 0;
   let indent = 0;
+  /*
+   * Parenthesis depth, so a routine whose parameter list runs over several
+   * lines is not closed by its own `): void {`, which sits back at the
+   * declaration's indent and looks exactly like the next declaration.
+   */
+  let parens = 0;
+  /** Whether this routine opened a brace, which decides how it can be closed. */
+  let braced = false;
 
   for (const [index, line] of lines.entries()) {
     const start = opens.exec(line);
@@ -385,29 +762,57 @@ function refereeRoutines(source: string, language: Language): RefereeRoutine[] {
       current = { name: start[1] ?? start[2]!, reads: [], line: index + 1 };
       found.push(current);
       opened = depth;
+      parens = 0;
+      braced = false;
       indent = line.length - line.trimStart().length;
       if (language === "python") continue;
     }
     if (!current) continue;
 
-    if (language === "python") {
-      // Indentation is the whole of Python's scoping, and a blank line is not
-      // the end of anything.
-      const here = line.length - line.trimStart().length;
-      if (line.trim() !== "" && here <= indent) { current = undefined; continue; }
+    /*
+     * A routine that never opened a brace cannot be closed by one, and until
+     * now nothing closed it at all. `const cell = (count, whole) => \`..\`` is
+     * a whole routine on one line: its depth never rises above where it
+     * started, so the `for` loop underneath raised the depth instead and read
+     * as this routine's body. `cell` in `measure-resolution.mts` collected six
+     * reads that way, and `pct`, `pc` and `total` did the same in three other
+     * scripts.
+     *
+     * Indentation ends those, and **only** those. Applying it to every routine
+     * looked tidier and was wrong: generated code is not indented, and
+     * `mundane/apps/graph/db/queries.rs` writes 31 handler bodies flat against
+     * the margin. The indent rule closed each one on its own first line and
+     * took 616 real member reads out of the corpus -- so a rule meant to stop
+     * the referee inventing reads would have stopped it seeing them.
+     */
+    const here = line.length - line.trimStart().length;
+    if (!start && !braced && line.trim() !== "" && here <= indent && parens === 0) {
+      current = undefined;
+      continue;
     }
 
-    // A trailing comment is prose, and a string is not a member read. `"a.b"`
-    // and a docstring between them accounted for most of the first run's noise.
-    const code = line
-      .replace(/(\/\/|#).*$/, "")
-      .replace(/"(?:[^"\\]|\\.)*"/g, '""')
-      .replace(/'(?:[^'\\]|\\.)*'/g, "''");
+    /*
+     * The same scanner the declaration half uses. It had its own stripper, and
+     * that one cut at the first `#` or `//` in *any* language and did it before
+     * the strings came out -- so a `#` inside a TypeScript string took the rest
+     * of the line, braces included, and the routine never closed.
+     */
+    const code = strip(line, language);
 
-    for (const hit of code.matchAll(READ)) current.reads.push(hit[1]!);
+    const importing = IMPORT.get(language);
+    if (importing?.test(line)) continue;
+
+    const readable = code.replace(DOTTED_TYPE, " ").replace(IMPORT_META, " ");
+    for (const hit of readable.matchAll(READ)) {
+      current.reads.push({ name: hit[1]!, line: index + 1 });
+    }
+
+    parens += (code.match(/[([]/g) ?? []).length - (code.match(/[)\]]/g) ?? []).length;
+    if (parens < 0) parens = 0;
 
     if (language !== "python") {
       depth += (code.match(/\{/g) ?? []).length - (code.match(/\}/g) ?? []).length;
+      if (depth > opened) braced = true;
       if (depth <= opened && !start) current = undefined;
     }
   }
@@ -432,6 +837,21 @@ const BUILT_IN = new Set([
   "iter", "collect", "into", "to_string", "append", "extend", "items", "format",
 ]);
 
+/**
+ * The distinct members a routine reads, each with the line it was read on.
+ *
+ * The line is the read's own, not the routine's opening line. Every one of the
+ * 23 reads at `resolution.py:63` pointed at a `def` that read none of them, and
+ * a list that all says `:63` is a list nobody can check.
+ */
+function distinctReads(routine: RefereeRoutine): Array<{ name: string; line: number }> {
+  const seen = new Map<string, number>();
+  for (const read of routine.reads) {
+    if (!BUILT_IN.has(read.name) && !seen.has(read.name)) seen.set(read.name, read.line);
+  }
+  return [...seen].map(([name, line]) => ({ name, line }));
+}
+
 const accused: Array<{ file: string; type: string; member: string; line: number }> = [];
 const missed: Array<{ file: string; routine: string; member: string; line: number }> = [];
 const invented: Array<{ file: string; where: string; end: string }> = [];
@@ -448,6 +868,16 @@ const wholeVerdicts = new Map<Language, Map<string, number>>();
 const files = new Map<Language, number>();
 let types = 0;
 let routines = 0;
+/**
+ * The routine credited with the most member reads, which is where a broken
+ * boundary shows itself first.
+ *
+ * 24 reads on one Python `def` was #222, and nothing in this report said so:
+ * the misses were spread across the miss list fifteen at a time and the total
+ * was the only number anybody saw. A routine that never closes collects
+ * everything below it, so the top of this ranking is the shape of the bug.
+ */
+let widest = { reads: 0, file: "", routine: "", line: 0 };
 
 const bump = <K,>(map: Map<K, number>, key: K) => map.set(key, (map.get(key) ?? 0) + 1);
 const bump2 = (map: Map<Language, Map<string, number>>, language: Language, key: string) => {
@@ -496,11 +926,14 @@ for (const tree of trees) {
     /* B · the confirming end. A miss here costs a confirmation, never a red. */
     for (const routine of declaredRoutines) {
       routines += 1;
-      const wanted = [...new Set(routine.reads)].filter((name) => !BUILT_IN.has(name));
-      for (const name of wanted) {
+      const wanted = distinctReads(routine);
+      if (wanted.length > widest.reads) {
+        widest = { reads: wanted.length, file, routine: routine.name, line: routine.line };
+      }
+      for (const { name, line } of wanted) {
         bump(readAsked, language);
         if (accessesIn(source, routine.name, name, language)) { bump(readAgreed, language); continue; }
-        missed.push({ file, routine: routine.name, member: name, line: routine.line });
+        missed.push({ file, routine: routine.name, member: name, line });
       }
       if (wanted.length > 0 && accessesIn(source, routine.name, SENTINEL, language)) {
         invented.push({ file, where: routine.name, end: "routine" });
@@ -515,7 +948,7 @@ for (const tree of trees) {
       for (const name of type.members) if (!declares.has(name)) declares.set(name, type.name);
     }
     for (const routine of declaredRoutines) {
-      for (const name of [...new Set(routine.reads)].filter((one) => !BUILT_IN.has(one))) {
+      for (const { name } of distinctReads(routine)) {
         const owner = declares.get(name);
         if (!owner) continue;
         bump(wholeAsked, language);
@@ -538,6 +971,17 @@ console.log();
 console.log("MEASURE ACCESSES -- can the member reader be trusted with a red?");
 console.log(`  ${trees.length} trees, ${total(files)} files, ${types} type declarations`
   + ` and ${routines} routines the referee could read`);
+for (const tree of trees) console.log(`    ${path.relative(HOME, tree)}`);
+if (unreadable.length > 0) {
+  console.log(`  ${unreadable.length} directories could not be opened, and are not in the`
+    + " counts above:");
+  for (const directory of unreadable.slice(0, cap(unreadable.length, 5))) {
+    console.log(`    ${path.relative(HOME, directory)}`);
+  }
+  if (unreadable.length > cap(unreadable.length, 5)) {
+    console.log(`    ... and ${unreadable.length - cap(unreadable.length, 5)} more (--all prints every one)`);
+  }
+}
 console.log();
 console.log("  Two ends, two footings, two tables. The first can accuse and the second");
 console.log("  cannot, so a single recall over both would hide the only number that matters.");
@@ -595,6 +1039,18 @@ for (const one of accused.slice(0, cap(accused.length, 25))) {
 }
 if (accused.length > cap(accused.length, 25)) {
   console.log(`    ... and ${accused.length - cap(accused.length, 25)} more (--all prints every one)`);
+}
+
+console.log();
+console.log(`  WIDEST SITE -- most member reads credited to one routine: ${widest.reads}`);
+console.log("    A routine whose end the referee cannot find collects every read below it,");
+console.log("    so this is where a broken boundary shows first. Read it against the");
+console.log("    routine's real end in the source before treating it as a finding: the");
+console.log("    widest site in this corpus is a genuinely enormous function. When the");
+console.log("    boundary was wrong (#222) the misses it caused were spread through the");
+console.log("    list below and nothing here named the cause.");
+if (widest.reads > 0) {
+  console.log(`    ${path.relative(HOME, widest.file)}:${widest.line} ${widest.routine}`);
 }
 
 console.log();

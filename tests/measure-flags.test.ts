@@ -31,18 +31,18 @@ describe("measure:accesses -- --all", () => {
 
   it("truncates nothing except through the cap the flag lifts", () => {
     /*
-     * The three findings lists -- accused, missed, invented. A bare
-     * `.slice(0, 15)` is the bug: it looks like a cap and is a wall, because
-     * no argument reaches it.
+     * Four lists: accused, missed, invented, and the directories the walk could
+     * not open. A bare `.slice(0, 15)` is the bug -- it looks like a cap and is
+     * a wall, because no argument reaches it.
      */
     const bare = [...source.matchAll(/\.slice\(0,\s*(\d+)\)/g)].map((hit) => hit[0]);
     expect(bare, "a findings list is sliced to a constant, so --all cannot lift it").toEqual([]);
-    expect([...source.matchAll(/\.slice\(0,\s*cap\(/g)]).toHaveLength(3);
+    expect([...source.matchAll(/\.slice\(0,\s*cap\(/g)]).toHaveLength(4);
   });
 
   it("says how many it hid, and how to see them", () => {
-    // Three lists, three notices. A count with nothing after it tells the
-    // reader a number is missing but not that it can be had.
-    expect([...source.matchAll(/--all prints every one/g)]).toHaveLength(3);
+    // One notice per list. A count with nothing after it tells the reader a
+    // number is missing but not that it can be had.
+    expect([...source.matchAll(/--all prints every one/g)]).toHaveLength(4);
   });
 });
