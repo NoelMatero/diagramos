@@ -556,6 +556,36 @@ function bindingOf(node: Node): { name: string; typeAnn: Node | null; value: Nod
     if (!left || left.childCount !== 0 || left.type !== "identifier") return undefined;
     return { name: left.text, typeAnn: null, value: node.childForFieldName("right") };
   }
+  /*
+   * A loop variable is a binding, and until #247 it was not recorded as one at
+   * all -- so a bare loop variable came back `unbound`, which was untrue (the
+   * name is plainly bound), and a *parameter* shadowed by a loop variable kept
+   * resolving to the parameter's type because nothing competed with it. That
+   * is the corpus instance #246's referee caught: ripgrep's
+   * `fn select(&mut self, name: &str)` shadowed by
+   * `for name in self.types.keys()`, reported as `str` where the real type is
+   * `String`.
+   *
+   * **The value is deliberately dropped.** `for c in v.iter()` binds an
+   * *element*, and the iterable's own type is not the element's -- classifying
+   * this binding from `v.iter()` would name the receiver `Iter`, trading a
+   * wrong answer for a different wrong answer. With neither an annotation nor
+   * a usable value it classifies as unresolved, so the loop variable itself
+   * stays withheld and its only effect is to make the shadowing visible.
+   *
+   * Field names differ per grammar and are read rather than assumed
+   * (`docs/reading-a-grammar.md`): Rust's `for_expression` carries `pattern`,
+   * Python's `for_statement` and TypeScript's `for_in_statement` carry `left`.
+   * A destructuring pattern (`for (a, b) in ...`) has children and is skipped
+   * the same way every other branch here skips one, which leaves a parameter
+   * shadowed by a tuple pattern still wrong -- an honest remaining limit
+   * rather than a guess.
+   */
+  if (node.type === "for_expression" || node.type === "for_statement" || node.type === "for_in_statement") {
+    const bound = node.childForFieldName("pattern") ?? node.childForFieldName("left");
+    if (!bound || bound.childCount !== 0 || bound.type !== "identifier") return undefined;
+    return { name: bound.text, typeAnn: null, value: null };
+  }
   return undefined;
 }
 
@@ -851,9 +881,30 @@ function resolveReceiver(
   if (site.receiver === "") return { verdict: "withheld", why: "not-a-name" };
 
   const param = scope.params.get(site.receiver);
+  const bindings = scope.bindings.get(site.receiver);
+
+  /*
+   * A parameter that the body rebinds is two candidate types for one name, and
+   * this reader cannot choose between them: it collects bindings for a whole
+   * routine with no notion of position, so it does not know whether the
+   * rebinding happens before this call or after it. Answering with the
+   * parameter's type -- which is what this did until #247, by consulting
+   * `params` before `bindings` -- is a confident wrong answer wherever the
+   * rebinding comes first, which is the common case: `let cwd = cwd.into()`,
+   * `for name in self.types.keys()`.
+   *
+   * `reassigned` is the existing word for exactly this, used just below when
+   * one name has two bindings. A parameter plus a binding is the same
+   * situation with one of the two spelled differently.
+   *
+   * Found by #246's rust-analyzer referee, and it is not a Rust bug -- the
+   * same shape reproduces in TypeScript and Python, so a share of items 12-14
+   * and 17's own wrongness numbers was always this.
+   */
+  if (param && bindings && bindings.length > 0) return { verdict: "withheld", why: "reassigned" };
+
   if (param) return verdictFrom(param, scope.generics, source);
 
-  const bindings = scope.bindings.get(site.receiver);
   if (bindings && bindings.length > 0) {
     if (bindings.length > 1) return { verdict: "withheld", why: "reassigned" };
     return verdictFrom(bindings[0]!.classified, scope.generics, source);

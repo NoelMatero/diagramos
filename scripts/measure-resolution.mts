@@ -6,6 +6,7 @@
  *                                                  orangutan, mundane, infrarouter
  *   npm run measure:resolution -- <path>...    -- any trees you like
  *   npm run measure:resolution -- --all        -- every disagreement, not the first few
+ *   npm run measure:resolution -- --no-python-lsp  -- skip sections 8-9 (see below)
  *
  * The npm script raises Node's heap to 8 GiB. Section 6 (#226) builds a real
  * `ts.Program` per package in every monorepo tree, and a package the size of
@@ -78,6 +79,22 @@ const HOME = process.env.HOME ?? "/Users/noelmatero";
 const flags = new Set(process.argv.slice(2).filter((one) => one.startsWith("--")));
 const roots = process.argv.slice(2).filter((one) => !one.startsWith("--"));
 const showAll = flags.has("--all");
+/*
+ * Skip sections 8-9, the pyright-language-server pass.
+ *
+ * Not a convenience: those two sections ask pyright a `typeDefinition` and a
+ * `definition` per receiver and compare the two answers to each other, so
+ * nothing in them consults the syntactic reader -- `tier1Resolved` feeds only
+ * the reported tier1/combined columns, never the safety check. A change to
+ * `src/engine/resolution.ts` therefore cannot move item 17's 85.5%/1.76%, and
+ * re-running this measurement to price such a change should not have to pay
+ * for them. On `graphify` alone that pass is 22,449 round trips and 687
+ * seconds, measured.
+ *
+ * The flag prints its own absence in the report rather than leaving a reader to
+ * wonder why two sections are missing.
+ */
+const skipPythonLsp = flags.has("--no-python-lsp");
 const cap = (count: number) => (showAll ? count : Math.min(count, 12));
 
 const real = (tree: string) => { try { return realpathSync(tree); } catch { return tree; } };
@@ -474,7 +491,7 @@ for (const tree of trees) {
   }
 
   /* ------------------------------------------------------ the referee, Python LSP (#235) */
-  if (collectedPyAll.length > 0) {
+  if (collectedPyAll.length > 0 && !skipPythonLsp) {
     let lspReferee: Awaited<ReturnType<typeof createPyrightLspReferee>> | undefined;
     try {
       lspReferee = await createPyrightLspReferee(tree);
@@ -855,7 +872,11 @@ console.log("  declaration.\" `textDocument/typeDefinition`, asked at every rece
 console.log("  included, the same no-gate shape as section 6's ts/tsx/js tier2 tally. This is");
 console.log("  Python's version of the number that took TypeScript from syntax alone to a real compiler.");
 console.log();
-if (pyLspCoverage.total > 0) {
+if (skipPythonLsp) {
+  console.log("  Skipped: --no-python-lsp. These two sections compare two pyright answers to");
+  console.log("  each other and never consult the syntactic reader, so a change to that reader");
+  console.log("  cannot move them -- see the flag's own note at the top of this file.");
+} else if (pyLspCoverage.total > 0) {
   console.log("  " + "receivers".padStart(11) + "tier1".padStart(15) + "lsp".padStart(15) + "combined".padStart(15));
   console.log("  " + String(pyLspCoverage.total).padStart(11)
     + cell(pyLspCoverage.tier1, pyLspCoverage.total).padStart(15)
