@@ -1508,8 +1508,10 @@ be one: `<MenuContent />` is a routine making a MenuContent, which is `@builds`.
       which is #203's territory rather than this issue's.
     - **#247**, the shadowed parameter. Predicted here to move TypeScript's and
       Python's published numbers too; item 19 measured it and **it moves
-      neither** -- the shape is not valid TypeScript, and Python's rebindings in
-      this corpus are type-preserving. Rust's own figure went 0.8% -> 0.4%.
+      neither on this corpus** -- no instance of the shape occurs in the
+      ts/tsx/js trees (it is expressible there, as a nested-block shadow --
+      see item 19), and Python's rebindings here are type-preserving. Rust's
+      own figure went 0.8% -> 0.4%.
 
 19. **A shadowed parameter outranked the binding that shadows it, and fixing it
     halved Rust's wrongness while costing Python 103 correct answers for no
@@ -1563,12 +1565,32 @@ be one: `<MenuContent />` is a routine making a MenuContent, which is `@builds`.
     (`impl Into<PathBuf>` rebound by `let cwd = cwd.into()`), so that item's own
     categorisation was slightly wrong and the fix caught more than it predicted.
 
-    **TypeScript does not have this bug, and #247 was filed saying it did.** The
-    reproduction that convinced me -- `function g(c: Thing) { const c = new
-    Other(); }` -- is not valid TypeScript: a parameter cannot be redeclared.
-    Plain reassignment (`c = x`) is collected and would be caught, and occurs
-    nowhere in this corpus. Nothing in ts/tsx/js moved, in either direction.
-    Item 12's 0.7% is untouched.
+    **TypeScript's numbers did not move, but not because TypeScript is immune
+    -- a third false claim, found the same way as the other two.** #247 was
+    filed saying the bug was cross-language, and the reproduction that
+    convinced its author -- `function g(c: Thing) { const c = new Other(); }`
+    -- is indeed not valid TypeScript, since a parameter cannot be
+    *redeclared* in its own scope. A first write-up of this entry concluded
+    from that "TypeScript does not have this bug," which does not follow: a
+    parameter can be **shadowed in a nested block**, which is valid
+    TypeScript and is the identical shape. Demonstrated against this reader
+    rather than argued:
+
+        function g(c: Thing) { { const c = new Other(); c.run(); } }
+        function g(c: Thing, xs: Other[]) { for (const c of xs) { c.run(); } }
+
+    Both resolved `c.run()` to `Thing` -- the parameter -- before this fix,
+    and both withhold as `reassigned` after it. The fix changes ts/tsx
+    behaviour, which is itself the evidence: were TypeScript immune it would
+    be a no-op there.
+
+    What is true is narrower and is the claim that belongs on the record:
+    **nothing in ts/tsx/js moved on this corpus**, because no instance of
+    either shape occurs in it -- plain reassignment (`c = x`) is collected and
+    would be caught, and also occurs nowhere here. Item 12's 0.7% is
+    untouched as a measured number. It is not evidence that the shape cannot
+    arise, and a later change that alters parameter or binding precedence
+    should re-check ts/tsx rather than reason from immunity.
 
     **Python pays and gets nothing, and that is the finding worth arguing
     with.** Of the 108 sites it stopped resolving, **103 were sites where

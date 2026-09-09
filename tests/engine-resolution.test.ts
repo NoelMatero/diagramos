@@ -509,6 +509,27 @@ describe("a rebound parameter is not still the parameter (#247)", () => {
       .toBe("withheld/reassigned");
   });
 
+  /*
+   * The two shapes above it that a reader of item 19 would otherwise assume
+   * cannot exist. The `const` case just above is not valid TypeScript --
+   * a parameter cannot be redeclared in its own scope, and tsc rejects it
+   * even though tree-sitter parses it -- so on its own it locks in behaviour
+   * for code that cannot occur. A parameter shadowed in a *nested block* is
+   * ordinary, valid TypeScript and is the identical shape; both resolved to
+   * the parameter's type before #247 and must not again.
+   */
+  it("withholds in TypeScript when a nested block shadows the parameter", () => {
+    const source = "function g(c: Thing) {\n  {\n    const c = new Other();\n    c.run();\n  }\n}";
+    expect(verdictOf(onlySite(resolveReceiversIn(source, "ts")).verdict))
+      .toBe("withheld/reassigned");
+  });
+
+  it("withholds in TypeScript when a `for...of` binding shadows the parameter", () => {
+    const source = "function g(c: Thing, xs: Other[]) {\n  for (const c of xs) {\n    c.run();\n  }\n}";
+    expect(verdictOf(onlySite(resolveReceiversIn(source, "ts")).verdict))
+      .toBe("withheld/reassigned");
+  });
+
   it("withholds in Python when an assignment rebinds the parameter", () => {
     const source = "def g(c: Thing) -> None:\n    c = Other()\n    c.run()";
     expect(verdictOf(onlySite(resolveReceiversIn(source, "python")).verdict))
