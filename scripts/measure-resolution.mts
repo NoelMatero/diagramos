@@ -54,14 +54,14 @@
  * counterpart) -- confirmed against a live server, not assumed from pyright's
  * docs, that both LSP methods answer the way TypeScript's compiler API does.
  */
-import { existsSync, readdirSync, realpathSync, statSync } from "node:fs";
+import { existsSync, readdirSync, readFileSync, realpathSync, statSync } from "node:fs";
 import path from "node:path";
 
 import { createTsReferee } from "./lib/resolution-ts";
 import { refereePythonTypes, type ResolutionQuery } from "./lib/resolution-python";
 import { createPyrightLspReferee, isOutsideTree as isOutsidePyTree, memberRangeAfter } from "./lib/resolution-python-lsp";
 import {
-  createRustAnalyzerReferee, isOutsideRustTree, rustMemberRangeAfter,
+  createRustAnalyzerReferee, declaredTypeOnLine, isOutsideRustTree, rustMemberRangeAfter,
 } from "./lib/resolution-rust-lsp";
 
 import { createWorkspace } from "../src/engine/drift";
@@ -247,6 +247,60 @@ interface RustDisagreement {
 }
 const rustDisagreements: RustDisagreement[] = [];
 
+/**
+ * The check that replaces the file comparison above, because that one cannot
+ * measure wrongness in Rust -- see `declaredTypeOnLine`. Two parts, and the
+ * first covers the whole answered population rather than only its
+ * disagreements, which is the gap that made a first reading of this
+ * measurement claim "0 wrong of 252" on the strength of having inspected 29.
+ *
+ * `notAType` is the whole-population sanity check: `textDocument/typeDefinition`
+ * should always land on a type's own declaration, so an answer whose target
+ * line declares no type means the anchor resolved to something that is not a
+ * type at all. That is item 17's Python placement bug restated, and it is a
+ * real failure whichever file it names.
+ *
+ * `agreed`/`wrong` is the referee proper, and it is independent in the way
+ * `AGENTS.md`'s gate requires: `src/engine/resolution.ts` reads a type *name*
+ * out of the text with no compiler involved, and rust-analyzer lands on a
+ * declaration whose own line states a name. Two mechanisms sharing nothing,
+ * asked the same question. Counted only where both answer -- tier 1 withholding
+ * is coverage, not disagreement.
+ */
+interface RustPlacement {
+  answered: number; notAType: number; agreed: number; wrong: number; shapeName: number;
+}
+const rustPlacement: RustPlacement = {
+  answered: 0, notAType: 0, agreed: 0, wrong: 0, shapeName: 0,
+};
+
+/**
+ * Names `src/engine/resolution.ts` gives a *shape* rather than a type: an
+ * array annotation reads as `Array`, an object literal type as `Object`. Real
+ * names in TypeScript, where `Array` is a declared type; in Rust `[T; N]` has
+ * no declaration named `Array` for rust-analyzer to land on, so comparing the
+ * two is a category error rather than a disagreement. Counted on their own so
+ * the referee's number is about answers that could actually match.
+ */
+const SHAPE_NAMES = new Set(["Array", "Object", "ReadonlyArray"]);
+
+/**
+ * The reader keeps a qualified name whole (`fmt::Formatter`, `process::Command`)
+ * on purpose -- `headTypeOf`'s own doc explains why, and a real checker's
+ * printed form is qualified too. rust-analyzer lands on the declaration, whose
+ * line states the bare name (`pub struct Formatter<'a>`). Comparing those
+ * as-is reported every qualified annotation in the corpus as a disagreement,
+ * which is this comparison being naive and not either side being wrong.
+ */
+const bareName = (name: string) => name.split("::").pop() ?? name;
+interface RustPlacementCase {
+  tree: string; file: string; line: number; ours: string; referee: string; shape: string; where: string;
+}
+const rustPlacementWrong: RustPlacementCase[] = [];
+const rustNotATypeCases: Array<{ tree: string; file: string; line: number; target: string }> = [];
+/** What rust-analyzer landed on, by kind -- `trait` here is worth seeing on its own. */
+const rustDeclaredKinds = new Map<string, number>();
+
 /** Resolved sites collected per tree, so the referee can be asked once per tree. */
 interface Collected {
   file: string; absolute: string; line: number; start: number; end: number;
@@ -272,7 +326,10 @@ for (const tree of trees) {
   const pySourcesAll = new Map<string, string>();
   /** #246's version of `collectedPyAll`: every Rust receiver site, resolved or not. */
   const collectedRustAll: Array<{
-    file: string; absolute: string; line: number; start: number; end: number; method: string; tier1Resolved: boolean;
+    file: string; absolute: string; line: number; start: number; end: number; method: string;
+    tier1Resolved: boolean;
+    /** What the syntactic reader named, for the independent referee -- see `rustPlacement`. */
+    tier1Type?: string; tier1Shape?: string;
   }> = [];
   const rustSourcesAll = new Map<string, string>();
 
@@ -328,6 +385,9 @@ for (const tree of trees) {
             collectedRustAll.push({
               file: rel, absolute, line: site.line, start: site.at.start, end: site.at.end,
               method: site.method, tier1Resolved: site.verdict.verdict === "resolved",
+              ...(site.verdict.verdict === "resolved"
+                ? { tier1Type: site.verdict.evidence.type, tier1Shape: site.verdict.evidence.shape }
+                : {}),
             });
             rustSourcesAll.set(rel, source);
           }
@@ -558,12 +618,53 @@ for (const tree of trees) {
           const source = rustSourcesAll.get(site.file)!;
           if (site.tier1Resolved) rustLspCoverage.tier1 += 1;
 
-          const typeDeclaring = await rustReferee!.typeDeclarationAt(site.absolute, source, site.start, site.end);
+          const declaringLocation = await rustReferee!.typeDeclarationLocationAt(
+            site.absolute, source, site.start, site.end,
+          );
+          const typeDeclaring = declaringLocation?.file;
           const lspResolved = typeDeclaring !== undefined;
           if (lspResolved) rustLspCoverage.lsp += 1;
           if (site.tier1Resolved || lspResolved) rustLspCoverage.either += 1;
 
-          if (typeDeclaring === undefined) continue;
+          if (typeDeclaring === undefined || declaringLocation === undefined) continue;
+
+          /*
+           * The placement check, over every answered site rather than only the
+           * ones the file comparison below happens to flag. See `rustPlacement`.
+           */
+          rustPlacement.answered += 1;
+          const targetLine = (() => {
+            try { return readFileSync(declaringLocation.file, "utf8").split("\n")[declaringLocation.line] ?? ""; }
+            catch { return ""; }
+          })();
+          const declared = declaredTypeOnLine(targetLine);
+          if (!declared) {
+            rustPlacement.notAType += 1;
+            if (showAll || rustNotATypeCases.length < 50) {
+              rustNotATypeCases.push({
+                tree: path.basename(tree), file: site.file, line: site.line,
+                target: `${path.relative(tree, declaringLocation.file)}:${declaringLocation.line + 1} ${targetLine.trim().slice(0, 70)}`,
+              });
+            }
+          } else {
+            bump(rustDeclaredKinds, declared.kind);
+            if (site.tier1Type && SHAPE_NAMES.has(site.tier1Type)) {
+              rustPlacement.shapeName += 1;
+            } else if (site.tier1Type) {
+              if (bareName(site.tier1Type) === declared.name) rustPlacement.agreed += 1;
+              else {
+                rustPlacement.wrong += 1;
+                if (showAll || rustPlacementWrong.length < 100) {
+                  rustPlacementWrong.push({
+                    tree: path.basename(tree), file: site.file, line: site.line,
+                    ours: site.tier1Type, referee: `${declared.kind} ${declared.name}`,
+                    shape: site.tier1Shape ?? "?",
+                    where: `${path.relative(tree, declaringLocation.file)}:${declaringLocation.line + 1}`,
+                  });
+                }
+              }
+            }
+          }
           const memberRange = rustMemberRangeAfter(source, site.end, site.method);
           if (!memberRange) continue; // a shape the scan did not expect -- withheld, not guessed at.
           const methodDeclaring = await rustReferee!.methodDeclarationAt(
@@ -854,5 +955,55 @@ if (rustSafetyTotal > 0) {
   }
 } else {
   console.log("  No site had both questions answered -- nothing to check yet.");
+}
+console.log();
+
+console.log("12 · RUST PLACEMENT -- did it land on the right type? (#246's real wrongness check)");
+console.log();
+console.log("  The check above compares files, and Rust splits a type from its methods across");
+console.log("  files as a matter of course, so a disagreement there says nothing about whether");
+console.log("  the answer is right. What does not split is the type's identity, so this checks");
+console.log("  that instead -- and over every answered site, not only the flagged ones.");
+console.log();
+if (rustPlacement.answered > 0) {
+  console.log(`  Answered sites: ${rustPlacement.answered}`);
+  console.log();
+  console.log("  a) Did it land on a type declaration at all? An answer that is not a type's own");
+  console.log("     declaration means the anchor resolved to something else entirely.");
+  console.log(`     not a type declaration: ${rustPlacement.notAType} `
+    + `(${percent(rustPlacement.notAType, rustPlacement.answered).trim()})`);
+  for (const one of rustNotATypeCases.slice(0, cap(rustNotATypeCases.length))) {
+    console.log(`       ${one.tree}/${one.file}:${one.line} -> ${one.target}`);
+  }
+  console.log();
+  console.log("     What it landed on, by kind:");
+  for (const [kind, count] of [...rustDeclaredKinds.entries()].sort((a, b) => b[1] - a[1])) {
+    console.log(`       ${kind.padEnd(8)} ${String(count).padStart(6)}`);
+  }
+  console.log();
+  console.log("  b) Does it name the same type the syntactic reader read from the text? The two");
+  console.log("     share no machinery -- `resolution.ts` reads a name, rust-analyzer resolves a");
+  console.log("     declaration -- which is what makes this a referee and not a second opinion.");
+  const placementChecked = rustPlacement.agreed + rustPlacement.wrong;
+  if (placementChecked > 0) {
+    console.log(`     ${placementChecked} sites where both named a type, `
+      + `${rustPlacement.wrong} disagreed (${percent(rustPlacement.wrong, placementChecked).trim()}).`);
+    console.log(`     Set aside, not counted either way: ${rustPlacement.shapeName} where the reader`);
+    console.log("     named a shape (`Array`) rather than a type -- see SHAPE_NAMES.");
+    if (rustPlacementWrong.length > 0) {
+      console.log();
+      for (const one of rustPlacementWrong.slice(0, cap(rustPlacementWrong.length))) {
+        console.log(`       ${one.tree}/${one.file}:${one.line} [${one.shape}] we said `
+          + `${one.ours}, it landed on ${one.referee} (${one.where})`);
+      }
+      if (rustPlacementWrong.length > cap(rustPlacementWrong.length)) {
+        console.log(`       ... and ${rustPlacementWrong.length - cap(rustPlacementWrong.length)} more`);
+      }
+    }
+  } else {
+    console.log("     No site had both a syntactic type name and an answer -- nothing to check.");
+  }
+} else {
+  console.log("  No answered Rust sites -- nothing to check.");
 }
 console.log();

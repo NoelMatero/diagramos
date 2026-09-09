@@ -26,7 +26,7 @@ import path from "node:path";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
 
 import {
-  createRustAnalyzerReferee, isOutsideRustTree, rustMemberRangeAfter, rustTypeAnchorFor,
+  createRustAnalyzerReferee, declaredTypeOnLine, isOutsideRustTree, rustMemberRangeAfter, rustTypeAnchorFor,
   type RustLspReferee,
 } from "../scripts/lib/resolution-rust-lsp";
 
@@ -345,5 +345,65 @@ describe("isOutsideRustTree", () => {
 
   it("counts a real module in the tree as inside", () => {
     expect(isOutsideRustTree("/repo/src/engine.rs", "/repo")).toBe(false);
+  });
+});
+
+/**
+ * `declaredTypeOnLine` reads the name off the line `typeDefinition` points at,
+ * which is what makes the placement check possible: comparing *files* measures
+ * nothing in Rust, because a type and its methods live in different files as a
+ * matter of course, while the type's identity does not move.
+ *
+ * The shapes are the ones the corpus actually produced -- sampling 120 answered
+ * sites on `anyhow`, every target line was a type declaration and none was a
+ * `fn`, a `let` or a module.
+ */
+describe("declaredTypeOnLine", () => {
+  const cases: Array<[string, string, string]> = [
+    ["a plain struct", "pub struct Command {", "struct Command"],
+    ["a generic struct", "pub struct Own<T>", "struct Own"],
+    ["a lifetime-parameterised struct", "pub struct Ref<'a, T>", "struct Ref"],
+    ["a tuple struct", "pub struct ExitStatus(imp::ExitStatus);", "struct ExitStatus"],
+    ["a unit struct with no visibility", "struct Split;", "struct Split"],
+    ["an enum", "pub enum Option<T> {", "enum Option"],
+    ["a union", "pub union MaybeUninit<T> {", "union MaybeUninit"],
+    ["a trait with supertraits", "pub trait Error: Debug + Display {", "trait Error"],
+    ["a type alias", "type Range = Match;", "type Range"],
+    ["a crate-visible struct", "pub(crate) struct ContextSeparator(Option<BString>);", "struct ContextSeparator"],
+    ["an attribute before the keyword", "#[repr(transparent)] pub struct Error {", "struct Error"],
+    ["a struct whose generics carry an attribute", "pub struct Vec<T, #[unstable(feature = \"x\")] A: Allocator = G", "struct Vec"],
+  ];
+  for (const [label, line, expected] of cases) {
+    it(`reads ${label}`, () => {
+      const declared = declaredTypeOnLine(line);
+      expect(declared && `${declared.kind} ${declared.name}`).toBe(expected);
+    });
+  }
+
+  /*
+   * Withheld rather than guessed at, and each of these is a real line the
+   * corpus pointed `typeDefinition` at -- they are the 0.2% the placement
+   * check reports as "not a type declaration" rather than silently counting.
+   */
+  it("withholds a `lazy_static!` body, which declares a value and not a type", () => {
+    expect(declaredTypeOnLine("    pub static ref ROUTES: Mutex<Vec<RouteInfo>> = Mutex::new(Vec::new());"))
+      .toBeUndefined();
+  });
+
+  it("withholds a line whose keyword carries a modifier this scan does not read", () => {
+    // `core`'s own `pub const trait Into<T>: Sized {` -- a real target line.
+    expect(declaredTypeOnLine("pub const trait Into<T>: Sized {")).toBeUndefined();
+  });
+
+  it("withholds a function, which is what a placement bug would land on", () => {
+    expect(declaredTypeOnLine("pub fn new() -> Config {")).toBeUndefined();
+  });
+
+  it("withholds a `let` binding", () => {
+    expect(declaredTypeOnLine("    let c = Config::new();")).toBeUndefined();
+  });
+
+  it("withholds a name that merely begins with a keyword", () => {
+    expect(declaredTypeOnLine("pub structural_thing()")).toBeUndefined();
   });
 });

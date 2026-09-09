@@ -102,6 +102,52 @@ import {
  * artefact as a declaring file the same way a hand-written module is. `target`
  * is the one name added here.
  */
+/**
+ * The type a declaration line declares -- its kind and its name -- or
+ * `undefined` when the line does not declare a type at all.
+ *
+ * This exists because comparing *files* is the wrong instrument for Rust, and
+ * that took a corpus reading to see. The safety check items 14 and 17 used --
+ * where is the receiver's type declared, versus where is the method actually
+ * called declared, and do those agree -- works for TypeScript and Python
+ * because a class and its methods share a file there. Rust separates them
+ * routinely and legally: `anyhow`'s `pub struct Error` is `src/lib.rs:390`,
+ * `mod error;` is a different file, and every method on `Error` is in it. So a
+ * file disagreement in Rust carries no information about correctness, and 29
+ * of them read one by one turned out to be 29 pairs of correct answers.
+ *
+ * What does not split is the type's *identity*. `impl Error` in `error.rs` is
+ * not a competing answer about something else; it is the same `Error`. So the
+ * property worth checking is the name of the type `textDocument/typeDefinition`
+ * actually landed on, which its own target line states.
+ *
+ * Reading that line is sound rather than a guess, and the corpus says so:
+ * sampling 120 answered sites on `anyhow`, every single target line was a real
+ * type declaration -- `struct`, `enum`, `union` or `trait`, never a `fn`, a
+ * `let` or a module. rust-analyzer points `typeDefinition` at the type's own
+ * name token (`targetSelectionRange`), so the line it names is the declaration
+ * header, and the shapes are narrow: an optional visibility, the keyword, the
+ * name, then generics, a tuple body, a supertrait list or a brace.
+ *
+ * `undefined` is itself a finding when it happens -- an answer that is not a
+ * type declaration would mean the anchor resolved to something that is not a
+ * type, which is exactly the class of placement bug item 17 found in Python by
+ * hand. It is counted rather than skipped.
+ */
+export function declaredTypeOnLine(
+  line: string,
+): { kind: "struct" | "enum" | "union" | "trait" | "type"; name: string } | undefined {
+  // Strip a leading attribute (`#[repr(transparent)] pub struct X`) and any
+  // visibility modifier, including the parenthesised forms.
+  const bare = line
+    .replace(/^\s*(?:#\[[^\]]*\]\s*)*/, "")
+    .replace(/^\s*pub\s*(?:\([^)]*\)\s*)?/, "")
+    .trimStart();
+  const match = /^(struct|enum|union|trait|type)\s+([A-Za-z_][A-Za-z0-9_]*)/.exec(bare);
+  if (!match) return undefined;
+  return { kind: match[1] as "struct" | "enum" | "union" | "trait" | "type", name: match[2]! };
+}
+
 export function isOutsideRustTree(declaringFile: string, tree: string): boolean {
   if (declaringFile.includes(`${path.sep}target${path.sep}`)) return true;
   const rel = path.relative(tree, declaringFile);
