@@ -60,6 +60,9 @@ import path from "node:path";
 import { createTsReferee } from "./lib/resolution-ts";
 import { refereePythonTypes, type ResolutionQuery } from "./lib/resolution-python";
 import { createPyrightLspReferee, isOutsideTree as isOutsidePyTree, memberRangeAfter } from "./lib/resolution-python-lsp";
+import {
+  createRustAnalyzerReferee, isOutsideRustTree, rustMemberRangeAfter,
+} from "./lib/resolution-rust-lsp";
 
 import { createWorkspace } from "../src/engine/drift";
 import { initEngine, languageOf, type Language } from "../src/engine/parse";
@@ -88,6 +91,12 @@ const trees = (roots.length > 0 ? roots : [
   `${HOME}/board-ai/graphify`,
   `${HOME}/mundane`,
   `${HOME}/infrarouter`,
+  /* #246's Rust corpus. `rust-test` above is two crates; these are the pinned
+   * repositories `measure:licence` already clones, and the only trees here big
+   * enough to say anything about rust-analyzer at real scale. Skipped silently
+   * when the corpus has not been cloned, the same as every other tree. */
+  `${HOME}/board-ai/.corpus/ripgrep`,
+  `${HOME}/board-ai/.corpus/anyhow`,
 ]).filter((tree) => existsSync(tree)).map(real);
 
 /**
@@ -125,6 +134,29 @@ function sourceFiles(root: string): string[] {
   };
   walk(root);
   return files;
+}
+
+/**
+ * The crate roots inside a tree: every directory holding a `Cargo.toml` that no
+ * *other* `Cargo.toml` directory already contains. A cargo workspace's members
+ * each have their own manifest, and starting a language server per member would
+ * index the same workspace once per crate; the shallowest manifest is the one
+ * rust-analyzer wants, and it finds the members itself.
+ */
+function cargoRoots(root: string): string[] {
+  const found: string[] = [];
+  const walk = (directory: string): void => {
+    if (existsSync(path.join(directory, "Cargo.toml"))) { found.push(directory); return; }
+    let entries: string[];
+    try { entries = readdirSync(directory); } catch { return; }
+    for (const entry of entries) {
+      if (entry.startsWith(".") || SKIP_DIRECTORIES.has(entry)) continue;
+      const full = path.join(directory, entry);
+      try { if (statSync(full).isDirectory()) walk(full); } catch { /* unreadable */ }
+    }
+  };
+  walk(root);
+  return found;
 }
 
 const LANGUAGES: Language[] = ["rust", "ts", "tsx", "python", "js"];
@@ -188,6 +220,33 @@ const pyLspSafety: PyLspSafety = { agree: 0, disagree: 0 };
 interface PyDisagreement { tree: string; file: string; line: number; method: string; typeSaid: string; methodSaid: string }
 const pyDisagreements: PyDisagreement[] = [];
 
+/**
+ * #246's version of the two tallies above, for Rust. Same two questions, same
+ * two columns, one addition Python did not need.
+ *
+ * `indexable` is that addition. pyright answers about any `.py` file under the
+ * root it was given; rust-analyzer answers only about files that belong to a
+ * *crate*, and a crate is a `Cargo.toml` away, not a directory away. A tree can
+ * hold real Rust that no crate claims -- `rust-test/src` is exactly that, three
+ * `.rs` files with no manifest above them -- and rust-analyzer will never
+ * resolve a receiver in one, correctly, because there is no crate graph to
+ * resolve it against. Folding those into `total` would report a tool limitation
+ * as a coverage failure, so both denominators are printed and the report says
+ * which is which.
+ */
+interface RustLspCoverage { total: number; indexable: number; tier1: number; lsp: number; either: number }
+const rustLspCoverage: RustLspCoverage = { total: 0, indexable: 0, tier1: 0, lsp: 0, either: 0 };
+let rustLspUnavailable = false;
+let rustAnalyzerVersion = "";
+/** A crate whose server never said it had finished indexing -- see `warmUp`. */
+let rustPrimeTimedOut = false;
+interface RustLspSafety { agree: number; disagree: number }
+const rustLspSafety: RustLspSafety = { agree: 0, disagree: 0 };
+interface RustDisagreement {
+  tree: string; file: string; line: number; method: string; typeSaid: string; methodSaid: string;
+}
+const rustDisagreements: RustDisagreement[] = [];
+
 /** Resolved sites collected per tree, so the referee can be asked once per tree. */
 interface Collected {
   file: string; absolute: string; line: number; start: number; end: number;
@@ -211,6 +270,11 @@ for (const tree of trees) {
     file: string; absolute: string; line: number; start: number; end: number; method: string; tier1Resolved: boolean;
   }> = [];
   const pySourcesAll = new Map<string, string>();
+  /** #246's version of `collectedPyAll`: every Rust receiver site, resolved or not. */
+  const collectedRustAll: Array<{
+    file: string; absolute: string; line: number; start: number; end: number; method: string; tier1Resolved: boolean;
+  }> = [];
+  const rustSourcesAll = new Map<string, string>();
 
   for (const file of sourceFiles(tree)) {
     const rel = path.relative(tree, file);
@@ -259,6 +323,13 @@ for (const tree of trees) {
               method: site.method, tier1Resolved: site.verdict.verdict === "resolved",
             });
             pySourcesAll.set(rel, source);
+          }
+          if (language === "rust") {
+            collectedRustAll.push({
+              file: rel, absolute, line: site.line, start: site.at.start, end: site.at.end,
+              method: site.method, tier1Resolved: site.verdict.verdict === "resolved",
+            });
+            rustSourcesAll.set(rel, source);
           }
         }
       }
@@ -419,6 +490,106 @@ for (const tree of trees) {
       await Promise.all(Array.from({ length: Math.min(CONCURRENCY, collectedPyAll.length) }, worker));
       console.error(`  [python-lsp] done: ${collectedPyAll.length} sites in ${Math.round((Date.now() - startedAt) / 1000)}s`);
       lspReferee.close();
+    }
+  }
+
+  /* ------------------------------------------------------ the referee, Rust LSP (#246) */
+  if (collectedRustAll.length > 0) {
+    /*
+     * One server per crate root, not per tree. See `cargoRoots`: rust-analyzer
+     * resolves against a crate graph, so a receiver in a file no `Cargo.toml`
+     * claims has no answer available to it at all -- counted in `total`,
+     * excluded from `indexable`, and never asked.
+     */
+    const roots = cargoRoots(tree);
+    const sitesByRoot = new Map<string, typeof collectedRustAll>();
+    for (const site of collectedRustAll) {
+      rustLspCoverage.total += 1;
+      const owner = roots
+        .filter((one) => site.absolute === one || site.absolute.startsWith(one + path.sep))
+        .sort((a, b) => b.length - a.length)[0];
+      if (!owner) continue; // real Rust that no crate claims -- see `RustLspCoverage`.
+      rustLspCoverage.indexable += 1;
+      const list = sitesByRoot.get(owner) ?? [];
+      list.push(site);
+      sitesByRoot.set(owner, list);
+    }
+
+    for (const [root, sites] of sitesByRoot) {
+      let rustReferee: Awaited<ReturnType<typeof createRustAnalyzerReferee>> | undefined;
+      try {
+        rustReferee = await createRustAnalyzerReferee(root);
+      } catch (error) {
+        rustLspUnavailable = true;
+        console.error(`  rust-analyzer referee failed to start on ${path.basename(root)}: ${(error as Error).message}`);
+      }
+      if (!rustReferee) {
+        // Not asked is not the same as asked and refused: these sites stay in
+        // `total` and `indexable` but must not be counted as coverage misses.
+        rustLspCoverage.indexable -= sites.length;
+        continue;
+      }
+      if (!rustAnalyzerVersion) rustAnalyzerVersion = rustReferee.version();
+      const startedAt = Date.now();
+      // Waits for rust-analyzer's own "done indexing" notification. Asking
+      // before it arrives is what made this measurement's first reading swing
+      // between 68.7% and 13.6% on identical input.
+      await rustReferee.warmUp();
+      if (!rustReferee.primedCleanly()) {
+        rustPrimeTimedOut = true;
+        console.error(`  [rust-lsp] ${path.basename(root)} never reported finished indexing`
+          + " -- its answers are not trustworthy and are reported separately");
+      }
+
+      const PROGRESS_EVERY = 200;
+      console.error(`  [rust-lsp] ${sites.length} receiver sites to ask on ${path.relative(tree, root) || path.basename(root)}`);
+      let asked = 0;
+      const CONCURRENCY = 32;
+      let cursor = 0;
+      async function worker(): Promise<void> {
+        for (;;) {
+          const i = cursor++;
+          if (i >= sites.length) return;
+          const site = sites[i]!;
+          asked++;
+          if (asked % PROGRESS_EVERY === 0) {
+            console.error(`  [rust-lsp] ${asked}/${sites.length} (${Math.round((Date.now() - startedAt) / 1000)}s)`);
+          }
+          const source = rustSourcesAll.get(site.file)!;
+          if (site.tier1Resolved) rustLspCoverage.tier1 += 1;
+
+          const typeDeclaring = await rustReferee!.typeDeclarationAt(site.absolute, source, site.start, site.end);
+          const lspResolved = typeDeclaring !== undefined;
+          if (lspResolved) rustLspCoverage.lsp += 1;
+          if (site.tier1Resolved || lspResolved) rustLspCoverage.either += 1;
+
+          if (typeDeclaring === undefined) continue;
+          const memberRange = rustMemberRangeAfter(source, site.end, site.method);
+          if (!memberRange) continue; // a shape the scan did not expect -- withheld, not guessed at.
+          const methodDeclaring = await rustReferee!.methodDeclarationAt(
+            site.absolute, source, memberRange.start, memberRange.end,
+          );
+          if (methodDeclaring === undefined) continue; // a coverage gap, not a disagreement.
+
+          const classify = (file: string) => (isOutsideRustTree(file, tree) ? "external" : path.relative(tree, file));
+          const typeSaid = classify(typeDeclaring);
+          const methodSaid = classify(methodDeclaring);
+          if (typeSaid === methodSaid) {
+            rustLspSafety.agree += 1;
+          } else {
+            rustLspSafety.disagree += 1;
+            if (showAll || rustDisagreements.length < 200) {
+              rustDisagreements.push({
+                tree: path.basename(tree), file: site.file, line: site.line,
+                method: site.method, typeSaid, methodSaid,
+              });
+            }
+          }
+        }
+      }
+      await Promise.all(Array.from({ length: Math.min(CONCURRENCY, sites.length) }, worker));
+      console.error(`  [rust-lsp] done: ${sites.length} sites in ${Math.round((Date.now() - startedAt) / 1000)}s`);
+      rustReferee.close();
     }
   }
 }
@@ -615,6 +786,70 @@ if (pySafetyTotal > 0) {
     }
     if (pyDisagreements.length > cap(pyDisagreements.length)) {
       console.log(`    ... and ${pyDisagreements.length - cap(pyDisagreements.length)} more`);
+    }
+  }
+} else {
+  console.log("  No site had both questions answered -- nothing to check yet.");
+}
+console.log();
+
+console.log("10 · RUST DECLARING FILE -- rust-analyzer's LSP, asked at every receiver (#246)");
+console.log();
+console.log("  Section 8's question, asked of Rust. `textDocument/typeDefinition` at every");
+console.log("  receiver, `not-a-name` included, no tier-1 gate.");
+console.log();
+console.log("  Two denominators, because rust-analyzer needs a crate and pyright needs only a");
+console.log("  directory: `receivers` is every Rust receiver in the corpus, `in a crate` is the");
+console.log("  ones under a Cargo.toml. A receiver in a loose .rs file has no crate graph to");
+console.log("  resolve against and is a fact about the corpus, not a miss by the tool.");
+console.log();
+if (rustLspCoverage.total > 0) {
+  const base = rustLspCoverage.indexable;
+  console.log("  " + "receivers".padStart(11) + "in a crate".padStart(15)
+    + "tier1".padStart(15) + "lsp".padStart(15) + "combined".padStart(15));
+  console.log("  " + String(rustLspCoverage.total).padStart(11)
+    + cell(rustLspCoverage.indexable, rustLspCoverage.total).padStart(15)
+    + cell(rustLspCoverage.tier1, base).padStart(15)
+    + cell(rustLspCoverage.lsp, base).padStart(15)
+    + cell(rustLspCoverage.either, base).padStart(15));
+  console.log();
+  console.log("  tier1/lsp/combined are shares of `in a crate`, not of `receivers`.");
+  if (rustAnalyzerVersion) console.log(`  rust-analyzer ${rustAnalyzerVersion}`);
+} else {
+  console.log("  No Rust receiver sites in this corpus.");
+}
+if (rustLspUnavailable) {
+  console.log();
+  console.log("  The rust-analyzer referee failed to start on at least one crate -- see stderr");
+  console.log("  above. Those sites are excluded from `in a crate` rather than counted as misses.");
+}
+if (rustPrimeTimedOut) {
+  console.log();
+  console.log("  At least one crate never reported that it had finished indexing, so its");
+  console.log("  answers were collected without the readiness gate this measurement depends on.");
+  console.log("  Treat the numbers above as a lower bound, not a reading.");
+}
+console.log();
+
+console.log("11 · RUST SAFETY CHECK -- does the receiver's type and the method actually");
+console.log("     called agree on where they live? (#246's version of sections 9 and 14)");
+console.log();
+console.log("  Restricted to sites where BOTH questions answered. `external` collapses the");
+console.log("  standard library, a registry dependency, and anything under `target/` into one");
+console.log("  answer, the same collapse `isOutsideTree` already makes for the other two languages.");
+console.log();
+const rustSafetyTotal = rustLspSafety.agree + rustLspSafety.disagree;
+if (rustSafetyTotal > 0) {
+  console.log(`  ${rustSafetyTotal} sites checked, ${rustLspSafety.disagree} disagreed `
+    + `(${percent(rustLspSafety.disagree, rustSafetyTotal).trim()}).`);
+  if (rustDisagreements.length > 0) {
+    console.log();
+    for (const one of rustDisagreements.slice(0, cap(rustDisagreements.length))) {
+      console.log(`    ${one.tree}/${one.file}:${one.line} .${one.method}(...) -- receiver's type says `
+        + `${one.typeSaid}, the method itself says ${one.methodSaid}`);
+    }
+    if (rustDisagreements.length > cap(rustDisagreements.length)) {
+      console.log(`    ... and ${rustDisagreements.length - cap(rustDisagreements.length)} more`);
     }
   }
 } else {

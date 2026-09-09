@@ -79,6 +79,15 @@ describe("a number a measurement prints", () => {
         const bare = line
           .replace(/\$\{[^}]*\}/g, "")          // anything interpolated is computed
           .replace(/#\d+/g, "")                  // an issue number
+          // A report section's own number, at the very start of the printed
+          // string and followed by this file's section separator: `10 · RUST
+          // DECLARING FILE`. Sections 1-9 never reached this guard because one
+          // digit does not match the figure pattern below; #246 added the
+          // first two-digit sections, which are no more a measured figure than
+          // the issue number stripped above. Deliberately narrow -- the digits
+          // must open the string *and* be followed by `·`, so a real figure
+          // anywhere else in the same line is still caught.
+          .replace(/(["'`])\s*\d+\s+·/g, "$1")
           .replace(/\.(slice|repeat|padStart|padEnd|toFixed)\([^)]*\)/g, "")
           .replace(/[<>]\s*\d+|\d+\s*\)/g, "");  // truncation caps and widths
         const figure = /(?<![\w.])\d[\d,]*\d(?![\w])/.exec(bare);

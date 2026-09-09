@@ -1284,6 +1284,112 @@ be one: `<MenuContent />` is a routine making a MenuContent, which is `@builds`.
     `symbolDeclarationAt` into `@calls`'s closed-body check is #236's own
     question to answer now that it is reopened, not decided here.
 
+18. **Rust's version of the same ladder: 68.7% get a declaring file, and the
+    safety check that produced items 14 and 17's wrongness numbers does not
+    measure wrongness in Rust at all (#246, after #237's spike).** The client
+    is `scripts/lib/resolution-rust-lsp.ts`, rust-analyzer over
+    `vscode-jsonrpc` per #237's recommendation, scoped to "only when
+    rust-analyzer is already on the machine" -- no binary fetcher, silent skip
+    on absence, `parse.ts`'s own stance for a missing grammar. Two things this
+    issue's own brief had wrong, both found by asking a live server:
+
+    - **"Not ready yet" is not one error code, and it is not detectable from
+      the answers at all.** #237 named `-32801 content modified` and this
+      issue's brief inherited it as *the* thing to retry past. Polling a real
+      handshake from `initialized` to the first true answer shows `-32801` is
+      the last and shortest of several stages, behind `-32603 file not found`
+      (the VFS has not loaded the file) and a plain `null` (loaded, not yet
+      analysed). Retrying only `-32801` gives up during the earlier two and
+      records a refusal for a receiver rust-analyzer resolves correctly a
+      second later.
+    - **The first cut inferred readiness from the shape of the answer, and the
+      corpus caught it -- item 17's lesson arriving a second time, in a
+      different disguise.** The reasoning was sound and the evidence looked
+      strong: unlike pyright, whose "not ready" and "no answer" are the same
+      `null`, rust-analyzer returns an empty array for a position it genuinely
+      cannot place, distinct from all three not-ready signals. So `[]` could be
+      final and fast, and item 17's two-ladder retry would be unnecessary
+      -- three workspaces polled at 100ms intervals never once showed `[]`
+      before the first real answer. It was three lucky samples. Running
+      `measure:resolution` twice on the same two trees reported **68.7%
+      coverage and then 13.6%**, and the same 50-site sample disagreed 30 times
+      in one run and once in the other. rust-analyzer does answer `[]` while
+      indexing, in a window narrow enough to poll straight past and often
+      enough to move a corpus number by a factor of five -- every instance a
+      false refusal. The fix is not a better inference: rust-analyzer
+      *publishes* readiness, sending `$/progress` under
+      `rustAnalyzer/cachePriming` when `window.workDoneProgress` is declared,
+      and its `end` is the moment queries start answering. Waiting for it makes
+      the first query correct every time (anyhow 3.3s across three runs,
+      ripgrep 1.3s, `rust-test/orangutan_macro` 2.7s) and the whole measurement
+      byte-identical across three runs. **A number that changes between two
+      identical runs is not a slow number, it is not a number** -- and the only
+      reason this one was caught is that the issue said to read the
+      disagreements rather than trust the percentage.
+
+    **Coverage, no reader gate, `not-a-name` included, the same shape items 12
+    and 17 measured:** `rust-test` and `.corpus/anyhow`, 475 receiver sites.
+    **367 (77.3%) are inside a crate**, and that second denominator is Rust's
+    own, not a hedge: pyright answers about any `.py` file under a root, while
+    rust-analyzer answers only about files a `Cargo.toml` claims, and a tree can
+    hold real Rust no crate owns (`rust-test/src` is exactly that -- three
+    `.rs` files, no manifest above them). Reporting those as coverage misses
+    would file a fact about the corpus as a failure of the tool. Of the 367,
+    **252 (68.7%) get a declaring file**, against 21.5% for the syntactic
+    reader on the same population -- the same shape of gap items 12 and 17
+    found, and the combined ceiling is 72.5%.
+
+    **The safety check reads 11.5% (29 of 252), and all 29 were read: every
+    one is two correct answers.** This is where Rust departs from both earlier
+    languages rather than scoring worse than them. The check compares where the
+    receiver's type is declared against where the method actually called is
+    declared, and for TypeScript and Python a disagreement is good evidence of
+    a placement bug, because a class and its methods are almost always in one
+    file. In Rust they routinely are not, in three separate mechanisms, none of
+    them an error:
+
+    - **24 of 29 -- an inherent `impl` block in another file.** `anyhow`'s
+      `pub struct Error` is `src/lib.rs:390`; its `impl Error`, carrying
+      `into_boxed_dyn_error`, `context`, `chain`, `downcast` and the rest, is
+      `src/error.rs:19`. Both answers are right and they name different files
+      because the author put them in different files.
+    - **4 of 29 -- a `core` trait's provided method on a repo type.**
+      `chain.skip(1)` in `src/fmt.rs`: the receiver is `anyhow`'s own `Chain`
+      (`src/lib.rs:415`), and `skip` is `Iterator::skip`, declared in `core`.
+      `.last`, `.rev` and `ROUTES.lock()` (a `lazy_static!` `Mutex`, answered
+      correctly straight through the macro expansion) are the same shape.
+    - **1 of 29 -- the inverse: a repo trait implemented for an external
+      type.** `x.parse().context("...")` in `tests/test_context.rs`: the
+      receiver is `Result`, from `core`, and `context` is `anyhow`'s own
+      `Context` trait (`src/context.rs:42`).
+
+    So **the honest wrongness number for Rust is 0 of 252 by inspection, and
+    11.5% is not a wrongness rate** -- it is the rate at which Rust separates a
+    type from its methods, which is a fact about the language. Whether that
+    clears the 0.7% (item 12) and 1.76% (item 17) bar is not a question this
+    measurement can answer, because it is not measuring the same thing: for
+    Rust, agreement is no longer the expected state, so a real placement bug
+    would sit unnoticed among two dozen legitimate `impl`-block splits.
+    Strengthening it was tried and abandoned rather than half-built:
+    `textDocument/hover` does name a method's container, but for a trait method
+    that container is the *trait* (`core::iter::traits::iterator::Iterator` for
+    `.skip`), so it flags every trait method and separates right from wrong no
+    better than the file comparison does. A wrongness instrument for Rust needs
+    an oracle this issue does not have, and shipping a weak one that prints a
+    defensible-looking percentage is the failure `licence.ts` exists to prevent.
+
+    **What #246 therefore settles, and what it does not.** Settled: the client
+    works, across crate boundaries and through macro expansion; the numbers are
+    reproducible; 68.7% of in-crate receivers get a declaring file. Not settled,
+    and deliberately not decided here per this issue's own instructions: whether
+    Rust's `declaringFile` may be wired into `resolveReceiver` or `@calls`'s
+    closed-body check. It may not be, on this evidence -- not because the
+    coverage is poor, but because **no wrongness number exists for it yet**,
+    and `AGENTS.md`'s measurement gate is a number, not a coverage figure. The
+    licence entry and the live wire-in were already outside this issue's scope
+    (#242/#243's split, repeated on purpose); this reading is the reason that
+    split was right.
+
 ## Open, in the order worth doing
 
 1. ~~**The licence grid.**~~ Built at #207 and shipped at #209. `@accesses` is
