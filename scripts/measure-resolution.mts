@@ -54,6 +54,16 @@
  * actually called is declared (section 9's safety check, `symbolDeclarationAt`'s
  * counterpart) -- confirmed against a live server, not assumed from pyright's
  * docs, that both LSP methods answer the way TypeScript's compiler API does.
+ *
+ * ## Section 13 (#250): Rust's answers, checked by the compiler
+ *
+ * Section 12's referee is the syntactic reader, which names a type for about a
+ * fifth of receivers -- so it can only ever check the receivers whose type is
+ * written in the text, and #246's 0.8% was a figure about that easy quarter.
+ * `scripts/lib/resolution-rustc.ts` asks rustc instead, which types every
+ * receiver it compiles, and compares the declaration it points at with the one
+ * rust-analyzer named. rustc and rust-analyzer are separate implementations of
+ * name resolution and type inference; what they share is stated in the report.
  */
 import { existsSync, readdirSync, readFileSync, realpathSync, statSync } from "node:fs";
 import path from "node:path";
@@ -65,6 +75,7 @@ import {
   aliasIndexOf, bareTypeName, createRustAnalyzerReferee, declaredTypeOnLine, isAliasFor,
   isOutsideRustTree, rustMemberRangeAfter,
 } from "./lib/resolution-rust-lsp";
+import { askRustc, declaredByMacro, type CompilerAnswer, type RustcSite } from "./lib/resolution-rustc";
 
 import { createWorkspace } from "../src/engine/drift";
 import { initEngine, languageOf, type Language } from "../src/engine/parse";
@@ -313,6 +324,170 @@ const rustNotATypeCases: Array<{ tree: string; file: string; line: number; targe
 /** What rust-analyzer landed on, by kind -- `trait` here is worth seeing on its own. */
 const rustDeclaredKinds = new Map<string, number>();
 
+/** One Rust receiver site, carried from the reader through both referees. */
+interface RustSite {
+  file: string; absolute: string; line: number; start: number; end: number; method: string;
+  tier1Resolved: boolean;
+  /** What the syntactic reader named, for the independent referee -- see `rustPlacement`. */
+  tier1Type?: string; tier1Shape?: string;
+  /** Why the syntactic reader named nothing -- which of #250's quarters this site is in. */
+  tier1Why?: ResolutionWithheld;
+  /** Where rust-analyzer said the receiver's type is declared; 0-based line. */
+  raLocation?: { file: string; line: number };
+  /** The header on that line, when it is one. */
+  raDeclared?: { kind: string; name: string };
+}
+
+/**
+ * #250: every rust-analyzer answer put to rustc, not only the ones the syntactic
+ * reader can also name.
+ *
+ * `rustPlacement`'s referee needs the syntactic reader to have named a type, and
+ * it names one where the text writes it -- annotated parameters, constructors,
+ * declared fields. So the population it checks is the easy quarter, and three
+ * quarters of rust-analyzer's answers, systematically the harder ones, had
+ * nothing weighed against them. rustc types every receiver it compiles.
+ *
+ * Split by `RustQuarter`, which is what the syntactic reader said about the same
+ * receiver: `resolved` is the quarter the old check reaches, and the three named
+ * withholds are the largest shares of the rest. A wrongness figure for the whole
+ * population that hid a bad hard quarter behind a good easy one would be the same
+ * mistake #250 was filed about.
+ */
+type RustQuarter = "resolved" | "not-a-name" | "from-a-call" | "unbound" | "other";
+const RUST_QUARTERS: RustQuarter[] = ["resolved", "not-a-name", "from-a-call", "unbound", "other"];
+interface CompilerCheck {
+  /** rust-analyzer named a declaration. */
+  answered: number;
+  /** rustc never typed the receiver: not compiled by any target the build checks. */
+  unanswered: number;
+  /** rustc typed it as something no declaration states: a slice, a tuple, `T`. */
+  noDeclaration: number;
+  agreed: number;
+  disagreed: number;
+  /** Of `disagreed`, a type a macro declares -- see `tallyCompiler`. */
+  macroDeclared: number;
+}
+const rustcByQuarter = new Map<RustQuarter, CompilerCheck>();
+const rustcNoDeclarationKinds = new Map<string, number>();
+const rustcClasses = new Map<string, number>();
+interface RustcDisagreement {
+  tree: string; file: string; line: number; method: string; quarter: RustQuarter; cls: string;
+  rustc: string; rustcAt: string; ra: string; raAt: string;
+}
+const rustcDisagreements: RustcDisagreement[] = [];
+/** Where rust-analyzer said nothing: how much of that rustc could type. */
+const rustcWhereRaSilent = { sites: 0, typed: 0, declared: 0 };
+/**
+ * The negative control. Each checked site's rust-analyzer declaration paired
+ * with the compiler's declaration for a *different* site: how often two
+ * unrelated receivers happen to share a type. An agreement rate that is not far
+ * above this is a check that cannot tell types apart.
+ */
+const rustcControlPool: Array<{ ra: string; rustc: string }> = [];
+/**
+ * Section 12's verdicts, re-read by the compiler, on the sites both reach. The
+ * old check's `agreed` is the column #246 could not look inside.
+ */
+const rustcOnOldCheck = { agreedHeld: 0, agreedOverturned: 0, disagreedRaRight: 0, disagreedRaWrong: 0 };
+const rustcBuilds: Array<{ tree: string; root: string; baselineErrors: number; failure?: string }> = [];
+let rustcProbedBuilds = 0;
+let rustcConflicts = 0;
+let rustcVersion = "";
+/** A tree read by a toolchain without `rust-src` -- see `RustcReading.stdSource`. */
+let rustcStdSourceMissing = false;
+const rustcUnavailable: string[] = [];
+/** Packages cargo would not build on their own -- their sites answer nothing. */
+const rustcPackageFailures: string[] = [];
+
+const canonicalCache = new Map<string, string>();
+/** rustc and rust-analyzer can spell one path two ways through a symlink. */
+function canonical(file: string): string {
+  let real = canonicalCache.get(file);
+  if (real === undefined) {
+    try { real = realpathSync(file); } catch { real = file; }
+    canonicalCache.set(file, real);
+  }
+  return real;
+}
+
+const linesCache = new Map<string, string[]>();
+function lineAt(file: string, line: number): string {
+  let lines = linesCache.get(file);
+  if (!lines) {
+    try { lines = readFileSync(file, "utf8").split("\n"); } catch { lines = []; }
+    linesCache.set(file, lines);
+  }
+  return lines[line] ?? "";
+}
+
+function quarterOf(site: RustSite): RustQuarter {
+  if (site.tier1Resolved) return "resolved";
+  const why = site.tier1Why;
+  return why === "not-a-name" || why === "from-a-call" || why === "unbound" ? why : "other";
+}
+
+function tallyCompiler(tree: string, site: RustSite, answer: CompilerAnswer | undefined): void {
+  if (!site.raLocation) {
+    rustcWhereRaSilent.sites += 1;
+    if (answer) rustcWhereRaSilent.typed += 1;
+    if (answer?.declaration) rustcWhereRaSilent.declared += 1;
+    return;
+  }
+  const quarter = quarterOf(site);
+  const tally = rustcByQuarter.get(quarter)
+    ?? { answered: 0, unanswered: 0, noDeclaration: 0, agreed: 0, disagreed: 0, macroDeclared: 0 };
+  rustcByQuarter.set(quarter, tally);
+  tally.answered += 1;
+  if (!answer) { tally.unanswered += 1; return; }
+  if (!answer.declaration) {
+    tally.noDeclaration += 1;
+    bump(rustcNoDeclarationKinds, answer.kind);
+    return;
+  }
+
+  const raAt = `${canonical(site.raLocation.file)}:${site.raLocation.line}`;
+  const rustcAt = `${canonical(answer.declaration.file)}:${answer.declaration.line}`;
+  const same = raAt === rustcAt;
+  rustcControlPool.push({ ra: raAt, rustc: rustcAt });
+
+  if (site.tier1Type && !SHAPE_NAMES.has(site.tier1Type) && site.raDeclared) {
+    const oldAgreed = bareTypeName(site.tier1Type) === site.raDeclared.name;
+    if (oldAgreed) rustcOnOldCheck[same ? "agreedHeld" : "agreedOverturned"] += 1;
+    else rustcOnOldCheck[same ? "disagreedRaRight" : "disagreedRaWrong"] += 1;
+  }
+
+  if (same) { tally.agreed += 1; return; }
+  tally.disagreed += 1;
+  const rustcLine = lineAt(answer.declaration.file, answer.declaration.line);
+  const rustcDeclared = declaredTypeOnLine(rustcLine);
+  const sameFile = canonical(site.raLocation.file) === canonical(answer.declaration.file);
+  const sameName = rustcDeclared !== undefined && rustcDeclared.name === site.raDeclared?.name;
+  const macroDeclared = declaredByMacro(
+    rustcLine, lineAt(site.raLocation.file, site.raLocation.line), answer.printed);
+  if (macroDeclared) tally.macroDeclared += 1;
+  const cls = macroDeclared ? "a type a macro declares: rustc at the template, rust-analyzer at the call"
+    : !site.raDeclared ? "rust-analyzer's answer is not a type declaration"
+    : site.raDeclared.kind === "type" ? "rust-analyzer stopped at a type alias"
+    : sameName && sameFile ? "same type, header read on another line"
+    : sameName ? "same name, a different declaration"
+    : "a different type";
+  bump(rustcClasses, cls);
+  if (showAll || rustcDisagreements.length < 300) {
+    const short = (file: string, line: number) => {
+      const rel = path.relative(tree, file);
+      return `${rel.startsWith("..") ? file.replace(/^.*\/(library|registry\/src\/[^/]+)\//, "<$1>/") : rel}:${line + 1}`;
+    };
+    rustcDisagreements.push({
+      tree: path.basename(tree), file: site.file, line: site.line, method: site.method, quarter, cls,
+      rustc: `${answer.printed}${rustcDeclared ? ` (${rustcDeclared.kind} ${rustcDeclared.name})` : ""}`,
+      rustcAt: short(answer.declaration.file, answer.declaration.line),
+      ra: site.raDeclared ? `${site.raDeclared.kind} ${site.raDeclared.name}` : "not a type declaration",
+      raAt: short(site.raLocation.file, site.raLocation.line),
+    });
+  }
+}
+
 /** Resolved sites collected per tree, so the referee can be asked once per tree. */
 interface Collected {
   file: string; absolute: string; line: number; start: number; end: number;
@@ -337,12 +512,7 @@ for (const tree of trees) {
   }> = [];
   const pySourcesAll = new Map<string, string>();
   /** #246's version of `collectedPyAll`: every Rust receiver site, resolved or not. */
-  const collectedRustAll: Array<{
-    file: string; absolute: string; line: number; start: number; end: number; method: string;
-    tier1Resolved: boolean;
-    /** What the syntactic reader named, for the independent referee -- see `rustPlacement`. */
-    tier1Type?: string; tier1Shape?: string;
-  }> = [];
+  const collectedRustAll: RustSite[] = [];
   const rustSourcesAll = new Map<string, string>();
 
   for (const file of sourceFiles(tree)) {
@@ -399,7 +569,7 @@ for (const tree of trees) {
               method: site.method, tier1Resolved: site.verdict.verdict === "resolved",
               ...(site.verdict.verdict === "resolved"
                 ? { tier1Type: site.verdict.evidence.type, tier1Shape: site.verdict.evidence.shape }
-                : {}),
+                : { tier1Why: site.verdict.why }),
             });
             rustSourcesAll.set(rel, source);
           }
@@ -592,6 +762,8 @@ for (const tree of trees) {
       sitesByRoot.set(owner, list);
     }
 
+    /** Roots rust-analyzer actually started on; the compiler checks only their answers. */
+    const rustRootsAsked = new Set<string>();
     for (const [root, sites] of sitesByRoot) {
       let rustReferee: Awaited<ReturnType<typeof createRustAnalyzerReferee>> | undefined;
       try {
@@ -606,6 +778,7 @@ for (const tree of trees) {
         rustLspCoverage.indexable -= sites.length;
         continue;
       }
+      rustRootsAsked.add(root);
       if (!rustAnalyzerVersion) rustAnalyzerVersion = rustReferee.version();
       const startedAt = Date.now();
       // Waits for rust-analyzer's own "done indexing" notification. Asking
@@ -644,6 +817,7 @@ for (const tree of trees) {
           if (site.tier1Resolved || lspResolved) rustLspCoverage.either += 1;
 
           if (typeDeclaring === undefined || declaringLocation === undefined) continue;
+          site.raLocation = declaringLocation;
 
           /*
            * The placement check, over every answered site rather than only the
@@ -655,6 +829,7 @@ for (const tree of trees) {
             catch { return ""; }
           })();
           const declared = declaredTypeOnLine(targetLine);
+          if (declared) site.raDeclared = declared;
           if (!declared) {
             rustPlacement.notAType += 1;
             if (showAll || rustNotATypeCases.length < 50) {
@@ -711,6 +886,39 @@ for (const tree of trees) {
       await Promise.all(Array.from({ length: Math.min(CONCURRENCY, sites.length) }, worker));
       console.error(`  [rust-lsp] done: ${sites.length} sites in ${Math.round((Date.now() - startedAt) / 1000)}s`);
       rustReferee.close();
+    }
+
+    /* ------------------------------------------------ the referee, rustc (#250) */
+    const rustcSites: RustcSite[] = [];
+    const rustcSiteOf = new Map<number, RustSite>();
+    for (const root of rustRootsAsked) {
+      for (const site of sitesByRoot.get(root) ?? []) {
+        const id = rustcSites.length;
+        rustcSites.push({ id, file: site.absolute, start: site.start, end: site.end });
+        rustcSiteOf.set(id, site);
+      }
+    }
+    if (rustcSites.length > 0) {
+      const startedAt = Date.now();
+      console.error(`  [rustc] ${rustcSites.length} receiver sites to probe in ${path.basename(tree)}`);
+      try {
+        const reading = await askRustc(tree, [...rustRootsAsked], rustcSites);
+        rustcVersion = reading.version;
+        if (!reading.stdSource) rustcStdSourceMissing = true;
+        rustcProbedBuilds += reading.probedBuilds;
+        rustcPackageFailures.push(...reading.packageFailures.map((one) => `${path.basename(tree)}: ${one}`));
+        rustcConflicts += reading.conflicts;
+        for (const build of reading.builds) {
+          rustcBuilds.push({
+            tree: path.basename(tree), root: path.relative(tree, build.root) || ".",
+            baselineErrors: build.baselineErrors, ...(build.failure ? { failure: build.failure } : {}),
+          });
+        }
+        for (const [id, site] of rustcSiteOf) tallyCompiler(tree, site, reading.answers.get(id));
+      } catch (error) {
+        rustcUnavailable.push(`${path.basename(tree)}: ${(error as Error).message.split("\n")[0]}`);
+      }
+      console.error(`  [rustc] done in ${Math.round((Date.now() - startedAt) / 1000)}s`);
     }
   }
 }
@@ -1051,5 +1259,131 @@ if (rustPlacement.answered > 0) {
   }
 } else {
   console.log("  No answered Rust sites -- nothing to check.");
+}
+console.log();
+
+console.log("13 · RUST, CHECKED BY THE COMPILER -- every rust-analyzer answer, not the easy quarter (#250)");
+console.log();
+console.log("  The placement check above needs the syntactic reader to have named a type too, so it");
+console.log("  only ever reaches receivers whose type is written in the text. rustc types every");
+console.log("  receiver it compiles. A probe planted at each one fails to build, and the error states");
+console.log("  the receiver's type and points at that type's declaration. An answer agrees when rustc");
+console.log("  and rust-analyzer name the same declaration -- file and line, not a name.");
+console.log("  Probes go into a copy of each tree, built into a target directory of its own.");
+console.log();
+for (const one of rustcUnavailable) console.log(`  rustc could not be asked on ${one}`);
+const rustcAll = [...rustcByQuarter.values()].reduce<CompilerCheck>((all, one) => ({
+  answered: all.answered + one.answered, unanswered: all.unanswered + one.unanswered,
+  noDeclaration: all.noDeclaration + one.noDeclaration,
+  agreed: all.agreed + one.agreed, disagreed: all.disagreed + one.disagreed,
+  macroDeclared: all.macroDeclared + one.macroDeclared,
+}), { answered: 0, unanswered: 0, noDeclaration: 0, agreed: 0, disagreed: 0, macroDeclared: 0 });
+if (rustcAll.answered > 0) {
+  console.log(`  ${rustcVersion}; ${rustcProbedBuilds} probed builds, one package at a time.`);
+  if (rustcStdSourceMissing) {
+    // Every std type is typed with no declaration on such a machine and lands
+    // in b)'s unchecked column, so the coverage below is the machine's, not the code's.
+    console.log("  NOT A FULL READING: this toolchain has no standard-library source (rust-src), so no");
+    console.log("  std type can be checked and coverage below is a floor. `rustup component add rust-src`.");
+  }
+  if (rustcPackageFailures.length > 0) {
+    // A package cargo would not build answers nothing, and its sites count as
+    // unchecked below -- a smaller number that must not read as a finding.
+    console.log(`  NOT A FULL READING: cargo refused ${rustcPackageFailures.length} package listing(s) or build(s) -- see g).`);
+  }
+  console.log();
+  console.log("  a) How much of rust-analyzer's answering this checks, by what the syntactic reader said");
+  console.log("     about the same receiver. `resolved` is the part the check above can reach.");
+  console.log();
+  console.log("     " + "reader said".padEnd(14) + "answered".padStart(10) + "checked".padStart(16)
+    + "agreed".padStart(9) + "disagreed".padStart(11) + "macro".padStart(7) + "  wrong");
+  const row = (label: string, one: CompilerCheck) => {
+    const checked = one.agreed + one.disagreed;
+    console.log("     " + label.padEnd(14) + String(one.answered).padStart(10)
+      + cell(checked, one.answered).padStart(16) + String(one.agreed).padStart(9)
+      + String(one.disagreed).padStart(11) + String(one.macroDeclared).padStart(7)
+      + "  " + percent(one.disagreed - one.macroDeclared, checked).trim());
+  };
+  for (const quarter of RUST_QUARTERS) {
+    const one = rustcByQuarter.get(quarter);
+    if (one) row(quarter, one);
+  }
+  row("all", rustcAll);
+  const rustcChecked = rustcAll.agreed + rustcAll.disagreed;
+  const oldChecked = rustPlacement.agreed + rustPlacement.wrong;
+  console.log();
+  console.log(`     Checked ${rustcChecked} of ${rustcAll.answered} answered sites `
+    + `(${percent(rustcChecked, rustcAll.answered).trim()}); the syntactic referee above reaches ${oldChecked} `
+    + `(${percent(oldChecked, rustcAll.answered).trim()}).`);
+  console.log("     `macro` is the disagreements that are one type a macro declares -- see c) -- and `wrong`");
+  console.log("     is the rest over checked. Both are printed; nothing is discounted silently.");
+  console.log();
+
+  console.log("  b) Answered by rust-analyzer and not checked here, and why:");
+  console.log(`     rustc never typed the receiver: ${rustcAll.unanswered}. The file is compiled by no target`);
+  console.log("     the build checks (an inactive `cfg`, a feature left off), or a macro discarded the probe.");
+  console.log(`     rustc typed it as a type no declaration states: ${rustcAll.noDeclaration}. By rustc's own word:`);
+  for (const [kind, count] of [...rustcNoDeclarationKinds.entries()].sort((a, b) => b[1] - a[1])) {
+    console.log(`       ${kind.padEnd(18)} ${String(count).padStart(6)}`);
+  }
+  console.log();
+
+  console.log("  c) Disagreements, by what they are. Classified mechanically from the two declaration");
+  console.log("     lines, not by eye; every one is listed with --all.");
+  for (const [cls, count] of [...rustcClasses.entries()].sort((a, b) => b[1] - a[1])) {
+    console.log(`     ${cls.padEnd(52)} ${String(count).padStart(6)}`);
+  }
+  if (rustcDisagreements.length > 0) {
+    console.log();
+    for (const one of rustcDisagreements.slice(0, cap(rustcDisagreements.length))) {
+      console.log(`       ${one.tree}/${one.file}:${one.line} .${one.method}(...) [${one.quarter}; ${one.cls}]`);
+      console.log(`         rustc: ${one.rustc} at ${one.rustcAt}`);
+      console.log(`         rust-analyzer: ${one.ra} at ${one.raAt}`);
+    }
+    if (rustcDisagreements.length > cap(rustcDisagreements.length)) {
+      console.log(`       ... and ${rustcDisagreements.length - cap(rustcDisagreements.length)} more`);
+    }
+  }
+  console.log();
+
+  console.log("  d) Whether this check can tell types apart at all.");
+  const pool = rustcControlPool.length;
+  let byChance = 0;
+  for (let i = 0; i < pool; i++) {
+    if (rustcControlPool[i]!.ra === rustcControlPool[(i + Math.floor(pool / 2)) % pool]!.rustc) byChance += 1;
+  }
+  console.log(`     Each checked answer paired with the compiler's declaration for a different site, half`);
+  console.log(`     the corpus away: ${byChance} of ${pool} agree (${percent(byChance, pool).trim()}). That is how often two`);
+  console.log("     unrelated receivers share a type; real agreement far above it is a check that discriminates.");
+  console.log();
+  console.log("     The verdicts of the check above, on the sites both reach:");
+  console.log(`       it said agreed, and rustc agrees with rust-analyzer:     ${rustcOnOldCheck.agreedHeld}`);
+  console.log(`       it said agreed, and rustc disagrees with rust-analyzer:  ${rustcOnOldCheck.agreedOverturned}`);
+  console.log(`       it said disagreed, and rust-analyzer was right:          ${rustcOnOldCheck.disagreedRaRight}`);
+  console.log(`       it said disagreed, and rust-analyzer was wrong:          ${rustcOnOldCheck.disagreedRaWrong}`);
+  console.log();
+
+  console.log("  e) Where rust-analyzer said nothing:");
+  console.log(`     ${rustcWhereRaSilent.sites} sites; rustc typed ${rustcWhereRaSilent.typed} of them, `
+    + `${rustcWhereRaSilent.declared} as a type with a declaration.`);
+  console.log();
+
+  console.log("  f) What the two share. Name resolution, macro expansion and type inference are separate");
+  console.log("     implementations. rust-analyzer embeds the crates of rustc's next-generation trait");
+  console.log("     solver; a stable rustc does not use that solver to type-check bodies, so trait");
+  console.log("     resolution is separate too on this toolchain -- but a toolchain that turns it on");
+  console.log("     would share it, and the version above is part of this number.");
+  console.log();
+
+  console.log("  g) Builds:");
+  for (const build of rustcBuilds) {
+    console.log(`     ${build.tree}/${build.root}: ${build.failure ? `cargo refused -- ${build.failure}` : `${build.baselineErrors} error(s) before any probe`}`);
+  }
+  for (const one of rustcPackageFailures) console.log(`     cargo would not build a package on its own: ${one}`);
+  if (rustcConflicts > 0) {
+    console.log(`     ${rustcConflicts} site(s) given two different declarations by two targets that compile the same file; the first is kept.`);
+  }
+} else if (rustcUnavailable.length === 0) {
+  console.log("  No rust-analyzer answer to check.");
 }
 console.log();
