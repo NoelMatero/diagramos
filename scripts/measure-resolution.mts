@@ -1311,7 +1311,8 @@ if (skipPythonLsp) {
   console.log();
   console.log(`  Withheld by the client because the line pyright pointed at declares no type: ${pyLspWithheldNoType}`);
   console.log("  (#259) -- a receiver's own binding where pyright's type was Unknown, or a callee's `def`");
-  console.log("  where the receiver ends in a call. Not in the `lsp` column; section 14 f) should read 0.");
+  console.log("  where the receiver ends in a call. Not in the `lsp` column; the mypy section's placement");
+  console.log("  counts of answers that declare no type should both read zero.");
 } else {
   console.log("  No Python receiver sites in this corpus.");
 }
