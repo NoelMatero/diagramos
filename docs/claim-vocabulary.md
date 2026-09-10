@@ -1756,6 +1756,16 @@ be one: `<MenuContent />` is a routine making a MenuContent, which is `@builds`.
     `Vec<_>`, `PathBuf`) and no declaration span comes with it. Closing that
     needs a different question, not a different referee.
 
+    **The 90.9% needs the standard library's source on the machine.** rustc
+    points a `std` type at its declaration only when the toolchain carries
+    `rust-src`; without it `Vec` is typed and declared nowhere, and every such
+    answer falls into the unchecked column. CI found it rather than a reading of
+    the code: the runner had no `rust-src`, and a test expecting `vec/mod.rs`
+    failed there alone. The reading now records whether the source was present
+    (`hasStdSource`, asked of the same `rustc` with the same `RUSTFLAGS` cargo
+    passes), and section 13 says so in as many words when it was not, so a lower
+    coverage figure from such a machine cannot read as a finding.
+
     **What rustc and rust-analyzer share, stated rather than assumed.** Name
     resolution, macro expansion and type inference are separate implementations
     -- that is the whole basis for calling this independent. rust-analyzer does

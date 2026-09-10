@@ -398,6 +398,8 @@ const rustcBuilds: Array<{ tree: string; root: string; baselineErrors: number; f
 let rustcProbedBuilds = 0;
 let rustcConflicts = 0;
 let rustcVersion = "";
+/** A tree read by a toolchain without `rust-src` -- see `RustcReading.stdSource`. */
+let rustcStdSourceMissing = false;
 const rustcUnavailable: string[] = [];
 /** Packages cargo would not build on their own -- their sites answer nothing. */
 const rustcPackageFailures: string[] = [];
@@ -1117,6 +1119,7 @@ for (const tree of trees) {
       try {
         const reading = await askRustc(tree, [...rustRootsAsked], rustcSites);
         rustcVersion = reading.version;
+        if (!reading.stdSource) rustcStdSourceMissing = true;
         rustcProbedBuilds += reading.probedBuilds;
         rustcPackageFailures.push(...reading.packageFailures.map((one) => `${path.basename(tree)}: ${one}`));
         rustcConflicts += reading.conflicts;
@@ -1492,6 +1495,12 @@ const rustcAll = [...rustcByQuarter.values()].reduce<CompilerCheck>((all, one) =
 }), { answered: 0, unanswered: 0, noDeclaration: 0, agreed: 0, disagreed: 0, macroDeclared: 0 });
 if (rustcAll.answered > 0) {
   console.log(`  ${rustcVersion}; ${rustcProbedBuilds} probed builds, one package at a time.`);
+  if (rustcStdSourceMissing) {
+    // Every std type is typed with no declaration on such a machine and lands
+    // in b)'s unchecked column, so the coverage below is the machine's, not the code's.
+    console.log("  NOT A FULL READING: this toolchain has no standard-library source (rust-src), so no");
+    console.log("  std type can be checked and coverage below is a floor. `rustup component add rust-src`.");
+  }
   if (rustcPackageFailures.length > 0) {
     // A package cargo would not build answers nothing, and its sites count as
     // unchecked below -- a smaller number that must not read as a finding.
