@@ -114,6 +114,21 @@ const FIELD = new Map<Language, RegExp>([
 ]);
 
 /**
+ * Where a comment starts, which is not the same character in every language.
+ *
+ * Whitespace before the marker is required, so a Rust attribute line and a
+ * Python comment are cut where they start rather than a TypeScript `#field`
+ * being cut at column zero.
+ */
+const COMMENT: Record<Language, RegExp> = {
+  rust: /\s+(#|\/\/).*$/,
+  python: /\s+#.*$/,
+  ts: /\s+\/\/.*$/,
+  tsx: /\s+\/\/.*$/,
+  js: /\s+\/\/.*$/,
+};
+
+/**
  * Type names as a person would read them off a field line.
  *
  * A qualified name is taken whole and then reduced to its last part, because
@@ -181,8 +196,17 @@ function refereeTypes(source: string, language: Language): RefereeType[] {
      * # HuggingFace ID e.g. "meta-llama/Llama-3.1-8B-Instruct"` has four
      * capitalised words in it and none of them is a field type; every one of the
      * last 11 disagreements was this.
+     *
+     * The marker is per language, and it was not. `#` is a comment in Python
+     * and an attribute in Rust; in TypeScript it is the **private field
+     * sigil**, so `#registry: Registry;` was cut down to the empty string and
+     * the field stopped existing. Not a false accusation -- an invisible
+     * question. Every private field in the corpus was one `holds` was licensed
+     * without ever being asked about, and a licence measured over a population
+     * with a spelling missing from it is not evidence about that spelling.
+     * `measure-accesses.mts` fixed the same line for the same reason (#223).
      */
-    const code = line.replace(/\s+(#|\/\/).*$/, "");
+    const code = line.replace(COMMENT[language], "");
     const member = field.exec(code);
     if (!member) continue;
     // A method, not a field: the referee declines the same case the reader does.
