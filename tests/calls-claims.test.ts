@@ -283,6 +283,30 @@ describe("on a real workspace, where the path shapes are the real ones", () => {
     expect(report.clean).toBe(true);
   });
 
+  /*
+   * Two boxes in one file, which is the one shape where #254's own-name bug
+   * reached a board: `resolves` read `seen.add(file)` as a call to the `add`
+   * that same file declares, so the arrow drawn the other way round was told
+   * to turn round -- a red quoting a call to a `Set`.
+   */
+  it("says nothing about two routines in one file that only share a method name", async () => {
+    write("src/rust.ts",
+      "export function collect(): void {\n"
+      + "  const add = (file: string): void => { void file; };\n"
+      + "  add('one');\n"
+      + "}\n"
+      + "export function resolveRustPath(files: string[]): string[] {\n"
+      + "  const seen = new Set<string>();\n"
+      + "  for (const file of files) seen.add(file);\n"
+      + "  return [...seen];\n"
+      + "}\n");
+    const board = await boardOf("src/rust.ts#add", "src/rust.ts#resolveRustPath", { claim: "calls" });
+    const report = checkDrift(board, createWorkspace(root), { edges: true });
+
+    expect(report.edges.filter((finding) => finding.kind === "calls-backwards")).toEqual([]);
+    expect(report.claims.callsConfirmed).toBe(0);
+  });
+
   it("accuses an arrow drawn against a call that is really there", async () => {
     write("src/c.ts", "export function run() { return 1; }\n");
     write("src/d.ts", 'import { run } from "./c";\nexport function render() { return run(); }\n');

@@ -258,6 +258,10 @@ export interface PyrightLspReferee {
   typeDeclarationAt(file: string, source: string, start: number, end: number): Promise<string | undefined>;
   /** `textDocument/definition` at `[start, end)` -- where the symbol *at that exact position* is declared. */
   methodDeclarationAt(file: string, source: string, start: number, end: number): Promise<string | undefined>;
+  /** `methodDeclarationAt`'s question with the declaration's line kept (#254). */
+  methodDeclarationLocationAt(
+    file: string, source: string, start: number, end: number,
+  ): Promise<{ file: string; line: number } | undefined>;
   /**
    * `typeDeclarationAt`'s own question, with the declaration's line kept
    * rather than thrown away (#243).
@@ -471,6 +475,8 @@ export async function createPyrightLspReferee(root: string): Promise<PyrightLspR
     typeDeclarationAt: async (file, source, start, end) => (await askTypeLocation(file, source, start, end))?.file,
     typeDeclarationLocationAt: askTypeLocation,
     methodDeclarationAt: (file, source, start) => ask("definition", file, source, start, STEADY_RETRY_MS),
+    methodDeclarationLocationAt: (file, source, start) =>
+      askLocation("definition", file, source, start, STEADY_RETRY_MS),
     warmUp: (file, source, start) => ask("typeDefinition", file, source, start, WARMUP_RETRY_MS).then(() => {}),
     withheldNoType: () => withheldNoType,
     close: () => {

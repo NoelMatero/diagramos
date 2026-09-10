@@ -43,13 +43,17 @@
  * A run is a measurement, not a test: it prints and never fails. The bugs it
  * finds become tests.
  */
-import { execFileSync } from "node:child_process";
-import { existsSync, readFileSync, realpathSync } from "node:fs";
+import { existsSync, realpathSync, writeFileSync } from "node:fs";
 import path from "node:path";
 
 import {
   bindsLocally, refereeRoutines, stripNoise, type RefereeRoutine,
 } from "./lib/call-scan";
+import {
+  callSitesOn, checkerFor, landingOf, scoreReceiverCall,
+  type CallChecker, type Declared, type Landing, type ReceiverScore,
+} from "./lib/call-receivers";
+import { sourceFiles } from "./lib/source-files";
 
 import { callsBetween, type CallSide } from "../src/engine/calls";
 import { readDependencies } from "../src/engine/deps";
@@ -65,6 +69,21 @@ const flags = new Set(process.argv.slice(2).filter((argument) => argument.starts
 const roots = process.argv.slice(2).filter((argument) => !argument.startsWith("--"));
 /** `--all` prints every miss and every refusal rather than the first handful. */
 const showAll = flags.has("--all");
+/**
+ * `--no-checker` runs exactly the measurement the licence was earned on and
+ * starts no checker. `--control` also asks the checker about every bare call,
+ * whose answer the text scan already has -- which is how the checker is shown
+ * to agree with the referee it joins, before it is trusted on the calls that
+ * referee could not read (#254).
+ */
+const useChecker = !flags.has("--no-checker");
+const control = useChecker && flags.has("--control");
+/**
+ * `--dump=<file>` writes every call put to the checker, agreements included, as
+ * JSON. Reading only the flagged cases is how a check that measures the wrong
+ * thing survives; this is what the agreements are read from.
+ */
+const dumpTo = [...flags].find((flag) => flag.startsWith("--dump="))?.slice("--dump=".length);
 const cap = (count: number) => (showAll ? count : Math.min(count, 20));
 
 const real = (tree: string) => { try { return realpathSync(tree); } catch { return tree; } };
@@ -83,18 +102,6 @@ const trees = (roots.length > 0 ? roots : [
   `${HOME}/mundane`,
   `${HOME}/infrarouter`,
 ]).filter((tree) => existsSync(tree)).map(real);
-
-function sourceFiles(root: string): string[] {
-  try {
-    return execFileSync("find", [root, "-type", "f"], { encoding: "utf8" })
-      .split("\n")
-      .filter(Boolean)
-      .filter((file) => !/\/(target|node_modules|\.git|dist|out|vendor|\.venv|\.claude)\//.test(file))
-      .filter((file) => languageOf(file) !== undefined);
-  } catch {
-    return [];
-  }
-}
 
 /* -------------------------------------------------------------- the referee */
 /*
@@ -130,7 +137,50 @@ let ambiguousNames = 0;
 /** What the reader answered about calls written on a receiver, by verdict. */
 const throughReceiver = new Map<string, number>();
 
+/*
+ * #254: the same receiver calls, asked of a real checker. Every one ends in a
+ * score or in a named reason it could not be scored -- never dropped without a
+ * word, which is how 1,995 of them came to sit outside the licence.
+ */
+type Verdict = ReturnType<typeof callsBetween>;
+interface Pending extends Ask {
+  tree: string;
+  language: Language;
+  lines: number[];
+  via: "bare" | "receiver";
+  verdict: Verdict;
+}
+interface Scored extends Pending { score: ReceiverScore; at?: Declared }
+const receiverScores = new Map<Language, Map<ReceiverScore, number>>();
+const receiverRefusals = new Map<Language, Map<string, number>>();
+const receiverSilent = new Map<Language, Map<string, number>>();
+const receiverCases: Scored[] = [];
+const controlCounts = new Map<Language, Map<Landing["kind"], number>>();
+/**
+ * The negative control (#250's own guard, applied here): every scored call's
+ * answers judged against **another** call's target instead of its own. A check
+ * that says `lands` either way is measuring nothing, and a corpus-scale
+ * agreement rate is no evidence until this number is near zero.
+ */
+const negativeControl = new Map<Language, Map<Landing["kind"], number>>();
+const controlElsewhere: Array<Pending & { at: Declared }> = [];
+/**
+ * `elsewhere` answers that name the target file at some **other** line, per
+ * language. `landingOf` calls a landing only when the line the checker points
+ * at declares the name, so this is the class where that strictness could turn
+ * a real call into a false `invented`. Counted rather than assumed empty.
+ */
+const elsewhereInTarget = new Map<Language, number>();
+const unavailable = new Map<string, string>();
+const checkerLabels = new Set<string>();
+const dumped: unknown[] = [];
+
 const bump = <K,>(map: Map<K, number>, key: K) => map.set(key, (map.get(key) ?? 0) + 1);
+const bumpIn = <K,>(outer: Map<Language, Map<K, number>>, language: Language, key: K) => {
+  const inner = outer.get(language) ?? new Map<K, number>();
+  outer.set(language, inner);
+  bump(inner, key);
+};
 
 for (const tree of trees) {
   const workspace = createWorkspace(tree);
@@ -164,6 +214,8 @@ for (const tree of trees) {
   };
 
   const paths = sourceFiles(tree).map((file) => path.relative(tree, file));
+  /** Calls to put to a checker once every routine in this tree has been read. */
+  const pending: Pending[] = [];
 
   /*
    * The referee's own index of what declares what, and the population filter.
@@ -201,7 +253,7 @@ for (const tree of trees) {
 
     for (const routine of seen) {
       routines += 1;
-      const wanted = new Map<string, { line: number; target: string; via: "bare" | "receiver" }>();
+      const wanted = new Map<string, { line: number; target: string; via: "bare" | "receiver"; lines: number[] }>();
       for (const call of routine.calls) {
         const target = declaredOnceIn.get(call.name);
         // A routine calling itself is not a relationship anybody draws.
@@ -210,13 +262,16 @@ for (const tree of trees) {
         const already = wanted.get(call.name);
         // A name written both ways in one routine is the readable one: the bare
         // call is evidence, and the receiver call is the referee's blind spot.
-        if (!already) wanted.set(call.name, { line: call.line, target, via: call.via });
+        if (!already) wanted.set(call.name, { line: call.line, target, via: call.via, lines: [call.line] });
         else if (already.via === "receiver" && call.via === "bare") {
-          wanted.set(call.name, { line: call.line, target, via: "bare" });
+          wanted.set(call.name, { line: call.line, target, via: "bare", lines: [call.line] });
+        } else if (already.via === call.via && !already.lines.includes(call.line)) {
+          // Every line it is written on, so a checker is asked at each (#254).
+          already.lines.push(call.line);
         }
       }
 
-      for (const [name, { line, target, via }] of wanted) {
+      for (const [name, { line, target, via, lines }] of wanted) {
         const targetSource = read(target);
         const targetLanguage = languageOf(target);
         if (targetSource === undefined || !targetLanguage) continue;
@@ -232,8 +287,10 @@ for (const tree of trees) {
           // A population the referee cannot place either. Counted apart, and the
           // reader's refusal here is the right answer rather than a cost.
           bump(throughReceiver, verdict.verdict === "withheld" ? verdict.why : verdict.verdict);
+          if (useChecker) pending.push({ ...ask, tree: path.basename(tree), language, lines, via, verdict });
           continue;
         }
+        if (control) pending.push({ ...ask, tree: path.basename(tree), language, lines, via, verdict });
 
         bump(asked, language);
         if (ask.crossFile) bump(crossAsked, language);
@@ -266,6 +323,86 @@ for (const tree of trees) {
         if (verdict.verdict === "confirmed") invented.push({ file: rel, routine: routine.name });
       }
     }
+  }
+
+  /*
+   * #254. Asked once the whole tree is read: one checker per language family,
+   * started only when this tree has a call for it, closed before the next tree.
+   * Held as a promise so a batch asking at once still starts one server.
+   */
+  const checkers = new Map<string, Promise<CallChecker | { unavailable: string }>>();
+  const checkerOf = (language: Language) => {
+    const family = language === "tsx" || language === "js" ? "ts" : language;
+    if (!checkers.has(family)) {
+      checkers.set(family, checkerFor(tree, language).then((made) => {
+        if ("unavailable" in made) unavailable.set(`${path.basename(tree)} ${family}`, made.unavailable);
+        else checkerLabels.add(made.label);
+        return made;
+      }));
+    }
+    return checkers.get(family)!;
+  };
+  const BATCH = 16;
+  for (let start = 0; start < pending.length; start += BATCH) {
+    await Promise.all(pending.slice(start, start + BATCH).map(async (one, offset) => {
+      const checker = await checkerOf(one.language);
+      /** How `landingOf` reads these answers against any one target file. */
+      const against = (answers: Array<Declared | undefined>, target: string, name: string) => {
+        const absolute = path.join(tree, target);
+        const lines = read(target)?.split("\n") ?? [];
+        return landingOf(answers, absolute, name, (file, at) => (file === absolute ? lines[at] : undefined));
+      };
+      let landing: Landing;
+      if ("unavailable" in checker) {
+        landing = { kind: "silent", why: "no-checker" };
+      } else {
+        const source = read(one.file)!;
+        const sites = one.lines.flatMap((at) => callSitesOn(source, at, one.name, one.via, one.language));
+        const answers = await Promise.all(sites.map((site) =>
+          checker.definitionAt(path.join(tree, one.file), source, site)));
+        landing = against(answers, one.target, one.name);
+        /*
+         * The same answers, judged against a **different** call's target -- the
+         * next one along the pending list, whose file and name are unrelated.
+         * Costs no query, because the checker has already spoken.
+         */
+        const other = pending[(start + offset + 1) % pending.length];
+        if (answers.length > 0 && other && other.target !== one.target) {
+          bumpIn(negativeControl, one.language, against(answers, other.target, other.name).kind);
+        }
+      }
+      if (dumpTo) {
+        dumped.push({
+          tree: one.tree, file: one.file, lines: one.lines, routine: one.routine, name: one.name,
+          target: one.target, via: one.via, language: one.language, verdict: one.verdict.verdict,
+          ...(one.verdict.verdict === "withheld" ? { why: one.verdict.why } : {}), landing,
+        });
+      }
+      if (one.via === "bare") {
+        bumpIn(controlCounts, one.language, landing.kind);
+        if (landing.kind === "elsewhere") controlElsewhere.push({ ...one, at: landing.at });
+        return;
+      }
+      if (landing.kind === "silent") {
+        bumpIn(receiverSilent, one.language, landing.why);
+        return;
+      }
+      if (landing.kind === "elsewhere" && landing.at.file === path.join(tree, one.target)) {
+        bump(elsewhereInTarget, one.language);
+      }
+      const score = scoreReceiverCall(landing, one.verdict.verdict);
+      bumpIn(receiverScores, one.language, score);
+      if (one.verdict.verdict === "withheld" && score === "refused") {
+        bumpIn(receiverRefusals, one.language, one.verdict.why);
+      }
+      if (score !== "agreed" && score !== "refused" && score !== "rightly-unconfirmed") {
+        receiverCases.push({ ...one, score, ...(landing.kind === "elsewhere" ? { at: landing.at } : {}) });
+      }
+    }));
+  }
+  for (const made of checkers.values()) {
+    const checker = await made;
+    if (!("unavailable" in checker)) checker.close();
   }
   resetEngineCache();
 }
@@ -308,6 +445,117 @@ console.log("  `x.foo(..)` or `Type::foo(..)`. It cannot say whose `foo` that is
 console.log("  not in the population above. What the reader said about them anyway:");
 console.log("    " + [...throughReceiver.entries()].sort((a, b) => b[1] - a[1])
   .map(([verdict, count]) => `${verdict} ${count}`).join(", "));
+
+const listed = (map?: Map<string, number>) => (map && map.size > 0
+  ? [...map.entries()].sort((a, b) => b[1] - a[1]).map(([key, count]) => `${key} ${count}`).join(", ")
+  : "—");
+const shortPath = (file: string) => file.replace(HOME, "~").replace(/^.*\/node_modules\//, "node_modules/");
+
+if (useChecker) {
+  const scoreOf = (language: Language, key: ReceiverScore) => receiverScores.get(language)?.get(key) ?? 0;
+  const realOf = (language: Language) =>
+    scoreOf(language, "agreed") + scoreOf(language, "refused") + scoreOf(language, "missed") + scoreOf(language, "accused");
+  const elsewhereOf = (language: Language) =>
+    scoreOf(language, "invented") + scoreOf(language, "rightly-unconfirmed") + scoreOf(language, "backwards-elsewhere");
+
+  console.log();
+  console.log(`  THROUGH A RECEIVER, ASKED OF A CHECKER (#254) -- ${[...checkerLabels].sort().join(", ") || "no checker started"}`);
+  console.log("  The same calls, each asked \"go to definition\" at its name. REAL: the checker");
+  console.log("  landed on the routine the scan meant. ELSEWHERE: somewhere else, so the call is");
+  console.log("  not to that routine and confirming it is an invention. SILENT: not scored.");
+  console.log();
+  console.log("  " + "language".padEnd(9) + "calls".padStart(7) + "real".padStart(7) + "elsewhere".padStart(11)
+    + "silent".padStart(8) + "  |" + "agreed".padStart(8) + "refused".padStart(9) + "missed".padStart(8)
+    + "accused".padStart(9) + "invented".padStart(10));
+  for (const language of LANGUAGES) {
+    const silent = total(receiverSilent.get(language) ?? new Map());
+    const real = realOf(language);
+    const elsewhere = elsewhereOf(language);
+    if (real + elsewhere + silent === 0) continue;
+    console.log("  " + language.padEnd(9) + String(real + elsewhere + silent).padStart(7) + String(real).padStart(7)
+      + String(elsewhere).padStart(11) + String(silent).padStart(8) + "  |"
+      + String(scoreOf(language, "agreed")).padStart(8) + String(scoreOf(language, "refused")).padStart(9)
+      + String(scoreOf(language, "missed")).padStart(8) + String(scoreOf(language, "accused")).padStart(9)
+      + String(scoreOf(language, "invented")).padStart(10));
+  }
+
+  console.log();
+  console.log("  THE POPULATION THE LICENCE RESTS ON, before and after the checker:");
+  for (const language of LANGUAGES) {
+    const before = asked.get(language) ?? 0;
+    const real = realOf(language);
+    if (before + real === 0) continue;
+    const agreedAll = (agreed.get(language) ?? 0) + scoreOf(language, "agreed");
+    console.log(`    ${language.padEnd(8)} ${String(before).padStart(6)} -> ${String(before + real).padStart(6)}`
+      + `   recall ${percent(agreed.get(language) ?? 0, before).trim()} -> ${percent(agreedAll, before + real).trim()}`);
+  }
+  console.log();
+  console.log("  NOT SCORED, by reason. `checker-silent`: no answer at any site; `partly-silent`:");
+  console.log("  some sites answered elsewhere and one did not, which could be the real call;");
+  console.log("  `no-site`: the scan's line holds no such call once strings are read as strings.");
+  for (const language of LANGUAGES) {
+    if (receiverSilent.has(language)) console.log(`    ${language.padEnd(8)} ${listed(receiverSilent.get(language))}`);
+  }
+  for (const [where, why] of unavailable) console.log(`    no checker in ${where}: ${why}`);
+  console.log();
+  console.log("  REFUSED, on calls the checker says are real, by the reader's reason:");
+  for (const language of LANGUAGES) {
+    if (receiverRefusals.has(language)) console.log(`    ${language.padEnd(8)} ${listed(receiverRefusals.get(language))}`);
+  }
+
+  for (const [score, heading, meaning] of [
+    ["missed", "MISSED", "the checker says the call is real, the reader said absent"],
+    ["accused", "ACCUSED", "the checker says the call is real, the reader said backwards"],
+    ["invented", "INVENTED", "the reader confirmed a call the checker places somewhere else"],
+    ["backwards-elsewhere", "BACKWARDS, CALL ELSEWHERE", "not scored: only the forward half was checked"],
+  ] as const) {
+    const cases = receiverCases.filter((one) => one.score === score);
+    console.log();
+    console.log(`  ${heading} -- ${meaning}: ${cases.length}`);
+    for (const one of cases.slice(0, cap(cases.length))) {
+      console.log(`    ${one.tree}/${one.file}:${one.line} ${one.routine} -> ${one.name} (${one.target})`
+        + (one.at ? `  checker: ${shortPath(one.at.file)}:${one.at.line + 1}` : ""));
+    }
+  }
+
+  console.log();
+  console.log("  A call is `real` only when the line the checker points at declares the name, so an");
+  console.log("  answer naming the right file at another line reads as `elsewhere` -- the one way");
+  console.log(`  that strictness could invent an INVENTED. It happened: ${total(elsewhereInTarget)} times.`);
+
+  console.log();
+  console.log("  NEGATIVE CONTROL -- every answer above judged against a different call's target.");
+  console.log("  A check that lands either way is measuring nothing, so `real` here should be ~0.");
+  for (const language of LANGUAGES) {
+    const counts = negativeControl.get(language);
+    if (!counts) continue;
+    const all = total(counts);
+    console.log(`    ${language.padEnd(8)} real ${counts.get("lands") ?? 0} of ${all}`
+      + ` (${percent(counts.get("lands") ?? 0, all).trim()}), elsewhere ${counts.get("elsewhere") ?? 0},`
+      + ` silent ${counts.get("silent") ?? 0}`);
+  }
+
+  if (control) {
+    console.log();
+    console.log("  CONTROL -- the checker asked about the bare calls above, whose answer the scan");
+    console.log("  already has. It should land on the scan's routine; ELSEWHERE is a disagreement.");
+    for (const language of LANGUAGES) {
+      const counts = controlCounts.get(language);
+      if (!counts) continue;
+      console.log(`    ${language.padEnd(8)} real ${counts.get("lands") ?? 0}, elsewhere ${counts.get("elsewhere") ?? 0},`
+        + ` silent ${counts.get("silent") ?? 0}`);
+    }
+    for (const one of controlElsewhere.slice(0, cap(controlElsewhere.length))) {
+      console.log(`    ${one.tree}/${one.file}:${one.line} ${one.routine} -> ${one.name} (${one.target})`
+        + `  checker: ${shortPath(one.at.file)}:${one.at.line + 1}`);
+    }
+  }
+  if (dumpTo) {
+    writeFileSync(dumpTo, JSON.stringify(dumped, null, 1));
+    console.log();
+    console.log(`  every call put to the checker (${dumped.length}) written to ${dumpTo}`);
+  }
+}
 
 console.log();
 console.log("  every language above carries a licence: "

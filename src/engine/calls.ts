@@ -913,8 +913,21 @@ function resolves(
      * first hazard #189 lists.
      */
     if (!bindings.local.has(bound)) return callee.kind === "through" ? "receiver" : "unbound";
-    if (side.file === target.file) return "yes";
-    return callee.kind === "through" ? "receiver" : undefined;
+    /*
+     * `through` before same-file, and the order is the whole of it (#254). A
+     * bare `add()` in a file that declares `add` is this file's own.
+     * `seen.add(x)` is a method on `seen`, and this file declaring an `add` of
+     * its own says nothing about it -- `seen` is a `Set`. Asking "same file?"
+     * before "written on a receiver?" answered `yes` to both: a green nothing
+     * earned, and in the reverse direction a `backwards` red on an arrow whose
+     * two ends are one file. `measure:calls`' checker referee put six of these
+     * to a real compiler and got a standard-library method back every time --
+     * `Set.add` and `Response.json` here, `Path::parent`, `Command::arg` and
+     * `Read::read_to_end` in ripgrep. `placeOf` below already asks in this
+     * order, and its own doc says the two must match.
+     */
+    if (callee.kind === "through") return "receiver";
+    return side.file === target.file ? "yes" : undefined;
   }
 
   const { files, known } = filesFor(imported.specifier, side.imports);

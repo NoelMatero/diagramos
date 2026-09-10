@@ -12,7 +12,7 @@
  * per tree, many queries" design -- a fresh `pyright-langserver` per test
  * would multiply every test by pyright's own startup cost for no reason.
  */
-import { mkdirSync, mkdtempSync, rmSync, writeFileSync } from "node:fs";
+import { mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from "node:fs";
 import os from "node:os";
 import path from "node:path";
 
@@ -106,6 +106,21 @@ describe("createPyrightLspReferee", () => {
     expect(member).toBeDefined();
     const declaring = await referee.methodDeclarationAt(useFile, useSource, member!.start, member!.end);
     expect(declaring && path.relative(repo, declaring)).toBe(path.join("pkg", "decl.py"));
+  });
+
+  /*
+   * #254 needs the line as well as the file: `measure:calls` asks whether a
+   * call landed on the one routine its text scan meant, and a file declaring
+   * two routines of the same name has no other way to say which. Tested on
+   * the server this file already starts rather than in one of its own.
+   */
+  it("methodDeclarationLocationAt keeps the line the declaration starts on", async () => {
+    const receiverEnd = rangeOf(useSource, "c.load").start + 1;
+    const member = memberRangeAfter(useSource, receiverEnd, "load");
+    const at = await referee.methodDeclarationLocationAt(useFile, useSource, member!.start, member!.end);
+    expect(at && path.relative(repo, at.file)).toBe(path.join("pkg", "decl.py"));
+    const declared = readFileSync(path.join(repo, "pkg", "decl.py"), "utf8").split("\n")[at!.line];
+    expect(declared).toContain("def load");
   });
 
   it("methodDeclarationAt, asked at the receiver's own position instead, answers a different question entirely", async () => {
