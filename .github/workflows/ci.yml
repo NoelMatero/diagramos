@@ -38,6 +38,12 @@ jobs:
           key: playwright-${{ runner.os }}-${{ hashFiles('package-lock.json') }}
       - run: npx playwright install --with-deps chromium
 
+      # The standard library's source, or rustc names a std type without pointing
+      # at its declaration and `tests/resolution-rustc.test.ts` can only check that
+      # it says so. Found when CI failed on exactly that: the runner has rustup and
+      # cargo, not the rust-src component.
+      - run: rustup component add rust-src
+
       - run: npm run typecheck
       - run: npm test
 

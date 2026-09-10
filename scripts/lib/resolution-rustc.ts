@@ -1,6 +1,6 @@
 import { execFileSync, spawn, spawnSync } from "node:child_process";
 import { createHash } from "node:crypto";
-import { cpSync, mkdirSync, readFileSync, realpathSync, rmSync, writeFileSync } from "node:fs";
+import { cpSync, existsSync, mkdirSync, readFileSync, realpathSync, rmSync, writeFileSync } from "node:fs";
 import os from "node:os";
 import path from "node:path";
 import { createInterface } from "node:readline";
@@ -49,6 +49,12 @@ export interface RustcBuild {
 export interface RustcReading {
   answers: Map<number, CompilerAnswer>;
   builds: RustcBuild[];
+  /**
+   * Whether the toolchain carries the standard library's source. Without it
+   * rustc names a `std` type and points at no declaration, so every such answer
+   * is unchecked for a reason that is the machine's, not the code's.
+   */
+  stdSource: boolean;
   /** Probed builds run: at most two per package -- see `askRustc`. */
   probedBuilds: number;
   /** Packages cargo would not list or build on their own, with its reason. */
@@ -202,7 +208,7 @@ export async function askRustc(
 
   let version = "unknown";
   try { version = execFileSync("rustc", ["--version"], { encoding: "utf8" }).trim(); } catch { /* recorded as unknown */ }
-  return { answers, builds, probedBuilds, packageFailures, conflicts, version };
+  return { answers, builds, probedBuilds, packageFailures, conflicts, version, stdSource: toolchainHasStdSource() };
 }
 
 interface CargoPackage { id: string; name: string; dir: string }
@@ -235,6 +241,34 @@ function cargoPackages(cwd: string): { packages: CargoPackage[] } | { failure: s
       .filter((one) => one.source === null)
       .map((one) => ({ id: one.id, name: one.name, dir: path.dirname(one.manifest_path) })),
   };
+}
+
+/**
+ * Whether a sysroot carries the standard library's source, where rustup's
+ * `rust-src` component installs it.
+ *
+ * Found by CI rather than by design: GitHub's runner has rustup and cargo but
+ * not this component, so rustc typed `Vec` there and pointed at nothing, and a
+ * test expecting `vec/mod.rs` failed on that machine alone.
+ */
+export function hasStdSource(sysroot: string): boolean {
+  return existsSync(path.join(sysroot, "lib", "rustlib", "src", "rust", "library"));
+}
+
+/**
+ * `hasStdSource`, for the sysroot the build will really use: asked of `rustc`
+ * with the flags cargo passes it, since `--sysroot` in `RUSTFLAGS` moves it.
+ */
+function toolchainHasStdSource(): boolean {
+  const encoded = process.env.CARGO_ENCODED_RUSTFLAGS;
+  const flags = encoded !== undefined && encoded !== ""
+    ? encoded.split("\x1f")
+    : (process.env.RUSTFLAGS ?? "").split(/\s+/).filter(Boolean);
+  try {
+    return hasStdSource(execFileSync("rustc", [...flags, "--print", "sysroot"], { encoding: "utf8" }).trim());
+  } catch {
+    return false;
+  }
 }
 
 /** An error the code itself has, not the summary line cargo adds after it. */

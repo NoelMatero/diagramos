@@ -17,7 +17,7 @@ import path from "node:path";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
 
 import {
-  askRustc, declaredByMacro, probeMethodName, probeSource, readProbeAnswer,
+  askRustc, declaredByMacro, hasStdSource, probeMethodName, probeSource, readProbeAnswer,
   type RustcMessage, type RustcReading, type RustcSite,
 } from "../scripts/lib/resolution-rustc";
 
@@ -252,6 +252,34 @@ describe("declaredByMacro", () => {
   });
 });
 
+describe("hasStdSource", () => {
+  /*
+   * rustc can only point a standard-library type at its declaration when the
+   * toolchain carries that library's source (`rustup component add rust-src`).
+   * Without it `Vec` is typed and declared nowhere, which CI found: the runner
+   * has no rust-src, and a test expecting `vec/mod.rs` failed there only.
+   */
+  it("finds the source where rustup's rust-src component puts it", () => {
+    const sysroot = mkdtempSync(path.join(os.tmpdir(), "sysroot-with-src-"));
+    mkdirSync(path.join(sysroot, "lib/rustlib/src/rust/library"), { recursive: true });
+    try {
+      expect(hasStdSource(sysroot)).toBe(true);
+    } finally {
+      rmSync(sysroot, { recursive: true, force: true });
+    }
+  });
+
+  it("says so when the toolchain has none", () => {
+    const sysroot = mkdtempSync(path.join(os.tmpdir(), "sysroot-without-src-"));
+    mkdirSync(path.join(sysroot, "lib/rustlib/x86_64-unknown-linux-gnu/lib"), { recursive: true });
+    try {
+      expect(hasStdSource(sysroot)).toBe(false);
+    } finally {
+      rmSync(sysroot, { recursive: true, force: true });
+    }
+  });
+});
+
 describe.skipIf(!hasCargo)("askRustc, against a real cargo workspace", () => {
   let tree: string;
   let work: string;
@@ -357,8 +385,21 @@ describe.skipIf(!hasCargo)("askRustc, against a real cargo workspace", () => {
 
   it("types a field and a chain, which the text alone cannot", () => {
     expect(reading.answers.get(field)?.printed).toMatch(/^Vec<.*Match>$/);
-    expect(reading.answers.get(field)?.declaration?.file).toMatch(/library\/alloc\/src\/vec\/mod\.rs$/);
     expect(reading.answers.get(chain)?.printed).toMatch(/^std::slice::Iter<'_, .*Match>$|^Iter<'_, .*Match>$/);
+  });
+
+  it("points a standard-library type at its declaration only when the toolchain has the source, and says which", () => {
+    // Whichever machine this runs on, the reading must say what it could see:
+    // a missing declaration with `stdSource: true` is a bug, and one with
+    // `stdSource: false` is the toolchain.
+    const flags = (process.env.RUSTFLAGS ?? "").split(/\s+/).filter(Boolean);
+    const sysroot = execFileSync("rustc", [...flags, "--print", "sysroot"], { encoding: "utf8" }).trim();
+    expect(reading.stdSource).toBe(hasStdSource(sysroot));
+    if (reading.stdSource) {
+      expect(reading.answers.get(field)?.declaration?.file).toMatch(/library\/alloc\/src\/vec\/mod\.rs$/);
+    } else {
+      expect(reading.answers.get(field)?.declaration).toBeUndefined();
+    }
   });
 
   it("answers inside a crate's unit tests when they use a dependency that has probes of its own", () => {
