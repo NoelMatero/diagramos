@@ -59,6 +59,7 @@
  * and answers every query after that over the same connection.
  */
 import { spawn, type ChildProcessWithoutNullStreams } from "node:child_process";
+import { readFileSync } from "node:fs";
 import path from "node:path";
 import { fileURLToPath, pathToFileURL } from "node:url";
 
@@ -66,6 +67,60 @@ import { PYRIGHT_VERSION } from "./licence-python";
 import { isOutsideTree } from "./resolution-ts";
 
 export { isOutsideTree };
+
+/**
+ * The type a declaration line declares, or `undefined` when it declares none
+ * (#258). Python's `declaredTypeOnLine` (`resolution-rust-lsp.ts`), asked of
+ * the line `textDocument/typeDefinition` pointed at.
+ *
+ * `isConcreteClassLine` (`resolution-python-live.ts`) answers a narrower
+ * question -- is this one-line header safe to accuse through -- and turns
+ * everything it cannot read into `concrete: false`. That is the right answer
+ * for an accusation and hides a second fact: an answer that declares no type is
+ * a wrong *file*, not just an unsafe one. Found against mypy on graphify: where
+ * pyright's type is `Unknown`, `typeDefinition` falls back to the receiver's
+ * own assignment (`a = args[i]`), and where the anchor is a callee's name it
+ * lands on the callee (`def out_path(...) -> Path:`). Both name a file in the
+ * repository, and neither is where any type was declared.
+ *
+ * Reads a split header (`class Split(`) as the class it opens, unlike
+ * `isConcreteClassLine`: the name is on the line, and whether this is a type
+ * does not depend on its bases.
+ */
+export function pythonTypeDeclaredOnLine(
+  lineText: string,
+): { kind: "class" | "alias" | "newtype" | "typevar"; name: string } | undefined {
+  const text = lineText.trim();
+  const typing = String.raw`(?:typing\.|typing_extensions\.)?`;
+  const klass = /^class\s+([A-Za-z_]\w*)/.exec(text);
+  if (klass) return { kind: "class", name: klass[1]! };
+  const statement = /^type\s+([A-Za-z_]\w*)\s*(?:\[[^\]]*\])?\s*=/.exec(text);
+  if (statement) return { kind: "alias", name: statement[1]! };
+  const annotated = new RegExp(String.raw`^([A-Za-z_]\w*)\s*:\s*${typing}TypeAlias\s*=`).exec(text);
+  if (annotated) return { kind: "alias", name: annotated[1]! };
+  const newtype = new RegExp(String.raw`^([A-Za-z_]\w*)\s*=\s*${typing}NewType\s*\(`).exec(text);
+  if (newtype) return { kind: "newtype", name: newtype[1]! };
+  const typevar = new RegExp(String.raw`^([A-Za-z_]\w*)\s*=\s*${typing}(?:TypeVar|ParamSpec|TypeVarTuple)\s*\(`).exec(text);
+  if (typevar) return { kind: "typevar", name: typevar[1]! };
+  return undefined;
+}
+
+/**
+ * What a `textDocument/typeDefinition` answer's line is, in three answers
+ * rather than `pythonTypeDeclaredOnLine`'s two (#258).
+ *
+ * A module receiver (`extract_mod.extract(...)`) lands on the first line of
+ * the module's own file -- a docstring, a comment, an import -- which declares
+ * no type and is still the right answer, being the file a board points at.
+ * Line 0 is read as that before the line's text is looked at, because a module
+ * can open with anything. A class declared on the very first line is read as a
+ * type first, which is the one case where the two overlap.
+ */
+export function pythonDeclarationKind(lineText: string, line: number): "type" | "module" | "not a type" {
+  if (pythonTypeDeclaredOnLine(lineText) !== undefined) return "type";
+  if (line === 0) return "module";
+  return "not a type";
+}
 
 /** LSP `Location`, `LocationLink`, or the array either comes wrapped in -- whatever the server sends. */
 type DefinitionResult =
@@ -227,6 +282,13 @@ export interface PyrightLspReferee {
    * its first queries land before the binder catches up on its own.
    */
   warmUp(file: string, source: string, start: number): Promise<void>;
+  /**
+   * How many `typeDefinition` answers this referee has withheld because the
+   * line they pointed at declares no type (#259) -- the cost of that rule,
+   * counted where it is paid so a measurement can print it rather than infer it
+   * from a coverage figure moving.
+   */
+  withheldNoType(): number;
   close(): void;
 }
 
@@ -363,24 +425,54 @@ export async function createPyrightLspReferee(root: string): Promise<PyrightLspR
     return (await askLocation(method, file, source, start, retryMs))?.file;
   }
 
+  const declarationLines = new Map<string, string[]>();
+  const lineOf = (file: string, line: number): string => {
+    let lines = declarationLines.get(file);
+    if (lines === undefined) {
+      try { lines = readFileSync(file, "utf8").split("\n"); } catch { lines = []; }
+      declarationLines.set(file, lines);
+    }
+    return lines[line] ?? "";
+  };
+  let withheldNoType = 0;
+
+  /*
+   * #259. Where pyright's own type is `Unknown`, `typeDefinition` answers with
+   * the receiver's bindings rather than `null` -- `a = args[i]`, a `for`
+   * target, a parameter, a `with ... as`, a lambda parameter -- and where
+   * `typeAnchorFor` anchors on a callee's name it answers with the callee's
+   * `def`. Every one is a real location and none is a type's declaration: 6,249
+   * of 7,104 in-repository answers on graphify and infrarouter (#258). A line
+   * that declares no type is withheld, wherever it is. The top of a module is
+   * kept: that is a module receiver's right answer.
+   *
+   * Only the first location is read, as `firstLocation` only ever returned the
+   * first: a fallback's locations are all bindings, so a later one is no
+   * better.
+   */
+  async function askTypeLocation(
+    file: string, source: string, start: number, end: number,
+  ): Promise<{ file: string; line: number } | undefined> {
+    const anchor = typeAnchorFor(source, start, end);
+    if (!anchor) return undefined;
+    const location = await askLocation("typeDefinition", file, source, anchor.start, STEADY_RETRY_MS);
+    if (!location) return undefined;
+    if (pythonDeclarationKind(lineOf(location.file, location.line), location.line) !== "not a type") return location;
+    withheldNoType += 1;
+    return undefined;
+  }
+
   return {
     // `typeAnchorFor` is the reason `end` matters here: `[start, end)` can
     // span an entire expression (a chain, `self.cache`), and only its last
     // token says what the whole thing evaluates to. `methodDeclarationAt`
     // takes no such range -- its caller already hands over the method
     // name's own exact position via `memberRangeAfter`.
-    typeDeclarationAt: (file, source, start, end) => {
-      const anchor = typeAnchorFor(source, start, end);
-      return anchor ? ask("typeDefinition", file, source, anchor.start, STEADY_RETRY_MS) : Promise.resolve(undefined);
-    },
-    typeDeclarationLocationAt: (file, source, start, end) => {
-      const anchor = typeAnchorFor(source, start, end);
-      return anchor
-        ? askLocation("typeDefinition", file, source, anchor.start, STEADY_RETRY_MS)
-        : Promise.resolve(undefined);
-    },
+    typeDeclarationAt: async (file, source, start, end) => (await askTypeLocation(file, source, start, end))?.file,
+    typeDeclarationLocationAt: askTypeLocation,
     methodDeclarationAt: (file, source, start) => ask("definition", file, source, start, STEADY_RETRY_MS),
     warmUp: (file, source, start) => ask("typeDefinition", file, source, start, WARMUP_RETRY_MS).then(() => {}),
+    withheldNoType: () => withheldNoType,
     close: () => {
       if (closed) return;
       closed = true;

@@ -101,7 +101,7 @@ const showAll = flags.has("--all");
  * `definition` per receiver and compare the two answers to each other, so
  * nothing in them consults the syntactic reader -- `tier1Resolved` feeds only
  * the reported tier1/combined columns, never the safety check. A change to
- * `src/engine/resolution.ts` therefore cannot move item 17's 85.5%/1.76%, and
+ * `src/engine/resolution.ts` therefore cannot move item 17's figures, and
  * re-running this measurement to price such a change should not have to pay
  * for them. On `graphify` alone that pass is 22,449 round trips and 687
  * seconds, measured.
@@ -241,6 +241,8 @@ const tier2 = new Map<Language, Tier2Tally>();
 interface PyLspCoverage { total: number; tier1: number; lsp: number; either: number }
 const pyLspCoverage: PyLspCoverage = { total: 0, tier1: 0, lsp: 0, either: 0 };
 let pyLspUnavailable = false;
+/** #259: `typeDefinition` answers the client withheld because their line declares no type. */
+let pyLspWithheldNoType = 0;
 
 /**
  * #235's version of item 14: does the type-of-the-receiver question and the
@@ -925,6 +927,7 @@ for (const tree of trees) {
       }
       await Promise.all(Array.from({ length: Math.min(CONCURRENCY, collectedPyAll.length) }, worker));
       console.error(`  [python-lsp] done: ${collectedPyAll.length} sites in ${Math.round((Date.now() - startedAt) / 1000)}s`);
+      pyLspWithheldNoType += lspReferee.withheldNoType();
       lspReferee.close();
 
       /* ------------------------------------------------- the referee, mypy (#258) */
@@ -1305,6 +1308,10 @@ if (skipPythonLsp) {
     + cell(pyLspCoverage.tier1, pyLspCoverage.total).padStart(15)
     + cell(pyLspCoverage.lsp, pyLspCoverage.total).padStart(15)
     + cell(pyLspCoverage.either, pyLspCoverage.total).padStart(15));
+  console.log();
+  console.log(`  Withheld by the client because the line pyright pointed at declares no type: ${pyLspWithheldNoType}`);
+  console.log("  (#259) -- a receiver's own binding where pyright's type was Unknown, or a callee's `def`");
+  console.log("  where the receiver ends in a call. Not in the `lsp` column; section 14 f) should read 0.");
 } else {
   console.log("  No Python receiver sites in this corpus.");
 }
@@ -1728,8 +1735,8 @@ if (skipPythonLsp) {
   console.log("     A line that declares no type is not a type's declaration, whichever file it is in:");
   console.log("     pyright's own type was Unknown and it fell back to the receiver's binding, or the");
   console.log("     anchor was a callee's name and it landed on the callee.");
-  console.log("     The live check already withholds on these (`isConcreteClassLine`); this measurement");
-  console.log("     counts them as answers, which is the part that was wrong.");
+  console.log(`     The client withholds these since #259 (${pyLspWithheldNoType} this run, section 8), so both`);
+  console.log("     `declare no type` counts above should be 0. A non-zero one is an answer that got past it.");
   console.log();
   console.log("     In-tree answers mypy weighed, by what the line is and what mypy said:");
   for (const [key, count] of [...pyPlacementByMypy.entries()].sort((a, b) => b[1] - a[1])) {

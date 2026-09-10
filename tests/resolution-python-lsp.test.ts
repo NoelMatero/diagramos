@@ -151,12 +151,97 @@ describe("createPyrightLspReferee", () => {
     expect(declaring && path.relative(repo, declaring)).toBe(path.join("pkg", "decl.py"));
   });
 
-  it("typeDeclarationAt on a chained call's receiver follows the chain's actual type, not the enclosing method's `self`", async () => {
+  it("typeDeclarationAt on a chained call's receiver never answers with the enclosing method's `self`", async () => {
     const { start, end } = rangeOf(useSource, "self._make().step()");
     const declaring = await referee.typeDeclarationAt(useFile, useSource, start, end);
-    // Before the fix this returned `useFile` -- `self`'s own type, Runner --
-    // instead of following `.step()` to where it (and Builder) are declared.
-    expect(declaring && path.relative(repo, declaring)).toBe(path.join("pkg", "decl.py"));
+    // Before #235's fix this returned `useFile` -- `self`'s own type, Runner.
+    // After it, `pkg/decl.py`, which was right by coincidence: the anchor is
+    // `step`, pyright answered with `def step(self) -> "Builder":`, and Builder
+    // happens to share that file. A line that declares no type is withheld
+    // since #259, so the chain now has no answer rather than a lucky one --
+    // what `.step()` returns is a different question from where `step` is.
+    expect(declaring).not.toBe(useFile);
+    expect(declaring).toBeUndefined();
+  });
+});
+
+/**
+ * #259: where pyright's own type is `Unknown`, `textDocument/typeDefinition`
+ * does not answer `null` -- it falls back to where the receiver was bound, and
+ * where the anchor is a callee's name it lands on the callee. Both are a line
+ * in the repository that declares no type, and the client used to hand either
+ * back as a declaring file: 6,249 of 7,104 in-repository answers on graphify
+ * and infrarouter (`measure:resolution` section 14 f).
+ *
+ * One test per line the fallback really landed on in that corpus, each taken
+ * from a site `pythonDeclarationKind` read as `not a type` there. The receiver
+ * is unannotated in every one, which is what makes pyright's type `Unknown`.
+ */
+describe("createPyrightLspReferee, a fallback that declares no type (#259)", () => {
+  let repo: string;
+  let referee: PyrightLspReferee;
+  let file: string;
+  let source: string;
+
+  beforeAll(async () => {
+    repo = mkdtempSync(path.join(os.tmpdir(), "resolution-python-lsp-fallback-"));
+    write(repo, "pkg/helpers.py", "\"\"\"Helpers.\"\"\"\n\n\ndef tool() -> int:\n    return 1\n");
+    source =
+      "from pathlib import Path\n\nimport pkg.helpers as helpers_mod\n\n\n"
+      + "class Local:\n    def run(self) -> int:\n        return 1\n\n\n"
+      + "def out_path(*parts: str) -> Path:\n    return Path(*parts)\n\n\n"
+      + "def assignment(args):\n    for i in range(len(args)):\n        a = args[i]\n        a.strip()\n\n\n"
+      + "def loop_variable(args):\n    for item in args:\n        item.strip()\n\n\n"
+      + "def parameter(x):\n    x.run()\n\n\n"
+      + "def with_as(ctx):\n    with ctx as fh:\n        fh.read()\n\n\n"
+      + "def lambda_parameter(args):\n    return list(map(lambda each: each.strip(), args))\n\n\n"
+      + "def callee_anchor():\n    out_path(\"cache\").stat()\n\n\n"
+      + "def module_receiver() -> int:\n    return helpers_mod.tool()\n\n\n"
+      + "def local_class(local: Local) -> int:\n    return local.run()\n";
+    write(repo, "pkg/untyped.py", source);
+    file = path.join(repo, "pkg/untyped.py");
+
+    referee = await createPyrightLspReferee(repo);
+    const warm = rangeOf(source, "local.run");
+    await referee.warmUp(file, source, warm.start);
+  }, 30_000);
+
+  afterAll(() => {
+    referee?.close();
+    rmSync(repo, { recursive: true, force: true });
+  });
+
+  /** The receiver `needle` starts with, up to the `.` before its method. */
+  const receiverOf = (needle: string) => {
+    const { start } = rangeOf(source, needle);
+    return { start, end: start + needle.lastIndexOf(".") };
+  };
+
+  it.each([
+    ["an assignment", "a.strip"],
+    ["a loop variable", "item.strip"],
+    ["a parameter", "x.run"],
+    ["a `with ... as` binding", "fh.read"],
+    ["a lambda parameter", "each.strip"],
+    ["a callee's own `def`, when the receiver ends in a call", "out_path(\"cache\").stat"],
+  ])("withholds the line %s is bound on", async (_label, needle) => {
+    const { start, end } = receiverOf(needle);
+    expect(await referee.typeDeclarationLocationAt(file, source, start, end)).toBeUndefined();
+    expect(await referee.typeDeclarationAt(file, source, start, end)).toBeUndefined();
+  });
+
+  it("still answers a module receiver with the top of the module's file", async () => {
+    const { start, end } = receiverOf("helpers_mod.tool");
+    const location = await referee.typeDeclarationLocationAt(file, source, start, end);
+    expect(location && { file: path.relative(repo, location.file), line: location.line })
+      .toEqual({ file: path.join("pkg", "helpers.py"), line: 0 });
+  });
+
+  it("still answers a class declared further down the same file", async () => {
+    const { start, end } = receiverOf("local.run");
+    const location = await referee.typeDeclarationLocationAt(file, source, start, end);
+    expect(location && { file: path.relative(repo, location.file), line: location.line })
+      .toEqual({ file: path.join("pkg", "untyped.py"), line: 5 });
   });
 });
 
