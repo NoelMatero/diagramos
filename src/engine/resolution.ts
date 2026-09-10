@@ -56,11 +56,21 @@
  * needs to explain "the call was opaque" cannot be aimed at the other shapes
  * hiding under `no-annotation`.
  */
+import { ACCESS } from "./accesses";
+import type { ReceiverResolution } from "./calls";
 import { COLLECTION_LITERAL, COLLECTION_MAKERS } from "./dataflow";
 import { each, parseSource, type Language, type Node } from "./parse";
 
 /** The shapes carrying enough evidence in the text to name a type. */
 export type ResolutionShape =
+  /**
+   * `self.width` / `this.width` -- read off the type the routine is declared
+   * in. Evidence in the strongest sense the module doc asks for: the type is
+   * written down in the declaration this routine sits inside, and nothing
+   * else it could be. Only ever reached from a member read; a call on `self`
+   * is not a receiver question (see `receiverOf`).
+   */
+  | "enclosing-type"
   | "construction"
   | "rust-constructor"
   | "struct-literal"
@@ -156,6 +166,65 @@ export interface RoutineResolution {
   line: number;
   sites: ReceiverSite[];
 }
+
+/**
+ * How a member read names the thing it is read off.
+ *
+ * The same three shapes `receiverOf` sorts a call receiver into, plus one it
+ * deliberately drops. `self.foo()` is not a receiver question -- it calls a
+ * method of the routine's own type -- but `self.width` is exactly the
+ * question `@accesses` asks, and in Python it is where most attributes are
+ * read. So `own` exists here and has no counterpart there.
+ */
+export type ReadReceiverKind = "own" | "field" | "name";
+
+/** One `x.width` found in a routine body, and what `x` was worked out to be. */
+export interface MemberReadSite {
+  /** The member being read -- `width` in `x.width`. */
+  member: string;
+  kind: ReadReceiverKind;
+  /** `x` for a name, the field name for `self.cache.width`, empty for `own`. */
+  receiver: string;
+  /** 1-based line the read sits on. */
+  line: number;
+  /**
+   * The receiver expression's own byte range, so a referee can ask a real
+   * type checker about the same position without re-deriving it. The same
+   * contract `ReceiverSite.at` carries.
+   */
+  at: { start: number; end: number };
+  /** What the text alone makes of the receiver. Never affected by `placed`. */
+  verdict: ResolutionVerdict;
+  /**
+   * What a real type checker made of the same position, when the caller
+   * supplied one and it had an opinion.
+   *
+   * Kept beside the syntactic verdict rather than folded into it, so a
+   * measurement can report the two tiers separately and say what the checker
+   * bought. Folding them would make the tier-1 column unrecoverable.
+   */
+  placed?: ReceiverResolution;
+}
+
+export interface RoutineReads {
+  routine: string;
+  /** 1-based line the routine opens on. */
+  line: number;
+  sites: MemberReadSite[];
+}
+
+/**
+ * A real type checker's answer about one receiver position, when a caller has
+ * one to offer. The same shape and the same contract `CallSide.resolveReceiver`
+ * carries in `calls.ts`, so the three adapters in `scripts/lib` drive both
+ * without an adapter of their own.
+ */
+export type ResolveRead =
+  (at: { start: number; end: number }) => ReceiverResolution | undefined;
+
+export type ReadsReading =
+  | { read: true; routines: RoutineReads[] }
+  | { read: false; why: "unreadable" };
 
 export type ResolutionReading =
   | { read: true; routines: RoutineResolution[] }
@@ -843,6 +912,53 @@ function receiverOf(
   return { kind: "name", receiver: "", method, node: object };
 }
 
+/**
+ * What a member read is read off, or `undefined` when the node is not a read
+ * of a plain member at all.
+ *
+ * Deliberately parallel to `receiverOf` rather than shared with it: that one
+ * answers about a *call* and drops `self`/`this` on the grounds that a method
+ * on your own type is not a receiver question. Here it is the question.
+ */
+function readReceiverOf(
+  node: Node,
+): { kind: ReadReceiverKind; receiver: string; member: string; node: Node } | undefined {
+  /*
+   * The node-type gate, and it is load-bearing rather than a tidy-up.
+   * `accessOf` reads an `object`/`value` field and a `property`/`name` one,
+   * which a `variable_declarator` also has: `const x = load()` came back as a
+   * read of member `x` off `load()`. Every binding in the corpus would have
+   * counted as an unresolvable read, every body would have looked open, and
+   * the region this issue exists to measure would have read as far too small
+   * to build on -- a wrong answer that looks like a finding.
+   */
+  if (!ACCESS.test(node.type)) return undefined;
+  if (node.type === "scoped_identifier") return undefined;
+  const outer = accessOf(node);
+  if (!outer) return undefined;
+  const member = outer.member.text;
+  const object = outer.object;
+
+  if (object.childCount === 0) {
+    if (OWN.has(object.text)) return { kind: "own", receiver: "", member, node: object };
+    return { kind: "name", receiver: object.text, member, node: object };
+  }
+  if (object.type === "scoped_identifier") return undefined;
+
+  const inner = accessOf(object);
+  if (inner && inner.object.childCount === 0 && OWN.has(inner.object.text) && inner.member.childCount === 0) {
+    return { kind: "field", receiver: inner.member.text, member, node: object };
+  }
+  /*
+   * A read off something this reader cannot name -- `make().width`,
+   * `rows[0].width`. Counted anyway, so a denominator is every read there is
+   * rather than only the ones that could be resolved: a body is closed when
+   * every read in it resolved, and a read left out of the count would make an
+   * open body look closed. That is the direction that ships a false red.
+   */
+  return { kind: "name", receiver: "", member, node: object };
+}
+
 /* --------------------------------------------------------------- verdicts */
 
 function verdictFrom(classified: Classified, generics: Set<string>, source: string): ResolutionVerdict {
@@ -858,6 +974,31 @@ function verdictFrom(classified: Classified, generics: Set<string>, source: stri
   if (classified.kind === "indexed") return { verdict: "withheld", why: "indexed-type" };
   if (classified.kind === "call") return { verdict: "withheld", why: "from-a-call" };
   return { verdict: "withheld", why: "no-annotation" };
+}
+
+/**
+ * The type a routine is declared inside, when there is one and it is named.
+ *
+ * `undefined` for a free function, and for a declaration whose name this
+ * reader could not read off -- an anonymous class expression, a Rust `impl`
+ * on a type spelled as something other than a plain name.
+ */
+type EnclosingType = { name: string; at: number } | undefined;
+
+/** What `self.width` is read off: the enclosing type, or a stated refusal. */
+function ownVerdict(own: EnclosingType, source: string): ResolutionVerdict {
+  /*
+   * `no-fields` rather than a word of its own, and it is the same sentence
+   * that reason already carries: a `self`/`this` receiver whose enclosing
+   * type this reader could not find. A read off `self` in a free function is
+   * not a thing that happens in any of these grammars, so this is reached by
+   * the anonymous and unnameable declarations rather than by ordinary code.
+   */
+  if (!own) return { verdict: "withheld", why: "no-fields" };
+  return {
+    verdict: "resolved",
+    evidence: { type: own.name, shape: "enclosing-type", line: lineOf(source, own.at) },
+  };
 }
 
 interface Scope {
@@ -948,14 +1089,21 @@ function collectParams(list: Node | null, language: Language, into: Map<string, 
   }
 }
 
+/** One routine's two populations: what it calls on, and what it reads. */
+interface RoutineBoth extends RoutineResolution {
+  reads: MemberReadSite[];
+}
+
 function resolveRoutine(
   routine: Node,
   fields: Map<string, Classified>,
+  own: EnclosingType,
   tree: Node,
   source: string,
   language: Language,
   imported: Set<string>,
-): RoutineResolution {
+  resolveRead: ResolveRead | undefined,
+): RoutineBoth {
   const nameNode = routine.type === "impl_item" ? undefined : routine.childForFieldName("name");
   const routineName = nameNode && nameNode.childCount === 0 ? nameNode.text : "";
   const generics = genericParamsOf(routine);
@@ -966,6 +1114,7 @@ function resolveRoutine(
   const body = routine.childForFieldName("body");
   const bindings = new Map<string, Binding[]>();
   const sites: ReceiverSite[] = [];
+  const reads: MemberReadSite[] = [];
 
   if (body) {
     each(body, (node) => {
@@ -976,11 +1125,34 @@ function resolveRoutine(
         bindings.set(bound.name, list);
       }
 
+      const scope: Scope = { params, bindings, fields, generics, imported };
+
+      /*
+       * The read population, collected in the same pass. `x.width` and
+       * `x.width()` are both reads of `width` -- `accesses.ts` counts a method
+       * call as reading a member, and a member list that left methods out
+       * would refute every arrow drawn at a class -- so this is not gated on
+       * the node being a call or not being one.
+       */
+      const read = readReceiverOf(node);
+      if (read) {
+        const at = { start: read.node.startIndex, end: read.node.startIndex + read.node.text.length };
+        const placed = resolveRead?.(at);
+        reads.push({
+          member: read.member, kind: read.kind, receiver: read.receiver,
+          line: lineOf(source, node.startIndex),
+          at,
+          verdict: read.kind === "own"
+            ? ownVerdict(own, source)
+            : resolveReceiver({ kind: read.kind, receiver: read.receiver }, scope, source),
+          ...(placed ? { placed } : {}),
+        });
+      }
+
       const callee = calleeOf(node);
       if (!callee) return;
       const site = receiverOf(callee);
       if (!site) return;
-      const scope: Scope = { params, bindings, fields, generics, imported };
       const verdict = resolveReceiver(site, scope, source);
       sites.push({
         receiver: site.receiver, kind: site.kind, method: site.method,
@@ -991,7 +1163,7 @@ function resolveRoutine(
     });
   }
 
-  return { routine: routineName, line: lineOf(source, routine.startIndex), sites };
+  return { routine: routineName, line: lineOf(source, routine.startIndex), sites, reads };
 }
 
 /* ---------------------------------------------------------------- the walk */
@@ -999,17 +1171,23 @@ function resolveRoutine(
 function walk(
   node: Node,
   fields: Map<string, Classified>,
+  own: EnclosingType,
   tree: Node,
   source: string,
   language: Language,
   imported: Set<string>,
-  routines: RoutineResolution[],
+  routines: RoutineBoth[],
+  resolveRead: ResolveRead | undefined,
 ): void {
   if (TYPE_DECLARATION.test(node.type)) {
     const nextFields = fieldsOf(node, language, source);
+    const declared = node.childForFieldName("name");
+    const nextOwn: EnclosingType = declared && declared.childCount === 0
+      ? { name: declared.text, at: declared.startIndex }
+      : undefined;
     for (let index = 0; index < node.childCount; index += 1) {
       const child = node.child(index);
-      if (child) walk(child, nextFields, tree, source, language, imported, routines);
+      if (child) walk(child, nextFields, nextOwn, tree, source, language, imported, routines, resolveRead);
     }
     return;
   }
@@ -1037,18 +1215,21 @@ function walk(
       const declared = declarationNamed(tree, typeName.text);
       if (declared) nextFields = fieldsOf(declared, language, source);
     }
+    const nextOwn: EnclosingType = typeName && typeName.childCount === 0
+      ? { name: typeName.text, at: typeName.startIndex }
+      : undefined;
     for (let index = 0; index < node.childCount; index += 1) {
       const child = node.child(index);
-      if (child) walk(child, nextFields, tree, source, language, imported, routines);
+      if (child) walk(child, nextFields, nextOwn, tree, source, language, imported, routines, resolveRead);
     }
     return;
   }
   if (isRoutineNode(node)) {
-    routines.push(resolveRoutine(node, fields, tree, source, language, imported));
+    routines.push(resolveRoutine(node, fields, own, tree, source, language, imported, resolveRead));
   }
   for (let index = 0; index < node.childCount; index += 1) {
     const child = node.child(index);
-    if (child) walk(child, fields, tree, source, language, imported, routines);
+    if (child) walk(child, fields, own, tree, source, language, imported, routines, resolveRead);
   }
 }
 
@@ -1063,9 +1244,36 @@ export function resolveReceiversIn(source: string, language: Language): Resoluti
   const tree = parseSource(source, language);
   if (!tree) return { read: false, why: "unreadable" };
   const imported = importedNamesIn(tree.rootNode, language);
-  const routines: RoutineResolution[] = [];
-  walk(tree.rootNode, new Map(), tree.rootNode, source, language, imported, routines);
-  return { read: true, routines };
+  const routines: RoutineBoth[] = [];
+  walk(tree.rootNode, new Map(), undefined, tree.rootNode, source, language, imported, routines, undefined);
+  return { read: true, routines: routines.map(({ routine, line, sites }) => ({ routine, line, sites })) };
+}
+
+/**
+ * Every `x.width` a routine reads, each resolved to the type it was read off
+ * or withheld with a named reason.
+ *
+ * The population `@accesses`'s routine end claims about (#255). That end can
+ * only ever confirm today: not finding a read is not evidence there is none,
+ * because a read this reader cannot place is its own blindness rather than
+ * the code's silence. Whether a body where *every* read resolved is a big
+ * enough region to accuse from is what `measure:accesses-closed` asks, and
+ * nothing may accuse on the strength of one until it has an answer.
+ *
+ * **A measurement's reader.** Nothing here is licenced and nothing here
+ * accuses -- see the module doc.
+ */
+export function memberReadsIn(
+  source: string,
+  language: Language,
+  resolveRead?: ResolveRead,
+): ReadsReading {
+  const tree = parseSource(source, language);
+  if (!tree) return { read: false, why: "unreadable" };
+  const imported = importedNamesIn(tree.rootNode, language);
+  const routines: RoutineBoth[] = [];
+  walk(tree.rootNode, new Map(), undefined, tree.rootNode, source, language, imported, routines, resolveRead);
+  return { read: true, routines: routines.map(({ routine, line, reads }) => ({ routine, line, sites: reads })) };
 }
 
 /** A binding where a written annotation and a written construction disagree about the type. */

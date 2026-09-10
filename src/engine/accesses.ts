@@ -207,8 +207,16 @@ const TYPE_DECLARATION =
 /** Node types that introduce a name for a type written elsewhere. */
 const ALIASES = new Set(["type_alias_declaration", "type_item"]);
 
-/** A member read off a value: `config.width`, `self.width`, `cfg.width()`. */
-const ACCESS = /^(field_expression|member_expression|attribute)$/;
+/**
+ * A member read off a value: `config.width`, `self.width`, `cfg.width()`.
+ *
+ * Exported because `resolution.ts` enumerates the same population for #255 --
+ * how much of a body's read set can be placed -- and a number about "every
+ * read in this body" is only about this word if it counts the same nodes this
+ * word does. Two hand-written lists of node names that have to agree is the
+ * failure `docs/reading-a-grammar.md` records four times in one sitting.
+ */
+export const ACCESS = /^(field_expression|member_expression|attribute)$/;
 
 /**
  * A member as an author would write it on a canvas, beside itself as written.
