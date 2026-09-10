@@ -1284,6 +1284,22 @@ be one: `<MenuContent />` is a routine making a MenuContent, which is `@builds`.
     `symbolDeclarationAt` into `@calls`'s closed-body check is #236's own
     question to answer now that it is reopened, not decided here.
 
+    **What kind of number 1.76% is, stated after #250: self-consistency, not
+    independence.** Both witnesses in sections 8-9 are pyright -- one
+    `typeDefinition` on the receiver, one `definition` on the method, compared
+    to each other. That is broad (it needs only one tool to answer twice, which
+    is why it covers 70% of answers) and it is not useless: it is how the
+    anchor bug above was found, because a harness that asks at the wrong
+    position gets two answers that do not line up. What it cannot catch is
+    pyright being wrong about a type, because a pyright mistake is made once
+    and then reported by both witnesses. Item 14's 0.7% for TypeScript is the
+    same kind of check and says so in its own limit paragraph. Item 18's
+    placement figure is the other kind -- rust-analyzer against a reader that
+    shares nothing with it -- and narrow for exactly that reason. So "0.7%,
+    1.76%, 0.8%" is not one column; the first two are consistency figures and
+    only the third is independent, over a quarter of its population. Item 20
+    is where that stopped being true for Rust.
+
 18. **Rust's version of the same ladder, and the safety check items 14 and 17
     used turns out to measure nothing in Rust -- so a different one was built,
     and it found three reader bugs (#246, after #237's spike).** The client is
@@ -1505,7 +1521,12 @@ be one: `<MenuContent />` is a routine making a MenuContent, which is `@builds`.
       figure above is sound for the sites it covers; three quarters of the
       answered sites are unrefereed, and no second question asked of the same
       server can change that. Raising it means a stronger *independent* reader,
-      which is #203's territory rather than this issue's.
+      which is #203's territory rather than this issue's. **Answered in item
+      20**, and by a route neither this entry nor #250 proposed: not a stronger
+      reader but a second oracle, `rustc` itself, which covers 90.9% and finds
+      the unchecked three quarters no worse than the checked quarter. The
+      figures in this entry stand as what *that* check measured; item 20's are
+      the ones about the whole population.
     - **#247**, the shadowed parameter. Predicted here to move TypeScript's and
       Python's published numbers too; item 19 measured it and **it moves
       neither on this corpus** -- no instance of the shape occurs in the
@@ -1622,6 +1643,131 @@ be one: `<MenuContent />` is a routine making a MenuContent, which is `@builds`.
     rediscovered:** a destructuring pattern (`for (a, b) in ...`) has children
     and is skipped the way every other binding shape here skips one, so a
     parameter shadowed by a tuple pattern is still reported as the parameter.
+
+20. **The referee item 18 could only run on a quarter of its answers now runs on
+    91% of them, because rustc will type any receiver it compiles -- and the
+    hard three quarters came back as good as the easy one (#250).** Item 18's
+    check needs `resolution.ts` to have named a type as well, and it names one
+    for about a fifth of receivers, so `0.4%` was a figure about annotated
+    parameters, constructors and declared fields. #250 was filed on the
+    suspicion that the unchecked majority -- chains, values out of calls,
+    untraced names -- might be worse. Measured: it is not.
+
+    **The mechanism, and it is not `reveal_type`.** Rust has no "print this
+    expression's type" request. What it has is an error that names one.
+    `scripts/lib/resolution-rustc.ts` wraps every receiver in a block that calls
+    a method reachable only through a blanket impl gated on a trait nothing
+    implements, so the receiver's own value flows out unchanged and the build
+    fails at exactly that expression with `the method ... exists for struct
+    \`X\`, but its trait bounds were not satisfied`. That message states the
+    type, and its secondary span is the type's own declaration -- which is what
+    makes this comparable to `textDocument/typeDefinition` at all. Two message
+    shapes, both read: the one above, and `no method named ... found for ...`,
+    which rustc uses where no impl candidate exists (a type parameter, and a
+    long tail of concrete types) and which names the type but points at no
+    declaration.
+
+    **Compared by declaration, not by name**, which also closes item 18's third
+    limit rather than restating it: 24.6% of that corpus's type declarations
+    share a bare name with another, so a name match was weaker evidence than it
+    read as. File and line are not ambiguous.
+
+    **Three things the plan had wrong, all found by running it.**
+
+    - **What a probe is called is a performance property.** The first names were
+      `__probe_0`, `__probe_1`, and every failed call makes rustc search for a
+      similarly-named method to suggest -- so each probe searched all the
+      others. 100 probes built in 1.6s, 200 in 5.9s, 400 in **266s**, and one
+      ripgrep crate ran past half an hour before it was killed. Six-letter names
+      scrambled by a bijection on 26^6 share nothing but their prefix: 400 in
+      0.8s, 800 in 1.8s, the whole 8,623-site corpus in 42s. Pinned by a test
+      that computes the edit distance between generated names rather than by a
+      comment, because the failure is invisible until a corpus is large.
+    - **One package at a time, and the obvious repair is the one that loses
+      data silently.** Every probe is a compile error, a crate with errors emits
+      no metadata, and nothing downstream of it is ever type-checked -- so
+      probing a whole workspace answers for its leaves and nothing above them.
+      The first repair was to restore what had answered and build again, which
+      lost **923 of 1,246 sites in ripgrep's printer**: a crate's library builds
+      without its dev-dependencies and its unit tests do not, so the file
+      answered on its library pass, was restored, and its `#[cfg(test)]` module
+      was never asked again. Each package is now built alone with only its own
+      files probed, and a second pass probes what did not answer -- which is
+      what reaches a package's binaries and integration tests, blocked the first
+      time by the library they link. Both shapes are pinned as tests against a
+      real three-package workspace.
+    - **`cargo metadata --offline` resolves every platform's dependencies**, so
+      it fails on the first one this machine never fetched -- ripgrep on
+      Android's `android_system_properties`, anyhow on Windows' `r-efi`. That
+      read as "cargo refused the package listing" for all three trees and
+      checked **zero** sites, which the report now says in as many words rather
+      than printing a small number. `--filter-platform <host>` is the fix; the
+      build only ever compiles for the host.
+
+    **The numbers.** `npm run measure:resolution -- --no-python-lsp --all
+    rust-test .corpus/ripgrep .corpus/anyhow`, section 13, rustc 1.93.0, 22
+    probed builds. Of 6,676 rust-analyzer answers:
+
+    | what the syntactic reader said | answered | checked | disagreed | macro | wrong |
+    |---|---|---|---|---|---|
+    | resolved -- item 18's whole population | 1,663 | 95.8% | 1 | 0 | 0.1% |
+    | `not-a-name` | 2,523 | 95.0% | 10 | 9 | 0.0% |
+    | `from-a-call` | 1,065 | 93.9% | 6 | 6 | 0.0% |
+    | `unbound` | 770 | 65.3% | 3 | 3 | 0.0% |
+    | other withholds | 655 | 87.3% | 0 | 0 | 0.0% |
+    | **all** | **6,676** | **90.9%** | **20** | **18** | **0.03%** |
+
+    **18 of the 20 disagreements are one type a macro declares, and neither tool
+    is wrong about it.** rustc names the line inside the `macro_rules!` body
+    that writes the declaration; rust-analyzer names the invocation that
+    supplies the name. `core`'s `str::Split` (`pub struct $forward_iterator`
+    against `struct Split;`) is most of them, `AtomicUsize` and `lazy_static!`'s
+    `ROUTES` the rest. `declaredByMacro` requires rustc's line to use a
+    metavariable *and* rust-analyzer's to name the very type rustc printed, so a
+    macro body alone never excuses a different type -- the condition that
+    carries the weight, and the one its tests aim at.
+
+    **Both remaining disagreements were read against the source, and
+    rust-analyzer is wrong in both.** `crates/ignore/src/walk.rs:704` --
+    `self.paths.clone()`, where `paths: Vec<PathBuf>` is declared on line 489 --
+    rustc says `Vec<PathBuf>`, rust-analyzer says `IntoIter`, the type of the
+    *whole* surrounding expression. `crates/cli/src/decompress.rs:511` --
+    `args.iter().skip(1).map(..)` -- rustc says `Skip<slice::Iter<'_, &str>>`,
+    rust-analyzer says `Vec`. The second is in `not-a-name`, which is to say it
+    is a real error that no check before this one could see.
+
+    **Two guards on the check itself, because a referee that agrees with
+    everything is not a referee.** Pairing each answer with the compiler's
+    verdict on an unrelated site half the corpus away agrees **1.3%** of the
+    time, so 99.7% agreement is discrimination rather than a check that cannot
+    tell types apart. And item 18's own verdicts, re-read on the sites both
+    reach: of 1,554 it called agreed, rustc overturned **none**; of the 39 it
+    flagged, **38 were false alarms** and one was real -- which is the alias
+    finding restated from the other side, by a mechanism that does not depend on
+    it.
+
+    **What is still unchecked: 610 answers (9.1%).** 78 rustc never typed --
+    compiled by no target the build checks, an inactive `cfg` or a feature left
+    off. 532 it typed as something no declaration states, by its own word: 200
+    `struct`, 181 `reference`, 57 `enum`, 49 `associated type`, and a tail. Most
+    are the second message shape above, where the type is named (`Option<T>`,
+    `Vec<_>`, `PathBuf`) and no declaration span comes with it. Closing that
+    needs a different question, not a different referee.
+
+    **What rustc and rust-analyzer share, stated rather than assumed.** Name
+    resolution, macro expansion and type inference are separate implementations
+    -- that is the whole basis for calling this independent. rust-analyzer does
+    vendor the crates of rustc's next-generation trait solver; a stable rustc
+    does not use that solver to type-check bodies, so on this toolchain trait
+    resolution is separate too. On a toolchain that turns it on it would not be,
+    and the compiler version is part of the number for that reason.
+
+    **What this does not settle.** It does not turn Rust on -- the licence
+    decision is not here, and item 18's open question about whether an arrow
+    belongs at an alias or at the underlying declaration is untouched. And it is
+    one language: **TypeScript and Python still have no independent check at
+    all** (see item 17's closing paragraph), which is now the whole of what #250
+    named and is filed as its own issue rather than left implied.
 
 
 ## Open, in the order worth doing
