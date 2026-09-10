@@ -76,6 +76,10 @@ import {
   isOutsideRustTree, rustMemberRangeAfter,
 } from "./lib/resolution-rust-lsp";
 import { askRustc, declaredByMacro, type CompilerAnswer, type RustcSite } from "./lib/resolution-rustc";
+import {
+  askMypy, isModuleReceiver, mypyCommand, namesOnlyBuiltins, type MypySite,
+} from "./lib/resolution-python-mypy";
+import { pythonDeclarationKind } from "./lib/resolution-python-live";
 
 import { createWorkspace } from "../src/engine/drift";
 import { initEngine, languageOf, type Language } from "../src/engine/parse";
@@ -348,14 +352,14 @@ interface RustSite {
  * quarters of rust-analyzer's answers, systematically the harder ones, had
  * nothing weighed against them. rustc types every receiver it compiles.
  *
- * Split by `RustQuarter`, which is what the syntactic reader said about the same
+ * Split by `ReaderQuarter`, which is what the syntactic reader said about the same
  * receiver: `resolved` is the quarter the old check reaches, and the three named
  * withholds are the largest shares of the rest. A wrongness figure for the whole
  * population that hid a bad hard quarter behind a good easy one would be the same
  * mistake #250 was filed about.
  */
-type RustQuarter = "resolved" | "not-a-name" | "from-a-call" | "unbound" | "other";
-const RUST_QUARTERS: RustQuarter[] = ["resolved", "not-a-name", "from-a-call", "unbound", "other"];
+type ReaderQuarter = "resolved" | "not-a-name" | "from-a-call" | "unbound" | "other";
+const READER_QUARTERS: ReaderQuarter[] = ["resolved", "not-a-name", "from-a-call", "unbound", "other"];
 interface CompilerCheck {
   /** rust-analyzer named a declaration. */
   answered: number;
@@ -368,11 +372,11 @@ interface CompilerCheck {
   /** Of `disagreed`, a type a macro declares -- see `tallyCompiler`. */
   macroDeclared: number;
 }
-const rustcByQuarter = new Map<RustQuarter, CompilerCheck>();
+const rustcByQuarter = new Map<ReaderQuarter, CompilerCheck>();
 const rustcNoDeclarationKinds = new Map<string, number>();
 const rustcClasses = new Map<string, number>();
 interface RustcDisagreement {
-  tree: string; file: string; line: number; method: string; quarter: RustQuarter; cls: string;
+  tree: string; file: string; line: number; method: string; quarter: ReaderQuarter; cls: string;
   rustc: string; rustcAt: string; ra: string; raAt: string;
 }
 const rustcDisagreements: RustcDisagreement[] = [];
@@ -398,6 +402,101 @@ const rustcUnavailable: string[] = [];
 /** Packages cargo would not build on their own -- their sites answer nothing. */
 const rustcPackageFailures: string[] = [];
 
+/**
+ * #258: pyright's answers put to mypy, a different implementation of Python's
+ * type system rather than a second question to the same one.
+ *
+ * Item 17's check compares `textDocument/typeDefinition` with
+ * `textDocument/definition` -- broad, because one server answers both, and
+ * blind to that server being wrong for the same reason. This is the Python
+ * version of what #250 built for Rust.
+ *
+ * `agreed`/`disagreed` compare the declaring *file*, which is what item 17's
+ * own check compares and what a board points at. `external` collapses the
+ * standard library and dependencies on both sides, the collapse
+ * `isOutsideTree` already makes -- and agreements of that kind are counted
+ * separately, because "neither of us thinks this is yours" is weaker evidence
+ * than two answers naming one file in the tree.
+ */
+interface OracleCheck {
+  /** pyright named a declaring file. */
+  answered: number;
+  /** mypy never typed the receiver: not a file it checked, or not an expression it reached. */
+  unanswered: number;
+  /** mypy typed it `Any` -- no opinion, which untyped Python produces a lot of. */
+  any: number;
+  agreedInTree: number;
+  agreedExternal: number;
+  disagreed: number;
+  /** Of `disagreed`, the ones where mypy names a type no repo file can declare
+   *  while pyright names a repo file -- see `namesOnlyBuiltins`. */
+  builtinAgainstInTree: number;
+  /** Of `disagreed`, a module used as a receiver: both answers right. */
+  moduleReceiver: number;
+}
+const mypyByQuarter = new Map<ReaderQuarter, OracleCheck>();
+interface MypyDisagreement {
+  tree: string; file: string; line: number; method: string; quarter: ReaderQuarter;
+  mypy: string; mypyAt: string; pyright: string; builtinAgainstInTree: boolean; moduleReceiver: boolean;
+  /** What sections 8-9 said here: the ones they called agreements are the
+   *  sites only a second implementation could reach. */
+  oldVerdict: "agreed" | "disagreed" | "not reached";
+}
+const mypyDisagreements: MypyDisagreement[] = [];
+/** The negative control, as section 13's -- see its own report line. */
+const mypyControlPool: Array<{ pyright: string; mypy: string }> = [];
+/**
+ * The same pairs, restricted to answers pyright placed inside the tree. The
+ * pooled control above is dominated by `external` on both sides -- two
+ * unrelated receivers agreeing that neither type is the tree's -- so it cannot
+ * say whether the check discriminates where a board actually points.
+ */
+const mypyControlPoolInTree: Array<{ pyright: string; mypy: string }> = [];
+/** Item 17's verdicts, re-read by mypy on the sites both reach. */
+const mypyOnOldCheck = { agreedHeld: 0, agreedOverturned: 0, disagreedPyrightRight: 0, disagreedPyrightWrong: 0 };
+/**
+ * #258: did pyright's answer land on a type declaration at all? Python's
+ * version of Rust's section 12 a), over every answer rather than only the ones
+ * mypy could check.
+ *
+ * Found against mypy rather than predicted: where pyright's own type is
+ * `Unknown`, `typeDefinition` falls back to the receiver's assignment
+ * (`a = args[i]`), and where the anchor is a callee's name it lands on the
+ * callee's `def`. Both are a file in the tree and neither declares a type --
+ * `isConcreteClassLine` withholds on them, so no accusation rests on one, but
+ * the declaring file this measurement counts as an answer is wrong.
+ */
+/** `module` is the top of a file -- a module receiver's right answer, see `pythonDeclarationKind`. */
+const pyPlacement = {
+  inTree: 0, inTreeModule: 0, inTreeNotAType: 0, external: 0, externalModule: 0, externalNotAType: 0,
+};
+const pyNotATypeCases: Array<{ tree: string; file: string; line: number; target: string }> = [];
+/** In-tree answers, by whether the line declares a type and what mypy said. */
+const pyPlacementByMypy = new Map<string, number>();
+
+function tallyPlacementAgainstMypy(
+  tree: string,
+  site: { pyDeclaring?: string; pyDeclaringLine?: number },
+  answer: { revealed: string; declaration?: string } | undefined,
+): void {
+  if (site.pyDeclaring === undefined || site.pyDeclaringLine === undefined) return;
+  if (isOutsidePyTree(site.pyDeclaring, tree)) return;
+  const kind = pythonDeclarationKind(lineAt(site.pyDeclaring, site.pyDeclaringLine), site.pyDeclaringLine);
+  const pyrightSaid = path.relative(tree, canonical(site.pyDeclaring));
+  const mypySaid = answer?.declaration ? path.relative(tree, canonical(answer.declaration)) : "external";
+  const said = !answer ? "mypy never typed it"
+    : answer.revealed === "Any" || answer.revealed.startsWith("Any[") ? "mypy: Any"
+    : pyrightSaid === mypySaid ? "mypy names the same file"
+    : isModuleReceiver(answer.revealed) ? "a module receiver, both right"
+    : "mypy names a different type";
+  bump(pyPlacementByMypy, `${kind === "type" ? "a type" : kind === "module" ? "a module" : "declares no type"} / ${said}`);
+}
+
+const mypyRuns: Array<{ tree: string; errorsBeforeProbes: number; failure?: string; ambiguous: number }> = [];
+let mypyVersion = "";
+/** Where pyright said nothing: how much of that mypy could type. */
+const mypyWherePyrightSilent = { sites: 0, typed: 0, inTree: 0 };
+
 const canonicalCache = new Map<string, string>();
 /** rustc and rust-analyzer can spell one path two ways through a symlink. */
 function canonical(file: string): string {
@@ -419,10 +518,69 @@ function lineAt(file: string, line: number): string {
   return lines[line] ?? "";
 }
 
-function quarterOf(site: RustSite): RustQuarter {
+function quarterOf(site: { tier1Resolved: boolean; tier1Why?: ResolutionWithheld }): ReaderQuarter {
   if (site.tier1Resolved) return "resolved";
   const why = site.tier1Why;
   return why === "not-a-name" || why === "from-a-call" || why === "unbound" ? why : "other";
+}
+
+function tallyMypy(
+  tree: string,
+  site: {
+    file: string; line: number; method: string; tier1Resolved: boolean;
+    tier1Why?: ResolutionWithheld; pyDeclaring?: string; pyOldAgreed?: boolean;
+  },
+  answer: { revealed: string; declaration?: string } | undefined,
+): void {
+  if (!site.pyDeclaring) {
+    mypyWherePyrightSilent.sites += 1;
+    if (answer && answer.revealed !== "Any") mypyWherePyrightSilent.typed += 1;
+    if (answer?.declaration) mypyWherePyrightSilent.inTree += 1;
+    return;
+  }
+  const quarter = quarterOf(site);
+  const tally = mypyByQuarter.get(quarter)
+    ?? { answered: 0, unanswered: 0, any: 0, agreedInTree: 0, agreedExternal: 0, disagreed: 0, builtinAgainstInTree: 0, moduleReceiver: 0 };
+  mypyByQuarter.set(quarter, tally);
+  tally.answered += 1;
+  if (!answer) { tally.unanswered += 1; return; }
+  /*
+   * `Any` is mypy declining rather than answering, and it is most of what
+   * unannotated Python produces. Counted as its own outcome: folding it into
+   * agreement would be a referee that agrees whenever it knows nothing.
+   */
+  if (answer.revealed === "Any" || answer.revealed.startsWith("Any[")) { tally.any += 1; return; }
+
+  const pyrightSaid = isOutsidePyTree(site.pyDeclaring, tree) ? "external" : path.relative(tree, canonical(site.pyDeclaring));
+  const mypySaid = answer.declaration ? path.relative(tree, canonical(answer.declaration)) : "external";
+  mypyControlPool.push({ pyright: pyrightSaid, mypy: mypySaid });
+  if (pyrightSaid !== "external") mypyControlPoolInTree.push({ pyright: pyrightSaid, mypy: mypySaid });
+
+  if (site.pyOldAgreed !== undefined) {
+    const seconded = pyrightSaid === mypySaid;
+    if (site.pyOldAgreed) mypyOnOldCheck[seconded ? "agreedHeld" : "agreedOverturned"] += 1;
+    else mypyOnOldCheck[seconded ? "disagreedPyrightRight" : "disagreedPyrightWrong"] += 1;
+  }
+
+  if (pyrightSaid === mypySaid) {
+    if (pyrightSaid === "external") tally.agreedExternal += 1;
+    else tally.agreedInTree += 1;
+    return;
+  }
+  tally.disagreed += 1;
+  const moduleReceiver = isModuleReceiver(answer.revealed);
+  const builtinAgainstInTree = !moduleReceiver && mypySaid === "external" && pyrightSaid !== "external"
+    && namesOnlyBuiltins(answer.revealed);
+  if (moduleReceiver) tally.moduleReceiver += 1;
+  if (builtinAgainstInTree) tally.builtinAgainstInTree += 1;
+  if (showAll || mypyDisagreements.length < 300) {
+    mypyDisagreements.push({
+      tree: path.basename(tree), file: site.file, line: site.line, method: site.method, quarter,
+      mypy: answer.revealed, mypyAt: mypySaid, pyright: pyrightSaid,
+      oldVerdict: site.pyOldAgreed === undefined ? "not reached" : site.pyOldAgreed ? "agreed" : "disagreed",
+      builtinAgainstInTree, moduleReceiver,
+    });
+  }
 }
 
 function tallyCompiler(tree: string, site: RustSite, answer: CompilerAnswer | undefined): void {
@@ -507,6 +665,15 @@ for (const tree of trees) {
    *  does not carry -- the method name, to find its own byte range later. */
   const collectedPyAll: Array<{
     file: string; absolute: string; line: number; start: number; end: number; method: string; tier1Resolved: boolean;
+    /** Why the syntactic reader named nothing -- which quarter this site is in (#258). */
+    tier1Why?: ResolutionWithheld;
+    /** Where pyright said the receiver's type is declared, for #258's referee. */
+    pyDeclaring?: string;
+    /** The 0-based line of that answer -- see `pyPlacement`. */
+    pyDeclaringLine?: number;
+    /** Item 17's own verdict here, for #258 to re-read: did pyright's two
+     *  answers name the same file? Absent when one of them said nothing. */
+    pyOldAgreed?: boolean;
   }> = [];
   const pySourcesAll = new Map<string, string>();
   /** #246's version of `collectedPyAll`: every Rust receiver site, resolved or not. */
@@ -558,6 +725,7 @@ for (const tree of trees) {
             collectedPyAll.push({
               file: rel, absolute, line: site.line, start: site.at.start, end: site.at.end,
               method: site.method, tier1Resolved: site.verdict.verdict === "resolved",
+              ...(site.verdict.verdict === "resolved" ? {} : { tier1Why: site.verdict.why }),
             });
             pySourcesAll.set(rel, source);
           }
@@ -701,7 +869,32 @@ for (const tree of trees) {
           pyLspCoverage.total += 1;
           if (site.tier1Resolved) pyLspCoverage.tier1 += 1;
 
-          const typeDeclaring = await lspReferee!.typeDeclarationAt(site.absolute, source, site.start, site.end);
+          // The same request `typeDeclarationAt` sends, with the line kept.
+          const typeLocation = await lspReferee!.typeDeclarationLocationAt(site.absolute, source, site.start, site.end);
+          const typeDeclaring = typeLocation?.file;
+          if (typeLocation !== undefined) {
+            site.pyDeclaring = typeLocation.file;
+            site.pyDeclaringLine = typeLocation.line;
+            const kind = pythonDeclarationKind(lineAt(typeLocation.file, typeLocation.line), typeLocation.line);
+            if (isOutsidePyTree(typeLocation.file, tree)) {
+              pyPlacement.external += 1;
+              if (kind === "module") pyPlacement.externalModule += 1;
+              if (kind === "not a type") pyPlacement.externalNotAType += 1;
+            } else {
+              pyPlacement.inTree += 1;
+              if (kind === "module") pyPlacement.inTreeModule += 1;
+              if (kind === "not a type") {
+                pyPlacement.inTreeNotAType += 1;
+                if (showAll || pyNotATypeCases.length < 100) {
+                  pyNotATypeCases.push({
+                    tree: path.basename(tree), file: site.file, line: site.line,
+                    target: `${path.relative(tree, typeLocation.file)}:${typeLocation.line + 1} `
+                      + lineAt(typeLocation.file, typeLocation.line).trim().slice(0, 70),
+                  });
+                }
+              }
+            }
+          }
           const lspResolved = typeDeclaring !== undefined;
           if (lspResolved) pyLspCoverage.lsp += 1;
           if (site.tier1Resolved || lspResolved) pyLspCoverage.either += 1;
@@ -717,6 +910,7 @@ for (const tree of trees) {
           const classify = (file: string) => (isOutsidePyTree(file, tree) ? "external" : path.relative(tree, file));
           const typeSaid = classify(typeDeclaring);
           const methodSaid = classify(methodDeclaring);
+          site.pyOldAgreed = typeSaid === methodSaid;
           if (typeSaid === methodSaid) {
             pyLspSafety.agree += 1;
           } else {
@@ -730,6 +924,27 @@ for (const tree of trees) {
       await Promise.all(Array.from({ length: Math.min(CONCURRENCY, collectedPyAll.length) }, worker));
       console.error(`  [python-lsp] done: ${collectedPyAll.length} sites in ${Math.round((Date.now() - startedAt) / 1000)}s`);
       lspReferee.close();
+
+      /* ------------------------------------------------- the referee, mypy (#258) */
+      const mypySites: MypySite[] = collectedPyAll.map((site, id) => ({
+        id, file: site.absolute, start: site.start, end: site.end,
+      }));
+      const startedMypy = Date.now();
+      console.error(`  [mypy] ${mypySites.length} receiver sites to probe in ${path.basename(tree)}`);
+      const reading = await askMypy(tree, [...new Set(collectedPyAll.map((one) => one.absolute))], mypySites);
+      if (reading.version !== "unknown") mypyVersion = reading.version;
+      mypyRuns.push({
+        tree: path.basename(tree), errorsBeforeProbes: reading.errorsBeforeProbes,
+        ambiguous: reading.ambiguousModules.length,
+        ...(reading.failure ? { failure: reading.failure } : {}),
+      });
+      if (!reading.failure) {
+        for (const [id, site] of collectedPyAll.entries()) {
+          tallyMypy(tree, site, reading.answers.get(id));
+          tallyPlacementAgainstMypy(tree, site, reading.answers.get(id));
+        }
+      }
+      console.error(`  [mypy] done in ${Math.round((Date.now() - startedMypy) / 1000)}s`);
     }
   }
 
@@ -1295,7 +1510,7 @@ if (rustcAll.answered > 0) {
       + String(one.disagreed).padStart(11) + String(one.macroDeclared).padStart(7)
       + "  " + percent(one.disagreed - one.macroDeclared, checked).trim());
   };
-  for (const quarter of RUST_QUARTERS) {
+  for (const quarter of READER_QUARTERS) {
     const one = rustcByQuarter.get(quarter);
     if (one) row(quarter, one);
   }
@@ -1376,5 +1591,161 @@ if (rustcAll.answered > 0) {
   }
 } else if (rustcUnavailable.length === 0) {
   console.log("  No rust-analyzer answer to check.");
+}
+console.log();
+
+console.log("14 · PYTHON, CHECKED BY A SECOND IMPLEMENTATION -- mypy against pyright (#258)");
+console.log();
+console.log("  Sections 8-9 ask pyright two questions and compare its two answers, so they catch a");
+console.log("  harness asking in the wrong place -- which is how #235's anchor bug was found -- and");
+console.log("  never catch pyright being wrong about a type. mypy is a different implementation of");
+console.log("  Python's type system, so this is the Python version of the Rust check above.");
+console.log();
+console.log("  A tagged `reveal_type` per receiver, in a copy of the tree, read out of one run.");
+console.log("  Answers are compared by declaring file, which is what section 9 compares and what a");
+console.log("  board points at. `external` collapses the standard library and dependencies on both");
+console.log("  sides, so those agreements are counted apart from two answers naming one file here.");
+console.log();
+const mypyAll = [...mypyByQuarter.values()].reduce<OracleCheck>((all, one) => ({
+  answered: all.answered + one.answered, unanswered: all.unanswered + one.unanswered,
+  any: all.any + one.any, agreedInTree: all.agreedInTree + one.agreedInTree,
+  agreedExternal: all.agreedExternal + one.agreedExternal, disagreed: all.disagreed + one.disagreed,
+  builtinAgainstInTree: all.builtinAgainstInTree + one.builtinAgainstInTree,
+  moduleReceiver: all.moduleReceiver + one.moduleReceiver,
+}), {
+  answered: 0, unanswered: 0, any: 0, agreedInTree: 0, agreedExternal: 0, disagreed: 0,
+  builtinAgainstInTree: 0, moduleReceiver: 0,
+});
+if (skipPythonLsp) {
+  console.log("  Skipped: --no-python-lsp. This section needs pyright's answers to compare against.");
+} else if (mypyAll.answered > 0) {
+  if (mypyVersion) console.log(`  ${mypyVersion}`);
+  console.log();
+  console.log("  a) How much of pyright's answering this checks, by what the syntactic reader said");
+  console.log("     about the same receiver.");
+  console.log();
+  console.log("     " + "reader said".padEnd(14) + "answered".padStart(10) + "checked".padStart(16)
+    + "in tree".padStart(9) + "external".padStart(10) + "disagreed".padStart(11) + "  wrong");
+  const row = (label: string, one: OracleCheck) => {
+    const checked = one.agreedInTree + one.agreedExternal + one.disagreed;
+    console.log("     " + label.padEnd(14) + String(one.answered).padStart(10)
+      + cell(checked, one.answered).padStart(16) + String(one.agreedInTree).padStart(9)
+      + String(one.agreedExternal).padStart(10) + String(one.disagreed).padStart(11)
+      + "  " + percent(one.disagreed, checked).trim());
+  };
+  for (const quarter of READER_QUARTERS) {
+    const one = mypyByQuarter.get(quarter);
+    if (one) row(quarter, one);
+  }
+  row("all", mypyAll);
+  const mypyChecked = mypyAll.agreedInTree + mypyAll.agreedExternal + mypyAll.disagreed;
+  console.log();
+  console.log(`     Checked ${mypyChecked} of ${mypyAll.answered} answered sites `
+    + `(${percent(mypyChecked, mypyAll.answered).trim()}).`);
+  console.log();
+
+  console.log("  b) Answered by pyright and not checked here, and why:");
+  console.log(`     mypy typed it \`Any\`: ${mypyAll.any}. Not agreement and not disagreement -- mypy declining.`);
+  console.log("     Unannotated Python produces this even with --check-untyped-defs, wherever the");
+  console.log("     value came from something the annotations do not reach.");
+  console.log(`     mypy never typed the receiver at all: ${mypyAll.unanswered}. An expression it did not`);
+  console.log("     check, or a file it declined to read.");
+  console.log();
+
+  console.log(`     Of the ${mypyAll.disagreed} disagreements, ${mypyAll.moduleReceiver} are a module used as a receiver, where`);
+  console.log("     both answers are right and different: mypy types it `types.ModuleType` and pyright");
+  console.log("     names the module's own file, which is the one a board wants.");
+  console.log(`     Another ${mypyAll.builtinAgainstInTree} are mypy naming a type no file here can declare -- a builtin --`);
+  console.log("     while pyright names a file here. Those two are not two readings of one type:");
+  console.log("     whatever the receiver is, a repo file is not where `str` comes from.");
+  console.log();
+  console.log("  c) Disagreements, split by what sections 8-9 said about the same site. The ones they");
+  console.log("     called agreements are what only a second implementation can reach; the rest are");
+  console.log("     sites they already flagged. Every one is listed with --all.");
+  for (const verdict of ["agreed", "disagreed", "not reached"] as const) {
+    const group = mypyDisagreements.filter((one) => one.oldVerdict === verdict);
+    console.log();
+    console.log(`     sections 8-9 said ${verdict}: ${group.length}`);
+    for (const one of group.slice(0, cap(group.length))) {
+      console.log(`       ${one.tree}/${one.file}:${one.line} .${one.method}(...) [${one.quarter}]`
+        + `${one.moduleReceiver ? " -- a module receiver, both right" : ""}`
+        + `${one.builtinAgainstInTree ? " -- a builtin against a repo file" : ""}`);
+      console.log(`         mypy: ${one.mypy} declared in ${one.mypyAt}`);
+      console.log(`         pyright: ${one.pyright}`);
+    }
+    if (group.length > cap(group.length)) {
+      console.log(`       ... and ${group.length - cap(group.length)} more`);
+    }
+  }
+  console.log();
+
+  console.log("  d) Whether this check can tell answers apart at all.");
+  const pool = mypyControlPool.length;
+  let byChance = 0;
+  for (let i = 0; i < pool; i++) {
+    if (mypyControlPool[i]!.pyright === mypyControlPool[(i + Math.floor(pool / 2)) % pool]!.mypy) byChance += 1;
+  }
+  console.log("     Each checked answer paired with mypy's verdict on a different site, half the");
+  console.log(`     corpus away: ${byChance} of ${pool} agree (${percent(byChance, pool).trim()}). Much of that floor is the`);
+  console.log("     `external` collapse, which is why in-tree agreement is reported on its own above.");
+  const inPool = mypyControlPoolInTree.length;
+  let inByChance = 0;
+  for (let i = 0; i < inPool; i++) {
+    if (mypyControlPoolInTree[i]!.pyright === mypyControlPoolInTree[(i + Math.floor(inPool / 2)) % inPool]!.mypy) inByChance += 1;
+  }
+  const inReal = mypyControlPoolInTree.filter((one) => one.pyright === one.mypy).length;
+  console.log(`     Restricted to answers pyright placed in this tree: unrelated pairs agree ${inByChance} of ${inPool}`);
+  console.log(`     (${percent(inByChance, inPool).trim()}), real pairs ${inReal} of ${inPool} (${percent(inReal, inPool).trim()}).`);
+  console.log();
+  console.log("     Sections 8-9's verdicts, re-read on the sites both reach:");
+  console.log(`       it said agreed, and mypy agrees with pyright:     ${mypyOnOldCheck.agreedHeld}`);
+  console.log(`       it said agreed, and mypy disagrees with pyright:  ${mypyOnOldCheck.agreedOverturned}`);
+  console.log(`       it said disagreed, and mypy backs pyright:        ${mypyOnOldCheck.disagreedPyrightRight}`);
+  console.log(`       it said disagreed, and mypy does not:             ${mypyOnOldCheck.disagreedPyrightWrong}`);
+  console.log();
+
+  console.log("  e) Where pyright said nothing:");
+  console.log(`     ${mypyWherePyrightSilent.sites} sites; mypy typed ${mypyWherePyrightSilent.typed} of them as something other than \`Any\`,`);
+  console.log(`     ${mypyWherePyrightSilent.inTree} of those declared in this tree.`);
+  console.log();
+
+  console.log("  f) Did pyright's answer land on a type declaration at all? Over every answer it gave,");
+  console.log("     not only the ones mypy could check -- read off the line typeDefinition pointed at.");
+  console.log(`     in this tree: ${pyPlacement.inTree} answers -- ${pyPlacement.inTreeModule} the top of a module, `
+    + `${pyPlacement.inTreeNotAType} declare no type (${percent(pyPlacement.inTreeNotAType, pyPlacement.inTree).trim()})`);
+  console.log(`     outside it:   ${pyPlacement.external} answers -- ${pyPlacement.externalModule} the top of a module, `
+    + `${pyPlacement.externalNotAType} declare no type (${percent(pyPlacement.externalNotAType, pyPlacement.external).trim()})`);
+  console.log("     The top of a module is a module receiver's right answer, and is the file a board wants.");
+  console.log("     A line that declares no type is not a type's declaration, whichever file it is in:");
+  console.log("     pyright's own type was Unknown and it fell back to the receiver's binding, or the");
+  console.log("     anchor was a callee's name and it landed on the callee.");
+  console.log("     The live check already withholds on these (`isConcreteClassLine`); this measurement");
+  console.log("     counts them as answers, which is the part that was wrong.");
+  console.log();
+  console.log("     In-tree answers mypy weighed, by what the line is and what mypy said:");
+  for (const [key, count] of [...pyPlacementByMypy.entries()].sort((a, b) => b[1] - a[1])) {
+    console.log(`       ${key.padEnd(58)} ${String(count).padStart(6)}`);
+  }
+  if (pyNotATypeCases.length > 0) {
+    console.log();
+    for (const one of pyNotATypeCases.slice(0, cap(pyNotATypeCases.length))) {
+      console.log(`       ${one.tree}/${one.file}:${one.line} -> ${one.target}`);
+    }
+    if (pyNotATypeCases.length > cap(pyNotATypeCases.length)) {
+      console.log(`       ... and ${pyNotATypeCases.length - cap(pyNotATypeCases.length)} more`);
+    }
+  }
+  console.log();
+
+  console.log("  g) Runs:");
+  for (const one of mypyRuns) {
+    console.log(`     ${one.tree}: ${one.failure ? `mypy could not run -- ${one.failure}` : `${one.errorsBeforeProbes} error(s) before any probe, ${one.ambiguous} ambiguous module name(s)`}`);
+  }
+} else if (mypyRuns.length > 0) {
+  for (const one of mypyRuns) {
+    console.log(`  ${one.tree}: ${one.failure ?? "no pyright answer to check"}`);
+  }
+} else {
+  console.log("  No Python receiver sites in this corpus.");
 }
 console.log();

@@ -17,7 +17,9 @@ import path from "node:path";
 
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
 
-import { isConcreteClassLine, resolvePythonReceivers } from "../scripts/lib/resolution-python-live";
+import {
+  isConcreteClassLine, pythonDeclarationKind, pythonTypeDeclaredOnLine, resolvePythonReceivers,
+} from "../scripts/lib/resolution-python-live";
 
 function write(root: string, relative: string, contents: string): void {
   const full = path.join(root, relative);
@@ -58,6 +60,69 @@ describe("isConcreteClassLine", () => {
   it("withholds rather than guesses on a line it does not recognise", () => {
     expect(isConcreteClassLine("@dataclass")).toBeUndefined();
     expect(isConcreteClassLine("class Split(")).toBeUndefined();
+  });
+});
+
+describe("pythonTypeDeclaredOnLine", () => {
+  /*
+   * Whether the line `textDocument/typeDefinition` pointed at declares a type
+   * at all (#258). Every shape below is a line pyright really pointed at on
+   * graphify or infrarouter, or the typeshed header a builtin resolves to.
+   * The ones that declare nothing are the answers `isConcreteClassLine` turns
+   * into `concrete: false` -- safe for an accusation, and still a wrong file.
+   */
+  it.each([
+    ["a plain class", "class Match:", { kind: "class", name: "Match" }],
+    ["a class with bases", "class LanguageConfig(BaseModel):", { kind: "class", name: "LanguageConfig" }],
+    ["a nested class, indented", "    class Inner(Base, metaclass=Meta):", { kind: "class", name: "Inner" }],
+    ["a header split across lines", "class Split(", { kind: "class", name: "Split" }],
+    ["a typeshed builtin", "class str(Sequence[str]):", { kind: "class", name: "str" }],
+    ["a 3.12 alias", "type Vector = list[float]", { kind: "alias", name: "Vector" }],
+    ["an annotated alias", "Vector: TypeAlias = list[float]", { kind: "alias", name: "Vector" }],
+    ["a NewType", 'NodeId = NewType("NodeId", str)', { kind: "newtype", name: "NodeId" }],
+    ["a TypeVar", 'T = typing.TypeVar("T", bound=Base)', { kind: "typevar", name: "T" }],
+  ])("reads %s as a type declaration", (_label, line, expected) => {
+    expect(pythonTypeDeclaredOnLine(line)).toEqual(expected);
+  });
+
+  it.each([
+    ["a receiver's own assignment, which is where an Unknown type lands", "                a = args[i]"],
+    ["a loop variable", "        for i, a in enumerate(args):"],
+    ["the function a call anchor asked about instead of its result", "def out_path(*parts: str) -> Path:"],
+    ["a method, indented", "    def _base_market(self) -> Market:"],
+    ["an assignment from a call", "            global_path = _custom_providers_path(global_=True)"],
+    ["a decorator above a class", "@dataclass(frozen=True)"],
+  ])("reads %s as declaring no type", (_label, line) => {
+    expect(pythonTypeDeclaredOnLine(line)).toBeUndefined();
+  });
+});
+
+describe("pythonDeclarationKind", () => {
+  /*
+   * What `textDocument/typeDefinition` pointed at, in three answers rather than
+   * two (#258). A module receiver -- `import graphify.extract as extract_mod;
+   * extract_mod.extract(...)` -- lands on the first line of the module's own
+   * file, which declares no type and is still the right answer: it is the file
+   * a board would point at. Counting it with `a = args[i]` overstated how much
+   * of pyright's answering was wrong, by 724 answers across 23 files of
+   * graphify and infrarouter.
+   */
+  it("reads a class line as a type, wherever it sits", () => {
+    expect(pythonDeclarationKind("class Match:", 41)).toBe("type");
+    expect(pythonDeclarationKind("class Early:", 0)).toBe("type");
+  });
+
+  it("reads the top of a file as a module, whatever that first line holds", () => {
+    // The three first lines graphify's module receivers really landed on.
+    expect(pythonDeclarationKind('"""Query logging for graphify -- append-only JSONL, fail-silent."""', 0)).toBe("module");
+    expect(pythonDeclarationKind("from __future__ import annotations", 0)).toBe("module");
+    expect(pythonDeclarationKind("import sys", 0)).toBe("module");
+  });
+
+  it("reads everything else that declares no type as not a type", () => {
+    expect(pythonDeclarationKind("                a = args[i]", 884)).toBe("not a type");
+    expect(pythonDeclarationKind("def out_path(*parts: str) -> Path:", 294)).toBe("not a type");
+    expect(pythonDeclarationKind("        for node_id, data in graph.nodes(data=True)", 147)).toBe("not a type");
   });
 });
 

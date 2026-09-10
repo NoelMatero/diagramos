@@ -1298,7 +1298,9 @@ be one: `<MenuContent />` is a routine making a MenuContent, which is `@builds`.
     shares nothing with it -- and narrow for exactly that reason. So "0.7%,
     1.76%, 0.8%" is not one column; the first two are consistency figures and
     only the third is independent, over a quarter of its population. Item 20
-    is where that stopped being true for Rust.
+    is where that stopped being true for Rust, and item 21 is where Python got
+    an independent check -- and where it turned out that the wrong answers in
+    this item's own 85.5% were never pyright's.
 
 18. **Rust's version of the same ladder, and the safety check items 14 and 17
     used turns out to measure nothing in Rust -- so a different one was built,
@@ -1768,6 +1770,162 @@ be one: `<MenuContent />` is a routine making a MenuContent, which is `@builds`.
     one language: **TypeScript and Python still have no independent check at
     all** (see item 17's closing paragraph), which is now the whole of what #250
     named and is filed as its own issue rather than left implied.
+
+21. **Python's version of item 20: mypy checks 61.8% of pyright's answers
+    independently -- and the wrong answers it finds are not pyright's
+    mistakes about a type, they are our client's, and none of them is among
+    the answers item 17's check called agreements. TypeScript has no second
+    oracle to ask (#258).**
+    Item 17's closing paragraph says what 1.76% is: pyright asked two questions
+    and compared with itself, which cannot catch pyright being wrong. #258 asked
+    whether that was hiding anything.
+
+    **The mechanism.** `scripts/lib/resolution-python-mypy.ts` puts a
+    `reveal_type` around every receiver in a copy of the tree and reads one
+    mypy run -- one, not rounds, because a probe here is an expression rather
+    than Rust's deliberate compile error. Two details are load-bearing and both
+    were found by running it. **Every probe carries its site's own id** as a
+    `Literal` in a tuple, because mypy prints one note per distinct message per
+    line: two receivers of one type on one line reported once, and the second
+    site silently had no answer. And **`--check-untyped-defs`**, because by
+    default mypy does not look inside an unannotated function and the probe
+    comes back a bare `Any` with its tag stripped, so the site cannot even be
+    identified -- the corpus quietly shrinks to its annotated half. Answers are
+    compared by declaring file, which is what item 17 compares and what a board
+    points at. A third bug was in this referee's own index and is the kind that
+    never announces itself: types were looked up only among files that carry a
+    probe, so a type declared in a module with no receivers of its own matched
+    a shorter prefix and came back declared in `graphify/__init__.py`. A wrong
+    file, not a missing one; every `.py` file is indexed now. The fourth was
+    in the same lookup: mypy prints a class declared inside a function with
+    the line it sits on (`tests.test_llm_backends._SubPath@229`), the suffix
+    names no module, and the class read as declared outside the tree -- a
+    disagreement with pyright that was this referee's own misreading, caught
+    because the write-up refused to fill while one disagreement fitted none
+    of the shapes it names.
+
+    **The numbers.** `npm run measure:resolution -- --all graphify infrarouter`,
+    section 14, mypy 2.3.1 against pyright 1.1.406, 20,065 pyright answers:
+
+    | what the syntactic reader said | answered | checked | disagreed | wrong |
+    |---|---|---|---|---|
+    | resolved | 3,132 | 93.2% | 36 | 1.2% |
+    | `not-a-name` | 2,057 | 86.2% | 182 | 10.3% |
+    | `from-a-call` | 2,686 | 43.0% | 39 | 3.4% |
+    | `unbound` | 3,786 | 30.8% | 20 | 1.7% |
+    | other | 8,404 | 64.2% | 906 | 16.8% |
+    | **all** | **20,065** | **61.8%** | **1,183** | **9.5%** |
+
+    7,653 are unchecked because mypy typed them `Any` -- declining, not
+    agreeing -- which is unannotated Python even with `--check-untyped-defs`.
+
+    **The counts move between identical runs, and by more than a rounding.**
+    Across the runs of this section, pyright answered 20,064, 20,065, 20,040 and
+    20,065 sites; the low one ran alongside the full test suite. Every figure in
+    this entry is from one run, the last, on an idle machine, and none is
+    combined with another's.
+
+    **723 of the 1,183 are two right answers.** A module used as a receiver
+    (`extract_mod.extract(...)`) is `types.ModuleType` to mypy and the module's
+    own file to pyright, and the second is the file a board wants.
+    `isModuleReceiver` classifies them out, the way `declaredByMacro` does in
+    Rust.
+
+    **Item 17's agreements hid nothing.** Re-read on the sites both reach, mypy
+    disagreed with 675 of the 11,705 answers item 17 called agreements, and
+    every one of them is a module receiver. Of the 237 it flagged, mypy backed
+    pyright on one. So on this corpus 1.76% was not an undercount dressed as a
+    consistency figure: its agreements were right.
+
+    **Whether this check discriminates, which is a smaller claim than it was
+    in Rust.** Paired with mypy's verdict on an unrelated site, pyright's answer
+    agrees 82.1% of the time: most answers on both sides are outside the
+    repository, and "neither of us thinks this type is yours" is what two
+    unrelated receivers share. So agreement *outside* the repository is close to
+    no evidence, and this entry leans on none of it. Restricted to answers
+    pyright placed inside the repository, unrelated pairs agree 0.0%
+    against 30.7% for real ones: inside the repository the check does tell
+    answers apart. Real agreement is that low because most of those answers are
+    the wrong files counted below, not because mypy and pyright name files at
+    random.
+
+    **The 460 that are not module receivers are a wrong file, and every one is
+    our client's.** 379 are mypy naming a builtin (`str`, `dict[...]`) against a
+    file in the repository, 79 `pathlib.Path` against one, and 2 infrarouter's
+    `Market` against the test that builds it. Asked directly rather than
+    inferred, pyright is not confused about any of them. Where its own type is
+    `Unknown`, `textDocument/typeDefinition` falls back to the receiver's
+    bindings -- `a` in `cli.py` answered with nine locations, all `a = args[i]`
+    -- and `firstLocation` takes the first as a declaring file. Where the
+    receiver ends in a call, `typeAnchorFor` anchors on the callee's name and
+    pyright correctly answers where the callee is (`def out_path(...) ->
+    Path:`, its hover stating the `Path`) -- the limit item 17 named, larger
+    than it looked. 269 of the 460 are sites item 17's check never
+    reached, because `definition` on the method answered nothing there; the
+    other 191 it had flagged without being able to say which answer was wrong.
+    Where pyright's answer does land on a real class in the repository, mypy
+    agrees on all 131.
+
+    **So the check that matters is the one that needs no second oracle: did
+    the answer land on a type declaration at all?** Rust's item 18 a), asked of
+    Python, over every answer. `pythonDeclarationKind` reads the target line as
+    a type, the top of a module, or neither:
+
+    | pyright's answer | answers | a type | top of a module | declares no type |
+    |---|---|---|---|---|
+    | in the repository | 7,104 | 131 | 724 | **6,249** |
+    | outside it | 12,961 | 9,869 | 2,389 | 703 |
+
+    Grouped by what the line holds, the in-repository ones are the fallback and
+    the callee anchor: 3,101 assignments, 1,868 `def` lines, 1,049 loop
+    variables, 42 `with ... as` bindings, and 189 left over. That last group was
+    sampled by hand rather than read in full, and every line sampled was a
+    binding too -- a lambda or comprehension variable, or a parameter on a
+    continuation line. **Item 17's 85.5% coverage counts 6,249 answers that are
+    not a declaration**, and 394 of mypy's in-repository agreements are a line
+    that declares no type in the file where mypy's type happens to be declared
+    too -- agreement
+    by file that is not evidence, item 18's lesson about names restated for
+    files.
+
+    **None of it reaches a board.** Traced rather than assumed: a pyright answer
+    reaches the engine only through `placeThroughChecker`, called only from
+    `placeOf`, called only from `callSitesIn`, whose only caller is
+    `closedBodyRefutes` -- and that returns `undefined` on `concrete === false`
+    before it reads the file. `isConcreteClassLine` answers `undefined` for every
+    one of these lines, which `resolution-python-live.ts` turns into
+    `concrete: false`; `resolution-python-live.test.ts` already pinned the
+    unannotated-parameter shape. What was wrong was this document's number.
+    Withholding them in the client is filed as #259 rather than done here,
+    because it moves item 17's published coverage and `AGENTS.md` wants that
+    cost measured.
+
+    **TypeScript: there is no second oracle, and that is the answer.** The one
+    independent implementation, `ezno` 0.0.23 (last released 2024-11-13), stops
+    at a parse error on **10 of the first 20** files in `src/engine`, taken
+    alphabetically -- a union written with a leading `|`, and a non-null
+    assertion (`bodies[0]!.line`) -- in a project `tsc` accepts cleanly. It
+    never reaches a type. `@typescript/native-preview` is Microsoft's port of
+    the same compiler, the same analysis in another language: #250's `hover`
+    lesson, a second opinion from one source. So item 14's 0.7% stays a
+    self-consistency figure, and the cost is stated rather than implied: a
+    `tsc` mistake about a type is invisible to every check here. #236's
+    precedent -- a bad answer written down is a complete answer.
+
+    **The five figures, as the kinds of number they are:**
+
+    | language | check | kind | answers checked | wrong |
+    |---|---|---|---|---|
+    | TypeScript | item 14 | self-consistency: `tsc` asked twice | -- | 0.7% |
+    | Python | item 17 | self-consistency: pyright asked twice | 70% | 1.76% |
+    | Python | item 21 | independent: mypy | 61.8% | 3.7% (460 of 12,409) |
+    | Rust | item 18 | independent, narrow: our own reader | 25.1% | 0.4% |
+    | Rust | item 20 | independent: `rustc` | 90.9% | 0.03% |
+
+    Python's independent figure is higher than its consistency figure, and the
+    difference is not pyright: it is the client's wrong files, on sites item
+    17's check either never reached or flagged without being able to settle --
+    and the placement table above counts them in full, oracle or not.
 
 
 ## Open, in the order worth doing
