@@ -70,6 +70,60 @@ export function isConcreteClassLine(lineText: string): boolean | undefined {
 }
 
 /**
+ * The type a declaration line declares, or `undefined` when it declares none
+ * (#258). Python's `declaredTypeOnLine` (`resolution-rust-lsp.ts`), asked of
+ * the line `textDocument/typeDefinition` pointed at.
+ *
+ * `isConcreteClassLine` answers a narrower question -- is this one-line header
+ * safe to accuse through -- and turns everything it cannot read into
+ * `concrete: false`. That is the right answer for an accusation and hides a
+ * second fact: an answer that declares no type is a wrong *file*, not just an
+ * unsafe one. Found against mypy on graphify: where pyright's type is
+ * `Unknown`, `typeDefinition` falls back to the receiver's own assignment
+ * (`a = args[i]`), and where the anchor is a callee's name it lands on the
+ * callee (`def out_path(...) -> Path:`). Both name a file in the repository,
+ * and neither is where any type was declared.
+ *
+ * Reads a split header (`class Split(`) as the class it opens, unlike
+ * `isConcreteClassLine`: the name is on the line, and whether this is a type
+ * does not depend on its bases.
+ */
+export function pythonTypeDeclaredOnLine(
+  lineText: string,
+): { kind: "class" | "alias" | "newtype" | "typevar"; name: string } | undefined {
+  const text = lineText.trim();
+  const typing = String.raw`(?:typing\.|typing_extensions\.)?`;
+  const klass = /^class\s+([A-Za-z_]\w*)/.exec(text);
+  if (klass) return { kind: "class", name: klass[1]! };
+  const statement = /^type\s+([A-Za-z_]\w*)\s*(?:\[[^\]]*\])?\s*=/.exec(text);
+  if (statement) return { kind: "alias", name: statement[1]! };
+  const annotated = new RegExp(String.raw`^([A-Za-z_]\w*)\s*:\s*${typing}TypeAlias\s*=`).exec(text);
+  if (annotated) return { kind: "alias", name: annotated[1]! };
+  const newtype = new RegExp(String.raw`^([A-Za-z_]\w*)\s*=\s*${typing}NewType\s*\(`).exec(text);
+  if (newtype) return { kind: "newtype", name: newtype[1]! };
+  const typevar = new RegExp(String.raw`^([A-Za-z_]\w*)\s*=\s*${typing}(?:TypeVar|ParamSpec|TypeVarTuple)\s*\(`).exec(text);
+  if (typevar) return { kind: "typevar", name: typevar[1]! };
+  return undefined;
+}
+
+/**
+ * What a `textDocument/typeDefinition` answer's line is, in three answers
+ * rather than `pythonTypeDeclaredOnLine`'s two (#258).
+ *
+ * A module receiver (`extract_mod.extract(...)`) lands on the first line of
+ * the module's own file -- a docstring, a comment, an import -- which declares
+ * no type and is still the right answer, being the file a board points at.
+ * Line 0 is read as that before the line's text is looked at, because a module
+ * can open with anything. A class declared on the very first line is read as a
+ * type first, which is the one case where the two overlap.
+ */
+export function pythonDeclarationKind(lineText: string, line: number): "type" | "module" | "not a type" {
+  if (pythonTypeDeclaredOnLine(lineText) !== undefined) return "type";
+  if (line === 0) return "module";
+  return "not a type";
+}
+
+/**
  * One receiver query, as `scripts/check-drift.mjs`'s recording pass gathers
  * it: everything `resolveReceiverLive` below needs and nothing it can derive
  * on its own, since the recording pass runs with no live referee at all.
