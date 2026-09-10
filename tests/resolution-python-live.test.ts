@@ -179,28 +179,38 @@ describe("resolvePythonReceivers", () => {
     expect(cache.get("caller.py", at)).toEqual({ kind: "declared", file: "concrete_store.py", concrete: true });
   }, 60_000);
 
-  it("never licenses an accusation for an unannotated receiver pyright cannot really type", async () => {
+  it("leaves an unannotated receiver pyright cannot really type unanswered", async () => {
     /*
      * Found live rather than assumed: asked about `x` with no annotation,
-     * `typeDefinition` does not answer `null` the way a position with no
-     * information at all does elsewhere in this file -- it falls back to
-     * `x`'s own parameter declaration, in `caller.py` itself, which is a
-     * real repo file and not a class at all. `isConcreteClassLine` reads
-     * that line, finds no `class ... :` header on it, and withholds --
-     * `concrete: false`, the same "never accuse" outcome an `undefined`
-     * answer produces, reached by a different road. The guard this test
-     * actually cares about is that no path through here licenses a refuted
-     * verdict on a receiver nobody could really type, not the exact shape
-     * of the safe answer.
+     * `typeDefinition` does not answer `null` -- it falls back to `x`'s own
+     * parameter declaration, in `caller.py` itself, which is a real repo file
+     * and not a class at all. Until #259 that came back as
+     * `{ kind: "declared", file: "caller.py", concrete: false }`: safe, since
+     * `concrete: false` never accuses, and still a wrong file. The client now
+     * withholds a line that declares no type, so there is no answer to cache.
      */
     const source = readCallerSource(repo);
     const { start } = rangeOf(source, "return x.run");
     const at = { start: start + "return ".length, end: start + "return x".length };
     const { cache, close } = await resolvePythonReceivers(repo, [{ file: "caller.py", at }]);
     close();
-    const resolved = cache.get("caller.py", at);
-    if (resolved === undefined) return;
-    expect(resolved.kind === "declared" && resolved.concrete).toBe(false);
+    expect(cache.get("caller.py", at)).toBeUndefined();
+  }, 60_000);
+
+  it("still places a module used as a receiver, at the module's own file", async () => {
+    /*
+     * The answer #259 must not withhold: `helpers_mod.tool()` lands on line 0
+     * of `helpers.py`, which declares no type and is the file a board points
+     * at. 724 such answers on graphify and infrarouter (#258).
+     */
+    write(repo, "helpers.py", "\"\"\"Helpers.\"\"\"\n\n\ndef tool() -> int:\n    return 1\n");
+    const moduleSource = "import helpers as helpers_mod\n\n\ndef use_module() -> int:\n    return helpers_mod.tool()\n";
+    write(repo, "module_caller.py", moduleSource);
+    const { start } = rangeOf(moduleSource, "helpers_mod.tool");
+    const at = { start, end: start + "helpers_mod".length };
+    const { cache, close } = await resolvePythonReceivers(repo, [{ file: "module_caller.py", at }]);
+    close();
+    expect(cache.get("module_caller.py", at)).toEqual({ kind: "declared", file: "helpers.py", concrete: false });
   }, 60_000);
 
   it("resolves a batch of queries off one warm-up, and answers a key never asked with undefined", async () => {

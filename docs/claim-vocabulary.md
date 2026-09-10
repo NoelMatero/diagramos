@@ -1300,7 +1300,9 @@ be one: `<MenuContent />` is a routine making a MenuContent, which is `@builds`.
     only the third is independent, over a quarter of its population. Item 20
     is where that stopped being true for Rust, and item 21 is where Python got
     an independent check -- and where it turned out that the wrong answers in
-    this item's own 85.5% were never pyright's.
+    this item's own 85.5% were never pyright's. Item 22 re-measured both figures
+    once the client stopped returning those answers: **55.5% and 0.35%**, and
+    most of what this entry reads as a narrowed builtin was one of them.
 
 18. **Rust's version of the same ladder, and the safety check items 14 and 17
     used turns out to measure nothing in Rust -- so a different one was built,
@@ -1908,7 +1910,7 @@ be one: `<MenuContent />` is a routine making a MenuContent, which is `@builds`.
     unannotated-parameter shape. What was wrong was this document's number.
     Withholding them in the client is filed as #259 rather than done here,
     because it moves item 17's published coverage and `AGENTS.md` wants that
-    cost measured.
+    cost measured. Done, and measured, at item 22.
 
     **TypeScript: there is no second oracle, and that is the answer.** The one
     independent implementation, `ezno` 0.0.23 (last released 2024-11-13), stops
@@ -1936,6 +1938,74 @@ be one: `<MenuContent />` is a routine making a MenuContent, which is `@builds`.
     difference is not pyright: it is the client's wrong files, on sites item
     17's check either never reached or flagged without being able to settle --
     and the placement table above counts them in full, oracle or not.
+
+22. **#259: the client no longer answers with a line that declares no type,
+    and most of item 17's disagreements were that line. 84.9% → 55.5%
+    answered, 1.76% → 0.35% disagreeing, and mypy's 460 wrong files → 0.**
+    `askTypeLocation` in `scripts/lib/resolution-python-lsp.ts` reads the line
+    `textDocument/typeDefinition` pointed at with `pythonDeclarationKind` and
+    withholds `not a type`, in the repository or out of it; `type` and `module`
+    are kept. `tests/resolution-python-lsp.test.ts` has one test per line the
+    fallback really landed on -- an assignment, a `for` target, a parameter, a
+    `with ... as`, a lambda parameter, a callee's `def` -- and each failed first
+    on the exact line pyright returned.
+
+    **Before and after.** `npm run measure:resolution -- ~/board-ai/graphify
+    ~/infrarouter`, run back to back on an idle machine, pyright 1.1.406, mypy
+    2.3.1. The before run reproduced item 21's figures exactly (20,065 answers,
+    6,249, 14,134/249), so the two compare:
+
+    | | before | after |
+    |---|---|---|
+    | pyright answered (section 8, `lsp`) | 20,065 (84.9%) | 13,113 (55.5%) |
+    | with the syntactic reader (`combined`) | 20,186 (85.5%) | 13,342 (56.5%) |
+    | withheld: the line declares no type | -- | 6,952 |
+    | in-repository answers declaring no type (14 f) | 6,249 | 0 |
+    | answers outside it declaring no type | 703 | 0 |
+    | section 9: checked, disagreed | 14,134, 249 (1.76%) | 12,906, 45 (0.35%) |
+    | mypy: checked | 12,409 (61.8%) | 11,023 (84.1%) |
+    | mypy: disagreed, not a module receiver | 460 | 0 |
+    | mypy typed it `Any` | 7,653 | 2,087 |
+    | pyright pass on graphify | 429s | 268s |
+    | whole run | 9m40s | 6m53s |
+
+    **The cost is 6,952 answers, 29.4 points of coverage.** 6,249 were in the
+    repository and never a declaration. The 703 outside it are a callee's `def`
+    in typeshed or a package; the type a call there returns is usually outside
+    the repository too, so the old answer's `external` was often right by
+    coincidence, and a library function can still return a repository type.
+    One loss is visible in a test: `self._make().step()` was answered with `def
+    step`, right only because `Builder` shares that file, and now has no answer.
+    Faster because a withheld type answer skips section 9's second question.
+
+    **What it overturns: item 17's reading of its own disagreements.** 204 of
+    the 249 are gone, and the fix does nothing but withhold type answers -- so
+    they were the fallback, not "a receiver typed with a repo class that narrows
+    to a builtin". `graphify/analyze.py:103 .endswith(...)`,
+    first on that list with the receiver's type "in `analyze.py`", was pyright
+    pointing at line 102, `src = (attrs.get("source_file") or "").lower()`. The
+    45 left are all module receivers: mypy counts every one of its 723 remaining
+    disagreements as one, these 45 among them. The twelve printed are a module
+    that re-exports the function from another file -- `graphify/__main__.py`
+    against `install.py`, `extract.py` against `extractors/fortran.py` -- two
+    right answers.
+
+    **What it does not change.** No board: these answers came back `concrete:
+    false` and could not accuse, and now there is no answer, so the call stays
+    unplaced and its body open -- fewer closed bodies, never a new accusation
+    (`resolution-python-live.test.ts` pins both the unannotated receiver and a
+    module receiver). `mayAccuse` reads whether a row is measured, not its
+    figures, so Python's `@calls` absence licence stays granted; its counts are
+    restated from this run.
+
+    **Named, not folded in:** what a call *returns*. A receiver ending in a call
+    is unanswered wherever the anchor is the callee. `hover` prints the return
+    type; no request here gives its file.
+
+    | language | check | kind | answers checked | wrong |
+    |---|---|---|---|---|
+    | Python | item 17, restated | self-consistency: pyright asked twice | 98.4% (12,906 of 13,113) | 0.35% |
+    | Python | item 21, restated | independent: mypy | 84.1% | 0.0% (0 of 11,023) |
 
 
 ## Open, in the order worth doing
