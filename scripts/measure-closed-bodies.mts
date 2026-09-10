@@ -54,6 +54,8 @@ import { existsSync, readdirSync, realpathSync, statSync } from "node:fs";
 import path from "node:path";
 
 import { refereeRoutines, stripNoise } from "./lib/call-scan";
+import { resolvePythonReceivers } from "./lib/resolution-python-live";
+import { resolveRustReceivers } from "./lib/resolution-rust-receivers";
 import { createTsReferee } from "./lib/resolution-ts";
 
 import {
@@ -87,6 +89,14 @@ const trees = (roots.length > 0 ? roots : [
   `${HOME}/board-ai/graphify`,
   `${HOME}/mundane`,
   `${HOME}/infrarouter`,
+  /* #256's Rust scale. `rust-test` above is two crates and 8 files, which says
+   * nothing about rust-analyzer's reach at size; these are the pinned
+   * repositories `measure:licence` clones and `measure:resolution` already
+   * reads for the same reason. Skipped silently when the corpus has not been
+   * cloned, the same as every other tree. They carry no TypeScript and no
+   * Python, so item 13's own figures are unaffected by their being here. */
+  `${HOME}/board-ai/.corpus/ripgrep`,
+  `${HOME}/board-ai/.corpus/anyhow`,
 ]).filter((tree) => existsSync(tree)).map(real);
 
 /**
@@ -149,6 +159,20 @@ const BANDS = [
 ];
 
 const bump = <K,>(map: Map<K, number>, key: K, by = 1) => map.set(key, (map.get(key) ?? 0) + by);
+
+/**
+ * #233's cost for one body: a closed body carrying a placement whose type is
+ * not concrete is withheld by `callsBetween` rather than accused from, so this
+ * is the refusal that guard actually spends. The closure test is re-asked here
+ * rather than threaded out of `bumpClosure` -- a body only spends the cost if
+ * `callsBetween` would otherwise have been free to accuse from it.
+ */
+function bumpGuardCost(body: BodyCallSites, language: Language): void {
+  const isClosed = body.sites.length > 0 && body.sites.every((one) => !one.why);
+  if (isClosed && body.sites.some((one) => one.receiver && one.concrete === false)) {
+    bump(closedBlockedByGuard, language);
+  }
+}
 
 /**
  * The closure/blocker tally section 1 and 2 compute inline for the baseline
@@ -215,10 +239,14 @@ const unlicensed = new Set<Language>();
 /**
  * #226's follow-up, named in `docs/claim-vocabulary.md` when #221's
  * recommendation was reaffirmed: does a real checker close what syntax
- * alone could not? ts/tsx/js only, mirroring the same `resolveReceiver`
- * reading run a second time with tier 2 wired in as the receiver resolver --
- * every tally below has the same meaning as its untagged twin above, just
- * counted on that second reading.
+ * alone could not? The same `resolveReceiver` reading run a second time with
+ * tier 2 wired in as the receiver resolver -- every tally below has the same
+ * meaning as its untagged twin above, just counted on that second reading.
+ *
+ * ts/tsx/js when this was written, because TypeScript was the only language
+ * with a tier-2 resolver then. Python got one at #235/#243 and Rust at #246,
+ * and #256 is the same question asked of both -- so item 13's 50.3% stops
+ * being the figure steering three languages from a measurement of one.
  */
 const bodiesTier2 = new Map<Language, number>();
 const closedTier2 = new Map<Language, number>();
@@ -226,7 +254,40 @@ const calllessTier2 = new Map<Language, number>();
 const openTier2 = new Map<Language, number>();
 const soleBlockerTier2 = new Map<Language, Map<string, number>>();
 const anyBlockerTier2 = new Map<Language, Map<string, number>>();
-const TIER2_LANGUAGES = new Set<Language>(["ts", "tsx", "js"]);
+const TIER2_LANGUAGES = new Set<Language>(["ts", "tsx", "js", "python", "rust"]);
+/** The two whose resolver answers over a language server, so the reading is a
+ *  record-then-resolve pair rather than one synchronous pass. */
+const LSP_TIER2_LANGUAGES = new Set<Language>(["python", "rust"]);
+
+/**
+ * What each language-server resolver cost and could not reach, for the honesty
+ * the issue asks for by name: a low closed share has to be readable as the
+ * resolver's reach rather than as the reader failing.
+ */
+interface LspRun {
+  language: Language;
+  tree: string;
+  /** Receiver queries the reader asked, before any were answered. */
+  asked: number;
+  /** Distinct queries, since the reader asks about one site once per reading. */
+  distinct: number;
+  started: boolean;
+  /** Seconds the resolver spent, so the runtime cost is on the record. */
+  seconds: number;
+  /** Rust only: queries in a file no `Cargo.toml` claims, never asked. */
+  unclaimed?: number;
+  /** Rust only: answers whose declaration line names no type (#246's `notAType`). */
+  notATypeDeclaration?: number;
+  /** Rust only: a type spelled as a path (`String::new()`), never asked. */
+  pathReceiver?: number;
+  /** Rust only: a receiver `rustTypeAnchorFor` would place no cursor in, never asked. */
+  anchorWithheld?: number;
+  /** Python only: answers withheld because their line declares no type (#259). */
+  withheldNoType?: number;
+  /** Rust only: false when a server never said it had finished indexing. */
+  primedCleanly?: boolean;
+}
+const lspRuns: LspRun[] = [];
 
 /**
  * What `resolveReceiver` actually answered, every query, no correlation
@@ -359,7 +420,9 @@ for (const tree of trees) {
     if (!reading.read) { bump(refusedFiles, reading.why); continue; }
     bump(files, language);
 
-    if (TIER2_LANGUAGES.has(language)) {
+    // Python and Rust answer over a language server, so their reading cannot
+    // happen here -- see the record-then-resolve pass after this loop.
+    if (TIER2_LANGUAGES.has(language) && !LSP_TIER2_LANGUAGES.has(language)) {
       const tier2Reading = callSitesIn({
         file: rel, source, language, imports: imports(rel, source), open,
         resolveReceiver: (at) => resolveReceiver(at, file, language),
@@ -370,13 +433,7 @@ for (const tree of trees) {
           soleBlockerTier2, anyBlockerTier2, siteReasonTier2,
         );
         for (const body of tier2Reading.bodies) {
-          // The same closure test `bumpClosure` runs, asked again here rather
-          // than threaded out of it: a body only spends the guard's cost if
-          // `callsBetween` would otherwise have been free to accuse from it.
-          const isClosed = body.sites.length > 0 && body.sites.every((one) => !one.why);
-          if (isClosed && body.sites.some((one) => one.receiver && one.concrete === false)) {
-            bump(closedBlockedByGuard, language);
-          }
+          bumpGuardCost(body, language);
           for (const site of body.sites) {
             if (!site.receiver || !site.file || !site.memberAt) continue;
             const refereeDecl = tsChecker?.symbolDeclarationAt(file, site.memberAt.start, site.memberAt.end);
@@ -502,6 +559,79 @@ for (const tree of trees) {
         readerSawMore.push(one);
       }
     }
+  }
+
+  /* ------------------------------------------ tier 2 over a language server (#256)
+   *
+   * Python's and Rust's resolvers answer over LSP, and `CallSide.resolveReceiver`
+   * is synchronous, so the reading above cannot ask them mid-walk.
+   * `resolution-python-live.ts` already solved this for the live checker and the
+   * shape is reused rather than reinvented: read once with a resolver that
+   * records every question and answers none, resolve the whole batch, then read
+   * again with a synchronous lookup into what came back. Two readings of
+   * unchanged input, which is what makes the second one comparable to the
+   * baseline above rather than to a different population.
+   */
+  for (const language of LSP_TIER2_LANGUAGES) {
+    const inLanguage = sourceFiles(tree).filter((one) => languageOf(path.basename(one)) === language);
+    if (inLanguage.length === 0) continue;
+
+    const relOf = (file: string) => path.relative(tree, file);
+    const readWith = (
+      resolveReceiver: (rel: string) => ((at: { start: number; end: number }) => ReceiverResolution | undefined),
+    ) => inLanguage.flatMap((file) => {
+      const rel = relOf(file);
+      const source = read(rel);
+      if (source === undefined) return [];
+      const reading = callSitesIn({
+        file: rel, source, language, imports: imports(rel, source), open,
+        resolveReceiver: resolveReceiver(rel),
+      });
+      return reading.read ? [reading.bodies] : [];
+    });
+
+    const queries: Array<{ file: string; at: { start: number; end: number } }> = [];
+    readWith((rel) => (at) => { queries.push({ file: rel, at }); return undefined; });
+    if (queries.length === 0) continue;
+    const distinct = new Set(queries.map((one) => `${one.file}:${one.at.start}:${one.at.end}`)).size;
+
+    console.error(`  [${language}] ${distinct} receiver sites to resolve on ${path.basename(tree)}`);
+    const startedAt = Date.now();
+    const answers = language === "python"
+      ? await resolvePythonReceivers(tree, queries)
+      : await resolveRustReceivers(tree, queries, SKIP_DIRECTORIES);
+    const seconds = Math.round((Date.now() - startedAt) / 1000);
+    console.error(`  [${language}] done in ${seconds}s`);
+
+    const tally = resolverAnswers.get(language) ?? { type: 0, declared: 0, external: 0, none: 0 };
+    resolverAnswers.set(language, tally);
+    for (const query of queries) {
+      const answer = answers.cache.get(query.file, query.at);
+      if (!answer) tally.none += 1;
+      else if (answer.kind === "external") tally.external += 1;
+      else tally.declared += 1;
+    }
+
+    for (const bodies of readWith((rel) => (at) => answers.cache.get(rel, at))) {
+      bumpClosure(
+        bodies, language, bodiesTier2, closedTier2, calllessTier2, openTier2,
+        soleBlockerTier2, anyBlockerTier2, siteReasonTier2,
+      );
+      for (const body of bodies) bumpGuardCost(body, language);
+    }
+
+    lspRuns.push({
+      language, tree: path.basename(tree), asked: queries.length, distinct, seconds,
+      started: answers.started,
+      ...("primedCleanly" in answers ? { primedCleanly: answers.primedCleanly } : {}),
+      ...("unclaimed" in answers ? { unclaimed: answers.unclaimed } : {}),
+      ...("notATypeDeclaration" in answers
+        ? { notATypeDeclaration: answers.notATypeDeclaration } : {}),
+      ...("pathReceiver" in answers ? { pathReceiver: answers.pathReceiver } : {}),
+      ...("anchorWithheld" in answers ? { anchorWithheld: answers.anchorWithheld } : {}),
+      ...("withheldNoType" in answers ? { withheldNoType: answers.withheldNoType } : {}),
+    });
+    answers.close();
   }
 }
 
@@ -704,20 +834,37 @@ const bigBand = byBand.get("51+ lines");
 const smallBand = byBand.get("1-5 lines");
 const receiverSole = totalOf(soleBlocker, "receiver");
 
-console.log("6 · TIER 2 (#226) -- does a real checker flip the ceiling section 1 found?");
+console.log("6 · TIER 2 (#226, #256) -- does a real checker flip the ceiling section 1 found?");
 console.log();
-console.log("  ts/tsx/js only, and this run also asks *where* a resolved type is declared:");
-console.log("  a receiver whose type provably lives outside this tree (a language builtin,");
-console.log("  a `node_modules` package) is placed immediately, on the same footing as one");
-console.log("  the text names -- neither leaves the call's destination in doubt.");
+console.log("  Every language with a tier-2 resolver: `tsc` in process (#226), pyright over");
+console.log("  its language server (#235/#243), rust-analyzer over its own (#246). This run");
+console.log("  also asks *where* a resolved type is declared: a receiver whose type provably");
+console.log("  lives outside this tree (a language builtin, a package) is placed immediately,");
+console.log("  on the same footing as one the text names -- neither leaves the call's");
+console.log("  destination in doubt.");
 console.log();
-console.log("  The same reading, run a second time with a real compiler");
-console.log("  (`createTsReferee`, the checker resolving 97.8% of receivers -- quoted from #226");
-console.log("  and not measured by this run) wired in as the receiver resolver -- every");
-console.log("  `x.foo()` `placeOf` would otherwise give up on gets asked of the compiler");
-console.log("  before it is counted `receiver`.");
+console.log("  The same reading, run a second time with the resolver wired in -- every");
+console.log("  `x.foo()` `placeOf` would otherwise give up on is asked of a real checker");
+console.log("  before it is counted `receiver`. Per language, because the resolvers do not");
+console.log("  reach equally far and a closed share is only readable beside the reach it");
+console.log("  rests on (section 6b).");
 console.log();
 const tsxLangs = [...TIER2_LANGUAGES];
+console.log("  " + "language".padEnd(10) + "with calls".padStart(12) + "closed t1".padStart(11)
+  + "  share" + "closed t2".padStart(12) + "  share");
+for (const language of tsxLangs) {
+  const perBodies = bodies.get(language) ?? 0;
+  if (perBodies === 0) continue;
+  const perWithCalls = perBodies - (callless.get(language) ?? 0);
+  const perTier2WithCalls = (bodiesTier2.get(language) ?? 0) - (calllessTier2.get(language) ?? 0);
+  const perClosed = closed.get(language) ?? 0;
+  const perClosedTier2 = closedTier2.get(language) ?? 0;
+  console.log("  " + language.padEnd(10)
+    + String(perWithCalls).padStart(12)
+    + String(perClosed).padStart(11) + "  " + percent(perClosed, perWithCalls).padStart(8)
+    + String(perClosedTier2).padStart(12) + "  " + percent(perClosedTier2, perTier2WithCalls).padStart(8));
+}
+console.log();
 const baselineBodies = tsxLangs.reduce((sum, one) => sum + (bodies.get(one) ?? 0), 0);
 const baselineCallless = tsxLangs.reduce((sum, one) => sum + (callless.get(one) ?? 0), 0);
 const baselineClosed = tsxLangs.reduce((sum, one) => sum + (closed.get(one) ?? 0), 0);
@@ -735,10 +882,10 @@ console.log("  " + "tier 2".padEnd(10) + String(tier2WithCalls).padStart(12)
   + String(tier2Closed).padStart(8) + "  " + percent(tier2Closed, tier2WithCalls).padStart(8));
 console.log();
 if (tier2Bodies !== baselineBodies) {
-  console.log(`  Population mismatch: tier 1 read ${baselineBodies} ts/tsx/js bodies, tier 2's`);
-  console.log(`  pass read ${tier2Bodies} -- a file the checker's own walk skipped or one added`);
-  console.log("  by a project's tsconfig `include`. Read as a caveat on the comparison above,");
-  console.log("  not as a second finding.");
+  console.log(`  Population mismatch: tier 1 read ${baselineBodies} bodies in these languages,`);
+  console.log(`  tier 2's pass read ${tier2Bodies} -- a file one walk skipped, or one a project's`);
+  console.log("  own configuration adds. Read as a caveat on the comparison above, not as a");
+  console.log("  second finding.");
   console.log();
 }
 const receiverSoleTier2 = totalOf(soleBlockerTier2, "receiver");
@@ -780,7 +927,7 @@ console.log("  the resolver actually answered, not reconstructed after the fact:
 console.log();
 console.log("  " + "language".padEnd(10) + "declared".padStart(10) + "external".padStart(10)
   + "type (no file)".padStart(16) + "none".padStart(8));
-for (const language of ["ts", "tsx", "js"] as Language[]) {
+for (const language of tsxLangs) {
   const tally = resolverAnswers.get(language);
   if (!tally) continue;
   console.log("  " + language.padEnd(10) + String(tally.declared).padStart(10) + String(tally.external).padStart(10)
@@ -813,10 +960,87 @@ if (siteUnboundOrUnplaced <= noFileOrNone) {
 }
 console.log();
 
+console.log("6b · WHAT EACH LANGUAGE'S NUMBER RESTS ON, and what it cost (#256)");
+console.log();
+console.log("  A closed share is a fact about the resolver's reach as much as about the code,");
+console.log("  and the three resolvers do not reach equally far. Read a low share here as the");
+console.log("  reach below it, not as the reader failing.");
+console.log();
+console.log("  `never asked` is counted apart from a refusal, because the two mean opposite");
+console.log("  things: a file no crate manifest claims, or a receiver that is a type spelled as");
+console.log("  a path (`String::new()`, how Rust writes a constructor) has no value at that");
+console.log("  position for any checker to have an opinion about. Folding those into the");
+console.log("  denominator would report Rust's constructor spelling as a resolver failure.");
+console.log();
+const neverAskedOf = (language: Language) => lspRuns
+  .filter((one) => one.language === language)
+  .reduce((sum, one) => sum
+    + (one.unclaimed ?? 0) + (one.pathReceiver ?? 0) + (one.anchorWithheld ?? 0), 0);
+console.log("  " + "language".padEnd(10) + "queries".padStart(9) + "never asked".padStart(13)
+  + "asked".padStart(8) + "answered".padStart(10) + "  reach of asked");
+for (const language of tsxLangs) {
+  const tally = resolverAnswers.get(language);
+  if (!tally) continue;
+  const queries = tally.declared + tally.external + tally.type + tally.none;
+  const neverAsked = neverAskedOf(language);
+  const asked = queries - neverAsked;
+  const answered = tally.declared + tally.external;
+  console.log("  " + language.padEnd(10) + String(queries).padStart(9)
+    + String(neverAsked).padStart(13) + String(asked).padStart(8)
+    + String(answered).padStart(10) + "  " + percent(answered, asked).padStart(8));
+}
+console.log();
+if (lspRuns.length > 0) {
+  console.log("  The two language-server resolvers, per tree -- a round trip per receiver, so");
+  console.log("  this is the most expensive measurement in the repository and its cost belongs");
+  console.log("  on the record rather than in a reader's surprise:");
+  console.log();
+  let lspSeconds = 0;
+  for (const one of lspRuns) {
+    lspSeconds += one.seconds;
+    const notes = [
+      one.started ? undefined : "no resolver ran on this tree at all",
+      // Only meaningful when a server actually ran: with no crate for it to
+      // index, "never reported finished indexing" would restate the line above
+      // as if it were a second fault.
+      one.started && one.primedCleanly === false
+        ? "a server never reported finished indexing" : undefined,
+      one.unclaimed ? `${one.unclaimed} in a file no Cargo.toml claims` : undefined,
+      one.pathReceiver ? `${one.pathReceiver} a type spelled as a path` : undefined,
+      one.anchorWithheld ? `${one.anchorWithheld} no anchor to ask at` : undefined,
+      one.notATypeDeclaration
+        ? `${one.notATypeDeclaration} answered a line that declares no type` : undefined,
+      one.withheldNoType
+        ? `${one.withheldNoType} answered a line that declares no type (#259)` : undefined,
+    ].filter(Boolean);
+    /*
+     * Queries, not distinct sites, because every count after the colon is a
+     * count of queries -- printing one against the other made a tree read as
+     * having more unclaimed sites than sites.
+     */
+    console.log(`    ${one.language}/${one.tree}: ${one.asked} queries`
+      + ` (${one.distinct} distinct sites) in ${one.seconds}s`
+      + (notes.length > 0 ? ` -- ${notes.join("; ")}` : ""));
+  }
+  console.log();
+  console.log(`  ${lspSeconds}s of that total is language-server time.`);
+  console.log();
+}
+console.log("  Where each resolver's own wrongness is measured, since it is not measured here:");
+console.log("  `measure:resolution` and `docs/claim-vocabulary.md`. TypeScript's is section 7");
+console.log("  below, on this run's own placements. Python's and Rust's are that other script's");
+console.log("  -- Python checked against mypy, Rust against rustc, both independently of this");
+console.log("  reading. A closed share is a coverage figure and never stands in for one.");
+console.log();
+
 console.log("7 · IS IT WRONG -- the gate AGENTS.md requires before anything may accuse on this");
 console.log();
 console.log("  Every closed-share and ceiling number above says how *much* this reads. This");
-console.log("  is the only section that asks how often it is *right*. For every receiver call");
+console.log("  is the only section that asks how often it is *right*. ts/tsx/js only -- it asks");
+console.log("  `tsc` a second question in process, and neither language server here answers");
+console.log("  one comparable. Python's and Rust's wrongness figures are `measure:resolution`'s");
+console.log("  own, against oracles that share nothing with their reader. For every");
+console.log("  receiver call");
 console.log("  this session's placement actually placed, a second, more direct question --");
 console.log("  what does the method itself (`getSymbolAtLocation` on `foo` in `x.foo()`)");
 console.log("  resolve to, not what kind of thing `x` is -- is asked of the same compiler and");
@@ -859,12 +1083,14 @@ console.log();
 console.log("  Section 7's blind spot is not hypothetical once something accuses on a closed");
 console.log("  body: `callsBetween` refuses to, for any closed body carrying a `declared`");
 console.log("  placement whose type is an interface, an abstract class, or a bare type");
-console.log("  parameter, rather than risk agreeing with a wrong one. This is that refusal,");
-console.log("  measured rather than assumed:");
+console.log("  parameter, rather than risk agreeing with a wrong one. Python spells the same");
+console.log("  hazard `Protocol`/`ABC` and Rust spells it `trait`, and each language's own");
+console.log("  resolver reads it off the declaration. This is that refusal, measured rather");
+console.log("  than assumed:");
 console.log();
 console.log("  " + "language".padEnd(10) + "closed".padStart(8) + "blocked".padStart(9) + "  share");
 let guardClosed = 0, guardBlocked = 0;
-for (const language of ["ts", "tsx", "js"] as Language[]) {
+for (const language of tsxLangs) {
   const closed = closedTier2.get(language) ?? 0;
   const blocked = closedBlockedByGuard.get(language) ?? 0;
   guardClosed += closed; guardBlocked += blocked;

@@ -115,10 +115,10 @@ export interface PythonClosedBodyCache {
 export async function resolvePythonReceivers(
   root: string,
   queries: readonly PythonReceiverQuery[],
-): Promise<{ cache: PythonClosedBodyCache; close: () => void }> {
+): Promise<PythonReceiverAnswers> {
   const cache = new Map<string, PythonReceiverResolution | undefined>();
   if (queries.length === 0) {
-    return { cache: { get: () => undefined }, close: () => {} };
+    return { cache: { get: () => undefined }, close: () => {}, started: false, withheldNoType: 0 };
   }
 
   const sources = new Map<string, string>();
@@ -149,37 +149,66 @@ export async function resolvePythonReceivers(
     // pyright, no node -- anything `createPyrightLspReferee` cannot itself
     // recover from). Every query stays unresolved, costing nothing beyond
     // what `@calls` already withheld before this axis existed for Python.
-    return { cache: { get: () => undefined }, close: () => {} };
+    // `started: false` says so, for a caller that would otherwise read every
+    // query unanswered as pyright having nothing to say.
+    return { cache: { get: () => undefined }, close: () => {}, started: false, withheldNoType: 0 };
   }
 
   const first = queries[0]!;
   try {
     await referee.warmUp(path.resolve(root, first.file), sourceOf(first.file), first.at.start);
+  } catch {
+    // Warming up only buys speed; every query below still gets its own answer.
+  }
 
-    for (const query of queries) {
+  /*
+   * Several at once, not one after another (#256). `measure:resolution` asks
+   * this same server 32 at a time; one at a time, a tree of graphify's size is
+   * tens of minutes of round trips that have nothing to wait on each other for.
+   */
+  const CONCURRENCY = 32;
+  let cursor = 0;
+  const worker = async (): Promise<void> => {
+    for (;;) {
+      const query = queries[cursor++];
+      if (query === undefined) return;
       const key = queryKey(query.file, query.at);
       if (cache.has(key)) continue;
-      const absolute = path.resolve(root, query.file);
-      const source = sourceOf(query.file);
-      const location = await referee.typeDeclarationLocationAt(
-        absolute, source, query.at.start, query.at.end,
-      );
-      if (!location) { cache.set(key, undefined); continue; }
-      if (isOutsideTree(location.file, root)) { cache.set(key, { kind: "external" }); continue; }
-      const lineText = lineOf(location.file, location.line);
-      const concrete = isConcreteClassLine(lineText) ?? false;
-      cache.set(key, { kind: "declared", file: path.relative(root, location.file), concrete });
+      cache.set(key, undefined); // claimed, so a duplicate query in another worker is not asked twice.
+      try {
+        const absolute = path.resolve(root, query.file);
+        const source = sourceOf(query.file);
+        const location = await referee.typeDeclarationLocationAt(
+          absolute, source, query.at.start, query.at.end,
+        );
+        if (!location) continue;
+        if (isOutsideTree(location.file, root)) { cache.set(key, { kind: "external" }); continue; }
+        const lineText = lineOf(location.file, location.line);
+        const concrete = isConcreteClassLine(lineText) ?? false;
+        cache.set(key, { kind: "declared", file: path.relative(root, location.file), concrete });
+      } catch {
+        // A query that failed in a way `typeDeclarationLocationAt` itself does
+        // not already turn into `undefined` (the referee's own process died,
+        // say) stays unresolved -- the same "silence over a guess" rule every
+        // branch above already follows.
+      }
     }
-  } catch {
-    // A query mid-batch failed in a way `typeDeclarationLocationAt` itself
-    // does not already turn into `undefined` (the referee's own process
-    // died, say). Whatever is already cached stays cached; anything not
-    // yet asked stays unresolved -- the same "silence over a guess" rule
-    // every branch above already follows.
-  }
+  };
+  await Promise.all(Array.from({ length: Math.min(CONCURRENCY, queries.length) }, worker));
 
   return {
     cache: { get: (file, at) => cache.get(queryKey(file, at)) },
     close: () => referee.close(),
+    started: true,
+    withheldNoType: referee.withheldNoType(),
   };
+}
+
+export interface PythonReceiverAnswers {
+  cache: PythonClosedBodyCache;
+  close: () => void;
+  /** Whether pyright ran at all. False when there was nothing to ask, or it could not start. */
+  started: boolean;
+  /** Answers withheld because their line declares no type (#259). */
+  withheldNoType: number;
 }
