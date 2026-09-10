@@ -958,6 +958,9 @@ one word or one reader, not from reviewing the design.
     contradiction) are untouched by any of this — but the ceiling itself is
     no longer "real and nearly empty."
 
+    **ts/tsx/js only, and item 23 is where the other two languages were asked.**
+    The reversal is TypeScript's: Python closes a quarter and Rust a sixth.
+
 14. **Item 13's reversal, checked against AGENTS.md's own gate: 0.7% wrong,
     and two of the bugs that measurement found were in this session's own
     code, not in a hazard nobody anticipated.** "50.3% closed" says how much
@@ -2006,6 +2009,94 @@ be one: `<MenuContent />` is a routine making a MenuContent, which is `@builds`.
     |---|---|---|---|---|
     | Python | item 17, restated | self-consistency: pyright asked twice | 98.4% (12,906 of 13,113) | 0.35% |
     | Python | item 21, restated | independent: mypy | 84.1% | 0.0% (0 of 11,023) |
+
+23. **Item 13's reversal does not generalise. Python closes a quarter of its
+    call bodies with a real checker and Rust a sixth, against TypeScript's
+    half — and Rust's is low with the *best* reach of the three, which is the
+    part that says something (#256).** Item 13 reversed #221's "don't build it"
+    on one number, 10.6% → 50.3%, and `measure:closed-bodies` asked that
+    question of ts/tsx/js only, because TypeScript was the only language with a
+    tier-2 resolver when it was written. Python got one at #235/#243 and Rust at
+    #246; `TIER2_LANGUAGES` never grew. So half of call bodies closing was on
+    the record as the result of this arc while nobody had asked the other two.
+
+    `npm run measure:closed-bodies`, whole corpus, 15,588 bodies:
+
+    | language | with calls | closed, text alone | closed, tier 2 |
+    |---|---|---|---|
+    | ts | 2,075 | 8.7% | **53.3%** |
+    | tsx | 489 | 17.2% | 36.0% |
+    | js | 78 | 6.4% | 6.4% |
+    | python | 8,786 | 13.9% | **25.7%** |
+    | rust | 2,416 | 3.0% | **16.1%** |
+    | all | 13,844 | 11.3% | 28.4% |
+
+    ts/tsx/js together are 48.8% against item 13's 50.3%. Not a change from
+    anything here: `mundane` and `infrarouter` are unpinned and have moved since,
+    which PR #238 already recorded when the same drift showed up in a different
+    figure.
+
+    **The reach each number rests on, which is what makes a low one readable.**
+    `declared + external` over the queries actually asked:
+
+    | language | queries | never asked | asked | answered | reach |
+    |---|---|---|---|---|---|
+    | ts | 9,580 | 0 | 9,580 | 7,860 | 82.0% |
+    | tsx | 1,897 | 0 | 1,897 | 1,541 | 81.2% |
+    | python | 31,872 | 0 | 31,872 | 20,960 | 65.8% |
+    | rust | 12,193 | 5,013 | 7,180 | 6,404 | **89.2%** |
+
+    **Never asked is kept out of the denominator on purpose, and it is 41% of
+    Rust's queries.** 2,529 are a type used as a path — `String::new()`,
+    `std::str::from_utf8(..)`, which is how Rust writes a constructor and a free
+    function, so there is no value at that position whose type could be declared
+    anywhere. (A type the file imports by name is placed by the reader's own
+    name search and never reaches the resolver at all — found by a fixture that
+    produced no such query until it used a prelude type, not by reading the
+    code.) 1,553 are a
+    receiver `rustTypeAnchorFor` places no cursor in at all (a subscript, a
+    trailing `?`, a trailing path call), for the reasons #246 measured. 922 are
+    `mundane`'s Rust, which no `Cargo.toml` claims, so rust-analyzer has no
+    crate graph to answer from. Counting any of them as refusals would report
+    Rust's constructor spelling as the resolver failing.
+
+    **So Rust's 16.1% is not about reach.** rust-analyzer answers a higher share
+    of what it is asked than `tsc` does, and Rust still closes a third as many
+    bodies. On `ripgrep` alone, after tier 2, `receiver` is still the sole
+    blocker in 26.5% of open bodies and `unbound` in 13.1%, with a `macro`
+    doubt present in 820 more. The constructors that were never asked are
+    exactly those remaining `receiver` blocks: `let x = Foo::new(); x.run()`
+    leaves the reader nothing, and the resolver is not asked because the text
+    names a type rather than a value. Rust's closed region is small because of
+    how Rust is written, not because rust-analyzer declines to answer — which is
+    the opposite of what a bare 16.1% beside 89.2% invites a reader to assume.
+
+    **Python's quarter is honest and lower than it would have been last week.**
+    6,575 answers are withheld by #259's rule, whose whole point is that they
+    were never a type's declaration. Measured before that fix, Python's share
+    would have been higher and part of it would have rested on a wrong file.
+    After tier 2, `receiver` is still the sole blocker in 28.4% of open Python
+    bodies and `unbound` in 26.3%, so the same wall stands one language over.
+
+    **Cost, since this is now the most expensive measurement here.** 5m41s for
+    the whole corpus, 187s of it language-server time. Two full readings gave
+    identical closed shares and reach in every language, so unlike item 21's
+    pyright counts these do not move between runs. pyright answered 216 queries
+    a second on `graphify`; rust-analyzer answered about 1,600, because it
+    serves a warm index where pyright re-analyses — the reason Rust's whole
+    10,421-query pass on `ripgrep` takes five seconds and Python's takes a
+    hundred.
+
+    **The interface guard's cost, per language (#233).** A closed body carrying a
+    placement whose type is not concrete is withheld rather than accused from:
+    ts 12.8%, tsx 4.0%, python 10.9%, rust 0.3%. Rust's is near zero because a
+    `trait` receiver is rare in this corpus, not because the guard is weaker —
+    it reads the declaration keyword, where Python reads `Protocol`/`ABC` off a
+    base list and TypeScript asks the compiler.
+
+    **What this does not do:** nothing is licensed and nothing new may accuse.
+    A closed share is a coverage figure. Wrongness for each resolver is
+    `measure:resolution`'s (items 20-22), and no word's licence moved here.
 
 
 ## Open, in the order worth doing

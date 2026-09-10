@@ -110,7 +110,13 @@ describe.skipIf(!hasRustAnalyzer)("resolveRustReceivers", () => {
       + "pub fn on_trait_object(s: &dyn Store) -> u32 {\n    s.run()\n}\n"
       + "pub fn on_generic<T: Store>(t: &T) -> u32 {\n    t.run()\n}\n"
       + "pub fn on_std(names: Vec<String>) -> usize {\n    names.len()\n}\n"
-      + "pub fn on_path_call() -> u32 {\n    Config::new().load()\n}\n";
+      + "pub fn on_path_call() -> u32 {\n    Config::new().load()\n}\n"
+      // A prelude type, which no `use` line names, so the reader's own name
+      // search has nothing to place and the resolver really is asked. An
+      // imported type is placed by that search first and never reaches here --
+      // confirmed by probing this fixture, which is why the path-receiver case
+      // needs a type from the prelude rather than `Config`.
+      + "pub fn on_prelude() -> String {\n    String::new()\n}\n";
     write(repo, "src/use_site.rs", source);
 
     const receiver = (needle: string) => {
@@ -123,6 +129,8 @@ describe.skipIf(!hasRustAnalyzer)("resolveRustReceivers", () => {
     at.generic = receiver("t.run");
     at.std = receiver("names.len");
     at.pathCall = receiver("Config::new().load");
+    const prelude = rangeOf(source, "String::new()");
+    at.prelude = { start: prelude.start, end: prelude.start + "String".length };
 
     answers = await resolveRustReceivers(
       repo, Object.values(at).map((one) => ({ file: "src/use_site.rs", at: one })));
@@ -170,14 +178,16 @@ describe.skipIf(!hasRustAnalyzer)("resolveRustReceivers", () => {
     expect(get("pathCall")).toBeUndefined();
   });
 
-  it("counts a type spelled as a path apart, since no value sits at that position", () => {
+  it("counts a type used as a path apart, since no value sits at that position", () => {
     /*
-     * `Config::new()` inside `Config::new().load()` is itself a call whose
-     * receiver is `Config` -- a type, not a value. Counted rather than asked,
-     * because folding it into a refusal would report how Rust spells its
-     * constructors as the resolver failing to answer. This is the single
-     * biggest reason Rust's reach sits below TypeScript's.
+     * `String` in `String::new()` is a type, not a value, so `typeDefinition`
+     * has nothing at that position to have an opinion about. Counted rather
+     * than asked, because folding it into a refusal would report how Rust
+     * spells its constructors as the resolver failing to answer. 2,529 queries
+     * corpus-wide, the largest single reason Rust's reach figure is computed
+     * over fewer queries than the reader asked about.
      */
+    expect(get("prelude")).toBeUndefined();
     expect(answers.pathReceiver).toBeGreaterThan(0);
   });
 

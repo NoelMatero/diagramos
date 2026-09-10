@@ -999,8 +999,12 @@ if (lspRuns.length > 0) {
   for (const one of lspRuns) {
     lspSeconds += one.seconds;
     const notes = [
-      one.started ? undefined : "resolver never started",
-      one.primedCleanly === false ? "a server never reported finished indexing" : undefined,
+      one.started ? undefined : "no resolver ran on this tree at all",
+      // Only meaningful when a server actually ran: with no crate for it to
+      // index, "never reported finished indexing" would restate the line above
+      // as if it were a second fault.
+      one.started && one.primedCleanly === false
+        ? "a server never reported finished indexing" : undefined,
       one.unclaimed ? `${one.unclaimed} in a file no Cargo.toml claims` : undefined,
       one.pathReceiver ? `${one.pathReceiver} a type spelled as a path` : undefined,
       one.anchorWithheld ? `${one.anchorWithheld} no anchor to ask at` : undefined,
@@ -1009,7 +1013,13 @@ if (lspRuns.length > 0) {
       one.withheldNoType
         ? `${one.withheldNoType} answered a line that declares no type (#259)` : undefined,
     ].filter(Boolean);
-    console.log(`    ${one.language}/${one.tree}: ${one.distinct} sites in ${one.seconds}s`
+    /*
+     * Queries, not distinct sites, because every count after the colon is a
+     * count of queries -- printing one against the other made a tree read as
+     * having more unclaimed sites than sites.
+     */
+    console.log(`    ${one.language}/${one.tree}: ${one.asked} queries`
+      + ` (${one.distinct} distinct sites) in ${one.seconds}s`
       + (notes.length > 0 ? ` -- ${notes.join("; ")}` : ""));
   }
   console.log();
@@ -1029,7 +1039,7 @@ console.log("  Every closed-share and ceiling number above says how *much* this 
 console.log("  is the only section that asks how often it is *right*. ts/tsx/js only -- it asks");
 console.log("  `tsc` a second question in process, and neither language server here answers");
 console.log("  one comparable. Python's and Rust's wrongness figures are `measure:resolution`'s");
-console.log("  (items 20-22), against oracles that share nothing with their reader. For every");
+console.log("  own, against oracles that share nothing with their reader. For every");
 console.log("  receiver call");
 console.log("  this session's placement actually placed, a second, more direct question --");
 console.log("  what does the method itself (`getSymbolAtLocation` on `foo` in `x.foo()`)");
