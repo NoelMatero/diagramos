@@ -543,19 +543,33 @@ export const LICENCES: readonly Licence[] = [
       accesses: {
         presence: {
           reproduce: "npm run measure:accesses",
-          measured: "2026-09-04",
+          measured: "2026-09-11",
           referee: MEMBER_SCAN,
           unit: "member asks at the type end",
-          counts: { asked: 5181, missed: 0, invented: 0 },
+          counts: { asked: 5460, missed: 0, invented: 0 },
           covers: ["ts", "tsx"],
           note:
-            "4,823 of them TypeScript and 358 TSX, and the count is of the **type** " +
-            "end only -- the end that can accuse. TypeScript refuses 1.9% of its " +
+            "5,102 of them TypeScript and 358 TSX, and the count is of the **type** " +
+            "end only -- the end that can accuse. TypeScript refuses 1.8% of its " +
             "asks, every one of them a type with an index signature, which is a " +
             "member list that answers to any name at all. TSX refuses none. " +
             "JavaScript is inside this licence and was asked **0 questions**: it " +
             "writes no member list a text scan can find, so `covers` withholds it " +
-            "-- the same square #211 shipped a `yes` in.",
+            "-- the same square #211 shipped a `yes` in. " +
+            "Re-measured at #222. Two of the seven trees had silently stopped " +
+            "being read -- `find` overflowed its buffer and a blanket `catch` " +
+            "reported no files -- so the row above had been measured on a corpus " +
+            "the command could no longer reach: 1,232 asks where this row says " +
+            "5,833. With the walk fixed the referee change itself is worth +30 " +
+            "TypeScript asks; the rest of the movement from 4,823 is the trees. " +
+            "The two accusations that had appeared since -- both an inline object " +
+            "type in a one-line `interface` -- are back to zero. " +
+            "Re-run on today's main when #222's commit was recovered (#264): TSX, " +
+            "Rust and Python reproduce to the ask, and TypeScript is 5,004 -> " +
+            "5,102. This repository's own `src` and `scripts` are two of the seven " +
+            "trees and grew by 5 files across #261, #262 and #263, worth +102 on " +
+            "their own; the corpus is 4 asks lower elsewhere because three of the " +
+            "remaining trees are live checkouts rather than pinned clones.",
         },
         absence: NOT_DESIGNED_YET,
       },
@@ -721,19 +735,25 @@ export const LICENCES: readonly Licence[] = [
       accesses: {
         presence: {
           reproduce: "npm run measure:accesses",
-          measured: "2026-09-04",
+          measured: "2026-09-11",
           referee: MEMBER_SCAN,
           unit: "member asks at the type end",
-          counts: { asked: 284, missed: 0, invented: 0 },
+          counts: { asked: 350, missed: 0, invented: 0 },
           note:
             "Refuses none of them, which is the one language where the member list " +
             "really is a declaration: a struct has no parent to inherit from and no " +
             "index signature. What Rust costs instead is at the other end, which " +
-            "never accuses -- the confirming half reads 87.3% of the accesses the " +
-            "referee sees, the lowest of the five, because `format!(\"{}\", " +
-            "self.status)` and `log_line!(.., sock.peer_addr())` put the access " +
-            "inside a macro and a macro's arguments are an unparsed token tree. " +
-            "That is a confirmation nobody gets, never a red.",
+            "never accuses -- the confirming half reads 89.3% of the accesses the " +
+            "referee sees, the lowest of the five by a distance, because " +
+            "`format!(\"{}\", self.status)` and `log_line!(.., sock.peer_addr())` " +
+            "put the access inside a macro and a macro's arguments are an unparsed " +
+            "token tree. That is a confirmation nobody gets, never a red. " +
+            "#222 cleared the referee's own bugs out of all five languages and this " +
+            "figure barely moved -- 89.2% to 89.3% on one corpus, against 87.3% " +
+            "recorded here on another -- which is the finding rather than a " +
+            "disappointment: every other language went to 99.8% or better, and 110 " +
+            "of the 116 misses left in the whole corpus are Rust, 83 of them one " +
+            "generated file whose every body reads its fields inside a macro.",
         },
         absence: NOT_DESIGNED_YET,
       },
@@ -971,10 +991,10 @@ export const LICENCES: readonly Licence[] = [
       accesses: {
         presence: {
           reproduce: "npm run measure:accesses",
-          measured: "2026-09-04",
+          measured: "2026-09-11",
           referee: MEMBER_SCAN,
           unit: "member asks at the type end",
-          counts: { asked: 368, missed: 0, invented: 0 },
+          counts: { asked: 356, missed: 0, invented: 0 },
           note:
             "The smallest population on this row and the reason is the design " +
             "working: a Python class with a base class has no closed member list, " +
