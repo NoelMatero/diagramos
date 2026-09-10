@@ -1111,6 +1111,30 @@ export type SiteUnresolved = Extract<
   "computed" | "dynamic" | "receiver" | "unbound" | "ambiguous" | "unplaced" | "elsewhere" | "macro"
 >;
 
+/**
+ * Which of the two things `unbound` means, when it is the reason (#256's
+ * follow-up).
+ *
+ * The word covers both and they send a reader to opposite places, which a
+ * blocker table cannot show: after tier 2 wired a real checker into every
+ * language, `unbound` became the single largest reason a body stays open
+ * (33.7% of them), and reading a cause off that label is how a wrong
+ * conclusion gets drawn from a real number.
+ *
+ *   `not-in-scope`          the name is neither imported nor declared here, so
+ *                           something brought it into scope invisibly: a
+ *                           wildcard import, a global, an ambient declaration,
+ *                           a language builtin. The text genuinely does not
+ *                           say, and `bindPython`'s own doc calls this the
+ *                           correct answer rather than a gap.
+ *   `unresolved-specifier`  the name *is* imported, and the module it comes
+ *                           from resolved to no file that `resolve.ts` could
+ *                           place, and the specifier is not a known
+ *                           dependency either. This one is about our own
+ *                           module resolution.
+ */
+export type SiteUnboundCause = "not-in-scope" | "unresolved-specifier";
+
 /** One call written in a body, and whether the reader can say what it reaches. */
 export interface CallSitePlaced {
   /** The callee as written, empty when the name is not in the text. */
@@ -1121,6 +1145,8 @@ export interface CallSitePlaced {
   file?: string;
   /** Why it was not placed. Absent exactly when `file` is present. */
   why?: SiteUnresolved;
+  /** Which kind of `unbound`, present exactly when `why` is `unbound`. */
+  unboundCause?: SiteUnboundCause;
   /**
    * Whether this call went through `resolveReceiver` at all -- `x.foo()`,
    * not a bare `foo()`. Without this, a `why` tally cannot be checked
@@ -1218,13 +1244,22 @@ function comesToRest(
 /** Where one call site's callee lives, when it can be placed at all. */
 type Placement = { file: string; concrete?: boolean };
 
+/** Why it could not be, with `unbound`'s own two causes told apart. */
+type Refused = { why: SiteUnresolved; unboundCause?: SiteUnboundCause };
+
 /** `placeOf`'s local/imported/comesToRest lookup, factored out so a type name a resolver hands back gets placed by the exact same rule a value name would be. */
-function placeName(name: string, side: CallSide, bindings: Bindings): Placement | { why: SiteUnresolved } {
+function placeName(name: string, side: CallSide, bindings: Bindings): Placement | Refused {
   if (bindings.ambiguous.has(name)) return { why: "ambiguous" };
   const imported = bindings.imported.get(name);
-  if (!imported) return bindings.local.has(name) ? { file: side.file } : { why: "unbound" };
+  if (!imported) {
+    return bindings.local.has(name)
+      ? { file: side.file }
+      : { why: "unbound", unboundCause: "not-in-scope" };
+  }
   const { files, known } = filesFor(imported.specifier, side.imports);
-  if (files.size === 0) return { why: known ? "unplaced" : "unbound" };
+  if (files.size === 0) {
+    return known ? { why: "unplaced" } : { why: "unbound", unboundCause: "unresolved-specifier" };
+  }
   for (const file of files) {
     const rest = comesToRest(name, file, side, new Set());
     if (rest) return { file: rest };
@@ -1260,7 +1295,7 @@ function placeThroughChecker(
   at: { start: number; end: number } | undefined,
   side: CallSide,
   bindings: Bindings,
-): Placement | { why: SiteUnresolved } | undefined {
+): Placement | Refused | undefined {
   if (!at || !side.resolveReceiver) return undefined;
   const resolved = side.resolveReceiver(at);
   if (!resolved) return undefined;
@@ -1282,7 +1317,7 @@ function placeOf(
   callee: Callee,
   side: CallSide,
   bindings: Bindings,
-): Placement | { why: SiteUnresolved } {
+): Placement | Refused {
   if (callee.kind === "computed") return { why: "computed" };
   if (REACHES_ANYTHING.has(callee.name)) return { why: "dynamic" };
 
@@ -1294,7 +1329,7 @@ function placeOf(
   const at = callee.kind === "through" ? callee.at : undefined;
   // A resolver is only ever a fallback for a `through` callee -- `bare` and
   // `own` calls have no receiver expression for one to be asked about.
-  const throughChecker = (): { why: SiteUnresolved } | Placement =>
+  const throughChecker = (): Refused | Placement =>
     placeThroughChecker(at, side, bindings) ?? { why: "receiver" };
 
   // An expression receiver -- `make().run()`, `a.b.c()` -- names nothing to
@@ -1328,7 +1363,7 @@ function placeOf(
   if (imported && callee.kind === "through" && !imported.namespace) return throughChecker();
   if (!imported) {
     if (!bindings.local.has(bound)) {
-      if (callee.kind !== "through") return { why: "unbound" };
+      if (callee.kind !== "through") return { why: "unbound", unboundCause: "not-in-scope" };
       return throughChecker();
     }
     /*
@@ -1349,7 +1384,7 @@ function placeOf(
     // is a namespace rather than an ordinary value that merely shares its
     // name with one, and a resolver answers the value question directly.
     if (callee.kind === "through") return throughChecker();
-    return { why: known ? "unplaced" : "unbound" };
+    return known ? { why: "unplaced" } : { why: "unbound", unboundCause: "unresolved-specifier" };
   }
   for (const file of files) {
     const rest = comesToRest(callee.name, file, side, new Set());
@@ -1435,7 +1470,10 @@ export function callSitesIn(side: CallSide): CallSitesReading {
         ...(callee.kind === "through" ? { memberAt: callee.memberAt } : {}),
         ...("file" in where
           ? { file: where.file, ...(where.concrete !== undefined ? { concrete: where.concrete } : {}) }
-          : { why: where.why }),
+          : {
+            why: where.why,
+            ...(where.unboundCause !== undefined ? { unboundCause: where.unboundCause } : {}),
+          }),
       });
     });
     bodies.push(body);

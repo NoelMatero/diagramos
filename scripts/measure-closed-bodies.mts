@@ -290,6 +290,66 @@ interface LspRun {
 const lspRuns: LspRun[] = [];
 
 /**
+ * `unbound`'s two causes, per language and per tier (#256's follow-up).
+ *
+ * Tier 2 halved the bodies blocked only by an unresolved receiver and left
+ * `unbound` as the largest single reason a body stays open. The word covers a
+ * name nothing in the text bound -- a wildcard import, a global, a builtin --
+ * and a name that *is* imported from a module our own resolution could not
+ * place. The first is a fact about the language, the second is about us, and a
+ * blocker table showing only the label is what made the cause guessable rather
+ * than known.
+ *
+ * Counted per site, and separately per *body* where `unbound` is the only thing
+ * blocking, because that is the population the 33.7% is drawn from and the only
+ * one a fix would move.
+ */
+const causeSites = new Map<Language, Map<string, number>>();
+const causeSitesTier2 = new Map<Language, Map<string, number>>();
+/** Bodies whose only blocker is `unbound`, by which causes appear in them. */
+const causeSole = new Map<Language, Map<string, number>>();
+const causeSoleTier2 = new Map<Language, Map<string, number>>();
+/** The names themselves, tier 2 -- a builtin and a wildcard import both land in
+ *  `not-in-scope`, and only the names tell them apart. */
+const notInScopeNames = new Map<string, number>();
+const unresolvedSpecifierNames = new Map<string, number>();
+
+/**
+ * One reading's `unbound` causes, per site and per sole-blocked body.
+ *
+ * `names` is only gathered on the tier-2 reading: the tier-1 one asks about the
+ * same sites and the point of the names is to read the residue that survives a
+ * real checker.
+ */
+function bumpUnboundCauses(
+  bodiesRead: BodyCallSites[], language: Language,
+  sites: Map<Language, Map<string, number>>, sole: Map<Language, Map<string, number>>,
+  names: boolean,
+): void {
+  for (const body of bodiesRead) {
+    const blocking = body.sites.filter((one) => one.why);
+    if (blocking.length === 0) continue;
+    const perSite = sites.get(language) ?? new Map<string, number>();
+    sites.set(language, perSite);
+    for (const site of blocking) {
+      if (site.why !== "unbound") continue;
+      const cause = site.unboundCause ?? "unnamed";
+      bump(perSite, cause);
+      if (!names) continue;
+      if (cause === "not-in-scope") bump(notInScopeNames, site.name || "(no name)");
+      if (cause === "unresolved-specifier") bump(unresolvedSpecifierNames, site.name || "(no name)");
+    }
+    // Sole-blocked: every blocking site in the body is `unbound`, which is what
+    // "remove this reason and the body closes" means for this reason.
+    if (!blocking.every((one) => one.why === "unbound")) continue;
+    const present = new Set(blocking.map((one) => one.unboundCause ?? "unnamed"));
+    const perSole = sole.get(language) ?? new Map<string, number>();
+    sole.set(language, perSole);
+    bump(perSole, present.size > 1 ? "both" : [...present][0]!);
+  }
+}
+
+/**
  * What `resolveReceiver` actually answered, every query, no correlation
  * needed after the fact -- counted right where the answer is decided,
  * which is the fix for the imprecise line-matching an earlier session's
@@ -432,6 +492,7 @@ for (const tree of trees) {
           tier2Reading.bodies, language, bodiesTier2, closedTier2, calllessTier2, openTier2,
           soleBlockerTier2, anyBlockerTier2, siteReasonTier2,
         );
+        bumpUnboundCauses(tier2Reading.bodies, language, causeSitesTier2, causeSoleTier2, true);
         for (const body of tier2Reading.bodies) {
           bumpGuardCost(body, language);
           for (const site of body.sites) {
@@ -461,6 +522,8 @@ for (const tree of trees) {
      * guessed at -- the referee cannot tell the two apart either, and pairing
      * them by name would manufacture a disagreement out of the pairing.
      */
+    bumpUnboundCauses(reading.bodies, language, causeSites, causeSole, false);
+
     const scanned = refereeRoutines(stripNoise(source, language), language);
     const seenTwice = new Set<string>();
     const byName = new Map<string, (typeof scanned)[number]>();
@@ -617,6 +680,7 @@ for (const tree of trees) {
         bodies, language, bodiesTier2, closedTier2, calllessTier2, openTier2,
         soleBlockerTier2, anyBlockerTier2, siteReasonTier2,
       );
+      bumpUnboundCauses(bodies, language, causeSitesTier2, causeSoleTier2, true);
       for (const body of bodies) bumpGuardCost(body, language);
     }
 
@@ -957,6 +1021,76 @@ if (siteUnboundOrUnplaced <= noFileOrNone) {
   console.log(`  ${siteUnboundOrUnplaced - noFileOrNone} more sites are unbound/unplaced than the resolver's own`);
   console.log("  ceiling accounts for -- a real remaining gap, worth a fixture and a fix");
   console.log("  rather than accepting the number as final.");
+}
+console.log();
+
+console.log("6a · WHICH KIND OF `unbound`, now that it is the largest blocker");
+console.log();
+console.log("  Tier 2 halved the bodies blocked only by an unresolved receiver, which left");
+console.log("  `unbound` first. The word covers two situations that point a fix in opposite");
+console.log("  directions, and the blocker table above cannot show which:");
+console.log();
+console.log("    not-in-scope          the name is neither imported nor declared here, so");
+console.log("                          something bound it invisibly -- a wildcard import, a");
+console.log("                          global, an ambient declaration, a language builtin.");
+console.log("                          The text does not say. Nothing here can fix it.");
+console.log("    unresolved-specifier  the name IS imported, and the module it came from");
+console.log("                          resolved to no file and is not a known dependency.");
+console.log("                          That is our own module resolution.");
+console.log();
+console.log("  Per site, both readings:");
+console.log();
+console.log("  " + "language".padEnd(10) + "not-in-scope".padStart(14) + "  t2"
+  + "unresolved-spec".padStart(17) + "  t2");
+for (const language of LANGUAGES) {
+  const one = causeSites.get(language);
+  const two = causeSitesTier2.get(language);
+  if (!one && !two) continue;
+  console.log("  " + language.padEnd(10)
+    + String(one?.get("not-in-scope") ?? 0).padStart(14)
+    + "  " + String(two?.get("not-in-scope") ?? 0).padEnd(8)
+    + String(one?.get("unresolved-specifier") ?? 0).padStart(15)
+    + "  " + String(two?.get("unresolved-specifier") ?? 0));
+}
+console.log();
+console.log("  And per BODY, counting only bodies where `unbound` is the only thing blocking --");
+console.log("  the population section 6's sole-blocker column is drawn from, and the only one a");
+console.log("  fix would move. `both` needs both causes gone before the body closes:");
+console.log();
+console.log("  " + "language".padEnd(10) + "not-in-scope".padStart(14)
+  + "unresolved-spec".padStart(17) + "both".padStart(7) + "  tier 2 total");
+let soleNot = 0, soleSpec = 0, soleBoth = 0;
+for (const language of LANGUAGES) {
+  const two = causeSoleTier2.get(language);
+  if (!two) continue;
+  const notInScope = two.get("not-in-scope") ?? 0;
+  const spec = two.get("unresolved-specifier") ?? 0;
+  const both = two.get("both") ?? 0;
+  soleNot += notInScope; soleSpec += spec; soleBoth += both;
+  console.log("  " + language.padEnd(10) + String(notInScope).padStart(14)
+    + String(spec).padStart(17) + String(both).padStart(7)
+    + "  " + String(notInScope + spec + both).padStart(11));
+}
+const soleAll = soleNot + soleSpec + soleBoth;
+console.log("  " + "all".padEnd(10) + String(soleNot).padStart(14)
+  + String(soleSpec).padStart(17) + String(soleBoth).padStart(7)
+  + "  " + String(soleAll).padStart(11));
+console.log();
+console.log(`  So of the bodies only \`unbound\` keeps open, ${percent(soleNot, soleAll).trim()} are a name the text`);
+console.log(`  never bound and ${percent(soleSpec + soleBoth, soleAll).trim()} would need our own module resolution to improve.`);
+console.log();
+console.log("  The names, tier 2, most frequent first. `not-in-scope` mixes a language builtin");
+console.log("  with a name a wildcard import brought in, and only the names tell them apart --");
+console.log("  a builtin is arguably not a call to any repository routine at all, which would");
+console.log("  make it a definition to change rather than a resolution to improve:");
+for (const [label, names] of [
+  ["not-in-scope", notInScopeNames], ["unresolved-specifier", unresolvedSpecifierNames],
+] as const) {
+  console.log();
+  console.log(`    ${label}:`);
+  const top = [...names.entries()].sort((a, b) => b[1] - a[1]).slice(0, cap(20));
+  for (const [name, count] of top) console.log(`      ${name.padEnd(28)} ${String(count).padStart(6)}`);
+  console.log(`      (${names.size} distinct names)`);
 }
 console.log();
 

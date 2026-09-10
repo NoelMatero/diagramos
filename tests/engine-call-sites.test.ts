@@ -36,6 +36,13 @@ function sitesIn(
   return reading.bodies;
 }
 
+/** `unbound`'s own two causes for one routine's unplaced calls, in source order. */
+function causes(source: string, routine: string, language: Language = "ts", extra: Partial<CallSide> = {}) {
+  const body = sitesIn(source, language, extra).find((one) => one.routine === routine);
+  if (!body) throw new Error(`no body ${routine}`);
+  return body.sites.filter((one) => one.why === "unbound").map((one) => one.unboundCause);
+}
+
 /** The reasons one routine's unplaced calls gave, in source order. */
 function why(source: string, routine: string, language: Language = "ts", extra: Partial<CallSide> = {}) {
   const body = sitesIn(source, language, extra).find((one) => one.routine === routine);
@@ -111,6 +118,40 @@ describe("a body the reader must leave open", () => {
       "ts",
       { imports: [{ specifier: "unittest.mock" }] },
     )).toEqual(["unplaced"]);
+  });
+
+  /*
+   * #256's follow-up. Wiring a real checker into every language halved the
+   * bodies blocked only by an unresolved receiver and left `unbound` as the
+   * largest single reason a body stays open -- 33.7% of them. The word covers
+   * two situations that send a reader to opposite places, and a blocker table
+   * showing only the label invites the cause to be guessed at. Each shape
+   * below is one a real corpus produces, and the cause each must report.
+   */
+  it("calls a global or a builtin `not-in-scope`, because nothing in the text bound it", () => {
+    expect(causes("function f() {\n  setTimeout(go, 1);\n}\n", "f")).toEqual(["not-in-scope"]);
+  });
+
+  it("calls a name a Python wildcard import brought in `not-in-scope`", () => {
+    // `bindPython`'s own doc: nothing is recorded for `import *`, and every
+    // name it brought in comes out unbound. Which kind of unbound is the
+    // question this cause answers.
+    expect(causes(
+      "from helpers import *\n\n\ndef f():\n    mystery()\n",
+      "f",
+      "python",
+      { imports: [{ specifier: "helpers" }] },
+    )).toEqual(["not-in-scope"]);
+  });
+
+  it("calls an import whose module resolved to nothing `unresolved-specifier`", () => {
+    // Imported by name, so the text does say where it came from -- our own
+    // module resolution could not place it. The opposite conclusion from the
+    // two above, which is why the two share no word here.
+    expect(causes(
+      'import { go } from "@internal/thing";\nfunction f() {\n  go();\n}\n',
+      "f",
+    )).toEqual(["unresolved-specifier"]);
   });
 
   it("leaves a barrel re-export open when the chain runs out of road", () => {
