@@ -19,7 +19,7 @@
  * is where the anchor rules are pinned, and it needs no server.
  */
 import { execFileSync } from "node:child_process";
-import { mkdirSync, mkdtempSync, rmSync, writeFileSync } from "node:fs";
+import { mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from "node:fs";
 import os from "node:os";
 import path from "node:path";
 
@@ -153,6 +153,23 @@ describe.skipIf(!hasRustAnalyzer)("createRustAnalyzerReferee", () => {
     expect(member).toBeDefined();
     const declaring = await referee.methodDeclarationAt(useFile, useSource, member!.start, member!.end);
     expect(declaring && path.relative(repo, declaring)).toBe(path.join("src", "decl.rs"));
+  }, LIVE_TIMEOUT_MS);
+
+  /*
+   * #254 needs the line as well as the file: `measure:calls` asks whether a
+   * call landed on the one routine its text scan meant, and a file that
+   * declares two routines of the same name has no other way to say which.
+   * Tested here, on the server this file already pays for, rather than in a
+   * file of its own -- a third concurrent rust-analyzer made the suite time
+   * out on whichever of the three lost the race.
+   */
+  it("methodDeclarationLocationAt keeps the line the declaration starts on", async () => {
+    const receiverEnd = rangeOf(useSource, "c.load").start + 1;
+    const member = rustMemberRangeAfter(useSource, receiverEnd, "load");
+    const at = await referee.methodDeclarationLocationAt(useFile, useSource, member!.start, member!.end);
+    expect(at && path.relative(repo, at.file)).toBe(path.join("src", "decl.rs"));
+    const declared = readFileSync(path.join(repo, "src", "decl.rs"), "utf8").split("\n")[at!.line];
+    expect(declared).toContain("fn load");
   }, LIVE_TIMEOUT_MS);
 
   it("methodDeclarationAt at the receiver's position answers a different question entirely", async () => {

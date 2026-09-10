@@ -93,6 +93,13 @@ export interface TsReferee {
    * first.
    */
   symbolDeclarationAt(file: string, start: number, end: number): string | undefined;
+  /**
+   * `symbolDeclarationAt`'s question with the declaration's 0-based line kept,
+   * taken from the declaration's own name where it has one. `measure:calls`
+   * needs the line (#254): a file can declare two routines, and only the line
+   * says which one "go to definition" landed on.
+   */
+  symbolDeclarationLocationAt(file: string, start: number, end: number): { file: string; line: number } | undefined;
 }
 
 const SKIP_DIRECTORIES = new Set([
@@ -388,7 +395,7 @@ export function createTsReferee(root: string): TsReferee {
     return { text, head: headOfTs(text), declaringFile, concrete };
   }
 
-  function symbolDeclarationAt(file: string, start: number, end: number): string | undefined {
+  function symbolDeclarationLocationAt(file: string, start: number, end: number): { file: string; line: number } | undefined {
     const configPath = configOf.get(file);
     if (configPath === undefined) return undefined;
     const { program, checker } = programFor(configPath);
@@ -399,13 +406,29 @@ export function createTsReferee(root: string): TsReferee {
     try {
       const symbol = checker.getSymbolAtLocation(node);
       const real = symbol && (symbol.flags & ts.SymbolFlags.Alias) ? checker.getAliasedSymbol(symbol) : symbol;
-      return real?.getDeclarations()?.[0]?.getSourceFile().fileName;
+      const declaration = real?.getDeclarations()?.[0];
+      if (!declaration) return undefined;
+      const declaredIn = declaration.getSourceFile();
+      /*
+       * The declaration's own *name*, not the node it opens: a routine's
+       * leading doc comment is part of its declaration, so `getStart` on the
+       * declaration itself points at the comment's first line and a caller
+       * reading that line to see what is declared there reads prose.
+       */
+      const named = (declaration as ts.NamedDeclaration).name ?? declaration;
+      const { line } = declaredIn.getLineAndCharacterOfPosition(named.getStart(declaredIn));
+      return { file: declaredIn.fileName, line };
     } catch {
       return undefined;
     }
   }
 
-  return { typeAt, symbolDeclarationAt };
+  /** `symbolDeclarationLocationAt`'s own file-only projection (#254). */
+  function symbolDeclarationAt(file: string, start: number, end: number): string | undefined {
+    return symbolDeclarationLocationAt(file, start, end)?.file;
+  }
+
+  return { typeAt, symbolDeclarationAt, symbolDeclarationLocationAt };
 }
 
 /**

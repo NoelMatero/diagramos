@@ -410,6 +410,10 @@ export interface RustLspReferee {
   typeDeclarationAt(file: string, source: string, start: number, end: number): Promise<string | undefined>;
   /** `textDocument/definition` at `[start, end)` -- where the symbol *at that exact position* is declared. */
   methodDeclarationAt(file: string, source: string, start: number, end: number): Promise<string | undefined>;
+  /** `methodDeclarationAt`'s question with the declaration's line kept (#254). */
+  methodDeclarationLocationAt(
+    file: string, source: string, start: number, end: number,
+  ): Promise<{ file: string; line: number } | undefined>;
   /** `typeDeclarationAt`'s question with the declaration's line kept. */
   typeDeclarationLocationAt(
     file: string, source: string, start: number, end: number,
@@ -631,6 +635,7 @@ export async function createRustAnalyzerReferee(root: string): Promise<RustLspRe
         : Promise.resolve(undefined);
     },
     methodDeclarationAt: (file, source, start) => ask("definition", file, source, start),
+    methodDeclarationLocationAt: (file, source, start) => askLocation("definition", file, source, start),
     warmUp: whenPrimed,
     primedCleanly: () => primed,
     version: () => serverVersion,

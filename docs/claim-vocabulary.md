@@ -409,6 +409,15 @@ to whatever `foo` is; it cannot say the first thing about whose `resolve` is
 meant in `path.resolve()`. The reader refused 1,245 of those and confirmed 622,
 and it should — that is dynamic dispatch, the first hazard #189 lists.
 
+**That last sentence was half right, and #254 is the half it got wrong.** The
+refusals were correct. The 622 confirmations were never checked by anything, and
+six of them were calls to a standard-library method — a green nothing earned,
+and in the reverse direction a red. A referee's blind spot is a fine reason to
+report a population apart; it is not a reason to leave the reader's answers on
+it unread. `measure:calls` now asks a real checker "go to definition" at the
+call's own name, which is exactly the question the text scan cannot put, and the
+receiver calls are scored rather than set aside. See item 24.
+
 ### What the measurement found, which is the reason it exists
 
 Nine bugs, and not one was reachable by thinking about it. Four in the reader:
@@ -463,7 +472,7 @@ and never fail.
 | `npm run measure:accesses` | can the member reader be trusted with a red |
 | `npm run measure:conforms` | can the base-list reader be trusted with a red, and what confirm-only Rust costs — `--all` prints every disagreement |
 | `npm run measure:holds` | can the field reader be trusted with a red |
-| `npm run measure:calls` | can the call reader be trusted to say backwards, and how often it can answer |
+| `npm run measure:calls` | can the call reader be trusted to say backwards, and how often it can answer — a real checker places the receiver calls its text scan cannot (#254); `--no-checker` for the text scan alone, `--control` to ask the checker the questions the scan already answers, `--dump=<file>` for every answer including the agreements |
 | `npm run measure:constructs` | can the construction reader be trusted to say backwards |
 | `npm run measure:signature` | the same for parameters and return types |
 | `npm run measure:dataflow` | what following a value through one body buys, confirming and refuting |
@@ -472,8 +481,13 @@ and never fail.
 
 The pattern in all of them is a **referee**: count the shape one way, count it
 again by a completely different mechanism, report the disagreement. It is not
-ceremony. Between them these scripts have found eleven reader bugs and nineteen
+ceremony. Between them these scripts have found twelve reader bugs and nineteen
 referee bugs, and not one was reachable by thinking about it.
+
+**A referee has a blind spot of its own, and `measure:calls` now has a second
+referee for exactly that** (#254, item 24). Where a text scan cannot say whose
+`foo` is meant in `x.foo()`, a real checker can be asked "go to definition" at
+`foo` — and where the two referees can both answer, they agree.
 
 ### The corpus
 
@@ -541,10 +555,13 @@ to pass every check this tool had.
 deliberate: almost all of it is `Vec<T>`, `Promise<T>`, `list[str]`, which
 nobody draws as two boxes.
 
-## Thirteen times a measurement contradicted the design
+## Twenty-four times a measurement contradicted the design
 
-Kept because the pattern is the point: eleven of the thirteen came from building
-one word or one reader, not from reviewing the design.
+Kept because the pattern is the point: eleven of the first thirteen came from
+building one word or one reader, not from reviewing the design. Nothing since
+has broken that — item 24 is the clearest case of it, a reader bug four
+measurements had walked past because the population it lived in was reported
+apart and never scored.
 
 1. **The substrate was empty.** #190's first draft proposed graphify as the
    fact supplier on the strength of 8,167 `contains` edges. `contains` there is
@@ -2098,6 +2115,163 @@ be one: `<MenuContent />` is a routine making a MenuContent, which is `@builds`.
     A closed share is a coverage figure. Wrongness for each resolver is
     `measure:resolution`'s (items 20-22), and no word's licence moved here.
 
+
+24. **The population `@calls` was licensed on left out the receiver calls, and
+    the reader's answers on them had never been read by anything. Six of its
+    confirmations were calls to a standard-library method -- one of them a red
+    on a correct board. 0 missed and 0 wrongly accused survive the wider
+    population; the invented column did not (#254).**
+
+    #211 reported 1,995 receiver calls apart from its recall figure and gave the
+    right reason: its referee is a text scan, and a text scan cannot say whose
+    `foo` is meant in `x.foo()`. What it also did was record that the reader
+    "refused 1,245 of those and confirmed 622, and it should". The refusals were
+    right. **Nothing had ever checked the 622.**
+
+    **The second referee.** `scripts/lib/call-receivers.ts` asks the checker each
+    language already has -- `tsc` in process, pyright and rust-analyzer over
+    LSP -- for "go to definition" at the *call's own name*, which is the
+    question the text scan structurally cannot put. It shares nothing with the
+    reader: `callsBetween` places a name with tree-sitter and its own
+    `Bindings`, and `resolves` never consults a resolver at all. Three outcomes
+    per call, and the third is the one that keeps this honest:
+
+    - **real** -- the checker names a line in the target file that declares the
+      name. Scored exactly as a bare call is: agreed, refused, missed, accused.
+    - **elsewhere** -- every site answered and none is the target, so the call
+      is not to that routine and confirming it is an invention. It needs
+      *every* site answered: one unplaced site could be the real call, and
+      calling the rest elsewhere would turn a correct confirmation into a
+      false accusation of the reader.
+    - **silent** -- not scored, with the reason named. This is the line #211
+      did not have: a call nothing can place is reported as such rather than
+      dropped.
+
+    **The numbers.** `npm run measure:calls -- --control --all`, 7 trees, 1,740
+    files, 18m 12s. Run twice, on a corpus that gained files in between (two of
+    the seven trees are this repository's own `src` and `scripts`, and #261 and
+    #262 landed between the runs): **every figure in the table below is
+    identical across both**, and what moved is the bare-call population it is
+    measured beside -- ts 1,407 to 1,416 -- which is the unpinned corpus behaving
+    as PR #238 already recorded it behaving, when the same effect moved a
+    closed-body figure between two runs of identical code.
+
+    | language | receiver calls | real | elsewhere | silent | agreed | refused | missed | accused | invented |
+    |---|---|---|---|---|---|---|---|---|---|
+    | python | 1,494 | 876 | 271 | 347 | 542 | 334 | 0 | 0 | 0 |
+    | ts | 389 | 33 | 353 | 3 | 32 | 1 | 0 | 0 | 0 |
+    | tsx | 74 | 1 | 73 | 0 | 1 | 0 | 0 | 0 | 0 |
+    | rust | 161 | 45 | 24 | 92 | 17 | 28 | 0 | 0 | 0 |
+    | js | 11 | 0 | 0 | 11 | 0 | 0 | 0 | 0 | 0 |
+
+    And over the corpus Rust's own row is measured on (`.corpus/ripgrep`,
+    `.corpus/anyhow`, `rust-test`, `~/orangutan`), 2m 08s: 2,221 receiver calls,
+    1,381 real, 763 elsewhere, 77 silent -- 350 agreed, 1,031 refused, **0
+    missed, 0 accused, 0 invented**.
+
+    So the two columns a licence rests on hold on the harder half of the
+    population: `MISSED` and `ACCUSED` are zero everywhere, over 4,350 receiver
+    calls between the two corpora. The population the licence speaks for grows
+    from 5,525 to 6,401 in Python and from 574 to 1,955 in Rust.
+
+    **The cost is refusal, and it is large.** Of the receiver calls that are
+    genuinely to the target, the reader confirms 61.9% in Python, 97.0% in ts
+    and 25.3% in Rust's own corpus, `receiver` being nearly all of what it
+    withholds. A refusal is silence on a board, so this buys the wider
+    population without spending anything a person sees -- but it is why the
+    headline recall falls when the calls are counted in (92.9% -> 88.7% Python,
+    66.0% -> 37.3% Rust). **The recall figure is now over a population that
+    includes the questions nobody could answer before, and it should be read
+    that way rather than against #211's.**
+
+    **The reader bug, which is the actual finding.** Six confirmations came back
+    `elsewhere`, and every one was read against the source: `seen.add(file)` on
+    a `Set` (`src/engine/rust.ts`), `await response.json()` on a fetch
+    `Response` (`src/server/board-server.ts`), and in ripgrep
+    `Read::read_to_end`, `Path::parent` and `Command::arg` twice. In each case
+    the repository declares a routine of that name itself, and `resolves`
+    matched on the name.
+
+    Two lines, in the wrong order:
+
+    ```
+    if (!bindings.local.has(bound)) return callee.kind === "through" ? "receiver" : "unbound";
+    if (side.file === target.file) return "yes";                       // asked first
+    return callee.kind === "through" ? "receiver" : undefined;          // asked second
+    ```
+
+    A bare `add()` in a file that declares `add` is that file's own, which is
+    what the same-file branch is for. `seen.add(x)` is a method on `seen`, and
+    this file declaring an `add` says nothing about it. `placeOf` -- whose doc
+    says "every branch below is the same branch in the same order" -- asks
+    `through` first and is right. `resolves` asked it second, so a receiver call
+    fell into the bare answer.
+
+    **It reaches a board, and the cost is a red.** `drift.ts` puts both ends of
+    a `@calls` arrow through `callsBetween` with no same-file guard, so two
+    boxes anchored at one file are a real arrow. Forward, the bug is a
+    confirmation nothing earned. Reverse -- forward genuinely absent, the bug
+    firing on the other direction -- is `calls-backwards`: **"the code says this
+    runs the other way, turn the arrow round", about a call to `Set.prototype.add`.**
+    `tests/calls-claims.test.ts` builds that board on a real workspace and it
+    goes red without the fix.
+
+    Fixed by swapping the two lines. The absence axis cannot move with it:
+    `resolves` is reached only from `callsTo`, and `callSitesIn` -- the whole
+    closed-body path, items 13 and 14 -- uses `placeOf`, which was already
+    right. Items 13's 50.3% and 14's 0.7% stand unchanged.
+
+    **Two guards on the check itself**, because a corpus-scale agreement rate is
+    not evidence on its own (#250's lesson, applied here):
+
+    - **A negative control.** Every answer judged against a *different* call's
+      target: 1 of 1,073 lands in ts, 0 of 2,905 in Python, 0 of 1,558 in Rust.
+      The one is `guard`'s own signature line, `async function guard<T>(run: ()
+      => Promise<T>): Promise<T | ReturnType<typeof failure>>`, which genuinely
+      contains both the name asked about and the stranger's -- the honest limit
+      of comparing by "does this line declare the name", and it can only ever
+      turn an invention into an agreement, which is the direction that would
+      have hidden this bug rather than manufactured it.
+    - **A positive control** (`--control`): the checker asked the questions the
+      text scan already answers. It agrees on 5,082 of 5,525 Python bare calls,
+      1,398 of 1,416 ts, 518 of 558 Rust.
+
+    **The positive control found something bigger than it was built for: 374 of
+    Python's 391 refusals are the referee asking a question with no right
+    answer.** `graphify` declares a `set` and a `patch` of its own, so the text
+    scan credited every `set()` and `patch(...)` in the tree to them --
+    `self._keys: set[str] = set()` is the builtin, and
+    `with patch("shutil.which")` is `unittest.mock`. The reader withheld all 374
+    and was right every time. Measured only over bare calls the checker says are
+    real, Python reads **99.9% (5,075 of 5,082)** against the 92.9% on the
+    record, ts **99.4%**, tsx **92.8%**. Item 9's warning about reading a zero
+    has a twin: **a refusal rate is only a cost if the questions were fair**,
+    and a third of Python's looked like a reader limit and were a referee bug.
+
+    The reader confirmed **0** of the 404 bare calls the checker says are not
+    real, across both corpora. That is a far stronger statement than the
+    sentinel `zzNotARealRoutineName` the INVENTED column rests on: these are
+    real calls to real routines somewhere else, and the reader took none of
+    them.
+
+    **What it costs to run.** 18m 12s for the default corpus against about
+    3m 45s for the text scan alone, and `measure:calls` now carries
+    `NODE_OPTIONS=--max-old-space-size=8192` the way `measure:closed-bodies`
+    and `measure:resolution` already do -- one real `ts.Program` per package in
+    a monorepo the size of `mundane` peaks well past Node's default.
+    `--no-checker` runs the old measurement exactly, for a cheap re-read.
+
+    **Two harness bugs, both found by running it.** `measure:calls` walked its
+    trees with `find` through `execFileSync` inside a blanket `catch`, so
+    `~/mundane` (126,863 files) and `~/infrarouter` threw `ENOBUFS` and read as
+    empty -- **the report said 7 trees while it read 5**, and #211's own 6,654
+    calls and 1,995 receiver calls cannot be reproduced from it. The walk is now
+    `scripts/lib/source-files.ts`, pruning while it descends, the same shape
+    `resolution-ts.ts` and `licence.ts` already use; eight other `measure-*`
+    scripts still have the old one. And the one MISSED in the default corpus
+    (`probeSource -> opening`) is the referee's error, not the reader's: two
+    files declare an `opening`, the checker points at the local one, and the
+    reader is right to disagree.
 
 ## Open, in the order worth doing
 

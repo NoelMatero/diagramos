@@ -481,7 +481,20 @@ export const LICENCES: readonly Licence[] = [
             "reading the old per-language gate, so a JavaScript arrow could be told " +
             "to turn round on a reader nothing had measured in JavaScript. Nothing " +
             "structural stops a JavaScript call the way `no-fields` stops a " +
-            "JavaScript `holds`, so this `covers` is the only thing withholding it.",
+            "JavaScript `holds`, so this `covers` is the only thing withholding it. " +
+            "**#254 widened the population this speaks for**: the receiver calls " +
+            "the text scan above cannot place are now put to `tsc` and scored, " +
+            "463 in ts/tsx -- 34 of them real calls to the target, 426 " +
+            "provably landing elsewhere -- at 0 missed and 0 accused. What it " +
+            "found was a " +
+            "reader bug on the other side of the ledger: `resolves` read a " +
+            "receiver call as this file's own whenever the file declared the " +
+            "method's name itself -- `seen.add(file)` on a `Set` credited to a " +
+            "local `add` -- which two boxes anchored at one file turned into a " +
+            "`calls-backwards` red on correct code. Fixed by asking `through` " +
+            "before same-file, the order `placeOf` already used; found by a " +
+            "real compiler rather than by review " +
+            "(docs/claim-vocabulary.md item 24).",
         },
         /*
          * The new axis (#231). `presence` above rests on finding a call
@@ -694,7 +707,14 @@ export const LICENCES: readonly Licence[] = [
             "both as a free function and as a method, and the referee credited the " +
             "call to the wrong one. What the accusation rests on is the ACCUSED " +
             "and INVENTED columns, and both are zero across all 574. Reproducing " +
-            "it needs the clones, which `measure:licence` makes in `.corpus/`.",
+            "it needs the clones, which `measure:licence` makes in `.corpus/`. " +
+            "**#254 adds the receiver calls this corpus left out, and they are " +
+            "the bulk of it**: 2,221 more, 1,381 of which rust-analyzer says are " +
+            "genuinely to the target, at 0 missed, 0 accused and 0 invented. The " +
+            "reader confirms 25.3% of them -- `receiver` is nearly all of what it " +
+            "withholds -- so the population grows from 574 to 1,955 and the " +
+            "recall over it falls to 37.3%. A refusal is silence, not a red " +
+            "(docs/claim-vocabulary.md item 24).",
         },
         absence: NO_CLOSED_BODY_RESOLVER,
       },
@@ -880,7 +900,14 @@ export const LICENCES: readonly Licence[] = [
             "the right shape: Python is where the census says most calls are and " +
             "where a call is hardest to place statically. Two thirds of the 7.1% " +
             "refused are `unbound` and `unplaced` -- a name a wildcard import or a " +
-            "module resolving to no file brought in -- and neither is a reader bug.",
+            "module resolving to no file brought in -- and neither is a reader bug. " +
+            "**#254 put a real checker behind that sentence and it is stronger " +
+            "than it reads**: 374 of the 391 refusals are the referee asking " +
+            "about a builtin the corpus happens to declare too (`set()`, " +
+            "`patch(..)`), so over bare calls pyright says are genuinely to the " +
+            "target the recall is 99.9% (5,075 of 5,082). The same run scores " +
+            "the 1,494 receiver calls this population left out: 876 real, 0 " +
+            "missed, 0 accused, 0 invented (docs/claim-vocabulary.md item 24).",
         },
         /*
          * The new axis (#231), Python's version. #235 measured whether
