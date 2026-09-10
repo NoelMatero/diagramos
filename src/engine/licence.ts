@@ -543,13 +543,13 @@ export const LICENCES: readonly Licence[] = [
       accesses: {
         presence: {
           reproduce: "npm run measure:accesses",
-          measured: "2026-09-10",
+          measured: "2026-09-11",
           referee: MEMBER_SCAN,
           unit: "member asks at the type end",
-          counts: { asked: 5362, missed: 0, invented: 0 },
+          counts: { asked: 5460, missed: 0, invented: 0 },
           covers: ["ts", "tsx"],
           note:
-            "5,004 of them TypeScript and 358 TSX, and the count is of the **type** " +
+            "5,102 of them TypeScript and 358 TSX, and the count is of the **type** " +
             "end only -- the end that can accuse. TypeScript refuses 1.8% of its " +
             "asks, every one of them a type with an index signature, which is a " +
             "member list that answers to any name at all. TSX refuses none. " +
@@ -563,7 +563,13 @@ export const LICENCES: readonly Licence[] = [
             "5,833. With the walk fixed the referee change itself is worth +30 " +
             "TypeScript asks; the rest of the movement from 4,823 is the trees. " +
             "The two accusations that had appeared since -- both an inline object " +
-            "type in a one-line `interface` -- are back to zero.",
+            "type in a one-line `interface` -- are back to zero. " +
+            "Re-run on today's main when #222's commit was recovered (#264): TSX, " +
+            "Rust and Python reproduce to the ask, and TypeScript is 5,004 -> " +
+            "5,102. This repository's own `src` and `scripts` are two of the seven " +
+            "trees and grew by 5 files across #261, #262 and #263, worth +102 on " +
+            "their own; the corpus is 4 asks lower elsewhere because three of the " +
+            "remaining trees are live checkouts rather than pinned clones.",
         },
         absence: NOT_DESIGNED_YET,
       },
@@ -729,7 +735,7 @@ export const LICENCES: readonly Licence[] = [
       accesses: {
         presence: {
           reproduce: "npm run measure:accesses",
-          measured: "2026-09-10",
+          measured: "2026-09-11",
           referee: MEMBER_SCAN,
           unit: "member asks at the type end",
           counts: { asked: 350, missed: 0, invented: 0 },
@@ -985,7 +991,7 @@ export const LICENCES: readonly Licence[] = [
       accesses: {
         presence: {
           reproduce: "npm run measure:accesses",
-          measured: "2026-09-10",
+          measured: "2026-09-11",
           referee: MEMBER_SCAN,
           unit: "member asks at the type end",
           counts: { asked: 356, missed: 0, invented: 0 },
