@@ -206,11 +206,54 @@ export interface MemberReadSite {
   placed?: ReceiverResolution;
 }
 
+/**
+ * A way this routine reads a member without any `.name` appearing for it.
+ *
+ * The reason a body's read list being complete is not the same thing as every
+ * read in it having resolved. `const { width } = config` reads `width` off
+ * Config, and both this reader and the independent referee in
+ * `scripts/lib/access-scan.ts` see nothing whatever -- so they agree, a
+ * measurement reports 100%, and a routine-end refutation would be licensed
+ * on a body nobody has fully read. #219 caught the same class of hole in
+ * `constructor(private width: number)` by reading the language rather than
+ * by finding a disagreement, which is the only way this class ever is.
+ */
+export type ReadHazardKind =
+  /** `const { width } = c`, `let C { width } = c`. Names members, no dot. */
+  | "destructured"
+  /** `{ ...c }`, `C { ..c }`, `{**c}`. Reads every member at once. */
+  | "spread"
+  /** `c[k]`. Can name any member there is, and the text does not say which. */
+  | "computed";
+
+export interface ReadHazard {
+  kind: ReadHazardKind;
+  /** 1-based. */
+  line: number;
+  /** As written, so a report can quote it. */
+  wrote: string;
+}
+
 export interface RoutineReads {
   routine: string;
   /** 1-based line the routine opens on. */
   line: number;
+  /**
+   * 1-based line it closes on, so a caller can ask what falls inside it.
+   *
+   * `BodyCallSites.lines` carries the same thing for the same reason. A
+   * measurement that pairs this body with an independent reading of it by
+   * *name* pairs the wrong two whenever a file declares a name twice --
+   * `follow.ts` has a `declaring` at line 186 and another at 467, and
+   * matching on the name alone reported a read from one inside the other.
+   */
+  endLine: number;
   sites: MemberReadSite[];
+  /**
+   * Reads this reader cannot see as reads. A body with one of these is not a
+   * closed region however many of its `.name` reads resolved.
+   */
+  hazards: ReadHazard[];
 }
 
 /**
@@ -959,6 +1002,45 @@ function readReceiverOf(
   return { kind: "name", receiver: "", member, node: object };
 }
 
+/**
+ * Node types that name members without writing a dot, per grammar.
+ *
+ * Read off a real parse rather than remembered: `docs/reading-a-grammar.md`
+ * records one reader making the same mistake four times, every instance a
+ * hand-written list of node names that one language spelled differently.
+ * Each of these was confirmed by parsing the shape and printing what came
+ * back, and the differences are real -- Python has no object destructuring
+ * at all, so its `pattern_list` is sequence unpacking and reads no member.
+ */
+const DESTRUCTURES = new Set(["object_pattern", "struct_pattern"]);
+const SPREADS = new Set(["base_field_initializer", "dictionary_splat"]);
+const COMPUTED = new Set(["subscript_expression", "subscript", "index_expression"]);
+
+/**
+ * Whether this node reads members without naming them in a `.name`.
+ *
+ * `spread_element` is the one that cannot be decided on its own type: it is
+ * both `{ ...config }`, which reads every member Config has, and `[...rows]`,
+ * which reads none. The grammar puts no field on it either way, so the
+ * structure decides -- the parent being an object literal -- and this is
+ * called from the parent for that reason rather than from the node.
+ */
+function hazardOf(node: Node, source: string): ReadHazardKind | undefined {
+  if (DESTRUCTURES.has(node.type)) return "destructured";
+  if (SPREADS.has(node.type)) return "spread";
+  if (COMPUTED.has(node.type)) return "computed";
+  return undefined;
+}
+
+/** Whether an object literal spreads something into itself: `{ ...c }`. */
+function spreadsInto(node: Node): boolean {
+  if (node.type !== "object") return false;
+  for (let index = 0; index < node.childCount; index += 1) {
+    if (node.child(index)?.type === "spread_element") return true;
+  }
+  return false;
+}
+
 /* --------------------------------------------------------------- verdicts */
 
 function verdictFrom(classified: Classified, generics: Set<string>, source: string): ResolutionVerdict {
@@ -1091,7 +1173,9 @@ function collectParams(list: Node | null, language: Language, into: Map<string, 
 
 /** One routine's two populations: what it calls on, and what it reads. */
 interface RoutineBoth extends RoutineResolution {
+  endLine: number;
   reads: MemberReadSite[];
+  hazards: ReadHazard[];
 }
 
 function resolveRoutine(
@@ -1115,6 +1199,25 @@ function resolveRoutine(
   const bindings = new Map<string, Binding[]>();
   const sites: ReceiverSite[] = [];
   const reads: MemberReadSite[] = [];
+  const hazards: ReadHazard[] = [];
+
+  /*
+   * Read off the parameter list as well as the body. `function f({ width }: C)`
+   * declares the read outside the braces, and a body-only walk reports the
+   * routine as reading nothing at all.
+   */
+  const noteHazards = (from: Node): void => {
+    each(from, (node) => {
+      const kind = spreadsInto(node) ? "spread" : hazardOf(node, source);
+      if (!kind) return;
+      hazards.push({
+        kind, line: lineOf(source, node.startIndex),
+        wrote: node.text.replace(/\s+/g, " ").slice(0, 60),
+      });
+    });
+  };
+  const parameterList = routine.childForFieldName("parameters");
+  if (parameterList) noteHazards(parameterList);
 
   if (body) {
     each(body, (node) => {
@@ -1163,7 +1266,14 @@ function resolveRoutine(
     });
   }
 
-  return { routine: routineName, line: lineOf(source, routine.startIndex), sites, reads };
+  if (body) noteHazards(body);
+
+  return {
+    routine: routineName,
+    line: lineOf(source, routine.startIndex),
+    endLine: lineOf(source, routine.startIndex + routine.text.length),
+    sites, reads, hazards,
+  };
 }
 
 /* ---------------------------------------------------------------- the walk */
@@ -1273,7 +1383,10 @@ export function memberReadsIn(
   const imported = importedNamesIn(tree.rootNode, language);
   const routines: RoutineBoth[] = [];
   walk(tree.rootNode, new Map(), undefined, tree.rootNode, source, language, imported, routines, resolveRead);
-  return { read: true, routines: routines.map(({ routine, line, reads }) => ({ routine, line, sites: reads })) };
+  return {
+    read: true,
+    routines: routines.map(({ routine, line, endLine, reads, hazards }) => ({ routine, line, endLine, sites: reads, hazards })),
+  };
 }
 
 /** A binding where a written annotation and a written construction disagree about the type. */

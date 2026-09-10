@@ -143,3 +143,70 @@ describe("a checker's answer, for the reads the text cannot place", () => {
     expect(onlySite(memberReadsIn(source, "ts", () => undefined)).placed).toBeUndefined();
   });
 });
+
+/*
+ * The reads that do not look like reads.
+ *
+ * `const { width } = config` reads `width` off Config, and neither this
+ * reader nor `scripts/lib/access-scan.ts` -- the independent referee -- sees
+ * anything at all. They agree, a measurement reports nothing, and a
+ * routine-end refutation would call a correct arrow wrong. `accesses.ts`
+ * already records destructuring as a known gap, on the grounds that it only
+ * ever costs a confirmation; the moment that end can accuse, the same gap
+ * makes a false red.
+ *
+ * This is #219's own lesson repeating: a hole a referee structurally cannot
+ * find has to be caught by reading the language instead.
+ */
+describe("reads that no `.name` appears for", () => {
+  const hazardsOf = (source: string, language: Parameters<typeof memberReadsIn>[1]) => {
+    const reading = memberReadsIn(source, language);
+    if (!reading.read) throw new Error("unreadable");
+    return reading.routines.flatMap((one) => one.hazards).map((one) => one.kind).sort();
+  };
+
+  it("flags a destructured binding in TypeScript", () => {
+    expect(hazardsOf("function f(c: C) {\n  const { width } = c;\n}", "ts")).toEqual(["destructured"]);
+  });
+
+  it("flags a destructured parameter, which is outside the body", () => {
+    expect(hazardsOf("function f({ width }: C) {\n  return width;\n}", "ts")).toEqual(["destructured"]);
+  });
+
+  it("flags a Rust struct pattern, which is how Rust spells it", () => {
+    expect(hazardsOf("fn f(c: C) {\n  let C { width } = c;\n}", "rust")).toEqual(["destructured"]);
+  });
+
+  it("does not flag Python tuple unpacking, which reads no member", () => {
+    expect(hazardsOf("def f(c):\n    width, height = c\n", "python")).toEqual([]);
+  });
+
+  it("flags an object spread, which reads every member at once", () => {
+    expect(hazardsOf("function f(c: C) {\n  return { ...c };\n}", "ts")).toEqual(["spread"]);
+  });
+
+  it("does not flag an array spread, which reads no member", () => {
+    expect(hazardsOf("function f(a: A[]) {\n  return [...a];\n}", "ts")).toEqual([]);
+  });
+
+  it("flags Rust's struct update syntax, its spelling of the same thing", () => {
+    expect(hazardsOf("fn f(c: C) -> C {\n  C { width: 1, ..c }\n}", "rust")).toEqual(["spread"]);
+  });
+
+  it("flags Python's dictionary splat", () => {
+    expect(hazardsOf("def f(c):\n    return {**c}\n", "python")).toEqual(["spread"]);
+  });
+
+  it("flags a computed member, which can name any member at all", () => {
+    expect(hazardsOf("function f(c: C, k: string) {\n  return c[k];\n}", "ts")).toEqual(["computed"]);
+  });
+
+  it("flags the same shape in Python and Rust", () => {
+    expect(hazardsOf("def f(c, k):\n    return c[k]\n", "python")).toEqual(["computed"]);
+    expect(hazardsOf("fn f(c: Vec<u8>, k: usize) -> u8 {\n  c[k]\n}", "rust")).toEqual(["computed"]);
+  });
+
+  it("leaves an ordinary body with no hazard at all", () => {
+    expect(hazardsOf("function f(c: C) {\n  return c.width;\n}", "ts")).toEqual([]);
+  });
+});
