@@ -32,7 +32,7 @@ that took longest to see and it is not in #190:
 | `@holds` | contains | a type's field list | yes | **absence** |
 | `@builds` | constructs | a routine's body | yes | **presence** |
 | `@calls` | invokes | a routine's body, and what its names are bound to | yes | **presence** |
-| `@accesses` | accesses | a type's member list — **and** a routine's body | yes | **absence**, at the type end only |
+| `@accesses` | accesses | a type's member list — **and** a routine's body | yes | **absence**, at both ends — the routine end by name |
 | `@conforms` | conforms | a type's base list, where the language writes one | yes | **absence** |
 | `@feeds` | flows | a body, for a value's journey | **no** | — |
 
@@ -86,15 +86,24 @@ that sentence have different evidence behind them:
   that does not declare `width` refutes the arrow — exactly the footing
   `@holds` stands on, and the value of the word: rename a field and every
   diagram still naming the old one goes red the turn the rename lands.
-- The **routine** end is a body. Working out what a body touches needs every
-  receiver's type, which needs the whole program — the may-analysis #203
-  measured and rejected. Not finding the access is not evidence there is none,
-  so this end confirms and is otherwise silent.
+- The **routine** end is a body. Working out what a body touches *off Config*
+  needs every receiver's type, which needs the whole program — the may-analysis
+  #203 measured and rejected. So until #255 this end confirmed and was otherwise
+  silent.
 
-So the word refutes from one end and stays silent at the other, and that is not
-a compromise between the two footings above. It is the split `@builds` already
-uses one relation over: the accusation rests on what was found, and the absence
-beside it is never a finding.
+  #255 found the half of that which is not true. A read of `Config.width` is
+  written `something.width` whatever `something` turns out to be, so a body
+  whose every read has a `.name` — no destructuring, spread, `c[k]`, `getattr`
+  or macro — and none of whose reads is called `width` does not read `width`
+  off anything. The type is only needed to refute in a body that *does* contain
+  `.width` off something else, and that is exactly where the typed design made
+  its false reds. So the routine end now refutes **by name**, and stays silent
+  wherever the body reads a member without a name, reads none at all, or calls
+  a function that visibly reads the member ([item 25](#twenty-five-times-a-measurement-contradicted-the-design)).
+
+So the two ends refute on two different footings: the type end from a
+declaration, the routine end from a body read whole by name. Neither accuses
+from a doubt about the other.
 
 Confirming needs **both** halves, which is `claim.ts`'s admission rule applied
 to a word with two of them. "Config declares `width`" would come back green
@@ -247,6 +256,15 @@ are measured at **0 accusations and 0 inventions across 2,652 asks**, and asked
 the same pairs backwards they confirmed **0** — which is the number the word
 exists for, because before it an arrow drawn from the base down to the subclass
 passed every check this tool had.
+
+`@accesses` is the second word with an **absence** square beside `@calls`, and
+its are the routine end refuted by name (#255). All five languages are licensed:
+**about 2.5 million asks** over the twelve pinned clones, **14 disputed**, every
+one a Python parameter annotation the referee read as a member read. That
+includes JavaScript, whose presence square below is a *no* — refuting at the
+routine end reads a body, and a JavaScript body reads the same as a TypeScript
+one, while the presence square needs a member list JavaScript does not write.
+The table above is the presence axis; `licence.ts` carries both.
 
 `measure:accesses` asks `@accesses` about JavaScript **0 times over 21 files**,
 for the reason `@holds` is a no there: a JavaScript class writes no member list
@@ -555,13 +573,15 @@ to pass every check this tool had.
 deliberate: almost all of it is `Vec<T>`, `Promise<T>`, `list[str]`, which
 nobody draws as two boxes.
 
-## Twenty-four times a measurement contradicted the design
+## Twenty-five times a measurement contradicted the design
 
 Kept because the pattern is the point: eleven of the first thirteen came from
 building one word or one reader, not from reviewing the design. Nothing since
 has broken that — item 24 is the clearest case of it, a reader bug four
 measurements had walked past because the population it lived in was reported
-apart and never scored.
+apart and never scored. Item 25 is the other kind: an issue's premise, that a
+word needed a type checker, which measuring both designs over the same bodies
+turned out to be wrong about.
 
 1. **The substrate was empty.** #190's first draft proposed graphify as the
    fact supplier on the strength of 8,167 `contains` edges. `contains` there is
@@ -2272,6 +2292,113 @@ be one: `<MenuContent />` is a routine making a MenuContent, which is `@builds`.
     (`probeSource -> opening`) is the referee's error, not the reader's: two
     files declare an `opening`, the checker points at the local one, and the
     reader is right to disagree.
+
+
+25. **The routine end of `@accesses` did not need a type checker, which is what
+    #226 ordered it last for. It needed a name. About 2.5 million asks over the
+    twelve pinned clones, 14 disputed and every one the referee's; the typed
+    design the issue proposed was smaller and made false reds of its own
+    (#255).**
+
+    #226 put this last because "this routine does not read that field" seemed
+    to need every receiver in the body typed: `x.rows` cannot be said not to
+    read `Cache.rows` until `x` is known. True, and only of a body that contains
+    `.rows`. A body whose every read has a `.name`, and none of whose reads is
+    called `rows`, does not read `rows` off anything.
+
+    **Both designs, measured over the same bodies.** `measure:accesses-closed`
+    counts the typed region and `measure:accesses-absence` asks both.
+
+    *By type* (region A: every read placed by the checker, no read without a
+    name), over #255's local corpus of 31 trees: TypeScript 72.4% of named
+    bodies that read anything, Python 51.1%, TSX 33.6%, Rust 29.6%. Two cuts
+    followed before it could ask anything safely. A read the checker names
+    without a declaring file cannot be matched to a box — `x.text` on a
+    `Node | undefined` is a read of `Node` — and that was 42% of TypeScript's
+    region. And #233's guard against a receiver typed as an interface left 202
+    TypeScript bodies. Three ways a type answer made a false red, each found
+    rather than supposed: `shadowNames(tree: Tree)` in `signature.ts` reads
+    `tree.rootNode` off a local interface mirroring `parse.ts`'s tree, which at
+    runtime *is* that tree; a read off `Partial<Config>`, `Readonly`, `Pick` or
+    `Required` is placed in `lib.es5.d.ts`, confirmed on a probe project and not
+    caught by the guard; and a union has no single declaration. TypeScript has
+    no independent checker to measure placement against at all (#260).
+
+    *By name*, over the same 31 trees and with no checker: TypeScript 74.3%
+    (1,590 bodies), Python 65.0%, JavaScript 65.4%, Rust 49.3%, TSX 33.6%;
+    105,226 asks, **1 disputed**. Over the twelve pinned clones:
+
+    | language | region | asks | disputed |
+    |---|---|---|---|
+    | python | 75.7% (33,228) | 1,932,538 | 14 |
+    | ts | 71.7% (7,333) | 293,709 | 0 |
+    | tsx | 56.4% (1,467) | 164,956 | 0 |
+    | rust | 66.1% (2,249) | 114,273 | 0 |
+    | js | 76.4% (440) | 6,065 | 0 |
+
+    **Every dispute was read.** By type, 44 across the corpus: one genuine false
+    red (`shadowNames`), the rest the referee unable to say whose `.x` it saw —
+    `evl.register(..)` inside a `fn register`, Web Audio's `osc.frequency`
+    beside a `types.ts` that declares a `frequency`. By name, 15: all type
+    annotations the text scan read as member reads, `typeof
+    useDesktopStore.getState` and fourteen multi-line Python signatures.
+
+    **What building the reader found**, each now a test:
+
+    - Anonymous callbacks were counted as routines: 501 bodies no board can
+      name, and every one of the bodies that would not pair with the call reader's.
+    - `const draw = () => ..` had no name in the reader, and has one everywhere else.
+    - `rows.sort(key=lambda r: ..)` was a routine called `key` — seven of the
+      first eight by-name disputes.
+    - A read in a parameter default, `reason = REASONS.none`, was invisible:
+      11 routines in about 13,000, and an absence cannot rest on a blind spot
+      however rare.
+    - A Rust macro hides every read in its arguments: 23 of the first 24 reads
+      the reader could not see, inside `log_line!`, `assert_eq!` and `json!`.
+    - `getattr(c, k)` and `vars(c)` are `c[k]` spelled another way.
+    - A field named `abstract` is valid TypeScript and stops tree-sitter parsing
+      the file, which `engine-deps.test.ts` caught.
+
+    **Helpers.** `draw()` calls `paint()`, which reads `width`. The right board
+    is `draw --calls--> paint --accesses--> Config`, so a red on
+    `draw --accesses--> Config` would be the right arrow drawn a level too high.
+    The red stays quiet when a function the body calls *visibly* reads the
+    member, followed one hop: placed by the call reader, or found with the "go
+    to definition" #254 built for `measure:calls` and nothing else used. A call
+    nobody could see into does not keep it quiet; the red says how many there
+    were.
+
+    On this repository's own TypeScript, with no checker, 85.2% of asks sat in
+    a body with a call nobody could see into; with receiver types and the
+    lookup, 19.9%, and 1,405 calls were proven to leave the repository. The
+    quiet share barely moved, 4.1% to 4.4%: the lookup mostly proves a call goes
+    somewhere no board draws rather than finding helpers, which is why the draw-
+    time check in the MCP server, which has no checker, still sees nearly every
+    helper.
+
+    Across #255's 31 trees, with receiver types and the lookup (26 runs, one
+    per `mundane` package, merged with `--merge`), of the asks where the body
+    reads nothing called the member:
+
+    | language | quiet: a helper reads it | red, past a call nobody could see into | red, every call seen |
+    |---|---|---|---|
+    | ts | 4.7% | 14.1% | 81.3% |
+    | tsx | 7.7% | 10.6% | 81.7% |
+    | python | 4.0% | 29.2% | 66.8% |
+    | rust | 3.7% | 28.0% | 68.3% |
+    | js | 1.9% | 86.8% | 11.4% |
+
+    JavaScript's middle column is the checker, not the code: `checkJs` is off,
+    so 133 of its 165 calls in these bodies got no answer. Python's is mostly
+    pyright falling silent (768 calls) against 7,935 it settled as leaving the
+    repository.
+
+    Two numbers on the way here were wrong before they were right. The first
+    helper figure, 88%, came from a run with the checkers switched off for
+    speed and was quoted as a fact about the code. And the first version of the
+    lookup read a call to a parameter — `isTest(file)` — as a call to the
+    routine declaring it, because "go to definition" lands on the parameter;
+    that counted a call nobody can see into as seen.
 
 ## Open, in the order worth doing
 

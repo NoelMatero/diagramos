@@ -357,3 +357,46 @@ describe("a receiver placed by a resolver, not by the text", () => {
     });
   });
 });
+
+/*
+ * Where each call's own name is written (#255).
+ *
+ * `@accesses` stays quiet when a function a body calls reads the member, and
+ * finding that function means asking a checker "go to definition" at the
+ * call's name. `memberAt` has carried that position for `x.foo()` since #217;
+ * a bare `foo()` had none, so #254's measurement found it again with a regex
+ * over the line. The tree already holds the node.
+ */
+describe("the position of a call's own name", () => {
+  const nameOf = (source: string, bodies: ReturnType<typeof sitesIn>, index: number) => {
+    const site = bodies.flatMap((one) => one.sites)[index]!;
+    return site.nameAt ? source.slice(site.nameAt.start, site.nameAt.end) : undefined;
+  };
+
+  it("records a bare call's name", () => {
+    const source = "function f() {\n  paint();\n}";
+    expect(nameOf(source, sitesIn(source), 0)).toBe("paint");
+  });
+
+  it("records a method call's name, the same range `memberAt` already has", () => {
+    const source = "function f(x: X) {\n  x.paint();\n}";
+    const site = sitesIn(source).flatMap((one) => one.sites)[0]!;
+    expect(nameOf(source, sitesIn(source), 0)).toBe("paint");
+    expect(site.nameAt).toEqual(site.memberAt);
+  });
+
+  it("records a call on the routine's own type", () => {
+    const source = "class C {\n  f() {\n    this.paint();\n  }\n}";
+    expect(nameOf(source, sitesIn(source), 0)).toBe("paint");
+  });
+
+  it("records a Python call's name", () => {
+    const source = "def f():\n    paint()\n";
+    expect(nameOf(source, sitesIn(source, "python"), 0)).toBe("paint");
+  });
+
+  it("records nothing for a computed call, which has no name in the text", () => {
+    const source = "function f(table: T, k: string) {\n  table[k]();\n}";
+    expect(sitesIn(source).flatMap((one) => one.sites)[0]!.nameAt).toBeUndefined();
+  });
+});

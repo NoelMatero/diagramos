@@ -386,6 +386,25 @@ const PYTHON_SIGNATURE: RelationMeasured = {
     "1,404 of them for no reason but a missing licence.",
 };
 
+/**
+ * The referee for `@accesses`' routine-end absence (#255).
+ *
+ * The same text scan as `MEMBER_SCAN`, asked a different question: for every
+ * member read somewhere in a file, and every named routine in it with no read
+ * lacking a `.name` that reads nothing by that name, does a `.member` appear
+ * inside the routine's lines anyway? It cannot say what `.member` is read off,
+ * so it disputes more than it should -- and every dispute is read.
+ */
+const ACCESS_ABSENCE_SCAN =
+  "a text scan (`scripts/lib/access-scan.ts`) sharing no tree-sitter query and no " +
+  "type checker with the reader, looking for `.member` inside the routine's own " +
+  "lines. It cannot tell whose `.member` it is, so it over-disputes, and every " +
+  "dispute is read by hand before a row may carry it.";
+
+const ACCESS_ABSENCE_UNIT =
+  "asks: a member read somewhere in the same file, against a named routine with " +
+  "no unnamed read that reads nothing by that name";
+
 export const LICENCES: readonly Licence[] = [
   {
     language: "typescript",
@@ -571,7 +590,25 @@ export const LICENCES: readonly Licence[] = [
             "their own; the corpus is 4 asks lower elsewhere because three of the " +
             "remaining trees are live checkouts rather than pinned clones.",
         },
-        absence: NOT_DESIGNED_YET,
+        absence: {
+          reproduce: "npm run measure:accesses-absence -- --no-tier2 .corpus/*",
+          measured: "2026-09-11",
+          referee: ACCESS_ABSENCE_SCAN,
+          unit: ACCESS_ABSENCE_UNIT,
+          counts: { asked: 464730, missed: 0 },
+          covers: ["ts", "tsx", "js"],
+          note:
+            "293,709 TypeScript, 164,956 TSX and 6,065 JavaScript asks over " +
+            "excalidraw, TanStack Query, nest, vite and vue at their pinned " +
+            "commits, none disputed. Over this repository and #255's local " +
+            "trees, 55,543 more and one dispute, which was the referee: " +
+            "`dash: ReturnType<typeof useDesktopStore.getState>` is a type " +
+            "annotation it read as a member read. Made by name rather than by " +
+            "type, and the typed alternative is recorded as not licensed: in " +
+            "TypeScript a read off `Partial<Config>` is placed in `lib.es5.d.ts`, " +
+            "and there is no second checker to measure placement against (#260). " +
+            "docs/claim-vocabulary.md item 25.",
+        },
       },
       conforms: {
         presence: {
@@ -755,7 +792,21 @@ export const LICENCES: readonly Licence[] = [
             "of the 116 misses left in the whole corpus are Rust, 83 of them one " +
             "generated file whose every body reads its fields inside a macro.",
         },
-        absence: NOT_DESIGNED_YET,
+        absence: {
+          reproduce: "npm run measure:accesses-absence -- --no-tier2 .corpus/*",
+          measured: "2026-09-11",
+          referee: ACCESS_ABSENCE_SCAN,
+          unit: ACCESS_ABSENCE_UNIT,
+          counts: { asked: 114273, missed: 0 },
+          note:
+            "Over ripgrep and anyhow at their pinned commits, none disputed; " +
+            "1,372 more over rust-test, orangutan, infrarouter and mundane's " +
+            "graph app, none disputed -- a zero over the local trees alone would " +
+            "be the too-small zero #209 warns about, which is why the clones. A " +
+            "body with a macro in it is never asked: a macro's arguments are an " +
+            "unparsed token tree, and 23 of the first 24 reads this reader could " +
+            "not see were inside `log_line!`, `assert_eq!` and `json!`.",
+        },
       },
       conforms: {
         /*
@@ -1005,7 +1056,28 @@ export const LICENCES: readonly Licence[] = [
             "is where most Python attributes are and which a reader stopping at " +
             "the class body would refute every one of.",
         },
-        absence: NOT_DESIGNED_YET,
+        absence: {
+          reproduce: "npm run measure:accesses-absence -- --no-tier2 .corpus/*",
+          measured: "2026-09-11",
+          referee: ACCESS_ABSENCE_SCAN,
+          unit: ACCESS_ABSENCE_UNIT,
+          counts: { asked: 1932538, missed: 14 },
+          note:
+            "Over django, flask, httpx, pydantic and poetry at their pinned " +
+            "commits; 48,311 more over graphify, infrarouter and mundane's Python " +
+            "package, none disputed once a keyword argument stopped naming the " +
+            "lambda passed by it (`rows.sort(key=lambda r: ..)` had been a " +
+            "routine called `key`). `getattr` and `vars` count as a read without " +
+            "a name, like `c[k]`.",
+          known: [
+            "A parameter annotation on a signature spread over several lines -- " +
+              "`schema: core_schema.CoreSchema`, `tz: datetime.tzinfo`, " +
+              "`list[metadata.PathDistribution]` -- which the text scan reads as a " +
+              "member read inside the routine and the reader rightly does not: " +
+              "an annotation reads nothing. All 14, in pydantic and poetry, each " +
+              "read against the source.",
+          ],
+        },
       },
       conforms: {
         presence: {

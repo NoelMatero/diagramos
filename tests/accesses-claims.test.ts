@@ -123,12 +123,12 @@ describe("the type end says wrong, which is what the word is for", () => {
   });
 });
 
-describe("the routine end is silent, and this is the test that keeps it so", () => {
-  it("says nothing when the type has the member and the routine does not show it", async () => {
+describe("the routine end is silent wherever the body cannot be read whole", () => {
+  it("says nothing when the type has the member and the routine reads no member at all", async () => {
     /*
-     * `render` reaches `width` through a helper. A reader that called this
-     * wrong would be accusing on the strength of not having followed a call --
-     * and following it is the may-analysis #203 measured and rejected.
+     * `render` reads nothing, so there is no body of reads to be closed and
+     * nothing was measured for one (#255). It may reach `width` through
+     * `sizeOf`, which this file cannot see into.
      */
     const render = "export function render(config: Config) { return sizeOf(config); }\n";
     const board = await boardOf("width", { claim: "accesses" });
@@ -186,5 +186,119 @@ describe("a claim nothing can ever read is loud, not quiet", () => {
 
     expect(report.garbledClaims).toHaveLength(1);
     expect(report.garbledClaims[0]!.detail).toContain("has no members");
+  });
+});
+
+/*
+ * The routine end says wrong, by name (#255).
+ *
+ * A read of Config.width is written `something.width` whatever `something`
+ * is, so a routine whose every read has a name, and none of whose reads is
+ * called `width`, does not read width off Config. Unless a function it calls
+ * does -- then the right board is `render --calls--> paint --accesses-->
+ * Config`, and this arrow is that board drawn one level too high, not wrong.
+ */
+describe("the routine end says wrong when nothing in the body is called the member", () => {
+  it("reports a routine that reads other members and never this one, and says what it reads", async () => {
+    const render = "export function render(config: Config) { return config.height; }\n";
+    const board = await boardOf("width", { claim: "accesses" });
+    const report = checkDrift(board, fakeWorkspace(files(CONFIG, render)), { edges: true });
+
+    const wrong = report.edges.filter((finding) => finding.kind === "accesses-not-read");
+    expect(wrong).toHaveLength(1);
+    expect(wrong[0]!.detail).toContain("nothing in render is called `width`");
+    expect(wrong[0]!.detail).toContain("reads 1 other member");
+    expect(report.clean).toBe(false);
+  });
+
+  it("stays quiet when a function in the same file reads the member for it", async () => {
+    const render = [
+      "function paint(config: Config) { return config.width; }",
+      "export function render(config: Config) { return paint(config) + config.height; }",
+    ].join("\n");
+    const board = await boardOf("width", { claim: "accesses" });
+    const report = checkDrift(board, fakeWorkspace(files(CONFIG, render)), { edges: true });
+
+    expect(report.edges.filter((finding) => finding.kind === "accesses-not-read")).toEqual([]);
+  });
+
+  it("stays quiet when an imported function reads the member for it", async () => {
+    const board = await boardOf("width", { claim: "accesses" });
+    const report = checkDrift(board, fakeWorkspace({
+      "src/config.ts": CONFIG,
+      "src/paint.ts": "import { Config } from './config';\nexport function paint(config: Config) { return config.width; }\n",
+      "src/render.ts": "import { paint } from './paint';\nexport function render(config: Config) { return paint(config) + config.height; }\n",
+    }), { edges: true });
+
+    expect(report.edges.filter((finding) => finding.kind === "accesses-not-read")).toEqual([]);
+  });
+
+  it("still says wrong past a call it cannot see into, and says how many there were", async () => {
+    const render = "export function render(config: Config) { return sizeOf(config) + config.height; }\n";
+    const board = await boardOf("width", { claim: "accesses" });
+    const report = checkDrift(board, fakeWorkspace(files(CONFIG, render)), { edges: true });
+
+    const wrong = report.edges.filter((finding) => finding.kind === "accesses-not-read");
+    expect(wrong).toHaveLength(1);
+    expect(wrong[0]!.detail).toContain("calls 1 function this check could not see into");
+    expect(wrong[0]!.detail).toContain("render --calls--> that function --accesses--> Config");
+  });
+
+  it("counts a call to a parameter as one nobody can see into, not as a call to itself", async () => {
+    // Where a checker's "go to definition" lands for `measure(..)`: the
+    // parameter, on render's own line. Reading render's own reads as the
+    // callee's would count that call as seen.
+    const render = "export function render(config: Config, measure: (c: Config) => number) { return measure(config) + config.height; }\n";
+    const board = await boardOf("width", { claim: "accesses" });
+    const report = checkDrift(board, fakeWorkspace(files(CONFIG, render)), {
+      edges: true,
+      closedBodyReferee: {
+        resolveReceiver: () => undefined,
+        declarationAt: () => ({ file: "src/render.ts", line: 1 }),
+      },
+    });
+
+    const wrong = report.edges.filter((finding) => finding.kind === "accesses-not-read");
+    expect(wrong).toHaveLength(1);
+    expect(wrong[0]!.detail).toContain("calls 1 function this check could not see into");
+  });
+
+  it("stays quiet when a checker finds the helper the call reader could not place", async () => {
+    // `lookup().paint(..)` has a receiver nothing in the text names, so only a
+    // checker can say which `paint` it is.
+    const workspace = fakeWorkspace({
+      "src/config.ts": CONFIG,
+      "src/paint.ts": "export function paint(config: Config) { return config.width; }\n",
+      "src/render.ts": "export function render(config: Config) { return lookup().paint(config) + config.height; }\n",
+    });
+    const board = await boardOf("width", { claim: "accesses" });
+    const blind = checkDrift(board, workspace, { edges: true });
+    expect(blind.edges.filter((finding) => finding.kind === "accesses-not-read")).toHaveLength(1);
+
+    const seeing = checkDrift(board, workspace, {
+      edges: true,
+      closedBodyReferee: {
+        resolveReceiver: () => undefined,
+        declarationAt: () => ({ file: "src/paint.ts", line: 1 }),
+      },
+    });
+    expect(seeing.edges.filter((finding) => finding.kind === "accesses-not-read")).toEqual([]);
+  });
+
+  it("never accuses a planned arrow", async () => {
+    const render = "export function render(config: Config) { return config.height; }\n";
+    const board = await boardOf("width", { claim: "accesses", state: "planned" });
+    const report = checkDrift(board, fakeWorkspace(files(CONFIG, render)), { edges: true });
+
+    expect(report.edges.filter((finding) => finding.kind === "accesses-not-read")).toEqual([]);
+  });
+
+  it("says nothing about a body that destructures, whatever else it reads", async () => {
+    const render = "export function render(config: Config) { const { height } = config; return height; }\n";
+    const board = await boardOf("width", { claim: "accesses" });
+    const report = checkDrift(board, fakeWorkspace(files(CONFIG, render)), { edges: true });
+
+    expect(report.edges.filter((finding) => finding.kind === "accesses-not-read")).toEqual([]);
+    expect(report.clean).toBe(true);
   });
 });

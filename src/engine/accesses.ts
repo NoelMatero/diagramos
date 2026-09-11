@@ -79,7 +79,8 @@
  *    numbers were counting, and the measurement would not notice.
  */
 import { mayAccuse } from "./licence";
-import { each, parseSource, type Language, type Node } from "./parse";
+import { each, MEMBER_ACCESS, parseSource, type Language, type Node } from "./parse";
+import { memberReadsIn } from "./resolution";
 
 /**
  * Why no verdict was reached. Every one of these is a reason to stay quiet, and
@@ -178,9 +179,38 @@ export interface AccessesEvidence {
   wrote: string;
 }
 
+/** Why the routine end refuted, so a report can say what was read instead. */
+export interface NotReadEvidence {
+  /** The routine, as the arrow names it. */
+  routine: string;
+  /** 1-based line it is declared on. */
+  line: number;
+  /** How many distinct members it does read, none of them this one. */
+  reads: number;
+}
+
 export type AccessesVerdict =
   /** The type declares the member and the routine can be seen reading it. */
   | { verdict: "confirmed"; evidence: AccessesEvidence }
+  /**
+   * The type declares the member, and the routine reads nothing called it.
+   *
+   * **The routine end's accusation (#255)**, and it is made by name, not by
+   * type. A read of Config.width is written `something.width` whatever
+   * `something` is, so a body that contains no read of anything called
+   * `width` does not read width off Config. It is only made where that is
+   * true of the whole body: every routine of the name is found, reads at
+   * least one member, and has no read without a `.name` -- a destructuring,
+   * a spread, `c[k]`, `getattr`, a macro. Measured before it was allowed:
+   * about 2.5 million asks over the twelve pinned clones, 14 disputed and
+   * every one a parameter annotation the referee misread
+   * (`measure:accesses-absence`, docs/claim-vocabulary.md item 25).
+   *
+   * Not yet a red. `drift.ts` stays quiet when a function the routine calls
+   * visibly reads the member, because `draw --calls--> paint --accesses-->
+   * Config` is the right board and this arrow is only drawn a level too high.
+   */
+  | { verdict: "not-read"; evidence: NotReadEvidence }
   /**
    * The type does not declare that member, and its member list is closed.
    *
@@ -194,8 +224,10 @@ export type AccessesVerdict =
    * The type declares the member and nothing in the routine reads it, as far as
    * the text shows.
    *
-   * **Not a finding, and this must stay true.** Reported exactly as an
-   * unclaimed arrow is.
+   * Not a finding. Reported exactly as an unclaimed arrow is -- which is still
+   * true of every body `not-read` above cannot be said of: one that reads a
+   * member with no `.name`, reads none at all, or is a class rather than a
+   * routine.
    */
   | { verdict: "absent" }
   | { verdict: "withheld"; why: AccessesWithheld };
@@ -207,8 +239,30 @@ const TYPE_DECLARATION =
 /** Node types that introduce a name for a type written elsewhere. */
 const ALIASES = new Set(["type_alias_declaration", "type_item"]);
 
-/** A member read off a value: `config.width`, `self.width`, `cfg.width()`. */
-const ACCESS = /^(field_expression|member_expression|attribute)$/;
+/** A member read off a value. The one list, shared with `resolution.ts` -- see its doc in `parse.ts`. */
+const ACCESS = MEMBER_ACCESS;
+
+/**
+ * Member names the routine end never refutes about.
+ *
+ * The independent referee in `scripts/lib/access-scan.ts` is built not to
+ * report these -- `length`, `map`, `get`, `name` and the rest are read off so
+ * many things that a disagreement about them is noise -- so an ask about one
+ * could never be disputed, and its agreement would be agreement nobody checked.
+ * `measure:accesses-absence` counts those asks apart as `unrefereed` and keeps
+ * them out of the rate the licence rests on. The accusation keeps them out too,
+ * or it would be accusing where nothing was measured.
+ *
+ * Moved here from the referee (#255) so the two share one list rather than two
+ * that must agree.
+ */
+export const UNREFEREED_MEMBERS: ReadonlySet<string> = new Set([
+  "length", "prototype", "constructor", "toString", "valueOf", "name",
+  "then", "catch", "finally", "map", "filter", "forEach", "push", "pop", "slice",
+  "join", "split", "trim", "replace", "test", "exec", "match", "keys", "values",
+  "entries", "has", "get", "set", "add", "delete", "size", "clone", "unwrap",
+  "iter", "collect", "into", "to_string", "append", "extend", "items", "format",
+]);
 
 /**
  * A member as an author would write it on a canvas, beside itself as written.
@@ -651,5 +705,77 @@ export function memberAccesses(
   }
 
   const evidence = accessesIn(source, routine, named, language);
-  return evidence ? { verdict: "confirmed", evidence } : { verdict: "absent" };
+  if (evidence) return { verdict: "confirmed", evidence };
+  /*
+   * The licence is the routine's language, on the absence axis: whether the
+   * accusation stands rests entirely on reading that body, and the far file
+   * was only ever asked whether it declares the name.
+   */
+  if (mayAccuse("accesses", language, "absence")) {
+    const closed = closedByName(source, routine, named, language);
+    if (closed) return { verdict: "not-read", evidence: closed };
+  }
+  return { verdict: "absent" };
+}
+
+const bare = (name: string) => name.replace(/^#/, "");
+
+/** Whether a set of member names includes this one, however the hash is written. */
+export function readsMember(members: Iterable<string>, member: string): boolean {
+  for (const one of members) if (bare(one) === bare(member)) return true;
+  return false;
+}
+
+/**
+ * The routine end's closed region, by name (#255).
+ *
+ * `undefined` for anything short of it: a name the referee does not check,
+ * no named routine of that name (a class box, a name bound some other way),
+ * any routine of the name that reads nothing or reads a member without a
+ * `.name`, or any routine of the name that reads this member. Every
+ * declaration of the name has to qualify, the rule `callsBetween` applies to
+ * an overload set.
+ */
+function closedByName(
+  source: string, routine: string, member: string, language: Language,
+): NotReadEvidence | undefined {
+  if (UNREFEREED_MEMBERS.has(bare(member))) return undefined;
+  const reading = memberReadsIn(source, language);
+  if (!reading.read) return undefined;
+  const matching = reading.routines.filter((one) => one.routine === routine);
+  if (matching.length === 0) return undefined;
+  if (matching.some((one) => one.sites.length === 0 || one.hazards.length > 0)) return undefined;
+  const members = new Set(matching.flatMap((one) => one.sites.map((site) => site.member)));
+  if (readsMember(members, member)) return undefined;
+  return { routine, line: matching[0]!.line, reads: members.size };
+}
+
+/**
+ * Every member the routines of this name read, by name. For `drift.ts` to ask
+ * whether a function a body calls reads the member the arrow names.
+ */
+export function membersReadByName(source: string, routine: string, language: Language): Set<string> | undefined {
+  const reading = memberReadsIn(source, language);
+  if (!reading.read) return undefined;
+  const matching = reading.routines.filter((one) => one.routine !== "" && one.routine === routine);
+  if (matching.length === 0) return undefined;
+  return new Set(matching.flatMap((one) => one.sites.map((site) => site.member)));
+}
+
+/**
+ * Every member the innermost named routine holding this 1-based line reads --
+ * where a checker's "go to definition" landed. `undefined` when no routine
+ * body holds it: a method signature in an interface, a type.
+ */
+export function membersReadAt(
+  source: string, line: number, language: Language,
+): { routine: string; line: number; members: Set<string> } | undefined {
+  const reading = memberReadsIn(source, language);
+  if (!reading.read) return undefined;
+  const holding = reading.routines
+    .filter((one) => one.routine !== "" && one.line <= line && line <= one.endLine)
+    .sort((a, b) => (a.endLine - a.line) - (b.endLine - b.line))[0];
+  return holding
+    ? { routine: holding.routine, line: holding.line, members: new Set(holding.sites.map((site) => site.member)) }
+    : undefined;
 }

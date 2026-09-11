@@ -321,3 +321,105 @@ describe("a member declared somewhere the member list is not", () => {
     }))).toBe("confirmed");
   });
 });
+
+/*
+ * The routine end says wrong, by name (#255).
+ *
+ * A read of Config.width is written `something.width` whatever `something`
+ * turns out to be. So a named body with no read that has no `.name` -- no
+ * destructuring, spread, `c[k]`, `getattr`, macro -- and no read of anything
+ * called `width` does not read width off Config, and the arrow saying it does
+ * is wrong. No type checker is needed for that, which is what the issue got
+ * wrong: the checker is needed only to refute in a body that *does* contain
+ * `.width` off something else, and this never asks there.
+ *
+ * Measured over the twelve pinned clones before it was allowed a red: about
+ * 2.5 million asks, 14 disputed, every one a Python parameter annotation the
+ * text scan read as a member read. `npm run measure:accesses-absence`.
+ */
+describe("the routine end says wrong when nothing in the body is called the member", () => {
+  const ask = (
+    routine: string, name: string, member: string, language: Parameters<typeof memberAccesses>[3],
+    type: string, typeNames: string[], typeLanguage = language,
+  ) => memberAccesses(routine, name, member, language, { source: type, names: typeNames, language: typeLanguage });
+
+  it("refutes a TypeScript function that reads another member and never this one", () => {
+    const verdict = ask(
+      "function render(config: Config) {\n  return config.height;\n}", "render", "width", "ts",
+      "class Config { width = 1; height = 2; }", ["Config"],
+    );
+    expect(verdictOf(verdict)).toBe("not-read");
+    if (verdict.verdict !== "not-read") return;
+    expect(verdict.evidence).toEqual({ routine: "render", line: 1, reads: 1 });
+  });
+
+  it("refutes the same shape in Python", () => {
+    expect(verdictOf(ask(
+      "def render(config):\n    return config.height\n", "render", "width", "python",
+      "class Config:\n    def __init__(self):\n        self.width = 1\n        self.height = 2\n", ["Config"],
+    ))).toBe("not-read");
+  });
+
+  it("refutes the same shape in Rust", () => {
+    expect(verdictOf(ask(
+      "fn render(config: &Config) -> u32 {\n    config.height\n}", "render", "width", "rust",
+      "struct Config { width: u32, height: u32 }", ["Config"],
+    ))).toBe("not-read");
+  });
+
+  it("refutes the same shape in JavaScript, through a method call", () => {
+    expect(verdictOf(ask(
+      "function render(config) {\n  return config.height();\n}", "render", "width", "js",
+      "class Config { width() { return 1; } height() { return 2; } }", ["Config"],
+    ))).toBe("not-read");
+  });
+});
+
+describe("the routine end refuses rather than accuses (#255)", () => {
+  const type = "class Config { width = 1; height = 2; name = ''; }";
+  const ask = (routine: string, name = "render", member = "width") =>
+    verdictOf(memberAccesses(routine, name, member, "ts", { source: type, names: ["Config"], language: "ts" }));
+
+  it("says nothing about a body with one read that has no `.name` -- a destructuring", () => {
+    // The issue's own test, restated: one read nobody could see is enough.
+    expect(ask("function render(config: Config) {\n  const { height } = config;\n  return height;\n}")).toBe("absent");
+  });
+
+  it("says nothing about a spread, which reads every member at once", () => {
+    expect(ask("function render(config: Config) {\n  const copy = { ...config };\n  return copy.height;\n}")).toBe("absent");
+  });
+
+  it("says nothing about a computed member, which could be any of them", () => {
+    expect(ask("function render(config: Config, key: 'height') {\n  return config[key];\n}")).toBe("absent");
+  });
+
+  it("says nothing about a Rust body that reads inside a macro", () => {
+    expect(verdictOf(memberAccesses(
+      "fn render(config: &Config) {\n    println!(\"{}\", config.height);\n}", "render", "width", "rust",
+      { source: "struct Config { width: u32, height: u32 }", names: ["Config"], language: "rust" },
+    ))).toBe("absent");
+  });
+
+  it("says nothing about a body that reads no member at all, which was never measured", () => {
+    expect(ask("function render(config: Config) {\n  return measure(config);\n}")).toBe("absent");
+  });
+
+  it("confirms, rather than refutes, a read made in a parameter's default", () => {
+    expect(ask("function render(config: Config, w = config.width) {\n  return config.height + w;\n}")).toBe("confirmed");
+  });
+
+  it("says nothing about a member name the referee is built not to check", () => {
+    expect(ask("function render(config: Config) {\n  return config.height;\n}", "render", "name")).toBe("absent");
+  });
+
+  it("says nothing when the arrow starts at a class, whose methods were never measured as one body", () => {
+    expect(ask("class Renderer {\n  draw(config: Config) {\n    return config.height;\n  }\n}", "Renderer")).toBe("absent");
+  });
+
+  it("says nothing when two routines share the name and one of them is not closed", () => {
+    expect(ask([
+      "class A { render(config: Config) { return config.height; } }",
+      "class B { render(config: Config) { const { height } = config; return height; } }",
+    ].join("\n"))).toBe("absent");
+  });
+});

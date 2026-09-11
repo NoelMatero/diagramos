@@ -68,6 +68,7 @@ const KNOWN_EDGE_KINDS = new Set([
   "calls-backwards",
   "calls-refuted",
   "accesses-absent",
+  "accesses-not-read",
   "conforms-absent",
 ]);
 
@@ -81,7 +82,7 @@ const KNOWN_EDGE_KINDS = new Set([
  */
 const WRONG_EDGE_KINDS = new Set([
   "backwards-edge", "signature-absent", "holds-absent", "builds-backwards",
-  "calls-backwards", "calls-refuted", "accesses-absent", "conforms-absent",
+  "calls-backwards", "calls-refuted", "accesses-absent", "accesses-not-read", "conforms-absent",
 ]);
 
 /**
@@ -365,6 +366,7 @@ export function tallyOf(report: DriftView): TallyPart[] {
   const wrongCalls = report.edges.filter((finding) => finding.kind === "calls-backwards").length;
   const refutedCalls = report.edges.filter((finding) => finding.kind === "calls-refuted").length;
   const wrongMembers = report.edges.filter((finding) => finding.kind === "accesses-absent").length;
+  const unreadMembers = report.edges.filter((finding) => finding.kind === "accesses-not-read").length;
   const wrongBases = report.edges.filter((finding) => finding.kind === "conforms-absent").length;
   const unsupported = report.edges.filter(
     (finding) => !WRONG_EDGE_KINDS.has(finding.kind) && KNOWN_EDGE_KINDS.has(finding.kind),
@@ -443,6 +445,17 @@ export function tallyOf(report: DriftView): TallyPart[] {
   if (wrongMembers) {
     parts.push({
       text: `${wrongMembers} ${wrongMembers === 1 ? "member" : "members"} gone`,
+      tone: "bad",
+    });
+  }
+  /*
+   * Its own chip beside `members gone`, because the fix is at the other end of
+   * the arrow: that one is a type that lost a member, this one a routine that
+   * never reads it (#255).
+   */
+  if (unreadMembers) {
+    parts.push({
+      text: `${unreadMembers} ${unreadMembers === 1 ? "member" : "members"} never read`,
       tone: "bad",
     });
   }
@@ -601,6 +614,7 @@ export function rowsOf(report: DriftView): StatusRow[] {
         + (finding.kind === "calls-backwards" ? " · called the other way" : "")
         + (finding.kind === "calls-refuted" ? " · never called" : "")
         + (finding.kind === "accesses-absent" ? " · no such member" : "")
+        + (finding.kind === "accesses-not-read" ? " · never read here" : "")
         + (finding.kind === "conforms-absent" ? " · not a base" : "")
         + (KNOWN_EDGE_KINDS.has(finding.kind)
           ? ""

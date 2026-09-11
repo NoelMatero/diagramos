@@ -12,6 +12,12 @@
  * decide whether a real type checker (tier 2) is a nice-to-have or a hard
  * requirement, before building on syntax alone.
  *
+ * One exception, and it uses no verdict: `memberReadsIn`'s *names and
+ * hazards* are what `accesses.ts` refutes the routine end of `@accesses` from
+ * (#255) -- which members a body reads by name, and whether it reads any
+ * without a name. The `resolved`/`withheld` verdicts beside them still reach
+ * no word.
+ *
  * ## Evidence, not convention -- the gate `dataflow.ts` set for #210
  *
  * `const v = []` says v is a list in the grammar; `const v = load()` says
@@ -56,11 +62,20 @@
  * needs to explain "the call was opaque" cannot be aimed at the other shapes
  * hiding under `no-annotation`.
  */
+import type { ReceiverResolution } from "./calls";
 import { COLLECTION_LITERAL, COLLECTION_MAKERS } from "./dataflow";
-import { each, parseSource, type Language, type Node } from "./parse";
+import { each, MEMBER_ACCESS, parseSource, type Language, type Node } from "./parse";
 
 /** The shapes carrying enough evidence in the text to name a type. */
 export type ResolutionShape =
+  /**
+   * `self.width` / `this.width` -- read off the type the routine is declared
+   * in. Evidence in the strongest sense the module doc asks for: the type is
+   * written down in the declaration this routine sits inside, and nothing
+   * else it could be. Only ever reached from a member read; a call on `self`
+   * is not a receiver question (see `receiverOf`).
+   */
+  | "enclosing-type"
   | "construction"
   | "rust-constructor"
   | "struct-literal"
@@ -157,6 +172,117 @@ export interface RoutineResolution {
   sites: ReceiverSite[];
 }
 
+/**
+ * How a member read names the thing it is read off.
+ *
+ * The same three shapes `receiverOf` sorts a call receiver into, plus one it
+ * deliberately drops. `self.foo()` is not a receiver question -- it calls a
+ * method of the routine's own type -- but `self.width` is exactly the
+ * question `@accesses` asks, and in Python it is where most attributes are
+ * read. So `own` exists here and has no counterpart there.
+ */
+export type ReadReceiverKind = "own" | "field" | "name";
+
+/** One `x.width` found in a routine body, and what `x` was worked out to be. */
+export interface MemberReadSite {
+  /** The member being read -- `width` in `x.width`. */
+  member: string;
+  kind: ReadReceiverKind;
+  /** `x` for a name, the field name for `self.cache.width`, empty for `own`. */
+  receiver: string;
+  /** 1-based line the read sits on. */
+  line: number;
+  /**
+   * The receiver expression's own byte range, so a referee can ask a real
+   * type checker about the same position without re-deriving it. The same
+   * contract `ReceiverSite.at` carries.
+   */
+  at: { start: number; end: number };
+  /** What the text alone makes of the receiver. Never affected by `placed`. */
+  verdict: ResolutionVerdict;
+  /**
+   * What a real type checker made of the same position, when the caller
+   * supplied one and it had an opinion.
+   *
+   * Kept beside the syntactic verdict rather than folded into it, so a
+   * measurement can report the two tiers separately and say what the checker
+   * bought. Folding them would make the tier-1 column unrecoverable.
+   */
+  placed?: ReceiverResolution;
+}
+
+/**
+ * A way this routine reads a member without any `.name` appearing for it.
+ *
+ * The reason a body's read list being complete is not the same thing as every
+ * read in it having resolved. `const { width } = config` reads `width` off
+ * Config, and both this reader and the independent referee in
+ * `scripts/lib/access-scan.ts` see nothing whatever -- so they agree, a
+ * measurement reports 100%, and a routine-end refutation would be licensed
+ * on a body nobody has fully read. #219 caught the same class of hole in
+ * `constructor(private width: number)` by reading the language rather than
+ * by finding a disagreement, which is the only way this class ever is.
+ */
+export type ReadHazardKind =
+  /** `const { width } = c`, `let C { width } = c`. Names members, no dot. */
+  | "destructured"
+  /** `{ ...c }`, `C { ..c }`, `{**c}`. Reads every member at once. */
+  | "spread"
+  /** `c[k]`. Can name any member there is, and the text does not say which. */
+  | "computed"
+  /**
+   * A Rust macro. Its arguments are a `token_tree` and nothing parses them,
+   * so `log_line!("{:?}", sock.peer_addr())` reads `peer_addr` and this
+   * reader sees an empty body. The licence row for `accesses` in Rust
+   * already names this as why its routine-end recall is 89.3%, the lowest
+   * of the five languages -- what is new is that the same blindness makes
+   * an absence unusable, where before it only ever cost a confirmation.
+   */
+  | "macro";
+
+export interface ReadHazard {
+  kind: ReadHazardKind;
+  /** 1-based. */
+  line: number;
+  /** As written, so a report can quote it. */
+  wrote: string;
+}
+
+export interface RoutineReads {
+  routine: string;
+  /** 1-based line the routine opens on. */
+  line: number;
+  /**
+   * 1-based line it closes on, so a caller can ask what falls inside it.
+   *
+   * `BodyCallSites.lines` carries the same thing for the same reason. A
+   * measurement that pairs this body with an independent reading of it by
+   * *name* pairs the wrong two whenever a file declares a name twice --
+   * `follow.ts` has a `declaring` at line 186 and another at 467, and
+   * matching on the name alone reported a read from one inside the other.
+   */
+  endLine: number;
+  sites: MemberReadSite[];
+  /**
+   * Reads this reader cannot see as reads. A body with one of these is not a
+   * closed region however many of its `.name` reads resolved.
+   */
+  hazards: ReadHazard[];
+}
+
+/**
+ * A real type checker's answer about one receiver position, when a caller has
+ * one to offer. The same shape and the same contract `CallSide.resolveReceiver`
+ * carries in `calls.ts`, so the three adapters in `scripts/lib` drive both
+ * without an adapter of their own.
+ */
+export type ResolveRead =
+  (at: { start: number; end: number }) => ReceiverResolution | undefined;
+
+export type ReadsReading =
+  | { read: true; routines: RoutineReads[] }
+  | { read: false; why: "unreadable" };
+
 export type ResolutionReading =
   | { read: true; routines: RoutineResolution[] }
   | { read: false; why: "unreadable" };
@@ -175,6 +301,19 @@ export type ResolutionReading =
 function isRoutineNode(node: Node): boolean {
   return node.childForFieldName("parameters") !== null && node.childForFieldName("body") !== null;
 }
+
+/**
+ * Shapes that carry a `name` and a `value` without declaring anything.
+ *
+ * `rows.sort(key=lambda r: ..)` hands a callback over by keyword, and
+ * `def f(cb=lambda r: ..)` / `function f(cb = (r) => ..)` give a parameter a
+ * default. Each has the two fields a binding has, and none of them names a
+ * routine a board could anchor a box to. Found by reading the by-name
+ * disputes: seven of eight were one-line Python bodies named `key`.
+ */
+const PASSED_NOT_DECLARED = new Set([
+  "keyword_argument", "default_parameter", "typed_default_parameter", "assignment_pattern",
+]);
 
 /** Node types that declare a type with a member list, in any grammar loaded here. */
 const TYPE_DECLARATION =
@@ -843,6 +982,107 @@ function receiverOf(
   return { kind: "name", receiver: "", method, node: object };
 }
 
+/**
+ * What a member read is read off, or `undefined` when the node is not a read
+ * of a plain member at all.
+ *
+ * Deliberately parallel to `receiverOf` rather than shared with it: that one
+ * answers about a *call* and drops `self`/`this` on the grounds that a method
+ * on your own type is not a receiver question. Here it is the question.
+ */
+function readReceiverOf(
+  node: Node,
+): { kind: ReadReceiverKind; receiver: string; member: string; node: Node } | undefined {
+  /*
+   * The node-type gate, and it is load-bearing rather than a tidy-up.
+   * `accessOf` reads an `object`/`value` field and a `property`/`name` one,
+   * which a `variable_declarator` also has: `const x = load()` came back as a
+   * read of member `x` off `load()`. Every binding in the corpus would have
+   * counted as an unresolvable read, every body would have looked open, and
+   * the region this issue exists to measure would have read as far too small
+   * to build on -- a wrong answer that looks like a finding.
+   */
+  if (!MEMBER_ACCESS.test(node.type)) return undefined;
+  if (node.type === "scoped_identifier") return undefined;
+  const outer = accessOf(node);
+  if (!outer) return undefined;
+  const member = outer.member.text;
+  const object = outer.object;
+
+  if (object.childCount === 0) {
+    if (OWN.has(object.text)) return { kind: "own", receiver: "", member, node: object };
+    return { kind: "name", receiver: object.text, member, node: object };
+  }
+  if (object.type === "scoped_identifier") return undefined;
+
+  const inner = accessOf(object);
+  if (inner && inner.object.childCount === 0 && OWN.has(inner.object.text) && inner.member.childCount === 0) {
+    return { kind: "field", receiver: inner.member.text, member, node: object };
+  }
+  /*
+   * A read off something this reader cannot name -- `make().width`,
+   * `rows[0].width`. Counted anyway, so a denominator is every read there is
+   * rather than only the ones that could be resolved: a body is closed when
+   * every read in it resolved, and a read left out of the count would make an
+   * open body look closed. That is the direction that ships a false red.
+   */
+  return { kind: "name", receiver: "", member, node: object };
+}
+
+/**
+ * Node types that name members without writing a dot, per grammar.
+ *
+ * Read off a real parse rather than remembered: `docs/reading-a-grammar.md`
+ * records one reader making the same mistake four times, every instance a
+ * hand-written list of node names that one language spelled differently.
+ * Each of these was confirmed by parsing the shape and printing what came
+ * back, and the differences are real -- Python has no object destructuring
+ * at all, so its `pattern_list` is sequence unpacking and reads no member.
+ */
+const DESTRUCTURES = new Set(["object_pattern", "struct_pattern"]);
+const SPREADS = new Set(["base_field_initializer", "dictionary_splat"]);
+const COMPUTED = new Set(["subscript_expression", "subscript", "index_expression"]);
+const UNPARSED = new Set(["macro_invocation"]);
+/**
+ * Python builtins that name an attribute the text does not fix.
+ *
+ * `getattr(c, k)` is `c[k]` in another spelling and `vars(c)` hands back the
+ * whole `__dict__`. Both read members with no `.name` for any of them.
+ * Deliberately short: `setattr` writes rather than reads, and `hasattr` asks
+ * without reading, so neither is on it.
+ */
+const PYTHON_DYNAMIC = new Set(["getattr", "vars"]);
+
+/**
+ * Whether this node reads members without naming them in a `.name`.
+ *
+ * `spread_element` is the one that cannot be decided on its own type: it is
+ * both `{ ...config }`, which reads every member Config has, and `[...rows]`,
+ * which reads none. The grammar puts no field on it either way, so the
+ * structure decides -- the parent being an object literal -- and this is
+ * called from the parent for that reason rather than from the node.
+ */
+function hazardOf(node: Node, language: Language): ReadHazardKind | undefined {
+  if (language === "python" && node.type === "call") {
+    const callee = node.childForFieldName("function");
+    if (callee && callee.childCount === 0 && PYTHON_DYNAMIC.has(callee.text)) return "computed";
+  }
+  if (DESTRUCTURES.has(node.type)) return "destructured";
+  if (SPREADS.has(node.type)) return "spread";
+  if (COMPUTED.has(node.type)) return "computed";
+  if (UNPARSED.has(node.type)) return "macro";
+  return undefined;
+}
+
+/** Whether an object literal spreads something into itself: `{ ...c }`. */
+function spreadsInto(node: Node): boolean {
+  if (node.type !== "object") return false;
+  for (let index = 0; index < node.childCount; index += 1) {
+    if (node.child(index)?.type === "spread_element") return true;
+  }
+  return false;
+}
+
 /* --------------------------------------------------------------- verdicts */
 
 function verdictFrom(classified: Classified, generics: Set<string>, source: string): ResolutionVerdict {
@@ -858,6 +1098,31 @@ function verdictFrom(classified: Classified, generics: Set<string>, source: stri
   if (classified.kind === "indexed") return { verdict: "withheld", why: "indexed-type" };
   if (classified.kind === "call") return { verdict: "withheld", why: "from-a-call" };
   return { verdict: "withheld", why: "no-annotation" };
+}
+
+/**
+ * The type a routine is declared inside, when there is one and it is named.
+ *
+ * `undefined` for a free function, and for a declaration whose name this
+ * reader could not read off -- an anonymous class expression, a Rust `impl`
+ * on a type spelled as something other than a plain name.
+ */
+type EnclosingType = { name: string; at: number } | undefined;
+
+/** What `self.width` is read off: the enclosing type, or a stated refusal. */
+function ownVerdict(own: EnclosingType, source: string): ResolutionVerdict {
+  /*
+   * `no-fields` rather than a word of its own, and it is the same sentence
+   * that reason already carries: a `self`/`this` receiver whose enclosing
+   * type this reader could not find. A read off `self` in a free function is
+   * not a thing that happens in any of these grammars, so this is reached by
+   * the anonymous and unnameable declarations rather than by ordinary code.
+   */
+  if (!own) return { verdict: "withheld", why: "no-fields" };
+  return {
+    verdict: "resolved",
+    evidence: { type: own.name, shape: "enclosing-type", line: lineOf(source, own.at) },
+  };
 }
 
 interface Scope {
@@ -948,14 +1213,34 @@ function collectParams(list: Node | null, language: Language, into: Map<string, 
   }
 }
 
+/** One routine's two populations: what it calls on, and what it reads. */
+interface RoutineBoth extends RoutineResolution {
+  /**
+   * The name the routine is bound to when it declares none of its own:
+   * `const draw = () => ..`, `onClick = () => ..`, `draw = lambda c: ..`.
+   *
+   * Carried beside `routine` rather than written into it, because
+   * `resolveReceiversIn` reports `routine` and #227's figures were measured
+   * with those arrows nameless. The member-read projection uses this, since
+   * `accesses.ts` finds an arrow's tail by exactly this binding.
+   */
+  boundName: string | undefined;
+  endLine: number;
+  reads: MemberReadSite[];
+  hazards: ReadHazard[];
+}
+
 function resolveRoutine(
   routine: Node,
   fields: Map<string, Classified>,
+  own: EnclosingType,
   tree: Node,
   source: string,
   language: Language,
   imported: Set<string>,
-): RoutineResolution {
+  resolveRead: ResolveRead | undefined,
+  boundName: string | undefined,
+): RoutineBoth {
   const nameNode = routine.type === "impl_item" ? undefined : routine.childForFieldName("name");
   const routineName = nameNode && nameNode.childCount === 0 ? nameNode.text : "";
   const generics = genericParamsOf(routine);
@@ -966,6 +1251,76 @@ function resolveRoutine(
   const body = routine.childForFieldName("body");
   const bindings = new Map<string, Binding[]>();
   const sites: ReceiverSite[] = [];
+  const reads: MemberReadSite[] = [];
+  const hazards: ReadHazard[] = [];
+
+  /*
+   * Read off the parameter list as well as the body. `function f({ width }: C)`
+   * declares the read outside the braces, and a body-only walk reports the
+   * routine as reading nothing at all.
+   */
+  const noteHazards = (from: Node): void => {
+    each(from, (node) => {
+      const kind = spreadsInto(node) ? "spread" : hazardOf(node, language);
+      if (!kind) return;
+      hazards.push({
+        kind, line: lineOf(source, node.startIndex),
+        wrote: node.text.replace(/\s+/g, " ").slice(0, 60),
+      });
+    });
+  };
+  const parameterList = routine.childForFieldName("parameters");
+  if (parameterList) noteHazards(parameterList);
+
+  /*
+   * The read population. `x.width` and `x.width()` are both reads of `width`
+   * -- `accesses.ts` counts a method call as reading a member, and a member
+   * list that left methods out would refute every arrow drawn at a class --
+   * so this is not gated on the node being a call or not being one.
+   */
+  const noteRead = (node: Node): void => {
+    const read = readReceiverOf(node);
+    if (!read) return;
+    const scope: Scope = { params, bindings, fields, generics, imported };
+    const at = { start: read.node.startIndex, end: read.node.startIndex + read.node.text.length };
+    const placed = resolveRead?.(at);
+    reads.push({
+      member: read.member, kind: read.kind, receiver: read.receiver,
+      line: lineOf(source, node.startIndex),
+      at,
+      verdict: read.kind === "own"
+        ? ownVerdict(own, source)
+        : resolveReceiver({ kind: read.kind, receiver: read.receiver }, scope, source),
+      ...(placed ? { placed } : {}),
+    });
+  };
+
+  /*
+   * A parameter's default value is evaluated by the routine, so a read in it
+   * is a read the routine makes -- `reason: Reason = REASONS.none` -- and a
+   * walk of the body never reaches it. Eleven routines in about 13,000 across
+   * the corpus, found by reading signatures the referee disputed. Rare is not
+   * a reason to leave it out: an absence cannot rest on a reader that is blind
+   * to a read, however seldom the read happens.
+   *
+   * The default only. An annotation such as `httpx._types.AuthTypes` is a
+   * module path, not a read of anything a board draws, and its field is
+   * `type`. JavaScript spells a default as an `assignment_pattern` and puts
+   * the value on `right`.
+   *
+   * Reads only, not call sites: `resolveReceiversIn` reports those, and #227's
+   * figures were measured without defaults.
+   */
+  if (parameterList) {
+    for (let index = 0; index < parameterList.childCount; index += 1) {
+      const parameter = parameterList.child(index);
+      if (!parameter) continue;
+      const value = parameter.type === "assignment_pattern"
+        ? parameter.childForFieldName("right")
+        : parameter.childForFieldName("value") ?? parameter.childForFieldName("default");
+      if (value) each(value, noteRead);
+    }
+  }
 
   if (body) {
     each(body, (node) => {
@@ -976,11 +1331,13 @@ function resolveRoutine(
         bindings.set(bound.name, list);
       }
 
+      const scope: Scope = { params, bindings, fields, generics, imported };
+      noteRead(node);
+
       const callee = calleeOf(node);
       if (!callee) return;
       const site = receiverOf(callee);
       if (!site) return;
-      const scope: Scope = { params, bindings, fields, generics, imported };
       const verdict = resolveReceiver(site, scope, source);
       sites.push({
         receiver: site.receiver, kind: site.kind, method: site.method,
@@ -991,7 +1348,15 @@ function resolveRoutine(
     });
   }
 
-  return { routine: routineName, line: lineOf(source, routine.startIndex), sites };
+  if (body) noteHazards(body);
+
+  return {
+    routine: routineName,
+    boundName,
+    line: lineOf(source, routine.startIndex),
+    endLine: lineOf(source, routine.startIndex + routine.text.length),
+    sites, reads, hazards,
+  };
 }
 
 /* ---------------------------------------------------------------- the walk */
@@ -999,17 +1364,39 @@ function resolveRoutine(
 function walk(
   node: Node,
   fields: Map<string, Classified>,
+  own: EnclosingType,
   tree: Node,
   source: string,
   language: Language,
   imported: Set<string>,
-  routines: RoutineResolution[],
+  routines: RoutineBoth[],
+  resolveRead: ResolveRead | undefined,
+  bound: Map<number, string> = new Map(),
 ): void {
+  /*
+   * A binding whose value is a routine names that routine: the rule
+   * `routinesNamed` in `accesses.ts` applies -- a `name` or `left` field, and
+   * a `value` with parameters -- so the population here is the population a
+   * board can ask about. Recorded by node id and read when the walk reaches
+   * the value, because `Node` exposes no parent to look back up at.
+   */
+  const bindingName = node.childForFieldName("name") ?? node.childForFieldName("left");
+  const boundValue = node.childForFieldName("value") ?? node.childForFieldName("right");
+  if (
+    !PASSED_NOT_DECLARED.has(node.type)
+    && bindingName && bindingName.childCount === 0 && boundValue && isRoutineNode(boundValue)
+  ) {
+    bound.set(boundValue.id, bindingName.text);
+  }
   if (TYPE_DECLARATION.test(node.type)) {
     const nextFields = fieldsOf(node, language, source);
+    const declared = node.childForFieldName("name");
+    const nextOwn: EnclosingType = declared && declared.childCount === 0
+      ? { name: declared.text, at: declared.startIndex }
+      : undefined;
     for (let index = 0; index < node.childCount; index += 1) {
       const child = node.child(index);
-      if (child) walk(child, nextFields, tree, source, language, imported, routines);
+      if (child) walk(child, nextFields, nextOwn, tree, source, language, imported, routines, resolveRead, bound);
     }
     return;
   }
@@ -1037,18 +1424,21 @@ function walk(
       const declared = declarationNamed(tree, typeName.text);
       if (declared) nextFields = fieldsOf(declared, language, source);
     }
+    const nextOwn: EnclosingType = typeName && typeName.childCount === 0
+      ? { name: typeName.text, at: typeName.startIndex }
+      : undefined;
     for (let index = 0; index < node.childCount; index += 1) {
       const child = node.child(index);
-      if (child) walk(child, nextFields, tree, source, language, imported, routines);
+      if (child) walk(child, nextFields, nextOwn, tree, source, language, imported, routines, resolveRead, bound);
     }
     return;
   }
   if (isRoutineNode(node)) {
-    routines.push(resolveRoutine(node, fields, tree, source, language, imported));
+    routines.push(resolveRoutine(node, fields, own, tree, source, language, imported, resolveRead, bound.get(node.id)));
   }
   for (let index = 0; index < node.childCount; index += 1) {
     const child = node.child(index);
-    if (child) walk(child, fields, tree, source, language, imported, routines);
+    if (child) walk(child, fields, own, tree, source, language, imported, routines, resolveRead, bound);
   }
 }
 
@@ -1063,9 +1453,41 @@ export function resolveReceiversIn(source: string, language: Language): Resoluti
   const tree = parseSource(source, language);
   if (!tree) return { read: false, why: "unreadable" };
   const imported = importedNamesIn(tree.rootNode, language);
-  const routines: RoutineResolution[] = [];
-  walk(tree.rootNode, new Map(), tree.rootNode, source, language, imported, routines);
-  return { read: true, routines };
+  const routines: RoutineBoth[] = [];
+  walk(tree.rootNode, new Map(), undefined, tree.rootNode, source, language, imported, routines, undefined);
+  return { read: true, routines: routines.map(({ routine, line, sites }) => ({ routine, line, sites })) };
+}
+
+/**
+ * Every `x.width` a routine reads, each resolved to the type it was read off
+ * or withheld with a named reason.
+ *
+ * The population `@accesses`'s routine end claims about (#255). That end can
+ * only ever confirm today: not finding a read is not evidence there is none,
+ * because a read this reader cannot place is its own blindness rather than
+ * the code's silence. Whether a body where *every* read resolved is a big
+ * enough region to accuse from is what `measure:accesses-closed` asks, and
+ * nothing may accuse on the strength of one until it has an answer.
+ *
+ * **A measurement's reader.** Nothing here is licenced and nothing here
+ * accuses -- see the module doc.
+ */
+export function memberReadsIn(
+  source: string,
+  language: Language,
+  resolveRead?: ResolveRead,
+): ReadsReading {
+  const tree = parseSource(source, language);
+  if (!tree) return { read: false, why: "unreadable" };
+  const imported = importedNamesIn(tree.rootNode, language);
+  const routines: RoutineBoth[] = [];
+  walk(tree.rootNode, new Map(), undefined, tree.rootNode, source, language, imported, routines, resolveRead);
+  return {
+    read: true,
+    routines: routines.map(({ routine, boundName, line, endLine, reads, hazards }) => ({
+      routine: routine || boundName || "", line, endLine, sites: reads, hazards,
+    })),
+  };
 }
 
 /** A binding where a written annotation and a written construction disagree about the type. */
