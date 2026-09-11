@@ -196,6 +196,22 @@ const nodeSchema = z.object({
       + "subsystem is meant to hold once built; nothing is walked or checked until the box "
       + "promotes.",
     ),
+  handles: z
+    .array(z.string())
+    .optional()
+    .describe(
+      "Only for a box whose ref names a ROUTINE (path#symbol) that dispatches on a closed set "
+      + "of cases — a match on an enum, a switch on string literals, an if/elif chain. Lists "
+      + "EVERY case it dispatches on. THIS IS CHECKED against the arms in the code: a case the "
+      + "routine dispatches on that is not in this list, or a case in this list the routine has "
+      + "no arm for, makes the claim false by file and line, and the build fails. Write it ONLY "
+      + "from the arms you have read — the whole point is that it catches a case being added to "
+      + "the code and not to the picture, so a guessed list produces an immediate failure that "
+      + "is your mistake, not the user's. A routine with a `_`/`default` fallback still has the "
+      + "unlisted-case half checked; the missing-case half withholds, because the fallback "
+      + "handles it. A routine with two dispatches in it is refused, since this names one set. "
+      + "On a state:'planned' box nothing is checked until the box promotes.",
+    ),
   state: z
     .enum(["planned", "built", "external"])
     .optional()

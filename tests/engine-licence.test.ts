@@ -25,7 +25,7 @@ import { readDependencies } from "../src/engine/deps";
 import { createWorkspace, type Workspace } from "../src/engine/drift";
 import { initEngine, type Language } from "../src/engine/parse";
 import { resolveDependency } from "../src/engine/resolve";
-import { ARROW_CLAIMS } from "../src/engine/claim";
+import { ARROW_CLAIMS, BOX_CLAIMS } from "../src/engine/claim";
 import {
   ACCUSING_RELATIONS, LICENCES, isMeasured, licenceFor, licenceTotals, mayAccuse,
   relationLicence, relationTotals, type AccusingRelation,
@@ -351,6 +351,21 @@ describe("which words may accuse, and in which languages", () => {
       calls: { ts: true, tsx: true, js: false, rust: true, python: true },
       accesses: { ts: true, tsx: true, js: false, rust: true, python: true },
       conforms: { ts: true, tsx: true, js: false, rust: false, python: true },
+      /*
+       * The first **box** word on the grid, and the only row with one `yes`.
+       *
+       * `closed` is the other box word and it is deliberately not here: it
+       * reads the imports, which is `@needs`' reader measured by `@needs`'
+       * corpus, so it asks `licenceFor` about a path instead. `handles` reads a
+       * dispatch, which nothing else here reads, so it needed a row or it would
+       * have been accusing on a measurement of something else -- #195 exactly.
+       *
+       * Rust is the square #206 expected to be strongest and it is a stated no,
+       * which is the opposite of the issue's prediction. The reason is the
+       * referee rather than the reader: a line-based scan cannot see an arm
+       * `rustfmt` broke across lines. See `src/engine/licence.ts`.
+       */
+      handles: { ts: true, tsx: false, js: false, rust: false, python: false },
     };
     for (const relation of ACCUSING_RELATIONS) {
       for (const language of LANGUAGES) {
@@ -363,17 +378,21 @@ describe("which words may accuse, and in which languages", () => {
   it("stays silent about a word nobody has measured anywhere", () => {
     /*
      * The shape that matters, stated as a test: an *unlisted* pair must answer
-     * "may not accuse", never "may". `handles` is #206's word and has no reader
-     * yet, so it stands in for whatever arrives next -- and the point is that it
-     * inherits nothing from the four measurements Python already has.
+     * "may not accuse", never "may". The stand-in is a word that will never
+     * arrive -- `type-arg` is on `docs/claim-vocabulary.md`'s "deliberately not
+     * being built" list, because almost all of it is `Vec<T>` and `list[str]`,
+     * which nobody draws as two boxes.
      *
-     * `invokes` stood here until #189 shipped it as `calls`, and what happened
-     * in between is why the cast matters: the word arrived, the type made the
-     * hole visible in four places, and every one of them had to be answered by
-     * hand. The cast is the other half -- a word that routes around the type
-     * still gets a no.
+     * It has been re-chosen twice and both times for the same happy reason.
+     * `invokes` stood here until #189 shipped it as `calls`; `handles` replaced
+     * it and #206 shipped that. What happened in between is why the cast
+     * matters: the word arrived, the type made the hole visible in four places,
+     * and every one had to be answered by hand. The cast is the other half -- a
+     * word that routes around the type still gets a no. Picking a declined word
+     * rather than the next likely one is the fix for a test that keeps being
+     * overtaken by the thing it is guarding against.
      */
-    const next = "handles" as AccusingRelation;
+    const next = "type-arg" as AccusingRelation;
     for (const language of LANGUAGES) {
       expect(mayAccuse(next, language), language).toBe(false);
       expect(relationLicence(next, language), language).toBeUndefined();
@@ -381,9 +400,31 @@ describe("which words may accuse, and in which languages", () => {
   });
 
   it("asks about every word that can accuse, and only those", () => {
-    // Filtered from `ARROW_CLAIMS` rather than typed out, so a report that walks
-    // it cannot quietly stop mentioning a word.
-    expect([...ACCUSING_RELATIONS]).toEqual(ARROW_CLAIMS.filter((word) => word !== "feeds"));
+    // Derived from `ARROW_CLAIMS` rather than typed out, so a report that walks
+    // it cannot quietly stop mentioning a word. `handles` is appended because it
+    // is a *box* word with a reader of its own; `closed` is not, because it
+    // reads the imports `@needs` is measured on and asks `licenceFor` instead.
+    expect([...ACCUSING_RELATIONS]).toEqual([
+      ...ARROW_CLAIMS.filter((word) => word !== "feeds"),
+      "handles",
+    ]);
+  });
+
+  it("puts every box word that accuses on its own reader on the grid", () => {
+    /*
+     * The rule, as a test rather than as a comment, because getting it wrong is
+     * #195: a reader shipping an accusation it inherited from a measurement of
+     * something else.
+     *
+     * A box word goes on the grid when it reads something no other word reads.
+     * `handles` reads a dispatch, so it has a row. `closed` reads the imports --
+     * `@needs`' reader, measured by `@needs`' corpus -- so it asks `licenceFor`
+     * about a path and must *not* have one, or the same measurement would be
+     * licensing two different questions.
+     */
+    expect(BOX_CLAIMS).toContain("handles");
+    expect([...ACCUSING_RELATIONS]).toContain("handles");
+    expect([...ACCUSING_RELATIONS]).not.toContain("closed");
   });
 
   it("gives a reason where it says no, rather than a shrug", () => {
@@ -489,8 +530,16 @@ describe("which words may accuse, and in which languages", () => {
      * language to that table has to be a decision, the same way adding one to
      * `parse.ts` is.
      */
+    /*
+     * TS and TSX are two columns as of #206, and that is a finding rather than
+     * a formatting choice. They agreed on every word for eight words running,
+     * so the table said `TS / TSX` and meant both -- and `@handles` is the
+     * first word where they do not agree. One column would have had to round
+     * one of them, and rounding *up* grants a licence nobody measured.
+     */
     const columns: Record<string, readonly Language[]> = {
-      "TS / TSX": ["ts", "tsx"],
+      TS: ["ts"],
+      TSX: ["tsx"],
       JavaScript: ["js"],
       Rust: ["rust"],
       Python: ["python"],

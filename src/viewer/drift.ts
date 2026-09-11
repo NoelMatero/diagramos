@@ -43,6 +43,7 @@ const KNOWN_BOX_KINDS = new Set([
   "stale-number",
   "open-box",
   "incomplete-board",
+  "mishandled-box",
 ]);
 
 /**
@@ -53,8 +54,13 @@ const KNOWN_BOX_KINDS = new Set([
  * `incomplete-board` is about a module that is not on the board at all. Both
  * have to say the engine's sentence instead, because the thing that is wrong
  * has no shape on the canvas to point at.
+ *
+ * `mishandled-box` is here for a third reason: its anchor is perfectly fine.
+ * The box points at the right routine and the routine exists -- what is wrong
+ * is which *cases* it dispatches on, and the only useful thing to show is the
+ * engine's own sentence naming them.
  */
-const DETAIL_KINDS = new Set(["open-box", "incomplete-board"]);
+const DETAIL_KINDS = new Set(["open-box", "incomplete-board", "mishandled-box"]);
 
 /** The arrow verdicts this page knows how to render. */
 const KNOWN_EDGE_KINDS = new Set([

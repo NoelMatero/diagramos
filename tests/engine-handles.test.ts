@@ -9,7 +9,7 @@
  */
 import { beforeAll, describe, expect, it } from "vitest";
 import { initEngine, parseSource, type Language } from "../src/engine/parse";
-import { findDispatches } from "../src/engine/handles";
+import { checkHandles, findDispatches } from "../src/engine/handles";
 
 beforeAll(async () => {
   await initEngine();
@@ -474,5 +474,126 @@ def label(s):
       "rust",
     );
     expect(names(dispatch.cases)).toEqual(["Active", "Pending"]);
+  });
+});
+
+describe("checking a box's case list against the code", () => {
+  const ROUTER = `
+enum Method { Get, Post, Delete, Put }
+
+fn status(m: Method) -> u16 {
+    match m {
+        Method::Get => 200,
+        Method::Post => 201,
+        Method::Delete => 204,
+    }
+}`;
+
+  it("holds when the box lists exactly what the code dispatches on", () => {
+    const reading = checkHandles(ROUTER, "status", ["Get", "Post", "Delete"], "rust");
+    expect(reading).toMatchObject({ verdict: "held", cases: ["Get", "Post", "Delete"] });
+  });
+
+  it("holds whatever order the box wrote them in", () => {
+    expect(checkHandles(ROUTER, "status", ["Delete", "Get", "Post"], "rust").verdict).toBe("held");
+  });
+
+  it("goes wrong when the code grew a case the box does not list", () => {
+    /*
+     * The bug this word exists for, from the diagram's side: somebody adds an
+     * arm and the picture still shows three. Refutable with no catch-all in
+     * sight, because every arm was read.
+     */
+    const reading = checkHandles(ROUTER, "status", ["Get", "Post"], "rust");
+    expect(reading).toMatchObject({ verdict: "wrong", extra: ["Delete"], missing: [] });
+  });
+
+  it("goes wrong when the box lists a case the routine never handles", () => {
+    // The other bug: the enum gained `Put`, the box was updated, the routine
+    // was not. No catch-all, so nothing is swallowing it.
+    const reading = checkHandles(ROUTER, "status", ["Get", "Post", "Delete", "Put"], "rust");
+    expect(reading).toMatchObject({ verdict: "wrong", missing: ["Put"], extra: [] });
+  });
+
+  it("quotes the line the dispatch is on, so a red can be acted on", () => {
+    const reading = checkHandles(ROUTER, "status", ["Get"], "rust");
+    expect(reading).toMatchObject({ verdict: "wrong", line: 5 });
+  });
+});
+
+describe("what a `handles` claim refuses to judge", () => {
+  /*
+   * `a-false-red-costs-trust`: the refusal path first. Every one of these
+   * would be a plausible red and every one of them would sometimes be wrong.
+   */
+  const WITH_CATCH_ALL = `
+fn status(m: Method) -> u16 {
+    match m {
+        Method::Get => 200,
+        Method::Post => 201,
+        _ => 405,
+    }
+}`;
+
+  it("withholds a missing case when a catch-all is handling it anyway", () => {
+    const reading = checkHandles(WITH_CATCH_ALL, "status", ["Get", "Post", "Delete"], "rust");
+    expect(reading).toMatchObject({ verdict: "withheld", why: "catch-all" });
+  });
+
+  it("still refutes an unlisted case, which a catch-all cannot excuse", () => {
+    // The box says these are the cases and the code names one it does not.
+    // That the routine also has a fallback does not make the picture right.
+    const reading = checkHandles(WITH_CATCH_ALL, "status", ["Get"], "rust");
+    expect(reading).toMatchObject({ verdict: "wrong", extra: ["Post"], missing: [] });
+  });
+
+  it("withholds when the routine has two dispatches and the claim names one set", () => {
+    const reading = checkHandles(`
+function handle(kind: string, verb: string) {
+  switch (kind) { case "a": return 1; case "b": return 2; }
+  switch (verb) { case "GET": return 3; case "PUT": return 4; }
+}`, "handle", ["a", "b"], "ts");
+    expect(reading).toMatchObject({ verdict: "withheld", why: "several-dispatches" });
+  });
+
+  it("withholds when a case in the dispatch could not be named", () => {
+    // A case list short by what the reader could not read would accuse somebody
+    // of forgetting a case that is plainly written down.
+    const reading = checkHandles(`
+function f(m: string, keys: string[]) {
+  switch (m) { case "a": return 1; case keys[0]: return 2; }
+}`, "f", ["a"], "ts");
+    expect(reading).toMatchObject({ verdict: "withheld", why: "unreadable-case" });
+  });
+
+  it("withholds when the routine does not dispatch on anything", () => {
+    expect(checkHandles(`fn status(m: Method) -> u16 { 200 }`, "status", ["Get"], "rust"))
+      .toMatchObject({ verdict: "withheld", why: "no-dispatch" });
+  });
+
+  it("withholds when the name is mentioned but not declared here", () => {
+    expect(checkHandles(`fn other() { status(m); }`, "status", ["Get"], "rust"))
+      .toMatchObject({ verdict: "withheld", why: "not-declared" });
+  });
+
+  it("reads every declaration of one name, which Rust impl blocks make ordinary", () => {
+    /*
+     * Two `impl` blocks declaring `ready`, the dispatch in the second. Reading
+     * only the first would report `no-dispatch` on a routine that plainly has
+     * one -- the loud direction, since it withholds a claim that holds.
+     */
+    const reading = checkHandles(`
+impl Reactor {
+    fn ready(&self) -> u8 { 0 }
+}
+impl Handler for Reactor {
+    fn handle(&self, e: Event) -> u8 {
+        match e {
+            Event::Read => 1,
+            Event::Write => 2,
+        }
+    }
+}`, "handle", ["Read", "Write"], "rust");
+    expect(reading).toMatchObject({ verdict: "held" });
   });
 });

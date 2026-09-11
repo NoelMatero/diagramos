@@ -409,11 +409,25 @@ export async function createDiagram(
         { closed: true, through: (node.closed!.through ?? []).map((entry) => entry.trim()).filter(Boolean) },
       ]),
   );
+  /*
+   * A box's case set. One claim per box, so this shares the `claim` key with
+   * `closed` and a node asking for both is refused at the schema rather than
+   * here -- two claims on one box is one unanswered question about which was
+   * meant, which is the rule an arrow already follows.
+   */
+  const handlesByNode = new Map(
+    params.nodes
+      .filter((node) => node.handles?.length)
+      .map((node) => [
+        node.id,
+        { handles: true, cases: node.handles!.map((entry) => entry.trim()).filter(Boolean) },
+      ]),
+  );
   for (const [nodeId, elementId] of plan.elementIdByNode) {
     const ref = refByNode.get(nodeId);
     const state = stateByNode.get(nodeId);
     const extra = extraRefsByNode.get(nodeId);
-    const claim = closedByNode.get(nodeId);
+    const claim = closedByNode.get(nodeId) ?? handlesByNode.get(nodeId);
     customData.set(elementId, {
       node: nodeId,
       ...(ref ? { ref } : {}),
@@ -694,7 +708,7 @@ export async function connectNodes(
  * lets the guidance point four changed refs at this tool instead of at a
  * forty-six box redraw.
  */
-const ANCHOR_FIELDS = ["ref", "refs", "state", "closed"] as const;
+const ANCHOR_FIELDS = ["ref", "refs", "state", "closed", "handles"] as const;
 
 function trimmedList(value: unknown): string[] {
   return Array.isArray(value)
@@ -750,6 +764,14 @@ function anchorEdit(
     const closed = patch.closed as { through?: unknown } | null | false;
     if (closed) existing.claim = { closed: true, through: trimmedList(closed.through) };
     else delete existing.claim;
+  }
+  if (patch.handles !== undefined) {
+    // `handles: []` is how a box drops the claim, the same way `refs: []` drops
+    // its extra anchors: an empty case set states nothing, so it cannot be a
+    // claim that merely happens to be empty.
+    const cases = trimmedList(patch.handles);
+    if (cases.length) existing.claim = { handles: true, cases };
+    else if (patch.handles !== undefined && Array.isArray(patch.handles)) delete existing.claim;
   }
   return existing;
 }

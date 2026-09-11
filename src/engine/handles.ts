@@ -49,7 +49,7 @@
  * about the code.
  */
 
-import { each, type Language, type Node, type Tree } from "./parse";
+import { each, parseSource, type Language, type Node, type Tree } from "./parse";
 
 /** One case a dispatch names. */
 export interface DispatchCase {
@@ -70,6 +70,24 @@ export interface Dispatch {
   unreadable: string[];
   /** 1-based line the dispatch starts on. */
   line: number;
+  /**
+   * Which of the two shapes this is.
+   *
+   * On the record because the two are not equally trusted. A `match` or a
+   * `switch` has an independent referee -- `scripts/lib/dispatch-scan.ts` finds
+   * `case X:` and `X =>` with no grammar -- and a chain of equality tests does
+   * not, for a reason that is structural rather than an oversight: a single
+   * `if (x === undefined)` is indistinguishable from a chain link unless the
+   * referee also collects the links and compares their subjects, which is the
+   * reader's own judgement written twice. The first version of the measurement
+   * did not make the distinction and reported 1,409 disagreeing files, almost
+   * every one an ordinary `if` the referee counted and the reader correctly
+   * refused.
+   *
+   * So `chain` is read, tested and reported, and `checkHandles` declines to
+   * accuse on it. `AGENTS.md`'s gate is not "measure the easy half".
+   */
+  kind: "cases" | "chain";
 }
 
 /**
@@ -281,16 +299,29 @@ const PATH = /^[A-Za-z_$][\w$]*(?:(?:\.|::)[A-Za-z_$][\w$]*)+$/;
  * works as the separator test in both languages that have one and costs
  * nothing in the three that do not.
  */
-function namesIn(label: Node, out: string[], unreadable: string[]): void {
+function namesIn(
+  label: Node,
+  out: string[],
+  unreadable: string[],
+  inPattern: boolean,
+): void {
+  /*
+   * Reaching a name through the grammar's own `name` or `type` field means the
+   * label was *qualified* -- `Method::Get` hands back `Get`, `Event::Scroll(_)`
+   * hands back `Scroll` -- so the bare-identifier refusal at the bottom of this
+   * function must not apply to what comes back. Passing `inPattern` through
+   * here instead refused every Rust enum variant in the corpus, which three
+   * tests caught immediately.
+   */
   const named = label.childForFieldName("name");
-  if (named) return namesIn(named, out, unreadable);
+  if (named) return namesIn(named, out, unreadable, false);
 
   const typed = label.childForFieldName("type");
-  if (typed) return namesIn(typed, out, unreadable);
+  if (typed) return namesIn(typed, out, unreadable, false);
 
   const loose = looseChildren(label, ["condition", "consequence", "body"]);
   if (hasAlternation(label)) {
-    for (const child of loose) namesIn(child, out, unreadable);
+    for (const child of loose) namesIn(child, out, unreadable, inPattern);
     return;
   }
 
@@ -333,11 +364,57 @@ function namesIn(label: Node, out: string[], unreadable: string[]): void {
     return;
   }
 
-  if (loose.length === 1) return namesIn(loose[0], out, unreadable);
+  if (loose.length === 1) return namesIn(loose[0], out, unreadable, inPattern);
 
   const text = label.text.trim();
-  if (READABLE_NAME.test(text)) out.push(text);
-  else unreadable.push(label.type);
+  if (!READABLE_NAME.test(text)) {
+    unreadable.push(label.type);
+    return;
+  }
+
+  out.push(text);
+}
+
+/**
+ * `match v { x => .. }` -- a binding, which is a catch-all wearing a name.
+ *
+ * A bare identifier means opposite things in the two families:
+ *
+ *   switch (m) { case ready: .. }   a *value*. `ready` is a constant and the
+ *                                   case is whatever it holds.
+ *   match v { x => .. }             a *binding*. `x` catches everything and
+ *                                   names it. There is no case here at all.
+ *
+ * Read as a case, the second one puts `x` in the set and a box listing the
+ * real variants gets told it is missing one. `ripgrep/tests/json.rs` has five.
+ *
+ * ## Two things this gets right that the first attempt did not
+ *
+ * The first version refused *every* unqualified identifier in a pattern, on the
+ * grounds that a unit variant can be brought into scope with `use Enum::*` and
+ * telling that from a binding needs name resolution. True, and it cost **372
+ * Rust cases and 21 Python ones** -- because bare `None`, `Ok` and `Err` are
+ * exactly that shape, and refusing them took the refused-dispatch count from
+ * 134 to 506. A refusal that removes a third of a language is not caution.
+ *
+ * So this leans on the one thing that does discriminate in practice: **case**.
+ * Rust warns on a variant that is not CamelCase and on a binding that is not
+ * snake_case, and Python spells constants upper or camel. It is a convention
+ * rather than a rule, which is why the answer is a **catch-all** rather than a
+ * case or a refusal: if this is wrong and `foo` really was a unit variant, the
+ * dispatch is reported as swallowing everything unlisted, so the claim gets
+ * *quieter* rather than accusing anybody. Being wrong in the safe direction is
+ * the whole of `licence.ts`'s argument.
+ *
+ * The families are told apart structurally rather than per language: Rust and
+ * Python wrap a label in a node whose type carries the word `pattern`
+ * (`match_pattern`, `case_pattern`), and a `switch` hands over the value
+ * itself. A qualified name never reaches here -- `PATH` has taken it already.
+ */
+function isBinding(label: Node): boolean {
+  if (!label.type.includes("pattern")) return false;
+  const text = label.text.trim();
+  return /^[a-z_][\w]*$/.test(text);
 }
 
 /**
@@ -468,7 +545,8 @@ function readChain(head: Node, source: string, consumed: Set<number>): Dispatch 
     if (subject !== here) return undefined;
 
     const names: string[] = [];
-    namesIn(right, names, unreadable);
+    // A chain compares a value, never binds one, so never a pattern position.
+    namesIn(right, names, unreadable, false);
     if (names.length === 0) return undefined;
     const line = lineOf(source, condition.startIndex);
     for (const name of names) cases.push({ name, line });
@@ -492,10 +570,20 @@ function readChain(head: Node, source: string, consumed: Set<number>): Dispatch 
   }
 
   if (subject === undefined || cases.length < 2) return undefined;
-  return { subject, cases, catchAll, unreadable, line: lineOf(source, head.startIndex) };
+  return {
+    subject, cases, catchAll, unreadable, kind: "chain", line: lineOf(source, head.startIndex),
+  };
 }
 
-export function findDispatches(tree: Tree, source: string, _language: Language): Dispatch[] {
+/**
+ * Every dispatch under one node.
+ *
+ * Takes a node rather than a tree so a caller can scope it to one routine's
+ * body, which is what a box claiming `handles` is about: the claim names a
+ * routine, and a dispatch elsewhere in the same file is a different routine's
+ * business.
+ */
+export function findDispatchesIn(root: Node, source: string): Dispatch[] {
   const found: Dispatch[] = [];
   /*
    * Links already read as part of a chain. An `else if` is an `if` inside an
@@ -503,7 +591,7 @@ export function findDispatches(tree: Tree, source: string, _language: Language):
    * the same chain once per link, each time one case shorter.
    */
   const consumed = new Set<number>();
-  each(tree.rootNode, (node) => {
+  each(root, (node) => {
     if (DISPATCH_OVER_A_CHAIN.test(node.type)) {
       if (consumed.has(node.id)) return;
       const chain = readChain(node, source, consumed);
@@ -533,12 +621,12 @@ export function findDispatches(tree: Tree, source: string, _language: Language):
         catchAll = true;
         continue;
       }
-      if (isWildcard(label)) {
+      if (isWildcard(label) || isBinding(label)) {
         catchAll = true;
         continue;
       }
       const names: string[] = [];
-      namesIn(label, names, unreadable);
+      namesIn(label, names, unreadable, label.type.includes("pattern"));
       const line = lineOf(source, label.startIndex);
       for (const name of names) cases.push({ name, line });
     }
@@ -548,8 +636,167 @@ export function findDispatches(tree: Tree, source: string, _language: Language):
       cases,
       catchAll,
       unreadable,
+      kind: "cases",
       line: lineOf(source, node.startIndex),
     });
   });
   return found;
+}
+
+/** Every dispatch in a whole file. The form the tests and the measurement use. */
+export function findDispatches(tree: Tree, source: string, _language: Language): Dispatch[] {
+  return findDispatchesIn(tree.rootNode, source);
+}
+
+/**
+ * The bodies one name is declared with, as nodes.
+ *
+ * `parse.ts`'s own rule rather than a second copy of `body.ts`'s bounding: a
+ * declaration is a node with a `name` field, and a function is one that also
+ * has a `body`. Every body is returned rather than the first, because one name
+ * can be declared more than once in a file and Rust `impl` blocks make that
+ * ordinary -- reading only the first is how a check reports a routine as not
+ * doing something the second declaration plainly does.
+ */
+function bodiesNamed(root: Node, symbol: string): Node[] {
+  const found: Node[] = [];
+  each(root, (node) => {
+    if (node.childForFieldName("name")?.text !== symbol) return;
+    const body = node.childForFieldName("body");
+    if (body) found.push(body);
+  });
+  return found;
+}
+
+/** Why a `handles` claim was not judged. Each is a sentence the report prints. */
+export type HandlesWithheld =
+  | "no-grammar"
+  | "not-declared"
+  | "no-body"
+  | "no-dispatch"
+  | "several-dispatches"
+  | "unreadable-case"
+  | "catch-all"
+  | "chain-unmeasured"
+  /**
+   * The reading disagreed with the box and the language has no licence to say
+   * so. Named here rather than in `drift.ts` so the report has one table of
+   * reasons; the check itself is language-blind and the caller holds the gate.
+   */
+  | "unlicensed";
+
+export type HandlesReading =
+  | { verdict: "held"; cases: string[]; line: number }
+  | {
+    verdict: "wrong";
+    /** Claimed on the box, not dispatched on in the code. */
+    missing: string[];
+    /** Dispatched on in the code, not claimed on the box. */
+    extra: string[];
+    /** Every case the code does dispatch on, for the report to quote. */
+    found: string[];
+    line: number;
+  }
+  | { verdict: "withheld"; why: HandlesWithheld; detail?: string };
+
+/**
+ * Whether a routine dispatches on the cases a box says it does.
+ *
+ * ## Both directions are refutable, and they are not refutable under the same
+ * ## conditions
+ *
+ * The case list of a dispatch is a **closed region** in the sense `claim.ts`
+ * requires: the arms are enumerable from the text, so a case that is not among
+ * them is genuinely absent rather than merely unfound. That is what lets this
+ * say *wrong* at all, and it is the same footing `@holds` stands on for a field
+ * list.
+ *
+ * - **A case the code dispatches on and the box does not list** refutes the
+ *   claim outright. The box says these are the cases; here is one more, with
+ *   its line. Nothing can hide it -- we read every arm.
+ * - **A case the box lists and the code does not dispatch on** refutes it too,
+ *   *unless the dispatch has a catch-all.* A `_ =>` or a `default:` handles
+ *   every unlisted case, so a claimed case with no arm of its own is still
+ *   handled, and calling that wrong would be a false red on a routine that is
+ *   behaving. So a catch-all costs this half of the check and keeps the other.
+ *
+ * ## Seven refusals, and they are most of the design
+ *
+ * `a-false-red-costs-trust` is the argument: build the refusal path first. A
+ * routine with two dispatches in it is refused rather than resolved, because
+ * `handles` names one case set and which one was meant is a question with no
+ * answer in the claim. A dispatch carrying a shape the reader could not name
+ * is refused, because a case list short by what it could not read would accuse
+ * somebody of forgetting a case they wrote down.
+ */
+export function checkHandles(
+  source: string,
+  symbol: string,
+  claimed: readonly string[],
+  language: Language,
+): HandlesReading {
+  const tree = parseSource(source, language);
+  if (!tree) return { verdict: "withheld", why: "no-grammar" };
+
+  const bodies = bodiesNamed(tree.rootNode, symbol);
+  if (bodies.length === 0) {
+    // No declaration of that name with a body. `drift.ts` has already checked
+    // the ref resolves, so this is a symbol that is mentioned and not declared,
+    // or declared as data -- neither of which dispatches on anything.
+    return { verdict: "withheld", why: "not-declared" };
+  }
+
+  const dispatches = bodies.flatMap((body) => findDispatchesIn(body, source));
+  if (dispatches.length === 0) return { verdict: "withheld", why: "no-dispatch" };
+  if (dispatches.length > 1) {
+    return {
+      verdict: "withheld",
+      why: "several-dispatches",
+      detail: dispatches.map((dispatch) => `${dispatch.subject} at line ${dispatch.line}`).join(", "),
+    };
+  }
+
+  const [dispatch] = dispatches;
+  /*
+   * A chain of equality tests is read and not judged, because it has no
+   * referee. See `Dispatch.kind`. This is the licence rule applied to half of
+   * one word rather than to a whole language, and it releases itself the day
+   * somebody builds a referee that can tell a chain from an `if`.
+   */
+  if (dispatch.kind === "chain") return { verdict: "withheld", why: "chain-unmeasured" };
+  if (dispatch.unreadable.length > 0) {
+    return {
+      verdict: "withheld",
+      why: "unreadable-case",
+      detail: [...new Set(dispatch.unreadable)].join(", "),
+    };
+  }
+
+  const found = dispatch.cases.map((one) => one.name);
+  const inCode = new Set(found);
+  const onBox = new Set(claimed);
+  const extra = found.filter((name) => !onBox.has(name));
+  const missing = claimed.filter((name) => !inCode.has(name));
+
+  // A catch-all handles every case nobody named, so a claimed case with no arm
+  // of its own is still handled. That costs the `missing` half and keeps
+  // `extra`, which a catch-all cannot excuse: the box still says these are the
+  // cases, and the code still names one it does not.
+  const refutableMissing = dispatch.catchAll ? [] : missing;
+
+  if (extra.length > 0 || refutableMissing.length > 0) {
+    return {
+      verdict: "wrong",
+      missing: refutableMissing,
+      extra,
+      found,
+      line: dispatch.line,
+    };
+  }
+
+  if (dispatch.catchAll && missing.length > 0) {
+    return { verdict: "withheld", why: "catch-all", detail: missing.join(", ") };
+  }
+
+  return { verdict: "held", cases: found, line: dispatch.line };
 }
