@@ -68,7 +68,7 @@ import { initEngine } from "../src/engine/parse.ts";
 import { createCodeGraphOption, TESTED_VERSION_PREFIX } from "../src/engine/codegraph.ts";
 import { createLedger } from "../src/engine/ledger.ts";
 import { goodNewsIds, goodNewsLine, goodNewsSince, novelGoodNews } from "../src/engine/goodnews.ts";
-import { createTsReferee, receiverResolutionFrom } from "./lib/resolution-ts.ts";
+import { createTsReferee, isOutsideTree, receiverResolutionFrom } from "./lib/resolution-ts.ts";
 import { resolvePythonReceivers } from "./lib/resolution-python-live.ts";
 import { languageOf } from "../src/engine/parse.ts";
 
@@ -848,6 +848,13 @@ function rowsFor({ report, promoted = [] }, colour, all = false) {
        */
       const wrongMembers = finding.kind === "accesses-absent";
       /*
+       * The routine end of the same word (#255): the type has the member and
+       * the routine reads nothing called it. Red here for the reason the one
+       * above had to be: a refutation left off this list prints amber, as one
+       * of the arrows nothing corroborated.
+       */
+      const wrongUnread = finding.kind === "accesses-not-read";
+      /*
        * The seventh (#216). Its own sentence for the reason the others have one:
        * this arrow is not pointing the wrong way *round the file* -- what makes
        * it wrong is a base list that does not name the other end, and the row
@@ -868,10 +875,11 @@ function rowsFor({ report, promoted = [] }, colour, all = false) {
         // The same words the board page uses, so one board does not read as two
         // different findings depending on where somebody looked at it.
         + (wrongMembers ? " \u00b7 no such member" : "")
+        + (wrongUnread ? " \u00b7 never read here" : "")
         + (wrongBase ? " \u00b7 not a base" : "")
         + (hop ? ` \u00b7 ${hop}` : ""),
         backwards || wrongSignature || wrongHolds || wrongBuilds || wrongCalls || wrongCallsRefuted
-          || wrongMembers || wrongBase
+          || wrongMembers || wrongUnread || wrongBase
           ? "red"
           : "yellow",
         colour,
@@ -943,7 +951,7 @@ function rowsFor({ report, promoted = [] }, colour, all = false) {
  */
 const WRONG_EDGE_KINDS = new Set(ACCUSING_EDGE_KINDS);
 
-function tallyCounts({ gone, generated, empty, unused, open, incomplete, removed, garbled, unanswered, backwards, signatures, fields, builtBackwards, callsBackwards, members, bases, arrows, stray, promoted, built, planned }, colour) {
+function tallyCounts({ gone, generated, empty, unused, open, incomplete, removed, garbled, unanswered, backwards, signatures, fields, builtBackwards, callsBackwards, members, unread, bases, arrows, stray, promoted, built, planned }, colour) {
   return [
     gone ? paint(`${gone} gone`, "red", colour) : "",
     // Its own word, because "gone" is the opposite of what happened: the file
@@ -1002,6 +1010,9 @@ function tallyCounts({ gone, generated, empty, unused, open, incomplete, removed
     members
       ? paint(`${members} ${members === 1 ? "member" : "members"} gone`, "red", colour)
       : null,
+    unread
+      ? paint(`${unread} ${unread === 1 ? "member" : "members"} never read`, "red", colour)
+      : null,
     bases
       ? paint(`${bases} ${bases === 1 ? "base disagrees" : "bases disagree"}`, "red", colour)
       : null,
@@ -1049,6 +1060,7 @@ function tallyFor({ report, promoted = [] }, colour) {
       callsBackwards: report.edges.filter((finding) => finding.kind === "calls-backwards").length,
       callsRefuted: report.edges.filter((finding) => finding.kind === "calls-refuted").length,
       members: report.edges.filter((finding) => finding.kind === "accesses-absent").length,
+      unread: report.edges.filter((finding) => finding.kind === "accesses-not-read").length,
       bases: report.edges.filter((finding) => finding.kind === "conforms-absent").length,
       arrows: report.edges.filter((finding) => !WRONG_EDGE_KINDS.has(finding.kind)).length,
       stray: report.strayArrows ?? 0,
@@ -1129,6 +1141,8 @@ function render(stale, colour) {
           + report.edges.filter((finding) => finding.kind === "calls-refuted").length,
         members: sum.members
           + report.edges.filter((finding) => finding.kind === "accesses-absent").length,
+        unread: sum.unread
+          + report.edges.filter((finding) => finding.kind === "accesses-not-read").length,
         bases: sum.bases
           + report.edges.filter((finding) => finding.kind === "conforms-absent").length,
         arrows: sum.arrows
@@ -1140,7 +1154,7 @@ function render(stale, colour) {
         planned: sum.planned + report.workItems.length,
       };
     },
-    { gone: 0, generated: 0, empty: 0, unused: 0, open: 0, incomplete: 0, removed: 0, garbled: 0, unanswered: 0, backwards: 0, signatures: 0, fields: 0, builtBackwards: 0, callsBackwards: 0, callsRefuted: 0, members: 0, bases: 0, arrows: 0, stray: 0, promoted: 0, built: 0, planned: 0 },
+    { gone: 0, generated: 0, empty: 0, unused: 0, open: 0, incomplete: 0, removed: 0, garbled: 0, unanswered: 0, backwards: 0, signatures: 0, fields: 0, builtBackwards: 0, callsBackwards: 0, callsRefuted: 0, members: 0, unread: 0, bases: 0, arrows: 0, stray: 0, promoted: 0, built: 0, planned: 0 },
   );
 
   // Too many to list: counts per diagram, and a pointer to the view that has room.
@@ -1383,6 +1397,22 @@ const closedBodyReferee = (tsReferee || pythonCache) ? {
     if (!tsReferee) return undefined;
     const absolute = path.resolve(root, file);
     return receiverResolutionFrom(tsReferee.typeAt(absolute, at.start, at.end), root);
+  },
+  /*
+   * "Go to definition" at a call's name, for `@accesses`' helper rule (#255):
+   * a red stays quiet when a function the routine calls reads the member, and
+   * this is how a call the reader could not place is found. TypeScript only,
+   * in process. Python's would need the recording pass above to ask a second
+   * kind of question; without it a Python helper is still found when the call
+   * reader places the call itself, and the red counts the rest as calls it
+   * could not see into.
+   */
+  declarationAt: (file, at) => {
+    if (!tsReferee || languageOf(file) === "python") return undefined;
+    const found = tsReferee.symbolDeclarationLocationAt(path.resolve(root, file), at.start, at.end);
+    if (!found) return undefined;
+    if (isOutsideTree(found.file, root)) return "outside";
+    return { file: path.relative(root, found.file), line: found.line + 1 };
   },
 } : undefined;
 

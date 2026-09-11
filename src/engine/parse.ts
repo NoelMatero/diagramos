@@ -86,6 +86,18 @@ interface Parser {
   setLanguage(language: unknown): void;
 }
 
+/**
+ * A member read off a value, in every grammar loaded here: `config.width`,
+ * `self.width`, `cfg.width()`.
+ *
+ * Here rather than in either of its two readers. `accesses.ts` confirms with
+ * it and `resolution.ts` enumerates a body's reads with it (#255), and a
+ * number about "every read in this body" is only about `@accesses` if both
+ * count the same nodes -- two hand-written lists that must agree is the
+ * failure `docs/reading-a-grammar.md` records four times in one sitting.
+ */
+export const MEMBER_ACCESS = /^(field_expression|member_expression|attribute)$/;
+
 export interface Node {
   type: string;
   text: string;

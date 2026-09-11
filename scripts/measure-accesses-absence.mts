@@ -231,6 +231,8 @@ interface NameTally {
   callsNoBody: number;
   callsNoName: number;
   callsNoChecker: number;
+  /** A call to a parameter or a local of the calling routine: its value is not in the text. */
+  callsOwnBinding: number;
 }
 const nameTallies = new Map<Language, NameTally>();
 function nameTally(language: Language): NameTally {
@@ -239,7 +241,7 @@ function nameTally(language: Language): NameTally {
     found = {
       named: 0, readless: 0, withReads: 0, hazard: 0, region: 0, asked: 0, agreed: 0,
       disputed: 0, disputedOnEdge: 0, unrefereed: 0, helper: 0, helperMaybe: 0,
-      callsInRepo: 0, callsOutside: 0, callsSilent: 0, callsNoBody: 0, callsNoName: 0, callsNoChecker: 0,
+      callsInRepo: 0, callsOutside: 0, callsSilent: 0, callsNoBody: 0, callsNoName: 0, callsNoChecker: 0, callsOwnBinding: 0,
     };
     nameTallies.set(language, found);
   }
@@ -499,8 +501,8 @@ if (!merging) {
     type Settled =
       | { kind: "repo"; names: Set<string> }
       | { kind: "outside" }
-      | { kind: "unknown"; why: "silent" | "no-body" | "no-name" | "no-checker" };
-    const settle = (reading: FileReading, site: CallSite): Settled => {
+      | { kind: "unknown"; why: "silent" | "no-body" | "no-name" | "no-checker" | "own-binding" };
+    const settle = (reading: FileReading, site: CallSite, caller: RoutineReads): Settled => {
       if (site.file === EXTERNAL_RECEIVER) return { kind: "outside" };
       const placed = syntactic(site);
       if (placed) return { kind: "repo", names: placed };
@@ -520,6 +522,17 @@ if (!merging) {
         .filter((one) => one.routine !== "" && one.line <= line && line <= one.endLine)
         .sort((a, b) => (a.endLine - a.line) - (b.endLine - b.line))[0];
       if (!holding) return { kind: "unknown", why: "no-body" };
+      /*
+       * Declared inside the calling routine itself: `isTest(file)` where
+       * `isTest` is a parameter, or a local holding whatever was picked. The
+       * lookup lands on that binding and the routine holding it is the caller,
+       * so the first version of this read the caller's own reads as the
+       * callee's and counted the call as seen. Nobody knows what `isTest` is.
+       */
+      if (relativeOf(declared.file) === reading.relative
+        && holding.routine === caller.routine && holding.line === caller.line) {
+        return { kind: "unknown", why: "own-binding" };
+      }
       return { kind: "repo", names: new Set(holding.sites.map((one) => one.member)) };
     };
 
@@ -549,7 +562,7 @@ if (!merging) {
         const reached = new Set<string>();
         let maybe = body === undefined;
         for (const site of body?.sites ?? []) {
-          const settled = settle(reading, site);
+          const settled = settle(reading, site, routine);
           if (settled.kind === "repo") {
             into.callsInRepo += 1;
             for (const name of settled.names) reached.add(name);
@@ -560,6 +573,7 @@ if (!merging) {
             if (settled.why === "silent") into.callsSilent += 1;
             else if (settled.why === "no-body") into.callsNoBody += 1;
             else if (settled.why === "no-name") into.callsNoName += 1;
+            else if (settled.why === "own-binding") into.callsOwnBinding += 1;
             else into.callsNoChecker += 1;
           }
         }
@@ -767,13 +781,14 @@ for (const language of LANGUAGES) {
   );
 }
 console.log("\n  HOW EACH CALL IN A REGION BODY WAS SETTLED, once per call.");
-console.log("  language   in this repo    outside   checker silent   declared, no body   no name   no checker");
+console.log("  language   in this repo    outside   checker silent   declared, no body   a parameter or local   no name   no checker");
 for (const language of LANGUAGES) {
   const one = data.names[language];
   if (!one || num(one.region) === 0) continue;
   console.log(
     " ", language.padEnd(8), String(num(one.callsInRepo)).padStart(12), String(num(one.callsOutside)).padStart(10),
     String(num(one.callsSilent)).padStart(16), String(num(one.callsNoBody)).padStart(19),
+    String(num(one.callsOwnBinding)).padStart(22),
     String(num(one.callsNoName)).padStart(9), String(num(one.callsNoChecker)).padStart(12),
   );
 }

@@ -12,6 +12,12 @@
  * decide whether a real type checker (tier 2) is a nice-to-have or a hard
  * requirement, before building on syntax alone.
  *
+ * One exception, and it uses no verdict: `memberReadsIn`'s *names and
+ * hazards* are what `accesses.ts` refutes the routine end of `@accesses` from
+ * (#255) -- which members a body reads by name, and whether it reads any
+ * without a name. The `resolved`/`withheld` verdicts beside them still reach
+ * no word.
+ *
  * ## Evidence, not convention -- the gate `dataflow.ts` set for #210
  *
  * `const v = []` says v is a list in the grammar; `const v = load()` says
@@ -56,10 +62,9 @@
  * needs to explain "the call was opaque" cannot be aimed at the other shapes
  * hiding under `no-annotation`.
  */
-import { ACCESS } from "./accesses";
 import type { ReceiverResolution } from "./calls";
 import { COLLECTION_LITERAL, COLLECTION_MAKERS } from "./dataflow";
-import { each, parseSource, type Language, type Node } from "./parse";
+import { each, MEMBER_ACCESS, parseSource, type Language, type Node } from "./parse";
 
 /** The shapes carrying enough evidence in the text to name a type. */
 export type ResolutionShape =
@@ -997,7 +1002,7 @@ function readReceiverOf(
    * the region this issue exists to measure would have read as far too small
    * to build on -- a wrong answer that looks like a finding.
    */
-  if (!ACCESS.test(node.type)) return undefined;
+  if (!MEMBER_ACCESS.test(node.type)) return undefined;
   if (node.type === "scoped_identifier") return undefined;
   const outer = accessOf(node);
   if (!outer) return undefined;

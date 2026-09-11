@@ -46,9 +46,11 @@ import { licenceFor } from "./licence";
 import { languageOf, type Language } from "./parse";
 import { ledgerAdditions, type Ledger } from "./ledger";
 import { checkNeeds, type NeedsWithheld } from "./needs";
-import { callsBetween, type CallSide, type CallsWithheld, type ReceiverResolution } from "./calls";
+import {
+  type CallSide, type CallsWithheld, EXTERNAL_RECEIVER, type ReceiverResolution, callSitesIn, callsBetween,
+} from "./calls";
 import { constructions, routineNamesIn, type ConstructsWithheld } from "./constructs";
-import { memberAccesses, type AccessesWithheld } from "./accesses";
+import { type AccessesWithheld, type NotReadEvidence, memberAccesses, memberNamed, membersReadAt, membersReadByName, readsMember } from "./accesses";
 import { heldTypes, type HoldsWithheld } from "./holds";
 import { conformedTypes, type ConformsWithheld } from "./conforms";
 import { signatureNames, type SignatureWithheld } from "./signature";
@@ -241,14 +243,33 @@ export type EdgeFindingKind =
    * declaration, so a member list is a closed region and a name absent from all
    * of it is genuinely absent. This finding is the type end alone.
    *
-   * There is no `accesses-unread` beside it and there must not be. Not seeing
-   * the routine touch the member is not evidence it does not -- that would need
-   * every receiver's type, which is the whole program.
+   * `accesses-not-read` beside it is the routine end, and it is a different
+   * footing: not a member list, but a body with nothing in it called the
+   * member (#255).
    *
    * What it buys is the case the word exists for: rename a field and every
    * diagram still naming the old one goes red, the turn the rename lands.
    */
   | "accesses-absent"
+  /**
+   * An `accesses` arrow from a routine that reads nothing called the member (#255).
+   *
+   * The routine end, which this file said for three releases could never say
+   * wrong: not seeing a body read `width` is not evidence it does not, because
+   * that needs every receiver's type. True of a body that contains `.width`
+   * off something. Not true of one that contains no read of anything called
+   * `width` -- a read of Config.width is written `something.width` whatever
+   * `something` is -- provided every read in it has a `.name`: no
+   * destructuring, spread, `c[k]`, `getattr` or macro.
+   *
+   * Two refusals the reader cannot make and this file does. A planned arrow
+   * is never accused. And a function the routine calls that visibly reads the
+   * member keeps it quiet: `draw --calls--> paint --accesses--> Config` is the
+   * right board, and `draw --accesses--> Config` is that board drawn one level
+   * too high rather than wrong. A call nobody could see into does not keep it
+   * quiet; the red says how many there were.
+   */
+  | "accesses-not-read"
   /**
    * A `conforms` arrow whose base list does not name the type (#216).
    *
@@ -308,6 +329,7 @@ export const EDGE_FINDING_KINDS = [
   "calls-backwards",
   "calls-refuted",
   "accesses-absent",
+  "accesses-not-read",
   "conforms-absent",
 ] as const satisfies readonly EdgeFindingKind[];
 
@@ -328,7 +350,7 @@ export const EDGE_FINDING_KINDS = [
  * from `relations`, and the only kind that survives somebody in a hurry.
  *
  * They are not all the same shape. `signature-absent`, `holds-absent`,
- * `accesses-absent`, `conforms-absent` and `calls-refuted` refute from an
+ * `accesses-absent`, `accesses-not-read`, `conforms-absent` and `calls-refuted` refute from an
  * absence; `backwards-edge`, `builds-backwards` and `calls-backwards` from a
  * presence. What the list is about is neither: it is whether somebody is
  * being told their diagram is wrong.
@@ -341,6 +363,7 @@ export const ACCUSING_EDGE_KINDS = [
   "calls-backwards",
   "calls-refuted",
   "accesses-absent",
+  "accesses-not-read",
   "conforms-absent",
 ] as const satisfies readonly EdgeFindingKind[];
 
@@ -1851,6 +1874,78 @@ function callSide(
  */
 export interface ClosedBodyReferee {
   resolveReceiver(file: string, at: { start: number; end: number }): ReceiverResolution | undefined;
+  /**
+   * "Go to definition" at a call's own name (#255): where the function called
+   * there is declared, as a repo-relative file and a 1-based line, `"outside"`
+   * when that is not in the repository, `undefined` when nothing answered.
+   *
+   * Optional, because only a caller holding a checker can answer it -- today
+   * `check-drift.mjs`, for TypeScript. Without it `@accesses` still finds a
+   * helper the call reader placed by itself, and counts the rest as calls it
+   * could not see into.
+   */
+  declarationAt?(file: string, at: { start: number; end: number }): { file: string; line: number } | "outside" | undefined;
+}
+
+/**
+ * Whether a function this routine calls visibly reads the member (#255).
+ *
+ * Each call is followed one hop. Placed by the call reader at a routine in
+ * this repository, that routine's reads answer it; placed outside the
+ * repository, it cannot be a helper anybody draws; otherwise the caller's
+ * checker is asked where the called name is declared, and the routine holding
+ * that line answers. What is left is counted and returned, never guessed at.
+ */
+function helperReading(
+  file: string,
+  evidence: NotReadEvidence,
+  member: string,
+  workspace: Workspace,
+  configs: ConfigCache,
+  referee: ClosedBodyReferee | undefined,
+): { via: string } | { unseen: number } {
+  const side = callSide(file, workspace, configs, referee);
+  const reading = side ? callSitesIn(side) : undefined;
+  if (!reading?.read) return { unseen: 1 };
+  const sameLine = reading.bodies.filter((one) => one.line === evidence.line);
+  const body = sameLine.length === 1 ? sameLine[0] : sameLine.find((one) => one.routine === evidence.routine);
+  if (!body) return { unseen: 1 };
+
+  const sourceOf = (target: string) => {
+    const absolute = workspace.resolve(target);
+    return absolute && workspace.stat(absolute) === "file" ? workspace.read(absolute) : undefined;
+  };
+  let unseen = 0;
+  for (const site of body.sites) {
+    if (site.file === EXTERNAL_RECEIVER) continue;
+    let members: Set<string> | undefined;
+    if (site.file !== undefined) {
+      const source = sourceOf(site.file);
+      const language = languageOf(site.file);
+      members = source !== undefined && language ? membersReadByName(source, site.name, language) : undefined;
+    }
+    if (!members && site.nameAt && referee?.declarationAt) {
+      const declared = referee.declarationAt(file, site.nameAt);
+      if (declared === "outside") continue;
+      if (declared) {
+        const source = sourceOf(declared.file);
+        const language = languageOf(declared.file);
+        const holding = source !== undefined && language ? membersReadAt(source, declared.line, language) : undefined;
+        /*
+         * Declared inside this routine itself -- `isTest(file)` where `isTest`
+         * is a parameter, or a local holding whatever was picked. The lookup
+         * lands on that binding, whose value is not in the text: a call
+         * nobody can see into, not a call to the routine around it.
+         */
+        const itself = holding !== undefined && declared.file === file
+          && holding.routine === evidence.routine && holding.line === evidence.line;
+        members = holding && !itself ? holding.members : undefined;
+      }
+    }
+    if (!members) { unseen += 1; continue; }
+    if (readsMember(members, member)) return { via: site.name };
+  }
+  return { unseen };
 }
 
 /**
@@ -4114,13 +4209,52 @@ export function checkDrift(
                 + "at the wrong type.",
             } });
             continue;
+          } else if (verdict.verdict === "not-read") {
+            const member = memberNamed(edge.label) ?? "";
+            const helper = helperReading(
+              fromFile, verdict.evidence, member, workspace, importCache.configs, options?.closedBodyReferee,
+            );
+            if ("unseen" in helper) {
+              edgesChecked += 1;
+              const wasClaimed = baselineGraph?.edges.some(
+                (was) => was.from === edge.from && was.to === edge.to && was.claim === "accesses",
+              );
+              const fresh = baselineGraph !== undefined && !wasClaimed;
+              const { routine, line, reads } = verdict.evidence;
+              const target = oneLine(toNode.label) || toPath;
+              recordEdge(edge, fromNode, toNode, { kind: "finding", finding: {
+                from: fromPath,
+                to: toPath,
+                fromLabel: fromNode.label,
+                toLabel: toNode.label,
+                fromRef,
+                toRef,
+                kind: "accesses-not-read",
+                detail:
+                  (fresh ? "a claim written this turn is already wrong: " : "")
+                  + `this arrow says ${oneLine(fromNode.label) || fromPath} reads \`${member}\` off `
+                  + `${target}, and nothing in ${routine} is called \`${member}\` -- it reads ${reads} `
+                  + `other member${reads === 1 ? "" : "s"}, and none of them is this one. `
+                  + `${fromPath} line ${line} is where ${routine} is declared.`
+                  + (helper.unseen > 0
+                    ? ` It also calls ${helper.unseen} function${helper.unseen === 1 ? "" : "s"} this check `
+                      + `could not see into. If one of those reads \`${member}\`, the board wants `
+                      + `${routine} --calls--> that function --accesses--> ${target}.`
+                    : ""),
+              } });
+              continue;
+            }
+            /*
+             * A function it calls reads the member, so the arrow is the right
+             * one drawn a level too high. Silent, like `absent` below.
+             */
           }
           /*
-           * `absent` falls through to the ordinary channels, untouched, and
-           * that is the half of this word that must never change. The type has
-           * the member and this routine was not seen reading it -- which needs
-           * every receiver's type to turn into evidence, and that is the whole
-           * program.
+           * `absent` falls through to the ordinary channels, untouched. The
+           * type has the member and this routine was not seen reading it, and
+           * nothing here can say that is a mistake: the body reads a member
+           * without a name, reads none at all, is a class, or a function it
+           * calls reads the member (#255).
            */
         }
       }

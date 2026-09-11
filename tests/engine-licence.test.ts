@@ -560,10 +560,21 @@ describe("the licence's second axis (#231)", () => {
     expect(mayAccuse("calls", "python", "absence")).toBe(true);
   });
 
+  it("gives @accesses a by-name routine-end absence licence in every language it was measured in", () => {
+    // #255: a named routine with no read lacking a `.name` that reads nothing
+    // called the member does not read it off anything. About 2.5 million asks
+    // over the twelve pinned clones, 14 disputed, every one a Python parameter
+    // annotation the referee read as a member read.
+    for (const language of ["ts", "tsx", "js", "rust", "python"] as const) {
+      expect(mayAccuse("accesses", language, "absence"), language).toBe(true);
+    }
+  });
+
   it("leaves every other word's absence axis unmeasured, everywhere", () => {
-    // Only @calls has an analogous closed-region reader. Every other square
-    // on this axis is a stated absence of a measurement, not a silent yes.
-    for (const relation of ACCUSING_RELATIONS.filter((one) => one !== "calls")) {
+    // @calls closes a body's call set with a real compiler, and @accesses
+    // closes a body's reads by name (#255). Every other square on this axis is
+    // a stated absence of a measurement, not a silent yes.
+    for (const relation of ACCUSING_RELATIONS.filter((one) => one !== "calls" && one !== "accesses")) {
       for (const language of LANGUAGES) {
         expect(mayAccuse(relation, language, "absence"), `${relation} in ${language}`)
           .toBe(false);

@@ -375,6 +375,37 @@ describe("claims on the command line", () => {
     expect(output).not.toContain("1 arrow  ");
   }, 120_000);
 
+  it("calls an arrow from a routine that never reads the member wrong, in red, and counts it (#255)", async () => {
+    /*
+     * The routine end of the same word. `render` reads `height` and nothing
+     * called `width`, so `render --[width]--> Config` is wrong -- and the lesson
+     * of the test above is that a red the engine makes and this file does not
+     * list prints amber, among the arrows nothing corroborated.
+     */
+    writeFileSync(path.join(project, "src/config.ts"), "export class Config { width = 0; height = 0; }\n");
+    writeFileSync(
+      path.join(project, "src/render.ts"),
+      "import { Config } from './config';\n"
+      + "export function render(config: Config) { return config.height; }\n",
+    );
+    const { board } = await createDiagram(emptyBoard(), {
+      name: "member",
+      nodes: [
+        { id: "render", label: "render", ref: "src/render.ts#render" },
+        { id: "config", label: "Config", ref: "src/config.ts#Config" },
+      ],
+      edges: [{ from: "render", to: "config", label: "width", claim: "accesses" }],
+    });
+    await writeBoard(path.join(project, "docs/diagrams/member.excalidraw"), board);
+
+    const result = await check();
+    const output = `${result.stdout}${result.stderr}`;
+    expect(result.code).toBe(1);
+    expect(output).toContain("never read here");
+    expect(output).toContain("1 member never read");
+    expect(output).not.toContain("1 arrow  ");
+  }, 120_000);
+
   it("calls a base list that does not name the type wrong, and says which way round", async () => {
     /*
      * The arrow #216 exists for. `Base -> Handler` and `Handler -> Base` used to

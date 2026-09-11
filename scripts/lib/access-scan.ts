@@ -20,6 +20,7 @@
  * that deleted the next eighty lines of a Python file. `call-scan.ts` exists
  * for the same reason on the `@calls` side.
  */
+import { UNREFEREED_MEMBERS } from "../../src/engine/accesses";
 import type { Language } from "../../src/engine/parse";
 
 /* ------------------------------------------------------------------ *
@@ -707,14 +708,13 @@ export function refereeRoutines(source: string, language: Language): RefereeRout
  *
  * Deliberately short. The point of this word is ordinary members with ordinary
  * names, and a long exclusion list is a way of not measuring the population.
+ *
+ * The list itself lives in the engine now (#255): the routine-end red must not
+ * accuse about a name this referee never checks, and one list is the only way
+ * the two cannot drift apart. A constant, not a reader -- the referee still
+ * shares no query and no checker with what it grades.
  */
-export const BUILT_IN = new Set([
-  "length", "prototype", "constructor", "toString", "valueOf", "name",
-  "then", "catch", "finally", "map", "filter", "forEach", "push", "pop", "slice",
-  "join", "split", "trim", "replace", "test", "exec", "match", "keys", "values",
-  "entries", "has", "get", "set", "add", "delete", "size", "clone", "unwrap",
-  "iter", "collect", "into", "to_string", "append", "extend", "items", "format",
-]);
+export const BUILT_IN = UNREFEREED_MEMBERS;
 
 /**
  * The distinct members a routine reads, each with the line it was read on.
