@@ -322,3 +322,36 @@ describe("reads in a JavaScript parameter's default value", () => {
     expect(reading.routines.flatMap((one) => one.sites.map((site) => site.member))).toEqual(["none"]);
   });
 });
+
+/*
+ * A callback handed over by keyword, or sitting in a parameter's default, has
+ * a `name` and a `value` in the grammar and is still not a declaration. No
+ * board can name it, and `accesses.ts` finds an arrow's tail by name.
+ *
+ * Found by reading the by-name disputes: seven of eight were Python bodies
+ * named `key`, one line long, reading `sort` -- `rows.sort(key=lambda r: ..)`.
+ * The binding rule had named the lambda after the keyword it was passed by.
+ */
+describe("a callback passed by keyword or as a default is not a declaration", () => {
+  const namesOf = (source: string, language: Parameters<typeof memberReadsIn>[1]) => {
+    const reading = memberReadsIn(source, language);
+    if (!reading.read) throw new Error("unreadable");
+    return reading.routines.map((one) => one.routine);
+  };
+
+  it("leaves `key=lambda` nameless, the shape the seven disputes came from", () => {
+    expect(namesOf("def f(rows):\n    rows.sort(key=lambda r: r.width)\n", "python")).toEqual(["f", ""]);
+  });
+
+  it("leaves a Python default-parameter lambda nameless", () => {
+    expect(namesOf("def f(cb=lambda r: r.width):\n    return cb\n", "python")).toEqual(["f", ""]);
+  });
+
+  it("leaves a JavaScript default-parameter arrow nameless", () => {
+    expect(namesOf("function f(cb = (r) => r.width) {\n  return cb;\n}", "js")).toEqual(["f", ""]);
+  });
+
+  it("still names a module-level Python assignment, which is a declaration", () => {
+    expect(namesOf("draw = lambda c: c.width\n", "python")).toEqual(["draw"]);
+  });
+});

@@ -297,6 +297,19 @@ function isRoutineNode(node: Node): boolean {
   return node.childForFieldName("parameters") !== null && node.childForFieldName("body") !== null;
 }
 
+/**
+ * Shapes that carry a `name` and a `value` without declaring anything.
+ *
+ * `rows.sort(key=lambda r: ..)` hands a callback over by keyword, and
+ * `def f(cb=lambda r: ..)` / `function f(cb = (r) => ..)` give a parameter a
+ * default. Each has the two fields a binding has, and none of them names a
+ * routine a board could anchor a box to. Found by reading the by-name
+ * disputes: seven of eight were one-line Python bodies named `key`.
+ */
+const PASSED_NOT_DECLARED = new Set([
+  "keyword_argument", "default_parameter", "typed_default_parameter", "assignment_pattern",
+]);
+
 /** Node types that declare a type with a member list, in any grammar loaded here. */
 const TYPE_DECLARATION =
   /^(struct_item|enum_item|class_declaration|abstract_class_declaration|class_definition)$/;
@@ -1364,7 +1377,10 @@ function walk(
    */
   const bindingName = node.childForFieldName("name") ?? node.childForFieldName("left");
   const boundValue = node.childForFieldName("value") ?? node.childForFieldName("right");
-  if (bindingName && bindingName.childCount === 0 && boundValue && isRoutineNode(boundValue)) {
+  if (
+    !PASSED_NOT_DECLARED.has(node.type)
+    && bindingName && bindingName.childCount === 0 && boundValue && isRoutineNode(boundValue)
+  ) {
     bound.set(boundValue.id, bindingName.text);
   }
   if (TYPE_DECLARATION.test(node.type)) {

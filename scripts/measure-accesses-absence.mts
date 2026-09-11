@@ -62,6 +62,29 @@
  * that makes a red false depends on what the word means, which is not a
  * measurement -- so it is its own column and never folded into the rate.
  *
+ * ## Two designs, measured over the same bodies
+ *
+ * **By type**, above: refute (R, X, M) when R reads M off no receiver the
+ * checker places at X. It needs a type checker for every receiver, and it has
+ * three ways to be wrong that a type answer creates -- a read off an interface
+ * that mirrors X (`shadowNames`), a read off `Partial<X>` or `Readonly<X>`,
+ * which the checker places in its own library, and a read off a type with no
+ * single declaration such as `X | undefined`.
+ *
+ * **By name**: refute (R, M) when a named body with no unnamed read contains
+ * no read of anything called M at all. It needs no type checker. A read of X.M
+ * is written `something.M` whatever `something` turns out to be, so where no
+ * `.M` appears the body does not read M off X -- and every one of the three
+ * failures above is a body that *does* contain `.M`, which this design never
+ * asks about. What it gives up is refuting in a body that reads M off
+ * something else.
+ *
+ * By name, the ask pool is every member read anywhere in the same file: a
+ * member somebody really reads, near enough that an author could draw it.
+ *
+ * `--no-tier2` skips the type checkers, which leaves only the by-name section
+ * and runs over the whole corpus in one process in under a minute.
+ *
  * A run is a measurement, not a test: it prints and never fails.
  */
 import { existsSync, readFileSync } from "node:fs";
@@ -91,6 +114,7 @@ const roots = argv.filter((one) => !one.startsWith("--"));
 const showAll = flags.has("--all");
 const asJson = flags.has("--json");
 const merging = flags.has("--merge");
+const noTier2 = flags.has("--no-tier2");
 
 const trees = (roots.length > 0 ? roots : [
   "src", "scripts", "rust-test",
@@ -143,6 +167,41 @@ interface Tally {
   guardedAgreed: number;
   guardedDisputed: number;
 }
+
+/** The by-name design's counts, per language. */
+interface NameTally {
+  named: number;
+  /** Named bodies that read no member at all. Closed for free, held apart. */
+  readless: number;
+  withReads: number;
+  /** Bodies with a read that has no `.name`: destructured, spread, computed, a macro. */
+  hazard: number;
+  /** Named bodies with reads and no hazard: the region. */
+  region: number;
+  asked: number;
+  agreed: number;
+  disputed: number;
+  /** ...of which the referee's `.M` is on the body's first or last line, shared with code around it. */
+  disputedOnEdge: number;
+  unrefereed: number;
+  /** Asks where a one-hop callee reads something called M. */
+  helper: number;
+  helperUnknown: number;
+}
+const nameTallies = new Map<Language, NameTally>();
+function nameTally(language: Language): NameTally {
+  let found = nameTallies.get(language);
+  if (!found) {
+    found = {
+      named: 0, readless: 0, withReads: 0, hazard: 0, region: 0, asked: 0, agreed: 0,
+      disputed: 0, disputedOnEdge: 0, unrefereed: 0, helper: 0, helperUnknown: 0,
+    };
+    nameTallies.set(language, found);
+  }
+  return found;
+}
+interface NameDispute { language: Language; file: string; routine: string; span: string; line: number; member: string; edge: boolean; helper: boolean }
+const nameDisputes: NameDispute[] = [];
 
 const tallies = new Map<Language, Tally>();
 function tally(language: Language): Tally {
@@ -246,7 +305,9 @@ if (!merging) {
 
     /* ------------------------------------------------ TypeScript, in process */
     let tsReferee: ReturnType<typeof createTsReferee> | undefined;
-    try { tsReferee = createTsReferee(tree); } catch { tsReferee = undefined; }
+    if (!noTier2) {
+      try { tsReferee = createTsReferee(tree); } catch { tsReferee = undefined; }
+    }
     for (const file of files) {
       const language = languageOf(file);
       if (!language || LSP_LANGUAGES.has(language)) continue;
@@ -261,6 +322,10 @@ if (!merging) {
     for (const language of LSP_LANGUAGES) {
       const inLanguage = files.filter((one) => languageOf(one) === language).map((one) => path.relative(tree, one));
       if (inLanguage.length === 0) continue;
+      if (noTier2) {
+        for (const relative of inLanguage) readWith(relative, language, undefined);
+        continue;
+      }
       const queries: Array<{ file: string; at: { start: number; end: number } }> = [];
       for (const relative of inLanguage) {
         const source = read(relative);
@@ -297,7 +362,72 @@ if (!merging) {
       pairsByRoutine.set(reading.relative, byName);
     }
 
-    /* ----------------------------------------------------------- the asking */
+    /* ------------------------------------------------ the asking, by name */
+    const namesByRoutine = new Map<string, Map<string, Set<string>>>();
+    for (const reading of readings) {
+      const byName = new Map<string, Set<string>>();
+      for (const routine of reading.routines) {
+        if (!routine.routine) continue;
+        const names = byName.get(routine.routine) ?? new Set<string>();
+        for (const site of routine.sites) names.add(site.member);
+        byName.set(routine.routine, names);
+      }
+      namesByRoutine.set(reading.relative, byName);
+    }
+    for (const reading of readings) {
+      const refereeReads = refereeRoutines(reading.source, reading.language)
+        .flatMap((one) => one.reads)
+        .filter((one) => !BUILT_IN.has(one.name));
+      const pool = new Set(reading.routines.flatMap((one) => one.sites.map((site) => site.member)));
+
+      for (const routine of reading.routines) {
+        if (!routine.routine) continue;
+        const into = nameTally(reading.language);
+        into.named += 1;
+        if (routine.sites.length === 0) { into.readless += 1; continue; }
+        into.withReads += 1;
+        if (routine.hazards.length > 0) { into.hazard += 1; continue; }
+        into.region += 1;
+
+        const own = new Set(routine.sites.map((site) => site.member));
+        const inSpan = new Map<string, number>();
+        for (const one of refereeReads) {
+          if (one.line < routine.line || one.line > routine.endLine) continue;
+          if (!inSpan.has(one.name)) inSpan.set(one.name, one.line);
+        }
+        const sameLine = reading.bodies.filter((one) => one.line === routine.line);
+        const body = sameLine.length === 1 ? sameLine[0] : sameLine.find((one) => one.routine === routine.routine);
+        let calleeNames: Set<string> | undefined = body ? new Set() : undefined;
+        for (const site of body?.sites ?? []) {
+          if (site.file === undefined) { calleeNames = undefined; break; }
+          if (site.file === EXTERNAL_RECEIVER) continue;
+          const names = namesByRoutine.get(site.file)?.get(site.name);
+          if (!names) { calleeNames = undefined; break; }
+          for (const name of names) calleeNames!.add(name);
+        }
+
+        for (const member of pool) {
+          if (own.has(member)) continue;
+          if (BUILT_IN.has(member)) { into.unrefereed += 1; continue; }
+          into.asked += 1;
+          const helper = calleeNames?.has(member) ?? false;
+          if (calleeNames === undefined) into.helperUnknown += 1;
+          else if (helper) into.helper += 1;
+          const line = inSpan.get(member);
+          if (line === undefined) { into.agreed += 1; continue; }
+          into.disputed += 1;
+          const edge = line === routine.line || line === routine.endLine;
+          if (edge) into.disputedOnEdge += 1;
+          nameDisputes.push({
+            language: reading.language, file: path.join(label, reading.relative), routine: routine.routine,
+            span: `${routine.line}-${routine.endLine}`, line, member, edge, helper,
+          });
+        }
+      }
+    }
+
+    /* ------------------------------------------------ the asking, by type */
+    if (noTier2) continue;
     for (const reading of readings) {
       const refereeReads = refereeRoutines(reading.source, reading.language)
         .flatMap((one) => one.reads)
@@ -392,7 +522,13 @@ if (!merging) {
 /* ---------------------------------------------------------------- the report */
 
 type Counts = Record<string, number>;
-interface Measured { trees: string[]; tallies: Record<string, Counts>; disputes: Dispute[] }
+interface Measured {
+  trees: string[];
+  tallies: Record<string, Counts>;
+  disputes: Dispute[];
+  names: Record<string, Counts>;
+  nameDisputes: NameDispute[];
+}
 
 function add(into: Record<string, unknown>, from: Record<string, unknown>): void {
   for (const [key, value] of Object.entries(from)) {
@@ -410,13 +546,17 @@ const data: Measured = merging
     const one = JSON.parse(readFileSync(file, "utf8")) as Measured;
     total.trees.push(...one.trees);
     total.disputes.push(...one.disputes);
+    total.nameDisputes.push(...one.nameDisputes);
     add(total.tallies as Record<string, unknown>, one.tallies as Record<string, unknown>);
+    add(total.names as Record<string, unknown>, one.names as Record<string, unknown>);
     return total;
-  }, { trees: [], tallies: {}, disputes: [] })
+  }, { trees: [], tallies: {}, disputes: [], names: {}, nameDisputes: [] })
   : {
     trees,
     tallies: Object.fromEntries([...tallies].map(([language, one]) => [language, { ...one }])) as Record<string, Counts>,
     disputes,
+    names: Object.fromEntries([...nameTallies].map(([language, one]) => [language, { ...one }])) as Record<string, Counts>,
+    nameDisputes,
   };
 
 if (asJson) {
@@ -436,6 +576,46 @@ const ORACLE: Partial<Record<Language, string>> = {
 
 console.log("\nMEASURE ACCESSES-ABSENCE -- would 'this routine does not read that member' be wrong? (#255)");
 console.log(`  ${data.trees.length} trees\n`);
+
+console.log("BY NAME -- refute when a body with no unnamed read contains no `.member` at all.");
+console.log("  No type checker. Pool: every member read anywhere in the same file.");
+console.log("  language   named  no reads  with reads  hazard   REGION   share      asked  disputed  on an edge    rate");
+for (const language of LANGUAGES) {
+  const one = data.names[language];
+  if (!one || num(one.named) === 0) continue;
+  console.log(
+    " ", language.padEnd(8), String(num(one.named)).padStart(6), String(num(one.readless)).padStart(9),
+    String(num(one.withReads)).padStart(11), String(num(one.hazard)).padStart(7),
+    String(num(one.region)).padStart(8), percent(num(one.region), num(one.withReads)).padStart(8),
+    String(num(one.asked)).padStart(10), String(num(one.disputed)).padStart(9),
+    String(num(one.disputedOnEdge)).padStart(11), percent(num(one.disputed), num(one.asked)).padStart(8),
+  );
+}
+console.log("\n  `on an edge`: the referee's `.member` is on the body's first or last line, which the");
+console.log("  body shares with the code around it -- `rows.sort(key=lambda r: ..)`. The referee");
+console.log("  reports lines, not positions, so it cannot tell whose read that is.");
+console.log("  language     asked   helper    share   calls not all followed   unrefereed names");
+for (const language of LANGUAGES) {
+  const one = data.names[language];
+  if (!one || num(one.asked) === 0) continue;
+  console.log(
+    " ", language.padEnd(8), String(num(one.asked)).padStart(9), String(num(one.helper)).padStart(8),
+    percent(num(one.helper), num(one.asked) - num(one.helperUnknown)).padStart(8),
+    String(num(one.helperUnknown)).padStart(24), String(num(one.unrefereed)).padStart(18),
+  );
+}
+if (data.nameDisputes.length > 0) {
+  console.log(`\n  BY-NAME DISPUTES -- ${data.nameDisputes.length}`);
+  for (const one of data.nameDisputes.slice(0, cap(data.nameDisputes.length, 20))) {
+    console.log(`    ${one.file}:${one.line} ${one.routine}() [${one.span}] reads ${one.member}${one.edge ? " [edge]" : ""}${one.helper ? " [helper]" : ""}`);
+  }
+  if (data.nameDisputes.length > cap(data.nameDisputes.length, 20)) {
+    console.log(`    ... and ${data.nameDisputes.length - 20} more (--all prints every one)`);
+  }
+}
+
+if (Object.values(data.tallies).every((one) => num(one.regionA) === 0)) process.exit(0);
+console.log("\nBY TYPE -- refute when no receiver the checker places at the type reads the member.");
 console.log("  language  region A  unkeyed  askable     asked    agreed  disputed  dispute rate");
 for (const language of LANGUAGES) {
   const one = data.tallies[language];
