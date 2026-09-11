@@ -1254,6 +1254,56 @@ function resolveRoutine(
   const parameterList = routine.childForFieldName("parameters");
   if (parameterList) noteHazards(parameterList);
 
+  /*
+   * The read population. `x.width` and `x.width()` are both reads of `width`
+   * -- `accesses.ts` counts a method call as reading a member, and a member
+   * list that left methods out would refute every arrow drawn at a class --
+   * so this is not gated on the node being a call or not being one.
+   */
+  const noteRead = (node: Node): void => {
+    const read = readReceiverOf(node);
+    if (!read) return;
+    const scope: Scope = { params, bindings, fields, generics, imported };
+    const at = { start: read.node.startIndex, end: read.node.startIndex + read.node.text.length };
+    const placed = resolveRead?.(at);
+    reads.push({
+      member: read.member, kind: read.kind, receiver: read.receiver,
+      line: lineOf(source, node.startIndex),
+      at,
+      verdict: read.kind === "own"
+        ? ownVerdict(own, source)
+        : resolveReceiver({ kind: read.kind, receiver: read.receiver }, scope, source),
+      ...(placed ? { placed } : {}),
+    });
+  };
+
+  /*
+   * A parameter's default value is evaluated by the routine, so a read in it
+   * is a read the routine makes -- `reason: Reason = REASONS.none` -- and a
+   * walk of the body never reaches it. Eleven routines in about 13,000 across
+   * the corpus, found by reading signatures the referee disputed. Rare is not
+   * a reason to leave it out: an absence cannot rest on a reader that is blind
+   * to a read, however seldom the read happens.
+   *
+   * The default only. An annotation such as `httpx._types.AuthTypes` is a
+   * module path, not a read of anything a board draws, and its field is
+   * `type`. JavaScript spells a default as an `assignment_pattern` and puts
+   * the value on `right`.
+   *
+   * Reads only, not call sites: `resolveReceiversIn` reports those, and #227's
+   * figures were measured without defaults.
+   */
+  if (parameterList) {
+    for (let index = 0; index < parameterList.childCount; index += 1) {
+      const parameter = parameterList.child(index);
+      if (!parameter) continue;
+      const value = parameter.type === "assignment_pattern"
+        ? parameter.childForFieldName("right")
+        : parameter.childForFieldName("value") ?? parameter.childForFieldName("default");
+      if (value) each(value, noteRead);
+    }
+  }
+
   if (body) {
     each(body, (node) => {
       const bound = bindingOf(node);
@@ -1264,28 +1314,7 @@ function resolveRoutine(
       }
 
       const scope: Scope = { params, bindings, fields, generics, imported };
-
-      /*
-       * The read population, collected in the same pass. `x.width` and
-       * `x.width()` are both reads of `width` -- `accesses.ts` counts a method
-       * call as reading a member, and a member list that left methods out
-       * would refute every arrow drawn at a class -- so this is not gated on
-       * the node being a call or not being one.
-       */
-      const read = readReceiverOf(node);
-      if (read) {
-        const at = { start: read.node.startIndex, end: read.node.startIndex + read.node.text.length };
-        const placed = resolveRead?.(at);
-        reads.push({
-          member: read.member, kind: read.kind, receiver: read.receiver,
-          line: lineOf(source, node.startIndex),
-          at,
-          verdict: read.kind === "own"
-            ? ownVerdict(own, source)
-            : resolveReceiver({ kind: read.kind, receiver: read.receiver }, scope, source),
-          ...(placed ? { placed } : {}),
-        });
-      }
+      noteRead(node);
 
       const callee = calleeOf(node);
       if (!callee) return;

@@ -276,3 +276,49 @@ describe("a routine is named by what it is bound to", () => {
     expect(namesOf("function f(rows: Row[]) {\n  return rows.map((row) => row.width);\n}", "ts")).toEqual(["f", ""]);
   });
 });
+
+/*
+ * A read in a parameter's default value is a read the routine makes, and it
+ * sits outside the body a walk of the body would find.
+ *
+ * Rare -- 11 routines of about 13,000 across the corpus -- and the shape is
+ * ordinary: `reason: Reason = REASONS.none`. Found by reading the Python
+ * signatures the referee disputed, where `= httpx.USE_CLIENT_DEFAULT` sits on
+ * a parameter line. A reader that cannot see a read is a reader an absence
+ * cannot rest on, however rare the read.
+ *
+ * Annotations are not reads of anything a board draws -- `httpx._types.
+ * AuthTypes` is a module path -- and the default is the only part taken.
+ */
+describe("reads in a parameter's default value", () => {
+  const membersOf = (source: string, language: Parameters<typeof memberReadsIn>[1]) => {
+    const reading = memberReadsIn(source, language);
+    if (!reading.read) throw new Error("unreadable");
+    return reading.routines.flatMap((one) => one.sites.map((site) => site.member)).sort();
+  };
+
+  it("sees a TypeScript default that reads a member", () => {
+    expect(membersOf("function open(reason: Reason = REASONS.none) {\n  return reason;\n}", "ts")).toEqual(["none"]);
+  });
+
+  it("sees a Python default that reads an attribute", () => {
+    expect(membersOf("def send(auth=httpx.USE_CLIENT_DEFAULT):\n    return auth\n", "python")).toEqual(["USE_CLIENT_DEFAULT"]);
+  });
+
+  it("does not read a Python annotation as a read", () => {
+    expect(membersOf("def send(auth: httpx._types.AuthTypes):\n    return auth\n", "python")).toEqual([]);
+  });
+
+  it("reads the default and not the annotation when a parameter has both", () => {
+    expect(membersOf("def send(auth: httpx._types.AuthTypes = httpx.USE_CLIENT_DEFAULT):\n    return auth\n", "python"))
+      .toEqual(["USE_CLIENT_DEFAULT"]);
+  });
+});
+
+describe("reads in a JavaScript parameter's default value", () => {
+  it("sees a default written as an assignment pattern, JavaScript's spelling", () => {
+    const reading = memberReadsIn("function open(reason = REASONS.none) {\n  return reason;\n}", "js");
+    if (!reading.read) throw new Error("unreadable");
+    expect(reading.routines.flatMap((one) => one.sites.map((site) => site.member))).toEqual(["none"]);
+  });
+});
