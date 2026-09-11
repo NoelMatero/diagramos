@@ -227,7 +227,12 @@ interface Dispute {
   type: string;
   kind: "never-seen" | "placed-elsewhere" | "placed-outside";
   elsewhere?: string;
-  abstract?: boolean;
+  /**
+   * The type the reader placed it on is an interface or abstract. Not called
+   * `abstract`: tree-sitter reads that as the keyword and stops parsing the
+   * file, which `engine-deps.test.ts` reports as a file nobody can trust.
+   */
+  notConcrete?: boolean;
   /** The file the reader placed it in declares a type with a parent: a subclass risk. */
   elsewhereInherits?: boolean;
   helper: boolean;
@@ -507,7 +512,7 @@ if (!merging) {
               ...(elsewhere?.placed?.kind === "declared"
                 ? {
                   elsewhere: elsewhere.placed.file,
-                  abstract: elsewhere.placed.concrete === false,
+                  notConcrete: elsewhere.placed.concrete === false,
                   elsewhereInherits: HERITAGE.test(read(elsewhere.placed.file) ?? ""),
                 }
                 : {}),
@@ -675,7 +680,7 @@ for (const kind of ["never-seen", "placed-elsewhere", "placed-outside"] as const
   if (these.length === 0) continue;
   console.log(`\n  ${kind.toUpperCase()} -- ${these.length}`);
   for (const one of these.slice(0, cap(these.length, 15))) {
-    const notes = [one.abstract ? "abstract" : "", one.elsewhereInherits ? "has a parent" : ""].filter(Boolean).join(", ");
+    const notes = [one.notConcrete ? "abstract" : "", one.elsewhereInherits ? "has a parent" : ""].filter(Boolean).join(", ");
     const where = one.elsewhere ? ` (reader: off ${one.elsewhere}${notes ? `, ${notes}` : ""})` : "";
     const tags = `${one.helper ? " [helper]" : ""}${one.guarded ? " [guarded]" : ""}`;
     console.log(`    ${one.file}:${one.line} ${one.routine} reads ${one.member}, asked off ${one.type}${where}${tags}`);
