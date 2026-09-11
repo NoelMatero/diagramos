@@ -51,6 +51,7 @@
     "measure:constructs": "tsx scripts/measure-constructs.mts",
     "measure:dataflow": "tsx scripts/measure-dataflow.mts",
     "measure:deps": "tsx scripts/measure-deps.mts",
+    "measure:doors": "NODE_OPTIONS=--max-old-space-size=8192 tsx scripts/measure-doors.mts",
     "measure:holds": "tsx scripts/measure-holds.mts",
     "measure:licence": "tsx scripts/measure-licence.mts",
     "measure:rebind": "tsx scripts/measure-rebind.mts",
