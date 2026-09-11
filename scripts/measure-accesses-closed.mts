@@ -607,6 +607,13 @@ if (!merging) {
       const answers = language === "python"
         ? await resolvePythonReceivers(tree, queries)
         : await resolveRustReceivers(tree, queries, new Set(["target", "node_modules", ".git", "dist", "out", "vendor", ".venv", ".claude"]));
+      /*
+       * Closed at once: every answer this run needs is already in `answers.cache`,
+       * and a live language server is an open child process Node will not exit
+       * past. Left open, a run printed its whole report and then sat idle forever
+       * -- the hazard `check-drift.mjs` records for the same resolver.
+       */
+      answers.close();
       console.error(`  [${label}/${language}] done in ${Math.round((Date.now() - startedAt) / 1000)}s`);
 
       resolverFor.set(language, (relative) => (at) => answers.cache.get(relative, at));
@@ -814,3 +821,6 @@ for (const one of data.unseen.slice(0, cap(data.unseen.length, 15))) {
 if (data.unseen.length > cap(data.unseen.length, 15)) {
   console.log(`    ... and ${data.unseen.length - 15} more (--all prints every one)`);
 }
+
+// Explicit, like the JSON path: nothing left to wait for once the report is out.
+process.exit(0);
