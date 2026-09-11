@@ -573,7 +573,7 @@ to pass every check this tool had.
 deliberate: almost all of it is `Vec<T>`, `Promise<T>`, `list[str]`, which
 nobody draws as two boxes.
 
-## Twenty-five times a measurement contradicted the design
+## Twenty-six times a measurement contradicted the design
 
 Kept because the pattern is the point: eleven of the first thirteen came from
 building one word or one reader, not from reviewing the design. Nothing since
@@ -581,7 +581,9 @@ has broken that — item 24 is the clearest case of it, a reader bug four
 measurements had walked past because the population it lived in was reported
 apart and never scored. Item 25 is the other kind: an issue's premise, that a
 word needed a type checker, which measuring both designs over the same bodies
-turned out to be wrong about.
+turned out to be wrong about. Item 26 is a third kind and the cheapest: an
+issue's own evidence for a word, read one arrow at a time, turning out to be
+evidence of something else.
 
 1. **The substrate was empty.** #190's first draft proposed graphify as the
    fact supplier on the strength of 8,167 `contains` edges. `contains` there is
@@ -2399,6 +2401,101 @@ be one: `<MenuContent />` is a routine making a MenuContent, which is `@builds`.
     lookup read a call to a parameter — `isTest(file)` — as a call to the
     routine declaring it, because "go to definition" lands on the parameter;
     that counted a call nobody can see into as seen.
+
+
+26. **#206 asked for `@handles` and the demand number closed it: 7 of 162
+    arrows, and read one by one, *nothing* on any board asserts a case set. The
+    two phrases the issue named as its own best evidence are a test-coverage
+    caption and three calls to guard functions.**
+
+    `@handles` would say what cases a routine dispatches on — a router on a
+    method, a `match` on an enum, a reducer on an action type — so that adding
+    a variant and forgetting the arm stops being invisible. #206 filed it
+    honestly: *every other word in this vocabulary arrived because something
+    broke. This one arrived from reasoning, and that is a worse reason.* Its
+    definition of done put the demand number first and said to close the issue
+    if the number was near zero.
+
+    **The number.** `bucketOf` in `measure-vocabulary.mts` grew a `handles`
+    bucket, deliberately wider than the word would be — `match`, `switch`,
+    `case`, `arm`, `variant`, `branch`, `covers`, `fallback`, `per method`,
+    `catch-all`, `unmatched`, `dispatches on`. Over the corpus's 20 boards it
+    catches **7 of the 162 arrows that carry prose**, taking the caption share
+    from 78.4% to 74.1%. Adding the two uncommitted boards on this machine
+    (`claim-path`, `how-it-reaches-you`) changes the catch not at all: the same
+    7 of 203 phrases.
+
+    The bucket is **last** in `BUCKETS` and claims only `dispatches on` rather
+    than `dispatch`, because `bucketOf` returns the first match and
+    `dispatch(es)?` has been `invokes` since #187. A first write-up of this
+    entry said that placing it first would have taken three arrows off
+    `invokes`, which is a claim argued rather than run, and running it made it
+    false twice over: with `dispatches on` the bucket catches the same 7 first
+    or last, so the *position* buys nothing, and the damage is in the pattern —
+    a bucket claiming bare `dispatch`, placed first, reads 9 and leaves
+    `invokes` 8. `invokes` is byte-identical across the shipped runs, which is
+    the check that nothing moved.
+
+    **Read one by one, which is the finding.** Two of the seven are the pattern
+    being too wide and are named here rather than tuned away: `re-arm` and `arm
+    writable` on `reactor-and-socket.excalidraw` are epoll re-registration, a
+    verb, not a match arm. Of the five that remain, three are one arm of a
+    dispatch drawn as a single arrow — `fallback` and `no match` both point at
+    `utils::err_404`, `one per method` points at `Route::new`. Of the last two,
+    `match` labels the parser-to-router arrow and names the act rather than the
+    set, and `covers` is test coverage. **None of the 162 arrows says "and
+    those are all of the cases."**
+
+    **The issue's own two candidates, checked.** #206 rests its thin demand
+    case on `covers ×3` and `gate ×3` in the unclassified 127. Today's corpus
+    reads `covers` once, on `one-summary.excalidraw`, from `its test` to `one
+    shared sentence` — test coverage, on an arrow that already carries
+    `@needs`. `gate ×3` reproduces exactly, all three on `claim-path`, and all
+    three run `checkNeeds → licenceFor`, `checkNeeds → vouchedFor`,
+    `checkNeeds → readDependencies`: preconditions consulted, which is
+    `invokes` or `depends` and is not a case. The issue's best evidence for the
+    word is evidence for words that already exist.
+
+    **The zero was checked for its mechanism, per `AGENTS.md`, and it is not
+    the `@holds` zero.** That one was a fact about drawing dates — every board
+    predated the word. This census reads *prose*, written when there was no
+    word at all, so a drawing date cannot hide the demand. And the population
+    had its chance: `orangutan` is an HTTP router, three of its boards are in
+    the corpus, and `routing-and-executor.excalidraw` is a board **of a
+    dispatcher**. What its author wrote on those arrows is `no match`, `on
+    MISS`, `HIT: O(1)`, `first`, `scans`, `verb`, `path+method`, `memoize` —
+    captions about the algorithm. Somebody drew the exact thing this word is
+    for and did not reach for it.
+
+    **The bias that remains, stated rather than argued away.** Two codebases,
+    20 boards. A reducer-heavy front end or a state machine over an enum is
+    where `handles` prose would live and there is none in the corpus. So the 7
+    is a fact about these boards, not a ceiling on the relation — what it
+    settles is that nothing here has asked, which is the question the issue
+    posed.
+
+    **The arrow form versus the box form, decided on the way past, because a
+    revisit needs it.** #206 left this open and the measurement answers it
+    against building either. Every real catch above is a *single arm* drawn as
+    an arrow, and the issue's own argument is that the arrow form is the one
+    that cannot catch the bug: *"The box form says 'these are all the cases'
+    and is the one that catches a forgotten branch — which is the whole
+    point."* So the 5 arrows are not demand for the form that would be built.
+    A future revisit wants the box form, `handles: ["Get", "Post"]`, and wants
+    it from a board that asked.
+
+    **What was not built, and what it would have cost.** The Rust
+    exhaustiveness chain is real and reachable: matched expression →
+    `typeDeclarationLocationAt` → `declaredTypeOnLine` says `enum` →
+    `holds.ts`'s existing `enum_variant` reading → compare against the arms
+    present. Every link but the last exists and is tested. Against that: a
+    ninth word in `ARROW_CLAIMS` stops the build in four licences and the grid
+    test until every (word, language) square has a measurement behind it
+    (#207), and a word that accuses needs `npm run measure:handles` against an
+    independent referee first — `rustc`'s own exhaustiveness error, on a
+    machine whose rustc is too old for ripgrep's crates (#237). That is the
+    price of a word nothing on 20 boards has asked for. Closed at the number,
+    which is what the definition of done said to do.
 
 ## Open, in the order worth doing
 
