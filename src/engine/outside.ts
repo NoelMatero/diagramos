@@ -65,6 +65,7 @@ const OUTSIDE: Record<Family, ReadonlyArray<readonly [string, OutsideKind]>> = {
     ["dgram", "network"],
     ["tls", "network"],
     ["dns", "network"],
+    ["dns/promises", "network"],
     ["fetch", "network"],
   ],
   /*
@@ -93,6 +94,12 @@ const OUTSIDE: Record<Family, ReadonlyArray<readonly [string, OutsideKind]>> = {
     ].map((name) => [`os.${name}`, "process"] as const),
     ["subprocess", "process"],
     ["socket", "network"],
+    /*
+     * The C accelerator `socket` is a thin wrapper over. A checker's "go to
+     * definition" lands on this name, so leaving it off would score a correct
+     * reading as an invention.
+     */
+    ["_socket", "network"],
     ["ssl", "network"],
     ["http.client", "network"],
     ["urllib.request", "network"],
@@ -178,9 +185,34 @@ export function outsideCallsIn(source: string, language: Language): { read: bool
   const tree = parseSource(source, language);
   if (!bindings || !tree) return { read: false, calls: [] };
 
+  /*
+   * `use std::fs::{self, File}` says "fs, and fs::File". `bindingsIn` records
+   * the group's `self` leaf under the name it is spelled with, so the module
+   * arrives bound as `self` and not as `fs`. Rebound here rather than in
+   * `calls.ts`: that reader carries a measured licence, and this one is a
+   * measurement.
+   */
+  const imported = new Map(bindings.imported);
+  if (family === "rust") {
+    for (const [name, binding] of bindings.imported) {
+      if (name !== "self") continue;
+      const prefix = binding.specifier.replace(/::self$/, "");
+      const module = prefix.split("::").pop();
+      if (module && !imported.has(module)) imported.set(module, { ...binding, specifier: prefix });
+    }
+    imported.delete("self");
+  }
+
   const readingOf = (names: string[]): CallReading => {
     const [head, ...rest] = names;
-    const binding = head === undefined ? undefined : bindings.imported.get(head);
+    /*
+     * A call on the thing the routine belongs to, which no import can name --
+     * and the one head that must never be looked up in one. Before this,
+     * `use std::fs::{self, ..}` made every `self.field.method()` in the file
+     * read as file access: 151 of ripgrep's 181, found by the benchmark.
+     */
+    if (head === "self" || head === "this") return { verdict: "unknown", why: "receiver" };
+    const binding = head === undefined ? undefined : imported.get(head);
     if (head === undefined || bindings.ambiguous.has(head)) return { verdict: "unknown", why: "receiver" };
     let qualified: string;
     if (binding) {

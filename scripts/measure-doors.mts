@@ -357,7 +357,8 @@ for (const family of ["ts", "python", "rust"] as const) {
   console.log(`  ${family.padEnd(7)} ${mine.length} of ${population} asked: missed ${tally.missed ?? 0} `
     + `(${Object.entries(byReader).map(([why, count]) => `${why} ${count}`).join(", ") || "none"}), `
     + `rightly not outside ${tally["rightly not outside"] ?? 0}, checker silent ${tally.silent ?? 0} `
-    + `-- about ${Math.round(rate * population)} missed across the population`);
+    + `-- ${percent(tally.missed ?? 0, answered)} of the ${percent(answered, mine.length)} the checker answered, `
+    + `which is ~${Math.round(rate * population)} across the population only if the silent calls are like the answered ones`);
 }
 for (const one of missed.slice(0, CASES)) {
   console.log(`      ${where(one)}  ${one.name}  reader: ${readerSays(one.reading)}  checker: ${keySays(answers.get(one)!)}`);

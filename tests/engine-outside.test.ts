@@ -7,7 +7,7 @@
  */
 import { beforeAll, describe, expect, it } from "vitest";
 
-import { outsideCallsIn } from "../src/engine/outside";
+import { kindOfQualified, outsideCallsIn } from "../src/engine/outside";
 import { initEngine } from "../src/engine/parse";
 
 beforeAll(async () => { await initEngine(); }, 120_000);
@@ -48,6 +48,43 @@ describe("Python", () => {
 });
 
 describe("Rust", () => {
+  /*
+   * `self.x.y()` is a method on the thing the routine belongs to, and the one
+   * shape that must never be looked up in the imports. `use std::fs::{self}`
+   * binds a name spelled `self`, so a chain starting `self.` matched it and
+   * every method call on a field came back as file access -- 151 of ripgrep's
+   * 181 outside calls, which is how the benchmark found this.
+   */
+  it("never reads a call on self as an import, whatever the file imports", () => {
+    const source = [
+      "use std::fs::{self, File};",
+      "",
+      "impl Walker {",
+      "    fn run(&self) {",
+      "        self.options.max_depth.is_some();",
+      "    }",
+      "}",
+    ].join("\n");
+    expect(readingsOf(source, "rust", "is_some")).toEqual([
+      { routine: "run", line: 5, reading: { verdict: "unknown", why: "receiver" } },
+    ]);
+  });
+
+  it("reads the module a grouped use brings in under its own name", () => {
+    // `use std::fs::{self, File}` is how a crate says "fs and fs::File", and
+    // the name it binds for the module is `fs` -- the last step of the prefix.
+    const source = [
+      "use std::fs::{self, File};",
+      "",
+      "fn save(path: &str, board: &str) {",
+      "    fs::write(path, board).unwrap();",
+      "}",
+    ].join("\n");
+    expect(readingsOf(source, "rust", "write")).toEqual([
+      { routine: "save", line: 4, reading: { verdict: "outside", kind: "file", qualified: "std::fs::write" } },
+    ]);
+  });
+
   it("reads a call through a use of std::fs as file access", () => {
     const source = [
       "use std::fs;",
@@ -59,6 +96,25 @@ describe("Rust", () => {
     expect(readingsOf(source, "rust", "write")).toEqual([
       { routine: "save", line: 4, reading: { verdict: "outside", kind: "file", qualified: "std::fs::write" } },
     ]);
+  });
+});
+
+/*
+ * The benchmark names a call by where its own checker landed, and looks that
+ * name up in this same list. So a module the runtime reaches under a second
+ * name is a hole in the list rather than a disagreement about a call, and the
+ * two below are the ones the corpus actually produced.
+ */
+describe("the list, under the names a checker lands on", () => {
+  it("knows Python's socket module by the accelerator behind it", () => {
+    expect(kindOfQualified("socket.gethostbyname", "python")).toBe("network");
+    expect(kindOfQualified("_socket.gethostbyname", "python")).toBe("network");
+  });
+
+  it("knows the promise-shaped half of a Node module", () => {
+    expect(kindOfQualified("node:dns.lookup", "ts")).toBe("network");
+    expect(kindOfQualified("dns/promises.lookup", "ts")).toBe("network");
+    expect(kindOfQualified("fs/promises.readFile", "ts")).toBe("file");
   });
 });
 
