@@ -322,13 +322,46 @@ const resolverAnswers = new Map<Language, { answered: number; none: number }>();
  * region-A body this follows each call one hop into the repository and asks
  * whether the callee reads a member the body does not read itself.
  *
- * **A floor on the helper problem, and an over-count of it, at once.** A
- * helper's helper is not followed, so the true reach is larger. And members
- * are compared by name with no type attached, so a callee reading `width` off
- * something unrelated still counts -- which inflates `reaches`. The two errors
- * point opposite ways, and neither is allowed to hide: every body whose calls
- * could not all be followed is counted in its own column, never assumed clean.
+ * **Type-aware, and one hop.** A pair is a member *and the type it was read
+ * off*: `draw --[width]--> Config` is only contradicted by a callee reading
+ * `width` off Config, not by one reading a `width` off anything at all. The
+ * first version compared names alone and reported half of all members as
+ * reachable through a helper, which is a number about spelling.
+ *
+ * A type is keyed by the repository file the checker says declares it. A
+ * type outside the repository, or one the checker named without placing, is
+ * left out on both sides: no board has a box for `string`. Spot-checked
+ * against the source: of 84 bodies that reached a pair through a callee, 1
+ * did so only through a member it already read under a different key.
+ *
+ * A helper's helper is not followed, so the true reach is larger. Every body
+ * whose calls could not all be followed is counted in its own column, never
+ * assumed clean.
  */
+
+/**
+ * The type a read was read off, as a key two readings can be compared by --
+ * only for a type declared in this repository.
+ *
+ * A board only has a box for a type the repository declares, so only those
+ * pairs can be on an arrow. The first type-aware run also kept types the
+ * checker named without a declaring file, and they were `string#endsWith`
+ * and `Node | undefined#text`: 178 of 620 reached pairs, none of them a thing
+ * anybody draws. Dropped on both sides, so the comparison stays symmetric.
+ */
+function typeKeyOf(site: MemberReadSite): string | undefined {
+  return site.placed?.kind === "declared" ? `file:${site.placed.file}` : undefined;
+}
+
+/** Every (type, member) pair a list of reads touches, in-repository types only. */
+function pairsOf(sites: MemberReadSite[]): Set<string> {
+  const pairs = new Set<string>();
+  for (const site of sites) {
+    const key = typeKeyOf(site);
+    if (key) pairs.add(`${key}#${site.member}`);
+  }
+  return pairs;
+}
 interface HelperCost {
   regionA: number;
   /** Makes no call. Regions A and B agree about these. */
@@ -345,10 +378,19 @@ interface HelperCost {
   reaches: number;
   /** Of `clean` + `reaches`, bodies with a call that leaves the repository. */
   external: number;
-  /** Distinct members read directly, summed over `clean` + `reaches`. */
+  /** Distinct (type, member) pairs read directly, summed over `clean` + `reaches`. */
   ownMembers: number;
-  /** Distinct members reached only through a callee, same bodies. */
+  /** Distinct (type, member) pairs reached only through a callee, same bodies. */
   viaHelper: number;
+  /**
+   * Why a call could not be placed, per call site, in `unplaced` bodies.
+   *
+   * Reported rather than lumped, because the first run lumped them and the
+   * lump was mostly `name.replace(..)` and `Number(..)` -- built-ins that can
+   * never be a helper in this repository. A reader of the table needs to see
+   * that before deciding region B is small for a reason that matters.
+   */
+  unplacedWhy: Record<string, number>;
 }
 const helperCost = new Map<Language, HelperCost>();
 function helper(language: Language): HelperCost {
@@ -356,7 +398,7 @@ function helper(language: Language): HelperCost {
   if (!found) {
     found = {
       regionA: 0, callless: 0, unmatched: 0, unplaced: 0, calleeUnread: 0,
-      clean: 0, reaches: 0, external: 0, ownMembers: 0, viaHelper: 0,
+      clean: 0, reaches: 0, external: 0, ownMembers: 0, viaHelper: 0, unplacedWhy: {},
     };
     helperCost.set(language, found);
   }
@@ -386,9 +428,17 @@ function followCalls(
       : sameLine.find((one) => one.routine === routine.routine);
     if (!body) { into.unmatched += 1; continue; }
     if (body.sites.length === 0) { into.callless += 1; continue; }
-    if (body.sites.some((site) => site.file === undefined)) { into.unplaced += 1; continue; }
+    const unplacedSites = body.sites.filter((site) => site.file === undefined);
+    if (unplacedSites.length > 0) {
+      into.unplaced += 1;
+      for (const site of unplacedSites) {
+        const key = `${site.why}/${site.receiver ? "receiver" : "bare"}`;
+        into.unplacedWhy[key] = (into.unplacedWhy[key] ?? 0) + 1;
+      }
+      continue;
+    }
 
-    const own = new Set(routine.sites.map((site) => site.member));
+    const own = pairsOf(routine.sites);
     const reached = new Set<string>();
     let unread = false;
     let leaves = false;
@@ -396,7 +446,7 @@ function followCalls(
       if (site.file === EXTERNAL_RECEIVER) { leaves = true; continue; }
       const members = membersOf(site.file!, site.name);
       if (!members) { unread = true; break; }
-      for (const member of members) if (!own.has(member)) reached.add(member);
+      for (const pair of members) if (!own.has(pair)) reached.add(pair);
     }
     if (unread) { into.calleeUnread += 1; continue; }
 
@@ -450,19 +500,29 @@ if (!merging) {
       ...(resolveReceiver ? { resolveReceiver } : {}),
     });
 
-    /** Every member a routine of this name reads, by name only, from the text. */
+    /**
+     * The checker to read a callee with, per language, so its reads are keyed
+     * by type the same way the caller's were. TypeScript is asked in process;
+     * Python and Rust are looked up in the batch their pass already resolved,
+     * which is set before any body in that language is followed.
+     */
+    const resolverFor = new Map<Language, (file: string) => ((at: { start: number; end: number }) => ReceiverResolution | undefined) | undefined>();
+
+    /** Every (type, member) pair a routine of this name reads. */
     const readsByRoutine = new Map<string, Map<string, Set<string>> | null>();
     const membersOf = (relative: string, routine: string): Set<string> | undefined => {
       if (!readsByRoutine.has(relative)) {
         const source = read(relative);
         const language = languageOf(relative);
-        const reading = source !== undefined && language ? memberReadsIn(source, language) : undefined;
+        const resolve = language ? resolverFor.get(language)?.(relative) : undefined;
+        const reading = source !== undefined && language ? memberReadsIn(source, language, resolve) : undefined;
         if (!reading?.read) readsByRoutine.set(relative, null);
         else {
           const byName = new Map<string, Set<string>>();
           for (const one of reading.routines) {
+            if (!one.routine) continue;
             const set = byName.get(one.routine) ?? new Set<string>();
-            for (const site of one.sites) set.add(site.member);
+            for (const pair of pairsOf(one.sites)) set.add(pair);
             byName.set(one.routine, set);
           }
           readsByRoutine.set(relative, byName);
@@ -475,6 +535,11 @@ if (!merging) {
     const tsReferee = noTier2 ? undefined : (() => {
       try { return createTsReferee(tree); } catch { return undefined; }
     })();
+    if (tsReferee) {
+      const inProcess = (relative: string) => (at: { start: number; end: number }) =>
+        receiverResolutionFrom(tsReferee.typeAt(path.join(tree, relative), at.start, at.end), tree);
+      for (const language of ["ts", "tsx", "js"] as Language[]) resolverFor.set(language, inProcess);
+    }
 
     for (const file of files) {
       const language = languageOf(file);
@@ -544,6 +609,8 @@ if (!merging) {
         : await resolveRustReceivers(tree, queries, new Set(["target", "node_modules", ".git", "dist", "out", "vendor", ".venv", ".claude"]));
       console.error(`  [${label}/${language}] done in ${Math.round((Date.now() - startedAt) / 1000)}s`);
 
+      resolverFor.set(language, (relative) => (at) => answers.cache.get(relative, at));
+
       const tally = resolverAnswers.get(language) ?? { answered: 0, none: 0 };
       resolverAnswers.set(language, tally);
       for (const query of readQueries) {
@@ -572,7 +639,7 @@ type Counts = Record<string, number>;
 interface Measured {
   trees: string[];
   tallies: Record<Tier, Record<string, Record<string, number | Counts>>>;
-  helper: Record<string, Counts>;
+  helper: Record<string, Record<string, number | Counts>>;
   resolverAnswers: Record<string, Counts>;
   refereeAsked: Counts;
   refereeAgreed: Counts;
@@ -697,7 +764,7 @@ for (const language of LANGUAGES) {
 console.log("\nC · REGION B -- does following each call one hop change the answer? Tier 2.");
 console.log("  Among region-A bodies. `reaches` is a body whose callee reads a member it does");
 console.log("  not read itself: a refutation from region A would be wrong about that member.");
-console.log("  Members compared by name, so `reaches` over-counts; one hop, so it under-counts.");
+console.log("  A member counts only if read off the same type. One hop, so it under-counts.");
 console.log("  language  region A  no calls  followed  clean  reaches  unknown   REGION B   share   via a helper");
 for (const language of LANGUAGES) {
   const one = data.helper[language];
@@ -710,7 +777,7 @@ for (const language of LANGUAGES) {
     " ", language.padEnd(8), String(num(one.regionA)).padStart(8), String(num(one.callless)).padStart(9),
     String(followed).padStart(9), String(num(one.clean)).padStart(6), String(num(one.reaches)).padStart(8),
     String(unknown).padStart(8), String(regionB).padStart(10), percent(regionB, withReads).padStart(7),
-    `${percent(num(one.viaHelper), num(one.ownMembers) + num(one.viaHelper))} of members`.padStart(20),
+    `${percent(num(one.viaHelper), num(one.ownMembers) + num(one.viaHelper))} of pairs`.padStart(18),
   );
 }
 console.log("  unknown, split: ");
@@ -718,6 +785,7 @@ for (const language of LANGUAGES) {
   const one = data.helper[language];
   if (!one || num(one.regionA) === 0) continue;
   console.log(`   ${language.padEnd(7)} unplaced call ${num(one.unplaced)}, callee not a routine ${num(one.calleeUnread)}, unmatched ${num(one.unmatched)}, leaves the repo ${num(one.external)}`);
+  console.log(`   ${"".padEnd(7)} why unplaced, per call: ${listed(one.unplacedWhy, 8)}`);
 }
 
 console.log("\n  THE CHECKER'S REACH -- read receivers it answered, so a low share reads as");
