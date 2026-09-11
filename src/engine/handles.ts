@@ -119,6 +119,17 @@ const EQUALITY = new Set(["==", "==="]);
  */
 const CONSEQUENCE = ["body", "consequence"] as const;
 
+/**
+ * A comment is never a case.
+ *
+ * It has to be said explicitly because a comment is a *named* node in every
+ * one of these grammars, so it arrives in the same list the cases do. Matched
+ * on the type containing the word rather than on a list of spellings, since
+ * the grammars disagree (`comment`, `line_comment`, `block_comment`) and a new
+ * one will disagree again.
+ */
+const isComment = (node: Node) => node.type.includes("comment");
+
 /** Named children a field does not already account for, in source order. */
 function looseChildren(node: Node, exclude: readonly string[]): Node[] {
   const claimed = new Set<number>();
@@ -129,9 +140,43 @@ function looseChildren(node: Node, exclude: readonly string[]): Node[] {
   const found: Node[] = [];
   for (let index = 0; index < node.childCount; index += 1) {
     const child = node.child(index);
-    if (child?.isNamed && !claimed.has(child.id)) found.push(child);
+    if (child?.isNamed && !claimed.has(child.id) && !isComment(child)) found.push(child);
   }
   return found;
+}
+
+/**
+ * The label of one case, or nothing when the case is a catch-all.
+ *
+ * **Positional against the consequence, not "the first loose child"**, and
+ * that is a fix for a bug found by running the reader over 16 real trees
+ * rather than a first draft. A grammar puts only the *first* statement of a
+ * case behind the `body` field, so a `default:` with two statements -- or with
+ * a comment in it -- has a loose child left over, and taking the first loose
+ * child read that leftover as the label:
+ *
+ *     default:                        the label came back as `break_statement`
+ *         dismissPopup(window);       in django's popup_response.js, and as
+ *         break;                      `comment` in vite's build.ts
+ *
+ * The consequence of that is the dangerous direction rather than a cosmetic
+ * one: a `default:` misread as a labelled case means the dispatch is reported
+ * with **no catch-all**, so a routine that quietly swallows every unlisted
+ * case looks like one that enumerates them, and a `handles` claim on it looks
+ * refutable when it is not. That is a false red, which `licence.ts` exists to
+ * argue is unrecoverable.
+ *
+ * A case with no consequence at all is a fallthrough (`case "DELETE":` with
+ * the next case doing the work), and there is nothing for its label to stand
+ * before, so the first loose child is taken.
+ */
+function labelOf(branch: Node): Node | undefined {
+  const loose = looseChildren(branch, CONSEQUENCE);
+  const consequence = CONSEQUENCE
+    .map((field) => branch.childForFieldName(field))
+    .find((child): child is Node => child !== null);
+  if (!consequence) return loose[0];
+  return loose.find((child) => child.startIndex < consequence.startIndex);
 }
 
 /** 1-based line of a byte offset, which is what a report quotes. */
@@ -143,8 +188,30 @@ function lineOf(source: string, offset: number): number {
   return line;
 }
 
-/** A name with a language's quoting taken off: `"GET"` and `\'GET\'` are `GET`. */
-const unquote = (text: string) => text.replace(/^(["\'`])([\s\S]*)\1$/, "$2");
+/**
+ * A quoted label's content, or nothing when the label is not quoted.
+ *
+ * Quoting is the thing that is the same in all five grammars, which is why it
+ * is the test. Inside quotes *any* character is a legal part of the case, so
+ * the content is taken whole -- and that is the fix for a real bug rather than
+ * a precaution. See `namesIn`.
+ *
+ * A template with a substitution in it is not a constant, so it is refused:
+ * `case \`row-${id}\`` names a different case every call.
+ */
+function quotedContent(text: string): string | undefined {
+  const match = /^(["'`])([\s\S]*)\1$/.exec(text);
+  if (!match) return undefined;
+  const [, delimiter, content] = match;
+  /*
+   * The delimiter must not reappear inside, or this is several literals rather
+   * than one: `"POST" | "PUT"` opens and closes with a quote and would come
+   * back as the single case `POST" | "PUT`. Refusing an escaped quote as well
+   * costs a case nobody writes and keeps the test to one line.
+   */
+  if (content.includes(delimiter)) return undefined;
+  return content.includes("${") ? undefined : content;
+}
 
 /**
  * A case a person would recognise as one, or nothing.
@@ -156,6 +223,30 @@ const unquote = (text: string) => text.replace(/^(["\'`])([\s\S]*)\1$/, "$2");
  * a case it must not claim to have read.
  */
 const READABLE_NAME = /^[A-Za-z_$][\w$]*$|^-?\d[\w.]*$/;
+
+/** `Status.Active`, `Method::Get`, `a.b.c` -- a case named through its owner. */
+const PATH = /^[A-Za-z_$][\w$]*(?:(?:\.|::)[A-Za-z_$][\w$]*)+$/;
+
+/*
+ * Why the two are separate, measured rather than supposed.
+ *
+ * `READABLE_NAME` is an identifier test and it is the right test for an enum
+ * variant, which is what the first version of this reader was written against.
+ * Applied to a *string* label it is wrong, and running the reader over real
+ * code is what showed it: four labels came back unreadable across this repo
+ * and `rust-test`, and every one was a perfectly ordinary constant whose text
+ * is not an identifier --
+ *
+ *     case "textDocument/hover":           a slash
+ *     "serde_json::value::Value" => ..     colons
+ *     "&str" | "String" => ..              an ampersand
+ *
+ * Each of those had two thirds of its dispatch read correctly and two cases
+ * dropped into `unreadable`, which counts against the claim: a box claiming
+ * the full set would have been told it was short by cases that are plainly
+ * written down. So a quoted label is taken whole and only an unquoted one has
+ * to look like a name.
+ */
 
 /**
  * Flatten one label into the cases it names.
@@ -202,9 +293,49 @@ function namesIn(label: Node, out: string[], unreadable: string[]): void {
     for (const child of loose) namesIn(child, out, unreadable);
     return;
   }
+
+  /*
+   * Before descending, because descending is what strips the quotes.
+   *
+   * A TypeScript `string` holds one `string_fragment`, so the single-child
+   * rule below walks past the quotes and then judges `textDocument/hover` as
+   * an identifier, which it is not. Asking here means the quoting is still
+   * visible at the point the decision is made.
+   */
+  const quoted = quotedContent(label.text.trim());
+  if (quoted !== undefined) {
+    out.push(quoted);
+    return;
+  }
+
+  /*
+   * `case Status.Active:`, `case Status.ACTIVE:`, `Method::Get =>` -- a
+   * constant read off an enum or a namespace, and the single commonest shape
+   * this reader could not name: 271 of the 4,905 cases in the sixteen trees
+   * measured, against 95 for the next one.
+   *
+   * Read as a path in the text rather than by node type, and that is a
+   * correction. The first attempt used `parse.ts`'s `MEMBER_ACCESS` on the
+   * one-list argument, and it reads 0 of Python's: a `case` pattern is a
+   * `dotted_name` there, while the same expression elsewhere in Python is an
+   * `attribute` -- so the set that is right for `accesses.ts` is a different
+   * question from this one, and sharing it would have been one list used for
+   * two things. A dotted or `::`-joined run of identifiers is the same shape
+   * in all five grammars, which is `reading-a-grammar.md`'s own advice:
+   * classify by the thing that cannot vary.
+   *
+   * The last segment is the case, which is the answer Rust already gives
+   * through its `name` field, so a box's list means the same in every language.
+   */
+  const path = label.text.trim();
+  if (PATH.test(path)) {
+    out.push(path.split(/\.|::/).pop()!);
+    return;
+  }
+
   if (loose.length === 1) return namesIn(loose[0], out, unreadable);
 
-  const text = unquote(label.text.trim());
+  const text = label.text.trim();
   if (READABLE_NAME.test(text)) out.push(text);
   else unreadable.push(label.type);
 }
@@ -394,7 +525,7 @@ export function findDispatches(tree: Tree, source: string, _language: Language):
     let catchAll = false;
 
     for (const branch of looseChildren(body, [])) {
-      const label = looseChildren(branch, CONSEQUENCE)[0];
+      const label = labelOf(branch);
       // No label at all is a `default:`, which is TypeScript's spelling of the
       // wildcard: the grammar gives `switch_default` its consequence and
       // nothing else.

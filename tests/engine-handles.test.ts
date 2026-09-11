@@ -327,3 +327,152 @@ function f(m: string) {
     expect(dispatch.unreadable).toEqual(["subscript_expression"]);
   });
 });
+
+describe("a case label that is not an identifier, found by running it on real code", () => {
+  /*
+   * Four labels came back unreadable across this repo and `rust-test`, and
+   * every one was an ordinary constant whose text is simply not an identifier.
+   * The reader was applying an identifier test -- right for an enum variant,
+   * wrong for a string -- to both. Pinned here by the real shapes.
+   */
+  it("reads an LSIF label with a slash in it", () => {
+    // scripts/lib/licence-rust.ts dispatches on exactly these.
+    const [dispatch] = read(`
+function on(label: string) {
+  switch (label) {
+    case "metaData": return 1;
+    case "textDocument/hover": return 2;
+    case "textDocument/definition": return 3;
+  }
+}`, "ts");
+    expect(names(dispatch.cases)).toEqual(["metaData", "textDocument/hover", "textDocument/definition"]);
+    expect(dispatch.unreadable).toEqual([]);
+  });
+
+  it("reads a Rust type name with colons and an ampersand in it", () => {
+    // rust-test/.../response.rs dispatches on exactly these.
+    const [dispatch] = read(`
+fn set(&mut self, payload: P) {
+    match type_of(&payload) {
+        "serde_json::value::Value" => {}
+        "&str" | "String" => {}
+        _ => {}
+    }
+}`, "rust");
+    expect(names(dispatch.cases)).toEqual(["serde_json::value::Value", "&str", "String"]);
+    expect(dispatch.unreadable).toEqual([]);
+    expect(dispatch.catchAll).toBe(true);
+  });
+
+  it("still refuses a template whose value is different on every call", () => {
+    const [dispatch] = read(`
+function f(k: string, id: number) {
+  switch (k) {
+    case "plain": return 1;
+    case \`row-\${id}\`: return 2;
+  }
+}`, "ts");
+    expect(names(dispatch.cases)).toEqual(["plain"]);
+    expect(dispatch.unreadable).toEqual(["template_string"]);
+  });
+});
+
+describe("a catch-all that is not the only thing in its branch", () => {
+  /*
+   * Found by running the reader over sixteen real trees, and the reason it
+   * matters is the direction of the mistake: a `default:` misread as a
+   * labelled case is reported as **no catch-all**, so a routine that quietly
+   * swallows every unlisted case looks like one that enumerates them, and a
+   * claim on it looks refutable when it is not. A false red.
+   */
+  it("still finds the catch-all when the default holds two statements", () => {
+    // django/contrib/admin/static/admin/js/popup_response.js, reduced.
+    const [dispatch] = read(`
+function go(action, value) {
+  switch (action) {
+    case "change":
+      dismissChange(window, value);
+      break;
+    default:
+      dismissAdd(window, value);
+      break;
+  }
+}`, "js");
+    expect(names(dispatch.cases)).toEqual(["change"]);
+    expect(dispatch.catchAll).toBe(true);
+    expect(dispatch.unreadable).toEqual([]);
+  });
+
+  it("still finds it when a comment sits in the branch", () => {
+    // packages/vite/src/node/build.ts, reduced.
+    const [dispatch] = read(`
+function log(level: string, message: string) {
+  switch (level) {
+    case "info":
+      logger.info(message);
+      return;
+    default:
+      // nothing to do
+      return;
+  }
+}`, "ts");
+    expect(names(dispatch.cases)).toEqual(["info"]);
+    expect(dispatch.catchAll).toBe(true);
+    expect(dispatch.unreadable).toEqual([]);
+  });
+
+  it("does not read a comment between the cases as a case", () => {
+    const [dispatch] = read(`
+function f(m: string) {
+  switch (m) {
+    case "a": return 1;
+    // b is handled upstream
+    case "c": return 2;
+  }
+}`, "ts");
+    expect(names(dispatch.cases)).toEqual(["a", "c"]);
+    expect(dispatch.catchAll).toBe(false);
+    expect(dispatch.unreadable).toEqual([]);
+  });
+});
+
+describe("a case read off an enum or a namespace", () => {
+  /*
+   * The commonest shape the reader could not name on real code: 271 of 4,905
+   * cases across sixteen trees. The last segment is the case, which is the
+   * answer Rust already gives for `Method::Get`, so a box's list means the
+   * same thing in both languages.
+   */
+  it("reads a TypeScript enum member as its last segment", () => {
+    const [dispatch] = read(`
+enum Status { Active, Pending, Closed }
+function label(s: Status): string {
+  switch (s) {
+    case Status.Active: return "on";
+    case Status.Pending: return "wait";
+  }
+}`, "ts");
+    expect(names(dispatch.cases)).toEqual(["Active", "Pending"]);
+    expect(dispatch.unreadable).toEqual([]);
+  });
+
+  it("reads a Python attribute the same way", () => {
+    const [dispatch] = read(`
+def label(s):
+    match s:
+        case Status.ACTIVE:
+            return "on"
+        case Status.PENDING:
+            return "wait"`, "python");
+    expect(names(dispatch.cases)).toEqual(["ACTIVE", "PENDING"]);
+    expect(dispatch.unreadable).toEqual([]);
+  });
+
+  it("agrees with Rust, which writes the same thing with colons", () => {
+    const [dispatch] = read(
+      `fn label(s: Status) -> u8 { match s { Status::Active => 1, Status::Pending => 2 } }`,
+      "rust",
+    );
+    expect(names(dispatch.cases)).toEqual(["Active", "Pending"]);
+  });
+});
