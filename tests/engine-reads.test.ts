@@ -206,7 +206,73 @@ describe("reads that no `.name` appears for", () => {
     expect(hazardsOf("fn f(c: Vec<u8>, k: usize) -> u8 {\n  c[k]\n}", "rust")).toEqual(["computed"]);
   });
 
+  it("flags a Rust macro, whose arguments are not parsed at all", () => {
+    /*
+     * `log_line!("{:?}", sock.peer_addr())` reads `peer_addr`, and the reader
+     * sees nothing: a macro's arguments are a `token_tree`, unparsed. The
+     * referee's text scan does see it, which is how this surfaced -- 23 of
+     * the 24 reads it found that this reader had not were exactly this, all
+     * of them inside `log_line!`.
+     */
+    expect(hazardsOf('fn f(sock: S) {\n  log_line!("{:?}", sock.peer_addr());\n}', "rust")).toEqual(["macro"]);
+  });
+
+  it("reads nothing inside that macro, which is why it has to be a hazard", () => {
+    const reading = memberReadsIn('fn f(sock: S) {\n  log_line!("{:?}", sock.peer_addr());\n}', "rust");
+    if (!reading.read) throw new Error("unreadable");
+    expect(reading.routines.flatMap((one) => one.sites)).toEqual([]);
+  });
+
+  it("flags Python's getattr, which is `c[k]` spelled another way", () => {
+    expect(hazardsOf('def f(c, k):\n    return getattr(c, k)\n', "python")).toEqual(["computed"]);
+  });
+
+  it("flags `vars(c)`, which hands back every attribute at once", () => {
+    expect(hazardsOf("def f(c):\n    return vars(c)\n", "python")).toEqual(["computed"]);
+  });
+
+  it("does not flag an ordinary Python call", () => {
+    expect(hazardsOf("def f(c):\n    return render(c)\n", "python")).toEqual([]);
+  });
+
   it("leaves an ordinary body with no hazard at all", () => {
     expect(hazardsOf("function f(c: C) {\n  return c.width;\n}", "ts")).toEqual([]);
+  });
+});
+
+/*
+ * The population `@accesses` can be asked about is named routines, because
+ * `accesses.ts` finds the tail of an arrow by name. A body that cannot be
+ * named is not in it; a body that can be named must not lose its name.
+ *
+ * Found by pairing this reader's bodies with `callSitesIn`'s: 550 of 550
+ * named routines paired, and 127 of the "anonymous" ones paired too --
+ * `const draw = () => ..`, which has a name everywhere except here.
+ */
+describe("a routine is named by what it is bound to", () => {
+  const namesOf = (source: string, language: Parameters<typeof memberReadsIn>[1]) => {
+    const reading = memberReadsIn(source, language);
+    if (!reading.read) throw new Error("unreadable");
+    return reading.routines.map((one) => one.routine);
+  };
+
+  it("names an arrow function by the const it is assigned to", () => {
+    expect(namesOf("const draw = (c: Config) => c.width;", "ts")).toEqual(["draw"]);
+  });
+
+  it("names a function expression the same way", () => {
+    expect(namesOf("const draw = function (c: Config) { return c.width; };", "ts")).toEqual(["draw"]);
+  });
+
+  it("names a class field holding an arrow, the React handler shape", () => {
+    expect(namesOf("class View {\n  onClick = () => this.width;\n}", "ts")).toEqual(["onClick"]);
+  });
+
+  it("names a Python lambda by the name it is assigned to", () => {
+    expect(namesOf("draw = lambda c: c.width\n", "python")).toEqual(["draw"]);
+  });
+
+  it("leaves a callback passed to a call without a name", () => {
+    expect(namesOf("function f(rows: Row[]) {\n  return rows.map((row) => row.width);\n}", "ts")).toEqual(["f", ""]);
   });
 });

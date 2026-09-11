@@ -224,7 +224,16 @@ export type ReadHazardKind =
   /** `{ ...c }`, `C { ..c }`, `{**c}`. Reads every member at once. */
   | "spread"
   /** `c[k]`. Can name any member there is, and the text does not say which. */
-  | "computed";
+  | "computed"
+  /**
+   * A Rust macro. Its arguments are a `token_tree` and nothing parses them,
+   * so `log_line!("{:?}", sock.peer_addr())` reads `peer_addr` and this
+   * reader sees an empty body. The licence row for `accesses` in Rust
+   * already names this as why its routine-end recall is 89.3%, the lowest
+   * of the five languages -- what is new is that the same blindness makes
+   * an absence unusable, where before it only ever cost a confirmation.
+   */
+  | "macro";
 
 export interface ReadHazard {
   kind: ReadHazardKind;
@@ -1015,6 +1024,16 @@ function readReceiverOf(
 const DESTRUCTURES = new Set(["object_pattern", "struct_pattern"]);
 const SPREADS = new Set(["base_field_initializer", "dictionary_splat"]);
 const COMPUTED = new Set(["subscript_expression", "subscript", "index_expression"]);
+const UNPARSED = new Set(["macro_invocation"]);
+/**
+ * Python builtins that name an attribute the text does not fix.
+ *
+ * `getattr(c, k)` is `c[k]` in another spelling and `vars(c)` hands back the
+ * whole `__dict__`. Both read members with no `.name` for any of them.
+ * Deliberately short: `setattr` writes rather than reads, and `hasattr` asks
+ * without reading, so neither is on it.
+ */
+const PYTHON_DYNAMIC = new Set(["getattr", "vars"]);
 
 /**
  * Whether this node reads members without naming them in a `.name`.
@@ -1025,10 +1044,15 @@ const COMPUTED = new Set(["subscript_expression", "subscript", "index_expression
  * structure decides -- the parent being an object literal -- and this is
  * called from the parent for that reason rather than from the node.
  */
-function hazardOf(node: Node, source: string): ReadHazardKind | undefined {
+function hazardOf(node: Node, language: Language): ReadHazardKind | undefined {
+  if (language === "python" && node.type === "call") {
+    const callee = node.childForFieldName("function");
+    if (callee && callee.childCount === 0 && PYTHON_DYNAMIC.has(callee.text)) return "computed";
+  }
   if (DESTRUCTURES.has(node.type)) return "destructured";
   if (SPREADS.has(node.type)) return "spread";
   if (COMPUTED.has(node.type)) return "computed";
+  if (UNPARSED.has(node.type)) return "macro";
   return undefined;
 }
 
@@ -1173,6 +1197,16 @@ function collectParams(list: Node | null, language: Language, into: Map<string, 
 
 /** One routine's two populations: what it calls on, and what it reads. */
 interface RoutineBoth extends RoutineResolution {
+  /**
+   * The name the routine is bound to when it declares none of its own:
+   * `const draw = () => ..`, `onClick = () => ..`, `draw = lambda c: ..`.
+   *
+   * Carried beside `routine` rather than written into it, because
+   * `resolveReceiversIn` reports `routine` and #227's figures were measured
+   * with those arrows nameless. The member-read projection uses this, since
+   * `accesses.ts` finds an arrow's tail by exactly this binding.
+   */
+  boundName: string | undefined;
   endLine: number;
   reads: MemberReadSite[];
   hazards: ReadHazard[];
@@ -1187,6 +1221,7 @@ function resolveRoutine(
   language: Language,
   imported: Set<string>,
   resolveRead: ResolveRead | undefined,
+  boundName: string | undefined,
 ): RoutineBoth {
   const nameNode = routine.type === "impl_item" ? undefined : routine.childForFieldName("name");
   const routineName = nameNode && nameNode.childCount === 0 ? nameNode.text : "";
@@ -1208,7 +1243,7 @@ function resolveRoutine(
    */
   const noteHazards = (from: Node): void => {
     each(from, (node) => {
-      const kind = spreadsInto(node) ? "spread" : hazardOf(node, source);
+      const kind = spreadsInto(node) ? "spread" : hazardOf(node, language);
       if (!kind) return;
       hazards.push({
         kind, line: lineOf(source, node.startIndex),
@@ -1270,6 +1305,7 @@ function resolveRoutine(
 
   return {
     routine: routineName,
+    boundName,
     line: lineOf(source, routine.startIndex),
     endLine: lineOf(source, routine.startIndex + routine.text.length),
     sites, reads, hazards,
@@ -1288,7 +1324,20 @@ function walk(
   imported: Set<string>,
   routines: RoutineBoth[],
   resolveRead: ResolveRead | undefined,
+  bound: Map<number, string> = new Map(),
 ): void {
+  /*
+   * A binding whose value is a routine names that routine: the rule
+   * `routinesNamed` in `accesses.ts` applies -- a `name` or `left` field, and
+   * a `value` with parameters -- so the population here is the population a
+   * board can ask about. Recorded by node id and read when the walk reaches
+   * the value, because `Node` exposes no parent to look back up at.
+   */
+  const bindingName = node.childForFieldName("name") ?? node.childForFieldName("left");
+  const boundValue = node.childForFieldName("value") ?? node.childForFieldName("right");
+  if (bindingName && bindingName.childCount === 0 && boundValue && isRoutineNode(boundValue)) {
+    bound.set(boundValue.id, bindingName.text);
+  }
   if (TYPE_DECLARATION.test(node.type)) {
     const nextFields = fieldsOf(node, language, source);
     const declared = node.childForFieldName("name");
@@ -1297,7 +1346,7 @@ function walk(
       : undefined;
     for (let index = 0; index < node.childCount; index += 1) {
       const child = node.child(index);
-      if (child) walk(child, nextFields, nextOwn, tree, source, language, imported, routines, resolveRead);
+      if (child) walk(child, nextFields, nextOwn, tree, source, language, imported, routines, resolveRead, bound);
     }
     return;
   }
@@ -1330,16 +1379,16 @@ function walk(
       : undefined;
     for (let index = 0; index < node.childCount; index += 1) {
       const child = node.child(index);
-      if (child) walk(child, nextFields, nextOwn, tree, source, language, imported, routines, resolveRead);
+      if (child) walk(child, nextFields, nextOwn, tree, source, language, imported, routines, resolveRead, bound);
     }
     return;
   }
   if (isRoutineNode(node)) {
-    routines.push(resolveRoutine(node, fields, own, tree, source, language, imported, resolveRead));
+    routines.push(resolveRoutine(node, fields, own, tree, source, language, imported, resolveRead, bound.get(node.id)));
   }
   for (let index = 0; index < node.childCount; index += 1) {
     const child = node.child(index);
-    if (child) walk(child, fields, own, tree, source, language, imported, routines, resolveRead);
+    if (child) walk(child, fields, own, tree, source, language, imported, routines, resolveRead, bound);
   }
 }
 
@@ -1385,7 +1434,9 @@ export function memberReadsIn(
   walk(tree.rootNode, new Map(), undefined, tree.rootNode, source, language, imported, routines, resolveRead);
   return {
     read: true,
-    routines: routines.map(({ routine, line, endLine, reads, hazards }) => ({ routine, line, endLine, sites: reads, hazards })),
+    routines: routines.map(({ routine, boundName, line, endLine, reads, hazards }) => ({
+      routine: routine || boundName || "", line, endLine, sites: reads, hazards,
+    })),
   };
 }
 

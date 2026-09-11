@@ -7,6 +7,22 @@
  *   npm run measure:accesses-closed -- <path>...    -- any trees you like
  *   npm run measure:accesses-closed -- --all        -- every disagreement, not the first few
  *   npm run measure:accesses-closed -- --no-tier2   -- syntax only, no type checkers
+ *   npm run measure:accesses-closed -- --json <path>...     -- tallies as JSON
+ *   npm run measure:accesses-closed -- --merge <file.json>... -- one report from several
+ *
+ * `mundane` does not fit in one process. The TypeScript referee keeps up to 24
+ * compiled programs in memory and a monorepo package pulls its whole
+ * `node_modules` into each, so the default run exhausts an 8 GiB heap there.
+ * It is measured one package per process and merged:
+ *
+ *   for d in ~/mundane/apps/* ~/mundane/packages/*; do
+ *     npm run -s measure:accesses-closed -- --json "$d" \
+ *       > "out/mundane-$(basename "$(dirname "$d")")-$(basename "$d").json"
+ *   done
+ *
+ * The group goes in the file name because `apps/graph` and `packages/graph`
+ * are both called `graph`. Fourteen files sit outside both directories, all
+ * of them skill examples under `.agents`, and are not read.
  *
  * **A measurement. No word ships from it and nothing here can colour a
  * diagram.**
@@ -69,7 +85,13 @@ import { resolvePythonReceivers } from "./lib/resolution-python-live";
 import { resolveRustReceivers } from "./lib/resolution-rust-receivers";
 import { createTsReferee, receiverResolutionFrom } from "./lib/resolution-ts";
 import { sourceFiles } from "./lib/source-files";
-import type { ReceiverResolution } from "../src/engine/calls";
+import {
+  callSitesIn, EXTERNAL_RECEIVER,
+  type BodyCallSites, type CallSide, type ReceiverResolution,
+} from "../src/engine/calls";
+import { readDependencies } from "../src/engine/deps";
+import { createWorkspace } from "../src/engine/drift";
+import type { ConfigCache } from "../src/engine/resolve";
 import { initEngine, languageOf, type Language } from "../src/engine/parse";
 import { memberReadsIn, type MemberReadSite, type ReadHazard } from "../src/engine/resolution";
 
@@ -80,6 +102,16 @@ const flags = new Set(process.argv.slice(2).filter((one) => one.startsWith("--")
 const roots = process.argv.slice(2).filter((one) => !one.startsWith("--"));
 const showAll = flags.has("--all");
 const noTier2 = flags.has("--no-tier2");
+/**
+ * Print the tallies as JSON instead of a table.
+ *
+ * The corpus does not fit in one process: `mundane` is 1,175 files and
+ * building a `ts.Program` per package in it is what the 8 GiB heap on
+ * `measure:resolution` exists for, and it was still killed here. So the run
+ * is split and the halves are added up -- by a reader that cannot misread a
+ * column, rather than by eye.
+ */
+const asJson = flags.has("--json");
 
 const trees = (roots.length > 0 ? roots : [
   path.resolve("src"),
@@ -98,7 +130,18 @@ const LSP_LANGUAGES: Language[] = ["python", "rust"];
 type Tier = "tier1" | "tier2";
 
 interface Tally {
-  /** Every routine the reader read, whatever it contained. */
+  /**
+   * Routines with no name: callbacks, `rows.map((row) => ..)`.
+   *
+   * Not in the population, and counted so the exclusion is on the record
+   * rather than silent. `accesses.ts` finds the tail of an arrow by name, so
+   * no board can ever ask this word about one of these -- and the reads
+   * inside one are already counted, in the named routine that encloses it.
+   * Pairing this reader's bodies with `callSitesIn`'s found the problem: all
+   * 501 bodies that did not pair were anonymous, and all 550 named ones did.
+   */
+  anonymous: number;
+  /** Every named routine the reader read, whatever it contained. */
   routines: number;
   /** Routines with no member read at all. Closed for free, so held apart. */
   readless: number;
@@ -110,10 +153,10 @@ interface Tally {
   placedAll: number;
   /** ...and nothing in it reads a member without naming one: REGION A. */
   closed: number;
-  /** ...and no computed access either: REGION A, strict. */
-  closedStrict: number;
   /** Bodies knocked out by each hazard, counted once per body. */
   hazard: Map<string, number>;
+  /** Bodies with exactly one kind of hazard -- what fixing that kind would return. */
+  soleHazard: Map<string, number>;
   /** Reasons a body stayed open, counted per body rather than per read. */
   anyBlocker: Map<string, number>;
   soleBlocker: Map<string, number>;
@@ -125,8 +168,8 @@ function tally(tier: Tier, language: Language): Tally {
   let found = per.get(language);
   if (!found) {
     found = {
-      routines: 0, readless: 0, withReads: 0, reads: 0, resolved: 0,
-      placedAll: 0, closed: 0, closedStrict: 0, hazard: new Map(),
+      anonymous: 0, routines: 0, readless: 0, withReads: 0, reads: 0, resolved: 0,
+      placedAll: 0, closed: 0, hazard: new Map(), soleHazard: new Map(),
       anyBlocker: new Map(), soleBlocker: new Map(),
     };
     per.set(language, found);
@@ -163,6 +206,7 @@ function hazardKinds(routine: RoutineReading): Set<string> {
 function count(tier: Tier, language: Language, routines: RoutineReading[]): void {
   const into = tally(tier, language);
   for (const routine of routines) {
+    if (routine.routine === "") { into.anonymous += 1; continue; }
     into.routines += 1;
     if (routine.sites.length === 0) { into.readless += 1; continue; }
     into.withReads += 1;
@@ -190,10 +234,25 @@ function count(tier: Tier, language: Language, routines: RoutineReading[]): void
     into.placedAll += 1;
     const hazards = hazardKinds(routine);
     for (const kind of hazards) bump(into.hazard, kind);
-    if (hazards.has("destructured") || hazards.has("spread")) continue;
+    if (hazards.size === 1) bump(into.soleHazard, [...hazards][0]!);
+    /*
+     * Every kind knocks the body out, `computed` included. The first version
+     * of this let `c[k]` stay in on the grounds that it is usually an array
+     * index -- but "usually" is a guess about a body, and `c[k]` on a Config
+     * reads whichever member `k` names. `soleHazard` says what telling the two
+     * apart would buy back, which is a coverage question and not a trust one.
+     */
+    if (hazards.size > 0) continue;
     into.closed += 1;
-    if (!hazards.has("computed")) into.closedStrict += 1;
   }
+}
+
+/** Whether a body is in region A at this tier. The same rule `count` applies. */
+function inRegionA(routine: RoutineReading, tier: Tier): boolean {
+  if (routine.routine === "") return false;
+  if (routine.sites.length === 0) return false;
+  if (routine.sites.some((site) => !placed(site, tier))) return false;
+  return routine.hazards.length === 0;
 }
 
 /* ------------------------------------------------------- the referee's check */
@@ -254,172 +313,436 @@ function referee(
 
 const resolverAnswers = new Map<Language, { answered: number; none: number }>();
 
-for (const tree of trees) {
-  const files = sourceFiles(tree);
-  const label = path.basename(tree);
-  console.error(`  [${label}] ${files.length} files`);
+/**
+ * What choosing region A over region B costs, measured rather than argued.
+ *
+ * If `draw()` calls `paint()` and *paint* reads `width`, most people drawing
+ * a board would say `draw` reads `width`. A refutation from region A -- every
+ * direct read placed -- is wrong about exactly those bodies. So for every
+ * region-A body this follows each call one hop into the repository and asks
+ * whether the callee reads a member the body does not read itself.
+ *
+ * **A floor on the helper problem, and an over-count of it, at once.** A
+ * helper's helper is not followed, so the true reach is larger. And members
+ * are compared by name with no type attached, so a callee reading `width` off
+ * something unrelated still counts -- which inflates `reaches`. The two errors
+ * point opposite ways, and neither is allowed to hide: every body whose calls
+ * could not all be followed is counted in its own column, never assumed clean.
+ */
+interface HelperCost {
+  regionA: number;
+  /** Makes no call. Regions A and B agree about these. */
+  callless: number;
+  /** No call reading was found on the same line. Unknown, not clean. */
+  unmatched: number;
+  /** At least one call nobody could place. Unknown, not clean. */
+  unplaced: number;
+  /** Placed in this repository at a file with no routine of that name. Unknown. */
+  calleeUnread: number;
+  /** Every call followed, and no callee reads a member this body does not. */
+  clean: number;
+  /** Every call followed, and a callee reads a member this body does not. */
+  reaches: number;
+  /** Of `clean` + `reaches`, bodies with a call that leaves the repository. */
+  external: number;
+  /** Distinct members read directly, summed over `clean` + `reaches`. */
+  ownMembers: number;
+  /** Distinct members reached only through a callee, same bodies. */
+  viaHelper: number;
+}
+const helperCost = new Map<Language, HelperCost>();
+function helper(language: Language): HelperCost {
+  let found = helperCost.get(language);
+  if (!found) {
+    found = {
+      regionA: 0, callless: 0, unmatched: 0, unplaced: 0, calleeUnread: 0,
+      clean: 0, reaches: 0, external: 0, ownMembers: 0, viaHelper: 0,
+    };
+    helperCost.set(language, found);
+  }
+  return found;
+}
 
-  /* ---------------------------------------------------------- tier 1, and ts */
-  const tsReferee = noTier2 ? undefined : (() => {
-    try { return createTsReferee(tree); } catch { return undefined; }
-  })();
+function followCalls(
+  language: Language,
+  routines: RoutineReading[],
+  bodies: BodyCallSites[],
+  membersOf: (file: string, routine: string) => Set<string> | undefined,
+): void {
+  const into = helper(language);
+  for (const routine of routines) {
+    if (!inRegionA(routine, "tier2")) continue;
+    into.regionA += 1;
 
-  for (const file of files) {
-    const language = languageOf(file);
-    if (!language) continue;
-    let source: string;
-    try { source = readFileSync(file, "utf8"); } catch { continue; }
+    /*
+     * Paired by the line the routine opens on, and by name where two open on
+     * one line. Both readers take that line from the declaration's own start,
+     * so a miss here is a shape the two disagree about rather than a body
+     * with no calls -- and it is counted as unknown for that reason.
+     */
+    const sameLine = bodies.filter((body) => body.line === routine.line);
+    const body = sameLine.length === 1
+      ? sameLine[0]
+      : sameLine.find((one) => one.routine === routine.routine);
+    if (!body) { into.unmatched += 1; continue; }
+    if (body.sites.length === 0) { into.callless += 1; continue; }
+    if (body.sites.some((site) => site.file === undefined)) { into.unplaced += 1; continue; }
 
-    const tier1 = memberReadsIn(source, language);
-    if (!tier1.read) continue;
-    count("tier1", language, tier1.routines);
+    const own = new Set(routine.sites.map((site) => site.member));
+    const reached = new Set<string>();
+    let unread = false;
+    let leaves = false;
+    for (const site of body.sites) {
+      if (site.file === EXTERNAL_RECEIVER) { leaves = true; continue; }
+      const members = membersOf(site.file!, site.name);
+      if (!members) { unread = true; break; }
+      for (const member of members) if (!own.has(member)) reached.add(member);
+    }
+    if (unread) { into.calleeUnread += 1; continue; }
 
-    if (noTier2) continue;
-    if (language === "ts" || language === "tsx" || language === "js") {
-      if (!tsReferee) { count("tier2", language, tier1.routines); continue; }
-      const answer = (at: { start: number; end: number }): ReceiverResolution | undefined => {
-        const tally = resolverAnswers.get(language) ?? { answered: 0, none: 0 };
-        resolverAnswers.set(language, tally);
-        const found = receiverResolutionFrom(tsReferee.typeAt(file, at.start, at.end), tree);
-        if (found) tally.answered += 1; else tally.none += 1;
-        return found;
-      };
+    if (leaves) into.external += 1;
+    into.ownMembers += own.size;
+    into.viaHelper += reached.size;
+    if (reached.size > 0) into.reaches += 1; else into.clean += 1;
+  }
+}
+
+const merging = flags.has("--merge");
+
+if (!merging) {
+  for (const tree of trees) {
+    const files = sourceFiles(tree);
+    const label = path.basename(tree);
+    console.error(`  [${label}] ${files.length} files`);
+
+    const workspace = createWorkspace(tree);
+    const configs: ConfigCache = new Map();
+    const relOf = (file: string) => path.relative(tree, file);
+
+    const sources = new Map<string, string | undefined>();
+    const read = (relative: string): string | undefined => {
+      if (sources.has(relative)) return sources.get(relative);
+      const absolute = workspace.resolve(relative);
+      const text = absolute && workspace.stat(absolute) === "file" ? workspace.read(absolute) : undefined;
+      sources.set(relative, text);
+      return text;
+    };
+    const importsOf = new Map<string, CallSide["imports"]>();
+    const imports = (relative: string, source: string): CallSide["imports"] => {
+      const cached = importsOf.get(relative);
+      if (cached) return cached;
+      const declared = readDependencies(relative, source, workspace, configs)?.dependencies ?? [];
+      const list = declared.map((one) => ({ specifier: one.specifier, ...(one.file ? { file: one.file } : {}) }));
+      importsOf.set(relative, list);
+      return list;
+    };
+    const open = (relative: string) => {
+      const source = read(relative);
+      const language = languageOf(relative);
+      if (source === undefined || !language) return undefined;
+      return { source, language, imports: imports(relative, source) };
+    };
+    const sideFor = (
+      relative: string, source: string, language: Language,
+      resolveReceiver?: (at: { start: number; end: number }) => ReceiverResolution | undefined,
+    ): CallSide => ({
+      file: relative, source, language, imports: imports(relative, source), open,
+      ...(resolveReceiver ? { resolveReceiver } : {}),
+    });
+
+    /** Every member a routine of this name reads, by name only, from the text. */
+    const readsByRoutine = new Map<string, Map<string, Set<string>> | null>();
+    const membersOf = (relative: string, routine: string): Set<string> | undefined => {
+      if (!readsByRoutine.has(relative)) {
+        const source = read(relative);
+        const language = languageOf(relative);
+        const reading = source !== undefined && language ? memberReadsIn(source, language) : undefined;
+        if (!reading?.read) readsByRoutine.set(relative, null);
+        else {
+          const byName = new Map<string, Set<string>>();
+          for (const one of reading.routines) {
+            const set = byName.get(one.routine) ?? new Set<string>();
+            for (const site of one.sites) set.add(site.member);
+            byName.set(one.routine, set);
+          }
+          readsByRoutine.set(relative, byName);
+        }
+      }
+      return readsByRoutine.get(relative)?.get(routine) ?? undefined;
+    };
+
+    /* -------------------------------------------------------- tier 1, and ts */
+    const tsReferee = noTier2 ? undefined : (() => {
+      try { return createTsReferee(tree); } catch { return undefined; }
+    })();
+
+    for (const file of files) {
+      const language = languageOf(file);
+      if (!language) continue;
+      const relative = relOf(file);
+      const source = read(relative);
+      if (source === undefined) continue;
+
+      const tier1 = memberReadsIn(source, language);
+      if (!tier1.read) continue;
+      count("tier1", language, tier1.routines);
+
+      if (noTier2 || LSP_LANGUAGES.includes(language)) continue;
+      const ask = tsReferee
+        ? (at: { start: number; end: number }) => receiverResolutionFrom(tsReferee.typeAt(file, at.start, at.end), tree)
+        : undefined;
+      const answer = ask
+        ? (at: { start: number; end: number }): ReceiverResolution | undefined => {
+          const tally = resolverAnswers.get(language) ?? { answered: 0, none: 0 };
+          resolverAnswers.set(language, tally);
+          const found = ask(at);
+          if (found) tally.answered += 1; else tally.none += 1;
+          return found;
+        }
+        : undefined;
       const tier2 = memberReadsIn(source, language, answer);
       if (!tier2.read) continue;
       count("tier2", language, tier2.routines);
-      referee(path.relative(tree, file), source, language, tier2.routines);
-    }
-  }
+      referee(relative, source, language, tier2.routines);
 
-  /* ------------------------------------------- tier 2 over a language server
-   *
-   * Python's and Rust's resolvers answer over LSP and `memberReadsIn` is
-   * synchronous, so the reading above cannot ask them mid-walk. The shape
-   * `resolution-python-live.ts` already solved for the live checker is reused
-   * rather than reinvented: read once with a resolver that records every
-   * question and answers none, resolve the whole batch, then read again with a
-   * synchronous lookup into what came back.
-   */
-  if (noTier2) continue;
-  for (const language of LSP_LANGUAGES) {
-    const inLanguage = files.filter((one) => languageOf(one) === language);
-    if (inLanguage.length === 0) continue;
-
-    const read = (file: string) => {
-      try { return readFileSync(file, "utf8"); } catch { return undefined; }
-    };
-    const queries: Array<{ file: string; at: { start: number; end: number } }> = [];
-    for (const file of inLanguage) {
-      const source = read(file);
-      if (source === undefined) continue;
-      memberReadsIn(source, language, (at) => {
-        queries.push({ file: path.relative(tree, file), at });
-        return undefined;
-      });
-    }
-    if (queries.length === 0) continue;
-
-    console.error(`  [${label}/${language}] ${queries.length} read receivers to resolve`);
-    const startedAt = Date.now();
-    const answers = language === "python"
-      ? await resolvePythonReceivers(tree, queries)
-      : await resolveRustReceivers(tree, queries, new Set(["target", "node_modules", ".git", "dist", "out", "vendor", ".venv", ".claude"]));
-    console.error(`  [${label}/${language}] done in ${Math.round((Date.now() - startedAt) / 1000)}s`);
-
-    const tally = resolverAnswers.get(language) ?? { answered: 0, none: 0 };
-    resolverAnswers.set(language, tally);
-    for (const query of queries) {
-      if (answers.cache.get(query.file, query.at)) tally.answered += 1; else tally.none += 1;
+      // Asked through `ask`, not `answer`: the reach column is about reads.
+      const calls = callSitesIn(sideFor(relative, source, language, ask));
+      if (calls.read) followCalls(language, tier2.routines, calls.bodies, membersOf);
     }
 
-    for (const file of inLanguage) {
-      const source = read(file);
-      if (source === undefined) continue;
-      const rel = path.relative(tree, file);
-      const tier2 = memberReadsIn(source, language, (at) => answers.cache.get(rel, at));
-      if (!tier2.read) continue;
-      count("tier2", language, tier2.routines);
-      referee(rel, source, language, tier2.routines);
+    /* ----------------------------------------- tier 2 over a language server
+     *
+     * Python's and Rust's resolvers answer over LSP and both readers here are
+     * synchronous, so the reading above cannot ask them mid-walk. The shape
+     * `resolution-python-live.ts` already solved for the live checker is
+     * reused: read once with a resolver that records every question and
+     * answers none, resolve the whole batch -- read receivers and call
+     * receivers together, one server round -- then read again through a
+     * synchronous lookup into what came back.
+     */
+    if (noTier2) continue;
+    for (const language of LSP_LANGUAGES) {
+      const inLanguage = files.filter((one) => languageOf(one) === language);
+      if (inLanguage.length === 0) continue;
+
+      const readQueries: Array<{ file: string; at: { start: number; end: number } }> = [];
+      const callQueries: Array<{ file: string; at: { start: number; end: number } }> = [];
+      for (const file of inLanguage) {
+        const relative = relOf(file);
+        const source = read(relative);
+        if (source === undefined) continue;
+        memberReadsIn(source, language, (at) => { readQueries.push({ file: relative, at }); return undefined; });
+        callSitesIn(sideFor(relative, source, language, (at) => { callQueries.push({ file: relative, at }); return undefined; }));
+      }
+      const queries = [...readQueries, ...callQueries];
+      if (queries.length === 0) continue;
+
+      console.error(`  [${label}/${language}] ${readQueries.length} read and ${callQueries.length} call receivers to resolve`);
+      const startedAt = Date.now();
+      const answers = language === "python"
+        ? await resolvePythonReceivers(tree, queries)
+        : await resolveRustReceivers(tree, queries, new Set(["target", "node_modules", ".git", "dist", "out", "vendor", ".venv", ".claude"]));
+      console.error(`  [${label}/${language}] done in ${Math.round((Date.now() - startedAt) / 1000)}s`);
+
+      const tally = resolverAnswers.get(language) ?? { answered: 0, none: 0 };
+      resolverAnswers.set(language, tally);
+      for (const query of readQueries) {
+        if (answers.cache.get(query.file, query.at)) tally.answered += 1; else tally.none += 1;
+      }
+
+      for (const file of inLanguage) {
+        const relative = relOf(file);
+        const source = read(relative);
+        if (source === undefined) continue;
+        const lookup = (at: { start: number; end: number }) => answers.cache.get(relative, at);
+        const tier2 = memberReadsIn(source, language, lookup);
+        if (!tier2.read) continue;
+        count("tier2", language, tier2.routines);
+        referee(relative, source, language, tier2.routines);
+        const calls = callSitesIn(sideFor(relative, source, language, lookup));
+        if (calls.read) followCalls(language, tier2.routines, calls.bodies, membersOf);
+      }
     }
   }
 }
 
 /* ---------------------------------------------------------------- the report */
 
+type Counts = Record<string, number>;
+interface Measured {
+  trees: string[];
+  tallies: Record<Tier, Record<string, Record<string, number | Counts>>>;
+  helper: Record<string, Counts>;
+  resolverAnswers: Record<string, Counts>;
+  refereeAsked: Counts;
+  refereeAgreed: Counts;
+  unseen: Array<{ file: string; member: string; line: number }>;
+}
+
+function measured(): Measured {
+  const plain = (map: Map<string, number>) => Object.fromEntries(map);
+  return {
+    trees,
+    tallies: Object.fromEntries([...tallies].map(([tier, per]) => [
+      tier,
+      Object.fromEntries([...per].map(([language, one]) => [language, {
+        ...one,
+        hazard: plain(one.hazard), soleHazard: plain(one.soleHazard),
+        anyBlocker: plain(one.anyBlocker), soleBlocker: plain(one.soleBlocker),
+      }])),
+    ])) as unknown as Measured["tallies"],
+    helper: Object.fromEntries([...helperCost].map(([language, one]) => [language, { ...one }])),
+    resolverAnswers: Object.fromEntries(resolverAnswers),
+    refereeAsked: Object.fromEntries(refereeAsked),
+    refereeAgreed: Object.fromEntries(refereeAgreed),
+    unseen,
+  };
+}
+
+/**
+ * Add two readings of the same shape, number by number.
+ *
+ * Every leaf here is a count, so a sum is the right way to combine them --
+ * there is no rate anywhere in the JSON, on purpose, because averaging two
+ * percentages over different populations is how a merged figure goes wrong.
+ */
+function add(into: Record<string, unknown>, from: Record<string, unknown>): void {
+  for (const [key, value] of Object.entries(from)) {
+    if (typeof value === "number") {
+      into[key] = ((into[key] as number | undefined) ?? 0) + value;
+    } else if (value && typeof value === "object" && !Array.isArray(value)) {
+      const child = (into[key] as Record<string, unknown> | undefined) ?? {};
+      add(child, value as Record<string, unknown>);
+      into[key] = child;
+    }
+  }
+}
+
+function merged(files: string[]): Measured {
+  const total: Measured = {
+    trees: [], tallies: { tier1: {}, tier2: {} }, helper: {}, resolverAnswers: {},
+    refereeAsked: {}, refereeAgreed: {}, unseen: [],
+  };
+  for (const file of files) {
+    const one = JSON.parse(readFileSync(file, "utf8")) as Measured;
+    total.trees.push(...one.trees);
+    total.unseen.push(...one.unseen);
+    const { trees: _t, unseen: _u, ...counts } = one;
+    add(total as unknown as Record<string, unknown>, counts as unknown as Record<string, unknown>);
+  }
+  return total;
+}
+
+const data = merging ? merged(roots) : measured();
+
+if (asJson) {
+  console.log(JSON.stringify(data));
+  process.exit(0);
+}
+
 const percent = (part: number, whole: number) =>
   whole === 0 ? "  n/a" : `${((part / whole) * 100).toFixed(1)}%`;
 const cap = (count: number, few: number) => (showAll ? count : Math.min(count, few));
+const num = (value: unknown) => (typeof value === "number" ? value : 0);
+const counts = (value: unknown) => (value && typeof value === "object" ? value as Counts : {});
+const listed = (value: unknown, few = 6) => Object.entries(counts(value))
+  .sort((a, b) => b[1] - a[1]).slice(0, cap(99, few))
+  .map(([why, n]) => `${why} ${n}`).join(", ");
 
 console.log("\nMEASURE ACCESSES-CLOSED -- is there a region the routine end could accuse from? (#255)");
-console.log(`  ${trees.length} trees\n`);
+console.log(`  ${data.trees.length} trees${merging ? `, merged from ${roots.length} runs` : ""}\n`);
 
 for (const tier of ["tier1", "tier2"] as Tier[]) {
-  const per = tallies.get(tier)!;
-  if ([...per.values()].every((one) => one.withReads === 0)) continue;
+  const per = data.tallies[tier];
+  if (Object.values(per).every((one) => num(one.withReads) === 0)) continue;
   console.log(tier === "tier1"
     ? "A · FROM THE TEXT ALONE -- no type checker asked"
     : "B · WITH THE REAL TYPE CHECKER -- tsc, pyright, rust-analyzer");
-  console.log("  language  routines  no reads  with reads    reads  reads placed  all placed  REGION A  share  strict");
+  if (tier === "tier1") {
+    console.log("  Named routines only: a board finds an arrow's tail by name. `anonymous` is");
+    console.log("  every callback left out, and its reads are counted in the routine around it.");
+  }
+  console.log("  language  anonymous  routines  no reads  with reads     reads  reads placed  all placed  REGION A   share");
   for (const language of LANGUAGES) {
-    const one = per.get(language);
-    if (!one || one.routines === 0) continue;
+    const one = per[language];
+    if (!one || num(one.routines) === 0) continue;
     console.log(
-      " ", language.padEnd(8),
-      String(one.routines).padStart(8), String(one.readless).padStart(9),
-      String(one.withReads).padStart(11), String(one.reads).padStart(8),
-      percent(one.resolved, one.reads).padStart(13),
-      String(one.placedAll).padStart(11),
-      String(one.closed).padStart(9), percent(one.closed, one.withReads).padStart(7),
-      percent(one.closedStrict, one.withReads).padStart(7),
+      " ", language.padEnd(8), String(num(one.anonymous)).padStart(9),
+      String(num(one.routines)).padStart(9), String(num(one.readless)).padStart(9),
+      String(num(one.withReads)).padStart(11), String(num(one.reads)).padStart(9),
+      percent(num(one.resolved), num(one.reads)).padStart(13),
+      String(num(one.placedAll)).padStart(11),
+      String(num(one.closed)).padStart(9), percent(num(one.closed), num(one.withReads)).padStart(7),
     );
   }
   console.log();
 }
 
-console.log("  READS WITH NO `.name` -- bodies where every read placed, knocked out anyway");
-console.log("  because something in them reads a member without naming one. The referee");
-console.log("  cannot find these: it is blind to them in the same way the reader is.");
+console.log("  READS WITH NO `.name` -- bodies where every read placed, knocked out anyway.");
+console.log("  The referee is blind to these in the same way the reader is. `sole` is what");
+console.log("  handling that one kind would give back.");
 for (const language of LANGUAGES) {
-  const one = tallies.get("tier2")!.get(language);
-  if (!one || one.hazard.size === 0) continue;
-  const kinds = [...one.hazard.entries()].sort((a, b) => b[1] - a[1]);
-  console.log(`   ${language.padEnd(7)}`, kinds.map(([kind, count]) => `${kind} ${count}`).join(", "));
+  const one = data.tallies.tier2[language];
+  if (!one || Object.keys(counts(one.hazard)).length === 0) continue;
+  console.log(`   ${language.padEnd(7)} any: ${listed(one.hazard)}   sole: ${listed(one.soleHazard)}`);
 }
 
-console.log();
-console.log("  WHAT KEPT A BODY OPEN -- counted per body, and `sole` is the one that would");
-console.log("  close it on its own. Per language, tier 2.");
+console.log("\n  WHAT KEPT A BODY OPEN -- per body; `sole` would close it on its own. Tier 2.");
 for (const language of LANGUAGES) {
-  const one = tallies.get("tier2")!.get(language);
-  if (!one || one.soleBlocker.size === 0) continue;
-  const sole = [...one.soleBlocker.entries()].sort((a, b) => b[1] - a[1]).slice(0, cap(99, 6));
-  console.log(`   ${language.padEnd(7)} sole:`, sole.map(([why, count]) => `${why} ${count}`).join(", "));
+  const one = data.tallies.tier2[language];
+  if (!one || Object.keys(counts(one.soleBlocker)).length === 0) continue;
+  console.log(`   ${language.padEnd(7)} sole: ${listed(one.soleBlocker)}`);
 }
 
-console.log("\n  THE CHECKER'S REACH -- questions it answered, so a low share is read as reach");
-console.log("  rather than as the checker failing.");
+console.log("\nC · REGION B -- does following each call one hop change the answer? Tier 2.");
+console.log("  Among region-A bodies. `reaches` is a body whose callee reads a member it does");
+console.log("  not read itself: a refutation from region A would be wrong about that member.");
+console.log("  Members compared by name, so `reaches` over-counts; one hop, so it under-counts.");
+console.log("  language  region A  no calls  followed  clean  reaches  unknown   REGION B   share   via a helper");
 for (const language of LANGUAGES) {
-  const one = resolverAnswers.get(language);
+  const one = data.helper[language];
+  if (!one || num(one.regionA) === 0) continue;
+  const followed = num(one.clean) + num(one.reaches);
+  const unknown = num(one.unmatched) + num(one.unplaced) + num(one.calleeUnread);
+  const regionB = num(one.callless) + followed;
+  const withReads = num(data.tallies.tier2[language]?.withReads);
+  console.log(
+    " ", language.padEnd(8), String(num(one.regionA)).padStart(8), String(num(one.callless)).padStart(9),
+    String(followed).padStart(9), String(num(one.clean)).padStart(6), String(num(one.reaches)).padStart(8),
+    String(unknown).padStart(8), String(regionB).padStart(10), percent(regionB, withReads).padStart(7),
+    `${percent(num(one.viaHelper), num(one.ownMembers) + num(one.viaHelper))} of members`.padStart(20),
+  );
+}
+console.log("  unknown, split: ");
+for (const language of LANGUAGES) {
+  const one = data.helper[language];
+  if (!one || num(one.regionA) === 0) continue;
+  console.log(`   ${language.padEnd(7)} unplaced call ${num(one.unplaced)}, callee not a routine ${num(one.calleeUnread)}, unmatched ${num(one.unmatched)}, leaves the repo ${num(one.external)}`);
+}
+
+console.log("\n  THE CHECKER'S REACH -- read receivers it answered, so a low share reads as");
+console.log("  reach rather than as the checker failing.");
+for (const language of LANGUAGES) {
+  const one = data.resolverAnswers[language];
   if (!one) continue;
-  const asked = one.answered + one.none;
-  console.log(`   ${language.padEnd(7)} ${asked} asked, ${one.answered} answered (${percent(one.answered, asked)})`);
+  const asked = num(one.answered) + num(one.none);
+  console.log(`   ${language.padEnd(7)} ${asked} asked, ${num(one.answered)} answered (${percent(num(one.answered), asked)})`);
 }
 
-console.log("\n  THE REFEREE ON THE PREMISE -- the region rests on a body's reads being");
-console.log("  enumerable. Per file, because the referee reports a line and a callback");
-console.log("  shares its line with the call it is passed to; per body the attribution is");
-console.log("  not sound and every disagreement it produced was that.");
+console.log("\n  THE REFEREE ON THE PREMISE -- a body's reads being enumerable. Per file,");
+console.log("  because the referee reports a line and a callback shares its line with the");
+console.log("  call it is passed to; per body that attribution is not sound.");
 for (const language of LANGUAGES) {
-  const asked = refereeAsked.get(language);
+  const asked = num(data.refereeAsked[language]);
   if (!asked) continue;
-  console.log(`   ${language.padEnd(7)} ${asked} members the referee read, ${refereeAgreed.get(language) ?? 0} this reader also read (${percent(refereeAgreed.get(language) ?? 0, asked)})`);
+  const agreed = num(data.refereeAgreed[language]);
+  console.log(`   ${language.padEnd(7)} ${asked} members the referee read, ${agreed} this reader also read (${percent(agreed, asked)})`);
 }
-console.log(`\n  UNSEEN -- a member the referee read that this reader read nowhere: ${unseen.length}`);
-console.log("    Each one is a way a body can be called closed while a read in it was");
-console.log("    never seen, which is what a routine-end refutation would rest on.");
-for (const one of unseen.slice(0, cap(unseen.length, 15))) {
+console.log(`\n  UNSEEN -- a member the referee read that this reader read nowhere: ${data.unseen.length}`);
+console.log("    Each is a way a body can look closed while a read in it was never seen.");
+for (const one of data.unseen.slice(0, cap(data.unseen.length, 15))) {
   console.log(`    ${one.file}:${one.line} ${one.member}`);
 }
-if (unseen.length > cap(unseen.length, 15)) {
-  console.log(`    ... and ${unseen.length - 15} more (--all prints every one)`);
+if (data.unseen.length > cap(data.unseen.length, 15)) {
+  console.log(`    ... and ${data.unseen.length - 15} more (--all prints every one)`);
 }

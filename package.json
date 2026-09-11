@@ -43,6 +43,7 @@
     "typecheck": "tsc --noEmit",
     "check:drift": "tsx scripts/check-drift.mjs",
     "measure:accesses": "tsx scripts/measure-accesses.mts",
+    "measure:accesses-closed": "NODE_OPTIONS=--max-old-space-size=8192 tsx scripts/measure-accesses-closed.mts",
     "measure:calls": "NODE_OPTIONS=--max-old-space-size=8192 tsx scripts/measure-calls.mts",
     "measure:closed-bodies": "NODE_OPTIONS=--max-old-space-size=8192 tsx scripts/measure-closed-bodies.mts",
     "measure:conforms": "tsx scripts/measure-conforms.mts",
