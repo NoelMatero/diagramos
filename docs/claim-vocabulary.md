@@ -2493,6 +2493,31 @@ language.
   which is what the orangutan arrow actually wants. Real, and probably not worth
   a word.
 
+- **Reading an arrow with one end outside the repository** (#58). An arrow
+  from code to a person, another product or a file on disk is dropped before
+  any check reads it: every channel asks whether code A reaches code B, and
+  there is no B. #58 weighed two ways of reading one anyway -- let a `via` route
+  run with one end outside, or read an I/O verb in the prose against code that
+  provably does no I/O -- and section B2 of `npm run measure:vocabulary` is why
+  neither is built. **8 of 150 arrows** on checked boards take this path. **0**
+  carry a route, and 1 of 313 arrows in the whole corpus does; **0** carry a
+  claim word; 2 have no code at either end. The prose is eight phrases, two of
+  them I/O verbs, and both of those arrows are true.
+
+  So the route reading would read nothing, and the verb reading would read two
+  correct arrows after paying for a no-I/O reader per language (nothing in
+  `src/engine` reads I/O today), a referee, a licence, and a verb list -- the
+  kind [reading-a-grammar.md](reading-a-grammar.md) is about, over prose that
+  already spells "stores or sends" as `writes`, `saves`, `flushed → close`,
+  `emits`, `tx.send` and `HTTP/1.1`. What was built instead is the admission:
+  the board page's quiet line counts the arrows nobody read, and `--coverage`
+  names them. **Reopen when** B2 reports tens of external-end arrows carrying
+  I/O prose, not two.
+
+  The other half of such a claim -- that it writes *that* file -- is out of
+  reach either way. On the board that raised it the file is `create_diagram`'s
+  path argument, a runtime value no reader follows (#203).
+
 ## A note on that orangutan arrow
 
 `orangutan/docs/diagrams/route-registration.excalidraw` carries

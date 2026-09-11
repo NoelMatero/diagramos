@@ -22,6 +22,7 @@
  *   A  failed claims   every arrow the checker calls wrong today
  *   B  arrow prose     what authors wrote when there was no word
  *   C  relation census what the code actually says, per language
+ *   B2 unread ends     arrows dropped because an end is outside the repository
  *
  * Nothing here decides anything and nothing here fails. It prints, the way
  * `measure-survey.mts` and `measure-signature.mts` print, so the decision can be
@@ -114,6 +115,26 @@ interface Red {
   detail: string;
   /** How stale the rest of the board is, so a reader can weigh the red. */
   staleOnBoard: number;
+}
+
+/**
+ * An arrow the checker dropped because one end is outside the repository (#58).
+ *
+ * Every channel the arrow check has asks whether code A reaches code B, and a
+ * person, another product or a file on disk at one end is not a B. So these are
+ * unread rather than passing, and #58's two ways of reading them anyway -- a
+ * `via` route allowed to run with one end outside, or the verb in the prose --
+ * are each only worth building over a population that exists. This counts it.
+ */
+interface ExternalEnd {
+  board: string;
+  what: string;
+  prose?: string;
+  claim?: string;
+  /** Hops on the arrow's `via` route. Non-zero is what option 1 would read. */
+  via: number;
+  /** Ends anchored at code in this repository: one, or none at all. */
+  codeEnds: number;
 }
 
 /* ── B · what authors wrote when there was no word ──────────────────────────
@@ -532,6 +553,7 @@ await initEngine();
 const boards = boardCorpus((root) => console.log(`  (no boards under ${root} -- skipped)`));
 
 const reds: Red[] = [];
+const externalEnds: ExternalEnd[] = [];
 const prose = new Map<string, Map<string, number>>();
 const claimCounts = new Map<string, number>();
 
@@ -539,6 +561,7 @@ let arrowsTotal = 0;
 let arrowsClaimed = 0;
 let arrowsLabelled = 0;
 let arrowsWithProse = 0;
+let arrowsRouted = 0;
 let boardsRead = 0;
 let boardsChecked = 0;
 let boardsUnreadable = 0;
@@ -581,6 +604,7 @@ for (const file of boards) {
       claimCounts.set(edge.claim, (claimCounts.get(edge.claim) ?? 0) + 1);
     }
     if (edge.label && edge.label.trim().length > 0) arrowsLabelled += 1;
+    if (edge.via && edge.via.length > 0) arrowsRouted += 1;
     const text = proseOf(edge.label);
     if (!text) continue;
     if (concept) continue;
@@ -615,6 +639,20 @@ for (const file of boards) {
   const stale = report.findings.filter((finding: DriftFinding) => STALE.has(finding.kind)).length;
   staleTotal += stale;
   const shown = path.relative(HOME, file);
+
+  for (const unread of report.unreadEdges) {
+    if (unread.reason !== "endpoint-external") continue;
+    const edge = graph.edges.find((candidate) => candidate.from === unread.from && candidate.to === unread.to);
+    const ends = [unread.from, unread.to].map((id) => graph.nodes.find((node) => node.id === id));
+    externalEnds.push({
+      board: shown,
+      what: `${oneLine(unread.fromLabel)} -> ${oneLine(unread.toLabel)}`,
+      prose: proseOf(edge?.label),
+      claim: edge?.claim,
+      via: edge?.via?.length ?? 0,
+      codeEnds: ends.filter((node) => node && node.state !== "external" && node.ref?.trim()).length,
+    });
+  }
 
   for (const finding of report.edges as EdgeDriftFinding[]) {
     if (!CLAIM_REDS.has(finding.kind)) continue;
@@ -719,6 +757,33 @@ for (const bucket of buckets) {
 const unclassified = buckets.find((bucket) => bucket.name === "unclassified")?.arrows ?? 0;
 console.log(`  ${unclassified} of ${arrowsWithProse} phrases (${percent(unclassified, arrowsWithProse)})`
   + " are not a relation at all -- captions, which no vocabulary should swallow.");
+console.log();
+
+console.log("B2 · ARROWS WITH AN END OUTSIDE THE REPO -- dropped before anything reads them");
+console.log("  Every arrow check asks whether code A reaches code B. A person, a product or a file");
+console.log("  on disk at one end is not a B, so these are unread, not passing.");
+console.log();
+{
+  const handed = edgesChecked + edgesSkipped;
+  const routed = externalEnds.filter((arrow) => arrow.via > 0).length;
+  const withProse = externalEnds.filter((arrow) => arrow.prose).length;
+  const withClaim = externalEnds.filter((arrow) => arrow.claim).length;
+  const noCode = externalEnds.filter((arrow) => arrow.codeEnds === 0).length;
+  console.log(`  ${externalEnds.length} of ${handed} arrows on checked boards (${percent(externalEnds.length, handed).trim()})`);
+  console.log(`  ${routed} of them carry a via route -- what reading a route with one end outside would reach.`);
+  console.log(`  ${arrowsRouted} of ${arrowsTotal} arrows in the whole corpus carr${arrowsRouted === 1 ? "ies" : "y"} a route at all.`);
+  console.log(`  ${withProse} carry prose, ${withClaim} a claim word, and ${noCode} have no code at either end,`);
+  console.log("  so nothing about them could be read whatever was built.");
+  console.log();
+  console.log("  The prose, with the bucket part B's verb table puts it in:");
+  for (const arrow of externalEnds) {
+    const words = arrow.prose ? `"${arrow.prose}"` : "(no prose)";
+    const bucket = arrow.prose ? bucketOf(arrow.prose) : "";
+    console.log(`      ${words.padEnd(20)} ${bucket.padEnd(13)} ${arrow.what}`);
+    console.log(`      ${"".padEnd(20)} ${"".padEnd(13)} ${arrow.via > 0 ? `via ${arrow.via} hops · ` : ""}`
+      + `${arrow.codeEnds === 0 ? "no code at either end · " : ""}${arrow.board}`);
+  }
+}
 console.log();
 
 /* ── C · the relation census ────────────────────────────────────────────── */
