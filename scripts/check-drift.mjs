@@ -106,7 +106,8 @@ const USAGE = [
   "  --shrink       go back to the short notice",
   "  --no-edges     skip the arrow check",
   "  --no-deletions skip the removed-box check",
-  "  --coverage     also suggest code the diagram does not show (never automatic)",
+  "  --coverage     also name the arrows nothing read, and suggest code the",
+  "                 diagram does not show (never automatic)",
   "  --repair       rewrite the refs whose code the repository can place, and",
   "                 say which. Only where there is exactly one answer; never",
   "                 on the per-turn path.",
@@ -1963,6 +1964,40 @@ function arrowRows(arrowsIn, words, colour) {
 }
 
 /**
+ * The arrows nothing read, with the line that says why: one sentence, two flags.
+ *
+ * `--details` prints it inside the audit and `--coverage` in a box of its own,
+ * and both go through here so the two cannot grow different words for one fact.
+ */
+function unreadArrowRows(report, colour) {
+  return [
+    paint(`${report.edgesSkipped} arrows skipped: ${skipWords(report.edgesSkippedWhy)}`, "yellow", colour),
+    ...arrowRows(report.unreadEdges, SKIP_WORDS, colour),
+  ];
+}
+
+/**
+ * The arrows nothing read, for `--coverage`.
+ *
+ * `check_drift` has returned these under `coverage` since they were first named,
+ * and the CLI flag of the same name never did: it listed boxes with no anchor and
+ * code with no box, and left out the arrows no check can read -- an end outside
+ * the repository, a directory, a box with no ref. That is the one list of the
+ * three that is not a suggestion. An arrow in it is not passing, it is unread,
+ * and a false one sits there looking exactly like a checked one (#58).
+ */
+function renderUnreadArrows(entries, colour) {
+  return box({
+    sections: entries.map(({ file, report }) => ({
+      label: path.basename(file),
+      rows: unreadArrowRows(report, colour),
+    })),
+    foot: "unread, not passing · nothing here checked these",
+    max: 76,
+  });
+}
+
+/**
  * What was looked at, and what was not.
  *
  * Printed only for --details, and printed even when everything is clean. That is
@@ -1979,10 +2014,7 @@ function renderCoverageAudit(entries, colour) {
       if (report.excused) rows.push(paint(`${report.excused} boxes outside this repo by declaration`, "dim", colour));
       if (report.handDrawn) rows.push(paint(`${report.handDrawn} hand-drawn boxes, never checked`, "dim", colour));
       if (report.skipped) rows.push(paint(`${report.skipped} boxes skipped: ${skipWords(report.skippedWhy)}`, "yellow", colour));
-      if (report.edgesSkipped) {
-        rows.push(paint(`${report.edgesSkipped} arrows skipped: ${skipWords(report.edgesSkippedWhy)}`, "yellow", colour));
-        rows.push(...arrowRows(report.unreadEdges, SKIP_WORDS, colour));
-      }
+      if (report.edgesSkipped) rows.push(...unreadArrowRows(report, colour));
       /*
        * Read, and not corroborated. The line the amber arrows became (#133).
        *
@@ -2154,6 +2186,16 @@ function renderCoverageAudit(entries, colour) {
 const unanchoredLines =
   opts.coverage && unannotated.length > 0
     ? renderUnannotated(unannotated, Boolean(process.stderr.isTTY))
+    : [];
+
+// Not with --details: the audit below lists the same arrows, and one fact printed
+// twice in one screen is how two phrasings of it start to differ.
+const unreadArrowLines =
+  opts.coverage && !opts.details
+    ? (() => {
+      const unread = examined.filter(({ report }) => (report.unreadEdges ?? []).length > 0);
+      return unread.length > 0 ? renderUnreadArrows(unread, Boolean(process.stderr.isTTY)) : [];
+    })()
     : [];
 
 const coverageLines =
@@ -2392,7 +2434,7 @@ if (opts.hook) {
 }
 
 if (showing.length > 0 || problems.length > 0 || coverageLines.length > 0
-  || unanchoredLines.length > 0 || auditLines.length > 0 || hintLines.length > 0
+  || unanchoredLines.length > 0 || unreadArrowLines.length > 0 || auditLines.length > 0 || hintLines.length > 0
   || goodLines.length > 0 || repairedLines.length > 0 || acceptedLines.length > 0) {
   // Measured: ANSI renders in a systemMessage. Off only when the output is being
   // piped or captured, where escapes would be junk in somebody's log.
@@ -2404,6 +2446,7 @@ if (showing.length > 0 || problems.length > 0 || coverageLines.length > 0
     ...repairedLines,
     ...auditLines,
     ...unanchoredLines,
+    ...unreadArrowLines,
     ...coverageLines,
     ...problems,
     ...(showing.length === 0
