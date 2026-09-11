@@ -638,10 +638,13 @@ function readBindings(source: string, language: Language): Bindings | undefined 
 
 /** How a call names the thing it calls. */
 type Callee =
-  /** `foo()` -- a bare name in this file's scope. */
-  | { kind: "bare"; name: string }
+  /**
+   * `foo()` -- a bare name in this file's scope. `nameAt` is where `foo` is
+   * written, for a checker to be asked "go to definition" there (#255).
+   */
+  | { kind: "bare"; name: string; nameAt: { start: number; end: number } }
   /** `self.foo()`, `this.foo()` -- a member of the thing the routine belongs to. */
-  | { kind: "own"; name: string }
+  | { kind: "own"; name: string; nameAt: { start: number; end: number } }
   /**
    * `ns.foo()`, `Type::foo()` -- a member of something else that is named.
    * `at` is the receiver expression's own byte range as written -- `ns` in
@@ -680,7 +683,9 @@ function calleeOf(node: Node): Callee | undefined {
 
 function calleeOfNode(callee: Node): Callee {
   if (callee.childCount === 0) {
-    return NAME_LEAF.test(callee.type) ? { kind: "bare", name: callee.text } : { kind: "computed" };
+    return NAME_LEAF.test(callee.type)
+      ? { kind: "bare", name: callee.text, nameAt: { start: callee.startIndex, end: callee.startIndex + callee.text.length } }
+      : { kind: "computed" };
   }
 
   /*
@@ -700,7 +705,9 @@ function calleeOfNode(callee: Node): Callee {
     ?? callee.childForFieldName("field")
     ?? callee.childForFieldName("name");
   if (!object || !member || member.childCount !== 0) return { kind: "computed" };
-  if (OWN.has(object.text)) return { kind: "own", name: member.text };
+  if (OWN.has(object.text)) {
+    return { kind: "own", name: member.text, nameAt: { start: member.startIndex, end: member.startIndex + member.text.length } };
+  }
   // A receiver that is itself an expression -- `make().run()`, `a.b.c()` -- names
   // nothing this reader can look up. Treated as an unknown receiver rather than
   // as a computed callee: the member *is* readable, so the doubt it raises is
@@ -1153,6 +1160,18 @@ export interface CallSitePlaced {
    */
   memberAt?: { start: number; end: number };
   /**
+   * The called name's own byte range -- `paint` in `paint()`, `x.paint()` and
+   * `this.paint()` alike -- and absent for a computed call, whose name is not
+   * in the text. Equal to `memberAt` on a receiver call.
+   *
+   * `@accesses` (#255) stays quiet when a function the body calls reads the
+   * member, and finding that function means asking a checker "go to
+   * definition" here. #254's measurement had only `memberAt`, so for a bare
+   * call it searched the line again with a regex; the tree already had the
+   * node.
+   */
+  nameAt?: { start: number; end: number };
+  /**
    * Whether this site's `file` came from a `resolveReceiver` answer whose
    * type is a concrete class -- `false` for an interface, an abstract class,
    * or a bare type parameter, `undefined` when the placement did not go
@@ -1446,6 +1465,7 @@ export function callSitesIn(side: CallSide): CallSitesReading {
         line: lineOf(side.source, inner.startIndex),
         receiver: callee.kind === "through",
         ...(callee.kind === "through" ? { memberAt: callee.memberAt } : {}),
+        ...(callee.kind === "computed" ? {} : { nameAt: callee.kind === "through" ? callee.memberAt : callee.nameAt }),
         ...("file" in where
           ? { file: where.file, ...(where.concrete !== undefined ? { concrete: where.concrete } : {}) }
           : { why: where.why }),

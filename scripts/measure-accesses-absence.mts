@@ -82,18 +82,37 @@
  * By name, the ask pool is every member read anywhere in the same file: a
  * member somebody really reads, near enough that an author could draw it.
  *
- * `--no-tier2` skips the type checkers, which leaves only the by-name section
- * and runs over the whole corpus in one process in under a minute.
+ * ## Helpers, and the rule the by-name red follows
+ *
+ * `draw()` does not read `width`, but it calls `paint()`, which does. The
+ * right board for that is `draw --calls--> paint --accesses--> Config`, and a
+ * red on `draw --accesses--> Config` would be telling somebody their board is
+ * wrong when it is only drawn at one level of abstraction too high. So the red
+ * stays quiet whenever a function the body calls *visibly* reads the member.
+ *
+ * Seeing that function is the hard part. Every call is settled before
+ * anything is asked: placed by the call reader at a routine in this
+ * repository; placed outside it; or, failing both, looked up with the "go to
+ * definition" #254 built -- `tsc`, pyright or rust-analyzer at the call's own
+ * name -- and then found as the routine whose body holds that line. A call
+ * that still lands nowhere does not silence the red. It is counted, per ask,
+ * as a red in a body that calls something nobody could see into.
+ *
+ * `--no-tier2` skips every checker: no receiver types, no lookup. It leaves
+ * only the by-name section, runs over the whole corpus in one process in
+ * under a minute, and shows what a caller with no checker sees -- which is
+ * what the MCP server's own draw-time check sees today.
  *
  * A run is a measurement, not a test: it prints and never fails.
  */
-import { existsSync, readFileSync } from "node:fs";
+import { existsSync, readFileSync, realpathSync } from "node:fs";
 import path from "node:path";
 
 import { BUILT_IN, refereeRoutines } from "./lib/access-scan";
+import { checkerFor, type Declared, type NameRange } from "./lib/call-receivers";
 import { resolvePythonReceivers } from "./lib/resolution-python-live";
 import { resolveRustReceivers } from "./lib/resolution-rust-receivers";
-import { createTsReferee, receiverResolutionFrom } from "./lib/resolution-ts";
+import { createTsReferee, isOutsideTree, receiverResolutionFrom } from "./lib/resolution-ts";
 import { sourceFiles } from "./lib/source-files";
 import {
   callSitesIn, EXTERNAL_RECEIVER,
@@ -125,6 +144,23 @@ const LANGUAGES: Language[] = ["rust", "ts", "tsx", "python", "js"];
 const LSP_LANGUAGES = new Set<Language>(["python", "rust"]);
 const RUST_SKIP = new Set(["target", "node_modules", ".git", "dist", "out", "vendor", ".venv", ".claude"]);
 type Resolve = (at: { start: number; end: number }) => ReceiverResolution | undefined;
+const TS_FAMILY = new Set<Language>(["ts", "tsx", "js"]);
+/** pyright and rust-analyzer take questions in parallel; #262 found 32 safe for pyright. */
+const LOOKUP_CONCURRENCY = 16;
+
+/**
+ * Whether a declaration a checker pointed at is outside the repository.
+ *
+ * `isOutsideTree` decides it by path: `node_modules`, or not under the tree.
+ * A Python virtualenv or a Rust `target` directory can sit *inside* a project,
+ * and a declaration there is a dependency's, not a helper anybody draws -- so
+ * those count as outside too. Compared against the tree's real path as well,
+ * because rust-analyzer and pyright answer with resolved symlinks.
+ */
+function outsideRepo(file: string, tree: string, realTree: string): boolean {
+  if (/[\\/](site-packages|dist-packages|\.venv|venv|target|typeshed[\w-]*)[\\/]/.test(file)) return true;
+  return isOutsideTree(file, tree) && isOutsideTree(file, realTree);
+}
 
 interface Tally {
   /** Named bodies where every read was placed and nothing reads a member unnamed. */
@@ -184,9 +220,17 @@ interface NameTally {
   /** ...of which the referee's `.M` is on the body's first or last line, shared with code around it. */
   disputedOnEdge: number;
   unrefereed: number;
-  /** Asks where a one-hop callee reads something called M. */
+  /** Asks where a function the body calls visibly reads something called M: the red stays quiet. */
   helper: number;
-  helperUnknown: number;
+  /** Asks with no visible helper, in a body with a call nobody could settle: red, and a helper might exist. */
+  helperMaybe: number;
+  /** How each call in a region body was settled, counted once per call. */
+  callsInRepo: number;
+  callsOutside: number;
+  callsSilent: number;
+  callsNoBody: number;
+  callsNoName: number;
+  callsNoChecker: number;
 }
 const nameTallies = new Map<Language, NameTally>();
 function nameTally(language: Language): NameTally {
@@ -194,7 +238,8 @@ function nameTally(language: Language): NameTally {
   if (!found) {
     found = {
       named: 0, readless: 0, withReads: 0, hazard: 0, region: 0, asked: 0, agreed: 0,
-      disputed: 0, disputedOnEdge: 0, unrefereed: 0, helper: 0, helperUnknown: 0,
+      disputed: 0, disputedOnEdge: 0, unrefereed: 0, helper: 0, helperMaybe: 0,
+      callsInRepo: 0, callsOutside: 0, callsSilent: 0, callsNoBody: 0, callsNoName: 0, callsNoChecker: 0,
     };
     nameTallies.set(language, found);
   }
@@ -368,6 +413,12 @@ if (!merging) {
     }
 
     /* ------------------------------------------------ the asking, by name */
+    const realTree = realpathSync(tree);
+    const readingOf = new Map(readings.map((one) => [one.relative, one]));
+    const relativeOf = (file: string) => {
+      const inReal = path.relative(realTree, file);
+      return inReal.startsWith("..") || path.isAbsolute(inReal) ? path.relative(tree, file) : inReal;
+    };
     const namesByRoutine = new Map<string, Map<string, Set<string>>>();
     for (const reading of readings) {
       const byName = new Map<string, Set<string>>();
@@ -379,6 +430,92 @@ if (!merging) {
       }
       namesByRoutine.set(reading.relative, byName);
     }
+
+    const inRegion = (routine: RoutineReads) =>
+      routine.routine !== "" && routine.sites.length > 0 && routine.hazards.length === 0;
+    const bodyOf = (reading: FileReading, routine: RoutineReads) => {
+      const sameLine = reading.bodies.filter((one) => one.line === routine.line);
+      return sameLine.length === 1 ? sameLine[0] : sameLine.find((one) => one.routine === routine.routine);
+    };
+    type CallSite = BodyCallSites["sites"][number];
+    const syntactic = (site: CallSite) =>
+      site.file !== undefined && site.file !== EXTERNAL_RECEIVER ? namesByRoutine.get(site.file)?.get(site.name) : undefined;
+
+    /*
+     * The lookup, done once per tree before anything is asked, because
+     * pyright and rust-analyzer answer asynchronously and the asking below
+     * does not. Only calls the reader could not already place at a routine
+     * are looked up.
+     */
+    const lookupKey = (relative: string, at: NameRange) => `${relative}:${at.start}:${at.end}`;
+    const looked = new Map<string, Declared | undefined>();
+    if (!noTier2) {
+      const pending = new Map<Language, Array<{ relative: string; source: string; at: NameRange }>>();
+      for (const reading of readings) {
+        for (const routine of reading.routines) {
+          if (!inRegion(routine)) continue;
+          for (const site of bodyOf(reading, routine)?.sites ?? []) {
+            if (site.file === EXTERNAL_RECEIVER || syntactic(site) || !site.nameAt) continue;
+            const family: Language = TS_FAMILY.has(reading.language) ? "ts" : reading.language;
+            const queue = pending.get(family) ?? [];
+            queue.push({ relative: reading.relative, source: reading.source, at: site.nameAt });
+            pending.set(family, queue);
+          }
+        }
+      }
+      for (const [language, queries] of pending) {
+        const checker = await checkerFor(tree, language);
+        if ("unavailable" in checker) {
+          console.error(`  [${label}/${language}] no lookup: ${checker.unavailable}`);
+          continue;
+        }
+        console.error(`  [${label}/${language}] ${queries.length} call names to look up with ${checker.label}`);
+        const startedAt = Date.now();
+        let next = 0;
+        await Promise.all(Array.from({ length: LOOKUP_CONCURRENCY }, async () => {
+          while (next < queries.length) {
+            const query = queries[next++]!;
+            let answer: Declared | undefined;
+            try {
+              answer = await checker.definitionAt(path.join(tree, query.relative), query.source, query.at);
+            } catch {
+              answer = undefined;
+            }
+            looked.set(lookupKey(query.relative, query.at), answer);
+          }
+        }));
+        checker.close();
+        console.error(`  [${label}/${language}] looked up in ${Math.round((Date.now() - startedAt) / 1000)}s`);
+      }
+    }
+
+    type Settled =
+      | { kind: "repo"; names: Set<string> }
+      | { kind: "outside" }
+      | { kind: "unknown"; why: "silent" | "no-body" | "no-name" | "no-checker" };
+    const settle = (reading: FileReading, site: CallSite): Settled => {
+      if (site.file === EXTERNAL_RECEIVER) return { kind: "outside" };
+      const placed = syntactic(site);
+      if (placed) return { kind: "repo", names: placed };
+      if (!site.nameAt) return { kind: "unknown", why: "no-name" };
+      const key = lookupKey(reading.relative, site.nameAt);
+      if (!looked.has(key)) return { kind: "unknown", why: "no-checker" };
+      const declared = looked.get(key);
+      if (!declared) return { kind: "unknown", why: "silent" };
+      if (outsideRepo(declared.file, tree, realTree)) return { kind: "outside" };
+      const line = declared.line + 1;
+      /*
+       * The innermost named routine whose body holds the declaration's line.
+       * A method signature in an interface, or a type, has no body here, and
+       * then nobody can see what the function reads.
+       */
+      const holding = readingOf.get(relativeOf(declared.file))?.routines
+        .filter((one) => one.routine !== "" && one.line <= line && line <= one.endLine)
+        .sort((a, b) => (a.endLine - a.line) - (b.endLine - b.line))[0];
+      if (!holding) return { kind: "unknown", why: "no-body" };
+      return { kind: "repo", names: new Set(holding.sites.map((one) => one.member)) };
+    };
+
     for (const reading of readings) {
       const refereeReads = refereeRoutines(reading.source, reading.language)
         .flatMap((one) => one.reads)
@@ -400,24 +537,33 @@ if (!merging) {
           if (one.line < routine.line || one.line > routine.endLine) continue;
           if (!inSpan.has(one.name)) inSpan.set(one.name, one.line);
         }
-        const sameLine = reading.bodies.filter((one) => one.line === routine.line);
-        const body = sameLine.length === 1 ? sameLine[0] : sameLine.find((one) => one.routine === routine.routine);
-        let calleeNames: Set<string> | undefined = body ? new Set() : undefined;
+
+        const body = bodyOf(reading, routine);
+        const reached = new Set<string>();
+        let maybe = body === undefined;
         for (const site of body?.sites ?? []) {
-          if (site.file === undefined) { calleeNames = undefined; break; }
-          if (site.file === EXTERNAL_RECEIVER) continue;
-          const names = namesByRoutine.get(site.file)?.get(site.name);
-          if (!names) { calleeNames = undefined; break; }
-          for (const name of names) calleeNames!.add(name);
+          const settled = settle(reading, site);
+          if (settled.kind === "repo") {
+            into.callsInRepo += 1;
+            for (const name of settled.names) reached.add(name);
+          } else if (settled.kind === "outside") {
+            into.callsOutside += 1;
+          } else {
+            maybe = true;
+            if (settled.why === "silent") into.callsSilent += 1;
+            else if (settled.why === "no-body") into.callsNoBody += 1;
+            else if (settled.why === "no-name") into.callsNoName += 1;
+            else into.callsNoChecker += 1;
+          }
         }
 
         for (const member of pool) {
           if (own.has(member)) continue;
           if (BUILT_IN.has(member)) { into.unrefereed += 1; continue; }
           into.asked += 1;
-          const helper = calleeNames?.has(member) ?? false;
-          if (calleeNames === undefined) into.helperUnknown += 1;
-          else if (helper) into.helper += 1;
+          const helper = reached.has(member);
+          if (helper) into.helper += 1;
+          else if (maybe) into.helperMaybe += 1;
           const line = inSpan.get(member);
           if (line === undefined) { into.agreed += 1; continue; }
           into.disputed += 1;
@@ -599,14 +745,29 @@ for (const language of LANGUAGES) {
 console.log("\n  `on an edge`: the referee's `.member` is on the body's first or last line, which the");
 console.log("  body shares with the code around it -- `rows.sort(key=lambda r: ..)`. The referee");
 console.log("  reports lines, not positions, so it cannot tell whose read that is.");
-console.log("  language     asked   helper    share   calls not all followed   unrefereed names");
+console.log("\n  HELPERS -- the red stays quiet when a function the body calls visibly reads the member.");
+console.log("  language     asked  quiet: a helper reads it   red, a call nobody could see into   red, every call seen   unrefereed names");
 for (const language of LANGUAGES) {
   const one = data.names[language];
   if (!one || num(one.asked) === 0) continue;
+  const clean = num(one.asked) - num(one.helper) - num(one.helperMaybe);
   console.log(
-    " ", language.padEnd(8), String(num(one.asked)).padStart(9), String(num(one.helper)).padStart(8),
-    percent(num(one.helper), num(one.asked) - num(one.helperUnknown)).padStart(8),
-    String(num(one.helperUnknown)).padStart(24), String(num(one.unrefereed)).padStart(18),
+    " ", language.padEnd(8), String(num(one.asked)).padStart(9),
+    `${num(one.helper)} (${percent(num(one.helper), num(one.asked))})`.padStart(26),
+    `${num(one.helperMaybe)} (${percent(num(one.helperMaybe), num(one.asked))})`.padStart(36),
+    `${clean} (${percent(clean, num(one.asked))})`.padStart(23),
+    String(num(one.unrefereed)).padStart(18),
+  );
+}
+console.log("\n  HOW EACH CALL IN A REGION BODY WAS SETTLED, once per call.");
+console.log("  language   in this repo    outside   checker silent   declared, no body   no name   no checker");
+for (const language of LANGUAGES) {
+  const one = data.names[language];
+  if (!one || num(one.region) === 0) continue;
+  console.log(
+    " ", language.padEnd(8), String(num(one.callsInRepo)).padStart(12), String(num(one.callsOutside)).padStart(10),
+    String(num(one.callsSilent)).padStart(16), String(num(one.callsNoBody)).padStart(19),
+    String(num(one.callsNoName)).padStart(9), String(num(one.callsNoChecker)).padStart(12),
   );
 }
 if (data.nameDisputes.length > 0) {
