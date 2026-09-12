@@ -240,7 +240,38 @@ export type ArrowClaim = (typeof ARROW_CLAIMS)[number];
  * it, never before. A claim that is rendered and judged by nothing reads
  * exactly like a claim that passed.
  */
-export const BOX_CLAIMS = ["closed"] as const;
+export const BOX_CLAIMS = ["closed", "handles"] as const;
+
+/**
+ * The second box word, and it arrived the same way: with its checker.
+ *
+ * `handles` says what cases a routine dispatches on -- a router on a method, a
+ * `match` on an enum, a reducer on an action type. It is on the footing
+ * `@holds` stands on rather than the one `@calls` does: the arms of a dispatch
+ * are **enumerable from the text**, so a case that is not among them is
+ * genuinely absent rather than merely unfound, and both halves of the claim
+ * can be refuted -- a case the code names and the box does not, and a case the
+ * box names and the code does not.
+ *
+ * ## Why it is a box claim rather than an arrow claim
+ *
+ * #206 left this open and the measurement answered it. An arrow can say *this
+ * case goes there*, which is checkable per case and is what the seven
+ * dispatch-shaped arrow labels in the corpus were all doing -- `fallback`,
+ * `no match`, `one per method`, each one arm drawn as one arrow. None of them
+ * can catch a forgotten branch, because none of them ever asserts that the set
+ * is complete. The box form says *these are all of the cases*, which is the
+ * only form the bug is visible through.
+ *
+ * ## The one asymmetry, which is a catch-all
+ *
+ * A `_ =>` or a `default:` handles every case nobody named, so a case the box
+ * lists and the code has no arm for is still handled, and calling it wrong
+ * would be a false red on a routine that is behaving. That half withholds when
+ * a catch-all is present. The other half does not: the box still says these
+ * are the cases, and a catch-all does not excuse the code naming one the
+ * picture leaves out.
+ */
 
 /**
  * The one claim a whole board can make, rather than a box or an arrow.
@@ -330,10 +361,29 @@ export function parseBoardClaim(value: unknown): ParsedBoardClaim | undefined {
  * total isolation is unusual but it happens, and this repository's own
  * `src/viewer` is exactly that shape.
  */
-export interface BoxClaim {
+export type BoxClaim = ClosedClaim | HandlesClaim;
+
+export interface ClosedClaim {
   closed: true;
   through: string[];
 }
+
+/**
+ * `cases` is the whole set, and an empty one is garbled rather than a claim.
+ *
+ * `closed` accepts an empty `through` because total isolation is a real thing
+ * to assert. "This routine dispatches on no cases" is not: it is either a
+ * routine that does not dispatch, which has nothing to claim, or a list
+ * somebody meant to fill in.
+ */
+export interface HandlesClaim {
+  handles: true;
+  cases: string[];
+}
+
+/** Narrowing helpers, so no caller has to remember which key discriminates. */
+export const isClosedClaim = (claim: BoxClaim): claim is ClosedClaim => "closed" in claim;
+export const isHandlesClaim = (claim: BoxClaim): claim is HandlesClaim => "handles" in claim;
 
 export type ParsedBoxClaim = { claim: BoxClaim } | { garbled: string };
 
@@ -352,21 +402,43 @@ export function parseBoxClaim(value: unknown): ParsedBoxClaim | undefined {
   if (typeof value === "string") {
     const word = value.trim().toLowerCase().replace(/^@/, "");
     if (!word) return undefined;
-    return word === "closed" ? { claim: { closed: true, through: [] } } : { garbled: value.trim() };
+    if (word === "closed") return { claim: { closed: true, through: [] } };
+    /*
+     * `handles` has no bare form, and that is deliberate rather than an
+     * omission. `closed` written as a word is a complete claim -- the box's own
+     * ref is the directory and an empty door list is meaningful. `@handles`
+     * with no cases states nothing: the set *is* the claim. Garbled rather than
+     * ignored, so somebody who typed it on a board is told why nothing checked
+     * it.
+     */
+    return { garbled: value.trim() };
   }
 
   if (typeof value === "object") {
     const record = value as Record<string, unknown>;
     /*
-     * `through` is not a claim word, it is the claim's argument, so it is taken
-     * out before the vocabulary is checked. Leaving it in made a box with doors
-     * read as claiming "closed+through", which is a word nobody wrote and a
-     * refusal nobody could act on.
+     * `through` and `cases` are not claim words, they are a claim's argument,
+     * so they are taken out before the vocabulary is checked. Leaving `through`
+     * in made a box with doors read as claiming "closed+through", which is a
+     * word nobody wrote and a refusal nobody could act on.
      */
-    const { through: listed, ...words } = record;
+    const { through: listed, cases: listedCases, ...words } = record;
     const set = Object.keys(words).filter((key) => words[key]);
     if (set.length === 0) return { garbled: Object.keys(words).join("+") || "{}" };
-    if (set.length !== 1 || set[0] !== "closed") return { garbled: set.join("+") };
+    if (set.length !== 1) return { garbled: set.join("+") };
+
+    if (set[0] === "handles") {
+      const cases = Array.isArray(listedCases)
+        ? listedCases
+          .filter((entry): entry is string => typeof entry === "string" && entry.trim() !== "")
+          .map((entry) => entry.trim())
+        : [];
+      // An empty set is not a claim about a dispatch, it is an unfinished one.
+      if (cases.length === 0) return { garbled: "handles with no cases" };
+      return { claim: { handles: true, cases } };
+    }
+
+    if (set[0] !== "closed") return { garbled: set.join("+") };
     const through = Array.isArray(listed)
       ? listed
         .filter((entry): entry is string => typeof entry === "string" && entry.trim() !== "")

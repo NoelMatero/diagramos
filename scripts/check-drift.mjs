@@ -223,6 +223,23 @@ function boxName(finding) {
  * frame, it splits it in half. Every label reaching a padded row goes through
  * here.
  */
+/**
+ * Why a `handles` claim got no verdict, in words rather than in the engine's
+ * enum. The engine names the reason and the CLI says it, which is the split
+ * every other reason list here follows.
+ */
+const HANDLES_WHY = {
+  "no-grammar": "no reader for that language",
+  "not-declared": "that routine is not declared in the file the box points at",
+  "no-body": "the box has to point at a routine, as path#symbol",
+  "no-dispatch": "that routine does not dispatch on a set of cases",
+  "several-dispatches": "that routine has more than one dispatch, and this claim names one set",
+  "unreadable-case": "one of its cases is not something a reader can name",
+  "catch-all": "a listed case has no arm of its own, and a fallback is handling it",
+  "chain-unmeasured": "an if/elif ladder, which no independent check can verify yet",
+  unlicensed: "this language has no measured reader for a case set, so it may not say wrong",
+};
+
 function oneLine(text) {
   return String(text).replace(/\s+/g, " ");
 }
@@ -244,6 +261,7 @@ const REASONS = {
   "unsupported-member": "the box lists it, and its body shows no trace of the others",
   "missing-route": "the file serves routes, and that one is not among them",
   "stale-number": "the label states a number the code it points at no longer uses",
+  "mishandled-box": "the cases the box lists and the cases the routine dispatches on are not the same set",
   "generated-ref": "it points into build output, which no change to your code will ever disturb",
 };
 /**
@@ -396,7 +414,14 @@ function unansweredClaims(report) {
   const needs = withheldReasons(report.claims?.needsWithheld);
   const feeds = withheldReasons(report.claims?.feedsWithheld, FEEDS_UNANSWERED);
   const conforms = withheldReasons(report.claims?.conformsWithheld, CONFORMS_UNANSWERED);
-  return [...needs, ...feeds, ...conforms].reduce((sum, [, count]) => sum + count, 0);
+  /*
+   * A `handles` claim nothing judged counts here too, and it has to: writing a
+   * case list is asking a question out loud, and a report that says nothing
+   * back reads as "checked, and fine". That is #113 exactly, and it is the
+   * failure the owner was caught out by.
+   */
+  const handles = (report.claims?.handlesWithheld ?? []).length;
+  return [...needs, ...feeds, ...conforms].reduce((sum, [, count]) => sum + count, 0) + handles;
 }
 
 /**
@@ -777,8 +802,11 @@ function rowsFor({ report, promoted = [] }, colour, all = false) {
        * that reached into it. `incomplete-board` is further out still: it is not
        * about a box at all, but about a module with no box, so there is nothing
        * for an arrow to point from. `stale-number` is about the label itself,
-       * and its anchor is not what went wrong. All three say the engine's own
-       * sentence instead.
+       * and its anchor is not what went wrong. `mishandled-box` is a fourth
+       * kind of elsewhere: its anchor is perfectly fine -- the box points at
+       * the right routine and the routine is there -- and what disagrees is
+       * which *cases* it dispatches on, so the only useful row is the sentence
+       * naming them. All four say the engine's own sentence instead.
        */
       finding.kind === "stale-number"
         // The label is cut, not the sentence. A box carrying a number claim is
@@ -789,7 +817,9 @@ function rowsFor({ report, promoted = [] }, colour, all = false) {
         ? paint(`${boxName(finding)} \u00b7 ${openBox(finding.detail)}`, "red", colour)
         : finding.kind === "incomplete-board"
           ? paint(`${boxName(finding)} \u00b7 ${incompleteBoard(finding.detail)}`, "red", colour)
-          : paint(`${boxName(finding)} \u2192 ${target(finding)}`, "red", colour),
+          : finding.kind === "mishandled-box"
+            ? paint(`${boxName(finding)} \u00b7 ${oneLine(finding.detail)}`, "red", colour)
+            : paint(`${boxName(finding)} \u2192 ${target(finding)}`, "red", colour),
       ...followRow(followedFor.get(finding.node), colour, all),
     ]),
     ...report.edges.map((finding) => {
@@ -952,7 +982,7 @@ function rowsFor({ report, promoted = [] }, colour, all = false) {
  */
 const WRONG_EDGE_KINDS = new Set(ACCUSING_EDGE_KINDS);
 
-function tallyCounts({ gone, generated, empty, unused, open, incomplete, removed, garbled, unanswered, backwards, signatures, fields, builtBackwards, callsBackwards, members, unread, bases, arrows, stray, promoted, built, planned }, colour) {
+function tallyCounts({ gone, generated, empty, unused, open, incomplete, mishandled, removed, garbled, unanswered, backwards, signatures, fields, builtBackwards, callsBackwards, members, unread, bases, arrows, stray, promoted, built, planned }, colour) {
   return [
     gone ? paint(`${gone} gone`, "red", colour) : "",
     // Its own word, because "gone" is the opposite of what happened: the file
@@ -968,6 +998,12 @@ function tallyCounts({ gone, generated, empty, unused, open, incomplete, removed
     // Same reasoning as "reached into": "1 gone" would say a file disappeared,
     // and what happened is that the board never drew one.
     incomplete ? paint(`${incomplete} incomplete`, "red", colour) : "",
+    // Its own word for the reason "reached into" and "incomplete" are: nothing
+    // is gone. The box points at the right routine and the routine is there --
+    // the set of cases it dispatches on is not the set the picture lists.
+    mishandled
+      ? paint(`${mishandled} case ${mishandled === 1 ? "list" : "lists"} wrong`, "red", colour)
+      : "",
     // Separate from "gone" because it is a different sentence: the code is
     // still there, and nothing calls it any more.
     unused ? paint(`${unused} unused`, "red", colour) : "",
@@ -1038,16 +1074,18 @@ function tallyFor({ report, promoted = [] }, colour) {
   // Out of "gone" for the reason "open-box" is: nothing here is missing from
   // the tree, the board is missing something from the picture.
   const incomplete = count("incomplete-board");
+  const mishandled = count("mishandled-box");
   const generated = count("generated-ref");
   const promotedNodes = new Set(promoted.map((promotion) => promotion.node));
   return tallyCounts(
     {
-      gone: report.findings.length - empty - unused - open - incomplete - generated,
+      gone: report.findings.length - empty - unused - open - incomplete - mishandled - generated,
       generated,
       empty,
       unused,
       open,
       incomplete,
+      mishandled,
       removed: report.deleted.length,
       garbled: (report.garbledClaims ?? []).length,
       unanswered: unansweredClaims(report),
@@ -1116,6 +1154,7 @@ function render(stale, colour) {
         gone: sum.gone + report.findings.filter(
           (finding) => finding.kind !== "empty-ref" && finding.kind !== "unused-symbol"
             && finding.kind !== "open-box" && finding.kind !== "incomplete-board"
+            && finding.kind !== "mishandled-box"
             && finding.kind !== "generated-ref",
         ).length,
         generated: sum.generated
@@ -2093,6 +2132,36 @@ function renderCoverageAudit(entries, colour) {
           rows.push(paint(
             `${oneLine(stale.label)} · ${stale.doors.length} listed `
             + `${stale.doors.length === 1 ? "door nothing" : "doors nothing"} came through: ${stale.doors.join(", ")}`,
+            "dim",
+            colour,
+          ));
+        }
+      }
+      /*
+       * The second box claim, and the withheld list is the part that matters.
+       *
+       * A refuted `handles` is already a finding in the list above this one, so
+       * what is left here is what became of the claims that were not refuted --
+       * and a claim nothing read has to be told apart from one that passed, or
+       * writing `handles` looks like it bought a check it did not. Same rule
+       * the `needs` withheld list follows (#113), which is the one that caught
+       * the project owner out.
+       */
+      const handles = report.claims?.handles ?? 0;
+      if (handles > 0) {
+        const held = report.claims?.handlesHeld ?? 0;
+        if (held > 0) {
+          rows.push(paint(
+            `${held} ${held === 1 ? "box" : "boxes"} listing what a routine handles `
+            + `${held === 1 ? "agrees" : "agree"} with the code`,
+            "dim",
+            colour,
+          ));
+        }
+        for (const gap of report.claims?.handlesWithheld ?? []) {
+          rows.push(paint(
+            `${oneLine(gap.label)} · @handles not checked: ${HANDLES_WHY[gap.why] ?? gap.why}`
+            + (gap.detail ? ` (${gap.detail})` : ""),
             "dim",
             colour,
           ));
