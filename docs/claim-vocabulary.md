@@ -620,7 +620,7 @@ to pass every check this tool had.
 deliberate: almost all of it is `Vec<T>`, `Promise<T>`, `list[str]`, which
 nobody draws as two boxes.
 
-## Thirty-five times a measurement contradicted the design
+## Thirty-six times a measurement contradicted the design
 
 Kept because the pattern is the point: eleven of the first thirteen came from
 building one word or one reader, not from reviewing the design. Nothing since
@@ -2659,11 +2659,55 @@ duplicate from conflitcts, requires reading prs "An arrow can be three calls lon
     `path.resolve("src")` **measures the branch it is run on** -- adding one file
     to `scripts/` moved five of this report's rows, which is the corpus bias to
     name before quoting any of them. And a lost tree does not fail anything: it
-    lowers a number, and a lowered number reads as a finding. **Seven more
-    measure scripts still discover files this way** (`measure:accesses`,
-    `constructs`, `conforms`, `handles`, `holds`, `signature`, `vocabulary`, and
-    `scripts/lib/boards.ts`); only this one was in #203's way, and the rest are
-    their own issues' numbers to re-establish.
+    lowers a number, and a lowered number reads as a finding.
+
+    **The sweep, and a correction to this item's own first count.** It first said
+    seven more scripts had the bug, from a grep for `execFileSync("find"`. That
+    grep was wrong twice over: in `measure-accesses` it matched the **doc comment
+    describing the fix**, which that script already carries as its own
+    `readdirSync` walk; and `measure-handles` passes `maxBuffer: 512 MB` and
+    prints the tree it could not read instead of swallowing it, so neither was
+    silently losing anything. `scripts/lib/boards.ts` lists `*.excalidraw` with
+    `find -name`, whose output is tiny, and it deliberately reads *inside*
+    `.claude` worktrees -- which the shared walk skips -- so adopting it there
+    would break that on purpose. Left alone, and the reason recorded.
+
+    Five were real and are now fixed: `measure:constructs`, `conforms`, `holds`,
+    `signature`, `vocabulary`. Measured directly, the walk they shared read
+    **230 of 1,506 files -- it lost 84.7%** -- and `constructs`, `conforms` and
+    `holds` each printed "7 trees, 230 files" while saying so. `signature` was
+    the one exception worth noting: it reads only `src`, `scripts`, two
+    `rust-test` subdirectories and `graphify`, none big enough to overflow, so it
+    was losing nothing today and was fixed for the trap rather than the damage.
+
+    One more way the same walk loses a tree, which only bites in the worktree
+    workflow this repository uses: `rust-test` is untracked, so a worktree
+    symlinks it, and `find <symlink> -type f` without `-L` returns nothing.
+    `statSync` follows it. That is 8 Rust files, and Rust is the language this
+    corpus has least of.
+
+    What the five had been hiding, now that they read their own corpus:
+
+    | | before | after |
+    |---|---|---|
+    | `constructs` routines the referee could read | 1,500 | **3,282** |
+    | `conforms` declarations naming something they are one of | 33 | **2,766** |
+    | `holds` type declarations the referee could read | 332 | **4,309** |
+
+    `conforms` is the one to look at twice. Its whole measurement rested on 33
+    declarations and there are 2,766 -- so nothing that was ever said about that
+    reader was said about its corpus. `vocabulary` has no source-side headline
+    to move (its corpus is boards, through `boards.ts`); its source walk feeds
+    only the staleness check, which stays at 0. And `signature` came out three
+    files *smaller*: `src/engine/vendor/{browser-shim,entry,browser-entry}.ts`
+    are first-party source in a directory named `vendor`, which the shared walk
+    skips and every other measurement already did. Consistent now, and a
+    reduction, which is worth saying rather than glossing.
+
+    Guarded at `tests/measure-corpus-walk.test.ts`, and the rule is the narrow
+    one: a script whose corpus names a big tree may not list it with `find`.
+    `find` itself is not the bug. The test was checked by breaking a script and
+    watching it name it.
 
 34. **The 1.4% for crossing a call survives being re-checked against the real
     call graph, and it was never a share of the whole question.**
@@ -2725,6 +2769,10 @@ duplicate from conflitcts, requires reading prs "An arrow can be three calls lon
     `subprocess.run`. Verified at both ends -- the corpus tally and a unit test
     on the six shapes (`tests/dataflow-call-sites.test.ts`).
 
+    **Those figures are the state before item 36.** Recording the site for a
+    call on a receiver took the recorded share to 370 of 390 and Python to 127
+    of 127; the reasoning below is what that step was chosen for, and it stands.
+
     So the value-level door question **must not be built refuting first**, and
     the reason is sharper than the general one. 87.4% of Python's doors are
     invisible to the reader, so "this value never reaches a door" would answer
@@ -2748,6 +2796,55 @@ duplicate from conflitcts, requires reading prs "An arrow can be three calls lon
     402 sites of 20,209 refusals. What is *not* rejected and is simply not this
     step is modelling what a library call does to what you hand it, which is
     where two thirds of the remaining escaping lives.
+
+36. **Recording the call site nobody had written down made
+    `callee-is-a-method` the biggest reason a value is trapped, and took seven
+    false `contained` with it.** The narrow step chosen at item 35, built (#203).
+
+    `body.calls` was appended to `if (callee)`, and `calleeName` answers for a
+    bare name and for `self.foo()` / `this.foo()`. So `store.keep(v)` and
+    `os.replace(v, p)` were exits with **no site at all**. The site is now
+    recorded with an **empty callee** -- one line, and it reaches a branch
+    `settleCalls` and `keeps` have carried since they were written and could
+    never enter.
+
+    Both halves of that are load-bearing. Recording the site counts the
+    population: `callee-is-a-method` goes from never printed to **2,734, 49.5%**
+    of the calls that still trap a value, ahead of `callee-not-resolved`'s 33.2%.
+    Refusing to *name* it is what keeps it safe -- a resolver keyed on `write`
+    finds any local routine spelled that way, reads the wrong body, and is then
+    entitled to free a value that did leave. There is no name here to look up,
+    so the site can only ever refuse.
+
+    **And it was not only bookkeeping.** A value handed to a resolvable call
+    *and* to an unnamed one was being freed on the strength of the one that was
+    recorded. `contained`-and-used went 5,268 -> 5,261 and the headline 19.3% ->
+    **19.2%**; `freed` went 370 -> 363, 1.4% -> **1.3%**. Seven values had been
+    called "provably never left this body" while going out on the next line.
+    Reproduced as a unit test first, and A/B'd against the previous reader:
+    `freed=1 contained=true` before, `freed=0` after.
+
+    **None of the seven was ever a `LEAKED`.** Because the reader set
+    `freedByCall`, `measure-dataflow.mts` files those disagreements under
+    "having read another routine's body", the population it declares
+    unrefereeable *by construction* -- so a referee that could see them was told
+    not to count them. Of the seven, three were sitting in an unrefereed bucket
+    (135 -> 133 there, 216 -> 215 in the collection one) and the referee had no
+    opinion at all about the other four. This is item 24's lesson in a second
+    reader: a population reported apart is where the bugs are. The bar itself
+    still reads 0 leaked, 0 invented.
+
+    What it bought item 35 is the point of having done it. Doors with a call
+    site go from 240 of 390 to **370 of 390 (94.9%)**, and **Python from 16 of
+    127 to 127 of 127** -- because the door question never needed the name.
+    `outside.ts` knows `os.replace` is a door from the *import*. What was
+    missing was somewhere to watch, not something to resolve.
+
+    Still unwatched: `tsx` 0 of 4 and `rust` 0 of 1, both too small to read
+    anything from. And the handle shape -- `f.write(row)`, where `f` came back
+    from `open()` -- is not in this population at all, because `outside.ts` does
+    not call it a door: it reads as a method on a value rather than a module.
+    Knowing `f` is a file needs a type, which is the tier-2 question.
 
 26. **#206's demand number came back at 7 arrows of 162 and did not decide the
     issue, because the corpus it counts was drawn to test the tool. Built
@@ -2960,10 +3057,16 @@ duplicate from conflitcts, requires reading prs "An arrow can be three calls lon
    is that the call question is only ever put to **bare** calls, so 45.3% of the
    values with a call-shaped exit have never been in it.
 
-   The next step is chosen and is deliberately the confirming half: **does this
-   value reach a door** (item 35). Not refuting it — 87.4% of Python's doors are
-   written on a receiver the reader records no site for, and Python is the only
-   language with a run-time referee.
+   The next step was chosen as the confirming half — **does this value reach a
+   door** (item 35) — and its one prerequisite is built: the site for a call on
+   a receiver is now recorded, unnamed, so Python's doors went from 16 of 127 to
+   127 of 127 and the refusal `callee-is-a-method` is now the largest reason a
+   value stays trapped at 49.5% (item 36). That also removed seven false
+   `contained`, none of which had ever been counted as a leak.
+
+   What is **not** built is the door question itself, and refuting it is still
+   the thing not to do: a wrong "never reaches a door" is unrecoverable, and
+   Python is the only language with a run-time referee to check against.
 3. **#190's layer 2.** The relation list is settled as-is by the owner. The one
 1. **#203 — the engine has no notion of a value.** Dataflow, points-to, escape
    analysis. #203's own prediction — confirmation much better, refutation only

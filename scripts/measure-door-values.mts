@@ -15,21 +15,28 @@
  *   > to a file, sends it over the network, or hands it to another process?
  *
  * Before building that on `dataflow.ts`, one thing has to be true: the reader
- * has to record a call site for the door. It resolves a call by name, and
- * `calleeName` answers for a bare name and for `self.foo()` / `this.foo()` and
- * nothing else -- `body.calls` is appended to `if (callee)`. A door reached
- * through any other receiver is a call the reader writes down nowhere.
+ * has to record a call site for the door, so a value can be watched going
+ * through it.
  *
- * And a door is *usually* written on a receiver. `fs.writeFileSync(data)`,
- * `f.write(row)`, `sock.send(payload)`, `proc.stdin.write(buf)`, `logger.info(x)`
- * are all `object.method(value)`. So the risk is specific and it is the worst
- * kind: a value handed straight out through `file.write(v)` would have no call
- * site, no exit recorded for that call, and a question asking "does this value
- * ever reach a door" would answer **no** -- an accusation, from a blind spot,
- * about the one shape the question exists to catch.
+ * The first run of this said it usually did not, and that was the finding.
+ * `calleeName` answers for a bare name and for `self.foo()` / `this.foo()`, and
+ * `body.calls` was appended to `if (callee)`, so a door written on a receiver
+ * was recorded nowhere: ts 206 of 239 doors had a site and **python 16 of
+ * 127**, because Python spells almost every one `os.replace`, `shutil.rmtree`,
+ * `subprocess.run`. A question asking "does this value ever reach a door" would
+ * have answered **no** for a value handed straight out of one -- an accusation
+ * from a blind spot, about the one shape the question exists to catch.
  *
- * This counts that before anything is built. For every door call in the corpus,
- * does the reader record a call site at that line?
+ * The site is now recorded with an empty callee. That is enough, and the reason
+ * is the useful part: **the door question does not need the name.**
+ * `outside.ts` knows `os.replace` is a door from the *import*, not from
+ * resolving a callee, so an unnameable site is still a place to watch. What was
+ * missing was the site, not the name.
+ *
+ * So this now reports two columns that used to be one: whether a site exists at
+ * all, which is what the door question rests on, and whether the reader could
+ * also name it, which is what the *escape* question needs and still cannot get
+ * for a receiver.
  *
  * `writes` is the half that matters most. A door that only *reads* -- `open(p)`,
  * `stat(f)` -- takes a path and hands nothing out, so a value reaching one is
@@ -70,6 +77,8 @@ const bump = <K,>(map: Map<K, number>, key: K, by = 1) =>
 const doors = new Map<Language, number>();
 const doorsInRoutine = new Map<Language, number>();
 const doorsWithSite = new Map<Language, number>();
+/** Of those, the ones the reader could also put a name to. */
+const doorsNamed = new Map<Language, number>();
 const doorsByKind = new Map<OutsideKind, number>();
 const doorsWithSiteByKind = new Map<OutsideKind, number>();
 /** The door's own spelling, so the shape that is missed is nameable. */
@@ -96,15 +105,25 @@ for (const tree of trees) {
     files += 1;
 
     const bodies = index.bodiesFor(rel).filter((body) => body.scope === "routine");
-    /* Every call the reader recorded, by routine and line. */
-    const recorded = new Map<string, Set<string>>();
+    /*
+     * Every call the reader recorded, by routine and line, and whether it could
+     * put a name to it.
+     *
+     * The name is what the door question does *not* need, which is the point.
+     * `outside.ts` already knows `os.replace` is a door, from the import rather
+     * than from resolving anything -- so a site with an empty callee is still a
+     * place a value can be watched going out. What matters is that a site exists
+     * at all: before #203's change there was none for a qualified call, and a
+     * value handed through one went out unwatched.
+     */
+    const recorded = new Map<string, { named: Set<string>; unnamed: number }>();
     for (const body of bodies) {
       for (const call of body.calls) {
-        if (!call.callee) continue;
         const key = `${body.routine}\u0000${call.line}`;
-        const names = recorded.get(key);
-        if (names) names.add(call.callee);
-        else recorded.set(key, new Set([call.callee]));
+        const at = recorded.get(key) ?? { named: new Set<string>(), unnamed: 0 };
+        if (call.callee) at.named.add(call.callee);
+        else at.unnamed += 1;
+        recorded.set(key, at);
       }
     }
 
@@ -121,14 +140,17 @@ for (const tree of trees) {
       if (!call.routine) continue;
       bump(doorsInRoutine, language);
 
-      // The door's own last segment is the name a call site would carry.
+      // The door's own last segment is the name a bare call site would carry.
       const member = qualified.split(".").pop() ?? qualified;
-      const names = recorded.get(`${call.routine}\u0000${call.line}`);
-      if (names?.has(member)) {
+      const at = recorded.get(`${call.routine}\u0000${call.line}`);
+      const named = at?.named.has(member) === true;
+      if (named || (at?.unnamed ?? 0) > 0) {
         bump(doorsWithSite, language);
         bump(doorsWithSiteByKind, kind);
+        if (named) bump(doorsNamed, language);
         if (foundExamples.length < 8) {
-          foundExamples.push(`${rel}:${call.line} ${call.routine} -> ${qualified}`);
+          foundExamples.push(`${rel}:${call.line} ${call.routine} -> ${qualified}`
+            + (named ? "" : "  (site recorded, callee unnamed)"));
         }
       } else {
         bump(missedQualified, qualified);
@@ -155,7 +177,7 @@ console.log("");
 console.log("1 - DOES THE READER RECORD A CALL SITE FOR THE DOOR?");
 console.log("");
 console.log("  " + "language".padEnd(10) + "doors".padStart(8) + "in a routine".padStart(14)
-  + "site recorded".padStart(15) + "share".padStart(8));
+  + "site recorded".padStart(15) + "share".padStart(8) + "of those, named".padStart(17));
 for (const language of LANGUAGES) {
   const all = doors.get(language) ?? 0;
   if (all === 0) continue;
@@ -163,15 +185,18 @@ for (const language of LANGUAGES) {
   const withSite = doorsWithSite.get(language) ?? 0;
   console.log("  " + language.padEnd(10) + String(all).padStart(8)
     + String(inRoutine).padStart(14) + String(withSite).padStart(15)
-    + share(withSite, inRoutine).padStart(8));
+    + share(withSite, inRoutine).padStart(8)
+    + String(doorsNamed.get(language) ?? 0).padStart(17));
 }
 console.log("  " + "all".padEnd(10) + String(total(doors)).padStart(8)
   + String(total(doorsInRoutine)).padStart(14) + String(total(doorsWithSite)).padStart(15)
-  + share(total(doorsWithSite), total(doorsInRoutine)).padStart(8));
+  + share(total(doorsWithSite), total(doorsInRoutine)).padStart(8)
+  + String(total(doorsNamed)).padStart(17));
 console.log("");
-console.log("  A door with no call site is a door the escape analysis cannot see a value");
-console.log("  go through. Asked of a value, it would answer `never reaches a door` for a");
-console.log("  value handed straight out of one.");
+console.log("  A door with no call site is a door the reader cannot see a value go");
+console.log("  through, so a value handed straight out of one would read as never having");
+console.log("  reached it. `named` is the narrower question the escape half needs and the");
+console.log("  door question does not: which routine the call goes to.");
 
 console.log("");
 console.log("2 - BY WHAT THE DOOR TOUCHES");
@@ -193,9 +218,10 @@ for (const [qualified, count] of [...missedQualified].sort((a, b) => b[1] - a[1]
   console.log("    " + qualified.padEnd(34) + String(count).padStart(6));
 }
 console.log("");
-console.log("  Every one of these is `object.method(..)`. `calleeName` answers for a bare");
-console.log("  name and for `self.`/`this.` and returns nothing else, so no site is");
-console.log("  written and no resolver can be pointed at it.");
+console.log("  What is left is the handle shape -- `f.write(row)`, where `f` came back");
+console.log("  from `open()`. `outside.ts` does not call that a door at all (it reads as");
+console.log("  a method on a value, not a module), so it is outside this population");
+console.log("  rather than missed inside it. Knowing `f` is a file needs a type.");
 if (missedExamples.length > 0) {
   console.log("");
   console.log("  MISSED");

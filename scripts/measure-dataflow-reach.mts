@@ -117,10 +117,16 @@ const unmatched = new Map<Language, number>();
 const reachOnlyWhere = new Map<string, number>();
 const reachOnlyExamples: string[] = [];
 
-/* Half two: values whose only call-shaped exit is a call with no site. */
+/* Half two: values whose call-shaped exit is a call the reader cannot name. */
 const passedValues = new Map<Language, number>();
+/** At least one of the calls it went to has an empty callee. */
+const passedUnnamed = new Map<Language, number>();
+/**
+ * No site at all, which is what this measurement first found and is now the
+ * regression check rather than the finding: it should be ~0.
+ */
 const passedNoSite = new Map<Language, number>();
-const passedNoSiteExamples: string[] = [];
+const passedUnnamedExamples: string[] = [];
 
 let files = 0;
 let bodiesRead = 0;
@@ -226,15 +232,22 @@ for (const tree of trees) {
 
       /* -- half two: values the reader wrote no site for -- */
       const handedTo = new Set<string>();
-      for (const call of body.calls) for (const name of call.passed) handedTo.add(name);
+      const handedToUnnamed = new Set<string>();
+      for (const call of body.calls) {
+        for (const name of call.passed) {
+          handedTo.add(name);
+          if (!call.callee) handedToUnnamed.add(name);
+        }
+      }
       for (const local of body.locals) {
         if (local.why) continue;
         if (!local.escapes.includes("passed-to-a-call")) continue;
         bump(passedValues, language);
-        if (handedTo.has(local.name)) continue;
-        bump(passedNoSite, language);
-        if (passedNoSiteExamples.length < 12) {
-          passedNoSiteExamples.push(`${rel}:${local.line} ${body.routine} / ${local.name}`);
+        if (!handedTo.has(local.name)) { bump(passedNoSite, language); continue; }
+        if (!handedToUnnamed.has(local.name)) continue;
+        bump(passedUnnamed, language);
+        if (passedUnnamedExamples.length < 12) {
+          passedUnnamedExamples.push(`${rel}:${local.line} ${body.routine} / ${local.name}`);
         }
       }
     }
@@ -300,29 +313,36 @@ if (total(reachOnly) > 0) {
 }
 
 console.log("");
-console.log("2 - THE VALUES NO RESOLVER CAN REACH, because no site was ever written");
+console.log("2 - THE VALUES NO RESOLVER CAN REACH, because the call cannot be named");
 console.log("");
 console.log("  " + "language".padEnd(10) + "passed to a call".padStart(18)
-  + "no site for it".padStart(16) + "share".padStart(8));
+  + "to an unnamed one".padStart(19) + "share".padStart(8) + "no site".padStart(9));
 for (const language of LANGUAGES) {
   const all = passedValues.get(language) ?? 0;
   if (all === 0) continue;
-  const none = passedNoSite.get(language) ?? 0;
+  const unnamed = passedUnnamed.get(language) ?? 0;
   console.log("  " + language.padEnd(10) + String(all).padStart(18)
-    + String(none).padStart(16) + share(none, all).padStart(8));
+    + String(unnamed).padStart(19) + share(unnamed, all).padStart(8)
+    + String(passedNoSite.get(language) ?? 0).padStart(9));
 }
 console.log("  " + "all".padEnd(10) + String(total(passedValues)).padStart(18)
-  + String(total(passedNoSite)).padStart(16)
-  + share(total(passedNoSite), total(passedValues)).padStart(8));
+  + String(total(passedUnnamed)).padStart(19)
+  + share(total(passedUnnamed), total(passedValues)).padStart(8)
+  + String(total(passedNoSite)).padStart(9));
 console.log("");
-console.log("  A value counted `passed-to-a-call` for which the reader recorded no call");
-console.log("  site passing it. `calleeName` answers for a bare name and for `self.foo()`");
-console.log("  only, and `body.calls` is appended to `if (callee)` -- so `store.keep(v)`");
-console.log("  is an exit with nothing to resolve. These were never in the 1.4%'s");
-console.log("  population, in the denominator or the numerator.");
-if (passedNoSiteExamples.length > 0) {
+console.log("  A value handed to at least one call whose callee this reader cannot name --");
+console.log("  `store.keep(v)`, `os.replace(v, p)`. `calleeName` answers for a bare name");
+console.log("  and for `self.foo()` / `this.foo()` and nothing else, so there is no name to");
+console.log("  look up and the call refuses as `callee-is-a-method`. Counted, which is the");
+console.log("  change: it used to be recorded nowhere and so absent from the question in");
+console.log("  the numerator and the denominator alike.");
+console.log("");
+console.log("  `no site` is the regression check on that, and it should stay at or near 0.");
+console.log("  Anything in it is a value the reader sees leave through a call it wrote no");
+console.log("  site for at all, which is the state this column was built to measure.");
+if (passedUnnamedExamples.length > 0) {
   console.log("");
-  for (const one of passedNoSiteExamples) console.log("    " + one);
+  for (const one of passedUnnamedExamples) console.log("    " + one);
 }
 
 console.log("");
@@ -331,14 +351,17 @@ console.log("");
 console.log(`  Refused sites where reach places the name:         ${total(reachOnly)}`);
 console.log(`  ... and a routine of that name is there to read:    ${total(reachOnlyRoutine)}`);
 console.log(`  ... and a refutation may rest on it:               ${total(reachOnlySafe)}`);
-console.log(`  Values excluded from the question altogether:      ${total(passedNoSite)}`);
+console.log(`  Values whose exit is a call that cannot be named:  ${total(passedUnnamed)}`);
+console.log(`  Values with no site recorded at all:              ${total(passedNoSite)}`);
 console.log("");
 console.log("  The first two bound what `reach.ts` could add to section 3 as it stands.");
 console.log("  Anything reach places that is not refutation-safe, it places for");
 console.log("  confirmation only; spending that on an accusation is the false red");
 console.log("  `licence.ts` exists to stop, and `blocking()` is `reach.ts` refusing to.");
 console.log("");
-console.log("  The third number is not headroom for a resolver at all. It is a population");
-console.log("  the reader does not put the question to, and no call graph changes that --");
-console.log("  recording the site is a change to `dataflow.ts`.");
+console.log("  The third number is not headroom for a resolver at all. It is the");
+console.log("  population that refuses as `callee-is-a-method`, and no call graph reaches");
+console.log("  it: naming `x.foo()` needs the type of `x`, and resting a *refutation* on a");
+console.log("  type read out of the text is what `blocking()` refuses. The fourth number");
+console.log("  is the regression check, and it is the one that used to be the third.");
 console.log("");

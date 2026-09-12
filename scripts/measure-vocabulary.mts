@@ -27,13 +27,13 @@
  * `measure-survey.mts` and `measure-signature.mts` print, so the decision can be
  * argued with rather than asserted.
  */
-import { execFileSync } from "node:child_process";
 import { existsSync } from "node:fs";
 import path from "node:path";
 
 import { readFileSync } from "node:fs";
 
 import { boardCorpus } from "./lib/boards";
+import { sourceFiles } from "./lib/source-files";
 
 import { readBoard } from "../src/engine/board-file";
 import { checkDrift, createWorkspace, type DriftFinding, type EdgeDriftFinding } from "../src/engine/drift";
@@ -770,19 +770,15 @@ const CODE_ROOTS: Array<{ name: string; path: string }> = [
   { name: "infrarouter", path: `${HOME}/infrarouter` },
 ];
 
-const SKIP_SOURCE = ["/node_modules/", "/target/", "/.git/", "/dist/", "/out/", "/vendor/", "/.venv/"];
-
+/**
+ * The shared walk, which skips a heavy directory during the descent rather than
+ * listing it and filtering after (#254). The `find` version this replaces threw
+ * `ENOBUFS` on `~/mundane` and `~/infrarouter` and a blanket `catch` read that
+ * as "no files here", so this counted 230 files of 1,506 while reporting seven
+ * trees.
+ */
 function sourcesUnder(root: string): string[] {
-  if (!existsSync(root)) return [];
-  try {
-    return execFileSync("find", [root, "-type", "f"], { encoding: "utf8" })
-      .split("\n")
-      .filter(Boolean)
-      .filter((file) => !SKIP_SOURCE.some((fragment) => file.includes(fragment)))
-      .filter((file) => languageOf(file) !== undefined);
-  } catch {
-    return [];
-  }
+  return existsSync(root) ? sourceFiles(root) : [];
 }
 
 interface Tally {

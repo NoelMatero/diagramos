@@ -32,8 +32,9 @@
  * what `absent` is allowed to say can be argued with.
  */
 import { readFileSync } from "node:fs";
-import { execFileSync } from "node:child_process";
 import path from "node:path";
+
+import { sourceFiles } from "./lib/source-files";
 
 import { initEngine, languageOf, parseSource, type Language, type Node } from "../src/engine/parse";
 import { signatureNames } from "../src/engine/signature";
@@ -53,18 +54,6 @@ const trees = roots.length > 0 ? roots : [
   "/Users/noelmatero/board-ai/graphify/graphify",
 ];
 
-/** Files under a tree that this engine has a grammar for. */
-function sourceFiles(root: string): string[] {
-  try {
-    return execFileSync("find", [root, "-type", "f"], { encoding: "utf8" })
-      .split("\n")
-      .filter(Boolean)
-      .filter((file) => !file.includes("/target/") && !file.includes("/node_modules/"))
-      .filter((file) => languageOf(file) !== undefined);
-  } catch {
-    return [];
-  }
-}
 
 const IDENTIFIER = /identifier$/;
 const isName = (node: Node): boolean => node.childCount === 0 && IDENTIFIER.test(node.type);

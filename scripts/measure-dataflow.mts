@@ -30,16 +30,32 @@
  *      the second number. This one crosses a function boundary, which #208 set
  *      out not to do; it was built after #189 merged and made a call's name
  *      resolvable. It is reported apart from the second number precisely so the
- *      step outward can be priced on its own -- and it comes to 1.4%.
+ *      step outward can be priced on its own -- and it comes to 1.3%.
  *
  * **What the three say together is not what this file was expecting.** Each
  * step further from the single function body bought less than the one before:
  * locals are worth most of the total, modelling a collection as one value is
  * worth some, following values *into* a collection is worth 38 values in the
- * whole corpus, and crossing a call boundary is worth 1.4% with half of that
+ * whole corpus, and crossing a call boundary is worth 1.3% with half of that
  * flagged as the weaker kind of claim. That is an argument for keeping this
  * small, and it is closer to what #203 said than to what the first reading of
  * these numbers concluded.
+ *
+ * Re-checked against `reach.ts`, a real interprocedural walk, in case 1.4% was
+ * a fact about a weak resolver rather than about crossing a call: of 20,209
+ * refused sites it places the name on 2,866 and only 402 have one routine of
+ * that name to *read*, all of them refutation-safe. The figure held
+ * (`measure:dataflow-reach`).
+ *
+ * **What the re-check found instead was that the question was only ever put to
+ * bare calls.** `calleeName` names a bare call and `self.foo()` / `this.foo()`
+ * and nothing else, and `body.calls` was appended to `if (callee)` -- so
+ * `store.keep(v)` and `os.replace(v, p)` were exits recorded nowhere. Those
+ * sites are now recorded with an empty callee, which is the long-unreachable
+ * `callee-is-a-method` refusal, and it is immediately the **largest** reason a
+ * call keeps a value trapped: 49.5%, ahead of `callee-not-resolved`. It also
+ * cost seven values that had been called contained while going out through a
+ * call nobody had written down.
  *
  * ## The referee
  *
