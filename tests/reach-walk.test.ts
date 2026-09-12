@@ -171,3 +171,59 @@ describe("TypeScript constructors", () => {
     expect(reaching(dir, "base.ts#constructor").has("app.ts#makeChild")).toBe(true);
   });
 });
+
+/*
+ * A library calling back into the repository (#58). flask's recorded test run
+ * still caught this: flask hands `_env_file_callback` to click inside a
+ * module-level `click.Option(..)`, `parse_args` touches only that option, and
+ * click runs the callback -- which loads the `.env` file. Nothing in flask ever
+ * calls `_env_file_callback` by name.
+ */
+describe("a function handed to a library and kept in a variable", () => {
+  it("counts a routine using the variable as reaching the function it holds, in Python", () => {
+    const dir = repoOf({
+      "cli.py": [
+        "import click",
+        "",
+        "def _load_env(ctx, param, value):",
+        "    open(value)",
+        "",
+        '_env_option = click.Option(["--env"], callback=_load_env)',
+        "",
+        "def parse_args(ctx, args):",
+        "    _env_option.handle_parse_result(ctx, {}, [])",
+        "    return args",
+        "",
+        "def unrelated():",
+        "    return 1",
+      ].join("\n"),
+    });
+    const set = reaching(dir, "cli.py#_load_env", "callbacks" as Walk);
+    expect(set.has("cli.py#parse_args")).toBe(true);
+    expect(set.has("cli.py#unrelated")).toBe(false);
+  });
+
+  it("counts a routine using the variable as reaching the function it holds, in TypeScript", () => {
+    const dir = repoOf({
+      "cli.ts": [
+        'import * as fs from "node:fs";',
+        'import { Option } from "commander";',
+        "function loadEnv(value: string) {",
+        "  fs.readFileSync(value);",
+        "}",
+        'const envOption = new Option("--env").argParser(loadEnv);',
+        "export function parseArgs(args: string[]) {",
+        "  envOption.parse(args);",
+        "  return args;",
+        "}",
+        "export function unrelated() {",
+        "  return 1;",
+        "}",
+      ].join("\n"),
+    });
+    const set = reaching(dir, "cli.ts#loadEnv", "callbacks" as Walk);
+    expect(set.has("cli.ts#parseArgs")).toBe(true);
+    expect(set.has("cli.ts#unrelated")).toBe(false);
+  });
+});
+

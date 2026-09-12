@@ -81,7 +81,7 @@ import path from "node:path";
 
 import { checkerFor, type CallChecker } from "./lib/call-receivers";
 import {
-  anythingCallers, constructs, couldReach, familyOf, mayLeadInto, readRepo, WALKS,
+  anythingCallers, constructs, couldReach, familyOf, holds, mayLeadInto, readRepo, WALKS,
   type Family, type Routine, type Walk,
 } from "./lib/reach";
 
@@ -172,7 +172,7 @@ for (const repo of repos) {
     const family = familyOf(door.language)!;
     const sameLanguage = [...read.routines.values()].filter((one) => familyOf(one.language) === family);
     const tally = perLanguage.get(family)
-      ?? { doors: 0, total: 0, reaching: { calls: 0, mentions: 0 }, anything: { calls: 0, mentions: 0 } };
+      ?? { doors: 0, total: 0, reaching: { calls: 0, mentions: 0, callbacks: 0 }, anything: { calls: 0, mentions: 0, callbacks: 0 } };
     perLanguage.set(family, tally);
     tally.doors += 1;
     tally.total += sameLanguage.length;
@@ -206,7 +206,7 @@ for (const repo of repos) {
   if (trace && existsSync(repo.dir) && realpathSync(repo.dir) === trace.root) {
     const score: TraceScore = {
       repo: repo.name, edges: 0, through: 0, unmatched: 0, doorsReached: 0, pairs: 0,
-      missedEdges: { calls: [], mentions: [] }, falseAccusations: { calls: [], mentions: [] },
+      missedEdges: { calls: [], mentions: [], callbacks: [] }, falseAccusations: { calls: [], mentions: [], callbacks: [] },
     };
     const callersOf = new Map<string, Set<string>>();
     for (const [fromFile, fromName, , toFile, toName, , through] of trace.edges) {
@@ -221,7 +221,8 @@ for (const repo of repos) {
       callersOf.set(to, (callersOf.get(to) ?? new Set()).add(from));
       for (const walk of WALKS) {
         const seen = anythingCallers(read, walk).has(from) || mayLeadInto(caller, callee, walk, walkOptions)
-          || (walk === "mentions" && constructs(read, caller, callee));
+          || (walk !== "calls" && constructs(read, caller, callee))
+          || (walk === "callbacks" && holds(read, caller, callee));
         if (!seen) score.missedEdges[walk].push({ from, to, through });
       }
     }
@@ -375,9 +376,9 @@ if (!trace) {
     for (const one of cases.slice(0, CASES)) console.log(`      ${one.routine} reaches ${one.door}`);
     if (cases.length > CASES) console.log(`      ... and ${cases.length - CASES} more (--all)`);
   }
-  const missed = score.missedEdges.mentions;
+  const missed = score.missedEdges.callbacks;
   if (missed.length > 0) {
-    console.log("  edges the mentions walk cannot see:");
+    console.log("  edges the callbacks walk cannot see:");
     for (const one of missed.slice(0, CASES)) {
       console.log(`      ${one.from} -> ${one.to}${one.through ? "  (through other code)" : ""}`);
     }

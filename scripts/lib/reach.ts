@@ -8,12 +8,16 @@
  *
  * `S(D)` is every routine that could possibly reach door `D`, built backwards
  * from the door and over-approximated on purpose: a routine outside it provably
- * cannot reach the door. Two walks build it.
+ * cannot reach the door. Three walks build it.
  *
  * - `calls` indexes a routine by the names it **calls**.
  * - `mentions` indexes every name a routine's text **uses**, called or not,
  *   treats a bare call to a name the file binds as a call to anything, and counts
  *   naming a class as running its constructor.
+ * - `callbacks` is `mentions`, plus one rule for a library calling back in: a
+ *   name used as a value inside something bound, at module or class level, to
+ *   another name -- `opt = Option(callback=f)` -- is held by that name, and a
+ *   routine using the holder counts as reaching what it holds.
  *
  * Either way, a routine holding a call with no readable name joins every set.
  */
@@ -36,8 +40,8 @@ export const familyOf = (language: Language): Family | undefined =>
   language === "ts" || language === "tsx" || language === "js" ? "ts"
     : language === "python" ? "python" : language === "rust" ? "rust" : undefined;
 
-export type Walk = "calls" | "mentions";
-export const WALKS: readonly Walk[] = ["calls", "mentions"];
+export type Walk = "calls" | "mentions" | "callbacks";
+export const WALKS: readonly Walk[] = ["calls", "mentions", "callbacks"];
 
 /**
  * What the text-scan referee is given, with the two Rust shapes that are not
@@ -189,6 +193,107 @@ function classesIn(source: string, language: Language): ClassShape[] {
   return classes;
 }
 
+/* -- names that hold a routine -------------------------------------------- */
+
+/**
+ * Fields whose subtree binds a name, each paired with the field holding what is
+ * bound to it: an assignment's `left`, and a `name` or `pattern` beside a `value`
+ * -- a declarator, a class field. An object entry's `key` is not one: the
+ * variable the object is assigned to already holds everything in it.
+ *
+ * Rust's struct `field: value` is not here, because a member access carries the
+ * same two fields; a Rust function stored in a struct field is not followed.
+ */
+const BINDINGS: ReadonlyArray<readonly [binder: string, value: string]> = [
+  ["left", "right"],
+  ["name", "value"],
+  ["pattern", "value"],
+];
+
+/** The field naming what a member access reads: `b` in `a.b`. */
+const MEMBER_TAILS = ["property", "attribute", "field"];
+
+/** Words naming the enclosing object: every method uses them, so they hold nothing. */
+const OWN_NAMES = new Set(["self", "this"]);
+
+/**
+ * The names a binding stores its value under. `a.b.c = f` stores under `c`, the
+ * member, not under `a`; a plain or destructured target stores under every name.
+ */
+function binderNames(node: Node): string[] {
+  const usable = (leaf: Node) => leaf.childCount === 0 && NAME_LEAF.test(leaf.type) && !OWN_NAMES.has(leaf.text);
+  if (node.childCount === 0) return usable(node) ? [node.text] : [];
+  // `a.b[key] = f` stores into the container `a.b`, never under `key` or `a`.
+  if (node.childForFieldName("subscript") ?? node.childForFieldName("index")) {
+    const container = node.childForFieldName("value") ?? node.childForFieldName("object");
+    return container ? binderNames(container) : [];
+  }
+  for (const field of MEMBER_TAILS) {
+    const tail = node.childForFieldName(field);
+    if (tail && tail.childCount === 0) return usable(tail) ? [tail.text] : [];
+  }
+  const out: string[] = [];
+  each(node, (leaf) => { if (usable(leaf)) out.push(leaf.text); });
+  return out;
+}
+
+/**
+ * Every `[held, holder]` pair in a file: a name used as a value somewhere inside
+ * what is bound, at module or class level, to another name.
+ *
+ * Only outside routine bodies, and never under a keyword argument's name. The
+ * first version took both, and a routine's locals and keywords -- `value`,
+ * `name`, `path`, `key`, `kwargs` -- held so much that the walk reached 95.5% of
+ * flask and ruled out 2.6% of Python per door (#58). A library is handed
+ * something to keep at the top of a file or a class; inside a function it is a
+ * local, and the function already mentions it.
+ *
+ * `_env_option = click.Option(["--env"], callback=_load_env)` gives `_load_env`
+ * two holders, `callback` and `_env_option`. A call's callee is called rather
+ * than held, so `r = compute(a)` holds `a` and never `compute` -- without that,
+ * every variable holding a result would hold the function that produced it, and
+ * a name like `result` reaches half a repository.
+ */
+function holdingsIn(source: string, language: Language): Array<[held: string, holder: string]> {
+  const tree = parseSource(source, language);
+  if (!tree) return [];
+  const out: Array<[string, string]> = [];
+  const visit = (node: Node, holders: readonly string[], inArguments: boolean): void => {
+    if (node.childCount === 0) {
+      if (holders.length > 0 && NAME_LEAF.test(node.type)) {
+        for (const holder of holders) if (holder !== node.text) out.push([node.text, holder]);
+      }
+      return;
+    }
+    // A routine's body holds locals, which it already mentions.
+    const parameters = node.childForFieldName("parameters") ?? node.childForFieldName("value")?.childForFieldName("parameters");
+    if (parameters && node.childForFieldName("body")) return;
+    const callee = node.childForFieldName("function") ?? node.childForFieldName("constructor");
+    let binder: Node | null = null;
+    let value: Node | null = null;
+    for (const [binderField, valueField] of BINDINGS) {
+      const candidate = node.childForFieldName(binderField);
+      const bound = node.childForFieldName(valueField);
+      if (!candidate || !bound || candidate.id === bound.id) continue;
+      if (binderField === "left" && !bindsLeft(node)) continue;
+      // `Option(callback=f)`: a keyword names the library's parameter, not a variable here.
+      if (binderField === "name" && inArguments) continue;
+      binder = candidate;
+      value = bound;
+      break;
+    }
+    const inner = binder && value ? [...holders, ...binderNames(binder)] : holders;
+    for (let index = 0; index < node.childCount; index += 1) {
+      const child = node.child(index);
+      if (!child) continue;
+      if ((callee && child.id === callee.id) || (binder && child.id === binder.id)) visit(child, [], inArguments);
+      else visit(child, value && child.id === value.id ? inner : holders, inArguments || Boolean(callee));
+    }
+  };
+  visit(tree.rootNode, [], false);
+  return out;
+}
+
 /* -- one repository's routines -------------------------------------------- */
 
 /** A routine, as the walks identify one. `file` is repo-relative. */
@@ -220,6 +325,8 @@ export interface Read {
   constructorClasses: Map<string, Set<string>>;
   /** A base class name, to the classes listing it and whether each declares its own constructor. */
   subclasses: Map<string, Array<{ name: string; ownConstructor: boolean }>>;
+  /** A name, to every name holding it as a value. `callbacks` only. */
+  heldBy: Map<string, Set<string>>;
   refereeUnseen: number;
   refereeSites: number;
 }
@@ -260,6 +367,7 @@ export function readRepo(dir: string): Read {
   const localCallers = new Set<string>();
   const constructorClasses = new Map<string, Set<string>>();
   const subclasses = new Map<string, Array<{ name: string; ownConstructor: boolean }>>();
+  const heldBy = new Map<string, Set<string>>();
   let refereeUnseen = 0;
   let refereeSites = 0;
   const index = (into: Map<string, Routine[]>, name: string, routine: Routine) => {
@@ -279,6 +387,9 @@ export function readRepo(dir: string): Read {
     const reading = callSitesIn({ file: rel, source, language, imports: imports(rel, source), open });
     if (!reading.read) continue;
     const names = namesIn(source, language);
+    for (const [held, holder] of holdingsIn(source, language)) {
+      heldBy.set(held, (heldBy.get(held) ?? new Set()).add(holder));
+    }
     for (const shape of classesIn(source, language)) {
       for (const constructor of shape.constructors) {
         const id = `${rel}#${constructor}`;
@@ -355,7 +466,7 @@ export function readRepo(dir: string): Read {
   resetEngineCache();
   return {
     routines, callersOfName, mentionersOfName, unnamedCallers, localCallers,
-    constructorClasses, subclasses, refereeUnseen, refereeSites,
+    constructorClasses, subclasses, heldBy, refereeUnseen, refereeSites,
   };
 }
 
@@ -403,6 +514,34 @@ export function constructingNames(read: Read, routineId: string): Set<string> {
   return names;
 }
 
+const holderCache = new WeakMap<Read, Map<string, Set<string>>>();
+
+/** Every name holding `name` as a value, directly or through another holder. */
+export function holdersOf(read: Read, name: string): Set<string> {
+  let cache = holderCache.get(read);
+  if (!cache) { cache = new Map(); holderCache.set(read, cache); }
+  const hit = cache.get(name);
+  if (hit) return hit;
+  const found = new Set<string>();
+  const frontier = [name];
+  while (frontier.length > 0) {
+    const current = frontier.pop()!;
+    for (const holder of read.heldBy.get(current) ?? []) {
+      if (holder === name || found.has(holder)) continue;
+      found.add(holder);
+      frontier.push(holder);
+    }
+  }
+  cache.set(name, found);
+  return found;
+}
+
+/** Whether `caller` uses a name that holds `callee`. */
+export function holds(read: Read, caller: Routine, callee: Routine): boolean {
+  for (const holder of holdersOf(read, callee.name)) if ((caller.mentions.get(holder) ?? 0) > 0) return true;
+  return false;
+}
+
 /** Whether `caller` names a class whose construction runs `callee`. */
 export function constructs(read: Read, caller: Routine, callee: Routine): boolean {
   for (const name of constructingNames(read, callee.id)) if ((caller.mentions.get(name) ?? 0) > 0) return true;
@@ -430,10 +569,19 @@ export function couldReach(
       frontier.push(caller);
     }
     // Building the object runs the constructor, and the code names only the class.
-    // `mentions` only: `calls` stays the baseline it was measured as.
-    if (walk !== "mentions") continue;
+    // Not `calls`: that stays the baseline it was measured as.
+    if (walk === "calls") continue;
     for (const name of constructingNames(read, current.id)) {
       for (const caller of read.mentionersOfName.get(name) ?? []) {
+        if (set.has(caller.id)) continue;
+        set.add(caller.id);
+        frontier.push(caller);
+      }
+    }
+    // A library holding this routine calls it back; whatever uses the holder may trigger it.
+    if (walk !== "callbacks") continue;
+    for (const holder of holdersOf(read, current.name)) {
+      for (const caller of read.mentionersOfName.get(holder) ?? []) {
         if (set.has(caller.id)) continue;
         set.add(caller.id);
         frontier.push(caller);
