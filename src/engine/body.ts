@@ -29,6 +29,15 @@
  * Discrimination survives because the receiver rule does the real work.
  * `Type::foo()` and `other.foo()` are not followed, so the search stays inside
  * the code this file owns and cannot wander into everything a library exposes.
+ *
+ * **One file is the limit here and it is not a budget.** `bodiesFor` looks a
+ * callee's name up in the tree it already parsed, so the moment a chain steps
+ * into another file it ends. `reach.ts` is the other half: it follows calls
+ * `calls.ts` can *place*, across files, and it exists because most real chains
+ * cross one on the first hop. This file stays the one-file reader, and
+ * `ownTokensOf` below is the one concession it makes to the other one being
+ * possible -- a name across a file boundary is held to a stricter standard
+ * than a name inside it.
  */
 
 import { each, parseSource, type Language, type Node, type Tree } from "./parse";
@@ -417,48 +426,165 @@ export function numbersInSymbol(
  * neither is `log_line` inside a string. It is also what makes `#private`
  * class fields work, which the old word-boundary search could not match.
  */
-const tokenCache = new Map<number, Set<string>>();
-const callCache = new Map<number, Set<string>>();
-
 /**
- * Node ids belong to a tree, and a tree gets freed when it falls out of the
- * parse cache -- so these would grow forever inside the long-lived MCP server.
- * Dropped wholesale rather than tracked per tree: rebuilding a token set is
- * microseconds, and bookkeeping to save that would cost more than it saves.
+ * Held against the tree, not in one map keyed by node id.
+ *
+ * A node id is an address inside one tree. Two trees alive at once never
+ * collide, and a tree that has fallen out of the parse cache is freed -- so
+ * the next tree can be handed the same addresses, and a global map keyed on
+ * them answers a question about the new file with the old file's tokens. That
+ * is not a slow cache, it is a wrong answer, and the shape of it is the worst
+ * one here: it depends on how many *other* files were parsed in between, so
+ * the same board gives two different verdicts depending on what else the check
+ * happened to read. Found when the cross-file walk in `reach.ts` started
+ * parsing more files and one arrow's confirmation in `measure:reach` moved
+ * without anything about that arrow changing.
+ *
+ * A `WeakMap` on the tree makes the lifetimes agree by construction: the
+ * entries go when the tree does, which is what the old `NODE_CACHE_LIMIT`
+ * was approximating with a wholesale clear.
  */
-const NODE_CACHE_LIMIT = 4096;
+const tokenCache = new WeakMap<Tree, Map<number, Set<string>>>();
+const ownTokenCache = new WeakMap<Tree, Map<number, Set<string>>>();
+const callCache = new WeakMap<Tree, Map<number, Set<string>>>();
 
-function bound(cache: Map<number, unknown>): void {
-  if (cache.size > NODE_CACHE_LIMIT) cache.clear();
+function inTree<T>(cache: WeakMap<Tree, Map<number, T>>, tree: Tree): Map<number, T> {
+  const hit = cache.get(tree);
+  if (hit) return hit;
+  const made = new Map<number, T>();
+  cache.set(tree, made);
+  return made;
 }
 
-function tokensOf(node: Node): Set<string> {
-  const hit = tokenCache.get(node.id);
+function tokensOf(tree: Tree, node: Node): Set<string> {
+  const byId = inTree(tokenCache, tree);
+  const hit = byId.get(node.id);
   if (hit) return hit;
-  bound(tokenCache);
   const found = new Set<string>();
-  tokenCache.set(node.id, found);
+  byId.set(node.id, found);
   each(node, (current) => { if (isName(current)) found.add(current.text); });
   return found;
 }
 
-function callsCached(node: Node): Set<string> {
-  const hit = callCache.get(node.id);
+function callsCached(tree: Tree, node: Node): Set<string> {
+  const byId = inTree(callCache, tree);
+  const hit = byId.get(node.id);
   if (hit) return hit;
-  bound(callCache);
   const found = calleesOf(node);
-  callCache.set(node.id, found);
+  byId.set(node.id, found);
   return found;
 }
 
-/** Free the per-node caches. Trees are freed by `resetEngineCache`. */
-export function resetBodyCache(): void {
-  tokenCache.clear();
-  callCache.clear();
+/**
+ * Nothing to free: the per-node sets are held against their tree and go when
+ * `resetEngineCache` drops it. Kept as a no-op because the test setup calls
+ * it, and a reset that quietly stopped resetting would be worse than one that
+ * says outright there is nothing left to reset.
+ */
+export function resetBodyCache(): void {}
+
+/**
+ * The fields a grammar puts a member's own name on.
+ *
+ * Fields rather than node types, for `docs/reading-a-grammar.md`'s reason: a
+ * list of names -- `field_expression|member_expression|attribute` -- is a
+ * second list that has to agree with a first one and silently will not. All
+ * three grammars agree on the *field*: Rust's `cause.source()` puts `source`
+ * on `field`, TypeScript's `x.foo()` puts `foo` on `property`, Python's on
+ * `attribute`. A reader matching these needs no branch per language and grows
+ * none when a fourth arrives.
+ */
+const MEMBER_FIELDS = ["field", "property", "attribute"];
+
+/** The fields a grammar puts the thing a member is read off on. */
+const RECEIVER_FIELDS = ["value", "object"];
+
+/** The receivers that mean "the thing this routine is part of". */
+const OWN_RECEIVER = new Set(["self", "this"]);
+
+/**
+ * A qualified name -- `path` and `name` on the same node, which in these
+ * grammars is Rust's `Parser::new()` and nothing else.
+ *
+ * Kept apart from the member fields above rather than folded in, because
+ * `name` on its own is the field every *declaration* uses: a rule that read
+ * `name` as a member would eat a TypeScript `const x = f()` (a
+ * `variable_declarator` carrying `name` and `value`) and a Python keyword
+ * argument. `path` beside it is what makes the clause mean "a qualified
+ * reference" rather than "anything with a name".
+ *
+ * That it belongs here at all is the second thing the corpus corrected. A
+ * path call writes the type at the call site, which reads like better
+ * evidence than `x.foo()` -- so it was let through, on the argument that none
+ * of the 51 it was first measured against had been one. Measured over the
+ * whole Rust population instead, letting it through bought 17
+ * confirmations and cost 5 more wrong ones: `ripgrep`'s `config.rs` has a
+ * test `fn basic` whose body writes `Parser::new()`, and an arrow to
+ * `parse.rs#new` went green on it. Three right for every wrong is not a rate
+ * this file accepts, so the argument lost to the number.
+ */
+const PATH_FIELD = "path";
+const QUALIFIED_NAME_FIELD = "name";
+
+/**
+ * Identifier tokens under a node, minus the ones that are somebody else's
+ * member.
+ *
+ * The strict standard, for a target in **another file**. `tokensOf` counts
+ * every identifier leaf, which is right inside one file -- there is no second
+ * thing the name could mean there -- and wrong across files, where there very
+ * much is. `anyhow`'s `chain.rs` has `fn len` whose body writes
+ * `cause.source()`, so an arrow from `context.rs#source` to `chain.rs#len` came
+ * back confirmed: the body writes the word `source`, and it is
+ * `StdError::source` on a trait object, nothing to do with the other file.
+ * Rust went green on **60 arrows in 1,572 that its own compiler says never
+ * reach**, nearly all of this one shape; with this rule, 9. Found by
+ * `measure:reach`, and paid for in that file's "what it costs".
+ *
+ * It is the rule ee3b29e already settled for *following* a hop -- "`Type::foo`
+ * and `other.foo` are somebody else's foo" -- applied to the place the search
+ * stops rather than only to the places it steps through. `self.foo` and
+ * `this.foo` still count: those are members of the type the routine belongs
+ * to, and a Rust `impl` block for that type may well be in the other file.
+ */
+function ownTokensOf(tree: Tree, node: Node): Set<string> {
+  const byId = inTree(ownTokenCache, tree);
+  const hit = byId.get(node.id);
+  if (hit) return hit;
+  const found = new Set<string>();
+  byId.set(node.id, found);
+  const field = (at: Node, names: string[]): Node | undefined => {
+    for (const one of names) {
+      const child = at.childForFieldName(one);
+      if (child) return child;
+    }
+    return undefined;
+  };
+  const walk = (current: Node): void => {
+    if (isName(current)) { found.add(current.text); return; }
+    const member = field(current, MEMBER_FIELDS);
+    const through = member
+      ? field(current, RECEIVER_FIELDS)
+      : current.childForFieldName(QUALIFIED_NAME_FIELD)
+        ? current.childForFieldName(PATH_FIELD)
+        : null;
+    if (through && !OWN_RECEIVER.has(through.text)) {
+      // The left side is still read: `a.b.c` says something about `a`, and
+      // `crate::chain::len` says something about `crate::chain`.
+      walk(through);
+      return;
+    }
+    for (let index = 0; index < current.childCount; index += 1) {
+      const child = current.child(index);
+      if (child) walk(child);
+    }
+  };
+  walk(node);
+  return found;
 }
 
-function namesAny(body: Node, targets: string[]): boolean {
-  const tokens = tokensOf(body);
+function namesAny(tree: Tree, body: Node, targets: string[], own = false): boolean {
+  const tokens = own ? ownTokensOf(tree, body) : tokensOf(tree, body);
   return targets.some((target) => tokens.has(target));
 }
 
@@ -630,12 +756,12 @@ export function chainBreak(
     const bodies = tree
       ? declarationsIn(tree, here).map((d) => d.body).filter((b): b is Node => b !== undefined)
       : [];
-    if (bodies.length === 0) {
+    if (!tree || bodies.length === 0) {
       return { at: here, next: wanted.join(" or "), unreadable: true };
     }
     // Any one of this name's declarations carrying the link is enough. A method
     // declared in two impl blocks is one name to the diagram.
-    if (!bodies.some((body) => namesAny(body, wanted))) {
+    if (!bodies.some((body) => namesAny(tree, body, wanted))) {
       return { at: here, next: wanted.join(" or "), unreadable: false };
     }
   }
@@ -672,7 +798,7 @@ export function unsupportedMembers(
     const others = members.filter((other) => other !== member);
     // Supported if *any* of its declarations shows a trace. One `impl` block
     // carrying the concept is the name carrying the concept.
-    const supported = callable.some((declaration) => namesAny(declaration.body!, others));
+    const supported = callable.some((declaration) => namesAny(tree, declaration.body!, others));
     if (!supported) orphans.push(member);
   }
   return orphans;
@@ -703,6 +829,11 @@ export function reaches(
   from: string,
   targets: string[],
   language: Language,
+  /**
+   * Whether the targets live in another file, in which case a name written as
+   * somebody else's member is not evidence about them. See `ownTokensOf`.
+   */
+  elsewhere = false,
 ): boolean | undefined {
   const tree = treeOf(source, language);
   // No grammar is no answer. Refusing the question is the quiet direction; a
@@ -729,10 +860,10 @@ export function reaches(
     const next: string[] = [];
     for (const name of frontier) {
       for (const body of bodiesFor(name)) {
-        if (namesAny(body, targets)) return true;
+        if (namesAny(tree, body, targets, elsewhere)) return true;
         if (read >= VISIT_CAP) return undefined;
         read += 1;
-        for (const callee of callsCached(body)) {
+        for (const callee of callsCached(tree, body)) {
           if (seen.has(callee)) continue;
           seen.add(callee);
           next.push(callee);

@@ -1,10 +1,15 @@
 /**
- * The backward reach walks behind `measure:reach` (#58).
+ * The backward reach walks behind `measure:door-reach` (#58).
  *
  * In a module of their own so each shape they handle can be tested on its own,
  * rather than only through a corpus run whose referee reaches three doors per
- * project. `scripts/measure-reach.mts` says what the walks are for and how they
- * are scored; this file is the walks.
+ * project. `scripts/measure-door-reach.mts` says what the walks are for and how
+ * they are scored; this file is the walks.
+ *
+ * Unrelated to `src/engine/reach.ts`, which follows a chain between two named
+ * routines (#271). Here the far end is a **door** and the question is which
+ * routines could reach it, so the walk runs backwards from the door and
+ * over-approximates rather than following one chain forwards.
  *
  * `S(D)` is every routine that could possibly reach door `D`, built backwards
  * from the door and over-approximated on purpose: a routine outside it provably

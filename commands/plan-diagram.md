@@ -279,6 +279,36 @@ Do not claim it on a subsystem you already know everything reaches into — that
 is a boundary you would have to build first, and the claim will be red from the
 day the box turns solid.
 
+### `handles: [...]` on a planned routine box — the cases it will cover
+
+`handles` says **these are all the cases that routine dispatches on**. Only for
+a box whose `ref` names a routine (`path#symbol`), and on a plan the routine
+does not exist yet, so the list is the set of cases the design says it will
+have to cover:
+
+```
+{ id: "dispatch", label: "the dispatcher", ref: "src/router.ts#dispatch",
+  state: "planned", handles: ["GET", "POST", "DELETE"] }
+```
+
+Of every claim on this page, this is the one whose *plan* form is worth the most,
+and for a reason specific to it. Every other word here goes stale when somebody
+changes something. A case list goes stale when somebody **adds** something —
+which is the one kind of drift nobody notices, because adding a fourth case
+breaks nothing and reads as progress. Writing the three you designed for means
+the fourth one arrives as a finding with a file and a line, the run after the box
+promotes, instead of as a bug six months later in whichever case nobody wrote an
+arm for.
+
+Write the set the design calls for, not a guess at what the code will end up
+doing: a partial list is not a smaller claim, it is a false one, and it goes red
+the day the box turns solid. Nothing is checked while the box is planned.
+
+It is checked in TypeScript today. The reader works in Rust, Python, JavaScript
+and TSX too and confirms there without ever saying wrong, because only
+TypeScript has a measured referee — so writing it elsewhere costs nothing and
+starts counting the day that square is earned.
+
 ## Check the board you just drew
 
 `create_diagram` checks the board as it writes it. If the result names boxes

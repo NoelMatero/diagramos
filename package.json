@@ -51,8 +51,9 @@
     "measure:constructs": "tsx scripts/measure-constructs.mts",
     "measure:dataflow": "tsx scripts/measure-dataflow.mts",
     "measure:deps": "tsx scripts/measure-deps.mts",
-    "measure:reach": "NODE_OPTIONS=--max-old-space-size=8192 tsx scripts/measure-reach.mts",
+    "measure:handles": "NODE_OPTIONS=--max-old-space-size=8192 tsx scripts/measure-handles.mts",
     "measure:doors": "NODE_OPTIONS=--max-old-space-size=8192 tsx scripts/measure-doors.mts",
+    "measure:door-reach": "NODE_OPTIONS=--max-old-space-size=8192 tsx scripts/measure-door-reach.mts",
     "measure:holds": "tsx scripts/measure-holds.mts",
     "measure:licence": "tsx scripts/measure-licence.mts",
     "measure:rebind": "tsx scripts/measure-rebind.mts",
@@ -66,7 +67,8 @@
     "test:watch": "vitest",
     "test:e2e:board": "tsx scripts/e2e-live-board.mjs",
     "diagram:example": "tsx scripts/make-example-diagram.mjs",
-    "diagram:render": "tsx scripts/render-diagram.mjs"
+    "diagram:render": "tsx scripts/render-diagram.mjs",
+    "measure:reach": "NODE_OPTIONS=--max-old-space-size=8192 tsx scripts/measure-reach.mts"
   },
   "dependencies": {
     "@modelcontextprotocol/sdk": "^1.29.0",

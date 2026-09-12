@@ -128,7 +128,8 @@ export function recoverDiagram(board: BoardFile, name: string): RecoveredDiagram
     .sort((left, right) => indexOf(left, "node") - indexOf(right, "node"))
     .map((element) => {
       const custom = customOf(element);
-      const claim = custom.claim as { closed?: unknown; through?: unknown } | undefined;
+      const claim = custom.claim as
+        { closed?: unknown; through?: unknown; handles?: unknown; cases?: unknown } | undefined;
       const background = stringOf(element.backgroundColor);
       const stroke = stringOf(element.strokeColor);
       return {
@@ -145,6 +146,7 @@ export function recoverDiagram(board: BoardFile, name: string): RecoveredDiagram
         ...(stringsOf(custom.refs) ? { refs: stringsOf(custom.refs)! } : {}),
         ...(stateOf(custom.state) ? { state: stateOf(custom.state)! } : {}),
         ...(claim?.closed ? { closed: { through: stringsOf(claim.through) ?? [] } } : {}),
+        ...(claim?.handles ? { handles: stringsOf(claim.cases) ?? [] } : {}),
       };
     });
 

@@ -361,9 +361,12 @@ export async function createPyrightLspReferee(root: string): Promise<PyrightLspR
     if (id === undefined) return undefined;
     return new Promise((resolve, reject) => {
       pending.set(id, { resolve, reject });
+      // `unref`, or a request that answered leaves its timeout pending and
+      // Node declines to exit until it fires. The same bug the rust client's
+      // `whenPrimed` had, and worth an entire minute there.
       setTimeout(() => {
         if (pending.delete(id)) reject(new Error(`textDocument request ${method} timed out`));
-      }, REQUEST_TIMEOUT_MS);
+      }, REQUEST_TIMEOUT_MS).unref();
     });
   }
 

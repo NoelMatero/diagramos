@@ -35,20 +35,25 @@ import {
 import { checkFeeds, type FeedsCandidate, type FeedsWithheld } from "./feeds";
 import { followAnchors, type FollowedRef, type StaleAnchor, type Trail } from "./follow";
 import type { BoardFile } from "./board-file";
-import { arrowClaimError, boxClaimError, valueClaimError, type ArrowClaim } from "./claim";
+import {
+  arrowClaimError, boxClaimError, isClosedClaim, isHandlesClaim, valueClaimError,
+  type ArrowClaim,
+} from "./claim";
 import { checkClosed, type ClosedBreach } from "./closed";
+import { checkHandles, type HandlesWithheld } from "./handles";
 import { connects, refIsStale, type CodeGraphOption } from "./codegraph";
 import { readDependencies, readerCanPlace } from "./deps";
 import type { BindingFault } from "./damage";
 import { generatedRef, NEVER_WALK } from "./generated";
 import { readGraph, type Provenance, type RecoveredGraph } from "./graph";
-import { licenceFor } from "./licence";
+import { licenceFor, mayAccuse } from "./licence";
 import { languageOf, type Language } from "./parse";
 import { ledgerAdditions, type Ledger } from "./ledger";
 import { checkNeeds, type NeedsWithheld } from "./needs";
 import {
   type CallSide, type CallsWithheld, EXTERNAL_RECEIVER, type ReceiverResolution, callSitesIn, callsBetween,
 } from "./calls";
+import { newReachCache, reachBetween, type ReachCache } from "./reach";
 import { constructions, routineNamesIn, type ConstructsWithheld } from "./constructs";
 import { type AccessesWithheld, type NotReadEvidence, memberAccesses, memberNamed, membersReadAt, membersReadByName, readsMember } from "./accesses";
 import { heldTypes, type HoldsWithheld } from "./holds";
@@ -112,7 +117,18 @@ export type DriftKind =
    * a caller can hit by writing a claim that could never fail -- see
    * `checkDrift`, which refuses an unfalsifiable scope with this same kind.
    */
-  | "incomplete-board";
+  | "incomplete-board"
+  /**
+   * A `handles` box whose routine does not dispatch on the cases it lists.
+   *
+   * Refutable on the footing `@holds` stands on rather than `@calls`': the arms
+   * of a dispatch are enumerable from the text, so a case that is not among
+   * them is genuinely absent. Both directions are reported under this one kind
+   * -- a case the code names and the box does not, and a case the box names and
+   * the code has no arm for -- because both mean the same thing to a reader:
+   * the picture and the dispatch disagree, and here is the line.
+   */
+  | "mishandled-box";
 
 export interface DriftFinding {
   /** Node id, as edges and edit_diagram refer to it. */
@@ -287,7 +303,27 @@ export type EdgeFindingKind =
    * looked; `conforms.ts` withholds with `region-is-the-crate` and the licence
    * grid carries the same `no` a second time.
    */
-  | "conforms-absent";
+  | "conforms-absent"
+  /**
+   * A `calls` arrow whose routine does not call the other one, and does reach
+   * it through a chain of calls (#reach).
+   *
+   * An **advisory**, and it exists because the alternative was a red on
+   * correct code. `calls-refuted` fires when every call one routine makes was
+   * read and none of them is the far end -- true, and not the whole truth
+   * when one of those calls leads to the far end two hops later. Measured on
+   * the corpus by `measure:reach`: of the pairs a compiler says really do
+   * reach each other, 62 were being told their arrow was wrong -- 58
+   * `refuted` and one `backwards` on TypeScript, 3 `refuted` on Python.
+   *
+   * A board like that is drawn one level too high, which is the reading
+   * `@accesses` already gives the same shape (`accesses-not-read` stays quiet
+   * when a called function does the reading). So the row says which route it
+   * found and leaves the arrow standing: the author can draw the hop or leave
+   * the arrow where it is, and neither answer is a mistake somebody has to be
+   * accused of.
+   */
+  | "calls-one-level-up";
 
 /**
  * Every verdict word this engine can put in a report, as data (#116).
@@ -316,6 +352,7 @@ export const DRIFT_KINDS = [
   "stale-number",
   "open-box",
   "incomplete-board",
+  "mishandled-box",
 ] as const satisfies readonly DriftKind[];
 
 export const EDGE_FINDING_KINDS = [
@@ -331,6 +368,7 @@ export const EDGE_FINDING_KINDS = [
   "accesses-absent",
   "accesses-not-read",
   "conforms-absent",
+  "calls-one-level-up",
 ] as const satisfies readonly EdgeFindingKind[];
 
 /**
@@ -372,6 +410,7 @@ export const ADVISORY_EDGE_KINDS = [
   "unsupported-edge",
   "broken-chain",
   "built-backwards",
+  "calls-one-level-up",
 ] as const satisfies readonly EdgeFindingKind[];
 
 /** Whether a verdict says the diagram is wrong rather than worth a look. */
@@ -843,6 +882,19 @@ export interface ClaimTally {
    * breach into this number in public; it does not make it disappear.
    */
   closedTestReaches: number;
+  /** Boxes asserting what cases their routine dispatches on. */
+  handles: number;
+  /** Of those, how many were checked and agreed with the code. */
+  handlesHeld: number;
+  /**
+   * Of those, how many got no verdict, and why.
+   *
+   * Counted rather than left silent for the reason the `needs` withheld list
+   * exists: a claim that passed and a claim nothing read look identical in a
+   * clean report, and only one of them means the diagram is being held to
+   * anything. Writing `handles` is somebody asking a question out loud.
+   */
+  handlesWithheld: Array<{ label: string; why: HandlesWithheld; detail?: string }>;
   /**
    * Whether the board asserts it is complete about a directory. One or zero:
    * a board carries at most one such claim, on its title element.
@@ -2043,6 +2095,57 @@ function poolShows(pool: Set<string>, route: string): boolean {
  * wrong inside prose: a finding that quotes a four-line label breaks its own
  * sentence in half and the reader loses the thread of the accusation.
  */
+/**
+ * What a refuted `handles` claim says, in the words the reader thinks in.
+ *
+ * Two sentences at most, the bad outcome first and the line second. Both
+ * directions are the same finding to a reader -- the picture and the dispatch
+ * disagree -- but they are not the same *instruction*, so they get different
+ * wording: an unlisted case is the diagram falling behind the code, and a
+ * listed case with no arm is a case nobody handles.
+ */
+function handlesDetail(
+  parsed: { path: string; symbol?: string },
+  extra: readonly string[],
+  missing: readonly string[],
+  found: readonly string[],
+  line: number,
+): string {
+  const routine = parsed.symbol ?? "this routine";
+  const said = found.length > 0 ? found.join(", ") : "nothing";
+  const parts: string[] = [];
+  if (missing.length > 0) {
+    parts.push(
+      `This box says ${routine} handles ${list(missing)}, and it has no case for `
+      + `${missing.length === 1 ? "that" : "those"}, and no default to fall through to.`,
+    );
+  }
+  if (extra.length > 0) {
+    parts.push(
+      `${routine} also dispatches on ${list(extra)}, which this box does not list.`,
+    );
+  }
+  /*
+   * The evidence once, at the end.
+   *
+   * Both halves used to carry the file, the line and the case set, so a box
+   * that was wrong in both directions printed them twice in one sentence --
+   * which reads as the tool repeating itself and buries the instruction. What a
+   * reader needs is the complaint, then the line, then what to do.
+   */
+  parts.push(
+    `${parsed.path}:${line} dispatches on ${said}. Fix the box, or fix the routine.`,
+  );
+  return parts.join(" ");
+}
+
+/** `a`, `a and b`, `a, b and c` -- a list a person reads rather than a JSON array. */
+function list(names: readonly string[]): string {
+  if (names.length <= 1) return names.map((name) => `\`${name}\``).join("");
+  const quoted = names.map((name) => `\`${name}\``);
+  return `${quoted.slice(0, -1).join(", ")} and ${quoted[quoted.length - 1]}`;
+}
+
 function oneLine(label: string): string {
   return label.replace(/\s+/g, " ").trim();
 }
@@ -2117,7 +2220,7 @@ type SymbolEdgeVerdict = "reached" | "unreached" | "unreadable";
  * code cannot answer either way (#133). The names are carried out so the reader
  * can be told which end to re-anchor.
  */
-interface SymbolEdgeResult {
+export interface SymbolEdgeResult {
   verdict: SymbolEdgeVerdict;
   dataEnds: string[];
 }
@@ -2129,7 +2232,7 @@ interface SymbolEdgeResult {
  * two are connected, and the diagram's sense of direction is a reading of the
  * design rather than a claim about who calls whom.
  */
-function checkSymbolEdge(
+export function checkSymbolEdge(
   from: { file: string; path: string; symbols: string[] },
   to: { file: string; path: string; symbols: string[] },
   workspace: Workspace,
@@ -2157,11 +2260,41 @@ function checkSymbolEdge(
     const source = workspace.read(start.file);
     let runs = false;
     let declared = false;
+    /*
+     * Which of the far end's names this file may be searched for, which is
+     * not always all of them.
+     *
+     * The search is a token match: does this body write the far end's name.
+     * Inside one file that is the right standard and there is no second thing
+     * the name could mean. Across files there is, and it is the failure both
+     * earlier attempts at depth made in a different costume (ee3b29e): Flask
+     * declares a nested `def decorator` inside `app_template_filter`, and an
+     * arrow from `app.py#decorator` to `blueprints.py#app_template_filter`
+     * came back **confirmed** -- on the strength of that body writing the word
+     * `decorator`, which is its own, declared eight lines down, and has
+     * nothing to do with the `decorator` in the other file. Six wrong
+     * confirmations in one repository, and `measure:reach` is what found them.
+     *
+     * So a name the searching file declares **itself** is dropped from the
+     * question. That is `call-scan.ts`'s own rule, arrived at the same way:
+     * "a referee that cannot tell which of two same-named things is meant has
+     * no business asking."
+     */
+    const askable = start.file === target.file
+      ? target.symbols
+      : target.symbols.filter((name) => declarationsOf(source, name, language).length === 0);
     for (const symbol of start.symbols) {
       const declarations = declarationsOf(source, symbol, language);
       if (declarations.length > 0) declared = true;
       if (declarations.some((one) => one.kind === "callable")) runs = true;
-      const verdict = reaches(source, symbol, target.symbols, language);
+      /*
+       * Nothing left to look for is a refusal, not an absence: the question
+       * was about a name this file spells two ways, and `unreached` would be
+       * an amber saying these two are unconnected on the strength of not
+       * having asked.
+       */
+      if (askable.length === 0) continue;
+      const verdict = reaches(source, symbol, askable, language, start.file !== target.file);
       if (verdict === undefined) continue;
       asked = true;
       if (verdict) return { verdict: "reached", dataEnds: [] };
@@ -2479,6 +2612,7 @@ export function checkDrift(
   const assertions: AssertionTally = { checked: 0, downgraded: 0, unsupportedLanguage: 0 };
   const claims: ClaimTally = {
     closed: 0, closedHeld: 0, closedTestReaches: 0,
+    handles: 0, handlesHeld: 0, handlesWithheld: [],
     complete: 0, completeHeld: 0,
     needs: 0, needsChecked: 0, needsWithheld: {},
     takes: 0, returns: 0, signatureConfirmed: 0, signatureWithheld: {},
@@ -2528,6 +2662,28 @@ export function checkDrift(
   };
   /** Shared by the box checks and the arrow checks: one read per file per run. */
   const importCache: ReadCache = { imports: new Map(), configs: new Map() };
+  /**
+   * Bodies the reach walk has already read, for this check and no longer.
+   *
+   * Per check rather than module-level, for `ConfigCache`'s reason: this
+   * process outlives a check, and a body read once and remembered forever is
+   * a fact with a shelf life -- the exact rot this tool exists to catch. A
+   * board's arrows cross the same handful of files over and over, so one
+   * reading per file per check is most of what a cache can buy anyway.
+   */
+  const reachCache: ReachCache = newReachCache();
+  /**
+   * The caller's "go to definition", handed to the reach walk when there is
+   * one.
+   *
+   * Spread rather than passed as a possibly-`undefined` property, so a check
+   * with no checker wired in hands `reachBetween` an options object with no
+   * `declarationAt` in it at all -- which is the shape its own default is
+   * written against, and the shape `measure:reach` deliberately runs in.
+   */
+  const declarationAsked = options?.closedBodyReferee?.declarationAt
+    ? { declarationAt: options.closedBodyReferee.declarationAt.bind(options.closedBodyReferee) }
+    : {};
 
   /**
    * Files the wiring behind a `@feeds` arrow could be in.
@@ -2945,6 +3101,100 @@ export function checkDrift(
   }
 
   /*
+   * `handles` boxes: what cases a routine dispatches on.
+   *
+   * Cheap in the way `closed` is expensive. The claim names one routine, so the
+   * evidence is the file the box already points at -- no walk, no second file,
+   * and nothing outside the diagram. It is the whole reason this word could
+   * ship on the per-turn path without a flag: a box that claims it costs one
+   * parse of a file the missing-symbol check has already read.
+   *
+   * `external` and `planned` are excused exactly as they are for `closed`, and
+   * for the same two different reasons: there is no code of ours to read, and a
+   * claim on a routine nobody has written yet is a specification rather than a
+   * transcription. The gate releases itself when the box promotes.
+   */
+  const handlesBoxes = graph.nodes.filter(
+    (node) => node.claim && isHandlesClaim(node.claim) && node.provenance === "recorded"
+      && node.state !== "external" && node.state !== "planned",
+  );
+  for (const node of handlesBoxes) {
+    if (concept) break;
+    const claim = node.claim;
+    if (!claim || !isHandlesClaim(claim)) continue;
+    claims.handles += 1;
+    const label = node.label || node.id;
+
+    const anchor = node.ref?.trim();
+    const parsed = anchor ? parseRef(anchor) : undefined;
+    /*
+     * A routine, named. `handles` is about one dispatch, and a box anchored at
+     * a whole file cannot say which routine in it -- so this refuses rather
+     * than picking the file's only dispatch, which would hold until somebody
+     * added a second one and then start refusing for a reason nobody could see.
+     */
+    if (!parsed?.symbol) {
+      claims.handlesWithheld.push({ label, why: "no-body", detail: anchor ?? "(no ref)" });
+      continue;
+    }
+    const resolved = workspace.resolve(parsed.path);
+    const source = resolved && workspace.stat(resolved) === "file"
+      ? workspace.read(resolved)
+      : undefined;
+    if (source === undefined) {
+      // The missing-file and missing-symbol checks have already said so, and
+      // saying it twice about one box is how a report stops being read.
+      claims.handlesWithheld.push({ label, why: "no-body", detail: parsed.path });
+      continue;
+    }
+    const language = languageOf(parsed.path);
+    if (!language) {
+      claims.handlesWithheld.push({ label, why: "no-grammar", detail: parsed.path });
+      continue;
+    }
+
+    /*
+     * The licence, at the last gate before the accusation and nowhere earlier.
+     *
+     * An unlicensed language still gets the whole reading -- the dispatch is
+     * found, the cases are compared, a match is counted as held. What it does
+     * not get is the *red*, because finding a name is the same evidence
+     * whoever reads it while an absence is a claim about the whole of
+     * something. That is the rule `licence.ts`'s header states and the one
+     * #195 was a violation of.
+     *
+     * As measured, this is `yes` in TypeScript and `no` in TSX, JavaScript,
+     * Rust and Python. Rust is the square #206 predicted would be strongest.
+     */
+    const reading = checkHandles(source, parsed.symbol, claim.cases, language);
+    if (reading.verdict === "wrong" && !mayAccuse("handles", language)) {
+      claims.handlesWithheld.push({ label, why: "unlicensed", detail: language });
+      continue;
+    }
+    if (reading.verdict === "withheld") {
+      claims.handlesWithheld.push({
+        label,
+        why: reading.why,
+        ...(reading.detail !== undefined ? { detail: reading.detail } : {}),
+      });
+      continue;
+    }
+    if (reading.verdict === "held") {
+      claims.handlesHeld += 1;
+      continue;
+    }
+
+    findings.push({
+      node: node.id,
+      label,
+      ref: anchor ?? "",
+      kind: "mishandled-box",
+      provenance: "recorded",
+      detail: handlesDetail(parsed, reading.extra, reading.missing, reading.found, reading.line),
+    });
+  }
+
+  /*
    * `closed` boxes: the one check here that reads files the board never names.
    *
    * Everything else in this file is bounded by the diagram -- a box names a
@@ -2969,7 +3219,7 @@ export function checkDrift(
    * checks the claim for real.
    */
   const closedBoxes = graph.nodes.filter(
-    (node) => node.claim?.closed && node.provenance === "recorded"
+    (node) => node.claim && isClosedClaim(node.claim) && node.provenance === "recorded"
       && node.state !== "external" && node.state !== "planned",
   );
   if (closedBoxes.length > 0 && !concept) {
@@ -3028,7 +3278,7 @@ export function checkDrift(
 
       const verdict = checkClosed(
         target,
-        node.claim!.through,
+        node.claim && isClosedClaim(node.claim) ? node.claim.through : [],
         files,
         workspace,
         (file) => TEST_FILE.test(file),
@@ -3095,6 +3345,7 @@ export function checkDrift(
 
   // Edge checking: check each generated edge for corroboration
   const edges: EdgeDriftFinding[] = [];
+
 
 
   if (options?.edges !== false && !concept) {
@@ -4015,6 +4266,46 @@ export function checkDrift(
               { ...head, names: toEnd.symbols },
             );
 
+            /*
+             * The chain an accusation has to rule out before it may be made.
+             *
+             * Both of this word's "wrong" verdicts are about the *direct*
+             * call, and both are read by the person holding the board as
+             * "this arrow is wrong". They are not the same thing. A routine
+             * that calls a helper that calls the far end has an arrow drawn
+             * one level too high, and a red is the wrong answer to it:
+             * `measure:reach` put 1,002 genuinely-reaching pairs in front of
+             * `@calls` and 61 came back `refuted`, one `backwards`.
+             *
+             * Asked lazily, and only where something is about to accuse.
+             * This walk reads bodies across files, which is worth doing to
+             * stop a red and not worth doing to decorate a silence.
+             */
+            const reaching = () => reachBetween(
+              { ...tail, routine: fromEnd.symbols[0]! },
+              { ...head, names: toEnd.symbols },
+              { cache: reachCache, ...declarationAsked },
+            );
+            /** The advisory a ruled-out accusation turns into. */
+            const oneLevelUp = (via: string[], hops: number): EdgeOutcome => ({
+              kind: "finding",
+              finding: {
+                from: fromPath,
+                to: toPath,
+                fromLabel: fromNode.label,
+                toLabel: toNode.label,
+                fromRef,
+                toRef,
+                kind: "calls-one-level-up",
+                detail:
+                  `this arrow says ${oneLine(fromNode.label) || fromPath} calls `
+                  + `${oneLine(toNode.label) || toPath}, and it does not call it directly -- `
+                  + `it gets there in ${hops} step${hops === 1 ? "" : "s"}, through `
+                  + `${via.join(" -> ")}. Draw the hop, or leave the arrow where it is and `
+                  + `read it as the whole path.`,
+              },
+            });
+
             if (verdict.verdict === "confirmed") {
               if (claimed) claims.callsConfirmed += 1;
               edgesChecked += 1;
@@ -4029,7 +4320,18 @@ export function checkDrift(
                * the other direction, and it falls through to silence -- the
                * accusation is refused for a plan exactly as it is for every
                * other claim, because a red about a plan is a lie about a plan.
+               *
+               * And "turn the arrow round" is wrong advice when the arrow also
+               * runs forwards through a chain. Both calls are real then, and
+               * the board drew the one the reader could not see in one hop.
                */
+              const alsoForward = reaching();
+              if (alsoForward.verdict === "reached") {
+                edgesChecked += 1;
+                recordEdge(edge, fromNode, toNode,
+                  oneLevelUp(alsoForward.via, alsoForward.hops.length));
+                continue;
+              }
               edgesChecked += 1;
               const wasClaimed = baselineGraph?.edges.some(
                 (was) => was.from === edge.from && was.to === edge.to && was.claim === "calls",
@@ -4057,7 +4359,19 @@ export function checkDrift(
                * A `planned` arrow reaching here is a sketch the code has not
                * caught up to; refused for the same reason `backwards` is
                * above -- a red about a plan is a lie about a plan.
+               *
+               * And the chain, for the reason `reaching` gives: every call
+               * this routine makes was read and none of them is the far end,
+               * which is true and is not the whole truth when one of them
+               * leads there.
                */
+              const throughAChain = reaching();
+              if (throughAChain.verdict === "reached") {
+                edgesChecked += 1;
+                recordEdge(edge, fromNode, toNode,
+                  oneLevelUp(throughAChain.via, throughAChain.hops.length));
+                continue;
+              }
               edgesChecked += 1;
               const wasClaimed = baselineGraph?.edges.some(
                 (was) => was.from === edge.from && was.to === edge.to && was.claim === "calls",
@@ -4395,9 +4709,42 @@ export function checkDrift(
         ? checkSymbolEdge(fromEnd, toEnd, workspace)
         : { verdict: "unreadable" as const, dataEnds: [] };
 
+      /**
+       * The same question, asked again across files (#reach).
+       *
+       * `checkSymbolEdge` above follows calls as deep as they go and never
+       * leaves the file it started in, because `body.ts` looks a callee's
+       * name up in the tree it already parsed. Most real chains leave the
+       * file on the first hop, and every one of them used to come back
+       * `no-call-either-way` -- an amber on a correct arrow, which is the
+       * commonest thing this engine says wrongly: 313 of TypeScript's 545
+       * reaching pairs, now 93 (docs/reach-measurement.md).
+       *
+       * Asked only once the one-file search has failed, and only to confirm:
+       * `reach.ts` is entitled to say `never` and nothing here reads that
+       * verdict yet, for the reason `licence.ts` exists. So the worst this
+       * can do is stay quiet exactly as before.
+       */
+      const reachedAcrossFiles = (): string[] | undefined => {
+        if (!bothNamed) return undefined;
+        const tail = callSide(fromAnchor, workspace, importCache.configs, options?.closedBodyReferee);
+        const head = callSide(toAnchor, workspace, importCache.configs, options?.closedBodyReferee);
+        if (!tail || !head) return undefined;
+        const walked = reachBetween(
+          { ...tail, routine: fromEnd.symbols[0]! },
+          { ...head, names: toEnd.symbols },
+          { cache: reachCache, ...declarationAsked },
+        );
+        return walked.verdict === "reached" ? walked.via : undefined;
+      };
+
       let outcome: EdgeOutcome = { kind: "confirmed" };
       if (symbolResult.verdict !== "unreadable") {
         edgesChecked += 1;
+        if (symbolResult.verdict === "unreached" && reachedAcrossFiles() !== undefined) {
+          recordEdge(edge, fromNode, toNode, { kind: "confirmed" });
+          continue;
+        }
         if (symbolResult.verdict === "unreached") {
           /*
            * Nothing found -- and which of two sentences that deserves depends

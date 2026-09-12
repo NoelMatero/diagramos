@@ -13,6 +13,7 @@ import { checkDrift, createWorkspace, parseRef, refFromLabel, type Workspace } f
 import { readGraph, type NodeState } from "../src/engine/graph";
 import { applyPromotions } from "../src/engine/promote";
 import type { ExcalidrawElement } from "../src/engine/normalize";
+import { summaryOf as pageSentence } from "../src/viewer/drift";
 import { installExcalifontMeasurer } from "./helpers/excalifont";
 
 installExcalifontMeasurer();
@@ -1444,6 +1445,42 @@ describe("naming the arrows nothing read", () => {
     for (const arrow of report.unreadEdges) tally[arrow.reason] = (tally[arrow.reason] ?? 0) + 1;
     expect(tally).toEqual(report.edgesSkippedWhy);
     expect(report.unreadEdges.every((arrow) => arrow.fromLabel && arrow.toLabel)).toBe(true);
+  });
+
+  /*
+   * #58's bad outcome, end to end. A box on code that touches no file, and an
+   * arrow labelled "writes" onto a file outside the repository: false, and
+   * dropped before anything reads it, because every check here asks whether
+   * code A reaches code B and there is no B. That half is deliberate (#58).
+   *
+   * What was not deliberate is the sentence. The board page's quiet line said
+   * "all still true" and counted only the arrows it had read, so an unread
+   * arrow was not in it at all -- the board looked more checked than it was,
+   * which is how that arrow survived from the first commit.
+   */
+  it("says on the board page that an arrow onto something outside the repo was never read", async () => {
+    const board = await boardOf(
+      [
+        { id: "engine", label: "ELK layout engine", ref: "src/layout.ts" },
+        { id: "convert", label: "Converter", ref: "src/convert.ts" },
+        { id: "file", label: "board.excalidraw", state: "external" },
+      ],
+      [
+        { from: "convert", to: "engine", label: "imports" },
+        { from: "engine", to: "file", label: "writes" },
+      ],
+    );
+    const code = {
+      "src/layout.ts": "export function layout(graph: string[]) {\n  return graph.map((node) => node.length);\n}\n",
+      "src/convert.ts": "import { layout } from './layout';\nexport const convert = (graph: string[]) => layout(graph);\n",
+    };
+    const report = checkDrift(board, fakeWorkspace(code));
+    // Still not called wrong, and on purpose: nothing here can read a claim with no code at one end.
+    expect(report.clean).toBe(true);
+    expect(report.edges).toEqual([]);
+    expect(pageSentence(report)).toBe(
+      "checked 2 boxes and 1 arrow against the code — all still true — 1 more arrow was never read",
+    );
   });
 });
 

@@ -14,7 +14,7 @@ import path from "node:path";
 
 import { afterEach, beforeAll, describe, expect, it } from "vitest";
 
-import { couldReach, readRepo, type Walk } from "../scripts/lib/reach";
+import { couldReach, readRepo, type Walk } from "../scripts/lib/door-reach";
 import { initEngine } from "../src/engine/parse";
 
 beforeAll(async () => { await initEngine(); }, 120_000);

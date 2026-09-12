@@ -128,6 +128,31 @@ interface Red {
  * diagram is for and the thing no vocabulary should try to swallow. That sets a
  * ceiling on how much of a board any claim vocabulary could ever cover, and it
  * kills the idea of deriving the relation set from what authors write.
+ *
+ * ## `handles` claims `dispatches on` and not `dispatch`, which is what keeps
+ * ## the order from mattering
+ *
+ * `bucketOf` returns the *first* bucket that matches, so a new bucket in front
+ * of an old one silently moves arrows out of it, and `dispatch(es)?` has been
+ * `invokes` since #187 with that number on the record. #206's bucket is last
+ * and claims only `dispatches on` -- the phrase that names a case set rather
+ * than the act of calling.
+ *
+ * Both halves of that were then run rather than reasoned about, and the first
+ * guess was wrong: with `dispatches on`, `handles` catches the same 7 arrows
+ * first or last, so the position buys nothing. What does the damage is the
+ * *pattern*. A bucket claiming bare `dispatch` and placed first takes
+ * `dispatch x2` off `invokes` -- 9 and 8 instead of 7 and 10 -- and those two
+ * arrows would have been read as demand for a new word.
+ *
+ * The pattern is otherwise deliberately wider than the word would be, for the
+ * reason `AGENTS.md` gives about zeros: a bucket narrowed until it matched
+ * nothing would measure the narrowing. So it takes every spelling of a case
+ * set a person might write -- `match`, `switch`, `case`, `arm`, `variant`,
+ * `branch`, `covers`, `fallback`, `per method` -- and the catches are then read
+ * one by one, in #206 and in item 26 of `docs/claim-vocabulary.md`. Two of
+ * them are this pattern being too wide and they are named there rather than
+ * tuned away.
  */
 const BUCKETS: Array<[string, RegExp]> = [
   ["invokes", /\b(calls?|call|calling|invoke[sd]?|runs?|run|delegates?|dispatch(es)?|polls?|triggers?)\b/i],
@@ -137,6 +162,7 @@ const BUCKETS: Array<[string, RegExp]> = [
   ["contains", /\b(owns?|contains?|has a|holds? a|field|member)\b/i],
   ["conforms", /\b(implements?|satisfies|conforms?|extends?|inherits?)\b/i],
   ["depends", /\b(imports?|requires?|needs?|depends? on|uses)\b/i],
+  ["handles", /\b(handles?|handled|handling|switch(es)?|match(es|ed|ing)?|cases?|arms?|variants?|branch(es)?|covers?|dispatch(es)? on|per (method|verb|path|action|case|kind|type)|one per|fallback|catch-all|unmatched)\b/i],
 ];
 
 /** Box labels wrap onto several lines on a canvas; a report line is one line. */

@@ -1,387 +1,598 @@
 #!/usr/bin/env node
 /**
- * Can "this code never reaches that" be proved often enough to catch a false
- * arrow? (#58)
+ * How far the engine can follow a chain of calls, and how often it is wrong
+ * when it tries.
  *
- *   npm run measure:reach                           -- every pinned repository in .corpus
- *   npm run measure:reach -- --only=ripgrep         -- some of them
- *   npm run measure:reach -- --all                  -- every door and every case, not the first few
- *   npm run measure:reach -- --no-checker           -- skip the language-server referee, most of the run
- *   npm run measure:reach -- --no-prune             -- never rule a caller out on where the reader placed its call
- *   npm run measure:reach -- --only=pallets-flask --trace=<file>
- *                                                    -- score both walks against the tests as they ran
+ *   npm run measure:reach
+ *   npm run measure:reach -- --only=rust --all
+ *   npm run measure:reach -- --seeds=40 <tree>...
  *
- * **A measurement. No word ships from it and nothing here can colour a diagram.**
+ * The question. An arrow `A -> B` between two routines is right when A really
+ * reaches B and wrong when it provably cannot. Both halves of the engine stop
+ * near one step: the confirming search never leaves the file it started in,
+ * and the only word that may say wrong (`@calls`) is about a direct call and
+ * needs every call in one body resolved before it will say even that. So a
+ * true arrow through a helper in another file cannot be confirmed, and a made
+ * up arrow between two routines with no chain between them cannot be called
+ * wrong.
  *
- * ## The question
+ * Four counts per language, and they are not equally weighted. A wrong
+ * accusation is the expensive one -- `licence.ts` is one long argument for
+ * why -- and a missed confirmation is merely a shrug:
  *
- * An arrow "A -> D" onto a door -- the routine that talks to a file, a socket
- * or another process -- is false when A cannot reach D. Confirming it is easy:
- * find one path. Calling it *wrong* means proving no path exists, and this
- * repository has always answered that question **forwards**: enumerate every
- * call A makes, resolve each one, recurse. #217 and #221 measured what that
- * costs at one level, and #256 put it at about half of TypeScript bodies with a
- * real type checker, a quarter of Python's and a sixth of Rust's. Forwards, a
- * path of three bodies needs all three, so the rate is those numbers multiplied.
+ *   confirmed        the referee found a chain, the reader said reached
+ *   wrongly confirmed  no chain, and the reader said reached anyway
+ *   wrongly accused    a chain exists, and the reader said it never reaches
+ *   answered at all    neither of the two silences, as a share of asks
  *
- * ## Why backwards is a different question, not the same one reversed
+ * The referee is in `scripts/lib/reach-graph.ts`: `tsc` for TypeScript,
+ * pyright for Python, rust-analyzer for Rust, and it shares no line of
+ * machinery with the reader. The question set is in `scripts/lib/reach-asks.ts`,
+ * which explains what a negative ask has to earn before it counts as one.
  *
- * Forwards, a call this reader cannot place could go **anywhere**, so one of
- * them anywhere on the frontier ends the proof. Backwards, the same call has an
- * unknown target but a **known caller**: start at the door and walk incoming
- * uses, and a use that might lead into the set adds exactly one routine -- the
- * one it is written in. So `S(D)`, every routine that could possibly reach `D`,
- * can be over-approximated at a bounded price, and over-approximating is sound
- * in the direction that matters: a routine outside `S(D)` cannot reach it. The
- * share of routines outside is the ceiling on catching a false arrow.
- *
- * ## Two walks, because the first had a hole both of its referees shared
- *
- * `calls` indexes a routine by the names it **calls**. That is blind to two
- * shapes, and a probe over all three languages confirmed both: a function handed
- * over as a value -- `map(door, items)`, `items.forEach(door)`, `let f = door` --
- * leaves no call to `door` anywhere; and a call through a parameter or variable,
- * `fn()`, leaves a name that matches no routine. Either one puts a routine that
- * reaches the door outside the set.
- *
- * `mentions` indexes every name a routine's text **uses**, called or not, and
- * treats a bare call to a name the file binds -- a parameter, a local, a
- * module-level alias -- as a call to anything. The two shares are printed side
- * by side, and the gap between them is what soundness against those shapes costs.
- *
- * Both walks live in `scripts/lib/reach.ts`, where each shape has a test.
- *
- * ## Three referees, and which blind spot each one has
- *
- * - **The premise**: call sites are enumerable. `scripts/lib/call-scan.ts` finds
- *   calls by the shape of `name(`, sharing no tree-sitter query with the reader,
- *   and the run prints what it saw that the reader did not.
- * - **The answer, statically**: for a sample of routines placed outside a set,
- *   each language's own checker is asked "go to definition" at every call. Blind
- *   to the shapes above, because it asks about call sites and a value is not one.
- * - **The answer, as the code ran** (`--trace`): a record of which repository
- *   functions called which while the test suite actually ran, from
- *   `scripts/lib/reach_trace.py`. Library frames, tests and lambdas in between
- *   are passed through, so a callback a library fires, a function stored and
- *   called later, a framework dispatching to a method -- every shape no reader
- *   here follows -- is an edge. A routine that reached a door at runtime and
- *   sits outside that door's set is a false accusation the walk would have made.
- *   It shares nothing with either walk: no parse, no index, no name. It sees
- *   only what the tests ran, so it can find false accusations and never prove
- *   there are none.
- *
- * Nothing here uses a type checker to build a set: tier 1 only.
- *
- * A run is a measurement, not a test: it prints and never fails.
+ * A run prints and never fails. What it finds becomes a test.
  */
-import { createHash } from "node:crypto";
-import { execFileSync } from "node:child_process";
-import { existsSync, readFileSync, realpathSync } from "node:fs";
+import { existsSync, realpathSync, writeFileSync } from "node:fs";
 import path from "node:path";
 
-import { checkerFor, type CallChecker } from "./lib/call-receivers";
-import {
-  anythingCallers, constructs, couldReach, familyOf, holds, mayLeadInto, readRepo, WALKS,
-  type Family, type Routine, type Walk,
-} from "./lib/reach";
+import { callsBetween, type CallSide } from "../src/engine/calls";
+import { readDependencies } from "../src/engine/deps";
+import { checkSymbolEdge, createWorkspace } from "../src/engine/drift";
+import { declarationMentions, declarationsOf, reaches } from "../src/engine/body";
+import { initEngine, languageOf, resetEngineCache, type Language } from "../src/engine/parse";
+import { newReachCache, reachBetween, type ReachCache, type ReachVerdict } from "../src/engine/reach";
+import type { ConfigCache } from "../src/engine/resolve";
 
-import { LICENCES } from "../src/engine/licence";
-import { type OutsideKind } from "../src/engine/outside";
-import { initEngine } from "../src/engine/parse";
-
-const HOME = process.env.HOME ?? "/Users/noelmatero";
-const argv = process.argv.slice(2);
-const option = (name: string) => argv.find((one) => one.startsWith(`--${name}=`))?.slice(name.length + 3);
-const showAll = argv.includes("--all");
-const noChecker = argv.includes("--no-checker");
-const walkOptions = { prune: !argv.includes("--no-prune") };
-const only = option("only")?.split(",").filter(Boolean);
-const tracePath = option("trace");
-/** Routines per language whose outside-the-set verdict the checker is asked about. */
-const sampleSize = Number(option("sample") ?? 120);
-const CASES = showAll ? Infinity : 10;
-
-const CORPUS = existsSync(path.resolve(".corpus")) ? path.resolve(".corpus") : `${HOME}/board-ai/.corpus`;
-
-interface Repo { name: string; dir: string; state: "pinned" | "moved" | "missing" }
-
-const repos: Repo[] = LICENCES.flatMap((licence) => licence.corpus.map((entry) => {
-  const candidates = [entry.name.replace("/", "-"), entry.name.split("/").pop()!];
-  const dir = candidates.map((one) => path.join(CORPUS, one)).find((one) => existsSync(one)) ?? path.join(CORPUS, candidates[0]!);
-  let state: Repo["state"] = "missing";
-  if (existsSync(dir)) {
-    let head = "";
-    try { head = execFileSync("git", ["-C", dir, "rev-parse", "HEAD"], { encoding: "utf8" }).trim(); } catch { /* not a checkout */ }
-    state = head === entry.commit ? "pinned" : "moved";
-  }
-  return { name: entry.name, dir, state };
-}))
-  .filter((repo, index, all) => all.findIndex((other) => other.dir === repo.dir) === index)
-  .filter((repo) => !only || only.some((one) => repo.dir.endsWith(`/${one}`) || repo.name === one));
+import { asksFrom, type Ask } from "./lib/reach-asks";
+import { refereeGraph } from "./lib/reach-graph";
 
 await initEngine();
 
-/** A stable spread over routine ids: the same sample every run. */
-const sampleKey = (id: string) => createHash("sha1").update(id).digest("hex");
+const flags = new Set(process.argv.slice(2).filter((one) => one.startsWith("--")));
+const roots = process.argv.slice(2).filter((one) => !one.startsWith("--"));
+const value = (name: string, fallback: number): number => {
+  const found = [...flags].find((one) => one.startsWith(`--${name}=`));
+  return found ? Number(found.slice(name.length + 3)) : fallback;
+};
+const only = [...flags].find((one) => one.startsWith("--only="))?.slice("--only=".length);
+const showAll = flags.has("--all");
+const dumpTo = [...flags].find((one) => one.startsWith("--dump="))?.slice("--dump=".length);
+const SEEDS = value("seeds", 30);
+const BUDGET = value("budget", 120);
+const DEPTH = value("depth", 6);
+const PER_SEED = value("per-seed", 4);
+const PER_SEED_NEVER = value("per-seed-never", 12);
+/**
+ * `--unguarded` also asks about never-pairs whose tail name *is* written on
+ * the closure -- the ones the callback guard rejects.
+ *
+ * Never scored. It answers one question and only one: how much of the
+ * population the product would face does the sound population cover.
+ */
+const unguarded = flags.has("--unguarded");
 
-/* -- the recorded run ----------------------------------------------------- */
+/**
+ * Which repositories answer for which language, and why these.
+ *
+ * Two per language, one small enough to read by hand when a disagreement
+ * needs explaining and one big enough that its chains are somebody else's
+ * design rather than a test fixture's. All are `.corpus` clones, pinned by
+ * `measure:licence`, so the numbers are reproducible from the commits in
+ * `licence.ts`.
+ */
+const CORPUS: Array<{ tree: string; language: Language }> = [
+  { tree: ".corpus/vuejs-core", language: "ts" },
+  { tree: ".corpus/TanStack-query", language: "ts" },
+  { tree: ".corpus/pallets-flask", language: "python" },
+  { tree: ".corpus/encode-httpx", language: "python" },
+  { tree: ".corpus/anyhow", language: "rust" },
+  { tree: ".corpus/ripgrep", language: "rust" },
+];
 
-/** `[fromFile, fromName, fromLine, toFile, toName, toLine, through, count]`, as `reach_trace.py` writes them. */
-type TraceEdge = [string, string, number, string, string, number, boolean, number];
-interface Trace { root: string; testsCollected: number; testsFailed: number; edges: TraceEdge[] }
+const real = (tree: string) => { try { return realpathSync(tree); } catch { return tree; } };
 
-const trace: Trace | undefined = tracePath ? JSON.parse(readFileSync(tracePath, "utf8")) as Trace : undefined;
+/*
+ * A tree named on the command line needs its language named too, because the
+ * referee is chosen by language and a tree is rarely one language only. So
+ * `--only=` is what says which, and it is required there rather than
+ * defaulted: a default would silently measure a Rust tree with `tsc`.
+ */
+const trees = (roots.length > 0
+  ? roots.map((tree) => ({ tree, language: (only ?? "ts") as Language }))
+  : CORPUS.filter((one) => !only || one.language === only))
+  .filter((one) => existsSync(one.tree));
 
-interface TraceScore {
-  repo: string;
-  edges: number;
-  through: number;
-  unmatched: number;
-  doorsReached: number;
-  pairs: number;
-  missedEdges: Record<Walk, Array<{ from: string; to: string; through: boolean }>>;
-  falseAccusations: Record<Walk, Array<{ routine: string; door: string }>>;
+/* ------------------------------------------------------------- the readers */
+
+type Answer =
+  | { said: "reached" }
+  | { said: "never" }
+  | { said: "quiet"; why: string; doubts?: readonly string[] };
+
+/** Everything a reader needs to be asked one pair, built once per tree. */
+interface Sides {
+  workspace: ReturnType<typeof createWorkspace>;
+  side(rel: string): (CallSide & { routine: string }) | undefined;
 }
-let traceScore: TraceScore | undefined;
 
-/* -- the run -------------------------------------------------------------- */
+function sidesFor(tree: string): Sides {
+  const workspace = createWorkspace(tree);
+  const configs: ConfigCache = new Map();
+  const sources = new Map<string, string | undefined>();
+  const importsOf = new Map<string, CallSide["imports"]>();
 
-interface DoorRow { repo: string; door: string; kind: OutsideKind; reaching: Record<Walk, number>; routines: number }
-interface LanguageTally { doors: number; total: number; reaching: Record<Walk, number>; anything: Record<Walk, number> }
+  const read = (rel: string): string | undefined => {
+    if (sources.has(rel)) return sources.get(rel);
+    const absolute = workspace.resolve(rel);
+    const text = absolute && workspace.stat(absolute) === "file" ? workspace.read(absolute) : undefined;
+    sources.set(rel, text);
+    return text;
+  };
+  const imports = (rel: string, source: string): CallSide["imports"] => {
+    const cached = importsOf.get(rel);
+    if (cached) return cached;
+    const declared = readDependencies(rel, source, workspace, configs)?.dependencies ?? [];
+    const list = declared.map((one) => ({ specifier: one.specifier, ...(one.file ? { file: one.file } : {}) }));
+    importsOf.set(rel, list);
+    return list;
+  };
+  const open = (rel: string) => {
+    const source = read(rel);
+    const language = languageOf(rel);
+    if (source === undefined || !language) return undefined;
+    return { source, language, imports: imports(rel, source) };
+  };
+  return {
+    workspace,
+    side(rel) {
+      const source = read(rel);
+      const language = languageOf(rel);
+      if (source === undefined || !language) return undefined;
+      return { file: rel, source, language, imports: imports(rel, source), open, routine: "" };
+    },
+  };
+}
 
-const rows: DoorRow[] = [];
-const perLanguage = new Map<Family, LanguageTally>();
-const refereeTotals = new Map<string, { seen: number; unseen: number }>();
-const outsideSamples: Array<{ repo: Repo; routine: Routine; door: Routine; set: Set<string>; at: Map<string, string> }> = [];
+/**
+ * The **before** column, written out here rather than read off the engine.
+ *
+ * This is what `checkSymbolEdge` did at ef70af9, in the three lines that made
+ * it up: both ends tried, a body "reaches" the far end when it *names* the far
+ * end's symbol anywhere -- comments and strings excluded, members included --
+ * following calls as deep as they go inside the one file it started in, and a
+ * declaration read instead when one end holds no code.
+ *
+ * It is spelled out because the alternative does not work. Calling the live
+ * `checkSymbolEdge` for this column measured the engine against itself: the
+ * moment #reach put two guards inside it, the "before" number moved with the
+ * "after" one and a regression would have been invisible. Written from
+ * `reaches` and `declarationMentions`, which are unchanged primitives, the
+ * column stays fixed and the comparison keeps meaning something. It
+ * reproduces the figures it was first measured at -- 232 confirmations on the
+ * TypeScript corpus, 182 on Python, 309 on Rust.
+ *
+ * `unreached` is *not* an accusation -- it printed amber, as
+ * `no-call-either-way` -- so it lands in `quiet` here. Reporting it as a
+ * "never" would credit the old engine with a verdict it never gave.
+ */
+function readerToday(ask: Ask, sides: Sides): Answer {
+  let asked = false;
+  for (const [start, target] of [[ask.from, ask.to], [ask.to, ask.from]] as const) {
+    const absolute = sides.workspace.resolve(start.file);
+    const language = languageOf(start.file);
+    if (!absolute || !language) continue;
+    const source = sides.workspace.read(absolute);
+    const verdict = reaches(source, start.name, [target.name], language);
+    if (verdict === undefined) continue;
+    asked = true;
+    if (verdict) return { said: "reached" };
+  }
+  // The declaration search (#144), which only ran when one end held no code.
+  for (const [start, target] of [[ask.from, ask.to], [ask.to, ask.from]] as const) {
+    const absolute = sides.workspace.resolve(start.file);
+    const language = languageOf(start.file);
+    if (!absolute || !language) continue;
+    const source = sides.workspace.read(absolute);
+    if (declarationsOf(source, start.name, language).some((one) => one.kind === "callable")) continue;
+    if (declarationMentions(source, start.name, [target.name], language)) return { said: "reached" };
+  }
+  return { said: "quiet", why: asked ? "no-call-either-way" : "unreadable" };
+}
 
-for (const repo of repos) {
-  if (repo.state === "missing") continue;
-  const read = readRepo(repo.dir);
-  const doors = [...read.routines.values()].filter((one) => one.door);
+/** The **after** column's first channel: the live engine's own body search. */
+function liveSymbolEdge(ask: Ask, sides: Sides): Answer {
+  const end = (at: { file: string; name: string }) => ({
+    file: sides.workspace.resolve(at.file)!,
+    path: at.file,
+    symbols: [at.name],
+  });
+  const edge = checkSymbolEdge(end(ask.from), end(ask.to), sides.workspace);
+  if (edge.verdict === "reached") return { said: "reached" };
+  return { said: "quiet", why: edge.verdict === "unreached" ? "no-call-either-way" : "unreadable" };
+}
+
+/** What `@calls` says about the same pair, for the column beside it. */
+function readerCalls(ask: Ask, sides: Sides): string {
+  const tail = sides.side(ask.from.file);
+  const head = sides.side(ask.to.file);
+  if (!tail || !head) return "unreadable";
+  const verdict = callsBetween(
+    { ...tail, routine: ask.from.name },
+    { ...head, names: [ask.to.name] },
+  );
+  return verdict.verdict === "withheld" ? `withheld:${verdict.why}` : verdict.verdict;
+}
+
+/**
+ * What the engine says with the new reader in it -- which is the old channel
+ * plus the new one, not the new one alone.
+ *
+ * The engine's own body search stays first -- guards and all, which is the
+ * point: those guards are part of what #reach changed, and a column that
+ * skipped them would credit the walk with work it does not do and hide what
+ * the guards cost. Measuring the walk alone would also report a regression
+ * wherever that channel already answered.
+ */
+function readerReach(ask: Ask, sides: Sides, cache: ReachCache): { answer: Answer; verdict: ReachVerdict } {
+  const already = liveSymbolEdge(ask, sides);
+  if (already.said === "reached") {
+    return { answer: already, verdict: { verdict: "reached", via: [ask.from.name, ask.to.name], hops: [] } };
+  }
+  const tail = sides.side(ask.from.file);
+  const head = sides.side(ask.to.file);
+  if (!tail || !head) return { answer: { said: "quiet", why: "unreadable" }, verdict: { verdict: "withheld", why: "unreadable" } };
+  const verdict = reachBetween(
+    { ...tail, routine: ask.from.name },
+    { ...head, names: [ask.to.name] },
+    { cache },
+  );
+  if (verdict.verdict === "reached") return { answer: { said: "reached" }, verdict };
+  if (verdict.verdict === "never") return { answer: { said: "never" }, verdict };
   /*
-   * Which routine a declaration line belongs to. The checker answers with a
-   * file and a line, and matching only the file calls every call between two
-   * routines of one file a landing in the set.
+   * The doubt, not just the word. `open-body` is 276 of one corpus's 324
+   * refusals on the never side, and "a call somewhere on the closure could
+   * not be placed" is not something anybody can aim a fix at. Which kind of
+   * call it was is.
    */
-  const at = new Map<string, string>();
-  for (const one of read.routines.values()) at.set(`${one.file}:${one.line}`, one.id);
-  refereeTotals.set(repo.name, { seen: read.refereeSites, unseen: read.refereeUnseen });
-
-  const setsOf = new Map<string, Record<Walk, Set<string>>>();
-  for (const door of doors) {
-    const family = familyOf(door.language)!;
-    const sameLanguage = [...read.routines.values()].filter((one) => familyOf(one.language) === family);
-    const tally = perLanguage.get(family)
-      ?? { doors: 0, total: 0, reaching: { calls: 0, mentions: 0, callbacks: 0 }, anything: { calls: 0, mentions: 0, callbacks: 0 } };
-    perLanguage.set(family, tally);
-    tally.doors += 1;
-    tally.total += sameLanguage.length;
-    const sets = {} as Record<Walk, Set<string>>;
-    const reaching = {} as Record<Walk, number>;
-    for (const walk of WALKS) {
-      const { set, fromAnything } = couldReach(door, read, walk, walkOptions);
-      sets[walk] = set;
+  return {
+    answer: {
+      said: "quiet",
+      why: verdict.detail ? `${verdict.why}:${verdict.detail}` : verdict.why,
       /*
-       * Names match across languages on purpose -- Python reaches Rust through
-       * pyo3, and over-including is the safe direction -- but a share is only
-       * meaningful inside one language. Counting the whole set printed 15872.7%
-       * for a JavaScript door in pydantic, whose set was mostly Python.
+       * Every kind of doubt on the closure, not just the first. A closure
+       * closes when all its sites place, so "which reader would settle this
+       * refusal" is a question about the whole set: one kind means one reader
+       * would do it, two kinds mean two readers both have to.
        */
-      reaching[walk] = sameLanguage.filter((one) => set.has(one.id)).length;
-      tally.reaching[walk] += reaching[walk];
-      tally.anything[walk] += fromAnything;
-    }
-    setsOf.set(door.id, sets);
-    rows.push({ repo: repo.name, door: door.id, kind: door.door!, reaching, routines: sameLanguage.length });
+      ...(verdict.verdict === "withheld" && verdict.doubts ? { doubts: verdict.doubts } : {}),
+    },
+    verdict,
+  };
+}
 
-    // Spread by a hash of the id, never walk order: walk order put every Python
-    // sample in `docs/conf.py`, a file pyright does not index.
-    const candidates = sameLanguage
-      .filter((one) => !sets.mentions.has(one.id) && one.sites.length > 0)
-      .sort((a, b) => sampleKey(a.id).localeCompare(sampleKey(b.id)))
-      .slice(0, 3);
-    for (const candidate of candidates) outsideSamples.push({ repo, routine: candidate, door, set: sets.mentions, at });
+/* ---------------------------------------------------------------- the ledger */
+
+interface Ledger {
+  /** Asks put, by truth. */
+  asked: Map<Ask["truth"], number>;
+  /** Right answers. */
+  confirmed: number;
+  refuted: number;
+  /** Wrong answers, the two that cost. */
+  wronglyConfirmed: number;
+  wronglyAccused: number;
+  /** Silences, by reason, and kept apart by which question was asked: a
+   * refusal on a reaching pair costs a confirmation, and a refusal on a
+   * never-reaching one costs an accusation nobody was going to be given
+   * anyway. One number for both hides which of the two is the problem. */
+  quiet: Map<string, number>;
+  quietNever: Map<string, number>;
+  /**
+   * Never-pair refusals grouped by the **whole set** of doubts on the
+   * closure, so the report can say what a new reader would buy.
+   *
+   * The histogram beside this one counts first doubts, which cannot answer
+   * that: a closure is conjunctive, and settling the commonest single doubt
+   * buys nothing on a closure that also has a different one. A row naming one
+   * kind is a refusal one reader would turn into an answer.
+   */
+  blockedBy: Map<string, number>;
+  /**
+   * What the reader said about never-pairs the callback guard rejected.
+   *
+   * Not a score: the referee is not ground truth on these, which is what the
+   * guard exists to say. It is a coverage figure. A `never` here is the
+   * reader answering on a pair this benchmark cannot certify, and the count
+   * of those against the count it can is the whole argument about whether
+   * the verdict is licensable from this measurement at all.
+   */
+  unguardedSaid: Map<string, number>;
+  /** Confirmations by referee distance, so depth is visible. */
+  byDistance: Map<number, { asked: number; confirmed: number }>;
+  /**
+   * The sentinel control: the same head, asked about a name nothing declares.
+   *
+   * A recall figure is agreement with itself unless something could have made
+   * it lower, and "0 wrongly confirmed" has two causes that look identical --
+   * the reader is careful, or the population could never have caught it out.
+   * This is the cheap live version of the guard: a name in the far file that
+   * does not exist must never come back reached, whatever else is true.
+   * `measure:calls` calls its own copy INVENTED and the bar is the same here.
+   *
+   * The expensive version is the never-reaching population itself, and on its
+   * first run it was not vacuous at all: it caught the body search confirming
+   * 51 `anyhow` arrows on a name that meant something else.
+   */
+  invented: number;
+  sentinels: number;
+}
+
+const ledger = (): Ledger => ({
+  asked: new Map(), confirmed: 0, refuted: 0, wronglyConfirmed: 0, wronglyAccused: 0,
+  quiet: new Map(), quietNever: new Map(), blockedBy: new Map(), unguardedSaid: new Map(),
+  byDistance: new Map(), invented: 0, sentinels: 0,
+});
+
+const bump = <K,>(map: Map<K, number>, key: K, by = 1) => map.set(key, (map.get(key) ?? 0) + by);
+
+function record(into: Ledger, ask: Ask, answer: Answer): void {
+  /*
+   * A guard-rejected never-ask is counted and never scored. The referee found
+   * no static path, and the tail's name is written on the closure -- so a
+   * callback could be carrying the call and the referee would not know.
+   * Scoring it either way would be inventing ground truth.
+   */
+  if (ask.named) { bump(into.unguardedSaid, answer.said); return; }
+  bump(into.asked, ask.truth);
+  if (ask.truth === "reaches") {
+    const at = into.byDistance.get(ask.distance) ?? { asked: 0, confirmed: 0 };
+    at.asked += 1;
+    if (answer.said === "reached") at.confirmed += 1;
+    into.byDistance.set(ask.distance, at);
   }
+  if (answer.said === "quiet") {
+    bump(ask.truth === "reaches" ? into.quiet : into.quietNever, answer.why);
+    if (ask.truth === "never" && answer.doubts && answer.doubts.length > 0) {
+      bump(into.blockedBy, [...answer.doubts].sort().join("+"));
+    }
+    return;
+  }
+  if (ask.truth === "reaches") {
+    if (answer.said === "reached") into.confirmed += 1;
+    else into.wronglyAccused += 1;
+  } else {
+    if (answer.said === "never") into.refuted += 1;
+    else into.wronglyConfirmed += 1;
+  }
+}
 
-  if (trace && existsSync(repo.dir) && realpathSync(repo.dir) === trace.root) {
-    const score: TraceScore = {
-      repo: repo.name, edges: 0, through: 0, unmatched: 0, doorsReached: 0, pairs: 0,
-      missedEdges: { calls: [], mentions: [], callbacks: [] }, falseAccusations: { calls: [], mentions: [], callbacks: [] },
-    };
-    const callersOf = new Map<string, Set<string>>();
-    for (const [fromFile, fromName, , toFile, toName, , through] of trace.edges) {
-      const from = `${fromFile}#${fromName}`;
-      const to = `${toFile}#${toName}`;
-      const caller = read.routines.get(from);
-      const callee = read.routines.get(to);
-      if (!caller || !callee) { score.unmatched += 1; continue; }
-      if (from === to) continue;
-      score.edges += 1;
-      if (through) score.through += 1;
-      callersOf.set(to, (callersOf.get(to) ?? new Set()).add(from));
-      for (const walk of WALKS) {
-        const seen = anythingCallers(read, walk).has(from) || mayLeadInto(caller, callee, walk, walkOptions)
-          || (walk !== "calls" && constructs(read, caller, callee))
-          || (walk === "callbacks" && holds(read, caller, callee));
-        if (!seen) score.missedEdges[walk].push({ from, to, through });
+/* ------------------------------------------------------------------ the run */
+
+interface Row {
+  language: Language;
+  today: Ledger;
+  reach: Ledger;
+  /**
+   * What `@calls` said, by verdict, on each population.
+   *
+   * The first column is the one that costs: a `refuted` or a `backwards` on a
+   * pair that genuinely reaches is a red on correct code. The second is the
+   * word doing its job, and both belong in the same report -- a change that
+   * removed the first by killing the second would look like a win in one
+   * column and be a loss.
+   */
+  callsOnReaching: Map<string, number>;
+  callsOnNever: Map<string, number>;
+  seeds: number;
+  complete: number;
+  stopped: Map<string, number>;
+  routines: number;
+  refereeLabels: Set<string>;
+  /**
+   * Milliseconds the reader itself spent, and on how many asks.
+   *
+   * The referee's time is not in here and should not be: a language server
+   * answering "go to definition" ten thousand times is what makes a run take
+   * forty minutes, and none of it is what a board check pays. This is the
+   * number a board check pays.
+   */
+  readerMs: number;
+  readerAsks: number;
+}
+
+const rows = new Map<Language, Row>();
+const rowFor = (language: Language): Row => {
+  const found = rows.get(language) ?? {
+    language, today: ledger(), reach: ledger(), callsOnReaching: new Map(), callsOnNever: new Map(),
+    seeds: 0, complete: 0, stopped: new Map(), routines: 0, refereeLabels: new Set<string>(),
+    readerMs: 0, readerAsks: 0,
+  };
+  rows.set(language, found);
+  return found;
+};
+
+interface Wrong { tree: string; ask: Ask; reader: "today" | "reach"; said: string; detail?: string }
+const wrongs: Wrong[] = [];
+const dumped: unknown[] = [];
+
+for (const { tree, language: declared } of trees) {
+  const absolute = real(path.resolve(tree));
+  const language = declared ?? "ts";
+  process.stderr.write(`reading ${tree} (${language}) ...\n`);
+  const graph = await refereeGraph(absolute, language);
+  const row = rowFor(language);
+  row.routines += graph.nodes.size;
+  row.refereeLabels.add(graph.label);
+
+  const set = await asksFrom(graph, absolute, language, {
+    seeds: SEEDS, budget: BUDGET, depth: DEPTH, perSeed: PER_SEED, perSeedNever: PER_SEED_NEVER,
+    unguarded,
+  });
+  row.seeds += set.seeds;
+  row.complete += set.complete;
+  for (const [why, count] of set.stopped) bump(row.stopped, why, count);
+  graph.close();
+  process.stderr.write(`  ${graph.nodes.size} routines, ${set.asks.length} asks `
+    + `(${set.complete}/${set.seeds} closures complete)\n`);
+
+  const sides = sidesFor(absolute);
+  const cache: ReachCache = newReachCache();
+  const SENTINEL = "zzNotARealRoutineName";
+  for (const ask of set.asks) {
+    if (ask.truth === "reaches") {
+      const control: Ask = { ...ask, to: { ...ask.to, name: SENTINEL } };
+      for (const [book, said] of [
+        [row.today, readerToday(control, sides).said],
+        [row.reach, readerReach(control, sides, cache).answer.said],
+      ] as const) {
+        book.sentinels += 1;
+        if (said === "reached") book.invented += 1;
       }
     }
-    for (const door of doors) {
-      // Every routine the tests saw reach this door, through anything at all.
-      const reached = new Set<string>();
-      const frontier = [door.id];
-      while (frontier.length > 0) {
-        const current = frontier.pop()!;
-        for (const caller of callersOf.get(current) ?? []) {
-          if (reached.has(caller) || caller === door.id) continue;
-          reached.add(caller);
-          frontier.push(caller);
-        }
-      }
-      if (reached.size === 0) continue;
-      score.doorsReached += 1;
-      score.pairs += reached.size;
-      const sets = setsOf.get(door.id)!;
-      for (const walk of WALKS) {
-        for (const routine of reached) {
-          if (!sets[walk].has(routine)) score.falseAccusations[walk].push({ routine, door: door.id });
-        }
-      }
+    const today = readerToday(ask, sides);
+    record(row.today, ask, today);
+    const began = performance.now();
+    const { answer: reach, verdict } = readerReach(ask, sides, cache);
+    row.readerMs += performance.now() - began;
+    row.readerAsks += 1;
+    record(row.reach, ask, reach);
+    bump(ask.truth === "reaches" ? row.callsOnReaching : row.callsOnNever, readerCalls(ask, sides));
+    if (ask.truth === "reaches" && today.said === "never") {
+      wrongs.push({ tree, ask, reader: "today", said: "never" });
     }
-    traceScore = score;
-  }
-}
-
-/* -- the static referee: is "outside the set" true, call by call? --------- */
-
-interface Checked { wrong: number; asked: number; silent: number; sites: number; answers: number }
-const checkedBy = new Map<Family, Checked>();
-const staticFalse: Array<{ routine: string; door: string; landed: string }> = [];
-
-if (!noChecker) {
-  const byFamily = new Map<Family, typeof outsideSamples>();
-  for (const one of outsideSamples) {
-    const family = familyOf(one.routine.language)!;
-    const list = byFamily.get(family) ?? [];
-    if (list.length < sampleSize) list.push(one);
-    byFamily.set(family, list);
-  }
-  for (const [family, samples] of byFamily) {
-    const byRepo = new Map<string, typeof samples>();
-    for (const one of samples) byRepo.set(one.repo.dir, [...(byRepo.get(one.repo.dir) ?? []), one]);
-    for (const [dir, group] of byRepo) {
-      const made = await checkerFor(dir, group[0]!.routine.language);
-      if ("unavailable" in made) continue;
-      const checker: CallChecker = made;
-      for (const one of group) {
-        const tally = checkedBy.get(family) ?? { wrong: 0, asked: 0, silent: 0, sites: 0, answers: 0 };
-        checkedBy.set(family, tally);
-        tally.asked += 1;
-        const absolute = path.join(dir, one.routine.file);
-        let source: string;
-        try { source = readFileSync(absolute, "utf8"); } catch { continue; }
-        let answered = false;
-        for (const site of one.routine.sites.slice(0, 40)) {
-          // The reader's own byte range: a text search lands on the import.
-          if (!site.name || !site.nameAt) continue;
-          tally.sites += 1;
-          const declared = await checker.definitionAt(absolute, source, site.nameAt);
-          if (!declared) continue;
-          tally.answers += 1;
-          answered = true;
-          const landed = one.at.get(`${path.relative(dir, declared.file)}:${declared.line + 1}`);
-          if (landed && one.set.has(landed)) {
-            tally.wrong += 1;
-            staticFalse.push({ routine: one.routine.id, door: one.door.id, landed });
-            break;
-          }
-        }
-        if (!answered) tally.silent += 1;
-      }
-      checker.close();
+    if (ask.truth === "never" && today.said === "reached") {
+      wrongs.push({ tree, ask, reader: "today", said: "reached" });
+    }
+    if (ask.truth === "reaches" && reach.said === "never") {
+      wrongs.push({ tree, ask, reader: "reach", said: "never",
+        detail: verdict.verdict === "never" ? `closure of ${verdict.checked}` : undefined });
+    }
+    if (ask.truth === "never" && reach.said === "reached") {
+      wrongs.push({ tree, ask, reader: "reach", said: "reached",
+        detail: verdict.verdict === "reached" ? verdict.via.join(" -> ") : undefined });
+    }
+    if (dumpTo) {
+      dumped.push({
+        tree, language, from: ask.from, to: ask.to, truth: ask.truth, distance: ask.distance,
+        chain: ask.chain, closure: ask.closure, today: today.said,
+        todayWhy: today.said === "quiet" ? today.why : undefined,
+        reach: reach.said, reachWhy: reach.said === "quiet" ? reach.why : undefined,
+      });
     }
   }
+  resetEngineCache();
 }
 
-/* -- the report ----------------------------------------------------------- */
+/* ------------------------------------------------------------------- report */
 
-const percent = (part: number, whole: number) => (whole === 0 ? "n/a" : `${((part / whole) * 100).toFixed(1)}%`);
+const percent = (part: number, whole: number) =>
+  whole === 0 ? "   n/a" : `${((part / whole) * 100).toFixed(1)}%`.padStart(6);
+const total = (map: Map<unknown, number>) => [...map.values()].reduce((a, b) => a + b, 0);
+
+const LANGUAGES: Language[] = ["ts", "tsx", "python", "rust", "js"];
 
 console.log();
-console.log("CORPUS");
-for (const repo of repos) console.log(`  ${repo.name.padEnd(24)} ${repo.state}`);
-
+console.log("MEASURE REACH -- how many steps can the engine follow, and at what cost?");
+console.log(`  ${trees.length} trees, seeds=${SEEDS} budget=${BUDGET} depth=${DEPTH} per-seed=${PER_SEED}`);
 console.log();
-console.log("COULD-REACH -- routines that might reach a door; every routine outside is a refutable arrow");
-for (const [family, tally] of perLanguage) {
-  const perDoor = tally.total / tally.doors;
-  console.log(`  ${family.padEnd(7)} ${tally.doors} doors, ${Math.round(perDoor)} routines in the door's language on average`);
-  for (const walk of WALKS) {
-    const set = tally.reaching[walk] / tally.doors;
-    console.log(`    ${walk.padEnd(9)} ${Math.round(set)} could reach (${percent(set, perDoor)}), `
-      + `${percent(perDoor - set, perDoor)} refutable -- ${Math.round(tally.anything[walk] / tally.doors)} joined `
-      + `every set because they call something that could be anything`);
+
+for (const language of LANGUAGES) {
+  const row = rows.get(language);
+  if (!row) continue;
+  console.log(`${language.toUpperCase()}  ${row.routines} routines the referee read, `
+    + `referee: ${[...row.refereeLabels].join(", ")}`);
+  console.log(`  ${row.seeds} seeds, ${row.complete} with a complete forward closure`
+    + (row.stopped.size > 0
+      ? `; the rest stopped: ${[...row.stopped].map(([w, c]) => `${w} ${c}`).join(", ")}`
+      : ""));
+  const reaching = row.today.asked.get("reaches") ?? 0;
+  const never = row.today.asked.get("never") ?? 0;
+  console.log(`  ${reaching} asks the referee says do reach, ${never} it says never do`);
+  console.log(`  the reader spent ${(row.readerMs / 1000).toFixed(1)}s over ${row.readerAsks} asks`
+    + ` -- ${(row.readerMs / Math.max(1, row.readerAsks)).toFixed(1)} ms each, warm`);
+  console.log();
+  console.log("    reader   confirmed  of true   wrongly-confirmed  never   wrongly-accused  answered");
+  for (const [name, book] of [["today", row.today], ["reach", row.reach]] as const) {
+    console.log(
+      `    ${name.padEnd(9)}`
+      + `${String(book.confirmed).padStart(9)}`
+      + `${percent(book.confirmed, reaching).padStart(10)}`
+      + `${String(book.wronglyConfirmed).padStart(20)}`
+      + `${String(book.refuted).padStart(8)}`
+      + `${String(book.wronglyAccused).padStart(18)}`
+      + `${percent(book.confirmed + book.refuted + book.wronglyConfirmed + book.wronglyAccused,
+        reaching + never).padStart(10)}`,
+    );
   }
-}
-
-console.log();
-console.log("PER DOOR, by the mentions walk -- widest first, which is where it gives up the most");
-const widest = [...rows].sort((a, b) => (b.reaching.mentions / b.routines) - (a.reaching.mentions / a.routines));
-for (const row of widest.slice(0, showAll ? Infinity : 15)) {
-  console.log(`  ${percent(row.reaching.mentions, row.routines).padStart(6)}  (calls ${percent(row.reaching.calls, row.routines).padStart(6)})  `
-    + `${row.kind.padEnd(8)} ${row.repo}/${row.door}`);
-}
-
-console.log();
-console.log("THE PREMISE, REFEREED -- call names the text scan saw in a file that the reader did not");
-for (const [repo, tally] of refereeTotals) {
-  if (tally.seen === 0) continue;
-  console.log(`  ${repo.padEnd(24)} ${tally.unseen} of ${tally.seen} (${percent(tally.unseen, tally.seen)})`);
-}
-
-console.log();
-console.log("THE ANSWER, STATICALLY -- routines outside a door's mentions set, every call asked of the checker");
-if (noChecker) console.log("  skipped (--no-checker).");
-else if (checkedBy.size === 0) console.log("  no checker answered.");
-for (const [family, tally] of checkedBy) {
-  console.log(`  ${family.padEnd(7)} ${tally.asked} routines asked: ${tally.wrong} reach the set after all `
-    + `(${percent(tally.wrong, tally.asked)}), ${tally.silent} unanswered -- `
-    + `${tally.answers} of ${tally.sites} call sites answered (${percent(tally.answers, tally.sites)})`);
-}
-for (const one of staticFalse.slice(0, CASES)) console.log(`      ${one.routine} -> ${one.door}: reaches ${one.landed}`);
-
-console.log();
-console.log("THE ANSWER, AS THE CODE RAN -- the recorded test run, against both walks");
-if (!trace) {
-  console.log("  no --trace given.");
-} else if (!traceScore) {
-  console.log(`  the trace is of ${trace.root}, which is not a repository this run read.`);
-} else {
-  const score = traceScore;
-  console.log(`  ${score.repo}: ${trace.testsCollected} tests collected, ${trace.testsFailed} failed; `
-    + `${score.edges} call edges between its own routines (${score.through} through code that is not), `
-    + `${score.unmatched} not matched to a routine this run read`);
-  console.log(`  ${score.doorsReached} doors reached by the tests, from ${score.pairs} (routine, door) pairs`);
-  for (const walk of WALKS) {
-    const missed = score.missedEdges[walk];
-    const through = missed.filter((one) => one.through).length;
-    console.log(`    ${walk.padEnd(9)} ${score.falseAccusations[walk].length} false accusations `
-      + `(${percent(score.falseAccusations[walk].length, score.pairs)} of pairs); `
-      + `${missed.length} edges it cannot see, ${through} of them through other code`);
+  console.log();
+  console.log("    control -- the same head asked about a name nothing declares; the bar is zero");
+  for (const [name, book] of [["today", row.today], ["reach", row.reach]] as const) {
+    console.log(`      ${name.padEnd(7)} confirmed ${book.invented} of ${book.sentinels}`);
   }
-  for (const walk of WALKS) {
-    const cases = score.falseAccusations[walk];
-    if (cases.length === 0) continue;
-    console.log(`  false accusations, ${walk}:`);
-    for (const one of cases.slice(0, CASES)) console.log(`      ${one.routine} reaches ${one.door}`);
-    if (cases.length > CASES) console.log(`      ... and ${cases.length - CASES} more (--all)`);
+  console.log();
+  for (const [name, book] of [["today", row.today], ["reach", row.reach]] as const) {
+    const distances = [...book.byDistance.keys()].sort((a, b) => a - b);
+    if (distances.length === 0) continue;
+    console.log(`    ${name} by referee distance: `
+      + distances.map((at) => {
+        const cell = book.byDistance.get(at)!;
+        return `${at} step${at === 1 ? "" : "s"} ${cell.confirmed}/${cell.asked}`;
+      }).join("   "));
   }
-  const missed = score.missedEdges.callbacks;
-  if (missed.length > 0) {
-    console.log("  edges the callbacks walk cannot see:");
-    for (const one of missed.slice(0, CASES)) {
-      console.log(`      ${one.from} -> ${one.to}${one.through ? "  (through other code)" : ""}`);
+  console.log();
+  for (const [name, book] of [["today", row.today], ["reach", row.reach]] as const) {
+    for (const [which, held] of [["on a reaching pair", book.quiet], ["on a never pair", book.quietNever]] as const) {
+      if (held.size === 0) continue;
+      const reasons = [...held].sort((a, b) => b[1] - a[1]);
+      console.log(`    ${name} stayed quiet ${total(held)}x ${which}: `
+        + reasons.map(([why, count]) => `${why} ${count}`).join(", "));
     }
-    if (missed.length > CASES) console.log(`      ... and ${missed.length - CASES} more (--all)`);
   }
+  console.log();
+  for (const [name, book] of [["today", row.today], ["reach", row.reach]] as const) {
+    const total_ = total(book.unguardedSaid);
+    if (total_ === 0) continue;
+    const answered = (book.unguardedSaid.get("never") ?? 0) + (book.unguardedSaid.get("reached") ?? 0);
+    console.log(`    ${name} on the ${total_} never-pairs the callback guard rejects `
+      + `(not ground truth, never scored): `
+      + [...book.unguardedSaid].sort((a, b) => b[1] - a[1]).map(([said, n]) => `${said} ${n}`).join(", ")
+      + ` -- ${answered} answered on evidence this benchmark cannot certify`);
+  }
+  if (row.reach.unguardedSaid.size > 0) console.log();
+  const blocked = row.reach.blockedBy;
+  if (blocked.size > 0) {
+    const single = [...blocked].filter(([kinds]) => !kinds.includes("+"));
+    console.log(`    what a refutation is waiting on, by the whole set of doubts `
+      + `(${total(blocked)} refusals, ${single.reduce((sum, [, n]) => sum + n, 0)} of them one kind only):`);
+    for (const [kinds, count] of [...blocked].sort((a, b) => b[1] - a[1]).slice(0, 8)) {
+      console.log(`      ${String(count).padStart(5)}  ${kinds}`);
+    }
+    console.log();
+  }
+  for (const [which, book] of [["reaching", row.callsOnReaching], ["never", row.callsOnNever]] as const) {
+    if (book.size === 0) continue;
+    console.log(`    @calls on the ${which} pairs: `
+      + [...book].sort((a, b) => b[1] - a[1])
+        .map(([verdict, count]) => `${verdict} ${count}`).join(", "));
+  }
+  console.log();
+}
+
+if (wrongs.length > 0) {
+  console.log(`WRONG ANSWERS (${wrongs.length})`);
+  for (const one of wrongs.slice(0, showAll ? wrongs.length : 25)) {
+    const { ask } = one;
+    console.log(`  [${one.reader}] said ${one.said}: ${ask.from.file}#${ask.from.name}`
+      + ` -> ${ask.to.file}#${ask.to.name} (${one.tree})`);
+    if (ask.truth === "reaches") console.log(`      referee chain: ${ask.chain.join(" -> ")}`);
+    else console.log(`      referee closure: ${ask.closure} routines, complete`);
+    if (one.detail) console.log(`      reader: ${one.detail}`);
+  }
+  if (!showAll && wrongs.length > 25) console.log(`  ... ${wrongs.length - 25} more, --all to see them`);
+  console.log();
+}
+
+if (dumpTo) {
+  writeFileSync(dumpTo, JSON.stringify(dumped, null, 2));
+  console.log(`every ask written to ${dumpTo}`);
 }

@@ -411,7 +411,8 @@ nothing in `drift.ts` reads `edge.label`. Every channel the arrow check has asks
 *does the code at this end reach the code at that end*, and with a person or a
 drawing file at one end there is no other end to reach. So the honest position is
 that these arrows carry no claim this check can test, and the fix is to say so
-out loud rather than to guess. What to do about it is tracked separately.
+out loud rather than to guess. #58 weighed two ways of reading one anyway and
+built neither; the number that decided it is in `docs/claim-vocabulary.md`.
 
 **The per-turn notice does not change.** It stays quiet, because a notice that
 reported coverage every turn is one that gets switched off — and that would take
@@ -438,6 +439,20 @@ a model deciding whether a diagram is trustworthy has the same information, and
 `coverage: true` adds `unreadEdges` — the same arrows by name. That one is gated
 where the CLI's is not, because the MCP response is read every turn and the
 counts already answer the per-turn question.
+
+**Two places still said less than this, until #58.** Both were a count of what
+*was* read standing in for the whole board:
+
+- **The board page's quiet line** said `checked 3 boxes and 2 arrows against the
+  code — all still true` on `example.excalidraw`, whose other four arrows nobody
+  read. Unread boxes already had a tail in that sentence; unread arrows had none,
+  so "all still true" covered them by omission. It now ends `— 4 more arrows were
+  never read`.
+- **`--coverage` on the CLI** named unanchored boxes and undrawn code, and left
+  out the arrows — though `coverage: true` on the tool has always included them.
+  It now prints them in a box of their own, `unread, not passing`, with the same
+  reason line `--details` uses, and skips that box when `--details` is also asked
+  for, since the audit already lists them.
 
 Most of the 105 unread boxes are the telecom boards, which describe a protocol
 rather than this repository. Marking them `describes: "concept"` turns them from

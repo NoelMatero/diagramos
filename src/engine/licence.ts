@@ -51,7 +51,24 @@ import { ARROW_CLAIMS, type ArrowClaim } from "./claim";
  * excluded here because somebody decided it, and the next one deserves the same
  * decision rather than a default.
  */
-export type AccusingRelation = Exclude<ArrowClaim, "feeds">;
+export type AccusingRelation = Exclude<ArrowClaim, "feeds"> | AccusingBoxClaim;
+
+/**
+ * A **box** word that may say wrong on its own reader, which is one of the two.
+ *
+ * `closed` is not here and that is not an omission. It reads the imports -- the
+ * same reader `@needs` uses, measured by the same corpus -- so it asks
+ * `licenceFor` about a *path*, which is that question in the form it can put
+ * it. `handles` reads a dispatch, which nothing else here reads, so it needs a
+ * row of its own or it would be accusing on a measurement of something else.
+ * That is #195's mistake exactly: a reader shipping an accusation it inherited.
+ *
+ * Written as a list of one rather than derived from `BOX_CLAIMS`, because the
+ * decision about `closed` is a decision and the next box word deserves the same
+ * one rather than a default. Adding a third box word does not silently grant it
+ * anything; forgetting to decide about it is what this shape prevents.
+ */
+export type AccusingBoxClaim = "handles";
 
 /**
  * The same list at runtime, filtered from `ARROW_CLAIMS` rather than typed out.
@@ -59,8 +76,10 @@ export type AccusingRelation = Exclude<ArrowClaim, "feeds">;
  * Complete by construction, so a report that walks it cannot quietly stop
  * mentioning a word.
  */
-export const ACCUSING_RELATIONS: readonly AccusingRelation[] =
-  ARROW_CLAIMS.filter((word): word is AccusingRelation => word !== "feeds");
+export const ACCUSING_RELATIONS: readonly AccusingRelation[] = [
+  ...ARROW_CLAIMS.filter((word): word is Exclude<ArrowClaim, "feeds"> => word !== "feeds"),
+  "handles",
+];
 
 /** One repository, at the commit it was measured at. */
 export interface CorpusEntry {
@@ -235,6 +254,51 @@ export interface AccusalLicence {
  * the honest answer until one is built -- not a placeholder standing in for
  * a "yes" nobody has checked.
  */
+/**
+ * The referee for `handles`, which is a text scan but not one of the others.
+ *
+ * It reads case labels, which means it is the one scan here that must **not**
+ * blank strings -- `case "GET":` is the thing being read. Named separately for
+ * that reason rather than folded into `TEXT_SCAN`: a square that says yes has
+ * to name the thing that earned it, and this earned a different thing.
+ */
+const DISPATCH_SCAN =
+  "a line-based text scan of the same files that reads `case X:` and `X =>` " +
+  "with no grammar at all (scripts/lib/dispatch-scan.ts). It shares no " +
+  "tree-sitter query with the reader, and unlike every other scan here it " +
+  "keeps string literals, because a case label is one.";
+
+/**
+ * Why `handles` says no outside TypeScript, and it is the referee rather than
+ * the reader.
+ *
+ * Stated once and shared, because the reason is the same in all four and it is
+ * a reason about the *measurement*: the scan is line-based, so it cannot see a
+ * Rust arm `rustfmt` broke across lines, it counts a `macro_rules!` arm as a
+ * case, and it reads a `switch` written inside a template literal in a test
+ * fixture as code. Every disagreement was read and almost all of them are
+ * those three shapes -- but item 18 settled that this is not enough: agreement
+ * is not evidence once a check is known not to discriminate, so the squares
+ * stay no until a referee that can tell them apart exists.
+ *
+ * For Rust the thing that would change it is named: `rustc`'s own
+ * non-exhaustive-match error lists the missing variants, which is a genuinely
+ * independent oracle for a case set. #237 found this machine's rustc too old
+ * for ripgrep's crates, so it is a real piece of work rather than a flag.
+ */
+const DISPATCH_SCAN_TOO_CRUDE = (detail: string): RelationUnmeasured => ({
+  unmeasured:
+    "Measured and not licensed. " + detail + " The referee " +
+    "(scripts/lib/dispatch-scan.ts) is line-based and has three known blind " +
+    "spots -- a Rust arm broken across lines, a `macro_rules!` arm, and a " +
+    "`switch` inside a template literal in a test fixture -- so a disagreement " +
+    "here is at least as likely to be the referee's. Reading them one by one " +
+    "says exactly that, and item 18 settled that reading the flagged cases is " +
+    "not enough to license on. rustc's own non-exhaustive-match error is the " +
+    "independent oracle that would settle Rust; nothing equivalent is wired in " +
+    "for Python. `npm run measure:handles` reproduces every number.",
+});
+
 const NOT_DESIGNED_YET: RelationUnmeasured = {
   unmeasured:
     "No absence-based accusation is designed for this word yet. #231 gave " +
@@ -513,7 +577,16 @@ export const LICENCES: readonly Licence[] = [
             "`calls-backwards` red on correct code. Fixed by asking `through` " +
             "before same-file, the order `placeOf` already used; found by a " +
             "real compiler rather than by review " +
-            "(docs/claim-vocabulary.md item 24).",
+            "(docs/claim-vocabulary.md item 24). **#reach re-measured this " +
+            "row**: a wildcard re-export is now followed to a unique " +
+            "declaration rather than refused, which is the same reader " +
+            "placing more names. `npm run measure:calls -- --no-checker` " +
+            "over the same six trees before and after: 0 accused, 0 " +
+            "invented and the same single miss either way, with recall up " +
+            "from 98.1% to 98.3% in ts and 87.6% to 88.3% in tsx as the " +
+            "`elsewhere` refusals went to zero. Re-run once more after the " +
+            "candidate tie-break (docs/claim-vocabulary.md item 29): 0 " +
+            "accused, 0 invented, the same single miss, recall unmoved.",
         },
         /*
          * The new axis (#231). `presence` above rests on finding a call
@@ -609,6 +682,46 @@ export const LICENCES: readonly Licence[] = [
             "and there is no second checker to measure placement against (#260). " +
             "docs/claim-vocabulary.md item 25.",
         },
+      },
+      handles: {
+        presence: {
+          reproduce: "npm run measure:handles",
+          measured: "2026-09-11",
+          referee: DISPATCH_SCAN,
+          unit: "case labels in a dispatch",
+          counts: { asked: 1099, missed: 7, invented: 0 },
+          covers: ["ts"],
+          note:
+            "176 dispatches and 1,099 case labels over 3,918 TypeScript files, " +
+            "against 1,106 from the scan: **0 invented and 7 missed (0.64%)**. " +
+            "Zero in the invented column is the half that matters here, because " +
+            "an invented case is the one that tells somebody their picture is " +
+            "short of a case their code does not have -- a false red. Both " +
+            "halves of @handles accuse, so unlike @calls there is no direction " +
+            "that is merely quiet, and the missed column is the other false " +
+            "red: it would say a routine has no arm for something it handles. " +
+            "Every one of the 7 is named in `known` and every one is the " +
+            "referee's. " +
+            "`covers` withholds **tsx** and **js** rather than letting them " +
+            "inherit this row, which is #207's whole lesson: tsx disagrees on 5 " +
+            "of 40 labels, and js agrees on all 27 but 27 asks over 1,119 files " +
+            "is the same thin evidence Rust's @calls square was refused for. " +
+            "The chain half of the word -- an if/elif ladder -- is refused by " +
+            "`checkHandles` in every language including this one, because a " +
+            "single `if (x === undefined)` is indistinguishable from a chain " +
+            "link to any referee that does not redo the reader's own work.",
+          known: [
+            "A `switch` written inside a template literal in a test fixture. " +
+              "The referee has to keep string literals -- a case label is one " +
+              "-- so it reads code-in-a-string as code, and the reader " +
+              "correctly does not. All 7 misses are this: six `case 1:` inside " +
+              "an inline snapshot in vite's ssrTransform.spec.ts, and one " +
+              "`case true:` inside a compile fixture in vue's " +
+              "transformExpressions.spec.ts. Both are the referee counting a " +
+              "dispatch that is not code in that file.",
+          ],
+        },
+        absence: NOT_DESIGNED_YET,
       },
       conforms: {
         presence: {
@@ -765,7 +878,11 @@ export const LICENCES: readonly Licence[] = [
             "reader confirms 25.3% of them -- `receiver` is nearly all of what it " +
             "withholds -- so the population grows from 574 to 1,955 and the " +
             "recall over it falls to 37.3%. A refusal is silence, not a red " +
-            "(docs/claim-vocabulary.md item 24).",
+            "(docs/claim-vocabulary.md item 24). **#reach re-measured this " +
+            "row too** -- see the TypeScript entry for what changed -- and " +
+            "Rust\'s figures did not move: 94.7% recall, 0 accused, 0 " +
+            "invented, the same before and after. A `use ..::*` is now " +
+            "followable in principle and this corpus has none that matter.",
         },
         absence: NO_CLOSED_BODY_RESOLVER,
       },
@@ -807,6 +924,19 @@ export const LICENCES: readonly Licence[] = [
             "unparsed token tree, and 23 of the first 24 reads this reader could " +
             "not see were inside `log_line!`, `assert_eq!` and `json!`.",
         },
+      },
+      handles: {
+        presence: DISPATCH_SCAN_TOO_CRUDE(
+          "1,042 dispatches and 2,959 case labels over 290 Rust files -- the " +
+          "largest population of any language here by a factor of three -- " +
+          "against 3,021 from the scan: 105 invented (3.55%) and 167 missed " +
+          "(5.56%), both outside the band. Rust is where #206 expected this " +
+          "word to be strongest and it is the square that fails, which is the " +
+          "opposite of the issue's prediction -- and the reason is the referee " +
+          "rather than the reader, which is exactly why it cannot be licensed " +
+          "on a reading of the disagreements.",
+        ),
+        absence: NOT_DESIGNED_YET,
       },
       conforms: {
         /*
@@ -922,6 +1052,17 @@ export const LICENCES: readonly Licence[] = [
         "shape of exposure.",
     ],
     relations: {
+      handles: {
+        presence: DISPATCH_SCAN_TOO_CRUDE(
+          "9 dispatches and 26 case labels over 3,957 Python files, against 26 "
+          + "from the scan: 6 invented and 6 missed. The sample is the finding "
+          + "rather than the percentage -- `match` arrived in 3.10 and this "
+          + "corpus barely uses it, so 26 asks is the same thin evidence Rust's "
+          + "@calls square was refused for, and four of the disagreements are "
+          + "one test file that writes a `match` inside a string.",
+        ),
+        absence: NOT_DESIGNED_YET,
+      },
       needs: {
         presence: {
           reproduce: "npm run measure:licence -- --only=python",
@@ -978,7 +1119,11 @@ export const LICENCES: readonly Licence[] = [
             "`patch(..)`), so over bare calls pyright says are genuinely to the " +
             "target the recall is 99.9% (5,075 of 5,082). The same run scores " +
             "the 1,494 receiver calls this population left out: 876 real, 0 " +
-            "missed, 0 accused, 0 invented (docs/claim-vocabulary.md item 24).",
+            "missed, 0 accused, 0 invented (docs/claim-vocabulary.md item 24). " +
+            "**#reach re-measured this row too** -- see the TypeScript entry " +
+            "for what changed, since `from x import *` is now followable the " +
+            "same way -- and Python\'s figures did not move: 92.9% recall, 0 " +
+            "accused, 0 invented, the same before and after.",
         },
         /*
          * The new axis (#231), Python's version. #235 measured whether

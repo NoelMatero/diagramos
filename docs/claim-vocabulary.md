@@ -19,9 +19,9 @@ The rule in `AGENTS.md`: nothing new may say *wrong* until a script has measured
 how often its reader is mistaken, against a referee that shares no machinery
 with it.
 
-## The nine words, and the three footings
+## The ten words, and the three footings
 
-Nine words, and they do not all refute the same way. This is the distinction
+Ten words, and they do not all refute the same way. This is the distinction
 that took longest to see and it is not in #190:
 
 | word | relation | what it reads | may say wrong | how |
@@ -35,9 +35,19 @@ that took longest to see and it is not in #190:
 | `@accesses` | accesses | a type's member list — **and** a routine's body | yes | **absence**, at both ends — the routine end by name |
 | `@conforms` | conforms | a type's base list, where the language writes one | yes | **absence** |
 | `@feeds` | flows | a body, for a value's journey | **no** | — |
+| `@handles` | handles | a routine's dispatch — the arms of a `match`, a `switch` | yes | **absence**, both ways |
 
-Plus `@closed` on a box (nothing outside reaches in) and `@complete` on a board
-(nothing reachable is missing). Both refute from absence.
+The last one is on a **box** rather than an arrow, and it is the first box word
+to reach this table. `@closed` is the other one and `@complete` is on the board;
+both refute from absence too, and both read the imports, which is why neither
+needs a row on [the grid](#the-grid) — see the note under it.
+
+`@handles` refutes both ways and that is unusual enough to state: a case the
+code dispatches on that the box does not list, *and* a case the box lists that
+the routine has no arm for. Both are absences in a closed region — the arms of
+a dispatch are enumerable from the text — so both can say wrong. The second one
+withholds where the routine has a `_` or a `default`, because a fallback really
+is handling the case and calling that wrong would be a false red.
 
 The **may say wrong** column is about the word, not about any particular board.
 Whether it may say so *here* is a second question with its own answer per
@@ -217,18 +227,50 @@ Hand-written rather than generated on purpose: the table is three lines of a
 section that is mostly prose, and prose is the thing a person came here for.
 What it may not do is drift.
 
-| word | TS / TSX | JavaScript | Rust | Python | what measured it |
-|---|---|---|---|---|---|
-| `@needs` | yes | yes | yes | yes | a compiler, five pinned repositories per language |
-| `@takes` | yes | **no** | yes | yes | a text scan of the same signatures |
-| `@returns` | yes | **no** | yes | yes | the same run |
-| `@holds` | yes | **no** | yes | yes | a text scan of the same field lists |
-| `@builds` | yes | **no** | yes | **no** | a text scan of the same routine bodies |
-| `@calls` | yes | **no** | yes | yes | a text scan that bounds each routine and reads its calls |
-| `@accesses` | yes | **no** | yes | yes | a text scan of the same member lists |
-| `@conforms` | yes | **no** | **no** | yes | a text scan of the same declaration headers |
+**TS and TSX are separate columns**, and that is #206's doing. They agreed on
+every word for eight words running, so one column said both — and the ninth
+word is the first where they do not: TSX disagrees with the referee on 5 of 40
+case labels where TypeScript disagrees on 7 of 1,099. A table that cannot say
+so would have had to round one of them, and rounding *up* is the direction that
+grants a licence nobody measured.
+
+| word | TS | TSX | JavaScript | Rust | Python | what measured it |
+|---|---|---|---|---|---|---|
+| `@needs` | yes | yes | yes | yes | yes | a compiler, five pinned repositories per language |
+| `@takes` | yes | yes | **no** | yes | yes | a text scan of the same signatures |
+| `@returns` | yes | yes | **no** | yes | yes | the same run |
+| `@holds` | yes | yes | **no** | yes | yes | a text scan of the same field lists |
+| `@builds` | yes | yes | **no** | yes | **no** | a text scan of the same routine bodies |
+| `@calls` | yes | yes | **no** | yes | yes | a text scan that bounds each routine and reads its calls |
+| `@accesses` | yes | yes | **no** | yes | yes | a text scan of the same member lists |
+| `@conforms` | yes | yes | **no** | **no** | yes | a text scan of the same declaration headers |
+| `@handles` | yes | **no** | **no** | **no** | **no** | a text scan that reads `case X:` and `X =>` with no grammar |
 
 `@feeds` is not on it. It never accuses, so there is nothing to license.
+
+**`@handles` is the first box word on the grid, and `closed` is deliberately not
+on it.** The rule is what a word *reads*: `closed` reads the imports, which is
+`@needs`' reader measured by `@needs`' corpus, so it asks `licenceFor` about a
+path — that question in the form it can put it. `handles` reads a dispatch,
+which nothing else here reads, so a row of its own is the only thing standing
+between it and accusing on somebody else's measurement. That is #195 exactly.
+
+**Its row has one `yes`, and Rust — the square #206 predicted would be
+strongest — is a stated no.** 1,042 Rust dispatches and 2,959 case labels, the
+largest population of any language here by a factor of three, and the reader
+disagrees with the referee on 3.55% of them. The reason is the *referee*: a
+line-based scan cannot see an arm `rustfmt` broke across lines, it counts a
+`macro_rules!` arm as a case, and every disagreement read one by one is one of
+those. Item 18 settled that this is not enough — agreement is not evidence once
+a check is known not to discriminate — so the square stays no until something
+that can discriminate exists. `rustc`'s own non-exhaustive-match error is that
+thing and #237 found this machine's rustc too old for ripgrep's crates.
+
+TypeScript is **0 invented and 7 missed of 1,099** (0.64%), and all 7 are the
+referee reading a `switch` written inside a template literal in a test fixture.
+`covers` withholds TSX (5 of 40 labels disagree) and JavaScript (0 of 27
+disagree, but 27 asks over 1,119 files is the thin evidence Rust's `@calls`
+square was refused for) rather than letting either inherit the TypeScript row.
 
 **Every no is a finding rather than a design**, and none of them was visible
 until the squares had to be filled in one at a time.
@@ -489,6 +531,7 @@ and never fail.
 | `npm run measure:vocabulary` | how much of a diagram can be judged at all — failed claims, arrow prose, relation census |
 | `npm run measure:accesses` | can the member reader be trusted with a red |
 | `npm run measure:conforms` | can the base-list reader be trusted with a red, and what confirm-only Rust costs — `--all` prints every disagreement |
+| `npm run measure:handles` | can the dispatch reader be trusted with a red -- `--all` prints every disagreement |
 | `npm run measure:holds` | can the field reader be trusted with a red |
 | `npm run measure:calls` | can the call reader be trusted to say backwards, and how often it can answer — a real checker places the receiver calls its text scan cannot (#254); `--no-checker` for the text scan alone, `--control` to ask the checker the questions the scan already answers, `--dump=<file>` for every answer including the agreements |
 | `npm run measure:constructs` | can the construction reader be trusted to say backwards |
@@ -499,8 +542,12 @@ and never fail.
 
 The pattern in all of them is a **referee**: count the shape one way, count it
 again by a completely different mechanism, report the disagreement. It is not
-ceremony. Between them these scripts have found twelve reader bugs and nineteen
-referee bugs, and not one was reachable by thinking about it.
+ceremony. Between them these scripts have found nineteen reader bugs and twenty-four
+referee bugs, and not one was reachable by thinking about it. #206 alone found
+seven and five, which is the largest haul from one word -- and the reason is
+worth knowing: it is the first word whose reader had to work in five grammars
+at once, so every place they disagree about a shape showed up as a number in
+one column.
 
 **A referee has a blind spot of its own, and `measure:calls` now has a second
 referee for exactly that** (#254, item 24). Where a text scan cannot say whose
@@ -573,7 +620,7 @@ to pass every check this tool had.
 deliberate: almost all of it is `Vec<T>`, `Promise<T>`, `list[str]`, which
 nobody draws as two boxes.
 
-## Twenty-five times a measurement contradicted the design
+## Thirty-two times a measurement contradicted the design
 
 Kept because the pattern is the point: eleven of the first thirteen came from
 building one word or one reader, not from reviewing the design. Nothing since
@@ -581,7 +628,15 @@ has broken that — item 24 is the clearest case of it, a reader bug four
 measurements had walked past because the population it lived in was reported
 apart and never scored. Item 25 is the other kind: an issue's premise, that a
 word needed a type checker, which measuring both designs over the same bodies
-turned out to be wrong about.
+turned out to be wrong about. Item 26 is a third kind and the cheapest: an
+issue's own evidence for a word, read one arrow at a time, turning out to be
+evidence of something else.
+
+Items 26 to 28 are all one measurement's first run. `measure:reach` was built
+to answer "how many steps can the engine follow", and before it answered that
+it found two false-confirmation generators in the channel that was already
+shipping and one cache that made an answer depend on which files had been read
+before it.
 
 1. **The substrate was empty.** #190's first draft proposed graphify as the
    fact supplier on the strength of 8,167 `contains` edges. `contains` there is
@@ -2399,6 +2454,356 @@ be one: `<MenuContent />` is a routine making a MenuContent, which is `@builds`.
     lookup read a call to a parameter — `isTest(file)` — as a call to the
     routine declaring it, because "go to definition" lands on the parameter;
     that counted a call nobody can see into as seen.
+duplicate from conflitcts, requires reading prs "An arrow can be three calls long #271" and "A box can say what cases a routine handles, and go red when the code grows one (#206)
+#266 ·" to be read to resolve
+26. **The body search was confirming arrows on a name that meant something
+    else, 60 times in Rust and 8 in Python.** `anyhow`'s `chain.rs` declares `fn len`
+    whose body writes `cause.source()`. An arrow from `context.rs#source` to
+    `chain.rs#len` came back **confirmed** — the body writes the word `source`,
+    and it is `StdError::source` on a trait object (#reach).
+
+    This is the failure ee3b29e already names and fixed in one place only.
+    Following a hop refuses `Type::foo` and `other.foo` because they are
+    somebody else's `foo`; the place the search *stops* counted every
+    identifier leaf, member halves included. Inside one file that is right —
+    there is no second thing the name could mean. Across files there is, and
+    every one of the 51 was that shape.
+
+    The fix is the same rule at the terminal match: for a target in another
+    file, a name written as somebody else's member is not evidence.
+    `self.foo` and `this.foo` still count, because a Rust `impl` block for the
+    routine's own type may be in the other file.
+
+    A second, smaller version of the same thing was found in the same run.
+    Flask writes a nested `def decorator` inside `app_template_filter`, so an
+    arrow from `app.py#decorator` to `blueprints.py#app_template_filter` was
+    confirmed on that body writing `decorator` — its own, declared eight lines
+    down. That is Python's half, fixed by dropping from the question any
+    name the searching file declares itself, which is `call-scan.ts`'s own
+    rule: a referee that cannot tell which of two same-named things is meant
+    has no business asking.
+
+27. **A cache keyed by node id made the same board give two different
+    answers.** `body.ts` held one node's token set in a `Map<number, ...>`,
+    and a node id is an address inside one tree. Evict that tree — 48 is the
+    parse cache limit — and the next one is handed the same addresses, so the
+    cache answers about the new file with the old file's tokens (#reach).
+
+    Not a slow cache: a wrong answer, and the worst shape of one. It depends
+    on how many *other* files were read in between, so whether an arrow is
+    confirmed is decided by what else happened to be on the board. It was
+    found because the cross-file walk parses more files than the one-file
+    search did, and one arrow in `measure:reach` moved with nothing about
+    that arrow changed. Held against the tree in a `WeakMap` now, so the
+    lifetimes agree by construction.
+
+28. **The confirming search had a wall, not a budget, and `@calls` was saying
+    "wrong" on the other side of it.** `body.ts` follows calls as deep as they
+    go inside one file, which reads as a depth limit and is not: `bodiesFor`
+    looks a callee up in the tree it already parsed, so a chain ends at the
+    first file boundary. Most real chains cross one. Of 545 pairs two
+    repositories' compilers say genuinely reach each other, the engine
+    confirmed 232; it confirms 452 now, and 321 of the 406 that are two or
+    more calls apart against 98 before (docs/reach-measurement.md) (#reach).
+
+    The expensive half is what `@calls` did with the rest. Its closed-body
+    absence (#233) is about the *direct* call and correct about it — and 58 of
+    those 545 reaching pairs came back `refuted` and one `backwards`, so 59
+    red accusations landed on arrows whose code really does reach. That is not
+    a reader bug; it is a true verdict about calling being read as a verdict
+    about the diagram. It is now an advisory that names the route
+    (`calls-one-level-up`), on the same reading `@accesses` already gives the
+    same shape: a board drawn one level too high is a board somebody can keep.
+
+29. **One import specifier can resolve to two files, and the wrong one was
+    winning on a tie-break.** Rust records `crate::codec::encode` against both
+    the file declaring `mod codec` and `codec.rs` itself. `comesToRest` ends
+    with a permissive step -- a file that neither declares the name nor
+    forwards it is still counted as the resting place -- which is right for a
+    specifier somebody wrote down and wrong as a way of choosing between
+    candidates. Taken in declared order `main.rs` won, and `encode` was placed
+    in a file that declares no `encode` at all (#reach).
+
+    Invisible while nothing walked past the first hop: `@calls` compares the
+    placement against one named far end, and a wrong file simply fails to
+    match, which reads as silence. The cross-file walk steps *into* the file it
+    was given, finds nothing of that name there and stops -- so a three-file
+    Rust crate's `main -> encode` could not be confirmed by any route.
+    Candidates are now asked the strict question first (does this file declare
+    the name, or forward it somewhere that does) and the permissive answer is
+    the fallback. A single candidate, which is every TypeScript and Python
+    import in the corpus, is unaffected either way.
+
+30. **A minute of a Rust board's check was a timer nobody was waiting on.**
+    Wiring rust-analyzer into the live check took `rust-test` from 1.3
+    seconds to 61, which read as the price of a language server and was not
+    (#reach). Instrumented: three seconds of server, 66 milliseconds of
+    walking, 11 bodies read -- and 57 seconds of a process declining to end.
+
+    Both language-server clients register `setTimeout` guards and never clear
+    them. A request that answered leaves its 30-second timeout in the queue;
+    `whenPrimed` leaves a 60-second one. Node will not exit while either is
+    pending. Invisible until now because every previous caller was a
+    measurement script ending in an explicit `process.exit`, which walks past
+    a pending timer; `check-drift.mjs` ends on its own. `unref` on both, and
+    the board went to 4.5 seconds.
+
+    Worth keeping for the shape of it: the number looked exactly like the cost
+    of the thing just added, and the thing just added was responsible for
+    three seconds of it. A timing that matches your expectation is not
+    evidence of what you think caused it.
+
+    A second thing the same wiring broke, and the built bin is what found it:
+    `vscode-jsonrpc` is a **devDependency**, so a static import of the Rust
+    client put it in `out/cli/drift.mjs`, which is shipped, and
+    `diagramos drift --help` exited 1 with `Cannot find module
+    'vscode-jsonrpc/node'` on a tree where npm had never installed it.
+    `packaged-server.test.ts` spawns that bin, which is why the suite caught
+    what every unit test passed straight through. The transport is fetched
+    when a server is started now, and failing to fetch it is the same silence
+    as rust-analyzer not being installed.
+
+31. **The next step this document named was not worth building, and the
+    measurement said so before anybody did.** #reach's own "still out of
+    reach" section named a cross-file field-type lookup as the thing that
+    would raise the floor, on the strength of `self.inner.by_ref()` in
+    `anyhow` being the shape a reader could not type. Counted instead of
+    assumed: `no-fields` is **45 of ripgrep's 6,823** withheld receiver sites,
+    11 of anyhow's 203, 109 of httpx's 2,577. What withholds is `not-a-name`
+    -- 4,040 in ripgrep, an expression receiver no reader of text can type --
+    and `imported-type`, mostly a module receiver `calls.ts` places anyway.
+
+    The second half is worse for the proposal and more useful. `never reaches`
+    needs a **closed** region, and closure is conjunctive, so the histogram of
+    first doubts everyone had been reading says nothing about what a new
+    reader would buy. Counted by the whole doubt set: 420 of anyhow's 965
+    refusals are blocked by a `macro` among others, which no grammar parses;
+    0 of Python's sample are blocked by one kind of doubt at all; and
+    TypeScript's 84 receiver-only refusals are ones `tsc` already settles in
+    the product, invisible here only because the answer key *is* `tsc`.
+
+    So the only honest route to licensing that word is an independent referee
+    for a compiler-backed reader -- pyright read, mypy refereeing, Python
+    only. Worth keeping because the proposal was this document's own, written
+    two commits earlier, and it took one afternoon's counting to retire.
+
+32. **Three bugs in the benchmark's own negative population, and the one that
+    mattered had been throwing away half of it.** `measure:reach`'s `never`
+    asks are the only evidence that verdict could ever be licensed on, so the
+    population is an argument and it was wrong in three ways (#reach).
+
+    The callback guard asks whether a closure might hand the tail out as a
+    value, and answered yes because the tail's own `export function` line was
+    in a file the closure touches -- `ast.ts#createInterpolation` against
+    `ast.ts#convertToBlock`, where the caller writes `isString` and nothing
+    else. **348 of `vuejs-core`'s never-pairs rejected for no evidence at
+    all.** The referee was directional where `checkSymbolEdge` is
+    bidirectional by documented design, so a pair whose *tail* calls the head
+    scored as a wrong confirmation -- 15 of them, all true statements about
+    the wrong question. And one per-seed cap served both populations, so
+    `--unguarded` moved the scored `never` count from 24 to 8: an instrument
+    changing its own reading.
+
+    What the corrected population then showed is the useful half. Wrong
+    confirmations are **7 on TypeScript, 43 on Python, 26 on Rust, and every
+    single one is same-file** -- cross-file is zero in all three, so the
+    strict standard item 26 added is doing exactly its job. The remainder is
+    the same-file lenient standard `body.ts` calls deliberate, and the corpus
+    disagrees with its reasoning: `error.rs#deref` confirms against
+    `error.rs#is` because the body writes `.is::<E>()`. Applying the strict
+    rule inside a file was measured, not argued -- free on TypeScript, and on
+    Rust 7 fewer wrong for 27 fewer right -- and left alone on that number.
+
+    Read the agreements too, applied to the instrument rather than the reader.
+
+    A fourth, in the suite rather than the measurement, and the shape is worth
+    the line: `resolveRustDefinitions` got its own test file, which made three
+    files each spawning their own rust-analyzer while vitest ran them in
+    parallel. Whichever lost the race went red with `expected undefined to be
+    defined` -- a starved server, reading exactly like a code fault, and
+    alternating between files run to run. Folded into
+    `resolution-rust-receivers.test.ts`, which puts the count back to the two
+    it was.
+
+26. **#206's demand number came back at 7 arrows of 162 and did not decide the
+    issue, because the corpus it counts was drawn to test the tool. Built
+    anyway, on the code-side argument the issue itself made. Licensed in
+    TypeScript at 0 invented and 7 missed of 1,099 case labels -- and Rust, the
+    square the issue predicted would be strongest, is a stated no.**
+
+    `@handles` says what cases a routine dispatches on: `handles: ["Get",
+    "Post", "Delete"]` on a box whose ref names a routine. It is the only word
+    here that catches something being **added** to the code rather than
+    something going stale, which is the one kind of drift nothing notices --
+    adding a fourth case breaks no test and reads as progress.
+
+    **The demand number, and why it did not settle anything.** `bucketOf` in
+    `measure-vocabulary.mts` grew a `handles` bucket -- last in `BUCKETS` and
+    claiming `dispatches on` rather than `dispatch`, so it cannot take arrows
+    off `invokes`, whose count has been on the record since #187. It catches **7
+    of the 162 arrows that carry prose**, the caption share moving 78.4% to
+    74.1%, and read one at a time none of the seven asserts a case set: two are
+    the pattern being too wide (`re-arm`, `arm writable` are epoll
+    re-registration), three are a single arm drawn as one arrow, and `covers` is
+    test coverage on an arrow that already carries `@needs`.
+
+    That was written up as a closure and the owner rejected it, correctly. The
+    census reads *prose*, so a drawing date cannot hide the demand -- but a
+    *corpus* can, and this one is twenty boards of two codebases drawn to
+    exercise the tool. "Nobody asked" is a fact about why those boards exist.
+    The issue's own case was never the boards: it was a closed region going
+    unused and a real failure nothing catches, and the closure leaned on the
+    weakest evidence available. **The lesson is the one `AGENTS.md` already
+    states one step earlier: name the mechanism that would have made the number
+    different. Here the mechanism is who drew the sample and why.**
+
+    **Arrow form versus box form, which #206 left open.** The box form, and the
+    7 arrows are the argument for it rather than against: every one of them is a
+    single arm drawn as one arrow, and an arrow can only ever say *this case
+    goes there*. Only a box says *these are all of them*, and only that catches
+    a forgotten branch.
+
+    **One reader, five languages, and the only list in it is which node is a
+    dispatch.** Two regexes for five languages; everything else is a field read
+    or a structural rule -- the subject is the first named child before the
+    body, a case's label is its first named child unless that child is the
+    case's own consequence, an alternation is a label with an anonymous `|`, a
+    catch-all is a case with no label or a label whose text is `_`. It is a list
+    rather than a shape rule because the obvious rule -- a `body` field and no
+    `name` field -- also matches every loop in all five grammars, and Python's
+    `match` body is a plain `block` exactly like a `for` body. So it is tested
+    for completeness rather than contents, per `reading-a-grammar.md`.
+
+    **Seven reader bugs, and every one came from running it rather than
+    reasoning about it.** Four from the sixteen-tree run, three from the
+    measurement.
+
+    - **`value` means opposite things.** It is the label on a TypeScript
+      `switch_case` and the arm's *result* on a Rust `match_arm`, so the one
+      field name that looks generic is the one that cannot be trusted. Nothing
+      reads it.
+    - **Counting loose children to find an alternation** is true of Rust's
+      `or_pattern`, Python's `union_pattern` and also a Python *string*, which
+      names `string_start`, `string_content` and `string_end` where
+      TypeScript's has one `string_fragment`. One `case "GET"` came back as
+      four unreadable shapes in Python and one clean case everywhere else.
+    - **An identifier test applied to a string.** `case "textDocument/hover"`,
+      `"&str" | "String" =>` are ordinary constants whose text is not an
+      identifier. The quoted check also has to be asked *before* descending,
+      because descending into a `string` is what strips the quotes.
+    - **A catch-all in a branch with anything else in it was lost.** A grammar
+      puts only the first statement of a case behind `body`, so a `default:`
+      holding two statements leaves a loose child over and it was read as the
+      label -- django's `popup_response.js` reported `break_statement`, vite's
+      `build.ts` reported `comment`. **This one runs toward a false red:** a
+      `default:` misread as a labelled case means the dispatch is reported with
+      no catch-all, so a routine that swallows every unlisted case looks like
+      one that enumerates them. TypeScript's catch-all count 116 -> 134.
+    - **A comment was a case, and then a catch-all.** A comment is a *named*
+      node in all five grammars. One loose in a `match_block` was read as a
+      branch with no label, which is the spelling of a wildcard, so **every
+      Rust match with a comment in it was reported as having a catch-all it
+      does not have.** Rust 216 -> 184, Python 132 -> 115. The safe direction of
+      the same defect: it cost refutability rather than inventing a red.
+    - **`case Status.Active:` was the commonest shape it could not read** -- 271
+      of 5,269 cases, against 95 for the next one. The first fix used
+      `parse.ts`'s `MEMBER_ACCESS` on the one-list argument and read **0** of
+      Python's, because a `case` pattern is a `dotted_name` there while the
+      same expression elsewhere in Python is an `attribute`. That set answers a
+      different question; sharing it would have been one list used for two
+      things. A dotted or `::`-joined run of identifiers is the same shape
+      everywhere.
+    - **A bare identifier means opposite things in the two families.** `case
+      ready:` in a `switch` is a value; `x => ..` in a `match` is a *binding*
+      that catches everything, and reading it as a case put `x` in the set five
+      times in `ripgrep/tests/json.rs`. The first fix refused every unqualified
+      identifier in a pattern and **cost 372 Rust cases and 21 Python ones**,
+      because bare `None`, `Ok` and `Err` are exactly that shape -- refused
+      dispatches went 134 to 506. It now leans on case, which is what
+      discriminates in practice, and answers **catch-all** rather than case or
+      refusal: if that is wrong the claim gets quieter rather than accusing
+      anybody.
+
+    **Five referee bugs, which is the other half of the pattern.** The first
+    run of `measure:handles` reported **1,409 disagreeing files**, and the
+    referee was wrong in every one of the first four:
+
+    - **Two chain patterns that matched every `if`.** A chain link and an
+      ordinary `if (x === undefined)` are the same text. Telling them apart
+      needs the links collected and their subjects compared, which is the
+      reader's own judgement written twice, and a second copy of the reader is
+      not a referee. **So the chain half of the word has no referee and
+      `checkHandles` refuses to accuse on it, in every language.** That is the
+      gate working rather than a gap.
+    - **A `case` pattern anchored at end of line**, so `case 2: return x;` and
+      every minified file was invisible. django's vendored `xregexp.min.js` hid
+      twelve cases that way.
+    - **One `case` per line.** `case 2:case 3:case 4:` is one line.
+    - **No payload rule**, so `Ok(v)`, `Err(e)`, `Event::Click { .. }` -- how
+      Rust writes patterns constantly -- were refused. This and the one above
+      were most of a **52.50%** disagreement, which came down to 3.76%.
+    - **A comment stripper that tripped on `/*` inside a string.** A CSS
+      string, a glob, a regex: the block-comment flag went on and **blanked the
+      rest of the file**. The scan read 0 of 2 case labels in vite's
+      `importMetaGlob.ts`, 2 of 6 in `create-vite`, 10 of 12 in `css.ts`, and
+      every one came out as the reader inventing a case. Rewritten as a
+      character scanner that tracks quote state, which took TypeScript from 8
+      invented to **0**.
+
+    **One referee change was built, measured and reverted**, which is worth as
+    much as the five above. `rustfmt` breaks a long arm across lines, so a
+    line-based scan cannot see it -- 116 of Rust's disagreements. Joining a run
+    of lines up to the one holding `=>` took the numbers from 3.76%/2.85% to
+    **5.39%/5.02%**, because deciding which lines are a continuation is itself a
+    judgement and it joined unrelated ones. A referee tuned until it flatters
+    the reader has stopped being a referee.
+
+    **The numbers, `npm run measure:handles`, 9,940 files over sixteen trees.**
+
+    | language | files | dispatches | cases | referee | invented | missed |
+    |---|---:|---:|---:|---:|---:|---:|
+    | ts | 3,918 | 176 | 1,099 | 1,106 | **0** | 7 (0.64%) |
+    | rust | 290 | 1,042 | 2,959 | 3,021 | 105 (3.55%) | 167 (5.56%) |
+    | tsx | 656 | 12 | 40 | 41 | 2 | 3 |
+    | python | 3,957 | 9 | 26 | 26 | 6 | 6 |
+    | js | 1,119 | 9 | 27 | 27 | **0** | **0** |
+
+    **Both halves of this word accuse, so unlike `@calls` there is no direction
+    that is merely quiet.** An invented case tells somebody their picture is
+    short of a case their code does not have; a missed one tells them their
+    routine has no arm for something it handles. Both are false reds. That is
+    why zero in the invented column is the number TypeScript's licence rests
+    on, and all 7 of its misses are the referee reading a `switch` written
+    inside a template literal in a test fixture -- it has to keep strings,
+    because a case label is one.
+
+    **Rust is the finding.** #206 called it "the strongest case by a distance"
+    -- exhaustive by the compiler, and the reader does read it: 1,042
+    dispatches and 2,959 cases, the largest population here by a factor of
+    three. It is a stated **no**, and the reason is the referee rather than the
+    reader. Every disagreement was read and almost all are the three known
+    blind spots. Item 18 already settled that this is not enough: agreement is
+    not evidence once a check is known not to discriminate. `rustc`'s own
+    non-exhaustive-match error is the independent oracle that would settle it,
+    and #237 found this machine's rustc too old for ripgrep's crates.
+
+    **Two things the grid had to grow.** `handles` is the first **box** word on
+    it -- `closed` is deliberately not, because it reads the imports `@needs`
+    is measured on and asks `licenceFor` about a path instead, while a dispatch
+    is a reader nothing else here has. And **TS and TSX are separate columns
+    now**: they agreed on every word for eight words running, so one column
+    said both, and this is the first word where they do not. A table that
+    cannot say so has to round one of them, and rounding up grants a licence
+    nobody measured.
+
+    **What it does not cover.** The `if`/`elif` half, refused in every
+    language. A routine with two dispatches, refused. A case the reader cannot
+    name -- a tuple pattern, a Rust byte range, a computed label -- refuses the
+    whole dispatch rather than shortening the list, 157 of them across the
+    corpus. And the comparison in `measure:handles` is per **file** rather than
+    per routine, because a referee that bounded a dispatch would be a second
+    copy of the reader; what guards attribution is the scoping tests and the
+    two-dispatch refusal, not that number.
 
 ## Open, in the order worth doing
 
@@ -2503,9 +2908,12 @@ language.
   within reach.
 
   Refuting one is not yet, and what is left in the way is now one thing rather
-  than two. It needs "this routine never reaches that door", proved backwards
-  from the door (`npm run measure:reach`) -- forwards, one unplaced call
-  anywhere on a path ends the proof. Scored against flask's and httpx's test
+  than two. It needs "this routine never reaches that door", which is the
+  opposite direction from the chain following item 28 built: that one *confirms*
+  a route and got 321 of 406 distant pairs where 98 were confirmed before, while
+  this one has to establish that no route exists at all. Forwards, one unplaced
+  call anywhere on any path ends that proof, so it is proved backwards from the
+  door instead (`npm run measure:door-reach`). Scored against flask's and httpx's test
   suites **as they actually ran** (`scripts/lib/reach_trace.py`), a referee
   sharing no parse, index or name with the walk, the walk now rules out **0 of
   90** (routine, door) pairs that do reach. Three rules got it there, each one

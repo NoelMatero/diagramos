@@ -42,6 +42,12 @@ plus a live local board for editing them alongside a human.
   what each language has earned the right to accuse about, and the six times a
   measurement contradicted the design. Four of those six were found by
   building one word or one reader rather than by reviewing the plan.
+- **Before changing what counts as a body reaching another, read
+  [docs/reach-measurement.md](docs/reach-measurement.md).** It carries the
+  before-and-after per language, and the one trade the whole thing turns on:
+  a token match is sound inside a file and unsound across one, so Rust gave
+  up 135 confirmations to stop 51 wrong greens. Both numbers are there
+  because a fix whose cost nobody wrote down cannot be argued with later.
 - **Before writing a reader that matches tree-sitter node types, read
   [docs/reading-a-grammar.md](docs/reading-a-grammar.md).** One reader made the
   same mistake four times in a sitting, three of them while fixing it, and every
