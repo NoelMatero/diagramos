@@ -57,21 +57,17 @@
  *
  * A run is a measurement, not a test: it prints and never fails.
  */
-import { execFileSync } from "node:child_process";
 import { existsSync, readFileSync } from "node:fs";
 import path from "node:path";
 
 import { boardCorpus } from "./lib/boards";
+import { indexOf } from "./lib/dataflow-index";
+import { sourceFiles } from "./lib/source-files";
 
 import { readBoard } from "../src/engine/board-file";
-import { bindingsIn, callsBetween, type Bindings, type CallSide } from "../src/engine/calls";
-import { type ConfigCache } from "../src/engine/resolve";
 import {
-  chainFrom, contained, readBodies, settleCalls,
-  type Body, type Callee, type Local, type Resolver,
+  chainFrom, contained, readBodies, settleCalls, type Local,
 } from "../src/engine/dataflow";
-import { readDependencies } from "../src/engine/deps";
-import { createWorkspace } from "../src/engine/drift";
 import { checkFeeds } from "../src/engine/feeds";
 import { readGraph } from "../src/engine/graph";
 import { initEngine, languageOf, type Language } from "../src/engine/parse";
@@ -96,18 +92,6 @@ const trees = roots.length > 0 ? roots : [
   `${HOME}/mundane`,
   `${HOME}/infrarouter`,
 ].filter((tree) => existsSync(tree));
-
-function sourceFiles(root: string): string[] {
-  try {
-    return execFileSync("find", [root, "-type", "f"], { encoding: "utf8" })
-      .split("\n")
-      .filter(Boolean)
-      .filter((file) => !/\/(target|node_modules|\.git|dist|out|vendor|\.venv)\//.test(file))
-      .filter((file) => languageOf(file) !== undefined);
-  } catch {
-    return [];
-  }
-}
 
 /* ------------------------------------------------------------------ referee */
 
@@ -612,138 +596,12 @@ const resolvedHow = new Map<string, number>();
 const resolutionChecked = new Map<string, number>();
 const resolutionDisputed: Array<{ file: string; routine: string; callee: string }> = [];
 
-/** One repository's lazily-built index: sources, bindings, bodies, imports. */
-function indexOf(tree: string) {
-  const workspace = createWorkspace(tree);
-  const configs: ConfigCache = new Map();
-  const sources = new Map<string, string | undefined>();
-  const bindings = new Map<string, Bindings | undefined>();
-  const bodies = new Map<string, Body[]>();
-  const importsOf = new Map<string, CallSide["imports"]>();
-
-  const read = (rel: string): string | undefined => {
-    if (sources.has(rel)) return sources.get(rel);
-    const absolute = workspace.resolve(rel);
-    const text = absolute && workspace.stat(absolute) === "file"
-      ? workspace.read(absolute)
-      : undefined;
-    sources.set(rel, text);
-    return text;
-  };
-
-  const bindingsFor = (rel: string): Bindings | undefined => {
-    if (bindings.has(rel)) return bindings.get(rel);
-    const source = read(rel);
-    const language = languageOf(rel);
-    const found = source !== undefined && language
-      ? bindingsIn(source, language)
-      : undefined;
-    bindings.set(rel, found);
-    return found;
-  };
-
-  const bodiesFor = (rel: string): Body[] => {
-    const cached = bodies.get(rel);
-    if (cached) return cached;
-    const source = read(rel);
-    const language = languageOf(rel);
-    const found = source !== undefined && language && source.length <= 400_000
-      ? readBodies(source, language).bodies
-      : [];
-    bodies.set(rel, found);
-    return found;
-  };
-
-  const importsFor = (rel: string): CallSide["imports"] => {
-    const cached = importsOf.get(rel);
-    if (cached) return cached;
-    const source = read(rel);
-    const declared = source === undefined
-      ? []
-      : readDependencies(rel, source, workspace, configs)?.dependencies ?? [];
-    const list = declared.map((one) =>
-      ({ specifier: one.specifier, ...(one.file ? { file: one.file } : {}) }));
-    importsOf.set(rel, list);
-    return list;
-  };
-
-  /** The routine of that name in that file, if exactly one body carries it. */
-  const routineIn = (rel: string, name: string): Callee | undefined => {
-    const found = bodiesFor(rel).filter((one) => one.routine === name);
-    // Two routines of one name in one file is a question with two answers, and
-    // picking one would be inventing the resolution rather than reading it.
-    return found.length === 1 ? { body: found[0]!, file: rel } : undefined;
-  };
-
-  /**
-   * Which routine a called name means, read the way `calls.ts` reads a binding.
-   *
-   * Three answers and a refusal. Declared here, imported from a file this
-   * repository holds, or forwarded through one barrel -- and `undefined` for
-   * everything else, which is what keeps a call an exit. A name bound twice, or
-   * brought in by a wildcard, is a refusal on the same footing `calls.ts`
-   * refuses it: the text does not say which.
-   */
-  const resolver = (rel: string): Resolver => (callee: string) => {
-    const bound = bindingsFor(rel);
-    if (!bound || bound.wildcard || bound.ambiguous.has(callee)) return undefined;
-
-    if (bound.local.has(callee)) {
-      const own = routineIn(rel, callee);
-      if (own) bump(resolvedHow, "declared here");
-      return own;
-    }
-
-    const imported = bound.imported.get(callee);
-    if (!imported || imported.namespace) return undefined;
-    const from = importsFor(rel).find((one) => one.specifier === imported.specifier);
-    if (!from?.file) return undefined;
-
-    const direct = routineIn(from.file, callee);
-    if (direct) { bump(resolvedHow, "imported"); return direct; }
-
-    /*
-     * One hop through a barrel, which `calls.ts` needed for the same reason:
-     * `from graphify.extract import extract_objc` where `extract.py` re-exports
-     * what `extractors/objc.py` declares. One hop and no further -- a chain of
-     * barrels is a call graph, and that is the line this does not cross.
-     */
-    const onward = bindingsFor(from.file)?.forwarded.get(callee);
-    if (!onward) return undefined;
-    const next = importsFor(from.file).find((one) => one.specifier === onward.specifier);
-    if (!next?.file) return undefined;
-    const forwarded = routineIn(next.file, callee);
-    if (forwarded) bump(resolvedHow, "forwarded once");
-    return forwarded;
-  };
-
-  /** #189's reader, asked whether the call this resolver followed is there. */
-  const confirms = (rel: string, routine: string, callee: Callee): boolean => {
-    const source = read(rel);
-    const target = read(callee.file);
-    const language = languageOf(rel);
-    const targetLanguage = languageOf(callee.file);
-    if (source === undefined || target === undefined || !language || !targetLanguage) {
-      return true; // Nothing to check against is not a disagreement.
-    }
-    const verdict = callsBetween(
-      { file: rel, source, language, imports: importsFor(rel), routine },
-      { file: callee.file, source: target, language: targetLanguage,
-        imports: importsFor(callee.file), names: [callee.body.routine] },
-    );
-    // `withheld` is a doubt rather than a contradiction, and this reader has its
-    // own reasons to withhold that say nothing about the resolution.
-    return verdict.verdict !== "backwards" && verdict.verdict !== "absent";
-  };
-
-  return { resolver, confirms, read, bodiesFor };
-}
 
 /** How many pairs one file may contribute, so one generated file cannot own the number. */
 const MOST_PAIRS = 200;
 
 for (const tree of trees) {
-  const index = indexOf(tree);
+  const index = indexOf(tree, (how) => bump(resolvedHow, how));
 
   for (const file of sourceFiles(tree)) {
     const language = languageOf(file)!;

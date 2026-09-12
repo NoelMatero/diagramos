@@ -620,7 +620,7 @@ to pass every check this tool had.
 deliberate: almost all of it is `Vec<T>`, `Promise<T>`, `list[str]`, which
 nobody draws as two boxes.
 
-## Thirty-two times a measurement contradicted the design
+## Thirty-five times a measurement contradicted the design
 
 Kept because the pattern is the point: eleven of the first thirteen came from
 building one word or one reader, not from reviewing the design. Nothing since
@@ -631,6 +631,12 @@ word needed a type checker, which measuring both designs over the same bodies
 turned out to be wrong about. Item 26 is a third kind and the cheapest: an
 issue's own evidence for a word, read one arrow at a time, turning out to be
 evidence of something else.
+
+Items 33 to 35 are a fourth kind, and the cheapest of all: not a reader bug and
+not a design error, but a measurement that had quietly stopped reading most of
+its corpus, so four numbers on an issue were shares of 15% of what they claimed.
+Nothing failed. A lost tree lowers a number, and a lowered number reads as a
+finding.
 
 Items 26 to 28 are all one measurement's first run. `measure:reach` was built
 to answer "how many steps can the engine follow", and before it answered that
@@ -2625,6 +2631,124 @@ duplicate from conflitcts, requires reading prs "An arrow can be three calls lon
     `resolution-rust-receivers.test.ts`, which puts the count back to the two
     it was.
 
+33. **`measure:dataflow` had silently lost two of its seven trees, and the
+    corpus it reports is the working tree it runs in.** Every number on #203 --
+    19.3% of values contained, 1.4% for crossing a call, 0 leaked -- is a share
+    of whatever the script managed to open, and for four days it opened 227
+    files while saying it had read the corpus (#203).
+
+    It listed each tree with `find` and filtered afterwards, so an installed
+    `node_modules` was listed in full before being thrown away. `~/mundane`
+    produces 16.9 MB of paths and `~/infrarouter` 1.5 MB, both past
+    `execFileSync`'s 1 MB default, and a blanket `catch` read the `ENOBUFS` as
+    "no files here". Both of those trees had `npm install` run in them at
+    **21:55 on 2026-09-07**, hours after the run the issue body quotes -- so the
+    corpus fell from 1,457 files to 227 and nothing anywhere said so. This is
+    #254's bug in a second script; `scripts/lib/source-files.ts` is the walk
+    written to fix it and this one had never adopted it.
+
+    Restored, the figures reproduce: **1,500 files, 15,244 bodies, 19.3%
+    contained-and-used, 5.6% confirmation gain, 1.4% across a call, 0 leaked and
+    0 invented.** So the bar #203 reports as failed is **met on current main**,
+    and the `1 leaked` at `scripts/measure-licence.mts:243` is not reproducible:
+    today's reader calls that value `captured-by-a-closure`, and so does the
+    reader from before #227, against both the current and the pre-#231 version
+    of that file.
+
+    Two things worth keeping from it. A measurement whose corpus is
+    `path.resolve("src")` **measures the branch it is run on** -- adding one file
+    to `scripts/` moved five of this report's rows, which is the corpus bias to
+    name before quoting any of them. And a lost tree does not fail anything: it
+    lowers a number, and a lowered number reads as a finding. **Seven more
+    measure scripts still discover files this way** (`measure:accesses`,
+    `constructs`, `conforms`, `handles`, `holds`, `signature`, `vocabulary`, and
+    `scripts/lib/boards.ts`); only this one was in #203's way, and the rest are
+    their own issues' numbers to re-establish.
+
+34. **The 1.4% for crossing a call survives being re-checked against the real
+    call graph, and it was never a share of the whole question.**
+    `npm run measure:dataflow-reach` puts `callSitesIn` with `reach.ts`'s own
+    receiver resolver beside the name resolver section 3 uses -- imported from
+    the same module rather than reimplemented -- over 1,151 files and 13,756
+    routine bodies (#203, #271).
+
+    Of the 20,209 recorded sites the name resolver refuses, reach places the
+    name on 2,866 and **402 of those have one routine of that name to read**
+    (2.0%). 402 more resolvable sites against the 3,716 the report already
+    resolves cannot move 1.4% materially, so **#203's ordering conclusion
+    stands, and now against a real interprocedural walk rather than against
+    `calls.ts`.** The gap between 2,866 and 402 was this measurement's own first
+    answer and it was wrong: `callSitesIn` places the file a *name* is bound in,
+    which for a local holding a function is the calling file --
+    `convert.ts:37` calls `getConverter`, bound from a dynamic `import()` of the
+    vendor bundle, and the site places to `convert.ts` where no such routine is
+    declared. Placing a name is not having a body to read.
+
+    All 402 are refutation-safe, and that is the part that could have gone
+    wrong. Reach places a method call by reading the receiver's type out of the
+    text, and `blocking()` makes any receiver site whose type is not known to be
+    a *concrete* class a doubt -- so `never` is withheld on it even though the
+    hop is still followed. The escape analysis is a refutation. Spending reach's
+    extra placements on it would have bought the number back with exactly the
+    move `reach.ts` refuses to make, and only a real checker clears that bar.
+
+    **What the re-check actually found is that the 1.4% is a share of the bare
+    calls only.** `calleeName` answers for a bare name and for `self.foo()` /
+    `this.foo()`, and `body.calls` is appended to `if (callee)` -- so
+    `store.keep(v)` makes `v` escape `passed-to-a-call` and writes no call site
+    at all. `callee-is-a-method` is a member of the `Unresolved` union the report
+    has never once printed, because the site never arrives to be refused.
+    **4,191 of 9,257 values with a call-shaped exit (45.3%) were never in the
+    question**, in the numerator or the denominator: ts 39.9%, tsx 47.3%, python
+    47.3%, js 58.4%, rust 10 of 12. That is not resolver headroom and no call
+    graph reaches it -- recording the site is a change to `dataflow.ts`, and the
+    escape is recorded either way so the gap has always cost coverage rather
+    than bought a false `contained`.
+
+    What the check itself could not see: 5,662 of 30,883 recorded sites (18.3%)
+    found no matching placed site, because the two readers name a routine
+    differently -- **and on `tsx` that is 3,270 of 4,888, so two thirds of that
+    language is uncompared.** Python is nearly fully compared (3 of 16,753).
+
+35. **The first slice of the door question is buildable in TypeScript and blind
+    in Python, which is the language that has the referee.**
+    `npm run measure:door-values` asks the one thing that has to be true before
+    "does this value reach a door?" can be built on this reader: is the door a
+    call the reader wrote a site for? (#203, #270.)
+
+    Of 390 doors written inside a routine, **240 have a call site (61.5%) -- and
+    the split by language is the finding**: ts 206 of 239 (86.2%), js 18 of 19,
+    **python 16 of 127 (12.6%)**, tsx 0 of 4, rust 0 of 1. It is the import
+    style and not the language: `writeFileSync(body)` off a named import is a
+    bare call and records, `fs.writeFileSync(path, body)` off a namespace does
+    not, and Python spells almost every door `os.replace`, `shutil.rmtree`,
+    `subprocess.run`. Verified at both ends -- the corpus tally and a unit test
+    on the six shapes (`tests/dataflow-call-sites.test.ts`).
+
+    So the value-level door question **must not be built refuting first**, and
+    the reason is sharper than the general one. 87.4% of Python's doors are
+    invisible to the reader, so "this value never reaches a door" would answer
+    *never* for a value handed straight out through `os.replace(body, path)` --
+    a false red on the exact shape the question exists to catch, in the only
+    language with a run-time referee (`scripts/lib/reach_trace.py`). #273 is
+    already open because "never reaches" rests on two Python repositories; this
+    would rest on the language the reader reads worst.
+
+    **Confirming is the slice that is safe and it is the one to build**: a value
+    created here, followed through the locals and collections already modelled,
+    reaching a call `outside.ts` names as a door. A missed door costs silence,
+    which is what this engine accepts everywhere. Recording a site for a
+    qualified call is the prerequisite and is worth doing for its own sake --
+    it is the same 45.3% in item 34 -- and it cannot manufacture containment,
+    because a name like `replace` resolves to nothing this corpus holds and the
+    value goes on escaping.
+
+    Two alternatives were weighed and are written down rather than tried.
+    **Refuting the door question** is above. **A bigger call graph** is item 34:
+    402 sites of 20,209 refusals. What is *not* rejected and is simply not this
+    step is modelling what a library call does to what you hand it, which is
+    where two thirds of the remaining escaping lives.
+
 26. **#206's demand number came back at 7 arrows of 162 and did not decide the
     issue, because the corpus it counts was drawn to test the tool. Built
     anyway, on the code-side argument the issue itself made. Licensed in
@@ -2828,6 +2952,18 @@ duplicate from conflitcts, requires reading prs "An arrow can be three calls lon
    measured (item 9). What it says is that the call graph was the *smaller*
    half of its own question, and that two thirds of calls still resolve to
    nothing this corpus holds.
+
+   Re-checked against `reach.ts`, a real interprocedural walk, and the answer
+   held: 402 more resolvable sites of 20,209 refusals (item 34). The number to
+   beat is **19.3%** on a corpus of 1,500 files, and the bar is met — 0 leaked,
+   0 invented — which item 33 is the reason for. What the re-check found instead
+   is that the call question is only ever put to **bare** calls, so 45.3% of the
+   values with a call-shaped exit have never been in it.
+
+   The next step is chosen and is deliberately the confirming half: **does this
+   value reach a door** (item 35). Not refuting it — 87.4% of Python's doors are
+   written on a receiver the reader records no site for, and Python is the only
+   language with a run-time referee.
 3. **#190's layer 2.** The relation list is settled as-is by the owner. The one
 1. **#203 — the engine has no notion of a value.** Dataflow, points-to, escape
    analysis. #203's own prediction — confirmation much better, refutation only
