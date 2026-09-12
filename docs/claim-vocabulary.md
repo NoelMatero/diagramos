@@ -2502,26 +2502,39 @@ language.
   (django: 101 of 6,393 touch the disk). So confirming an arrow onto a door is
   within reach.
 
-  Refuting one is not yet. It needs "this routine never reaches that door",
-  proved backwards from the door (`npm run measure:reach`) -- forwards, one
-  unplaced call anywhere on a path ends the proof. It was scored against
-  flask's and httpx's test suites **as they actually ran**
-  (`scripts/lib/reach_trace.py`), a referee that shares no parse, index or name
-  with the walk, and against that the careful walk still rules out **2 of 90**
-  (routine, door) pairs that do reach -- both flask's CLI handing control to
-  click, which calls back into flask, invisible to any reading of flask alone.
-  Getting there took a constructor rule (`HTTPTransport(..)` runs its
-  `__init__`) that brought it down from 5, and a walk that indexes every name a
-  routine uses rather than only the names it calls, which brought it down from
-  55. What that care costs is the other half of the answer: it can rule out
-  **23.0%** of TypeScript routines per door, **10.2%** of Python's and **9.3%**
-  of Rust's.
+  Refuting one is not yet, and what is left in the way is now one thing rather
+  than two. It needs "this routine never reaches that door", proved backwards
+  from the door (`npm run measure:reach`) -- forwards, one unplaced call
+  anywhere on a path ends the proof. Scored against flask's and httpx's test
+  suites **as they actually ran** (`scripts/lib/reach_trace.py`), a referee
+  sharing no parse, index or name with the walk, the walk now rules out **0 of
+  90** (routine, door) pairs that do reach. Three rules got it there, each one
+  measured before the next: reading every name a routine uses rather than only
+  the names it calls (55 -> 5), counting `HTTPTransport(..)` as running its
+  `__init__` (5 -> 2), and following a routine handed to a library and kept in
+  a module-level or class-level name -- flask stores a callback in a
+  `click.Option` and click runs it (2 -> 0).
 
-  A false red is not recoverable, so this stays unbuilt. **Reopen when** a
-  library calling back into the repository has an answer, and a run-time
-  referee exists for TypeScript and Rust -- today only Python has one, over two
-  projects whose tests reached three doors each, so 2 is a floor rather than a
-  rate.
+  What that costs is the other half of the answer: it rules out **16.5%** of
+  TypeScript routines per door, **8.7%** of Python's and **9.2%** of Rust's. So
+  most arrows stay unjudgeable even where the walk is right.
+
+  **The remaining blocker is the referee, not the reader.** Only Python has a
+  run-time one, over two repositories whose tests reached three doors each, so
+  0 is a floor rather than a rate, and neither TypeScript nor Rust has been
+  scored against a real run at all. A false red is not recoverable, and one
+  language's evidence is not three languages' evidence. **Reopen when** a
+  TypeScript and a Rust project can be recorded the same way.
+
+  Two things were measured and rejected on the way, and the numbers are the
+  reason both are written down rather than retried. Staying quiet on any door
+  whose set holds a routine a library could call back silences **every door in
+  the corpus** -- 204 of 204 in TypeScript, 161 of 161 in Python, 46 of 48 in
+  Rust -- so it refutes nothing anywhere. And reading held names inside routine
+  bodies, rather than only at the top of a file or a class, drops what can be
+  ruled out to **4.6% / 2.6% / 2.5%**: a body's locals (`value`, `name`,
+  `path`, `key`) then hold most of a repository, `value` alone adding 128 of
+  flask's pairs.
 
 ## A note on that orangutan arrow
 
