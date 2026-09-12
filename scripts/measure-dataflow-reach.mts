@@ -337,9 +337,15 @@ console.log("  look up and the call refuses as `callee-is-a-method`. Counted, wh
 console.log("  change: it used to be recorded nowhere and so absent from the question in");
 console.log("  the numerator and the denominator alike.");
 console.log("");
-console.log("  `no site` is the regression check on that, and it should stay at or near 0.");
-console.log("  Anything in it is a value the reader sees leave through a call it wrote no");
-console.log("  site for at all, which is the state this column was built to measure.");
+console.log("  `no site` is a value the reader sees go to a call and cannot attribute to a");
+console.log("  parameter *position*, which is a different limit and not the one above. It is");
+console.log("  overwhelmingly a spread: `emit(...read)` records the call with `args=[-]`,");
+console.log("  because `...read` may arrive as no parameters, one, or many, and which");
+console.log("  position a value came in at is exactly what makes a call resolvable. Where");
+console.log("  the spread goes into a modelled collection -- `names.push(...read)` -- there");
+console.log("  is no site at all, because that branch is the collection write and returns");
+console.log("  before one is made. Undecidable rather than unwritten, so it is named here");
+console.log("  and not fixed.");
 if (passedUnnamedExamples.length > 0) {
   console.log("");
   for (const one of passedUnnamedExamples) console.log("    " + one);

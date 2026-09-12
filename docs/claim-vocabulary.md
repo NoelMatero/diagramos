@@ -2846,6 +2846,19 @@ duplicate from conflitcts, requires reading prs "An arrow can be three calls lon
     not call it a door: it reads as a method on a value rather than a module.
     Knowing `f` is a file needs a type, which is the tier-2 question.
 
+    **One prediction in this work was wrong and the residual is a second
+    limit.** `measure:dataflow-reach` was written expecting its "no site" column
+    to fall to about zero once the sites were recorded. It fell from 4,191 to
+    **1,147** and stopped, and reading the cases rather than the total says why:
+    they are a **spread**. `emit(...read)` records the call and `args=[-]`,
+    because `...read` may arrive as no parameters, one or many -- and which
+    position a value came in at is exactly what makes a call resolvable. Where
+    the spread goes into a modelled collection, `names.push(...read)`, there is
+    no site at all, because that branch is the collection write and returns
+    before one is made. That is undecidable rather than unwritten, so it is
+    named and not fixed. 3,528 values now refuse by name; 1,147 cannot be
+    attributed to a position at all.
+
 26. **#206's demand number came back at 7 arrows of 162 and did not decide the
     issue, because the corpus it counts was drawn to test the tool. Built
     anyway, on the code-side argument the issue itself made. Licensed in
