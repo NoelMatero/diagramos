@@ -49,9 +49,7 @@
  * module-level alias -- as a call to anything. The two shares are printed side
  * by side, and the gap between them is what soundness against those shapes costs.
  *
- * Either way, a routine holding a call with no readable name at all --
- * `handlers[i]()`, `getattr(obj, name)()` -- joins every set, counted apart
- * because it is not about any door.
+ * Both walks live in `scripts/lib/reach.ts`, where each shape has a test.
  *
  * ## Three referees, and which blind spot each one has
  *
@@ -81,24 +79,22 @@ import { execFileSync } from "node:child_process";
 import { existsSync, readFileSync, realpathSync } from "node:fs";
 import path from "node:path";
 
-import { refereeRoutines, stripNoise } from "./lib/call-scan";
 import { checkerFor, type CallChecker } from "./lib/call-receivers";
-import { sourceFiles } from "./lib/source-files";
+import {
+  anythingCallers, constructs, couldReach, familyOf, mayLeadInto, readRepo, WALKS,
+  type Family, type Routine, type Walk,
+} from "./lib/reach";
 
-import { callSitesIn, type CallSide } from "../src/engine/calls";
-import { readDependencies } from "../src/engine/deps";
-import { type ConfigCache } from "../src/engine/resolve";
-import { createWorkspace } from "../src/engine/drift";
 import { LICENCES } from "../src/engine/licence";
-import { outsideCallsIn, type OutsideKind } from "../src/engine/outside";
-import { each, initEngine, languageOf, parseSource, resetEngineCache, type Language, type Node } from "../src/engine/parse";
+import { type OutsideKind } from "../src/engine/outside";
+import { initEngine } from "../src/engine/parse";
 
 const HOME = process.env.HOME ?? "/Users/noelmatero";
 const argv = process.argv.slice(2);
 const option = (name: string) => argv.find((one) => one.startsWith(`--${name}=`))?.slice(name.length + 3);
 const showAll = argv.includes("--all");
 const noChecker = argv.includes("--no-checker");
-const noPrune = argv.includes("--no-prune");
+const walkOptions = { prune: !argv.includes("--no-prune") };
 const only = option("only")?.split(",").filter(Boolean);
 const tracePath = option("trace");
 /** Routines per language whose outside-the-set verdict the checker is asked about. */
@@ -106,15 +102,6 @@ const sampleSize = Number(option("sample") ?? 120);
 const CASES = showAll ? Infinity : 10;
 
 const CORPUS = existsSync(path.resolve(".corpus")) ? path.resolve(".corpus") : `${HOME}/board-ai/.corpus`;
-const TEST_PATH = /(^|\/)(tests?|__tests__|spec|benches|examples|fixtures|testing)(\/|$)|\.(test|spec)\.|(^|\/)test_[^/]*\.py$|_test\.(py|rs)$/;
-
-type Family = "ts" | "python" | "rust";
-const familyOf = (language: Language): Family | undefined =>
-  language === "ts" || language === "tsx" || language === "js" ? "ts"
-    : language === "python" ? "python" : language === "rust" ? "rust" : undefined;
-
-type Walk = "calls" | "mentions";
-const WALKS: readonly Walk[] = ["calls", "mentions"];
 
 interface Repo { name: string; dir: string; state: "pinned" | "moved" | "missing" }
 
@@ -132,289 +119,7 @@ const repos: Repo[] = LICENCES.flatMap((licence) => licence.corpus.map((entry) =
   .filter((repo, index, all) => all.findIndex((other) => other.dir === repo.dir) === index)
   .filter((repo) => !only || only.some((one) => repo.dir.endsWith(`/${one}`) || repo.name === one));
 
-/**
- * What the text-scan referee is given, with the two Rust shapes that are not
- * calls taken out first.
- *
- * The scan finds a call by the shape of `name(`, which in Rust also matches
- * inside an attribute -- `#[cfg(any(feature = "std"))]` -- and it does not know
- * that a capitalised callee is a tuple-struct or enum-variant construction.
- * Those two were the whole of the first run's 13.0% "unseen" on anyhow: `cfg`
- * 21, `any` 12, `all` 6, then `Err`, `Ok`, `Some`. Neither is a call node in the
- * grammar, so counting them measured the referee rather than the reader.
- */
-function refereeInput(source: string, language: Language): string {
-  const stripped = stripNoise(source, language);
-  if (language !== "rust") return stripped;
-  return stripped.replace(/#!?\[[^\n]*\]/g, (text) => " ".repeat(text.length));
-}
-
-/* -- names in a file, and the ones it binds ------------------------------- */
-
-/** A name a reader would recognise, wherever a grammar puts one -- `calls.ts`'s own rule. */
-const NAME_LEAF = /identifier$|^field_identifier$|^property_identifier$/;
-
-/** An operator that binds its left-hand side rather than reading it. */
-function bindsLeft(node: Node): boolean {
-  const operator = node.childForFieldName("operator");
-  if (!operator) return true; // `x = ..`, `for x in ..`: the grammar gives it no operator field
-  const text = operator.text;
-  if (text === "in" || text === "of") return true;
-  return text.endsWith("=") && !["==", "!=", "<=", ">=", "===", "!=="].includes(text);
-}
-
-interface NamedLeaf { line: number; text: string }
-
-/**
- * Every name leaf in a file, and every name the file binds, each with its line.
- *
- * Bindings are read by field, never by node type (`docs/reading-a-grammar.md`):
- * `parameters`, `pattern` and `alias` bind what is under them, `left` binds when
- * the operator is an assignment rather than arithmetic, and `name` binds when the
- * same node carries a `value` -- a declarator, a keyword argument, a default.
- */
-function namesIn(source: string, language: Language): { leaves: NamedLeaf[]; bound: Set<string> } | undefined {
-  const tree = parseSource(source, language);
-  if (!tree) return undefined;
-  const lineStarts = [0];
-  for (let index = 0; index < source.length; index += 1) if (source[index] === "\n") lineStarts.push(index + 1);
-  const lineOf = (offset: number) => {
-    let low = 0;
-    let high = lineStarts.length - 1;
-    while (low < high) {
-      const middle = (low + high + 1) >> 1;
-      if (lineStarts[middle]! <= offset) low = middle; else high = middle - 1;
-    }
-    return low + 1;
-  };
-  const leaves: NamedLeaf[] = [];
-  const bound = new Set<string>();
-  const bindUnder = (node: Node) => each(node, (one) => {
-    if (one.childCount === 0 && NAME_LEAF.test(one.type)) bound.add(one.text);
-  });
-  each(tree.rootNode, (node) => {
-    if (node.childCount === 0 && NAME_LEAF.test(node.type)) leaves.push({ line: lineOf(node.startIndex), text: node.text });
-    for (const field of ["parameters", "pattern", "alias"]) {
-      const child = node.childForFieldName(field);
-      if (child) bindUnder(child);
-    }
-    const left = node.childForFieldName("left");
-    if (left && bindsLeft(node)) bindUnder(left);
-    const name = node.childForFieldName("name");
-    if (name && node.childForFieldName("value")) bindUnder(name);
-  });
-  return { leaves, bound };
-}
-
-/** The leaves on lines `[from, to]`, from a list already in document order. */
-function leavesWithin(leaves: NamedLeaf[], from: number, to: number): NamedLeaf[] {
-  let low = 0;
-  let high = leaves.length;
-  while (low < high) {
-    const middle = (low + high) >> 1;
-    if (leaves[middle]!.line < from) low = middle + 1; else high = middle;
-  }
-  const out: NamedLeaf[] = [];
-  for (let index = low; index < leaves.length && leaves[index]!.line <= to; index += 1) out.push(leaves[index]!);
-  return out;
-}
-
-/* -- one repository's routines -------------------------------------------- */
-
-/** A routine, as this walk identifies one. `file` is repo-relative. */
-interface Routine {
-  id: string;
-  file: string;
-  name: string;
-  line: number;
-  language: Language;
-  /** The calls written here, with where the reader placed each when it could. */
-  sites: Array<{ name: string; file?: string; receiver: boolean; nameAt?: { start: number; end: number } }>;
-  /** Every name this routine's text uses, and how often. Its own declared name once less. */
-  mentions: Map<string, number>;
-  /** A door: this routine talks to the outside directly. */
-  door?: OutsideKind;
-}
-
-interface Read {
-  routines: Map<string, Routine>;
-  /** Routines holding a call to a name, per name. */
-  callersOfName: Map<string, Routine[]>;
-  /** Routines whose text uses a name at all, per name. */
-  mentionersOfName: Map<string, Routine[]>;
-  /** A call with no readable name: could be a call to anything. Both walks. */
-  unnamedCallers: Set<string>;
-  /** A bare call to a name the file binds -- a parameter, a variable. `mentions` only. */
-  localCallers: Set<string>;
-  refereeUnseen: number;
-  refereeSites: number;
-}
-
 await initEngine();
-
-function readRepo(repo: Repo): Read {
-  const workspace = createWorkspace(repo.dir);
-  const configs: ConfigCache = new Map();
-  const sources = new Map<string, string>();
-  const importsOf = new Map<string, CallSide["imports"]>();
-  const read = (rel: string): string | undefined => {
-    if (sources.has(rel)) return sources.get(rel);
-    const absolute = workspace.resolve(rel);
-    if (!absolute || workspace.stat(absolute) !== "file") return undefined;
-    const text = workspace.read(absolute);
-    sources.set(rel, text);
-    return text;
-  };
-  const imports = (rel: string, source: string): CallSide["imports"] => {
-    const cached = importsOf.get(rel);
-    if (cached) return cached;
-    const declared = readDependencies(rel, source, workspace, configs)?.dependencies ?? [];
-    const list = declared.map((one) => ({ specifier: one.specifier, ...(one.file ? { file: one.file } : {}) }));
-    importsOf.set(rel, list);
-    return list;
-  };
-  const open = (rel: string) => {
-    const source = read(rel);
-    const language = languageOf(rel);
-    if (source === undefined || !language) return undefined;
-    return { source, language, imports: imports(rel, source) };
-  };
-
-  const routines = new Map<string, Routine>();
-  const callersOfName = new Map<string, Routine[]>();
-  const mentionersOfName = new Map<string, Routine[]>();
-  const unnamedCallers = new Set<string>();
-  const localCallers = new Set<string>();
-  let refereeUnseen = 0;
-  let refereeSites = 0;
-  const index = (into: Map<string, Routine[]>, name: string, routine: Routine) => {
-    const list = into.get(name) ?? [];
-    if (list[list.length - 1]?.id !== routine.id) list.push(routine);
-    into.set(name, list);
-  };
-
-  for (const absolute of sourceFiles(repo.dir)) {
-    const language = languageOf(absolute);
-    if (!language || !familyOf(language)) continue;
-    const rel = path.relative(repo.dir, absolute);
-    if (TEST_PATH.test(rel)) continue;
-    const source = read(rel);
-    if (source === undefined || source.length > 1_000_000) continue;
-
-    const reading = callSitesIn({ file: rel, source, language, imports: imports(rel, source), open });
-    if (!reading.read) continue;
-    const names = namesIn(source, language);
-
-    // Doors, by the reader `measure:doors` already measured.
-    const doorRoutines = new Map<string, OutsideKind>();
-    for (const call of outsideCallsIn(source, language).calls) {
-      if (call.reading.verdict !== "outside" || !call.routine) continue;
-      doorRoutines.set(call.routine, call.reading.kind);
-    }
-
-    for (const body of reading.bodies) {
-      const id = `${rel}#${body.routine}`;
-      const mentions = new Map<string, number>();
-      for (const leaf of leavesWithin(names?.leaves ?? [], body.line, body.line + body.lines - 1)) {
-        mentions.set(leaf.text, (mentions.get(leaf.text) ?? 0) + 1);
-      }
-      // Its own name in its own declaration is not a use of itself.
-      const own = mentions.get(body.routine);
-      if (own !== undefined) { if (own <= 1) mentions.delete(body.routine); else mentions.set(body.routine, own - 1); }
-
-      /*
-       * Two routines of one name in one file collapse into one id. They are
-       * merged, never replaced: a replacement drops the first one's calls, and a
-       * dropped call is a caller nobody adds.
-       */
-      const previous = routines.get(id);
-      const routine: Routine = previous ?? {
-        id, file: rel, name: body.routine, line: body.line, language, sites: [], mentions: new Map(),
-      };
-      for (const site of body.sites) {
-        routine.sites.push({
-          name: site.name, receiver: site.receiver,
-          ...(site.file ? { file: site.file } : {}),
-          ...(site.nameAt ? { nameAt: site.nameAt } : {}),
-        });
-      }
-      for (const [name, count] of mentions) routine.mentions.set(name, (routine.mentions.get(name) ?? 0) + count);
-      if (doorRoutines.has(body.routine)) routine.door = doorRoutines.get(body.routine)!;
-      routines.set(id, routine);
-
-      if (body.sites.some((site) => site.name === "")) unnamedCallers.add(id);
-      if (body.sites.some((site) => site.name && !site.file && !site.receiver && names?.bound.has(site.name))) {
-        localCallers.add(id);
-      }
-      for (const site of body.sites) if (site.name) index(callersOfName, site.name, routine);
-      for (const name of mentions.keys()) index(mentionersOfName, name, routine);
-    }
-
-    /*
-     * The premise, refereed: a call site the reader never saw is a caller
-     * nobody adds. Compared per file rather than per routine, because the scan
-     * and the reader bound a routine differently and a call inside a nested
-     * closure then lands in two different places without either being wrong.
-     */
-    const seenInFile = new Set(reading.bodies.flatMap((body) => body.sites.map((site) => site.name)).filter(Boolean));
-    for (const one of refereeRoutines(refereeInput(source, language), language)) {
-      for (const call of one.calls) {
-        if (call.construction) continue; // not a call node in any of these grammars
-        if (language === "rust" && /^[A-Z]/.test(call.name)) continue; // `Ok(..)`: a constructor
-        refereeSites += 1;
-        if (!seenInFile.has(call.name)) refereeUnseen += 1;
-      }
-    }
-  }
-  resetEngineCache();
-  return { routines, callersOfName, mentionersOfName, unnamedCallers, localCallers, refereeUnseen, refereeSites };
-}
-
-/* -- the backward walks --------------------------------------------------- */
-
-/**
- * Whether `caller` might lead into `target`, by one walk's rule.
- *
- * The one pruning both walks allow: every use of the name here is a call the
- * reader placed at some *other* file, so none of them is this routine. Any use
- * that is not such a call -- an unplaced call, a value, an argument -- keeps it.
- */
-function mayLeadInto(caller: Routine, target: Routine, walk: Walk): boolean {
-  const named = caller.sites.filter((site) => site.name === target.name);
-  /*
-   * The pruning trusts a placement, and one placement is a guess: `self.foo()`
-   * is placed in the caller's own file, and an inherited `foo` lives in the base
-   * class's. On flask that ruled out `handle_user_exception` calling
-   * `_find_error_handler` in `sansio/app.py`, an edge the tests ran.
-   */
-  if (noPrune) return walk === "calls" ? named.length > 0 : (caller.mentions.get(target.name) ?? 0) > 0;
-  const elsewhere = named.filter((site) => site.file !== undefined && site.file !== target.file).length;
-  if (walk === "calls") return named.length > elsewhere;
-  const uses = caller.mentions.get(target.name) ?? 0;
-  return uses > elsewhere;
-}
-
-/** Routines joining every set, whatever the door: a call that could be to anything. */
-function anythingCallers(read: Read, walk: Walk): Set<string> {
-  return walk === "calls" ? read.unnamedCallers : new Set([...read.unnamedCallers, ...read.localCallers]);
-}
-
-/** Every routine that could possibly reach `door`, over-approximated on purpose. */
-function couldReach(door: Routine, read: Read, walk: Walk): { set: Set<string>; fromAnything: number } {
-  const set = new Set<string>([door.id, ...anythingCallers(read, walk)]);
-  const fromAnything = set.size - 1;
-  const frontier: Routine[] = [...set].map((id) => read.routines.get(id)).filter((one): one is Routine => one !== undefined);
-  const index = walk === "calls" ? read.callersOfName : read.mentionersOfName;
-  while (frontier.length > 0) {
-    const current = frontier.pop()!;
-    for (const caller of index.get(current.name) ?? []) {
-      if (set.has(caller.id) || !mayLeadInto(caller, current, walk)) continue;
-      set.add(caller.id);
-      frontier.push(caller);
-    }
-  }
-  return { set, fromAnything };
-}
 
 /** A stable spread over routine ids: the same sample every run. */
 const sampleKey = (id: string) => createHash("sha1").update(id).digest("hex");
@@ -451,7 +156,7 @@ const outsideSamples: Array<{ repo: Repo; routine: Routine; door: Routine; set: 
 
 for (const repo of repos) {
   if (repo.state === "missing") continue;
-  const read = readRepo(repo);
+  const read = readRepo(repo.dir);
   const doors = [...read.routines.values()].filter((one) => one.door);
   /*
    * Which routine a declaration line belongs to. The checker answers with a
@@ -474,7 +179,7 @@ for (const repo of repos) {
     const sets = {} as Record<Walk, Set<string>>;
     const reaching = {} as Record<Walk, number>;
     for (const walk of WALKS) {
-      const { set, fromAnything } = couldReach(door, read, walk);
+      const { set, fromAnything } = couldReach(door, read, walk, walkOptions);
       sets[walk] = set;
       /*
        * Names match across languages on purpose -- Python reaches Rust through
@@ -515,7 +220,8 @@ for (const repo of repos) {
       if (through) score.through += 1;
       callersOf.set(to, (callersOf.get(to) ?? new Set()).add(from));
       for (const walk of WALKS) {
-        const seen = anythingCallers(read, walk).has(from) || mayLeadInto(caller, callee, walk);
+        const seen = anythingCallers(read, walk).has(from) || mayLeadInto(caller, callee, walk, walkOptions)
+          || (walk === "mentions" && constructs(read, caller, callee));
         if (!seen) score.missedEdges[walk].push({ from, to, through });
       }
     }
