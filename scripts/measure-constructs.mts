@@ -35,9 +35,10 @@
  * A run is a measurement, not a test: it prints and never fails. The bugs it
  * finds become tests.
  */
-import { execFileSync } from "node:child_process";
 import { existsSync, readFileSync } from "node:fs";
 import path from "node:path";
+
+import { sourceFiles } from "./lib/source-files";
 
 import { constructions } from "../src/engine/constructs";
 import { mayAccuse } from "../src/engine/licence";
@@ -58,17 +59,6 @@ const trees = roots.length > 0 ? roots : [
   `${HOME}/infrarouter`,
 ].filter((tree) => existsSync(tree));
 
-function sourceFiles(root: string): string[] {
-  try {
-    return execFileSync("find", [root, "-type", "f"], { encoding: "utf8" })
-      .split("\n")
-      .filter(Boolean)
-      .filter((file) => !/\/(target|node_modules|\.git|dist|out|vendor|\.venv)\//.test(file))
-      .filter((file) => languageOf(file) !== undefined);
-  } catch {
-    return [];
-  }
-}
 
 /**
  * The referee: routines and what they construct, read out of the source *text*.

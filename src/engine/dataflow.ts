@@ -213,7 +213,19 @@ export interface Local {
 
 /** A call written in the body, and the locals handed to it. */
 export interface CallSite {
-  /** The name called, under the same receiver rule `feeds.ts` follows. */
+  /**
+   * The name called, under the same receiver rule `feeds.ts` follows -- and
+   * **empty** when the call is on a receiver this reader does not name.
+   *
+   * `calleeName` answers for a bare name and for `self.foo()` / `this.foo()`.
+   * `store.keep(v)` and `os.replace(v, p)` get a site with no name, which is
+   * the `callee-is-a-method` refusal: the exit is counted and cannot be looked
+   * up. Both halves matter. Leaving the site out made these exits invisible
+   * rather than refused, and a value handed to *both* a resolvable call and an
+   * unnamed one was freed on the strength of the one that was recorded.
+   * Inventing a name for it would be worse: a lookup on `write` finds any local
+   * routine spelled that way and reads the wrong body (#203).
+   */
   callee: string;
   /** 1-based line the call sits on. */
   line: number;
@@ -1300,7 +1312,20 @@ function readRoutine(
         for (const pair of carriedBy(argument)) site.reached.push(pair);
         walk(argument, { kind: "escape", as: "passed-to-a-call" }, depth + 1);
       }
-      if (callee) body.calls.push(site);
+      /*
+       * Recorded whether or not the callee could be named. An empty `callee` is
+       * the `callee-is-a-method` refusal `settleCalls` and `keeps` have always
+       * had a branch for: `store.keep(v)` and `os.replace(v, p)` are exits, and
+       * leaving the site out made them exits that could not be counted -- 45.3%
+       * of the values with a call-shaped exit, absent from the question rather
+       * than refused by it (#203).
+       *
+       * Recorded and *not* nameable, which is the whole of why this is safe. A
+       * resolver keyed on the name would look `write` up, find any local routine
+       * spelled that way, read the wrong body and be entitled to free a value
+       * that did leave. There is no name here to look up.
+       */
+      body.calls.push(site);
       // Anything else under the call -- a type argument, the callee's own
       // subexpressions -- still has to be walked, or a use hides in it.
       for (let index = 0; index < current.childCount; index += 1) {
@@ -1877,7 +1902,9 @@ export function chainFrom(
   consumers: string[],
 ): FlowChain | undefined {
   for (const call of body.calls) {
-    if (!consumers.includes(call.callee)) continue;
+    // An unnamed call is a call this reader could not identify, so it is not
+    // evidence of a flow to anything -- including to a box named "".
+    if (!call.callee || !consumers.includes(call.callee)) continue;
     for (const inline of call.inline) {
       if (producers.includes(inline)) {
         return { producer: inline, consumer: call.callee, through: [], line: call.line };
