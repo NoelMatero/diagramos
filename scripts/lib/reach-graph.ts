@@ -384,12 +384,40 @@ export function namedAnywhere(
   files: Iterable<string>,
   tree: string,
   language: Language,
+  /**
+   * The routine being asked about, when it is known.
+   *
+   * Its own declaration is skipped, and that is the whole correctness of this
+   * guard rather than a refinement of it. The question is whether the closure
+   * could be *handing this name out* as a value -- and a declaration is not a
+   * mention of that kind, it is the thing being declared.
+   *
+   * Counted before it was fixed: on `vuejs-core` the guard rejected 348
+   * never-pairs, and reading them showed the commonest shape by far was a
+   * tail declared in a file the closure already touches --
+   * `ast.ts#createInterpolation` against `ast.ts#convertToBlock`, where
+   * `createInterpolation` calls `isString` and `createSimpleExpression` and
+   * nothing else, and the only reason `convertToBlock` "appeared" was its own
+   * `export function` two hundred lines down. Rejecting those shrank the
+   * population anything could be licensed on by half, for no evidence at all.
+   */
+  declaredAt?: { file: string; line: number },
 ): boolean {
   const pattern = new RegExp(`(?<![\\w$])${name.replace(/[$]/g, "\\$")}(?![\\w$])`);
   for (const file of files) {
     let source: string;
     try { source = readFileSync(path.join(tree, file), "utf8"); } catch { continue; }
-    if (pattern.test(stripNoise(source, language))) return true;
+    const lines = stripNoise(source, language).split("\n");
+    for (const [index, line] of lines.entries()) {
+      /*
+       * The declaring line, and the signature that may run past it. A
+       * multi-line parameter list puts the name on its own line and the
+       * closing paren several down, so a fixed window is wrong -- the name
+       * itself only appears on the opening line, which is the one to skip.
+       */
+      if (declaredAt && file === declaredAt.file && index + 1 === declaredAt.line) continue;
+      if (pattern.test(line)) return true;
+    }
   }
   return false;
 }

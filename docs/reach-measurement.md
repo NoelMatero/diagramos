@@ -299,6 +299,80 @@ Two unrelated type checkers disagreeing is a real number. Everything else on
 this page either measures the text reader against a compiler, which is the
 floor, or would measure a compiler against itself.
 
+**That number already exists and it is good.** Item 22 of
+`docs/claim-vocabulary.md`: pyright's answers put to mypy over 12,409 sites,
+and after #259 taught the client to withhold on a line that declares no type,
+mypy's 460 wrong files went to **0**, with 0.35% disagreeing on the
+consistency axis. So the type answers a Python closure would rest on are
+sound, independently checked, by a different implementation of the language.
+
+Which leaves one thing between `never` and a licence, and it is not a type
+question at all: **a call nobody can see.** A callback handed out, a
+`getattr`, a decorator, a dispatch table. `calls.ts` has said so since #189 --
+"a routine that never writes `b()` can still reach `b` through a callback, a
+trait object or a dispatch table" -- and no type checker answers it, because
+it is not about types.
+
+## Three bugs in this benchmark's own negative population
+
+Found by loosening the population and reading what came through, which is
+`AGENTS.md`'s "read the agreements too" applied to the instrument rather than
+the reader. Each had been shrinking or distorting the only evidence `never`
+could ever be licensed on.
+
+**The callback guard counted a routine's own declaration.** It asks whether
+the closure might be handing the tail out as a value, and answered yes
+because the tail's own `export function` line sat in a file the closure
+touches. `ast.ts#createInterpolation` against `ast.ts#convertToBlock` --
+`createInterpolation` calls `isString` and nothing else, and the only
+"mention" was a declaration two hundred lines down. That rejected **348 of
+`vuejs-core`'s never-pairs, about half the population**, for no evidence at
+all.
+
+**The referee was directional where the reader is bidirectional.**
+`checkSymbolEdge` tries both ends and says so: "an arrow means these two are
+connected, and the diagram's sense of direction is a reading of the design
+rather than a claim about who calls whom." The referee only looked forward, so
+a pair where the *tail* calls the head scored as a wrong confirmation. 15 of
+them on `vuejs-core` -- `transformElement` calls `mergeAsArray` on line 881,
+and the forward closure from `mergeAsArray` is right to exclude it. Both
+statements true; only the question was wrong. A `never` ask now requires the
+reverse closure to exclude the head too.
+
+**One cap was serving two populations.** `--unguarded` moved the *scored*
+`never` count from 24 to 8, because the guard-rejected asks filled the quota
+and crowded out the certifiable ones -- an instrument changing its own
+reading. Capped separately, the scored population is byte-identical with the
+flag and without it.
+
+## Where the precision actually stands
+
+With the population corrected, the cross-file rule this work added is doing
+exactly its job, and every remaining wrong confirmation is somewhere else:
+
+| | wrong confirmations | same file | **cross file** |
+|---|---:|---:|---:|
+| vuejs-core | 7 | 7 | **0** |
+| encode-httpx + pallets-flask | 43 | 43 | **0** |
+| anyhow | 26 | 26 | **0** |
+
+**Zero across files, in all three languages.** What is left is the same-file
+lenient standard, which `body.ts` documents as deliberate -- "inside one file
+that is right, there is no second thing the name could mean" -- and which the
+corpus now shows is not quite true: `error.rs#deref` confirms against
+`error.rs#is` because its body writes `.is::<E>()`.
+
+Applying the strict standard inside a file too was measured rather than
+argued: **free on TypeScript** (7 wrong to 4, no confirmations lost) and
+**a bad trade on Rust** (26 to 19, but 103 confirmations down to 76, because
+`Error::construct_from_display` is how that crate is written). Left alone,
+because a confirmation standard that differs per language is a bigger decision
+than this measurement should make on its own, and the numbers are here for
+whoever makes it.
+
+And through all of it, in every language and every population: **0 wrong
+accusations.** That is the number this project is arranged around.
+
 **A name nothing in the file binds**: 182 Rust, 18 Python and 10 TypeScript
 on the reaching pairs. A `use some::*`, a global, an ambient declaration.
 

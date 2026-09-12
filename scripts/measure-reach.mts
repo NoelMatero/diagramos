@@ -62,6 +62,14 @@ const BUDGET = value("budget", 120);
 const DEPTH = value("depth", 6);
 const PER_SEED = value("per-seed", 4);
 const PER_SEED_NEVER = value("per-seed-never", 12);
+/**
+ * `--unguarded` also asks about never-pairs whose tail name *is* written on
+ * the closure -- the ones the callback guard rejects.
+ *
+ * Never scored. It answers one question and only one: how much of the
+ * population the product would face does the sound population cover.
+ */
+const unguarded = flags.has("--unguarded");
 
 /**
  * Which repositories answer for which language, and why these.
@@ -289,6 +297,16 @@ interface Ledger {
    * kind is a refusal one reader would turn into an answer.
    */
   blockedBy: Map<string, number>;
+  /**
+   * What the reader said about never-pairs the callback guard rejected.
+   *
+   * Not a score: the referee is not ground truth on these, which is what the
+   * guard exists to say. It is a coverage figure. A `never` here is the
+   * reader answering on a pair this benchmark cannot certify, and the count
+   * of those against the count it can is the whole argument about whether
+   * the verdict is licensable from this measurement at all.
+   */
+  unguardedSaid: Map<string, number>;
   /** Confirmations by referee distance, so depth is visible. */
   byDistance: Map<number, { asked: number; confirmed: number }>;
   /**
@@ -311,13 +329,20 @@ interface Ledger {
 
 const ledger = (): Ledger => ({
   asked: new Map(), confirmed: 0, refuted: 0, wronglyConfirmed: 0, wronglyAccused: 0,
-  quiet: new Map(), quietNever: new Map(), blockedBy: new Map(),
+  quiet: new Map(), quietNever: new Map(), blockedBy: new Map(), unguardedSaid: new Map(),
   byDistance: new Map(), invented: 0, sentinels: 0,
 });
 
 const bump = <K,>(map: Map<K, number>, key: K, by = 1) => map.set(key, (map.get(key) ?? 0) + by);
 
 function record(into: Ledger, ask: Ask, answer: Answer): void {
+  /*
+   * A guard-rejected never-ask is counted and never scored. The referee found
+   * no static path, and the tail's name is written on the closure -- so a
+   * callback could be carrying the call and the referee would not know.
+   * Scoring it either way would be inventing ground truth.
+   */
+  if (ask.named) { bump(into.unguardedSaid, answer.said); return; }
   bump(into.asked, ask.truth);
   if (ask.truth === "reaches") {
     const at = into.byDistance.get(ask.distance) ?? { asked: 0, confirmed: 0 };
@@ -401,6 +426,7 @@ for (const { tree, language: declared } of trees) {
 
   const set = await asksFrom(graph, absolute, language, {
     seeds: SEEDS, budget: BUDGET, depth: DEPTH, perSeed: PER_SEED, perSeedNever: PER_SEED_NEVER,
+    unguarded,
   });
   row.seeds += set.seeds;
   row.complete += set.complete;
@@ -523,6 +549,16 @@ for (const language of LANGUAGES) {
     }
   }
   console.log();
+  for (const [name, book] of [["today", row.today], ["reach", row.reach]] as const) {
+    const total_ = total(book.unguardedSaid);
+    if (total_ === 0) continue;
+    const answered = (book.unguardedSaid.get("never") ?? 0) + (book.unguardedSaid.get("reached") ?? 0);
+    console.log(`    ${name} on the ${total_} never-pairs the callback guard rejects `
+      + `(not ground truth, never scored): `
+      + [...book.unguardedSaid].sort((a, b) => b[1] - a[1]).map(([said, n]) => `${said} ${n}`).join(", ")
+      + ` -- ${answered} answered on evidence this benchmark cannot certify`);
+  }
+  if (row.reach.unguardedSaid.size > 0) console.log();
   const blocked = row.reach.blockedBy;
   if (blocked.size > 0) {
     const single = [...blocked].filter(([kinds]) => !kinds.includes("+"));

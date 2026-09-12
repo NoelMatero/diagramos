@@ -541,3 +541,51 @@ describe("a specifier that resolves to more than one file", () => {
     if (verdict.verdict === "reached") expect(verdict.hops[0]!.file).toBe("src/codec.rs");
   });
 });
+
+describe("the benchmark's own negative population", () => {
+  /*
+   * Not the reader -- the instrument. Three bugs in the `never` population
+   * were found by loosening it and reading what came through, and each one had
+   * been quietly shrinking or distorting the only evidence that verdict could
+   * ever be licensed on. Kept as tests because the population is an argument,
+   * and an argument that drifts is one nobody can check.
+   *
+   * These exercise `namedAnywhere` directly; the directional half is in
+   * `reach-asks.ts` and needs a referee graph, which is a live compiler.
+   */
+  const files = {
+    "ast.ts": "export function createInterpolation(content: string) {\n"
+      + "  return isString(content);\n"
+      + "}\n"
+      + "export function convertToBlock(node: string) {\n"
+      + "  return node;\n"
+      + "}\n",
+  };
+
+  it("does not read a routine's own declaration as the closure naming it", async () => {
+    /*
+     * The bug: the guard asks whether the closure could be handing the tail
+     * out as a value, and answered yes because the tail's own
+     * `export function` line was in a file the closure touches. On
+     * `vuejs-core` that rejected 348 never-pairs -- half the population --
+     * for no evidence at all.
+     */
+    const { namedAnywhere } = await import("../scripts/lib/reach-graph");
+    const { mkdtempSync, writeFileSync, rmSync } = await import("node:fs");
+    const os = await import("node:os");
+    const path = await import("node:path");
+    const tree = mkdtempSync(path.join(os.tmpdir(), "reach-guard-"));
+    try {
+      writeFileSync(path.join(tree, "ast.ts"), files["ast.ts"]);
+      // `convertToBlock` opens on line 4 and is written nowhere else.
+      expect(namedAnywhere("convertToBlock", ["ast.ts"], tree, "ts",
+        { file: "ast.ts", line: 4 })).toBe(false);
+      // Without the declaration to skip, the guard sees its own footprint.
+      expect(namedAnywhere("convertToBlock", ["ast.ts"], tree, "ts")).toBe(true);
+      // And a name the closure really does write is still caught.
+      expect(namedAnywhere("isString", ["ast.ts"], tree, "ts")).toBe(true);
+    } finally {
+      rmSync(tree, { recursive: true, force: true });
+    }
+  });
+});

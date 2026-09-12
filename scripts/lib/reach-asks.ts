@@ -11,13 +11,15 @@
  *   right, which is what the negative control in `measure:calls` already
  *   tests for the same checkers.
  *
- *   **never**, which has to be earned twice. The referee's forward closure
- *   from the head must be *complete* -- every call site of every routine on
- *   it resolved -- and the tail must not be in it. Then a second guard: the
- *   tail's name must appear nowhere in any file the closure touches, which is
- *   what stands in for the callback the referee cannot see. A routine whose
- *   name is never written in the closure cannot be handed out of it as a
- *   value either.
+ *   **never**, which has to be earned three times over. The referee's forward
+ *   closure from the head must be *complete* -- every call site of every
+ *   routine on it resolved -- and the tail must not be in it. The tail must
+ *   not reach the head either, because the reader is bidirectional by design
+ *   and may call such a pair connected. And the tail's name must appear
+ *   nowhere in any file the closure touches *other than its own
+ *   declaration*, which is what stands in for the callback the referee cannot
+ *   see: a routine whose name the closure never writes cannot be handed out
+ *   of it as a value.
  *
  * Seeds are picked by walking the sorted id list at a fixed stride rather
  * than at random, so two runs over the same commit ask the same questions and
@@ -32,6 +34,16 @@ import { idOf, namedAnywhere, type NodeId, type RefereeGraph, type RefereeNode }
 export interface Ask {
   from: RefereeNode;
   to: RefereeNode;
+  /**
+   * True when the tail's name **is** written somewhere on the closure, so
+   * the callback guard did not clear it.
+   *
+   * A `never` ask like this is not ground truth and is never scored as one.
+   * It exists to measure the population the *product* would be asked about,
+   * against the one the benchmark can be sure of -- see `unguarded` in
+   * `asksFrom`.
+   */
+  named?: true;
   /** What the referee says. */
   truth: "reaches" | "never";
   /** Shortest chain length the referee found, for a `reaches` ask. */
@@ -135,7 +147,23 @@ export async function asksFrom(
   graph: RefereeGraph,
   tree: string,
   language: Language,
-  options: { seeds: number; budget: number; depth: number; perSeed: number; perSeedNever: number },
+  options: {
+    seeds: number; budget: number; depth: number; perSeed: number; perSeedNever: number;
+    /**
+     * Also collect the never-asks the callback guard rejects, marked `named`.
+     *
+     * The guard is what makes the negative population sound: a name written
+     * nowhere on the closure cannot be handed out of it as a value, so no
+     * invisible indirect call can be hiding behind it. That is also the exact
+     * property the product cannot rely on -- somebody drawing an arrow
+     * between two real routines is usually drawing one whose names appear all
+     * over the code.
+     *
+     * So the guarded population is the one anything may be scored against,
+     * and this is the one that says how much of the real question it covers.
+     */
+    unguarded?: boolean;
+  },
 ): Promise<AskSet> {
   const ids = sorted(graph);
   const asks: Ask[] = [];
@@ -199,19 +227,52 @@ export async function asksFrom(
     const candidates = ids
       .filter((id) => !closure.distance.has(id))
       .sort((a, b) => near(a) - near(b) || (a < b ? -1 : 1));
+    /*
+     * Two counters, not one, and that is load-bearing.
+     *
+     * A shared cap would make `--unguarded` change the *scored* population:
+     * the guard-rejected asks would fill the quota and crowd out the ones the
+     * benchmark can certify. Measured while building this -- the scored
+     * `never` count went from 24 to 8 with the flag on, which is an
+     * instrument moving its own reading. Capped separately, the guarded
+     * population is identical with the flag and without it.
+     */
     let negatives = 0;
+    let alsoNamed = 0;
     for (const id of candidates) {
-      if (negatives >= options.perSeedNever) break;
+      if (negatives >= options.perSeedNever
+        && (!options.unguarded || alsoNamed >= options.perSeedNever)) break;
       const tail = graph.nodes.get(id)!;
       if (tail.name === head.name) continue;
       // The callback guard: a name nowhere in the closure cannot be handed
       // out of it, so no unseen indirect call can be hiding behind it.
-      if (namedAnywhere(tail.name, closure.files, tree, language)) continue;
+      const named = namedAnywhere(tail.name, closure.files, tree, language, tail);
+      if (named && !options.unguarded) continue;
+      if (named ? alsoNamed >= options.perSeedNever : negatives >= options.perSeedNever) continue;
+      /*
+       * And the reverse direction, because the reader is entitled to confirm
+       * it. `checkSymbolEdge` tries both ends and says so -- "an arrow means
+       * these two are connected, and the diagram's sense of direction is a
+       * reading of the design rather than a claim about who calls whom" -- so
+       * a pair where the *tail* reaches the head is a pair the reader may
+       * call connected, and a referee that only looked forward would score
+       * that as a wrong confirmation.
+       *
+       * It scored 15 of them on `vuejs-core` the moment the guard above
+       * stopped rejecting the shape by accident: `transformElement` calls
+       * `mergeAsArray` on line 881, so the arrow between them is real and the
+       * forward closure from `mergeAsArray` is right to exclude it. Both
+       * statements are true, and only the question was wrong.
+       */
+      const back = await closureFrom(graph, id, options.budget, options.depth);
+      if (back.distance.has(seed)) continue;
       asks.push({
         from: head, to: tail, truth: "never", distance: 0,
         chain: [], closure: closure.distance.size,
+        ...(named ? { named: true as const } : {}),
       });
-      negatives += 1;
+      if (named) alsoNamed += 1;
+      else negatives += 1;
     }
   }
   return { asks, complete, seeds, stopped };

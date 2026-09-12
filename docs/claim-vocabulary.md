@@ -573,7 +573,7 @@ to pass every check this tool had.
 deliberate: almost all of it is `Vec<T>`, `Promise<T>`, `list[str]`, which
 nobody draws as two boxes.
 
-## Thirty-one times a measurement contradicted the design
+## Thirty-two times a measurement contradicted the design
 
 Kept because the pattern is the point: eleven of the first thirteen came from
 building one word or one reader, not from reviewing the design. Nothing since
@@ -2536,6 +2536,44 @@ be one: `<MenuContent />` is a routine making a MenuContent, which is `@builds`.
     for a compiler-backed reader -- pyright read, mypy refereeing, Python
     only. Worth keeping because the proposal was this document's own, written
     two commits earlier, and it took one afternoon's counting to retire.
+
+32. **Three bugs in the benchmark's own negative population, and the one that
+    mattered had been throwing away half of it.** `measure:reach`'s `never`
+    asks are the only evidence that verdict could ever be licensed on, so the
+    population is an argument and it was wrong in three ways (#reach).
+
+    The callback guard asks whether a closure might hand the tail out as a
+    value, and answered yes because the tail's own `export function` line was
+    in a file the closure touches -- `ast.ts#createInterpolation` against
+    `ast.ts#convertToBlock`, where the caller writes `isString` and nothing
+    else. **348 of `vuejs-core`'s never-pairs rejected for no evidence at
+    all.** The referee was directional where `checkSymbolEdge` is
+    bidirectional by documented design, so a pair whose *tail* calls the head
+    scored as a wrong confirmation -- 15 of them, all true statements about
+    the wrong question. And one per-seed cap served both populations, so
+    `--unguarded` moved the scored `never` count from 24 to 8: an instrument
+    changing its own reading.
+
+    What the corrected population then showed is the useful half. Wrong
+    confirmations are **7 on TypeScript, 43 on Python, 26 on Rust, and every
+    single one is same-file** -- cross-file is zero in all three, so the
+    strict standard item 26 added is doing exactly its job. The remainder is
+    the same-file lenient standard `body.ts` calls deliberate, and the corpus
+    disagrees with its reasoning: `error.rs#deref` confirms against
+    `error.rs#is` because the body writes `.is::<E>()`. Applying the strict
+    rule inside a file was measured, not argued -- free on TypeScript, and on
+    Rust 7 fewer wrong for 27 fewer right -- and left alone on that number.
+
+    Read the agreements too, applied to the instrument rather than the reader.
+
+    A fourth, in the suite rather than the measurement, and the shape is worth
+    the line: `resolveRustDefinitions` got its own test file, which made three
+    files each spawning their own rust-analyzer while vitest ran them in
+    parallel. Whichever lost the race went red with `expected undefined to be
+    defined` -- a starved server, reading exactly like a code fault, and
+    alternating between files run to run. Folded into
+    `resolution-rust-receivers.test.ts`, which puts the count back to the two
+    it was.
 
 ## Open, in the order worth doing
 
