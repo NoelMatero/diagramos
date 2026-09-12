@@ -47,6 +47,11 @@ export type GraphNode = {
    * through the listed doors. Carried through to customData; layout ignores it.
    */
   closed?: { through?: string[] };
+  /**
+   * The cases this box's routine dispatches on. Carried through to customData;
+   * layout ignores it.
+   */
+  handles?: string[];
 };
 export type GraphEdge = {
   from: string;

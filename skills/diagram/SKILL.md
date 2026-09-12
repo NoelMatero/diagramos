@@ -663,6 +663,52 @@ Nothing is reported either way when a base could stand for another name (`import
 { Base as B }`), when it is an expression rather than a name (`extends
 mixin(B)`), or when the tail is an alias for a type declared elsewhere.
 
+#### `handles: [...]` — and those are all the cases
+
+A box that stands for a routine which dispatches on a fixed set of cases — a
+router on a method, a `match` on an enum, a reducer on an action type — can say
+what that set is:
+
+```
+{ id: "status", ref: "src/route.ts#status", handles: ["GET", "POST", "DELETE"] }
+```
+
+**This is the one claim here that catches something being *added* to the code.**
+Every other word is about one thing going stale. A case list is about
+completeness, so when somebody adds a fourth case to the routine and not to the
+picture, the next check says so with the file and the line. That is the whole
+reason it exists, and it is why the list has to be *all* of them: a partial list
+is not a smaller claim, it is a false one.
+
+**It can come back wrong in both directions.** A case the routine dispatches on
+that is not in your list, and a case in your list the routine has no arm for.
+Both are refutable because the arms of a dispatch are enumerable — the reader
+sees every one, so a case that is not there is genuinely absent rather than
+merely unfound.
+
+Write it **only from the arms you have read.** The ref must name a routine
+(`path#symbol`), not a file — a file cannot say which dispatch was meant.
+
+Six things it declines to judge rather than guess, and it says which in the
+report every time:
+
+- **a `_` or a `default` arm** — the missing-case half withholds, because the
+  fallback really is handling the case you listed. The unlisted-case half still
+  checks: a fallback does not excuse the picture leaving out a case the code
+  names.
+- **two dispatches in one routine** — the claim names one set and nothing says
+  which, so it refuses rather than picking.
+- **a case the reader cannot name** — a computed label, a tuple pattern, a Rust
+  byte range. A case list short by what could not be read would accuse you of
+  forgetting a case you wrote down.
+- **an `if`/`elif` ladder** — read, and never judged. Nothing independent can
+  tell a chain link from an ordinary `if`, so it has not earned a red.
+- **a language other than TypeScript** — the reader works in Rust, Python,
+  JavaScript and TSX and is measured only in TypeScript, so elsewhere it
+  confirms and stays quiet. Writing the claim there still costs nothing and
+  still gets checked the day the square is earned.
+- **a `planned` box** — nothing is graded until it promotes.
+
 #### `closed: {}` — nothing outside reaches into this box
 
 This is the claim architecture diagrams actually make and could never say: you

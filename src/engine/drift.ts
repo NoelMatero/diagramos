@@ -35,14 +35,18 @@ import {
 import { checkFeeds, type FeedsCandidate, type FeedsWithheld } from "./feeds";
 import { followAnchors, type FollowedRef, type StaleAnchor, type Trail } from "./follow";
 import type { BoardFile } from "./board-file";
-import { arrowClaimError, boxClaimError, valueClaimError, type ArrowClaim } from "./claim";
+import {
+  arrowClaimError, boxClaimError, isClosedClaim, isHandlesClaim, valueClaimError,
+  type ArrowClaim,
+} from "./claim";
 import { checkClosed, type ClosedBreach } from "./closed";
+import { checkHandles, type HandlesWithheld } from "./handles";
 import { connects, refIsStale, type CodeGraphOption } from "./codegraph";
 import { readDependencies, readerCanPlace } from "./deps";
 import type { BindingFault } from "./damage";
 import { generatedRef, NEVER_WALK } from "./generated";
 import { readGraph, type Provenance, type RecoveredGraph } from "./graph";
-import { licenceFor } from "./licence";
+import { licenceFor, mayAccuse } from "./licence";
 import { languageOf, type Language } from "./parse";
 import { ledgerAdditions, type Ledger } from "./ledger";
 import { checkNeeds, type NeedsWithheld } from "./needs";
@@ -113,7 +117,18 @@ export type DriftKind =
    * a caller can hit by writing a claim that could never fail -- see
    * `checkDrift`, which refuses an unfalsifiable scope with this same kind.
    */
-  | "incomplete-board";
+  | "incomplete-board"
+  /**
+   * A `handles` box whose routine does not dispatch on the cases it lists.
+   *
+   * Refutable on the footing `@holds` stands on rather than `@calls`': the arms
+   * of a dispatch are enumerable from the text, so a case that is not among
+   * them is genuinely absent. Both directions are reported under this one kind
+   * -- a case the code names and the box does not, and a case the box names and
+   * the code has no arm for -- because both mean the same thing to a reader:
+   * the picture and the dispatch disagree, and here is the line.
+   */
+  | "mishandled-box";
 
 export interface DriftFinding {
   /** Node id, as edges and edit_diagram refer to it. */
@@ -337,6 +352,7 @@ export const DRIFT_KINDS = [
   "stale-number",
   "open-box",
   "incomplete-board",
+  "mishandled-box",
 ] as const satisfies readonly DriftKind[];
 
 export const EDGE_FINDING_KINDS = [
@@ -866,6 +882,19 @@ export interface ClaimTally {
    * breach into this number in public; it does not make it disappear.
    */
   closedTestReaches: number;
+  /** Boxes asserting what cases their routine dispatches on. */
+  handles: number;
+  /** Of those, how many were checked and agreed with the code. */
+  handlesHeld: number;
+  /**
+   * Of those, how many got no verdict, and why.
+   *
+   * Counted rather than left silent for the reason the `needs` withheld list
+   * exists: a claim that passed and a claim nothing read look identical in a
+   * clean report, and only one of them means the diagram is being held to
+   * anything. Writing `handles` is somebody asking a question out loud.
+   */
+  handlesWithheld: Array<{ label: string; why: HandlesWithheld; detail?: string }>;
   /**
    * Whether the board asserts it is complete about a directory. One or zero:
    * a board carries at most one such claim, on its title element.
@@ -2066,6 +2095,57 @@ function poolShows(pool: Set<string>, route: string): boolean {
  * wrong inside prose: a finding that quotes a four-line label breaks its own
  * sentence in half and the reader loses the thread of the accusation.
  */
+/**
+ * What a refuted `handles` claim says, in the words the reader thinks in.
+ *
+ * Two sentences at most, the bad outcome first and the line second. Both
+ * directions are the same finding to a reader -- the picture and the dispatch
+ * disagree -- but they are not the same *instruction*, so they get different
+ * wording: an unlisted case is the diagram falling behind the code, and a
+ * listed case with no arm is a case nobody handles.
+ */
+function handlesDetail(
+  parsed: { path: string; symbol?: string },
+  extra: readonly string[],
+  missing: readonly string[],
+  found: readonly string[],
+  line: number,
+): string {
+  const routine = parsed.symbol ?? "this routine";
+  const said = found.length > 0 ? found.join(", ") : "nothing";
+  const parts: string[] = [];
+  if (missing.length > 0) {
+    parts.push(
+      `This box says ${routine} handles ${list(missing)}, and it has no case for `
+      + `${missing.length === 1 ? "that" : "those"}, and no default to fall through to.`,
+    );
+  }
+  if (extra.length > 0) {
+    parts.push(
+      `${routine} also dispatches on ${list(extra)}, which this box does not list.`,
+    );
+  }
+  /*
+   * The evidence once, at the end.
+   *
+   * Both halves used to carry the file, the line and the case set, so a box
+   * that was wrong in both directions printed them twice in one sentence --
+   * which reads as the tool repeating itself and buries the instruction. What a
+   * reader needs is the complaint, then the line, then what to do.
+   */
+  parts.push(
+    `${parsed.path}:${line} dispatches on ${said}. Fix the box, or fix the routine.`,
+  );
+  return parts.join(" ");
+}
+
+/** `a`, `a and b`, `a, b and c` -- a list a person reads rather than a JSON array. */
+function list(names: readonly string[]): string {
+  if (names.length <= 1) return names.map((name) => `\`${name}\``).join("");
+  const quoted = names.map((name) => `\`${name}\``);
+  return `${quoted.slice(0, -1).join(", ")} and ${quoted[quoted.length - 1]}`;
+}
+
 function oneLine(label: string): string {
   return label.replace(/\s+/g, " ").trim();
 }
@@ -2532,6 +2612,7 @@ export function checkDrift(
   const assertions: AssertionTally = { checked: 0, downgraded: 0, unsupportedLanguage: 0 };
   const claims: ClaimTally = {
     closed: 0, closedHeld: 0, closedTestReaches: 0,
+    handles: 0, handlesHeld: 0, handlesWithheld: [],
     complete: 0, completeHeld: 0,
     needs: 0, needsChecked: 0, needsWithheld: {},
     takes: 0, returns: 0, signatureConfirmed: 0, signatureWithheld: {},
@@ -3020,6 +3101,100 @@ export function checkDrift(
   }
 
   /*
+   * `handles` boxes: what cases a routine dispatches on.
+   *
+   * Cheap in the way `closed` is expensive. The claim names one routine, so the
+   * evidence is the file the box already points at -- no walk, no second file,
+   * and nothing outside the diagram. It is the whole reason this word could
+   * ship on the per-turn path without a flag: a box that claims it costs one
+   * parse of a file the missing-symbol check has already read.
+   *
+   * `external` and `planned` are excused exactly as they are for `closed`, and
+   * for the same two different reasons: there is no code of ours to read, and a
+   * claim on a routine nobody has written yet is a specification rather than a
+   * transcription. The gate releases itself when the box promotes.
+   */
+  const handlesBoxes = graph.nodes.filter(
+    (node) => node.claim && isHandlesClaim(node.claim) && node.provenance === "recorded"
+      && node.state !== "external" && node.state !== "planned",
+  );
+  for (const node of handlesBoxes) {
+    if (concept) break;
+    const claim = node.claim;
+    if (!claim || !isHandlesClaim(claim)) continue;
+    claims.handles += 1;
+    const label = node.label || node.id;
+
+    const anchor = node.ref?.trim();
+    const parsed = anchor ? parseRef(anchor) : undefined;
+    /*
+     * A routine, named. `handles` is about one dispatch, and a box anchored at
+     * a whole file cannot say which routine in it -- so this refuses rather
+     * than picking the file's only dispatch, which would hold until somebody
+     * added a second one and then start refusing for a reason nobody could see.
+     */
+    if (!parsed?.symbol) {
+      claims.handlesWithheld.push({ label, why: "no-body", detail: anchor ?? "(no ref)" });
+      continue;
+    }
+    const resolved = workspace.resolve(parsed.path);
+    const source = resolved && workspace.stat(resolved) === "file"
+      ? workspace.read(resolved)
+      : undefined;
+    if (source === undefined) {
+      // The missing-file and missing-symbol checks have already said so, and
+      // saying it twice about one box is how a report stops being read.
+      claims.handlesWithheld.push({ label, why: "no-body", detail: parsed.path });
+      continue;
+    }
+    const language = languageOf(parsed.path);
+    if (!language) {
+      claims.handlesWithheld.push({ label, why: "no-grammar", detail: parsed.path });
+      continue;
+    }
+
+    /*
+     * The licence, at the last gate before the accusation and nowhere earlier.
+     *
+     * An unlicensed language still gets the whole reading -- the dispatch is
+     * found, the cases are compared, a match is counted as held. What it does
+     * not get is the *red*, because finding a name is the same evidence
+     * whoever reads it while an absence is a claim about the whole of
+     * something. That is the rule `licence.ts`'s header states and the one
+     * #195 was a violation of.
+     *
+     * As measured, this is `yes` in TypeScript and `no` in TSX, JavaScript,
+     * Rust and Python. Rust is the square #206 predicted would be strongest.
+     */
+    const reading = checkHandles(source, parsed.symbol, claim.cases, language);
+    if (reading.verdict === "wrong" && !mayAccuse("handles", language)) {
+      claims.handlesWithheld.push({ label, why: "unlicensed", detail: language });
+      continue;
+    }
+    if (reading.verdict === "withheld") {
+      claims.handlesWithheld.push({
+        label,
+        why: reading.why,
+        ...(reading.detail !== undefined ? { detail: reading.detail } : {}),
+      });
+      continue;
+    }
+    if (reading.verdict === "held") {
+      claims.handlesHeld += 1;
+      continue;
+    }
+
+    findings.push({
+      node: node.id,
+      label,
+      ref: anchor ?? "",
+      kind: "mishandled-box",
+      provenance: "recorded",
+      detail: handlesDetail(parsed, reading.extra, reading.missing, reading.found, reading.line),
+    });
+  }
+
+  /*
    * `closed` boxes: the one check here that reads files the board never names.
    *
    * Everything else in this file is bounded by the diagram -- a box names a
@@ -3044,7 +3219,7 @@ export function checkDrift(
    * checks the claim for real.
    */
   const closedBoxes = graph.nodes.filter(
-    (node) => node.claim?.closed && node.provenance === "recorded"
+    (node) => node.claim && isClosedClaim(node.claim) && node.provenance === "recorded"
       && node.state !== "external" && node.state !== "planned",
   );
   if (closedBoxes.length > 0 && !concept) {
@@ -3103,7 +3278,7 @@ export function checkDrift(
 
       const verdict = checkClosed(
         target,
-        node.claim!.through,
+        node.claim && isClosedClaim(node.claim) ? node.claim.through : [],
         files,
         workspace,
         (file) => TEST_FILE.test(file),
