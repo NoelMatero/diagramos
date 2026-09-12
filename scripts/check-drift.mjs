@@ -70,6 +70,8 @@ import { createLedger } from "../src/engine/ledger.ts";
 import { goodNewsIds, goodNewsLine, goodNewsSince, novelGoodNews } from "../src/engine/goodnews.ts";
 import { createTsReferee, isOutsideTree, receiverResolutionFrom } from "./lib/resolution-ts.ts";
 import { resolvePythonReceivers } from "./lib/resolution-python-live.ts";
+import { resolveRustReceivers } from "./lib/resolution-rust-receivers.ts";
+import { refereePool, resolvePythonDefinitions, resolveRustDefinitions } from "./lib/resolution-definitions.ts";
 import { languageOf } from "../src/engine/parse.ts";
 
 const root = process.cwd();
@@ -868,6 +870,14 @@ function rowsFor({ report, promoted = [] }, colour, all = false) {
        */
       const wrongCallsRefuted = finding.kind === "calls-refuted";
       /*
+       * And the answer that stops both of the two above from being wrong
+       * (#reach): the routine does not call the far end and does reach it
+       * through a chain. Amber, not red -- a board drawn one level too high
+       * is a board somebody can keep, and the detail names the route so the
+       * choice is theirs.
+       */
+      const reachedNotCalled = finding.kind === "calls-one-level-up";
+      /*
        * The sixth (#213), and the one that was missing here.
        *
        * It shipped into the board page and not into this file, so the browser
@@ -903,6 +913,7 @@ function rowsFor({ report, promoted = [] }, colour, all = false) {
         + (wrongBuilds ? " \u00b7 built the other way" : "")
         + (wrongCalls ? " \u00b7 called the other way" : "")
         + (wrongCallsRefuted ? " \u00b7 never called" : "")
+        + (reachedNotCalled ? " \u00b7 reached, not called" : "")
         // The same words the board page uses, so one board does not read as two
         // different findings depending on where somebody looked at it.
         + (wrongMembers ? " \u00b7 no such member" : "")
@@ -1363,77 +1374,265 @@ for (const file of checking) {
 }
 
 /*
- * Python's own closed-body absence check (#243), assembled here because it
+ * The language servers' half of the live resolver, assembled here because it
  * needs `loaded` in hand and nothing after it does.
  *
  * `CallSide.resolveReceiver` is synchronous -- called deep inside `calls.ts`'s
- * own synchronous walk -- and pyright's own language-server protocol
- * (`resolution-python-lsp.ts`) is not: every answer is a round trip to a
- * spawned process. `scripts/lib/resolution-python-live.ts`'s own header has
- * the full reasoning; the shape of it here is two passes. First, a silent
- * run of every loaded board with a resolver that answers `undefined` but
- * remembers what it was asked, for Python files only -- this report is
- * thrown away, only the questions it asked matter. Then, once, every one of
- * those questions is put to a single live pyright process and cached. The
- * real run further down reads that cache synchronously, the same shape
- * `tsReferee` already answers TypeScript's half of this question with.
+ * own synchronous walk -- and a language server is not: every answer is a
+ * round trip to a spawned process. `scripts/lib/resolution-python-live.ts`'s
+ * header has the full reasoning; the shape of it is a silent run of every
+ * board with a resolver that answers `undefined` and remembers what it was
+ * asked, then one batch of real async work, then the real run reading a
+ * synchronous cache.
  *
- * Skipped entirely, at zero cost, when nothing loaded names a Python file:
- * pyright's own startup is not free, and a TypeScript or Rust repository
- * must not pay for a tool nothing here needs.
+ * ## Rounds, and why there is one of them
+ *
+ * One recording pass is enough for the question this was built for: `@calls`'
+ * closed-body check reads one file's bodies, so every question it will ever
+ * ask is asked on the first pass. The cross-file walk in `reach.ts` is not
+ * like that -- it reaches a second file only by placing a call in the first,
+ * and placing that call is sometimes the very question being recorded, so one
+ * pass harvests the first hop of each chain and never learns there was a
+ * second. The machinery below rounds, and `ROUNDS` is nevertheless 1, because
+ * the price was measured rather than guessed at:
+ *
+ *   a Flask board, two arrows      1 round   28s     2 rounds  48s   3  118s
+ *
+ * Startup is not the cost -- pyright is up in 0.7s. The questions are: the
+ * walk reads whole files, and `callSitesIn` places *every* call site in each
+ * one, so two arrows over a handful of Flask modules is 212 questions in the
+ * first round alone. Each further round buys the next hop of the chains the
+ * last one unlocked, and costs another twenty seconds, and this check runs
+ * on every Stop.
+ *
+ * So one round, and the narrowing that would make more of them affordable is
+ * named in docs/reach-measurement.md: place a body's call sites when the walk
+ * visits that body, rather than every body in the file on the way past.
+ *
+ * ## The guard, which is what keeps a healthy board free
+ *
+ * Skipped when no loaded board names a file of that language -- and skipped
+ * again when a tier-1 pass, which starts nothing and costs about a tenth of a
+ * second, already settled every arrow in it. A board whose arrows all confirm
+ * has nothing a compiler could add, and paying twenty seconds to find that
+ * out is the shape of a check people switch off.
  */
-const anyPython = loaded.some(({ boardFile }) =>
-  readGraph(boardFile).nodes.some((node) => {
-    const target = node.ref?.split("#")[0];
-    return target !== undefined && languageOf(target) === "python";
-  }),
-);
-let pythonCache;
-if (anyPython) {
-  const pythonQueries = [];
-  const recordingReferee = {
-    resolveReceiver: (file, at) => {
-      if (languageOf(file) === "python") pythonQueries.push({ file, at });
-      return undefined;
-    },
-  };
-  for (const { boardFile } of loaded) {
-    try {
-      // `edges`/`coverage`/`trail` are left out on purpose: this pass's own
-      // report is never read, only the `resolveReceiver` questions it asks
-      // matter, and `edges` defaults to on regardless. `trail` in particular
-      // is not yet built at this point in the script -- see it further down.
-      checkDrift(boardFile, workspace, { closedBodyReferee: recordingReferee });
-    } catch {
-      // The recording pass's only job is to harvest queries. Whatever this
-      // board's own real, printed check further down finds is unaffected --
-      // it runs again from the same unmodified board and workspace.
-    }
-  }
-  const resolved = await resolvePythonReceivers(root, pythonQueries);
-  pythonCache = resolved.cache;
-  /*
-   * Closed here, immediately, rather than left running for the rest of the
-   * script: a live pyright process is an open child-process handle, and
-   * Node will not reach its own natural exit while one is still alive --
-   * found live, the hard way, as this script hanging until something else
-   * killed it even after printing its report and reaching its own final
-   * `process.exit()` call further down. Every query this run will ever ask
-   * is already in `pythonCache` by this line; nothing after it needs the
-   * process still running.
-   */
-  resolved.close();
+const ROUNDS = 3;
+
+/**
+ * How long the language servers get, in total, for one check.
+ *
+ * The guard below keeps a healthy board free, and the narrowing in
+ * `callSitesIn` brought a Flask board from 212 questions to 55. What neither
+ * of them bounds is a language server *loading a project*, which is most of
+ * what Rust costs: `rust-test` is three crate roots, and rust-analyzer wants
+ * cargo metadata and a fresh index for each one -- sixty seconds for 106
+ * questions, almost none of it answering any of them. Pooling the servers did
+ * not move it, which is how the load rather than the asking was identified as
+ * the cost.
+ *
+ * So there is a ceiling, checked between batches rather than mid-flight: an
+ * answer already in hand is kept, and the walk falls back to reading the text
+ * for the rest. Degrading that way costs confirmations and can never produce a
+ * wrong one, which is the direction everything here errs in.
+ *
+ * Fifteen seconds because that is comfortably more than the two cases that
+ * finish -- a Flask board is 10s, a single small crate about 1s -- and well
+ * under a wait somebody would kill.
+ */
+const SERVER_BUDGET_MS = 15_000;
+
+function boardsName(language) {
+  return loaded.some(({ boardFile }) =>
+    readGraph(boardFile).nodes.some((node) => {
+      const target = node.ref?.split("#")[0];
+      return target !== undefined && languageOf(target) === language;
+    }),
+  );
 }
 
 /**
- * The merged live resolver `checkDrift` actually reports through -- TypeScript
- * still answered by `tsReferee` in-process and synchronously, Python by a
- * lookup into what the pass above already resolved. Neither half knows the
- * other exists; only `languageOf(file)` decides which one a query reaches.
+ * One language's two questions, asked in rounds until the boards stop asking
+ * new ones.
+ *
+ * `receivers` and `definitions` each take `(root, queries, pool)` and wrap
+ * that language's own batch resolver -- `resolvePythonReceivers` /
+ * `resolveRustReceivers` and the pair in `resolution-definitions.ts`, which
+ * share a shape without sharing a line. Wrapped rather than passed directly
+ * because Rust's two take a `skip` set that Python's have no use for, and a
+ * caller threading `undefined` through a positional slot to reach the pool is
+ * how the pool ends up in the wrong argument.
+ * Both are harvested in the same round, because they are asked from the same
+ * walk and each can be what uncovers the other's next question: placing a
+ * receiver is how the walk reaches the file whose definitions it then wants.
+ *
+ * Returns a synchronous `get` for each, and the closers to run before this
+ * process tries to exit.
  */
-const closedBodyReferee = (tsReferee || pythonCache) ? {
+async function harvestFor(language, { receivers, definitions }) {
+  /*
+   * One server per key for the whole harvest, shared by both questions and
+   * every round. Without it, `rust-test` started rust-analyzer six times --
+   * three crate roots, two resolvers -- for 106 questions, and spent
+   * sixty-four seconds almost none of which was answering anything.
+   */
+  const until = Date.now() + SERVER_BUDGET_MS;
+  const pool = refereePool(until);
+  /** Whether there is time left to put another batch to a server. */
+  const affordable = () => Date.now() < until;
+  /** Every key ever put to a server, so a question with no answer is asked once. */
+  const askedReceiver = new Set();
+  const askedDefinition = new Set();
+  const receiverRounds = [];
+  const definitionRounds = [];
+  const closers = [];
+  const lookIn = (rounds) => (file, at) => {
+    for (const round of rounds) {
+      const hit = round.get(file, at);
+      if (hit !== undefined) return hit;
+    }
+    return undefined;
+  };
+  const receiverAnswer = lookIn(receiverRounds);
+  const definitionAnswer = lookIn(definitionRounds);
+
+  for (let round = 0; round < ROUNDS; round += 1) {
+    const freshReceivers = [];
+    const freshDefinitions = [];
+    const harvest = (known, asked, fresh) => (file, at) => {
+      if (languageOf(file) !== language) return undefined;
+      const hit = known(file, at);
+      if (hit !== undefined) return hit;
+      const key = `${file}:${at.start}:${at.end}`;
+      if (!asked.has(key)) { asked.add(key); fresh.push({ file, at }); }
+      return undefined;
+    };
+    const recording = {
+      resolveReceiver: harvest(receiverAnswer, askedReceiver, freshReceivers),
+      declarationAt: harvest(definitionAnswer, askedDefinition, freshDefinitions),
+    };
+    for (const { boardFile } of loaded) {
+      try {
+        // `edges`/`coverage`/`trail` are left out on purpose: this pass's own
+        // report is never read, only the questions it asks matter, and
+        // `edges` defaults to on regardless. `trail` in particular is not yet
+        // built at this point in the script -- see it further down.
+        checkDrift(boardFile, workspace, { closedBodyReferee: recording });
+      } catch {
+        // The recording pass's only job is to harvest queries. Whatever this
+        // board's own real, printed check further down finds is unaffected --
+        // it runs again from the same unmodified board and workspace.
+      }
+    }
+    if (freshReceivers.length === 0 && freshDefinitions.length === 0) break;
+    if (freshReceivers.length > 0 && affordable()) {
+      const resolved = await receivers(root, freshReceivers, pool);
+      receiverRounds.push(resolved.cache);
+      closers.push(resolved.close);
+    }
+    if (freshDefinitions.length > 0 && affordable()) {
+      const resolved = await definitions(root, freshDefinitions, pool);
+      definitionRounds.push(resolved.cache);
+      closers.push(resolved.close);
+    }
+    if (!affordable()) break;
+  }
+  return {
+    receiver: receiverAnswer,
+    definition: definitionAnswer,
+    close: () => { for (const close of closers) close(); pool.close(); },
+  };
+}
+
+/*
+ * Closed immediately once every round is in, rather than left running for the
+ * rest of the script: a live language server is an open child-process handle,
+ * and Node will not reach its own natural exit while one is still alive --
+ * found live, the hard way, as this script hanging until something else killed
+ * it even after printing its report and reaching its own final `process.exit()`
+ * further down. Every query this run will ever ask is already answered by the
+ * time these close; nothing after them needs the process still running.
+ */
+/**
+ * Whether any board left an arrow a second opinion could change.
+ *
+ * One silent tier-1 pass -- no referee, so nothing starts and nothing is
+ * asked, and it costs about a tenth of a second per board. An arrow that came
+ * back confirmed is not going to be improved by a compiler, and one skipped
+ * for want of an anchor is not either; what is left is the unconfirmed and
+ * the accused, and those are the only two worth paying a language server for.
+ *
+ * Deliberately not asked per language. `UnconfirmedEdge` carries node *ids*
+ * rather than paths -- that was this guard's first bug, and it read as the
+ * harvest silently never running -- and the finding shapes that do carry
+ * paths carry the anchor rather than the file the walk ended up in. A board
+ * mixing Python and TypeScript may start a server it did not strictly need;
+ * a board whose arrows all confirm starts none, which is the case this
+ * exists for and the common one.
+ *
+ * Computed once, lazily, because a board with nothing unsettled must not pay
+ * for the pass twice over.
+ */
+let unsettled;
+function anythingUnsettled() {
+  if (unsettled !== undefined) return unsettled;
+  unsettled = false;
+  for (const { boardFile } of loaded) {
+    try {
+      const report = checkDrift(boardFile, workspace);
+      if (report.unconfirmedEdges.length > 0 || report.edges.length > 0) unsettled = true;
+    } catch {
+      // A board this pass cannot read is one whose real check will say so.
+      // Treated as unsettled: better to pay for a question than to skip one.
+      unsettled = true;
+    }
+    if (unsettled) break;
+  }
+  return unsettled;
+}
+
+let pythonCache;
+let pythonDefinitions;
+if (boardsName("python") && anythingUnsettled()) {
+  const harvested = await harvestFor("python", {
+    receivers: (tree, queries, pool) => resolvePythonReceivers(tree, queries, pool),
+    definitions: (tree, queries, pool) => resolvePythonDefinitions(tree, queries, pool),
+  });
+  pythonCache = { get: harvested.receiver };
+  pythonDefinitions = { get: harvested.definition };
+  harvested.close();
+}
+
+/*
+ * Rust's half (#reach). `resolveRustReceivers` has existed since #256 and was
+ * only ever called by the measurement scripts -- so a Rust board got no
+ * receiver resolved at check time at all, which `measure:reach` put a number
+ * on: 476 of the 695 chains it could not follow in Rust end at a method
+ * called on a value whose type is not written down, and that is the exact
+ * question rust-analyzer answers.
+ */
+let rustCache;
+let rustDefinitions;
+if (boardsName("rust") && anythingUnsettled()) {
+  const harvested = await harvestFor("rust", {
+    receivers: (tree, queries, pool) => resolveRustReceivers(tree, queries, undefined, pool),
+    definitions: (tree, queries, pool) => resolveRustDefinitions(tree, queries, undefined, pool),
+  });
+  rustCache = { get: harvested.receiver };
+  rustDefinitions = { get: harvested.definition };
+  harvested.close();
+}
+
+/**
+ * The merged live resolver `checkDrift` actually reports through --
+ * TypeScript answered by `tsReferee` in-process and synchronously, Python and
+ * Rust by a lookup into what the rounds above already resolved. No half knows
+ * the others exist; only `languageOf(file)` decides which one a query reaches.
+ */
+const closedBodyReferee = (tsReferee || pythonCache || rustCache) ? {
   resolveReceiver: (file, at) => {
     if (languageOf(file) === "python") return pythonCache?.get(file, at);
+    if (languageOf(file) === "rust") return rustCache?.get(file, at);
     if (!tsReferee) return undefined;
     const absolute = path.resolve(root, file);
     return receiverResolutionFrom(tsReferee.typeAt(absolute, at.start, at.end), root);
@@ -1448,7 +1647,9 @@ const closedBodyReferee = (tsReferee || pythonCache) ? {
    * could not see into.
    */
   declarationAt: (file, at) => {
-    if (!tsReferee || languageOf(file) === "python") return undefined;
+    if (languageOf(file) === "python") return pythonDefinitions?.get(file, at);
+    if (languageOf(file) === "rust") return rustDefinitions?.get(file, at);
+    if (!tsReferee) return undefined;
     const found = tsReferee.symbolDeclarationLocationAt(path.resolve(root, file), at.start, at.end);
     if (!found) return undefined;
     if (isOutsideTree(found.file, root)) return "outside";

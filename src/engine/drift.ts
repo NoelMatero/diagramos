@@ -53,6 +53,7 @@ import { checkNeeds, type NeedsWithheld } from "./needs";
 import {
   type CallSide, type CallsWithheld, EXTERNAL_RECEIVER, type ReceiverResolution, callSitesIn, callsBetween,
 } from "./calls";
+import { newReachCache, reachBetween, type ReachCache } from "./reach";
 import { constructions, routineNamesIn, type ConstructsWithheld } from "./constructs";
 import { type AccessesWithheld, type NotReadEvidence, memberAccesses, memberNamed, membersReadAt, membersReadByName, readsMember } from "./accesses";
 import { heldTypes, type HoldsWithheld } from "./holds";
@@ -302,7 +303,27 @@ export type EdgeFindingKind =
    * looked; `conforms.ts` withholds with `region-is-the-crate` and the licence
    * grid carries the same `no` a second time.
    */
-  | "conforms-absent";
+  | "conforms-absent"
+  /**
+   * A `calls` arrow whose routine does not call the other one, and does reach
+   * it through a chain of calls (#reach).
+   *
+   * An **advisory**, and it exists because the alternative was a red on
+   * correct code. `calls-refuted` fires when every call one routine makes was
+   * read and none of them is the far end -- true, and not the whole truth
+   * when one of those calls leads to the far end two hops later. Measured on
+   * the corpus by `measure:reach`: of the pairs a compiler says really do
+   * reach each other, 62 were being told their arrow was wrong -- 58
+   * `refuted` and one `backwards` on TypeScript, 3 `refuted` on Python.
+   *
+   * A board like that is drawn one level too high, which is the reading
+   * `@accesses` already gives the same shape (`accesses-not-read` stays quiet
+   * when a called function does the reading). So the row says which route it
+   * found and leaves the arrow standing: the author can draw the hop or leave
+   * the arrow where it is, and neither answer is a mistake somebody has to be
+   * accused of.
+   */
+  | "calls-one-level-up";
 
 /**
  * Every verdict word this engine can put in a report, as data (#116).
@@ -347,6 +368,7 @@ export const EDGE_FINDING_KINDS = [
   "accesses-absent",
   "accesses-not-read",
   "conforms-absent",
+  "calls-one-level-up",
 ] as const satisfies readonly EdgeFindingKind[];
 
 /**
@@ -388,6 +410,7 @@ export const ADVISORY_EDGE_KINDS = [
   "unsupported-edge",
   "broken-chain",
   "built-backwards",
+  "calls-one-level-up",
 ] as const satisfies readonly EdgeFindingKind[];
 
 /** Whether a verdict says the diagram is wrong rather than worth a look. */
@@ -2197,7 +2220,7 @@ type SymbolEdgeVerdict = "reached" | "unreached" | "unreadable";
  * code cannot answer either way (#133). The names are carried out so the reader
  * can be told which end to re-anchor.
  */
-interface SymbolEdgeResult {
+export interface SymbolEdgeResult {
   verdict: SymbolEdgeVerdict;
   dataEnds: string[];
 }
@@ -2209,7 +2232,7 @@ interface SymbolEdgeResult {
  * two are connected, and the diagram's sense of direction is a reading of the
  * design rather than a claim about who calls whom.
  */
-function checkSymbolEdge(
+export function checkSymbolEdge(
   from: { file: string; path: string; symbols: string[] },
   to: { file: string; path: string; symbols: string[] },
   workspace: Workspace,
@@ -2237,11 +2260,41 @@ function checkSymbolEdge(
     const source = workspace.read(start.file);
     let runs = false;
     let declared = false;
+    /*
+     * Which of the far end's names this file may be searched for, which is
+     * not always all of them.
+     *
+     * The search is a token match: does this body write the far end's name.
+     * Inside one file that is the right standard and there is no second thing
+     * the name could mean. Across files there is, and it is the failure both
+     * earlier attempts at depth made in a different costume (ee3b29e): Flask
+     * declares a nested `def decorator` inside `app_template_filter`, and an
+     * arrow from `app.py#decorator` to `blueprints.py#app_template_filter`
+     * came back **confirmed** -- on the strength of that body writing the word
+     * `decorator`, which is its own, declared eight lines down, and has
+     * nothing to do with the `decorator` in the other file. Six wrong
+     * confirmations in one repository, and `measure:reach` is what found them.
+     *
+     * So a name the searching file declares **itself** is dropped from the
+     * question. That is `call-scan.ts`'s own rule, arrived at the same way:
+     * "a referee that cannot tell which of two same-named things is meant has
+     * no business asking."
+     */
+    const askable = start.file === target.file
+      ? target.symbols
+      : target.symbols.filter((name) => declarationsOf(source, name, language).length === 0);
     for (const symbol of start.symbols) {
       const declarations = declarationsOf(source, symbol, language);
       if (declarations.length > 0) declared = true;
       if (declarations.some((one) => one.kind === "callable")) runs = true;
-      const verdict = reaches(source, symbol, target.symbols, language);
+      /*
+       * Nothing left to look for is a refusal, not an absence: the question
+       * was about a name this file spells two ways, and `unreached` would be
+       * an amber saying these two are unconnected on the strength of not
+       * having asked.
+       */
+      if (askable.length === 0) continue;
+      const verdict = reaches(source, symbol, askable, language, start.file !== target.file);
       if (verdict === undefined) continue;
       asked = true;
       if (verdict) return { verdict: "reached", dataEnds: [] };
@@ -2609,6 +2662,28 @@ export function checkDrift(
   };
   /** Shared by the box checks and the arrow checks: one read per file per run. */
   const importCache: ReadCache = { imports: new Map(), configs: new Map() };
+  /**
+   * Bodies the reach walk has already read, for this check and no longer.
+   *
+   * Per check rather than module-level, for `ConfigCache`'s reason: this
+   * process outlives a check, and a body read once and remembered forever is
+   * a fact with a shelf life -- the exact rot this tool exists to catch. A
+   * board's arrows cross the same handful of files over and over, so one
+   * reading per file per check is most of what a cache can buy anyway.
+   */
+  const reachCache: ReachCache = newReachCache();
+  /**
+   * The caller's "go to definition", handed to the reach walk when there is
+   * one.
+   *
+   * Spread rather than passed as a possibly-`undefined` property, so a check
+   * with no checker wired in hands `reachBetween` an options object with no
+   * `declarationAt` in it at all -- which is the shape its own default is
+   * written against, and the shape `measure:reach` deliberately runs in.
+   */
+  const declarationAsked = options?.closedBodyReferee?.declarationAt
+    ? { declarationAt: options.closedBodyReferee.declarationAt.bind(options.closedBodyReferee) }
+    : {};
 
   /**
    * Files the wiring behind a `@feeds` arrow could be in.
@@ -3270,6 +3345,7 @@ export function checkDrift(
 
   // Edge checking: check each generated edge for corroboration
   const edges: EdgeDriftFinding[] = [];
+
 
 
   if (options?.edges !== false && !concept) {
@@ -4190,6 +4266,46 @@ export function checkDrift(
               { ...head, names: toEnd.symbols },
             );
 
+            /*
+             * The chain an accusation has to rule out before it may be made.
+             *
+             * Both of this word's "wrong" verdicts are about the *direct*
+             * call, and both are read by the person holding the board as
+             * "this arrow is wrong". They are not the same thing. A routine
+             * that calls a helper that calls the far end has an arrow drawn
+             * one level too high, and a red is the wrong answer to it:
+             * `measure:reach` put 1,002 genuinely-reaching pairs in front of
+             * `@calls` and 61 came back `refuted`, one `backwards`.
+             *
+             * Asked lazily, and only where something is about to accuse.
+             * This walk reads bodies across files, which is worth doing to
+             * stop a red and not worth doing to decorate a silence.
+             */
+            const reaching = () => reachBetween(
+              { ...tail, routine: fromEnd.symbols[0]! },
+              { ...head, names: toEnd.symbols },
+              { cache: reachCache, ...declarationAsked },
+            );
+            /** The advisory a ruled-out accusation turns into. */
+            const oneLevelUp = (via: string[], hops: number): EdgeOutcome => ({
+              kind: "finding",
+              finding: {
+                from: fromPath,
+                to: toPath,
+                fromLabel: fromNode.label,
+                toLabel: toNode.label,
+                fromRef,
+                toRef,
+                kind: "calls-one-level-up",
+                detail:
+                  `this arrow says ${oneLine(fromNode.label) || fromPath} calls `
+                  + `${oneLine(toNode.label) || toPath}, and it does not call it directly -- `
+                  + `it gets there in ${hops} step${hops === 1 ? "" : "s"}, through `
+                  + `${via.join(" -> ")}. Draw the hop, or leave the arrow where it is and `
+                  + `read it as the whole path.`,
+              },
+            });
+
             if (verdict.verdict === "confirmed") {
               if (claimed) claims.callsConfirmed += 1;
               edgesChecked += 1;
@@ -4204,7 +4320,18 @@ export function checkDrift(
                * the other direction, and it falls through to silence -- the
                * accusation is refused for a plan exactly as it is for every
                * other claim, because a red about a plan is a lie about a plan.
+               *
+               * And "turn the arrow round" is wrong advice when the arrow also
+               * runs forwards through a chain. Both calls are real then, and
+               * the board drew the one the reader could not see in one hop.
                */
+              const alsoForward = reaching();
+              if (alsoForward.verdict === "reached") {
+                edgesChecked += 1;
+                recordEdge(edge, fromNode, toNode,
+                  oneLevelUp(alsoForward.via, alsoForward.hops.length));
+                continue;
+              }
               edgesChecked += 1;
               const wasClaimed = baselineGraph?.edges.some(
                 (was) => was.from === edge.from && was.to === edge.to && was.claim === "calls",
@@ -4232,7 +4359,19 @@ export function checkDrift(
                * A `planned` arrow reaching here is a sketch the code has not
                * caught up to; refused for the same reason `backwards` is
                * above -- a red about a plan is a lie about a plan.
+               *
+               * And the chain, for the reason `reaching` gives: every call
+               * this routine makes was read and none of them is the far end,
+               * which is true and is not the whole truth when one of them
+               * leads there.
                */
+              const throughAChain = reaching();
+              if (throughAChain.verdict === "reached") {
+                edgesChecked += 1;
+                recordEdge(edge, fromNode, toNode,
+                  oneLevelUp(throughAChain.via, throughAChain.hops.length));
+                continue;
+              }
               edgesChecked += 1;
               const wasClaimed = baselineGraph?.edges.some(
                 (was) => was.from === edge.from && was.to === edge.to && was.claim === "calls",
@@ -4570,9 +4709,42 @@ export function checkDrift(
         ? checkSymbolEdge(fromEnd, toEnd, workspace)
         : { verdict: "unreadable" as const, dataEnds: [] };
 
+      /**
+       * The same question, asked again across files (#reach).
+       *
+       * `checkSymbolEdge` above follows calls as deep as they go and never
+       * leaves the file it started in, because `body.ts` looks a callee's
+       * name up in the tree it already parsed. Most real chains leave the
+       * file on the first hop, and every one of them used to come back
+       * `no-call-either-way` -- an amber on a correct arrow, which is the
+       * commonest thing this engine says wrongly: 313 of TypeScript's 545
+       * reaching pairs, now 93 (docs/reach-measurement.md).
+       *
+       * Asked only once the one-file search has failed, and only to confirm:
+       * `reach.ts` is entitled to say `never` and nothing here reads that
+       * verdict yet, for the reason `licence.ts` exists. So the worst this
+       * can do is stay quiet exactly as before.
+       */
+      const reachedAcrossFiles = (): string[] | undefined => {
+        if (!bothNamed) return undefined;
+        const tail = callSide(fromAnchor, workspace, importCache.configs, options?.closedBodyReferee);
+        const head = callSide(toAnchor, workspace, importCache.configs, options?.closedBodyReferee);
+        if (!tail || !head) return undefined;
+        const walked = reachBetween(
+          { ...tail, routine: fromEnd.symbols[0]! },
+          { ...head, names: toEnd.symbols },
+          { cache: reachCache, ...declarationAsked },
+        );
+        return walked.verdict === "reached" ? walked.via : undefined;
+      };
+
       let outcome: EdgeOutcome = { kind: "confirmed" };
       if (symbolResult.verdict !== "unreadable") {
         edgesChecked += 1;
+        if (symbolResult.verdict === "unreached" && reachedAcrossFiles() !== undefined) {
+          recordEdge(edge, fromNode, toNode, { kind: "confirmed" });
+          continue;
+        }
         if (symbolResult.verdict === "unreached") {
           /*
            * Nothing found -- and which of two sentences that deserves depends

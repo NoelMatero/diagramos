@@ -12,6 +12,13 @@
  *
  * The live half is skipped when `rust-analyzer` is not installed, the stance
  * `resolution-rust-lsp.test.ts` already takes.
+ *
+ * `resolveRustDefinitions` is tested in this file rather than its own, and
+ * that is about load rather than tidiness: each test file spawns its own
+ * rust-analyzer, vitest runs files in parallel, and a third server made the
+ * suite red on whichever of the three lost the race -- an unanswered query
+ * reads as `expected undefined to be defined`, which looks like a code fault
+ * and is a starved server. Two files was the status quo and stays it.
  */
 import { execFileSync } from "node:child_process";
 import { mkdirSync, mkdtempSync, rmSync, writeFileSync } from "node:fs";
@@ -20,6 +27,7 @@ import path from "node:path";
 
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
 
+import { resolveRustDefinitions } from "../scripts/lib/resolution-definitions";
 import {
   cargoRootsIn, isConcreteRustDeclaration, resolveRustReceivers,
 } from "../scripts/lib/resolution-rust-receivers";
@@ -193,5 +201,73 @@ describe.skipIf(!hasRustAnalyzer)("resolveRustReceivers", () => {
 
   it("answers a key never asked with undefined", () => {
     expect(answers.cache.get("src/use_site.rs", { start: 0, end: 1 })).toBeUndefined();
+  });
+});
+
+describe.skipIf(!hasRustAnalyzer)("resolveRustDefinitions", () => {
+  let repo: string;
+  let source: string;
+  let answers: Awaited<ReturnType<typeof resolveRustDefinitions>>;
+  const at: Record<string, { start: number; end: number }> = {};
+
+  beforeAll(async () => {
+    repo = mkdtempSync(path.join(os.tmpdir(), "resolution-definitions-"));
+    write(repo, "Cargo.toml",
+      "[package]\nname = \"fixture\"\nversion = \"0.1.0\"\nedition = \"2021\"\n[workspace]\n");
+    write(repo, "src/lib.rs", "pub mod decl;\npub mod use_site;\n");
+    write(repo, "src/decl.rs",
+      "pub struct Config { pub name: String }\n"
+      + "impl Config {\n"
+      + "    pub fn new() -> Config { Config { name: String::new() } }\n"
+      + "    pub fn load(&self) -> u32 { 7 }\n"
+      + "}\n");
+    source =
+      "use crate::decl::Config;\n\n"
+      + "pub fn build() -> Config {\n    Config::new()\n}\n"
+      + "pub fn read(c: &Config) -> u32 {\n    c.load()\n}\n"
+      + "pub fn shout(word: &str) -> String {\n    word.to_uppercase()\n}\n";
+    write(repo, "src/use_site.rs", source);
+
+    /** The *called name*'s own range, which is what a definition is asked at. */
+    const name = (needle: string, called: string) => {
+      const site = source.indexOf(needle);
+      if (site < 0) throw new Error(`fixture bug: ${JSON.stringify(needle)} not found`);
+      const start = source.indexOf(called, site);
+      return { start, end: start + called.length };
+    };
+    at.pathCall = name("Config::new", "new");
+    at.method = name("c.load", "load");
+    at.std = name("word.to_uppercase", "to_uppercase");
+
+    answers = await resolveRustDefinitions(repo, [
+      { file: "src/use_site.rs", at: at.pathCall! },
+      { file: "src/use_site.rs", at: at.method! },
+      { file: "src/use_site.rs", at: at.std! },
+    ]);
+  }, LIVE_TIMEOUT_MS);
+
+  afterAll(() => {
+    answers?.close();
+    if (repo) rmSync(repo, { recursive: true, force: true });
+  });
+
+  it("started a server for the crate", () => {
+    expect(answers.started).toBe(true);
+  });
+
+  it("places a path call at the impl, which is what a receiver's type cannot do", () => {
+    expect(answers.cache.get("src/use_site.rs", at.pathCall!))
+      .toEqual({ file: path.join("src", "decl.rs"), line: 3 });
+  });
+
+  it("places a method called on a value the same way", () => {
+    expect(answers.cache.get("src/use_site.rs", at.method!))
+      .toEqual({ file: path.join("src", "decl.rs"), line: 4 });
+  });
+
+  it("says outside for a call into the standard library", () => {
+    // The one answer allowed to settle a call site: a call the compiler puts
+    // outside this repository provably is not a routine in it.
+    expect(answers.cache.get("src/use_site.rs", at.std!)).toBe("outside");
   });
 });

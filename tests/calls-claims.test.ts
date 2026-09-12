@@ -106,6 +106,71 @@ describe("absent is not a finding, and this is the test that keeps it true", () 
   });
 });
 
+describe("an arrow one level too high is not an arrow that is wrong", () => {
+  /*
+   * `measure:reach` put 545 genuinely-reaching pairs from two repositories in
+   * front of `@calls`: 58 came back `refuted` and one `backwards`, so 59 red
+   * accusations landed on arrows whose code really does reach. Every one is
+   * the shape below -- the routine calls a helper, and the helper calls the
+   * far end.
+   *
+   * The accusation is not wrong about the *call*; it is wrong about what the
+   * person holding the board will do with it, which is delete an arrow that
+   * was right. So it becomes an advisory that names the route.
+   */
+  const HELPER = 'import { render } from "./b";\n'
+    + "export function draw(n: number) { return render(n); }\n";
+
+  it("says reached rather than refuted when a helper gets there", async () => {
+    const caller = 'import { draw } from "./helper";\n'
+      + "export function run() { return draw(1); }\n";
+    const board = await boardOf("src/a.ts#run", "src/b.ts#render", { claim: "calls" });
+    const report = checkDrift(board, fakeWorkspace({
+      "src/a.ts": caller, "src/helper.ts": HELPER, "src/b.ts": CALLEE,
+    }), { edges: true });
+
+    expect(report.edges.filter((finding) => finding.kind === "calls-refuted")).toEqual([]);
+    const advisory = report.edges.filter((finding) => finding.kind === "calls-one-level-up");
+    expect(advisory).toHaveLength(1);
+    expect(advisory[0]!.detail).toContain("run -> draw -> render");
+  });
+
+  it("keeps the accusation when nothing on the way gets there either", async () => {
+    // The same board with the helper calling something else. Nothing reaches
+    // `render`, the closure is closed, and the red is the right answer -- so
+    // the guard above has to cost the accusation nothing here.
+    const caller = 'import { draw } from "./helper";\n'
+      + "export function run() { return draw(1); }\n";
+    const elsewhere = "export function draw(n: number) { return n + 1; }\n";
+    const board = await boardOf("src/a.ts#run", "src/b.ts#render", { claim: "calls" });
+    const report = checkDrift(board, fakeWorkspace({
+      "src/a.ts": caller, "src/helper.ts": elsewhere, "src/b.ts": CALLEE,
+    }), { edges: true });
+
+    expect(report.edges.filter((finding) => finding.kind === "calls-one-level-up")).toEqual([]);
+    expect(report.edges.filter((finding) => finding.kind === "calls-refuted")).toHaveLength(1);
+  });
+
+  it("does not tell anybody to turn an arrow round that also runs forwards", async () => {
+    /*
+     * The `backwards` half of the same guard. `render` calls `run` directly,
+     * and `run` reaches `render` through the helper, so both calls are real --
+     * "turn the arrow round" would be advice to break a board that is right.
+     */
+    const caller = 'import { draw } from "./helper";\n'
+      + "export function run() { return draw(1); }\n";
+    const callee = 'import { run } from "./a";\n'
+      + "export function render(n: number) { return run() + n; }\n";
+    const board = await boardOf("src/a.ts#run", "src/b.ts#render", { claim: "calls" });
+    const report = checkDrift(board, fakeWorkspace({
+      "src/a.ts": caller, "src/helper.ts": HELPER, "src/b.ts": callee,
+    }), { edges: true });
+
+    expect(report.edges.filter((finding) => finding.kind === "calls-backwards")).toEqual([]);
+    expect(report.edges.filter((finding) => finding.kind === "calls-one-level-up")).toHaveLength(1);
+  });
+});
+
 describe("an arrow into a routine whose whole call set is checked (#233)", () => {
   it("is refuted when the routine provably calls nothing at the far end", async () => {
     // No receiver dead ends here, so this closes even with no live compiler

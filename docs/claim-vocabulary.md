@@ -620,7 +620,7 @@ to pass every check this tool had.
 deliberate: almost all of it is `Vec<T>`, `Promise<T>`, `list[str]`, which
 nobody draws as two boxes.
 
-## Twenty-six times a measurement contradicted the design
+## Thirty-two times a measurement contradicted the design
 
 Kept because the pattern is the point: eleven of the first thirteen came from
 building one word or one reader, not from reviewing the design. Nothing since
@@ -631,6 +631,12 @@ word needed a type checker, which measuring both designs over the same bodies
 turned out to be wrong about. Item 26 is a third kind and the cheapest: an
 issue's own evidence for a word, read one arrow at a time, turning out to be
 evidence of something else.
+
+Items 26 to 28 are all one measurement's first run. `measure:reach` was built
+to answer "how many steps can the engine follow", and before it answered that
+it found two false-confirmation generators in the channel that was already
+shipping and one cache that made an answer depend on which files had been read
+before it.
 
 1. **The substrate was empty.** #190's first draft proposed graphify as the
    fact supplier on the strength of 8,167 `contains` edges. `contains` there is
@@ -2448,7 +2454,176 @@ be one: `<MenuContent />` is a routine making a MenuContent, which is `@builds`.
     lookup read a call to a parameter — `isTest(file)` — as a call to the
     routine declaring it, because "go to definition" lands on the parameter;
     that counted a call nobody can see into as seen.
+duplicate from conflitcts, requires reading prs "An arrow can be three calls long #271" and "A box can say what cases a routine handles, and go red when the code grows one (#206)
+#266 ·" to be read to resolve
+26. **The body search was confirming arrows on a name that meant something
+    else, 60 times in Rust and 8 in Python.** `anyhow`'s `chain.rs` declares `fn len`
+    whose body writes `cause.source()`. An arrow from `context.rs#source` to
+    `chain.rs#len` came back **confirmed** — the body writes the word `source`,
+    and it is `StdError::source` on a trait object (#reach).
 
+    This is the failure ee3b29e already names and fixed in one place only.
+    Following a hop refuses `Type::foo` and `other.foo` because they are
+    somebody else's `foo`; the place the search *stops* counted every
+    identifier leaf, member halves included. Inside one file that is right —
+    there is no second thing the name could mean. Across files there is, and
+    every one of the 51 was that shape.
+
+    The fix is the same rule at the terminal match: for a target in another
+    file, a name written as somebody else's member is not evidence.
+    `self.foo` and `this.foo` still count, because a Rust `impl` block for the
+    routine's own type may be in the other file.
+
+    A second, smaller version of the same thing was found in the same run.
+    Flask writes a nested `def decorator` inside `app_template_filter`, so an
+    arrow from `app.py#decorator` to `blueprints.py#app_template_filter` was
+    confirmed on that body writing `decorator` — its own, declared eight lines
+    down. That is Python's half, fixed by dropping from the question any
+    name the searching file declares itself, which is `call-scan.ts`'s own
+    rule: a referee that cannot tell which of two same-named things is meant
+    has no business asking.
+
+27. **A cache keyed by node id made the same board give two different
+    answers.** `body.ts` held one node's token set in a `Map<number, ...>`,
+    and a node id is an address inside one tree. Evict that tree — 48 is the
+    parse cache limit — and the next one is handed the same addresses, so the
+    cache answers about the new file with the old file's tokens (#reach).
+
+    Not a slow cache: a wrong answer, and the worst shape of one. It depends
+    on how many *other* files were read in between, so whether an arrow is
+    confirmed is decided by what else happened to be on the board. It was
+    found because the cross-file walk parses more files than the one-file
+    search did, and one arrow in `measure:reach` moved with nothing about
+    that arrow changed. Held against the tree in a `WeakMap` now, so the
+    lifetimes agree by construction.
+
+28. **The confirming search had a wall, not a budget, and `@calls` was saying
+    "wrong" on the other side of it.** `body.ts` follows calls as deep as they
+    go inside one file, which reads as a depth limit and is not: `bodiesFor`
+    looks a callee up in the tree it already parsed, so a chain ends at the
+    first file boundary. Most real chains cross one. Of 545 pairs two
+    repositories' compilers say genuinely reach each other, the engine
+    confirmed 232; it confirms 452 now, and 321 of the 406 that are two or
+    more calls apart against 98 before (docs/reach-measurement.md) (#reach).
+
+    The expensive half is what `@calls` did with the rest. Its closed-body
+    absence (#233) is about the *direct* call and correct about it — and 58 of
+    those 545 reaching pairs came back `refuted` and one `backwards`, so 59
+    red accusations landed on arrows whose code really does reach. That is not
+    a reader bug; it is a true verdict about calling being read as a verdict
+    about the diagram. It is now an advisory that names the route
+    (`calls-one-level-up`), on the same reading `@accesses` already gives the
+    same shape: a board drawn one level too high is a board somebody can keep.
+
+29. **One import specifier can resolve to two files, and the wrong one was
+    winning on a tie-break.** Rust records `crate::codec::encode` against both
+    the file declaring `mod codec` and `codec.rs` itself. `comesToRest` ends
+    with a permissive step -- a file that neither declares the name nor
+    forwards it is still counted as the resting place -- which is right for a
+    specifier somebody wrote down and wrong as a way of choosing between
+    candidates. Taken in declared order `main.rs` won, and `encode` was placed
+    in a file that declares no `encode` at all (#reach).
+
+    Invisible while nothing walked past the first hop: `@calls` compares the
+    placement against one named far end, and a wrong file simply fails to
+    match, which reads as silence. The cross-file walk steps *into* the file it
+    was given, finds nothing of that name there and stops -- so a three-file
+    Rust crate's `main -> encode` could not be confirmed by any route.
+    Candidates are now asked the strict question first (does this file declare
+    the name, or forward it somewhere that does) and the permissive answer is
+    the fallback. A single candidate, which is every TypeScript and Python
+    import in the corpus, is unaffected either way.
+
+30. **A minute of a Rust board's check was a timer nobody was waiting on.**
+    Wiring rust-analyzer into the live check took `rust-test` from 1.3
+    seconds to 61, which read as the price of a language server and was not
+    (#reach). Instrumented: three seconds of server, 66 milliseconds of
+    walking, 11 bodies read -- and 57 seconds of a process declining to end.
+
+    Both language-server clients register `setTimeout` guards and never clear
+    them. A request that answered leaves its 30-second timeout in the queue;
+    `whenPrimed` leaves a 60-second one. Node will not exit while either is
+    pending. Invisible until now because every previous caller was a
+    measurement script ending in an explicit `process.exit`, which walks past
+    a pending timer; `check-drift.mjs` ends on its own. `unref` on both, and
+    the board went to 4.5 seconds.
+
+    Worth keeping for the shape of it: the number looked exactly like the cost
+    of the thing just added, and the thing just added was responsible for
+    three seconds of it. A timing that matches your expectation is not
+    evidence of what you think caused it.
+
+    A second thing the same wiring broke, and the built bin is what found it:
+    `vscode-jsonrpc` is a **devDependency**, so a static import of the Rust
+    client put it in `out/cli/drift.mjs`, which is shipped, and
+    `diagramos drift --help` exited 1 with `Cannot find module
+    'vscode-jsonrpc/node'` on a tree where npm had never installed it.
+    `packaged-server.test.ts` spawns that bin, which is why the suite caught
+    what every unit test passed straight through. The transport is fetched
+    when a server is started now, and failing to fetch it is the same silence
+    as rust-analyzer not being installed.
+
+31. **The next step this document named was not worth building, and the
+    measurement said so before anybody did.** #reach's own "still out of
+    reach" section named a cross-file field-type lookup as the thing that
+    would raise the floor, on the strength of `self.inner.by_ref()` in
+    `anyhow` being the shape a reader could not type. Counted instead of
+    assumed: `no-fields` is **45 of ripgrep's 6,823** withheld receiver sites,
+    11 of anyhow's 203, 109 of httpx's 2,577. What withholds is `not-a-name`
+    -- 4,040 in ripgrep, an expression receiver no reader of text can type --
+    and `imported-type`, mostly a module receiver `calls.ts` places anyway.
+
+    The second half is worse for the proposal and more useful. `never reaches`
+    needs a **closed** region, and closure is conjunctive, so the histogram of
+    first doubts everyone had been reading says nothing about what a new
+    reader would buy. Counted by the whole doubt set: 420 of anyhow's 965
+    refusals are blocked by a `macro` among others, which no grammar parses;
+    0 of Python's sample are blocked by one kind of doubt at all; and
+    TypeScript's 84 receiver-only refusals are ones `tsc` already settles in
+    the product, invisible here only because the answer key *is* `tsc`.
+
+    So the only honest route to licensing that word is an independent referee
+    for a compiler-backed reader -- pyright read, mypy refereeing, Python
+    only. Worth keeping because the proposal was this document's own, written
+    two commits earlier, and it took one afternoon's counting to retire.
+
+32. **Three bugs in the benchmark's own negative population, and the one that
+    mattered had been throwing away half of it.** `measure:reach`'s `never`
+    asks are the only evidence that verdict could ever be licensed on, so the
+    population is an argument and it was wrong in three ways (#reach).
+
+    The callback guard asks whether a closure might hand the tail out as a
+    value, and answered yes because the tail's own `export function` line was
+    in a file the closure touches -- `ast.ts#createInterpolation` against
+    `ast.ts#convertToBlock`, where the caller writes `isString` and nothing
+    else. **348 of `vuejs-core`'s never-pairs rejected for no evidence at
+    all.** The referee was directional where `checkSymbolEdge` is
+    bidirectional by documented design, so a pair whose *tail* calls the head
+    scored as a wrong confirmation -- 15 of them, all true statements about
+    the wrong question. And one per-seed cap served both populations, so
+    `--unguarded` moved the scored `never` count from 24 to 8: an instrument
+    changing its own reading.
+
+    What the corrected population then showed is the useful half. Wrong
+    confirmations are **7 on TypeScript, 43 on Python, 26 on Rust, and every
+    single one is same-file** -- cross-file is zero in all three, so the
+    strict standard item 26 added is doing exactly its job. The remainder is
+    the same-file lenient standard `body.ts` calls deliberate, and the corpus
+    disagrees with its reasoning: `error.rs#deref` confirms against
+    `error.rs#is` because the body writes `.is::<E>()`. Applying the strict
+    rule inside a file was measured, not argued -- free on TypeScript, and on
+    Rust 7 fewer wrong for 27 fewer right -- and left alone on that number.
+
+    Read the agreements too, applied to the instrument rather than the reader.
+
+    A fourth, in the suite rather than the measurement, and the shape is worth
+    the line: `resolveRustDefinitions` got its own test file, which made three
+    files each spawning their own rust-analyzer while vitest ran them in
+    parallel. Whichever lost the race went red with `expected undefined to be
+    defined` -- a starved server, reading exactly like a code fault, and
+    alternating between files run to run. Folded into
+    `resolution-rust-receivers.test.ts`, which puts the count back to the two
+    it was.
 
 26. **#206's demand number came back at 7 arrows of 162 and did not decide the
     issue, because the corpus it counts was drawn to test the tool. Built
