@@ -927,7 +927,7 @@ describe("--details", () => {
  * a reader no way to find which four short of opening the engine, which is how a
  * false arrow survived on this repo's own example board from the first commit.
  */
-describe("--details names the arrows nothing read", () => {
+describe("--details and --coverage name the arrows nothing read", () => {
   let project: string;
 
   beforeAll(async () => {
@@ -1001,6 +1001,26 @@ describe("--details names the arrows nothing read", () => {
     expect(crowded).toContain("10 arrows skipped");
     expect((crowded.match(/Engine → OUT/g) ?? []).length).toBe(8);
     expect(crowded).toContain("+2 more");
+  }, 180_000);
+
+  it("names them under --coverage, the flag a person runs to ask what was not looked at", async () => {
+    // `check_drift` has named these under `coverage` since they were first named.
+    // The CLI's flag of the same name listed unanchored boxes and undrawn code and
+    // left the arrows out, so its answer to "what did this not read" was short by
+    // exactly the arrow #58 was about.
+    const out = await at("--coverage");
+    expect(out).toContain("ELK layout engine → board.excalidraw");
+    expect(out).toContain("writes");
+    expect(out).toContain("You → board.excalidraw");
+  }, 180_000);
+
+  it("names them once when --coverage and --details are asked for together", async () => {
+    // The audit already lists them; a second copy in the coverage box is the same
+    // fact twice in one screen, which is how two phrasings of it start to differ.
+    const out = await at("--coverage", "--details");
+    const mixed = out.slice(out.indexOf("mixed.excalidraw"));
+    expect((out.match(/ELK layout engine → board\.excalidraw/g) ?? []).length).toBe(1);
+    expect(mixed).toContain("2 arrows skipped");
   }, 180_000);
 
   it("says nothing about them on the per-turn run, which has to stay quiet", async () => {

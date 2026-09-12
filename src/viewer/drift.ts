@@ -177,6 +177,8 @@ export interface DriftView {
   checked: number;
   skipped: number;
   edgesChecked: number;
+  /** Arrows nothing read. Optional: older payloads have none, and the sentence leaves the tail off. */
+  edgesSkipped?: number;
   strayArrows?: number;
   concept: boolean;
   /**

@@ -125,6 +125,17 @@ describe("summaryOf", () => {
     );
   });
 
+  it("counts the arrows nothing read apart from the ones read and not confirmed", () => {
+    // Two different silences about arrows, and the second was missing from the
+    // sentence altogether until #58: "all still true" covered it by omission.
+    expect(summaryOf({ checked: 4, edgesChecked: 2, unconfirmed: 2, edgesSkipped: 4, skipped: 1 })).toBe(
+      "checked 4 boxes and 2 arrows against the code — all still true"
+        + " — 2 arrows were read and not confirmed"
+        + " — 4 more arrows were never read"
+        + " — 1 more box has no ref, so it went unchecked",
+    );
+  });
+
   it("never claims a verdict over a board where nothing was checkable", () => {
     expect(summaryOf({ checked: 0, edgesChecked: 0 })).toBe(
       "nothing on this board points at code yet, so nothing was checked",

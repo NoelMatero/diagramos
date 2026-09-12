@@ -51,6 +51,16 @@ export interface Checked {
    * large is honest only if it says so.
    */
   unconfirmed?: number;
+  /**
+   * Arrows nothing read at all: an end outside this repo, a directory, no ref.
+   *
+   * Extra to `edgesChecked`, unlike `unconfirmed`. The quiet line counted only
+   * the arrows it had read, so an unread one was missing from the sentence and
+   * "all still true" covered it by omission -- which is how a false "writes"
+   * arrow onto an external file sat on a board from its first commit (#58).
+   * Unread boxes already had this tail; arrows never did.
+   */
+  edgesSkipped?: number;
   /** The board is not about this repo, so nothing here is checkable. */
   concept?: boolean;
 }
@@ -141,5 +151,9 @@ export function summaryOf(facts: Checked): string {
   const unproven = unconfirmed
     ? ` — ${unconfirmed} ${unconfirmed === 1 ? "arrow was read and not" : "arrows were read and not"} confirmed`
     : "";
-  return `${coverage} — all still true${unproven}${unread}`;
+  const edgesSkipped = facts.edgesSkipped ?? 0;
+  const neverRead = edgesSkipped
+    ? ` — ${edgesSkipped} more ${edgesSkipped === 1 ? "arrow was" : "arrows were"} never read`
+    : "";
+  return `${coverage} — all still true${unproven}${neverRead}${unread}`;
 }
