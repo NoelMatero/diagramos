@@ -222,16 +222,32 @@ earlier one was a measurement script finishing in an explicit `process.exit`.
 
 ## What is still out of reach
 
-**A receiver nothing typed** -- most of what is left, *with no compiler
-running*. Of the refusals on pairs that do reach: 476 of Rust's 695, 69 of
-Python's 111, 50 of TypeScript's 93. Of the refusals on pairs that do not: 988
-of Rust's 1,552, 467 of Python's 779, 204 of TypeScript's 360. This is the
-population the compiler channel above exists for, and the reason the measured
-number is a floor rather than an estimate. `self.inner.by_ref()` in `anyhow`
-is the shape --
+**A receiver nothing typed, with no compiler running.** Of the refusals on
+pairs that do reach: 476 of Rust's 695, 69 of Python's 111, 50 of
+TypeScript's 93. Of the refusals on pairs that do not: 988 of Rust's 1,552,
+467 of Python's 779, 204 of TypeScript's 360.
+
+That clause carries the whole of it, and getting it wrong is easy enough that
+it is worth spelling out. `self.inner.by_ref()` in `anyhow` is the shape:
 `inner`'s type is declared on a struct in *another file*, and `resolution.ts`
-reads one file. A cross-file field-type lookup is the named next step and this
-is the number that would justify it.
+reads one file, so the text reader cannot place it and the benchmark counts
+it here. **A compiler places it immediately, and one is asked**: rust-analyzer
+answers `src/ptr.rs:48` for that exact call, pyright answers
+`httpx/_urls.py:327` for `self.base_url.copy_with(..)`, and an `anyhow` board
+drawn `error.rs#chain -> ptr.rs#deref` is unconfirmed before this work and
+confirmed after it. A definition is asked at the *method's* own position, so
+it never needs the field's type as a separate question -- which is why this
+population is the reason the measured number is a floor, and not a list of
+things the product cannot do.
+
+What would raise the floor itself is a cross-file field-type lookup in
+`resolution.ts`. Worth having for three reasons and none of them is the
+common case: a project whose compiler will not load (no `Cargo.toml` over the
+file, no `tsconfig.json`, pyright that cannot start), a licence-grade number
+that is less of an underestimate, and the refutation side -- a field's
+declared type is *written down*, so unlike a compiler's go-to-definition it
+could count toward closing a region, which is what `never reaches` has been
+too thin to earn.
 
 **A name nothing in the file binds**: 182 Rust, 18 Python and 10 TypeScript
 on the reaching pairs. A `use some::*`, a global, an ambient declaration.
