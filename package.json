@@ -55,6 +55,7 @@
     "measure:handles": "NODE_OPTIONS=--max-old-space-size=8192 tsx scripts/measure-handles.mts",
     "measure:doors": "NODE_OPTIONS=--max-old-space-size=8192 tsx scripts/measure-doors.mts",
     "measure:door-values": "NODE_OPTIONS=--max-old-space-size=8192 tsx scripts/measure-door-values.mts",
+    "measure:outflow": "NODE_OPTIONS=--max-old-space-size=8192 tsx scripts/measure-outflow.mts",
     "measure:door-reach": "NODE_OPTIONS=--max-old-space-size=8192 tsx scripts/measure-door-reach.mts",
     "measure:holds": "tsx scripts/measure-holds.mts",
     "measure:licence": "tsx scripts/measure-licence.mts",

@@ -620,7 +620,7 @@ to pass every check this tool had.
 deliberate: almost all of it is `Vec<T>`, `Promise<T>`, `list[str]`, which
 nobody draws as two boxes.
 
-## Thirty-six times a measurement contradicted the design
+## Thirty-seven times a measurement contradicted the design
 
 Kept because the pattern is the point: eleven of the first thirteen came from
 building one word or one reader, not from reviewing the design. Nothing since
@@ -2859,6 +2859,73 @@ duplicate from conflitcts, requires reading prs "An arrow can be three calls lon
     named and not fixed. 3,528 values now refuse by name; 1,147 cannot be
     attributed to a position at all.
 
+37. **The door question was built, met its bar, and the number says do not
+    ship it: seven flows in the corpus mean what it asked.** `outflow.ts` and
+    `npm run measure:outflow` (#203, #270).
+
+    The reader is the confirming half of #203's own question -- *this value is
+    created here; does it reach something that writes it to a file, sends it
+    over the network, or hands it to another process?* Almost no new machinery:
+    `dataflow.ts` already follows a value through a body's locals and already
+    records, at every call site, which producers reached it and through which
+    locals; `outside.ts` already knows which calls are doors. It joins them and
+    adds one rule of its own, the collection one.
+
+    **The bar is `invented`, not `missed`,** because confirming is all it does:
+    a door it cannot see costs silence, which the engine accepts everywhere. A
+    text scan sharing no parse, tree or index asks the decisive question -- is
+    the name handed over actually written in the door call's argument list?
+    **309 flows, 309 corroborated, 0 invented. 24 of 24 hops walked. Two runs
+    byte-identical.**
+
+    **And then the split that undoes the headline.** Of those 309, **242
+    (78.3%) arrive as argument 0** -- which at a file door is a directory or a
+    filename. `writeFile(path, contents)` takes a place and a payload, and "this
+    value is written to a file" means the payload. Only **26 (8.4%)** arrive at
+    argument 1 or later, and reading all 26 by door rather than eyeballing the
+    total finishes the job:
+
+    | door | flows | argument 1 is |
+    |---|---|---|
+    | `os.replace`, `cpSync`, `shutil.copy`, `copy2`, `rename`, `copytree` | 17 | a destination path |
+    | `execFileSync`, `spawnSync` | **7** | the argument list handed to a process |
+    | `os.chmod`, `socket.getaddrinfo` | 2 | a mode, a port |
+
+    **Seven flows in 1,500 files mean what the question asked, and all seven are
+    one idiom** -- a `git(args)` / `run(args)` wrapper. That is not a word. It is
+    the same shape as every other step on this issue: each move outward bought
+    less than the one before.
+
+    Two more numbers in the same direction. **`out-of-a-collection` fires 0
+    times** -- the rule written for this issue's own motivating example,
+    `v.push(widget); use(v[i])`, pointed at a door, matches nothing in the
+    corpus. And 141 values escape `into-a-structure` in the very bodies where a
+    flow was found: `fetch(url, { body: payload })` is the usual spelling of the
+    commonest door in TypeScript and `dataflow.ts` does not model a structure
+    the way it models a collection, so the network row (18) is a floor and a low
+    one.
+
+    **Two reader bugs the referee and the examples found, in that order.** The
+    referee first reported 3 invented and was wrong all three times:
+    `subprocess.run(` opens on the door's line with `cli_args` on the next, and
+    the scan read one line. Reading the argument list to its balancing paren
+    fixed it -- the referee wrong more often than the reader, again. Then the
+    *examples* found the real one: doors were keyed by **line**, so in
+    `readFileSync(path.join(root, file), "utf8")` the arguments of `path.join`
+    were attributed to the door, and `file` was reported arriving at
+    `readFileSync` position 1 -- which is `join`'s position, and `readFileSync`
+    has no second value argument. The flow was true and the path was not.
+    Matching the door's own call site dropped 384 flows to 309 and is why the
+    position split can be quoted at all. Neither would have been found from the
+    totals.
+
+    **Not shipped, and this is the recommendation not to.** Nothing reads
+    `outflow.ts` but its measurement; no colour, no word. Reopen the question if
+    a structure abstraction lands (it would raise the network row) or if anybody
+    actually draws an arrow onto a door -- which `measure:vocabulary` and
+    `measure:doors` answer and this run deliberately does not guess at, because
+    a hardcoded demand count is the mistake this issue already made once.
+
 26. **#206's demand number came back at 7 arrows of 162 and did not decide the
     issue, because the corpus it counts was drawn to test the tool. Built
     anyway, on the code-side argument the issue itself made. Licensed in
@@ -3077,9 +3144,16 @@ duplicate from conflitcts, requires reading prs "An arrow can be three calls lon
    value stays trapped at 49.5% (item 36). That also removed seven false
    `contained`, none of which had ever been counted as a leak.
 
-   What is **not** built is the door question itself, and refuting it is still
-   the thing not to do: a wrong "never reaches a door" is unrecoverable, and
-   Python is the only language with a run-time referee to check against.
+   The door question itself is now **built and measured, and the measurement
+   says do not ship it** (item 37): 309 flows at 0 invented, but 242 of them are
+   a filename rather than the data, and the seven that mean what the question
+   asked are all one `git(args)` idiom. Refuting it remains the thing not to do
+   at all.
+
+   So #203 stays open with its ordering intact and one fewer candidate. What
+   would change the answer is a structure abstraction -- `fetch(url, { body })`
+   is the commonest door in TypeScript and is invisible -- or evidence that
+   anybody draws an arrow onto a door.
 3. **#190's layer 2.** The relation list is settled as-is by the owner. The one
 1. **#203 — the engine has no notion of a value.** Dataflow, points-to, escape
    analysis. #203's own prediction — confirmation much better, refutation only
