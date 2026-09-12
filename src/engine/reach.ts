@@ -136,7 +136,21 @@ export type ReachVerdict =
    * weigh an accusation resting on an absence.
    */
   | { verdict: "never"; checked: number; sites: number }
-  | { verdict: "withheld"; why: ReachWithheld; detail?: SiteUnresolved };
+  | {
+      verdict: "withheld";
+      why: ReachWithheld;
+      detail?: SiteUnresolved;
+      /**
+       * Every kind of doubt met on the closure, not just the first.
+       *
+       * A closure is conjunctive: it closes when *all* of its sites are
+       * placed, so a histogram of first doubts cannot say what closing one
+       * category would buy. This can -- a refusal whose `doubts` are all of
+       * one kind is one that a reader for that kind would settle, and
+       * `measure:reach` counts those apart before anybody builds one.
+       */
+      doubts?: readonly SiteUnresolved[];
+    };
 
 /**
  * What one file's reading costs, kept so a board's arrows do not pay it twice.
@@ -385,6 +399,8 @@ export function reachBetween(
   let sites = 0;
   /** The first doubt met, kept so the refusal can say which one it was. */
   let doubt: SiteUnresolved | undefined;
+  /** Every kind of doubt met, for the question `ReachVerdict.doubts` answers. */
+  const doubts = new Set<SiteUnresolved>();
   let unreadableHop = false;
   let overBudget = false;
 
@@ -502,6 +518,7 @@ export function reachBetween(
              */
             const landed = asked(file, site);
             if (landed === "outside") continue;
+            if (site.why) doubts.add(site.why);
             if (!landed) { doubt ??= site.why; continue; }
             doubt ??= site.why; // followed, and still a doubt for the closure.
             if (landed.file === to.file && wanted.has(landed.routine)) {
@@ -526,7 +543,7 @@ export function reachBetween(
            * So the site is a doubt for the closure -- and still followed,
            * since following it can only ever produce a confirmation.
            */
-          if (blocking(site)) doubt ??= "receiver";
+          if (blocking(site)) { doubt ??= "receiver"; doubts.add("receiver"); }
           // Provably outside the repository, so provably not any repo routine.
           if (site.file === EXTERNAL_RECEIVER) continue;
           const landing = { file: site.file, routine: site.name };
@@ -584,7 +601,7 @@ export function reachBetween(
 
   if (overBudget) return { verdict: "withheld", why: "budget" };
   if (frontier.length > 0) return { verdict: "withheld", why: "depth" };
-  if (doubt) return { verdict: "withheld", why: "open-body", detail: doubt };
+  if (doubt) return { verdict: "withheld", why: "open-body", detail: doubt, doubts: [...doubts] };
   if (unreadableHop) return { verdict: "withheld", why: "unreadable-hop" };
   return { verdict: "never", checked: read, sites };
 }

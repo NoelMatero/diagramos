@@ -240,14 +240,64 @@ it never needs the field's type as a separate question -- which is why this
 population is the reason the measured number is a floor, and not a list of
 things the product cannot do.
 
-What would raise the floor itself is a cross-file field-type lookup in
-`resolution.ts`. Worth having for three reasons and none of them is the
-common case: a project whose compiler will not load (no `Cargo.toml` over the
-file, no `tsconfig.json`, pyright that cannot start), a licence-grade number
-that is less of an underestimate, and the refutation side -- a field's
-declared type is *written down*, so unlike a compiler's go-to-definition it
-could count toward closing a region, which is what `never reaches` has been
-too thin to earn.
+A cross-file field-type lookup in `resolution.ts` was going to raise the
+floor, and the number says not to build it. `resolveReceiversIn`'s own
+refusals, counted over the corpus:
+
+| | receiver sites | resolved | `no-fields` |
+|---|---:|---:|---:|
+| ripgrep | 8,623 | 1,800 | **45** |
+| anyhow | 273 | 70 | **11** |
+| encode-httpx | 2,707 | 130 | **109** |
+| pallets-flask | 2,835 | 182 | **41** |
+
+`no-fields` is the whole of what a field-type reader could address: 45 of
+ripgrep's 6,823 withheld sites. What actually withholds is `not-a-name` --
+4,040 in ripgrep, an expression receiver like `make().run()` or `a.b.c()`,
+which no reader of text can ever type -- and `imported-type`, 2,028 across the
+two Python trees, which is mostly a module receiver that `calls.ts` places by
+itself anyway.
+
+## What would make `never reaches` licensable, and what would not
+
+`never` needs a **closed** region, and closure is conjunctive: it holds when
+every site places, so settling the commonest single doubt buys nothing on a
+closure that also has a different one. A histogram of first doubts cannot say
+that, so `measure:reach` counts refusals by the **whole set** of doubts on the
+closure. A row naming one kind is a refusal one new reader would turn into an
+answer.
+
+| | refusals | one kind only | the rest |
+|---|---:|---:|---|
+| vuejs-core | 276 | **72**, all `receiver` | 84 `receiver+unbound`, then longer sets |
+| TanStack-query | 24 | **12**, all `receiver` | 12 `receiver+unbound+unplaced` |
+| anyhow | 965 | **83**, all `receiver` | 420 `macro+receiver+unbound`, 96 `macro+unbound` |
+| pallets-flask | 24 | **0** | 12 `receiver+unbound`, 12 `+unplaced` |
+
+Three things follow, and the third is the one that matters.
+
+**Rust's ceiling is structural, not a missing reader.** 420 of anyhow's 965
+refusals are blocked by a `macro` among others. A macro's arguments are tokens
+waiting for an expansion that has not happened, so no grammar parses them and
+no closure can be drawn around them. Half of ripgrep's receivers are
+expression receivers besides. No amount of type reading reaches either.
+
+**Python's refusals are never one thing.** 0 of 24 on the sample above -- a
+thin sample, and the shape is unambiguous: every one needs a receiver reader
+*and* an unbound reader.
+
+**TypeScript's 84 receiver-only refusals are already settled in the
+product.** `tsc` places those receivers with a concreteness answer, which is
+exactly what a closure needs, and `check:drift` has had it wired since #233.
+The gap is in what this benchmark can *see*, not in what the checker can do --
+and it cannot see it, because its answer key is `tsc`.
+
+So the only honest route to a licensable `never` is an independent referee for
+a **compiler-backed** reader, and the repository has the parts for exactly one:
+pyright as the reader, `resolution-python-mypy.ts` as the referee, Python only.
+Two unrelated type checkers disagreeing is a real number. Everything else on
+this page either measures the text reader against a compiler, which is the
+floor, or would measure a compiler against itself.
 
 **A name nothing in the file binds**: 182 Rust, 18 Python and 10 TypeScript
 on the reaching pairs. A `use some::*`, a global, an ambient declaration.

@@ -99,7 +99,7 @@ const trees = (roots.length > 0
 type Answer =
   | { said: "reached" }
   | { said: "never" }
-  | { said: "quiet"; why: string };
+  | { said: "quiet"; why: string; doubts?: readonly string[] };
 
 /** Everything a reader needs to be asked one pair, built once per tree. */
 interface Sides {
@@ -247,7 +247,17 @@ function readerReach(ask: Ask, sides: Sides, cache: ReachCache): { answer: Answe
    * call it was is.
    */
   return {
-    answer: { said: "quiet", why: verdict.detail ? `${verdict.why}:${verdict.detail}` : verdict.why },
+    answer: {
+      said: "quiet",
+      why: verdict.detail ? `${verdict.why}:${verdict.detail}` : verdict.why,
+      /*
+       * Every kind of doubt on the closure, not just the first. A closure
+       * closes when all its sites place, so "which reader would settle this
+       * refusal" is a question about the whole set: one kind means one reader
+       * would do it, two kinds mean two readers both have to.
+       */
+      ...(verdict.verdict === "withheld" && verdict.doubts ? { doubts: verdict.doubts } : {}),
+    },
     verdict,
   };
 }
@@ -269,6 +279,16 @@ interface Ledger {
    * anyway. One number for both hides which of the two is the problem. */
   quiet: Map<string, number>;
   quietNever: Map<string, number>;
+  /**
+   * Never-pair refusals grouped by the **whole set** of doubts on the
+   * closure, so the report can say what a new reader would buy.
+   *
+   * The histogram beside this one counts first doubts, which cannot answer
+   * that: a closure is conjunctive, and settling the commonest single doubt
+   * buys nothing on a closure that also has a different one. A row naming one
+   * kind is a refusal one reader would turn into an answer.
+   */
+  blockedBy: Map<string, number>;
   /** Confirmations by referee distance, so depth is visible. */
   byDistance: Map<number, { asked: number; confirmed: number }>;
   /**
@@ -291,7 +311,8 @@ interface Ledger {
 
 const ledger = (): Ledger => ({
   asked: new Map(), confirmed: 0, refuted: 0, wronglyConfirmed: 0, wronglyAccused: 0,
-  quiet: new Map(), quietNever: new Map(), byDistance: new Map(), invented: 0, sentinels: 0,
+  quiet: new Map(), quietNever: new Map(), blockedBy: new Map(),
+  byDistance: new Map(), invented: 0, sentinels: 0,
 });
 
 const bump = <K,>(map: Map<K, number>, key: K, by = 1) => map.set(key, (map.get(key) ?? 0) + by);
@@ -306,6 +327,9 @@ function record(into: Ledger, ask: Ask, answer: Answer): void {
   }
   if (answer.said === "quiet") {
     bump(ask.truth === "reaches" ? into.quiet : into.quietNever, answer.why);
+    if (ask.truth === "never" && answer.doubts && answer.doubts.length > 0) {
+      bump(into.blockedBy, [...answer.doubts].sort().join("+"));
+    }
     return;
   }
   if (ask.truth === "reaches") {
@@ -499,6 +523,16 @@ for (const language of LANGUAGES) {
     }
   }
   console.log();
+  const blocked = row.reach.blockedBy;
+  if (blocked.size > 0) {
+    const single = [...blocked].filter(([kinds]) => !kinds.includes("+"));
+    console.log(`    what a refutation is waiting on, by the whole set of doubts `
+      + `(${total(blocked)} refusals, ${single.reduce((sum, [, n]) => sum + n, 0)} of them one kind only):`);
+    for (const [kinds, count] of [...blocked].sort((a, b) => b[1] - a[1]).slice(0, 8)) {
+      console.log(`      ${String(count).padStart(5)}  ${kinds}`);
+    }
+    console.log();
+  }
   for (const [which, book] of [["reaching", row.callsOnReaching], ["never", row.callsOnNever]] as const) {
     if (book.size === 0) continue;
     console.log(`    @calls on the ${which} pairs: `

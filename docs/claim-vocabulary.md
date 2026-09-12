@@ -573,7 +573,7 @@ to pass every check this tool had.
 deliberate: almost all of it is `Vec<T>`, `Promise<T>`, `list[str]`, which
 nobody draws as two boxes.
 
-## Thirty times a measurement contradicted the design
+## Thirty-one times a measurement contradicted the design
 
 Kept because the pattern is the point: eleven of the first thirteen came from
 building one word or one reader, not from reviewing the design. Nothing since
@@ -2512,6 +2512,30 @@ be one: `<MenuContent />` is a routine making a MenuContent, which is `@builds`.
     what every unit test passed straight through. The transport is fetched
     when a server is started now, and failing to fetch it is the same silence
     as rust-analyzer not being installed.
+
+31. **The next step this document named was not worth building, and the
+    measurement said so before anybody did.** #reach's own "still out of
+    reach" section named a cross-file field-type lookup as the thing that
+    would raise the floor, on the strength of `self.inner.by_ref()` in
+    `anyhow` being the shape a reader could not type. Counted instead of
+    assumed: `no-fields` is **45 of ripgrep's 6,823** withheld receiver sites,
+    11 of anyhow's 203, 109 of httpx's 2,577. What withholds is `not-a-name`
+    -- 4,040 in ripgrep, an expression receiver no reader of text can type --
+    and `imported-type`, mostly a module receiver `calls.ts` places anyway.
+
+    The second half is worse for the proposal and more useful. `never reaches`
+    needs a **closed** region, and closure is conjunctive, so the histogram of
+    first doubts everyone had been reading says nothing about what a new
+    reader would buy. Counted by the whole doubt set: 420 of anyhow's 965
+    refusals are blocked by a `macro` among others, which no grammar parses;
+    0 of Python's sample are blocked by one kind of doubt at all; and
+    TypeScript's 84 receiver-only refusals are ones `tsc` already settles in
+    the product, invisible here only because the answer key *is* `tsc`.
+
+    So the only honest route to licensing that word is an independent referee
+    for a compiler-backed reader -- pyright read, mypy refereeing, Python
+    only. Worth keeping because the proposal was this document's own, written
+    two commits earlier, and it took one afternoon's counting to retire.
 
 ## Open, in the order worth doing
 
