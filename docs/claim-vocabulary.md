@@ -573,7 +573,7 @@ to pass every check this tool had.
 deliberate: almost all of it is `Vec<T>`, `Promise<T>`, `list[str]`, which
 nobody draws as two boxes.
 
-## Twenty-five times a measurement contradicted the design
+## Twenty-eight times a measurement contradicted the design
 
 Kept because the pattern is the point: eleven of the first thirteen came from
 building one word or one reader, not from reviewing the design. Nothing since
@@ -582,6 +582,12 @@ measurements had walked past because the population it lived in was reported
 apart and never scored. Item 25 is the other kind: an issue's premise, that a
 word needed a type checker, which measuring both designs over the same bodies
 turned out to be wrong about.
+
+Items 26 to 28 are all one measurement's first run. `measure:reach` was built
+to answer "how many steps can the engine follow", and before it answered that
+it found two false-confirmation generators in the channel that was already
+shipping and one cache that made an answer depend on which files had been read
+before it.
 
 1. **The substrate was empty.** #190's first draft proposed graphify as the
    fact supplier on the strength of 8,167 `contains` edges. `contains` there is
@@ -2399,6 +2405,65 @@ be one: `<MenuContent />` is a routine making a MenuContent, which is `@builds`.
     lookup read a call to a parameter — `isTest(file)` — as a call to the
     routine declaring it, because "go to definition" lands on the parameter;
     that counted a call nobody can see into as seen.
+
+26. **The body search was confirming arrows on a name that meant something
+    else, 60 times in Rust and 8 in Python.** `anyhow`'s `chain.rs` declares `fn len`
+    whose body writes `cause.source()`. An arrow from `context.rs#source` to
+    `chain.rs#len` came back **confirmed** — the body writes the word `source`,
+    and it is `StdError::source` on a trait object (#reach).
+
+    This is the failure ee3b29e already names and fixed in one place only.
+    Following a hop refuses `Type::foo` and `other.foo` because they are
+    somebody else's `foo`; the place the search *stops* counted every
+    identifier leaf, member halves included. Inside one file that is right —
+    there is no second thing the name could mean. Across files there is, and
+    every one of the 51 was that shape.
+
+    The fix is the same rule at the terminal match: for a target in another
+    file, a name written as somebody else's member is not evidence.
+    `self.foo` and `this.foo` still count, because a Rust `impl` block for the
+    routine's own type may be in the other file.
+
+    A second, smaller version of the same thing was found in the same run.
+    Flask writes a nested `def decorator` inside `app_template_filter`, so an
+    arrow from `app.py#decorator` to `blueprints.py#app_template_filter` was
+    confirmed on that body writing `decorator` — its own, declared eight lines
+    down. That is Python's half, fixed by dropping from the question any
+    name the searching file declares itself, which is `call-scan.ts`'s own
+    rule: a referee that cannot tell which of two same-named things is meant
+    has no business asking.
+
+27. **A cache keyed by node id made the same board give two different
+    answers.** `body.ts` held one node's token set in a `Map<number, ...>`,
+    and a node id is an address inside one tree. Evict that tree — 48 is the
+    parse cache limit — and the next one is handed the same addresses, so the
+    cache answers about the new file with the old file's tokens (#reach).
+
+    Not a slow cache: a wrong answer, and the worst shape of one. It depends
+    on how many *other* files were read in between, so whether an arrow is
+    confirmed is decided by what else happened to be on the board. It was
+    found because the cross-file walk parses more files than the one-file
+    search did, and one arrow in `measure:reach` moved with nothing about
+    that arrow changed. Held against the tree in a `WeakMap` now, so the
+    lifetimes agree by construction.
+
+28. **The confirming search had a wall, not a budget, and `@calls` was saying
+    "wrong" on the other side of it.** `body.ts` follows calls as deep as they
+    go inside one file, which reads as a depth limit and is not: `bodiesFor`
+    looks a callee up in the tree it already parsed, so a chain ends at the
+    first file boundary. Most real chains cross one. Of 545 pairs two
+    repositories' compilers say genuinely reach each other, the engine
+    confirmed 232; it confirms 452 now, and 321 of the 406 that are two or
+    more calls apart against 98 before (docs/reach-measurement.md) (#reach).
+
+    The expensive half is what `@calls` did with the rest. Its closed-body
+    absence (#233) is about the *direct* call and correct about it — and 58 of
+    those 545 reaching pairs came back `refuted` and one `backwards`, so 59
+    red accusations landed on arrows whose code really does reach. That is not
+    a reader bug; it is a true verdict about calling being read as a verdict
+    about the diagram. It is now an advisory that names the route
+    (`calls-one-level-up`), on the same reading `@accesses` already gives the
+    same shape: a board drawn one level too high is a board somebody can keep.
 
 ## Open, in the order worth doing
 

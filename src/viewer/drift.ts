@@ -70,6 +70,7 @@ const KNOWN_EDGE_KINDS = new Set([
   "accesses-absent",
   "accesses-not-read",
   "conforms-absent",
+  "calls-one-level-up",
 ]);
 
 /**
@@ -615,6 +616,7 @@ export function rowsOf(report: DriftView): StatusRow[] {
         + (finding.kind === "builds-backwards" ? " · built the other way" : "")
         + (finding.kind === "calls-backwards" ? " · called the other way" : "")
         + (finding.kind === "calls-refuted" ? " · never called" : "")
+        + (finding.kind === "calls-one-level-up" ? " · reached, not called" : "")
         + (finding.kind === "accesses-absent" ? " · no such member" : "")
         + (finding.kind === "accesses-not-read" ? " · never read here" : "")
         + (finding.kind === "conforms-absent" ? " · not a base" : "")

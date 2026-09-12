@@ -838,6 +838,14 @@ function rowsFor({ report, promoted = [] }, colour, all = false) {
        */
       const wrongCallsRefuted = finding.kind === "calls-refuted";
       /*
+       * And the answer that stops both of the two above from being wrong
+       * (#reach): the routine does not call the far end and does reach it
+       * through a chain. Amber, not red -- a board drawn one level too high
+       * is a board somebody can keep, and the detail names the route so the
+       * choice is theirs.
+       */
+      const reachedNotCalled = finding.kind === "calls-one-level-up";
+      /*
        * The sixth (#213), and the one that was missing here.
        *
        * It shipped into the board page and not into this file, so the browser
@@ -873,6 +881,7 @@ function rowsFor({ report, promoted = [] }, colour, all = false) {
         + (wrongBuilds ? " \u00b7 built the other way" : "")
         + (wrongCalls ? " \u00b7 called the other way" : "")
         + (wrongCallsRefuted ? " \u00b7 never called" : "")
+        + (reachedNotCalled ? " \u00b7 reached, not called" : "")
         // The same words the board page uses, so one board does not read as two
         // different findings depending on where somebody looked at it.
         + (wrongMembers ? " \u00b7 no such member" : "")

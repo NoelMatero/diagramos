@@ -513,7 +513,14 @@ export const LICENCES: readonly Licence[] = [
             "`calls-backwards` red on correct code. Fixed by asking `through` " +
             "before same-file, the order `placeOf` already used; found by a " +
             "real compiler rather than by review " +
-            "(docs/claim-vocabulary.md item 24).",
+            "(docs/claim-vocabulary.md item 24). **#reach re-measured this " +
+            "row**: a wildcard re-export is now followed to a unique " +
+            "declaration rather than refused, which is the same reader " +
+            "placing more names. `npm run measure:calls -- --no-checker` " +
+            "over the same six trees before and after: 0 accused, 0 " +
+            "invented and the same single miss either way, with recall up " +
+            "from 98.1% to 98.3% in ts and 87.6% to 88.3% in tsx as the " +
+            "`elsewhere` refusals went to zero.",
         },
         /*
          * The new axis (#231). `presence` above rests on finding a call
@@ -765,7 +772,11 @@ export const LICENCES: readonly Licence[] = [
             "reader confirms 25.3% of them -- `receiver` is nearly all of what it " +
             "withholds -- so the population grows from 574 to 1,955 and the " +
             "recall over it falls to 37.3%. A refusal is silence, not a red " +
-            "(docs/claim-vocabulary.md item 24).",
+            "(docs/claim-vocabulary.md item 24). **#reach re-measured this " +
+            "row too** -- see the TypeScript entry for what changed -- and " +
+            "Rust\'s figures did not move: 94.7% recall, 0 accused, 0 " +
+            "invented, the same before and after. A `use ..::*` is now " +
+            "followable in principle and this corpus has none that matter.",
         },
         absence: NO_CLOSED_BODY_RESOLVER,
       },
@@ -978,7 +989,11 @@ export const LICENCES: readonly Licence[] = [
             "`patch(..)`), so over bare calls pyright says are genuinely to the " +
             "target the recall is 99.9% (5,075 of 5,082). The same run scores " +
             "the 1,494 receiver calls this population left out: 876 real, 0 " +
-            "missed, 0 accused, 0 invented (docs/claim-vocabulary.md item 24).",
+            "missed, 0 accused, 0 invented (docs/claim-vocabulary.md item 24). " +
+            "**#reach re-measured this row too** -- see the TypeScript entry " +
+            "for what changed, since `from x import *` is now followable the " +
+            "same way -- and Python\'s figures did not move: 92.9% recall, 0 " +
+            "accused, 0 invented, the same before and after.",
         },
         /*
          * The new axis (#231), Python's version. #235 measured whether

@@ -322,6 +322,24 @@ export interface Bindings {
    * following through it stops rather than concluding.
    */
   wildcard: boolean;
+  /**
+   * The specifiers those wildcards name -- `"./general"` in `export * from
+   * "./general"`.
+   *
+   * The names a wildcard brings in cannot be listed. The *places* it brings
+   * them from can, and they are written down right there. Recording them is
+   * what makes a barrel file followable: `@vue/shared` resolves to
+   * `packages/shared/src/index.ts`, which declares nothing and re-exports
+   * seven modules, so `toRawType` used to come back `elsewhere` and every
+   * cross-package chain in that repository died at the barrel -- 20 of one
+   * corpus's arrows, and the commonest single reason the walk in `reach.ts`
+   * could not follow a real path.
+   *
+   * Followed only to a **unique** answer. A name two of the wildcard's
+   * targets declare, or a target that could not be read, is a doubt exactly
+   * as it was before; see `throughWildcards`.
+   */
+  reExported: string[];
 }
 
 /** The separators a module path is written with, in the four grammars. */
@@ -394,7 +412,13 @@ function bindTypeScript(root: Node, into: Bindings): void {
         }
         continue;
       }
-      if (part.type === "*") { into.wildcard = true; continue; }
+      if (part.type === "*") {
+        into.wildcard = true;
+        // `export * from "./y"`. An `import *` is a `namespace_import` below
+        // and binds a name, so this branch is only ever the re-export.
+        if (!isImport) into.reExported.push(specifier);
+        continue;
+      }
       if (part.type !== "import_clause") continue;
       for (const clause of children(part)) {
         if (clause.type === "identifier") {
@@ -445,6 +469,7 @@ function bindPython(root: Node, into: Bindings): void {
           }
         } else if (part.type === "wildcard_import") {
           into.wildcard = true;
+          into.reExported.push(module);
         }
       }
       return;
@@ -496,11 +521,16 @@ function bindRust(root: Node, into: Bindings): void {
         bind(into, alias.text, { specifier: full, namespace: false });
         return;
       }
-      case "use_wildcard":
-        // Binds names nothing can enumerate, so nothing is recorded and the
-        // flag stops a follow rather than letting it conclude.
+      case "use_wildcard": {
+        // The names are not enumerable; the module they come from is, and it
+        // is written right here. See `Bindings.reExported`.
         into.wildcard = true;
+        const path = node.childForFieldName("path") ?? node.child(0);
+        const under = path && path.type !== "*" ? path.text : "";
+        const full = prefix && under ? `${prefix}::${under}` : prefix || under;
+        if (full) into.reExported.push(full);
         return;
+      }
       case "scoped_identifier":
       case "identifier":
       case "crate":
@@ -620,7 +650,7 @@ function readBindings(source: string, language: Language): Bindings | undefined 
   if (!tree) return undefined;
   const bindings: Bindings = {
     imported: new Map(), local: new Set(), ambiguous: new Set(),
-    forwarded: new Map(), wildcard: false,
+    forwarded: new Map(), wildcard: false, reExported: [],
   };
   declaredNames(tree.rootNode, bindings.local);
   if (language === "python") bindPython(tree.rootNode, bindings);
@@ -846,9 +876,10 @@ function arrivesAt(
   side: CallSide,
   target: string,
   seen: Set<string>,
+  depth = 0,
 ): "yes" | "no" | "maybe" {
   if (file === target) return "yes";
-  if (seen.has(file) || seen.size >= FOLLOW_LIMIT) return "maybe";
+  if (seen.has(file) || depth >= FOLLOW_LIMIT) return "maybe";
   seen.add(file);
 
   const opened = side.open?.(file);
@@ -862,6 +893,20 @@ function arrivesAt(
     // Declared right here, and here is not the far end. The one place a
     // forwarding search gets to say no.
     if (bindings.local.has(name) && !bindings.wildcard) return "no";
+    /*
+     * A barrel. `comesToRest` follows these to a unique answer and this only
+     * ever looks for a **yes**: a wildcard whose targets do not lead to the
+     * far end is not evidence that nothing does, because one of them may be
+     * a package this reader cannot open. So the gain here is confirmations
+     * (`@vue/shared` re-exporting `toRawType`, 20 arrows in one corpus that
+     * came back `elsewhere`) and never a new way to say no.
+     */
+    for (const specifier of bindings.reExported) {
+      const { files } = filesFor(specifier, opened.imports);
+      for (const next of files) {
+        if (arrivesAt(name, next, side, target, new Set(seen), depth + 1) === "yes") return "yes";
+      }
+    }
     return "maybe";
   }
 
@@ -870,7 +915,7 @@ function arrivesAt(
   if (files.size === 0) return "maybe";
   let maybe = false;
   for (const next of files) {
-    const answer = arrivesAt(name, next, side, target, seen);
+    const answer = arrivesAt(name, next, side, target, seen, depth + 1);
     if (answer === "yes") return "yes";
     if (answer === "maybe") maybe = true;
   }
@@ -1218,8 +1263,9 @@ function comesToRest(
   file: string,
   side: CallSide,
   seen: Set<string>,
+  depth = 0,
 ): string | undefined {
-  if (seen.has(file) || seen.size >= FOLLOW_LIMIT) return undefined;
+  if (seen.has(file) || depth >= FOLLOW_LIMIT) return undefined;
   seen.add(file);
 
   const opened = side.open?.(file);
@@ -1236,15 +1282,103 @@ function comesToRest(
   if (bindings.local.has(name)) return file;
 
   const onward = bindings.imported.get(name) ?? bindings.forwarded.get(name);
-  if (!onward) return bindings.wildcard ? undefined : file;
+  if (!onward) {
+    if (bindings.reExported.length > 0) {
+      return throughWildcards(name, bindings, opened.imports, side, seen, depth);
+    }
+    return bindings.wildcard ? undefined : file;
+  }
 
   const { files } = filesFor(onward.specifier, opened.imports);
   if (files.size === 0) return undefined;
   for (const next of files) {
-    const rest = comesToRest(name, next, side, seen);
+    const rest = comesToRest(name, next, side, seen, depth + 1);
     if (rest) return rest;
   }
   return undefined;
+}
+
+/**
+ * `comesToRest` with its one permissive step taken out.
+ *
+ * That step -- a file that does not declare the name and forwards nothing
+ * still counting as the resting place -- is right for a specifier somebody
+ * wrote down, and wrong for a wildcard's targets. A barrel re-exporting seven
+ * modules would have every one of them answer with itself, so the uniqueness
+ * rule below would see seven different answers and always refuse. Here a file
+ * answers only if it actually declares the name or forwards it onward.
+ */
+function declaresOrForwards(
+  name: string,
+  file: string,
+  side: CallSide,
+  seen: Set<string>,
+  depth: number,
+): string | undefined {
+  if (seen.has(file) || depth >= FOLLOW_LIMIT) return undefined;
+  seen.add(file);
+  const opened = side.open?.(file);
+  if (!opened) return undefined;
+  const bindings = bindingsIn(opened.source, opened.language);
+  if (!bindings) return undefined;
+  if (bindings.ambiguous.has(name)) return undefined;
+  if (bindings.local.has(name)) return file;
+  const onward = bindings.imported.get(name) ?? bindings.forwarded.get(name);
+  if (onward) {
+    const { files } = filesFor(onward.specifier, opened.imports);
+    for (const next of files) {
+      const rest = declaresOrForwards(name, next, side, new Set(seen), depth + 1);
+      if (rest) return rest;
+    }
+    return undefined;
+  }
+  if (bindings.reExported.length > 0) {
+    return throughWildcards(name, bindings, opened.imports, side, seen, depth);
+  }
+  return undefined;
+}
+
+/**
+ * Where a wildcard re-export puts a name, when exactly one of its targets has
+ * it.
+ *
+ * The whole value of this is in the word *exactly*. A barrel's job is to
+ * present several modules as one, and the name being asked after is declared
+ * in one of them -- so the answer is there in the text, and refusing to look
+ * was a doubt about something written down. What is not written down is which
+ * one, so:
+ *
+ *   - every target must resolve to a file this reader can open. One that does
+ *     not could be the one declaring the name, and the answer is a doubt.
+ *   - the name must come to rest in one place. Two targets declaring it is a
+ *     collision the text does not settle, and a doubt is the honest answer --
+ *     the same rule `ambiguous` already applies one level up.
+ *
+ * Each target is followed with a fresh `seen`, because these are siblings
+ * rather than a chain: one barrel re-exporting seven modules is one hop, and
+ * sharing a visited set between them made the seventh look like a
+ * seven-deep chain and run out of budget.
+ */
+function throughWildcards(
+  name: string,
+  bindings: Bindings,
+  imports: CallSide["imports"],
+  side: CallSide,
+  seen: Set<string>,
+  depth: number,
+): string | undefined {
+  let answer: string | undefined;
+  for (const specifier of bindings.reExported) {
+    const { files } = filesFor(specifier, imports);
+    if (files.size === 0) return undefined;
+    for (const next of files) {
+      const rest = declaresOrForwards(name, next, side, new Set(seen), depth + 1);
+      if (!rest) continue;
+      if (answer !== undefined && answer !== rest) return undefined;
+      answer = rest;
+    }
+  }
+  return answer;
 }
 
 /** Where one call site's callee lives, when it can be placed at all. */
