@@ -81,10 +81,26 @@
 import { spawn, type ChildProcessWithoutNullStreams } from "node:child_process";
 import path from "node:path";
 import { fileURLToPath, pathToFileURL } from "node:url";
-import {
-  StreamMessageReader, StreamMessageWriter, createMessageConnection,
-  type MessageConnection,
-} from "vscode-jsonrpc/node";
+import type { MessageConnection } from "vscode-jsonrpc/node";
+
+/**
+ * The transport, fetched when a server is actually started.
+ *
+ * `vscode-jsonrpc` is a **devDependency**, so it is not there in a published
+ * install -- and a static import puts it in `out/cli/drift.mjs`, which is
+ * shipped. It did: wiring rust-analyzer into the live check made
+ * `diagramos drift --help` exit 1 with `Cannot find module
+ * 'vscode-jsonrpc/node'`, because the bundler keeps a dependency external and
+ * npm had never installed that one. Caught by `packaged-server.test.ts`,
+ * which spawns the built bin.
+ *
+ * Loaded here instead, at the one moment it is needed, and a failure to load
+ * is the same silence as rust-analyzer not being installed -- which is
+ * #237's settled answer and what every caller already handles.
+ */
+async function transport(): Promise<typeof import("vscode-jsonrpc/node")> {
+  return import("vscode-jsonrpc/node");
+}
 
 /**
  * Whether a declaration rust-analyzer named is outside the tree being measured.
@@ -500,6 +516,7 @@ export async function createRustAnalyzerReferee(root: string): Promise<RustLspRe
   await spawned;
 
   let closed = false;
+  const { StreamMessageReader, StreamMessageWriter, createMessageConnection } = await transport();
   const connection: MessageConnection = createMessageConnection(
     new StreamMessageReader(child.stdout),
     new StreamMessageWriter(child.stdin),
@@ -534,7 +551,20 @@ export async function createRustAnalyzerReferee(root: string): Promise<RustLspRe
   const whenPrimed = (): Promise<void> => new Promise((resolve) => {
     if (primed || closed) return resolve();
     primeWaiters.push(resolve);
-    setTimeout(resolve, PRIME_TIMEOUT_MS);
+    /*
+     * `unref`, or this timer holds the event loop open for its full minute
+     * after everything else has finished.
+     *
+     * It cost a minute per run and read as work rather than as a wait:
+     * `check-drift.mjs` on a Rust board took 61 seconds, of which the
+     * language server spent 3 and the walk 66 milliseconds. The rest was Node
+     * declining to exit while a 60-second timer nobody was waiting on any
+     * more sat in the queue. Only visible once something called `warmUp` from
+     * a process that then tried to end on its own -- every earlier caller was
+     * a measurement script ending in an explicit `process.exit`, which walks
+     * straight past a pending timer.
+     */
+    setTimeout(resolve, PRIME_TIMEOUT_MS).unref();
   });
 
   let serverVersion = "unknown";
@@ -596,8 +626,11 @@ export async function createRustAnalyzerReferee(root: string): Promise<RustLspRe
       let result: DefinitionResult;
       try {
         const request = connection.sendRequest(`textDocument/${method}`, params);
+        // `unref` for `whenPrimed`'s reason: a request that answered leaves
+        // its timeout pending, and thirty seconds of those keep a process
+        // that is otherwise done from ending.
         const timeout = new Promise<never>((_, reject) => setTimeout(
-          () => reject(new Error(`textDocument/${method} timed out`)), REQUEST_TIMEOUT_MS));
+          () => reject(new Error(`textDocument/${method} timed out`)), REQUEST_TIMEOUT_MS).unref());
         result = (await Promise.race([request, timeout])) as DefinitionResult;
       } catch (error) {
         // Only a not-ready signal is worth asking again; anything else is a

@@ -573,7 +573,7 @@ to pass every check this tool had.
 deliberate: almost all of it is `Vec<T>`, `Promise<T>`, `list[str]`, which
 nobody draws as two boxes.
 
-## Twenty-eight times a measurement contradicted the design
+## Thirty times a measurement contradicted the design
 
 Kept because the pattern is the point: eleven of the first thirteen came from
 building one word or one reader, not from reviewing the design. Nothing since
@@ -2464,6 +2464,54 @@ be one: `<MenuContent />` is a routine making a MenuContent, which is `@builds`.
     about the diagram. It is now an advisory that names the route
     (`calls-one-level-up`), on the same reading `@accesses` already gives the
     same shape: a board drawn one level too high is a board somebody can keep.
+
+29. **One import specifier can resolve to two files, and the wrong one was
+    winning on a tie-break.** Rust records `crate::codec::encode` against both
+    the file declaring `mod codec` and `codec.rs` itself. `comesToRest` ends
+    with a permissive step -- a file that neither declares the name nor
+    forwards it is still counted as the resting place -- which is right for a
+    specifier somebody wrote down and wrong as a way of choosing between
+    candidates. Taken in declared order `main.rs` won, and `encode` was placed
+    in a file that declares no `encode` at all (#reach).
+
+    Invisible while nothing walked past the first hop: `@calls` compares the
+    placement against one named far end, and a wrong file simply fails to
+    match, which reads as silence. The cross-file walk steps *into* the file it
+    was given, finds nothing of that name there and stops -- so a three-file
+    Rust crate's `main -> encode` could not be confirmed by any route.
+    Candidates are now asked the strict question first (does this file declare
+    the name, or forward it somewhere that does) and the permissive answer is
+    the fallback. A single candidate, which is every TypeScript and Python
+    import in the corpus, is unaffected either way.
+
+30. **A minute of a Rust board's check was a timer nobody was waiting on.**
+    Wiring rust-analyzer into the live check took `rust-test` from 1.3
+    seconds to 61, which read as the price of a language server and was not
+    (#reach). Instrumented: three seconds of server, 66 milliseconds of
+    walking, 11 bodies read -- and 57 seconds of a process declining to end.
+
+    Both language-server clients register `setTimeout` guards and never clear
+    them. A request that answered leaves its 30-second timeout in the queue;
+    `whenPrimed` leaves a 60-second one. Node will not exit while either is
+    pending. Invisible until now because every previous caller was a
+    measurement script ending in an explicit `process.exit`, which walks past
+    a pending timer; `check-drift.mjs` ends on its own. `unref` on both, and
+    the board went to 4.5 seconds.
+
+    Worth keeping for the shape of it: the number looked exactly like the cost
+    of the thing just added, and the thing just added was responsible for
+    three seconds of it. A timing that matches your expectation is not
+    evidence of what you think caused it.
+
+    A second thing the same wiring broke, and the built bin is what found it:
+    `vscode-jsonrpc` is a **devDependency**, so a static import of the Rust
+    client put it in `out/cli/drift.mjs`, which is shipped, and
+    `diagramos drift --help` exited 1 with `Cannot find module
+    'vscode-jsonrpc/node'` on a tree where npm had never installed it.
+    `packaged-server.test.ts` spawns that bin, which is why the suite caught
+    what every unit test passed straight through. The transport is fetched
+    when a server is started now, and failing to fetch it is the same silence
+    as rust-analyzer not being installed.
 
 ## Open, in the order worth doing
 

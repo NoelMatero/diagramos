@@ -71,7 +71,7 @@ npm run measure:reach          # 6 trees, seeds=400, ~40 minutes (the language s
 |---|---:|---:|---:|---:|---:|
 | typescript | 545 | 232 (42.6%) | **452 (82.9%)** | 98 / 406 | **321 / 406** |
 | python | 457 | 350 (76.6%) | **346 (75.7%)** | 38 / 145 | **84 / 145** |
-| rust | 983 | 423 (43.0%) | **288 (29.3%)** | 135 / 695 | 88 / 695 |
+| rust | 983 | 423 (43.0%) | 305 (31.0%) | 135 / 695 | 98 / 695 |
 
 "multi-step" is every pair two or more calls apart, which is the population
 this was built for. Per depth, written `before → after` out of the asks at
@@ -79,12 +79,12 @@ that depth:
 
 | steps | typescript | python | rust |
 |---|---|---|---|
-| 1 | 134 → 131 (of 139) | 312 → 262 (of 312) | 288 → 200 (of 288) |
-| 2 | 45 → **99** (of 115) | 29 → **56** (of 78) | 75 → 53 (of 156) |
-| 3 | 33 → **81** (of 95) | 7 → **19** (of 37) | 26 → 24 (of 105) |
-| 4 | 13 → **60** (of 69) | 2 → **8** (of 21) | 10 → 7 (of 96) |
+| 1 | 134 → 131 (of 139) | 312 → 262 (of 312) | 288 → 207 (of 288) |
+| 2 | 45 → **99** (of 115) | 29 → **56** (of 78) | 75 → 60 (of 156) |
+| 3 | 33 → **81** (of 95) | 7 → **19** (of 37) | 26 → 25 (of 105) |
+| 4 | 13 → **60** (of 69) | 2 → **8** (of 21) | 10 → 8 (of 96) |
 | 5 | 5 → **43** (of 55) | 0 → **1** (of 8) | 4 → 1 (of 116) |
-| 6 | 2 → **38** (of 72) | 0 → 0 (of 1) | 20 → 3 (of 222) |
+| 6 | 2 → **38** (of 72) | 0 → 0 (of 1) | 20 → 4 (of 222) |
 
 **Arrows that go green and should not.** This is the number Rust's row above
 is the price of.
@@ -95,7 +95,7 @@ is the price of.
 | python | 8 of 792 | **1 of 792** |
 | rust | 60 of 1,572 | **9 of 1,572** |
 
-As precision: Rust 87.6% → **97.0%**, Python 97.8% → **99.7%**, TypeScript
+As precision: Rust 87.6% → **97.1%**, Python 97.8% → **99.7%**, TypeScript
 100% either way.
 
 **Arrows called wrong.** The engine has never had a "never reaches" verdict
@@ -117,9 +117,10 @@ not reach are untouched.
 
 ## What it costs
 
-**Rust confirms 135 fewer arrows than it used to. 51 of those 135 were
-wrong, and 84 were correct arrows that lost their green.** That is one trade,
-not two numbers: the rule that stops
+**Rust confirms 118 fewer arrows than it used to. 51 of those were wrong, and
+67 were correct arrows that lost their green** -- and on a project whose
+`Cargo.toml` rust-analyzer will load, the compiler channel below gets those
+back. That is one trade, not two numbers: the rule that stops
 `chain.rs#len` being read as reaching `context.rs#source` because its body
 writes `cause.source()` also stops every *correct* method call being read that
 way, and at tier 1 -- no compiler at check time -- the two are the same shape
@@ -133,29 +134,101 @@ exit 0` is a diagram that *looked* checked.
 
 **One rule, reversible.** `ownTokensOf` in `src/engine/body.ts`, and the one
 line in `checkSymbolEdge` that asks for it when the two ends are in different
-files. Anybody who would rather have Rust's 135 greens back, and its 51 wrong
+files. Anybody who would rather have Rust's 118 greens back, and its 51 wrong
 ones with them, changes that argument to `false`.
 
-**Time: 0.4 ms an arrow.** Measured over 715 asks on `vuejs-core`, 4,874
-routines, warm -- `measure:reach` prints it. 0.3 seconds for all 715.
+**Time: under a millisecond an arrow, with no compiler.** `measure:reach`
+prints it per language: 0.7 ms on TypeScript over 929 asks, 0.3 ms on Rust
+over 2,555, 0.1 ms on Python over 1,249.
 
 The walk is asked in two places and nowhere else: where the one-file search
 failed to confirm a symbol-anchored arrow, and where `@calls` is about to
 accuse. Never on an arrow that already passed. Bodies are read at most once
 per file per check (`ReachCache`).
 
-`npm run check:drift` on this repository's fourteen boards: 1.57s before,
-1.62s after, and byte-identical output -- none of those boards has an arrow
-that needed the walk, which is the other half of the cost answer. It costs
-nothing where it is not needed.
+`npm run check:drift` on this repository's fourteen boards: 1.64s before,
+1.52s after, byte-identical output. None of those boards has an arrow that
+needed the walk, which is the other half of the cost answer: it costs nothing
+where it is not needed. The compiler channel's own costs are in the table
+above.
+
+## The compiler channel, and why it is not in the numbers above
+
+Every figure on this page is the reader **without a compiler**. That is not
+how the product runs and it is not an accident.
+
+`check:drift` has built a real `ts.Program` since #233 and spawned real
+pyright since #243. #reach adds three things to that:
+
+- **rust-analyzer is wired into the live check at all.** It existed only in
+  the measurement scripts, so a Rust board got no receiver resolved at check
+  time.
+- **"Go to definition" is asked.** The engine's hook for it (`declarationAt`)
+  was built for `@accesses` at #255 and answered for TypeScript only. It is
+  now answered for all three, and the walk asks it about every call the reader
+  could not place. It is the better question: `Orangutan::new(addr)` is a
+  *type* at the receiver position, so "what type is the receiver" has nothing
+  to say about it, while "where is `new` declared" lands on the `impl`.
+- **The recording pass repeats.** One pass was enough while the only caller
+  read one file's bodies. A cross-file walk reaches a second file only by
+  placing a call in the first, so a single pass harvests the first hop of
+  every chain and never learns there was a second. It now runs up to three
+  rounds, stopping when a round asks nothing new.
+
+**Why none of it is in the table.** The answer key for TypeScript is `tsc`. A
+reader that asks `tsc` and is marked by `tsc` cannot be caught being wrong --
+it would score 100% and the 60 false passes on Rust would have been invisible.
+Same for rust-analyzer. So the measured number is the floor, and the product
+does better than it on any project whose compiler will load.
+
+**What that is worth, on real boards.** `rust-test/boot-and-routing.excalidraw`
+has 17 arrows over a small Rust crate. Two of them are path calls --
+`fn main → Orangutan::new`, `Orangutan::run → Route::new` -- and they are
+exactly what the safety rule above costs: without a compiler they go from
+green to "not verified". With rust-analyzer answering, both come back, and the
+board reports the same four unverified arrows it did before any of this work.
+Not by a name coincidence this time.
+
+A three-file Rust crate drawn `main → encode`, two calls apart through
+`Server::run`: not confirmed before, confirmed now. A Flask board drawn
+`make_response → dumps` and `get_command → _get_current_object`: one confirmed
+before, both now.
+
+**What it costs, on those same boards.**
+
+| | before | after |
+|---|---:|---:|
+| this repository, 14 TypeScript boards | 1.64s | 1.52s |
+| a 3-file Rust crate, 1 arrow | 1.2s | 0.9s |
+| `rust-test`, 17 arrows over a Rust crate | 1.3s | 4.5s |
+| a Flask board, 4 boxes and 2 arrows | 1.6s | 7.2s |
+
+TypeScript pays nothing: `tsc` was already being built for every run.
+Python and Rust pay a few seconds *on a board that has something unsettled*,
+and nothing at all on one whose arrows all confirm -- a tier-1 pass, which
+starts no server, decides which.
+
+Two caveats worth knowing, because both are invisible otherwise.
+**rust-analyzer answers nothing about a file no `Cargo.toml` claims** -- that
+fixture had no manifest over `src/` until one was added for this check, and
+every query in it came back unclaimed and silent. And the Rust figure was
+**61 seconds** until the language-server clients' timers were `unref`ed: a
+request that answered left its 30-second timeout pending, and `whenPrimed`
+left a 60-second one, so Node declined to exit long after the work was done.
+Three seconds of server, 66 milliseconds of walking, and 57 seconds of
+waiting for a timer nobody needed. Only visible because this is the first
+caller that warms a server and then lets the process end on its own; every
+earlier one was a measurement script finishing in an explicit `process.exit`.
 
 ## What is still out of reach
 
-**A receiver nothing typed**, which is most of it. Of the refusals on pairs
-that do reach: 476 of Rust's 695, 69 of Python's 111, 50 of TypeScript's 93.
-Of the refusals on pairs that do not: 988 of Rust's 1,552, 467 of Python's
-779, 204 of TypeScript's 360. `self.inner.by_ref()` in `anyhow` is the
-shape --
+**A receiver nothing typed** -- most of what is left, *with no compiler
+running*. Of the refusals on pairs that do reach: 476 of Rust's 695, 69 of
+Python's 111, 50 of TypeScript's 93. Of the refusals on pairs that do not: 988
+of Rust's 1,552, 467 of Python's 779, 204 of TypeScript's 360. This is the
+population the compiler channel above exists for, and the reason the measured
+number is a floor rather than an estimate. `self.inner.by_ref()` in `anyhow`
+is the shape --
 `inner`'s type is declared on a struct in *another file*, and `resolution.ts`
 reads one file. A cross-file field-type lookup is the named next step and this
 is the number that would justify it.

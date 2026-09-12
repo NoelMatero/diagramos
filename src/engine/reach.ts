@@ -71,16 +71,22 @@
  * So the reader is built, measured, and wired nowhere -- the same posture
  * `resolution.ts` held from #227 until this file consulted it. What would
  * change the answer is a bigger answered sample, and what stands in the way of
- * one is named in the numbers: 204 of TypeScript's 360 refusals and 881 of
- * Rust's 1,385 are a receiver nothing typed. A real checker wired into
- * `resolveReceiver` is the thing that closes those, and `check-drift.mjs`
- * already builds one for TypeScript -- which is exactly why the measurement
- * above does not use it. A reader that follows `tsc`'s answers, judged against
- * a referee that is `tsc`, cannot be caught being wrong.
+ * one is named in the numbers: 204 of TypeScript's 360 refusals and 988 of
+ * Rust's 1,552 are a receiver nothing typed.
+ *
+ * A real checker is what closes those, and `check-drift.mjs` now supplies one
+ * for all three languages -- which is exactly why the measurement above does
+ * not use it. A reader that follows `tsc`'s answers, judged against a referee
+ * that is `tsc`, cannot be caught being wrong. Even so, a checker's answer
+ * only ever *follows* a hop here: `declarationAt` can name a trait method or
+ * an interface method whose implementation is elsewhere, so a site it places
+ * stays open for the closure. `"outside"` is the single exception, and it is
+ * the same fact `EXTERNAL_RECEIVER` already carried.
  */
 import {
   EXTERNAL_RECEIVER, callSitesIn,
-  type CallSide, type CallSitesReading, type ReceiverResolution, type SiteUnresolved,
+  type BodyCallSites, type CallSide, type CallSitesReading,
+  type ReceiverResolution, type SiteUnresolved,
 } from "./calls";
 import type { Language } from "./parse";
 import { resolveReceiversIn } from "./resolution";
@@ -142,11 +148,24 @@ export type ReachVerdict =
  * slower.
  */
 export interface ReachCache {
+  /**
+   * One routine's placed sites, keyed by file **and** routine.
+   *
+   * Keyed by both because `callSitesIn` is asked to place only the routine
+   * being read: every other body in that file comes back listed and
+   * unplaced, which is the right reading for the walk and the wrong one for
+   * any other routine in the same file. A cache keyed by file alone would
+   * hand the second routine the first one's reading, and an empty `sites`
+   * reads as a body that calls nothing.
+   */
   bodies: Map<string, CallSitesReading>;
+  /** Every routine a file declares, listed and not placed. Keyed by file. */
+  listed: Map<string, CallSitesReading>;
   receivers: Map<string, ReceiverLookup>;
 }
 
-export const newReachCache = (): ReachCache => ({ bodies: new Map(), receivers: new Map() });
+export const newReachCache = (): ReachCache =>
+  ({ bodies: new Map(), listed: new Map(), receivers: new Map() });
 
 /** What a receiver expression's type is, asked by the expression's byte range. */
 type ReceiverLookup = (at: { start: number; end: number }) => ReceiverResolution | undefined;
@@ -206,6 +225,30 @@ function blocking(site: { receiver: boolean; concrete?: boolean }): boolean {
   return site.receiver && site.concrete !== true;
 }
 
+/**
+ * "Go to definition" at a call's own name -- where the function called there
+ * is declared, repo-relative with a 1-based line, `"outside"` when that is
+ * not in this repository, `undefined` when nothing answered.
+ *
+ * The same question `@accesses` already asks (`ClosedBodyReferee` in
+ * `drift.ts`), asked here for the hops `calls.ts` cannot place by itself.
+ * It is a strictly better question than "what type is the receiver": it
+ * answers `x.foo()`, `make().run()` and a bare name nothing in the file
+ * binds, all in one step and without a name search afterwards.
+ *
+ * Only ever used to **follow** a hop, never to close a region. A definition
+ * can name an interface method or a trait method whose implementation lives
+ * somewhere else, which is item 14's caveat (docs/claim-vocabulary.md) and
+ * the reason the refutation side treats these sites as open exactly as it
+ * did before. `"outside"` is the exception and is allowed to settle a site:
+ * a call the compiler places outside the repository is provably not a repo
+ * routine, which is the same thing `EXTERNAL_RECEIVER` means.
+ */
+export type DeclarationAt = (
+  file: string,
+  at: { start: number; end: number },
+) => { file: string; line: number } | "outside" | undefined;
+
 export interface ReachOptions {
   /**
    * Routine bodies one question may read.
@@ -219,6 +262,8 @@ export interface ReachOptions {
   /** Call steps one question may follow. */
   depth?: number;
   cache?: ReachCache;
+  /** A real checker's "go to definition", when the caller has one. */
+  declarationAt?: DeclarationAt;
 }
 
 const DEFAULT_BUDGET = 400;
@@ -292,13 +337,34 @@ export function reachBetween(
     };
   };
 
-  const readingOf = (file: string): CallSitesReading | undefined => {
-    const hit = cache.bodies.get(file);
+  /** One routine's sites, placed. Every other body in the file is listed only. */
+  const placedIn = (file: string, routine: string): CallSitesReading | undefined => {
+    const key = `${file}\u0000${routine}`;
+    const hit = cache.bodies.get(key);
     if (hit) return hit;
     const side = sideOf(file);
     if (!side) return undefined;
-    const reading = callSitesIn(side);
-    cache.bodies.set(file, reading);
+    const reading = callSitesIn(side, routine);
+    cache.bodies.set(key, reading);
+    return reading;
+  };
+
+  /**
+   * Every routine a file declares, with no site placed.
+   *
+   * Two questions need this and neither reads a site: which routine holds the
+   * line a definition points at, and whether a file declares a name at all.
+   * Asked with a routine name nothing can match, so every body is listed and
+   * nothing reaches a checker.
+   */
+  const NOTHING_IS_CALLED_THIS = "\u0000none";
+  const listedIn = (file: string): CallSitesReading | undefined => {
+    const hit = cache.listed.get(file);
+    if (hit) return hit;
+    const side = sideOf(file);
+    if (!side) return undefined;
+    const reading = callSitesIn(side, NOTHING_IS_CALLED_THIS);
+    cache.listed.set(file, reading);
     return reading;
   };
 
@@ -337,6 +403,38 @@ export function reachBetween(
     return { via, hops };
   };
 
+  /**
+   * Where a checker says an unplaced call lands, as a routine this walk can
+   * step to.
+   *
+   * A definition is a file and a line; a hop is a file and a *routine*. The
+   * bridge is the reading this walk already has of that file: the routine
+   * whose declaration opens on that line, and failing that the innermost one
+   * whose body spans it -- a definition pointing a line off (an overload
+   * signature, a decorator above the `def`) is common enough to be worth the
+   * second try, and the innermost is the only one of the candidates that is
+   * not merely an enclosing scope.
+   */
+  const asked = (
+    file: string,
+    site: { why?: SiteUnresolved; nameAt?: { start: number; end: number } },
+  ): { file: string; routine: string } | "outside" | undefined => {
+    if (!options.declarationAt || !site.nameAt) return undefined;
+    const found = options.declarationAt(file, site.nameAt);
+    if (!found) return undefined;
+    if (found === "outside") return "outside";
+    const reading = listedIn(found.file);
+    if (!reading?.read) return undefined;
+    const exact = reading.bodies.find((body) => body.line === found.line);
+    if (exact) return { file: found.file, routine: exact.routine };
+    let spanning: BodyCallSites | undefined;
+    for (const body of reading.bodies) {
+      if (found.line < body.line || found.line >= body.line + body.lines) continue;
+      if (!spanning || body.line > spanning.line) spanning = body;
+    }
+    return spanning ? { file: found.file, routine: spanning.routine } : undefined;
+  };
+
   for (let depth = 0; depth < maxDepth && frontier.length > 0; depth += 1) {
     const next: Array<{ file: string; routine: string }> = [];
     for (const { file, routine } of frontier) {
@@ -351,7 +449,7 @@ export function reachBetween(
        * head's file to trip over.
        */
       const isHead = keyOf(file, routine) === start;
-      const reading = readingOf(file);
+      const reading = placedIn(file, routine);
       if (!reading || !reading.read) {
         if (isHead) return { verdict: "withheld", why: "unreadable" };
         unreadableHop = true;
@@ -395,7 +493,32 @@ export function reachBetween(
         const unplacedMethods: Array<{ name: string; line: number }> = [];
         for (const site of body.sites) {
           sites += 1;
-          if (site.file === undefined) { doubt ??= site.why; continue; }
+          if (site.file === undefined) {
+            /*
+             * The reader could not place it. A checker often can, and at a
+             * position rather than by a name search -- so this is asked here
+             * and nowhere earlier: `calls.ts` places what the text settles,
+             * and only what the text leaves open reaches a compiler.
+             */
+            const landed = asked(file, site);
+            if (landed === "outside") continue;
+            if (!landed) { doubt ??= site.why; continue; }
+            doubt ??= site.why; // followed, and still a doubt for the closure.
+            if (landed.file === to.file && wanted.has(landed.routine)) {
+              const key = keyOf(landed.file, landed.routine);
+              at.set(key, landed);
+              came.set(key, { previous: keyOf(file, routine), line: site.line });
+              return { verdict: "reached", ...routeTo(key) };
+            }
+            const onward = keyOf(landed.file, landed.routine);
+            if (seen.has(onward)) continue;
+            if (seen.size >= budget) { overBudget = true; continue; }
+            seen.add(onward);
+            at.set(onward, landed);
+            came.set(onward, { previous: keyOf(file, routine), line: site.line });
+            next.push(landed);
+            continue;
+          }
           /*
            * Item 14's guard, widened by one shape: the file an interface, an
            * abstract class or a *type read out of the text* is declared in is
@@ -425,7 +548,7 @@ export function reachBetween(
          * unplaced method calls. See the comment above the first. */
         for (const site of body.sites) {
           if (site.file !== undefined && site.file !== EXTERNAL_RECEIVER) {
-            const declares = readingOf(site.file);
+            const declares = listedIn(site.file);
             if (declares?.read && !declares.bodies.some((one) => one.routine === site.name)) {
               if (!typeFiles.includes(site.file)) typeFiles.push(site.file);
             }
@@ -436,7 +559,7 @@ export function reachBetween(
         }
         for (const method of unplacedMethods) {
           for (const typeFile of typeFiles) {
-            const declares = readingOf(typeFile);
+            const declares = listedIn(typeFile);
             if (!declares?.read) continue;
             if (!declares.bodies.some((one) => one.routine === method.name)) continue;
             const landing = { file: typeFile, routine: method.name };

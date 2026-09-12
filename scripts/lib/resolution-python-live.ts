@@ -23,6 +23,7 @@
 import { readFileSync } from "node:fs";
 import path from "node:path";
 
+import { refereePool, type RefereePool } from "./resolution-definitions";
 import {
   createPyrightLspReferee, isOutsideTree,
   type PyrightLspReferee,
@@ -115,6 +116,14 @@ export interface PythonClosedBodyCache {
 export async function resolvePythonReceivers(
   root: string,
   queries: readonly PythonReceiverQuery[],
+  /**
+   * The tree's pyright, shared with whatever else is asking this run (#reach).
+   *
+   * Optional, and every existing caller leaves it out and keeps the old
+   * behaviour of owning its own. See `refereePool` in
+   * `resolution-definitions.ts` for what starting one twice cost.
+   */
+  pool?: RefereePool<PyrightLspReferee>,
 ): Promise<PythonReceiverAnswers> {
   const cache = new Map<string, PythonReceiverResolution | undefined>();
   if (queries.length === 0) {
@@ -141,16 +150,15 @@ export async function resolvePythonReceivers(
     return lines[line] ?? "";
   };
 
-  let referee: PyrightLspReferee;
-  try {
-    referee = await createPyrightLspReferee(root);
-  } catch {
-    // No referee reachable (no network the first time `npx` needs to fetch
-    // pyright, no node -- anything `createPyrightLspReferee` cannot itself
-    // recover from). Every query stays unresolved, costing nothing beyond
-    // what `@calls` already withheld before this axis existed for Python.
-    // `started: false` says so, for a caller that would otherwise read every
-    // query unanswered as pyright having nothing to say.
+  // No referee reachable (no network the first time `npx` needs to fetch
+  // pyright, no node -- anything `createPyrightLspReferee` cannot itself
+  // recover from). Every query stays unresolved, costing nothing beyond
+  // what `@calls` already withheld before this axis existed for Python.
+  // `started: false` says so, for a caller that would otherwise read every
+  // query unanswered as pyright having nothing to say.
+  const mine = pool ?? refereePool<PyrightLspReferee>();
+  const referee = await mine.get(root, () => createPyrightLspReferee(root));
+  if (!referee) {
     return { cache: { get: () => undefined }, close: () => {}, started: false, withheldNoType: 0 };
   }
 
@@ -198,7 +206,8 @@ export async function resolvePythonReceivers(
 
   return {
     cache: { get: (file, at) => cache.get(queryKey(file, at)) },
-    close: () => referee.close(),
+    // A pool the caller owns is the caller's to close; one made here is ours.
+    close: () => { if (!pool) mine.close(); },
     started: true,
     withheldNoType: referee.withheldNoType(),
   };

@@ -414,3 +414,130 @@ describe("a name in another file that means something else", () => {
     expect(verdict).toBe("reached");
   });
 });
+
+describe("a checker's go-to-definition, when the caller has one", () => {
+  /*
+   * The hop the text cannot place at all: `make()` hands back something whose
+   * type is written nowhere, and `.run()` on it is a `receiver` doubt for
+   * every reader in this repository. A compiler answers it at that exact
+   * position in one step. `check-drift.mjs` has had one wired in for
+   * TypeScript since #233 and the walk was not asking it.
+   */
+  const files = {
+    "app.ts": 'import { make } from "./factory";\n'
+      + "export function boot() { return make().run(); }\n",
+    "factory.ts": 'import { Engine } from "./engine";\n'
+      + "export function make() { return new Engine(); }\n",
+    "engine.ts": "export class Engine {\n  run() { return 1; }\n}\n",
+  };
+
+  it("stays quiet without one", () => {
+    const { side } = sides(files);
+    const verdict = reachBetween(
+      { ...side("app.ts"), routine: "boot" },
+      { ...side("engine.ts"), names: ["run"] },
+    );
+    expect(verdict.verdict).toBe("withheld");
+  });
+
+  it("follows the hop when one answers", () => {
+    const { side } = sides(files);
+    const verdict = reachBetween(
+      { ...side("app.ts"), routine: "boot" },
+      { ...side("engine.ts"), names: ["run"] },
+      {
+        // `run` in app.ts is declared on line 2 of engine.ts, which is what a
+        // real "go to definition" at that call would answer.
+        declarationAt: (file, at) =>
+          file === "app.ts" && files["app.ts"].slice(at.start, at.end) === "run"
+            ? { file: "engine.ts", line: 2 }
+            : undefined,
+      },
+    );
+    expect(verdict.verdict).toBe("reached");
+    if (verdict.verdict === "reached") expect(verdict.via).toEqual(["boot", "run"]);
+  });
+
+  it("still refuses to say never on the strength of one", () => {
+    /*
+     * Item 14's caveat in this shape: a definition can name an interface or
+     * trait method whose implementation is somewhere else entirely. So a hop
+     * a checker placed is followed and the site stays open, and the closure
+     * it belongs to can never be called closed.
+     */
+    const { side } = sides(files);
+    const verdict = reachBetween(
+      { ...side("app.ts"), routine: "boot" },
+      { ...side("engine.ts"), names: ["nothingCalledThis"] },
+      { declarationAt: () => ({ file: "engine.ts", line: 2 }) },
+    );
+    expect(verdict.verdict).toBe("withheld");
+  });
+
+  it("settles a site the checker places outside the repository", () => {
+    /*
+     * The one answer that *does* close a site: a call the compiler puts
+     * outside this repository provably is not any routine in it, which is
+     * exactly what `EXTERNAL_RECEIVER` already means. Without it this body
+     * would stay open on `make().run()` forever.
+     */
+    const outward = {
+      "solo.ts": "export function boot() { return [1].map(String); }\n",
+      "other.ts": "export function unrelated() { return 2; }\n",
+    };
+    const { side } = sides(outward);
+    const verdict = reachBetween(
+      { ...side("solo.ts"), routine: "boot" },
+      { ...side("other.ts"), names: ["unrelated"] },
+      { declarationAt: () => "outside" },
+    );
+    expect(verdict.verdict).toBe("never");
+  });
+});
+
+describe("a specifier that resolves to more than one file", () => {
+  /*
+   * Rust records `crate::codec::encode` against both the file declaring
+   * `mod codec` and `codec.rs` itself. Taken in order, the first candidate won
+   * on `comesToRest`'s permissive last step -- a file that declares nothing of
+   * the name is still counted as the resting place, which is right for a
+   * specifier somebody wrote down and wrong as a tie-break. `encode` was
+   * placed in `main.rs`, and the walk stepped into a file with no `encode` in
+   * it and stopped. Found on a three-file Rust crate, not by review.
+   */
+  const files = {
+    "src/main.rs": "mod codec;\nmod server;\n\nuse server::Server;\n\n"
+      + "fn main() {\n    let s = Server::new(\"addr\");\n    s.run();\n}\n",
+    "src/server.rs": "use crate::codec::encode;\n\npub struct Server { addr: String }\n\n"
+      + "impl Server {\n    pub fn new(addr: &str) -> Server { Server { addr: addr.to_string() } }\n"
+      + "    pub fn run(&self) -> String { encode(&self.addr) }\n}\n",
+    "src/codec.rs": "pub fn encode(raw: &str) -> String { raw.to_uppercase() }\n",
+  };
+  /** Both candidates, in the order the dependency reader records them. */
+  const sidesWithBothCandidates = () => {
+    const imports = (file: string): CallSide["imports"] =>
+      file === "src/server.rs"
+        ? [
+            { specifier: "crate::codec::encode", file: "src/main.rs" },
+            { specifier: "crate::codec::encode", file: "src/codec.rs" },
+          ]
+        : [{ specifier: "mod codec", file: "src/codec.rs" }, { specifier: "mod server", file: "src/server.rs" }];
+    const open = (file: string) => (files[file as keyof typeof files] === undefined
+      ? undefined
+      : { source: files[file as keyof typeof files], language: "rust" as const, imports: imports(file) });
+    return (file: string): CallSide => ({
+      file, source: files[file as keyof typeof files], language: "rust",
+      imports: imports(file), open,
+    });
+  };
+
+  it("places the name in the file that declares it, not the first candidate", () => {
+    const side = sidesWithBothCandidates();
+    const verdict = reachBetween(
+      { ...side("src/server.rs"), routine: "run" },
+      { ...side("src/codec.rs"), names: ["encode"] },
+    );
+    expect(verdict.verdict).toBe("reached");
+    if (verdict.verdict === "reached") expect(verdict.hops[0]!.file).toBe("src/codec.rs");
+  });
+});

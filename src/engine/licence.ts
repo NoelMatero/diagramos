@@ -520,7 +520,9 @@ export const LICENCES: readonly Licence[] = [
             "over the same six trees before and after: 0 accused, 0 " +
             "invented and the same single miss either way, with recall up " +
             "from 98.1% to 98.3% in ts and 87.6% to 88.3% in tsx as the " +
-            "`elsewhere` refusals went to zero.",
+            "`elsewhere` refusals went to zero. Re-run once more after the " +
+            "candidate tie-break (docs/claim-vocabulary.md item 29): 0 " +
+            "accused, 0 invented, the same single miss, recall unmoved.",
         },
         /*
          * The new axis (#231). `presence` above rests on finding a call

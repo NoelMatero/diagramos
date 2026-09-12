@@ -1391,11 +1391,41 @@ function placeName(name: string, side: CallSide, bindings: Bindings): Placement 
   if (!imported) return bindings.local.has(name) ? { file: side.file } : { why: "unbound" };
   const { files, known } = filesFor(imported.specifier, side.imports);
   if (files.size === 0) return { why: known ? "unplaced" : "unbound" };
+  const settled = settlesOn(name, files, side);
+  return settled ? { file: settled } : { why: "elsewhere" };
+}
+
+/**
+ * Which of a specifier's candidate files a name actually comes to rest in.
+ *
+ * One specifier can resolve to more than one file, and Rust is where it
+ * happens: `crate::codec::encode` is recorded against both the file that
+ * declares `mod codec` and `codec.rs` itself. `comesToRest` ends with a
+ * permissive step -- a file that neither declares the name nor forwards it is
+ * still counted as the resting place, which is right for a specifier somebody
+ * wrote down and wrong as a tie-break. Taken in order, the first candidate
+ * won on that fallback: `encode` was placed in `main.rs`, which declares no
+ * `encode` at all, and the walk in `reach.ts` then stepped into a file with
+ * nothing of that name in it and stopped.
+ *
+ * So the candidates are asked the strict question first -- does this file
+ * declare the name, or forward it somewhere that does -- and only if none of
+ * them does is the permissive answer taken, in the original order. A single
+ * candidate is unaffected either way, which is every TypeScript and Python
+ * import in the corpus.
+ */
+function settlesOn(name: string, files: Set<string>, side: CallSide): string | undefined {
+  if (files.size > 1) {
+    for (const file of files) {
+      const declares = declaresOrForwards(name, file, side, new Set(), 0);
+      if (declares) return declares;
+    }
+  }
   for (const file of files) {
     const rest = comesToRest(name, file, side, new Set());
-    if (rest) return { file: rest };
+    if (rest) return rest;
   }
-  return { why: "elsewhere" };
+  return undefined;
 }
 
 /**
@@ -1517,10 +1547,8 @@ function placeOf(
     if (callee.kind === "through") return throughChecker();
     return { why: known ? "unplaced" : "unbound" };
   }
-  for (const file of files) {
-    const rest = comesToRest(callee.name, file, side, new Set());
-    if (rest) return { file: rest };
-  }
+  const settled = settlesOn(callee.name, files, side);
+  if (settled) return { file: settled };
   return callee.kind === "through" ? throughChecker() : { why: "elsewhere" };
 }
 
@@ -1537,7 +1565,7 @@ function placeOf(
  * Nothing consumes this but `scripts/measure-closed-bodies.mts`. It puts no
  * colour on a diagram and no word rests on it.
  */
-export function callSitesIn(side: CallSide): CallSitesReading {
+export function callSitesIn(side: CallSide, only?: string): CallSitesReading {
   const bindings = bindingsIn(side.source, side.language);
   if (!bindings) return { read: false, why: "unreadable" };
   const tree = parseSource(side.source, side.language);
@@ -1574,6 +1602,27 @@ export function callSitesIn(side: CallSide): CallSitesReading {
       lines: node.text.split("\n").length,
       sites: [],
     };
+    /*
+     * `only` names the one routine whose sites are wanted, and the rest are
+     * listed without being placed (#reach).
+     *
+     * Placing a site is where a receiver reaches a real checker, and a
+     * language server answers one question at a time over a pipe. The
+     * cross-file walk reads whole *files* and needs one *body* out of each,
+     * so placing all of them made two arrows over a handful of Flask modules
+     * 212 questions and twenty-eight seconds -- for perhaps thirty that were
+     * on the route. The walk asks for what it is about to read and lists the
+     * rest, which is all it needs them for: mapping a definition's line to
+     * the routine holding it, and finding whether a file declares a name.
+     *
+     * A body listed this way has an empty `sites`, which reads as a routine
+     * that calls nothing -- and that would be a closed body to anything
+     * counting them. So `only` is never passed by a caller that draws a
+     * conclusion from the absence of sites, and `reach.ts` keys its cache by
+     * routine as well as file so one body's reading is never handed back for
+     * another's.
+     */
+    if (only !== undefined && name.text !== only) { bodies.push(body); return; }
     each(node, (inner) => {
       /*
        * A macro's arguments are loose tokens rather than a tree, so a call

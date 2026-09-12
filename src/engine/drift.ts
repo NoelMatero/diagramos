@@ -2591,6 +2591,18 @@ export function checkDrift(
    * reading per file per check is most of what a cache can buy anyway.
    */
   const reachCache: ReachCache = newReachCache();
+  /**
+   * The caller's "go to definition", handed to the reach walk when there is
+   * one.
+   *
+   * Spread rather than passed as a possibly-`undefined` property, so a check
+   * with no checker wired in hands `reachBetween` an options object with no
+   * `declarationAt` in it at all -- which is the shape its own default is
+   * written against, and the shape `measure:reach` deliberately runs in.
+   */
+  const declarationAsked = options?.closedBodyReferee?.declarationAt
+    ? { declarationAt: options.closedBodyReferee.declarationAt.bind(options.closedBodyReferee) }
+    : {};
 
   /**
    * Files the wiring behind a `@feeds` arrow could be in.
@@ -3158,6 +3170,7 @@ export function checkDrift(
 
   // Edge checking: check each generated edge for corroboration
   const edges: EdgeDriftFinding[] = [];
+
 
 
   if (options?.edges !== false && !concept) {
@@ -4096,7 +4109,7 @@ export function checkDrift(
             const reaching = () => reachBetween(
               { ...tail, routine: fromEnd.symbols[0]! },
               { ...head, names: toEnd.symbols },
-              { cache: reachCache },
+              { cache: reachCache, ...declarationAsked },
             );
             /** The advisory a ruled-out accusation turns into. */
             const oneLevelUp = (via: string[], hops: number): EdgeOutcome => ({
@@ -4545,7 +4558,7 @@ export function checkDrift(
         const walked = reachBetween(
           { ...tail, routine: fromEnd.symbols[0]! },
           { ...head, names: toEnd.symbols },
-          { cache: reachCache },
+          { cache: reachCache, ...declarationAsked },
         );
         return walked.verdict === "reached" ? walked.via : undefined;
       };

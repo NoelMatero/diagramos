@@ -33,6 +33,7 @@
 import { existsSync, readdirSync, readFileSync, statSync } from "node:fs";
 import path from "node:path";
 
+import { refereePool, type RefereePool } from "./resolution-definitions";
 import {
   createRustAnalyzerReferee, declaredTypeOnLine, isOutsideRustTree, rustTypeAnchorFor,
   type RustLspReferee,
@@ -140,6 +141,16 @@ export async function resolveRustReceivers(
   root: string,
   queries: readonly RustReceiverQuery[],
   skip: ReadonlySet<string> = new Set(["node_modules", ".git", "target", "vendor"]),
+  /**
+   * A crate's server, shared with whatever else is asking this run (#reach).
+   *
+   * Optional, and every existing caller leaves it out and keeps the old
+   * behaviour of owning its own. `check-drift.mjs` passes one because two
+   * resolvers now run over the same tree in the same check, and starting
+   * rust-analyzer twice per crate root cost sixty seconds on a three-crate
+   * board -- see `refereePool` in `resolution-definitions.ts`.
+   */
+  pool?: RefereePool<RustLspReferee>,
 ): Promise<RustReceiverAnswers> {
   const cache = new Map<string, RustReceiverResolution | undefined>();
   const empty: RustReceiverAnswers = {
@@ -195,20 +206,15 @@ export async function resolveRustReceivers(
   let notATypeDeclaration = 0;
   let pathReceiver = 0;
   let anchorWithheld = 0;
-  const open: RustLspReferee[] = [];
+  const mine = pool ?? refereePool<RustLspReferee>();
 
   for (const [crate, crateQueries] of byCrate) {
-    let referee: RustLspReferee;
-    try {
-      referee = await createRustAnalyzerReferee(crate);
-    } catch {
-      // No rust-analyzer on this machine, or a manifest it will not load.
-      // #237's settled distribution decision: silence, not a fetcher. Every
-      // query here stays unresolved, costing nothing beyond what
-      // `measure:closed-bodies` already withheld for Rust.
-      continue;
-    }
-    open.push(referee);
+    // No rust-analyzer on this machine, or a manifest it will not load.
+    // #237's settled distribution decision: silence, not a fetcher. Every
+    // query here stays unresolved, costing nothing beyond what
+    // `measure:closed-bodies` already withheld for Rust.
+    const referee = await mine.get(crate, () => createRustAnalyzerReferee(crate));
+    if (!referee) continue;
     started = true;
     // Asking before rust-analyzer says it has finished indexing is what made
     // #246's first reading swing between 68.7% and 13.6% on identical input.
@@ -270,7 +276,8 @@ export async function resolveRustReceivers(
 
   return {
     cache: { get: (file, at) => cache.get(queryKey(file, at)) },
-    close: () => { for (const one of open.splice(0)) one.close(); },
+    // A pool the caller owns is the caller's to close; one made here is ours.
+    close: () => { if (!pool) mine.close(); },
     started,
     primedCleanly: started && primedCleanly,
     unclaimed,
