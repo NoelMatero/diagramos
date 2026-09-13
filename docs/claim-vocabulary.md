@@ -2938,11 +2938,23 @@ duplicate from conflitcts, requires reading prs "An arrow can be three calls lon
     totals.
 
     **Not shipped, and this is the recommendation not to.** Nothing reads
-    `outflow.ts` but its measurement; no colour, no word. Reopen the question if
-    a structure abstraction lands (it would raise the network row) or if anybody
-    actually draws an arrow onto a door -- which `measure:vocabulary` and
-    `measure:doors` answer and this run deliberately does not guess at, because
-    a hardcoded demand count is the mistake this issue already made once.
+    `outflow.ts` but its measurement; no colour, no word.
+
+    **The reason is the 15, and it is not demand.** Worth being exact, because
+    the demand argument is not available here and was reached for anyway in this
+    issue's own history. **The board corpus cannot answer whether anybody wants
+    a word.** Those diagrams are the owner's own test boards, most drawn before
+    `@feeds` existed, and none redrawn since -- so "one `@feeds` arrow across 21
+    boards" is a fact about when they were made, which `measure:dataflow`'s
+    section 1 says in as many words and which two comments on this issue then
+    quoted as though it were demand. It is not evidence of anything about the
+    word. Do not use it.
+
+    What stands on its own is the capability: fifteen findings in 1,506 files,
+    eleven of them one idiom. **Reopen when** a structure abstraction lands --
+    `fetch(url, { body })` is the commonest door in TypeScript and is invisible,
+    so the network row is a floor -- or when the payload count is large enough
+    to be worth a word on its own terms.
 
 26. **#206's demand number came back at 7 arrows of 162 and did not decide the
     issue, because the corpus it counts was drawn to test the tool. Built
@@ -3170,8 +3182,9 @@ duplicate from conflitcts, requires reading prs "An arrow can be three calls lon
 
    So #203 stays open with its ordering intact and one fewer candidate. What
    would change the answer is a structure abstraction -- `fetch(url, { body })`
-   is the commonest door in TypeScript and is invisible -- or evidence that
-   anybody draws an arrow onto a door.
+   is the commonest door in TypeScript and is invisible -- and **not** a count of
+   arrows on the boards in this repository, which are the owner's own test
+   diagrams and cannot answer demand for anything (item 37).
 3. **#190's layer 2.** The relation list is settled as-is by the owner. The one
 1. **#203 — the engine has no notion of a value.** Dataflow, points-to, escape
    analysis. #203's own prediction — confirmation much better, refutation only
