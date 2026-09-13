@@ -620,7 +620,7 @@ to pass every check this tool had.
 deliberate: almost all of it is `Vec<T>`, `Promise<T>`, `list[str]`, which
 nobody draws as two boxes.
 
-## Thirty-seven times a measurement contradicted the design
+## Thirty-eight times a measurement contradicted the design
 
 Kept because the pattern is the point: eleven of the first thirteen came from
 building one word or one reader, not from reviewing the design. Nothing since
@@ -2955,6 +2955,58 @@ duplicate from conflitcts, requires reading prs "An arrow can be three calls lon
     `fetch(url, { body })` is the commonest door in TypeScript and is invisible,
     so the network row is a floor -- or when the payload count is large enough
     to be worth a word on its own terms.
+
+38. **An arrow onto a file or a service can be checked, and what it took was
+    letting an external box carry a door.** #272, built. The first thing in this
+    programme that changes what a board says rather than what a measurement
+    prints.
+
+    Every arrow touching an `external` box was skipped before it: there is no
+    code at the far end, so no channel had anything to compare, and the board
+    said "4 more arrows were never read" and stopped. On
+    `docs/diagrams/example.excalidraw` that is **4 of 6 arrows**.
+
+    What is in the repository is the code that talks to the outside thing -- its
+    **door**, which `outside.ts` finds (#270, wrong at most once per language).
+    So an external box may now carry an ordinary `path#symbol` ref pointing at
+    that routine, and the arrow becomes a question about code again: does the
+    near end reach the door? Every channel already answers that. `drift.ts` had
+    the skip *before* refs were looked at; now it skips only an unanchored box.
+
+    **A ref is not enough, and that is the part that took the care.** An external
+    box has always been allowed a ref that merely records what it corresponds to
+    -- "Browser" against `src/b.ts` -- and two tests have encoded since `state`
+    shipped that such a box is still skipped. Reading those as door anchors would
+    change what boards already on disk mean and could confirm an arrow off one.
+    So the anchor is **verified**: the ref names a symbol, and that routine
+    really does call the file system, the network or another process. Both old
+    tests pass untouched, because their refs are not doors.
+
+    Confirm-only throughout. No route found is silence, on the footing every
+    confirming channel here already stands on -- the refuting channels rest on a
+    closed region and a door is not one.
+
+    **A suggestion was built alongside it and removed, measured on a real
+    board.** It named the one routine in the code end's file that touches the
+    outside world, so an author could anchor a box in one edit. Run against
+    `example.excalidraw` it offered `src/mcp/server.ts#steerExistingBoard` for
+    the box standing for `board.excalidraw` -- and that routine's door is
+    `fetch`, the **network**. The file's real door is `board-file.ts#writeBoard`,
+    in a module the suggestion never looked at. A network door for a file box, on
+    three of that board's four arrows.
+
+    Which outside thing a box stands for is the author's statement. A checker
+    that guesses it is inventing the claim it then checks, and an author who took
+    the suggestion would have got a confirmation resting on the wrong code. So
+    anchoring stays the author's job and the checker only verifies an anchor once
+    it is there. The reasoning is kept in `drift.ts` where the code was, because
+    the next person to want that convenience should see the number first.
+
+    **What it does not do.** Nothing anchors a box automatically, so no board on
+    disk changes behaviour until someone adds a ref -- `example.excalidraw` still
+    reports its 4 unread arrows and still comes back clean. The value-level
+    reader from item 37 is not wired in: this is the routine-level question,
+    which is the one with the coverage.
 
 26. **#206's demand number came back at 7 arrows of 162 and did not decide the
     issue, because the corpus it counts was drawn to test the tool. Built

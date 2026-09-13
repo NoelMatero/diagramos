@@ -127,6 +127,24 @@ describe("outflowIn", () => {
     expect(told).toContain("save: build -> item -> bag -> node:fs.writeFileSync (file)");
   });
 
+  it("follows a collection that left through a serializer, which is how they leave", () => {
+    /*
+     * The shape that made the collection rule look dead. Nothing writes a list
+     * to a file directly; it writes `rows.join("\n")`. `join` was classified as
+     * a question that lets nothing out -- true of a *reference*, false of the
+     * *contents*, which is the question a door asks. `get`, `filter`, `map` and
+     * `pop` already carried through; `join` was the one that did not.
+     */
+    expect(said(
+      'import { writeFileSync } from "node:fs";\n'
+      + "export function save() {\n"
+      + "  const rows: string[] = [];\n"
+      + "  rows.push(build());\n"
+      + '  writeFileSync("/tmp/x", rows.join("\\n"));\n'
+      + "}\n",
+    )).toContain("save: build -> rows -> node:fs.writeFileSync (file)");
+  });
+
   it("does not follow a collection that stayed at home", () => {
     expect(said(
       'import { writeFileSync } from "node:fs";\n'

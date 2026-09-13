@@ -220,8 +220,12 @@ const nodeSchema = z.object({
       + "Use 'planned' for something meant to exist — it is drawn dashed, its ref not resolving "
       + "is reported as work to do rather than as drift, and check_drift says so once the code "
       + "catches up. Use 'external' for something deliberately outside this repo (a browser, a "
-      + "third-party service), which is drawn dotted, is never checked, and is not the same as "
-      + "forgetting a ref.",
+      + "third-party service, a file, a database), which is drawn dotted and is not the same as "
+      + "forgetting a ref. "
+      + "An 'external' box is worth a ref even so: point it at its **door**, the routine in this "
+      + "repo that talks to that thing — `src/engine/board-file.ts#writeBoard` for a box standing "
+      + "for `board.excalidraw`. Arrows onto an unanchored external box cannot be checked at all, "
+      + "and anchoring one at its door makes them checkable.",
     ),
 });
 
@@ -1098,7 +1102,8 @@ server.registerTool(
         .default(false)
         .describe(
           "Three questions the per-turn check does not ask. `unreadEdges` names the arrows nothing "
-          + "checked, with the reason for each: an arrow with an end marked external, or refless, or "
+          + "checked, with the reason for each: an arrow with an end marked external and not anchored "
+          + "at a door, or refless, or "
           + "pointing at a directory carries no claim any check here can test, and until it is named "
           + "it is indistinguishable from an arrow that passed. It is not drift and not a suggestion "
           + "-- it is the list of things this tool did not look at. "

@@ -846,9 +846,19 @@ const PUTS_IN = new Set([
 /**
  * Methods that ask the collection a question and let nothing out.
  *
- * `seen.has(k)` yields a boolean, `rows.join(",")` a string, `rows.sort()` the
- * same array reordered. None of them hands a reference to anything inside back
- * to the caller, so neither the collection nor its contents go anywhere.
+ * `seen.has(k)` yields a boolean and `rows.sort()` the same array reordered.
+ * None of them hands a reference to anything inside back to the caller, so
+ * neither the collection nor its contents go anywhere.
+ *
+ * **`join` used to be here and the reasoning was one word too broad.** It hands
+ * back no *reference*, which is what this set is about -- and it hands back
+ * every *value*, built into a string. For "did the object leak" that is the same
+ * thing; for "did the data leave" it is the opposite, and `rows.join("\n")` is
+ * how a list reaches a file. It is a read, so it belongs in `TAKES_OUT` with
+ * `get`, `filter` and `map`, which already carried through. Found because the
+ * collection rule in `outflow.ts` fired **zero** times on 1,506 files: nothing
+ * writes a list to a door directly, so everything went through the serializer
+ * that was classified as letting nothing out (#203).
  *
  * Every entry here was found by the report rather than by imagining it: an
  * unclassified method falls through to "a method was called on it, which might
@@ -858,7 +868,7 @@ const PUTS_IN = new Set([
 const ASKS = new Set([
   "has", "includes", "contains", "indexOf", "lastIndexOf", "count", "index",
   "startsWith", "endsWith", "isEmpty", "is_empty", "any", "all", "every",
-  "join", "sort", "reverse", "clear", "delete", "remove", "discard",
+  "sort", "reverse", "clear", "delete", "remove", "discard",
   "position", "find_index", "contains_key", "len", "size",
 ]);
 
@@ -880,6 +890,12 @@ const TAKES_OUT = new Set([
    */
   "filter", "map", "slice", "concat", "flatMap", "flat", "splice",
   "sorted", "reversed", "collect", "take", "chain", "cloned", "copied",
+  /*
+   * And the one that hands back every element at once, built into a string.
+   * `rows.join(",")` retains no reference and publishes every value, which is a
+   * read for both questions this file answers -- see the note on `ASKS`.
+   */
+  "join",
 ]);
 
 /**

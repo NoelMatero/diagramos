@@ -45,8 +45,9 @@ import { connects, refIsStale, type CodeGraphOption } from "./codegraph";
 import { readDependencies, readerCanPlace } from "./deps";
 import type { BindingFault } from "./damage";
 import { generatedRef, NEVER_WALK } from "./generated";
-import { readGraph, type Provenance, type RecoveredGraph } from "./graph";
+import { readGraph, type Provenance, type RecoveredGraph, type RecoveredNode } from "./graph";
 import { licenceFor, mayAccuse } from "./licence";
+import { outsideCallsIn } from "./outside";
 import { languageOf, type Language } from "./parse";
 import { ledgerAdditions, type Ledger } from "./ledger";
 import { checkNeeds, type NeedsWithheld } from "./needs";
@@ -625,6 +626,24 @@ export interface UnreadEdgeFinding {
   label?: string;
   reason: EdgeSkipReason;
 }
+
+/*
+ * A `doorAnchor` suggestion was built here and removed, and the reason is worth
+ * keeping (#272). It named the one routine in the code end's file that touches
+ * the outside world, so an author could anchor an external box in one edit.
+ *
+ * Run against `docs/diagrams/example.excalidraw` it suggested
+ * `src/mcp/server.ts#steerExistingBoard` for the box standing for
+ * `board.excalidraw` -- and that routine's door is `fetch`, the **network**. The
+ * file's real door is `board-file.ts#writeBoard`, in another module the
+ * suggestion never looked at. So it offered a network door for a file box, on
+ * three of that board's four arrows.
+ *
+ * Which outside thing a box stands for is the author's statement. A checker that
+ * guesses it is inventing the claim it then checks, and an author who took the
+ * suggestion would get a confirmation resting on the wrong code. Anchoring stays
+ * the author's job; what this file does is check an anchor once it is there.
+ */
 
 /**
  * Why an arrow the check *did* read came back unconfirmed.
@@ -3463,9 +3482,51 @@ export function checkDrift(
         continue;
       }
 
-      // An arrow into something deliberately outside the repo has nothing to
-      // corroborate against, and saying so would be noise, not a finding.
-      if (fromNode.state === "external" || toNode.state === "external") {
+      /*
+       * An arrow into something deliberately outside the repo used to stop
+       * here: there is no code at the far end, so no channel had anything to
+       * compare and saying so would be noise rather than a finding.
+       *
+       * It stops here unless the box is anchored at its **door** (#272). What
+       * is in this repository is the code that talks to the outside thing, and
+       * `outside.ts` finds it -- so an external box pointed at that routine
+       * makes the arrow a question about code again: does the near end reach
+       * the door? Every channel below already answers that.
+       *
+       * **A ref is not enough; it has to be a door.** An external box has
+       * always been allowed to carry a ref that merely records what it
+       * corresponds to -- "Browser" against `src/b.ts` -- and two tests have
+       * encoded since `state` shipped that such a box is still skipped. Reading
+       * those refs as door anchors would repurpose data already on boards and
+       * could confirm an arrow off one. So the anchor is verified: the ref names
+       * a symbol, and that routine really does call the file system, the network
+       * or another process.
+       *
+       * Confirm-only, and nothing here changes that. No ref, or a ref that is
+       * not a door, is skipped exactly as before -- which is every board drawn
+       * so far. A door with no route found goes quiet on the same footing as any
+       * other unconfirmed arrow: the refuting channels rest on a closed region,
+       * and a door is not one.
+       */
+      const atADoor = (node: RecoveredNode): boolean => {
+        if (node.state !== "external") return false;
+        const ref = node.ref?.trim();
+        if (!ref) return false;
+        const { path: doorPath, symbol } = parseRef(ref);
+        if (!symbol) return false;
+        const language = languageOf(doorPath);
+        if (!language) return false;
+        const absolute = workspace.resolve(doorPath);
+        if (!absolute || workspace.stat(absolute) !== "file") return false;
+        const source = workspace.read(absolute);
+        if (source === undefined) return false;
+        const reading = outsideCallsIn(source, language);
+        if (!reading.read) return false;
+        return reading.calls.some((call) =>
+          call.routine === symbol && call.reading.verdict === "outside");
+      };
+      const externalEnd = fromNode.state === "external" || toNode.state === "external";
+      if (externalEnd && !(atADoor(fromNode) || atADoor(toNode))) {
         skipClaimedEdge("endpoint-external");
         continue;
       }
