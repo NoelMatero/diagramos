@@ -1484,6 +1484,138 @@ describe("naming the arrows nothing read", () => {
   });
 });
 
+describe("an arrow onto something outside the repository (#272)", () => {
+  /*
+   * An `external` box stands for a file, a service or another process, and
+   * until now every arrow touching one was skipped: there is no code at the far
+   * end, so no channel had anything to compare. The board would say "4 more
+   * arrows were never read" and stop there.
+   *
+   * What *is* in the repository is the code that talks to that thing -- its
+   * **door**, which `outside.ts` finds. So the box can be anchored at the door
+   * with an ordinary `path#symbol` ref, and the arrow becomes a question about
+   * code again: does the near end reach the door?
+   *
+   * Confirm-only. Failing to find a route stays silent, exactly as before, and
+   * an external box with no ref is skipped exactly as before.
+   */
+  async function boardOf(
+    nodes: Array<{ id: string; label: string; ref?: string; state?: NodeState }>,
+    edges: Array<{ from: string; to: string; label?: string }>,
+  ): Promise<BoardFile> {
+    return (await createDiagram(emptyBoard(), { name: "arch", nodes, edges })).board;
+  }
+  /**
+   * `writeIt` is a real door: it calls the file system. `caller` reaches it, so
+   * an arrow from `caller` to a box anchored at `writeIt` is a question the
+   * import channel can already answer. `plain` is a routine that touches
+   * nothing outside, which is what keeps an ordinary ref from being read as an
+   * anchor.
+   */
+  const tree = {
+    "src/door.ts":
+      'import { writeFileSync } from "node:fs";\n'
+      + "export function writeIt(body: string) {\n"
+      + '  writeFileSync("/tmp/x", body);\n'
+      + "}\n",
+    "src/caller.ts":
+      "import { writeIt } from './door';\n"
+      + "export function caller(body: string) {\n"
+      + "  writeIt(body);\n"
+      + "}\n",
+    "src/plain.ts": "export function plain() {\n  return 1;\n}\n",
+  };
+
+  it("checks the arrow when the outside box is anchored at its door", async () => {
+    const board = await boardOf(
+      [
+        { id: "caller", label: "caller", ref: "src/caller.ts#caller" },
+        { id: "file", label: "board.excalidraw", state: "external", ref: "src/door.ts#writeIt" },
+      ],
+      [{ from: "caller", to: "file", label: "writes" }],
+    );
+    const report = checkDrift(board, fakeWorkspace(tree));
+    expect(report.edgesChecked).toBe(1);
+    expect(report.unreadEdges).toEqual([]);
+    expect(report.clean).toBe(true);
+  });
+
+  it("still skips one with no anchor at all, which is every board drawn so far", async () => {
+    const board = await boardOf(
+      [
+        { id: "caller", label: "caller", ref: "src/caller.ts#caller" },
+        { id: "file", label: "board.excalidraw", state: "external" },
+      ],
+      [{ from: "caller", to: "file", label: "writes" }],
+    );
+    const report = checkDrift(board, fakeWorkspace(tree));
+    expect(report.unreadEdges).toHaveLength(1);
+    expect(report.unreadEdges[0]?.reason).toBe("endpoint-external");
+    expect(report.clean).toBe(true);
+  });
+
+  it("still skips one whose ref is not a door, so an old ref is not repurposed", async () => {
+    /*
+     * An external box has always been allowed a ref that merely records what it
+     * corresponds to. Reading one of those as a door anchor would change what
+     * boards already on disk mean, and could confirm an arrow off it.
+     */
+    const board = await boardOf(
+      [
+        { id: "caller", label: "caller", ref: "src/caller.ts#caller" },
+        { id: "browser", label: "Browser", state: "external", ref: "src/plain.ts#plain" },
+      ],
+      [{ from: "caller", to: "browser", label: "renders" }],
+    );
+    const report = checkDrift(board, fakeWorkspace(tree));
+    expect(report.unreadEdges).toHaveLength(1);
+    expect(report.unreadEdges[0]?.reason).toBe("endpoint-external");
+  });
+
+  it("does not guess which door an unanchored box means", async () => {
+    /*
+     * A suggestion was built here and removed. It named the one routine in the
+     * code end's file that touches the outside world, so an author could anchor
+     * a box in one edit -- and on `example.excalidraw` it offered
+     * `src/mcp/server.ts#steerExistingBoard`, whose door is `fetch`, for the box
+     * standing for `board.excalidraw`. A network door for a file box, on three
+     * of that board's four arrows. The file's real door is in another module the
+     * suggestion never looked at.
+     *
+     * Which outside thing a box stands for is the author's statement. Anchoring
+     * stays their job; this file checks an anchor once it is there.
+     */
+    const board = await boardOf(
+      [
+        { id: "writer", label: "writeBoard", ref: "src/door.ts" },
+        { id: "file", label: "board.excalidraw", state: "external" },
+      ],
+      [{ from: "writer", to: "file", label: "writes" }],
+    );
+    const report = checkDrift(board, fakeWorkspace(tree));
+    expect(report.unreadEdges[0]?.reason).toBe("endpoint-external");
+    expect(report.unreadEdges[0]).not.toHaveProperty("doorAnchor");
+  });
+
+  it("stays quiet rather than accusing when no route to the door is found", async () => {
+    /*
+     * The whole safety case. An arrow onto a door this reader cannot connect is
+     * silence, never a finding -- the same footing every confirming channel
+     * here already stands on.
+     */
+    const board = await boardOf(
+      [
+        { id: "far", label: "unrelated", ref: "src/plain.ts#plain" },
+        { id: "file", label: "board.excalidraw", state: "external", ref: "src/door.ts#writeIt" },
+      ],
+      [{ from: "far", to: "file", label: "writes" }],
+    );
+    const report = checkDrift(board, fakeWorkspace(tree));
+    expect(report.edges).toEqual([]);
+    expect(report.clean).toBe(true);
+  });
+});
+
 describe("code the diagram leaves out", () => {
   const tree = {
     "src/a.ts": "import { b } from './b';\nimport { deep } from './deep';\nexport const a = b;",

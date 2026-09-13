@@ -35,8 +35,17 @@ export type Provenance = "recorded" | "inferred";
  * - `planned`: this is meant to exist. A ref that does not resolve is then a
  *   work item, not a regression.
  * - `external`: deliberately not code in this repository -- a browser, a
- *   third-party service, another project. Never checked, and distinct from a
- *   node whose ref someone simply forgot.
+ *   third-party service, a file, a database. Distinct from a node whose ref
+ *   someone simply forgot.
+ *
+ *   The box itself is never checked: there is no tree to walk. **Arrows onto
+ *   one are, when it is anchored at its door** (#272) -- the routine in this
+ *   repository that talks to the outside thing, which `outside.ts` finds. Then
+ *   "does the near end reach that routine" is an ordinary question about code.
+ *   Confirm-only, and an ordinary ref is not enough: the anchor has to be a
+ *   routine that really does touch the file system, the network or another
+ *   process, so a ref that merely records what a box corresponds to keeps the
+ *   meaning it has always had.
  *
  * Nothing here records what the filesystem can answer for itself. "Missing" is
  * observed every run and is deliberately not a state: committing it would put a

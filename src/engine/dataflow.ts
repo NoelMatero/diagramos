@@ -213,7 +213,19 @@ export interface Local {
 
 /** A call written in the body, and the locals handed to it. */
 export interface CallSite {
-  /** The name called, under the same receiver rule `feeds.ts` follows. */
+  /**
+   * The name called, under the same receiver rule `feeds.ts` follows -- and
+   * **empty** when the call is on a receiver this reader does not name.
+   *
+   * `calleeName` answers for a bare name and for `self.foo()` / `this.foo()`.
+   * `store.keep(v)` and `os.replace(v, p)` get a site with no name, which is
+   * the `callee-is-a-method` refusal: the exit is counted and cannot be looked
+   * up. Both halves matter. Leaving the site out made these exits invisible
+   * rather than refused, and a value handed to *both* a resolvable call and an
+   * unnamed one was freed on the strength of the one that was recorded.
+   * Inventing a name for it would be worse: a lookup on `write` finds any local
+   * routine spelled that way and reads the wrong body (#203).
+   */
   callee: string;
   /** 1-based line the call sits on. */
   line: number;
@@ -237,8 +249,17 @@ export interface CallSite {
    * last-write-wins, which is what the shipped reader does.
    */
   reached: Array<[string, string[]]>;
-  /** Calls whose result was passed straight in, with no name in between. */
-  inline: string[];
+  /**
+   * Calls whose result was passed straight in, with no name in between, and
+   * which argument each sat at.
+   *
+   * The position is what a door question needs and a flow question does not.
+   * `writeFile(path, serializeBoard(board), "utf8")` puts the *contents* at
+   * argument 1 as an inline call, and without the index that flow was found and
+   * then reported with no position at all -- which read as "unknown" and made
+   * the payload population look far smaller than it is (#203).
+   */
+  inline: Array<{ name: string; at: number }>;
 }
 
 /**
@@ -825,9 +846,19 @@ const PUTS_IN = new Set([
 /**
  * Methods that ask the collection a question and let nothing out.
  *
- * `seen.has(k)` yields a boolean, `rows.join(",")` a string, `rows.sort()` the
- * same array reordered. None of them hands a reference to anything inside back
- * to the caller, so neither the collection nor its contents go anywhere.
+ * `seen.has(k)` yields a boolean and `rows.sort()` the same array reordered.
+ * None of them hands a reference to anything inside back to the caller, so
+ * neither the collection nor its contents go anywhere.
+ *
+ * **`join` used to be here and the reasoning was one word too broad.** It hands
+ * back no *reference*, which is what this set is about -- and it hands back
+ * every *value*, built into a string. For "did the object leak" that is the same
+ * thing; for "did the data leave" it is the opposite, and `rows.join("\n")` is
+ * how a list reaches a file. It is a read, so it belongs in `TAKES_OUT` with
+ * `get`, `filter` and `map`, which already carried through. Found because the
+ * collection rule in `outflow.ts` fired **zero** times on 1,506 files: nothing
+ * writes a list to a door directly, so everything went through the serializer
+ * that was classified as letting nothing out (#203).
  *
  * Every entry here was found by the report rather than by imagining it: an
  * unclassified method falls through to "a method was called on it, which might
@@ -837,7 +868,7 @@ const PUTS_IN = new Set([
 const ASKS = new Set([
   "has", "includes", "contains", "indexOf", "lastIndexOf", "count", "index",
   "startsWith", "endsWith", "isEmpty", "is_empty", "any", "all", "every",
-  "join", "sort", "reverse", "clear", "delete", "remove", "discard",
+  "sort", "reverse", "clear", "delete", "remove", "discard",
   "position", "find_index", "contains_key", "len", "size",
 ]);
 
@@ -859,6 +890,12 @@ const TAKES_OUT = new Set([
    */
   "filter", "map", "slice", "concat", "flatMap", "flat", "splice",
   "sorted", "reversed", "collect", "take", "chain", "cloned", "copied",
+  /*
+   * And the one that hands back every element at once, built into a string.
+   * `rows.join(",")` retains no reference and publishes every value, which is a
+   * read for both questions this file answers -- see the note on `ASKS`.
+   */
+  "join",
 ]);
 
 /**
@@ -1282,7 +1319,8 @@ function readRoutine(
         const peeled = unwrap(argument);
         if (isCall(peeled) && !readsOutOf(argument)) {
           const nested = calleeName(peeled);
-          if (nested) site.inline.push(nested);
+          // Pushed before `args`, so `at` is this argument's own index.
+          if (nested) site.inline.push({ name: nested, at: site.args.length });
           site.args.push(undefined);
         } else if (isName(peeled) && held(peeled.text)) {
           site.passed.push(peeled.text);
@@ -1300,7 +1338,20 @@ function readRoutine(
         for (const pair of carriedBy(argument)) site.reached.push(pair);
         walk(argument, { kind: "escape", as: "passed-to-a-call" }, depth + 1);
       }
-      if (callee) body.calls.push(site);
+      /*
+       * Recorded whether or not the callee could be named. An empty `callee` is
+       * the `callee-is-a-method` refusal `settleCalls` and `keeps` have always
+       * had a branch for: `store.keep(v)` and `os.replace(v, p)` are exits, and
+       * leaving the site out made them exits that could not be counted -- 45.3%
+       * of the values with a call-shaped exit, absent from the question rather
+       * than refused by it (#203).
+       *
+       * Recorded and *not* nameable, which is the whole of why this is safe. A
+       * resolver keyed on the name would look `write` up, find any local routine
+       * spelled that way, read the wrong body and be entitled to free a value
+       * that did leave. There is no name here to look up.
+       */
+      body.calls.push(site);
       // Anything else under the call -- a type argument, the callee's own
       // subexpressions -- still has to be walked, or a use hides in it.
       for (let index = 0; index < current.childCount; index += 1) {
@@ -1877,10 +1928,12 @@ export function chainFrom(
   consumers: string[],
 ): FlowChain | undefined {
   for (const call of body.calls) {
-    if (!consumers.includes(call.callee)) continue;
-    for (const inline of call.inline) {
-      if (producers.includes(inline)) {
-        return { producer: inline, consumer: call.callee, through: [], line: call.line };
+    // An unnamed call is a call this reader could not identify, so it is not
+    // evidence of a flow to anything -- including to a box named "".
+    if (!call.callee || !consumers.includes(call.callee)) continue;
+    for (const { name } of call.inline) {
+      if (producers.includes(name)) {
+        return { producer: name, consumer: call.callee, through: [], line: call.line };
       }
     }
     for (const [producer, hops] of call.reached) {

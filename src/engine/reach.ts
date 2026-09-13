@@ -182,7 +182,7 @@ export const newReachCache = (): ReachCache =>
   ({ bodies: new Map(), listed: new Map(), receivers: new Map() });
 
 /** What a receiver expression's type is, asked by the expression's byte range. */
-type ReceiverLookup = (at: { start: number; end: number }) => ReceiverResolution | undefined;
+export type ReceiverLookup = (at: { start: number; end: number }) => ReceiverResolution | undefined;
 
 /**
  * `resolution.ts`, wired in as a receiver resolver for the first time.
@@ -204,7 +204,7 @@ type ReceiverLookup = (at: { start: number; end: number }) => ReceiverResolution
  * sites as closed at all (see `blocking` below), so nothing accuses on the
  * strength of one.
  */
-function textReceivers(source: string, language: Language): ReceiverLookup {
+export function textReceivers(source: string, language: Language): ReceiverLookup {
   const reading = resolveReceiversIn(source, language);
   if (!reading.read) return () => undefined;
   const byRange = new Map<string, string>();
@@ -235,7 +235,7 @@ function textReceivers(source: string, language: Language): ReceiverLookup {
  * that buys a false accusation, which is this file's whole standing
  * instruction.
  */
-function blocking(site: { receiver: boolean; concrete?: boolean }): boolean {
+export function blocking(site: { receiver: boolean; concrete?: boolean }): boolean {
   return site.receiver && site.concrete !== true;
 }
 
