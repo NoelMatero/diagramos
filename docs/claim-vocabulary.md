@@ -2878,23 +2878,41 @@ duplicate from conflitcts, requires reading prs "An arrow can be three calls lon
     **309 flows, 309 corroborated, 0 invented. 24 of 24 hops walked. Two runs
     byte-identical.**
 
-    **And then the split that undoes the headline.** Of those 309, **242
-    (78.3%) arrive as argument 0** -- which at a file door is a directory or a
-    filename. `writeFile(path, contents)` takes a place and a payload, and "this
-    value is written to a file" means the payload. Only **26 (8.4%)** arrive at
-    argument 1 or later, and reading all 26 by door rather than eyeballing the
-    total finishes the job:
+    **And then the split that undoes the headline.** `writeFile(path, contents)`
+    takes a place and a payload, and "this value is written to a file" means the
+    payload. Split by a `PAYLOAD_AT` table -- library knowledge, per door, which
+    no rule derives -- **13 of 309 flows (4.2%) are the value that leaves**:
 
-    | door | flows | argument 1 is |
-    |---|---|---|
-    | `os.replace`, `cpSync`, `shutil.copy`, `copy2`, `rename`, `copytree` | 17 | a destination path |
-    | `execFileSync`, `spawnSync` | **7** | the argument list handed to a process |
-    | `os.chmod`, `socket.getaddrinfo` | 2 | a mode, a port |
+    | | flows |
+    |---|---|
+    | `execFileSync`, `spawnSync`, `subprocess.run` — an argument list to a process | **11** |
+    | `writeFile`, `writeFileSync` — contents to a file | **2** |
+    | the door carries nothing out (a read, a stat, a delete, a copy of paths) | 261 |
+    | a payload door, but this value is the place or an option | 30 |
+    | a payload door, position not recorded | 5 |
 
-    **Seven flows in 1,500 files mean what the question asked, and all seven are
-    one idiom** -- a `git(args)` / `run(args)` wrapper. That is not a word. It is
-    the same shape as every other step on this issue: each move outward bought
-    less than the one before.
+    Reading those last 5 by hand rather than shrugging: two are payloads nested
+    one level deeper than this reader follows --
+    `writeFileSync(p, Buffer.from(png))` and
+    `writeFileSync(p, probeSource(readFileSync(f), list))` -- and three are a
+    path inside `path.join(..)`. **So call it 15 of 309**, and the remaining gap
+    is nesting depth inside the payload argument.
+
+    **Fifteen flows in 1,500 files mean what the question asked, and eleven are
+    one idiom** -- a `git(args)` / `run(args)` wrapper. Two are a file write.
+    That is not a word, and it is the same shape as every other step on this
+    issue: each move outward bought less than the one before.
+
+    **That figure moved from 7 to 13 under challenge, and how is the useful
+    part.** The first reading split it as "argument 0 is a path, argument 1 is
+    the data" and found 7. Both halves were wrong. An inline call had **no
+    recorded position**, so `writeFile(path, serializeBoard(board))` -- the
+    commonest payload shape there is -- landed in "unknown"; and "argument 0 is
+    a path" is false at `subprocess.run(args)`, whose payload *is* argument 0.
+    Recording the inline position and writing the table moved it to 13. The
+    conclusion held; the ground under it changed from an eyeballed number with a
+    known gap to a measured one. It should not have been quoted before the gap
+    was closed.
 
     Two more numbers in the same direction. **`out-of-a-collection` fires 0
     times** -- the rule written for this issue's own motivating example,

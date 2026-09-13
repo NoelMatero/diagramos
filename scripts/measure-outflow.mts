@@ -37,6 +37,23 @@
  * blindness, and item 24's lesson is that the apart pile is where bugs hide, so
  * it is printed with a number on it.
  *
+ * ## The payload figure moved once already, and how is the useful part
+ *
+ * The first run of this reported the split as "argument 0 is a path, argument 1
+ * is the data" and came to **7** flows that meant what the question asked. Two
+ * gaps in this measurement, not in the code:
+ *
+ *   - **An inline call had no recorded position.**
+ *     `writeFile(path, serializeBoard(board), "utf8")` is how contents are
+ *     usually written, and the position of a call computed at the door was not
+ *     recorded -- so the commonest payload shape landed in the "unknown" bucket.
+ *   - **"Argument 0 is a path" is false at some doors.** `subprocess.run(args)`
+ *     carries its payload at argument **0**. A table was needed either way.
+ *
+ * With both fixed it is **13**, and reading the five remaining unknowns by hand
+ * puts it near 15. The conclusion did not change and the reason to trust it did:
+ * 15 of 309 is a measured number rather than an eyeballed one with a known gap.
+ *
  * ## What this cannot see, stated before any number is read off it
  *
  *   - **A value wrapped in an object literal.** `fetch(url, { body: payload })`
@@ -100,8 +117,13 @@ const byHops = new Map<number, number>();
  * data going out.
  */
 const byPosition = new Map<string, number>();
-/** The argument-1-or-later flows by which door they reach, so nobody has to eyeball it. */
+/** Flows where the value is the data leaving, by door. */
 const payloadDoors = new Map<string, number>();
+/** And the rest, by what the value turned out to be. */
+const notPayload = new Map<string, number>();
+/** Doors the corpus has and `PAYLOAD_AT` does not -- the table's edge. */
+const doorsOffTable = new Map<string, number>();
+const payloadExamples: string[] = [];
 
 /* The referee. */
 let checked = 0;
@@ -116,6 +138,52 @@ const intoAStructure = new Map<Language, number>();
 
 const examples: string[] = [];
 let files = 0;
+
+/**
+ * Which argument of a door carries **data leaving the program**, per door.
+ *
+ * The table this measurement cannot do without, and the one thing in it that no
+ * rule derives: that `writeFile`'s second argument is the contents and its first
+ * is a place is knowledge about a library, not about a grammar
+ * (`docs/reading-a-grammar.md`). It lives in the measurement rather than in
+ * `outflow.ts` because it is a judgement about how to *bucket* an answer, and
+ * the reader is not entitled to one.
+ *
+ * Built from the doors the corpus actually contains rather than guessed at, and
+ * it corrects the crude "argument 0 is a path" split in **both** directions:
+ * `subprocess.run(args)` puts the payload at argument **0**, while
+ * `execFileSync(cmd, args)` puts it at 1.
+ *
+ * A door absent from here is one where nothing the program holds goes out: a
+ * read, a stat, a delete, or a copy whose arguments are both paths. Those are
+ * real door contact and they are not data leaving. Every door the corpus has and
+ * this table does not is printed, so its edge is a number.
+ */
+const PAYLOAD_AT = new Map<string, number>([
+  // Written to a file.
+  ["node:fs.writeFileSync", 1],
+  ["node:fs.appendFileSync", 1],
+  ["node:fs/promises.writeFile", 1],
+  ["node:fs/promises.appendFile", 1],
+  ["fs.writeFileSync", 1],
+  ["fs/promises.writeFile", 1],
+  // Handed to another process as its argument list.
+  ["node:child_process.execFileSync", 1],
+  ["node:child_process.execFile", 1],
+  ["node:child_process.spawnSync", 1],
+  ["node:child_process.spawn", 1],
+  // Python spells the same thing with the list first.
+  ["subprocess.run", 0],
+  ["subprocess.check_output", 0],
+  ["subprocess.check_call", 0],
+  ["subprocess.Popen", 0],
+  ["os.write", 1],
+  // Sent over the network. `fetch`'s second argument is the init object that
+  // carries `body`, which is as close as this gets without a structure model.
+  ["fetch", 1],
+  ["socket.send", 0],
+  ["socket.sendall", 0],
+]);
 
 /**
  * The door call's argument list, as text, from the line it opens on.
@@ -200,7 +268,24 @@ for (const tree of trees) {
       bump(byHops, flow.through.length);
       bump(byPosition, flow.at === undefined ? "not recorded"
         : flow.at === 0 ? "argument 0" : "argument 1 or later");
-      if (flow.at !== undefined && flow.at > 0) bump(payloadDoors, flow.door.qualified);
+
+      /* Is this value the data leaving, or a place, or an option? */
+      const payloadAt = PAYLOAD_AT.get(flow.door.qualified);
+      if (payloadAt === undefined) {
+        bump(doorsOffTable, flow.door.qualified);
+        bump(notPayload, "the door carries nothing out (a read, a stat, a copy)");
+      } else if (flow.at === undefined) {
+        bump(notPayload, "a payload door, position not recorded");
+      } else if (flow.at === payloadAt) {
+        bump(payloadDoors, flow.door.qualified);
+        if (payloadExamples.length < 20) {
+          payloadExamples.push(`${rel}:${flow.door.line} ${flow.routine}: ${flow.value}`
+            + (flow.through.length > 0 ? ` -> ${flow.through.join(" -> ")}` : "")
+            + ` -> ${flow.door.qualified}[${flow.at}] (${flow.door.kind})`);
+        }
+      } else {
+        bump(notPayload, "a payload door, but this value is the place or an option");
+      }
 
       /* -- the referee, on the one question it can settle -- */
       const doorLine = argumentTextAt(lines, flow.door.line);
@@ -349,23 +434,47 @@ console.log("  connects it to the argument. Every one of these is a flow that ma
 console.log("  and is not reported. It is the reason to read the counts above as a floor,");
 console.log("  and the reason the network row is low.");
 
+const payload = [...payloadDoors.values()].reduce((sum, one) => sum + one, 0);
 console.log("");
-console.log("4 - THE POPULATION THE QUESTION WAS ACTUALLY ABOUT -- argument 1 or later");
+console.log("4 - THE POPULATION THE QUESTION WAS ACTUALLY ABOUT -- data leaving, not a path");
 console.log("");
-console.log("  BY DOOR, because `argument 1` means different things at different doors");
+console.log(`  ${payload} of ${total(flowsBy)} flows are the value that leaves `
+  + `(${share(payload, total(flowsBy))}), by door:`);
+console.log("");
 for (const [door, found] of [...payloadDoors].sort((a, b) => b[1] - a[1])) {
-  console.log("    " + door.padEnd(34) + String(found).padStart(5));
+  console.log("    " + door.padEnd(36) + String(found).padStart(5));
 }
 console.log("");
-console.log("    Read this list rather than the total. Argument 1 of `rename`, `os.replace`,");
-console.log("    `cpSync`, `copy2`, `copy` and `copytree` is a **destination path** -- the");
-console.log("    value reaches the door truthfully and is still not the data going out.");
-console.log("    Argument 1 of `execFileSync` and `spawnSync` is the argument list handed to");
-console.log("    another process, which is. So the population that means what the question");
-console.log("    asked is the subprocess rows, and it is one idiom -- a `git(args)` wrapper");
-console.log("    -- repeated across the corpus.");
-if (examples.length > 0) {
+console.log("  AND WHAT THE REST TURNED OUT TO BE");
+for (const [why, found] of [...notPayload].sort((a, b) => b[1] - a[1])) {
+  console.log("    " + why.padEnd(52) + String(found).padStart(5));
+}
+console.log("");
+console.log("  `PAYLOAD_AT` is what splits these, and it is a hand-written table: that");
+console.log("  `writeFile`'s second argument is the contents and its first is a place is");
+console.log("  knowledge about a library, not about a grammar. It corrects the crude");
+console.log("  \"argument 0 is a path\" reading in both directions -- `subprocess.run(args)`");
+console.log("  carries its payload at argument 0.");
+console.log("");
+console.log("  THE TABLE'S OWN EDGE -- doors the corpus has and the table does not");
+for (const [door, found] of [...doorsOffTable].sort((a, b) => b[1] - a[1]).slice(0, 14)) {
+  console.log("    " + door.padEnd(36) + String(found).padStart(5));
+}
+console.log("");
+console.log("    Each of these is a door where nothing the program holds goes out: a read,");
+console.log("    a stat, a delete, or a copy whose arguments are both paths. If one of them");
+console.log("    does carry data out, it is missing from the count above -- so the number");
+console.log("    is a floor, and this list is how far the table reaches.");
+console.log("");
+console.log("    The `position not recorded` row above was read by hand rather than left as");
+console.log("    a shrug. Some of it is a payload nested one level deeper than this reader");
+console.log("    follows -- `writeFileSync(p, Buffer.from(png))`, and");
+console.log("    `writeFileSync(p, probeSource(readFileSync(f), list))` -- and the rest is a");
+console.log("    path inside `path.join(..)`. So the payload count is a floor, and the gap");
+console.log("    left in it is nesting depth inside the payload argument.");
+if (payloadExamples.length > 0) {
   console.log("");
-  for (const one of examples) console.log("    " + one);
+  console.log("  WHAT THEY LOOK LIKE");
+  for (const one of payloadExamples) console.log("    " + one);
 }
 console.log("");

@@ -218,10 +218,18 @@ export function outflowIn(source: string, language: Language): OutflowReading {
 
     /** What one door call site says, in the order a reader should hear it. */
     function atDoor(site: CallSite, door: Door, routine: string): void {
-      /** Where a name sits in the door's argument list, when it sits in one. */
+      /**
+       * Where a name sits in the door's argument list, when it sits in one.
+       *
+       * Two ways to sit in one: as a bare argument (`write(p, body)`) or as a
+       * call computed there (`write(p, serialize(board))`). The second is how
+       * contents are usually written, so missing it understated the payload
+       * population rather than the path one.
+       */
       const positionOf = (name: string): number | undefined => {
-        const at = site.args.indexOf(name);
-        return at === -1 ? undefined : at;
+        const asArgument = site.args.indexOf(name);
+        if (asArgument !== -1) return asArgument;
+        return site.inline.find((one) => one.name === name)?.at;
       };
 
       // 1. The names written at the door, which need no following at all.
@@ -242,10 +250,10 @@ export function outflowIn(source: string, language: Language): OutflowReading {
          * the corpus `handed-to-the-door` on the first run, which read as though
          * following a value had bought nothing.
          */
-        const handed = hops.length > 0 ? hops[hops.length - 1]! : undefined;
+        const handed = hops.length > 0 ? hops[hops.length - 1]! : producer;
         add(routine, producer, "a-producer", hops,
           door, hops.length > 0 ? "through-a-local" : "handed-to-the-door",
-          handed === undefined ? undefined : positionOf(handed));
+          positionOf(handed));
       }
 
       /*

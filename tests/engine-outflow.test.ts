@@ -177,6 +177,25 @@ describe("outflowIn", () => {
     expect(reading.flows).toEqual([]);
   });
 
+  it("records the position of a payload computed at the door", () => {
+    /*
+     * `writeFile(path, serializeBoard(board), "utf8")` is the shape that matters
+     * most: the *contents* are computed inline, at argument 1. The first version
+     * of this reader found the flow and recorded no position for it, which put
+     * it in the same bucket as "unknown" and made the payload population read as
+     * seven flows in the whole corpus when it is not.
+     */
+    const told = flows(
+      'import { writeFile } from "node:fs/promises";\n'
+      + "export async function save(board: Board) {\n"
+      + '  await writeFile("/tmp/x", serializeBoard(board), "utf8");\n'
+      + "}\n",
+    );
+    const payload = told.find((one) => one.value === "serializeBoard");
+    expect(payload).toBeDefined();
+    expect(payload?.at).toBe(1);
+  });
+
   it("attributes an argument to the door and not to another call on the same line", () => {
     /*
      * `readFileSync(path.join(root, file), "utf8")` puts two calls on one line.

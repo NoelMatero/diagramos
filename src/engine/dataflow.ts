@@ -249,8 +249,17 @@ export interface CallSite {
    * last-write-wins, which is what the shipped reader does.
    */
   reached: Array<[string, string[]]>;
-  /** Calls whose result was passed straight in, with no name in between. */
-  inline: string[];
+  /**
+   * Calls whose result was passed straight in, with no name in between, and
+   * which argument each sat at.
+   *
+   * The position is what a door question needs and a flow question does not.
+   * `writeFile(path, serializeBoard(board), "utf8")` puts the *contents* at
+   * argument 1 as an inline call, and without the index that flow was found and
+   * then reported with no position at all -- which read as "unknown" and made
+   * the payload population look far smaller than it is (#203).
+   */
+  inline: Array<{ name: string; at: number }>;
 }
 
 /**
@@ -1294,7 +1303,8 @@ function readRoutine(
         const peeled = unwrap(argument);
         if (isCall(peeled) && !readsOutOf(argument)) {
           const nested = calleeName(peeled);
-          if (nested) site.inline.push(nested);
+          // Pushed before `args`, so `at` is this argument's own index.
+          if (nested) site.inline.push({ name: nested, at: site.args.length });
           site.args.push(undefined);
         } else if (isName(peeled) && held(peeled.text)) {
           site.passed.push(peeled.text);
@@ -1905,9 +1915,9 @@ export function chainFrom(
     // An unnamed call is a call this reader could not identify, so it is not
     // evidence of a flow to anything -- including to a box named "".
     if (!call.callee || !consumers.includes(call.callee)) continue;
-    for (const inline of call.inline) {
-      if (producers.includes(inline)) {
-        return { producer: inline, consumer: call.callee, through: [], line: call.line };
+    for (const { name } of call.inline) {
+      if (producers.includes(name)) {
+        return { producer: name, consumer: call.callee, through: [], line: call.line };
       }
     }
     for (const [producer, hops] of call.reached) {
