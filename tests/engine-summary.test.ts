@@ -153,4 +153,38 @@ describe("summaryOf", () => {
   it("treats a missing skipped count as none, for a report that never sent one", () => {
     expect(summaryOf({ checked: 2, edgesChecked: 2 })).not.toContain("unchecked");
   });
+
+  it("names the action for anchorable arrows, once", () => {
+    expect(summaryOf({ checked: 4, edgesChecked: 2, edgesSkipped: 4, anchorableEdges: 1 })).toBe(
+      "checked 4 boxes and 2 arrows against the code — all still true"
+        + " — anchor this box at the code that reaches it and this arrow becomes checkable"
+        + " — 4 more arrows were never read",
+    );
+  });
+
+  it("pluralizes the anchorable notice when there are multiple arrows", () => {
+    expect(summaryOf({ checked: 4, edgesChecked: 2, edgesSkipped: 4, anchorableEdges: 2 })).toContain(
+      "anchor external boxes at the code that reaches them and these arrows become checkable",
+    );
+  });
+
+  it("never suggests which routine to anchor at, so a reversion cannot sneak back in", () => {
+    // #274 deleted a suggestion that named the routine. This test prevents it from
+    // quietly returning in a future change. The notice names the action, not a target.
+    const output = summaryOf({ checked: 4, edgesChecked: 2, edgesSkipped: 4, anchorableEdges: 2 });
+    // Routine names are typically word characters followed by parentheses or camelCase boundaries
+    expect(output).not.toMatch(/\w+\.ts#\w+/);
+    expect(output).not.toMatch(/\w+\(/);
+    // The message should only say what to do, not where
+    expect(output).toContain("anchor");
+    expect(output).toContain("code that reaches");
+  });
+
+  it("says nothing new for unanchored arrows on a board where nothing has code at either end", () => {
+    // An arrow from a person to an external box cannot be anchored, so it is not
+    // actionable. This board should not advertise the feature.
+    expect(summaryOf({ checked: 0, edgesChecked: 0, edgesSkipped: 3, anchorableEdges: 0 })).toBe(
+      "nothing on this board points at code yet, so nothing was checked",
+    );
+  });
 });
