@@ -61,6 +61,15 @@ export interface Checked {
    * Unread boxes already had this tail; arrows never did.
    */
   edgesSkipped?: number;
+  /**
+   * Unread arrows that could be made checkable by anchoring at their door.
+   *
+   * When an arrow touches an external box (file, database, service) and that
+   * box is anchored at the code that reaches it, the arrow becomes a question
+   * about code that can be checked. This counts how many unread arrows meet
+   * the criteria: external end, code at the near end, and no verified door ref.
+   */
+  anchorableEdges?: number;
   /** The board is not about this repo, so nothing here is checkable. */
   concept?: boolean;
 }
@@ -151,9 +160,13 @@ export function summaryOf(facts: Checked): string {
   const unproven = unconfirmed
     ? ` — ${unconfirmed} ${unconfirmed === 1 ? "arrow was read and not" : "arrows were read and not"} confirmed`
     : "";
+  const anchorable = facts.anchorableEdges ?? 0;
+  const anchorableNotice = anchorable
+    ? ` — anchor ${anchorable === 1 ? "this box at the code that reaches it and this arrow becomes" : "external boxes at the code that reaches them and these arrows become"} checkable`
+    : "";
   const edgesSkipped = facts.edgesSkipped ?? 0;
   const neverRead = edgesSkipped
     ? ` — ${edgesSkipped} more ${edgesSkipped === 1 ? "arrow was" : "arrows were"} never read`
     : "";
-  return `${coverage} — all still true${unproven}${neverRead}${unread}`;
+  return `${coverage} — all still true${unproven}${anchorableNotice}${neverRead}${unread}`;
 }

@@ -2255,6 +2255,13 @@ function renderCoverageAudit(entries, colour) {
       if (report.handDrawn) rows.push(paint(`${report.handDrawn} hand-drawn boxes, never checked`, "dim", colour));
       if (report.skipped) rows.push(paint(`${report.skipped} boxes skipped: ${skipWords(report.skippedWhy)}`, "yellow", colour));
       if (report.edgesSkipped) rows.push(...unreadArrowRows(report, colour));
+      if (report.anchorableEdges) {
+        rows.push(paint(
+          `anchor ${report.anchorableEdges === 1 ? "this box at the code that reaches it and this arrow becomes" : "external boxes at the code that reaches them and these arrows become"} checkable`,
+          "dim",
+          colour,
+        ));
+      }
       /*
        * Read, and not corroborated. The line the amber arrows became (#133).
        *

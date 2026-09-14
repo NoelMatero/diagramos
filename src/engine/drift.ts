@@ -1290,6 +1290,16 @@ export interface DriftReport {
    */
   unreadEdges: UnreadEdgeFinding[];
   /**
+   * Unread arrows that could be checked if anchored at their door.
+   *
+   * An arrow touching an external box becomes checkable when that box is
+   * anchored at the code that reaches it (its door). This counts how many
+   * unread arrows meet the criteria: external end with no door ref, code at
+   * the near end. Arrows with a person at one end or no code at either end
+   * are excluded.
+   */
+  anchorableEdges?: number;
+  /**
    * Arrows that were read and not corroborated: counted, named, never judged.
    *
    * The honest half of what amber used to say. "How much of this board is
@@ -2621,6 +2631,7 @@ export function checkDrift(
   let skipped = 0;
   let edgesChecked = 0;
   let edgesSkipped = 0;
+  let anchorableEdges = 0;
   let excused = 0;
   let handDrawn = 0;
   const skippedWhy: SkipBreakdown<NodeSkipReason> = {};
@@ -3527,6 +3538,21 @@ export function checkDrift(
       };
       const externalEnd = fromNode.state === "external" || toNode.state === "external";
       if (externalEnd && !(atADoor(fromNode) || atADoor(toNode))) {
+        /*
+         * An unanchored arrow to an external box is unread. But if both ends
+         * exist and one is code, the arrow could be made checkable by anchoring
+         * the external box at the code that reaches it.
+         *
+         * The node graph tracks "planned", "built" (code in this repo), and
+         * "external". The code end must be "built" -- planned sketches are not
+         * there yet, and external boxes by definition are not in this repo.
+         * An arrow from code to an external thing is checkable; an arrow from a
+         * person to an external thing is not, so the other end must be "built".
+         */
+        const codeEnd = fromNode.state === "external" ? toNode : fromNode;
+        if (codeEnd.state === "built") {
+          anchorableEdges += 1;
+        }
         skipClaimedEdge("endpoint-external");
         continue;
       }
@@ -5309,6 +5335,7 @@ export function checkDrift(
     edgesSkipped,
     edgesSkippedWhy,
     unreadEdges,
+    ...(anchorableEdges > 0 ? { anchorableEdges } : {}),
     unconfirmedEdges,
     ...(graph.strayArrows > 0 ? { strayArrows: graph.strayArrows } : {}),
     // Read off the graph rather than recomputed: one answer, so no two channels

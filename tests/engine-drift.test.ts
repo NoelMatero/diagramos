@@ -1478,8 +1478,13 @@ describe("naming the arrows nothing read", () => {
     // Still not called wrong, and on purpose: nothing here can read a claim with no code at one end.
     expect(report.clean).toBe(true);
     expect(report.edges).toEqual([]);
+    // The arrow from engine (code) to file (external) is anchorable: if the file
+    // box is anchored at the code that writes to it, the arrow becomes checkable.
+    expect(report.anchorableEdges).toBe(1);
     expect(pageSentence(report)).toBe(
-      "checked 2 boxes and 1 arrow against the code — all still true — 1 more arrow was never read",
+      "checked 2 boxes and 1 arrow against the code — all still true"
+        + " — anchor this box at the code that reaches it and this arrow becomes checkable"
+        + " — 1 more arrow was never read",
     );
   });
 });
