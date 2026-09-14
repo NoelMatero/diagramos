@@ -25,6 +25,10 @@ docs/handoff/
 # (sidecar metadata is also here; freshness is checked at check time)
 graphify-out/
 
+# Bytecode for `scripts/lib/reach_trace.py`, which `npm run trace:reach` puts on
+# a corpus repository's PYTHONPATH, so pytest compiles it in place.
+__pycache__/
+
 # Corpus clones for `npm run measure:licence`. A licence records the commit it
 # was measured at, not a copy of somebody else's repository.
 /.corpus/

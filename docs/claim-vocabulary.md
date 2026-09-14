@@ -620,7 +620,7 @@ to pass every check this tool had.
 deliberate: almost all of it is `Vec<T>`, `Promise<T>`, `list[str]`, which
 nobody draws as two boxes.
 
-## Thirty-eight times a measurement contradicted the design
+## Thirty-nine times a measurement contradicted the design
 
 Kept because the pattern is the point: eleven of the first thirteen came from
 building one word or one reader, not from reviewing the design. Nothing since
@@ -3188,6 +3188,43 @@ duplicate from conflitcts, requires reading prs "An arrow can be three calls lon
     copy of the reader; what guards attribution is the scoping tests and the
     two-dispatch refusal, not that number.
 
+39. **The instrument the issue named would not have worked, and the one that
+    does reported a clean run over a suite that had not run.** #273 asked for a
+    TypeScript referee and named V8's CPU profiler as the likely way. Measured,
+    it is not: at a 200us sampling interval over nestjs's 276 files and 2,739
+    tests it saw **123 distinct `file#name` frames**, nearly all of them
+    anonymous module initialisation, because that suite spends 4 seconds of 19
+    actually running tests. A profile is a set of samples, and the calls a
+    referee has to see are the cheap ones.
+
+    What replaced it is an entry hook inserted by a vite plugin, with caller and
+    callee read off the real JS stack -- `reach_trace.py`'s logic, on V8 frames.
+    A shadow stack would be cheaper and is **wrong in Node**: an `await` unwinds
+    while the function is still on it, so every edge until it resumes is
+    attributed to a function that is not running, and a referee that invents an
+    edge invents the false accusation to go with it.
+
+    **Then the second kind of finding, and it is the one worth remembering.**
+    The first vite score was read off a run that reported `0 failed`. It was
+    not: **45 of its 67 suites had failed to parse**, because vite is written
+    without semicolons and the hook went in behind a bare `super()`. A suite
+    that fails to *collect* reports no tests rather than a failure, so the run
+    exits 0 and the trace holds a fraction of the code -- the same shape as
+    items 33 to 35, one layer further out, and found by asking what a suspiciously
+    small population meant rather than by anything going red. `trace-reach.mts`
+    now refuses to write a trace when any file collected no tests, and separates
+    that from a test that ran and failed on its own timing, which is a real
+    consequence of a hook on every call and does not invalidate anything.
+
+    Three more, each now a test in `tests/reach-trace-node.test.ts`: a project
+    that owns `Error.prepareStackTrace` handed back a stack of the wrong shape
+    (9 of vite's suites); the runtime, copied into the clone so vue's jsdom
+    project could resolve it, was instrumented by its own plugin and every one
+    of vue's 183 files died in `Maximum call stack size exceeded`; and a marker
+    appended to a file whose last line is a `//` comment lands inside the
+    comment, which parses, does nothing, and silently drops every later edge
+    through that file.
+
 ## Open, in the order worth doing
 
 1. ~~**The licence grid.**~~ Built at #207 and shipped at #209. `@accesses` is
@@ -3336,12 +3373,66 @@ language.
   TypeScript routines per door, **8.7%** of Python's and **9.2%** of Rust's. So
   most arrows stay unjudgeable even where the walk is right.
 
-  **The remaining blocker is the referee, not the reader.** Only Python has a
-  run-time one, over two repositories whose tests reached three doors each, so
-  0 is a floor rather than a rate, and neither TypeScript nor Rust has been
-  scored against a real run at all. A false red is not recoverable, and one
-  language's evidence is not three languages' evidence. **Reopen when** a
-  TypeScript and a Rust project can be recorded the same way.
+  **TypeScript now has a run-time referee too, and the walk survives it**
+  (#273). `npm run trace:reach -- --repo=vitejs-vite` records which of a
+  repository's own routines called which while its own vitest suite ran, in the
+  same shape `reach_trace.py` writes, and `measure:door-reach --trace=` scores
+  it unchanged. Over five repositories in two languages the walk rules out **0
+  of 1,423** (routine, door) pairs that do reach, against **117** for the
+  `calls` baseline it replaced:
+
+  | | doors reached | pairs | `calls` | `mentions` | `callbacks` |
+  |---|---|---|---|---|---|
+  | vitejs/vite | 47 of 119 | 1,328 | 61 | **0** | **0** |
+  | nestjs/nest | 1 of 34 | 5 | 1 | **0** | **0** |
+  | vuejs/core | 0 of 17 | 0 | -- | -- | -- |
+  | pallets/flask | 3 | 12 | 5 | 2 | **0** |
+  | encode/httpx | 3 | 78 | 50 | **0** | **0** |
+
+  vite is the find: its suite is the only one in the corpus that really touches
+  the disk, and it alone carries **fifteen times the whole Python evidence
+  base**. vue is the other half of the lesson -- 3,681 tests, 3,937 edges and
+  **not one door**, because a reactivity suite has no reason to open a file. A
+  language's referee is only as good as whether its suites go near the outside.
+
+  **What that evidence does not cover, said plainly.** The tests reached 48 of
+  the 170 doors in the three TypeScript repositories, and each trace sees only
+  the paths its own suite ran: vite's loaded 101 of 1,564 source files (6.5%),
+  nest's 300 of 1,904 (15.8%), vue's 198 of 527 (37.6%), flask's 19 of 83
+  (22.9%), httpx's 20 of 60 (33.3%). So 0 is still a floor and not a rate, and
+  it covers **two of the three languages**. Rust has no referee -- see below --
+  and `excalidraw` and `TanStack/query` were not traced, so nothing here says
+  anything about them.
+
+  **Rust: there is no referee, and the reason is not the one expected.** #273
+  guessed the obstacle was that calls are compiled and inlined so a profiler's
+  stacks are not a call graph. Half right. A sampling profiler is indeed
+  useless, and that is true of Node as well: V8's CPU profiler at a 200us
+  interval over nestjs's 276 files and 2,739 tests saw **123 distinct
+  `file#name` frames**, almost all of them anonymous module initialisation. But
+  a Rust *backtrace* is fine. In a debug `cargo test` build it names the whole
+  caller chain, file and line included, at **9.5us a capture** -- the same order
+  as the 3.0-7.5us the Node referee pays for `Error.captureStackTrace`, which
+  is how it attributes every edge it records.
+
+  The blocker is that there is nowhere to put the hook. Node's referee exists
+  because vitest already routes every module through a transform, so a plugin
+  can insert an entry hook without touching the repository. `cargo test`
+  compiles from source and offers no such seam: instrumenting would mean
+  rewriting a pinned crate's `.rs` files and its manifest, and the part it could
+  not reach is the part that already sank the crate-wide Rust reader above -- a
+  function written inside a `macro_rules!` body is an unparsed token tree to any
+  source-level instrumenter. So the Rust half is **a written answer rather than
+  a promise**, which is what #273 asked for. Two facts worth not re-deriving:
+  the toolchain and the suites are ready (`cargo test --no-run` is clean on
+  `anyhow`), and the backtrace is not what is in the way.
+
+  **So the remaining blocker is one language, not the referee as such.** A false
+  red is not recoverable, and two languages' evidence is not three. Refuting an
+  arrow onto a door is arguable on its merits in TypeScript and Python now, and
+  it still would not obviously be worth shipping: the walk rules out 8.7% to
+  16.5% of routines per door, so most arrows stay unjudgeable even where it is
+  right, and that trade is a separate decision (#273 defers it on purpose).
 
   Two things were measured and rejected on the way, and the numbers are the
   reason both are written down rather than retried. Staying quiet on any door
