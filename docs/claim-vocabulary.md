@@ -377,9 +377,10 @@ on; the recall is the cost.
 
 The numbers behind each square, and the command that reproduces it, are in
 `relations` in `licence.ts`. In short, for Python: 12,693 dependency edges with
-41 missed and 0 invented; 2,177 field asks with 0 missed; 4,002 type names in
-1,543 functions with 0 missed; 5,525 calls in 683 files with 0 missed and 0
-invented, refusing 7.1%. Four separate runs against four unrelated referees,
+41 missed and 0 invented; 2,300 field asks over the pinned clones, whose 241
+misses are all the referee's (item 40); 25,151 type names in 49,371 functions
+with 0 missed; 5,525 calls in 683 files with 0 missed and 0 invented, refusing
+7.1%. Four separate runs against four unrelated referees,
 which is exactly why one entry saying "yes" for all of them was the wrong
 shape.
 
@@ -3265,14 +3266,20 @@ duplicate from conflitcts, requires reading prs "An arrow can be three calls lon
     | `conforms` ts+tsx | 376 · 0 accused | 379 · 0 | **956 · 32 accused** |
     | `conforms` python | 2,276 · 0 | 2,276 · 0 | **14,238 · 0** |
     | `conforms` rust, a stated no | 4,975 · 0 | — | 4,975 · 0, the five Rust clones |
+    | `takes`/`returns` ts+tsx | 1,842 · 0 | 3,167 · 0 | **22,793 · 80** |
+    | `takes`/`returns` rust | 154 · 0 | 154 · 0 | **32,719 · 0** |
+    | `takes`/`returns` python | 4,002 · 0 | 4,002 · 0 | **25,151 · 0** |
 
-    Invented is 0 in every cell. **Every one of the 381 disagreements was read,
-    and the reader is right about all of them.** They are the referee, and the
-    shapes are ones no tree on this machine writes much of: a docstring's
-    `Args:` list read as fields (168 of Python's 241), a class written inside a
-    string that a test loads as a module, a Rust `match` arm or `if id == DEAD {`
-    read as a construction (88 of Rust's 93), a TypeScript header over several
-    lines whose type arguments were read as bases (30 of 32). Each row's `known`
+    Invented is 0 in every cell that counts it (`measure:signature` does not).
+    **Every one of the 461 disagreements was read, and the reader is right about
+    all of them.** They are the referee, and the shapes are ones no tree on this
+    machine writes much of: a docstring's `Args:` list read as fields (168 of
+    Python's 241), a class written inside a string that a test loads as a
+    module, a Rust `match` arm or `if id == DEAD {` read as a construction (88 of
+    Rust's 93), a TypeScript header over several lines whose type arguments were
+    read as bases (30 of 32), a NestJS decorator's argument
+    `@Body({ schema: mockSchema })` read as a parameter's type (38 of the 80
+    signature misses). Each row's `known`
     lists them with counts. The one real construction among them is inside a
     `macro_rules!` body, which no reader here parses.
 

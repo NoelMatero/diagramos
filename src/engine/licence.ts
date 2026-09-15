@@ -164,7 +164,9 @@ export interface RelationMeasured {
    * It is not the honest answer for the other three. One licence entry covers
    * TypeScript, TSX **and JavaScript**, and `measure:holds`, `measure:signature`
    * and `measure:constructs` between them ask JavaScript 0 questions -- 21
-   * files, 51 functions, not one type name and not one construction. So the
+   * files, 51 functions, not one type name and not one construction. Over the
+   * pinned clones (#278) it is 24 constructions in 1,254 files and not one type
+   * name in 587 functions, which is still no evidence for a type word. So the
    * entry is right that its extensions were measured for imports and wrong that
    * they were measured for field lists, and saying "yes" on JavaScript's behalf
    * is #207 one axis over: permission inherited from a measurement of something
@@ -416,42 +418,68 @@ const MEMBER_SCAN =
  * has to name the thing that earned it, and two squares may name the same thing.
  */
 const TYPESCRIPT_SIGNATURE: RelationMeasured = {
-  reproduce: "npm run measure:signature",
-  measured: "2026-09-02",
+  reproduce: "npm run measure:signature -- .corpus/*",
+  measured: "2026-09-15",
   referee: TEXT_SCAN("signature"),
   unit: "type names in function signatures",
-  counts: { asked: 1842, missed: 0 },
+  counts: { asked: 22793, missed: 80 },
   covers: ["ts", "tsx"],
+  known: [
+    "An argument to a parameter decorator -- nest's `@Body({ schema: " +
+      "mockSchema, pipes: [ParseIntPipe] }) body` -- whose `schema:` the " +
+      "referee reads as a type annotation. 38 of the 80, all nest.",
+    "A destructured parameter renaming what it takes -- `{ attrs: _attrs }`, " +
+      "`{ p: patch, um: unmount }: RendererInternals` -- where the new binding " +
+      "follows a colon. 26, most of them vue.",
+    "A comment inside an inline return type that holds a parenthesis -- vite's " +
+      "`/** import map entries with the base stripped (placeholder name -> real " +
+      "name) */` -- so the referee cuts the signature at the comment's `)` and " +
+      "reads its words. 10.",
+    "A default value written over several lines, `options = { interceptors: " +
+      "true, .. }`, which the referee drops only as far as the first comma. 5.",
+    "A `$`-prefixed property in an inline type, `{ $cls?: string }`, read as " +
+      "the name `cls`. 1.",
+  ],
   note:
-    "1,801 of them TypeScript and 41 TSX. JavaScript is inside this licence and " +
-    "outside this number, and it is the one square here that was costing " +
-    "something: its 51 functions declare no type at all, so every parameter " +
-    "claim on one read as an absence and was refutable -- 51 of 51 -- by a " +
-    "reader no referee has ever checked in JavaScript. They are withheld now.",
+    "21,822 of them TypeScript and 971 TSX, over the fifteen pinned clones " +
+    "(#278). The trees on disk the bare command reads ask 3,167 today (3,126 " +
+    "and 41), 0 missed, against the 1,842 this row used to cite. Every miss " +
+    "above was read, and not one of the names is a type. JavaScript is inside " +
+    "this licence and outside this number, and it is the one square here that " +
+    "was costing something: a JavaScript function declares no type at all, so " +
+    "every parameter claim on one read as an absence and was refutable -- 51 " +
+    "of 51 in the corpus #207 filled this in from, and the clones' 587 " +
+    "JavaScript functions write not one type name. They are withheld now.",
 };
 
 const RUST_SIGNATURE: RelationMeasured = {
-  reproduce: "npm run measure:signature",
-  measured: "2026-09-02",
+  reproduce: "npm run measure:signature -- .corpus/*",
+  measured: "2026-09-15",
   referee: TEXT_SCAN("signature"),
   unit: "type names in function signatures",
-  counts: { asked: 154, missed: 0 },
+  counts: { asked: 32719, missed: 0 },
   note:
-    "Across 63 functions, withholding 5 of them for `Self` (#193). A " +
-    "small sample beside TypeScript's and Python's, and the smallest " +
-    "number on this grid.",
+    "Across 14,391 functions in the pinned clones (#278), withholding 1,749 " +
+    "of them -- 852 aliased, 454 for `Self` (#193), 443 incomplete. Until " +
+    "then this row cited the bare command over the trees on disk, which " +
+    "still reproduces its old figure exactly: 154 names in 63 functions, the " +
+    "smallest number on the grid, now two hundred times larger and still " +
+    "without a miss.",
 };
 
 const PYTHON_SIGNATURE: RelationMeasured = {
-  reproduce: "npm run measure:signature",
-  measured: "2026-09-02",
+  reproduce: "npm run measure:signature -- .corpus/*",
+  measured: "2026-09-15",
   referee: TEXT_SCAN("signature"),
   unit: "type names in function signatures",
-  counts: { asked: 4002, missed: 0 },
+  counts: { asked: 25151, missed: 0 },
   note:
-    "Across 1,543 functions, of which it would refute 1,404 and withhold " +
-    "139 -- 71 aliased, 68 quoted. Before #198 it withheld all 1,543, " +
-    "1,404 of them for no reason but a missing licence.",
+    "Across 49,371 functions in the pinned clones (#278), of which it would " +
+    "refute 48,750 and withhold 621 -- 358 quoted, 260 aliased. The trees on " +
+    "disk the bare command reads reproduce the old figure exactly: 4,002 " +
+    "names in 1,548 functions, refuting 1,409 and withholding 139, 71 " +
+    "aliased and 68 quoted. Before #198 it withheld every one of those, " +
+    "for no reason but a missing licence.",
 };
 
 /**
