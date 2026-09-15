@@ -44,8 +44,8 @@ import { surveyScope } from "../src/engine/survey";
 
 const HOME = process.env.HOME ?? "/Users/noelmatero";
 const CORPUS = [
-  `${HOME}/board-ai/.claude/worktrees/96-rust/.corpus`,
-  `${process.cwd()}/.claude/worktrees/96-rust/.corpus`,
+  `${process.cwd()}/.corpus`,
+  `${HOME}/board-ai/.corpus`,
 ].find((candidate) => existsSync(candidate)) ?? "";
 
 type Claim =
@@ -79,7 +79,7 @@ interface Board {
 const ANYHOW: Board = {
   name: "anyhow (rust)",
   language: "rust",
-  root: `${CORPUS}/dtolnay-anyhow`,
+  root: `${CORPUS}/anyhow`,
   scope: "src",
   nodes: [
     { id: "error", label: "Error", ref: "src/lib.rs#Error" },

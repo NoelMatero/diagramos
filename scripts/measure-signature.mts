@@ -191,7 +191,9 @@ for (const root of trees) {
         // answering wrongly, which is the whole design.
         if (verdict.verdict === "withheld" && other.verdict === "withheld") continue;
         tally.missed += 1;
-        if (tally.examples.length < 12) {
+        // `--all` for every miss rather than the first 12: over the pinned
+        // clones TypeScript alone misses 78, and each one has to be read (#278).
+        if (tally.examples.length < 12 || process.argv.includes("--all")) {
           tally.examples.push(`${path.relative(process.cwd(), file)}: ${symbol}${signatureText} — did not find ${name}`);
         }
       }

@@ -131,11 +131,15 @@ export interface RelationMeasured {
   /** What the referee counted, in its own units. */
   unit: string;
   /*
-   * A note on reproducing these. The dependency corpus is five repositories at
-   * pinned commits, so its numbers are exact. The other three commands read
-   * trees as they sit on disk -- this repository among them -- so their counts
-   * move by a handful with every commit, this one included. What has to hold is
-   * the miss column, which is the number an accusation rests on.
+   * A note on reproducing these. A row's `reproduce` names its corpus, and a
+   * bare script name is not one: with no arguments a measure script reads the
+   * trees as they sit on disk -- this repository among them -- whose counts move
+   * with every commit and four of which are other checkouts on this machine. #278
+   * found `holds`, `builds`, `conforms`, `takes` and `returns` citing that bare
+   * command for numbers it no longer printed, so those rows are measured over
+   * the pinned clones in `.corpus` and reproduce exactly. What has to hold is
+   * the miss column, which is the number an accusation rests on: zero, or every
+   * miss read and written down in `known`.
    */
   /**
    * The counts, or `"corpus"` for the table above.
@@ -160,7 +164,9 @@ export interface RelationMeasured {
    * It is not the honest answer for the other three. One licence entry covers
    * TypeScript, TSX **and JavaScript**, and `measure:holds`, `measure:signature`
    * and `measure:constructs` between them ask JavaScript 0 questions -- 21
-   * files, 51 functions, not one type name and not one construction. So the
+   * files, 51 functions, not one type name and not one construction. Over the
+   * pinned clones (#278) it is 24 constructions in 1,254 files and not one type
+   * name in 587 functions, which is still no evidence for a type word. So the
    * entry is right that its extensions were measured for imports and wrong that
    * they were measured for field lists, and saying "yes" on JavaScript's behalf
    * is #207 one axis over: permission inherited from a measurement of something
@@ -412,42 +418,68 @@ const MEMBER_SCAN =
  * has to name the thing that earned it, and two squares may name the same thing.
  */
 const TYPESCRIPT_SIGNATURE: RelationMeasured = {
-  reproduce: "npm run measure:signature",
-  measured: "2026-09-02",
+  reproduce: "npm run measure:signature -- .corpus/*",
+  measured: "2026-09-15",
   referee: TEXT_SCAN("signature"),
   unit: "type names in function signatures",
-  counts: { asked: 1842, missed: 0 },
+  counts: { asked: 22793, missed: 80 },
   covers: ["ts", "tsx"],
+  known: [
+    "An argument to a parameter decorator -- nest's `@Body({ schema: " +
+      "mockSchema, pipes: [ParseIntPipe] }) body` -- whose `schema:` the " +
+      "referee reads as a type annotation. 38 of the 80, all nest.",
+    "A destructured parameter renaming what it takes -- `{ attrs: _attrs }`, " +
+      "`{ p: patch, um: unmount }: RendererInternals` -- where the new binding " +
+      "follows a colon. 26, most of them vue.",
+    "A comment inside an inline return type that holds a parenthesis -- vite's " +
+      "`/** import map entries with the base stripped (placeholder name -> real " +
+      "name) */` -- so the referee cuts the signature at the comment's `)` and " +
+      "reads its words. 10.",
+    "A default value written over several lines, `options = { interceptors: " +
+      "true, .. }`, which the referee drops only as far as the first comma. 5.",
+    "A `$`-prefixed property in an inline type, `{ $cls?: string }`, read as " +
+      "the name `cls`. 1.",
+  ],
   note:
-    "1,801 of them TypeScript and 41 TSX. JavaScript is inside this licence and " +
-    "outside this number, and it is the one square here that was costing " +
-    "something: its 51 functions declare no type at all, so every parameter " +
-    "claim on one read as an absence and was refutable -- 51 of 51 -- by a " +
-    "reader no referee has ever checked in JavaScript. They are withheld now.",
+    "21,822 of them TypeScript and 971 TSX, over the fifteen pinned clones " +
+    "(#278). The trees on disk the bare command reads ask 3,167 today (3,126 " +
+    "and 41), 0 missed, against the 1,842 this row used to cite. Every miss " +
+    "above was read, and not one of the names is a type. JavaScript is inside " +
+    "this licence and outside this number, and it is the one square here that " +
+    "was costing something: a JavaScript function declares no type at all, so " +
+    "every parameter claim on one read as an absence and was refutable -- 51 " +
+    "of 51 in the corpus #207 filled this in from, and the clones' 587 " +
+    "JavaScript functions write not one type name. They are withheld now.",
 };
 
 const RUST_SIGNATURE: RelationMeasured = {
-  reproduce: "npm run measure:signature",
-  measured: "2026-09-02",
+  reproduce: "npm run measure:signature -- .corpus/*",
+  measured: "2026-09-15",
   referee: TEXT_SCAN("signature"),
   unit: "type names in function signatures",
-  counts: { asked: 154, missed: 0 },
+  counts: { asked: 32719, missed: 0 },
   note:
-    "Across 63 functions, withholding 5 of them for `Self` (#193). A " +
-    "small sample beside TypeScript's and Python's, and the smallest " +
-    "number on this grid.",
+    "Across 14,391 functions in the pinned clones (#278), withholding 1,749 " +
+    "of them -- 852 aliased, 454 for `Self` (#193), 443 incomplete. Until " +
+    "then this row cited the bare command over the trees on disk, which " +
+    "still reproduces its old figure exactly: 154 names in 63 functions, the " +
+    "smallest number on the grid, now two hundred times larger and still " +
+    "without a miss.",
 };
 
 const PYTHON_SIGNATURE: RelationMeasured = {
-  reproduce: "npm run measure:signature",
-  measured: "2026-09-02",
+  reproduce: "npm run measure:signature -- .corpus/*",
+  measured: "2026-09-15",
   referee: TEXT_SCAN("signature"),
   unit: "type names in function signatures",
-  counts: { asked: 4002, missed: 0 },
+  counts: { asked: 25151, missed: 0 },
   note:
-    "Across 1,543 functions, of which it would refute 1,404 and withhold " +
-    "139 -- 71 aliased, 68 quoted. Before #198 it withheld all 1,543, " +
-    "1,404 of them for no reason but a missing licence.",
+    "Across 49,371 functions in the pinned clones (#278), of which it would " +
+    "refute 48,750 and withhold 621 -- 358 quoted, 260 aliased. The trees on " +
+    "disk the bare command reads reproduce the old figure exactly: 4,002 " +
+    "names in 1,548 functions, refuting 1,409 and withholding 139, 71 " +
+    "aliased and 68 quoted. Before #198 it withheld every one of those, " +
+    "for no reason but a missing licence.",
 };
 
 /**
@@ -518,34 +550,61 @@ export const LICENCES: readonly Licence[] = [
       returns: { presence: TYPESCRIPT_SIGNATURE, absence: NOT_DESIGNED_YET },
       holds: {
         presence: {
-          reproduce: "npm run measure:holds",
-          measured: "2026-09-02",
+          reproduce: "npm run measure:holds -- .corpus/*",
+          measured: "2026-09-15",
           referee: TEXT_SCAN("field list"),
           unit: "field asks",
-          counts: { asked: 1195, missed: 0, invented: 0 },
+          counts: { asked: 688, missed: 3, invented: 0 },
           covers: ["ts", "tsx"],
+          known: [
+            "A constructor parameter's type read as a field's. excalidraw's " +
+              "`FileManager` destructures `getFiles: (fileIds: FileId[]) => ..` in " +
+              "its constructor and keeps it in an untyped `private _getFiles`, and " +
+              "the referee reads those lines as the class's own. 2 of the 3.",
+            "A name inside a string in a field's initializer -- nest's sample " +
+              "`owners: Owner[] = [{ id: 1, name: 'Jon', age: 5 }]`. 1 of the 3.",
+          ],
           note:
-            "1,018 of them TypeScript and 177 TSX. JavaScript writes no type on a " +
-            "field, so its 21 files in the corpus ask nothing -- and `holds` " +
-            "refuses them as `no-fields` well before the licence is read, which " +
-            "is why saying no here costs nothing and says something true.",
+            "546 of them TypeScript and 142 TSX, over the fifteen pinned clones " +
+            "(#278). Until then this row cited the bare command, which reads the " +
+            "trees on disk and never reproduced its 1,195: it reads 1,284 today " +
+            "(1,107 and 177), 0 missed, 0 invented. Each of the 3 misses above was " +
+            "read against the source and the reader is right about all of them. " +
+            "JavaScript writes no type on a field, so its 1,254 files in the " +
+            "clones ask nothing -- and `holds` refuses them as `no-fields` well " +
+            "before the licence is read, which is why saying no here costs nothing " +
+            "and says something true.",
         },
         absence: NOT_DESIGNED_YET,
       },
       builds: {
         presence: {
-          reproduce: "npm run measure:constructs",
-          measured: "2026-09-02",
+          reproduce: "npm run measure:constructs -- .corpus/*",
+          measured: "2026-09-15",
           referee: TEXT_SCAN("routine body"),
           unit: "construction asks",
-          counts: { asked: 225, missed: 0, invented: 0 },
+          counts: { asked: 1050, missed: 10, invented: 0 },
           covers: ["ts", "tsx"],
+          known: [
+            "A one-line routine the referee never closes, so the `new X` on the " +
+              "next line is credited to it: `const queryFn = () => 'data'` above " +
+              "`new QueryClient(..)` in five TanStack Query tests, once in vue and " +
+              "twice in nest. 8 of the 10.",
+            "`const dep = (this.dep = new Dep())` in vue, read as a routine named " +
+              "`dep` opening on that line. 1.",
+            "Code inside a template literal -- vite's worker plugin writes " +
+              "`new Blob([..])` into the source it generates. 1.",
+          ],
           note:
-            "55 of them TypeScript and 170 TSX. JavaScript is the real gap on this " +
-            "grid: `new Foo()` is a construction this reader could read there, and " +
-            "the corpus simply has none to ask about. Unlike `holds`, nothing else " +
-            "stops a JavaScript `@builds` arrow, so the empty square is the only " +
-            "thing standing between an unmeasured reader and a red.",
+            "239 TypeScript and 811 TSX over the fifteen pinned clones (#278); the " +
+            "trees on disk the bare command reads ask 227 today (57 and 170), 0 " +
+            "missed, 0 invented, against the 225 this row used to cite. JavaScript " +
+            "is the real gap on this grid: the clones ask it 24 questions over " +
+            "1,254 files and it misses 2, both the one-line-routine shape above, " +
+            "which is thin evidence either way -- so `covers` still withholds it. " +
+            "Unlike `holds`, nothing else stops a JavaScript `@builds` arrow, so " +
+            "the empty square is the only thing standing between a barely measured " +
+            "reader and a red.",
         },
         absence: NOT_DESIGNED_YET,
       },
@@ -725,20 +784,35 @@ export const LICENCES: readonly Licence[] = [
       },
       conforms: {
         presence: {
-          reproduce: "npm run measure:conforms",
-          measured: "2026-09-06",
+          reproduce: "npm run measure:conforms -- .corpus/*",
+          measured: "2026-09-15",
           referee: HEADER_SCAN,
           unit: "base asks",
-          counts: { asked: 376, missed: 0, invented: 0 },
+          counts: { asked: 956, missed: 32, invented: 0 },
           covers: ["ts", "tsx"],
+          known: [
+            "A header written over several lines, which the referee joins into " +
+              "one and then reads the base's type arguments as further bases: " +
+              "TanStack Query's `interface CreateBaseQueryOptions<..> extends " +
+              "QueryObserverOptions<` puts `TQueryFnData,` `TError,` `TData,` on " +
+              "a line each. 30 of the 32.",
+            "A type parameter's constraint read as a heritage clause -- `C " +
+              "extends ComputedOptions,` on its own line inside vue's " +
+              "`interface LegacyOptions<..>` and `ComponentOptionsBase<..>`. 2.",
+          ],
           note:
-            "213 TypeScript and 163 TSX, refusing none of them, and every one of " +
-            "the 163 is `interface X extends Y` -- there is not one class heritage " +
-            "clause in any .tsx file in the corpus. JavaScript is inside this " +
-            "licence and was asked **0 questions**, so `covers` withholds it, the " +
-            "same square #211 shipped a `yes` in. Asked the 122 readable pairs " +
-            "backwards, it confirmed **0**, which is the number the word exists " +
-            "for. The run found one reader bug before it could report any of this: " +
+            "937 TypeScript and 19 TSX over the fifteen pinned clones (#278), " +
+            "refusing 7.9% of the TypeScript, `incomplete` and `not-declared`. " +
+            "The trees on disk the bare command reads ask 379 today (216 and " +
+            "163), 0 accused, against the 376 this row used to cite. JavaScript " +
+            "is inside this licence and was asked **5 questions** over 1,254 " +
+            "files, so `covers` withholds it, the same square #211 shipped a " +
+            "`yes` in. Asked the 198 readable pairs backwards it confirmed **2**, " +
+            "and both are true: vite's ws.d.ts declares `interface WebSocketAlias " +
+            "extends WebSocket` at the top level and `interface WebSocket extends " +
+            "WebSocketAlias` inside `declare namespace WebSocket`, so the file " +
+            "says both. The first run found one reader bug before it could report " +
+            "any of this: " +
             "TypeScript hangs a class's type arguments off the clause as a sibling " +
             "of the base name, and with no rule for that node every declaration " +
             "carrying them held a doubt that silences absences -- a word that " +
@@ -815,25 +889,54 @@ export const LICENCES: readonly Licence[] = [
       returns: { presence: RUST_SIGNATURE, absence: NOT_DESIGNED_YET },
       holds: {
         presence: {
-          reproduce: "npm run measure:holds",
-          measured: "2026-09-02",
+          reproduce: "npm run measure:holds -- .corpus/*",
+          measured: "2026-09-15",
           referee: TEXT_SCAN("field list"),
           unit: "field asks",
-          counts: { asked: 47, missed: 0, invented: 0 },
+          counts: { asked: 1813, missed: 2, invented: 0 },
+          known: [
+            "A field typed by a type parameter's associated type -- `map: " +
+              "S::SerializeMap` in pydantic-core, `caps: M::Captures` in ripgrep " +
+              "-- where the referee reads the parameter `S` as a held type. Both.",
+          ],
+          note:
+            "Over 911 Rust files in the pinned clones, pydantic's own Rust core " +
+            "among them (#278), refusing 2.2%, most of it `incomplete`. The trees " +
+            "on disk the bare command reads ask 62 today, 0 missed -- against the " +
+            "47 this row used to cite, and a population thin enough that its zero " +
+            "said little.",
         },
         absence: NOT_DESIGNED_YET,
       },
       builds: {
         presence: {
-          reproduce: "npm run measure:constructs",
-          measured: "2026-09-02",
+          reproduce: "npm run measure:constructs -- .corpus/*",
+          measured: "2026-09-15",
           referee: TEXT_SCAN("routine body"),
           unit: "construction asks",
-          counts: { asked: 66, missed: 0, invented: 0 },
+          counts: { asked: 1481, missed: 93, invented: 0 },
+          known: [
+            "A pattern rather than a construction -- a `match` arm, `if let`, " +
+              "`while let`, `let X { .. } =`, or a closure parameter written " +
+              "`|X { .. }|`. regex's `State::ByteRange { .. }` arms are most of it. " +
+              "54 of the 93.",
+            "A condition or a range ending in a constant or a variant just before " +
+              "the block's brace -- `if id == DEAD {`, `for _ in 0..LIMIT {` -- " +
+              "which the referee reads as `DEAD { .. }`. 34.",
+            "A regex written in a raw string, `r\"\\U{61}\"`, read as code. 4.",
+            "A routine inside a `macro_rules!` body, which is an unparsed token " +
+              "tree: the referee reads regex's generated `fn new` making a " +
+              "`SmallIndexIter`, and the reader answers for the `fn new` the same " +
+              "file declares outside the macro. 1.",
+          ],
           note:
-            "It refuses 81.8% of them, and 96% of the refusals are one generated " +
-            "query module whose every routine is a macro. Safe and nearly useless " +
-            "in that file; the bar this row is about is the zero misses.",
+            "It refuses 26.5% of them, nearly all `macro`. Measured over the " +
+            "pinned clones at #278; the trees on disk the bare command reads ask " +
+            "75 today, against the 66 this row used to cite, and refuse 73.3% -- " +
+            "95% of that one generated query module whose every routine is a " +
+            "macro. Every miss above was read, and 92 of the 93 are not a " +
+            "construction at all; a false `backwards` needs a miss paired with a " +
+            "hit the other way.",
         },
         absence: NOT_DESIGNED_YET,
       },
@@ -944,11 +1047,13 @@ export const LICENCES: readonly Licence[] = [
          * things are compatible, and the reason the grid needs a language axis
          * at all rather than just a word axis.
          *
-         * `npm run measure:conforms -- <the five pinned clones>` asks this
-         * reader **4,975** questions over 775 Rust files: 92.9% recall, 0
-         * wrongly accused, 0 invented, and 0 confirmations when the same pairs
-         * are asked backwards. On any other row those numbers would be a
-         * licence.
+         * `npm run measure:conforms -- .corpus/ripgrep .corpus/anyhow
+         * .corpus/clap .corpus/regex .corpus/json` asks this reader **4,975**
+         * questions over 775 Rust files: 92.9% recall, 0 wrongly accused, 0
+         * invented, and 0 confirmations when the same pairs are asked
+         * backwards -- reproduced to the ask at #278. On any other row those
+         * numbers would be a licence. `.corpus/*`, which adds pydantic's Rust
+         * core, asks 5,730 at 93.2% with the same three zeros.
          */
         presence: {
           unmeasured:
@@ -1077,14 +1182,37 @@ export const LICENCES: readonly Licence[] = [
       returns: { presence: PYTHON_SIGNATURE, absence: NOT_DESIGNED_YET },
       holds: {
         presence: {
-          reproduce: "npm run measure:holds",
-          measured: "2026-09-02",
+          reproduce: "npm run measure:holds -- .corpus/*",
+          measured: "2026-09-15",
           referee: TEXT_SCAN("field list"),
           unit: "field asks",
-          counts: { asked: 2177, missed: 0, invented: 0 },
+          counts: { asked: 2300, missed: 241, invented: 0 },
+          known: [
+            "A docstring's `Args:` or `Attributes:` list. `mode: The proposed " +
+              "validator mode.` is a field to a scan that reads one line at a " +
+              "time. 168 of the 241, nearly all pydantic.",
+            "A method's parameter or local variable, such as `fileobj: " +
+              "FileContent` inside httpx's `FileField.__init__`. 33.",
+            "A line after the class has ended, because the referee ends a Python " +
+              "class only at an unindented line: a nested class runs on into its " +
+              "parent's fields (`model: Model` under pydantic's " +
+              "`NestedModel.Model`), or into the test function that declared it. " +
+              "16.",
+            "A class written inside a string -- pydantic's tests build modules " +
+              "from `create_module(\"\"\"..\"\"\")`, django's serializer tests " +
+              "carry YAML and JSON fixtures -- which the reader rightly does not " +
+              "read as code. 11.",
+            "A dict literal's `key: Value` lines, django's `Serializer._registry` " +
+              "(`frozenset: FrozensetSerializer`). 6.",
+            "A name in a field's default rather than its type -- `extra: Extra = " +
+              "Extra.forbid`, `klassvar: ClassVar = \"I'm a Class variable\"`. 7.",
+          ],
           note:
-            "It refuses 25.4% of them, every one a quoted annotation. A refusal " +
-            "is not a miss, and the bar this row is about is the zero misses.",
+            "Over 4,077 Python files in the pinned clones (#278), refusing 15.0% " +
+            "-- `not-declared` and `quoted` -- and a refusal is not a miss. The " +
+            "trees on disk the bare command reads reproduce the old figure " +
+            "exactly: 2,177 asks, 0 missed, refusing 25.4%, every one a quoted " +
+            "annotation.",
         },
         absence: NOT_DESIGNED_YET,
       },
@@ -1093,7 +1221,8 @@ export const LICENCES: readonly Licence[] = [
           unmeasured:
             "Python spells making one of something as an ordinary call, so the " +
             "referee has no pattern to count and the reader has no verdict to " +
-            "give: `measure:constructs` asks it 0 times over 442 files. " +
+            "give: `measure:constructs` asks it 0 times over the 4,077 files " +
+            "of the pinned clones. " +
             "`constructs.ts` withholds Python before any licence is consulted, so " +
             "nothing changes by saying so here -- but until #207 this square read " +
             "`yes`, on the strength of three measurements of other words.",
@@ -1226,22 +1355,25 @@ export const LICENCES: readonly Licence[] = [
       },
       conforms: {
         presence: {
-          reproduce: "npm run measure:conforms",
-          measured: "2026-09-06",
+          reproduce: "npm run measure:conforms -- .corpus/*",
+          measured: "2026-09-15",
           referee: HEADER_SCAN,
           unit: "base asks",
-          counts: { asked: 2276, missed: 0, invented: 0 },
+          counts: { asked: 14238, missed: 0, invented: 0 },
           note:
-            "The largest population of this relation anywhere -- 2,276 asks over " +
-            "442 files, 78% of every `conforms` fact in the corpus -- and it " +
-            "refuses none of them. A base list sits in the declaration in the one " +
-            "language `holds` and `accesses` both had to withhold most of, which " +
-            "is worth saying plainly: what stops those two is a class body, and " +
-            "this word never reads one. Asked its 7 readable pairs backwards it " +
-            "confirmed 0. Only 7 because a Python base is nearly always imported, " +
-            "so the far end is not in the same file -- the reverse question is " +
-            "answered from the board's other end instead, which `drift.ts` has and " +
-            "a single-file run does not.",
+            "The largest population of this relation anywhere -- 14,238 asks over " +
+            "4,077 files of the pinned clones (#278) -- refusing 5 and accusing " +
+            "none. The trees on disk the bare command reads reproduce the old " +
+            "figure exactly: 2,276 asks, 0 accused. A base list sits in the " +
+            "declaration in the one language `holds` and `accesses` both had to " +
+            "withhold most of, which is worth saying plainly: what stops those two " +
+            "is a class body, and this word never reads one. Asked its 3,151 " +
+            "readable pairs backwards it confirmed 3, and all 3 are true: django's " +
+            "deprecation tests declare `class Deprecated(Renamed)` in one test and " +
+            "`class Renamed(Deprecated)` in another, in the same file. A pair " +
+            "whose base is imported has its far end in another file, and the " +
+            "reverse question is answered from the board's other end instead, " +
+            "which `drift.ts` has and a single-file run does not.",
         },
         absence: NOT_DESIGNED_YET,
       },

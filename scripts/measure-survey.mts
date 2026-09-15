@@ -34,17 +34,19 @@ const HERE = process.cwd();
 /**
  * The #96 corpus of ten real Rust and TypeScript repositories.
  *
- * It is a working checkout rather than a fixture, so it lives outside any one
- * worktree. Set `SURVEY_CORPUS` to point somewhere else; scopes that are not on
- * disk are skipped and said to be skipped, because a table that quietly drops
- * the foreign repositories would leave only the repository this engine was
- * written in, which is the one measurement that proves nothing.
+ * The clones `licence.ts` pins, in the main checkout's `.corpus` -- not in the
+ * worktree #96 was built in, which can be removed. Set `SURVEY_CORPUS` to point
+ * somewhere else; scopes that are not on disk are skipped and said to be
+ * skipped, because a table that quietly drops the foreign repositories would
+ * leave only the repository this engine was written in, which is the one
+ * measurement that proves nothing.
  */
 const CORPUS = process.env.SURVEY_CORPUS
-  ?? [`${HERE}/.claude/worktrees/96-rust/.corpus`,
-      `${HERE}/../../../.claude/worktrees/96-rust/.corpus`]
+  ?? [`${HERE}/.corpus`,
+      `${HERE}/../../../.corpus`,
+      `${process.env.HOME ?? ""}/board-ai/.corpus`]
        .find((candidate) => existsSync(candidate))
-  ?? `${HERE}/.claude/worktrees/96-rust/.corpus`;
+  ?? `${HERE}/.corpus`;
 
 /** Same reason: a Python scope has to come from somewhere with Python in it. */
 const PYTHON = [`${HERE}/graphify/graphify`, `${HERE}/../../../graphify/graphify`]
@@ -53,11 +55,11 @@ const PYTHON = [`${HERE}/graphify/graphify`, `${HERE}/../../../graphify/graphify
 const SCOPES: Array<{ name: string; root: string; scope: string }> = [
   { name: "board-ai/src", root: HERE, scope: "src" },
   { name: "board-ai/src/engine", root: HERE, scope: "src/engine" },
-  { name: "ripgrep/crates", root: `${CORPUS}/BurntSushi-ripgrep`, scope: "crates" },
-  { name: "clap_builder", root: `${CORPUS}/clap-rs-clap`, scope: "clap_builder/src" },
-  { name: "regex-automata", root: `${CORPUS}/rust-lang-regex`, scope: "regex-automata/src" },
-  { name: "serde_json", root: `${CORPUS}/serde-rs-json`, scope: "src" },
-  { name: "anyhow", root: `${CORPUS}/dtolnay-anyhow`, scope: "src" },
+  { name: "ripgrep/crates", root: `${CORPUS}/ripgrep`, scope: "crates" },
+  { name: "clap_builder", root: `${CORPUS}/clap`, scope: "clap_builder/src" },
+  { name: "regex-automata", root: `${CORPUS}/regex`, scope: "regex-automata/src" },
+  { name: "serde_json", root: `${CORPUS}/json`, scope: "src" },
+  { name: "anyhow", root: `${CORPUS}/anyhow`, scope: "src" },
   { name: "vue runtime-core", root: `${CORPUS}/vuejs-core`, scope: "packages/runtime-core/src" },
   { name: "vite/node", root: `${CORPUS}/vitejs-vite`, scope: "packages/vite/src/node" },
   { name: "nest/core", root: `${CORPUS}/nestjs-nest`, scope: "packages/core" },
