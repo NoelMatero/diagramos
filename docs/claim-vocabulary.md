@@ -291,13 +291,17 @@ not fix that; it would produce a confident wrong answer about every derived and
 every macro-generated conformance, which is a false red in the language this
 project understands worst.
 
-`measure:conforms` asks `@conforms` about JavaScript **0 times over 21 files**,
-which is the third square JavaScript has failed to earn for the same reason: 21
-files, and not one of them writes a class heritage clause. Python and TypeScript
-are measured at **0 accusations and 0 inventions across 2,652 asks**, and asked
-the same pairs backwards they confirmed **0** — which is the number the word
-exists for, because before it an arrow drawn from the base down to the subclass
-passed every check this tool had.
+`measure:conforms` asked `@conforms` about JavaScript **0 times over 21 files**
+when the square was filled in, and over the pinned clones it asks **5 times over
+1,254** — the third square JavaScript has failed to earn for the same reason.
+Python and TypeScript were measured at **0 accusations and 0 inventions across
+2,652 asks**, and asked the same pairs backwards they confirmed **0** — which is
+the number the word exists for, because before it an arrow drawn from the base
+down to the subclass passed every check this tool had. Over the pinned clones
+(#278, item 40) that is 15,194 asks: Python accuses none of 14,238, and all 32
+TypeScript accusations are the referee reading a header written over several
+lines. Asked backwards they confirm 5, and all 5 are two declarations of one
+name in one file, each written both ways.
 
 `@accesses` is the second word with an **absence** square beside `@calls`, and
 its are the routine end refuted by name (#255). All five languages are licensed:
@@ -313,7 +317,8 @@ for the reason `@holds` is a no there: a JavaScript class writes no member list
 a text scan can read off, so there is nothing to measure and so no permission.
 The other four squares are measured at **0 accusations across 5,833 asks**.
 
-`measure:constructs` asks `@builds` about Python **0 times over 442 files**,
+`measure:constructs` asks `@builds` about Python **0 times over 442 files**, and
+0 times over the pinned clones' 4,077,
 because Python spells making one of something as an ordinary call. There is no
 measurement, so there is no permission. `constructs.ts` refuses Python before
 any licence is consulted anyway, so nothing changes today — what changed is that
@@ -532,9 +537,9 @@ and never fail.
 | `npm run measure:accesses` | can the member reader be trusted with a red |
 | `npm run measure:conforms` | can the base-list reader be trusted with a red, and what confirm-only Rust costs — `--all` prints every disagreement |
 | `npm run measure:handles` | can the dispatch reader be trusted with a red -- `--all` prints every disagreement |
-| `npm run measure:holds` | can the field reader be trusted with a red |
+| `npm run measure:holds` | can the field reader be trusted with a red — `--all` prints every miss |
 | `npm run measure:calls` | can the call reader be trusted to say backwards, and how often it can answer — a real checker places the receiver calls its text scan cannot (#254); `--no-checker` for the text scan alone, `--control` to ask the checker the questions the scan already answers, `--dump=<file>` for every answer including the agreements |
-| `npm run measure:constructs` | can the construction reader be trusted to say backwards |
+| `npm run measure:constructs` | can the construction reader be trusted to say backwards — `--all` prints every miss |
 | `npm run measure:signature` | the same for parameters and return types |
 | `npm run measure:dataflow` | what following a value through one body buys, confirming and refuting |
 | `npm run measure:licence` | reproduces the per-language dependency numbers, then prints the whole (word, language) grid — `--only=python` for one |
@@ -556,11 +561,20 @@ referee for exactly that** (#254, item 24). Where a text scan cannot say whose
 
 ### The corpus
 
-Code, taken as it sits on disk rather than pinned, because these are dormant
-checkouts: `src`, `scripts`, `rust-test`, `~/orangutan`, `~/mundane`,
-`~/infrarouter`, `graphify/graphify`. Four languages throughout, never one — a
-detector that misses a language's spelling produces a confident wrong answer,
-which has happened twice here.
+With no arguments, code taken as it sits on disk rather than pinned: `src`,
+`scripts`, `rust-test`, `~/orangutan`, `~/mundane`, `~/infrarouter`,
+`graphify/graphify`. Four languages throughout, never one — a detector that
+misses a language's spelling produces a confident wrong answer, which has
+happened twice here.
+
+**A licence row does not cite that default** (#278, item 40). It moves with every
+commit to this repository, and four of the seven trees are other checkouts on
+the machine that ran it, so a row quoting the bare command quotes a number
+nobody can reproduce — the `holds`, `builds`, `conforms`, `takes` and `returns`
+rows all did. They name `.corpus/*` instead: the fifteen clones `licence.ts` pins, which
+live in the main checkout's `.corpus` (a worktree symlinks it). The Rust ones
+are `ripgrep`, `anyhow`, `clap`, `regex` and `json`; the rest are
+`owner-repo`.
 
 Boards: the real ones, excluding worktree copies under `.claude` and test
 fixtures. That is ~20 of the 1,902 `.excalidraw` files on the machine this was
@@ -3224,6 +3238,55 @@ duplicate from conflitcts, requires reading prs "An arrow can be three calls lon
     appended to a file whose last line is a `//` comment lands inside the
     comment, which parses, does nothing, and silently drops every later edge
     through that file.
+
+40. **Every licence row #274's sweep touched cited a command that could not
+    reproduce it, and re-running it on a corpus that can found the referees had
+    never met real code.** Nothing lost its licence (#278).
+
+    The `holds`, `builds`, `conforms`, `takes` and `returns` rows said
+    `reproduce: "npm run measure:holds"` and nothing else. With no arguments the
+    script reads the seven trees on disk, and this repository is two of them, so
+    the count moves with every commit: the TypeScript `holds` row said 1,195 and
+    the command prints 1,284. Nobody could tell from the row which run produced
+    its number, and so nobody could confirm #274's blind walk had not -- it had
+    not, the rows are dated before the trees went missing on 2026-09-07, but a
+    date is an inference and a command is a measurement.
+
+    So every one of those rows now names `.corpus/*`, the fifteen clones the
+    dependency licence already pins, and was re-measured there:
+
+    | row | cited before | bare command today | `.corpus/*`, now cited |
+    |---|---|---|---|
+    | `holds` ts+tsx | 1,195 · 0 missed | 1,284 · 0 | **688 · 3 missed** |
+    | `holds` rust | 47 · 0 | 62 · 0 | **1,813 · 2** |
+    | `holds` python | 2,177 · 0 | 2,177 · 0 | **2,300 · 241** |
+    | `builds` ts+tsx | 225 · 0 | 227 · 0 | **1,050 · 10** |
+    | `builds` rust | 66 · 0 | 75 · 0 | **1,481 · 93** |
+    | `conforms` ts+tsx | 376 · 0 accused | 379 · 0 | **956 · 32 accused** |
+    | `conforms` python | 2,276 · 0 | 2,276 · 0 | **14,238 · 0** |
+    | `conforms` rust, a stated no | 4,975 · 0 | — | 4,975 · 0, the five Rust clones |
+
+    Invented is 0 in every cell. **Every one of the 381 disagreements was read,
+    and the reader is right about all of them.** They are the referee, and the
+    shapes are ones no tree on this machine writes much of: a docstring's
+    `Args:` list read as fields (168 of Python's 241), a class written inside a
+    string that a test loads as a module, a Rust `match` arm or `if id == DEAD {`
+    read as a construction (88 of Rust's 93), a TypeScript header over several
+    lines whose type arguments were read as bases (30 of 32). Each row's `known`
+    lists them with counts. The one real construction among them is inside a
+    `macro_rules!` body, which no reader here parses.
+
+    The zeros the rows used to carry were true and said less than they seemed
+    to: a referee tuned against the trees at hand is only known to agree with
+    the reader on those trees. The referees are left as they are, on purpose.
+    Teaching a scan to skip docstrings is right, and it is also the move that
+    makes a referee agree with the reader, so each fix needs its own argument
+    rather than arriving as a batch that happens to take the misses to zero.
+
+    Two more corpus paths were pointing into `.claude/worktrees/96-rust`, a
+    worktree that can be removed, under clone names nothing else uses:
+    `measure-survey.mts`, `probe-generative.mts` and the Rust example in
+    `measure-conforms.mts`' header. They name `.corpus` now.
 
 ## Open, in the order worth doing
 

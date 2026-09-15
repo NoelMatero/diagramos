@@ -466,9 +466,11 @@ describe("which words may accuse, and in which languages", () => {
      * The bar, in one place, and it is not the same bar everywhere.
      *
      * `holds`, `takes`, `returns` and `builds` are measured against a text scan
-     * of the same declarations over trees taken as they sit on disk, and there
-     * the bar is zero: a miss is the referee seeing a name the reader did not,
-     * and a miss paired with a hit the other way is a false red.
+     * of the same declarations. Over trees taken as they sit on disk the bar is
+     * zero: a miss is the referee seeing a name the reader did not, and a miss
+     * paired with a hit the other way is a false red. #278 moved them onto the
+     * pinned clones, where a text scan meets docstrings, patterns and code in
+     * strings it was never written for, and every miss there is read and named.
      *
      * `needs` is the exception and it is deliberate. Its referee is a real
      * compiler over five pinned repositories, and its 48 misses across three
