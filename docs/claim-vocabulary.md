@@ -109,7 +109,7 @@ that sentence have different evidence behind them:
   `.width` off something else, and that is exactly where the typed design made
   its false reds. So the routine end now refutes **by name**, and stays silent
   wherever the body reads a member without a name, reads none at all, or calls
-  a function that visibly reads the member ([item 25](#twenty-five-times-a-measurement-contradicted-the-design)).
+  a function that visibly reads the member ([item 25](#forty-one-times-a-measurement-contradicted-the-design)).
 
 So the two ends refute on two different footings: the type end from a
 declaration, the routine end from a body read whole by name. Neither accuses
@@ -635,7 +635,7 @@ to pass every check this tool had.
 deliberate: almost all of it is `Vec<T>`, `Promise<T>`, `list[str]`, which
 nobody draws as two boxes.
 
-## Thirty-nine times a measurement contradicted the design
+## Forty-one times a measurement contradicted the design
 
 Kept because the pattern is the point: eleven of the first thirteen came from
 building one word or one reader, not from reviewing the design. Nothing since
@@ -3295,6 +3295,80 @@ duplicate from conflitcts, requires reading prs "An arrow can be three calls lon
     `measure-survey.mts`, `probe-generative.mts` and the Rust example in
     `measure-conforms.mts`' header. They name `.corpus` now.
 
+41. **"The right relationship at the wrong altitude" has one definition that
+    survives, it covers the easy quarter, and the shape it covers was being
+    passed on nothing.** #280, gap 2 of #217. Five candidates were tried against
+    the 221 arrows on 17 code boards (`board-ai`, `~/orangutan`, and one board
+    that ships inside the vuejs-core clone). Apart from that one they are the
+    owner's test boards, so every count below says whether the rule *can* be read, never whether
+    anybody wants it. "Right" and "wrong" below are a person reading the box
+    label against the code, not a script.
+
+    `npm run measure:altitude` prints every hit for that reading. The corpus
+    starts from the directory it is run in, and these numbers are from the main
+    checkout, which also holds untracked boards (`claim-path`,
+    `how-it-reaches-you`, `rust-test`). From a clean checkout it reads 150 arrows
+    on 12 boards, 28 of 56 file boxes and 13 of 53 arrows for the last two rows,
+    and **the same 9** for the one that survived.
+
+    | candidate | fires on | right | wrong |
+    |---|---:|---:|---:|
+    | a box anchored at a whole file | every file-anchored end | — | nearly all: `drift check`, `read / write the file` are summaries on purpose |
+    | an arrow joining a file end to a symbol end | 27 | 9 | 18: `check-drift.mjs -> checkDrift`, `checkDrift -> graph.ts "nodes · refs"`, the generated macro module |
+    | the file box's label names something the file declares | 30 of 62 boxes | 5, all Rust (`conns: Slab<Client>`, `tpool`) | 25: "read", "server", "layout", "board" are ordinary words *and* declarations |
+    | the evidence for a file-level arrow sits inside one declaration | 13 of 56 (TS/JS) | 0 | 13: `App.tsx -> reveal.ts` is the component, `render-diagram.mjs` is the script |
+    | **both ends in one file, at least one of them the whole file** | **9** | **8** | **1** |
+
+    The survivor is the issue's own example in its narrowest form: a box for
+    `conns` or `tpool`, both fields of `Orangutan`, anchored at `src/lib.rs`,
+    with an arrow from a routine in `src/lib.rs`. The one it gets wrong is
+    `route -> "generated mod route_<fn>"`, macro output that has no declaration
+    to anchor at, so the file really is the finest anchor there is.
+
+    **It was also a false green, in all three languages.** Every file-level
+    channel asks about two files, and here there is one. The shared-importer
+    channel said yes whenever the board showed anything that imports that file:
+    4 of the 9 were green, all on the two boards that also show `main.rs` and
+    other files of the crate. The third board shows only `src/lib.rs`, and its 5
+    were not. Tested per shape in
+    `tests/engine-altitude.test.ts` -- routine to file, file to routine, two
+    boxes on one file, TypeScript, Rust, Python, and a `planned` arrow that was
+    being told the code had already built it. The other 5 were amber
+    `nothing-connects-them`, which is true and useless.
+
+    The same one-file question was reached by one more shape, not an altitude:
+    two named ends with no body on either side. `rcache -> routes`, two fields
+    of `Orangutan`, was green the same way and is now `no-function-body`, the
+    reason that shape already had when the file could not be placed.
+
+    Now all 9 are unread, `ends-in-one-file`, with the fix in the words: anchor
+    the end at the thing it stands for. A skip, like `directory-ref`, so a
+    deliberate summary is never called wrong. Re-anchored at the field or
+    routine each label names, **7 of the 8 that can be re-anchored confirm by
+    reading bodies**, and the eighth is `accept -> conns`, which is a wrong
+    arrow: the `conns.insert_with` is in `ready`, not `accept`. The file anchor
+    had been hiding that.
+
+    **The cost, on the record: 5 greens gone**, the 4 above and `rcache ->
+    routes`. The 4 confirm once re-anchored, so they were right, but nothing had
+    read them. **211 of the 221 arrows are unchanged.**
+
+    The engine's own advice was half of how the shape got drawn: `an-end-is-data`
+    said "anchor that end at file level", which with the other end in the same
+    file lands exactly here. That sentence now says so, in the per-arrow detail,
+    the words table and `create_diagram`'s note.
+
+    **What it does not cover, and this is most of the gap.** 9 of the 35 arrows
+    whose two anchored ends sit at different altitudes (27 file-to-symbol, 7
+    directory-to-file, 1 onto a missing file). The 9 are the easy part, the only
+    one where the check provably had nothing to read. The shape #217 actually
+    describes, a module box on an arrow that is really about two functions *in
+    different files*, has no definition that separates it from a deliberate
+    summary. It is on the corpus once -- `tpool -> hello_handler`, the same
+    `tpool` box pointing into `main.rs` -- among 18 cross-file arrows of that
+    kind, and the other 17 read as summaries on purpose. The 54 file-to-file
+    arrows could hide the same thing, and nothing here can tell. Recorded under "not being built".
+
 ## Open, in the order worth doing
 
 1. ~~**The licence grid.**~~ Built at #207 and shipped at #209. `@accesses` is
@@ -3410,6 +3484,11 @@ language.
   that must union three sources and can only read two cannot close a region, and
   a confident wrong answer in Rust is the false red this project can least
   afford.
+- **A wrong-altitude check across files** (#280). No definition separated a
+  module box on an arrow about two functions in two files from a deliberate
+  summary; see item 41 for the four that were tried. What would change this is
+  a reader that says which declaration an arrow's evidence sits in *and* a
+  signal of intent that is not the label, because labels failed as that signal.
 - **A relation for "this function fits that field's function-pointer type"**,
   which is what the orangutan arrow actually wants. Real, and probably not worth
   a word.

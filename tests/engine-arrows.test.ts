@@ -1073,7 +1073,9 @@ describe("code graph — the fifth corroboration channel", () => {
     // Two boxes on one file, drawn as an arrow between them. The graph holds
     // no edge between the endpoints -- there is nothing it could confirm --
     // but both ends expand to the same node set, which used to read as
-    // "reaches". Unconfirmed must stay unconfirmed, and stay uncounted.
+    // "reaches". Not confirmed must stay not confirmed, and stay uncounted.
+    // Unread since #280: one file at both ends gives the channels nothing to
+    // ask, so it is a skip rather than an amber.
     const soloFiles = { "src/solo.ts": "function one() {}\nfunction two() {}\n" };
     const graph = fixtureGraph(
       [["one", "src/solo.ts"], ["two", "src/solo.ts"]],
@@ -1082,13 +1084,13 @@ describe("code graph — the fifth corroboration channel", () => {
     const board = await arrowAB("src/solo.ts", "src/solo.ts");
 
     const without = checkDrift(board, fakeWorkspace(soloFiles), { edges: true });
-    expect(without.unconfirmedEdges).toHaveLength(1);
+    expect(without.edgesSkippedWhy).toEqual({ "ends-in-one-file": 1 });
 
     const withGraph = checkDrift(board, fakeWorkspace(soloFiles), {
       edges: true,
       codeGraph: { graph, modified: new Set() },
     });
-    expect(withGraph.unconfirmedEdges).toHaveLength(1);
+    expect(withGraph.edgesSkippedWhy).toEqual({ "ends-in-one-file": 1 });
     expect(withGraph.edges).toHaveLength(0);
     expect(withGraph.edgesChecked).toBe(without.edgesChecked);
   });

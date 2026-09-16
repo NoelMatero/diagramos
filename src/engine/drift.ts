@@ -658,7 +658,8 @@ export interface UnreadEdgeFinding {
  *   answers about the wrong thing. The declarations either end stands in are
  *   read before this word is used (#144), so what is left is an arrow with no
  *   evidence in a body *or* a signature -- and the fix is on the board, not in
- *   the code: anchor that end at file level.
+ *   the code: anchor that end at file level, unless the other end is in that
+ *   same file, where file level is `ends-in-one-file` and checks nothing.
  * - `nothing-connects-them` is the file-level channels coming up empty: no
  *   import either way, no shared importer, no shared route, nothing in the code
  *   graph.
@@ -712,7 +713,7 @@ export type EdgeUnconfirmedReason =
  */
 export const UNCONFIRMED_WORDS: Record<EdgeUnconfirmedReason, string> = {
   "no-call-either-way": "nothing calls the other, either way",
-  "an-end-is-data": "an end names data, not something that runs — anchor that end at file level",
+  "an-end-is-data": "an end names data, not something that runs — anchor that end at file level, or at the routine that uses it when both are in one file",
   "nothing-connects-them": "no import, shared importer or shared route connects them",
   "feeds-runs-the-other-way": "the only flow found runs the other way",
   "signature-other-half": "the type is in the other half of the signature — the arrow may be the wrong way round",
@@ -813,6 +814,15 @@ export type EdgeSkipReason =
    * deleted* was spent on a ref shape the README documents as legal.
    */
   | "glob-ref"
+  /**
+   * Both ends are in one file and at least one of them is the whole file (#280).
+   *
+   * An arrow from `lib.rs#accept` to a box anchored at `lib.rs` describes
+   * something two things inside that file do, with one end drawn at the file's
+   * altitude. The file-level channels have no pair of files to ask about, and
+   * asked anyway they confirmed on any importer of that file.
+   */
+  | "ends-in-one-file"
   /**
    * Neither endpoint's language has a measured licence, so no reader here has
    * earned an opinion about it. Called `not-ts-or-js` until Rust arrived: that
@@ -4856,8 +4866,17 @@ export function checkDrift(
                   `${data.join(" and ")} names data rather than something that runs, so there `
                   + `is no body on that side to search. The declarations were read as well — `
                   + `the signature, the field's own type, the enclosing block — and none of `
-                  + `them names the other end either. Anchor that end at file level and the `
-                  + `import channels can answer instead.`,
+                  + `them names the other end either. `
+                  /*
+                   * File level is only an answer when it gives the channels
+                   * two files. Both ends in one file is `ends-in-one-file` the
+                   * moment the advice is taken (#280).
+                   */
+                  + (fromFile === toFile
+                    ? `Both ends are in ${fromPath}, so anchoring either at the file leaves `
+                      + `nothing to check: if the arrow means a use, anchor the data end at the `
+                      + `routine that uses it.`
+                    : `Anchor that end at file level and the import channels can answer instead.`),
               }
             : {
                 kind: "unconfirmed",
@@ -4899,6 +4918,28 @@ export function checkDrift(
           const why: EdgeSkipReason = bothNamed
             ? "no-function-body"
             : licensed ? "outside-licence" : "unlicensed-language";
+          notePlannedClaim(why);
+          skipEdge(why, edge, fromNode, toNode);
+          continue;
+        }
+        if (fromFile === toFile) {
+          /*
+           * One file at both ends. Every channel below is a question about two
+           * files, so here it is one file asked about twice -- and the
+           * shared-importer channel answered yes whenever the board showed
+           * anything that imports it. Five arrows on the orangutan boards were
+           * green on exactly that (#280).
+           *
+           * Two shapes arrive here. An end anchored at the whole file -- a
+           * routine and the file that holds it, or two boxes on one file -- is
+           * `ends-in-one-file`, and the words say what would make it
+           * checkable. Two named ends mean neither had a body to read, which
+           * already has a reason. Both are skips, like `directory-ref`: nothing
+           * was read, and an end standing for the whole file may be a
+           * deliberate summary.
+           */
+          const whole = !parseRef(fromRef).symbol || !parseRef(toRef).symbol;
+          const why: EdgeSkipReason = whole ? "ends-in-one-file" : "no-function-body";
           notePlannedClaim(why);
           skipEdge(why, edge, fromNode, toNode);
           continue;
