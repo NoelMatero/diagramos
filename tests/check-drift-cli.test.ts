@@ -99,6 +99,22 @@ afterAll(() => {
   if (workspace) rmSync(workspace, { recursive: true, force: true });
 });
 
+describe("a board pointed at line numbers", () => {
+  it("counts them as line numbers, not as code that is gone (#286)", async () => {
+    // One board carrying 27 of these read "27 gone" -- a deletion nobody made.
+    await writeBoard(
+      path.join(workspace, "docs/diagrams/lines.excalidraw"),
+      (await board([{ id: "l", label: "Router", ref: "src/present.ts#12-30" }])),
+    );
+    const result = await checkDrift();
+    const said = findings(`${result.stdout}${result.stderr}`);
+    expect(said).toContain("1 at line numbers");
+    expect(said).not.toContain("gone");
+    expect(result.code).not.toBe(0);
+    rmSync(path.join(workspace, "docs/diagrams/lines.excalidraw"));
+  });
+});
+
 describe("a board that claims it is complete", () => {
   it("names the module nobody drew, and does not call it a file that is gone", async () => {
     // `main` reaches `helper`, `helper` has no box, and the board says it shows

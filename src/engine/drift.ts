@@ -63,6 +63,8 @@ import { signatureNames, type SignatureWithheld } from "./signature";
 import { resolveDependency, type ConfigCache } from "./resolve";
 import { boardIsNewer, newerBuildClaimError } from "./version";
 import type { Workspace } from "./workspace";
+import { COLON_LINE, LINE_NUMBERS, LONE_LINE, plainNameOf } from "./lines";
+export { pointsAtLines, pointsAtQualified } from "./lines";
 
 export type DriftKind =
   | "missing-file"
@@ -1279,6 +1281,13 @@ export interface DriftReport {
   /** True when the board says it describes something other than this repository. */
   concept: boolean;
   /**
+   * On a concept board, how many boxes point at a path that exists here, and
+   * how many boxes it has. Absent when none do (#287): a board of this
+   * project's code marked concept checks nothing, and nothing said so.
+   */
+  conceptAnchored?: number;
+  conceptBoxes?: number;
+  /**
    * Numbers on box labels read against the code, and numbers nobody could read.
    *
    * Counted for the reason every other coverage number here is: silence has to
@@ -1423,6 +1432,15 @@ function mentions(source: string, symbol: string): boolean {
   return new RegExp(`\\b${symbol.replace(REGEX_SPECIAL, "\\$&")}\\b`).test(source);
 }
 
+function lineNumbers(base: Omit<DriftFinding, "kind" | "detail">, file: string, lines: string): DriftFinding {
+  return {
+    ...base,
+    kind: "unresolvable-ref",
+    detail: `${base.ref} points at line numbers (${lines}), which go stale on any edit. `
+      + `After # goes a name: ${file}#<function or type name>, or just ${file} for the whole file.`,
+  };
+}
+
 type Inspection = DriftFinding | "ok" | { skip: NodeSkipReason };
 
 /**
@@ -1543,6 +1561,16 @@ export function globOf(target: string): { directory: string; pattern: RegExp } |
   return { directory, pattern: new RegExp(`^${body}$`) };
 }
 
+/** Whether any of these refs names a path that exists in this repository. */
+function pointsHere(refs: Array<string | undefined>, workspace: Workspace): boolean {
+  return refs.some((ref) => {
+    const target = ref ? parseRef(ref).path.replace(/\/+$/, "") : "";
+    if (!target) return false;
+    const absolute = workspace.resolve(globOf(target)?.directory ?? target);
+    return absolute !== undefined && workspace.stat(absolute) !== "missing";
+  });
+}
+
 /** Names directly inside a directory that are files. `undefined` past the cap. */
 function filesIn(
   directoryAbsolute: string,
@@ -1626,6 +1654,33 @@ function inspect(
   if (!rawTarget) {
     return { ...base, kind: "unresolvable-ref", detail: `"${ref}" names a symbol but no file.` };
   }
+  // Refused before anything is read: however the file stands, a line number
+  // was never going to work, and "no longer mentions 578-636" would say the
+  // code changed when it did not.
+  const colon = rawSymbol === undefined ? COLON_LINE.exec(rawTarget) : null;
+  if (colon) return lineNumbers(base, colon[1], colon[2]);
+  const lineShaped = rawSymbol !== undefined && LINE_NUMBERS.test(rawSymbol.split("@")[0].trim());
+  if (lineShaped && !LONE_LINE.test(rawSymbol!.split("@")[0].trim())) {
+    return lineNumbers(base, rawTarget, rawSymbol!);
+  }
+  /**
+   * What a symbol the target does not mention is reported as. A qualified name
+   * whose plain part *is* there was never going to be found as written, so it
+   * is a pointer to rewrite, not code that went (#288).
+   */
+  const notMentioned = (detail: string, has: (name: string) => boolean): DriftFinding => {
+    if (lineShaped) return lineNumbers(base, rawTarget, rawSymbol!);
+    const plain = symbol === undefined ? undefined : plainNameOf(symbol);
+    if (plain && has(plain)) {
+      return {
+        ...base,
+        kind: "unresolvable-ref",
+        detail: `${ref} qualifies the name, and ${rawTarget} never spells it that way: a method sits `
+          + `inside its impl or class. Write the plain name: ${rawTarget}#${plain}.`,
+      };
+    }
+    return { ...base, kind: "missing-symbol", detail };
+  };
 
   // A garbled assertion is loud immediately rather than becoming a claim that
   // silently checks nothing. It fails the turn it is written, while the author
@@ -1729,7 +1784,7 @@ function inspect(
     if (!symbol) return "ok";
     const code = matched.filter((name) => TS_JS.test(name)).map((name) => `${absolute}/${name}`);
     if (!mentionedIn(code, symbol, workspace)) {
-      return { ...base, kind: "missing-symbol", detail: `no file matching ${target} mentions ${symbol}.` };
+      return notMentioned(`no file matching ${target} mentions ${symbol}.`, (name) => mentionedIn(code, name, workspace));
     }
     if (!assertion) return "ok";
     const verdict = assertedIn(code, symbol, assertion, workspace, tally);
@@ -1755,7 +1810,7 @@ function inspect(
       };
     }
     if (!mentionedIn(code, symbol, workspace)) {
-      return { ...base, kind: "missing-symbol", detail: `nothing directly in ${target} mentions ${symbol}.` };
+      return notMentioned(`nothing directly in ${target} mentions ${symbol}.`, (name) => mentionedIn(code, name, workspace));
     }
     if (!assertion) return "ok";
     const verdict = assertedIn(code, symbol, assertion, workspace, tally);
@@ -1781,7 +1836,7 @@ function inspect(
   if (!symbol) return "ok";
   const source = workspace.read(absolute);
   if (!mentions(source, symbol)) {
-    return { ...base, kind: "missing-symbol", detail: `${target} no longer mentions ${symbol}.` };
+    return notMentioned(`${target} no longer mentions ${symbol}.`, (name) => mentions(source, name));
   }
   if (!assertion) return "ok";
   const verdict = judgeAssertion(target, source, symbol, assertion, tally);
@@ -2643,6 +2698,8 @@ export function checkDrift(
   let edgesSkipped = 0;
   let anchorableEdges = 0;
   let excused = 0;
+  let conceptAnchored = 0;
+  let conceptBoxes = 0;
   let handDrawn = 0;
   const skippedWhy: SkipBreakdown<NodeSkipReason> = {};
   const edgesSkippedWhy: SkipBreakdown<EdgeSkipReason> = {};
@@ -2854,6 +2911,12 @@ export function checkDrift(
     if (node.provenance !== "recorded") {
       handDrawn += 1;
       continue;
+    }
+    if (concept) {
+      conceptBoxes += 1;
+      if (node.state !== "external" && pointsHere([node.ref, ...(node.refs ?? [])], workspace)) {
+        conceptAnchored += 1;
+      }
     }
     if (concept || node.state === "external") {
       excused += 1;
@@ -5367,6 +5430,7 @@ export function checkDrift(
     claims,
     garbledClaims: reportedGarbled,
     excused,
+    ...(conceptAnchored ? { conceptAnchored, conceptBoxes } : {}),
     handDrawn,
     concept,
     edges,

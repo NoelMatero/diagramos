@@ -53,6 +53,7 @@ import { readGraph } from "../src/engine/graph.ts";
 import { damageSentence } from "../src/engine/damage.ts";
 import { CONFIG_FILE, ConfigError, DEFAULT_DIAGRAM_DIR, diagramDir } from "../src/engine/config.ts";
 import { countedWords, coverageLabel } from "../src/engine/summary.ts";
+import { pointsAtLines, pointsAtQualified } from "../src/engine/lines.ts";
 import {
   ACCUSING_EDGE_KINDS,
   checkDrift,
@@ -995,7 +996,7 @@ function rowsFor({ report, promoted = [] }, colour, all = false) {
  */
 const WRONG_EDGE_KINDS = new Set(ACCUSING_EDGE_KINDS);
 
-function tallyCounts({ gone, generated, empty, unused, open, incomplete, mishandled, removed, garbled, unanswered, backwards, signatures, fields, builtBackwards, callsBackwards, members, unread, bases, arrows, stray, promoted, built, planned }, colour) {
+function tallyCounts({ gone, generated, lines, qualified, empty, unused, open, incomplete, mishandled, removed, garbled, unanswered, backwards, signatures, fields, builtBackwards, callsBackwards, members, unread, bases, arrows, stray, promoted, built, planned }, colour) {
   return [
     gone ? paint(`${gone} gone`, "red", colour) : "",
     // Its own word, because "gone" is the opposite of what happened: the file
@@ -1004,6 +1005,9 @@ function tallyCounts({ gone, generated, empty, unused, open, incomplete, mishand
     generated
       ? paint(`${generated} ${generated === 1 ? "points" : "point"} at build output`, "red", colour)
       : "",
+    // Not gone either: the code is there, and a line number can never reach it.
+    lines ? paint(`${lines} at line numbers`, "red", colour) : "",
+    qualified ? paint(`${qualified} qualified ${qualified === 1 ? "name" : "names"}`, "red", colour) : "",
     empty ? paint(`${empty} empty`, "red", colour) : "",
     // Its own word, because "1 gone" was actively wrong for it: nothing is gone,
     // a boundary the board claimed is being reached through.
@@ -1089,11 +1093,15 @@ function tallyFor({ report, promoted = [] }, colour) {
   const incomplete = count("incomplete-board");
   const mishandled = count("mishandled-box");
   const generated = count("generated-ref");
+  const lines = report.findings.filter(pointsAtLines).length;
+  const qualified = report.findings.filter(pointsAtQualified).length;
   const promotedNodes = new Set(promoted.map((promotion) => promotion.node));
   return tallyCounts(
     {
-      gone: report.findings.length - empty - unused - open - incomplete - mishandled - generated,
+      gone: report.findings.length - empty - unused - open - incomplete - mishandled - generated - lines - qualified,
       generated,
+      lines,
+      qualified,
       empty,
       unused,
       open,
@@ -1168,8 +1176,11 @@ function render(stale, colour) {
           (finding) => finding.kind !== "empty-ref" && finding.kind !== "unused-symbol"
             && finding.kind !== "open-box" && finding.kind !== "incomplete-board"
             && finding.kind !== "mishandled-box"
-            && finding.kind !== "generated-ref",
+            && finding.kind !== "generated-ref"
+            && !pointsAtLines(finding) && !pointsAtQualified(finding),
         ).length,
+        lines: sum.lines + report.findings.filter(pointsAtLines).length,
+        qualified: sum.qualified + report.findings.filter(pointsAtQualified).length,
         generated: sum.generated
           + report.findings.filter((finding) => finding.kind === "generated-ref").length,
         open: sum.open + report.findings.filter((finding) => finding.kind === "open-box").length,
@@ -1207,7 +1218,7 @@ function render(stale, colour) {
         planned: sum.planned + report.workItems.length,
       };
     },
-    { gone: 0, generated: 0, empty: 0, unused: 0, open: 0, incomplete: 0, removed: 0, garbled: 0, unanswered: 0, backwards: 0, signatures: 0, fields: 0, builtBackwards: 0, callsBackwards: 0, callsRefuted: 0, members: 0, unread: 0, bases: 0, arrows: 0, stray: 0, promoted: 0, built: 0, planned: 0 },
+    { gone: 0, generated: 0, lines: 0, qualified: 0, empty: 0, unused: 0, open: 0, incomplete: 0, removed: 0, garbled: 0, unanswered: 0, backwards: 0, signatures: 0, fields: 0, builtBackwards: 0, callsBackwards: 0, callsRefuted: 0, members: 0, unread: 0, bases: 0, arrows: 0, stray: 0, promoted: 0, built: 0, planned: 0 },
   );
 
   // Too many to list: counts per diagram, and a pointer to the view that has room.

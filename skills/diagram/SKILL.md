@@ -5,124 +5,127 @@ description: Draw, read, or update an Excalidraw diagram in this repo — archit
 
 # Diagrams that live in the repo
 
-Diagrams are `.excalidraw` files next to the code they describe. They are the
-artifact, not a picture of one: they diff in git, open in any Excalidraw editor,
-and are read back as a graph so a sketch can act as a specification.
+Diagrams are `.excalidraw` files in `docs/diagrams/`. Each box can point at the
+code it stands for, and `check_drift` then says when the picture stops matching
+the code.
 
-## Draw it, don't lecture about it
+## Rules that break a board
 
-The diagram is the deliverable. After writing one, say what changed in **a
-sentence or two** and stop.
+Follow these every time.
 
-Do not follow a diagram with an essay explaining the domain it depicts. If the
-user wants the concepts explained they will ask, and a diagram they can look at
-is the reason they asked for a diagram. A paragraph per node is the single
-largest cost of a diagram task and almost never what was wanted.
-
-Worth mentioning after a write: anything you inferred rather than were told,
-anything you left out, and the live URL if you started a board. Nothing else.
+1. **Every box points at code, or says why not.** Give it a `ref`, or
+   `state: "planned"` (not built yet), or `state: "external"` (not code in this
+   repo: a browser, a database, another project).
+2. **After `#` goes one plain name, as the code spells it.** Write
+   `src/lib.rs#dispatch`. Never line numbers (`src/lib.rs#578-636`,
+   `src/lib.rs:254`), which are refused, and never a qualified path
+   (`src/lib.rs#Server::dispatch`, `src/lib.rs#Server#dispatch`), which is not text in the file and reads as
+   missing.
+3. **Leave `describes` off.** `describes: "concept"` is only for a board about
+   something outside this repo, such as a protocol or another project, and it
+   switches all checking off. A flow through this code is never concept. Never
+   use it to make red boxes go away; fix the refs instead.
+4. **Point at source, never build output** (`target/`, `dist/`, `out/`,
+   `build/`, `node_modules/`).
+5. **Write a claim only from code you read.** `@declared`, `@used` and every
+   `claim` below are transcriptions. If you did not read the line, leave the
+   claim off; an arrow or box with no claim is normal.
+6. **Read every draw and edit response, and fix what it names in the same
+   turn** with `edit_diagram`: `pointsAtNothing`, `pointsAtLineNumbers`,
+   `pointsAtQualifiedNames`, `pointsAtBuildOutput`, `conceptPointsHere`,
+   `garbledClaims`, an unviewable size. Correct the ref; never delete a ref to
+   make a finding go away.
+7. **Do not render to find out whether it worked.** The draw response already
+   says whether the board is legible. Render once, at the end, to show a person.
+8. **Never redraw what the user drew.** Hand-drawn elements are the spec.
+   `create_diagram` keeps them.
+9. **Afterwards, say what changed in a sentence or two.** No essay about the
+   domain.
 
 ## How to draw one
 
-Everything below this section is a reference for what the fields mean. This part
-is the order to do things in, and it exists because inventing an order is what a
-diagram task actually spends money on: 21 boards in this repo were each drawn by
-a session deciding for itself how many boxes to draw and what a box should stand
-for, and across them 47% of boxes carry no code anchor, 5% of arrows carry a
-claim, and 9 do not render legibly.
+1. **Survey first, for a structural board.** `survey_scope` on a directory
+   returns a draft: how many boxes, each anchored at a real path, the arrows
+   with `claim: "needs"`, and `separateBoards` for parts that belong on a board
+   of their own. Skip it when the user already named the boxes, or the board is
+   about something outside this repo.
+2. **Rename the boxes. That is your job.** The draft's labels are filenames.
+   Say what each box does, merge boxes that are one idea, drop what was not
+   asked about. Keep `ref` and `claim` exactly as they came.
+3. **Draw it in one `create_diagram` call**, edges included. Leave
+   `direction` off on a first draw; the engine picks the flow that reads.
+4. **A flow is different.** "The lifeline of a request" is a path through the
+   code, not a directory, and no survey drafts it. Read the code, name the boxes
+   yourself, and anchor each at the function it stands for
+   (`src/lib.rs#handle_request`).
 
-**1. Survey the scope before you read any code.** `survey_scope` takes a
-directory and hands back a draft graph: which boxes, anchored at paths that
-exist, and the arrows between them already carrying `needs` and the `file:line`
-each one was read from. It is the answer to *how many boxes* — it lays candidate
-boards out and keeps whatever detail still renders legibly — and to *is this one
-board or four*, which it returns as `separateBoards`. Working the same thing out
-by reading costs 2–37× more tokens, and it is how a session ends up drawing a
-board, rendering it, and drawing it again.
+**When it is done:** every box has a `ref` or a `state`, the draw response says
+legible and names nothing to fix, and `check_drift` is clean. If
+`separateBoards` was not empty, say which boards are still undrawn.
 
-Skip it only when the user has already told you what the boxes are, when the
-diagram is not about this repository, or when it refuses the scope.
+One diagram per file, in `docs/diagrams/<topic>.excalidraw`. Another directory
+is refused. If the project keeps diagrams elsewhere, write
+`{"diagrams": "docs/architecture"}` to `.diagramos.json` once.
 
-**2. Rename what came back. This is your half.** The draft's labels are
-filenames, and a board of filenames is a dependency graph rather than an
-architecture diagram. Say what each box *does* — `layout` becomes "ELK layout /
-real font metrics" — merge boxes that are one idea, and drop what the user did
-not ask about. Keep `ref`, `claim` and `seen` exactly as they came: those were
-read out of the code, and rewriting them turns a transcription back into a guess.
+Give nodes and edges, never coordinates. Keep edge labels to a word or two, and
+give each subsystem its own `backgroundColor`.
 
-**3. Draw it in one `create_diagram` call**, edges included. The response says
-whether it renders legibly and which arrows nothing corroborated, so there is
-nothing to find out by looking.
+## Pointing a box at code
 
-**4. For a flow rather than a structure, none of the above applies.** "How does a
-request become a picture" is a path through the code, not a directory, and no
-survey produces it — read the code and name the boxes yourself. Those are the
-boards worth the most and the ones nothing can draft for you.
+| you mean | write |
+| --- | --- |
+| a file | `src/engine/layout.ts` |
+| one function or type in it | `src/engine/layout.ts#planLayout` |
+| a whole directory | `src/engine/` (must not be empty) |
+| something inside a directory | `src/engine/#Workspace` |
+| some files in one directory | `src/engine/*.ts` (`*` in the last segment only) |
+| an HTTP endpoint | `src/server/board-server.ts#/api/board` or `#GET /api/board` |
 
-**When it is done:** every box has a `ref` or a stated reason not to
-(`state: "planned"`, `state: "external"`, `describes: "concept"`), the draw-time
-response says legible, and `check_drift` is clean. If `separateBoards` came back
-non-empty, say which boards are still undrawn rather than leaving the picture
-looking whole. Do not render to check any of this — every one of those answers
-arrives in words, and the image is the most expensive call here.
+A box that stands for several things takes `refs: [...]` beside `ref`; every one
+is checked. Arrows are checked against `ref`.
 
-## Path
+A symbol ref can also say what you saw in that file:
 
-Write to `docs/diagrams/<topic>.excalidraw`. `create_diagram` refuses anywhere
-else, because `check_drift` and the board CLI find diagrams by looking in that
-one directory — a board outside it is never checked and never served, and the
-check reports clean rather than admitting it never saw the file.
+| the file showed you | write |
+| --- | --- |
+| the symbol is declared here | `src/lib.rs#log_line@declared` |
+| something here uses it | `src/server.rs#log_line@used` |
+| both | `src/lib.rs#log_line@declared+used` |
 
-If the user wants their diagrams somewhere else, that is a property of the
-project rather than of one diagram: write `{"diagrams": "docs/architecture"}`
-into `.diagramos.json` at the repo root, once, and everything reads it
-afterwards. Do not work around a refusal by picking a different path.
+A symbol declared here and used only by other files gets `@declared` alone. If
+you did not look, write no suffix.
 
-One diagram per file — `create_diagram` replaces what it generated last time.
+**Anchor arrow ends at what the arrow means.** "This function calls that one":
+both ends `path#symbol`, and the check reads that one function body. Looser
+meanings (ownership, orchestration): anchor at file level. A box for data (a
+struct, a table, a buffer) has no body to read, so an arrow into it is
+checkable only at file level; the draw response says which arrows those are.
 
-## Give meaning, never geometry
+`via: ["handle_logging", "emit_batch"]` on an arrow names the route it takes,
+and a break names the hop. Use it only when the route itself matters.
 
-`create_diagram` takes nodes and edges. Layout, node sizing, connector routing,
-arrow binding and label contrast are all decided by the engine using real font
-metrics. Passing coordinates is not possible and not wanted; if a layout comes
-out wrong, that is a bug worth reporting, not something to hand-place around.
+## States
 
-Pass all edges to `create_diagram` in one call. `connect_nodes` draws straight
-arrows between existing shapes and does not re-run layout, so using it to build a
-graph incrementally produces connectors that cut across boxes. It is for joining
-things that already exist — especially shapes the user drew.
+| `state` | means | drawn |
+| --- | --- | --- |
+| `built` | exists now; the default, never written | solid |
+| `planned` | meant to exist; its ref is work to do, not drift | dashed |
+| `external` | real, not code in this repo | dotted |
 
-Colour carries meaning cheaply: give each subsystem its own `backgroundColor`,
-and set `strokeColor` on edges in the same call rather than patching arrows
-afterwards, since the next regenerate would revert a patch.
+A `planned` box turns `built` on its own once every ref on it resolves. Do not
+flip it by hand. Arrows take `state` too. For planning a whole piece of work as
+a board first, use `/plan-diagram`.
 
-Keep edge labels to one or two words. On a board being drawn for the first time,
-**leave `direction` off**: both flows are measured and the one that reads is
-drawn, and the response says which it picked and what the other would have come
-to. Naming a flow turns that off, so name one only when the board is a sequence
-and you want `DOWN` whatever it costs.
+## Changing a board that exists
 
-To change the flow of a board that already exists, `relayout_diagram` is a single
-word and never re-sends the graph. Reach for it when the picture is wrong in a way
-the numbers did not catch — not to find out whether it was, which the draw-time
-response already said.
-
-## Changing a board that already exists
-
-Three tools, and the wrong one is expensive rather than wrong. A board of 34
-boxes and 44 arrows costs about **1,900 tokens** to re-send, so reaching for
-`create_diagram` out of habit charges that for a change whose real content is a
-handful of strings.
+Read it first with `read_diagram` and address boxes by the node ids it gives.
 
 | what changed | call |
 | --- | --- |
-| a ref, a state, a colour, a closed claim | `edit_diagram` |
+| a ref, a state, a colour, a claim, a closed claim | `edit_diagram` |
+| the whole board's `describes` | `edit_diagram` with top-level `describes` |
 | the layout flow | `relayout_diagram` |
 | boxes added or removed, a subsystem reworked | `create_diagram` |
-
-`edit_diagram` merges: everything you do not name is still true afterwards, so
-re-anchoring a box cannot silently drop its state or its second anchor. Address
-boxes by the node id `read_diagram` gives you.
 
 ```json
 {"path": "docs/diagrams/architecture.excalidraw",
@@ -130,741 +133,69 @@ boxes by the node id `read_diagram` gives you.
              {"id": "store", "state": "planned"}]}
 ```
 
-`relayout_diagram` re-runs the layout from the graph already in the file and
-records the flow on the board, so a later regenerate does not turn it back.
-
 ```json
-{"path": "docs/diagrams/architecture.excalidraw", "direction": "DOWN"}
+{"path": "docs/diagrams/routing.excalidraw", "describes": "repo"}
 ```
 
-**Drawing is not reproducible; checking is.** Two runs of the same request
-produce different boards — a different split, different boxes, a different
-layout — because the graph comes from a model. Everything downstream of the
-graph is deterministic: an unchanged diagram regenerates byte-identically, and
-every check gives the same answer every time. So a user who redraws a board
-expecting the same picture will not get it, and it is worth saying that before
-redrawing one they liked.
+`edit_diagram` changes only what you name. Re-sending a whole board to
+`create_diagram` costs far more and is for structure only.
 
-## Point nodes at the code they stand for
+Two runs of the same request draw different boards, so say so before redrawing
+one the user liked. When a box goes stale, work out whether its code moved
+(repoint it) or went (remove it).
 
-When a node is real code in this repo, set `ref` on it. That is what lets
-`check_drift` say later that a diagram has gone stale.
+## Claims
 
-| you mean | write |
-| --- | --- |
-| a file | `src/engine/layout.ts` |
-| one function in it | `src/engine/layout.ts#planLayout` |
-| a whole directory | `src/engine/` — the trailing slash says so, and it must not be empty |
-| something inside a directory | `src/engine/#Workspace` |
-| some files in one directory | `src/engine/*.ts` — `*` in the last segment only, never `**` |
-| an HTTP endpoint | `src/server/board-server.ts#/api/board`, or `#GET /api/board` |
+All optional. Most arrows carry none. Each arrow carries at most one, set with
+`claim` on the edge. Both ends name a symbol (`path#symbol`) unless the table
+says otherwise. Read `claims.md` in this skill before writing one you have not
+used before.
 
-An endpoint box is the one anchor that is not a name. It asks whether the route
-literal is still served by that file or something it imports, which is the only
-mechanically checkable thing about an endpoint — the method token is there for
-the reader and is never verified. A file that writes no route literals at all is
-counted as unread rather than reported as broken, so pointing this at a helper
-module is quiet, not a false alarm.
-
-A ref must point at source, never at build output. `target/`, `dist/`, `out/`,
-`build/` and `node_modules/` are refused outright, and the reason is that they
-would otherwise pass: the file is really there, so the box goes green and stays
-green while the code it was drawn for is renamed, moved or deleted. The trap is
-that these directories quote your source — a Rust fingerprint log holds whole
-function signatures — so a search for a symbol returns one and it looks right.
-
-When one box stands for several things — a feature spread over files, a constant
-and the function using it — add `refs: [...]` beside `ref`. Every anchor is
-checked, and the box is loud when any of them breaks. Pick `ref` for the main one;
-arrows between boxes are checked against it.
-
-### Claiming a symbol is still wired in
-
-A plain `path#symbol` asks only whether the name appears in the file, so a file
-holding nothing but a comment mentioning it passes. Add `@` to record what you
-actually read there:
-
-| what the file showed you | write |
-| --- | --- |
-| the symbol is declared here | `src/lib.rs#log_line@declared` |
-| something here calls it | `src/server.rs#log_line@used` |
-| both — it lives here and is wired in | `src/lib.rs#log_line@declared+used` |
-
-**Transcribe it, never infer it.** Setting a symbol ref means you already had
-that file open to find the symbol, so both answers were on screen: you saw the
-`fn`, the `def`, the `export function` — that is `@declared`; you saw the name
-again somewhere that was not its declaration — that is `@used`. Write the ones
-you saw and stop. Do not add `@used` because a box labelled "logging" is
-obviously called from somewhere: that is a hypothesis, and a hypothesis that
-ages badly is indistinguishable from real drift later.
-
-A symbol declared here but called only by other files gets `@declared` alone,
-and that is the common case, not a shortfall. If you did not look, leave the
-suffix off entirely — a plain `path#symbol` is a smaller claim, not a worse one.
-
-The cost of guessing instead is measured: applied blindly to all 121 exports in
-this repo, "declared and used" flags 35 of them — 29% noise — because an export
-used only by its importers looks unused where it is written. Applied where
-someone had actually read the file, it was quiet.
-
-Those two words are the whole vocabulary; anything else after `@` is a broken
-ref and says so immediately. TypeScript, TSX, JavaScript, Rust and Python are
-read properly; in any other language the claim quietly falls back to a plain
-mention.
-
-For a feature spread across files, name the files — the box carries the graph:
-
-```
-refs: ["src/logging.rs#log_line@declared",
-       "src/server.rs#log_line@used"]
-```
-
-### Arrows get sharper when both ends name a symbol
-
-An arrow between two boxes that both anchor on a **file** is checked by imports
-and shared route strings. When both ends anchor on a **symbol**, the check
-narrows to one function's body: does this function name the other, directly or
-through a call it makes in the same file?
-
-That is how `handle_request → log` gets caught when the logging call actually
-lives in `reset_connection`. It works in every language above, not only
-TypeScript.
-
-So anchor an arrow's endpoints at the granularity you mean. If the arrow means
-"this function calls that one", give both ends `path#symbol`. If it means
-something looser — orchestration, ownership, "these belong together" — anchor
-at file level and let the import channels answer, because a body-scoped search
-will not find a relationship that was never a call.
-
-The same goes for **a box standing for data**: a struct, a static, a table, a
-buffer. There is no body to read on that side, and the relationship almost
-always lives in a type in a signature, a field, or an enclosing `impl` — none of
-which is inside any function body. An arrow into a symbol like that comes back
-unconfirmed, and `create_diagram` says so in its own result, the turn you draw
-it — how many arrows nothing corroborated, why, and which ones are the
-re-anchorable kind — with the fix in the sentence: anchor that end at file
-level. It is information and never a refusal. Nothing accuses you of anything
-for it, and nothing about the board is wrong; the arrow just goes unverified
-until it is anchored at a granularity the code can answer. Changing a ref with
-`edit_diagram` gets the same answer, because that is the other way an arrow
-gains its anchors.
-
-When a box stands for a concept rather than one function, list in `refs` **the
-symbols whose invocation counts as using it** — the interface, not just the
-implementation. Any one of them being reached settles the arrow, so fifty
-callers need one claim.
-
-Membership is checked in one direction too: every listed symbol that *runs*
-must name another one. A box that lists a helper which has stopped doing
-anything with the concept is reported, because otherwise the callers keep
-calling a listed name and every arrow stays green while the concept is hollow.
-Data — a `static`, a `struct`, a `const` — is exempt: that is the ground the
-rest of the concept reaches to.
-
-### When the route itself is worth writing down
-
-The body check follows calls as far as they go inside the file, so a chain like
-
-```
-handle_fail → handle_logging → emit_batch → log_line!
-```
-
-is found on its own. You do **not** need to do anything for depth.
-
-`via` is for when the *path* is part of what the diagram is claiming:
-
-```
-via: ["handle_logging", "emit_batch"]
-```
-
-That says the connection goes this way, through these names. Each consecutive
-pair is checked inside one body, so a break reports **which hop** stopped
-holding instead of shrugging at the whole arrow — and it is the only shape that
-can say that. It is also a stronger claim than the arrow alone, so a `via`
-arrow never falls back to a looser channel: get the route wrong on a connection
-that is genuinely there and it says so, in those words.
-
-Use `via` when the route matters — a path you want protected from refactors, or
-a hand-off you want documented. Leave it off when only the destination does.
-
-Only for things that exist in the repository. Inventing a path is worse than
-leaving it off — but say *why* it is off, because a missing ref otherwise reads
-as an oversight:
-
-- **A box for something you are about to build**: keep the ref and set
-  `state: "planned"`. `check_drift` then reports it as work to do rather than as
-  drift — and once the code catches up, the end-of-turn check flips the box to
-  `built` on its own. **Do not flip it by hand or redraw the box just to update
-  its state**: the automatic promotion is deterministic, waits until *every*
-  anchor on the box resolves, and reports itself as `promoted`. Editing the
-  state yourself preempts it for no gain. (Setting `built` naturally as part of
-  a redraw you are doing for other reasons is fine.) When the user wants a whole
-  piece of work planned as a board before building it, that is `/plan-diagram`.
-- **A box that is not code in this repo** — a browser, a vendor API, another
-  project: `state: "external"`. Never checked, and distinct from a forgotten
-  ref. Drawn dotted, so a box nothing verifies does not sit on the board
-  looking exactly like one that is verified every turn.
-- **A whole board that is not about this codebase** — a protocol, a standard,
-  someone else's system: pass `describes: "concept"` to `create_diagram`. That
-  excuses every box at once, and it needs a title, since that is where it is
-  recorded.
-
-Same field on an edge. A connection you intend but have not wired yet is
-`state: "planned"`, which is the honest way to draw the arrow before the import
-exists.
-
-### The claims that can come back wrong
-
-Everything above can be *unconfirmed*. A claim can be **refuted** — reported in
-red, with a file and a line, as a thing the diagram states and the code
-contradicts. That is the point of them, and it is also the only place here where
-guessing has a real cost.
-
-Every word below can come back wrong except `feeds`, which confirms and
-otherwise stays quiet. Two of them — `builds` and `calls` — can only ever be
-wrong about the **direction**, never about an absence. One of them —
-`accesses` — can only ever be wrong about one of its two ends. One of them —
-`conforms` — can be wrong in Python and TypeScript and never in Rust, because
-what a Rust type implements is not written on the type. Each says why under its
-own heading.
-
-They are all optional. An arrow with no claim and a box with no claim are the
-normal case, not a shortfall.
-
-They are also about `built` things, and the rules below say so as if that were
-the only case. It is not. On a `planned` arrow or box there is no line to read,
-so a claim there is a specification rather than a transcription — *when this is
-built, it will work this way* — and nothing grades it until the code lands and
-the thing promotes. Writing one on a plan therefore costs nothing and can accuse
-nobody. `/plan-diagram` is where that is spelled out.
-
-#### `claim: "needs"` — this arrow's direction is a fact
-
-A plain arrow means "these two are related, somehow". Nothing can disprove
-*somehow*: the check looks for any connection and failing to find one is never
-proof there is none. So a plain arrow has no bad verdict available to it — it
-comes back confirmed, or it comes back counted as unconfirmed — and an arrow
-drawn the wrong way round survives every run.
-
-Draw those freely. An arrow that claims nothing is never reported against you,
-never coloured, and never fails a build; the report keeps a number, because "how
-much of this board is actually verified" is a fair question. What it costs is
-only that: the arrow stays unverified.
-
-`needs` is the way out. It says **the `from` end declares a dependency on the
-`to` end** — an import, a require, a `use`, an include. A direction has an
-opposite, and an opposite can be shown to be the only one present:
-
-```
-edges: [{ from: "server", to: "logging", claim: "needs" }]
-```
-
-Get it backwards and the next check says so in red, naming the line that proves
-it, and tells you to turn the arrow round. That is the whole feature.
-
-It is written onto the arrow's label as `@needs`, after the reader's own words,
-because a claim nobody can see on the board is a claim nobody can refuse. That
-also makes it the one claim a person can write without any tool: `@needs` typed
-into an arrow's label is read back as the same claim, and so is the tick in the
-board page's panel. Expect to find claims on a board you did not put there.
-
-**Transcribe it, never infer it.** Write `needs` only when you have read the
-line that declares the dependency — the same rule as `@declared`, for the same
-reason. "The server obviously imports the logger" is a hypothesis. A wrong
-`needs` is not a harmless decoration: it is a false statement read back to the
-user, on their diagram, in red, and the report can tell it was written this
-turn — it says *a claim written this turn is already wrong*, which is the tool
-reporting your mistake to somebody who did not make it.
-
-If you did not read the line, draw the arrow with no claim. That is a smaller
-statement, not a worse one.
-
-The check withholds rather than guesses when it cannot see enough to refute:
-a language with no measured reader, a parse that recovered from an error, a
-file that reaches out at runtime, an end anchored at a directory, both ends the
-same file. The claim is then recorded and unverified, which costs nothing —
-so a `needs` you actually read is always worth writing, even where you cannot
-be sure it will be checked.
-
-#### `claim: "feeds"` — this arrow's result goes into that box
-
-A lot of arrows do not mean "A imports B". They mean **A's output goes into B**
-— a pipeline. That is a different fact, and it frequently runs the *opposite*
-way to the import: the file holding a result usually imports the one that
-produced it.
-
-```
-edges: [{ from: "parse", to: "render", claim: "feeds" }]
-```
-
-It reads as `@feeds` on the label, next to your own words, and it is checked by
-going and finding the flow: one function that binds the first call's result and
-passes it into the second, or hands it straight over. That function is usually
-in neither endpoint — the wiring lives in a third file the board often does not
-draw at all — so this is the one arrow check that looks outside the diagram.
-
-Both ends must name a symbol (`path#symbol`). A file has no result.
-
-**It can never come back red.** A value can reach the other end through a
-callback, a struct field, a builder chain — places no reader follows — so
-failing to find the flow is not evidence the arrow is wrong. Finding it is
-evidence it is right. So `feeds` confirms or it stays quiet, and the honest
-consequence is that guessing costs you nothing *and buys you nothing*: an
-unfound flow is a count in `--details`, not a verdict.
-
-That makes it the opposite trade from `needs`. `needs` is powerful and
-dangerous — write it only from a line you read. `feeds` is safe and weaker:
-write it wherever the arrow really means a pipeline, and the check will confirm
-the ones it can see.
-
-#### `claim: "takes"` / `claim: "returns"` — that function's signature names this type
-
-The most ordinary arrow on a typed diagram is neither of the two above. You draw
-a box for a type and a box for a function, and what you mean is *that function's
-signature mentions this type*:
+| claim | the arrow says | direction | can be red when |
+| --- | --- | --- | --- |
+| `needs` | from imports to | importer → imported; ends may be files | the import runs only the other way |
+| `feeds` | from's result goes into to | producer → consumer | never |
+| `takes` | the function has a parameter of this type | type → function | the type is not a parameter |
+| `returns` | the function returns this type | type → function | the type is not the return type |
+| `holds` | the type has a field of that type | container → field type | no field has that type |
+| `builds` | from makes a value of that type | maker → type made | the arrow is backwards |
+| `calls` | from calls to | caller → callee | the arrow is backwards |
+| `accesses` | from reads a member of to; the member name is the `label` | reader → type | the type has no such member |
+| `conforms` | from extends or implements to | subtype → base | the base is not listed (not in Rust) |
 
 ```
 edges: [
+  { from: "server", to: "logging", claim: "needs" },
   { from: "request", to: "handler", claim: "takes" },
-  { from: "get_client", to: "client", claim: "returns" },
-]
-```
-
-The `to` end is the function and the `from` end is the type, so the arrow points
-the way the data flows. `takes` reads the parameters; `returns` reads the return
-type. The `to` end must anchor a symbol (`path#symbol`) and the `from` end must
-name the type.
-
-**Both can come back red.** A function's parameters and return type can be
-listed in full, so a type absent from both is genuinely absent — there is no
-helper or macro for it to hide behind. The report names the arrow and quotes the
-signature it read.
-
-The two words are separate so the arrow's direction still carries information.
-Claim the wrong half and you do not get a red: you get told the type is on the
-other side, which usually means the arrow is drawn the wrong way round.
-
-Nothing is reported either way when the type could be written under a different
-name — a type alias, or an import renamed on the way in. A signature that might
-be hiding it proves nothing, so the check withholds instead of accusing.
-
-So the same rule as `needs` applies, for the same reason: write it from a
-signature you read.
-
-The claims are mutually exclusive on one arrow: an arrow asserts one thing, and
-two claims is one unanswered question about which was meant, which the check
-refuses rather than resolving.
-
-#### `claim: "holds"` — this type has a field of that type
-
-The most ordinary thing a data type does is hold another one — a struct field, an
-interface property, a dataclass attribute:
-
-```
-edges: [
-  { from: "route_info", to: "response", claim: "holds" },
-]
-```
-
-**Read the direction carefully, because it is the other way round from `takes`.**
-The `from` end is the type that has the field and the `to` end is the type the
-field is of: *RouteInfo holds a Response*. Containment points whole to part,
-which is how everybody draws it and how the one hand-drawn claim in this
-project's history was drawn. Both ends must name a type (`path#symbol`).
-
-**It can come back red.** A type's fields can be listed in full, so a type absent
-from all of them is genuinely absent. The report names the arrow and quotes the
-field list it read.
-
-The generic wrappers are read through, so all of these confirm: `Vec<RouteInfo>`,
-`Promise<Response>`, `Optional[Handler]`, `list[Route]`, `Client[]`. A field
-holding a collection of the thing still holds the thing.
-
-Nothing is reported either way when a field's type could be written under
-another name — a type alias, an import renamed on the way in, or a Python
-annotation written as a string (`x: "Path | FileSlice"`, which is how a forward
-reference is spelled). A field list that might be hiding it proves nothing, so
-the check withholds instead of accusing.
-
-Same rule as the others: write it from a field list you read.
-
-#### `claim: "builds"` — this makes one of those
-
-A routine that makes a value of a type. `new QueryCache()`, `RouteInfo { .. }`,
-and — the one most boards need — one component rendering another:
-
-```
-edges: [
-  { from: "build", to: "widget", claim: "builds" },
-  { from: "menu", to: "menu_content", claim: "builds" },
-]
-```
-
-The `from` end is the thing doing the work and the `to` end is what comes out,
-so it runs the same way as `returns` and the opposite way from `holds`. The
-`from` end may name a routine, or a **type whose routines do the making** — draw
-`QueryClient` and mean "this makes Queries", which is how anybody would draw it.
-
-**It cannot be red for an absence, and that is deliberate.** A routine that
-never writes `new Widget` can still hand you one by calling a factory, so not
-finding the construction says nothing about the arrow. Finding it does.
-
-**What can come back wrong is the direction.** If the construction is found at
-the far end and only there, the arrow is drawn backwards and you get told, with
-a file and a line. That is the one accusation this word makes.
-
-`<Menu />` counts; `<div />` does not — a lowercase tag is not something anybody
-draws a box for.
-
-Nothing is reported either way when the construction could be hiding: a Rust
-macro that expands to it, or a constructor whose name is built at runtime
-(`new registry[kind]()`). **Python gets no verdict at all**, in either
-direction: `Response(body)` and `render(body)` are the same syntax there, and
-guessing on the capital letter would be a naming convention pretending to be
-evidence.
-
-#### `claim: "calls"` — this calls that
-
-The most common thing one piece of code does to another, and the thing your
-boards have been trying to say in prose. If you were about to write `calls` or
-`will call` on a label, write the claim instead:
-
-```
-edges: [
-  { from: "run", to: "render", claim: "calls" },
-]
-```
-
-The `from` end is the caller, which is the direction every diagram already
-draws. There is no second word for "is called by" — that is the same fact read
-backwards, and the arrow already carries the direction.
-
-Both ends must anchor a symbol (`path#symbol`). A file does not call anything.
-
-The called name is traced back to the file it came from, so a name imported
-through a barrel or a re-export still confirms: `from graphify.extract import
-extract_objc` confirms against the file that actually declares it, not the one
-that passes it on.
-
-**It cannot be red for an absence, and that is deliberate.** A routine that
-never writes `render()` can still reach it through a callback, a trait object or
-a dispatch table, so not finding the call says nothing about the arrow.
-
-**What can come back wrong is the direction.** If the call is found at the far
-end and only there, the arrow is drawn backwards and you get told, with a file
-and a line. That is the one accusation this word makes — and it is the case
-worth catching, because a call arrow drawn backwards used to pass every check
-this tool had.
-
-Nothing is reported either way when the name cannot be placed: a method on a
-value whose type is not written down (`thing.render()`), a name a wildcard
-import brought in, a name from a package, or a call inside a Rust macro.
-Measured across five repositories that is 7% of Python asks and 2% of
-TypeScript's.
-
-Do not reach for this when what you mean is that a **value** flows from one to
-the other. That is `feeds`, and it frequently points the opposite way.
-
-#### `claim: "accesses"` — this reads that member off that type
-
-The largest thing your boards could say and had no word for: a routine reading a
-field, a property or a method off a type. If you were about to label an arrow
-`reads`, `writes`, `key`, `value` or `looks up`, this is the claim.
-
-It is the only claim that takes an **argument**, and the argument is the member
-name, written as the arrow's label:
-
-```
-edges: [
+  { from: "client", to: "get_client", claim: "returns" },
   { from: "renderer", to: "config", label: "width", claim: "accesses" },
 ]
 ```
 
-That comes out as `width @accesses` on the arrow. The reader is the `from` end
-and the type is the `to` end, the same way round as `calls`. Both ends must
-anchor a symbol (`path#symbol`).
+On a box:
 
-**Write the member.** An `@accesses` arrow with prose on its label, or with no
-label at all, names nothing to look for and is reported as a claim nothing can
-read — not as a claim that passed.
+- `handles: ["GET", "POST"]` on a box whose ref names one routine: every case it
+  dispatches on. Red when the code has a case the list lacks, or the reverse.
+- `closed: { through: ["src/engine/index.ts"] }` on a box whose ref is a
+  directory: nothing outside imports into it except through those files. Red on
+  the first outside import. Check `check_drift`'s `closedBreaches` before
+  claiming it.
+- `complete: "src/engine"`, passed to `create_diagram` beside `title`: every
+  module there that the board reaches has a box. Off by default; add it only
+  when the user wants the board held to that.
 
-**Its two ends are checked to different standards, and this is worth knowing
-before you draw one.**
+A claim on a `planned` box or arrow is a specification: nothing checks it until
+the code lands.
 
-*It can come back red* — but only about the type. A type's members can be listed
-in full, so a member absent from all of them is genuinely absent, and the report
-names the arrow and quotes the member list it read. This is what the word is
-for: rename a field and every diagram still naming the old one goes red the turn
-the rename lands.
+## Reading, checking and the live board
 
-*It can never be red about the routine.* Working out everything a body touches
-needs to know the type of every value in it, which is the whole program. So a
-routine that cannot be seen reading the member is reported as nothing at all.
-
-A green needs both halves: the type declares it **and** the routine can be seen
-reading it. The type having a `width` is not evidence that this routine touches
-it.
-
-Nothing is reported either way when the member list is not closed — a type that
-extends another (`class Config extends Base`, `class Config(BaseModel)`), one
-with an index signature (`[key: string]: unknown`), a Python class defining
-`__getattr__`, a type alias for a shape declared elsewhere, or a Rust struct
-whose `impl` block is in another file. Every one of those is a member list that
-might be hiding the name, and a list that might be hiding it proves nothing.
-
-Same rule as the others: write it from a member list you read.
-
-#### `claim: "conforms"` — this is one of those
-
-A class extending a base, a class or struct implementing an interface or trait,
-an interface extending another. The relation every class diagram draws and this
-one could not say:
-
-```
-edges: [
-  { from: "handler", to: "base", claim: "conforms" },
-]
-```
-
-**Subtype first.** `Handler -> Base`, the same way round as `holds` and
-`builds`, and the way generalisation has been drawn for thirty years. Both ends
-must anchor a symbol (`path#symbol`).
-
-Drawing it the other way round is the mistake this word exists for. Before it,
-`Base -> Handler` and `Handler -> Base` were the same arrow to this tool —
-inheritance brings an import with it, the corroboration search found the import,
-and the backwards one passed. Now the backwards one is red, and the report says
-it is the right fact drawn backwards rather than sending you to look for a base
-that was never missing.
-
-*It can come back red in Python and TypeScript.* A base list is written in the
-declaration and can be read in full, so a type absent from it is genuinely
-absent, and the report quotes what the declaration does say.
-
-*It can never come back red in Rust*, and this is the one place in this file
-where the language changes what a word may say. `impl Trait for Type` is a
-free-standing item that may sit in any file in the crate, next to neither the
-trait nor the type — so reading `struct Type` enumerates nothing, and an absence
-would be a statement about where the reader happened to look. Rust confirms an
-`impl` it can find and reports the arrow as unread otherwise, with the reason
-said out loud.
-
-**Type arguments are not bases.** `class Store extends Cache<Entry>` says Store
-is one of Cache and says nothing about Entry. That is the opposite of `holds`,
-where `Vec<RouteInfo>` really does hold a RouteInfo.
-
-**Structural conformance is not on offer.** An object that satisfies an
-interface without naming it, or a function that fits a protocol, is written down
-nowhere — so an arrow from or at a function is reported as a claim nothing can
-read, not as one that passed. Nor is it transitive: `A extends B extends C`
-confirms `A -> B` and says nothing about `A -> C`.
-
-Nothing is reported either way when a base could stand for another name (`import
-{ Base as B }`), when it is an expression rather than a name (`extends
-mixin(B)`), or when the tail is an alias for a type declared elsewhere.
-
-#### `handles: [...]` — and those are all the cases
-
-A box that stands for a routine which dispatches on a fixed set of cases — a
-router on a method, a `match` on an enum, a reducer on an action type — can say
-what that set is:
-
-```
-{ id: "status", ref: "src/route.ts#status", handles: ["GET", "POST", "DELETE"] }
-```
-
-**This is the one claim here that catches something being *added* to the code.**
-Every other word is about one thing going stale. A case list is about
-completeness, so when somebody adds a fourth case to the routine and not to the
-picture, the next check says so with the file and the line. That is the whole
-reason it exists, and it is why the list has to be *all* of them: a partial list
-is not a smaller claim, it is a false one.
-
-**It can come back wrong in both directions.** A case the routine dispatches on
-that is not in your list, and a case in your list the routine has no arm for.
-Both are refutable because the arms of a dispatch are enumerable — the reader
-sees every one, so a case that is not there is genuinely absent rather than
-merely unfound.
-
-Write it **only from the arms you have read.** The ref must name a routine
-(`path#symbol`), not a file — a file cannot say which dispatch was meant.
-
-Six things it declines to judge rather than guess, and it says which in the
-report every time:
-
-- **a `_` or a `default` arm** — the missing-case half withholds, because the
-  fallback really is handling the case you listed. The unlisted-case half still
-  checks: a fallback does not excuse the picture leaving out a case the code
-  names.
-- **two dispatches in one routine** — the claim names one set and nothing says
-  which, so it refuses rather than picking.
-- **a case the reader cannot name** — a computed label, a tuple pattern, a Rust
-  byte range. A case list short by what could not be read would accuse you of
-  forgetting a case you wrote down.
-- **an `if`/`elif` ladder** — read, and never judged. Nothing independent can
-  tell a chain link from an ordinary `if`, so it has not earned a red.
-- **a language other than TypeScript** — the reader works in Rust, Python,
-  JavaScript and TSX and is measured only in TypeScript, so elsewhere it
-  confirms and stays quiet. Writing the claim there still costs nothing and
-  still gets checked the day the square is earned.
-- **a `planned` box** — nothing is graded until it promotes.
-
-#### `closed: {}` — nothing outside reaches into this box
-
-This is the claim architecture diagrams actually make and could never say: you
-draw a box round a subsystem, put the rest of the system outside it, and what
-you mean is *the rest of the system does not reach in here*.
-
-Only for a box whose `ref` is a **directory**. `through` lists the front doors
-— repo-relative paths of files **inside** the directory that outside code is
-allowed to import:
-
-```
-{ id: "engine", label: "the engine", ref: "src/engine",
-  closed: { through: ["src/engine/index.ts"] } }
-```
-
-An empty or omitted `through` claims total isolation. Unusual, and real: this
-repository's own `src/viewer` is exactly that shape.
-
-**The two halves are wildly unequal, and you should expect that.** Refuting is
-cheap — one import from outside, read out of the source, and the claim is false.
-Confirming is a statement about every file in the repository, so it holds only
-if every file was read to the end. One file the reader could not finish and the
-honest answer is *no breach found*, which the report prints as unproven rather
-than as a pass.
-
-**Check before you claim.** Claiming `closed` on a subsystem everything reaches
-into produces an immediate red failure that is your mistake, not the user's.
-`check_drift` returns `closedBreaches` — every import in, by file and line — so
-the way to find out is to claim it on a scratch board and read the list, or to
-look at what imports the directory before you write it.
-
-**The test-file trap.** Tests reach into everything, and they have to: testing
-a private function means importing it. Test breaches are held apart and do not
-refute the claim — but they are counted and shown, never filtered out. Renaming
-a file to `foo.test.ts` moves a breach from one list to the other in public; it
-does not make it disappear. So a `closed` box in a repo with a suite is normal
-and readable, and nobody can quietly widen it by naming a file cleverly.
-
-A door nobody used is reported too. Not a failure — a subsystem being tidier
-than it promised — but usually a door that *was* used until the import moved,
-and a stale door silently widens the claim.
-
-Run `check_drift` after changing module structure, and fix the diagram it
-complains about — usually with `edit_diagram`, since a drift report mostly asks
-for refs to move. `/update-diagram` does exactly that if the user asks for it by
-name.
-A clean report with `checked: 0` means no node had a ref, not that the diagram is
-right. `clean` covers regressions only: `workItems` and `promotions` sit beside it
-because neither is a broken diagram.
-
-To ask the opposite question — what does the code have that this diagram does not
-show? — call `check_drift` with `coverage: true`. It names modules the board's own
-boxes import but no box covers, most-imported first. Suggestions, not drift: worth
-running when deciding what a diagram is missing, not on every pass.
-
-#### `complete: "src/engine"` — and that is all of them
-
-Every claim above is about one thing: this arrow, this directory's boundary. So
-none of them can catch what a diagram *leaves out*. Delete a box and no check
-notices; let the code grow a module the picture never had and the report stays
-clean. A diagram cannot be wrong by omission.
-
-`complete` is the claim that fixes that, and it goes on the **board**, not a box
-— it is passed to `create_diagram` beside `title`:
-
-```
-{ title: "The engine", complete: "src/engine", nodes: [...] }
-```
-
-It says: every module under `src/engine` that this board reaches — imported by
-one of its boxes, or importing one — has a box of its own. A module that does
-not is then a **finding**, not a suggestion.
-
-**It is the same walk `coverage: true` runs.** The difference is who is
-speaking. Unclaimed, a missing module is the engine having an opinion about what
-you should have drawn, which is why it is off by default. Claimed, it is the
-board's own assertion coming back false.
-
-**Do not add it by default.** Most boards should claim nothing about what they
-omit — a diagram is allowed to be a selective view, and that is usually the
-point of one. Add it when the user wants this picture held to the code, or when
-the board is the spec for a subsystem and growing past it silently is the risk.
-
-**Three things it refuses rather than answers**, all of them loudly:
-
-- A scope that is not a directory.
-- A scope one box already covers whole — a directory-anchored box excuses
-  everything beneath it, so nothing inside could ever come back missing, and a
-  claim that can only go green is worse than none. Draw the modules separately,
-  or scope the claim somewhere no single box stands for.
-- A scope in a language no reader is measured for. That is reported unproven,
-  never held: nothing was read, so nothing was proved.
-
-Modules nothing on the board reaches are never nominated — the relevance bar is
-inherited from what you drew, not invented — so a helper no box imports will not
-be held against the claim.
-
-When a box has drifted, work out whether its code *moved* or *went*: repoint the
-first, remove the second. Deleting a box because a path changed loses a real part
-of the picture.
-
-## Do not render to find out whether it worked
-
-**Whether a board can be read is a number, and you already have it.**
-`create_diagram` and `relayout_diagram` both report the size the board came to,
-the scale a render will be forced down to, and how big the labels end up at that
-scale — crowding and unreadable labels are arithmetic, not something to look at.
-A board they call unviewable renders into text a few pixels tall, so the image
-answers nothing and the call after it is another redraw. That loop is what cost
-$1.94 for two diagrams once.
-
-`render_diagram` is for showing a person the board, or for judging something
-genuinely visual that the numbers do not cover. Once, at the end, and never as
-the way to check your own work.
-
-## Reading, and honouring, what is already there
-
-`read_diagram` marks every fact `recorded` (drawn by a tool, exact) or `inferred`
-(hand-drawn, derived from geometry). Keep that distinction when you report:
-an inferred label is a guess about someone's sketch.
-
-Never redraw a user's drawing. Their rectangles, their arrows, their handwriting
-are the spec. Label them, connect to them, build from them — `create_diagram`
-preserves them automatically, and `connect_nodes` and `edit_diagram` both accept
-hand-drawn elements by id.
-
-By default `read_diagram` omits positions and sizes. Ask for `geometry: true`
-when you need to fix layout, and `includeElements: true` only when you need to
-address individual elements in `edit_diagram`.
-
-## The live board
-
-`open_board` starts a local page that follows the file: your writes appear as the
-diagram being drawn, and anything the user draws is saved back. Offer it when
-someone wants to watch or join in.
-
-Each board gets its own URL, served by one local server. Opening a second diagram
-leaves the first page where it is, so a project split across several diagrams can
-have them open side by side — call `open_board` once per diagram and give the user
-both addresses rather than one that changes under them.
-
-Selecting a box or an arrow on that page opens a panel showing what it means —
-its files, its state, its claim, and the findings about it — and every field is
-editable there. So the user can anchor a box, mark one `planned`, or claim an
-arrow's direction without asking you, and a board can come back changed in ways
-no tool call of yours explains. Read the board before assuming your last write is
-what is on it. A box the user sketched and anchored themselves is `recorded` like
-any other, and is checked like any other.
-
-`board_status` says what is running: every open board with its own URL, and which
-one the bare address is currently following. Never give the user a localhost URL
-you did not get back from one of those two tools in this session — an address that
-answers nothing is worse than none.
-
-## Model choice
-
-The model's job here is to emit a node and edge list; the engine does the
-drawing. This does not need a frontier model. If the user is on one and mentions
-cost or speed, saying so is more useful than optimising the prompt.
+- `read_diagram` marks each fact `recorded` (drawn by a tool) or `inferred`
+  (read off a hand drawing). Say which when you report. Ask for
+  `geometry: true` only to fix layout.
+- `check_drift` checks every board. A clean report with `checked: 0` means no
+  box had a ref, not that the board is right. `coverage: true` lists code no
+  box covers.
+- `open_board` starts a live page that follows the file; the user can draw and
+  edit there too, so read a board again before assuming your last write is
+  what is on it. `board_status` lists open boards. Only give the user a
+  localhost URL one of those two returned in this session.

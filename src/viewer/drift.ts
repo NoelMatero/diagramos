@@ -19,6 +19,7 @@
  * instead of quietly grading a report by last release's rules.
  */
 
+import { pointsAtLines, pointsAtQualified } from "../engine/lines";
 import { summaryOf as sentenceFor } from "../engine/summary";
 
 export type Tone = "bad" | "warn" | "good" | "dim";
@@ -188,6 +189,9 @@ export interface DriftView {
   edgesSkipped?: number;
   strayArrows?: number;
   concept: boolean;
+  /** On a concept board, boxes pointing at code here (#287). Absent on older payloads. */
+  conceptAnchored?: number;
+  conceptBoxes?: number;
   /**
    * Every verdict word the engine that produced this report can emit.
    *
@@ -331,7 +335,10 @@ export function tallyOf(report: DriftView): TallyPart[] {
    * a complete claim coming back false would have read as a deleted file.
    */
   const incomplete = kind("incomplete-board");
-  const gone = report.findings.length - empty - unused - strangeBoxes - incomplete;
+  // Out of the remainder too: the code is there, the pointer never could reach it (#286).
+  const lines = report.findings.filter(pointsAtLines).length;
+  const qualified = report.findings.filter(pointsAtQualified).length;
+  const gone = report.findings.length - empty - unused - strangeBoxes - incomplete - lines - qualified;
   const parts: TallyPart[] = [];
   /*
    * First, and red, because it is the only part here that is about the page
@@ -344,6 +351,10 @@ export function tallyOf(report: DriftView): TallyPart[] {
     parts.push({ text: "page out of date", tone: "bad" });
   }
   if (gone) parts.push({ text: `${gone} gone`, tone: "bad" });
+  if (lines) parts.push({ text: `${lines} at line numbers`, tone: "bad" });
+  if (qualified) {
+    parts.push({ text: `${qualified} qualified ${qualified === 1 ? "name" : "names"}`, tone: "bad" });
+  }
   if (incomplete) parts.push({ text: `${incomplete} incomplete`, tone: "bad" });
   if (empty) parts.push({ text: `${empty} empty`, tone: "bad" });
   if (unused) parts.push({ text: `${unused} unused`, tone: "bad" });
@@ -740,6 +751,18 @@ export function livePromotionNote(count: number): string | undefined {
 }
 
 /** The dot's colour: the worst news wins, and quiet is green. */
+/**
+ * The chip's words when nothing is wrong with the boxes. A concept board full
+ * of this repo's code is amber rather than green: the setting that checks
+ * nothing is probably the mistake (#287).
+ */
+export function quietChipOf(report: DriftView): { text: string; tone: Tone } {
+  if (report.concept && report.conceptAnchored) {
+    return { text: `concept board · ${report.conceptAnchored} point here`, tone: "warn" };
+  }
+  return { text: report.concept ? "concept board" : "in sync", tone: "good" };
+}
+
 export function worstToneOf(rows: StatusRow[]): Tone {
   if (rows.some((row) => row.tone === "bad")) return "bad";
   if (rows.some((row) => row.tone === "warn")) return "warn";

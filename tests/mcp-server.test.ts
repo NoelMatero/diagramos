@@ -348,6 +348,60 @@ describe("board MCP server", () => {
   }, 120_000);
 
   /**
+   * #287: Haiku marked five boards of real code concept, which checks nothing,
+   * and then could not switch them back through edit_diagram. The draw says
+   * so, and edit_diagram has a named field that does the switch.
+   */
+  it("warns when a concept board points at this repo, and switches it back by name", async () => {
+    const board = "docs/diagrams/concept-here.excalidraw";
+    await mkdir(path.join(workspace, "src"), { recursive: true });
+    await writeFile(path.join(workspace, "src/router.ts"), "export function route() {}\n");
+    const drawn = jsonOf(await call("create_diagram", {
+      path: board,
+      title: "Request flow",
+      describes: "concept",
+      nodes: [
+        { id: "router", label: "Router", ref: "src/router.ts#route" },
+        { id: "ghost", label: "Handler", ref: "src/handler-not-here.ts" },
+        { id: "client", label: "Browser" },
+      ],
+    }));
+    const warned = String(drawn.conceptPointsHere);
+    expect(warned).toContain("1 of its 3 boxes");
+    expect(warned).toContain('describes: "repo"');
+    expect(jsonOf(await call("read_diagram", { path: board })).describes).toBe("concept");
+
+    // The switch, by name, and the check runs straight after it: the missing
+    // handler is now reported, which it never was on the concept board.
+    const edited = jsonOf(await call("edit_diagram", { path: board, describes: "repo" }));
+    expect(edited.describes).toBe("repo");
+    expect(edited.pointsAtNothing).toEqual(["Handler → src/handler-not-here.ts"]);
+    const read = jsonOf(await call("read_diagram", { path: board }));
+    expect(read.describes).toBeUndefined();
+
+    // And back again, warned the same way.
+    const again = jsonOf(await call("edit_diagram", { path: board, describes: "concept" }));
+    expect(String(again.conceptPointsHere)).toContain("1 of its 3 boxes");
+
+    // A board drawn without a title has nowhere to record it.
+    const bare = "docs/diagrams/no-title.excalidraw";
+    await call("create_diagram", { path: bare, nodes: [{ id: "a", label: "A" }] });
+    const refused = await client.callTool({ name: "edit_diagram", arguments: { path: bare, describes: "concept" } });
+    expect(refused.isError).toBe(true);
+    expect(JSON.stringify(refused.content)).toContain("title");
+  }, 120_000);
+
+  it("says in the describes field what concept is not for", async () => {
+    const tools = (await client.listTools()).tools;
+    const field = (name: string) => JSON.stringify(
+      (tools.find((tool) => tool.name === name)!.inputSchema.properties as Record<string, unknown>).describes,
+    );
+    expect(field("create_diagram")).toContain("flow through this codebase");
+    expect(field("create_diagram")).toContain("not a way to silence");
+    expect(field("edit_diagram")).toContain('"repo"');
+  }, 60_000);
+
+  /**
    * The claim slot, over the wire.
    *
    * The engine tests cover what a claim is; this covers whether an agent can
@@ -554,6 +608,51 @@ describe("board MCP server", () => {
     expect(result.pointsAtNothing).toEqual(["Ghost → src/not-written-yet.ts"]);
     expect(String(result.fix)).toContain('state: "planned"');
     expect(result.plannedWork).toBeUndefined();
+  }, 120_000);
+
+  /**
+   * #286: a small model pointed all 73 boxes on five boards at line numbers.
+   * "Typo, or mark it planned" is the wrong advice for that -- the code is
+   * there -- so the draw-time answer names the box and says to use a name, on
+   * the draw and again on an edit that re-anchors a box the same way.
+   */
+  it("says at draw time when a box points at line numbers, and says to use a name", async () => {
+    const board = "docs/diagrams/line-numbers.excalidraw";
+    await mkdir(path.join(workspace, "src"), { recursive: true });
+    await writeFile(path.join(workspace, "src/lib.rs"), "pub fn dispatch() {}\n");
+    const drawn = jsonOf(
+      await call("create_diagram", {
+        path: board,
+        nodes: [
+          { id: "real", label: "Dispatch", ref: "src/lib.rs#dispatch" },
+          { id: "lines", label: "Router", ref: "src/lib.rs#578-636" },
+        ],
+      }),
+    );
+    expect(drawn.pointsAtNothing).toBeUndefined();
+    expect(drawn.fix).toBeUndefined();
+    const said = (drawn.pointsAtLineNumbers as string[]).join(" ");
+    expect(said).toContain("Router → src/lib.rs#578-636");
+    expect(said).toContain("src/lib.rs#<function or type name>");
+
+    const edited = jsonOf(
+      await call("edit_diagram", { path: board, updates: [{ id: "real", ref: "src/lib.rs#L12" }] }),
+    );
+    expect((edited.pointsAtLineNumbers as string[]).join(" ")).toContain("Dispatch → src/lib.rs#L12");
+  }, 120_000);
+
+  it("says at draw time when a box names a method with its type, and says to drop the type (#288)", async () => {
+    const board = "docs/diagrams/qualified.excalidraw";
+    await mkdir(path.join(workspace, "src"), { recursive: true });
+    await writeFile(path.join(workspace, "src/server.rs"), "impl Server {\n    fn accept(&self) {}\n}\n");
+    const drawn = jsonOf(await call("create_diagram", {
+      path: board,
+      nodes: [{ id: "accept", label: "Accept", ref: "src/server.rs#Server::accept" }],
+    }));
+    expect(drawn.pointsAtNothing).toBeUndefined();
+    const said = (drawn.pointsAtQualifiedNames as string[]).join(" ");
+    expect(said).toContain("Accept → src/server.rs#Server::accept");
+    expect(said).toContain("src/server.rs#accept");
   }, 120_000);
 
   /**

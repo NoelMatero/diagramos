@@ -242,6 +242,110 @@ describe("checking a board against the code", () => {
     expect(checkDrift(labelled, fakeWorkspace({}))).toMatchObject({ clean: true, skipped: 1 });
   });
 
+  /**
+   * #286: a box pointed at line numbers was red from the start, and the red
+   * said "no longer mentions 578-636" -- as though the code had changed, when
+   * the pointer was never one that could work.
+   */
+  describe("a ref that points at line numbers", () => {
+    const lib = { "src/lib.rs": "pub fn dispatch() {}\nconst L254: u32 = 1;\n" };
+
+    it("says it is a line number, not that the code went missing, for every spelling", async () => {
+      for (const ref of [
+        "src/lib.rs#254",
+        "src/lib.rs#578-636",
+        "src/lib.rs#L254",
+        "src/lib.rs#L578-L636",
+        "src/lib.rs#L578-636",
+        "src/lib.rs#578–636",
+        "src/lib.rs#578:636",
+      ]) {
+        const board = await boardWith([{ id: "a", label: "Dispatch", ref }]);
+        const [finding] = checkDrift(board, fakeWorkspace({ "src/lib.rs": "pub fn dispatch() {}" })).findings;
+        expect(finding, ref).toMatchObject({ node: "a", kind: "unresolvable-ref" });
+        expect(finding.detail, ref).toContain("line numbers");
+        expect(finding.detail, ref).toContain("src/lib.rs#");
+        expect(finding.detail, ref).not.toContain("no longer");
+      }
+    });
+
+    it("says the same inside a directory and a glob", async () => {
+      const files = { src: "dir", "src/lib.ts": "export function dispatch() {}" } as const;
+      for (const ref of ["src/#254", "src/*.ts#12-30", "src/#L12"]) {
+        const board = await boardWith([{ id: "a", label: "Dispatch", ref }]);
+        const [finding] = checkDrift(board, fakeWorkspace(files)).findings;
+        expect(finding, ref).toMatchObject({ kind: "unresolvable-ref" });
+        expect(finding.detail, ref).toContain("line numbers");
+      }
+    });
+
+    it("says the same when the line number follows a colon instead of #", async () => {
+      // `src/lib.rs:254` is how search results and stack traces spell it, and
+      // it used to read as a file called `lib.rs:254` that "no longer exists".
+      for (const ref of ["src/lib.rs:254", "src/lib.rs:578-636", "src/lib.rs:L254"]) {
+        const board = await boardWith([{ id: "a", label: "Dispatch", ref }]);
+        const [finding] = checkDrift(board, fakeWorkspace(lib)).findings;
+        expect(finding, ref).toMatchObject({ kind: "unresolvable-ref" });
+        expect(finding.detail, ref).toContain("line numbers");
+        expect(finding.detail, ref).toContain("src/lib.rs#");
+        expect(finding.detail, ref).not.toContain("no longer");
+      }
+    });
+
+    it("never refuses a real name", async () => {
+      // No identifier in TypeScript, Python or Rust may start with a digit or
+      // contain a dash, so `254` and `578-636` can never be a name anyone
+      // wrote. `L254` can: it is only refused when the file does not have it.
+      const board = await boardWith([
+        { id: "named", label: "Constant", ref: "src/lib.rs#L254" },
+        { id: "fn", label: "Dispatch", ref: "src/lib.rs#dispatch" },
+      ]);
+      expect(checkDrift(board, fakeWorkspace(lib))).toMatchObject({ clean: true, findings: [] });
+      for (const name of ["254", "578-636", "578:636", "L578-L636"]) {
+        expect(/^[\p{L}_$][\p{L}\p{N}_$]*$/u.test(name), name).toBe(false);
+      }
+    });
+  });
+
+  /**
+   * #288's measurement: told not to use line numbers, Haiku wrote
+   * `src/lib.rs#Orangutan::accept` on 38 of 46 boxes. A method sits inside its
+   * impl or class, so the file never spells it that way, and every box read as
+   * code that went missing. Asked to fix them, it deleted the refs.
+   */
+  describe("a ref that qualifies the name with its type or module", () => {
+    const rust = { "src/lib.rs": "impl Orangutan {\n    fn accept(&mut self) {}\n}\nfn go() { Error::new(); }\n" };
+    const python = { "app.py": "class App:\n    def run(self):\n        pass\n" };
+    const ts = { "server.ts": "export class Server {\n  dispatch() {}\n}\n" };
+
+    it("says to write the plain name, for each way it is spelled", async () => {
+      for (const [ref, files, plain] of [
+        ["src/lib.rs#Orangutan::accept", rust, "src/lib.rs#accept"],
+        ["src/lib.rs#crate::net::accept", rust, "src/lib.rs#accept"],
+        ["src/lib.rs#Orangutan#accept", rust, "src/lib.rs#accept"],
+        ["app.py#App.run", python, "app.py#run"],
+        ["server.ts#Server.dispatch", ts, "server.ts#dispatch"],
+        ["server.ts#Server.dispatch@declared", ts, "server.ts#dispatch"],
+      ] as const) {
+        const board = await boardWith([{ id: "a", label: "Box", ref }]);
+        const [finding] = checkDrift(board, fakeWorkspace(files)).findings;
+        expect(finding, ref).toMatchObject({ kind: "unresolvable-ref" });
+        expect(finding.detail, ref).toContain(plain);
+        expect(finding.detail, ref).not.toContain("no longer");
+      }
+    });
+
+    it("leaves a qualified name the file really spells alone, and a missing one missing", async () => {
+      const board = await boardWith([
+        { id: "spelled", label: "Error", ref: "src/lib.rs#Error::new" },
+        { id: "gone", label: "Gone", ref: "src/lib.rs#Orangutan::vanished" },
+      ]);
+      const report = checkDrift(board, fakeWorkspace(rust));
+      expect(report.findings).toHaveLength(1);
+      expect(report.findings[0]).toMatchObject({ node: "gone", kind: "missing-symbol" });
+    });
+  });
+
   it("survives a ref written with a regex metacharacter in the symbol", async () => {
     const board = await boardWith([{ id: "a", label: "Odd", ref: "f.ts#a(b" }]);
     expect(() => checkDrift(board, fakeWorkspace({ "f.ts": "nothing" }))).not.toThrow();
@@ -944,6 +1048,35 @@ describe("state: what the diagram claims about time", () => {
     const report = checkDrift(board, fakeWorkspace({}));
     expect(report).toMatchObject({ concept: true, excused: 2, skipped: 0, checked: 0, clean: true });
     expect(report.edgesChecked).toBe(0);
+  });
+
+  /**
+   * #287: five boards full of this project's code were marked concept, and
+   * nothing said so. Still excused -- the author said concept -- but counted,
+   * so the tool can say "N of these boxes point here".
+   */
+  it("counts the boxes on a concept board that point at files in this repo", async () => {
+    const board = await stateBoard(
+      [
+        { id: "here", label: "Router", ref: "src/lib.rs#dispatch" },
+        { id: "dir", label: "Handlers", ref: "src/" },
+        { id: "gone", label: "Ghost", ref: "src/ghost.rs" },
+        { id: "far", label: "Elsewhere", ref: "../other/x.rs" },
+        { id: "plain", label: "UE" },
+        { id: "ext", label: "Postgres", ref: "src/db.rs", state: "external" },
+      ],
+      { title: "Request flow", describes: "concept" },
+    );
+    const report = checkDrift(board, fakeWorkspace({ src: "dir", "src/lib.rs": "fn x() {}", "src/db.rs": "" }));
+    expect(report).toMatchObject({ concept: true, excused: 6, checked: 0, clean: true, conceptAnchored: 2 });
+  });
+
+  it("does not count anything on a concept board that points nowhere here", async () => {
+    const board = await stateBoard(
+      [{ id: "ue", label: "UE", ref: "specs/ts-24229.md" }],
+      { title: "IMS registration", describes: "concept" },
+    );
+    expect(checkDrift(board, fakeWorkspace({})).conceptAnchored).toBeUndefined();
   });
 
   it("does not record describes for a repo board, so existing files do not churn", async () => {

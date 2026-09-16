@@ -8,6 +8,7 @@ import { describe, expect, it } from "vitest";
 import {
   livePromotedCount,
   livePromotionNote,
+  quietChipOf,
   rowsOf,
   summaryOf,
   tallyOf,
@@ -31,6 +32,19 @@ function reportWith(overrides: Partial<DriftView>): DriftView {
     ...overrides,
   };
 }
+
+describe("a concept board full of this repo's code (#287)", () => {
+  it("says so on the chip, in amber, and in the sentence", () => {
+    const report = reportWith({ concept: true, conceptAnchored: 27, conceptBoxes: 29 });
+    expect(quietChipOf(report)).toEqual({ text: "concept board · 27 point here", tone: "warn" });
+    expect(summaryOf(report)).toContain("27 of its 29 boxes point at code in this repo");
+  });
+
+  it("stays a plain green concept chip when nothing on it points here", () => {
+    expect(quietChipOf(reportWith({ concept: true }))).toEqual({ text: "concept board", tone: "good" });
+    expect(quietChipOf(reportWith({}))).toEqual({ text: "in sync", tone: "good" });
+  });
+});
 
 describe("the status chip's tally", () => {
   it("uses the CLI notice's words, so both surfaces tell one story", () => {
@@ -306,6 +320,23 @@ describe("a finding kind this page has never heard of", () => {
     expect(tallyOf(report)).toEqual([
       { text: "1 gone", tone: "bad" },
       { text: "1 finding this page cannot read", tone: "dim" },
+    ]);
+  });
+
+  it("counts a box pointed at line numbers apart from files that are gone (#286)", () => {
+    const report = reportWith({
+      clean: false,
+      findings: [
+        { node: "a", label: "Cache", ref: "src/cache.ts", kind: "missing-file" },
+        { node: "b", label: "Router", ref: "src/lib.rs#578-636", kind: "unresolvable-ref" },
+        { node: "c", label: "Loop", ref: "src/lib.rs:254", kind: "unresolvable-ref" },
+        { node: "d", label: "Accept", ref: "src/lib.rs#Server::accept", kind: "unresolvable-ref" },
+      ],
+    });
+    expect(tallyOf(report)).toEqual([
+      { text: "1 gone", tone: "bad" },
+      { text: "2 at line numbers", tone: "bad" },
+      { text: "1 qualified name", tone: "bad" },
     ]);
   });
 
