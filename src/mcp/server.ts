@@ -178,7 +178,7 @@ const nodeSchema = z.object({
       + "directory (src/engine/), a symbol inside one (src/engine/#Name), a glob in one directory "
       + "(src/engine/*.ts), or an endpoint (src/server.ts#/api/board). After # goes ONE plain name as "
       + "the code spells it (#dispatch): never line numbers (#578-636, :254) and never a qualified "
-      + "path (#Server::dispatch). Never build output (target/, dist/, out/). "
+      + "path (#Server::dispatch, #Server#dispatch). Never build output (target/, dist/, out/). "
       + "Leave it off only with state planned or external. A symbol may end @declared (declared "
       + "here), @used (used here) or @declared+used, written ONLY from the file you read.",
     ),

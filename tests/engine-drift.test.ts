@@ -322,6 +322,7 @@ describe("checking a board against the code", () => {
       for (const [ref, files, plain] of [
         ["src/lib.rs#Orangutan::accept", rust, "src/lib.rs#accept"],
         ["src/lib.rs#crate::net::accept", rust, "src/lib.rs#accept"],
+        ["src/lib.rs#Orangutan#accept", rust, "src/lib.rs#accept"],
         ["app.py#App.run", python, "app.py#run"],
         ["server.ts#Server.dispatch", ts, "server.ts#dispatch"],
         ["server.ts#Server.dispatch@declared", ts, "server.ts#dispatch"],

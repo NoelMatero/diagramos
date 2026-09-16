@@ -30,12 +30,13 @@ export function pointsAtLines(finding: { kind: string; ref: string }): boolean {
 }
 
 /**
- * `Server::accept`, `crate::net::accept`, `App.run`: a name with its owner in
+ * `Server::accept`, `crate::net::accept`, `App.run`, `Server#accept`: a name
+ * with its owner in
  * front (#288). A method sits inside its `impl` or `class`, so the file never
  * spells it that way and a mention check finds nothing. The last part is the
  * name the file does spell.
  */
-const QUALIFIED = /^(?:[A-Za-z_$][\w$]*(?:::|\.))+([A-Za-z_$][\w$]*)$/;
+const QUALIFIED = /^(?:[A-Za-z_$][\w$]*(?:::|\.|#))+([A-Za-z_$][\w$]*)$/;
 
 /** The plain name inside a qualified one, or nothing when it is not qualified. */
 export function plainNameOf(symbol: string): string | undefined {

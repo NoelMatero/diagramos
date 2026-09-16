@@ -19,7 +19,7 @@ Follow these every time.
 2. **After `#` goes one plain name, as the code spells it.** Write
    `src/lib.rs#dispatch`. Never line numbers (`src/lib.rs#578-636`,
    `src/lib.rs:254`), which are refused, and never a qualified path
-   (`src/lib.rs#Server::dispatch`), which is not text in the file and reads as
+   (`src/lib.rs#Server::dispatch`, `src/lib.rs#Server#dispatch`), which is not text in the file and reads as
    missing.
 3. **Leave `describes` off.** `describes: "concept"` is only for a board about
    something outside this repo, such as a protocol or another project, and it
