@@ -1,5 +1,6 @@
 /**
- * Refs that point at line numbers instead of names (#286).
+ * Refs whose name is written in a shape the file never spells: line numbers
+ * (#286), and a name qualified with its type or module (#288).
  *
  * Its own module, with no imports, because the board page counts these too and
  * cannot load the checker to find out.
@@ -26,4 +27,24 @@ export function pointsAtLines(finding: { kind: string; ref: string }): boolean {
   const hash = finding.ref.indexOf("#");
   if (hash < 0) return COLON_LINE.test(finding.ref.trim());
   return LINE_NUMBERS.test(finding.ref.slice(hash + 1).split("@")[0].trim());
+}
+
+/**
+ * `Server::accept`, `crate::net::accept`, `App.run`: a name with its owner in
+ * front (#288). A method sits inside its `impl` or `class`, so the file never
+ * spells it that way and a mention check finds nothing. The last part is the
+ * name the file does spell.
+ */
+const QUALIFIED = /^(?:[A-Za-z_$][\w$]*(?:::|\.))+([A-Za-z_$][\w$]*)$/;
+
+/** The plain name inside a qualified one, or nothing when it is not qualified. */
+export function plainNameOf(symbol: string): string | undefined {
+  return QUALIFIED.exec(symbol.split("@")[0].trim())?.[1];
+}
+
+/** Whether a finding is the qualified-name refusal. */
+export function pointsAtQualified(finding: { kind: string; ref: string }): boolean {
+  if (finding.kind !== "unresolvable-ref") return false;
+  const hash = finding.ref.indexOf("#");
+  return hash >= 0 && plainNameOf(finding.ref.slice(hash + 1)) !== undefined;
 }

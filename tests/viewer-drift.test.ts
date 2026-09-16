@@ -330,11 +330,13 @@ describe("a finding kind this page has never heard of", () => {
         { node: "a", label: "Cache", ref: "src/cache.ts", kind: "missing-file" },
         { node: "b", label: "Router", ref: "src/lib.rs#578-636", kind: "unresolvable-ref" },
         { node: "c", label: "Loop", ref: "src/lib.rs:254", kind: "unresolvable-ref" },
+        { node: "d", label: "Accept", ref: "src/lib.rs#Server::accept", kind: "unresolvable-ref" },
       ],
     });
     expect(tallyOf(report)).toEqual([
       { text: "1 gone", tone: "bad" },
       { text: "2 at line numbers", tone: "bad" },
+      { text: "1 qualified name", tone: "bad" },
     ]);
   });
 

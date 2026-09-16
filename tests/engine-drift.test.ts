@@ -307,6 +307,44 @@ describe("checking a board against the code", () => {
     });
   });
 
+  /**
+   * #288's measurement: told not to use line numbers, Haiku wrote
+   * `src/lib.rs#Orangutan::accept` on 38 of 46 boxes. A method sits inside its
+   * impl or class, so the file never spells it that way, and every box read as
+   * code that went missing. Asked to fix them, it deleted the refs.
+   */
+  describe("a ref that qualifies the name with its type or module", () => {
+    const rust = { "src/lib.rs": "impl Orangutan {\n    fn accept(&mut self) {}\n}\nfn go() { Error::new(); }\n" };
+    const python = { "app.py": "class App:\n    def run(self):\n        pass\n" };
+    const ts = { "server.ts": "export class Server {\n  dispatch() {}\n}\n" };
+
+    it("says to write the plain name, for each way it is spelled", async () => {
+      for (const [ref, files, plain] of [
+        ["src/lib.rs#Orangutan::accept", rust, "src/lib.rs#accept"],
+        ["src/lib.rs#crate::net::accept", rust, "src/lib.rs#accept"],
+        ["app.py#App.run", python, "app.py#run"],
+        ["server.ts#Server.dispatch", ts, "server.ts#dispatch"],
+        ["server.ts#Server.dispatch@declared", ts, "server.ts#dispatch"],
+      ] as const) {
+        const board = await boardWith([{ id: "a", label: "Box", ref }]);
+        const [finding] = checkDrift(board, fakeWorkspace(files)).findings;
+        expect(finding, ref).toMatchObject({ kind: "unresolvable-ref" });
+        expect(finding.detail, ref).toContain(plain);
+        expect(finding.detail, ref).not.toContain("no longer");
+      }
+    });
+
+    it("leaves a qualified name the file really spells alone, and a missing one missing", async () => {
+      const board = await boardWith([
+        { id: "spelled", label: "Error", ref: "src/lib.rs#Error::new" },
+        { id: "gone", label: "Gone", ref: "src/lib.rs#Orangutan::vanished" },
+      ]);
+      const report = checkDrift(board, fakeWorkspace(rust));
+      expect(report.findings).toHaveLength(1);
+      expect(report.findings[0]).toMatchObject({ node: "gone", kind: "missing-symbol" });
+    });
+  });
+
   it("survives a ref written with a regex metacharacter in the symbol", async () => {
     const board = await boardWith([{ id: "a", label: "Odd", ref: "f.ts#a(b" }]);
     expect(() => checkDrift(board, fakeWorkspace({ "f.ts": "nothing" }))).not.toThrow();

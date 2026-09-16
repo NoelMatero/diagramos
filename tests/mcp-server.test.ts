@@ -641,6 +641,20 @@ describe("board MCP server", () => {
     expect((edited.pointsAtLineNumbers as string[]).join(" ")).toContain("Dispatch → src/lib.rs#L12");
   }, 120_000);
 
+  it("says at draw time when a box names a method with its type, and says to drop the type (#288)", async () => {
+    const board = "docs/diagrams/qualified.excalidraw";
+    await mkdir(path.join(workspace, "src"), { recursive: true });
+    await writeFile(path.join(workspace, "src/server.rs"), "impl Server {\n    fn accept(&self) {}\n}\n");
+    const drawn = jsonOf(await call("create_diagram", {
+      path: board,
+      nodes: [{ id: "accept", label: "Accept", ref: "src/server.rs#Server::accept" }],
+    }));
+    expect(drawn.pointsAtNothing).toBeUndefined();
+    const said = (drawn.pointsAtQualifiedNames as string[]).join(" ");
+    expect(said).toContain("Accept → src/server.rs#Server::accept");
+    expect(said).toContain("src/server.rs#accept");
+  }, 120_000);
+
   /**
    * A ref into build output, said at draw time and said differently.
    *

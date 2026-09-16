@@ -39,6 +39,7 @@ import {
   findBoards,
   findStrayBoards,
   pointsAtLines,
+  pointsAtQualified,
   UNCONFIRMED_WORDS,
   type UnconfirmedEdge,
 } from "../engine/drift";
@@ -604,8 +605,9 @@ function drawTimeNotes(drawn: {
   // Not a typo and not a plan: the code is there, the pointer can never reach
   // it. The finding's detail already says what to write instead (#286).
   const lines = drawn.findings.filter(pointsAtLines);
+  const qualified = drawn.findings.filter(pointsAtQualified);
   const missing = drawn.findings.filter(
-    (finding) => finding.kind !== "generated-ref" && !pointsAtLines(finding),
+    (finding) => finding.kind !== "generated-ref" && !pointsAtLines(finding) && !pointsAtQualified(finding),
   );
   return {
     // First, because it decides whether anything below was checked at all (#287).
@@ -625,13 +627,21 @@ function drawTimeNotes(drawn: {
           ),
         }
       : {}),
+    // Same reason: the code is there under its plain name (#288).
+    ...(qualified.length
+      ? {
+          pointsAtQualifiedNames: qualified.map(
+            (finding) => `${finding.label || finding.node} → ${finding.ref}: ${finding.detail}`,
+          ),
+        }
+      : {}),
     ...(missing.length
       ? {
           pointsAtNothing: missing.map(
             (finding) => `${finding.label || finding.node} → ${finding.ref}`,
           ),
           fix:
-            "Each of those is a typo to correct or work not written yet. Work to come carries "
+            "Each of those is a typo to correct (keep the ref, fix it) or work not written yet. Work to come carries "
             + 'state: "planned" -- drawn dashed, reported as a work item, and flipped to built '
             + "on its own when the code lands. Left as is, the end-of-turn check reports it to "
             + "the user in red.",
@@ -721,7 +731,8 @@ server.registerTool(
       + "board or change its structure; for a ref, state, claim or colour use edit_diagram, and "
       + "for the flow use relayout_diagram. "
       + "READ THE RESPONSE and fix what it names in this turn: pointsAtNothing (a typo, or mark "
-      + "the box planned), pointsAtLineNumbers, pointsAtBuildOutput, conceptPointsHere, "
+      + "the box planned), pointsAtLineNumbers, pointsAtQualifiedNames, pointsAtBuildOutput, "
+      + "conceptPointsHere, "
       + "garbledClaims. It also says whether the board is legible, so do not render to find out.",
     inputSchema: {
       path: z

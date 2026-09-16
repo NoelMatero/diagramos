@@ -19,7 +19,7 @@
  * instead of quietly grading a report by last release's rules.
  */
 
-import { pointsAtLines } from "../engine/lines";
+import { pointsAtLines, pointsAtQualified } from "../engine/lines";
 import { summaryOf as sentenceFor } from "../engine/summary";
 
 export type Tone = "bad" | "warn" | "good" | "dim";
@@ -337,7 +337,8 @@ export function tallyOf(report: DriftView): TallyPart[] {
   const incomplete = kind("incomplete-board");
   // Out of the remainder too: the code is there, the pointer never could reach it (#286).
   const lines = report.findings.filter(pointsAtLines).length;
-  const gone = report.findings.length - empty - unused - strangeBoxes - incomplete - lines;
+  const qualified = report.findings.filter(pointsAtQualified).length;
+  const gone = report.findings.length - empty - unused - strangeBoxes - incomplete - lines - qualified;
   const parts: TallyPart[] = [];
   /*
    * First, and red, because it is the only part here that is about the page
@@ -351,6 +352,9 @@ export function tallyOf(report: DriftView): TallyPart[] {
   }
   if (gone) parts.push({ text: `${gone} gone`, tone: "bad" });
   if (lines) parts.push({ text: `${lines} at line numbers`, tone: "bad" });
+  if (qualified) {
+    parts.push({ text: `${qualified} qualified ${qualified === 1 ? "name" : "names"}`, tone: "bad" });
+  }
   if (incomplete) parts.push({ text: `${incomplete} incomplete`, tone: "bad" });
   if (empty) parts.push({ text: `${empty} empty`, tone: "bad" });
   if (unused) parts.push({ text: `${unused} unused`, tone: "bad" });

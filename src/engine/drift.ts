@@ -63,8 +63,8 @@ import { signatureNames, type SignatureWithheld } from "./signature";
 import { resolveDependency, type ConfigCache } from "./resolve";
 import { boardIsNewer, newerBuildClaimError } from "./version";
 import type { Workspace } from "./workspace";
-import { COLON_LINE, LINE_NUMBERS, LONE_LINE } from "./lines";
-export { pointsAtLines } from "./lines";
+import { COLON_LINE, LINE_NUMBERS, LONE_LINE, plainNameOf } from "./lines";
+export { pointsAtLines, pointsAtQualified } from "./lines";
 
 export type DriftKind =
   | "missing-file"
@@ -1663,11 +1663,24 @@ function inspect(
   if (lineShaped && !LONE_LINE.test(rawSymbol!.split("@")[0].trim())) {
     return lineNumbers(base, rawTarget, rawSymbol!);
   }
-  /** What a symbol the target does not mention is reported as. */
-  const notMentioned = (detail: string): DriftFinding =>
-    lineShaped
-      ? lineNumbers(base, rawTarget, rawSymbol!)
-      : { ...base, kind: "missing-symbol", detail };
+  /**
+   * What a symbol the target does not mention is reported as. A qualified name
+   * whose plain part *is* there was never going to be found as written, so it
+   * is a pointer to rewrite, not code that went (#288).
+   */
+  const notMentioned = (detail: string, has: (name: string) => boolean): DriftFinding => {
+    if (lineShaped) return lineNumbers(base, rawTarget, rawSymbol!);
+    const plain = symbol === undefined ? undefined : plainNameOf(symbol);
+    if (plain && has(plain)) {
+      return {
+        ...base,
+        kind: "unresolvable-ref",
+        detail: `${ref} qualifies the name, and ${rawTarget} never spells it that way: a method sits `
+          + `inside its impl or class. Write the plain name: ${rawTarget}#${plain}.`,
+      };
+    }
+    return { ...base, kind: "missing-symbol", detail };
+  };
 
   // A garbled assertion is loud immediately rather than becoming a claim that
   // silently checks nothing. It fails the turn it is written, while the author
@@ -1771,7 +1784,7 @@ function inspect(
     if (!symbol) return "ok";
     const code = matched.filter((name) => TS_JS.test(name)).map((name) => `${absolute}/${name}`);
     if (!mentionedIn(code, symbol, workspace)) {
-      return notMentioned(`no file matching ${target} mentions ${symbol}.`);
+      return notMentioned(`no file matching ${target} mentions ${symbol}.`, (name) => mentionedIn(code, name, workspace));
     }
     if (!assertion) return "ok";
     const verdict = assertedIn(code, symbol, assertion, workspace, tally);
@@ -1797,7 +1810,7 @@ function inspect(
       };
     }
     if (!mentionedIn(code, symbol, workspace)) {
-      return notMentioned(`nothing directly in ${target} mentions ${symbol}.`);
+      return notMentioned(`nothing directly in ${target} mentions ${symbol}.`, (name) => mentionedIn(code, name, workspace));
     }
     if (!assertion) return "ok";
     const verdict = assertedIn(code, symbol, assertion, workspace, tally);
@@ -1823,7 +1836,7 @@ function inspect(
   if (!symbol) return "ok";
   const source = workspace.read(absolute);
   if (!mentions(source, symbol)) {
-    return notMentioned(`${target} no longer mentions ${symbol}.`);
+    return notMentioned(`${target} no longer mentions ${symbol}.`, (name) => mentions(source, name));
   }
   if (!assertion) return "ok";
   const verdict = judgeAssertion(target, source, symbol, assertion, tally);
