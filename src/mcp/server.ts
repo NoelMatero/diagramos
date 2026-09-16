@@ -139,6 +139,29 @@ async function guard<T>(run: () => Promise<T>): Promise<T | ReturnType<typeof fa
   }
 }
 
+/**
+ * What an arrow's claim asserts, for create_diagram and connect_nodes alike.
+ *
+ * Short on purpose (#288): a small model read the ~6,000-character version
+ * and still got the basics wrong. The reasons behind each word live in
+ * docs/claim-vocabulary.md and docs/drawing-guide-long.md.
+ */
+const CLAIM_DESCRIPTION =
+  "Optional; most arrows carry none. Write one ONLY from code you read. Both ends name a symbol "
+  + "(path#symbol) unless noted. "
+  + "needs: from imports to (ends may be files); red if the import runs only the other way. "
+  + "feeds: from's result goes into to; never red. "
+  + "takes / returns: from is a TYPE, to is a FUNCTION whose parameter / return type it is; red if "
+  + "absent from the signature. "
+  + "holds: from is a type with a field of type to; red if no field has it. "
+  + "builds: from makes a value of type to; red only if the arrow is backwards. "
+  + "calls: from calls to; red only if the arrow is backwards. "
+  + "accesses: from reads member of type to, and the member name goes in label; red if the type "
+  + "lacks it. "
+  + "conforms: from extends or implements to (subtype first); red in Python and TypeScript if the "
+  + "base is not listed, never in Rust. "
+  + "On a planned arrow a claim is checked only once the code lands.";
+
 const nodeSchema = z.object({
   id: z.string().describe("Stable id, used by edges and later edits"),
   label: z.string().describe("Text shown inside the shape"),
@@ -150,30 +173,18 @@ const nodeSchema = z.object({
     .string()
     .optional()
     .describe(
-      "What this node stands for in the repo. A file (src/engine/layout.ts), a symbol in one "
-      + "(src/engine/layout.ts#planLayout), a directory (src/engine/ — must not be empty), a symbol "
-      + "somewhere directly inside one (src/engine/#Workspace), or a glob over one directory "
-      + "(src/engine/*.ts — * is allowed in the last segment only, never **), or an HTTP endpoint "
-      + "(src/server/board-server.ts#/api/board, optionally with a method token as in #GET /api/board, "
-      + "which is read but never verified). After # goes a name, never line numbers (#578-636 and "
-      + ":254 are refused). Set it when a node is "
-      + "real code so check_drift can tell when it goes stale. Leave it off for anything not in this "
-      + "repository, and say why with state or the board's describes. "
-      + "A symbol ref may end in @declared, @used, or @declared+used, which narrows the check from "
-      + "'this file mentions the name' to 'this file declares it' and 'something here calls it'. "
-      + "Write it ONLY from the code you just read to locate the symbol: it is a transcription of "
-      + "what was on screen, never a guess about what the box probably does. A symbol declared here "
-      + "but called only from other files takes @declared alone. Unread means no suffix, which is a "
-      + "smaller claim rather than a worse one.",
+      "The code this box stands for: a file (src/a.ts), a symbol in it (src/a.ts#name), a "
+      + "directory (src/engine/), a symbol inside one (src/engine/#Name), a glob in one directory "
+      + "(src/engine/*.ts), or an endpoint (src/server.ts#/api/board). After # goes a NAME, never "
+      + "line numbers (#578-636 and :254 are refused). Never build output (target/, dist/, out/). "
+      + "Leave it off only with state planned or external. A symbol may end @declared (declared "
+      + "here), @used (used here) or @declared+used, written ONLY from the file you read.",
     ),
   refs: z
     .array(z.string())
     .optional()
     .describe(
-      "Further anchors, when one box stands for more than one thing — a feature spread over "
-      + "several files, or a constant and the function that uses it. Each is checked and reported "
-      + "separately; the box is clean when all of them are. ref stays the primary one, and is what "
-      + "arrows between boxes are checked against.",
+      "More anchors when one box stands for several things. Each is checked; arrows use ref.",
     ),
   closed: z
     .object({
@@ -181,54 +192,30 @@ const nodeSchema = z.object({
         .array(z.string())
         .optional()
         .describe(
-          "Files inside the directory that outside code IS allowed to reach — the front doors. "
-          + "Repo-relative paths. Omit or leave empty to claim total isolation, which is unusual "
-          + "but real.",
+          "Files inside the directory that outside code may import. Empty: total isolation.",
         ),
     })
     .optional()
     .describe(
-      "Only for a box whose ref is a DIRECTORY. Claims that nothing outside that directory "
-      + "imports anything inside it, except through the doors listed in `through`. THIS IS "
-      + "CHECKED against every file in the repository: one import from outside that no door "
-      + "allows makes the claim false, by file and line, and the build fails. Test files are "
-      + "exempt and counted separately. Write it ONLY when you have reason to believe the "
-      + "boundary holds — check first, because claiming it on a subsystem everything reaches "
-      + "into produces an immediate failure that is your mistake, not the user's. On a "
-      + "state:'planned' box the directory does not exist yet, so the claim is the boundary the "
-      + "subsystem is meant to hold once built; nothing is walked or checked until the box "
-      + "promotes.",
+      "Only on a box whose ref is a directory: nothing outside imports into it except through "
+      + "`through`. Checked against every file; one outside import is red (tests are counted "
+      + "apart). Check check_drift's closedBreaches before claiming it.",
     ),
   handles: z
     .array(z.string())
     .optional()
     .describe(
-      "Only for a box whose ref names a ROUTINE (path#symbol) that dispatches on a closed set "
-      + "of cases — a match on an enum, a switch on string literals, an if/elif chain. Lists "
-      + "EVERY case it dispatches on. THIS IS CHECKED against the arms in the code: a case the "
-      + "routine dispatches on that is not in this list, or a case in this list the routine has "
-      + "no arm for, makes the claim false by file and line, and the build fails. Write it ONLY "
-      + "from the arms you have read — the whole point is that it catches a case being added to "
-      + "the code and not to the picture, so a guessed list produces an immediate failure that "
-      + "is your mistake, not the user's. A routine with a `_`/`default` fallback still has the "
-      + "unlisted-case half checked; the missing-case half withholds, because the fallback "
-      + "handles it. A routine with two dispatches in it is refused, since this names one set. "
-      + "On a state:'planned' box nothing is checked until the box promotes.",
+      "Only on a box whose ref names one routine (path#symbol) that dispatches on fixed cases "
+      + "(a match, a switch). List EVERY case, from the arms you read. Red when the code has a case "
+      + "the list lacks, or the reverse.",
     ),
   state: z
     .enum(["planned", "built", "external"])
     .optional()
     .describe(
-      "Whether this exists yet. Omit for 'built' (the default: it exists now). "
-      + "Use 'planned' for something meant to exist — it is drawn dashed, its ref not resolving "
-      + "is reported as work to do rather than as drift, and check_drift says so once the code "
-      + "catches up. Use 'external' for something deliberately outside this repo (a browser, a "
-      + "third-party service, a file, a database), which is drawn dotted and is not the same as "
-      + "forgetting a ref. "
-      + "An 'external' box is worth a ref even so: point it at its **door**, the routine in this "
-      + "repo that talks to that thing — `src/engine/board-file.ts#writeBoard` for a box standing "
-      + "for `board.excalidraw`. Arrows onto an unanchored external box cannot be checked at all, "
-      + "and anchoring one at its door makes them checkable.",
+      "Omit for built. planned: meant to exist, drawn dashed; its ref is work to do, and it "
+      + "turns built on its own when the code lands. external: real but not code in this repo (a "
+      + "browser, a database), drawn dotted; its ref, if any, is the routine here that talks to it.",
     ),
 });
 
@@ -239,95 +226,15 @@ const edgeSchema = z.object({
     .array(z.string())
     .optional()
     .describe(
-      "The route this connection takes, named hop by hop, when it is not a direct call: "
-      + "['handle_logging', 'emit'] for from -> handle_logging -> emit -> to. Each consecutive "
-      + "pair is checked inside one function body, so a chain of any depth is verified and a "
-      + "break names the hop that stopped holding. Only for arrows whose ends both name symbols.",
+      "Named hops between from and to, when the route matters: ['handle_logging', 'emit']. A "
+      + "break names the hop. Both ends must name symbols.",
     ),
   claim: z
     .enum(["needs", "feeds", "takes", "returns", "holds", "builds", "calls",
       "accesses", "conforms"])
     .optional()
     .describe(
-      "What this arrow asserts, when it asserts anything. Nine words, and an arrow may carry one. "
-      + "'needs': the from end declares a dependency on the to end — an import, a require, an "
-      + "include. Write it ONLY when you have read that line in the code: it is a transcription of "
-      + "something you saw, never a guess about what the relationship probably is. Shown on the "
-      + "board as @needs and recorded, and CHECKED: if the dependency runs the other way and only "
-      + "the other way, the arrow is reported as backwards, by file and line, and the build fails. "
-      + "So a needs you guessed at is not a harmless decoration -- it is a false statement read "
-      + "back to the user, on their diagram, in red. "
-      + "'feeds': the from end's RESULT goes into the to end -- the pipeline arrow, which is a "
-      + "different fact and often points the opposite way from the import. Confirmed by finding "
-      + "the flow written down somewhere a person can read it: one function binding the first "
-      + "call's result and passing it to the second, or handing it straight over. It CANNOT fail "
-      + "-- a value can reach the other end through a callback or a field no reader follows, so "
-      + "not finding the flow is never held against the arrow, and there is no red for it. Both "
-      + "ends must anchor a symbol (path#symbol), because a file has no result. "
-      + "'takes' and 'returns': the TO end is a function and the FROM end is a type, and the "
-      + "arrow says that function's signature names that type -- 'takes' for a parameter, "
-      + "'returns' for the return type. This is the ordinary shape of a typed diagram (struct "
-      + "Request -> handler(&Request)) and neither needs nor feeds is true of it. Both are "
-      + "CHECKED and both can fail: a function's parameters and return type can be listed in "
-      + "full, so a type absent from both is genuinely absent, and the arrow is reported in red "
-      + "with the signature quoted. Two words rather than one so the arrow's direction still "
-      + "means something -- claim the wrong half and you get told the type is on the other side "
-      + "rather than a red. Nothing is reported either way when the type would have to be "
-      + "recognised under another name (a type alias, an import renamed on the way in): a "
-      + "signature that could be hiding it proves nothing, so the check withholds instead of "
-      + "accusing. The TO end must anchor a symbol and the FROM end must name the type. "
-      + "'holds': one of the FROM end's fields is of the TO end's type — the container first, the "
-      + "opposite end from takes, because containment points whole to part. CHECKED and it can "
-      + "fail: a field list can be read in full, so a type absent from it is genuinely absent. "
-      + "Generic wrappers are read through, so Vec<T>, Promise<T> and Optional[T] all confirm. "
-      + "'builds': the FROM end makes one of the TO end's type — `new X`, `X { .. }`, `<X />`. It "
-      + "is the only way to describe a component tree. NOT finding the construction is never held "
-      + "against the arrow (a factory one call away is invisible); what fails is finding it at the "
-      + "far end and only there, which means the arrow is backwards. "
-      + "'calls': the FROM end calls the TO end. The most common thing one piece of code does to "
-      + "another, and the called name is traced back to the file it came from, through a barrel or "
-      + "a re-export if there is one. Same footing as builds: NOT finding the call is never held "
-      + "against the arrow, because a callback or a dispatch table is invisible to it; what fails "
-      + "is finding the call at the far end and only there. Both ends must anchor a symbol. Do not "
-      + "reach for 'calls' when what you mean is that a value flows — that is 'feeds', and it "
-      + "often points the other way. "
-      + "'accesses': the FROM end reads a named member off the TO end's type -- a field, a "
-      + "property, a method. The largest relationship a diagram could draw, and the one your "
-      + "prose labels have been reaching for when they say reads, writes, key, value or looks "
-      + "up. It is the ONLY claim that takes an argument: put the member name in the arrow's "
-      + "`label`, so `label: 'width', claim: 'accesses'` reads as `width @accesses` on the "
-      + "board. An accesses arrow with prose on its label, or none, names nothing to look for "
-      + "and is reported as a claim nothing can read. Its two ends are held to different "
-      + "standards and this is the thing to know before writing one: a member list can be "
-      + "listed in full, so a member the TYPE does not declare is a red with the member list "
-      + "quoted -- rename a field and every board still naming it goes red -- while the "
-      + "ROUTINE end can never be a red, because knowing everything a body touches needs the "
-      + "type of every value in it. A green needs both: the type declares it AND the routine "
-      + "can be seen reading it. Nothing is reported either way when the member list is not "
-      + "closed -- a type that extends another, an index signature, a Python __getattr__, an "
-      + "alias for a shape declared elsewhere, or a Rust struct whose impl is in another file. "
-      + "Both ends must anchor a symbol. "
-      + "'conforms': the FROM end is one of the TO end -- a class extending a base, a class or "
-      + "struct implementing an interface or trait, an interface extending another. Subtype "
-      + "first, the way holds and builds are drawn, and the way a class diagram has drawn "
-      + "generalisation for thirty years. CHECKED and it can fail in Python and TypeScript: a "
-      + "base list is written in the declaration, so a type absent from it is genuinely absent, "
-      + "and an arrow drawn from the base DOWN to the subclass is a red that tells you to turn "
-      + "it round. Type arguments are NOT read as bases -- `class Store extends Cache<Entry>` "
-      + "says Store is one of Cache and nothing about Entry. In RUST it confirms and can never "
-      + "fail, because `impl Trait for Type` may sit in any file in the crate, so a struct with "
-      + "no impl beside it is reported unread rather than wrong. Nothing is reported either way "
-      + "when a base could stand for another name, or is an expression like `extends mixin(B)`. "
-      + "Structural conformance is not on offer: an object that satisfies an interface without "
-      + "naming it, or a function that fits a protocol, is written down nowhere -- an arrow at a "
-      + "function is reported as a claim nothing can read. Both ends must anchor a symbol. "
-      + "A relationship you cannot point at is an arrow with no claim, which is fine and is what "
-      + "most arrows are: an unclaimed arrow is looked for and counted, never judged, so it cannot "
-      + "come back as a finding against you. "
-      + "Both rules are about arrows that exist. On a state:'planned' arrow there is nothing to "
-      + "read yet, so a claim there is a specification of what will be true once built; nothing "
-      + "checks it until the code lands and the arrow promotes, so writing it there costs nothing "
-      + "and accuses nobody.",
+      CLAIM_DESCRIPTION,
     ),
   label: z.string().optional().describe("One or two words; longer crowds the diagram"),
   strokeColor: z
@@ -339,9 +246,7 @@ const edgeSchema = z.object({
     .enum(["planned", "built", "external"])
     .optional()
     .describe(
-      "Whether this connection exists yet. Omit for 'built'. Use 'planned' for a connection "
-      + "that should exist — the wiring to be done — which is drawn as a dashed arrow, and "
-      + "check_drift reports it as work rather than as an unsupported arrow.",
+      "Omit for built. planned: wiring still to do, drawn dashed.",
     ),
 });
 
@@ -810,28 +715,19 @@ server.registerTool(
   {
     title: "Create diagram",
     description:
-      "Lay out a graph into a .excalidraw file. Give nodes and edges, never coordinates: layout, "
-      + "sizing, routing, and bindings are automatic. Replaces every diagram previously generated in "
-      + "this file and keeps hand-drawn elements. "
-      + "This is for drawing a board and for reworking its STRUCTURE -- boxes added or removed, a "
-      + "subsystem redrawn. It is not how you make a small change, and reaching for it by habit is "
-      + "expensive: re-sending a 34-node graph to correct four refs costs ~1,900 tokens to "
-      + "communicate four short strings. Change a ref, a state, a claim or a colour with "
-      + "edit_diagram, and change the layout flow with relayout_diagram; both leave the rest of the "
-      + "board alone. Use delete_diagram to remove one, not a throwaway graph. "
-      + "The response says whether the board it just drew can be READ once rendered: its pixel size, "
-      + "the scale a render will be forced down to, and how big the labels come out at that scale. "
-      + "A big graph often lands as a ribbon whose text renders at 4px, and no image of that is worth "
-      + "paying for. So do not render to find out whether the layout worked -- this already said, and "
-      + "when it says the board is unviewable it also says which single call fixes it. On a first "
-      + "draw with no direction given it goes further and picks the flow that reads; see direction.",
+      "Draw a board from nodes and edges; layout is automatic, never pass coordinates. Replaces "
+      + "what this tool drew in the file before and keeps hand-drawn elements. Use it to draw a "
+      + "board or change its structure; for a ref, state, claim or colour use edit_diagram, and "
+      + "for the flow use relayout_diagram. "
+      + "READ THE RESPONSE and fix what it names in this turn: pointsAtNothing (a typo, or mark "
+      + "the box planned), pointsAtLineNumbers, pointsAtBuildOutput, conceptPointsHere, "
+      + "garbledClaims. It also says whether the board is legible, so do not render to find out.",
     inputSchema: {
       path: z
         .string()
         .describe(
-          `Inside this project's diagram directory — ${DEFAULT_DIAGRAM_DIR}/architecture.excalidraw, `
-          + `unless ${CONFIG_FILE} names another. A path outside it is refused, because diagrams found `
-          + "anywhere else are never checked for drift.",
+          `A file in ${DEFAULT_DIAGRAM_DIR}/ (or the directory ${CONFIG_FILE} names), e.g. `
+          + `${DEFAULT_DIAGRAM_DIR}/architecture.excalidraw. Anywhere else is refused.`,
         ),
       title: z.string().optional(),
       describes: z
@@ -848,12 +744,9 @@ server.registerTool(
         .string()
         .optional()
         .describe(
-          "A directory this board asserts it shows completely: every module under it that the board "
-          + "reaches — imported by a box, or importing one — has a box of its own. A module that "
-          + "does not is then a finding rather than a suggestion, which is the only way this tool "
-          + "can catch a diagram that is wrong by omission. Leave it off unless the user wants the "
-          + "picture held to that; most boards should claim nothing. It is refused if a single box "
-          + "already covers the whole directory, since nothing inside could ever come back missing.",
+          "A directory this board claims to show completely: every module there that the board "
+          + "reaches must have a box, or it is a finding. Leave it off unless the user asks. Needs "
+          + "a title.",
         ),
       nodes: z.array(nodeSchema).min(1),
       edges: z.array(edgeSchema).default([]),
@@ -861,22 +754,16 @@ server.registerTool(
         .enum(["RIGHT", "DOWN"])
         .optional()
         .describe(
-          "Layout flow. Inherited from the board when it already records one, so regenerating a "
-          + "board somebody turned DOWN does not quietly turn it back. To change the flow of a board "
-          + "that already exists, call relayout_diagram instead of re-sending this graph. "
-          + "Omit it on a board being drawn for the first time and the flow is chosen by measurement: "
-          + "RIGHT is laid out, and if it would render too small to read while DOWN would not, DOWN "
-          + "is drawn instead and the response says so with both sets of numbers. Naming a flow here "
-          + "turns that off -- an explicit RIGHT stays RIGHT however wide it comes out.",
+          "Leave it off on a first draw: the flow that reads is picked by measurement. An existing "
+          + "board keeps its recorded flow; change that with relayout_diagram.",
         ),
       name: z.string().optional().describe("Element id prefix; from the title otherwise"),
       append: z
         .boolean()
         .default(false)
         .describe(
-          "Add below what is there instead of replacing. Only when the user wants two diagrams in "
-          + "one file; it makes node ids ambiguous across them. False removes EVERY generated "
-          + "diagram here, not just a same-named one.",
+          "Add below instead of replacing, only for two diagrams in one file. False replaces every "
+          + "diagram this tool drew here.",
         ),
     },
   },
@@ -982,38 +869,24 @@ server.registerTool(
   {
     title: "Read diagram",
     description:
-      "Read a board back as a semantic graph: nodes, edges, labels, and anything unattributed. "
-      + "Each fact is marked recorded (drawn by this tool, exact) or inferred (hand-drawn, derived "
-      + "from geometry). Every edge also says how its ends were resolved: declared or bound are "
-      + "exact pointers to two shapes, nearest means an end was matched to whichever shape it landed "
-      + "close to and may not be the one intended. A hand-drawn arrow bound at both ends is a precise "
-      + "claim despite being inferred. Use this to treat a diagram as a specification. "
-      + "A field sitting at its default is left out rather than repeated on every item; the response "
-      + "opens with omittedWhenDefault, which says what each absence means. A state is built, planned "
-      + "(drawn as intent, not written yet) or external (real, and not yours to change); nodes and "
-      + "edges both carry one. No unattributed means the board has no strays. "
-      + "Edit or delete by the node id listed here -- edit_diagram resolves it -- "
-      + "and ask for geometry or includeElements if you need the raw Excalidraw elementId. "
-      + "When the board has anchored refs, notShown describes what it leaves out: files drawn on sibling boards and files on no board. "
-      + "A damaged block means the file contradicts itself and will not draw the way it reads -- the graph "
-      + "below it is what the file says, not what anyone sees. Stop and repair the board rather than acting "
-      + "on the rest of the response.",
+      "Read a board as a graph: nodes, edges, labels and anything unattributed. Each fact is "
+      + "recorded (drawn by a tool) or inferred (read off a hand drawing). Fields at their default "
+      + "are left out; omittedWhenDefault says what each absence means. Edit by the node ids given "
+      + "here. notShown lists code the board leaves out. If the response has a damaged block, stop "
+      + "and repair the board before acting on the rest.",
     inputSchema: {
       path: z.string(),
       geometry: z
         .boolean()
         .default(false)
         .describe(
-          "Add positions and sizes to each node and edge. Off by default because it doubles the "
-          + "response and a question about the graph does not need it; turn it on to fix layout.",
+          "Add positions and sizes. Only to fix layout.",
         ),
       includeElements: z
         .boolean()
         .default(false)
         .describe(
-          "Also list every element with its position, size, and colours -- what edit_diagram needs "
-          + "to address one. Large on a big board; prefer the node and edge ids above where they "
-          + "will do.",
+          "Also list raw elements. Large; node ids usually do.",
         ),
     },
   },
@@ -1099,25 +972,11 @@ server.registerTool(
   {
     title: "Check drift",
     description:
-      "Do these diagrams still match the code? Compares each node's ref against the working tree "
-      + "and reports the ones pointing at a file or symbol that is gone, and checks arrows for static "
-      + "connections through imports, shared orchestrators, or route literals — unsupported ones are "
-      + "worth a look, not wrong. Read-only, and cheap "
-      + "enough to run whenever module structure changes. Nodes without a ref are skipped, "
-      + "hand-drawn ones ignored, and edges touching refless nodes are skipped, so a clean report means "
-      + "nothing checkable disagreed -- not that the diagram is correct. skippedWhy and edgesSkippedWhy "
-      + "say what went unread, which is how you tell a verified diagram from an unreadable one. "
-      + "A ref may also claim more than existence: path#symbol@declared asks that the file declare that "
-      + "name, path#symbol@used that something there use it beyond its own declaration, and "
-      + "@declared+used both -- which is how a box standing for a feature notices the feature being "
-      + "gutted rather than deleted. TypeScript, TSX, JavaScript, Rust and Python; elsewhere the claim "
-      + "falls "
-      + "back to a plain mention and is counted in assertions. A route anchor (path#/api/board) instead "
-      + "asks that the literal still be served by that file or one it imports; a file writing no route "
-      + "literals at all is counted as unread rather than reported broken. When both ends of an arrow name symbols, the arrow is checked inside one function body rather than by imports — so an arrow drawn from the wrong function is caught. Give the arrow via: [...] when the call goes through named intermediaries, and a break reports which hop stopped holding. "
-      + "A damaged entry is not drift: the board file contradicts itself and will not draw the way it "
-      + "reads, so clean says nothing about it. Repair or restore that board before acting on anything "
-      + "else in the response.",
+      "Do the boards still match the code? Reports boxes whose ref no longer resolves, arrows the "
+      + "code contradicts, and claims that are wrong. Read-only and cheap. Boxes without a ref and "
+      + "hand-drawn ones are not checked, so clean means nothing checked disagreed, not that the "
+      + "board is right; skippedWhy says what went unread. Fix what it reports with edit_diagram. "
+      + "A damaged entry means the file contradicts itself: repair that board first.",
     inputSchema: {
       path: z
         .string()
@@ -1130,24 +989,9 @@ server.registerTool(
         .boolean()
         .default(false)
         .describe(
-          "Three questions the per-turn check does not ask. `unreadEdges` names the arrows nothing "
-          + "checked, with the reason for each: an arrow with an end marked external and not anchored "
-          + "at a door, or refless, or "
-          + "pointing at a directory carries no claim any check here can test, and until it is named "
-          + "it is indistinguishable from an arrow that passed. It is not drift and not a suggestion "
-          + "-- it is the list of things this tool did not look at. "
-          + "`unannotated` names the boxes that claim to "
-          + "be about this repo and carry no ref at all, with their labels -- these are invisible to "
-          + "every other check, and naming them is what lets a ref be proposed for each. "
-          + "`unrepresented` is the opposite direction: code no box covers, most-imported first. It "
-          + "runs both ways round the import graph. A module the board's own ref'd files import "
-          + "arrives with `importedBy`; an entry point that imports the board and that nothing "
-          + "imports back -- a CLI, a hook, a browser main -- arrives with `imports` instead, and is "
-          + "the case the first direction structurally cannot reach, so a board can be every-box-"
-          + "anchored and clean while missing an entire surface. Test files are left out. Both are "
-          + "suggestions, never drift -- they do not affect clean. Off by default because it walks "
-          + "the repository's source files; ask for it when deciding what a diagram is missing or "
-          + "when annotating one.",
+          "Also list what nothing checked: unreadEdges (arrows, with why), unannotated (boxes with "
+          + "no ref) and unrepresented (code no box covers). Suggestions, never drift. Walks the "
+          + "repository, so ask only when deciding what a board is missing.",
         ),
     },
   },
@@ -1425,14 +1269,8 @@ server.registerTool(
   {
     title: "Render diagram",
     description:
-      "Rasterise a board to PNG and return the image, so you can look at the result and judge "
-      + "layout, overlap, and readability directly rather than inferring them from the data. "
-      + "One look after the diagram is finished is usually enough; rendering after every tweak "
-      + "costs an image each time. "
-      + "This is not how you find out whether a board is too big to read -- create_diagram and "
-      + "relayout_diagram both say that in words, before any image exists. A board they called "
-      + "unviewable renders into text a few pixels tall, so a render of it answers nothing and the "
-      + "next call after it is another redraw.",
+      "Render a board to PNG. Once, at the end, to show a person or judge something visual. Not "
+      + "to check legibility: create_diagram and relayout_diagram already say that.",
     inputSchema: {
       path: z.string(),
       // Scale 1 is legible enough to judge layout and overlap, and costs less
@@ -1493,85 +1331,7 @@ server.registerTool(
                 "accesses", "conforms"])
               .optional()
               .describe(
-      "What this arrow asserts, when it asserts anything. Nine words, and an arrow may carry one. "
-      + "'needs': the from end declares a dependency on the to end — an import, a require, an "
-      + "include. Write it ONLY when you have read that line in the code: it is a transcription of "
-      + "something you saw, never a guess about what the relationship probably is. Shown on the "
-      + "board as @needs and recorded, and CHECKED: if the dependency runs the other way and only "
-      + "the other way, the arrow is reported as backwards, by file and line, and the build fails. "
-      + "So a needs you guessed at is not a harmless decoration -- it is a false statement read "
-      + "back to the user, on their diagram, in red. "
-      + "'feeds': the from end's RESULT goes into the to end -- the pipeline arrow, which is a "
-      + "different fact and often points the opposite way from the import. Confirmed by finding "
-      + "the flow written down somewhere a person can read it: one function binding the first "
-      + "call's result and passing it to the second, or handing it straight over. It CANNOT fail "
-      + "-- a value can reach the other end through a callback or a field no reader follows, so "
-      + "not finding the flow is never held against the arrow, and there is no red for it. Both "
-      + "ends must anchor a symbol (path#symbol), because a file has no result. "
-      + "'takes' and 'returns': the TO end is a function and the FROM end is a type, and the "
-      + "arrow says that function's signature names that type -- 'takes' for a parameter, "
-      + "'returns' for the return type. This is the ordinary shape of a typed diagram (struct "
-      + "Request -> handler(&Request)) and neither needs nor feeds is true of it. Both are "
-      + "CHECKED and both can fail: a function's parameters and return type can be listed in "
-      + "full, so a type absent from both is genuinely absent, and the arrow is reported in red "
-      + "with the signature quoted. Two words rather than one so the arrow's direction still "
-      + "means something -- claim the wrong half and you get told the type is on the other side "
-      + "rather than a red. Nothing is reported either way when the type would have to be "
-      + "recognised under another name (a type alias, an import renamed on the way in): a "
-      + "signature that could be hiding it proves nothing, so the check withholds instead of "
-      + "accusing. The TO end must anchor a symbol and the FROM end must name the type. "
-      + "'holds': one of the FROM end's fields is of the TO end's type — the container first, the "
-      + "opposite end from takes, because containment points whole to part. CHECKED and it can "
-      + "fail: a field list can be read in full, so a type absent from it is genuinely absent. "
-      + "Generic wrappers are read through, so Vec<T>, Promise<T> and Optional[T] all confirm. "
-      + "'builds': the FROM end makes one of the TO end's type — `new X`, `X { .. }`, `<X />`. It "
-      + "is the only way to describe a component tree. NOT finding the construction is never held "
-      + "against the arrow (a factory one call away is invisible); what fails is finding it at the "
-      + "far end and only there, which means the arrow is backwards. "
-      + "'calls': the FROM end calls the TO end. The most common thing one piece of code does to "
-      + "another, and the called name is traced back to the file it came from, through a barrel or "
-      + "a re-export if there is one. Same footing as builds: NOT finding the call is never held "
-      + "against the arrow, because a callback or a dispatch table is invisible to it; what fails "
-      + "is finding the call at the far end and only there. Both ends must anchor a symbol. Do not "
-      + "reach for 'calls' when what you mean is that a value flows — that is 'feeds', and it "
-      + "often points the other way. "
-      + "'accesses': the FROM end reads a named member off the TO end's type -- a field, a "
-      + "property, a method. The largest relationship a diagram could draw, and the one your "
-      + "prose labels have been reaching for when they say reads, writes, key, value or looks "
-      + "up. It is the ONLY claim that takes an argument: put the member name in the arrow's "
-      + "`label`, so `label: 'width', claim: 'accesses'` reads as `width @accesses` on the "
-      + "board. An accesses arrow with prose on its label, or none, names nothing to look for "
-      + "and is reported as a claim nothing can read. Its two ends are held to different "
-      + "standards and this is the thing to know before writing one: a member list can be "
-      + "listed in full, so a member the TYPE does not declare is a red with the member list "
-      + "quoted -- rename a field and every board still naming it goes red -- while the "
-      + "ROUTINE end can never be a red, because knowing everything a body touches needs the "
-      + "type of every value in it. A green needs both: the type declares it AND the routine "
-      + "can be seen reading it. Nothing is reported either way when the member list is not "
-      + "closed -- a type that extends another, an index signature, a Python __getattr__, an "
-      + "alias for a shape declared elsewhere, or a Rust struct whose impl is in another file. "
-      + "Both ends must anchor a symbol. "
-      + "'conforms': the FROM end is one of the TO end -- a class extending a base, a class or "
-      + "struct implementing an interface or trait, an interface extending another. Subtype "
-      + "first, the way holds and builds are drawn, and the way a class diagram has drawn "
-      + "generalisation for thirty years. CHECKED and it can fail in Python and TypeScript: a "
-      + "base list is written in the declaration, so a type absent from it is genuinely absent, "
-      + "and an arrow drawn from the base DOWN to the subclass is a red that tells you to turn "
-      + "it round. Type arguments are NOT read as bases -- `class Store extends Cache<Entry>` "
-      + "says Store is one of Cache and nothing about Entry. In RUST it confirms and can never "
-      + "fail, because `impl Trait for Type` may sit in any file in the crate, so a struct with "
-      + "no impl beside it is reported unread rather than wrong. Nothing is reported either way "
-      + "when a base could stand for another name, or is an expression like `extends mixin(B)`. "
-      + "Structural conformance is not on offer: an object that satisfies an interface without "
-      + "naming it, or a function that fits a protocol, is written down nowhere -- an arrow at a "
-      + "function is reported as a claim nothing can read. Both ends must anchor a symbol. "
-      + "A relationship you cannot point at is an arrow with no claim, which is fine and is what "
-      + "most arrows are: an unclaimed arrow is looked for and counted, never judged, so it cannot "
-      + "come back as a finding against you. "
-      + "Both rules are about arrows that exist. On a state:'planned' arrow there is nothing to "
-      + "read yet, so a claim there is a specification of what will be true once built; nothing "
-      + "checks it until the code lands and the arrow promotes, so writing it there costs nothing "
-      + "and accuses nobody.",
+      CLAIM_DESCRIPTION,
               ),
           }),
         )
@@ -1597,20 +1357,12 @@ server.registerTool(
   {
     title: "Edit diagram",
     description:
-      "Change a few things on a board without redrawing it. This is the cheap path and the one to "
-      + "reach for first: correcting four refs here costs four short strings, where re-sending the "
-      + "graph to create_diagram costs ~1,900 tokens on a 34-node board. "
-      + "Patches and deletes elements by id, hand-drawn ones included. Use it to re-anchor a box "
-      + "(ref, refs), change what it claims to exist (state), assert or drop a closed boundary, switch "
-      + "the whole board between repo and concept (describes), and "
-      + "to move, resize or recolour anything. Everything you do not mention stays as it was, so a "
-      + "ref correction cannot silently unsay a box's state or its second anchor. "
-      + "The id can be a node id from read_diagram or a raw Excalidraw element id; a real element id "
-      + "wins if something is called both. Deleting a shape takes its bound label. Read the board "
-      + "first; change only what must change. "
-      + "Two things this cannot do: change the layout flow, which is relayout_diagram, and add or "
-      + "remove boxes, which is create_diagram. A label change is possible but only re-letters the "
-      + "text -- the box is not re-measured, so a much longer word wants a redraw.",
+      "Change part of a board without redrawing it. Patch a box or arrow by node id: ref, refs, "
+      + "state, closed, a colour, a size. Delete by id (a shape takes its label). Set the whole "
+      + "board's describes with the top-level field. Everything you do not name stays. Read the "
+      + "board first. The response re-checks anchors after a ref, state or describes change: fix "
+      + "what it names. Cannot add or remove boxes (create_diagram) or change the flow "
+      + "(relayout_diagram).",
     inputSchema: {
       path: z.string(),
       updates: z
@@ -1622,10 +1374,8 @@ server.registerTool(
                 .string()
                 .optional()
                 .describe(
-                  "Re-anchor this box at different code, in the same form create_diagram takes. "
-                  + 'Pass "" to remove the anchor. This is the one edit worth making by hand: it is '
-                  + "how a box wrongly anchored at a bundle of siblings gets pointed at the thing it "
-                  + "actually stands for, and the drift check reads the new anchor immediately.",
+                  "New anchor, as in create_diagram (a name after #, never line numbers). \"\" "
+                  + "removes it.",
                 ),
               refs: z
                 .array(z.string())
@@ -1635,16 +1385,14 @@ server.registerTool(
                 .enum(["planned", "built", "external"])
                 .optional()
                 .describe(
-                  "Change what this box or arrow claims about existing. The stroke is redrawn to "
-                  + "match, so the picture and the record cannot disagree.",
+                  "built, planned or external; the stroke is redrawn to match.",
                 ),
               closed: z
                 .object({ through: z.array(z.string()).optional() })
                 .nullable()
                 .optional()
                 .describe(
-                  "Assert, or with null drop, the closed-boundary claim on a box anchored at a "
-                  + "directory. Checked exactly as it is when written by create_diagram.",
+                  "Set, or with null drop, the closed claim on a directory box.",
                 ),
             })
             .passthrough(),
@@ -1725,35 +1473,22 @@ server.registerTool(
   {
     title: "Re-lay out diagram",
     description:
-      "Lay a board out again in a different flow, without re-sending the graph. Layout is the one "
-      + "thing this tool decides on its own, and the graph is already recorded in the file, so this "
-      + "costs a word where create_diagram costs every node and every edge -- ~1,900 tokens on a "
-      + "34-node board for a change whose whole content is RIGHT or DOWN. "
-      + "Trying a layout after seeing a board for the first time is the most reasonable thing there "
-      + "is, and it needs no judgement about the code at all: use this rather than settling for the "
-      + "first layout because a redraw felt expensive. "
-      + "Every box keeps its id, ref, state, claims, colour and label, and arrows drawn with "
-      + "connect_nodes are carried across and re-routed; hand-drawn elements are not moved. The "
-      + "flow is recorded on the board, so a later regenerate does not revert it. "
-      + "Like create_diagram, the response says whether the result is legible once rendered, so you "
-      + "can tell whether the flow helped without paying for an image to look at.",
+      "Lay a board out again in another flow (RIGHT or DOWN) without re-sending the graph. "
+      + "Everything on it is kept; hand-drawn elements do not move. The flow is recorded. The "
+      + "response says whether the result is legible.",
     inputSchema: {
       path: z.string(),
       direction: z
         .enum(["RIGHT", "DOWN"])
         .optional()
         .describe(
-          "The flow to lay out in. RIGHT suits most architecture; DOWN suits a sequence or a "
-          + "pipeline, and is worth trying when a board sprawls sideways or its connectors run long. "
-          + "Omit only to re-run a board that already records a flow; one drawn before flows were "
-          + "recorded says nothing about it, and is refused rather than laid out in the default.",
+          "RIGHT suits most boards; DOWN suits a sequence or a board that sprawls sideways.",
         ),
       name: z
         .string()
         .optional()
         .describe(
-          "Which diagram, as reported by read_diagram. Only needed when a board holds more than "
-          + "one; with one it is unambiguous and is refused rather than guessed with several.",
+          "Which diagram, from read_diagram. Only when a file holds several.",
         ),
     },
   },
@@ -2011,12 +1746,9 @@ server.registerTool(
   {
     title: "Open live board",
     description:
-      "Open the board in a live local page. It updates the moment any tool writes the file, and "
-      + "what the user draws is saved back, so you both edit the same board. Returns a URL pinned to "
-      + "this board: several can be open at once and each stays on its own diagram, so opening a "
-      + "second one does not disturb a page the user is watching. One background service serves them "
-      + "all, and it outlives this session -- the board is still there afterwards, and `diagramos "
-      + "stop` is what ends it. Prefer it to a shell command.",
+      "Open the board in a live local page that follows the file; what the user draws there is "
+      + "saved back. Returns a URL for this board; several can be open at once. The page outlives "
+      + "this session until `diagramos stop`.",
     inputSchema: {
       path: z.string(),
       open: z.boolean().default(true).describe("Also launch the system browser"),
@@ -2073,46 +1805,25 @@ server.registerTool(
   {
     title: "Survey a scope",
     description:
-      "Work out the shape of a board for a directory BEFORE drawing one, and get back a draft graph "
-      + "to name. Call this first when asked to diagram code you have not already read. "
-      + "It answers, by measurement rather than convention, the four things there is otherwise no "
-      + "way to know: how many boxes this board holds, whether a box should be a file or a whole "
-      + "directory (decided per box, so a board is a mixture), which directories are a SEPARATE "
-      + "board rather than more boxes on this one, and what this board leaves out. "
-      + "Every box comes back anchored at a path that exists, and every arrow comes back with "
-      + "claim 'needs' and the file:line the dependency was read from -- so passing them straight "
-      + "to create_diagram is transcription, not a guess, and the draft is verified: across eleven "
-      + "scopes in nine repositories the drafted board came back with 0 findings and every box "
-      + "checked. That is the cost this replaces: the alternative is reading the files to find the "
-      + "same thing out, which is 2-37x more tokens and is how a session ends up drawing a board, "
-      + "rendering it, and drawing it again. "
-      + "WHAT IT WILL NOT DO: it does not name anything. Labels come back as filenames, and a board "
-      + "of filenames is a dependency graph rather than an architecture diagram -- 'layout' where "
-      + "the label wanted is 'ELK layout / real font metrics'. Renaming boxes, merging ones that are "
-      + "one idea, and dropping ones the user did not ask about is YOUR half of this and is the half "
-      + "worth doing; keep the refs and the claims when you do. It also only knows about "
-      + "dependencies, so it drafts the structural board and not a flow -- for 'how does X happen', "
-      + "read the code and draw it yourself. It refuses a scope outright in a language with no "
-      + "dependency reader rather than drafting boxes nothing corroborated. Python was that refusal "
-      + "until #198 gave it a reader and a measured licence; TypeScript, JavaScript, Rust and "
-      + "Python are all drafted now.",
+      "Call first when asked to diagram a directory's structure. Returns a draft for "
+      + "create_diagram: how many boxes, each anchored at a real path, arrows with claim needs and "
+      + "the line each was read from, separateBoards for parts that belong on their own board, and "
+      + "what it left out. YOUR job: the labels are filenames, so rename each box for what it does, "
+      + "merge and drop boxes, and keep refs and claims as they are. It does not draft flows (\"how "
+      + "does X happen\"): read the code for those. TypeScript, JavaScript, Rust and Python; other "
+      + "languages are refused.",
     inputSchema: {
       scope: z
         .string()
         .describe(
-          "Repo-relative directory to survey — 'src', 'src/engine', 'packages/core'. Not a file, "
-          + "and not the repo root unless the repo really is one small tree: the survey drops the "
-          + "least-connected boxes until the board reads, so too wide a scope comes back as a few "
-          + "boxes and a long list of what it had to leave out.",
+          "A repo-relative directory, e.g. 'src/engine'. Too wide a scope comes back as a few "
+          + "boxes and a long list of what was left out.",
         ),
       direction: z
         .enum(["RIGHT", "DOWN"])
         .optional()
         .describe(
-          "The flow to measure the grain against. Leave it off: how many boxes fit barely depends "
-          + "on it, and create_diagram picks the flow the board is actually drawn in, from the real "
-          + "labels rather than the filenames here. Pass DOWN only when you already know the board "
-          + "is a sequence.",
+          "Leave it off.",
         ),
     },
   },
