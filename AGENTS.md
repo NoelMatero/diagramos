@@ -162,9 +162,12 @@ not a thing to reach for after every edit — a session that runs it eight times
 has spent half an hour watching files it never touched.
 
 - **While you are working, run the files you are working on.** `npm run
-  build:cli` once, then `npx vitest run tests/<file>.test.ts` for as many
-  targeted runs as you like. The build is what `pretest` does; without it four
-  files fail on a stale `out/cli` and the failures look like real ones.
+  build:viewer && npm run build:cli` once, then `npx vitest run
+  tests/<file>.test.ts` for as many targeted runs as you like. That is what
+  `pretest` does; without it files fail on a stale `out/cli` or a missing
+  `out/viewer`, and the failures look like real ones. `pretest` builds the page
+  too since #285: building only the server let the two drift apart, and the
+  board page reported itself out of date.
 - **Run the whole suite once**, when the change is finished.
 - **`npm run test:e2e:board` needs `npm run build:viewer` first**, or it tests
   the last bundle instead of yours. Two minutes, and it drives a real browser —

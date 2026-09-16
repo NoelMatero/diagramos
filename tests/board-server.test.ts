@@ -577,6 +577,14 @@ describe("board server drift status", () => {
     expect(payload.report.findings[0]).toMatchObject({ node: "gone", kind: "missing-file" });
   });
 
+  it("tells the page it is served from a source checkout, so its advice can be npm run build (#285)", async () => {
+    // This suite runs the server from src/, which is exactly a checkout.
+    const board = path.join(workspace, "checkout.excalidraw");
+    await writeBoard(board, statusBoard());
+    const payload = (await (await fetch(driftUrl(board))).json()) as { fromCheckout?: boolean };
+    expect(payload.fromCheckout).toBe(true);
+  });
+
   it("reports a planned box as work, so the page can show the sketch being ahead", async () => {
     const board = path.join(workspace, "planned.excalidraw");
     await writeBoard(board, statusBoard(anchored("next", "future.ts", "planned")));

@@ -196,6 +196,8 @@ export interface DriftView {
    * to a server that never said what it knows.
    */
   vocabulary?: string[];
+  /** Set by the page when its server runs from a source checkout (#285). */
+  fromCheckout?: boolean;
 }
 
 /**
@@ -556,7 +558,10 @@ export function rowsOf(report: DriftView): StatusRow[] {
     ...(unknown.length
       ? [{
         text: `this page is out of date — it does not know: ${unknown.join(", ")}`
-          + " · restart the board to rebuild it",
+          // A restart rebuilds nothing: it serves the same page again (#285).
+          + (report.fromCheckout
+            ? " · run npm run build:viewer in the checkout, then reload"
+            : " · stop the board (npx diagramos stop) and open it again"),
         tone: "bad" as Tone,
       }]
       : []),
