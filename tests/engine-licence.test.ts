@@ -352,7 +352,8 @@ describe("which words may accuse, and in which languages", () => {
       accesses: { ts: true, tsx: true, js: false, rust: true, python: true },
       conforms: { ts: true, tsx: true, js: false, rust: false, python: true },
       /*
-       * The first **box** word on the grid, and the only row with one `yes`.
+       * The first **box** word on the grid, and now the only row with two
+       * `yes`es.
        *
        * `closed` is the other box word and it is deliberately not here: it
        * reads the imports, which is `@needs`' reader measured by `@needs`'
@@ -360,12 +361,14 @@ describe("which words may accuse, and in which languages", () => {
        * dispatch, which nothing else here reads, so it needed a row or it would
        * have been accusing on a measurement of something else -- #195 exactly.
        *
-       * Rust is the square #206 expected to be strongest and it is a stated no,
-       * which is the opposite of the issue's prediction. The reason is the
-       * referee rather than the reader: a line-based scan cannot see an arm
-       * `rustfmt` broke across lines. See `src/engine/licence.ts`.
+       * Rust is the square #206 expected to be strongest and #267 first found a
+       * stated no, which was the opposite of the issue's prediction. The reason
+       * was the referee rather than the reader: a line-based scan cannot see an
+       * arm `rustfmt` broke across lines. #267 built a real one (`syn`),
+       * found two bugs in the reader along the way, fixed them, and moved the
+       * square. See `src/engine/licence.ts` and item 41 in claim-vocabulary.md.
        */
-      handles: { ts: true, tsx: false, js: false, rust: false, python: false },
+      handles: { ts: true, tsx: false, js: false, rust: true, python: false },
     };
     for (const relation of ACCUSING_RELATIONS) {
       for (const language of LANGUAGES) {

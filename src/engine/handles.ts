@@ -410,10 +410,43 @@ function namesIn(
  * Python wrap a label in a node whose type carries the word `pattern`
  * (`match_pattern`, `case_pattern`), and a `switch` hands over the value
  * itself. A qualified name never reaches here -- `PATH` has taken it already.
+ *
+ * ## Two spellings that are never a binding, whatever their case
+ *
+ * `true` and `false` are keywords in every one of this reader's languages --
+ * Rust's grammar will not let you name a variable either one -- so unlike an
+ * ordinary lowercase word there is no ambiguity to be cautious about here.
+ * Before this carve-out `match flag { true => .., false => .. }` read as two
+ * bindings, which is a catch-all applied twice: `checkHandles` withheld on
+ * every such dispatch rather than confirming or refuting it, on the one shape
+ * that has no doubt attached to it at all. #267's measurement is what found
+ * it -- a syn-based referee reads a Rust `Lit::Bool` pattern as a real case,
+ * and every disagreement it produced against this reader turned out to be one
+ * of these two words.
+ *
+ * ## `ref` and `mut` are binding modifiers, never part of a value
+ *
+ * `ref x` and `ref mut x` are Rust's by-reference binding forms -- their text
+ * starts with a keyword the regex below does not expect, so `ref x => ..`
+ * used to read as a *case* named `x` rather than as the catch-all it is. That
+ * is the dangerous direction: unlike a missed case, an invented one is not
+ * excused by `catchAll` (`checkHandles` only lets a catch-all forgive a
+ * *missing* claim), so a routine ending in `ref x => panic!(..)` reported a
+ * real, unlisted case on every dispatch above it too -- `ripgrep/tests/json.rs`
+ * has five. `ref` and `mut` can only ever open a binding in pattern position,
+ * so stripping them first carries no risk of hiding a real case behind them.
+ *
+ * A trailing guard is stripped the same way `nameOf` in `dispatch-scan.ts`
+ * already strips one -- `t if t < 0 => ..` is a binding named `t` guarded by
+ * a condition, not a pattern whose whole text happens to contain spaces, and
+ * pydantic-core's `int_as_time` has one.
  */
 function isBinding(label: Node): boolean {
   if (!label.type.includes("pattern")) return false;
-  const text = label.text.trim();
+  const text = label.text.trim()
+    .replace(/\s+if\s+.*$/, "")
+    .replace(/^ref\s+mut\s+|^ref\s+|^mut\s+/, "");
+  if (text === "true" || text === "false") return false;
   return /^[a-z_][\w]*$/.test(text);
 }
 

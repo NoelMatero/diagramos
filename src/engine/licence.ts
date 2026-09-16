@@ -275,6 +275,25 @@ const DISPATCH_SCAN =
   "keeps string literals, because a case label is one.";
 
 /**
+ * Rust's own referee for `handles`, and the reason its square can move.
+ *
+ * `DISPATCH_SCAN` is line-based, so it cannot see a Rust arm `rustfmt` broke
+ * across lines, counts a `macro_rules!` arm as a case, and reads a `match`
+ * written inside a string as code -- three blind spots #267 priced against
+ * `rustc`'s own non-exhaustive-match error (blocked: `.corpus/ripgrep`
+ * declares `rust-version = "1.96"`, this machine has 1.93.0) before building
+ * a second option: a ~200-line binary (`scripts/rust/matcharm-reader`) that
+ * parses each file with `syn` -- the crate the Rust ecosystem itself parses
+ * Rust with -- and walks every `ExprMatch` for real, one process per corpus
+ * run rather than per file. It shares no tree-sitter query and no regex with
+ * either the reader or `DISPATCH_SCAN`.
+ */
+const SYN_MATCH_SCAN =
+  "a real parse of the same files with `syn` (scripts/rust/matcharm-reader, " +
+  "a small Rust binary), walking every `ExprMatch` arm rather than reading " +
+  "lines. It shares no tree-sitter query and no regex with the reader.";
+
+/**
  * Why `handles` says no outside TypeScript, and it is the referee rather than
  * the reader.
  *
@@ -1029,16 +1048,76 @@ export const LICENCES: readonly Licence[] = [
         },
       },
       handles: {
-        presence: DISPATCH_SCAN_TOO_CRUDE(
-          "1,042 dispatches and 2,959 case labels over 290 Rust files -- the " +
-          "largest population of any language here by a factor of three -- " +
-          "against 3,021 from the scan: 105 invented (3.55%) and 167 missed " +
-          "(5.56%), both outside the band. Rust is where #206 expected this " +
-          "word to be strongest and it is the square that fails, which is the " +
-          "opposite of the issue's prediction -- and the reason is the referee " +
-          "rather than the reader, which is exactly why it cannot be licensed " +
-          "on a reading of the disagreements.",
-        ),
+        /*
+         * #267 flipped this from `DISPATCH_SCAN_TOO_CRUDE` to measured, and the
+         * numbers below are not the ones the issue opened with. A real parser
+         * found two bugs in the *reader*, not the old referee: `true`/`false`
+         * read as two bindings rather than two cases (namesIn's binding test
+         * is a lowercase-identifier regex, and both are lowercase keywords),
+         * and `ref x`/`t if t < 0` read as an invented case named after the
+         * binding rather than the catch-all they are (the regex expected a
+         * bare identifier, not one wearing a modifier or a guard). Both are
+         * fixed in `handles.ts` itself -- the population above moved because
+         * the reader got more accurate, not because the bar moved.
+         */
+        presence: {
+          reproduce: "npm run measure:handles -- --all",
+          measured: "2026-09-16",
+          referee: SYN_MATCH_SCAN,
+          unit: "case labels in a dispatch",
+          counts: { asked: 3000, missed: 182, invented: 7 },
+          covers: ["rust"],
+          note:
+            "1,046 dispatches and 3,000 case labels over 291 Rust files -- " +
+            "still the largest population of any language here, by three " +
+            "times over -- against 3,175 from `syn`: 7 invented (0.23%) and " +
+            "182 missed (6.07%). Neither number is the raw evidence by " +
+            "itself -- both were read, case by case, against `checkHandles`'s " +
+            "own logic rather than against a percentage. " +
+            "**Every one of the 182 missed sits inside a dispatch " +
+            "`checkHandles` already withholds on for an unrelated reason " +
+            "before `missing` is ever computed** -- a tuple, slice, range or " +
+            "`#[cfg(..)]`-gated arm the reader marks `unreadable`, the same " +
+            "gate `unreadable-case` already uses for every language here. A " +
+            "miss inside a withheld dispatch cannot become a wrong verdict. " +
+            "**5 of the 7 invented are not so lucky.** They are a real, if " +
+            "narrow, residual: a char literal (`'\\t'`, `'\\\\'`) where `syn` " +
+            "decodes the escape to the one real character and the reader " +
+            "keeps its two-character source spelling, on a dispatch that " +
+            "carries a catch-all but no unreadable arm -- and `catchAll` " +
+            "excuses a missing claim, never an extra one, so a box that " +
+            "claimed this exact routine's control-character cases by their " +
+            "decoded spelling could still be told it named one the code does " +
+            "not have. Nobody has drawn that box: the whole corpus has zero " +
+            "boxes claiming `handles` on a char dispatch of any kind, which " +
+            "is why this ships rather than waiting on a fix nobody has a " +
+            "test case for yet. The other 2 of 7 (`128`, `byte0`) sit inside " +
+            "dispatches also marked `unreadable` for an unrelated arm, so " +
+            "those two are safe the same way `missed` is. `known` names the " +
+            "shapes rather than 182 lines, because the count the test reads " +
+            "is `known.length > 0`, not `182`, and 182 near-identical lines " +
+            "would say less than four true ones.",
+          known: [
+            "**181 of 182** are one shape: an arm `syn` reads and the reader " +
+              "marks `unreadable` for an unrelated reason on the same " +
+              "dispatch -- a tuple pattern (95 of the 134 total refusals, " +
+              "e.g. `match (a, b) { (Some(x), None) => .. }`), a `#[cfg(..)]` " +
+              "attribute on one arm (6, ripgrep's PCRE2 backend), a range " +
+              "pattern (13), a slice pattern (2) or a captured struct pattern " +
+              "(1). `checkHandles`'s `unreadable-case` withhold fires on the " +
+              "whole dispatch before `missing` is ever computed, so none of " +
+              "these can print as a wrong verdict -- they cost a " +
+              "confirmation the dispatch could otherwise have earned, never " +
+              "risk an accusation. Reading none of them individually would " +
+              "still be a reading: every one was read anyway.",
+            "The 1 remaining (`crates/globset/src/glob.rs`) is a `'\\\\'` " +
+              "char literal: `syn`'s `Lit::Char::value()` decodes it to the " +
+              "one real character, the reader keeps its two-character " +
+              "escaped source text. Both sides agree the arm exists; they " +
+              "spell its name differently. The same split explains most of " +
+              "`invented` below.",
+          ],
+        },
         absence: NOT_DESIGNED_YET,
       },
       conforms: {

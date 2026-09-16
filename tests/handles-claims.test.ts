@@ -235,10 +235,12 @@ describe("a claim on work nobody has started", () => {
 
 describe("the licence, at the last gate and nowhere earlier", () => {
   /*
-   * Measured at 0 invented and 7 missed of 1,099 in TypeScript, and outside
-   * the band everywhere else. So the word may say wrong in TypeScript and may
-   * not in TSX, JavaScript, Rust or Python -- including Rust, which #206
-   * predicted would be the strongest square.
+   * Measured at 0 invented and 7 missed of 1,099 in TypeScript. Rust joined
+   * it at 7 invented and 182 missed of 3,000 (#267) -- every one of the 182,
+   * and all but 5 of the 7, sit inside a dispatch `checkHandles` already
+   * withholds on for an unrelated reason, which is why the number the
+   * measurement prints and the number this gate accuses on are different
+   * questions. TSX, JavaScript and Python stay outside the band.
    *
    * The gate is at the accusation and not before it, which is the rule
    * `licence.ts`'s header states: an unlicensed language still gets the whole
@@ -272,27 +274,60 @@ export function status(m: string): number {
     expect(report.clean).toBe(false);
   });
 
-  it("reads Rust, disagrees with the box, and still does not accuse", async () => {
+  it("goes red in Rust too, with a file and a line, now that #267 licensed it", async () => {
+    /*
+     * The DoD item #206 could not tick: a Rust board where the code grows a
+     * case the picture does not show reads red, by file and line, the same
+     * as TypeScript already did above. `ROUTER` dispatches on `Get`, `Post`
+     * and `Delete`; the box below only knows about the first two, same as
+     * the TypeScript version of this test three blocks up.
+     */
     const report = checkDrift(
-      await boardFor("src/route.rs#status", ["Get"]),
+      await boardFor("src/route.rs#status", ["Get", "Post"]),
       fakeWorkspace({ "src/route.rs": ROUTER }),
     );
-    expect(report.findings.filter((f) => f.kind === "mishandled-box")).toEqual([]);
-    expect(report.claims.handlesWithheld).toEqual([
-      { label: "status", why: "unlicensed", detail: "rust" },
-    ]);
-    expect(report.clean).toBe(true);
+    const [finding, ...rest] = report.findings;
+    expect(rest).toEqual([]);
+    expect(finding.kind).toBe("mishandled-box");
+    expect(finding.detail).toContain("`Delete`");
+    expect(finding.detail).toContain("src/route.rs:5");
+    expect(report.clean).toBe(false);
   });
 
-  it("loses the red and keeps the confirmation, which is the whole rule", async () => {
-    // An unlicensed language is not a language that goes unchecked. A box that
-    // agrees with its code is still counted as held.
+  it("still confirms a Rust box that agrees with its code", async () => {
     const report = checkDrift(
       await boardFor("src/route.rs#status", ["Get", "Post", "Delete"]),
       fakeWorkspace({ "src/route.rs": ROUTER }),
     );
     expect(report.claims.handlesHeld).toBe(1);
     expect(report.claims.handlesWithheld).toEqual([]);
+    expect(report.findings).toEqual([]);
+  });
+
+  it("withholds a Rust dispatch #267 found unreadable, rather than guessing", async () => {
+    /*
+     * The exact safety property the #267 measurement rests on: a tuple
+     * pattern is read and not judged, the same way an if/elif chain is
+     * below. A box anchored here never goes red on the strength of a case
+     * list the reader could not fully read.
+     */
+    const TUPLE_ROUTER = `
+pub fn combine(a: Option<bool>, b: Option<bool>) -> i32 {
+    match (a, b) {
+        (Some(true), Some(true)) => 1,
+        (Some(false), Some(false)) => 2,
+        _ => 0,
+    }
+}
+`;
+    const report = checkDrift(
+      await boardFor("src/combine.rs#combine", ["true"]),
+      fakeWorkspace({ "src/combine.rs": TUPLE_ROUTER }),
+    );
+    expect(report.findings.filter((f) => f.kind === "mishandled-box")).toEqual([]);
+    expect(report.claims.handlesWithheld).toEqual([
+      { label: "status", why: "unreadable-case", detail: "tuple_pattern" },
+    ]);
   });
 
   it("does not accuse in TSX either, on 40 measured labels", async () => {
