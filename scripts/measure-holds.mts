@@ -318,10 +318,14 @@ if (unlicensed.length > 0) {
 console.log();
 console.log(`  MISSED -- referee saw the name, reader did not: ${missed.length}`);
 console.log("    The bar is zero. Each one is an arrow that would be called wrong when it is right.");
-for (const miss of missed.slice(0, 25)) {
+// `--all` for every miss, the way `measure:conforms` has it: over the pinned
+// clones this list runs to hundreds, and a cap nobody can get past is a list
+// nobody can read (#278).
+const showAllMisses = process.argv.includes("--all");
+for (const miss of showAllMisses ? missed : missed.slice(0, 25)) {
   console.log(`    ${path.relative(HOME, miss.file)}:${miss.line} ${miss.type} holds ${miss.name}`);
 }
-if (missed.length > 25) console.log(`    ... and ${missed.length - 25} more`);
+if (!showAllMisses && missed.length > 25) console.log(`    ... and ${missed.length - 25} more`);
 
 console.log();
 console.log(`  INVENTED -- reader confirmed a name that is not in the file: ${invented.length}`);

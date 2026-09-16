@@ -2,7 +2,7 @@
 /**
  * How often the base-list reader is wrong, measured before it is allowed a red.
  *
- *   npm run measure:conforms                 -- this repo, rust-test, orangutan, mundane, infrarouter
+ *   npm run measure:conforms                 -- src, scripts, rust-test, orangutan, graphify, mundane, infrarouter
  *   npm run measure:conforms -- <path>...    -- any trees you like
  *   npm run measure:conforms -- --all        -- print every disagreement, not the first 25
  *
@@ -10,11 +10,8 @@
  * had to be sure about. So it is also run over the five clones the dependency
  * licence already pins, the way `measure:calls` widened its own Rust row:
  *
- *   npm run measure:conforms -- .claude/worktrees/96-rust/.corpus/BurntSushi-ripgrep \
- *     .claude/worktrees/96-rust/.corpus/dtolnay-anyhow \
- *     .claude/worktrees/96-rust/.corpus/clap-rs-clap \
- *     .claude/worktrees/96-rust/.corpus/rust-lang-regex \
- *     .claude/worktrees/96-rust/.corpus/serde-rs-json
+ *   npm run measure:conforms -- .corpus/ripgrep .corpus/anyhow .corpus/clap \
+ *     .corpus/regex .corpus/json
  *
  * 775 files and 4,975 asks against the default corpus's 308, and it is what
  * found the derive half of the relation: the reader saw `impl Trait for Type`
