@@ -1,0 +1,2009 @@
+{
+  "type": "excalidraw",
+  "version": 2,
+  "source": "diagramos",
+  "elements": [
+    {
+      "id": "django-signal-dispatch-architecture-title",
+      "type": "text",
+      "x": 0,
+      "y": -115,
+      "width": 462.00000000000006,
+      "height": 30,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a0",
+      "roundness": null,
+      "seed": 751889776,
+      "version": 1,
+      "versionNonce": 625332684,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "django-signal-dispatch-architecture",
+        "role": "title"
+      },
+      "text": "Django Signal Dispatch Architecture",
+      "fontSize": 24,
+      "fontFamily": 5,
+      "textAlign": "left",
+      "verticalAlign": "middle",
+      "containerId": null,
+      "originalText": "Django Signal Dispatch Architecture",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "django-signal-dispatch-architecture-node-0",
+      "type": "rectangle",
+      "x": 20,
+      "y": 20,
+      "width": 160,
+      "height": 80,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a1",
+      "roundness": null,
+      "seed": 1522267583,
+      "version": 1,
+      "versionNonce": 1613472729,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "django-signal-dispatch-architecture-node-0-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "django-signal-dispatch-architecture",
+        "node": "Signal",
+        "ref": "django/dispatch/dispatcher.py#Signal"
+      }
+    },
+    {
+      "id": "django-signal-dispatch-architecture-node-1",
+      "type": "rectangle",
+      "x": 20,
+      "y": 640,
+      "width": 280,
+      "height": 80,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a2",
+      "roundness": null,
+      "seed": 1992352558,
+      "version": 1,
+      "versionNonce": 832339282,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "django-signal-dispatch-architecture-node-1-label"
+        },
+        {
+          "id": "django-signal-dispatch-architecture-edge-0",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "django-signal-dispatch-architecture",
+        "node": "receiver_decorator",
+        "ref": "django/dispatch/dispatcher.py#receiver"
+      }
+    },
+    {
+      "id": "django-signal-dispatch-architecture-node-2",
+      "type": "rectangle",
+      "x": 660,
+      "y": 640,
+      "width": 160,
+      "height": 100,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a3",
+      "roundness": null,
+      "seed": 242989977,
+      "version": 1,
+      "versionNonce": 1069657059,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "django-signal-dispatch-architecture-node-2-label"
+        },
+        {
+          "id": "django-signal-dispatch-architecture-edge-0",
+          "type": "arrow"
+        },
+        {
+          "id": "django-signal-dispatch-architecture-edge-1",
+          "type": "arrow"
+        },
+        {
+          "id": "django-signal-dispatch-architecture-edge-7",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "django-signal-dispatch-architecture",
+        "node": "connect",
+        "ref": "django/dispatch/dispatcher.py#Signal.connect"
+      }
+    },
+    {
+      "id": "django-signal-dispatch-architecture-node-3",
+      "type": "rectangle",
+      "x": 680,
+      "y": 460,
+      "width": 160,
+      "height": 100,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a4",
+      "roundness": null,
+      "seed": 971960976,
+      "version": 1,
+      "versionNonce": 1472733804,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "django-signal-dispatch-architecture-node-3-label"
+        },
+        {
+          "id": "django-signal-dispatch-architecture-edge-2",
+          "type": "arrow"
+        },
+        {
+          "id": "django-signal-dispatch-architecture-edge-8",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "django-signal-dispatch-architecture",
+        "node": "disconnect",
+        "ref": "django/dispatch/dispatcher.py#Signal.disconnect"
+      }
+    },
+    {
+      "id": "django-signal-dispatch-architecture-node-4",
+      "type": "ellipse",
+      "x": 1280,
+      "y": 340,
+      "width": 200,
+      "height": 120,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a5",
+      "roundness": null,
+      "seed": 1192205211,
+      "version": 1,
+      "versionNonce": 104891285,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "django-signal-dispatch-architecture-node-4-label"
+        },
+        {
+          "id": "django-signal-dispatch-architecture-edge-1",
+          "type": "arrow"
+        },
+        {
+          "id": "django-signal-dispatch-architecture-edge-2",
+          "type": "arrow"
+        },
+        {
+          "id": "django-signal-dispatch-architecture-edge-6",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "django-signal-dispatch-architecture",
+        "node": "receivers_list",
+        "ref": "django/dispatch/dispatcher.py#Signal.receivers"
+      }
+    },
+    {
+      "id": "django-signal-dispatch-architecture-node-5",
+      "type": "rectangle",
+      "x": 140,
+      "y": 440,
+      "width": 160,
+      "height": 80,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a6",
+      "roundness": null,
+      "seed": 430386250,
+      "version": 1,
+      "versionNonce": 789921950,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "django-signal-dispatch-architecture-node-5-label"
+        },
+        {
+          "id": "django-signal-dispatch-architecture-edge-3",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "django-signal-dispatch-architecture",
+        "node": "send",
+        "ref": "django/dispatch/dispatcher.py#Signal.send"
+      }
+    },
+    {
+      "id": "django-signal-dispatch-architecture-node-6",
+      "type": "rectangle",
+      "x": 140,
+      "y": 280,
+      "width": 160,
+      "height": 80,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a7",
+      "roundness": null,
+      "seed": 1584502053,
+      "version": 1,
+      "versionNonce": 1775812527,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "django-signal-dispatch-architecture-node-6-label"
+        },
+        {
+          "id": "django-signal-dispatch-architecture-edge-4",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "django-signal-dispatch-architecture",
+        "node": "asend",
+        "ref": "django/dispatch/dispatcher.py#Signal.asend"
+      }
+    },
+    {
+      "id": "django-signal-dispatch-architecture-node-7",
+      "type": "rectangle",
+      "x": 120,
+      "y": 120,
+      "width": 180,
+      "height": 80,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a8",
+      "roundness": null,
+      "seed": 1444612876,
+      "version": 1,
+      "versionNonce": 1947357400,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "django-signal-dispatch-architecture-node-7-label"
+        },
+        {
+          "id": "django-signal-dispatch-architecture-edge-5",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "django-signal-dispatch-architecture",
+        "node": "send_robust",
+        "ref": "django/dispatch/dispatcher.py#Signal.send_robust"
+      }
+    },
+    {
+      "id": "django-signal-dispatch-architecture-node-8",
+      "type": "rectangle",
+      "x": 620,
+      "y": 260,
+      "width": 220,
+      "height": 120,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a9",
+      "roundness": null,
+      "seed": 131375111,
+      "version": 1,
+      "versionNonce": 1738150433,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "django-signal-dispatch-architecture-node-8-label"
+        },
+        {
+          "id": "django-signal-dispatch-architecture-edge-3",
+          "type": "arrow"
+        },
+        {
+          "id": "django-signal-dispatch-architecture-edge-4",
+          "type": "arrow"
+        },
+        {
+          "id": "django-signal-dispatch-architecture-edge-5",
+          "type": "arrow"
+        },
+        {
+          "id": "django-signal-dispatch-architecture-edge-6",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "django-signal-dispatch-architecture",
+        "node": "live_receivers",
+        "ref": "django/dispatch/dispatcher.py#Signal._live_receivers"
+      }
+    },
+    {
+      "id": "django-signal-dispatch-architecture-node-9",
+      "type": "rectangle",
+      "x": 1280,
+      "y": 640,
+      "width": 160,
+      "height": 100,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aA",
+      "roundness": null,
+      "seed": 943291254,
+      "version": 1,
+      "versionNonce": 47002586,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "django-signal-dispatch-architecture-node-9-label"
+        },
+        {
+          "id": "django-signal-dispatch-architecture-edge-7",
+          "type": "arrow"
+        },
+        {
+          "id": "django-signal-dispatch-architecture-edge-8",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "django-signal-dispatch-architecture",
+        "node": "make_id",
+        "ref": "django/dispatch/dispatcher.py#_make_id"
+      }
+    },
+    {
+      "id": "django-signal-dispatch-architecture-edge-0",
+      "type": "arrow",
+      "x": 292,
+      "y": 682,
+      "width": 372.79999999999995,
+      "height": 0,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aB",
+      "roundness": null,
+      "seed": 1035492016,
+      "version": 1,
+      "versionNonce": 68288524,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "django-signal-dispatch-architecture-edge-0-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "django-signal-dispatch-architecture",
+        "edge": {
+          "from": "receiver_decorator",
+          "to": "connect",
+          "claim": "calls"
+        }
+      },
+      "points": [
+        [
+          0.5,
+          0
+        ],
+        [
+          186.39999999999998,
+          0
+        ],
+        [
+          372.29999999999995,
+          0
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "django-signal-dispatch-architecture-node-1",
+        "focus": 0.05,
+        "gap": 8
+      },
+      "endBinding": {
+        "elementId": "django-signal-dispatch-architecture-node-2",
+        "focus": 0.15999999999999956,
+        "gap": 4.7999999999999545
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "django-signal-dispatch-architecture-edge-1",
+      "type": "arrow",
+      "x": 824.8,
+      "y": 665.3333333333334,
+      "width": 449.60000000000014,
+      "height": 230.2666666666667,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aC",
+      "roundness": null,
+      "seed": 1709770041,
+      "version": 1,
+      "versionNonce": 386369027,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "django-signal-dispatch-architecture-edge-1-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "django-signal-dispatch-architecture",
+        "edge": {
+          "from": "connect",
+          "to": "receivers_list",
+          "claim": "accesses"
+        }
+      },
+      "points": [
+        [
+          0.5,
+          0
+        ],
+        [
+          76,
+          0
+        ],
+        [
+          76,
+          -203.4666666666667
+        ],
+        [
+          136.4666666666667,
+          -203.4666666666667
+        ],
+        [
+          341.60000000000014,
+          -203.4666666666667
+        ],
+        [
+          341.60000000000014,
+          -230.2666666666667
+        ],
+        [
+          449.10000000000014,
+          -230.2666666666667
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "django-signal-dispatch-architecture-node-2",
+        "focus": -0.49333333333333124,
+        "gap": 4.7999999999999545
+      },
+      "endBinding": {
+        "elementId": "django-signal-dispatch-architecture-node-4",
+        "focus": -0.5844444444444437,
+        "gap": 17.79373865432817
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "django-signal-dispatch-architecture-edge-2",
+      "type": "arrow",
+      "x": 844.8,
+      "y": 485.3333333333333,
+      "width": 429.60000000000014,
+      "height": 80.26666666666665,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aD",
+      "roundness": null,
+      "seed": 1777683150,
+      "version": 1,
+      "versionNonce": 1872077426,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "django-signal-dispatch-architecture-edge-2-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "django-signal-dispatch-architecture",
+        "edge": {
+          "from": "disconnect",
+          "to": "receivers_list",
+          "claim": "accesses"
+        }
+      },
+      "points": [
+        [
+          0.5,
+          0
+        ],
+        [
+          32,
+          0
+        ],
+        [
+          32,
+          -80.26666666666665
+        ],
+        [
+          174.66666666666674,
+          -80.26666666666665
+        ],
+        [
+          238.4000000000001,
+          -80.26666666666665
+        ],
+        [
+          302.13333333333344,
+          -80.26666666666665
+        ],
+        [
+          429.10000000000014,
+          -80.26666666666665
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "django-signal-dispatch-architecture-node-3",
+        "focus": -0.4933333333333337,
+        "gap": 4.7999999999999545
+      },
+      "endBinding": {
+        "elementId": "django-signal-dispatch-architecture-node-4",
+        "focus": -0.08444444444444368,
+        "gap": 5.906793357869812
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "django-signal-dispatch-architecture-edge-3",
+      "type": "arrow",
+      "x": 292,
+      "y": 472,
+      "width": 332.79999999999995,
+      "height": 130,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aE",
+      "roundness": null,
+      "seed": 1585798623,
+      "version": 1,
+      "versionNonce": 909781369,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "django-signal-dispatch-architecture-edge-3-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "django-signal-dispatch-architecture",
+        "edge": {
+          "from": "send",
+          "to": "live_receivers",
+          "claim": "calls"
+        }
+      },
+      "points": [
+        [
+          0.5,
+          0
+        ],
+        [
+          224.79999999999995,
+          0
+        ],
+        [
+          224.79999999999995,
+          -6.600000000000023
+        ],
+        [
+          224.79999999999995,
+          -130
+        ],
+        [
+          332.29999999999995,
+          -130
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "django-signal-dispatch-architecture-node-5",
+        "focus": -0.2,
+        "gap": 8
+      },
+      "endBinding": {
+        "elementId": "django-signal-dispatch-architecture-node-8",
+        "focus": -0.366666666666667,
+        "gap": 4.7999999999999545
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "django-signal-dispatch-architecture-edge-4",
+      "type": "arrow",
+      "x": 292,
+      "y": 312,
+      "width": 332.79999999999995,
+      "height": 0,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aF",
+      "roundness": null,
+      "seed": 1508143916,
+      "version": 1,
+      "versionNonce": 501335416,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "django-signal-dispatch-architecture-edge-4-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "django-signal-dispatch-architecture",
+        "edge": {
+          "from": "asend",
+          "to": "live_receivers",
+          "claim": "calls"
+        }
+      },
+      "points": [
+        [
+          0.5,
+          0
+        ],
+        [
+          166.39999999999998,
+          0
+        ],
+        [
+          332.29999999999995,
+          0
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "django-signal-dispatch-architecture-node-6",
+        "focus": -0.2,
+        "gap": 8
+      },
+      "endBinding": {
+        "elementId": "django-signal-dispatch-architecture-node-8",
+        "focus": 0.13333333333333308,
+        "gap": 4.7999999999999545
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "django-signal-dispatch-architecture-edge-5",
+      "type": "arrow",
+      "x": 292,
+      "y": 152,
+      "width": 332.79999999999995,
+      "height": 130,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aG",
+      "roundness": null,
+      "seed": 2072490565,
+      "version": 1,
+      "versionNonce": 329790543,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "django-signal-dispatch-architecture-edge-5-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "django-signal-dispatch-architecture",
+        "edge": {
+          "from": "send_robust",
+          "to": "live_receivers",
+          "claim": "calls"
+        }
+      },
+      "points": [
+        [
+          0.5,
+          0
+        ],
+        [
+          224.79999999999995,
+          0
+        ],
+        [
+          224.79999999999995,
+          6.600000000000023
+        ],
+        [
+          224.79999999999995,
+          130
+        ],
+        [
+          332.29999999999995,
+          130
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "django-signal-dispatch-architecture-node-7",
+        "focus": -0.19999999999999998,
+        "gap": 8
+      },
+      "endBinding": {
+        "elementId": "django-signal-dispatch-architecture-node-8",
+        "focus": 0.6333333333333332,
+        "gap": 4.7999999999999545
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "django-signal-dispatch-architecture-edge-6",
+      "type": "arrow",
+      "x": 844.8,
+      "y": 312,
+      "width": 429.60000000000014,
+      "height": 63.06666666666666,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aH",
+      "roundness": null,
+      "seed": 916470762,
+      "version": 1,
+      "versionNonce": 724071614,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "django-signal-dispatch-architecture-edge-6-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "django-signal-dispatch-architecture",
+        "edge": {
+          "from": "live_receivers",
+          "to": "receivers_list",
+          "claim": "accesses"
+        }
+      },
+      "points": [
+        [
+          0.5,
+          0
+        ],
+        [
+          61.58333333333337,
+          0
+        ],
+        [
+          123.16666666666674,
+          0
+        ],
+        [
+          246.33333333333348,
+          0
+        ],
+        [
+          321.60000000000014,
+          0
+        ],
+        [
+          321.60000000000014,
+          63.06666666666666
+        ],
+        [
+          429.10000000000014,
+          63.06666666666666
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "django-signal-dispatch-architecture-node-8",
+        "focus": -0.13333333333333308,
+        "gap": 4.7999999999999545
+      },
+      "endBinding": {
+        "elementId": "django-signal-dispatch-architecture-node-4",
+        "focus": 0.4155555555555563,
+        "gap": 12.275437954263495
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "django-signal-dispatch-architecture-edge-7",
+      "type": "arrow",
+      "x": 824.8,
+      "y": 698.6666666666666,
+      "width": 449.60000000000014,
+      "height": 0,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aI",
+      "roundness": null,
+      "seed": 511501627,
+      "version": 1,
+      "versionNonce": 1527510197,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "django-signal-dispatch-architecture-edge-7-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "django-signal-dispatch-architecture",
+        "edge": {
+          "from": "connect",
+          "to": "make_id",
+          "claim": "calls"
+        }
+      },
+      "points": [
+        [
+          0.5,
+          0
+        ],
+        [
+          224.79999999999995,
+          0
+        ],
+        [
+          449.10000000000014,
+          0
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "django-signal-dispatch-architecture-node-2",
+        "focus": 0.17333333333333215,
+        "gap": 4.7999999999999545
+      },
+      "endBinding": {
+        "elementId": "django-signal-dispatch-architecture-node-9",
+        "focus": -0.17333333333333215,
+        "gap": 5.599999999999909
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "django-signal-dispatch-architecture-edge-8",
+      "type": "arrow",
+      "x": 844.8,
+      "y": 518.6666666666666,
+      "width": 429.60000000000014,
+      "height": 146.66666666666674,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aJ",
+      "roundness": null,
+      "seed": 2089663736,
+      "version": 1,
+      "versionNonce": 1540290644,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "django-signal-dispatch-architecture-edge-8-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "django-signal-dispatch-architecture",
+        "edge": {
+          "from": "disconnect",
+          "to": "make_id",
+          "claim": "calls"
+        }
+      },
+      "points": [
+        [
+          0.5,
+          0
+        ],
+        [
+          72.0333333333333,
+          0
+        ],
+        [
+          144.06666666666672,
+          0
+        ],
+        [
+          288.13333333333344,
+          0
+        ],
+        [
+          321.60000000000014,
+          0
+        ],
+        [
+          321.60000000000014,
+          146.66666666666674
+        ],
+        [
+          429.10000000000014,
+          146.66666666666674
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "django-signal-dispatch-architecture-node-3",
+        "focus": 0.17333333333333215,
+        "gap": 4.7999999999999545
+      },
+      "endBinding": {
+        "elementId": "django-signal-dispatch-architecture-node-9",
+        "focus": 0.49333333333333124,
+        "gap": 5.599999999999909
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "django-signal-dispatch-architecture-node-0-label",
+      "type": "text",
+      "x": 67,
+      "y": 47.5,
+      "width": 66,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aK",
+      "roundness": null,
+      "seed": 1594057546,
+      "version": 1,
+      "versionNonce": 1598018974,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "django-signal-dispatch-architecture"
+      },
+      "text": "Signal",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "django-signal-dispatch-architecture-node-0",
+      "originalText": "Signal",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "django-signal-dispatch-architecture-node-1-label",
+      "type": "text",
+      "x": 99.5,
+      "y": 655,
+      "width": 121.00000000000001,
+      "height": 50,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aL",
+      "roundness": null,
+      "seed": 1723136335,
+      "version": 1,
+      "versionNonce": 600401449,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "django-signal-dispatch-architecture"
+      },
+      "text": "receiver\n(decorator)",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "django-signal-dispatch-architecture-node-1",
+      "originalText": "receiver\n(decorator)",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "django-signal-dispatch-architecture-node-2-label",
+      "type": "text",
+      "x": 701.5,
+      "y": 677.5,
+      "width": 77,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aM",
+      "roundness": null,
+      "seed": 894422944,
+      "version": 1,
+      "versionNonce": 1437188348,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "django-signal-dispatch-architecture"
+      },
+      "text": "connect",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "django-signal-dispatch-architecture-node-2",
+      "originalText": "connect",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "django-signal-dispatch-architecture-node-3-label",
+      "type": "text",
+      "x": 705,
+      "y": 497.5,
+      "width": 110.00000000000001,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aN",
+      "roundness": null,
+      "seed": 626378605,
+      "version": 1,
+      "versionNonce": 367772631,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "django-signal-dispatch-architecture"
+      },
+      "text": "disconnect",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "django-signal-dispatch-architecture-node-3",
+      "originalText": "disconnect",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "django-signal-dispatch-architecture-node-4-label",
+      "type": "text",
+      "x": 1330.2893218813451,
+      "y": 387.57359312880715,
+      "width": 99.00000000000001,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aO",
+      "roundness": null,
+      "seed": 976283590,
+      "version": 1,
+      "versionNonce": 1822264362,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "django-signal-dispatch-architecture"
+      },
+      "text": "receivers",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "django-signal-dispatch-architecture-node-4",
+      "originalText": "receivers",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "django-signal-dispatch-architecture-node-5-label",
+      "type": "text",
+      "x": 198,
+      "y": 467.5,
+      "width": 44,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aP",
+      "roundness": null,
+      "seed": 586979195,
+      "version": 1,
+      "versionNonce": 1124381941,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "django-signal-dispatch-architecture"
+      },
+      "text": "send",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "django-signal-dispatch-architecture-node-5",
+      "originalText": "send",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "django-signal-dispatch-architecture-node-6-label",
+      "type": "text",
+      "x": 192.5,
+      "y": 307.5,
+      "width": 55.00000000000001,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aQ",
+      "roundness": null,
+      "seed": 1488300556,
+      "version": 1,
+      "versionNonce": 226139608,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "django-signal-dispatch-architecture"
+      },
+      "text": "asend",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "django-signal-dispatch-architecture-node-6",
+      "originalText": "asend",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "django-signal-dispatch-architecture-node-7-label",
+      "type": "text",
+      "x": 149.5,
+      "y": 147.5,
+      "width": 121.00000000000001,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aR",
+      "roundness": null,
+      "seed": 2119615657,
+      "version": 1,
+      "versionNonce": 1399667635,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "django-signal-dispatch-architecture"
+      },
+      "text": "send_robust",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "django-signal-dispatch-architecture-node-7",
+      "originalText": "send_robust",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "django-signal-dispatch-architecture-node-8-label",
+      "type": "text",
+      "x": 647.5,
+      "y": 307.5,
+      "width": 165,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aS",
+      "roundness": null,
+      "seed": 566180226,
+      "version": 1,
+      "versionNonce": 1052051958,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "django-signal-dispatch-architecture"
+      },
+      "text": "_live_receivers",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "django-signal-dispatch-architecture-node-8",
+      "originalText": "_live_receivers",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "django-signal-dispatch-architecture-node-9-label",
+      "type": "text",
+      "x": 1316,
+      "y": 677.5,
+      "width": 88,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aT",
+      "roundness": null,
+      "seed": 1528089639,
+      "version": 1,
+      "versionNonce": 1436492737,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "django-signal-dispatch-architecture"
+      },
+      "text": "_make_id",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "django-signal-dispatch-architecture-node-9",
+      "originalText": "_make_id",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "django-signal-dispatch-architecture-edge-0-label",
+      "type": "text",
+      "x": 452,
+      "y": 672,
+      "width": 52.800000000000004,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aU",
+      "roundness": null,
+      "seed": 1581308429,
+      "version": 1,
+      "versionNonce": 309598711,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "django-signal-dispatch-architecture"
+      },
+      "text": "@calls",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "django-signal-dispatch-architecture-edge-0",
+      "originalText": "@calls",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "django-signal-dispatch-architecture-edge-1-label",
+      "type": "text",
+      "x": 886.4666666666667,
+      "y": 451.8666666666667,
+      "width": 149.60000000000002,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aV",
+      "roundness": null,
+      "seed": 358175808,
+      "version": 1,
+      "versionNonce": 1688647452,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "django-signal-dispatch-architecture"
+      },
+      "text": "appends @accesses",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "django-signal-dispatch-architecture-edge-1",
+      "originalText": "appends @accesses",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "django-signal-dispatch-architecture-edge-2-label",
+      "type": "text",
+      "x": 944.6666666666667,
+      "y": 395.06666666666666,
+      "width": 149.60000000000002,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aW",
+      "roundness": null,
+      "seed": 297171695,
+      "version": 1,
+      "versionNonce": 500915017,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "django-signal-dispatch-architecture"
+      },
+      "text": "deletes @accesses",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "django-signal-dispatch-architecture-edge-2",
+      "originalText": "deletes @accesses",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "django-signal-dispatch-architecture-edge-3-label",
+      "type": "text",
+      "x": 490.4,
+      "y": 455.4,
+      "width": 52.800000000000004,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aX",
+      "roundness": null,
+      "seed": 792197098,
+      "version": 1,
+      "versionNonce": 33908926,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "django-signal-dispatch-architecture"
+      },
+      "text": "@calls",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "django-signal-dispatch-architecture-edge-3",
+      "originalText": "@calls",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "django-signal-dispatch-architecture-edge-4-label",
+      "type": "text",
+      "x": 432,
+      "y": 302,
+      "width": 52.800000000000004,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aY",
+      "roundness": null,
+      "seed": 2017739081,
+      "version": 1,
+      "versionNonce": 184242643,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "django-signal-dispatch-architecture"
+      },
+      "text": "@calls",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "django-signal-dispatch-architecture-edge-4",
+      "originalText": "@calls",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "django-signal-dispatch-architecture-edge-5-label",
+      "type": "text",
+      "x": 490.4,
+      "y": 148.60000000000002,
+      "width": 52.800000000000004,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aZ",
+      "roundness": null,
+      "seed": 263886636,
+      "version": 1,
+      "versionNonce": 1576825208,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "django-signal-dispatch-architecture"
+      },
+      "text": "@calls",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "django-signal-dispatch-architecture-edge-5",
+      "originalText": "@calls",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "django-signal-dispatch-architecture-edge-6-label",
+      "type": "text",
+      "x": 1016.3333333333335,
+      "y": 302,
+      "width": 149.60000000000002,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aa",
+      "roundness": null,
+      "seed": 1654393115,
+      "version": 1,
+      "versionNonce": 1683022869,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "django-signal-dispatch-architecture"
+      },
+      "text": "filters @accesses",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "django-signal-dispatch-architecture-edge-6",
+      "originalText": "filters @accesses",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "django-signal-dispatch-architecture-edge-7-label",
+      "type": "text",
+      "x": 1023.1999999999999,
+      "y": 688.6666666666666,
+      "width": 52.800000000000004,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "ab",
+      "roundness": null,
+      "seed": 477197926,
+      "version": 1,
+      "versionNonce": 2017307978,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "django-signal-dispatch-architecture"
+      },
+      "text": "@calls",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "django-signal-dispatch-architecture-edge-7",
+      "originalText": "@calls",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "django-signal-dispatch-architecture-edge-8-label",
+      "type": "text",
+      "x": 1106.5333333333333,
+      "y": 508.66666666666663,
+      "width": 52.800000000000004,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "ac",
+      "roundness": null,
+      "seed": 1363754693,
+      "version": 1,
+      "versionNonce": 324559311,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "django-signal-dispatch-architecture"
+      },
+      "text": "@calls",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "django-signal-dispatch-architecture-edge-8",
+      "originalText": "@calls",
+      "autoResize": true,
+      "lineHeight": 1.25
+    }
+  ],
+  "appState": {
+    "gridSize": null,
+    "viewBackgroundColor": "#ffffff"
+  },
+  "files": {},
+  "diagramos": {
+    "version": "0.2.0-rc.6",
+    "schema": 1
+  }
+}

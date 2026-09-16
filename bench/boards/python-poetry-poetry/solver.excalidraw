@@ -1,0 +1,2374 @@
+{
+  "type": "excalidraw",
+  "version": 2,
+  "source": "diagramos",
+  "elements": [
+    {
+      "id": "poetry-version-solver-title",
+      "type": "text",
+      "x": 0,
+      "y": -115,
+      "width": 277.20000000000005,
+      "height": 30,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a0",
+      "roundness": null,
+      "seed": 1066134375,
+      "version": 1,
+      "versionNonce": 601347841,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "poetry-version-solver",
+        "role": "title"
+      },
+      "text": "Poetry Version Solver",
+      "fontSize": 24,
+      "fontFamily": 5,
+      "textAlign": "left",
+      "verticalAlign": "middle",
+      "containerId": null,
+      "originalText": "Poetry Version Solver",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "poetry-version-solver-node-0",
+      "type": "rectangle",
+      "x": 20,
+      "y": 40,
+      "width": 280,
+      "height": 100,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a1",
+      "roundness": null,
+      "seed": 48600682,
+      "version": 2,
+      "versionNonce": 1012263998,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "poetry-version-solver-node-0-label"
+        },
+        {
+          "id": "poetry-version-solver-edge-0",
+          "type": "arrow"
+        },
+        {
+          "id": "poetry-version-solver-edge-1",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "poetry-version-solver",
+        "node": "solve",
+        "ref": "src/poetry/mixology/version_solver.py#solve"
+      }
+    },
+    {
+      "id": "poetry-version-solver-node-1",
+      "type": "rectangle",
+      "x": 780,
+      "y": 20,
+      "width": 180,
+      "height": 100,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a2",
+      "roundness": null,
+      "seed": 1791115195,
+      "version": 2,
+      "versionNonce": 1815702581,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "poetry-version-solver-node-1-label"
+        },
+        {
+          "id": "poetry-version-solver-edge-0",
+          "type": "arrow"
+        },
+        {
+          "id": "poetry-version-solver-edge-2",
+          "type": "arrow"
+        },
+        {
+          "id": "poetry-version-solver-edge-3",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "poetry-version-solver",
+        "node": "propagate",
+        "ref": "src/poetry/mixology/version_solver.py#_propagate"
+      }
+    },
+    {
+      "id": "poetry-version-solver-node-2",
+      "type": "rectangle",
+      "x": 1440,
+      "y": 180,
+      "width": 360,
+      "height": 100,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a3",
+      "roundness": null,
+      "seed": 640273836,
+      "version": 2,
+      "versionNonce": 789527800,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "poetry-version-solver-node-2-label"
+        },
+        {
+          "id": "poetry-version-solver-edge-2",
+          "type": "arrow"
+        },
+        {
+          "id": "poetry-version-solver-edge-4",
+          "type": "arrow"
+        },
+        {
+          "id": "poetry-version-solver-edge-5",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "poetry-version-solver",
+        "node": "propagate_incompat",
+        "ref": "src/poetry/mixology/version_solver.py#_propagate_incompatibility"
+      }
+    },
+    {
+      "id": "poetry-version-solver-node-3",
+      "type": "rectangle",
+      "x": 660,
+      "y": 360,
+      "width": 340,
+      "height": 100,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a4",
+      "roundness": null,
+      "seed": 1204620485,
+      "version": 2,
+      "versionNonce": 617982927,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "poetry-version-solver-node-3-label"
+        },
+        {
+          "id": "poetry-version-solver-edge-1",
+          "type": "arrow"
+        },
+        {
+          "id": "poetry-version-solver-edge-6",
+          "type": "arrow"
+        },
+        {
+          "id": "poetry-version-solver-edge-7",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "poetry-version-solver",
+        "node": "choose_version",
+        "ref": "src/poetry/mixology/version_solver.py#_choose_package_version"
+      }
+    },
+    {
+      "id": "poetry-version-solver-node-4",
+      "type": "rectangle",
+      "x": 1500,
+      "y": 20,
+      "width": 260,
+      "height": 80,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a5",
+      "roundness": null,
+      "seed": 909813070,
+      "version": 2,
+      "versionNonce": 12786162,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "poetry-version-solver-node-4-label"
+        },
+        {
+          "id": "poetry-version-solver-edge-3",
+          "type": "arrow"
+        },
+        {
+          "id": "poetry-version-solver-edge-8",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "poetry-version-solver",
+        "node": "resolve_conflict",
+        "ref": "src/poetry/mixology/version_solver.py#_resolve_conflict"
+      }
+    },
+    {
+      "id": "poetry-version-solver-node-5",
+      "type": "rectangle",
+      "x": 2240,
+      "y": 220,
+      "width": 220,
+      "height": 100,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a6",
+      "roundness": null,
+      "seed": 717928543,
+      "version": 1,
+      "versionNonce": 1197973753,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "poetry-version-solver-node-5-label"
+        },
+        {
+          "id": "poetry-version-solver-edge-4",
+          "type": "arrow"
+        },
+        {
+          "id": "poetry-version-solver-edge-7",
+          "type": "arrow"
+        },
+        {
+          "id": "poetry-version-solver-edge-9",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "poetry-version-solver",
+        "node": "partial_solution",
+        "ref": "src/poetry/mixology/partial_solution.py#PartialSolution"
+      }
+    },
+    {
+      "id": "poetry-version-solver-node-6",
+      "type": "rectangle",
+      "x": 2240,
+      "y": 20,
+      "width": 220,
+      "height": 100,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a7",
+      "roundness": null,
+      "seed": 167621936,
+      "version": 1,
+      "versionNonce": 356480908,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "poetry-version-solver-node-6-label"
+        },
+        {
+          "id": "poetry-version-solver-edge-5",
+          "type": "arrow"
+        },
+        {
+          "id": "poetry-version-solver-edge-8",
+          "type": "arrow"
+        },
+        {
+          "id": "poetry-version-solver-edge-11",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "poetry-version-solver",
+        "node": "incompatibility",
+        "ref": "src/poetry/mixology/incompatibility.py#Incompatibility"
+      }
+    },
+    {
+      "id": "poetry-version-solver-node-7",
+      "type": "rectangle",
+      "x": 3360,
+      "y": 40,
+      "width": 160,
+      "height": 100,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a8",
+      "roundness": null,
+      "seed": 841899961,
+      "version": 1,
+      "versionNonce": 674561411,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "poetry-version-solver-node-7-label"
+        },
+        {
+          "id": "poetry-version-solver-edge-10",
+          "type": "arrow"
+        },
+        {
+          "id": "poetry-version-solver-edge-11",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "poetry-version-solver",
+        "node": "term",
+        "ref": "src/poetry/mixology/term.py#Term"
+      }
+    },
+    {
+      "id": "poetry-version-solver-node-8",
+      "type": "rectangle",
+      "x": 2840,
+      "y": 240,
+      "width": 160,
+      "height": 80,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a9",
+      "roundness": null,
+      "seed": 1849680946,
+      "version": 1,
+      "versionNonce": 2059381734,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "poetry-version-solver-node-8-label"
+        },
+        {
+          "id": "poetry-version-solver-edge-9",
+          "type": "arrow"
+        },
+        {
+          "id": "poetry-version-solver-edge-10",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "poetry-version-solver",
+        "node": "assignment",
+        "ref": "src/poetry/mixology/assignment.py#Assignment"
+      }
+    },
+    {
+      "id": "poetry-version-solver-node-9",
+      "type": "rectangle",
+      "x": 1440,
+      "y": 360,
+      "width": 220,
+      "height": 80,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aA",
+      "roundness": null,
+      "seed": 84038563,
+      "version": 2,
+      "versionNonce": 848376125,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "poetry-version-solver-node-9-label"
+        },
+        {
+          "id": "poetry-version-solver-edge-6",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "poetry-version-solver",
+        "node": "dependency_cache",
+        "ref": "src/poetry/mixology/version_solver.py#DependencyCache"
+      }
+    },
+    {
+      "id": "poetry-version-solver-edge-0",
+      "type": "arrow",
+      "x": 292,
+      "y": 68.66666666666667,
+      "width": 483.4666666666666,
+      "height": 0,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aB",
+      "roundness": null,
+      "seed": 787593277,
+      "version": 1,
+      "versionNonce": 734653223,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "poetry-version-solver-edge-0-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "poetry-version-solver",
+        "edge": {
+          "from": "solve",
+          "to": "propagate",
+          "claim": "calls"
+        }
+      },
+      "points": [
+        [
+          0.5,
+          0
+        ],
+        [
+          241.73333333333335,
+          0
+        ],
+        [
+          482.9666666666666,
+          0
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "poetry-version-solver-node-0",
+        "focus": -0.4266666666666665,
+        "gap": 8
+      },
+      "endBinding": {
+        "elementId": "poetry-version-solver-node-1",
+        "focus": 0.02666666666666638,
+        "gap": 4.533333333333417
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "poetry-version-solver-edge-1",
+      "type": "arrow",
+      "x": 292,
+      "y": 102,
+      "width": 376.79999999999995,
+      "height": 306.6666666666667,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aC",
+      "roundness": null,
+      "seed": 1180479908,
+      "version": 1,
+      "versionNonce": 1790502192,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "poetry-version-solver-edge-1-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "poetry-version-solver",
+        "edge": {
+          "from": "solve",
+          "to": "choose_version",
+          "claim": "calls"
+        }
+      },
+      "points": [
+        [
+          0.5,
+          0
+        ],
+        [
+          32,
+          0
+        ],
+        [
+          32,
+          306.6666666666667
+        ],
+        [
+          35.06666666666666,
+          306.6666666666667
+        ],
+        [
+          205.93333333333328,
+          306.6666666666667
+        ],
+        [
+          291.36666666666656,
+          306.6666666666667
+        ],
+        [
+          376.29999999999995,
+          306.6666666666667
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "poetry-version-solver-node-0",
+        "focus": 0.23999999999999996,
+        "gap": 8
+      },
+      "endBinding": {
+        "elementId": "poetry-version-solver-node-3",
+        "focus": 0.026666666666665152,
+        "gap": 8.799999999999955
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "poetry-version-solver-edge-2",
+      "type": "arrow",
+      "x": 955.4666666666666,
+      "y": 85.33333333333333,
+      "width": 491.73333333333346,
+      "height": 136.66666666666669,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aD",
+      "roundness": null,
+      "seed": 2035925459,
+      "version": 1,
+      "versionNonce": 1013077549,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "poetry-version-solver-edge-2-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "poetry-version-solver",
+        "edge": {
+          "from": "propagate",
+          "to": "propagate_incompat",
+          "claim": "calls"
+        }
+      },
+      "points": [
+        [
+          0.5,
+          0
+        ],
+        [
+          85.33333333333337,
+          0
+        ],
+        [
+          85.33333333333337,
+          136.66666666666669
+        ],
+        [
+          177.53333333333342,
+          136.66666666666669
+        ],
+        [
+          334.6333333333333,
+          136.66666666666669
+        ],
+        [
+          413.1833333333335,
+          136.66666666666669
+        ],
+        [
+          491.23333333333346,
+          136.66666666666669
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "poetry-version-solver-node-1",
+        "focus": 0.3066666666666668,
+        "gap": 4.533333333333417
+      },
+      "endBinding": {
+        "elementId": "poetry-version-solver-node-2",
+        "focus": 0.15999999999999978,
+        "gap": 7.2000000000000455
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "poetry-version-solver-edge-3",
+      "type": "arrow",
+      "x": 955.4666666666666,
+      "y": 52,
+      "width": 541.7333333333335,
+      "height": 0,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aE",
+      "roundness": null,
+      "seed": 1559056546,
+      "version": 1,
+      "versionNonce": 1212353686,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "poetry-version-solver-edge-3-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "poetry-version-solver",
+        "edge": {
+          "from": "propagate",
+          "to": "resolve_conflict",
+          "claim": "calls"
+        }
+      },
+      "points": [
+        [
+          0.5,
+          0
+        ],
+        [
+          270.8666666666667,
+          0
+        ],
+        [
+          541.2333333333335,
+          0
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "poetry-version-solver-node-1",
+        "focus": -0.3599999999999999,
+        "gap": 4.533333333333417
+      },
+      "endBinding": {
+        "elementId": "poetry-version-solver-node-4",
+        "focus": 0.2,
+        "gap": 2.7999999999999545
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "poetry-version-solver-edge-4",
+      "type": "arrow",
+      "x": 1807.2,
+      "y": 238.66666666666666,
+      "width": 429.60000000000014,
+      "height": 23.46666666666667,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aF",
+      "roundness": null,
+      "seed": 1416243217,
+      "version": 1,
+      "versionNonce": 538168091,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "poetry-version-solver-edge-4-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "poetry-version-solver",
+        "edge": {
+          "from": "propagate_incompat",
+          "to": "partial_solution",
+          "claim": "calls"
+        }
+      },
+      "points": [
+        [
+          0.5,
+          0
+        ],
+        [
+          32,
+          0
+        ],
+        [
+          32,
+          23.46666666666667
+        ],
+        [
+          203.06666666666683,
+          23.46666666666667
+        ],
+        [
+          259.7000000000005,
+          23.46666666666667
+        ],
+        [
+          316.3333333333337,
+          23.46666666666667
+        ],
+        [
+          429.10000000000014,
+          23.46666666666667
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "poetry-version-solver-node-2",
+        "focus": 0.17333333333333356,
+        "gap": 7.2000000000000455
+      },
+      "endBinding": {
+        "elementId": "poetry-version-solver-node-5",
+        "focus": 0.15733333333333469,
+        "gap": 3.199999999999818
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "poetry-version-solver-edge-5",
+      "type": "arrow",
+      "x": 1807.2,
+      "y": 205.33333333333331,
+      "width": 429.60000000000014,
+      "height": 119.99999999999999,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aG",
+      "roundness": null,
+      "seed": 739062120,
+      "version": 1,
+      "versionNonce": 925808196,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "poetry-version-solver-edge-5-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "poetry-version-solver",
+        "edge": {
+          "from": "propagate_incompat",
+          "to": "incompatibility",
+          "claim": "takes"
+        }
+      },
+      "points": [
+        [
+          0.5,
+          0
+        ],
+        [
+          137.39999999999986,
+          0
+        ],
+        [
+          206.0999999999999,
+          0
+        ],
+        [
+          274.79999999999995,
+          0
+        ],
+        [
+          321.60000000000014,
+          0
+        ],
+        [
+          321.60000000000014,
+          -119.99999999999999
+        ],
+        [
+          429.10000000000014,
+          -119.99999999999999
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "poetry-version-solver-node-2",
+        "focus": -0.49333333333333307,
+        "gap": 7.2000000000000455
+      },
+      "endBinding": {
+        "elementId": "poetry-version-solver-node-6",
+        "focus": -0.30666666666666503,
+        "gap": 3.199999999999818
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "poetry-version-solver-edge-6",
+      "type": "arrow",
+      "x": 1008.8,
+      "y": 392,
+      "width": 438.4000000000001,
+      "height": 0,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aH",
+      "roundness": null,
+      "seed": 1289368727,
+      "version": 1,
+      "versionNonce": 1394383985,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "poetry-version-solver-edge-6-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "poetry-version-solver",
+        "edge": {
+          "from": "choose_version",
+          "to": "dependency_cache",
+          "claim": "calls"
+        }
+      },
+      "points": [
+        [
+          0.5,
+          0
+        ],
+        [
+          219.20000000000005,
+          0
+        ],
+        [
+          437.9000000000001,
+          0
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "poetry-version-solver-node-3",
+        "focus": -0.3600000000000002,
+        "gap": 8.799999999999955
+      },
+      "endBinding": {
+        "elementId": "poetry-version-solver-node-9",
+        "focus": 0.2,
+        "gap": 7.2000000000000455
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "poetry-version-solver-edge-7",
+      "type": "arrow",
+      "x": 1008.8,
+      "y": 425.33333333333337,
+      "width": 1228.0000000000002,
+      "height": 216.5333333333333,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aI",
+      "roundness": null,
+      "seed": 1346604486,
+      "version": 1,
+      "versionNonce": 737730090,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "poetry-version-solver-edge-7-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "poetry-version-solver",
+        "edge": {
+          "from": "choose_version",
+          "to": "partial_solution",
+          "claim": "calls"
+        }
+      },
+      "points": [
+        [
+          0.5,
+          0
+        ],
+        [
+          32,
+          0
+        ],
+        [
+          32,
+          86.66666666666663
+        ],
+        [
+          678.9333333333336,
+          86.66666666666663
+        ],
+        [
+          1120.0000000000002,
+          86.66666666666663
+        ],
+        [
+          1120.0000000000002,
+          -129.86666666666667
+        ],
+        [
+          1227.5000000000002,
+          -129.86666666666667
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "poetry-version-solver-node-3",
+        "focus": 0.3066666666666666,
+        "gap": 8.799999999999955
+      },
+      "endBinding": {
+        "elementId": "poetry-version-solver-node-5",
+        "focus": -0.5093333333333331,
+        "gap": 3.199999999999818
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "poetry-version-solver-edge-8",
+      "type": "arrow",
+      "x": 1757.2,
+      "y": 52,
+      "width": 479.60000000000014,
+      "height": 0,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aJ",
+      "roundness": null,
+      "seed": 1453773813,
+      "version": 1,
+      "versionNonce": 363979903,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "poetry-version-solver-edge-8-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "poetry-version-solver",
+        "edge": {
+          "from": "resolve_conflict",
+          "to": "incompatibility",
+          "claim": "builds"
+        }
+      },
+      "points": [
+        [
+          0.5,
+          0
+        ],
+        [
+          239.79999999999995,
+          0
+        ],
+        [
+          479.10000000000014,
+          0
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "poetry-version-solver-node-4",
+        "focus": -0.2,
+        "gap": 2.7999999999999545
+      },
+      "endBinding": {
+        "elementId": "poetry-version-solver-node-6",
+        "focus": 0.35999999999999927,
+        "gap": 3.199999999999818
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "poetry-version-solver-edge-9",
+      "type": "arrow",
+      "x": 2456.8,
+      "y": 278.8,
+      "width": 376.8000000000002,
+      "height": 0,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aK",
+      "roundness": null,
+      "seed": 784552668,
+      "version": 1,
+      "versionNonce": 822038248,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "poetry-version-solver-edge-9-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "poetry-version-solver",
+        "edge": {
+          "from": "partial_solution",
+          "to": "assignment",
+          "claim": "holds"
+        }
+      },
+      "points": [
+        [
+          0.5,
+          0
+        ],
+        [
+          188.4000000000001,
+          0
+        ],
+        [
+          376.3000000000002,
+          0
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "poetry-version-solver-node-5",
+        "focus": 0.17600000000000102,
+        "gap": 3.199999999999818
+      },
+      "endBinding": {
+        "elementId": "poetry-version-solver-node-8",
+        "focus": 0.030000000000000852,
+        "gap": 6.399999999999636
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "poetry-version-solver-edge-10",
+      "type": "arrow",
+      "x": 2993.6000000000004,
+      "y": 278.8,
+      "width": 359.1999999999998,
+      "height": 176.8,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aL",
+      "roundness": null,
+      "seed": 1107625170,
+      "version": 1,
+      "versionNonce": 1440268550,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "poetry-version-solver-edge-10-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "poetry-version-solver",
+        "edge": {
+          "from": "assignment",
+          "to": "term",
+          "claim": "conforms"
+        }
+      },
+      "points": [
+        [
+          0.5,
+          0
+        ],
+        [
+          251.19999999999982,
+          0
+        ],
+        [
+          251.19999999999982,
+          -16.800000000000068
+        ],
+        [
+          251.19999999999982,
+          -176.8
+        ],
+        [
+          358.6999999999998,
+          -176.8
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "poetry-version-solver-node-8",
+        "focus": -0.030000000000000852,
+        "gap": 6.399999999999636
+      },
+      "endBinding": {
+        "elementId": "poetry-version-solver-node-7",
+        "focus": -0.23999999999999835,
+        "gap": 7.199999999999818
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "poetry-version-solver-edge-11",
+      "type": "arrow",
+      "x": 2456.8,
+      "y": 68.66666666666667,
+      "width": 896,
+      "height": 0,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aM",
+      "roundness": null,
+      "seed": 1447889731,
+      "version": 1,
+      "versionNonce": 229262941,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "poetry-version-solver-edge-11-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "poetry-version-solver",
+        "edge": {
+          "from": "incompatibility",
+          "to": "term",
+          "claim": "holds"
+        }
+      },
+      "points": [
+        [
+          0.5,
+          0
+        ],
+        [
+          448,
+          0
+        ],
+        [
+          895.5,
+          0
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "poetry-version-solver-node-6",
+        "focus": -0.02666666666666711,
+        "gap": 3.199999999999818
+      },
+      "endBinding": {
+        "elementId": "poetry-version-solver-node-7",
+        "focus": 0.42666666666666553,
+        "gap": 7.199999999999818
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "poetry-version-solver-node-0-label",
+      "type": "text",
+      "x": 44.499999999999986,
+      "y": 77.5,
+      "width": 231.00000000000003,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aN",
+      "roundness": null,
+      "seed": 149065627,
+      "version": 1,
+      "versionNonce": 626433941,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "poetry-version-solver"
+      },
+      "text": "VersionSolver.solve()",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "poetry-version-solver-node-0",
+      "originalText": "VersionSolver.solve()",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "poetry-version-solver-node-1-label",
+      "type": "text",
+      "x": 804,
+      "y": 57.5,
+      "width": 132,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aO",
+      "roundness": null,
+      "seed": 1119354086,
+      "version": 1,
+      "versionNonce": 960719050,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "poetry-version-solver"
+      },
+      "text": "_propagate()",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "poetry-version-solver-node-1",
+      "originalText": "_propagate()",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "poetry-version-solver-node-2-label",
+      "type": "text",
+      "x": 1466,
+      "y": 217.5,
+      "width": 308,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aP",
+      "roundness": null,
+      "seed": 512411593,
+      "version": 1,
+      "versionNonce": 1275137363,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "poetry-version-solver"
+      },
+      "text": "_propagate_incompatibility()",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "poetry-version-solver-node-2",
+      "originalText": "_propagate_incompatibility()",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "poetry-version-solver-node-3-label",
+      "type": "text",
+      "x": 692.5,
+      "y": 397.5,
+      "width": 275,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aQ",
+      "roundness": null,
+      "seed": 906042796,
+      "version": 1,
+      "versionNonce": 520236280,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "poetry-version-solver"
+      },
+      "text": "_choose_package_version()",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "poetry-version-solver-node-3",
+      "originalText": "_choose_package_version()",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "poetry-version-solver-node-4-label",
+      "type": "text",
+      "x": 1525.5,
+      "y": 47.5,
+      "width": 209.00000000000003,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aR",
+      "roundness": null,
+      "seed": 939327855,
+      "version": 1,
+      "versionNonce": 1591809737,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "poetry-version-solver"
+      },
+      "text": "_resolve_conflict()",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "poetry-version-solver-node-4",
+      "originalText": "_resolve_conflict()",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "poetry-version-solver-node-5-label",
+      "type": "text",
+      "x": 2267.5,
+      "y": 257.5,
+      "width": 165,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aS",
+      "roundness": null,
+      "seed": 1434353258,
+      "version": 1,
+      "versionNonce": 1124803646,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "poetry-version-solver"
+      },
+      "text": "PartialSolution",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "poetry-version-solver-node-5",
+      "originalText": "PartialSolution",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "poetry-version-solver-node-6-label",
+      "type": "text",
+      "x": 2267.5,
+      "y": 57.5,
+      "width": 165,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aT",
+      "roundness": null,
+      "seed": 75980941,
+      "version": 1,
+      "versionNonce": 1400493431,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "poetry-version-solver"
+      },
+      "text": "Incompatibility",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "poetry-version-solver-node-6",
+      "originalText": "Incompatibility",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "poetry-version-solver-node-7-label",
+      "type": "text",
+      "x": 3418,
+      "y": 77.5,
+      "width": 44,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aU",
+      "roundness": null,
+      "seed": 1000331968,
+      "version": 1,
+      "versionNonce": 632058524,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "poetry-version-solver"
+      },
+      "text": "Term",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "poetry-version-solver-node-7",
+      "originalText": "Term",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "poetry-version-solver-node-8-label",
+      "type": "text",
+      "x": 2865,
+      "y": 267.5,
+      "width": 110.00000000000001,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aV",
+      "roundness": null,
+      "seed": 2031456595,
+      "version": 1,
+      "versionNonce": 1359609005,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "poetry-version-solver"
+      },
+      "text": "Assignment",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "poetry-version-solver-node-8",
+      "originalText": "Assignment",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "poetry-version-solver-node-9-label",
+      "type": "text",
+      "x": 1467.5,
+      "y": 387.5,
+      "width": 165,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aW",
+      "roundness": null,
+      "seed": 903812286,
+      "version": 1,
+      "versionNonce": 1319397730,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "poetry-version-solver"
+      },
+      "text": "DependencyCache",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "poetry-version-solver-node-9",
+      "originalText": "DependencyCache",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "poetry-version-solver-edge-0-label",
+      "type": "text",
+      "x": 485.33333333333337,
+      "y": 58.66666666666667,
+      "width": 96.80000000000001,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aX",
+      "roundness": null,
+      "seed": 1326085876,
+      "version": 1,
+      "versionNonce": 1272901824,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "poetry-version-solver"
+      },
+      "text": "loop @calls",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "poetry-version-solver-edge-0",
+      "originalText": "loop @calls",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "poetry-version-solver-edge-1-label",
+      "type": "text",
+      "x": 278.66666666666663,
+      "y": 398.6666666666667,
+      "width": 96.80000000000001,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aY",
+      "roundness": null,
+      "seed": 656191793,
+      "version": 1,
+      "versionNonce": 790709179,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "poetry-version-solver"
+      },
+      "text": "loop @calls",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "poetry-version-solver-edge-1",
+      "originalText": "loop @calls",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "poetry-version-solver-edge-2-label",
+      "type": "text",
+      "x": 1067,
+      "y": 212,
+      "width": 132,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aZ",
+      "roundness": null,
+      "seed": 561785646,
+      "version": 1,
+      "versionNonce": 1986975058,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "poetry-version-solver"
+      },
+      "text": "for each @calls",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "poetry-version-solver-edge-2",
+      "originalText": "for each @calls",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "poetry-version-solver-edge-3-label",
+      "type": "text",
+      "x": 1147.1333333333332,
+      "y": 42,
+      "width": 158.4,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aa",
+      "roundness": null,
+      "seed": 1762687363,
+      "version": 1,
+      "versionNonce": 18133917,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "poetry-version-solver"
+      },
+      "text": "on conflict @calls",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "poetry-version-solver-edge-3",
+      "originalText": "on conflict @calls",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "poetry-version-solver-edge-4-label",
+      "type": "text",
+      "x": 1935.466666666667,
+      "y": 252.13333333333333,
+      "width": 149.60000000000002,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "ab",
+      "roundness": null,
+      "seed": 908854120,
+      "version": 1,
+      "versionNonce": 632507460,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "poetry-version-solver"
+      },
+      "text": "relation() @calls",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "poetry-version-solver-edge-4",
+      "originalText": "relation() @calls",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "poetry-version-solver-edge-5-label",
+      "type": "text",
+      "x": 2029.2,
+      "y": 195.33333333333331,
+      "width": 105.60000000000001,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "ac",
+      "roundness": null,
+      "seed": 1743501749,
+      "version": 1,
+      "versionNonce": 128004415,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "poetry-version-solver"
+      },
+      "text": "terms @takes",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "poetry-version-solver-edge-5",
+      "originalText": "terms @takes",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "poetry-version-solver-edge-6-label",
+      "type": "text",
+      "x": 1170.8,
+      "y": 382,
+      "width": 114.4,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "ad",
+      "roundness": null,
+      "seed": 1152203666,
+      "version": 1,
+      "versionNonce": 685808838,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "poetry-version-solver"
+      },
+      "text": "search @calls",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "poetry-version-solver-edge-6",
+      "originalText": "search @calls",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "poetry-version-solver-edge-7-label",
+      "type": "text",
+      "x": 1630.5333333333335,
+      "y": 502,
+      "width": 114.4,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "ae",
+      "roundness": null,
+      "seed": 1025796663,
+      "version": 1,
+      "versionNonce": 606974865,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "poetry-version-solver"
+      },
+      "text": "decide @calls",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "poetry-version-solver-edge-7",
+      "originalText": "decide @calls",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "poetry-version-solver-edge-8-label",
+      "type": "text",
+      "x": 1948.6,
+      "y": 42,
+      "width": 96.80000000000001,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "af",
+      "roundness": null,
+      "seed": 1027770268,
+      "version": 1,
+      "versionNonce": 1128173480,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "poetry-version-solver"
+      },
+      "text": "new @builds",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "poetry-version-solver-edge-8",
+      "originalText": "new @builds",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "poetry-version-solver-edge-9-label",
+      "type": "text",
+      "x": 2596.8,
+      "y": 268.8,
+      "width": 96.80000000000001,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "ag",
+      "roundness": null,
+      "seed": 1853768825,
+      "version": 1,
+      "versionNonce": 62780995,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "poetry-version-solver"
+      },
+      "text": "list @holds",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "poetry-version-solver-edge-9",
+      "originalText": "list @holds",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "poetry-version-solver-edge-10-label",
+      "type": "text",
+      "x": 3205.2000000000003,
+      "y": 251.99999999999994,
+      "width": 79.2,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "ah",
+      "roundness": null,
+      "seed": 1616708211,
+      "version": 1,
+      "versionNonce": 758380621,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "poetry-version-solver"
+      },
+      "text": "@conforms",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "poetry-version-solver-edge-10",
+      "originalText": "@conforms",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "poetry-version-solver-edge-11-label",
+      "type": "text",
+      "x": 2852,
+      "y": 58.66666666666667,
+      "width": 105.60000000000001,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "ai",
+      "roundness": null,
+      "seed": 1080272478,
+      "version": 1,
+      "versionNonce": 1411878786,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "poetry-version-solver"
+      },
+      "text": "terms @holds",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "poetry-version-solver-edge-11",
+      "originalText": "terms @holds",
+      "autoResize": true,
+      "lineHeight": 1.25
+    }
+  ],
+  "appState": {
+    "gridSize": null,
+    "viewBackgroundColor": "#ffffff"
+  },
+  "files": {},
+  "diagramos": {
+    "version": "0.2.0-rc.6",
+    "schema": 1
+  }
+}

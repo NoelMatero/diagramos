@@ -1,0 +1,1969 @@
+{
+  "type": "excalidraw",
+  "version": 2,
+  "source": "diagramos",
+  "elements": [
+    {
+      "id": "flask-request-dispatch-flow-title",
+      "type": "text",
+      "x": 0,
+      "y": -115,
+      "width": 356.40000000000003,
+      "height": 30,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a0",
+      "roundness": null,
+      "seed": 716791186,
+      "version": 1,
+      "versionNonce": 1308238534,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "flask-request-dispatch-flow",
+        "role": "title"
+      },
+      "text": "Flask Request Dispatch Flow",
+      "fontSize": 24,
+      "fontFamily": 5,
+      "textAlign": "left",
+      "verticalAlign": "middle",
+      "containerId": null,
+      "originalText": "Flask Request Dispatch Flow",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "flask-request-dispatch-flow-node-0",
+      "type": "rectangle",
+      "x": 20,
+      "y": 40,
+      "width": 160,
+      "height": 80,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a1",
+      "roundness": null,
+      "seed": 2065905653,
+      "version": 1,
+      "versionNonce": 92491903,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "flask-request-dispatch-flow-node-0-label"
+        },
+        {
+          "id": "flask-request-dispatch-flow-edge-0",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "flask-request-dispatch-flow",
+        "node": "call",
+        "ref": "src/flask/app.py#__call__"
+      }
+    },
+    {
+      "id": "flask-request-dispatch-flow-node-1",
+      "type": "rectangle",
+      "x": 500,
+      "y": 20,
+      "width": 180,
+      "height": 120,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a2",
+      "roundness": null,
+      "seed": 1396684508,
+      "version": 1,
+      "versionNonce": 550550248,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "flask-request-dispatch-flow-node-1-label"
+        },
+        {
+          "id": "flask-request-dispatch-flow-edge-0",
+          "type": "arrow"
+        },
+        {
+          "id": "flask-request-dispatch-flow-edge-1",
+          "type": "arrow"
+        },
+        {
+          "id": "flask-request-dispatch-flow-edge-3",
+          "type": "arrow"
+        },
+        {
+          "id": "flask-request-dispatch-flow-edge-5",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "flask-request-dispatch-flow",
+        "node": "wsgi_app",
+        "ref": "src/flask/app.py#wsgi_app"
+      }
+    },
+    {
+      "id": "flask-request-dispatch-flow-node-2",
+      "type": "rectangle",
+      "x": 1040,
+      "y": 20,
+      "width": 220,
+      "height": 80,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a3",
+      "roundness": null,
+      "seed": 70509227,
+      "version": 1,
+      "versionNonce": 641642917,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "flask-request-dispatch-flow-node-2-label"
+        },
+        {
+          "id": "flask-request-dispatch-flow-edge-1",
+          "type": "arrow"
+        },
+        {
+          "id": "flask-request-dispatch-flow-edge-2",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "flask-request-dispatch-flow",
+        "node": "request_context",
+        "ref": "src/flask/app.py#request_context"
+      }
+    },
+    {
+      "id": "flask-request-dispatch-flow-node-3",
+      "type": "rectangle",
+      "x": 1640,
+      "y": 20,
+      "width": 220,
+      "height": 80,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a4",
+      "roundness": null,
+      "seed": 1124788506,
+      "version": 1,
+      "versionNonce": 2102119150,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "flask-request-dispatch-flow-node-3-label"
+        },
+        {
+          "id": "flask-request-dispatch-flow-edge-2",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "flask-request-dispatch-flow",
+        "node": "context_obj",
+        "ref": "src/flask/ctx.py#AppContext"
+      }
+    },
+    {
+      "id": "flask-request-dispatch-flow-node-4",
+      "type": "rectangle",
+      "x": 1040,
+      "y": 500,
+      "width": 240,
+      "height": 80,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a5",
+      "roundness": null,
+      "seed": 184719017,
+      "version": 1,
+      "versionNonce": 1172885939,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "flask-request-dispatch-flow-node-4-label"
+        },
+        {
+          "id": "flask-request-dispatch-flow-edge-3",
+          "type": "arrow"
+        },
+        {
+          "id": "flask-request-dispatch-flow-edge-4",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "flask-request-dispatch-flow",
+        "node": "context_push",
+        "ref": "src/flask/ctx.py#push"
+      }
+    },
+    {
+      "id": "flask-request-dispatch-flow-node-5",
+      "type": "rectangle",
+      "x": 1640,
+      "y": 500,
+      "width": 180,
+      "height": 80,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a6",
+      "roundness": null,
+      "seed": 1987406048,
+      "version": 1,
+      "versionNonce": 1343871804,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "flask-request-dispatch-flow-node-5-label"
+        },
+        {
+          "id": "flask-request-dispatch-flow-edge-4",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "flask-request-dispatch-flow",
+        "node": "match_request",
+        "ref": "src/flask/ctx.py#match_request"
+      }
+    },
+    {
+      "id": "flask-request-dispatch-flow-node-6",
+      "type": "rectangle",
+      "x": 1020,
+      "y": 180,
+      "width": 280,
+      "height": 100,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a7",
+      "roundness": null,
+      "seed": 1463996623,
+      "version": 1,
+      "versionNonce": 1393796265,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "flask-request-dispatch-flow-node-6-label"
+        },
+        {
+          "id": "flask-request-dispatch-flow-edge-5",
+          "type": "arrow"
+        },
+        {
+          "id": "flask-request-dispatch-flow-edge-6",
+          "type": "arrow"
+        },
+        {
+          "id": "flask-request-dispatch-flow-edge-7",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "flask-request-dispatch-flow",
+        "node": "full_dispatch",
+        "ref": "src/flask/app.py#full_dispatch_request"
+      }
+    },
+    {
+      "id": "flask-request-dispatch-flow-node-7",
+      "type": "rectangle",
+      "x": 1640,
+      "y": 180,
+      "width": 180,
+      "height": 80,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a8",
+      "roundness": null,
+      "seed": 2071352702,
+      "version": 1,
+      "versionNonce": 423896354,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "flask-request-dispatch-flow-node-7-label"
+        },
+        {
+          "id": "flask-request-dispatch-flow-edge-6",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "flask-request-dispatch-flow",
+        "node": "dispatch",
+        "ref": "src/flask/app.py#dispatch_request"
+      }
+    },
+    {
+      "id": "flask-request-dispatch-flow-node-8",
+      "type": "rectangle",
+      "x": 2220,
+      "y": 340,
+      "width": 220,
+      "height": 80,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a9",
+      "roundness": null,
+      "seed": 1399725117,
+      "version": 1,
+      "versionNonce": 463165223,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "flask-request-dispatch-flow-node-8-label"
+        },
+        {
+          "id": "flask-request-dispatch-flow-edge-8",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "flask-request-dispatch-flow",
+        "node": "make_response",
+        "ref": "src/flask/app.py#make_response"
+      }
+    },
+    {
+      "id": "flask-request-dispatch-flow-node-9",
+      "type": "rectangle",
+      "x": 1640,
+      "y": 340,
+      "width": 240,
+      "height": 80,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aA",
+      "roundness": null,
+      "seed": 1792611748,
+      "version": 1,
+      "versionNonce": 1519014192,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "flask-request-dispatch-flow-node-9-label"
+        },
+        {
+          "id": "flask-request-dispatch-flow-edge-7",
+          "type": "arrow"
+        },
+        {
+          "id": "flask-request-dispatch-flow-edge-8",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "flask-request-dispatch-flow",
+        "node": "finalize",
+        "ref": "src/flask/app.py#finalize_request"
+      }
+    },
+    {
+      "id": "flask-request-dispatch-flow-edge-0",
+      "type": "arrow",
+      "x": 172,
+      "y": 82,
+      "width": 332.8,
+      "height": 0,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aB",
+      "roundness": null,
+      "seed": 366238554,
+      "version": 1,
+      "versionNonce": 551772718,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "flask-request-dispatch-flow-edge-0-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "flask-request-dispatch-flow",
+        "edge": {
+          "from": "call",
+          "to": "wsgi_app",
+          "claim": "calls"
+        }
+      },
+      "points": [
+        [
+          0.5,
+          0
+        ],
+        [
+          166.39999999999998,
+          0
+        ],
+        [
+          332.3,
+          0
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "flask-request-dispatch-flow-node-0",
+        "focus": 0.05,
+        "gap": 8
+      },
+      "endBinding": {
+        "elementId": "flask-request-dispatch-flow-node-1",
+        "focus": -0.03333333333333334,
+        "gap": 4.800000000000011
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "flask-request-dispatch-flow-edge-1",
+      "type": "arrow",
+      "x": 684.8,
+      "y": 52,
+      "width": 362.79999999999995,
+      "height": 0,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aC",
+      "roundness": null,
+      "seed": 1777316075,
+      "version": 1,
+      "versionNonce": 216241893,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "flask-request-dispatch-flow-edge-1-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "flask-request-dispatch-flow",
+        "edge": {
+          "from": "wsgi_app",
+          "to": "request_context",
+          "claim": "calls"
+        }
+      },
+      "points": [
+        [
+          0.5,
+          0
+        ],
+        [
+          181.39999999999998,
+          0
+        ],
+        [
+          362.29999999999995,
+          0
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "flask-request-dispatch-flow-node-1",
+        "focus": -0.4666666666666667,
+        "gap": 4.7999999999999545
+      },
+      "endBinding": {
+        "elementId": "flask-request-dispatch-flow-node-2",
+        "focus": 0.2,
+        "gap": 7.599999999999909
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "flask-request-dispatch-flow-edge-2",
+      "type": "arrow",
+      "x": 1267.6,
+      "y": 52,
+      "width": 371.5999999999999,
+      "height": 0,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aD",
+      "roundness": null,
+      "seed": 956007708,
+      "version": 1,
+      "versionNonce": 125149224,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "flask-request-dispatch-flow-edge-2-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "flask-request-dispatch-flow",
+        "edge": {
+          "from": "request_context",
+          "to": "context_obj",
+          "claim": "builds"
+        }
+      },
+      "points": [
+        [
+          0.5,
+          0
+        ],
+        [
+          185.79999999999995,
+          0
+        ],
+        [
+          371.0999999999999,
+          0
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "flask-request-dispatch-flow-node-2",
+        "focus": -0.2,
+        "gap": 7.599999999999909
+      },
+      "endBinding": {
+        "elementId": "flask-request-dispatch-flow-node-3",
+        "focus": 0.2,
+        "gap": 1
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "flask-request-dispatch-flow-edge-3",
+      "type": "arrow",
+      "x": 684.8,
+      "y": 112,
+      "width": 352.79999999999995,
+      "height": 420,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aE",
+      "roundness": null,
+      "seed": 1307252533,
+      "version": 1,
+      "versionNonce": 413229503,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "flask-request-dispatch-flow-edge-3-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "flask-request-dispatch-flow",
+        "edge": {
+          "from": "wsgi_app",
+          "to": "context_push",
+          "claim": "calls"
+        }
+      },
+      "points": [
+        [
+          0.5,
+          0
+        ],
+        [
+          32,
+          0
+        ],
+        [
+          32,
+          354.4
+        ],
+        [
+          32,
+          420
+        ],
+        [
+          352.29999999999995,
+          420
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "flask-request-dispatch-flow-node-1",
+        "focus": 0.5333333333333334,
+        "gap": 4.7999999999999545
+      },
+      "endBinding": {
+        "elementId": "flask-request-dispatch-flow-node-4",
+        "focus": 0.2,
+        "gap": 2.400000000000091
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "flask-request-dispatch-flow-edge-4",
+      "type": "arrow",
+      "x": 1277.6,
+      "y": 532,
+      "width": 361.5999999999999,
+      "height": 0,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aF",
+      "roundness": null,
+      "seed": 888242110,
+      "version": 1,
+      "versionNonce": 1487067746,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "flask-request-dispatch-flow-edge-4-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "flask-request-dispatch-flow",
+        "edge": {
+          "from": "context_push",
+          "to": "match_request",
+          "claim": "calls"
+        }
+      },
+      "points": [
+        [
+          0.5,
+          0
+        ],
+        [
+          180.79999999999995,
+          0
+        ],
+        [
+          361.0999999999999,
+          0
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "flask-request-dispatch-flow-node-4",
+        "focus": -0.2,
+        "gap": 2.400000000000091
+      },
+      "endBinding": {
+        "elementId": "flask-request-dispatch-flow-node-5",
+        "focus": 0.19999999999999998,
+        "gap": 1
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "flask-request-dispatch-flow-edge-5",
+      "type": "arrow",
+      "x": 684.8,
+      "y": 82,
+      "width": 332.79999999999995,
+      "height": 146.66666666666669,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aG",
+      "roundness": null,
+      "seed": 1064793359,
+      "version": 1,
+      "versionNonce": 543937769,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "flask-request-dispatch-flow-edge-5-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "flask-request-dispatch-flow",
+        "edge": {
+          "from": "wsgi_app",
+          "to": "full_dispatch",
+          "claim": "calls"
+        }
+      },
+      "points": [
+        [
+          0.5,
+          0
+        ],
+        [
+          56,
+          0
+        ],
+        [
+          56,
+          146.66666666666669
+        ],
+        [
+          93.0666666666666,
+          146.66666666666669
+        ],
+        [
+          153,
+          146.66666666666669
+        ],
+        [
+          212.93333333333328,
+          146.66666666666669
+        ],
+        [
+          332.29999999999995,
+          146.66666666666669
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "flask-request-dispatch-flow-node-1",
+        "focus": 0.03333333333333334,
+        "gap": 4.7999999999999545
+      },
+      "endBinding": {
+        "elementId": "flask-request-dispatch-flow-node-6",
+        "focus": 0.026666666666666786,
+        "gap": 2.400000000000091
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "flask-request-dispatch-flow-edge-6",
+      "type": "arrow",
+      "x": 1297.6,
+      "y": 212,
+      "width": 341.5999999999999,
+      "height": 0,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aH",
+      "roundness": null,
+      "seed": 1588305952,
+      "version": 1,
+      "versionNonce": 1899166332,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "flask-request-dispatch-flow-edge-6-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "flask-request-dispatch-flow",
+        "edge": {
+          "from": "full_dispatch",
+          "to": "dispatch",
+          "claim": "calls"
+        }
+      },
+      "points": [
+        [
+          0.5,
+          0
+        ],
+        [
+          170.79999999999995,
+          0
+        ],
+        [
+          341.0999999999999,
+          0
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "flask-request-dispatch-flow-node-6",
+        "focus": -0.3600000000000006,
+        "gap": 2.400000000000091
+      },
+      "endBinding": {
+        "elementId": "flask-request-dispatch-flow-node-7",
+        "focus": 0.19999999999999998,
+        "gap": 1
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "flask-request-dispatch-flow-edge-7",
+      "type": "arrow",
+      "x": 1297.6,
+      "y": 245.33333333333334,
+      "width": 341.5999999999999,
+      "height": 126.66666666666666,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aI",
+      "roundness": null,
+      "seed": 1149092073,
+      "version": 1,
+      "versionNonce": 1027589363,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "flask-request-dispatch-flow-edge-7-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "flask-request-dispatch-flow",
+        "edge": {
+          "from": "full_dispatch",
+          "to": "finalize",
+          "claim": "calls"
+        }
+      },
+      "points": [
+        [
+          0.5,
+          0
+        ],
+        [
+          32,
+          0
+        ],
+        [
+          32,
+          126.66666666666666
+        ],
+        [
+          107.4666666666667,
+          126.66666666666666
+        ],
+        [
+          166,
+          126.66666666666666
+        ],
+        [
+          224.5333333333333,
+          126.66666666666666
+        ],
+        [
+          341.0999999999999,
+          126.66666666666666
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "flask-request-dispatch-flow-node-6",
+        "focus": 0.3066666666666672,
+        "gap": 2.400000000000091
+      },
+      "endBinding": {
+        "elementId": "flask-request-dispatch-flow-node-9",
+        "focus": 0.2,
+        "gap": 1
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "flask-request-dispatch-flow-edge-8",
+      "type": "arrow",
+      "x": 1879.1999999999998,
+      "y": 372,
+      "width": 332.8000000000002,
+      "height": 0,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aJ",
+      "roundness": null,
+      "seed": 49062114,
+      "version": 1,
+      "versionNonce": 1879040982,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "flask-request-dispatch-flow-edge-8-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "flask-request-dispatch-flow",
+        "edge": {
+          "from": "finalize",
+          "to": "make_response",
+          "claim": "calls"
+        }
+      },
+      "points": [
+        [
+          0.5,
+          0
+        ],
+        [
+          166.4000000000001,
+          0
+        ],
+        [
+          332.3000000000002,
+          0
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "flask-request-dispatch-flow-node-9",
+        "focus": -0.2,
+        "gap": 1
+      },
+      "endBinding": {
+        "elementId": "flask-request-dispatch-flow-node-8",
+        "focus": 0.2,
+        "gap": 8
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "flask-request-dispatch-flow-node-0-label",
+      "type": "text",
+      "x": 44.99999999999999,
+      "y": 67.5,
+      "width": 110.00000000000001,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aK",
+      "roundness": null,
+      "seed": 1924909980,
+      "version": 1,
+      "versionNonce": 1898224552,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "flask-request-dispatch-flow"
+      },
+      "text": "WSGI entry",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "flask-request-dispatch-flow-node-0",
+      "originalText": "WSGI entry",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "flask-request-dispatch-flow-node-1-label",
+      "type": "text",
+      "x": 524,
+      "y": 67.5,
+      "width": 132,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aL",
+      "roundness": null,
+      "seed": 603424889,
+      "version": 1,
+      "versionNonce": 832832067,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "flask-request-dispatch-flow"
+      },
+      "text": "WSGI handler",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "flask-request-dispatch-flow-node-1",
+      "originalText": "WSGI handler",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "flask-request-dispatch-flow-node-2-label",
+      "type": "text",
+      "x": 1073,
+      "y": 47.5,
+      "width": 154,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aM",
+      "roundness": null,
+      "seed": 502813654,
+      "version": 1,
+      "versionNonce": 1354042810,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "flask-request-dispatch-flow"
+      },
+      "text": "Create context",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "flask-request-dispatch-flow-node-2",
+      "originalText": "Create context",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "flask-request-dispatch-flow-node-3-label",
+      "type": "text",
+      "x": 1667.5,
+      "y": 47.5,
+      "width": 165,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aN",
+      "roundness": null,
+      "seed": 2128633739,
+      "version": 1,
+      "versionNonce": 1673926661,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "flask-request-dispatch-flow"
+      },
+      "text": "Request context",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "flask-request-dispatch-flow-node-3",
+      "originalText": "Request context",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "flask-request-dispatch-flow-node-4-label",
+      "type": "text",
+      "x": 1072,
+      "y": 527.5,
+      "width": 176,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aO",
+      "roundness": null,
+      "seed": 601034480,
+      "version": 1,
+      "versionNonce": 2107674188,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "flask-request-dispatch-flow"
+      },
+      "text": "Activate context",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "flask-request-dispatch-flow-node-4",
+      "originalText": "Activate context",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "flask-request-dispatch-flow-node-5-label",
+      "type": "text",
+      "x": 1669.5,
+      "y": 527.5,
+      "width": 121.00000000000001,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aP",
+      "roundness": null,
+      "seed": 1185317693,
+      "version": 1,
+      "versionNonce": 2103802919,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "flask-request-dispatch-flow"
+      },
+      "text": "URL routing",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "flask-request-dispatch-flow-node-5",
+      "originalText": "URL routing",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "flask-request-dispatch-flow-node-6-label",
+      "type": "text",
+      "x": 1044.5,
+      "y": 217.5,
+      "width": 231.00000000000003,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aQ",
+      "roundness": null,
+      "seed": 293966106,
+      "version": 1,
+      "versionNonce": 140657390,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "flask-request-dispatch-flow"
+      },
+      "text": "Dispatch orchestrator",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "flask-request-dispatch-flow-node-6",
+      "originalText": "Dispatch orchestrator",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "flask-request-dispatch-flow-node-7-label",
+      "type": "text",
+      "x": 1669.5,
+      "y": 207.5,
+      "width": 121.00000000000001,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aR",
+      "roundness": null,
+      "seed": 1449595359,
+      "version": 1,
+      "versionNonce": 1854440825,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "flask-request-dispatch-flow"
+      },
+      "text": "View lookup",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "flask-request-dispatch-flow-node-7",
+      "originalText": "View lookup",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "flask-request-dispatch-flow-node-8-label",
+      "type": "text",
+      "x": 2253,
+      "y": 367.5,
+      "width": 154,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aS",
+      "roundness": null,
+      "seed": 75741940,
+      "version": 1,
+      "versionNonce": 2042952896,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "flask-request-dispatch-flow"
+      },
+      "text": "Build response",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "flask-request-dispatch-flow-node-8",
+      "originalText": "Build response",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "flask-request-dispatch-flow-node-9-label",
+      "type": "text",
+      "x": 1666.5,
+      "y": 367.5,
+      "width": 187.00000000000003,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aT",
+      "roundness": null,
+      "seed": 1553331505,
+      "version": 1,
+      "versionNonce": 1560760251,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "flask-request-dispatch-flow"
+      },
+      "text": "Finalize response",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "flask-request-dispatch-flow-node-9",
+      "originalText": "Finalize response",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "flask-request-dispatch-flow-edge-0-label",
+      "type": "text",
+      "x": 312,
+      "y": 72,
+      "width": 52.800000000000004,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aU",
+      "roundness": null,
+      "seed": 743326539,
+      "version": 1,
+      "versionNonce": 625606597,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "flask-request-dispatch-flow"
+      },
+      "text": "@calls",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "flask-request-dispatch-flow-edge-0",
+      "originalText": "@calls",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "flask-request-dispatch-flow-edge-1-label",
+      "type": "text",
+      "x": 839.8,
+      "y": 42,
+      "width": 52.800000000000004,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aV",
+      "roundness": null,
+      "seed": 259372950,
+      "version": 1,
+      "versionNonce": 491962490,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "flask-request-dispatch-flow"
+      },
+      "text": "@calls",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "flask-request-dispatch-flow-edge-1",
+      "originalText": "@calls",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "flask-request-dispatch-flow-edge-2-label",
+      "type": "text",
+      "x": 1422.6,
+      "y": 42,
+      "width": 61.60000000000001,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aW",
+      "roundness": null,
+      "seed": 1444742457,
+      "version": 1,
+      "versionNonce": 954435075,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "flask-request-dispatch-flow"
+      },
+      "text": "@builds",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "flask-request-dispatch-flow-edge-2",
+      "originalText": "@builds",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "flask-request-dispatch-flow-edge-3-label",
+      "type": "text",
+      "x": 690.4,
+      "y": 456.4,
+      "width": 52.800000000000004,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aX",
+      "roundness": null,
+      "seed": 1016197468,
+      "version": 1,
+      "versionNonce": 1833095784,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "flask-request-dispatch-flow"
+      },
+      "text": "@calls",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "flask-request-dispatch-flow-edge-3",
+      "originalText": "@calls",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "flask-request-dispatch-flow-edge-4-label",
+      "type": "text",
+      "x": 1431.9999999999998,
+      "y": 522,
+      "width": 52.800000000000004,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aY",
+      "roundness": null,
+      "seed": 699493535,
+      "version": 1,
+      "versionNonce": 1284806713,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "flask-request-dispatch-flow"
+      },
+      "text": "@calls",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "flask-request-dispatch-flow-edge-4",
+      "originalText": "@calls",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "flask-request-dispatch-flow-edge-5-label",
+      "type": "text",
+      "x": 751.4666666666666,
+      "y": 218.66666666666669,
+      "width": 52.800000000000004,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aZ",
+      "roundness": null,
+      "seed": 2136626650,
+      "version": 1,
+      "versionNonce": 1053604270,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "flask-request-dispatch-flow"
+      },
+      "text": "@calls",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "flask-request-dispatch-flow-edge-5",
+      "originalText": "@calls",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "flask-request-dispatch-flow-edge-6-label",
+      "type": "text",
+      "x": 1441.9999999999998,
+      "y": 202,
+      "width": 52.800000000000004,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aa",
+      "roundness": null,
+      "seed": 725981949,
+      "version": 1,
+      "versionNonce": 1067435751,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "flask-request-dispatch-flow"
+      },
+      "text": "@calls",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "flask-request-dispatch-flow-edge-6",
+      "originalText": "@calls",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "flask-request-dispatch-flow-edge-7-label",
+      "type": "text",
+      "x": 1378.6666666666665,
+      "y": 362,
+      "width": 52.800000000000004,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "ab",
+      "roundness": null,
+      "seed": 788372144,
+      "version": 1,
+      "versionNonce": 1410711564,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "flask-request-dispatch-flow"
+      },
+      "text": "@calls",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "flask-request-dispatch-flow-edge-7",
+      "originalText": "@calls",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "flask-request-dispatch-flow-edge-8-label",
+      "type": "text",
+      "x": 2019.1999999999998,
+      "y": 362,
+      "width": 52.800000000000004,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "ac",
+      "roundness": null,
+      "seed": 1831935043,
+      "version": 1,
+      "versionNonce": 380701021,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "flask-request-dispatch-flow"
+      },
+      "text": "@calls",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "flask-request-dispatch-flow-edge-8",
+      "originalText": "@calls",
+      "autoResize": true,
+      "lineHeight": 1.25
+    }
+  ],
+  "appState": {
+    "gridSize": null,
+    "viewBackgroundColor": "#ffffff"
+  },
+  "files": {},
+  "diagramos": {
+    "version": "0.2.0-rc.6",
+    "schema": 1
+  }
+}

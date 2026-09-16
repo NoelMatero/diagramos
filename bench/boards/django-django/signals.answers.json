@@ -1,0 +1,122 @@
+{
+  "board": "bench/boards/django-django/signals.excalidraw",
+  "project": "django-django",
+  "topic": "signals",
+  "language": "python",
+  "scope": "django/dispatch",
+  "pin": "05aec0a4aa",
+  "tool": "python 1.1.406",
+  "claims": [
+    {
+      "id": "calls|django/dispatch/dispatcher.py#receiver|django/dispatch/dispatcher.py#Signal.connect|",
+      "word": "calls",
+      "from": "django/dispatch/dispatcher.py#receiver",
+      "to": "django/dispatch/dispatcher.py#Signal.connect",
+      "fromLabel": "receiver (decorator)",
+      "toLabel": "connect",
+      "language": "python",
+      "source": "drawn",
+      "truth": "undecidable",
+      "why": "an end names nothing the tool declares"
+    },
+    {
+      "id": "accesses|django/dispatch/dispatcher.py#Signal.connect|django/dispatch/dispatcher.py#Signal.receivers|appends",
+      "word": "accesses",
+      "from": "django/dispatch/dispatcher.py#Signal.connect",
+      "to": "django/dispatch/dispatcher.py#Signal.receivers",
+      "member": "appends",
+      "fromLabel": "connect",
+      "toLabel": "receivers",
+      "language": "python",
+      "source": "drawn",
+      "truth": "undecidable",
+      "why": "an end names nothing the tool declares"
+    },
+    {
+      "id": "accesses|django/dispatch/dispatcher.py#Signal.disconnect|django/dispatch/dispatcher.py#Signal.receivers|deletes",
+      "word": "accesses",
+      "from": "django/dispatch/dispatcher.py#Signal.disconnect",
+      "to": "django/dispatch/dispatcher.py#Signal.receivers",
+      "member": "deletes",
+      "fromLabel": "disconnect",
+      "toLabel": "receivers",
+      "language": "python",
+      "source": "drawn",
+      "truth": "undecidable",
+      "why": "an end names nothing the tool declares"
+    },
+    {
+      "id": "calls|django/dispatch/dispatcher.py#Signal.send|django/dispatch/dispatcher.py#Signal._live_receivers|",
+      "word": "calls",
+      "from": "django/dispatch/dispatcher.py#Signal.send",
+      "to": "django/dispatch/dispatcher.py#Signal._live_receivers",
+      "fromLabel": "send",
+      "toLabel": "_live_receivers",
+      "language": "python",
+      "source": "drawn",
+      "truth": "undecidable",
+      "why": "an end names nothing the tool declares"
+    },
+    {
+      "id": "calls|django/dispatch/dispatcher.py#Signal.asend|django/dispatch/dispatcher.py#Signal._live_receivers|",
+      "word": "calls",
+      "from": "django/dispatch/dispatcher.py#Signal.asend",
+      "to": "django/dispatch/dispatcher.py#Signal._live_receivers",
+      "fromLabel": "asend",
+      "toLabel": "_live_receivers",
+      "language": "python",
+      "source": "drawn",
+      "truth": "undecidable",
+      "why": "an end names nothing the tool declares"
+    },
+    {
+      "id": "calls|django/dispatch/dispatcher.py#Signal.send_robust|django/dispatch/dispatcher.py#Signal._live_receivers|",
+      "word": "calls",
+      "from": "django/dispatch/dispatcher.py#Signal.send_robust",
+      "to": "django/dispatch/dispatcher.py#Signal._live_receivers",
+      "fromLabel": "send_robust",
+      "toLabel": "_live_receivers",
+      "language": "python",
+      "source": "drawn",
+      "truth": "undecidable",
+      "why": "an end names nothing the tool declares"
+    },
+    {
+      "id": "accesses|django/dispatch/dispatcher.py#Signal._live_receivers|django/dispatch/dispatcher.py#Signal.receivers|filters",
+      "word": "accesses",
+      "from": "django/dispatch/dispatcher.py#Signal._live_receivers",
+      "to": "django/dispatch/dispatcher.py#Signal.receivers",
+      "member": "filters",
+      "fromLabel": "_live_receivers",
+      "toLabel": "receivers",
+      "language": "python",
+      "source": "drawn",
+      "truth": "undecidable",
+      "why": "an end names nothing the tool declares"
+    },
+    {
+      "id": "calls|django/dispatch/dispatcher.py#Signal.connect|django/dispatch/dispatcher.py#_make_id|",
+      "word": "calls",
+      "from": "django/dispatch/dispatcher.py#Signal.connect",
+      "to": "django/dispatch/dispatcher.py#_make_id",
+      "fromLabel": "connect",
+      "toLabel": "_make_id",
+      "language": "python",
+      "source": "drawn",
+      "truth": "undecidable",
+      "why": "an end names nothing the tool declares"
+    },
+    {
+      "id": "calls|django/dispatch/dispatcher.py#Signal.disconnect|django/dispatch/dispatcher.py#_make_id|",
+      "word": "calls",
+      "from": "django/dispatch/dispatcher.py#Signal.disconnect",
+      "to": "django/dispatch/dispatcher.py#_make_id",
+      "fromLabel": "disconnect",
+      "toLabel": "_make_id",
+      "language": "python",
+      "source": "drawn",
+      "truth": "undecidable",
+      "why": "an end names nothing the tool declares"
+    }
+  ]
+}

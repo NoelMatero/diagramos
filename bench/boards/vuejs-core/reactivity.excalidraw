@@ -1,0 +1,1962 @@
+{
+  "type": "excalidraw",
+  "version": 2,
+  "source": "diagramos",
+  "elements": [
+    {
+      "id": "vue-reactivity-tracking-and-triggering-e-title",
+      "type": "text",
+      "x": 0,
+      "y": -115,
+      "width": 620.4000000000001,
+      "height": 30,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a0",
+      "roundness": null,
+      "seed": 2034475917,
+      "version": 1,
+      "versionNonce": 399986295,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "vue-reactivity-tracking-and-triggering-e",
+        "role": "title",
+        "direction": "DOWN"
+      },
+      "text": "Vue Reactivity: Tracking and Triggering Effects",
+      "fontSize": 24,
+      "fontFamily": 5,
+      "textAlign": "left",
+      "verticalAlign": "middle",
+      "containerId": null,
+      "originalText": "Vue Reactivity: Tracking and Triggering Effects",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "vue-reactivity-tracking-and-triggering-e-node-0",
+      "type": "rectangle",
+      "x": 800,
+      "y": 400,
+      "width": 160,
+      "height": 80,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a1",
+      "roundness": null,
+      "seed": 131245300,
+      "version": 1,
+      "versionNonce": 788486848,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "vue-reactivity-tracking-and-triggering-e-node-0-label"
+        },
+        {
+          "id": "vue-reactivity-tracking-and-triggering-e-edge-0",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "vue-reactivity-tracking-and-triggering-e",
+        "node": "reactive-wrapper",
+        "ref": "packages/reactivity/src/reactive.ts#reactive"
+      }
+    },
+    {
+      "id": "vue-reactivity-tracking-and-triggering-e-node-1",
+      "type": "rectangle",
+      "x": 720,
+      "y": 780,
+      "width": 320,
+      "height": 80,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a2",
+      "roundness": null,
+      "seed": 1471727437,
+      "version": 1,
+      "versionNonce": 2001535799,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "vue-reactivity-tracking-and-triggering-e-node-1-label"
+        },
+        {
+          "id": "vue-reactivity-tracking-and-triggering-e-edge-0",
+          "type": "arrow"
+        },
+        {
+          "id": "vue-reactivity-tracking-and-triggering-e-edge-1",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "vue-reactivity-tracking-and-triggering-e",
+        "node": "base-get",
+        "ref": "packages/reactivity/src/baseHandlers.ts#BaseReactiveHandler"
+      }
+    },
+    {
+      "id": "vue-reactivity-tracking-and-triggering-e-node-2",
+      "type": "rectangle",
+      "x": 260,
+      "y": 20,
+      "width": 320,
+      "height": 80,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a3",
+      "roundness": null,
+      "seed": 1349854130,
+      "version": 1,
+      "versionNonce": 345154150,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "vue-reactivity-tracking-and-triggering-e-node-2-label"
+        },
+        {
+          "id": "vue-reactivity-tracking-and-triggering-e-edge-5",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "vue-reactivity-tracking-and-triggering-e",
+        "node": "base-set",
+        "ref": "packages/reactivity/src/baseHandlers.ts#MutableReactiveHandler"
+      }
+    },
+    {
+      "id": "vue-reactivity-tracking-and-triggering-e-node-3",
+      "type": "rectangle",
+      "x": 800,
+      "y": 1160,
+      "width": 160,
+      "height": 80,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a4",
+      "roundness": null,
+      "seed": 1731695395,
+      "version": 1,
+      "versionNonce": 1281632189,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "vue-reactivity-tracking-and-triggering-e-node-3-label"
+        },
+        {
+          "id": "vue-reactivity-tracking-and-triggering-e-edge-1",
+          "type": "arrow"
+        },
+        {
+          "id": "vue-reactivity-tracking-and-triggering-e-edge-2",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "vue-reactivity-tracking-and-triggering-e",
+        "node": "track-fn",
+        "ref": "packages/reactivity/src/dep.ts#track"
+      }
+    },
+    {
+      "id": "vue-reactivity-tracking-and-triggering-e-node-4",
+      "type": "rectangle",
+      "x": 500,
+      "y": 1540,
+      "width": 340,
+      "height": 80,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a5",
+      "roundness": null,
+      "seed": 721966840,
+      "version": 1,
+      "versionNonce": 114255444,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "vue-reactivity-tracking-and-triggering-e-node-4-label"
+        },
+        {
+          "id": "vue-reactivity-tracking-and-triggering-e-edge-2",
+          "type": "arrow"
+        },
+        {
+          "id": "vue-reactivity-tracking-and-triggering-e-edge-3",
+          "type": "arrow"
+        },
+        {
+          "id": "vue-reactivity-tracking-and-triggering-e-edge-8",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "vue-reactivity-tracking-and-triggering-e",
+        "node": "dep-class",
+        "ref": "packages/reactivity/src/dep.ts#Dep"
+      }
+    },
+    {
+      "id": "vue-reactivity-tracking-and-triggering-e-node-5",
+      "type": "rectangle",
+      "x": 280,
+      "y": 1920,
+      "width": 260,
+      "height": 80,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a6",
+      "roundness": null,
+      "seed": 359339937,
+      "version": 1,
+      "versionNonce": 711133035,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "vue-reactivity-tracking-and-triggering-e-node-5-label"
+        },
+        {
+          "id": "vue-reactivity-tracking-and-triggering-e-edge-3",
+          "type": "arrow"
+        },
+        {
+          "id": "vue-reactivity-tracking-and-triggering-e-edge-4",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "vue-reactivity-tracking-and-triggering-e",
+        "node": "link-class",
+        "ref": "packages/reactivity/src/dep.ts#Link"
+      }
+    },
+    {
+      "id": "vue-reactivity-tracking-and-triggering-e-node-6",
+      "type": "rectangle",
+      "x": 300,
+      "y": 780,
+      "width": 220,
+      "height": 80,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a7",
+      "roundness": null,
+      "seed": 63582870,
+      "version": 1,
+      "versionNonce": 1045455226,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "vue-reactivity-tracking-and-triggering-e-node-6-label"
+        },
+        {
+          "id": "vue-reactivity-tracking-and-triggering-e-edge-4",
+          "type": "arrow"
+        },
+        {
+          "id": "vue-reactivity-tracking-and-triggering-e-edge-6",
+          "type": "arrow"
+        },
+        {
+          "id": "vue-reactivity-tracking-and-triggering-e-edge-7",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "vue-reactivity-tracking-and-triggering-e",
+        "node": "effect-class",
+        "ref": "packages/reactivity/src/effect.ts#ReactiveEffect"
+      }
+    },
+    {
+      "id": "vue-reactivity-tracking-and-triggering-e-node-7",
+      "type": "rectangle",
+      "x": 340,
+      "y": 400,
+      "width": 160,
+      "height": 80,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a8",
+      "roundness": null,
+      "seed": 1399150375,
+      "version": 1,
+      "versionNonce": 1013576897,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "vue-reactivity-tracking-and-triggering-e-node-7-label"
+        },
+        {
+          "id": "vue-reactivity-tracking-and-triggering-e-edge-5",
+          "type": "arrow"
+        },
+        {
+          "id": "vue-reactivity-tracking-and-triggering-e-edge-6",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "vue-reactivity-tracking-and-triggering-e",
+        "node": "trigger-fn",
+        "ref": "packages/reactivity/src/dep.ts#trigger"
+      }
+    },
+    {
+      "id": "vue-reactivity-tracking-and-triggering-e-node-8",
+      "type": "rectangle",
+      "x": 500,
+      "y": 1160,
+      "width": 220,
+      "height": 80,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a9",
+      "roundness": null,
+      "seed": 140447020,
+      "version": 1,
+      "versionNonce": 1222783864,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "vue-reactivity-tracking-and-triggering-e-node-8-label"
+        },
+        {
+          "id": "vue-reactivity-tracking-and-triggering-e-edge-7",
+          "type": "arrow"
+        },
+        {
+          "id": "vue-reactivity-tracking-and-triggering-e-edge-8",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "vue-reactivity-tracking-and-triggering-e",
+        "node": "computed-class",
+        "ref": "packages/reactivity/src/computed.ts#ComputedRefImpl"
+      }
+    },
+    {
+      "id": "vue-reactivity-tracking-and-triggering-e-node-9",
+      "type": "rectangle",
+      "x": 20,
+      "y": 20,
+      "width": 220,
+      "height": 80,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aA",
+      "roundness": null,
+      "seed": 704793669,
+      "version": 1,
+      "versionNonce": 1051238991,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "vue-reactivity-tracking-and-triggering-e-node-9-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "vue-reactivity-tracking-and-triggering-e",
+        "node": "effect-notify",
+        "ref": "packages/reactivity/src/effect.ts#ReactiveEffect"
+      }
+    },
+    {
+      "id": "vue-reactivity-tracking-and-triggering-e-edge-0",
+      "type": "arrow",
+      "x": 873.4,
+      "y": 472.8,
+      "width": 0,
+      "height": 300.7999999999999,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aB",
+      "roundness": null,
+      "seed": 716667211,
+      "version": 1,
+      "versionNonce": 619315653,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "vue-reactivity-tracking-and-triggering-e-edge-0-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "vue-reactivity-tracking-and-triggering-e",
+        "edge": {
+          "from": "reactive-wrapper",
+          "to": "base-get",
+          "claim": "builds"
+        }
+      },
+      "points": [
+        [
+          0,
+          0.5
+        ],
+        [
+          0,
+          150.39999999999992
+        ],
+        [
+          0,
+          300.2999999999999
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "vue-reactivity-tracking-and-triggering-e-node-0",
+        "focus": 0.08250000000000028,
+        "gap": 7.199999999999989
+      },
+      "endBinding": {
+        "elementId": "vue-reactivity-tracking-and-triggering-e-node-1",
+        "focus": -0.04125000000000009,
+        "gap": 6.400000000000091
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "vue-reactivity-tracking-and-triggering-e-edge-1",
+      "type": "arrow",
+      "x": 873.4,
+      "y": 853.5999999999999,
+      "width": 0,
+      "height": 300.79999999999995,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aC",
+      "roundness": null,
+      "seed": 284278074,
+      "version": 1,
+      "versionNonce": 736884878,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "vue-reactivity-tracking-and-triggering-e-edge-1-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "vue-reactivity-tracking-and-triggering-e",
+        "edge": {
+          "from": "base-get",
+          "to": "track-fn",
+          "claim": "calls"
+        }
+      },
+      "points": [
+        [
+          0,
+          0.5
+        ],
+        [
+          0,
+          150.39999999999998
+        ],
+        [
+          0,
+          300.29999999999995
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "vue-reactivity-tracking-and-triggering-e-node-1",
+        "focus": 0.04125000000000009,
+        "gap": 6.400000000000091
+      },
+      "endBinding": {
+        "elementId": "vue-reactivity-tracking-and-triggering-e-node-3",
+        "focus": -0.08249999999999999,
+        "gap": 5.600000000000136
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "vue-reactivity-tracking-and-triggering-e-edge-2",
+      "type": "arrow",
+      "x": 873.4,
+      "y": 1234.3999999999999,
+      "width": 156.66666666666663,
+      "height": 300.79999999999995,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aD",
+      "roundness": null,
+      "seed": 1225395221,
+      "version": 1,
+      "versionNonce": 173884191,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "vue-reactivity-tracking-and-triggering-e-edge-2-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "vue-reactivity-tracking-and-triggering-e",
+        "edge": {
+          "from": "track-fn",
+          "to": "dep-class",
+          "claim": "accesses"
+        }
+      },
+      "points": [
+        [
+          0,
+          0.5
+        ],
+        [
+          0,
+          192.79999999999995
+        ],
+        [
+          -35.93333333333328,
+          192.79999999999995
+        ],
+        [
+          -156.66666666666663,
+          192.79999999999995
+        ],
+        [
+          -156.66666666666663,
+          300.29999999999995
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "vue-reactivity-tracking-and-triggering-e-node-3",
+        "focus": 0.08249999999999999,
+        "gap": 5.600000000000136
+      },
+      "endBinding": {
+        "elementId": "vue-reactivity-tracking-and-triggering-e-node-4",
+        "focus": 0.2749019607843138,
+        "gap": 4.800000000000182
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "vue-reactivity-tracking-and-triggering-e-edge-3",
+      "type": "arrow",
+      "x": 660.0666666666666,
+      "y": 1615.1999999999998,
+      "width": 197.00000000000006,
+      "height": 300.79999999999995,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aE",
+      "roundness": null,
+      "seed": 1300408700,
+      "version": 1,
+      "versionNonce": 653115912,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "vue-reactivity-tracking-and-triggering-e-edge-3-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "vue-reactivity-tracking-and-triggering-e",
+        "edge": {
+          "from": "dep-class",
+          "to": "link-class",
+          "claim": "holds"
+        }
+      },
+      "points": [
+        [
+          0.5,
+          0.5
+        ],
+        [
+          1.1368683772161603e-13,
+          192.79999999999995
+        ],
+        [
+          -56.09999999999991,
+          192.79999999999995
+        ],
+        [
+          -196.99999999999994,
+          192.79999999999995
+        ],
+        [
+          -197.4999999999999,
+          300.29999999999995
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "vue-reactivity-tracking-and-triggering-e-node-4",
+        "focus": 0.058431372549020144,
+        "gap": 4.800000000000182
+      },
+      "endBinding": {
+        "elementId": "vue-reactivity-tracking-and-triggering-e-node-5",
+        "focus": 0.408205128205129,
+        "gap": 4.000000000000227
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "vue-reactivity-tracking-and-triggering-e-edge-4",
+      "type": "arrow",
+      "x": 376.40000000000003,
+      "y": 1915.9999999999998,
+      "width": 5.684341886080802e-14,
+      "height": 1062.3999999999999,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aF",
+      "roundness": null,
+      "seed": 2110051439,
+      "version": 1,
+      "versionNonce": 947011529,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "vue-reactivity-tracking-and-triggering-e-edge-4-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "vue-reactivity-tracking-and-triggering-e",
+        "edge": {
+          "from": "link-class",
+          "to": "effect-class",
+          "claim": "accesses"
+        }
+      },
+      "points": [
+        [
+          0,
+          -0.5
+        ],
+        [
+          -5.684341886080802e-14,
+          -531.2
+        ],
+        [
+          -5.684341886080802e-14,
+          -1061.8999999999999
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "vue-reactivity-tracking-and-triggering-e-node-5",
+        "focus": -0.2584615384615379,
+        "gap": 4.000000000000227
+      },
+      "endBinding": {
+        "elementId": "vue-reactivity-tracking-and-triggering-e-node-6",
+        "focus": 0.30545454545454576,
+        "gap": 6.400000000000091
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "vue-reactivity-tracking-and-triggering-e-edge-5",
+      "type": "arrow",
+      "x": 413.06666666666666,
+      "y": 92,
+      "width": 0,
+      "height": 300.8,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aG",
+      "roundness": null,
+      "seed": 1975076894,
+      "version": 1,
+      "versionNonce": 484988482,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "vue-reactivity-tracking-and-triggering-e-edge-5-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "vue-reactivity-tracking-and-triggering-e",
+        "edge": {
+          "from": "base-set",
+          "to": "trigger-fn",
+          "claim": "calls"
+        }
+      },
+      "points": [
+        [
+          0,
+          0.5
+        ],
+        [
+          0,
+          150.4
+        ],
+        [
+          0,
+          300.3
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "vue-reactivity-tracking-and-triggering-e-node-2",
+        "focus": 0.043333333333333,
+        "gap": 8
+      },
+      "endBinding": {
+        "elementId": "vue-reactivity-tracking-and-triggering-e-node-7",
+        "focus": -0.086666666666666,
+        "gap": 7.199999999999989
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "vue-reactivity-tracking-and-triggering-e-edge-6",
+      "type": "arrow",
+      "x": 413.06666666666666,
+      "y": 472.8,
+      "width": 0,
+      "height": 300.7999999999999,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aH",
+      "roundness": null,
+      "seed": 1491692233,
+      "version": 1,
+      "versionNonce": 788244051,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "vue-reactivity-tracking-and-triggering-e-edge-6-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "vue-reactivity-tracking-and-triggering-e",
+        "edge": {
+          "from": "trigger-fn",
+          "to": "effect-class",
+          "claim": "calls"
+        }
+      },
+      "points": [
+        [
+          0,
+          0.5
+        ],
+        [
+          0,
+          150.39999999999992
+        ],
+        [
+          0,
+          300.2999999999999
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "vue-reactivity-tracking-and-triggering-e-node-7",
+        "focus": 0.086666666666666,
+        "gap": 7.199999999999989
+      },
+      "endBinding": {
+        "elementId": "vue-reactivity-tracking-and-triggering-e-node-6",
+        "focus": 0.02787878787878787,
+        "gap": 6.400000000000091
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "vue-reactivity-tracking-and-triggering-e-edge-7",
+      "type": "arrow",
+      "x": 449.73333333333335,
+      "y": 853.5999999999999,
+      "width": 153.66666666666663,
+      "height": 300.79999999999995,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aI",
+      "roundness": null,
+      "seed": 485977216,
+      "version": 1,
+      "versionNonce": 897087068,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "vue-reactivity-tracking-and-triggering-e-edge-7-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "vue-reactivity-tracking-and-triggering-e",
+        "edge": {
+          "from": "effect-class",
+          "to": "computed-class",
+          "claim": "conforms"
+        }
+      },
+      "points": [
+        [
+          0,
+          0.5
+        ],
+        [
+          0,
+          32
+        ],
+        [
+          153.66666666666663,
+          32
+        ],
+        [
+          153.66666666666663,
+          73.5666666666666
+        ],
+        [
+          153.66666666666663,
+          130.375
+        ],
+        [
+          153.66666666666663,
+          187.1833333333334
+        ],
+        [
+          153.66666666666663,
+          300.29999999999995
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "vue-reactivity-tracking-and-triggering-e-node-6",
+        "focus": -0.36121212121212193,
+        "gap": 6.400000000000091
+      },
+      "endBinding": {
+        "elementId": "vue-reactivity-tracking-and-triggering-e-node-8",
+        "focus": -0.06000000000000044,
+        "gap": 5.600000000000136
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "vue-reactivity-tracking-and-triggering-e-edge-8",
+      "type": "arrow",
+      "x": 603.4,
+      "y": 1234.3999999999999,
+      "width": 0,
+      "height": 300.79999999999995,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aJ",
+      "roundness": null,
+      "seed": 1807546867,
+      "version": 1,
+      "versionNonce": 356947661,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "vue-reactivity-tracking-and-triggering-e-edge-8-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "vue-reactivity-tracking-and-triggering-e",
+        "edge": {
+          "from": "computed-class",
+          "to": "dep-class",
+          "claim": "holds"
+        }
+      },
+      "points": [
+        [
+          0,
+          0.5
+        ],
+        [
+          0,
+          150.39999999999986
+        ],
+        [
+          0,
+          300.29999999999995
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "vue-reactivity-tracking-and-triggering-e-node-8",
+        "focus": 0.06000000000000044,
+        "gap": 5.600000000000136
+      },
+      "endBinding": {
+        "elementId": "vue-reactivity-tracking-and-triggering-e-node-4",
+        "focus": -0.39176470588235307,
+        "gap": 4.800000000000182
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "vue-reactivity-tracking-and-triggering-e-node-0-label",
+      "type": "text",
+      "x": 825,
+      "y": 427.5,
+      "width": 110.00000000000001,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aK",
+      "roundness": null,
+      "seed": 264557377,
+      "version": 1,
+      "versionNonce": 1373900939,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "vue-reactivity-tracking-and-triggering-e"
+      },
+      "text": "reactive()",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "vue-reactivity-tracking-and-triggering-e-node-0",
+      "originalText": "reactive()",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "vue-reactivity-tracking-and-triggering-e-node-1-label",
+      "type": "text",
+      "x": 753.5,
+      "y": 807.5,
+      "width": 253.00000000000003,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aL",
+      "roundness": null,
+      "seed": 1745166980,
+      "version": 1,
+      "versionNonce": 1945149072,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "vue-reactivity-tracking-and-triggering-e"
+      },
+      "text": "BaseReactiveHandler.get",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "vue-reactivity-tracking-and-triggering-e-node-1",
+      "originalText": "BaseReactiveHandler.get",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "vue-reactivity-tracking-and-triggering-e-node-2-label",
+      "type": "text",
+      "x": 293.5,
+      "y": 47.5,
+      "width": 253.00000000000003,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aM",
+      "roundness": null,
+      "seed": 1956959443,
+      "version": 1,
+      "versionNonce": 1402027821,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "vue-reactivity-tracking-and-triggering-e"
+      },
+      "text": "BaseReactiveHandler.set",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "vue-reactivity-tracking-and-triggering-e-node-2",
+      "originalText": "BaseReactiveHandler.set",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "vue-reactivity-tracking-and-triggering-e-node-3-label",
+      "type": "text",
+      "x": 841.5,
+      "y": 1187.5,
+      "width": 77,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aN",
+      "roundness": null,
+      "seed": 829315134,
+      "version": 1,
+      "versionNonce": 1361816546,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "vue-reactivity-tracking-and-triggering-e"
+      },
+      "text": "track()",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "vue-reactivity-tracking-and-triggering-e-node-3",
+      "originalText": "track()",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "vue-reactivity-tracking-and-triggering-e-node-4-label",
+      "type": "text",
+      "x": 532.5,
+      "y": 1567.5,
+      "width": 275,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aO",
+      "roundness": null,
+      "seed": 1931413701,
+      "version": 1,
+      "versionNonce": 1457872847,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "vue-reactivity-tracking-and-triggering-e"
+      },
+      "text": "Dep (property dependency)",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "vue-reactivity-tracking-and-triggering-e-node-4",
+      "originalText": "Dep (property dependency)",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "vue-reactivity-tracking-and-triggering-e-node-5-label",
+      "type": "text",
+      "x": 305.5,
+      "y": 1947.5,
+      "width": 209.00000000000003,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aP",
+      "roundness": null,
+      "seed": 1543454328,
+      "version": 1,
+      "versionNonce": 461231316,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "vue-reactivity-tracking-and-triggering-e"
+      },
+      "text": "Link (dep ↔ effect)",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "vue-reactivity-tracking-and-triggering-e-node-5",
+      "originalText": "Link (dep ↔ effect)",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "vue-reactivity-tracking-and-triggering-e-node-6-label",
+      "type": "text",
+      "x": 333,
+      "y": 807.5,
+      "width": 154,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aQ",
+      "roundness": null,
+      "seed": 338755527,
+      "version": 1,
+      "versionNonce": 1467497953,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "vue-reactivity-tracking-and-triggering-e"
+      },
+      "text": "ReactiveEffect",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "vue-reactivity-tracking-and-triggering-e-node-6",
+      "originalText": "ReactiveEffect",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "vue-reactivity-tracking-and-triggering-e-node-7-label",
+      "type": "text",
+      "x": 370.5,
+      "y": 427.5,
+      "width": 99.00000000000001,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aR",
+      "roundness": null,
+      "seed": 92069666,
+      "version": 1,
+      "versionNonce": 574644246,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "vue-reactivity-tracking-and-triggering-e"
+      },
+      "text": "trigger()",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "vue-reactivity-tracking-and-triggering-e-node-7",
+      "originalText": "trigger()",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "vue-reactivity-tracking-and-triggering-e-node-8-label",
+      "type": "text",
+      "x": 527.5,
+      "y": 1187.5,
+      "width": 165,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aS",
+      "roundness": null,
+      "seed": 437914441,
+      "version": 1,
+      "versionNonce": 1317556179,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "vue-reactivity-tracking-and-triggering-e"
+      },
+      "text": "ComputedRefImpl",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "vue-reactivity-tracking-and-triggering-e-node-8",
+      "originalText": "ComputedRefImpl",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "vue-reactivity-tracking-and-triggering-e-node-9-label",
+      "type": "text",
+      "x": 47.5,
+      "y": 47.5,
+      "width": 165,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aT",
+      "roundness": null,
+      "seed": 831545644,
+      "version": 1,
+      "versionNonce": 562655096,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "vue-reactivity-tracking-and-triggering-e"
+      },
+      "text": "effect.notify()",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "vue-reactivity-tracking-and-triggering-e-node-9",
+      "originalText": "effect.notify()",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "vue-reactivity-tracking-and-triggering-e-edge-0-label",
+      "type": "text",
+      "x": 816.1999999999999,
+      "y": 613.1999999999999,
+      "width": 114.4,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aU",
+      "roundness": null,
+      "seed": 1768469750,
+      "version": 1,
+      "versionNonce": 1881454682,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "vue-reactivity-tracking-and-triggering-e"
+      },
+      "text": "Proxy @builds",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "vue-reactivity-tracking-and-triggering-e-edge-0",
+      "originalText": "Proxy @builds",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "vue-reactivity-tracking-and-triggering-e-edge-1-label",
+      "type": "text",
+      "x": 816.1999999999999,
+      "y": 993.9999999999999,
+      "width": 114.4,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aV",
+      "roundness": null,
+      "seed": 2065848363,
+      "version": 1,
+      "versionNonce": 1604430373,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "vue-reactivity-tracking-and-triggering-e"
+      },
+      "text": "on get @calls",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "vue-reactivity-tracking-and-triggering-e-edge-1",
+      "originalText": "on get @calls",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "vue-reactivity-tracking-and-triggering-e-edge-2-label",
+      "type": "text",
+      "x": 753.8666666666667,
+      "y": 1417.1999999999998,
+      "width": 167.20000000000002,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aW",
+      "roundness": null,
+      "seed": 417298876,
+      "version": 1,
+      "versionNonce": 1531925320,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "vue-reactivity-tracking-and-triggering-e"
+      },
+      "text": "targetMap @accesses",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "vue-reactivity-tracking-and-triggering-e-edge-2",
+      "originalText": "targetMap @accesses",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "vue-reactivity-tracking-and-triggering-e-edge-3-label",
+      "type": "text",
+      "x": 529.1666666666667,
+      "y": 1797.9999999999998,
+      "width": 149.60000000000002,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aX",
+      "roundness": null,
+      "seed": 542890777,
+      "version": 1,
+      "versionNonce": 1670595171,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "vue-reactivity-tracking-and-triggering-e"
+      },
+      "text": "activeLink @holds",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "vue-reactivity-tracking-and-triggering-e-edge-3",
+      "originalText": "activeLink @holds",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "vue-reactivity-tracking-and-triggering-e-edge-4-label",
+      "type": "text",
+      "x": 319.2,
+      "y": 1374.7999999999997,
+      "width": 114.4,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aY",
+      "roundness": null,
+      "seed": 1498136634,
+      "version": 1,
+      "versionNonce": 295612814,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "vue-reactivity-tracking-and-triggering-e"
+      },
+      "text": "sub @accesses",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "vue-reactivity-tracking-and-triggering-e-edge-4",
+      "originalText": "sub @accesses",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "vue-reactivity-tracking-and-triggering-e-edge-5-label",
+      "type": "text",
+      "x": 355.8666666666667,
+      "y": 232.4,
+      "width": 114.4,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aZ",
+      "roundness": null,
+      "seed": 1823957759,
+      "version": 1,
+      "versionNonce": 1861735961,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "vue-reactivity-tracking-and-triggering-e"
+      },
+      "text": "on set @calls",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "vue-reactivity-tracking-and-triggering-e-edge-5",
+      "originalText": "on set @calls",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "vue-reactivity-tracking-and-triggering-e-edge-6-label",
+      "type": "text",
+      "x": 355.8666666666667,
+      "y": 613.1999999999999,
+      "width": 114.4,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aa",
+      "roundness": null,
+      "seed": 626599824,
+      "version": 1,
+      "versionNonce": 1878626668,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "vue-reactivity-tracking-and-triggering-e"
+      },
+      "text": "notify @calls",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "vue-reactivity-tracking-and-triggering-e-edge-6",
+      "originalText": "notify @calls",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "vue-reactivity-tracking-and-triggering-e-edge-7-label",
+      "type": "text",
+      "x": 515.4,
+      "y": 917.1666666666665,
+      "width": 176,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "ab",
+      "roundness": null,
+      "seed": 1835103325,
+      "version": 1,
+      "versionNonce": 695283399,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "vue-reactivity-tracking-and-triggering-e"
+      },
+      "text": "Subscriber @conforms",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "vue-reactivity-tracking-and-triggering-e-edge-7",
+      "originalText": "Subscriber @conforms",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "vue-reactivity-tracking-and-triggering-e-edge-8-label",
+      "type": "text",
+      "x": 559.4,
+      "y": 1374.7999999999997,
+      "width": 88,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "ac",
+      "roundness": null,
+      "seed": 1396139982,
+      "version": 1,
+      "versionNonce": 581519730,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "vue-reactivity-tracking-and-triggering-e"
+      },
+      "text": "dep @holds",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "vue-reactivity-tracking-and-triggering-e-edge-8",
+      "originalText": "dep @holds",
+      "autoResize": true,
+      "lineHeight": 1.25
+    }
+  ],
+  "appState": {
+    "gridSize": null,
+    "viewBackgroundColor": "#ffffff"
+  },
+  "files": {},
+  "diagramos": {
+    "version": "0.2.0-rc.6",
+    "schema": 1
+  }
+}

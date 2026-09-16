@@ -1,0 +1,1866 @@
+{
+  "type": "excalidraw",
+  "version": 2,
+  "source": "diagramos",
+  "elements": [
+    {
+      "id": "vue-compiler-transforms-title",
+      "type": "text",
+      "x": 0,
+      "y": -115,
+      "width": 303.6,
+      "height": 30,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a0",
+      "roundness": null,
+      "seed": 1152155811,
+      "version": 1,
+      "versionNonce": 1802897469,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "vue-compiler-transforms",
+        "role": "title"
+      },
+      "text": "Vue Compiler Transforms",
+      "fontSize": 24,
+      "fontFamily": 5,
+      "textAlign": "left",
+      "verticalAlign": "middle",
+      "containerId": null,
+      "originalText": "Vue Compiler Transforms",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "vue-compiler-transforms-node-0",
+      "type": "rectangle",
+      "x": 20,
+      "y": 720,
+      "width": 240,
+      "height": 100,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a1",
+      "roundness": null,
+      "seed": 901883302,
+      "version": 1,
+      "versionNonce": 334605962,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "vue-compiler-transforms-node-0-label"
+        },
+        {
+          "id": "vue-compiler-transforms-edge-0",
+          "type": "arrow"
+        },
+        {
+          "id": "vue-compiler-transforms-edge-3",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "vue-compiler-transforms",
+        "node": "element",
+        "ref": "packages/compiler-core/src/transforms/transformElement.ts#transformElement"
+      }
+    },
+    {
+      "id": "vue-compiler-transforms-node-1",
+      "type": "rectangle",
+      "x": 700,
+      "y": 720,
+      "width": 160,
+      "height": 120,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a2",
+      "roundness": null,
+      "seed": 1781862391,
+      "version": 1,
+      "versionNonce": 265687377,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "vue-compiler-transforms-node-1-label"
+        },
+        {
+          "id": "vue-compiler-transforms-edge-0",
+          "type": "arrow"
+        },
+        {
+          "id": "vue-compiler-transforms-edge-1",
+          "type": "arrow"
+        },
+        {
+          "id": "vue-compiler-transforms-edge-2",
+          "type": "arrow"
+        },
+        {
+          "id": "vue-compiler-transforms-edge-7",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "vue-compiler-transforms",
+        "node": "buildProps",
+        "ref": "packages/compiler-core/src/transforms/transformElement.ts#buildProps"
+      }
+    },
+    {
+      "id": "vue-compiler-transforms-node-2",
+      "type": "rectangle",
+      "x": 740,
+      "y": 440,
+      "width": 160,
+      "height": 80,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a3",
+      "roundness": null,
+      "seed": 1231555784,
+      "version": 1,
+      "versionNonce": 263248932,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "vue-compiler-transforms-node-2-label"
+        },
+        {
+          "id": "vue-compiler-transforms-edge-4",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "vue-compiler-transforms",
+        "node": "vif",
+        "ref": "packages/compiler-core/src/transforms/vIf.ts#processIf"
+      }
+    },
+    {
+      "id": "vue-compiler-transforms-node-3",
+      "type": "rectangle",
+      "x": 600,
+      "y": 280,
+      "width": 300,
+      "height": 80,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a4",
+      "roundness": null,
+      "seed": 1910744049,
+      "version": 1,
+      "versionNonce": 218463355,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "vue-compiler-transforms-node-3-label"
+        },
+        {
+          "id": "vue-compiler-transforms-edge-5",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "vue-compiler-transforms",
+        "node": "vfor",
+        "ref": "packages/compiler-core/src/transforms/vFor.ts#finalizeForParseResult"
+      }
+    },
+    {
+      "id": "vue-compiler-transforms-node-4",
+      "type": "rectangle",
+      "x": 1320,
+      "y": 620,
+      "width": 200,
+      "height": 80,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a5",
+      "roundness": null,
+      "seed": 1114438530,
+      "version": 1,
+      "versionNonce": 809332726,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "vue-compiler-transforms-node-4-label"
+        },
+        {
+          "id": "vue-compiler-transforms-edge-1",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "vue-compiler-transforms",
+        "node": "vbind",
+        "ref": "packages/compiler-core/src/transforms/vBind.ts#transformBind"
+      }
+    },
+    {
+      "id": "vue-compiler-transforms-node-5",
+      "type": "rectangle",
+      "x": 1320,
+      "y": 780,
+      "width": 220,
+      "height": 80,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a6",
+      "roundness": null,
+      "seed": 381038643,
+      "version": 1,
+      "versionNonce": 2031967757,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "vue-compiler-transforms-node-5-label"
+        },
+        {
+          "id": "vue-compiler-transforms-edge-2",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "vue-compiler-transforms",
+        "node": "vmodel",
+        "ref": "packages/compiler-core/src/transforms/vModel.ts#transformModel"
+      }
+    },
+    {
+      "id": "vue-compiler-transforms-node-6",
+      "type": "rectangle",
+      "x": 1320,
+      "y": 420,
+      "width": 260,
+      "height": 120,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a7",
+      "roundness": null,
+      "seed": 972322820,
+      "version": 1,
+      "versionNonce": 1874081552,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "vue-compiler-transforms-node-6-label"
+        },
+        {
+          "id": "vue-compiler-transforms-edge-4",
+          "type": "arrow"
+        },
+        {
+          "id": "vue-compiler-transforms-edge-5",
+          "type": "arrow"
+        },
+        {
+          "id": "vue-compiler-transforms-edge-7",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "vue-compiler-transforms",
+        "node": "expr",
+        "ref": "packages/compiler-core/src/transforms/transformExpression.ts#transformExpression"
+      }
+    },
+    {
+      "id": "vue-compiler-transforms-node-7",
+      "type": "rectangle",
+      "x": 20,
+      "y": 20,
+      "width": 200,
+      "height": 80,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a8",
+      "roundness": null,
+      "seed": 1321663645,
+      "version": 1,
+      "versionNonce": 72093959,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "vue-compiler-transforms-node-7-label"
+        },
+        {
+          "id": "vue-compiler-transforms-edge-6",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "vue-compiler-transforms",
+        "node": "text",
+        "ref": "packages/compiler-core/src/transforms/transformText.ts"
+      }
+    },
+    {
+      "id": "vue-compiler-transforms-node-8",
+      "type": "rectangle",
+      "x": 540,
+      "y": 20,
+      "width": 180,
+      "height": 80,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a9",
+      "roundness": null,
+      "seed": 590145374,
+      "version": 1,
+      "versionNonce": 1459151490,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "vue-compiler-transforms-node-8-label"
+        },
+        {
+          "id": "vue-compiler-transforms-edge-6",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "vue-compiler-transforms",
+        "node": "cache",
+        "ref": "packages/compiler-core/src/transforms/cacheStatic.ts"
+      }
+    },
+    {
+      "id": "vue-compiler-transforms-node-9",
+      "type": "rectangle",
+      "x": 600,
+      "y": 120,
+      "width": 220,
+      "height": 80,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aA",
+      "roundness": null,
+      "seed": 2130272943,
+      "version": 1,
+      "versionNonce": 2004593929,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "vue-compiler-transforms-node-9-label"
+        },
+        {
+          "id": "vue-compiler-transforms-edge-3",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "vue-compiler-transforms",
+        "node": "vnode",
+        "ref": "packages/compiler-core/src/ast.ts#createVNodeCall"
+      }
+    },
+    {
+      "id": "vue-compiler-transforms-edge-0",
+      "type": "arrow",
+      "x": 252,
+      "y": 782,
+      "width": 446.6,
+      "height": 0,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aB",
+      "roundness": null,
+      "seed": 2099061561,
+      "version": 1,
+      "versionNonce": 504545283,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "vue-compiler-transforms-edge-0-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "vue-compiler-transforms",
+        "edge": {
+          "from": "element",
+          "to": "buildProps",
+          "claim": "calls"
+        }
+      },
+      "points": [
+        [
+          0.5,
+          0
+        ],
+        [
+          223.3,
+          0
+        ],
+        [
+          446.1,
+          0
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "vue-compiler-transforms-node-0",
+        "focus": 0.23999999999999996,
+        "gap": 8
+      },
+      "endBinding": {
+        "elementId": "vue-compiler-transforms-node-1",
+        "focus": -0.033333333333333034,
+        "gap": 1.3999999999999773
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "vue-compiler-transforms-edge-1",
+      "type": "arrow",
+      "x": 858.6,
+      "y": 782,
+      "width": 455.80000000000007,
+      "height": 130,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aC",
+      "roundness": null,
+      "seed": 1424783536,
+      "version": 1,
+      "versionNonce": 186464780,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "vue-compiler-transforms-edge-1-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "vue-compiler-transforms",
+        "edge": {
+          "from": "buildProps",
+          "to": "vbind",
+          "claim": "calls"
+        }
+      },
+      "points": [
+        [
+          0.5,
+          0
+        ],
+        [
+          91,
+          0
+        ],
+        [
+          91,
+          -130
+        ],
+        [
+          162.89999999999998,
+          -130
+        ],
+        [
+          236.1249999999999,
+          -130
+        ],
+        [
+          309.35,
+          -130
+        ],
+        [
+          455.30000000000007,
+          -130
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "vue-compiler-transforms-node-1",
+        "focus": 0.033333333333333034,
+        "gap": 1.3999999999999773
+      },
+      "endBinding": {
+        "elementId": "vue-compiler-transforms-node-4",
+        "focus": 0.20000000000000004,
+        "gap": 5.599999999999909
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "vue-compiler-transforms-edge-2",
+      "type": "arrow",
+      "x": 858.6,
+      "y": 812,
+      "width": 455.80000000000007,
+      "height": 0,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aD",
+      "roundness": null,
+      "seed": 1975090143,
+      "version": 1,
+      "versionNonce": 1027957625,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "vue-compiler-transforms-edge-2-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "vue-compiler-transforms",
+        "edge": {
+          "from": "buildProps",
+          "to": "vmodel",
+          "claim": "calls"
+        }
+      },
+      "points": [
+        [
+          0.5,
+          0
+        ],
+        [
+          227.89999999999998,
+          0
+        ],
+        [
+          455.30000000000007,
+          0
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "vue-compiler-transforms-node-1",
+        "focus": 0.5333333333333331,
+        "gap": 1.3999999999999773
+      },
+      "endBinding": {
+        "elementId": "vue-compiler-transforms-node-5",
+        "focus": 0.2,
+        "gap": 5.599999999999909
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "vue-compiler-transforms-edge-3",
+      "type": "arrow",
+      "x": 252,
+      "y": 748.6666666666667,
+      "width": 341.6,
+      "height": 596.6666666666667,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aE",
+      "roundness": null,
+      "seed": 19491022,
+      "version": 1,
+      "versionNonce": 1990253682,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "vue-compiler-transforms-edge-3-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "vue-compiler-transforms",
+        "edge": {
+          "from": "element",
+          "to": "vnode",
+          "claim": "builds"
+        }
+      },
+      "points": [
+        [
+          0.5,
+          0
+        ],
+        [
+          32,
+          0
+        ],
+        [
+          32,
+          -437.1333333333334
+        ],
+        [
+          32,
+          -596.6666666666667
+        ],
+        [
+          341.1,
+          -596.6666666666667
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "vue-compiler-transforms-node-0",
+        "focus": -0.426666666666665,
+        "gap": 8
+      },
+      "endBinding": {
+        "elementId": "vue-compiler-transforms-node-9",
+        "focus": 0.1999999999999991,
+        "gap": 6.399999999999977
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "vue-compiler-transforms-edge-4",
+      "type": "arrow",
+      "x": 893.6,
+      "y": 472,
+      "width": 420.80000000000007,
+      "height": 0,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aF",
+      "roundness": null,
+      "seed": 314298437,
+      "version": 1,
+      "versionNonce": 447966799,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "vue-compiler-transforms-edge-4-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "vue-compiler-transforms",
+        "edge": {
+          "from": "vif",
+          "to": "expr",
+          "claim": "calls"
+        }
+      },
+      "points": [
+        [
+          0.5,
+          0
+        ],
+        [
+          210.39999999999998,
+          0
+        ],
+        [
+          420.30000000000007,
+          0
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "vue-compiler-transforms-node-2",
+        "focus": -0.2,
+        "gap": 6.399999999999977
+      },
+      "endBinding": {
+        "elementId": "vue-compiler-transforms-node-6",
+        "focus": 0.13333333333333286,
+        "gap": 5.599999999999909
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "vue-compiler-transforms-edge-5",
+      "type": "arrow",
+      "x": 893.6,
+      "y": 312,
+      "width": 420.80000000000007,
+      "height": 130,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aG",
+      "roundness": null,
+      "seed": 1897435436,
+      "version": 1,
+      "versionNonce": 619511672,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "vue-compiler-transforms-edge-5-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "vue-compiler-transforms",
+        "edge": {
+          "from": "vfor",
+          "to": "expr",
+          "claim": "calls"
+        }
+      },
+      "points": [
+        [
+          0.5,
+          0
+        ],
+        [
+          137.69999999999993,
+          0
+        ],
+        [
+          206.55000000000007,
+          0
+        ],
+        [
+          275.4,
+          0
+        ],
+        [
+          312.80000000000007,
+          0
+        ],
+        [
+          312.80000000000007,
+          130
+        ],
+        [
+          420.30000000000007,
+          130
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "vue-compiler-transforms-node-3",
+        "focus": -0.19999999999999998,
+        "gap": 6.399999999999977
+      },
+      "endBinding": {
+        "elementId": "vue-compiler-transforms-node-6",
+        "focus": 0.6333333333333329,
+        "gap": 5.599999999999909
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "vue-compiler-transforms-edge-6",
+      "type": "arrow",
+      "x": 212,
+      "y": 52,
+      "width": 332.79999999999995,
+      "height": 0,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aH",
+      "roundness": null,
+      "seed": 900793147,
+      "version": 1,
+      "versionNonce": 1645686453,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "vue-compiler-transforms-edge-6-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "vue-compiler-transforms",
+        "edge": {
+          "from": "text",
+          "to": "cache",
+          "claim": "calls"
+        }
+      },
+      "points": [
+        [
+          0.5,
+          0
+        ],
+        [
+          166.39999999999998,
+          0
+        ],
+        [
+          332.29999999999995,
+          0
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "vue-compiler-transforms-node-7",
+        "focus": -0.20000000000000004,
+        "gap": 8
+      },
+      "endBinding": {
+        "elementId": "vue-compiler-transforms-node-8",
+        "focus": 0.19999999999999998,
+        "gap": 4.7999999999999545
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "vue-compiler-transforms-edge-7",
+      "type": "arrow",
+      "x": 858.6,
+      "y": 752,
+      "width": 455.80000000000007,
+      "height": 250,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aI",
+      "roundness": null,
+      "seed": 1305762282,
+      "version": 1,
+      "versionNonce": 842247870,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "vue-compiler-transforms-edge-7-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "vue-compiler-transforms",
+        "edge": {
+          "from": "buildProps",
+          "to": "expr",
+          "claim": "calls"
+        }
+      },
+      "points": [
+        [
+          0.5,
+          0
+        ],
+        [
+          67,
+          0
+        ],
+        [
+          67,
+          -156.79999999999995
+        ],
+        [
+          196.10000000000002,
+          -156.79999999999995
+        ],
+        [
+          347.80000000000007,
+          -156.79999999999995
+        ],
+        [
+          347.80000000000007,
+          -250
+        ],
+        [
+          455.30000000000007,
+          -250
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "vue-compiler-transforms-node-1",
+        "focus": -0.466666666666667,
+        "gap": 1.3999999999999773
+      },
+      "endBinding": {
+        "elementId": "vue-compiler-transforms-node-6",
+        "focus": -0.3666666666666672,
+        "gap": 5.599999999999909
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "vue-compiler-transforms-node-0-label",
+      "type": "text",
+      "x": 52,
+      "y": 757.5,
+      "width": 176,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aJ",
+      "roundness": null,
+      "seed": 1862492311,
+      "version": 1,
+      "versionNonce": 434954353,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "vue-compiler-transforms"
+      },
+      "text": "transformElement",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "vue-compiler-transforms-node-0",
+      "originalText": "transformElement",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "vue-compiler-transforms-node-1-label",
+      "type": "text",
+      "x": 725,
+      "y": 767.5,
+      "width": 110.00000000000001,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aK",
+      "roundness": null,
+      "seed": 832009586,
+      "version": 1,
+      "versionNonce": 757110566,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "vue-compiler-transforms"
+      },
+      "text": "buildProps",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "vue-compiler-transforms-node-1",
+      "originalText": "buildProps",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "vue-compiler-transforms-node-2-label",
+      "type": "text",
+      "x": 770.5,
+      "y": 467.5,
+      "width": 99.00000000000001,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aL",
+      "roundness": null,
+      "seed": 1769853461,
+      "version": 1,
+      "versionNonce": 547222815,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "vue-compiler-transforms"
+      },
+      "text": "processIf",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "vue-compiler-transforms-node-2",
+      "originalText": "processIf",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "vue-compiler-transforms-node-3-label",
+      "type": "text",
+      "x": 629,
+      "y": 307.5,
+      "width": 242.00000000000003,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aM",
+      "roundness": null,
+      "seed": 254466120,
+      "version": 1,
+      "versionNonce": 1633105572,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "vue-compiler-transforms"
+      },
+      "text": "finalizeForParseResult",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "vue-compiler-transforms-node-3",
+      "originalText": "finalizeForParseResult",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "vue-compiler-transforms-node-4-label",
+      "type": "text",
+      "x": 1348.5,
+      "y": 647.5,
+      "width": 143,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aN",
+      "roundness": null,
+      "seed": 306629091,
+      "version": 1,
+      "versionNonce": 1431735933,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "vue-compiler-transforms"
+      },
+      "text": "transformBind",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "vue-compiler-transforms-node-4",
+      "originalText": "transformBind",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "vue-compiler-transforms-node-5-label",
+      "type": "text",
+      "x": 1353,
+      "y": 807.5,
+      "width": 154,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aO",
+      "roundness": null,
+      "seed": 561133454,
+      "version": 1,
+      "versionNonce": 1518707762,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "vue-compiler-transforms"
+      },
+      "text": "transformModel",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "vue-compiler-transforms-node-5",
+      "originalText": "transformModel",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "vue-compiler-transforms-node-6-label",
+      "type": "text",
+      "x": 1345.5,
+      "y": 467.5,
+      "width": 209.00000000000003,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aP",
+      "roundness": null,
+      "seed": 1517640081,
+      "version": 1,
+      "versionNonce": 598914971,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "vue-compiler-transforms"
+      },
+      "text": "transformExpression",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "vue-compiler-transforms-node-6",
+      "originalText": "transformExpression",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "vue-compiler-transforms-node-7-label",
+      "type": "text",
+      "x": 48.5,
+      "y": 47.5,
+      "width": 143,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aQ",
+      "roundness": null,
+      "seed": 1325433684,
+      "version": 1,
+      "versionNonce": 1929845920,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "vue-compiler-transforms"
+      },
+      "text": "transformText",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "vue-compiler-transforms-node-7",
+      "originalText": "transformText",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "vue-compiler-transforms-node-8-label",
+      "type": "text",
+      "x": 569.5,
+      "y": 47.5,
+      "width": 121.00000000000001,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aR",
+      "roundness": null,
+      "seed": 1796361919,
+      "version": 1,
+      "versionNonce": 404340441,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "vue-compiler-transforms"
+      },
+      "text": "cacheStatic",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "vue-compiler-transforms-node-8",
+      "originalText": "cacheStatic",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "vue-compiler-transforms-node-9-label",
+      "type": "text",
+      "x": 627.5,
+      "y": 147.5,
+      "width": 165,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aS",
+      "roundness": null,
+      "seed": 1403884538,
+      "version": 1,
+      "versionNonce": 832049230,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "vue-compiler-transforms"
+      },
+      "text": "createVNodeCall",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "vue-compiler-transforms-node-9",
+      "originalText": "createVNodeCall",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "vue-compiler-transforms-edge-0-label",
+      "type": "text",
+      "x": 448.90000000000003,
+      "y": 772,
+      "width": 52.800000000000004,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aT",
+      "roundness": null,
+      "seed": 1711047232,
+      "version": 1,
+      "versionNonce": 1434984732,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "vue-compiler-transforms"
+      },
+      "text": "@calls",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "vue-compiler-transforms-edge-0",
+      "originalText": "@calls",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "vue-compiler-transforms-edge-1-label",
+      "type": "text",
+      "x": 951.1,
+      "y": 642,
+      "width": 140.8,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aU",
+      "roundness": null,
+      "seed": 786696205,
+      "version": 1,
+      "versionNonce": 55935991,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "vue-compiler-transforms"
+      },
+      "text": "directive @calls",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "vue-compiler-transforms-edge-1",
+      "originalText": "directive @calls",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "vue-compiler-transforms-edge-2-label",
+      "type": "text",
+      "x": 1016.1,
+      "y": 802,
+      "width": 140.8,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aV",
+      "roundness": null,
+      "seed": 2145068522,
+      "version": 1,
+      "versionNonce": 1927729854,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "vue-compiler-transforms"
+      },
+      "text": "directive @calls",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "vue-compiler-transforms-edge-2",
+      "originalText": "directive @calls",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "vue-compiler-transforms-edge-3-label",
+      "type": "text",
+      "x": 253.2,
+      "y": 301.53333333333336,
+      "width": 61.60000000000001,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aW",
+      "roundness": null,
+      "seed": 1650043119,
+      "version": 1,
+      "versionNonce": 247252297,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "vue-compiler-transforms"
+      },
+      "text": "@builds",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "vue-compiler-transforms-edge-3",
+      "originalText": "@builds",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "vue-compiler-transforms-edge-4-label",
+      "type": "text",
+      "x": 1077.6,
+      "y": 462,
+      "width": 52.800000000000004,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aX",
+      "roundness": null,
+      "seed": 1616758060,
+      "version": 1,
+      "versionNonce": 1323162488,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "vue-compiler-transforms"
+      },
+      "text": "@calls",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "vue-compiler-transforms-edge-4",
+      "originalText": "@calls",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "vue-compiler-transforms-edge-5-label",
+      "type": "text",
+      "x": 1142.6,
+      "y": 302,
+      "width": 52.800000000000004,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aY",
+      "roundness": null,
+      "seed": 1223126857,
+      "version": 1,
+      "versionNonce": 2078063571,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "vue-compiler-transforms"
+      },
+      "text": "@calls",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "vue-compiler-transforms-edge-5",
+      "originalText": "@calls",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "vue-compiler-transforms-edge-6-label",
+      "type": "text",
+      "x": 352,
+      "y": 42,
+      "width": 52.800000000000004,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aZ",
+      "roundness": null,
+      "seed": 1830069350,
+      "version": 1,
+      "versionNonce": 1763645258,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "vue-compiler-transforms"
+      },
+      "text": "@calls",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "vue-compiler-transforms-edge-6",
+      "originalText": "@calls",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "vue-compiler-transforms-edge-7-label",
+      "type": "text",
+      "x": 1028.3,
+      "y": 585.2,
+      "width": 52.800000000000004,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aa",
+      "roundness": null,
+      "seed": 859780891,
+      "version": 1,
+      "versionNonce": 1429360149,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "vue-compiler-transforms"
+      },
+      "text": "@calls",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "vue-compiler-transforms-edge-7",
+      "originalText": "@calls",
+      "autoResize": true,
+      "lineHeight": 1.25
+    }
+  ],
+  "appState": {
+    "gridSize": null,
+    "viewBackgroundColor": "#ffffff"
+  },
+  "files": {},
+  "diagramos": {
+    "version": "0.2.0-rc.6",
+    "schema": 1
+  }
+}

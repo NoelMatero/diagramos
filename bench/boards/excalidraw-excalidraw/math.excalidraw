@@ -1,0 +1,2287 @@
+{
+  "type": "excalidraw",
+  "version": 2,
+  "source": "diagramos",
+  "elements": [
+    {
+      "id": "math-package-geometry-types-and-operatio-title",
+      "type": "text",
+      "x": 0,
+      "y": -115,
+      "width": 554.4000000000001,
+      "height": 30,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a0",
+      "roundness": null,
+      "seed": 1154564393,
+      "version": 1,
+      "versionNonce": 1178548531,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "math-package-geometry-types-and-operatio",
+        "role": "title"
+      },
+      "text": "Math Package Geometry Types and Operations",
+      "fontSize": 24,
+      "fontFamily": 5,
+      "textAlign": "left",
+      "verticalAlign": "middle",
+      "containerId": null,
+      "originalText": "Math Package Geometry Types and Operations",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "math-package-geometry-types-and-operatio-node-0",
+      "type": "rectangle",
+      "x": 1180,
+      "y": 380,
+      "width": 160,
+      "height": 240,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a1",
+      "roundness": null,
+      "seed": 41152144,
+      "version": 1,
+      "versionNonce": 18929260,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "math-package-geometry-types-and-operatio-node-0-label"
+        },
+        {
+          "id": "math-package-geometry-types-and-operatio-edge-0",
+          "type": "arrow"
+        },
+        {
+          "id": "math-package-geometry-types-and-operatio-edge-2",
+          "type": "arrow"
+        },
+        {
+          "id": "math-package-geometry-types-and-operatio-edge-4",
+          "type": "arrow"
+        },
+        {
+          "id": "math-package-geometry-types-and-operatio-edge-6",
+          "type": "arrow"
+        },
+        {
+          "id": "math-package-geometry-types-and-operatio-edge-7",
+          "type": "arrow"
+        },
+        {
+          "id": "math-package-geometry-types-and-operatio-edge-9",
+          "type": "arrow"
+        },
+        {
+          "id": "math-package-geometry-types-and-operatio-edge-10",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "math-package-geometry-types-and-operatio",
+        "node": "point",
+        "ref": "packages/math/src/types.ts#GlobalPoint"
+      }
+    },
+    {
+      "id": "math-package-geometry-types-and-operatio-node-1",
+      "type": "rectangle",
+      "x": 660,
+      "y": 180,
+      "width": 160,
+      "height": 80,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a2",
+      "roundness": null,
+      "seed": 1459664793,
+      "version": 1,
+      "versionNonce": 1763336163,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "math-package-geometry-types-and-operatio-node-1-label"
+        },
+        {
+          "id": "math-package-geometry-types-and-operatio-edge-0",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "math-package-geometry-types-and-operatio",
+        "node": "pointFrom",
+        "ref": "packages/math/src/point.ts#pointFrom"
+      }
+    },
+    {
+      "id": "math-package-geometry-types-and-operatio-node-2",
+      "type": "rectangle",
+      "x": 1180,
+      "y": 940,
+      "width": 160,
+      "height": 100,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a3",
+      "roundness": null,
+      "seed": 1061543726,
+      "version": 1,
+      "versionNonce": 1526018386,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "math-package-geometry-types-and-operatio-node-2-label"
+        },
+        {
+          "id": "math-package-geometry-types-and-operatio-edge-1",
+          "type": "arrow"
+        },
+        {
+          "id": "math-package-geometry-types-and-operatio-edge-3",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "math-package-geometry-types-and-operatio",
+        "node": "vector",
+        "ref": "packages/math/src/types.ts#Vector"
+      }
+    },
+    {
+      "id": "math-package-geometry-types-and-operatio-node-3",
+      "type": "rectangle",
+      "x": 600,
+      "y": 880,
+      "width": 220,
+      "height": 100,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a4",
+      "roundness": null,
+      "seed": 591458751,
+      "version": 1,
+      "versionNonce": 159668185,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "math-package-geometry-types-and-operatio-node-3-label"
+        },
+        {
+          "id": "math-package-geometry-types-and-operatio-edge-1",
+          "type": "arrow"
+        },
+        {
+          "id": "math-package-geometry-types-and-operatio-edge-2",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "math-package-geometry-types-and-operatio",
+        "node": "vectorFromPoint",
+        "ref": "packages/math/src/vector.ts#vectorFromPoint"
+      }
+    },
+    {
+      "id": "math-package-geometry-types-and-operatio-node-4",
+      "type": "rectangle",
+      "x": 640,
+      "y": 1060,
+      "width": 180,
+      "height": 80,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a5",
+      "roundness": null,
+      "seed": 513804044,
+      "version": 1,
+      "versionNonce": 493552856,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "math-package-geometry-types-and-operatio-node-4-label"
+        },
+        {
+          "id": "math-package-geometry-types-and-operatio-edge-3",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "math-package-geometry-types-and-operatio",
+        "node": "vectorCross",
+        "ref": "packages/math/src/vector.ts#vectorCross"
+      }
+    },
+    {
+      "id": "math-package-geometry-types-and-operatio-node-5",
+      "type": "rectangle",
+      "x": 640,
+      "y": 340,
+      "width": 160,
+      "height": 80,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a6",
+      "roundness": null,
+      "seed": 653693221,
+      "version": 1,
+      "versionNonce": 322007983,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "math-package-geometry-types-and-operatio-node-5-label"
+        },
+        {
+          "id": "math-package-geometry-types-and-operatio-edge-4",
+          "type": "arrow"
+        },
+        {
+          "id": "math-package-geometry-types-and-operatio-edge-5",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "math-package-geometry-types-and-operatio",
+        "node": "line",
+        "ref": "packages/math/src/types.ts#Line"
+      }
+    },
+    {
+      "id": "math-package-geometry-types-and-operatio-node-6",
+      "type": "rectangle",
+      "x": 40,
+      "y": 340,
+      "width": 240,
+      "height": 100,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a7",
+      "roundness": null,
+      "seed": 1647061066,
+      "version": 1,
+      "versionNonce": 1483601054,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "math-package-geometry-types-and-operatio-node-6-label"
+        },
+        {
+          "id": "math-package-geometry-types-and-operatio-edge-5",
+          "type": "arrow"
+        },
+        {
+          "id": "math-package-geometry-types-and-operatio-edge-6",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "math-package-geometry-types-and-operatio",
+        "node": "linesIntersectAt",
+        "ref": "packages/math/src/line.ts#linesIntersectAt"
+      }
+    },
+    {
+      "id": "math-package-geometry-types-and-operatio-node-7",
+      "type": "rectangle",
+      "x": 620,
+      "y": 600,
+      "width": 180,
+      "height": 80,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a8",
+      "roundness": null,
+      "seed": 261396379,
+      "version": 1,
+      "versionNonce": 798570389,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "math-package-geometry-types-and-operatio-node-7-label"
+        },
+        {
+          "id": "math-package-geometry-types-and-operatio-edge-7",
+          "type": "arrow"
+        },
+        {
+          "id": "math-package-geometry-types-and-operatio-edge-8",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "math-package-geometry-types-and-operatio",
+        "node": "lineSegment",
+        "ref": "packages/math/src/types.ts#LineSegment"
+      }
+    },
+    {
+      "id": "math-package-geometry-types-and-operatio-node-8",
+      "type": "rectangle",
+      "x": 20,
+      "y": 620,
+      "width": 260,
+      "height": 100,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a9",
+      "roundness": null,
+      "seed": 672770392,
+      "version": 1,
+      "versionNonce": 152336436,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "math-package-geometry-types-and-operatio-node-8-label"
+        },
+        {
+          "id": "math-package-geometry-types-and-operatio-edge-8",
+          "type": "arrow"
+        },
+        {
+          "id": "math-package-geometry-types-and-operatio-edge-9",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "math-package-geometry-types-and-operatio",
+        "node": "segmentsIntersectAt",
+        "ref": "packages/math/src/segment.ts#segmentsIntersectAt"
+      }
+    },
+    {
+      "id": "math-package-geometry-types-and-operatio-node-9",
+      "type": "rectangle",
+      "x": 660,
+      "y": 20,
+      "width": 160,
+      "height": 80,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aA",
+      "roundness": null,
+      "seed": 1476828417,
+      "version": 1,
+      "versionNonce": 1832685899,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "math-package-geometry-types-and-operatio-node-9-label"
+        },
+        {
+          "id": "math-package-geometry-types-and-operatio-edge-10",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "math-package-geometry-types-and-operatio",
+        "node": "polygon",
+        "ref": "packages/math/src/types.ts#Polygon"
+      }
+    },
+    {
+      "id": "math-package-geometry-types-and-operatio-edge-0",
+      "type": "arrow",
+      "x": 824.8,
+      "y": 212,
+      "width": 350.39999999999986,
+      "height": 220,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aB",
+      "roundness": null,
+      "seed": 904930567,
+      "version": 1,
+      "versionNonce": 2095870241,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "math-package-geometry-types-and-operatio-edge-0-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "math-package-geometry-types-and-operatio",
+        "edge": {
+          "from": "pointFrom",
+          "to": "point",
+          "claim": "builds"
+        }
+      },
+      "points": [
+        [
+          0.5,
+          0
+        ],
+        [
+          266.39999999999986,
+          0
+        ],
+        [
+          266.39999999999986,
+          18.800000000000068
+        ],
+        [
+          266.39999999999986,
+          220
+        ],
+        [
+          349.89999999999986,
+          220
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "math-package-geometry-types-and-operatio-node-1",
+        "focus": -0.2,
+        "gap": 4.7999999999999545
+      },
+      "endBinding": {
+        "elementId": "math-package-geometry-types-and-operatio-node-0",
+        "focus": 0.5666666666666664,
+        "gap": 4.800000000000182
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "math-package-geometry-types-and-operatio-edge-1",
+      "type": "arrow",
+      "x": 824.8,
+      "y": 944.2666666666665,
+      "width": 350.39999999999986,
+      "height": 23.466666666666697,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aC",
+      "roundness": null,
+      "seed": 1716846710,
+      "version": 1,
+      "versionNonce": 404722394,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "math-package-geometry-types-and-operatio-edge-1-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "math-package-geometry-types-and-operatio",
+        "edge": {
+          "from": "vectorFromPoint",
+          "to": "vector",
+          "claim": "returns"
+        }
+      },
+      "points": [
+        [
+          0.5,
+          0
+        ],
+        [
+          32,
+          0
+        ],
+        [
+          32,
+          23.466666666666697
+        ],
+        [
+          163.46666666666658,
+          23.466666666666697
+        ],
+        [
+          256.93333333333317,
+          23.466666666666697
+        ],
+        [
+          303.6666666666665,
+          23.466666666666697
+        ],
+        [
+          349.89999999999986,
+          23.466666666666697
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "math-package-geometry-types-and-operatio-node-3",
+        "focus": 0.285333333333329,
+        "gap": 4.7999999999999545
+      },
+      "endBinding": {
+        "elementId": "math-package-geometry-types-and-operatio-node-2",
+        "focus": 0.4453333333333369,
+        "gap": 4.800000000000182
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "math-package-geometry-types-and-operatio-edge-2",
+      "type": "arrow",
+      "x": 824.8,
+      "y": 910.9333333333333,
+      "width": 350.39999999999986,
+      "height": 328.9333333333333,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aD",
+      "roundness": null,
+      "seed": 1033709057,
+      "version": 1,
+      "versionNonce": 1496726603,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "math-package-geometry-types-and-operatio-edge-2-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "math-package-geometry-types-and-operatio",
+        "edge": {
+          "from": "vectorFromPoint",
+          "to": "point",
+          "claim": "takes"
+        }
+      },
+      "points": [
+        [
+          0.5,
+          0
+        ],
+        [
+          290.39999999999986,
+          0
+        ],
+        [
+          290.39999999999986,
+          -49.266666666666765
+        ],
+        [
+          290.39999999999986,
+          -328.9333333333333
+        ],
+        [
+          349.89999999999986,
+          -328.9333333333333
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "math-package-geometry-types-and-operatio-node-3",
+        "focus": -0.38133333333333597,
+        "gap": 4.7999999999999545
+      },
+      "endBinding": {
+        "elementId": "math-package-geometry-types-and-operatio-node-0",
+        "focus": -0.6833333333333336,
+        "gap": 4.800000000000182
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "math-package-geometry-types-and-operatio-edge-3",
+      "type": "arrow",
+      "x": 824.8,
+      "y": 1097.6,
+      "width": 350.39999999999986,
+      "height": 96.53333333333342,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aE",
+      "roundness": null,
+      "seed": 229651032,
+      "version": 1,
+      "versionNonce": 1963860788,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "math-package-geometry-types-and-operatio-edge-3-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "math-package-geometry-types-and-operatio",
+        "edge": {
+          "from": "vectorCross",
+          "to": "vector",
+          "claim": "takes"
+        }
+      },
+      "points": [
+        [
+          0.5,
+          0
+        ],
+        [
+          55.866666666666674,
+          0
+        ],
+        [
+          111.73333333333335,
+          0
+        ],
+        [
+          223.4666666666667,
+          0
+        ],
+        [
+          242.39999999999986,
+          0
+        ],
+        [
+          242.39999999999986,
+          -96.53333333333342
+        ],
+        [
+          349.89999999999986,
+          -96.53333333333342
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "math-package-geometry-types-and-operatio-node-4",
+        "focus": -0.06000000000000333,
+        "gap": 4.7999999999999545
+      },
+      "endBinding": {
+        "elementId": "math-package-geometry-types-and-operatio-node-2",
+        "focus": -0.22133333333332797,
+        "gap": 4.800000000000182
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "math-package-geometry-types-and-operatio-edge-4",
+      "type": "arrow",
+      "x": 794.8,
+      "y": 372,
+      "width": 380.39999999999986,
+      "height": 90,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aF",
+      "roundness": null,
+      "seed": 1620356355,
+      "version": 1,
+      "versionNonce": 640796189,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "math-package-geometry-types-and-operatio-edge-4-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "math-package-geometry-types-and-operatio",
+        "edge": {
+          "from": "line",
+          "to": "point",
+          "claim": "holds"
+        }
+      },
+      "points": [
+        [
+          0.5,
+          0
+        ],
+        [
+          58.799999999999955,
+          0
+        ],
+        [
+          117.60000000000002,
+          0
+        ],
+        [
+          235.20000000000005,
+          0
+        ],
+        [
+          272.39999999999986,
+          0
+        ],
+        [
+          272.39999999999986,
+          90
+        ],
+        [
+          379.89999999999986,
+          90
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "math-package-geometry-types-and-operatio-node-5",
+        "focus": -0.2,
+        "gap": 5.2000000000000455
+      },
+      "endBinding": {
+        "elementId": "math-package-geometry-types-and-operatio-node-0",
+        "focus": 0.31666666666666643,
+        "gap": 4.800000000000182
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "math-package-geometry-types-and-operatio-edge-5",
+      "type": "arrow",
+      "x": 272,
+      "y": 372,
+      "width": 362.79999999999995,
+      "height": 0,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aG",
+      "roundness": null,
+      "seed": 855634322,
+      "version": 1,
+      "versionNonce": 1427447494,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "math-package-geometry-types-and-operatio-edge-5-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "math-package-geometry-types-and-operatio",
+        "edge": {
+          "from": "linesIntersectAt",
+          "to": "line",
+          "claim": "takes"
+        }
+      },
+      "points": [
+        [
+          0.5,
+          0
+        ],
+        [
+          181.39999999999998,
+          0
+        ],
+        [
+          362.29999999999995,
+          0
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "math-package-geometry-types-and-operatio-node-6",
+        "focus": -0.3599999999999999,
+        "gap": 8
+      },
+      "endBinding": {
+        "elementId": "math-package-geometry-types-and-operatio-node-5",
+        "focus": 0.2,
+        "gap": 5.2000000000000455
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "math-package-geometry-types-and-operatio-edge-6",
+      "type": "arrow",
+      "x": 272,
+      "y": 405.33333333333337,
+      "width": 903.1999999999998,
+      "height": 86.66666666666663,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aH",
+      "roundness": null,
+      "seed": 2104623021,
+      "version": 1,
+      "versionNonce": 215188247,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "math-package-geometry-types-and-operatio-edge-6-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "math-package-geometry-types-and-operatio",
+        "edge": {
+          "from": "linesIntersectAt",
+          "to": "point",
+          "claim": "returns"
+        }
+      },
+      "points": [
+        [
+          0.5,
+          0
+        ],
+        [
+          32,
+          0
+        ],
+        [
+          32,
+          86.66666666666663
+        ],
+        [
+          408.26666666666665,
+          86.66666666666663
+        ],
+        [
+          532,
+          86.66666666666663
+        ],
+        [
+          655.7333333333332,
+          86.66666666666663
+        ],
+        [
+          902.6999999999998,
+          86.66666666666663
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "math-package-geometry-types-and-operatio-node-6",
+        "focus": 0.30666666666666825,
+        "gap": 8
+      },
+      "endBinding": {
+        "elementId": "math-package-geometry-types-and-operatio-node-0",
+        "focus": 0.06666666666666637,
+        "gap": 4.800000000000182
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "math-package-geometry-types-and-operatio-edge-7",
+      "type": "arrow",
+      "x": 804.8,
+      "y": 644.8,
+      "width": 370.39999999999986,
+      "height": 122.79999999999995,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aI",
+      "roundness": null,
+      "seed": 1042178516,
+      "version": 1,
+      "versionNonce": 1594646560,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "math-package-geometry-types-and-operatio-edge-7-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "math-package-geometry-types-and-operatio",
+        "edge": {
+          "from": "lineSegment",
+          "to": "point",
+          "claim": "holds"
+        }
+      },
+      "points": [
+        [
+          0.5,
+          0
+        ],
+        [
+          61.64999999999998,
+          0
+        ],
+        [
+          123.29999999999995,
+          0
+        ],
+        [
+          246.5999999999999,
+          0
+        ],
+        [
+          262.39999999999986,
+          0
+        ],
+        [
+          262.39999999999986,
+          -122.79999999999995
+        ],
+        [
+          369.89999999999986,
+          -122.79999999999995
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "math-package-geometry-types-and-operatio-node-7",
+        "focus": 0.11999999999999836,
+        "gap": 4.7999999999999545
+      },
+      "endBinding": {
+        "elementId": "math-package-geometry-types-and-operatio-node-0",
+        "focus": -0.18333333333333363,
+        "gap": 4.800000000000182
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "math-package-geometry-types-and-operatio-edge-8",
+      "type": "arrow",
+      "x": 272,
+      "y": 644.8,
+      "width": 352.79999999999995,
+      "height": 0,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aJ",
+      "roundness": null,
+      "seed": 148339391,
+      "version": 1,
+      "versionNonce": 1971192537,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "math-package-geometry-types-and-operatio-edge-8-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "math-package-geometry-types-and-operatio",
+        "edge": {
+          "from": "segmentsIntersectAt",
+          "to": "lineSegment",
+          "claim": "takes"
+        }
+      },
+      "points": [
+        [
+          0.5,
+          0
+        ],
+        [
+          176.39999999999998,
+          0
+        ],
+        [
+          352.29999999999995,
+          0
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "math-package-geometry-types-and-operatio-node-8",
+        "focus": -0.504,
+        "gap": 8
+      },
+      "endBinding": {
+        "elementId": "math-package-geometry-types-and-operatio-node-7",
+        "focus": -0.11999999999999836,
+        "gap": 4.7999999999999545
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "math-package-geometry-types-and-operatio-edge-9",
+      "type": "arrow",
+      "x": 272,
+      "y": 678.1333333333332,
+      "width": 903.1999999999998,
+      "height": 212.79999999999995,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aK",
+      "roundness": null,
+      "seed": 618424366,
+      "version": 1,
+      "versionNonce": 1190059090,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "math-package-geometry-types-and-operatio-edge-9-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "math-package-geometry-types-and-operatio",
+        "edge": {
+          "from": "segmentsIntersectAt",
+          "to": "point",
+          "claim": "returns"
+        }
+      },
+      "points": [
+        [
+          0.5,
+          0
+        ],
+        [
+          32,
+          0
+        ],
+        [
+          32,
+          86.66666666666674
+        ],
+        [
+          514.6666666666665,
+          86.66666666666674
+        ],
+        [
+          819.1999999999998,
+          86.66666666666674
+        ],
+        [
+          819.1999999999998,
+          -126.13333333333321
+        ],
+        [
+          902.6999999999998,
+          -126.13333333333321
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "math-package-geometry-types-and-operatio-node-8",
+        "focus": 0.16266666666666343,
+        "gap": 8
+      },
+      "endBinding": {
+        "elementId": "math-package-geometry-types-and-operatio-node-0",
+        "focus": -0.4333333333333337,
+        "gap": 4.800000000000182
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "math-package-geometry-types-and-operatio-edge-10",
+      "type": "arrow",
+      "x": 824.8,
+      "y": 52,
+      "width": 350.39999999999986,
+      "height": 350,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aL",
+      "roundness": null,
+      "seed": 1931993656,
+      "version": 1,
+      "versionNonce": 1349964436,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "math-package-geometry-types-and-operatio-edge-10-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "math-package-geometry-types-and-operatio",
+        "edge": {
+          "from": "polygon",
+          "to": "point",
+          "claim": "holds"
+        }
+      },
+      "points": [
+        [
+          0.5,
+          0
+        ],
+        [
+          290.39999999999986,
+          0
+        ],
+        [
+          290.39999999999986,
+          59.80000000000007
+        ],
+        [
+          290.39999999999986,
+          350
+        ],
+        [
+          349.89999999999986,
+          350
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "math-package-geometry-types-and-operatio-node-9",
+        "focus": -0.2,
+        "gap": 4.7999999999999545
+      },
+      "endBinding": {
+        "elementId": "math-package-geometry-types-and-operatio-node-0",
+        "focus": 0.8166666666666664,
+        "gap": 4.800000000000182
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "math-package-geometry-types-and-operatio-node-0-label",
+      "type": "text",
+      "x": 1232.5,
+      "y": 487.5,
+      "width": 55.00000000000001,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aM",
+      "roundness": null,
+      "seed": 701686637,
+      "version": 1,
+      "versionNonce": 652138455,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "math-package-geometry-types-and-operatio"
+      },
+      "text": "Point",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "math-package-geometry-types-and-operatio-node-0",
+      "originalText": "Point",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "math-package-geometry-types-and-operatio-node-1-label",
+      "type": "text",
+      "x": 690.5,
+      "y": 207.5,
+      "width": 99.00000000000001,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aN",
+      "roundness": null,
+      "seed": 969730976,
+      "version": 1,
+      "versionNonce": 1721554172,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "math-package-geometry-types-and-operatio"
+      },
+      "text": "pointFrom",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "math-package-geometry-types-and-operatio-node-1",
+      "originalText": "pointFrom",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "math-package-geometry-types-and-operatio-node-2-label",
+      "type": "text",
+      "x": 1227,
+      "y": 977.5,
+      "width": 66,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aO",
+      "roundness": null,
+      "seed": 1798444367,
+      "version": 1,
+      "versionNonce": 884767273,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "math-package-geometry-types-and-operatio"
+      },
+      "text": "Vector",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "math-package-geometry-types-and-operatio-node-2",
+      "originalText": "Vector",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "math-package-geometry-types-and-operatio-node-3-label",
+      "type": "text",
+      "x": 627.5,
+      "y": 917.5,
+      "width": 165,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aP",
+      "roundness": null,
+      "seed": 1669365578,
+      "version": 1,
+      "versionNonce": 1882384798,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "math-package-geometry-types-and-operatio"
+      },
+      "text": "vectorFromPoint",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "math-package-geometry-types-and-operatio-node-3",
+      "originalText": "vectorFromPoint",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "math-package-geometry-types-and-operatio-node-4-label",
+      "type": "text",
+      "x": 669.5,
+      "y": 1087.5,
+      "width": 121.00000000000001,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aQ",
+      "roundness": null,
+      "seed": 47440041,
+      "version": 1,
+      "versionNonce": 1684033459,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "math-package-geometry-types-and-operatio"
+      },
+      "text": "vectorCross",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "math-package-geometry-types-and-operatio-node-4",
+      "originalText": "vectorCross",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "math-package-geometry-types-and-operatio-node-5-label",
+      "type": "text",
+      "x": 698,
+      "y": 367.5,
+      "width": 44,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aR",
+      "roundness": null,
+      "seed": 1563608588,
+      "version": 1,
+      "versionNonce": 510505432,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "math-package-geometry-types-and-operatio"
+      },
+      "text": "Line",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "math-package-geometry-types-and-operatio-node-5",
+      "originalText": "Line",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "math-package-geometry-types-and-operatio-node-6-label",
+      "type": "text",
+      "x": 72,
+      "y": 377.5,
+      "width": 176,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aS",
+      "roundness": null,
+      "seed": 662287227,
+      "version": 1,
+      "versionNonce": 1408747765,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "math-package-geometry-types-and-operatio"
+      },
+      "text": "linesIntersectAt",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "math-package-geometry-types-and-operatio-node-6",
+      "originalText": "linesIntersectAt",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "math-package-geometry-types-and-operatio-node-7-label",
+      "type": "text",
+      "x": 649.5,
+      "y": 627.5,
+      "width": 121.00000000000001,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aT",
+      "roundness": null,
+      "seed": 1051591622,
+      "version": 1,
+      "versionNonce": 2106630186,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "math-package-geometry-types-and-operatio"
+      },
+      "text": "LineSegment",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "math-package-geometry-types-and-operatio-node-7",
+      "originalText": "LineSegment",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "math-package-geometry-types-and-operatio-node-8-label",
+      "type": "text",
+      "x": 45.499999999999986,
+      "y": 657.5,
+      "width": 209.00000000000003,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aU",
+      "roundness": null,
+      "seed": 1470031909,
+      "version": 1,
+      "versionNonce": 741501103,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "math-package-geometry-types-and-operatio"
+      },
+      "text": "segmentsIntersectAt",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "math-package-geometry-types-and-operatio-node-8",
+      "originalText": "segmentsIntersectAt",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "math-package-geometry-types-and-operatio-node-9-label",
+      "type": "text",
+      "x": 701.5,
+      "y": 47.5,
+      "width": 77,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aV",
+      "roundness": null,
+      "seed": 1589254488,
+      "version": 1,
+      "versionNonce": 128239668,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "math-package-geometry-types-and-operatio"
+      },
+      "text": "Polygon",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "math-package-geometry-types-and-operatio-node-9",
+      "originalText": "Polygon",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "math-package-geometry-types-and-operatio-edge-0-label",
+      "type": "text",
+      "x": 1060.3999999999999,
+      "y": 220.80000000000007,
+      "width": 61.60000000000001,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aW",
+      "roundness": null,
+      "seed": 819369602,
+      "version": 1,
+      "versionNonce": 8155382,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "math-package-geometry-types-and-operatio"
+      },
+      "text": "@builds",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "math-package-geometry-types-and-operatio-edge-0",
+      "originalText": "@builds",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "math-package-geometry-types-and-operatio-edge-1-label",
+      "type": "text",
+      "x": 953.0666666666665,
+      "y": 957.7333333333332,
+      "width": 70.4,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aX",
+      "roundness": null,
+      "seed": 1781279015,
+      "version": 1,
+      "versionNonce": 392596161,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "math-package-geometry-types-and-operatio"
+      },
+      "text": "@returns",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "math-package-geometry-types-and-operatio-edge-1",
+      "originalText": "@returns",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "math-package-geometry-types-and-operatio-edge-2-label",
+      "type": "text",
+      "x": 1088.7999999999997,
+      "y": 851.6666666666665,
+      "width": 52.800000000000004,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aY",
+      "roundness": null,
+      "seed": 1767135832,
+      "version": 1,
+      "versionNonce": 947460916,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "math-package-geometry-types-and-operatio"
+      },
+      "text": "@takes",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "math-package-geometry-types-and-operatio-edge-2",
+      "originalText": "@takes",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "math-package-geometry-types-and-operatio-edge-3-label",
+      "type": "text",
+      "x": 1021.8666666666667,
+      "y": 1087.6,
+      "width": 52.800000000000004,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aZ",
+      "roundness": null,
+      "seed": 1647913253,
+      "version": 1,
+      "versionNonce": 1560722351,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "math-package-geometry-types-and-operatio"
+      },
+      "text": "@takes",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "math-package-geometry-types-and-operatio-edge-3",
+      "originalText": "@takes",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "math-package-geometry-types-and-operatio-edge-4-label",
+      "type": "text",
+      "x": 1003.6,
+      "y": 362,
+      "width": 52.800000000000004,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aa",
+      "roundness": null,
+      "seed": 1426687646,
+      "version": 1,
+      "versionNonce": 674937282,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "math-package-geometry-types-and-operatio"
+      },
+      "text": "@holds",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "math-package-geometry-types-and-operatio-edge-4",
+      "originalText": "@holds",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "math-package-geometry-types-and-operatio-edge-5-label",
+      "type": "text",
+      "x": 427,
+      "y": 362,
+      "width": 52.800000000000004,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "ab",
+      "roundness": null,
+      "seed": 1473990579,
+      "version": 1,
+      "versionNonce": 109966477,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "math-package-geometry-types-and-operatio"
+      },
+      "text": "@takes",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "math-package-geometry-types-and-operatio-edge-5",
+      "originalText": "@takes",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "math-package-geometry-types-and-operatio-edge-6-label",
+      "type": "text",
+      "x": 645.0666666666666,
+      "y": 482,
+      "width": 70.4,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "ac",
+      "roundness": null,
+      "seed": 1914928740,
+      "version": 1,
+      "versionNonce": 771405296,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "math-package-geometry-types-and-operatio"
+      },
+      "text": "@returns",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "math-package-geometry-types-and-operatio-edge-6",
+      "originalText": "@returns",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "math-package-geometry-types-and-operatio-edge-7-label",
+      "type": "text",
+      "x": 1024.9999999999998,
+      "y": 634.8,
+      "width": 52.800000000000004,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "ad",
+      "roundness": null,
+      "seed": 1742177569,
+      "version": 1,
+      "versionNonce": 1796433899,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "math-package-geometry-types-and-operatio"
+      },
+      "text": "@holds",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "math-package-geometry-types-and-operatio-edge-7",
+      "originalText": "@holds",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "math-package-geometry-types-and-operatio-edge-8-label",
+      "type": "text",
+      "x": 422,
+      "y": 634.8,
+      "width": 52.800000000000004,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "ae",
+      "roundness": null,
+      "seed": 1847246922,
+      "version": 1,
+      "versionNonce": 554122398,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "math-package-geometry-types-and-operatio"
+      },
+      "text": "@takes",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "math-package-geometry-types-and-operatio-edge-8",
+      "originalText": "@takes",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "math-package-geometry-types-and-operatio-edge-9-label",
+      "type": "text",
+      "x": 751.4666666666665,
+      "y": 754.8,
+      "width": 70.4,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "af",
+      "roundness": null,
+      "seed": 1976325711,
+      "version": 1,
+      "versionNonce": 1703988521,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "math-package-geometry-types-and-operatio"
+      },
+      "text": "@returns",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "math-package-geometry-types-and-operatio-edge-9",
+      "originalText": "@returns",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "math-package-geometry-types-and-operatio-edge-10-label",
+      "type": "text",
+      "x": 1088.7999999999997,
+      "y": 101.80000000000007,
+      "width": 52.800000000000004,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "ag",
+      "roundness": null,
+      "seed": 2114396037,
+      "version": 1,
+      "versionNonce": 1153093519,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "math-package-geometry-types-and-operatio"
+      },
+      "text": "@holds",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "math-package-geometry-types-and-operatio-edge-10",
+      "originalText": "@holds",
+      "autoResize": true,
+      "lineHeight": 1.25
+    }
+  ],
+  "appState": {
+    "gridSize": null,
+    "viewBackgroundColor": "#ffffff"
+  },
+  "files": {},
+  "diagramos": {
+    "version": "0.2.0-rc.6",
+    "schema": 1
+  }
+}

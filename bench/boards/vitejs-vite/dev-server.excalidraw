@@ -1,0 +1,1962 @@
+{
+  "type": "excalidraw",
+  "version": 2,
+  "source": "diagramos",
+  "elements": [
+    {
+      "id": "vite-dev-server-creation-and-module-requ-title",
+      "type": "text",
+      "x": 0,
+      "y": -115,
+      "width": 699.6,
+      "height": 30,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a0",
+      "roundness": null,
+      "seed": 1808305312,
+      "version": 1,
+      "versionNonce": 364595196,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "vite-dev-server-creation-and-module-requ",
+        "role": "title",
+        "direction": "DOWN"
+      },
+      "text": "Vite Dev Server: Creation and Module Request Handling",
+      "fontSize": 24,
+      "fontFamily": 5,
+      "textAlign": "left",
+      "verticalAlign": "middle",
+      "containerId": null,
+      "originalText": "Vite Dev Server: Creation and Module Request Handling",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "vite-dev-server-creation-and-module-requ-node-0",
+      "type": "rectangle",
+      "x": 500,
+      "y": 20,
+      "width": 200,
+      "height": 80,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a1",
+      "roundness": null,
+      "seed": 953746287,
+      "version": 1,
+      "versionNonce": 959986889,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "vite-dev-server-creation-and-module-requ-node-0-label"
+        },
+        {
+          "id": "vite-dev-server-creation-and-module-requ-edge-0",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "vite-dev-server-creation-and-module-requ",
+        "node": "create-server",
+        "ref": "packages/vite/src/node/server/index.ts#_createServer"
+      }
+    },
+    {
+      "id": "vite-dev-server-creation-and-module-requ-node-1",
+      "type": "rectangle",
+      "x": 500,
+      "y": 400,
+      "width": 200,
+      "height": 80,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a2",
+      "roundness": null,
+      "seed": 818771742,
+      "version": 1,
+      "versionNonce": 497963842,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "vite-dev-server-creation-and-module-requ-node-1-label"
+        },
+        {
+          "id": "vite-dev-server-creation-and-module-requ-edge-0",
+          "type": "arrow"
+        },
+        {
+          "id": "vite-dev-server-creation-and-module-requ-edge-1",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "vite-dev-server-creation-and-module-requ",
+        "node": "vite-server",
+        "ref": "packages/vite/src/node/server/index.ts#ViteDevServer"
+      }
+    },
+    {
+      "id": "vite-dev-server-creation-and-module-requ-node-2",
+      "type": "rectangle",
+      "x": 440,
+      "y": 780,
+      "width": 220,
+      "height": 80,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a3",
+      "roundness": null,
+      "seed": 335387081,
+      "version": 1,
+      "versionNonce": 801219411,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "vite-dev-server-creation-and-module-requ-node-2-label"
+        },
+        {
+          "id": "vite-dev-server-creation-and-module-requ-edge-1",
+          "type": "arrow"
+        },
+        {
+          "id": "vite-dev-server-creation-and-module-requ-edge-2",
+          "type": "arrow"
+        },
+        {
+          "id": "vite-dev-server-creation-and-module-requ-edge-3",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "vite-dev-server-creation-and-module-requ",
+        "node": "dev-environment",
+        "ref": "packages/vite/src/node/server/environment.ts#DevEnvironment"
+      }
+    },
+    {
+      "id": "vite-dev-server-creation-and-module-requ-node-3",
+      "type": "rectangle",
+      "x": 160,
+      "y": 400,
+      "width": 260,
+      "height": 80,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a4",
+      "roundness": null,
+      "seed": 1477155712,
+      "version": 1,
+      "versionNonce": 910062428,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "vite-dev-server-creation-and-module-requ-node-3-label"
+        },
+        {
+          "id": "vite-dev-server-creation-and-module-requ-edge-2",
+          "type": "arrow"
+        },
+        {
+          "id": "vite-dev-server-creation-and-module-requ-edge-8",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "vite-dev-server-creation-and-module-requ",
+        "node": "transform-middleware",
+        "ref": "packages/vite/src/node/server/middlewares/transform.ts#transformMiddleware"
+      }
+    },
+    {
+      "id": "vite-dev-server-creation-and-module-requ-node-4",
+      "type": "rectangle",
+      "x": 440,
+      "y": 1160,
+      "width": 240,
+      "height": 80,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a5",
+      "roundness": null,
+      "seed": 1707845707,
+      "version": 1,
+      "versionNonce": 632291013,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "vite-dev-server-creation-and-module-requ-node-4-label"
+        },
+        {
+          "id": "vite-dev-server-creation-and-module-requ-edge-3",
+          "type": "arrow"
+        },
+        {
+          "id": "vite-dev-server-creation-and-module-requ-edge-4",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "vite-dev-server-creation-and-module-requ",
+        "node": "transform-request",
+        "ref": "packages/vite/src/node/server/transformRequest.ts#transformRequest"
+      }
+    },
+    {
+      "id": "vite-dev-server-creation-and-module-requ-node-5",
+      "type": "rectangle",
+      "x": 460,
+      "y": 1540,
+      "width": 180,
+      "height": 80,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a6",
+      "roundness": null,
+      "seed": 1275456570,
+      "version": 1,
+      "versionNonce": 749860238,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "vite-dev-server-creation-and-module-requ-node-5-label"
+        },
+        {
+          "id": "vite-dev-server-creation-and-module-requ-edge-4",
+          "type": "arrow"
+        },
+        {
+          "id": "vite-dev-server-creation-and-module-requ-edge-5",
+          "type": "arrow"
+        },
+        {
+          "id": "vite-dev-server-creation-and-module-requ-edge-6",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "vite-dev-server-creation-and-module-requ",
+        "node": "do-transform",
+        "ref": "packages/vite/src/node/server/transformRequest.ts#doTransform"
+      }
+    },
+    {
+      "id": "vite-dev-server-creation-and-module-requ-node-6",
+      "type": "rectangle",
+      "x": 160,
+      "y": 1920,
+      "width": 220,
+      "height": 80,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a7",
+      "roundness": null,
+      "seed": 69090069,
+      "version": 1,
+      "versionNonce": 186859551,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "vite-dev-server-creation-and-module-requ-node-6-label"
+        },
+        {
+          "id": "vite-dev-server-creation-and-module-requ-edge-5",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "vite-dev-server-creation-and-module-requ",
+        "node": "plugin-container",
+        "ref": "packages/vite/src/node/server/pluginContainer.ts#PluginContainer"
+      }
+    },
+    {
+      "id": "vite-dev-server-creation-and-module-requ-node-7",
+      "type": "rectangle",
+      "x": 460,
+      "y": 1920,
+      "width": 240,
+      "height": 80,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a8",
+      "roundness": null,
+      "seed": 144103548,
+      "version": 1,
+      "versionNonce": 666091272,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "vite-dev-server-creation-and-module-requ-node-7-label"
+        },
+        {
+          "id": "vite-dev-server-creation-and-module-requ-edge-6",
+          "type": "arrow"
+        },
+        {
+          "id": "vite-dev-server-creation-and-module-requ-edge-7",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "vite-dev-server-creation-and-module-requ",
+        "node": "load-and-transform",
+        "ref": "packages/vite/src/node/server/transformRequest.ts#loadAndTransform"
+      }
+    },
+    {
+      "id": "vite-dev-server-creation-and-module-requ-node-8",
+      "type": "rectangle",
+      "x": 500,
+      "y": 2300,
+      "width": 180,
+      "height": 80,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a9",
+      "roundness": null,
+      "seed": 2052168631,
+      "version": 1,
+      "versionNonce": 1918017553,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "vite-dev-server-creation-and-module-requ-node-8-label"
+        },
+        {
+          "id": "vite-dev-server-creation-and-module-requ-edge-7",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "vite-dev-server-creation-and-module-requ",
+        "node": "module-graph",
+        "ref": "packages/vite/src/node/server/mixedModuleGraph.ts#ModuleGraph"
+      }
+    },
+    {
+      "id": "vite-dev-server-creation-and-module-requ-node-9",
+      "type": "rectangle",
+      "x": 20,
+      "y": 780,
+      "width": 160,
+      "height": 80,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aA",
+      "roundness": null,
+      "seed": 1448485990,
+      "version": 1,
+      "versionNonce": 456890186,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "vite-dev-server-creation-and-module-requ-node-9-label"
+        },
+        {
+          "id": "vite-dev-server-creation-and-module-requ-edge-8",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "vite-dev-server-creation-and-module-requ",
+        "node": "send",
+        "ref": "packages/vite/src/node/server/send.ts#send"
+      }
+    },
+    {
+      "id": "vite-dev-server-creation-and-module-requ-edge-0",
+      "type": "arrow",
+      "x": 596.0666666666666,
+      "y": 92,
+      "width": 0,
+      "height": 300.8,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aB",
+      "roundness": null,
+      "seed": 1008794720,
+      "version": 1,
+      "versionNonce": 2100497852,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "vite-dev-server-creation-and-module-requ-edge-0-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "vite-dev-server-creation-and-module-requ",
+        "edge": {
+          "from": "create-server",
+          "to": "vite-server",
+          "claim": "builds"
+        }
+      },
+      "points": [
+        [
+          0,
+          0.5
+        ],
+        [
+          0,
+          150.4
+        ],
+        [
+          0,
+          300.3
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "vite-dev-server-creation-and-module-requ-node-0",
+        "focus": 0.039333333333334955,
+        "gap": 8
+      },
+      "endBinding": {
+        "elementId": "vite-dev-server-creation-and-module-requ-node-1",
+        "focus": -0.039333333333333824,
+        "gap": 7.199999999999989
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "vite-dev-server-creation-and-module-requ-edge-1",
+      "type": "arrow",
+      "x": 596.0666666666666,
+      "y": 472.8,
+      "width": 0,
+      "height": 300.7999999999999,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aC",
+      "roundness": null,
+      "seed": 1353591337,
+      "version": 1,
+      "versionNonce": 1929511987,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "vite-dev-server-creation-and-module-requ-edge-1-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "vite-dev-server-creation-and-module-requ",
+        "edge": {
+          "from": "vite-server",
+          "to": "dev-environment",
+          "claim": "holds"
+        }
+      },
+      "points": [
+        [
+          0,
+          0.5
+        ],
+        [
+          0,
+          150.39999999999992
+        ],
+        [
+          0,
+          300.2999999999999
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "vite-dev-server-creation-and-module-requ-node-1",
+        "focus": 0.039333333333334795,
+        "gap": 7.199999999999989
+      },
+      "endBinding": {
+        "elementId": "vite-dev-server-creation-and-module-requ-node-2",
+        "focus": 0.41878787878787915,
+        "gap": 6.400000000000091
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "vite-dev-server-creation-and-module-requ-edge-2",
+      "type": "arrow",
+      "x": 329.4,
+      "y": 472.8,
+      "width": 193.33333333333337,
+      "height": 300.7999999999999,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aD",
+      "roundness": null,
+      "seed": 1092741374,
+      "version": 1,
+      "versionNonce": 1180522402,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "vite-dev-server-creation-and-module-requ-edge-2-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "vite-dev-server-creation-and-module-requ",
+        "edge": {
+          "from": "transform-middleware",
+          "to": "dev-environment",
+          "claim": "calls"
+        }
+      },
+      "points": [
+        [
+          0,
+          0.5
+        ],
+        [
+          0,
+          192.7999999999999
+        ],
+        [
+          54.266666666666765,
+          192.7999999999999
+        ],
+        [
+          193.33333333333337,
+          192.7999999999999
+        ],
+        [
+          193.33333333333337,
+          300.2999999999999
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "vite-dev-server-creation-and-module-requ-node-3",
+        "focus": -0.303076923076923,
+        "gap": 7.199999999999989
+      },
+      "endBinding": {
+        "elementId": "vite-dev-server-creation-and-module-requ-node-2",
+        "focus": -0.24787878787878762,
+        "gap": 6.400000000000091
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "vite-dev-server-creation-and-module-requ-edge-3",
+      "type": "arrow",
+      "x": 559.4,
+      "y": 853.5999999999999,
+      "width": 0,
+      "height": 300.79999999999995,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aE",
+      "roundness": null,
+      "seed": 485385295,
+      "version": 1,
+      "versionNonce": 2938665,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "vite-dev-server-creation-and-module-requ-edge-3-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "vite-dev-server-creation-and-module-requ",
+        "edge": {
+          "from": "dev-environment",
+          "to": "transform-request",
+          "claim": "feeds"
+        }
+      },
+      "points": [
+        [
+          0,
+          0.5
+        ],
+        [
+          0,
+          150.39999999999998
+        ],
+        [
+          0,
+          300.29999999999995
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "vite-dev-server-creation-and-module-requ-node-2",
+        "focus": -0.08545454545454516,
+        "gap": 6.400000000000091
+      },
+      "endBinding": {
+        "elementId": "vite-dev-server-creation-and-module-requ-node-4",
+        "focus": -0.005000000000000284,
+        "gap": 5.600000000000136
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "vite-dev-server-creation-and-module-requ-edge-4",
+      "type": "arrow",
+      "x": 559.4,
+      "y": 1234.3999999999999,
+      "width": 0,
+      "height": 300.79999999999995,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aF",
+      "roundness": null,
+      "seed": 418073180,
+      "version": 1,
+      "versionNonce": 1307176296,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "vite-dev-server-creation-and-module-requ-edge-4-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "vite-dev-server-creation-and-module-requ",
+        "edge": {
+          "from": "transform-request",
+          "to": "do-transform",
+          "claim": "feeds"
+        }
+      },
+      "points": [
+        [
+          0,
+          0.5
+        ],
+        [
+          0,
+          150.39999999999986
+        ],
+        [
+          0,
+          300.29999999999995
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "vite-dev-server-creation-and-module-requ-node-4",
+        "focus": 0.005000000000000284,
+        "gap": 5.600000000000136
+      },
+      "endBinding": {
+        "elementId": "vite-dev-server-creation-and-module-requ-node-5",
+        "focus": 0.10444444444444387,
+        "gap": 4.800000000000182
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "vite-dev-server-creation-and-module-requ-edge-5",
+      "type": "arrow",
+      "x": 529.4,
+      "y": 1615.1999999999998,
+      "width": 250,
+      "height": 300.79999999999995,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aG",
+      "roundness": null,
+      "seed": 1087294325,
+      "version": 1,
+      "versionNonce": 849117951,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "vite-dev-server-creation-and-module-requ-edge-5-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "vite-dev-server-creation-and-module-requ",
+        "edge": {
+          "from": "do-transform",
+          "to": "plugin-container",
+          "claim": "calls"
+        }
+      },
+      "points": [
+        [
+          0,
+          0.5
+        ],
+        [
+          0,
+          32
+        ],
+        [
+          -243.39999999999998,
+          32
+        ],
+        [
+          -250,
+          32
+        ],
+        [
+          -250,
+          300.29999999999995
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "vite-dev-server-creation-and-module-requ-node-5",
+        "focus": 0.22888888888888914,
+        "gap": 4.800000000000182
+      },
+      "endBinding": {
+        "elementId": "vite-dev-server-creation-and-module-requ-node-6",
+        "focus": 0.08545454545454416,
+        "gap": 4.000000000000227
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "vite-dev-server-creation-and-module-requ-edge-6",
+      "type": "arrow",
+      "x": 589.4,
+      "y": 1615.1999999999998,
+      "width": 0,
+      "height": 300.79999999999995,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aH",
+      "roundness": null,
+      "seed": 146177178,
+      "version": 1,
+      "versionNonce": 711261550,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "vite-dev-server-creation-and-module-requ-edge-6-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "vite-dev-server-creation-and-module-requ",
+        "edge": {
+          "from": "do-transform",
+          "to": "load-and-transform",
+          "claim": "feeds"
+        }
+      },
+      "points": [
+        [
+          0,
+          0.5
+        ],
+        [
+          0,
+          150.4000000000001
+        ],
+        [
+          0,
+          300.29999999999995
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "vite-dev-server-creation-and-module-requ-node-5",
+        "focus": -0.4377777777777778,
+        "gap": 4.800000000000182
+      },
+      "endBinding": {
+        "elementId": "vite-dev-server-creation-and-module-requ-node-7",
+        "focus": 0.0783333333333323,
+        "gap": 4.000000000000227
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "vite-dev-server-creation-and-module-requ-edge-7",
+      "type": "arrow",
+      "x": 589.4,
+      "y": 1995.9999999999998,
+      "width": 0,
+      "height": 300.8000000000004,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aI",
+      "roundness": null,
+      "seed": 1239381547,
+      "version": 1,
+      "versionNonce": 1398268965,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "vite-dev-server-creation-and-module-requ-edge-7-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "vite-dev-server-creation-and-module-requ",
+        "edge": {
+          "from": "load-and-transform",
+          "to": "module-graph",
+          "claim": "accesses"
+        }
+      },
+      "points": [
+        [
+          0,
+          0.5
+        ],
+        [
+          0,
+          150.40000000000032
+        ],
+        [
+          0,
+          300.3000000000004
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "vite-dev-server-creation-and-module-requ-node-7",
+        "focus": -0.07833333333333344,
+        "gap": 4.000000000000227
+      },
+      "endBinding": {
+        "elementId": "vite-dev-server-creation-and-module-requ-node-8",
+        "focus": -0.006666666666667753,
+        "gap": 3.199999999999818
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "vite-dev-server-creation-and-module-requ-edge-8",
+      "type": "arrow",
+      "x": 242.73333333333335,
+      "y": 472.8,
+      "width": 150.73333333333335,
+      "height": 300.7999999999999,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aJ",
+      "roundness": null,
+      "seed": 372582632,
+      "version": 1,
+      "versionNonce": 1410946244,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "vite-dev-server-creation-and-module-requ-edge-8-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "vite-dev-server-creation-and-module-requ",
+        "edge": {
+          "from": "transform-middleware",
+          "to": "send",
+          "claim": "calls"
+        }
+      },
+      "points": [
+        [
+          0,
+          0.5
+        ],
+        [
+          0,
+          32
+        ],
+        [
+          -150.73333333333335,
+          32
+        ],
+        [
+          -150.73333333333335,
+          75.03333333333325
+        ],
+        [
+          -150.73333333333335,
+          131.47499999999985
+        ],
+        [
+          -150.73333333333335,
+          187.91666666666657
+        ],
+        [
+          -150.73333333333335,
+          300.2999999999999
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "vite-dev-server-creation-and-module-requ-node-3",
+        "focus": 0.36358974358974333,
+        "gap": 7.199999999999989
+      },
+      "endBinding": {
+        "elementId": "vite-dev-server-creation-and-module-requ-node-9",
+        "focus": -0.1,
+        "gap": 6.400000000000091
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "vite-dev-server-creation-and-module-requ-node-0-label",
+      "type": "text",
+      "x": 528.5,
+      "y": 47.5,
+      "width": 143,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aK",
+      "roundness": null,
+      "seed": 1682339642,
+      "version": 1,
+      "versionNonce": 1514981006,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "vite-dev-server-creation-and-module-requ"
+      },
+      "text": "_createServer",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "vite-dev-server-creation-and-module-requ-node-0",
+      "originalText": "_createServer",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "vite-dev-server-creation-and-module-requ-node-1-label",
+      "type": "text",
+      "x": 528.5,
+      "y": 427.5,
+      "width": 143,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aL",
+      "roundness": null,
+      "seed": 2008160767,
+      "version": 1,
+      "versionNonce": 933620505,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "vite-dev-server-creation-and-module-requ"
+      },
+      "text": "ViteDevServer",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "vite-dev-server-creation-and-module-requ-node-1",
+      "originalText": "ViteDevServer",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "vite-dev-server-creation-and-module-requ-node-2-label",
+      "type": "text",
+      "x": 473,
+      "y": 807.5,
+      "width": 154,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aM",
+      "roundness": null,
+      "seed": 810802832,
+      "version": 1,
+      "versionNonce": 950511212,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "vite-dev-server-creation-and-module-requ"
+      },
+      "text": "DevEnvironment",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "vite-dev-server-creation-and-module-requ-node-2",
+      "originalText": "DevEnvironment",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "vite-dev-server-creation-and-module-requ-node-3-label",
+      "type": "text",
+      "x": 185.5,
+      "y": 427.5,
+      "width": 209.00000000000003,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aN",
+      "roundness": null,
+      "seed": 2019306333,
+      "version": 1,
+      "versionNonce": 1914651591,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "vite-dev-server-creation-and-module-requ"
+      },
+      "text": "transformMiddleware",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "vite-dev-server-creation-and-module-requ-node-3",
+      "originalText": "transformMiddleware",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "vite-dev-server-creation-and-module-requ-node-4-label",
+      "type": "text",
+      "x": 472,
+      "y": 1187.5,
+      "width": 176,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aO",
+      "roundness": null,
+      "seed": 1952672758,
+      "version": 1,
+      "versionNonce": 953339226,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "vite-dev-server-creation-and-module-requ"
+      },
+      "text": "transformRequest",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "vite-dev-server-creation-and-module-requ-node-4",
+      "originalText": "transformRequest",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "vite-dev-server-creation-and-module-requ-node-5-label",
+      "type": "text",
+      "x": 489.5,
+      "y": 1567.5,
+      "width": 121.00000000000001,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aP",
+      "roundness": null,
+      "seed": 102567723,
+      "version": 1,
+      "versionNonce": 676314917,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "vite-dev-server-creation-and-module-requ"
+      },
+      "text": "doTransform",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "vite-dev-server-creation-and-module-requ-node-5",
+      "originalText": "doTransform",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "vite-dev-server-creation-and-module-requ-node-6-label",
+      "type": "text",
+      "x": 187.5,
+      "y": 1947.5,
+      "width": 165,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aQ",
+      "roundness": null,
+      "seed": 601501884,
+      "version": 1,
+      "versionNonce": 603809864,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "vite-dev-server-creation-and-module-requ"
+      },
+      "text": "PluginContainer",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "vite-dev-server-creation-and-module-requ-node-6",
+      "originalText": "PluginContainer",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "vite-dev-server-creation-and-module-requ-node-7-label",
+      "type": "text",
+      "x": 492,
+      "y": 1947.5,
+      "width": 176,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aR",
+      "roundness": null,
+      "seed": 727093785,
+      "version": 1,
+      "versionNonce": 742479715,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "vite-dev-server-creation-and-module-requ"
+      },
+      "text": "loadAndTransform",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "vite-dev-server-creation-and-module-requ-node-7",
+      "originalText": "loadAndTransform",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "vite-dev-server-creation-and-module-requ-node-8-label",
+      "type": "text",
+      "x": 529.5,
+      "y": 2327.5,
+      "width": 121.00000000000001,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aS",
+      "roundness": null,
+      "seed": 725935282,
+      "version": 1,
+      "versionNonce": 161445222,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "vite-dev-server-creation-and-module-requ"
+      },
+      "text": "ModuleGraph",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "vite-dev-server-creation-and-module-requ-node-8",
+      "originalText": "ModuleGraph",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "vite-dev-server-creation-and-module-requ-node-9-label",
+      "type": "text",
+      "x": 78,
+      "y": 807.5,
+      "width": 44,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aT",
+      "roundness": null,
+      "seed": 1262697943,
+      "version": 1,
+      "versionNonce": 627556017,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "vite-dev-server-creation-and-module-requ"
+      },
+      "text": "send",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "vite-dev-server-creation-and-module-requ-node-9",
+      "originalText": "send",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "vite-dev-server-creation-and-module-requ-edge-0-label",
+      "type": "text",
+      "x": 565.2666666666667,
+      "y": 232.4,
+      "width": 61.60000000000001,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aU",
+      "roundness": null,
+      "seed": 257522365,
+      "version": 1,
+      "versionNonce": 1864440487,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "vite-dev-server-creation-and-module-requ"
+      },
+      "text": "@builds",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "vite-dev-server-creation-and-module-requ-edge-0",
+      "originalText": "@builds",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "vite-dev-server-creation-and-module-requ-edge-1-label",
+      "type": "text",
+      "x": 569.6666666666666,
+      "y": 613.1999999999999,
+      "width": 52.800000000000004,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aV",
+      "roundness": null,
+      "seed": 1820722800,
+      "version": 1,
+      "versionNonce": 1868311756,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "vite-dev-server-creation-and-module-requ"
+      },
+      "text": "@holds",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "vite-dev-server-creation-and-module-requ-edge-1",
+      "originalText": "@holds",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "vite-dev-server-creation-and-module-requ-edge-2-label",
+      "type": "text",
+      "x": 313.26666666666677,
+      "y": 645.5999999999999,
+      "width": 140.8,
+      "height": 40,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aW",
+      "roundness": null,
+      "seed": 521800031,
+      "version": 1,
+      "versionNonce": 1615078393,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "vite-dev-server-creation-and-module-requ"
+      },
+      "text": "transformRequest\n@calls",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "vite-dev-server-creation-and-module-requ-edge-2",
+      "originalText": "transformRequest @calls",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "vite-dev-server-creation-and-module-requ-edge-3-label",
+      "type": "text",
+      "x": 533,
+      "y": 993.9999999999999,
+      "width": 52.800000000000004,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aX",
+      "roundness": null,
+      "seed": 1513654426,
+      "version": 1,
+      "versionNonce": 2048778606,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "vite-dev-server-creation-and-module-requ"
+      },
+      "text": "@feeds",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "vite-dev-server-creation-and-module-requ-edge-3",
+      "originalText": "@feeds",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "vite-dev-server-creation-and-module-requ-edge-4-label",
+      "type": "text",
+      "x": 533,
+      "y": 1374.7999999999997,
+      "width": 52.800000000000004,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aY",
+      "roundness": null,
+      "seed": 1823113209,
+      "version": 1,
+      "versionNonce": 593469635,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "vite-dev-server-creation-and-module-requ"
+      },
+      "text": "@feeds",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "vite-dev-server-creation-and-module-requ-edge-4",
+      "originalText": "@feeds",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "vite-dev-server-creation-and-module-requ-edge-5-label",
+      "type": "text",
+      "x": 215.6,
+      "y": 1637.1999999999998,
+      "width": 140.8,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aZ",
+      "roundness": null,
+      "seed": 997114652,
+      "version": 1,
+      "versionNonce": 1658862120,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "vite-dev-server-creation-and-module-requ"
+      },
+      "text": "resolveId @calls",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "vite-dev-server-creation-and-module-requ-edge-5",
+      "originalText": "resolveId @calls",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "vite-dev-server-creation-and-module-requ-edge-6-label",
+      "type": "text",
+      "x": 563,
+      "y": 1755.6,
+      "width": 52.800000000000004,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aa",
+      "roundness": null,
+      "seed": 1200838411,
+      "version": 1,
+      "versionNonce": 1434564229,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "vite-dev-server-creation-and-module-requ"
+      },
+      "text": "@feeds",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "vite-dev-server-creation-and-module-requ-edge-6",
+      "originalText": "@feeds",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "vite-dev-server-creation-and-module-requ-edge-7-label",
+      "type": "text",
+      "x": 523.4,
+      "y": 2136.4,
+      "width": 132,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "ab",
+      "roundness": null,
+      "seed": 1722501974,
+      "version": 1,
+      "versionNonce": 1114680378,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "vite-dev-server-creation-and-module-requ"
+      },
+      "text": "cache @accesses",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "vite-dev-server-creation-and-module-requ-edge-7",
+      "originalText": "cache @accesses",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "vite-dev-server-creation-and-module-requ-edge-8-label",
+      "type": "text",
+      "x": 65.6,
+      "y": 537.8333333333333,
+      "width": 52.800000000000004,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "ac",
+      "roundness": null,
+      "seed": 1712846133,
+      "version": 1,
+      "versionNonce": 658693055,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "vite-dev-server-creation-and-module-requ"
+      },
+      "text": "@calls",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "vite-dev-server-creation-and-module-requ-edge-8",
+      "originalText": "@calls",
+      "autoResize": true,
+      "lineHeight": 1.25
+    }
+  ],
+  "appState": {
+    "gridSize": null,
+    "viewBackgroundColor": "#ffffff"
+  },
+  "files": {},
+  "diagramos": {
+    "version": "0.2.0-rc.6",
+    "schema": 1
+  }
+}

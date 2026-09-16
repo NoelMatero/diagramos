@@ -1,0 +1,2431 @@
+{
+  "type": "excalidraw",
+  "version": 2,
+  "source": "diagramos",
+  "elements": [
+    {
+      "id": "globset-flow-title",
+      "type": "text",
+      "x": 0,
+      "y": -115,
+      "width": 435.6,
+      "height": 30,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a0",
+      "roundness": null,
+      "seed": 367125798,
+      "version": 1,
+      "versionNonce": 1723180298,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "globset-flow",
+        "role": "title",
+        "direction": "DOWN"
+      },
+      "text": "Glob Parsing and GlobSet Matching",
+      "fontSize": 24,
+      "fontFamily": 5,
+      "textAlign": "left",
+      "verticalAlign": "middle",
+      "containerId": null,
+      "originalText": "Glob Parsing and GlobSet Matching",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "globset-flow-node-0",
+      "type": "rectangle",
+      "x": 360,
+      "y": 20,
+      "width": 160,
+      "height": 80,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a1",
+      "roundness": null,
+      "seed": 1372702601,
+      "version": 1,
+      "versionNonce": 794302995,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "globset-flow-node-0-label"
+        },
+        {
+          "id": "globset-flow-edge-0",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "globset-flow",
+        "node": "parser",
+        "ref": "crates/globset/src/glob.rs#Parser"
+      }
+    },
+    {
+      "id": "globset-flow-node-1",
+      "type": "rectangle",
+      "x": 360,
+      "y": 400,
+      "width": 160,
+      "height": 80,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a2",
+      "roundness": null,
+      "seed": 1772140608,
+      "version": 1,
+      "versionNonce": 285811484,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "globset-flow-node-1-label"
+        },
+        {
+          "id": "globset-flow-edge-0",
+          "type": "arrow"
+        },
+        {
+          "id": "globset-flow-edge-1",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "globset-flow",
+        "node": "tokens",
+        "ref": "crates/globset/src/glob.rs#Tokens"
+      }
+    },
+    {
+      "id": "globset-flow-node-2",
+      "type": "rectangle",
+      "x": 20,
+      "y": 1160,
+      "width": 260,
+      "height": 80,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a3",
+      "roundness": null,
+      "seed": 1248731183,
+      "version": 1,
+      "versionNonce": 1078066569,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "globset-flow-node-2-label"
+        },
+        {
+          "id": "globset-flow-edge-2",
+          "type": "arrow"
+        },
+        {
+          "id": "globset-flow-edge-11",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "globset-flow",
+        "node": "strategy",
+        "ref": "crates/globset/src/glob.rs#MatchStrategy::new"
+      }
+    },
+    {
+      "id": "globset-flow-node-3",
+      "type": "rectangle",
+      "x": 360,
+      "y": 780,
+      "width": 160,
+      "height": 80,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a4",
+      "roundness": null,
+      "seed": 1856087262,
+      "version": 1,
+      "versionNonce": 532624130,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "globset-flow-node-3-label"
+        },
+        {
+          "id": "globset-flow-edge-1",
+          "type": "arrow"
+        },
+        {
+          "id": "globset-flow-edge-2",
+          "type": "arrow"
+        },
+        {
+          "id": "globset-flow-edge-3",
+          "type": "arrow"
+        },
+        {
+          "id": "globset-flow-edge-5",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "globset-flow",
+        "node": "glob",
+        "ref": "crates/globset/src/glob.rs#Glob"
+      }
+    },
+    {
+      "id": "globset-flow-node-4",
+      "type": "rectangle",
+      "x": 360,
+      "y": 1160,
+      "width": 180,
+      "height": 80,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a5",
+      "roundness": null,
+      "seed": 746955733,
+      "version": 1,
+      "versionNonce": 263259359,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "globset-flow-node-4-label"
+        },
+        {
+          "id": "globset-flow-edge-3",
+          "type": "arrow"
+        },
+        {
+          "id": "globset-flow-edge-4",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "globset-flow",
+        "node": "matcher",
+        "ref": "crates/globset/src/glob.rs#GlobMatcher"
+      }
+    },
+    {
+      "id": "globset-flow-node-5",
+      "type": "rectangle",
+      "x": 360,
+      "y": 1600,
+      "width": 160,
+      "height": 80,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a6",
+      "roundness": null,
+      "seed": 1139842364,
+      "version": 1,
+      "versionNonce": 659174856,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "globset-flow-node-5-label"
+        },
+        {
+          "id": "globset-flow-edge-4",
+          "type": "arrow"
+        },
+        {
+          "id": "globset-flow-edge-10",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "globset-flow",
+        "node": "candidate",
+        "ref": "crates/globset/src/lib.rs#Candidate"
+      }
+    },
+    {
+      "id": "globset-flow-node-6",
+      "type": "rectangle",
+      "x": 640,
+      "y": 1380,
+      "width": 160,
+      "height": 80,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a7",
+      "roundness": null,
+      "seed": 1961150731,
+      "version": 1,
+      "versionNonce": 750267525,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "globset-flow-node-6-label"
+        },
+        {
+          "id": "globset-flow-edge-5",
+          "type": "arrow"
+        },
+        {
+          "id": "globset-flow-edge-6",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "globset-flow",
+        "node": "globset",
+        "ref": "crates/globset/src/lib.rs#GlobSet"
+      }
+    },
+    {
+      "id": "globset-flow-node-7",
+      "type": "rectangle",
+      "x": 520,
+      "y": 1980,
+      "width": 280,
+      "height": 80,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a8",
+      "roundness": null,
+      "seed": 123711738,
+      "version": 1,
+      "versionNonce": 318486350,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "globset-flow-node-7-label"
+        },
+        {
+          "id": "globset-flow-edge-6",
+          "type": "arrow"
+        },
+        {
+          "id": "globset-flow-edge-7",
+          "type": "arrow"
+        },
+        {
+          "id": "globset-flow-edge-8",
+          "type": "arrow"
+        },
+        {
+          "id": "globset-flow-edge-9",
+          "type": "arrow"
+        },
+        {
+          "id": "globset-flow-edge-10",
+          "type": "arrow"
+        },
+        {
+          "id": "globset-flow-edge-11",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "globset-flow",
+        "node": "setstrat",
+        "ref": "crates/globset/src/lib.rs#GlobSetMatchStrategy"
+      }
+    },
+    {
+      "id": "globset-flow-node-8",
+      "type": "rectangle",
+      "x": 540,
+      "y": 2360,
+      "width": 240,
+      "height": 80,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a9",
+      "roundness": null,
+      "seed": 1029202289,
+      "version": 1,
+      "versionNonce": 1439419643,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "globset-flow-node-8-label"
+        },
+        {
+          "id": "globset-flow-edge-7",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "globset-flow",
+        "node": "regex-strat",
+        "ref": "crates/globset/src/lib.rs#RegexSetStrategy"
+      }
+    },
+    {
+      "id": "globset-flow-node-9",
+      "type": "rectangle",
+      "x": 860,
+      "y": 2360,
+      "width": 240,
+      "height": 80,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aA",
+      "roundness": null,
+      "seed": 350014024,
+      "version": 1,
+      "versionNonce": 1484205220,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "globset-flow-node-9-label"
+        },
+        {
+          "id": "globset-flow-edge-8",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "globset-flow",
+        "node": "ext-strat",
+        "ref": "crates/globset/src/lib.rs#ExtensionStrategy"
+      }
+    },
+    {
+      "id": "globset-flow-node-10",
+      "type": "rectangle",
+      "x": 240,
+      "y": 2360,
+      "width": 220,
+      "height": 80,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aB",
+      "roundness": null,
+      "seed": 800407174,
+      "version": 1,
+      "versionNonce": 1203269866,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "globset-flow-node-10-label"
+        },
+        {
+          "id": "globset-flow-edge-9",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "globset-flow",
+        "node": "prefix-strat",
+        "ref": "crates/globset/src/lib.rs#PrefixStrategy"
+      }
+    },
+    {
+      "id": "globset-flow-edge-0",
+      "type": "arrow",
+      "x": 445.2000000000001,
+      "y": 92,
+      "width": 0,
+      "height": 300.8,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aC",
+      "roundness": null,
+      "seed": 64430462,
+      "version": 1,
+      "versionNonce": 1235568930,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "globset-flow-edge-0-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "globset-flow",
+        "edge": {
+          "from": "parser",
+          "to": "tokens",
+          "claim": "builds"
+        }
+      },
+      "points": [
+        [
+          0,
+          0.5
+        ],
+        [
+          0,
+          150.4
+        ],
+        [
+          0,
+          300.3
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "globset-flow-node-0",
+        "focus": -0.06500000000000128,
+        "gap": 8
+      },
+      "endBinding": {
+        "elementId": "globset-flow-node-1",
+        "focus": 0.06500000000000114,
+        "gap": 7.199999999999989
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "globset-flow-edge-1",
+      "type": "arrow",
+      "x": 445.2000000000001,
+      "y": 472.8,
+      "width": 0,
+      "height": 300.7999999999999,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aD",
+      "roundness": null,
+      "seed": 1604558031,
+      "version": 1,
+      "versionNonce": 57985193,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "globset-flow-edge-1-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "globset-flow",
+        "edge": {
+          "from": "tokens",
+          "to": "glob",
+          "claim": "builds"
+        }
+      },
+      "points": [
+        [
+          0,
+          0.5
+        ],
+        [
+          0,
+          150.39999999999992
+        ],
+        [
+          0,
+          300.2999999999999
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "globset-flow-node-1",
+        "focus": -0.06500000000000114,
+        "gap": 7.199999999999989
+      },
+      "endBinding": {
+        "elementId": "globset-flow-node-3",
+        "focus": 0.06500000000000114,
+        "gap": 6.400000000000091
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "globset-flow-edge-2",
+      "type": "arrow",
+      "x": 405.2000000000001,
+      "y": 853.5999999999999,
+      "width": 260.00000000000006,
+      "height": 300.79999999999995,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aE",
+      "roundness": null,
+      "seed": 2127967456,
+      "version": 1,
+      "versionNonce": 8060732,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "globset-flow-edge-2-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "globset-flow",
+        "edge": {
+          "from": "glob",
+          "to": "strategy",
+          "claim": "calls"
+        }
+      },
+      "points": [
+        [
+          0,
+          0.5
+        ],
+        [
+          0,
+          32
+        ],
+        [
+          -248.39999999999998,
+          32
+        ],
+        [
+          -260.00000000000006,
+          32
+        ],
+        [
+          -260.00000000000006,
+          300.29999999999995
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "globset-flow-node-3",
+        "focus": 0.4349999999999989,
+        "gap": 6.400000000000091
+      },
+      "endBinding": {
+        "elementId": "globset-flow-node-2",
+        "focus": -0.036923076923076836,
+        "gap": 5.600000000000136
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "globset-flow-edge-3",
+      "type": "arrow",
+      "x": 445.2000000000001,
+      "y": 853.5999999999999,
+      "width": 0,
+      "height": 300.79999999999995,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aF",
+      "roundness": null,
+      "seed": 325280425,
+      "version": 1,
+      "versionNonce": 1984558515,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "globset-flow-edge-3-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "globset-flow",
+        "edge": {
+          "from": "glob",
+          "to": "matcher",
+          "claim": "builds"
+        }
+      },
+      "points": [
+        [
+          0,
+          0.5
+        ],
+        [
+          0,
+          150.39999999999998
+        ],
+        [
+          0,
+          300.29999999999995
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "globset-flow-node-3",
+        "focus": -0.06500000000000114,
+        "gap": 6.400000000000091
+      },
+      "endBinding": {
+        "elementId": "globset-flow-node-4",
+        "focus": -0.05333333333333282,
+        "gap": 5.600000000000136
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "globset-flow-edge-4",
+      "type": "arrow",
+      "x": 445.2000000000001,
+      "y": 1234.3999999999999,
+      "width": 0,
+      "height": 360,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aG",
+      "roundness": null,
+      "seed": 1265349914,
+      "version": 1,
+      "versionNonce": 766308078,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "globset-flow-edge-4-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "globset-flow",
+        "edge": {
+          "from": "matcher",
+          "to": "candidate",
+          "claim": "takes"
+        }
+      },
+      "points": [
+        [
+          0,
+          0.5
+        ],
+        [
+          0,
+          180
+        ],
+        [
+          0,
+          359.5
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "globset-flow-node-4",
+        "focus": 0.05333333333333282,
+        "gap": 5.600000000000136
+      },
+      "endBinding": {
+        "elementId": "globset-flow-node-5",
+        "focus": 0.06500000000000057,
+        "gap": 5.600000000000136
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "globset-flow-edge-5",
+      "type": "arrow",
+      "x": 485.2000000000001,
+      "y": 853.5999999999999,
+      "width": 236.59999999999997,
+      "height": 520.8,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aH",
+      "roundness": null,
+      "seed": 211070635,
+      "version": 1,
+      "versionNonce": 1453315493,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "globset-flow-edge-5-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "globset-flow",
+        "edge": {
+          "from": "glob",
+          "to": "globset",
+          "claim": "feeds"
+        }
+      },
+      "points": [
+        [
+          0,
+          0.5
+        ],
+        [
+          0,
+          32
+        ],
+        [
+          236.59999999999997,
+          32
+        ],
+        [
+          236.59999999999997,
+          142.0999999999999
+        ],
+        [
+          236.59999999999997,
+          331.4499999999998
+        ],
+        [
+          236.59999999999997,
+          426.125
+        ],
+        [
+          236.59999999999997,
+          520.3
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "globset-flow-node-3",
+        "focus": -0.5650000000000011,
+        "gap": 6.400000000000091
+      },
+      "endBinding": {
+        "elementId": "globset-flow-node-6",
+        "focus": 0.022500000000001134,
+        "gap": 5.600000000000136
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "globset-flow-edge-6",
+      "type": "arrow",
+      "x": 721.8000000000001,
+      "y": 1454.3999999999999,
+      "width": 0,
+      "height": 520.8,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aI",
+      "roundness": null,
+      "seed": 1537245916,
+      "version": 1,
+      "versionNonce": 1362222824,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "globset-flow-edge-6-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "globset-flow",
+        "edge": {
+          "from": "globset",
+          "to": "setstrat",
+          "claim": "holds"
+        }
+      },
+      "points": [
+        [
+          0,
+          0.5
+        ],
+        [
+          0,
+          260.39999999999986
+        ],
+        [
+          0,
+          520.3
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "globset-flow-node-6",
+        "focus": -0.022500000000001134,
+        "gap": 5.600000000000136
+      },
+      "endBinding": {
+        "elementId": "globset-flow-node-7",
+        "focus": 0.4414285714285726,
+        "gap": 4.800000000000182
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "globset-flow-edge-7",
+      "type": "arrow",
+      "x": 651.8000000000001,
+      "y": 2055.2,
+      "width": 0,
+      "height": 300.8000000000002,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aJ",
+      "roundness": null,
+      "seed": 58983413,
+      "version": 1,
+      "versionNonce": 904164479,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "globset-flow-edge-7-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "globset-flow",
+        "edge": {
+          "from": "setstrat",
+          "to": "regex-strat",
+          "claim": "accesses"
+        }
+      },
+      "points": [
+        [
+          0,
+          0.5
+        ],
+        [
+          0,
+          150.4000000000001
+        ],
+        [
+          0,
+          300.3000000000002
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "globset-flow-node-7",
+        "focus": 0.05857142857142739,
+        "gap": 4.800000000000182
+      },
+      "endBinding": {
+        "elementId": "globset-flow-node-8",
+        "focus": -0.06833333333333229,
+        "gap": 4
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "globset-flow-edge-8",
+      "type": "arrow",
+      "x": 721.8000000000001,
+      "y": 2055.2,
+      "width": 250,
+      "height": 300.8000000000002,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aK",
+      "roundness": null,
+      "seed": 2099297734,
+      "version": 1,
+      "versionNonce": 1277914666,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "globset-flow-edge-8-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "globset-flow",
+        "edge": {
+          "from": "setstrat",
+          "to": "ext-strat",
+          "claim": "accesses"
+        }
+      },
+      "points": [
+        [
+          0,
+          0.5
+        ],
+        [
+          0,
+          32
+        ],
+        [
+          243.4000000000001,
+          32
+        ],
+        [
+          250,
+          32
+        ],
+        [
+          250,
+          300.3000000000002
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "globset-flow-node-7",
+        "focus": -0.4414285714285726,
+        "gap": 4.800000000000182
+      },
+      "endBinding": {
+        "elementId": "globset-flow-node-9",
+        "focus": -0.06833333333333143,
+        "gap": 4
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "globset-flow-edge-9",
+      "type": "arrow",
+      "x": 581.8000000000001,
+      "y": 2055.2,
+      "width": 240.0000000000001,
+      "height": 300.8000000000002,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aL",
+      "roundness": null,
+      "seed": 2042061975,
+      "version": 1,
+      "versionNonce": 1934568561,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "globset-flow-edge-9-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "globset-flow",
+        "edge": {
+          "from": "setstrat",
+          "to": "prefix-strat",
+          "claim": "accesses"
+        }
+      },
+      "points": [
+        [
+          -0.5,
+          0.5
+        ],
+        [
+          0,
+          32
+        ],
+        [
+          -238.4000000000001,
+          32
+        ],
+        [
+          -240.00000000000006,
+          32
+        ],
+        [
+          -239.5000000000001,
+          300.3000000000002
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "globset-flow-node-7",
+        "focus": 0.5585714285714274,
+        "gap": 4.800000000000182
+      },
+      "endBinding": {
+        "elementId": "globset-flow-node-10",
+        "focus": -0.07454545454545496,
+        "gap": 4
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "globset-flow-edge-10",
+      "type": "arrow",
+      "x": 445.2000000000001,
+      "y": 1674.3999999999999,
+      "width": 206.59999999999997,
+      "height": 300.79999999999995,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aM",
+      "roundness": null,
+      "seed": 1515048175,
+      "version": 1,
+      "versionNonce": 1678864713,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "globset-flow-edge-10-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "globset-flow",
+        "edge": {
+          "from": "candidate",
+          "to": "setstrat",
+          "claim": "takes"
+        }
+      },
+      "points": [
+        [
+          0,
+          0.5
+        ],
+        [
+          0,
+          192.79999999999995
+        ],
+        [
+          60.900000000000034,
+          192.79999999999995
+        ],
+        [
+          206.59999999999997,
+          192.79999999999995
+        ],
+        [
+          206.59999999999997,
+          300.29999999999995
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "globset-flow-node-5",
+        "focus": -0.06500000000000057,
+        "gap": 5.600000000000136
+      },
+      "endBinding": {
+        "elementId": "globset-flow-node-7",
+        "focus": -0.05857142857142739,
+        "gap": 4.800000000000182
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "globset-flow-edge-11",
+      "type": "arrow",
+      "x": 145.20000000000005,
+      "y": 1234.3999999999999,
+      "width": 436.6,
+      "height": 740.8,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aN",
+      "roundness": null,
+      "seed": 1380073630,
+      "version": 1,
+      "versionNonce": 1216841666,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "globset-flow-edge-11-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "globset-flow",
+        "edge": {
+          "from": "strategy",
+          "to": "setstrat",
+          "claim": "feeds"
+        }
+      },
+      "points": [
+        [
+          0,
+          0.5
+        ],
+        [
+          0,
+          147.17499999999995
+        ],
+        [
+          0,
+          294.35000000000014
+        ],
+        [
+          0,
+          588.7
+        ],
+        [
+          0,
+          656.8
+        ],
+        [
+          436.6,
+          656.8
+        ],
+        [
+          436.6,
+          740.3
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "globset-flow-node-2",
+        "focus": 0.036923076923076836,
+        "gap": 5.600000000000136
+      },
+      "endBinding": {
+        "elementId": "globset-flow-node-7",
+        "focus": -0.5585714285714274,
+        "gap": 4.800000000000182
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "globset-flow-node-0-label",
+      "type": "text",
+      "x": 407,
+      "y": 47.5,
+      "width": 66,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aO",
+      "roundness": null,
+      "seed": 488298448,
+      "version": 1,
+      "versionNonce": 1884649132,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "globset-flow"
+      },
+      "text": "Parser",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "globset-flow-node-0",
+      "originalText": "Parser",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "globset-flow-node-1-label",
+      "type": "text",
+      "x": 407,
+      "y": 427.5,
+      "width": 66,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aP",
+      "roundness": null,
+      "seed": 887507357,
+      "version": 1,
+      "versionNonce": 1200769031,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "globset-flow"
+      },
+      "text": "Tokens",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "globset-flow-node-1",
+      "originalText": "Tokens",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "globset-flow-node-2-label",
+      "type": "text",
+      "x": 50.999999999999986,
+      "y": 1187.5,
+      "width": 198.00000000000003,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aQ",
+      "roundness": null,
+      "seed": 1183868282,
+      "version": 1,
+      "versionNonce": 212327630,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "globset-flow"
+      },
+      "text": "MatchStrategy::new",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "globset-flow-node-2",
+      "originalText": "MatchStrategy::new",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "globset-flow-node-3-label",
+      "type": "text",
+      "x": 418,
+      "y": 807.5,
+      "width": 44,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aR",
+      "roundness": null,
+      "seed": 1576345663,
+      "version": 1,
+      "versionNonce": 1932102489,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "globset-flow"
+      },
+      "text": "Glob",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "globset-flow-node-3",
+      "originalText": "Glob",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "globset-flow-node-4-label",
+      "type": "text",
+      "x": 389.5,
+      "y": 1187.5,
+      "width": 121.00000000000001,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aS",
+      "roundness": null,
+      "seed": 1398872828,
+      "version": 1,
+      "versionNonce": 1679453832,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "globset-flow"
+      },
+      "text": "GlobMatcher",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "globset-flow-node-4",
+      "originalText": "GlobMatcher",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "globset-flow-node-5-label",
+      "type": "text",
+      "x": 390.5,
+      "y": 1627.5,
+      "width": 99.00000000000001,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aT",
+      "roundness": null,
+      "seed": 121497177,
+      "version": 1,
+      "versionNonce": 426389155,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "globset-flow"
+      },
+      "text": "Candidate",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "globset-flow-node-5",
+      "originalText": "Candidate",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "globset-flow-node-6-label",
+      "type": "text",
+      "x": 681.5,
+      "y": 1407.5,
+      "width": 77,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aU",
+      "roundness": null,
+      "seed": 1293156406,
+      "version": 1,
+      "versionNonce": 2105454490,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "globset-flow"
+      },
+      "text": "GlobSet",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "globset-flow-node-6",
+      "originalText": "GlobSet",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "globset-flow-node-7-label",
+      "type": "text",
+      "x": 550,
+      "y": 2007.5,
+      "width": 220.00000000000003,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aV",
+      "roundness": null,
+      "seed": 662478955,
+      "version": 1,
+      "versionNonce": 1908448613,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "globset-flow"
+      },
+      "text": "GlobSetMatchStrategy",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "globset-flow-node-7",
+      "originalText": "GlobSetMatchStrategy",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "globset-flow-node-8-label",
+      "type": "text",
+      "x": 572,
+      "y": 2387.5,
+      "width": 176,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aW",
+      "roundness": null,
+      "seed": 34449864,
+      "version": 1,
+      "versionNonce": 1013383972,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "globset-flow"
+      },
+      "text": "RegexSetStrategy",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "globset-flow-node-8",
+      "originalText": "RegexSetStrategy",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "globset-flow-node-9-label",
+      "type": "text",
+      "x": 886.5,
+      "y": 2387.5,
+      "width": 187.00000000000003,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aX",
+      "roundness": null,
+      "seed": 1549837205,
+      "version": 1,
+      "versionNonce": 2074984863,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "globset-flow"
+      },
+      "text": "ExtensionStrategy",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "globset-flow-node-9",
+      "originalText": "ExtensionStrategy",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "globset-flow-node-10-label",
+      "type": "text",
+      "x": 273,
+      "y": 2387.5,
+      "width": 154,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aY",
+      "roundness": null,
+      "seed": 1747197559,
+      "version": 1,
+      "versionNonce": 1328145617,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "globset-flow"
+      },
+      "text": "PrefixStrategy",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "globset-flow-node-10",
+      "originalText": "PrefixStrategy",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "globset-flow-edge-0-label",
+      "type": "text",
+      "x": 388.0000000000001,
+      "y": 232.4,
+      "width": 114.4,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aZ",
+      "roundness": null,
+      "seed": 492928479,
+      "version": 1,
+      "versionNonce": 717261177,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "globset-flow"
+      },
+      "text": "parse @builds",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "globset-flow-edge-0",
+      "originalText": "parse @builds",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "globset-flow-edge-1-label",
+      "type": "text",
+      "x": 374.80000000000007,
+      "y": 613.1999999999999,
+      "width": 140.8,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aa",
+      "roundness": null,
+      "seed": 1484782874,
+      "version": 1,
+      "versionNonce": 1150961390,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "globset-flow"
+      },
+      "text": "to_regex @builds",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "globset-flow-edge-1",
+      "originalText": "to_regex @builds",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "globset-flow-edge-2-label",
+      "type": "text",
+      "x": 95.20000000000012,
+      "y": 875.5999999999999,
+      "width": 123.20000000000002,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "ab",
+      "roundness": null,
+      "seed": 228650813,
+      "version": 1,
+      "versionNonce": 966623271,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "globset-flow"
+      },
+      "text": "analyze @calls",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "globset-flow-edge-2",
+      "originalText": "analyze @calls",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "globset-flow-edge-3-label",
+      "type": "text",
+      "x": 379.2000000000001,
+      "y": 993.9999999999999,
+      "width": 132,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "ac",
+      "roundness": null,
+      "seed": 1791851248,
+      "version": 1,
+      "versionNonce": 970494540,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "globset-flow"
+      },
+      "text": "compile @builds",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "globset-flow-edge-3",
+      "originalText": "compile @builds",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "globset-flow-edge-4-label",
+      "type": "text",
+      "x": 392.4000000000001,
+      "y": 1404.3999999999999,
+      "width": 105.60000000000001,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "ad",
+      "roundness": null,
+      "seed": 1171966859,
+      "version": 1,
+      "versionNonce": 536747013,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "globset-flow"
+      },
+      "text": "match @takes",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "globset-flow-edge-4",
+      "originalText": "match @takes",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "globset-flow-edge-5-label",
+      "type": "text",
+      "x": 677.8000000000001,
+      "y": 985.6999999999998,
+      "width": 88,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "ae",
+      "roundness": null,
+      "seed": 1693630422,
+      "version": 1,
+      "versionNonce": 216863162,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "globset-flow"
+      },
+      "text": "add @feeds",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "globset-flow-edge-5",
+      "originalText": "add @feeds",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "globset-flow-edge-6-label",
+      "type": "text",
+      "x": 664.6,
+      "y": 1704.7999999999997,
+      "width": 114.4,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "af",
+      "roundness": null,
+      "seed": 1794241657,
+      "version": 1,
+      "versionNonce": 1843136067,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "globset-flow"
+      },
+      "text": "strats @holds",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "globset-flow-edge-6",
+      "originalText": "strats @holds",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "globset-flow-edge-7-label",
+      "type": "text",
+      "x": 585.8000000000001,
+      "y": 2195.6,
+      "width": 132,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "ag",
+      "roundness": null,
+      "seed": 968243100,
+      "version": 1,
+      "versionNonce": 761044904,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "globset-flow"
+      },
+      "text": "Regex @accesses",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "globset-flow-edge-7",
+      "originalText": "Regex @accesses",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "globset-flow-edge-8-label",
+      "type": "text",
+      "x": 908.0000000000001,
+      "y": 2077.2,
+      "width": 114.4,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "ah",
+      "roundness": null,
+      "seed": 966269495,
+      "version": 1,
+      "versionNonce": 239846289,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "globset-flow"
+      },
+      "text": "Ext @accesses",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "globset-flow-edge-8",
+      "originalText": "Ext @accesses",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "globset-flow-edge-9-label",
+      "type": "text",
+      "x": 273,
+      "y": 2077.2,
+      "width": 140.8,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "ai",
+      "roundness": null,
+      "seed": 1092676498,
+      "version": 1,
+      "versionNonce": 318680262,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "globset-flow"
+      },
+      "text": "Prefix @accesses",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "globset-flow-edge-9",
+      "originalText": "Prefix @accesses",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "globset-flow-edge-10-label",
+      "type": "text",
+      "x": 457.70000000000016,
+      "y": 1857.1999999999998,
+      "width": 96.80000000000001,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aj",
+      "roundness": null,
+      "seed": 80278714,
+      "version": 1,
+      "versionNonce": 129521422,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "globset-flow"
+      },
+      "text": "path @takes",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "globset-flow-edge-10",
+      "originalText": "path @takes",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "globset-flow-edge-11-label",
+      "type": "text",
+      "x": 83.60000000000004,
+      "y": 1813.1,
+      "width": 123.20000000000002,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "ak",
+      "roundness": null,
+      "seed": 406099839,
+      "version": 1,
+      "versionNonce": 1695644569,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "globset-flow"
+      },
+      "text": "maps to @feeds",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "globset-flow-edge-11",
+      "originalText": "maps to @feeds",
+      "autoResize": true,
+      "lineHeight": 1.25
+    }
+  ],
+  "appState": {
+    "gridSize": null,
+    "viewBackgroundColor": "#ffffff"
+  },
+  "files": {},
+  "diagramos": {
+    "version": "0.2.0-rc.6",
+    "schema": 1
+  }
+}
