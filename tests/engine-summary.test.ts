@@ -60,6 +60,14 @@ describe("coverageWords", () => {
     );
   });
 
+  it("says when a concept board is full of this repo's code (#287)", () => {
+    const said = coverageWords({ checked: 0, edgesChecked: 0, concept: true, conceptAnchored: 27, conceptBoxes: 29 });
+    expect(said).toContain("nothing here is checked");
+    expect(said).toContain("27 of its 29 boxes point at code in this repo");
+    expect(coverageLabel({ checked: 0, edgesChecked: 0, concept: true, conceptAnchored: 27, conceptBoxes: 29 }))
+      .toBe("concept board · unchecked · 27 boxes point here");
+  });
+
   it("treats a concept board as one even if something on it got counted", () => {
     // Whatever the counts say, the board is not about this repo, and the
     // explanation is the honest answer rather than the tally.

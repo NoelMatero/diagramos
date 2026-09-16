@@ -946,6 +946,35 @@ describe("state: what the diagram claims about time", () => {
     expect(report.edgesChecked).toBe(0);
   });
 
+  /**
+   * #287: five boards full of this project's code were marked concept, and
+   * nothing said so. Still excused -- the author said concept -- but counted,
+   * so the tool can say "N of these boxes point here".
+   */
+  it("counts the boxes on a concept board that point at files in this repo", async () => {
+    const board = await stateBoard(
+      [
+        { id: "here", label: "Router", ref: "src/lib.rs#dispatch" },
+        { id: "dir", label: "Handlers", ref: "src/" },
+        { id: "gone", label: "Ghost", ref: "src/ghost.rs" },
+        { id: "far", label: "Elsewhere", ref: "../other/x.rs" },
+        { id: "plain", label: "UE" },
+        { id: "ext", label: "Postgres", ref: "src/db.rs", state: "external" },
+      ],
+      { title: "Request flow", describes: "concept" },
+    );
+    const report = checkDrift(board, fakeWorkspace({ src: "dir", "src/lib.rs": "fn x() {}", "src/db.rs": "" }));
+    expect(report).toMatchObject({ concept: true, excused: 6, checked: 0, clean: true, conceptAnchored: 2 });
+  });
+
+  it("does not count anything on a concept board that points nowhere here", async () => {
+    const board = await stateBoard(
+      [{ id: "ue", label: "UE", ref: "specs/ts-24229.md" }],
+      { title: "IMS registration", describes: "concept" },
+    );
+    expect(checkDrift(board, fakeWorkspace({})).conceptAnchored).toBeUndefined();
+  });
+
   it("does not record describes for a repo board, so existing files do not churn", async () => {
     const board = await stateBoard([{ id: "a", label: "A" }], { title: "How it works", describes: "repo" });
     const title = board.elements.find((e) => (e.customData as { role?: string })?.role === "title");

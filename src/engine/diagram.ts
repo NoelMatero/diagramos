@@ -874,4 +874,39 @@ export function applyEdits(
   return { board: { ...board, elements }, updated, deleted, skipped };
 }
 
+/**
+ * Sets what a board is about, on its title element (#287).
+ *
+ * `repo` is written by removing the key, the same way a fresh draw never
+ * writes it, so a board switched back is byte-identical to one never switched.
+ * Refused where create_diagram would refuse it: no title to record it on, or a
+ * concept board still claiming `complete`.
+ */
+export function applyDescribes(board: BoardFile, describes: BoardDescribes): BoardFile {
+  const custom = (element: (typeof board.elements)[number]) =>
+    (element.customData ?? {}) as Record<string, unknown>;
+  const title = board.elements.find((element) => !element.isDeleted && custom(element).role === "title");
+  if (!title) {
+    throw new Error(
+      "This board has no title, and describes is recorded on the title. Redraw it with "
+      + "create_diagram, passing a title.",
+    );
+  }
+  if (describes === "concept" && custom(title).complete) {
+    throw new Error(
+      "A concept board cannot claim complete. Drop the complete claim first, or leave the board as repo.",
+    );
+  }
+  const { describes: _previous, ...rest } = custom(title);
+  const next = describes === "concept" ? { ...rest, describes } : rest;
+  return {
+    ...board,
+    elements: board.elements.map((element) =>
+      element === title
+        ? { ...element, customData: next, version: (Number(element.version) || 1) + 1 }
+        : element,
+    ),
+  };
+}
+
 export { emptyBoard };

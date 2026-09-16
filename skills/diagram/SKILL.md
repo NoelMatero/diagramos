@@ -116,7 +116,7 @@ handful of strings.
 
 | what changed | call |
 | --- | --- |
-| a ref, a state, a colour, a closed claim | `edit_diagram` |
+| a ref, a state, a colour, a closed claim, the board's `describes` | `edit_diagram` |
 | the layout flow | `relayout_diagram` |
 | boxes added or removed, a subsystem reworked | `create_diagram` |
 
@@ -307,7 +307,9 @@ as an oversight:
 - **A whole board that is not about this codebase** — a protocol, a standard,
   someone else's system: pass `describes: "concept"` to `create_diagram`. That
   excuses every box at once, and it needs a title, since that is where it is
-  recorded.
+  recorded. A flow through this codebase is never concept, and concept is not
+  a way to make red boxes go away. To switch a board later, call `edit_diagram`
+  with `describes: "repo"` or `"concept"`.
 
 Same field on an edge. A connection you intend but have not wired yet is
 `state: "planned"`, which is the honest way to draw the arrow before the import

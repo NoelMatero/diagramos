@@ -9,6 +9,7 @@ import {
   livePromotionNote,
   rowsOf,
   summaryOf,
+  quietChipOf,
   tallyOf,
   worstToneOf,
   type DriftView,
@@ -106,7 +107,7 @@ function DriftPanel({
   const tally = tallyOf(report);
   const rows = rowsOf(report);
   const quiet = rows.length === 0;
-  const tone = quiet ? "good" : worstToneOf(rows);
+  const tone = quiet ? quietChipOf(report).tone : worstToneOf(rows);
   const early = livePromotionNote(shownEarly);
 
   return (
@@ -120,9 +121,7 @@ function DriftPanel({
         >
           <span className={`drift-dot tone-${tone}`} />
           {quiet
-            ? report.concept
-              ? "concept board"
-              : "in sync"
+            ? quietChipOf(report).text
             : tally.map((part) => (
                 <span key={part.text} className={`tone-${part.tone}`}>
                   {part.text}
