@@ -12,7 +12,7 @@
  * stroke the human just made.
  */
 import { createHash, randomBytes, timingSafeEqual } from "node:crypto";
-import { watch, type FSWatcher } from "node:fs";
+import { existsSync, watch, type FSWatcher } from "node:fs";
 import { readdir, readFile, realpath, stat } from "node:fs/promises";
 import { createServer, type IncomingMessage, type Server, type ServerResponse } from "node:http";
 import path from "node:path";
@@ -61,6 +61,13 @@ const DEFAULT_IDLE_HOURS = 12;
 const IDLE_CHECK_MS = 60_000;
 const VIEWER_DIR = path.join(ROOT, "out/viewer");
 const VIEWER_SRC = path.join(ROOT, "src/viewer");
+/**
+ * Whether this server runs from a source checkout. The published package ships
+ * no sources, so their presence is the test. The page uses it to give advice
+ * that works: in a checkout its bundle is rebuilt by hand, and a restart only
+ * serves the same stale page again (#285).
+ */
+const FROM_CHECKOUT = existsSync(VIEWER_SRC);
 
 /**
  * Whether the board page on disk is older than the sources it was built from.
@@ -882,7 +889,7 @@ export async function startBoardServer(options: BoardServerOptions): Promise<Run
         // Grammars load once per process, lazily: a server nobody asks for
         // status keeps starting as fast as it always did.
         const { report } = await reportFor(target.file);
-        return json(response, 200, { file: target.file, report });
+        return json(response, 200, { file: target.file, report, ...(FROM_CHECKOUT ? { fromCheckout: true } : {}) });
       }
 
       /**

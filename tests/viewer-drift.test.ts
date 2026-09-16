@@ -387,11 +387,21 @@ describe("a finding kind this page has never heard of", () => {
       vocabulary: ["missing-file", "backwards-edge", "sideways-edge"],
     });
     expect(tallyOf(report)).toEqual([{ text: "page out of date", tone: "bad" }]);
+    /*
+     * #285: "restart the board to rebuild it" was wrong advice. A restart
+     * serves the same old page again. An installed package ships page and
+     * server together, so there the fix is a fresh start of the service; in a
+     * checkout it is rebuilding the page.
+     */
     expect(rowsOf(report)[0]).toEqual({
       text: "this page is out of date — it does not know: sideways-edge"
-        + " · restart the board to rebuild it",
+        + " · stop the board (npx diagramos stop) and open it again",
       tone: "bad",
     });
+    expect(rowsOf({ ...report, fromCheckout: true })[0]!.text).toBe(
+      "this page is out of date — it does not know: sideways-edge"
+        + " · run npm run build:viewer in the checkout, then reload",
+    );
     // Loud, because every count beside it was graded by the wrong rules.
     expect(worstToneOf(rowsOf(report))).toBe("bad");
   });

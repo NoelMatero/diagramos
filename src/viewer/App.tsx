@@ -211,8 +211,10 @@ export default function App() {
     try {
       const response = await fetch(withBoard("/api/drift"), { cache: "no-store" });
       if (!response.ok) return;
-      const payload = (await response.json()) as { report?: DriftView };
-      if (payload.report) setDrift(payload.report);
+      const payload = (await response.json()) as { report?: DriftView; fromCheckout?: boolean };
+      if (payload.report) {
+        setDrift(payload.fromCheckout ? { ...payload.report, fromCheckout: true } : payload.report);
+      }
     } catch {
       // Offline is already told by the status pill; stale beats wrong here.
     }
