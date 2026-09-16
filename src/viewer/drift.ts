@@ -189,6 +189,9 @@ export interface DriftView {
   edgesSkipped?: number;
   strayArrows?: number;
   concept: boolean;
+  /** On a concept board, boxes pointing at code here (#287). Absent on older payloads. */
+  conceptAnchored?: number;
+  conceptBoxes?: number;
   /**
    * Every verdict word the engine that produced this report can emit.
    *
@@ -744,6 +747,18 @@ export function livePromotionNote(count: number): string | undefined {
 }
 
 /** The dot's colour: the worst news wins, and quiet is green. */
+/**
+ * The chip's words when nothing is wrong with the boxes. A concept board full
+ * of this repo's code is amber rather than green: the setting that checks
+ * nothing is probably the mistake (#287).
+ */
+export function quietChipOf(report: DriftView): { text: string; tone: Tone } {
+  if (report.concept && report.conceptAnchored) {
+    return { text: `concept board · ${report.conceptAnchored} point here`, tone: "warn" };
+  }
+  return { text: report.concept ? "concept board" : "in sync", tone: "good" };
+}
+
 export function worstToneOf(rows: StatusRow[]): Tone {
   if (rows.some((row) => row.tone === "bad")) return "bad";
   if (rows.some((row) => row.tone === "warn")) return "warn";

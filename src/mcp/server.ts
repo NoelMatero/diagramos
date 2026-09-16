@@ -18,6 +18,7 @@ import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js"
 import { emptyBoard, readBoard, writeBoard } from "../engine/board-file";
 import { TOOL_VERSION, schemaOf } from "../engine/version";
 import {
+  applyDescribes,
   applyEdits,
   connectNodes,
   createDiagram,
@@ -680,6 +681,8 @@ function drawTimeNotes(drawn: {
   workItems: ReadonlyArray<unknown>;
   unconfirmedEdges: ReadonlyArray<UnconfirmedEdge>;
   followed: ReadonlyArray<FollowedRef>;
+  conceptAnchored?: number;
+  conceptBoxes?: number;
 }): Record<string, unknown> {
   /*
    * Build output is reported apart from the rest, because the advice differs.
@@ -699,6 +702,16 @@ function drawTimeNotes(drawn: {
     (finding) => finding.kind !== "generated-ref" && !pointsAtLines(finding),
   );
   return {
+    // First, because it decides whether anything below was checked at all (#287).
+    ...(drawn.conceptAnchored
+      ? {
+          conceptPointsHere:
+            `This board is marked concept, which checks nothing, but ${drawn.conceptAnchored} of its `
+            + `${drawn.conceptBoxes ?? drawn.conceptAnchored} boxes point at code in this repo. Concept is `
+            + "only for a board about something outside this repo. If this board is about this code, "
+            + 'call edit_diagram with describes: "repo".',
+        }
+      : {}),
     ...(lines.length
       ? {
           pointsAtLineNumbers: lines.map(
@@ -825,10 +838,11 @@ server.registerTool(
         .enum(["repo", "concept"])
         .optional()
         .describe(
-          "What the board is about. Omit for 'repo' (the default: it describes this codebase). "
-          + "Use 'concept' when it describes a protocol, a standard, or another project — every box "
-          + "is then excused from drift checking instead of reported as missing a ref. Needs a title, "
-          + "since that is where it is recorded.",
+          "What the board is about. Omit it for a board about this codebase, which is almost every "
+          + "board. 'concept' is only for a protocol, a standard, or another project: nothing on a "
+          + "concept board is checked. A flow through this codebase is not a concept board, and "
+          + "concept is not a way to silence findings -- fix the refs instead. Needs a title. "
+          + 'Change it later with edit_diagram\'s describes.',
         ),
       complete: z
         .string()
@@ -1587,7 +1601,8 @@ server.registerTool(
       + "reach for first: correcting four refs here costs four short strings, where re-sending the "
       + "graph to create_diagram costs ~1,900 tokens on a 34-node board. "
       + "Patches and deletes elements by id, hand-drawn ones included. Use it to re-anchor a box "
-      + "(ref, refs), change what it claims to exist (state), assert or drop a closed boundary, and "
+      + "(ref, refs), change what it claims to exist (state), assert or drop a closed boundary, switch "
+      + "the whole board between repo and concept (describes), and "
       + "to move, resize or recolour anything. Everything you do not mention stays as it was, so a "
       + "ref correction cannot silently unsay a box's state or its second anchor. "
       + "The id can be a node id from read_diagram or a raw Excalidraw element id; a real element id "
@@ -1640,12 +1655,22 @@ server.registerTool(
           + 'Anything else is an Excalidraw property: {"id":"api","backgroundColor":"#ffec99","width":220}.',
         ),
       deletes: z.array(z.string()).default([]),
+      describes: z
+        .enum(["repo", "concept"])
+        .optional()
+        .describe(
+          'Switch what the whole board is about: "repo" (checked against this code) or "concept" '
+          + "(about something else, never checked). No id needed; the check runs straight after.",
+        ),
     },
   },
-  async ({ path: boardPath, updates, deletes }) =>
+  async ({ path: boardPath, updates, deletes, describes }) =>
     guard(async () => {
       const file = resolveBoardPath(boardPath);
-      const result = applyEdits(await readBoard(file), updates, deletes);
+      const edited = applyEdits(await readBoard(file), updates, deletes);
+      const result = describes
+        ? { ...edited, board: applyDescribes(edited.board, describes) }
+        : edited;
       await writeBoard(file, result.board);
       await followBoard(file);
       /*
@@ -1676,7 +1701,9 @@ server.registerTool(
           || payload.closed !== undefined;
       });
       let notes: Record<string, unknown> = {};
-      if (touchedAnchors && result.updated.length) {
+      // Switching describes changes what every box on the board is checked
+      // against, so it is owed the same answer as a ref edit.
+      if ((touchedAnchors && result.updated.length) || describes) {
         await initEngine();
         notes = drawTimeNotes(checkDrift(result.board, createWorkspace(WORKSPACE_ROOT), {
           trail: createGitTrail(WORKSPACE_ROOT),
@@ -1686,6 +1713,7 @@ server.registerTool(
         wrote: relativeToWorkspace(file),
         updated: result.updated,
         deleted: result.deleted,
+        ...(describes ? { describes } : {}),
         ...(result.skipped.length ? { skipped: result.skipped, note: "No element has these ids." } : {}),
         ...notes,
       });

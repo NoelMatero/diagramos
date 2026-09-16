@@ -72,6 +72,9 @@ export interface Checked {
   anchorableEdges?: number;
   /** The board is not about this repo, so nothing here is checkable. */
   concept?: boolean;
+  /** On a concept board, boxes pointing at code that exists here, out of `conceptBoxes`. */
+  conceptAnchored?: number;
+  conceptBoxes?: number;
 }
 
 /** `1 box`, `4 boxes` -- the noun the whole tool uses for an anchored shape. */
@@ -105,6 +108,13 @@ export function countedWords(facts: Checked): string {
  * as a pass, which is the one thing this line exists to prevent.
  */
 export function coverageWords(facts: Checked): string {
+  if (facts.concept && facts.conceptAnchored) {
+    // Said to the person, not only the model: "concept" is the setting that
+    // makes red go away, and a board of this repo's code wearing it is the
+    // one concept board that is probably wrong (#287).
+    return `marked as a concept board, so nothing here is checked — but ${facts.conceptAnchored} of its `
+      + `${facts.conceptBoxes ?? facts.conceptAnchored} boxes point at code in this repo`;
+  }
   if (facts.concept) {
     return "a concept board — it describes something outside this repo, so nothing here is checked";
   }
@@ -124,6 +134,9 @@ export function coverageWords(facts: Checked): string {
  * fits, and a second phrasing of the common case is how this drifted before.
  */
 export function coverageLabel(facts: Checked): string {
+  if (facts.concept && facts.conceptAnchored) {
+    return `concept board · unchecked · ${boxes(facts.conceptAnchored)} ${facts.conceptAnchored === 1 ? "points" : "point"} here`;
+  }
   if (facts.concept) return "concept board · not about this repo";
   if (!facts.checked && !facts.edgesChecked) return "nothing here points at code yet";
   // Same nouns, same plurals, minus the trailing phrase. "against the code" is

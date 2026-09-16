@@ -8,6 +8,7 @@ import { describe, expect, it } from "vitest";
 import {
   livePromotedCount,
   livePromotionNote,
+  quietChipOf,
   rowsOf,
   summaryOf,
   tallyOf,
@@ -31,6 +32,19 @@ function reportWith(overrides: Partial<DriftView>): DriftView {
     ...overrides,
   };
 }
+
+describe("a concept board full of this repo's code (#287)", () => {
+  it("says so on the chip, in amber, and in the sentence", () => {
+    const report = reportWith({ concept: true, conceptAnchored: 27, conceptBoxes: 29 });
+    expect(quietChipOf(report)).toEqual({ text: "concept board · 27 point here", tone: "warn" });
+    expect(summaryOf(report)).toContain("27 of its 29 boxes point at code in this repo");
+  });
+
+  it("stays a plain green concept chip when nothing on it points here", () => {
+    expect(quietChipOf(reportWith({ concept: true }))).toEqual({ text: "concept board", tone: "good" });
+    expect(quietChipOf(reportWith({}))).toEqual({ text: "in sync", tone: "good" });
+  });
+});
 
 describe("the status chip's tally", () => {
   it("uses the CLI notice's words, so both surfaces tell one story", () => {
