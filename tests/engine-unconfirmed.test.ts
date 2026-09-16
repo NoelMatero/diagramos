@@ -119,8 +119,10 @@ describe("an arrow whose end names data", () => {
       reason: "an-end-is-data",
     });
     // The one reason a reader can act on says how, in the sentence itself.
+    // Both ends are in lib.rs, so the how is not "file level": that would
+    // leave the arrow with nothing to check (#280).
     expect(found.unconfirmedEdges[0]!.detail).toContain("Client");
-    expect(found.unconfirmedEdges[0]!.detail).toContain("file level");
+    expect(found.unconfirmedEdges[0]!.detail).toContain("anchor the data end at the routine");
   });
 
   it("was still read, so it counts as checked and not as skipped", async () => {
