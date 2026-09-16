@@ -37,7 +37,7 @@
 import { existsSync, mkdirSync, readFileSync, rmSync, writeFileSync } from "node:fs";
 import path from "node:path";
 
-import { box, fit, pad } from "./lib/box.mjs";
+import { box, fit, pad, width } from "./lib/box.mjs";
 import {
   buildCodeGraph,
   codeGraphIsCurrent,
@@ -57,6 +57,7 @@ import { pointsAtLines, pointsAtQualified } from "../src/engine/lines.ts";
 import {
   ACCUSING_EDGE_KINDS,
   checkDrift,
+  lackingPhrase,
   createGitBaseline,
   createWorkspace,
   findBoards,
@@ -693,6 +694,24 @@ function builtBackwards(report) {
   return report.workItems.filter((item) => item.kind === "built-backwards");
 }
 
+/**
+ * A sentence broken into rows a box will not cut.
+ *
+ * Every other row here is short enough to truncate harmlessly -- a label and a
+ * phrase. A sentence that says what to do instead is not, and `fit` would take
+ * the instruction off the end of it.
+ */
+function wrapped(text, cells) {
+  const lines = [];
+  let line = "";
+  for (const word of text.split(/\s+/)) {
+    if (line && width(`${line} ${word}`) > cells) { lines.push(line); line = word; }
+    else line = line ? `${line} ${word}` : word;
+  }
+  if (line) lines.push(line);
+  return lines;
+}
+
 /** Rows of findings. Low on purpose: this fires at the end of every turn. */
 const MAX_LISTED = 6;
 
@@ -827,7 +846,7 @@ function rowsFor({ report, promoted = [] }, colour, all = false) {
             : paint(`${boxName(finding)} \u2192 ${target(finding)}`, "red", colour),
       ...followRow(followedFor.get(finding.node), colour, all),
     ]),
-    ...report.edges.map((finding) => {
+    ...report.edges.flatMap((finding) => {
       // A named route knows where it stopped holding, and that is the only
       // thing this shape offers over a plain unsupported arrow. Printing just
       // the endpoints would throw it away.
@@ -881,6 +900,17 @@ function rowsFor({ report, promoted = [] }, colour, all = false) {
        */
       const reachedNotCalled = finding.kind === "calls-one-level-up";
       /*
+       * The eighth (#297), and the only one whose row says what the *end* is
+       * rather than what the code does: this arrow asks a struct for a result
+       * or a function for its fields, so there is nothing to go and compare.
+       * The engine's own phrase, read off the front of its sentence for the
+       * reason `brokenHop` reads off the detail -- a second phrasing here is a
+       * second thing to keep in step.
+       */
+      const wrongKindOfEnd = finding.kind === "end-lacks-part"
+        ? lackingPhrase(finding.detail)
+        : undefined;
+      /*
        * The sixth (#213), and the one that was missing here.
        *
        * It shipped into the board page and not into this file, so the browser
@@ -906,7 +936,7 @@ function rowsFor({ report, promoted = [] }, colour, all = false) {
        * been in the detail.
        */
       const wrongBase = finding.kind === "conforms-absent";
-      return paint(
+      return [paint(
         `${boxName({ label: finding.fromLabel, node: finding.from })}`
         + ` ${backwards ? "\u2192 (should be \u2190)" : "\u2192"} `
         + `${boxName({ label: finding.toLabel, node: finding.to })}`
@@ -922,13 +952,30 @@ function rowsFor({ report, promoted = [] }, colour, all = false) {
         + (wrongMembers ? " \u00b7 no such member" : "")
         + (wrongUnread ? " \u00b7 never read here" : "")
         + (wrongBase ? " \u00b7 not a base" : "")
+        + (wrongKindOfEnd ? ` \u00b7 ${wrongKindOfEnd}` : "")
         + (hop ? ` \u00b7 ${hop}` : ""),
         backwards || wrongSignature || wrongHolds || wrongBuilds || wrongCalls || wrongCallsRefuted
-          || wrongMembers || wrongUnread || wrongBase
+          || wrongMembers || wrongUnread || wrongBase || wrongKindOfEnd
           ? "red"
           : "yellow",
         colour,
-      );
+      ),
+      /*
+       * The one arrow verdict whose row cannot carry its own answer (#297).
+       *
+       * Every other red here names something to go and read -- a signature, a
+       * field list, an import -- and the row has width for the phrase. This one
+       * says the end cannot answer the question at all, and what to do instead
+       * is the whole point of saying so. `--details` prints the engine's own
+       * sentence under it, the way a followed ref prints where the code went:
+       * dim, because it answers the row above rather than being a second thing
+       * wrong.
+       */
+      ...(all && wrongKindOfEnd
+        ? wrapped(oneLine(finding.detail), 58).map((line, index) =>
+          paint(`${index === 0 ? "  \u21b3 " : "    "}${line}`, "dim", colour))
+        : []),
+      ];
     }),
     /*
      * A plan the code went the other way on.
@@ -996,7 +1043,7 @@ function rowsFor({ report, promoted = [] }, colour, all = false) {
  */
 const WRONG_EDGE_KINDS = new Set(ACCUSING_EDGE_KINDS);
 
-function tallyCounts({ gone, generated, lines, qualified, empty, unused, open, incomplete, mishandled, removed, garbled, unanswered, backwards, signatures, fields, builtBackwards, callsBackwards, members, unread, bases, arrows, stray, promoted, built, planned }, colour) {
+function tallyCounts({ gone, generated, lines, qualified, empty, unused, open, incomplete, mishandled, removed, garbled, unanswered, backwards, signatures, fields, builtBackwards, callsBackwards, members, unread, bases, wrongKind, arrows, stray, promoted, built, planned }, colour) {
   return [
     gone ? paint(`${gone} gone`, "red", colour) : "",
     // Its own word, because "gone" is the opposite of what happened: the file
@@ -1070,6 +1117,15 @@ function tallyCounts({ gone, generated, lines, qualified, empty, unused, open, i
     bases
       ? paint(`${bases} ${bases === 1 ? "base disagrees" : "bases disagree"}`, "red", colour)
       : null,
+    /*
+     * Its own word for the reason every other red here has one: nothing about
+     * these arrows disagrees with the code. They ask something of an end that
+     * cannot have it, and "1 field disagrees" would send somebody to read a
+     * field list that was never the problem.
+     */
+    wrongKind
+      ? paint(`${wrongKind} at the wrong kind of end`, "red", colour)
+      : null,
     signatures
       ? paint(`${signatures} ${signatures === 1 ? "signature" : "signatures"} disagree`, "red", colour)
       : "",
@@ -1122,6 +1178,7 @@ function tallyFor({ report, promoted = [] }, colour) {
       members: report.edges.filter((finding) => finding.kind === "accesses-absent").length,
       unread: report.edges.filter((finding) => finding.kind === "accesses-not-read").length,
       bases: report.edges.filter((finding) => finding.kind === "conforms-absent").length,
+      wrongKind: report.edges.filter((finding) => finding.kind === "end-lacks-part").length,
       arrows: report.edges.filter((finding) => !WRONG_EDGE_KINDS.has(finding.kind)).length,
       stray: report.strayArrows ?? 0,
       promoted: promoted.length,
@@ -1209,6 +1266,8 @@ function render(stale, colour) {
           + report.edges.filter((finding) => finding.kind === "accesses-not-read").length,
         bases: sum.bases
           + report.edges.filter((finding) => finding.kind === "conforms-absent").length,
+        wrongKind: sum.wrongKind
+          + report.edges.filter((finding) => finding.kind === "end-lacks-part").length,
         arrows: sum.arrows
           + report.edges.filter((finding) => !WRONG_EDGE_KINDS.has(finding.kind)).length,
         stray: sum.stray + (report.strayArrows ?? 0),
@@ -1218,7 +1277,7 @@ function render(stale, colour) {
         planned: sum.planned + report.workItems.length,
       };
     },
-    { gone: 0, generated: 0, lines: 0, qualified: 0, empty: 0, unused: 0, open: 0, incomplete: 0, removed: 0, garbled: 0, unanswered: 0, backwards: 0, signatures: 0, fields: 0, builtBackwards: 0, callsBackwards: 0, callsRefuted: 0, members: 0, unread: 0, bases: 0, arrows: 0, stray: 0, promoted: 0, built: 0, planned: 0 },
+    { gone: 0, generated: 0, lines: 0, qualified: 0, empty: 0, unused: 0, open: 0, incomplete: 0, removed: 0, garbled: 0, unanswered: 0, backwards: 0, signatures: 0, fields: 0, builtBackwards: 0, callsBackwards: 0, callsRefuted: 0, members: 0, unread: 0, bases: 0, wrongKind: 0, arrows: 0, stray: 0, promoted: 0, built: 0, planned: 0 },
   );
 
   // Too many to list: counts per diagram, and a pointer to the view that has room.

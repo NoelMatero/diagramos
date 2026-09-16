@@ -202,6 +202,22 @@ function declarationsIn(
   });
 }
 
+/**
+ * Every place this file introduces a name, for a reader that asks what shape
+ * the declaration has rather than what its body says (`parts.ts`, #297).
+ *
+ * The same index everything above reads, handed out rather than rebuilt, so
+ * "what counts as a declaration" stays one list. `soup` is a name read out of a
+ * macro, whose shape nobody parsed.
+ */
+export function declaredShapes(
+  source: string,
+  language: Language,
+): ReadonlyMap<string, ReadonlyArray<{ node: Node; nameNode: Node; soup: boolean }>> | undefined {
+  const tree = treeOf(source, language);
+  return tree ? declarationNodes(tree) : undefined;
+}
+
 function treeOf(source: string, language: Language): Tree | undefined {
   return parseSource(source, language);
 }

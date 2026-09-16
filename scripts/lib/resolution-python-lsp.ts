@@ -64,6 +64,7 @@ import path from "node:path";
 import { fileURLToPath, pathToFileURL } from "node:url";
 
 import { PYRIGHT_VERSION } from "./licence-python";
+import type { LspDocumentSymbol } from "./lsp-symbols";
 import { isOutsideTree } from "./resolution-ts";
 
 export { isOutsideTree };
@@ -293,6 +294,11 @@ export interface PyrightLspReferee {
    * from a coverage figure moving.
    */
   withheldNoType(): number;
+  /**
+   * `textDocument/documentSymbol` -- what pyright says each name in a file
+   * *is* (#297). `undefined` when it would not answer.
+   */
+  documentSymbols(file: string): Promise<LspDocumentSymbol[] | undefined>;
   close(): void;
 }
 
@@ -373,7 +379,10 @@ export async function createPyrightLspReferee(root: string): Promise<PyrightLspR
   await send("initialize", {
     processId: process.pid,
     rootUri: pathToFileURL(root).toString(),
-    capabilities: { textDocument: { definition: {}, typeDefinition: {} } },
+    capabilities: { textDocument: {
+      definition: {}, typeDefinition: {},
+      documentSymbol: { hierarchicalDocumentSymbolSupport: true },
+    } },
     workspaceFolders: [{ uri: pathToFileURL(root).toString(), name: path.basename(root) }],
   });
   send("initialized", {}, true);
@@ -482,6 +491,21 @@ export async function createPyrightLspReferee(root: string): Promise<PyrightLspR
       askLocation("definition", file, source, start, STEADY_RETRY_MS),
     warmUp: (file, source, start) => ask("typeDefinition", file, source, start, WARMUP_RETRY_MS).then(() => {}),
     withheldNoType: () => withheldNoType,
+    documentSymbols: async (file) => {
+      for (const wait of [0, ...STEADY_RETRY_MS]) {
+        if (wait) await new Promise((resolve) => setTimeout(resolve, wait));
+        if (closed) return undefined;
+        try {
+          const result = (await send("textDocument/documentSymbol", {
+            textDocument: { uri: pathToFileURL(file).toString() },
+          })) as LspDocumentSymbol[] | null;
+          if (result) return result;
+        } catch {
+          return undefined;
+        }
+      }
+      return undefined;
+    },
     close: () => {
       if (closed) return;
       closed = true;

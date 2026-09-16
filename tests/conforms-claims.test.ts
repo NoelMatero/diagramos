@@ -239,8 +239,13 @@ describe("a claim nothing can ever read", () => {
     );
     const report = checkDrift(board, fakeWorkspace(files), { edges: true });
 
-    const garbled = report.garbledClaims?.find((one) => one.written === "conforms");
-    expect(garbled?.detail).toContain("Draw it from the type that has the base");
+    // Red since #297, where this was an unreadable claim: a function has no
+    // base list, so no code will ever answer this arrow either way, and the
+    // person whose board it is should be the one told.
+    const wrongKind = report.edges.find((one) => one.kind === "end-lacks-part");
+    expect(wrongKind?.detail).toContain("a function has no base types");
+    expect(wrongKind?.detail).toContain("Start the arrow at the type that declares the base");
+    expect(report.garbledClaims).toEqual([]);
   });
 });
 

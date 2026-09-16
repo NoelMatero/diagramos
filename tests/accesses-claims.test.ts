@@ -179,13 +179,26 @@ describe("a claim nothing can ever read is loud, not quiet", () => {
   });
 
   it("says so when the far end is a routine, which has no members", async () => {
+    /*
+     * Red since #297, where this was an unreadable claim.
+     *
+     * Both sentences say the same thing -- a function has no members, so
+     * nothing can ever read this arrow -- and the difference is who hears it.
+     * Unreadable is reported to whoever drew the board; red is reported to the
+     * person whose board it is, and a claim that can never come true belongs
+     * in the second place. The draw-time surface still names it either way
+     * (`arrowsAtTheWrongKindOfEnd` in `mcp-server.test.ts`).
+     */
     const config = "export function Config(width: number) { return width; }\n";
     const render = "export function render() { return 1; }\n";
     const board = await boardOf("width", { claim: "accesses" });
     const report = checkDrift(board, fakeWorkspace(files(config, render)), { edges: true });
 
-    expect(report.garbledClaims).toHaveLength(1);
-    expect(report.garbledClaims[0]!.detail).toContain("has no members");
+    const wrongKind = report.edges.filter((finding) => finding.kind === "end-lacks-part");
+    expect(wrongKind).toHaveLength(1);
+    expect(wrongKind[0]!.detail).toContain("a function has no fields");
+    expect(report.garbledClaims).toEqual([]);
+    expect(report.clean).toBe(false);
   });
 });
 

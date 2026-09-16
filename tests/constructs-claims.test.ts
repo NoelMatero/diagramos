@@ -123,10 +123,14 @@ describe("@builds on an arrow drawn the wrong way round", () => {
     expect(report.clean).toBe(false);
   });
 
-  it("says nothing when the tail cannot be read at all", async () => {
-    // An empty class makes nothing and proves nothing. "Runs the other way and
-    // not this way" needs both halves, so this is silence -- and it is the
-    // distinction that keeps the accusation honest.
+  it("is red when the tail has no body to make anything in", async () => {
+    /*
+     * Silence until #297, on the reasoning that "runs the other way and not
+     * this way" needs both halves. That is still true of `builds-backwards`
+     * and it was the wrong answer here: an empty class has no code in it at
+     * all, so this arrow is not unproven, it is unprovable. The red says which
+     * end and what to do, and `builds-backwards` below is untouched.
+     */
     const factory = "export class Builder {}\n";
     const widget = "export class Widget { make() { return new Builder(); } }\n";
     const { board } = await createDiagram(emptyBoard(), {
@@ -142,8 +146,12 @@ describe("@builds on an arrow drawn the wrong way round", () => {
     }), { edges: true });
 
     expect(report.edges.filter((finding) => finding.kind === "builds-backwards")).toEqual([]);
-    expect(report.claims.buildsWithheld["no-body"]).toBe(1);
-    expect(report.clean).toBe(true);
+    const wrongKind = report.edges.filter((finding) => finding.kind === "end-lacks-part");
+    expect(wrongKind).toHaveLength(1);
+    expect(wrongKind[0]!.detail).toContain("a class has no body of code that runs");
+    // Counted once: red, and not also among the claims nobody could answer.
+    expect(report.claims.buildsWithheld["no-body"]).toBeUndefined();
+    expect(report.clean).toBe(false);
   });
 });
 

@@ -427,6 +427,119 @@ claim across 17 boards, and it is the same Rust one — and `measure:holds`,
 `measure:constructs` and `measure:signature` report 0 missed and 0 invented as
 before.
 
+## What a claim needs from its end, and the end that has not got it
+
+Everything above is about what an end *says* -- its fields, its signature, the
+calls in its body. #297 is the question underneath: whether the end is the kind
+of thing the claim is about at all.
+
+`Client --@feeds--> handle_request` is the case it came from. `Client` is a
+struct, and a struct has no result, so no reader was ever going to confirm that
+arrow -- and each of them met it on its own terms, found nothing, and withheld.
+The one mistake on that board a person could have fixed in a second reported as
+"not sure", which is the same failure `an-end-is-data` names for an unclaimed
+arrow, one layer up.
+
+**What each claim needs from each end is written by hand, once, and it is the
+only hand-written part.** Nine lines, in `NEEDS` in `parts.ts`:
+
+| word | wants | at which end |
+|---|---|---|
+| `@needs` | nothing -- every declaration lives in a file, and a file has imports | — |
+| `@feeds` | a result | the tail |
+| `@calls` | a body of code that runs | the tail |
+| `@builds` | a body of code that runs | the tail |
+| `@takes` | parameters or a return type | the head |
+| `@returns` | parameters or a return type | the head |
+| `@holds` | a field list | the tail |
+| `@conforms` | a base list | the tail |
+| `@accesses` | a body at the tail, a field list at the head | both |
+
+**Whether an end has that part is read from the grammar's fields**, which is
+the whole point: a table of "a struct cannot feed" per language is the list
+`docs/reading-a-grammar.md` was written about. Two shapes, both `parse.ts`'s
+own rule:
+
+```
+a routine    a declaration with a `parameters` field
+a container  a declaration with a `body` field and no `parameters`,
+             `value`, `right` or `type`
+```
+
+A routine has a signature and a result, and never a field list or a base list.
+A container is the other way round. Everything else -- a constant, a field, a
+type alias, a variable holding who knows what, a name out of a macro -- is *not
+sure*, and never lacks anything. A name declared twice lacks a part only when
+every declaration of it does, so `interface Handler` beside `function Handler`
+has a signature.
+
+### The three refusals that keep it honest
+
+**A confirmation always wins.** The question is asked once, after every reader
+above has had its turn, so an arrow one of them confirmed never reaches it.
+Python's `work(Config())` really does put a Config into `work`, and if
+`feeds.ts` can see that, the arrow stays green whatever shape `Config` is.
+
+**A container that holds code is not "no body".** A Python class body runs at
+import, a TypeScript field initialiser runs at construction, and a module or a
+class with methods holds routines somebody may well have drawn the box for. So
+a container whose body contains anything invoked (`function`, `macro` or
+`arguments` on a node) or any routine at all is read as *not sure*. What is
+left saying "no body" is a field list and a class of nothing but attributes.
+The cost is on the record below: 8,299 Python lacks and 1,084 TypeScript ones
+given up.
+
+**A plan is never accused**, as with every other red here.
+
+### The measurement
+
+```
+npm run measure:parts -- /Users/noelmatero/board-ai/.corpus/*
+```
+
+The referee is each language's own tooling and shares none of the reader's
+machinery: rust-analyzer and pyright answering `textDocument/documentSymbol`,
+and the TypeScript compiler's own syntax tree. Where a server will not classify
+a line -- pyright lists one symbol per name per scope, so a `@property` getter
+hides behind its setter and nothing declared inside a function is listed at
+all; rust-analyzer answers nothing for a file in no crate and skips `fn gen`,
+whose name is a keyword in the 2024 edition -- the line itself is read for the
+keyword the language writes. That is a third mechanism, and it is in the
+referee only.
+
+| language | part | wrong lacks | unjudged | agreed lacks | missed |
+|---|---|---:|---:|---:|---:|
+| rust | body | 0 | 0 | 1,402 | 1,265 |
+| rust | signature / result | 0 | 0 | 1,817 | 797 |
+| rust | fields / bases | 0 | 0 | 10,264 | 308 |
+| python | body | 0 | 0 | 3,471 | 8,959 |
+| python | signature / result | 0 | 0 | 12,430 | 0 |
+| python | fields / bases | 0 | 0 | 42,222 | 0 |
+| ts | body | 0 | 0 | 1,966 | 1,621 |
+| ts | signature / result | 0 | 0 | 3,090 | 0 |
+| ts | fields / bases | 0 | 0 | 8,615 | 2 |
+| tsx | body | 0 | 0 | 71 | 59 |
+| tsx | signature / result | 0 | 0 | 120 | 0 |
+| tsx | fields / bases | 0 | 0 | 733 | 0 |
+| js | body | 0 | 0 | 3 | 12 |
+| js | signature / result | 0 | 0 | 15 | 0 |
+| js | fields / bases | 0 | 0 | 542 | 0 |
+
+17,955 Rust names, 100,346 Python, 49,146 TS, 10,258 TSX, 2,733 JS, over all
+fifteen pinned repositories, in 2m54s. **Not one wrong "lacks" in any square,
+and none the referee could not judge**, so every part may accuse in every
+language. `missed` is the cheap direction -- the tooling says "lacks" and the
+reader will not commit -- and it costs a red that never fires.
+
+Every square open is not the usual outcome in this document, so the measurement
+was broken on purpose twice to check that it can fail. Made to say a struct
+lacks fields, it refuses all five languages. Made to say a function lacks a
+signature, it reports 926 wrong lacks in Python and 208 in Rust.
+
+What the licence costs when a square closes is one accusation and nothing else,
+exactly as in `licence.ts`: the claim's own reader is untouched, and the arrow
+goes back to being withheld.
+
 ## #189's decision: refutable, and the number that decided it
 
 #189 gated `@calls` on a measurement rather than sequencing it, because a call

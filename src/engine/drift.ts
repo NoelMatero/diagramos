@@ -48,6 +48,8 @@ import { generatedRef, NEVER_WALK } from "./generated";
 import { readGraph, type Provenance, type RecoveredGraph, type RecoveredNode } from "./graph";
 import { licenceFor, mayAccuse } from "./licence";
 import { outsideCallsIn } from "./outside";
+import { lackingPhrase } from "./summary";
+import { lackingEnd, PART_NEEDED, PART_WORDS, type LackingEnd } from "./parts";
 import { languageOf, type Language } from "./parse";
 import { ledgerAdditions, type Ledger } from "./ledger";
 import { checkNeeds, type NeedsWithheld } from "./needs";
@@ -326,7 +328,19 @@ export type EdgeFindingKind =
    * the arrow where it is, and neither answer is a mistake somebody has to be
    * accused of.
    */
-  | "calls-one-level-up";
+  | "calls-one-level-up"
+  /**
+   * An arrow whose end is the wrong kind of thing for its claim (#297):
+   * `@feeds` from a struct, `@holds` from a function, `@takes` into a class.
+   *
+   * Wrong, and on a footing none of the others stand on. They read what an
+   * end says -- its fields, its signature, its calls. This reads whether it
+   * has fields or a signature at all, which is the shape of the declaration
+   * rather than its contents, and it is asked only after the claim's own
+   * reader found nothing to confirm. `parts.ts` carries the reading and the
+   * per-language licence `measure:parts` earned it.
+   */
+  | "end-lacks-part";
 
 /**
  * Every verdict word this engine can put in a report, as data (#116).
@@ -372,6 +386,7 @@ export const EDGE_FINDING_KINDS = [
   "accesses-not-read",
   "conforms-absent",
   "calls-one-level-up",
+  "end-lacks-part",
 ] as const satisfies readonly EdgeFindingKind[];
 
 /**
@@ -406,6 +421,7 @@ export const ACCUSING_EDGE_KINDS = [
   "accesses-absent",
   "accesses-not-read",
   "conforms-absent",
+  "end-lacks-part",
 ] as const satisfies readonly EdgeFindingKind[];
 
 /** The rest: an observation about an arrow, never an accusation about one. */
@@ -720,6 +736,52 @@ export const UNCONFIRMED_WORDS: Record<EdgeUnconfirmedReason, string> = {
   "feeds-runs-the-other-way": "the only flow found runs the other way",
   "signature-other-half": "the type is in the other half of the signature — the arrow may be the wrong way round",
 };
+
+export { lackingPhrase };
+
+/** Where a claim's "not sure" answers are counted, for taking one back (#297). */
+function withheldTallyOf(claims: ClaimTally, claim: ArrowClaim): Record<string, number> {
+  const tallies: Record<ArrowClaim, Record<string, number>> = {
+    needs: claims.needsWithheld,
+    feeds: claims.feedsWithheld,
+    takes: claims.signatureWithheld,
+    returns: claims.signatureWithheld,
+    holds: claims.holdsWithheld,
+    conforms: claims.conformsWithheld,
+    builds: claims.buildsWithheld,
+    calls: claims.callsWithheld,
+    accesses: claims.accessesWithheld,
+  };
+  return tallies[claim];
+}
+
+/** What the fix is, per part: where the arrow's end should be instead. */
+const LACKING_FIX: Record<LackingEnd["part"], string> = {
+  body: "Start the arrow at the function that does it",
+  signature: "Point the arrow at the function whose parameters or return type name it",
+  result: "Start the arrow at the function that produces the value",
+  fields: "Anchor that end at the type that has the field",
+  bases: "Start the arrow at the type that declares the base",
+};
+
+/**
+ * The red sentence for an end of the wrong kind (#297), led by the short
+ * phrase the CLI and the board page print on the row: everything before the
+ * first colon.
+ */
+export function lackingSentence(
+  claim: ArrowClaim,
+  lacking: LackingEnd,
+  from: { label: string },
+  to: { label: string },
+): string {
+  const side = lacking.end === "from" ? from : to;
+  const which = lacking.end === "from" ? "start" : "end";
+  return `${lacking.noun} has ${PART_WORDS[lacking.part]}: `
+    + `${side.label} is anchored at \`${lacking.name}\`, ${lacking.noun}, and @${claim} needs `
+    + `${PART_NEEDED[lacking.part]} at the ${which} of the arrow. `
+    + `${LACKING_FIX[lacking.part]}, or drop the claim.`;
+}
 
 /**
  * An arrow that was read and could not be corroborated.
@@ -3926,6 +3988,16 @@ export function checkDrift(
       const bothNamed = fromEnd.symbols.length > 0 && toEnd.symbols.length > 0;
 
       /*
+       * What this claim's own reader is about to count as "not sure", and what
+       * it is about to call unreadable, kept so an end of the wrong kind can
+       * take both back when it turns the arrow red below (#297). One arrow is
+       * one answer, and a red that was also tallied as a refusal would be two.
+       */
+      const tallyOf = edge.claim ? withheldTallyOf(claims, edge.claim) : undefined;
+      const tallyBefore = tallyOf ? { ...tallyOf } : undefined;
+      const garbledBefore = garbledClaims.length;
+
+      /*
        * `@takes` / `@returns`: does the head's signature name the tail's type?
        *
        * Placed with `needs` rather than with `feeds`, because it belongs to the
@@ -4811,6 +4883,58 @@ export function checkDrift(
           const why = feeds.verdict === "withheld" ? feeds.why : "absent";
           if (claimed) claims.feedsWithheld[why] = (claims.feedsWithheld[why] ?? 0) + 1;
         }
+      }
+
+      /*
+       * An end that is the wrong kind of thing for its claim (#297).
+       *
+       * Asked here, once, after every reader above has had its turn: a claim
+       * one of them confirmed never reaches this line, so a struct whose name
+       * really is written where the claim looks (`run(Config())`) stays green.
+       * What does reach it is the arrow every reader withheld on -- and when
+       * the end it reads has no result, no body, no fields at all, that
+       * refusal was never doubt about the code. The board asks something the
+       * code cannot have.
+       *
+       * Whether an end has the part is read from the grammar's fields
+       * (`parts.ts`) and licensed per language and part by `measure:parts`. A
+       * plan is never accused, as everywhere else here.
+       */
+      const lacking = claimed && edge.claim && bothNamed
+        ? lackingEnd(
+          edge.claim,
+          { source: workspace.read(fromFile), language: languageOf(fromFile), symbols: fromEnd.symbols },
+          { source: workspace.read(toFile), language: languageOf(toFile), symbols: toEnd.symbols },
+        )
+        : undefined;
+      if (lacking && edge.claim) {
+        if (tallyOf && tallyBefore) {
+          for (const key of Object.keys(tallyOf)) delete tallyOf[key];
+          Object.assign(tallyOf, tallyBefore);
+        }
+        garbledClaims.length = garbledBefore;
+        edgesChecked += 1;
+        const wasClaimed = baselineGraph?.edges.some(
+          (was) => was.from === edge.from && was.to === edge.to && was.claim === edge.claim,
+        );
+        const fresh = baselineGraph !== undefined && !wasClaimed;
+        recordEdge(edge, fromNode, toNode, { kind: "finding", finding: {
+          from: fromPath,
+          to: toPath,
+          fromLabel: fromNode.label,
+          toLabel: toNode.label,
+          fromRef,
+          toRef,
+          kind: "end-lacks-part",
+          detail: (fresh ? "a claim written this turn is already wrong: " : "")
+            + lackingSentence(
+              edge.claim,
+              lacking,
+              { label: oneLine(fromNode.label) || fromPath },
+              { label: oneLine(toNode.label) || toPath },
+            ),
+        } });
+        continue;
       }
 
       if (bothNamed && via && via.length > 0) {

@@ -707,6 +707,34 @@ describe("board MCP server", () => {
     expect(String(result.plannedWork)).toMatch(/^1 planned item tracked/);
   }, 120_000);
 
+  /**
+   * The claim the code can never answer, said while the author is still here
+   * (#297). It used to be a garbled claim for two words and silence for the
+   * rest; it is a red now, so the turn it is written is the cheap turn to fix
+   * it.
+   */
+  it("says at draw time which arrows ask an end for something it has not got", async () => {
+    const board = "docs/diagrams/wrong-kind.excalidraw";
+    await writeFile(
+      path.join(workspace, "kinds.ts"),
+      "export class Client { buffer: Uint8Array | undefined }\n"
+      + "export function receive(): Uint8Array { return new Uint8Array(); }\n",
+    );
+    const result = jsonOf(
+      await call("create_diagram", {
+        path: board,
+        nodes: [
+          { id: "client", label: "Client", ref: "kinds.ts#Client" },
+          { id: "receive", label: "receive()", ref: "kinds.ts#receive" },
+        ],
+        edges: [{ from: "client", to: "receive", claim: "feeds" }],
+      }),
+    );
+
+    expect(String(result.arrowsAtTheWrongKindOfEnd)).toContain("a class has no result");
+    expect(String(result.fixWrongKindOfEnd)).toContain("Move that end of the arrow");
+  }, 120_000);
+
   it("stays quiet at draw time when every ref resolves", async () => {
     const board = "docs/diagrams/resolved.excalidraw";
     await writeFile(path.join(workspace, "already.ts"), "export const already = 1;\n");
