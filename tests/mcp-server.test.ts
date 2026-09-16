@@ -557,6 +557,37 @@ describe("board MCP server", () => {
   }, 120_000);
 
   /**
+   * #286: a small model pointed all 73 boxes on five boards at line numbers.
+   * "Typo, or mark it planned" is the wrong advice for that -- the code is
+   * there -- so the draw-time answer names the box and says to use a name, on
+   * the draw and again on an edit that re-anchors a box the same way.
+   */
+  it("says at draw time when a box points at line numbers, and says to use a name", async () => {
+    const board = "docs/diagrams/line-numbers.excalidraw";
+    await mkdir(path.join(workspace, "src"), { recursive: true });
+    await writeFile(path.join(workspace, "src/lib.rs"), "pub fn dispatch() {}\n");
+    const drawn = jsonOf(
+      await call("create_diagram", {
+        path: board,
+        nodes: [
+          { id: "real", label: "Dispatch", ref: "src/lib.rs#dispatch" },
+          { id: "lines", label: "Router", ref: "src/lib.rs#578-636" },
+        ],
+      }),
+    );
+    expect(drawn.pointsAtNothing).toBeUndefined();
+    expect(drawn.fix).toBeUndefined();
+    const said = (drawn.pointsAtLineNumbers as string[]).join(" ");
+    expect(said).toContain("Router → src/lib.rs#578-636");
+    expect(said).toContain("src/lib.rs#<function or type name>");
+
+    const edited = jsonOf(
+      await call("edit_diagram", { path: board, updates: [{ id: "real", ref: "src/lib.rs#L12" }] }),
+    );
+    expect((edited.pointsAtLineNumbers as string[]).join(" ")).toContain("Dispatch → src/lib.rs#L12");
+  }, 120_000);
+
+  /**
    * A ref into build output, said at draw time and said differently.
    *
    * The advice for `pointsAtNothing` is "correct the typo or mark it planned",

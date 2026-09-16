@@ -159,6 +159,9 @@ When a node is real code in this repo, set `ref` on it. That is what lets
 | some files in one directory | `src/engine/*.ts` — `*` in the last segment only, never `**` |
 | an HTTP endpoint | `src/server/board-server.ts#/api/board`, or `#GET /api/board` |
 
+After `#` goes a name, never line numbers: `src/lib.rs#578-636` and
+`src/lib.rs:254` are refused, because lines move on any edit.
+
 An endpoint box is the one anchor that is not a name. It asks whether the route
 literal is still served by that file or something it imports, which is the only
 mechanically checkable thing about an endpoint — the method token is there for

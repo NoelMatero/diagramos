@@ -63,6 +63,8 @@ import { signatureNames, type SignatureWithheld } from "./signature";
 import { resolveDependency, type ConfigCache } from "./resolve";
 import { boardIsNewer, newerBuildClaimError } from "./version";
 import type { Workspace } from "./workspace";
+import { COLON_LINE, LINE_NUMBERS, LONE_LINE } from "./lines";
+export { pointsAtLines } from "./lines";
 
 export type DriftKind =
   | "missing-file"
@@ -1423,6 +1425,15 @@ function mentions(source: string, symbol: string): boolean {
   return new RegExp(`\\b${symbol.replace(REGEX_SPECIAL, "\\$&")}\\b`).test(source);
 }
 
+function lineNumbers(base: Omit<DriftFinding, "kind" | "detail">, file: string, lines: string): DriftFinding {
+  return {
+    ...base,
+    kind: "unresolvable-ref",
+    detail: `${base.ref} points at line numbers (${lines}), which go stale on any edit. `
+      + `After # goes a name: ${file}#<function or type name>, or just ${file} for the whole file.`,
+  };
+}
+
 type Inspection = DriftFinding | "ok" | { skip: NodeSkipReason };
 
 /**
@@ -1626,6 +1637,20 @@ function inspect(
   if (!rawTarget) {
     return { ...base, kind: "unresolvable-ref", detail: `"${ref}" names a symbol but no file.` };
   }
+  // Refused before anything is read: however the file stands, a line number
+  // was never going to work, and "no longer mentions 578-636" would say the
+  // code changed when it did not.
+  const colon = rawSymbol === undefined ? COLON_LINE.exec(rawTarget) : null;
+  if (colon) return lineNumbers(base, colon[1], colon[2]);
+  const lineShaped = rawSymbol !== undefined && LINE_NUMBERS.test(rawSymbol.split("@")[0].trim());
+  if (lineShaped && !LONE_LINE.test(rawSymbol!.split("@")[0].trim())) {
+    return lineNumbers(base, rawTarget, rawSymbol!);
+  }
+  /** What a symbol the target does not mention is reported as. */
+  const notMentioned = (detail: string): DriftFinding =>
+    lineShaped
+      ? lineNumbers(base, rawTarget, rawSymbol!)
+      : { ...base, kind: "missing-symbol", detail };
 
   // A garbled assertion is loud immediately rather than becoming a claim that
   // silently checks nothing. It fails the turn it is written, while the author
@@ -1729,7 +1754,7 @@ function inspect(
     if (!symbol) return "ok";
     const code = matched.filter((name) => TS_JS.test(name)).map((name) => `${absolute}/${name}`);
     if (!mentionedIn(code, symbol, workspace)) {
-      return { ...base, kind: "missing-symbol", detail: `no file matching ${target} mentions ${symbol}.` };
+      return notMentioned(`no file matching ${target} mentions ${symbol}.`);
     }
     if (!assertion) return "ok";
     const verdict = assertedIn(code, symbol, assertion, workspace, tally);
@@ -1755,7 +1780,7 @@ function inspect(
       };
     }
     if (!mentionedIn(code, symbol, workspace)) {
-      return { ...base, kind: "missing-symbol", detail: `nothing directly in ${target} mentions ${symbol}.` };
+      return notMentioned(`nothing directly in ${target} mentions ${symbol}.`);
     }
     if (!assertion) return "ok";
     const verdict = assertedIn(code, symbol, assertion, workspace, tally);
@@ -1781,7 +1806,7 @@ function inspect(
   if (!symbol) return "ok";
   const source = workspace.read(absolute);
   if (!mentions(source, symbol)) {
-    return { ...base, kind: "missing-symbol", detail: `${target} no longer mentions ${symbol}.` };
+    return notMentioned(`${target} no longer mentions ${symbol}.`);
   }
   if (!assertion) return "ok";
   const verdict = judgeAssertion(target, source, symbol, assertion, tally);

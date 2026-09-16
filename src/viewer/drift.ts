@@ -19,6 +19,7 @@
  * instead of quietly grading a report by last release's rules.
  */
 
+import { pointsAtLines } from "../engine/lines";
 import { summaryOf as sentenceFor } from "../engine/summary";
 
 export type Tone = "bad" | "warn" | "good" | "dim";
@@ -331,7 +332,9 @@ export function tallyOf(report: DriftView): TallyPart[] {
    * a complete claim coming back false would have read as a deleted file.
    */
   const incomplete = kind("incomplete-board");
-  const gone = report.findings.length - empty - unused - strangeBoxes - incomplete;
+  // Out of the remainder too: the code is there, the pointer never could reach it (#286).
+  const lines = report.findings.filter(pointsAtLines).length;
+  const gone = report.findings.length - empty - unused - strangeBoxes - incomplete - lines;
   const parts: TallyPart[] = [];
   /*
    * First, and red, because it is the only part here that is about the page
@@ -344,6 +347,7 @@ export function tallyOf(report: DriftView): TallyPart[] {
     parts.push({ text: "page out of date", tone: "bad" });
   }
   if (gone) parts.push({ text: `${gone} gone`, tone: "bad" });
+  if (lines) parts.push({ text: `${lines} at line numbers`, tone: "bad" });
   if (incomplete) parts.push({ text: `${incomplete} incomplete`, tone: "bad" });
   if (empty) parts.push({ text: `${empty} empty`, tone: "bad" });
   if (unused) parts.push({ text: `${unused} unused`, tone: "bad" });

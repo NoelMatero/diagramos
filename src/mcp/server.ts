@@ -37,6 +37,7 @@ import {
   createWorkspace,
   findBoards,
   findStrayBoards,
+  pointsAtLines,
   UNCONFIRMED_WORDS,
   type UnconfirmedEdge,
 } from "../engine/drift";
@@ -153,7 +154,8 @@ const nodeSchema = z.object({
       + "somewhere directly inside one (src/engine/#Workspace), or a glob over one directory "
       + "(src/engine/*.ts — * is allowed in the last segment only, never **), or an HTTP endpoint "
       + "(src/server/board-server.ts#/api/board, optionally with a method token as in #GET /api/board, "
-      + "which is read but never verified). Set it when a node is "
+      + "which is read but never verified). After # goes a name, never line numbers (#578-636 and "
+      + ":254 are refused). Set it when a node is "
       + "real code so check_drift can tell when it goes stale. Leave it off for anything not in this "
       + "repository, and say why with state or the board's describes. "
       + "A symbol ref may end in @declared, @used, or @declared+used, which narrows the check from "
@@ -690,8 +692,20 @@ function drawTimeNotes(drawn: {
    * directory generated what (#166).
    */
   const generated = drawn.findings.filter((finding) => finding.kind === "generated-ref");
-  const missing = drawn.findings.filter((finding) => finding.kind !== "generated-ref");
+  // Not a typo and not a plan: the code is there, the pointer can never reach
+  // it. The finding's detail already says what to write instead (#286).
+  const lines = drawn.findings.filter(pointsAtLines);
+  const missing = drawn.findings.filter(
+    (finding) => finding.kind !== "generated-ref" && !pointsAtLines(finding),
+  );
   return {
+    ...(lines.length
+      ? {
+          pointsAtLineNumbers: lines.map(
+            (finding) => `${finding.label || finding.node} → ${finding.ref}: ${finding.detail}`,
+          ),
+        }
+      : {}),
     ...(missing.length
       ? {
           pointsAtNothing: missing.map(
