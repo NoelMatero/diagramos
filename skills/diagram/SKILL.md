@@ -16,9 +16,11 @@ Follow these every time.
 1. **Every box points at code, or says why not.** Give it a `ref`, or
    `state: "planned"` (not built yet), or `state: "external"` (not code in this
    repo: a browser, a database, another project).
-2. **After `#` goes a name, never line numbers.** Write `src/lib.rs#dispatch`.
-   Never `src/lib.rs#578-636` or `src/lib.rs:254`: lines move on any edit, and
-   those refs are refused.
+2. **After `#` goes one plain name, as the code spells it.** Write
+   `src/lib.rs#dispatch`. Never line numbers (`src/lib.rs#578-636`,
+   `src/lib.rs:254`), which are refused, and never a qualified path
+   (`src/lib.rs#Server::dispatch`), which is not text in the file and reads as
+   missing.
 3. **Leave `describes` off.** `describes: "concept"` is only for a board about
    something outside this repo, such as a protocol or another project, and it
    switches all checking off. A flow through this code is never concept. Never

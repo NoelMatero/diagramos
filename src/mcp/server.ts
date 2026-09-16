@@ -175,8 +175,9 @@ const nodeSchema = z.object({
     .describe(
       "The code this box stands for: a file (src/a.ts), a symbol in it (src/a.ts#name), a "
       + "directory (src/engine/), a symbol inside one (src/engine/#Name), a glob in one directory "
-      + "(src/engine/*.ts), or an endpoint (src/server.ts#/api/board). After # goes a NAME, never "
-      + "line numbers (#578-636 and :254 are refused). Never build output (target/, dist/, out/). "
+      + "(src/engine/*.ts), or an endpoint (src/server.ts#/api/board). After # goes ONE plain name as "
+      + "the code spells it (#dispatch): never line numbers (#578-636, :254) and never a qualified "
+      + "path (#Server::dispatch). Never build output (target/, dist/, out/). "
       + "Leave it off only with state planned or external. A symbol may end @declared (declared "
       + "here), @used (used here) or @declared+used, written ONLY from the file you read.",
     ),
