@@ -653,7 +653,8 @@ function unconfirmedArrowNote(unconfirmed: ReadonlyArray<UnconfirmedEdge>): Reco
         ? " An end naming a struct, a field or a static has no body for a call search to read. If "
           + "the arrow means a call, anchor that end at the function that makes it; if it means "
           + "orchestration or ownership, anchor it at file level and the import channels can "
-          + "answer instead."
+          + "answer instead -- unless the other end is in that same file, where file level "
+          + "leaves nothing to check."
         : "")
       + " If the anchors are already the ones you meant, leave them.",
   };

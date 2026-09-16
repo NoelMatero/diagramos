@@ -297,6 +297,7 @@ const NEEDS_WITHHELD = {
   "endpoint-file-missing": "with an end whose file is missing",
   "directory-ref": "with an end that refs a directory, not a file",
   "glob-ref": "with an end that refs a glob, not a file",
+  "ends-in-one-file": "with one end the whole file the other end is in",
 };
 
 /**
@@ -321,6 +322,7 @@ const FEEDS_NOT_CONFIRMED = {
   "endpoint-file-missing": "with an end whose file is missing",
   "directory-ref": "with an end that refs a directory, not a file",
   "glob-ref": "with an end that refs a glob, not a file",
+  "ends-in-one-file": "with one end the whole file the other end is in",
   absent: "where no flow was found in either direction",
   reversed: "where the only flow found runs the other way",
 };
@@ -2113,6 +2115,7 @@ const SKIP_WORDS = {
   "endpoint-file-missing": "an end's file is missing",
   "directory-ref": "an end refs a directory",
   "glob-ref": "an end refs a glob",
+  "ends-in-one-file": "one end is the whole file the other end is in — anchor it at the thing it stands for",
   "unlicensed-language": "no licence for that language",
   "outside-licence": "an end the reader cannot place",
   "no-function-body": "both ends name something with no body to read",

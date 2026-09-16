@@ -249,6 +249,7 @@ const WITHHELD_WORDS: Record<string, string> = {
   "endpoint-file-missing": "with an end whose file is missing",
   "directory-ref": "with an end that refs a directory, not a file",
   "glob-ref": "with an end that refs a glob, not a file",
+  "ends-in-one-file": "with one end the whole file the other end is in — anchor it at the thing it stands for",
   // `feeds` only: an end anchored at a file has no result to follow.
   "not-symbols": "with an end anchored at a file rather than a symbol",
   "nowhere-to-look": "in a tree too large to walk",
