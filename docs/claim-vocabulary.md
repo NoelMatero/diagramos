@@ -244,7 +244,7 @@ grants a licence nobody measured.
 | `@calls` | yes | yes | **no** | yes | yes | a text scan that bounds each routine and reads its calls |
 | `@accesses` | yes | yes | **no** | yes | yes | a text scan of the same member lists |
 | `@conforms` | yes | yes | **no** | **no** | yes | a text scan of the same declaration headers |
-| `@handles` | yes | **no** | **no** | **no** | **no** | a text scan that reads `case X:` and `X =>` with no grammar |
+| `@handles` | yes | **no** | **no** | yes | **no** | a text scan that reads `case X:` and `X =>` with no grammar (Rust: a real `syn` parse, #267) |
 
 `@feeds` is not on it. It never accuses, so there is nothing to license.
 
@@ -255,16 +255,20 @@ path — that question in the form it can put it. `handles` reads a dispatch,
 which nothing else here reads, so a row of its own is the only thing standing
 between it and accusing on somebody else's measurement. That is #195 exactly.
 
-**Its row has one `yes`, and Rust — the square #206 predicted would be
-strongest — is a stated no.** 1,042 Rust dispatches and 2,959 case labels, the
-largest population of any language here by a factor of three, and the reader
-disagrees with the referee on 3.55% of them. The reason is the *referee*: a
-line-based scan cannot see an arm `rustfmt` broke across lines, it counts a
-`macro_rules!` arm as a case, and every disagreement read one by one is one of
-those. Item 18 settled that this is not enough — agreement is not evidence once
-a check is known not to discriminate — so the square stays no until something
-that can discriminate exists. `rustc`'s own non-exhaustive-match error is that
-thing and #237 found this machine's rustc too old for ripgrep's crates.
+**Its row now has two `yes`es, and Rust — the square #206 predicted would be
+strongest and #267 first found a stated no — is the second.** 1,042 Rust
+dispatches and 2,959 case labels, the largest population of any language
+here by a factor of three, and the reader disagreed with a line-based
+referee on 3.55% of them. The reason was the *referee*: a line-based scan
+cannot see an arm `rustfmt` broke across lines, it counts a `macro_rules!`
+arm as a case, and every disagreement read one by one was one of those. Item
+18 settled that this was not enough — agreement is not evidence once a check
+is known not to discriminate — so the square stayed no until something that
+could discriminate existed. `rustc`'s own non-exhaustive-match error was
+priced first and is still blocked (`.corpus/ripgrep` needs rustc 1.96, this
+machine has 1.93.0); a real parser (`syn`) was not blocked, and #267 built
+one, found two bugs in the *reader* rather than the old referee along the
+way, fixed them, and moved the square. Item 41 has the numbers.
 
 TypeScript is **0 invented and 7 missed of 1,099** (0.64%), and all 7 are the
 referee reading a `switch` written inside a template literal in a test fixture.
@@ -3368,6 +3372,70 @@ duplicate from conflitcts, requires reading prs "An arrow can be three calls lon
     `tpool` box pointing into `main.rs` -- among 18 cross-file arrows of that
     kind, and the other 17 read as summaries on purpose. The 54 file-to-file
     arrows could hide the same thing, and nothing here can tell. Recorded under "not being built".
+
+42. **A real Rust parser found the reader's bug, not the referee's, and
+    Rust's `@handles` square went from no to yes (#267).**
+
+    #267 priced two ways to build a referee `dispatch-scan.ts`'s line-based
+    scan cannot be, for the language holding three times any other's dispatch
+    population. `rustc`'s own non-exhaustive-match error was the first
+    candidate and it is still blocked: `.corpus/ripgrep` declares
+    `rust-version = "1.96"`, this machine has `1.93.0`. The second was a small
+    binary parsing every file with `syn` -- the crate the Rust ecosystem
+    itself parses Rust with -- and that one is not blocked: it built in
+    seconds and read all 929 Rust files on this machine without a parse
+    failure, ripgrep included.
+
+    Wired in as `scripts/rust/matcharm-reader` + `scripts/lib/dispatch-scan-rust.ts`
+    and run against the reader, the first numbers looked worse than
+    `dispatch-scan.ts`'s, not better: invented held at 15, but missed rose
+    from 167 to 210. That is backwards for a referee that is supposed to be
+    more trustworthy, and it did not get explained away -- every disagreement
+    was read against the real code, not just counted.
+
+    Two were reader bugs, not referee ones, both in `namesIn`/`isBinding`
+    (`src/engine/handles.ts`), and both fixed there rather than worked around:
+
+    - `match flag { true => .., false => .. }` read as two *bindings*, because
+      `isBinding`'s test is "a lowercase identifier in pattern position", and
+      `true`/`false` are lowercase. Unlike an ordinary lowercase word, a
+      Rust keyword can never be a binding name, so excluding exactly these two
+      spellings costs nothing. This alone moved missed from 210 to 182 -- the
+      dispatch had gone from *silently confirmable* to *silently withheld
+      forever*, never to a wrong verdict, because `checkHandles`'s catch-all
+      rule already excuses a claimed case the code does not name.
+    - `ref x => panic!(..)` and `t if t < 0 => ..` read as *invented* cases
+      named `x` and `t`, because the same regex expected a bare identifier
+      and got one wearing a `ref`/`mut` modifier or a trailing guard.
+      Unlike a missed case, `catchAll` does not excuse an invented one --
+      `ripgrep/tests/json.rs` had five dispatches where the reader would have
+      told an accurate box it was missing a case the code does not have. This
+      moved invented from 15 to 7.
+
+    What was left after both fixes was read case by case against
+    `checkHandles`'s own logic rather than against a percentage: **every one
+    of the 182 remaining missed cases, and 2 of the 7 remaining invented
+    ones, sit inside a dispatch the reader already marks `unreadable` for an
+    unrelated arm** -- a tuple pattern, a slice pattern, a range pattern, or a
+    `#[cfg(..)]`-gated arm (ripgrep's PCRE2 backend). `checkHandles` withholds
+    the whole dispatch the moment any one arm is unreadable, before the case
+    lists are ever compared, so none of these can print as a wrong verdict.
+
+    **The other 5 invented are a real, narrow residual, disclosed rather than
+    hidden**: a char literal (`'\t'`, `'\\'`) where `syn` decodes the escape
+    to the one real character and the reader keeps its two-character source
+    spelling, on a dispatch that carries a catch-all but no unreadable arm --
+    and a catch-all excuses a missing claim, never an extra one. A box
+    claiming this exact routine's control-character cases by their decoded
+    spelling could still be told it named one the code does not have. The
+    whole corpus has zero boxes claiming `handles` on any char dispatch, which
+    is why this ships disclosed rather than waiting on a fix nobody has a
+    real test case for.
+
+    `src/engine/licence.ts`'s Rust `handles.presence` and the grid row in this
+    file both moved from no to yes on these numbers. `src/engine/handles.ts`
+    itself -- the reader every language shares -- is more correct than it was
+    for TypeScript, Python and JavaScript too, not only for Rust.
 
 ## Open, in the order worth doing
 

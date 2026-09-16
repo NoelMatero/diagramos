@@ -45,6 +45,7 @@ import path from "node:path";
 import { findDispatches } from "../src/engine/handles";
 import { initEngine, languageOf, parseSource, type Language } from "../src/engine/parse";
 import { labelsIn, type ScanLanguage } from "./lib/dispatch-scan";
+import { labelsInRust } from "./lib/dispatch-scan-rust";
 
 const ALL = process.argv.includes("--all");
 const HOME = process.env.HOME ?? "/Users/noelmatero";
@@ -142,6 +143,34 @@ console.log();
 console.log("MEASURE:HANDLES -- the dispatch reader against a text scan of the same files");
 console.log();
 
+// First pass: collect all files by language
+const filesByLanguage = new Map<Language, string[]>();
+const allRustFiles: string[] = [];
+
+for (const tree of TREES) {
+  const files = filesUnder(tree);
+  if (files === undefined) {
+    continue;
+  }
+  for (const file of files) {
+    const language = languageOf(file);
+    if (!language) continue;
+    if (!filesByLanguage.has(language)) {
+      filesByLanguage.set(language, []);
+    }
+    filesByLanguage.get(language)!.push(file);
+    if (language === "rust") {
+      allRustFiles.push(file);
+    }
+  }
+}
+
+// Run the Rust referee once on all Rust files
+const rustRefereeCases = allRustFiles.length > 0
+  ? await labelsInRust(allRustFiles)
+  : {};
+
+// Second pass: process files
 let treesRead = 0;
 for (const tree of TREES) {
   const files = filesUnder(tree);
@@ -176,7 +205,9 @@ for (const tree of TREES) {
     const found = findDispatches(tree_, source, language)
       .filter((dispatch) => dispatch.kind === "cases");
     const readerCases = found.flatMap((dispatch) => dispatch.cases.map((one) => one.name));
-    const refereeCases = labelsIn(source, language as ScanLanguage);
+    const refereeCases = language === "rust"
+      ? (rustRefereeCases[file] ?? [])
+      : labelsIn(source, language as ScanLanguage);
 
     row.dispatches += found.length;
     row.cases += readerCases.length;
