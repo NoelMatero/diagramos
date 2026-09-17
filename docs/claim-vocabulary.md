@@ -324,9 +324,16 @@ The other four squares are measured at **0 accusations across 5,833 asks**.
 `measure:constructs` asks `@builds` about Python **0 times over 442 files**, and
 0 times over the pinned clones' 4,077,
 because Python spells making one of something as an ordinary call. There is no
-measurement, so there is no permission. `constructs.ts` refuses Python before
-any licence is consulted anyway, so nothing changes today — what changed is that
-the square used to read *yes*.
+measurement, so there is no permission — what changed at the time is that the
+square used to read *yes*.
+
+**#309 did not change it, and the reason is the distinction this whole document
+turns on.** The reader now *confirms* Python constructions, by resolving the
+called name through the file's imports the way `calls.ts` does. It still cannot
+read an absence there, so that path answers `confirmed` or a refusal and never
+`absent` — and `absent` is the door the `backwards` accusation stands behind. A
+word that confirms and stays quiet needs no licence. This square stays **no**
+until somebody measures the accusation against pyright.
 
 **JavaScript is the one that was not already known, and it was not free.** It
 lives inside the TypeScript licence, and that licence's *imports* were measured
@@ -768,21 +775,51 @@ end's file. **Recall = confirmed / asked.**
 | `@takes` | 100.0% of 2,380 | 99.6% of 2,739 | 100.0% of 52 | — | 100.0% of 1,960 | 99.9% of 7,131 |
 | `@returns` | 100.0% of 590 | 99.4% of 868 | 100.0% of 9 | — | 99.9% of 1,668 | 99.8% of 3,135 |
 | `@holds` | 78.1% of 183 | 99.4% of 165 | 100.0% of 44 | — | 99.9% of 772 | 96.4% of 1,164 |
-| `@builds` | 0.0% of 12,127 | 96.6% of 89 | 98.1% of 54 | 100.0% of 8 | 83.0% of 341 | 3.4% of 12,619 |
+| `@builds` | 79.8% of 11,199 | 96.6% of 89 | 98.1% of 54 | 100.0% of 8 | 83.0% of 341 | 80.1% of 11,691 |
 | `@calls` | 64.0% of 8,437 | 86.0% of 4,963 | 77.5% of 1,012 | 85.1% of 168 | 70.7% of 2,462 | 72.4% of 17,042 |
 | `@accesses` | 99.0% of 24,536 | 91.3% of 1,053 | 83.1% of 468 | 81.6% of 87 | 67.8% of 3,758 | 94.5% of 29,902 |
 | `@conforms` | 100.0% of 4,782 | 88.7% of 477 | 100.0% of 3 | — | 95.1% of 485 | 98.6% of 5,747 |
 | `@feeds` | 100.0% of 140 | 96.6% of 417 | 100.0% of 48 | 100.0% of 12 | 68.8% of 16 | 97.0% of 633 |
 | `@handles` | 33.3% of 6 | 37.6% of 133 | 16.7% of 12 | 20.0% of 5 | 71.5% of 1,131 | 67.1% of 1,287 |
 
-**The three low figures have three different causes.** Each is labelled in the
-script's `REASONS` table as "the reader cannot see it" or "the fact is not in
-the file".
+**Three rows were low when this table was first written, for three different
+causes.** Each is labelled in the script's `REASONS` table as "the reader cannot
+see it" or "the fact is not in the file". One of the three has since been
+closed, and it is kept here because what it cost and what it left behind are
+the argument for reading the labels rather than the number.
 
-- **`@builds` in Python** is `call-shaped`: `constructs.ts` refuses the whole
-  language before reading anything. The fact *is* in the file. The import that
-  binds `Response` names the file declaring `class Response`, and `calls.ts`
-  already follows it.
+- **`@builds` in Python was 0.0% of 12,127** and is **79.8% of 11,199** (#309).
+  The fact was in the file the whole time: the import that binds `Response`
+  names the file declaring `class Response`, and `calls.ts` already followed
+  exactly those imports. `constructs.ts` now asks it with the same resolver
+  (`placeName`) and reads the file it lands in for a class — name and body and
+  no parameter list, which over 400 Python files of the clones is
+  `class_definition` and nothing else in the grammar.
+
+  **The denominator moved too, and that is a referee fix rather than a
+  convenience.** Python has no construction syntax, so the referee is the call
+  scan — and `CALL_TOKEN` is a name in front of a bracket, so `class
+  E1(Exception):` read as a bare call to `E1`. **1,346 asks corpus-wide were a
+  class *declaration* being counted as the enclosing function constructing one**
+  (26 of `pallets-flask`'s 79, a third of that tree). They are excluded now and
+  counted where the run prints its exclusions. `@calls` never saw them: a class
+  name is not in the `routinesIn` index that word draws from.
+
+  **The 20.2% that still does not resolve is two reasons, and neither is the
+  Python reader.** `unplaced` is 1,146 (10.2%) — the import resolves to no file
+  in the tree, which is `Counter` coming from `collections` in a repository that
+  also declares a `Counter` of its own. That is the referee's own
+  built-in problem, the same one that put 1,900 of `@calls`' 2,100 `unbound` in
+  the same bucket, and refusing is right. `elsewhere` is 1,098 (9.8%), and that
+  one **is** a reader bug, in shared machinery rather than here:
+  `settlesOn` asks its candidates the strict "does this file declare or forward
+  the name" question before falling back to the permissive one, and
+  `comesToRest`'s own recursion does not. So a bare `import django` in
+  `django/core/management/__init__.py` covers the specifier
+  `django.core.management.base.CommandError`, `django/__init__.py` is tried
+  first, declares nothing of the name, and wins on the fallback. `@calls`
+  resolves names through the same function, so moving it means re-running
+  `measure:calls` against its recorded licence — its own issue, not this one.
 - **`@needs` was 75.7% and is 99.8%**, and the row above is the second run.
   It lost 19.8% to `dynamic`, 3.6% to `cycle` and 0.8% to `incomplete`, because
   `needs.ts` refused when **either** file did something at run time or had a

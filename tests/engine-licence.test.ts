@@ -313,7 +313,11 @@ describe("which words may accuse, and in which languages", () => {
      *
      * `builds` has never been measured in Python: `measure:constructs` asks it 0
      * times over 442 files, because Python spells making one of something as an
-     * ordinary call.
+     * ordinary call. #309 gave that language a reader that *confirms* -- the
+     * import places the name, and the file it lands in says class or function --
+     * and left this square alone on purpose: that path answers `confirmed` or a
+     * refusal and never `absent`, so nothing there can accuse, and a licence
+     * would need its own run against pyright.
      *
      * JavaScript has never been measured for any of the four words the
      * dependency corpus does not cover. It sits inside the TypeScript licence,

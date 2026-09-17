@@ -1382,10 +1382,20 @@ function throughWildcards(
 }
 
 /** Where one call site's callee lives, when it can be placed at all. */
-type Placement = { file: string; concrete?: boolean };
+export type Placement = { file: string; concrete?: boolean };
 
-/** `placeOf`'s local/imported/comesToRest lookup, factored out so a type name a resolver hands back gets placed by the exact same rule a value name would be. */
-function placeName(name: string, side: CallSide, bindings: Bindings): Placement | { why: SiteUnresolved } {
+/**
+ * `placeOf`'s local/imported/comesToRest lookup, factored out so a type name a
+ * resolver hands back gets placed by the exact same rule a value name would be.
+ *
+ * Exported because `constructs.ts` asks the same question of a different thing
+ * (#309): in Python `Response(body)` and `render(body)` are one syntax, and what
+ * separates them is which file the name comes to rest in and what that file
+ * declares it as. The same rule rather than a second copy of it -- a name placed
+ * one way for `@calls` and another way for `@builds` is two readers that have to
+ * agree and silently would not.
+ */
+export function placeName(name: string, side: CallSide, bindings: Bindings): Placement | { why: SiteUnresolved } {
   if (bindings.ambiguous.has(name)) return { why: "ambiguous" };
   const imported = bindings.imported.get(name);
   if (!imported) return bindings.local.has(name) ? { file: side.file } : { why: "unbound" };

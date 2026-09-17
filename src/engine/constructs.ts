@@ -34,18 +34,40 @@
  *     X { .. }         Rust                     `struct_expression`
  *     <X />            TypeScript with JSX      `jsx_*_element`
  *
- * Two more are constructions that a reader cannot tell from an ordinary call,
- * and both are withheld rather than guessed at:
+ * Two more are constructions that a reader cannot tell from an ordinary call:
  *
  *     X::new(..)       Rust      an associated function, by convention only
  *     X(..)            Python    calling a class name *is* construction
  *
- * Python is the whole of why this word cannot be trusted with an absence even in
- * the languages where the syntax is clear. It is also why Python gets no
- * confirmations here at all: the reader cannot see the difference between
- * `Response(body)` making a Response and `render(body)` making nothing, and
- * guessing on capitalisation is a naming convention masquerading as evidence.
+ * Rust's is still withheld rather than guessed at. Python's was too, and #309 is
+ * why it no longer is.
+ *
+ * ## Python, and the thing that was in the file all along
+ *
+ * The syntax genuinely does not separate `Response(body)` from `render(body)`,
+ * and guessing on capitalisation is a naming convention masquerading as
+ * evidence -- wrong the first time somebody writes `Response = make_response`.
+ * So for a long time this reader refused the language outright, and confirmed
+ * **none** of the 12,127 true constructions #302's recall measurement found in
+ * the pinned clones.
+ *
+ * What separates the two is not in the body. It is the line above it. The import
+ * that brings `Response` into the file names the file that declares it, and that
+ * file says whether it declares a class or a function -- and `calls.ts` already
+ * follows exactly those imports to exactly that file, for exactly this kind of
+ * question. `pythonConstructions` asks it with `placeName`, the same resolver,
+ * rather than a second one that would have to agree and silently would not.
+ *
+ * That path **confirms and never accuses**, which is a rule and not an
+ * omission: an absence is as unreadable in Python as it ever was, so the reader
+ * never reaches `absent` there, and `absent` is the door `backwards` stands
+ * behind. Python's `builds` accusation has no measured licence and this change
+ * did not give it one.
+ *
+ * Python remains the whole of why this word cannot be trusted with an absence
+ * even in the languages where the syntax is clear.
  */
+import { bindingsIn, placeName, type Bindings, type CallSide } from "./calls";
 import { mayAccuse } from "./licence";
 import { each, parseSource, type Language, type Node } from "./parse";
 
@@ -67,15 +89,51 @@ export type ConstructsWithheld =
    */
   | "incomplete"
   /**
-   * The language spells construction as an ordinary call, so the reader cannot
-   * tell one from the other.
+   * The language spells construction as an ordinary call, and nothing was handed
+   * in that could say which of the two this is.
    *
    * Python is the case: `Response(body)` is a construction and `render(body)` is
-   * not, and nothing in the syntax separates them. Capitalisation is a naming
+   * not, and nothing *in the syntax* separates them. Capitalisation is a naming
    * convention rather than evidence, and a word that accused on a convention
    * would be wrong the first time somebody wrote `Response = make_response`.
+   *
+   * What does separate them is the import, and since #309 a caller that can
+   * offer one gets an answer instead of this. So this is now the refusal for a
+   * caller holding a single file with no import table -- the reader as it was --
+   * rather than a fact about the language.
    */
   | "call-shaped"
+  /**
+   * The body writes no call to that name at all (#309, Python).
+   *
+   * **Not an absence**, and it must not become one. A factory is as invisible
+   * here as it is anywhere -- `make_response()` hands back a Response and writes
+   * the name nowhere -- so this is "no construction found", and in Python it does
+   * not even get to be `absent`, because `absent` is the door the `backwards`
+   * accusation stands behind and Python has no licence to accuse.
+   */
+  | "not-constructed"
+  /**
+   * The name is written and nothing in the file binds it: a wildcard import, a
+   * builtin, a global. `calls.ts`' word for the same dead end.
+   */
+  | "unbound"
+  /** The import that binds the name resolves to no file in the tree. */
+  | "unplaced"
+  /** The file binds the name more than one way, and the text does not say which wins. */
+  | "ambiguous"
+  /** The name comes to rest in some file other than the one the arrow points at. */
+  | "elsewhere"
+  /**
+   * The name resolves to the file the arrow points at, and that file declares it
+   * as a routine rather than as a class -- so the call makes nothing.
+   *
+   * A refusal rather than a finding, deliberately. It is the honest answer to
+   * "is this arrow confirmed" and it is not the honest basis for "this arrow is
+   * wrong": the routine may still get one of that type from somewhere else in
+   * the body this reader did not resolve.
+   */
+  | "not-a-class"
   /**
    * The body builds the constructor's name at runtime -- `new registry[kind]()`.
    *
@@ -322,6 +380,185 @@ export function routineNamesIn(source: string, language: Language): string[] {
 }
 
 /**
+ * Where the names a Python body writes come from (#309).
+ *
+ * Python spells `Response(body)` and `render(body)` the same way, so which of
+ * them is a construction cannot be read off the body. What separates them is one
+ * line above it: the import that brings `Response` into the file names the file
+ * declaring it, and that file says whether it declares a class or a function.
+ *
+ * `side` is the tail's own file in the shape `calls.ts` resolves a name with --
+ * its imports already resolved to files by `deps.ts`, plus an `open` that can
+ * read one more file, which is what makes a re-export followable. It repeats
+ * `source` and `language`, and that is the price of asking the resolver the same
+ * question `@calls` asks rather than writing a second one.
+ *
+ * `target` is the repo-relative file the far box's type is declared in. A name
+ * that comes to rest anywhere else is a different `Response` than the one the
+ * arrow points at, and confirming on it would be a green nobody earned.
+ *
+ * Optional throughout: a caller holding one file and no import table gets the
+ * refusal this reader always gave.
+ */
+export interface ConstructsNames {
+  side: CallSide;
+  target: string;
+}
+
+/**
+ * Every bare call written under this node, and where.
+ *
+ * `parse.ts`' own rule -- *a call is a node with a `function` field* -- and a
+ * bare one is a call whose function is a single identifier. `mod.Response(..)`
+ * has a whole expression there instead, and which module `mod` stands for is a
+ * question this reader is not asked; it is left alone rather than guessed at.
+ * The referee behind #309's measurement counts bare calls only, so nothing
+ * measured turns on the ones left out.
+ */
+function bareCalls(node: Node, source: string): Array<{ name: string; evidence: ConstructsEvidence }> {
+  const found: Array<{ name: string; evidence: ConstructsEvidence }> = [];
+  each(node, (child) => {
+    const callee = child.childForFieldName("function");
+    if (!callee || callee.childCount !== 0 || !TYPE_NAME.test(callee.type)) return;
+    found.push({
+      name: callee.text,
+      evidence: {
+        name: callee.text,
+        line: lineOf(source, callee.startIndex),
+        wrote: child.text.replace(/\s+/g, " ").slice(0, 80),
+      },
+    });
+  });
+  return found;
+}
+
+/**
+ * Whether this Python source declares `name` as a class.
+ *
+ * The structural rule `parse.ts` states rather than a list of node type names: a
+ * declaration is a node with a `name` field, and a routine is one that also has
+ * `parameters`. `docs/reading-a-grammar.md` is about what happens to the list --
+ * one reader made the same mistake four times, every instance a hand-written set
+ * of node names that one language spelled differently.
+ *
+ * The shape is exact here, and it was checked rather than assumed. Over 400
+ * Python files of the pinned clones the only nodes carrying a bare `name` field
+ * *and* a `body` are `function_definition` (2,596, every one with `parameters`)
+ * and `class_definition` (267, not one with any). Everything else with a `name` --
+ * `keyword_argument`, a defaulted parameter, a walrus -- has no body. So name and
+ * body and no parameters is a class, and nothing else in the grammar wears it.
+ */
+function declaresClass(source: string, name: string): boolean {
+  const tree = parseSource(source, "python");
+  if (!tree) return false;
+  let found = false;
+  each(tree.rootNode, (node) => {
+    if (found) return;
+    const declared = node.childForFieldName("name");
+    if (!declared || declared.childCount !== 0 || declared.text !== name) return;
+    if (!node.childForFieldName("body") || node.childForFieldName("parameters")) return;
+    found = true;
+  });
+  return found;
+}
+
+/**
+ * Which of the far box's names a written name stands for.
+ *
+ * `Res(body)` in a file that says `from app.wsgi import Response as Res` is a
+ * Response being made, and the import is the only thing in the file that says so.
+ * A reader comparing spellings answers "not written here" about an arrow written
+ * in plain sight -- the `aliased` gap #227 named, one word over.
+ *
+ * Nothing new is read for it: the specifier `bindPython` records already carries
+ * the original name on its tail, because that is the string `deps-python.ts`
+ * resolves. A namespace binding (`import app.wsgi as w`) is left out -- `w` is a
+ * module, and `w.Response(..)` is not a bare call this reader is asked about.
+ */
+function meansOneOf(name: string, wanted: Set<string>, bindings: Bindings): string | undefined {
+  if (wanted.has(name)) return name;
+  const imported = bindings.imported.get(name);
+  if (!imported || imported.namespace) return undefined;
+  const tail = imported.specifier.split(".").pop();
+  return tail !== undefined && wanted.has(tail) ? tail : undefined;
+}
+
+/** The refusals `placeName` hands back, in this reader's own words for them. */
+function unresolved(why: string): ConstructsWithheld {
+  switch (why) {
+    case "unbound": return "unbound";
+    case "unplaced": return "unplaced";
+    case "ambiguous": return "ambiguous";
+    default: return "elsewhere";
+  }
+}
+
+/**
+ * Whether a Python routine makes one of these types, resolved through the file's
+ * imports (#309).
+ *
+ * **Confirmations only, and that is a rule rather than an omission.** This reader
+ * can now find a construction that is written; it still cannot read an absence,
+ * because a factory is invisible here exactly as it is everywhere else. So every
+ * answer that is not a confirmation is a refusal, and Python never reaches
+ * `absent`, `cycle` or `backwards` through this path -- which is what keeps the
+ * change from making a new red possible in a language whose `builds` accusation
+ * has no measured licence.
+ */
+function pythonConstructions(
+  source: string,
+  routine: string,
+  targets: string[],
+  names: ConstructsNames | undefined,
+): ConstructsVerdict {
+  if (!names) return { verdict: "withheld", why: "call-shaped" };
+
+  const { routines, declared, unreadable } = routinesNamed(source, routine, "python");
+  if (unreadable) return { verdict: "withheld", why: "unreadable" };
+  if (routines.length === 0) {
+    return { verdict: "withheld", why: declared ? "no-body" : "not-declared" };
+  }
+  const bindings = bindingsIn(source, "python");
+  if (!bindings) return { verdict: "withheld", why: "unreadable" };
+
+  const wanted = new Set(targets);
+  /*
+   * The reason reported when nothing confirms: the first one hit, which is the
+   * rule the C-family path above already follows (`withheld ??= why`). It only
+   * ever decides which of several refusals gets named, never whether the answer
+   * is a refusal -- and `not-constructed` is the fallback rather than a
+   * candidate, so "the name is nowhere in this body" cannot mask a name that is
+   * there and could not be placed.
+   */
+  let why: ConstructsWithheld | undefined;
+  const note = (reason: ConstructsWithheld) => { why ??= reason; };
+
+  for (const body of routines) {
+    // The same doubt `madeIn` refuses on: a recovered parse is a statement about
+    // a file only partly read, so a call node found inside one is not evidence.
+    if (body.hasError) { note("incomplete"); continue; }
+    for (const call of bareCalls(body, source)) {
+      const meant = meansOneOf(call.name, wanted, bindings);
+      if (meant === undefined) continue;
+      const placed = placeName(call.name, names.side, bindings);
+      if ("why" in placed) { note(unresolved(placed.why)); continue; }
+      if (placed.file !== names.target) { note("elsewhere"); continue; }
+      const at = placed.file === names.side.file
+        ? { source, language: "python" as Language }
+        : names.side.open?.(placed.file);
+      // The far file could not be handed over, or is not Python -- either way
+      // there is no Python declaration here to read a class off.
+      if (!at || at.language !== "python") { note("unreadable"); continue; }
+      if (!declaresClass(at.source, meant)) { note("not-a-class"); continue; }
+      // The class that was made, under the name the far box carries -- not the
+      // local spelling an import renamed it to.
+      return { verdict: "confirmed", evidence: { ...call.evidence, name: meant } };
+    }
+  }
+  return { verdict: "withheld", why: why ?? "not-constructed" };
+}
+
+/**
  * Whether this routine makes one of these types, and whether the reverse holds.
  *
  * `targets` is every name the far box stands for, and any one of them is enough
@@ -338,13 +575,15 @@ export function constructions(
   targets: string[],
   language: Language,
   reverse?: { source: string; routines: string[]; language: Language; names: string[] },
+  names?: ConstructsNames,
 ): ConstructsVerdict {
   /*
-   * Python spells construction as a call, so there is nothing here to read in
-   * either direction. Answered before the parse: the refusal is about the
-   * language rather than about this file, and saying so costs nothing.
+   * Python spells construction as a call, so nothing in this body separates one
+   * from the other and the answer comes from the file's imports instead (#309).
+   * Its own path, and confirm-only: `reverse` is not consulted, because the
+   * accusation that rests on it has no measured licence in this language.
    */
-  if (language === "python") return { verdict: "withheld", why: "call-shaped" };
+  if (language === "python") return pythonConstructions(source, routine, targets, names);
 
   const { routines, declared, unreadable } = routinesNamed(source, routine, language);
   if (unreadable) return { verdict: "withheld", why: "unreadable" };
