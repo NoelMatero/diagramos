@@ -3913,12 +3913,16 @@ export function checkDrift(
        * both files are in a measured language, both vouched for by a source
        * index, both parsed to the end, and neither reaches out at runtime.
        *
-       * A verdict of anything but `backwards` falls straight through to the
-       * checks below, untouched. That is deliberate and it is what keeps the
-       * claim from quietly changing anything else: a confirmed `needs` is
-       * confirmed again by the ordinary channels a moment later, and an absent
-       * one goes amber exactly as it did before claims existed.
+       * Every verdict is acted on here now (#304). It used to be only
+       * `backwards`: a confirmed `needs` fell through and was confirmed again
+       * by the ordinary channels a moment later, and an absent one went to
+       * them too. That reads as harmless and was not -- those channels confirm
+       * on an import *either* way and on a third file importing both ends, so
+       * they would have given the same green to the arrow drawn backwards.
+       * `confirmed` now ends here on the import this reader found, and
+       * anything else ends at the gate below.
        */
+
       /*
        * Why this claim's own reader did not answer, kept for the arrow to say
        * (#304). Set by whichever reader withheld, and read only at the gate
@@ -4562,9 +4566,10 @@ export function checkDrift(
             continue;
           }
           /*
-           * `absent` and `cycle` both fall through to the ordinary channels,
-           * untouched. That is the point of the word: not finding a
-           * construction is not evidence there is none.
+           * `absent` and `cycle` are both silent here. That is the point of
+           * the word: not finding a construction is not evidence there is
+           * none. A claimed arrow then reaches the gate below and is not
+           * verified; a plan takes the ordinary channels as it always did.
            */
         }
       }
@@ -4764,9 +4769,10 @@ export function checkDrift(
               continue;
             }
             /*
-             * `absent` falls through to the ordinary channels, untouched. That is
-             * the point of the word: not finding a call is not evidence there is
-             * none.
+             * `absent` is silent here. That is the point of the word: not
+             * finding a call is not evidence there is none. A claimed arrow
+             * then reaches the gate below and is not verified; a plan takes
+             * the ordinary channels as it always did.
              */
           }
         }
@@ -4933,11 +4939,12 @@ export function checkDrift(
              */
           }
           /*
-           * `absent` falls through to the ordinary channels, untouched. The
-           * type has the member and this routine was not seen reading it, and
-           * nothing here can say that is a mistake: the body reads a member
-           * without a name, reads none at all, is a class, or a function it
-           * calls reads the member (#255).
+           * `absent` is silent here. The type has the member and this routine
+           * was not seen reading it, and nothing here can say that is a
+           * mistake: the body reads a member without a name, reads none at
+           * all, is a class, or a function it calls reads the member (#255).
+           * A claimed arrow then reaches the gate below and is not verified;
+           * a plan takes the ordinary channels as it always did.
            */
         }
       }
@@ -5013,10 +5020,11 @@ export function checkDrift(
             continue;
           }
           /*
-           * Nothing found, or nowhere to look. Counted, and then straight on to
-           * the ordinary channels: a `feeds` arrow between two files that import
-           * each other is still a corroborated arrow, and the claim going
-           * unconfirmed does not take that away.
+           * Nothing found, or nowhere to look. Counted, and then the gate
+           * below: a `feeds` arrow between two files that import each other
+           * used to be confirmed on that import, which is a fact about the
+           * files and not about the flow the arrow draws (#304). A plan still
+           * takes the ordinary channels.
            */
           const why = feeds.verdict === "withheld" ? feeds.why : "absent";
           if (claimed) claims.feedsWithheld[why] = (claims.feedsWithheld[why] ?? 0) + 1;
