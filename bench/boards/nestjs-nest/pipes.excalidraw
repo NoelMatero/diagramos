@@ -1,0 +1,2557 @@
+{
+  "type": "excalidraw",
+  "version": 2,
+  "source": "diagramos",
+  "elements": [
+    {
+      "id": "nestjs-validation-and-parse-pipes-transf-title",
+      "type": "text",
+      "x": 0,
+      "y": -115,
+      "width": 699.6,
+      "height": 30,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a0",
+      "roundness": null,
+      "seed": 161574869,
+      "version": 1,
+      "versionNonce": 577972447,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "nestjs-validation-and-parse-pipes-transf",
+        "role": "title"
+      },
+      "text": "NestJS Validation and Parse Pipes Transformation Flow",
+      "fontSize": 24,
+      "fontFamily": 5,
+      "textAlign": "left",
+      "verticalAlign": "middle",
+      "containerId": null,
+      "originalText": "NestJS Validation and Parse Pipes Transformation Flow",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "nestjs-validation-and-parse-pipes-transf-node-0",
+      "type": "rectangle",
+      "x": 60,
+      "y": 660,
+      "width": 200,
+      "height": 140,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a1",
+      "roundness": null,
+      "seed": 212252796,
+      "version": 1,
+      "versionNonce": 212950792,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "nestjs-validation-and-parse-pipes-transf-node-0-label"
+        },
+        {
+          "id": "nestjs-validation-and-parse-pipes-transf-edge-0",
+          "type": "arrow"
+        },
+        {
+          "id": "nestjs-validation-and-parse-pipes-transf-edge-1",
+          "type": "arrow"
+        },
+        {
+          "id": "nestjs-validation-and-parse-pipes-transf-edge-2",
+          "type": "arrow"
+        },
+        {
+          "id": "nestjs-validation-and-parse-pipes-transf-edge-3",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "nestjs-validation-and-parse-pipes-transf",
+        "node": "pipe-transform-intf",
+        "ref": "packages/common/interfaces/features/pipe-transform.interface.ts#PipeTransform"
+      }
+    },
+    {
+      "id": "nestjs-validation-and-parse-pipes-transf-node-1",
+      "type": "rectangle",
+      "x": 20,
+      "y": 440,
+      "width": 240,
+      "height": 140,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a2",
+      "roundness": null,
+      "seed": 137239317,
+      "version": 1,
+      "versionNonce": 1881202719,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "nestjs-validation-and-parse-pipes-transf-node-1-label"
+        },
+        {
+          "id": "nestjs-validation-and-parse-pipes-transf-edge-9",
+          "type": "arrow"
+        },
+        {
+          "id": "nestjs-validation-and-parse-pipes-transf-edge-10",
+          "type": "arrow"
+        },
+        {
+          "id": "nestjs-validation-and-parse-pipes-transf-edge-11",
+          "type": "arrow"
+        },
+        {
+          "id": "nestjs-validation-and-parse-pipes-transf-edge-12",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "nestjs-validation-and-parse-pipes-transf",
+        "node": "argument-metadata",
+        "ref": "packages/common/interfaces/features/pipe-transform.interface.ts#ArgumentMetadata"
+      }
+    },
+    {
+      "id": "nestjs-validation-and-parse-pipes-transf-node-2",
+      "type": "rectangle",
+      "x": 1460,
+      "y": 600,
+      "width": 220,
+      "height": 120,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a3",
+      "roundness": null,
+      "seed": 1343605818,
+      "version": 1,
+      "versionNonce": 296719758,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "nestjs-validation-and-parse-pipes-transf-node-2-label"
+        },
+        {
+          "id": "nestjs-validation-and-parse-pipes-transf-edge-0",
+          "type": "arrow"
+        },
+        {
+          "id": "nestjs-validation-and-parse-pipes-transf-edge-4",
+          "type": "arrow"
+        },
+        {
+          "id": "nestjs-validation-and-parse-pipes-transf-edge-5",
+          "type": "arrow"
+        },
+        {
+          "id": "nestjs-validation-and-parse-pipes-transf-edge-6",
+          "type": "arrow"
+        },
+        {
+          "id": "nestjs-validation-and-parse-pipes-transf-edge-9",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "nestjs-validation-and-parse-pipes-transf",
+        "node": "validation-pipe",
+        "ref": "packages/common/pipes/validation.pipe.ts#ValidationPipe"
+      }
+    },
+    {
+      "id": "nestjs-validation-and-parse-pipes-transf-node-3",
+      "type": "rectangle",
+      "x": 740,
+      "y": 200,
+      "width": 180,
+      "height": 100,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a4",
+      "roundness": null,
+      "seed": 1775994955,
+      "version": 1,
+      "versionNonce": 179150533,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "nestjs-validation-and-parse-pipes-transf-node-3-label"
+        },
+        {
+          "id": "nestjs-validation-and-parse-pipes-transf-edge-1",
+          "type": "arrow"
+        },
+        {
+          "id": "nestjs-validation-and-parse-pipes-transf-edge-7",
+          "type": "arrow"
+        },
+        {
+          "id": "nestjs-validation-and-parse-pipes-transf-edge-10",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "nestjs-validation-and-parse-pipes-transf",
+        "node": "parse-int-pipe",
+        "ref": "packages/common/pipes/parse-int.pipe.ts#ParseIntPipe"
+      }
+    },
+    {
+      "id": "nestjs-validation-and-parse-pipes-transf-node-4",
+      "type": "rectangle",
+      "x": 740,
+      "y": 580,
+      "width": 220,
+      "height": 100,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a5",
+      "roundness": null,
+      "seed": 1545304960,
+      "version": 1,
+      "versionNonce": 456921948,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "nestjs-validation-and-parse-pipes-transf-node-4-label"
+        },
+        {
+          "id": "nestjs-validation-and-parse-pipes-transf-edge-2",
+          "type": "arrow"
+        },
+        {
+          "id": "nestjs-validation-and-parse-pipes-transf-edge-6",
+          "type": "arrow"
+        },
+        {
+          "id": "nestjs-validation-and-parse-pipes-transf-edge-8",
+          "type": "arrow"
+        },
+        {
+          "id": "nestjs-validation-and-parse-pipes-transf-edge-11",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "nestjs-validation-and-parse-pipes-transf",
+        "node": "parse-array-pipe",
+        "ref": "packages/common/pipes/parse-array.pipe.ts#ParseArrayPipe"
+      }
+    },
+    {
+      "id": "nestjs-validation-and-parse-pipes-transf-node-5",
+      "type": "rectangle",
+      "x": 720,
+      "y": 20,
+      "width": 240,
+      "height": 100,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a6",
+      "roundness": null,
+      "seed": 403536329,
+      "version": 1,
+      "versionNonce": 348078931,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "nestjs-validation-and-parse-pipes-transf-node-5-label"
+        },
+        {
+          "id": "nestjs-validation-and-parse-pipes-transf-edge-3",
+          "type": "arrow"
+        },
+        {
+          "id": "nestjs-validation-and-parse-pipes-transf-edge-12",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "nestjs-validation-and-parse-pipes-transf",
+        "node": "default-value-pipe",
+        "ref": "packages/common/pipes/default-value.pipe.ts#DefaultValuePipe"
+      }
+    },
+    {
+      "id": "nestjs-validation-and-parse-pipes-transf-node-6",
+      "type": "rectangle",
+      "x": 2200,
+      "y": 480,
+      "width": 240,
+      "height": 80,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "dotted",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a7",
+      "roundness": null,
+      "seed": 886920990,
+      "version": 1,
+      "versionNonce": 44823362,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "nestjs-validation-and-parse-pipes-transf-node-6-label"
+        },
+        {
+          "id": "nestjs-validation-and-parse-pipes-transf-edge-4",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "nestjs-validation-and-parse-pipes-transf",
+        "node": "class-transformer",
+        "state": "external"
+      }
+    },
+    {
+      "id": "nestjs-validation-and-parse-pipes-transf-node-7",
+      "type": "rectangle",
+      "x": 2200,
+      "y": 640,
+      "width": 220,
+      "height": 80,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "dotted",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a8",
+      "roundness": null,
+      "seed": 1021895535,
+      "version": 1,
+      "versionNonce": 506846409,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "nestjs-validation-and-parse-pipes-transf-node-7-label"
+        },
+        {
+          "id": "nestjs-validation-and-parse-pipes-transf-edge-5",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "nestjs-validation-and-parse-pipes-transf",
+        "node": "class-validator",
+        "state": "external"
+      }
+    },
+    {
+      "id": "nestjs-validation-and-parse-pipes-transf-node-8",
+      "type": "rectangle",
+      "x": 1440,
+      "y": 200,
+      "width": 260,
+      "height": 80,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a9",
+      "roundness": null,
+      "seed": 2011429060,
+      "version": 1,
+      "versionNonce": 1118767824,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "nestjs-validation-and-parse-pipes-transf-node-8-label"
+        },
+        {
+          "id": "nestjs-validation-and-parse-pipes-transf-edge-7",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "nestjs-validation-and-parse-pipes-transf",
+        "node": "parse-int-options",
+        "ref": "packages/common/pipes/parse-int.pipe.ts#ParseIntPipeOptions"
+      }
+    },
+    {
+      "id": "nestjs-validation-and-parse-pipes-transf-node-9",
+      "type": "rectangle",
+      "x": 1440,
+      "y": 360,
+      "width": 280,
+      "height": 80,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aA",
+      "roundness": null,
+      "seed": 1194084957,
+      "version": 1,
+      "versionNonce": 62918855,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "nestjs-validation-and-parse-pipes-transf-node-9-label"
+        },
+        {
+          "id": "nestjs-validation-and-parse-pipes-transf-edge-8",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "nestjs-validation-and-parse-pipes-transf",
+        "node": "parse-array-options",
+        "ref": "packages/common/pipes/parse-array.pipe.ts#ParseArrayPipeOptions"
+      }
+    },
+    {
+      "id": "nestjs-validation-and-parse-pipes-transf-edge-0",
+      "type": "arrow",
+      "x": 252,
+      "y": 767.6,
+      "width": 1213.6,
+      "height": 83.33333333333337,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aB",
+      "roundness": null,
+      "seed": 1313694259,
+      "version": 1,
+      "versionNonce": 2082542605,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "nestjs-validation-and-parse-pipes-transf-edge-0-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "nestjs-validation-and-parse-pipes-transf",
+        "edge": {
+          "from": "pipe-transform-intf",
+          "to": "validation-pipe",
+          "claim": "conforms"
+        }
+      },
+      "points": [
+        [
+          0.5,
+          0
+        ],
+        [
+          162.11666666666667,
+          0
+        ],
+        [
+          324.23333333333335,
+          0
+        ],
+        [
+          648.4666666666667,
+          0
+        ],
+        [
+          1081.6,
+          0
+        ],
+        [
+          1081.6,
+          -83.33333333333337
+        ],
+        [
+          1213.1,
+          -83.33333333333337
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "nestjs-validation-and-parse-pipes-transf-node-0",
+        "focus": 0.5371428571428573,
+        "gap": 8
+      },
+      "endBinding": {
+        "elementId": "nestjs-validation-and-parse-pipes-transf-node-2",
+        "focus": -0.40444444444444394,
+        "gap": 5.599999999999909
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "nestjs-validation-and-parse-pipes-transf-edge-1",
+      "type": "arrow",
+      "x": 252,
+      "y": 711.6,
+      "width": 496,
+      "height": 452.9333333333334,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aC",
+      "roundness": null,
+      "seed": 2047094146,
+      "version": 1,
+      "versionNonce": 859907574,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "nestjs-validation-and-parse-pipes-transf-edge-1-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "nestjs-validation-and-parse-pipes-transf",
+        "edge": {
+          "from": "pipe-transform-intf",
+          "to": "parse-int-pipe",
+          "claim": "conforms"
+        }
+      },
+      "points": [
+        [
+          0.5,
+          0
+        ],
+        [
+          104,
+          0
+        ],
+        [
+          104,
+          -370.4666666666667
+        ],
+        [
+          104,
+          -452.9333333333334
+        ],
+        [
+          495.5,
+          -452.9333333333334
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "nestjs-validation-and-parse-pipes-transf-node-0",
+        "focus": -0.2628571428571427,
+        "gap": 8
+      },
+      "endBinding": {
+        "elementId": "nestjs-validation-and-parse-pipes-transf-node-3",
+        "focus": -0.17333333333333334,
+        "gap": 8
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "nestjs-validation-and-parse-pipes-transf-edge-2",
+      "type": "arrow",
+      "x": 252,
+      "y": 739.6,
+      "width": 486,
+      "height": 85.33333333333337,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aD",
+      "roundness": null,
+      "seed": 106835613,
+      "version": 1,
+      "versionNonce": 122668807,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "nestjs-validation-and-parse-pipes-transf-edge-2-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "nestjs-validation-and-parse-pipes-transf",
+        "edge": {
+          "from": "pipe-transform-intf",
+          "to": "parse-array-pipe",
+          "claim": "conforms"
+        }
+      },
+      "points": [
+        [
+          0.5,
+          0
+        ],
+        [
+          128,
+          0
+        ],
+        [
+          128,
+          -85.33333333333337
+        ],
+        [
+          200.33333333333331,
+          -85.33333333333337
+        ],
+        [
+          343.16666666666663,
+          -85.33333333333337
+        ],
+        [
+          414.58333333333326,
+          -85.33333333333337
+        ],
+        [
+          485.5,
+          -85.33333333333337
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "nestjs-validation-and-parse-pipes-transf-node-0",
+        "focus": 0.1371428571428573,
+        "gap": 8
+      },
+      "endBinding": {
+        "elementId": "nestjs-validation-and-parse-pipes-transf-node-4",
+        "focus": -0.4853333333333332,
+        "gap": 2
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "nestjs-validation-and-parse-pipes-transf-edge-3",
+      "type": "arrow",
+      "x": 252,
+      "y": 683.6,
+      "width": 476,
+      "height": 604.9333333333334,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aE",
+      "roundness": null,
+      "seed": 1904978436,
+      "version": 1,
+      "versionNonce": 1924656400,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "nestjs-validation-and-parse-pipes-transf-edge-3-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "nestjs-validation-and-parse-pipes-transf",
+        "edge": {
+          "from": "pipe-transform-intf",
+          "to": "default-value-pipe",
+          "claim": "conforms"
+        }
+      },
+      "points": [
+        [
+          0.5,
+          0
+        ],
+        [
+          56,
+          0
+        ],
+        [
+          56,
+          -484.4666666666667
+        ],
+        [
+          56,
+          -604.9333333333334
+        ],
+        [
+          475.5,
+          -604.9333333333334
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "nestjs-validation-and-parse-pipes-transf-node-0",
+        "focus": -0.6628571428571427,
+        "gap": 8
+      },
+      "endBinding": {
+        "elementId": "nestjs-validation-and-parse-pipes-transf-node-5",
+        "focus": -0.17333333333333215,
+        "gap": 8
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "nestjs-validation-and-parse-pipes-transf-edge-4",
+      "type": "arrow",
+      "x": 1685.6,
+      "y": 634.2666666666667,
+      "width": 509.5999999999999,
+      "height": 120,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aF",
+      "roundness": null,
+      "seed": 567034359,
+      "version": 1,
+      "versionNonce": 316262225,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "nestjs-validation-and-parse-pipes-transf-edge-4-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "nestjs-validation-and-parse-pipes-transf",
+        "edge": {
+          "from": "validation-pipe",
+          "to": "class-transformer",
+          "claim": "calls"
+        }
+      },
+      "points": [
+        [
+          0.5,
+          0
+        ],
+        [
+          68,
+          0
+        ],
+        [
+          68,
+          -120
+        ],
+        [
+          194.79999999999995,
+          -120
+        ],
+        [
+          352.1999999999998,
+          -120
+        ],
+        [
+          430.9000000000001,
+          -120
+        ],
+        [
+          509.0999999999999,
+          -120
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "nestjs-validation-and-parse-pipes-transf-node-2",
+        "focus": -0.4288888888888884,
+        "gap": 5.599999999999909
+      },
+      "endBinding": {
+        "elementId": "nestjs-validation-and-parse-pipes-transf-node-6",
+        "focus": 0.143333333333332,
+        "gap": 4.800000000000182
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "nestjs-validation-and-parse-pipes-transf-edge-5",
+      "type": "arrow",
+      "x": 1685.6,
+      "y": 674.2666666666667,
+      "width": 509.5999999999999,
+      "height": 0,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aG",
+      "roundness": null,
+      "seed": 1834538918,
+      "version": 1,
+      "versionNonce": 385180810,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "nestjs-validation-and-parse-pipes-transf-edge-5-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "nestjs-validation-and-parse-pipes-transf",
+        "edge": {
+          "from": "validation-pipe",
+          "to": "class-validator",
+          "claim": "calls"
+        }
+      },
+      "points": [
+        [
+          0.5,
+          0
+        ],
+        [
+          254.79999999999995,
+          0
+        ],
+        [
+          509.0999999999999,
+          0
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "nestjs-validation-and-parse-pipes-transf-node-2",
+        "focus": 0.23777777777777778,
+        "gap": 5.599999999999909
+      },
+      "endBinding": {
+        "elementId": "nestjs-validation-and-parse-pipes-transf-node-7",
+        "focus": 0.14333333333333506,
+        "gap": 4.800000000000182
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "nestjs-validation-and-parse-pipes-transf-edge-6",
+      "type": "arrow",
+      "x": 958,
+      "y": 654.2666666666667,
+      "width": 507.5999999999999,
+      "height": 0,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aH",
+      "roundness": null,
+      "seed": 695916017,
+      "version": 1,
+      "versionNonce": 269038203,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "nestjs-validation-and-parse-pipes-transf-edge-6-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "nestjs-validation-and-parse-pipes-transf",
+        "edge": {
+          "from": "parse-array-pipe",
+          "to": "validation-pipe",
+          "claim": "calls"
+        }
+      },
+      "points": [
+        [
+          0.5,
+          0
+        ],
+        [
+          253.79999999999995,
+          0
+        ],
+        [
+          507.0999999999999,
+          0
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "nestjs-validation-and-parse-pipes-transf-node-4",
+        "focus": 0.4853333333333332,
+        "gap": 2
+      },
+      "endBinding": {
+        "elementId": "nestjs-validation-and-parse-pipes-transf-node-2",
+        "focus": 0.09555555555555609,
+        "gap": 5.599999999999909
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "nestjs-validation-and-parse-pipes-transf-edge-7",
+      "type": "arrow",
+      "x": 928,
+      "y": 242,
+      "width": 513.5999999999999,
+      "height": 0,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aI",
+      "roundness": null,
+      "seed": 16727752,
+      "version": 1,
+      "versionNonce": 313823780,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "nestjs-validation-and-parse-pipes-transf-edge-7-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "nestjs-validation-and-parse-pipes-transf",
+        "edge": {
+          "from": "parse-int-pipe",
+          "to": "parse-int-options",
+          "claim": "takes"
+        }
+      },
+      "points": [
+        [
+          0.5,
+          0
+        ],
+        [
+          256.79999999999995,
+          0
+        ],
+        [
+          513.0999999999999,
+          0
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "nestjs-validation-and-parse-pipes-transf-node-3",
+        "focus": -0.1599999999999998,
+        "gap": 8
+      },
+      "endBinding": {
+        "elementId": "nestjs-validation-and-parse-pipes-transf-node-8",
+        "focus": -0.05,
+        "gap": 1.599999999999909
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "nestjs-validation-and-parse-pipes-transf-edge-8",
+      "type": "arrow",
+      "x": 958,
+      "y": 620.9333333333334,
+      "width": 483.5999999999999,
+      "height": 218.9333333333334,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aJ",
+      "roundness": null,
+      "seed": 1627864459,
+      "version": 1,
+      "versionNonce": 1727369733,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "nestjs-validation-and-parse-pipes-transf-edge-8-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "nestjs-validation-and-parse-pipes-transf",
+        "edge": {
+          "from": "parse-array-pipe",
+          "to": "parse-array-options",
+          "claim": "takes"
+        }
+      },
+      "points": [
+        [
+          0.5,
+          0
+        ],
+        [
+          42,
+          0
+        ],
+        [
+          42,
+          -218.9333333333334
+        ],
+        [
+          132.33333333333326,
+          -218.9333333333334
+        ],
+        [
+          220.1500000000001,
+          -218.9333333333334
+        ],
+        [
+          307.9666666666667,
+          -218.9333333333334
+        ],
+        [
+          483.0999999999999,
+          -218.9333333333334
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "nestjs-validation-and-parse-pipes-transf-node-4",
+        "focus": -0.18133333333333387,
+        "gap": 2
+      },
+      "endBinding": {
+        "elementId": "nestjs-validation-and-parse-pipes-transf-node-9",
+        "focus": -0.05,
+        "gap": 1.599999999999909
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "nestjs-validation-and-parse-pipes-transf-edge-9",
+      "type": "arrow",
+      "x": 252,
+      "y": 519.6,
+      "width": 1213.6,
+      "height": 149.46666666666664,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aK",
+      "roundness": null,
+      "seed": 1937909114,
+      "version": 1,
+      "versionNonce": 1295588558,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "nestjs-validation-and-parse-pipes-transf-edge-9-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "nestjs-validation-and-parse-pipes-transf",
+        "edge": {
+          "from": "argument-metadata",
+          "to": "validation-pipe",
+          "claim": "takes"
+        }
+      },
+      "points": [
+        [
+          0.5,
+          0
+        ],
+        [
+          128,
+          0
+        ],
+        [
+          128,
+          -44.80000000000001
+        ],
+        [
+          659.1333333333332,
+          -44.80000000000001
+        ],
+        [
+          1081.6,
+          -44.80000000000001
+        ],
+        [
+          1081.6,
+          104.66666666666663
+        ],
+        [
+          1213.1,
+          104.66666666666663
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "nestjs-validation-and-parse-pipes-transf-node-1",
+        "focus": 0.1371428571428572,
+        "gap": 8
+      },
+      "endBinding": {
+        "elementId": "nestjs-validation-and-parse-pipes-transf-node-2",
+        "focus": 0.5955555555555561,
+        "gap": 5.599999999999909
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "nestjs-validation-and-parse-pipes-transf-edge-10",
+      "type": "arrow",
+      "x": 252,
+      "y": 491.6,
+      "width": 496,
+      "height": 289.7333333333334,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aL",
+      "roundness": null,
+      "seed": 637083804,
+      "version": 1,
+      "versionNonce": 447834792,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "nestjs-validation-and-parse-pipes-transf-edge-10-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "nestjs-validation-and-parse-pipes-transf",
+        "edge": {
+          "from": "argument-metadata",
+          "to": "parse-int-pipe",
+          "claim": "takes"
+        }
+      },
+      "points": [
+        [
+          0.5,
+          0
+        ],
+        [
+          80,
+          0
+        ],
+        [
+          80,
+          -289.7333333333334
+        ],
+        [
+          114.86666666666662,
+          -289.7333333333334
+        ],
+        [
+          368,
+          -289.7333333333334
+        ],
+        [
+          368,
+          -266.2666666666667
+        ],
+        [
+          495.5,
+          -266.2666666666667
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "nestjs-validation-and-parse-pipes-transf-node-1",
+        "focus": -0.26285714285714273,
+        "gap": 8
+      },
+      "endBinding": {
+        "elementId": "nestjs-validation-and-parse-pipes-transf-node-3",
+        "focus": 0.4933333333333331,
+        "gap": 8
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "nestjs-validation-and-parse-pipes-transf-edge-11",
+      "type": "arrow",
+      "x": 252,
+      "y": 547.6,
+      "width": 486,
+      "height": 73.33333333333337,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aM",
+      "roundness": null,
+      "seed": 988328629,
+      "version": 1,
+      "versionNonce": 735915071,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "nestjs-validation-and-parse-pipes-transf-edge-11-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "nestjs-validation-and-parse-pipes-transf",
+        "edge": {
+          "from": "argument-metadata",
+          "to": "parse-array-pipe",
+          "claim": "takes"
+        }
+      },
+      "points": [
+        [
+          0.5,
+          0
+        ],
+        [
+          69.91666666666669,
+          0
+        ],
+        [
+          139.83333333333337,
+          0
+        ],
+        [
+          279.66666666666674,
+          0
+        ],
+        [
+          368,
+          0
+        ],
+        [
+          368,
+          73.33333333333337
+        ],
+        [
+          485.5,
+          73.33333333333337
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "nestjs-validation-and-parse-pipes-transf-node-1",
+        "focus": 0.5371428571428573,
+        "gap": 8
+      },
+      "endBinding": {
+        "elementId": "nestjs-validation-and-parse-pipes-transf-node-4",
+        "focus": 0.18133333333333387,
+        "gap": 2
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "nestjs-validation-and-parse-pipes-transf-edge-12",
+      "type": "arrow",
+      "x": 252,
+      "y": 463.6,
+      "width": 476,
+      "height": 441.73333333333335,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aN",
+      "roundness": null,
+      "seed": 47314650,
+      "version": 1,
+      "versionNonce": 874458286,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "nestjs-validation-and-parse-pipes-transf-edge-12-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "nestjs-validation-and-parse-pipes-transf",
+        "edge": {
+          "from": "argument-metadata",
+          "to": "default-value-pipe",
+          "claim": "takes"
+        }
+      },
+      "points": [
+        [
+          0.5,
+          -0.5
+        ],
+        [
+          32,
+          0
+        ],
+        [
+          32,
+          -109.64999999999998
+        ],
+        [
+          32,
+          -219.3
+        ],
+        [
+          32,
+          -438.6
+        ],
+        [
+          32,
+          -441.73333333333335
+        ],
+        [
+          368,
+          -441.73333333333335
+        ],
+        [
+          368,
+          -418.26666666666665
+        ],
+        [
+          475.5,
+          -417.7666666666667
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "nestjs-validation-and-parse-pipes-transf-node-1",
+        "focus": -0.6628571428571427,
+        "gap": 8
+      },
+      "endBinding": {
+        "elementId": "nestjs-validation-and-parse-pipes-transf-node-5",
+        "focus": 0.49333333333333385,
+        "gap": 8
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "nestjs-validation-and-parse-pipes-transf-node-0-label",
+      "type": "text",
+      "x": 88.5,
+      "y": 717.5,
+      "width": 143,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aO",
+      "roundness": null,
+      "seed": 1340568089,
+      "version": 1,
+      "versionNonce": 1012004707,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "nestjs-validation-and-parse-pipes-transf"
+      },
+      "text": "PipeTransform",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "nestjs-validation-and-parse-pipes-transf-node-0",
+      "originalText": "PipeTransform",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "nestjs-validation-and-parse-pipes-transf-node-1-label",
+      "type": "text",
+      "x": 52,
+      "y": 497.5,
+      "width": 176,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aP",
+      "roundness": null,
+      "seed": 1214976188,
+      "version": 1,
+      "versionNonce": 873334856,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "nestjs-validation-and-parse-pipes-transf"
+      },
+      "text": "ArgumentMetadata",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "nestjs-validation-and-parse-pipes-transf-node-1",
+      "originalText": "ArgumentMetadata",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "nestjs-validation-and-parse-pipes-transf-node-2-label",
+      "type": "text",
+      "x": 1493,
+      "y": 647.5,
+      "width": 154,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aQ",
+      "roundness": null,
+      "seed": 716042027,
+      "version": 1,
+      "versionNonce": 945839909,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "nestjs-validation-and-parse-pipes-transf"
+      },
+      "text": "ValidationPipe",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "nestjs-validation-and-parse-pipes-transf-node-2",
+      "originalText": "ValidationPipe",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "nestjs-validation-and-parse-pipes-transf-node-3-label",
+      "type": "text",
+      "x": 764,
+      "y": 237.5,
+      "width": 132,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aR",
+      "roundness": null,
+      "seed": 418663414,
+      "version": 1,
+      "versionNonce": 1222864218,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "nestjs-validation-and-parse-pipes-transf"
+      },
+      "text": "ParseIntPipe",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "nestjs-validation-and-parse-pipes-transf-node-3",
+      "originalText": "ParseIntPipe",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "nestjs-validation-and-parse-pipes-transf-node-4-label",
+      "type": "text",
+      "x": 773,
+      "y": 617.5,
+      "width": 154,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aS",
+      "roundness": null,
+      "seed": 485296989,
+      "version": 1,
+      "versionNonce": 36692935,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "nestjs-validation-and-parse-pipes-transf"
+      },
+      "text": "ParseArrayPipe",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "nestjs-validation-and-parse-pipes-transf-node-4",
+      "originalText": "ParseArrayPipe",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "nestjs-validation-and-parse-pipes-transf-node-5-label",
+      "type": "text",
+      "x": 752,
+      "y": 57.5,
+      "width": 176,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aT",
+      "roundness": null,
+      "seed": 1424277136,
+      "version": 1,
+      "versionNonce": 1220036204,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "nestjs-validation-and-parse-pipes-transf"
+      },
+      "text": "DefaultValuePipe",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "nestjs-validation-and-parse-pipes-transf-node-5",
+      "originalText": "DefaultValuePipe",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "nestjs-validation-and-parse-pipes-transf-node-6-label",
+      "type": "text",
+      "x": 2226.5,
+      "y": 507.5,
+      "width": 187.00000000000003,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aU",
+      "roundness": null,
+      "seed": 474151423,
+      "version": 1,
+      "versionNonce": 1203145497,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "nestjs-validation-and-parse-pipes-transf"
+      },
+      "text": "class-transformer",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "nestjs-validation-and-parse-pipes-transf-node-6",
+      "originalText": "class-transformer",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "nestjs-validation-and-parse-pipes-transf-node-7-label",
+      "type": "text",
+      "x": 2227.5,
+      "y": 667.5,
+      "width": 165,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aV",
+      "roundness": null,
+      "seed": 148330298,
+      "version": 1,
+      "versionNonce": 1784505998,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "nestjs-validation-and-parse-pipes-transf"
+      },
+      "text": "class-validator",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "nestjs-validation-and-parse-pipes-transf-node-7",
+      "originalText": "class-validator",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "nestjs-validation-and-parse-pipes-transf-node-8-label",
+      "type": "text",
+      "x": 1465.5,
+      "y": 227.5,
+      "width": 209.00000000000003,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aW",
+      "roundness": null,
+      "seed": 1822189265,
+      "version": 1,
+      "versionNonce": 1999358427,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "nestjs-validation-and-parse-pipes-transf"
+      },
+      "text": "ParseIntPipeOptions",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "nestjs-validation-and-parse-pipes-transf-node-8",
+      "originalText": "ParseIntPipeOptions",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "nestjs-validation-and-parse-pipes-transf-node-9-label",
+      "type": "text",
+      "x": 1464.5,
+      "y": 387.5,
+      "width": 231.00000000000003,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aX",
+      "roundness": null,
+      "seed": 1989661844,
+      "version": 1,
+      "versionNonce": 1869147872,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "nestjs-validation-and-parse-pipes-transf"
+      },
+      "text": "ParseArrayPipeOptions",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "nestjs-validation-and-parse-pipes-transf-node-9",
+      "originalText": "ParseArrayPipeOptions",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "nestjs-validation-and-parse-pipes-transf-edge-0-label",
+      "type": "text",
+      "x": 812.4666666666667,
+      "y": 757.6,
+      "width": 176,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aY",
+      "roundness": null,
+      "seed": 784325006,
+      "version": 1,
+      "versionNonce": 1270590002,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "nestjs-validation-and-parse-pipes-transf"
+      },
+      "text": "implements @conforms",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "nestjs-validation-and-parse-pipes-transf-edge-0",
+      "originalText": "implements @conforms",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "nestjs-validation-and-parse-pipes-transf-edge-1-label",
+      "type": "text",
+      "x": 268,
+      "y": 331.1333333333333,
+      "width": 176,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aZ",
+      "roundness": null,
+      "seed": 529820643,
+      "version": 1,
+      "versionNonce": 1183618173,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "nestjs-validation-and-parse-pipes-transf"
+      },
+      "text": "implements @conforms",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "nestjs-validation-and-parse-pipes-transf-edge-1",
+      "originalText": "implements @conforms",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "nestjs-validation-and-parse-pipes-transf-edge-2-label",
+      "type": "text",
+      "x": 364.3333333333333,
+      "y": 644.2666666666667,
+      "width": 176,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aa",
+      "roundness": null,
+      "seed": 1548625236,
+      "version": 1,
+      "versionNonce": 1681728160,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "nestjs-validation-and-parse-pipes-transf"
+      },
+      "text": "implements @conforms",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "nestjs-validation-and-parse-pipes-transf-edge-2",
+      "originalText": "implements @conforms",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "nestjs-validation-and-parse-pipes-transf-edge-3-label",
+      "type": "text",
+      "x": 220,
+      "y": 189.13333333333333,
+      "width": 176,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "ab",
+      "roundness": null,
+      "seed": 1740831633,
+      "version": 1,
+      "versionNonce": 350797211,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "nestjs-validation-and-parse-pipes-transf"
+      },
+      "text": "implements @conforms",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "nestjs-validation-and-parse-pipes-transf-edge-3",
+      "originalText": "implements @conforms",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "nestjs-validation-and-parse-pipes-transf-edge-4-label",
+      "type": "text",
+      "x": 1783.6,
+      "y": 504.26666666666665,
+      "width": 193.60000000000002,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "ac",
+      "roundness": null,
+      "seed": 1055201138,
+      "version": 1,
+      "versionNonce": 508992806,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "nestjs-validation-and-parse-pipes-transf"
+      },
+      "text": "plainToInstance @calls",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "nestjs-validation-and-parse-pipes-transf-edge-4",
+      "originalText": "plainToInstance @calls",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "nestjs-validation-and-parse-pipes-transf-edge-5-label",
+      "type": "text",
+      "x": 1874.3999999999999,
+      "y": 664.2666666666667,
+      "width": 132,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "ad",
+      "roundness": null,
+      "seed": 2085683863,
+      "version": 1,
+      "versionNonce": 186836593,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "nestjs-validation-and-parse-pipes-transf"
+      },
+      "text": "validate @calls",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "nestjs-validation-and-parse-pipes-transf-edge-5",
+      "originalText": "validate @calls",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "nestjs-validation-and-parse-pipes-transf-edge-6-label",
+      "type": "text",
+      "x": 1115,
+      "y": 644.2666666666667,
+      "width": 193.60000000000002,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "ae",
+      "roundness": null,
+      "seed": 477657672,
+      "version": 1,
+      "versionNonce": 1384987812,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "nestjs-validation-and-parse-pipes-transf"
+      },
+      "text": "transform items @calls",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "nestjs-validation-and-parse-pipes-transf-edge-6",
+      "originalText": "transform items @calls",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "nestjs-validation-and-parse-pipes-transf-edge-7-label",
+      "type": "text",
+      "x": 1158.3999999999999,
+      "y": 232,
+      "width": 52.800000000000004,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "af",
+      "roundness": null,
+      "seed": 1993045013,
+      "version": 1,
+      "versionNonce": 299105055,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "nestjs-validation-and-parse-pipes-transf"
+      },
+      "text": "@takes",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "nestjs-validation-and-parse-pipes-transf-edge-7",
+      "originalText": "@takes",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "nestjs-validation-and-parse-pipes-transf-edge-8-label",
+      "type": "text",
+      "x": 1063.9333333333332,
+      "y": 392,
+      "width": 52.800000000000004,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "ag",
+      "roundness": null,
+      "seed": 1736364214,
+      "version": 1,
+      "versionNonce": 329574682,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "nestjs-validation-and-parse-pipes-transf"
+      },
+      "text": "@takes",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "nestjs-validation-and-parse-pipes-transf-edge-8",
+      "originalText": "@takes",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "nestjs-validation-and-parse-pipes-transf-edge-9-label",
+      "type": "text",
+      "x": 884.7333333333332,
+      "y": 464.8,
+      "width": 52.800000000000004,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "ah",
+      "roundness": null,
+      "seed": 1105686763,
+      "version": 1,
+      "versionNonce": 132568805,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "nestjs-validation-and-parse-pipes-transf"
+      },
+      "text": "@takes",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "nestjs-validation-and-parse-pipes-transf-edge-9",
+      "originalText": "@takes",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "nestjs-validation-and-parse-pipes-transf-edge-10-label",
+      "type": "text",
+      "x": 340.46666666666664,
+      "y": 191.86666666666662,
+      "width": 52.800000000000004,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "ai",
+      "roundness": null,
+      "seed": 726779065,
+      "version": 1,
+      "versionNonce": 1525480579,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "nestjs-validation-and-parse-pipes-transf"
+      },
+      "text": "@takes",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "nestjs-validation-and-parse-pipes-transf-edge-10",
+      "originalText": "@takes",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "nestjs-validation-and-parse-pipes-transf-edge-11-label",
+      "type": "text",
+      "x": 505.26666666666677,
+      "y": 537.6,
+      "width": 52.800000000000004,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aj",
+      "roundness": null,
+      "seed": 298234076,
+      "version": 1,
+      "versionNonce": 256657640,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "nestjs-validation-and-parse-pipes-transf"
+      },
+      "text": "@takes",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "nestjs-validation-and-parse-pipes-transf-edge-11",
+      "originalText": "@takes",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "nestjs-validation-and-parse-pipes-transf-edge-12-label",
+      "type": "text",
+      "x": 257.6,
+      "y": 15,
+      "width": 52.800000000000004,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "ak",
+      "roundness": null,
+      "seed": 25363147,
+      "version": 1,
+      "versionNonce": 1196652101,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "nestjs-validation-and-parse-pipes-transf"
+      },
+      "text": "@takes",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "nestjs-validation-and-parse-pipes-transf-edge-12",
+      "originalText": "@takes",
+      "autoResize": true,
+      "lineHeight": 1.25
+    }
+  ],
+  "appState": {
+    "gridSize": null,
+    "viewBackgroundColor": "#ffffff"
+  },
+  "files": {},
+  "diagramos": {
+    "version": "0.2.0-rc.6",
+    "schema": 1
+  }
+}

@@ -1,0 +1,2076 @@
+{
+  "type": "excalidraw",
+  "version": 2,
+  "source": "diagramos",
+  "elements": [
+    {
+      "id": "repository-pool-package-discovery-title",
+      "type": "text",
+      "x": 0,
+      "y": -115,
+      "width": 435.6,
+      "height": 30,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a0",
+      "roundness": null,
+      "seed": 244053794,
+      "version": 1,
+      "versionNonce": 1694705686,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "repository-pool-package-discovery",
+        "role": "title"
+      },
+      "text": "Repository Pool Package Discovery",
+      "fontSize": 24,
+      "fontFamily": 5,
+      "textAlign": "left",
+      "verticalAlign": "middle",
+      "containerId": null,
+      "originalText": "Repository Pool Package Discovery",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "repository-pool-package-discovery-node-0",
+      "type": "rectangle",
+      "x": 2420,
+      "y": 20,
+      "width": 260,
+      "height": 100,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a1",
+      "roundness": {
+        "type": 3
+      },
+      "seed": 1204227909,
+      "version": 1,
+      "versionNonce": 459774799,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "repository-pool-package-discovery-node-0-label"
+        },
+        {
+          "id": "repository-pool-package-discovery-edge-0",
+          "type": "arrow"
+        },
+        {
+          "id": "repository-pool-package-discovery-edge-4",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "repository-pool-package-discovery",
+        "node": "abstract-repo",
+        "ref": "src/poetry/repositories/abstract_repository.py#AbstractRepository"
+      }
+    },
+    {
+      "id": "repository-pool-package-discovery-node-1",
+      "type": "rectangle",
+      "x": 1900,
+      "y": 120,
+      "width": 160,
+      "height": 120,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a2",
+      "roundness": null,
+      "seed": 639881260,
+      "version": 1,
+      "versionNonce": 631319672,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "repository-pool-package-discovery-node-1-label"
+        },
+        {
+          "id": "repository-pool-package-discovery-edge-0",
+          "type": "arrow"
+        },
+        {
+          "id": "repository-pool-package-discovery-edge-1",
+          "type": "arrow"
+        },
+        {
+          "id": "repository-pool-package-discovery-edge-5",
+          "type": "arrow"
+        },
+        {
+          "id": "repository-pool-package-discovery-edge-6",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "repository-pool-package-discovery",
+        "node": "repository",
+        "ref": "src/poetry/repositories/repository.py#Repository"
+      }
+    },
+    {
+      "id": "repository-pool-package-discovery-node-2",
+      "type": "rectangle",
+      "x": 1200,
+      "y": 440,
+      "width": 240,
+      "height": 80,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a3",
+      "roundness": null,
+      "seed": 1790722619,
+      "version": 1,
+      "versionNonce": 1657494453,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "repository-pool-package-discovery-node-2-label"
+        },
+        {
+          "id": "repository-pool-package-discovery-edge-1",
+          "type": "arrow"
+        },
+        {
+          "id": "repository-pool-package-discovery-edge-2",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "repository-pool-package-discovery",
+        "node": "cached-repo",
+        "ref": "src/poetry/repositories/cached_repository.py#CachedRepository"
+      }
+    },
+    {
+      "id": "repository-pool-package-discovery-node-3",
+      "type": "rectangle",
+      "x": 600,
+      "y": 400,
+      "width": 220,
+      "height": 100,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a4",
+      "roundness": null,
+      "seed": 48208106,
+      "version": 1,
+      "versionNonce": 854055870,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "repository-pool-package-discovery-node-3-label"
+        },
+        {
+          "id": "repository-pool-package-discovery-edge-2",
+          "type": "arrow"
+        },
+        {
+          "id": "repository-pool-package-discovery-edge-3",
+          "type": "arrow"
+        },
+        {
+          "id": "repository-pool-package-discovery-edge-7",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "repository-pool-package-discovery",
+        "node": "http-repo",
+        "ref": "src/poetry/repositories/http_repository.py#HTTPRepository"
+      }
+    },
+    {
+      "id": "repository-pool-package-discovery-node-4",
+      "type": "rectangle",
+      "x": 20,
+      "y": 400,
+      "width": 220,
+      "height": 80,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a5",
+      "roundness": null,
+      "seed": 841507385,
+      "version": 1,
+      "versionNonce": 516353283,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "repository-pool-package-discovery-node-4-label"
+        },
+        {
+          "id": "repository-pool-package-discovery-edge-3",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "repository-pool-package-discovery",
+        "node": "pypi-repo",
+        "ref": "src/poetry/repositories/pypi_repository.py#PyPiRepository"
+      }
+    },
+    {
+      "id": "repository-pool-package-discovery-node-5",
+      "type": "rectangle",
+      "x": 1220,
+      "y": 20,
+      "width": 220,
+      "height": 120,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a6",
+      "roundness": {
+        "type": 3
+      },
+      "seed": 167229360,
+      "version": 1,
+      "versionNonce": 198272780,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "repository-pool-package-discovery-node-5-label"
+        },
+        {
+          "id": "repository-pool-package-discovery-edge-4",
+          "type": "arrow"
+        },
+        {
+          "id": "repository-pool-package-discovery-edge-5",
+          "type": "arrow"
+        },
+        {
+          "id": "repository-pool-package-discovery-edge-6",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "repository-pool-package-discovery",
+        "node": "repo-pool",
+        "ref": "src/poetry/repositories/repository_pool.py#RepositoryPool"
+      }
+    },
+    {
+      "id": "repository-pool-package-discovery-node-6",
+      "type": "rectangle",
+      "x": 1200,
+      "y": 220,
+      "width": 160,
+      "height": 120,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a7",
+      "roundness": null,
+      "seed": 717535967,
+      "version": 1,
+      "versionNonce": 1039765625,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "repository-pool-package-discovery-node-6-label"
+        },
+        {
+          "id": "repository-pool-package-discovery-edge-7",
+          "type": "arrow"
+        },
+        {
+          "id": "repository-pool-package-discovery-edge-8",
+          "type": "arrow"
+        },
+        {
+          "id": "repository-pool-package-discovery-edge-9",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "repository-pool-package-discovery",
+        "node": "link-source",
+        "ref": "src/poetry/repositories/link_sources/base.py#LinkSource"
+      }
+    },
+    {
+      "id": "repository-pool-package-discovery-node-7",
+      "type": "rectangle",
+      "x": 660,
+      "y": 240,
+      "width": 160,
+      "height": 80,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a8",
+      "roundness": null,
+      "seed": 909420494,
+      "version": 1,
+      "versionNonce": 2002061682,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "repository-pool-package-discovery-node-7-label"
+        },
+        {
+          "id": "repository-pool-package-discovery-edge-8",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "repository-pool-package-discovery",
+        "node": "html-page",
+        "ref": "src/poetry/repositories/link_sources/html.py#HTMLPage"
+      }
+    },
+    {
+      "id": "repository-pool-package-discovery-node-8",
+      "type": "rectangle",
+      "x": 600,
+      "y": 80,
+      "width": 220,
+      "height": 80,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a9",
+      "roundness": null,
+      "seed": 1971161677,
+      "version": 1,
+      "versionNonce": 1410071607,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "repository-pool-package-discovery-node-8-label"
+        },
+        {
+          "id": "repository-pool-package-discovery-edge-9",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "repository-pool-package-discovery",
+        "node": "json-page",
+        "ref": "src/poetry/repositories/link_sources/json.py#SimpleJsonPage"
+      }
+    },
+    {
+      "id": "repository-pool-package-discovery-edge-0",
+      "type": "arrow",
+      "x": 2052.8,
+      "y": 186.33333333333331,
+      "width": 359.1999999999998,
+      "height": 107.66666666666666,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aA",
+      "roundness": null,
+      "seed": 1517210538,
+      "version": 1,
+      "versionNonce": 805885054,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "repository-pool-package-discovery-edge-0-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "repository-pool-package-discovery",
+        "edge": {
+          "from": "repository",
+          "to": "abstract-repo",
+          "claim": "conforms"
+        }
+      },
+      "points": [
+        [
+          0.5,
+          0
+        ],
+        [
+          58.358333333333576,
+          0
+        ],
+        [
+          116.7166666666667,
+          0
+        ],
+        [
+          233.4333333333334,
+          0
+        ],
+        [
+          251.19999999999982,
+          0
+        ],
+        [
+          251.19999999999982,
+          -107.66666666666666
+        ],
+        [
+          358.6999999999998,
+          -107.66666666666666
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "repository-pool-package-discovery-node-1",
+        "focus": 0.10555555555555463,
+        "gap": 7.199999999999818
+      },
+      "endBinding": {
+        "elementId": "repository-pool-package-discovery-node-0",
+        "focus": -0.17333333333333312,
+        "gap": 8
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "repository-pool-package-discovery-edge-1",
+      "type": "arrow",
+      "x": 1436.8,
+      "y": 485.46666666666664,
+      "width": 456,
+      "height": 269.1333333333333,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aB",
+      "roundness": null,
+      "seed": 131545851,
+      "version": 1,
+      "versionNonce": 120854389,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "repository-pool-package-discovery-edge-1-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "repository-pool-package-discovery",
+        "edge": {
+          "from": "cached-repo",
+          "to": "repository",
+          "claim": "conforms"
+        }
+      },
+      "points": [
+        [
+          0.5,
+          0
+        ],
+        [
+          348,
+          0
+        ],
+        [
+          348,
+          -14.566666666666663
+        ],
+        [
+          348,
+          -269.1333333333333
+        ],
+        [
+          455.5,
+          -269.1333333333333
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "repository-pool-package-discovery-node-2",
+        "focus": 0.1366666666666673,
+        "gap": 3.2000000000000455
+      },
+      "endBinding": {
+        "elementId": "repository-pool-package-discovery-node-1",
+        "focus": -0.6055555555555565,
+        "gap": 7.2000000000000455
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "repository-pool-package-discovery-edge-2",
+      "type": "arrow",
+      "x": 811.2,
+      "y": 462,
+      "width": 385.5999999999999,
+      "height": 23.466666666666697,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aC",
+      "roundness": null,
+      "seed": 1128188140,
+      "version": 1,
+      "versionNonce": 499832632,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "repository-pool-package-discovery-edge-2-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "repository-pool-package-discovery",
+        "edge": {
+          "from": "http-repo",
+          "to": "cached-repo",
+          "claim": "conforms"
+        }
+      },
+      "points": [
+        [
+          0.5,
+          0
+        ],
+        [
+          32,
+          -5.684341886080802e-14
+        ],
+        [
+          32,
+          23.46666666666664
+        ],
+        [
+          181.0666666666666,
+          23.46666666666664
+        ],
+        [
+          232.20000000000005,
+          23.46666666666664
+        ],
+        [
+          283.33333333333326,
+          23.46666666666664
+        ],
+        [
+          385.0999999999999,
+          23.46666666666664
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "repository-pool-package-discovery-node-3",
+        "focus": 0.24000000000000193,
+        "gap": 8.799999999999955
+      },
+      "endBinding": {
+        "elementId": "repository-pool-package-discovery-node-2",
+        "focus": -0.1366666666666673,
+        "gap": 3.2000000000000455
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "repository-pool-package-discovery-edge-3",
+      "type": "arrow",
+      "x": 232,
+      "y": 445.3333333333333,
+      "width": 359.20000000000005,
+      "height": 0,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aD",
+      "roundness": null,
+      "seed": 1734008325,
+      "version": 1,
+      "versionNonce": 328184591,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "repository-pool-package-discovery-edge-3-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "repository-pool-package-discovery",
+        "edge": {
+          "from": "pypi-repo",
+          "to": "http-repo",
+          "claim": "conforms"
+        }
+      },
+      "points": [
+        [
+          0.5,
+          0
+        ],
+        [
+          179.60000000000002,
+          0
+        ],
+        [
+          358.70000000000005,
+          0
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "repository-pool-package-discovery-node-4",
+        "focus": 0.1333333333333332,
+        "gap": 8
+      },
+      "endBinding": {
+        "elementId": "repository-pool-package-discovery-node-3",
+        "focus": 0.09333333333333328,
+        "gap": 8.799999999999955
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "repository-pool-package-discovery-edge-4",
+      "type": "arrow",
+      "x": 1436.8,
+      "y": 45.33333333333333,
+      "width": 975.2,
+      "height": 0,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aE",
+      "roundness": null,
+      "seed": 230939278,
+      "version": 1,
+      "versionNonce": 1594441010,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "repository-pool-package-discovery-edge-4-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "repository-pool-package-discovery",
+        "edge": {
+          "from": "repo-pool",
+          "to": "abstract-repo",
+          "claim": "conforms"
+        }
+      },
+      "points": [
+        [
+          0.5,
+          0
+        ],
+        [
+          487.60000000000014,
+          0
+        ],
+        [
+          974.7,
+          0
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "repository-pool-package-discovery-node-5",
+        "focus": -0.5777777777777785,
+        "gap": 2.990477689642502
+      },
+      "endBinding": {
+        "elementId": "repository-pool-package-discovery-node-0",
+        "focus": 0.49333333333333246,
+        "gap": 8
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "repository-pool-package-discovery-edge-5",
+      "type": "arrow",
+      "x": 1436.8,
+      "y": 105.33333333333333,
+      "width": 456,
+      "height": 80.99999999999999,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aF",
+      "roundness": null,
+      "seed": 1247419551,
+      "version": 1,
+      "versionNonce": 908175417,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "repository-pool-package-discovery-edge-5-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "repository-pool-package-discovery",
+        "edge": {
+          "from": "repo-pool",
+          "to": "repository",
+          "claim": "holds"
+        }
+      },
+      "points": [
+        [
+          0.5,
+          0
+        ],
+        [
+          32,
+          0
+        ],
+        [
+          32,
+          80.99999999999999
+        ],
+        [
+          187.5,
+          80.99999999999999
+        ],
+        [
+          254.625,
+          80.99999999999999
+        ],
+        [
+          321.75,
+          80.99999999999999
+        ],
+        [
+          455.5,
+          80.99999999999999
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "repository-pool-package-discovery-node-5",
+        "focus": 0.42222222222222144,
+        "gap": 3.2000000000000455
+      },
+      "endBinding": {
+        "elementId": "repository-pool-package-discovery-node-1",
+        "focus": -0.10555555555555446,
+        "gap": 7.2000000000000455
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "repository-pool-package-discovery-edge-6",
+      "type": "arrow",
+      "x": 1436.8,
+      "y": 75.33333333333333,
+      "width": 456,
+      "height": 80.99999999999999,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aG",
+      "roundness": null,
+      "seed": 697112944,
+      "version": 1,
+      "versionNonce": 25105868,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "repository-pool-package-discovery-edge-6-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "repository-pool-package-discovery",
+        "edge": {
+          "from": "repo-pool",
+          "to": "repository",
+          "claim": "calls"
+        }
+      },
+      "points": [
+        [
+          0.5,
+          0
+        ],
+        [
+          56,
+          0
+        ],
+        [
+          56,
+          42.8
+        ],
+        [
+          225.70000000000005,
+          42.8
+        ],
+        [
+          348,
+          42.8
+        ],
+        [
+          348,
+          80.99999999999999
+        ],
+        [
+          455.5,
+          80.99999999999999
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "repository-pool-package-discovery-node-5",
+        "focus": -0.0777777777777785,
+        "gap": 3.2000000000000455
+      },
+      "endBinding": {
+        "elementId": "repository-pool-package-discovery-node-1",
+        "focus": 0.3944444444444454,
+        "gap": 7.2000000000000455
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "repository-pool-package-discovery-edge-7",
+      "type": "arrow",
+      "x": 811.2,
+      "y": 428.66666666666663,
+      "width": 385.5999999999999,
+      "height": 123.33333333333331,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aH",
+      "roundness": null,
+      "seed": 587483641,
+      "version": 1,
+      "versionNonce": 850960067,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "repository-pool-package-discovery-edge-7-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "repository-pool-package-discovery",
+        "edge": {
+          "from": "http-repo",
+          "to": "link-source",
+          "claim": "builds"
+        }
+      },
+      "points": [
+        [
+          0.5,
+          0
+        ],
+        [
+          63.616666666666674,
+          0
+        ],
+        [
+          127.23333333333335,
+          0
+        ],
+        [
+          254.4666666666667,
+          0
+        ],
+        [
+          277.5999999999999,
+          0
+        ],
+        [
+          277.5999999999999,
+          -123.33333333333331
+        ],
+        [
+          385.0999999999999,
+          -123.33333333333331
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "repository-pool-package-discovery-node-3",
+        "focus": -0.42666666666666725,
+        "gap": 8.799999999999955
+      },
+      "endBinding": {
+        "elementId": "repository-pool-package-discovery-node-6",
+        "focus": -0.42222222222222255,
+        "gap": 3.2000000000000455
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "repository-pool-package-discovery-edge-8",
+      "type": "arrow",
+      "x": 811.2,
+      "y": 275.3333333333333,
+      "width": 385.5999999999999,
+      "height": 0,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aI",
+      "roundness": null,
+      "seed": 1954611314,
+      "version": 1,
+      "versionNonce": 46557222,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "repository-pool-package-discovery-edge-8-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "repository-pool-package-discovery",
+        "edge": {
+          "from": "html-page",
+          "to": "link-source",
+          "claim": "conforms"
+        }
+      },
+      "points": [
+        [
+          0.5,
+          0
+        ],
+        [
+          192.79999999999995,
+          0
+        ],
+        [
+          385.0999999999999,
+          0
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "repository-pool-package-discovery-node-7",
+        "focus": -0.11666666666666856,
+        "gap": 8.799999999999955
+      },
+      "endBinding": {
+        "elementId": "repository-pool-package-discovery-node-6",
+        "focus": 0.07777777777777749,
+        "gap": 3.2000000000000455
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "repository-pool-package-discovery-edge-9",
+      "type": "arrow",
+      "x": 811.2,
+      "y": 115.33333333333331,
+      "width": 385.5999999999999,
+      "height": 130,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aJ",
+      "roundness": null,
+      "seed": 1977105891,
+      "version": 1,
+      "versionNonce": 324020861,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "repository-pool-package-discovery-edge-9-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "repository-pool-package-discovery",
+        "edge": {
+          "from": "json-page",
+          "to": "link-source",
+          "claim": "conforms"
+        }
+      },
+      "points": [
+        [
+          0.5,
+          0
+        ],
+        [
+          64.45000000000005,
+          0
+        ],
+        [
+          128.89999999999998,
+          0
+        ],
+        [
+          257.79999999999995,
+          0
+        ],
+        [
+          277.5999999999999,
+          0
+        ],
+        [
+          277.5999999999999,
+          130
+        ],
+        [
+          385.0999999999999,
+          130
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "repository-pool-package-discovery-node-8",
+        "focus": -0.11666666666666702,
+        "gap": 8.799999999999955
+      },
+      "endBinding": {
+        "elementId": "repository-pool-package-discovery-node-6",
+        "focus": 0.5777777777777774,
+        "gap": 3.2000000000000455
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "repository-pool-package-discovery-node-0-label",
+      "type": "text",
+      "x": 2451,
+      "y": 57.5,
+      "width": 198.00000000000003,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aK",
+      "roundness": null,
+      "seed": 1024920620,
+      "version": 1,
+      "versionNonce": 1183359096,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "repository-pool-package-discovery"
+      },
+      "text": "AbstractRepository",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "repository-pool-package-discovery-node-0",
+      "originalText": "AbstractRepository",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "repository-pool-package-discovery-node-1-label",
+      "type": "text",
+      "x": 1925,
+      "y": 167.5,
+      "width": 110.00000000000001,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aL",
+      "roundness": null,
+      "seed": 631289417,
+      "version": 1,
+      "versionNonce": 1938260179,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "repository-pool-package-discovery"
+      },
+      "text": "Repository",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "repository-pool-package-discovery-node-1",
+      "originalText": "Repository",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "repository-pool-package-discovery-node-2-label",
+      "type": "text",
+      "x": 1232,
+      "y": 467.5,
+      "width": 176,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aM",
+      "roundness": null,
+      "seed": 1238231910,
+      "version": 1,
+      "versionNonce": 1623841866,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "repository-pool-package-discovery"
+      },
+      "text": "CachedRepository",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "repository-pool-package-discovery-node-2",
+      "originalText": "CachedRepository",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "repository-pool-package-discovery-node-3-label",
+      "type": "text",
+      "x": 633,
+      "y": 437.5,
+      "width": 154,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aN",
+      "roundness": null,
+      "seed": 267943451,
+      "version": 1,
+      "versionNonce": 1289556757,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "repository-pool-package-discovery"
+      },
+      "text": "HTTPRepository",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "repository-pool-package-discovery-node-3",
+      "originalText": "HTTPRepository",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "repository-pool-package-discovery-node-4-label",
+      "type": "text",
+      "x": 53,
+      "y": 427.5,
+      "width": 154,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aO",
+      "roundness": null,
+      "seed": 1119209792,
+      "version": 1,
+      "versionNonce": 1295181340,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "repository-pool-package-discovery"
+      },
+      "text": "PyPiRepository",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "repository-pool-package-discovery-node-4",
+      "originalText": "PyPiRepository",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "repository-pool-package-discovery-node-5-label",
+      "type": "text",
+      "x": 1253,
+      "y": 67.5,
+      "width": 154,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aP",
+      "roundness": null,
+      "seed": 194858765,
+      "version": 1,
+      "versionNonce": 2063616247,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "repository-pool-package-discovery"
+      },
+      "text": "RepositoryPool",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "repository-pool-package-discovery-node-5",
+      "originalText": "RepositoryPool",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "repository-pool-package-discovery-node-6-label",
+      "type": "text",
+      "x": 1225,
+      "y": 267.5,
+      "width": 110.00000000000001,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aQ",
+      "roundness": null,
+      "seed": 1553231082,
+      "version": 1,
+      "versionNonce": 1787926462,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "repository-pool-package-discovery"
+      },
+      "text": "LinkSource",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "repository-pool-package-discovery-node-6",
+      "originalText": "LinkSource",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "repository-pool-package-discovery-node-7-label",
+      "type": "text",
+      "x": 696,
+      "y": 267.5,
+      "width": 88,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aR",
+      "roundness": null,
+      "seed": 1058205679,
+      "version": 1,
+      "versionNonce": 107448905,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "repository-pool-package-discovery"
+      },
+      "text": "HTMLPage",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "repository-pool-package-discovery-node-7",
+      "originalText": "HTMLPage",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "repository-pool-package-discovery-node-8-label",
+      "type": "text",
+      "x": 633,
+      "y": 107.5,
+      "width": 154,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aS",
+      "roundness": null,
+      "seed": 1938541956,
+      "version": 1,
+      "versionNonce": 418369424,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "repository-pool-package-discovery"
+      },
+      "text": "SimpleJsonPage",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "repository-pool-package-discovery-node-8",
+      "originalText": "SimpleJsonPage",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "repository-pool-package-discovery-edge-0-label",
+      "type": "text",
+      "x": 2246.6333333333337,
+      "y": 176.33333333333331,
+      "width": 79.2,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aT",
+      "roundness": null,
+      "seed": 2063229787,
+      "version": 1,
+      "versionNonce": 1461000277,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "repository-pool-package-discovery"
+      },
+      "text": "@conforms",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "repository-pool-package-discovery-edge-0",
+      "originalText": "@conforms",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "repository-pool-package-discovery-edge-1-label",
+      "type": "text",
+      "x": 1745.2,
+      "y": 460.9,
+      "width": 79.2,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aU",
+      "roundness": null,
+      "seed": 766669478,
+      "version": 1,
+      "versionNonce": 1678009738,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "repository-pool-package-discovery"
+      },
+      "text": "@conforms",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "repository-pool-package-discovery-edge-1",
+      "originalText": "@conforms",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "repository-pool-package-discovery-edge-2-label",
+      "type": "text",
+      "x": 952.6666666666666,
+      "y": 475.46666666666664,
+      "width": 79.2,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aV",
+      "roundness": null,
+      "seed": 486284681,
+      "version": 1,
+      "versionNonce": 50166803,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "repository-pool-package-discovery"
+      },
+      "text": "@conforms",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "repository-pool-package-discovery-edge-2",
+      "originalText": "@conforms",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "repository-pool-package-discovery-edge-3-label",
+      "type": "text",
+      "x": 372,
+      "y": 435.3333333333333,
+      "width": 79.2,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aW",
+      "roundness": null,
+      "seed": 1475925100,
+      "version": 1,
+      "versionNonce": 1051390392,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "repository-pool-package-discovery"
+      },
+      "text": "@conforms",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "repository-pool-package-discovery-edge-3",
+      "originalText": "@conforms",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "repository-pool-package-discovery-edge-4-label",
+      "type": "text",
+      "x": 1884.8000000000002,
+      "y": 35.33333333333333,
+      "width": 79.2,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aX",
+      "roundness": null,
+      "seed": 1603027247,
+      "version": 1,
+      "versionNonce": 2125459593,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "repository-pool-package-discovery"
+      },
+      "text": "@conforms",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "repository-pool-package-discovery-edge-4",
+      "originalText": "@conforms",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "repository-pool-package-discovery-edge-5-label",
+      "type": "text",
+      "x": 1536.3,
+      "y": 176.33333333333331,
+      "width": 176,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aY",
+      "roundness": null,
+      "seed": 1552774186,
+      "version": 1,
+      "versionNonce": 105649662,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "repository-pool-package-discovery"
+      },
+      "text": "_repositories @holds",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "repository-pool-package-discovery-edge-5",
+      "originalText": "_repositories @holds",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "repository-pool-package-discovery-edge-6-label",
+      "type": "text",
+      "x": 1574.5,
+      "y": 108.13333333333333,
+      "width": 176,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aZ",
+      "roundness": null,
+      "seed": 425101389,
+      "version": 1,
+      "versionNonce": 1118033463,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "repository-pool-package-discovery"
+      },
+      "text": "find_packages @calls",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "repository-pool-package-discovery-edge-6",
+      "originalText": "find_packages @calls",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "repository-pool-package-discovery-edge-7-label",
+      "type": "text",
+      "x": 1012.8666666666668,
+      "y": 418.66666666666663,
+      "width": 105.60000000000001,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aa",
+      "roundness": null,
+      "seed": 1570111104,
+      "version": 1,
+      "versionNonce": 1863863388,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "repository-pool-package-discovery"
+      },
+      "text": "page @builds",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "repository-pool-package-discovery-edge-7",
+      "originalText": "page @builds",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "repository-pool-package-discovery-edge-8-label",
+      "type": "text",
+      "x": 964.4,
+      "y": 265.3333333333333,
+      "width": 79.2,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "ab",
+      "roundness": null,
+      "seed": 507568659,
+      "version": 1,
+      "versionNonce": 2062430061,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "repository-pool-package-discovery"
+      },
+      "text": "@conforms",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "repository-pool-package-discovery-edge-8",
+      "originalText": "@conforms",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "repository-pool-package-discovery-edge-9-label",
+      "type": "text",
+      "x": 1029.4,
+      "y": 105.33333333333331,
+      "width": 79.2,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "ac",
+      "roundness": null,
+      "seed": 1163634046,
+      "version": 1,
+      "versionNonce": 1832981794,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "repository-pool-package-discovery"
+      },
+      "text": "@conforms",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "repository-pool-package-discovery-edge-9",
+      "originalText": "@conforms",
+      "autoResize": true,
+      "lineHeight": 1.25
+    }
+  ],
+  "appState": {
+    "gridSize": null,
+    "viewBackgroundColor": "#ffffff"
+  },
+  "files": {},
+  "diagramos": {
+    "version": "0.2.0-rc.6",
+    "schema": 1
+  }
+}

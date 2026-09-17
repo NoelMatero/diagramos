@@ -1,0 +1,3241 @@
+{
+  "type": "excalidraw",
+  "version": 2,
+  "source": "diagramos",
+  "elements": [
+    {
+      "id": "dropdownmenu-component-composition-title",
+      "type": "text",
+      "x": 0,
+      "y": -115,
+      "width": 448.8,
+      "height": 30,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a0",
+      "roundness": null,
+      "seed": 1632993224,
+      "version": 1,
+      "versionNonce": 981263652,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "dropdownmenu-component-composition",
+        "role": "title"
+      },
+      "text": "DropdownMenu Component Composition",
+      "fontSize": 24,
+      "fontFamily": 5,
+      "textAlign": "left",
+      "verticalAlign": "middle",
+      "containerId": null,
+      "originalText": "DropdownMenu Component Composition",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "dropdownmenu-component-composition-node-0",
+      "type": "rectangle",
+      "x": 20,
+      "y": 560,
+      "width": 180,
+      "height": 240,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a1",
+      "roundness": null,
+      "seed": 1263415831,
+      "version": 1,
+      "versionNonce": 1672785137,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "dropdownmenu-component-composition-node-0-label"
+        },
+        {
+          "id": "dropdownmenu-component-composition-edge-0",
+          "type": "arrow"
+        },
+        {
+          "id": "dropdownmenu-component-composition-edge-1",
+          "type": "arrow"
+        },
+        {
+          "id": "dropdownmenu-component-composition-edge-2",
+          "type": "arrow"
+        },
+        {
+          "id": "dropdownmenu-component-composition-edge-3",
+          "type": "arrow"
+        },
+        {
+          "id": "dropdownmenu-component-composition-edge-4",
+          "type": "arrow"
+        },
+        {
+          "id": "dropdownmenu-component-composition-edge-5",
+          "type": "arrow"
+        },
+        {
+          "id": "dropdownmenu-component-composition-edge-6",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "dropdownmenu-component-composition",
+        "node": "dropdownmenu",
+        "ref": "packages/excalidraw/components/dropdownMenu/DropdownMenu.tsx"
+      }
+    },
+    {
+      "id": "dropdownmenu-component-composition-node-1",
+      "type": "rectangle",
+      "x": 600,
+      "y": 20,
+      "width": 160,
+      "height": 80,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a2",
+      "roundness": null,
+      "seed": 1320651590,
+      "version": 1,
+      "versionNonce": 1016131242,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "dropdownmenu-component-composition-node-1-label"
+        },
+        {
+          "id": "dropdownmenu-component-composition-edge-0",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "dropdownmenu-component-composition",
+        "node": "dropdownmenutrigger",
+        "ref": "packages/excalidraw/components/dropdownMenu/DropdownMenuTrigger.tsx"
+      }
+    },
+    {
+      "id": "dropdownmenu-component-composition-node-2",
+      "type": "rectangle",
+      "x": 600,
+      "y": 180,
+      "width": 160,
+      "height": 80,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a3",
+      "roundness": null,
+      "seed": 1390290321,
+      "version": 1,
+      "versionNonce": 816569243,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "dropdownmenu-component-composition-node-2-label"
+        },
+        {
+          "id": "dropdownmenu-component-composition-edge-1",
+          "type": "arrow"
+        },
+        {
+          "id": "dropdownmenu-component-composition-edge-7",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "dropdownmenu-component-composition",
+        "node": "dropdownmenucontent",
+        "ref": "packages/excalidraw/components/dropdownMenu/DropdownMenuContent.tsx"
+      }
+    },
+    {
+      "id": "dropdownmenu-component-composition-node-3",
+      "type": "rectangle",
+      "x": 1180,
+      "y": 1040,
+      "width": 160,
+      "height": 100,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a4",
+      "roundness": null,
+      "seed": 713109224,
+      "version": 1,
+      "versionNonce": 1204209348,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "dropdownmenu-component-composition-node-3-label"
+        },
+        {
+          "id": "dropdownmenu-component-composition-edge-2",
+          "type": "arrow"
+        },
+        {
+          "id": "dropdownmenu-component-composition-edge-8",
+          "type": "arrow"
+        },
+        {
+          "id": "dropdownmenu-component-composition-edge-9",
+          "type": "arrow"
+        },
+        {
+          "id": "dropdownmenu-component-composition-edge-10",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "dropdownmenu-component-composition",
+        "node": "dropdownmenuitem",
+        "ref": "packages/excalidraw/components/dropdownMenu/DropdownMenuItem.tsx"
+      }
+    },
+    {
+      "id": "dropdownmenu-component-composition-node-4",
+      "type": "rectangle",
+      "x": 600,
+      "y": 800,
+      "width": 180,
+      "height": 80,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a5",
+      "roundness": null,
+      "seed": 2009972563,
+      "version": 1,
+      "versionNonce": 1291478701,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "dropdownmenu-component-composition-node-4-label"
+        },
+        {
+          "id": "dropdownmenu-component-composition-edge-3",
+          "type": "arrow"
+        },
+        {
+          "id": "dropdownmenu-component-composition-edge-10",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "dropdownmenu-component-composition",
+        "node": "dropdownmenuitemcheckbox",
+        "ref": "packages/excalidraw/components/dropdownMenu/DropdownMenuItemCheckbox.tsx"
+      }
+    },
+    {
+      "id": "dropdownmenu-component-composition-node-5",
+      "type": "rectangle",
+      "x": 600,
+      "y": 960,
+      "width": 160,
+      "height": 80,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a6",
+      "roundness": null,
+      "seed": 1533103650,
+      "version": 1,
+      "versionNonce": 1490754838,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "dropdownmenu-component-composition-node-5-label"
+        },
+        {
+          "id": "dropdownmenu-component-composition-edge-4",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "dropdownmenu-component-composition",
+        "node": "dropdownmenuitemcustom",
+        "ref": "packages/excalidraw/components/dropdownMenu/DropdownMenuItemCustom.tsx"
+      }
+    },
+    {
+      "id": "dropdownmenu-component-composition-node-6",
+      "type": "rectangle",
+      "x": 1180,
+      "y": 640,
+      "width": 160,
+      "height": 100,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a7",
+      "roundness": null,
+      "seed": 761640381,
+      "version": 1,
+      "versionNonce": 1013054375,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "dropdownmenu-component-composition-node-6-label"
+        },
+        {
+          "id": "dropdownmenu-component-composition-edge-5",
+          "type": "arrow"
+        },
+        {
+          "id": "dropdownmenu-component-composition-edge-11",
+          "type": "arrow"
+        },
+        {
+          "id": "dropdownmenu-component-composition-edge-12",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "dropdownmenu-component-composition",
+        "node": "dropdownmenuitemlink",
+        "ref": "packages/excalidraw/components/dropdownMenu/DropdownMenuItemLink.tsx"
+      }
+    },
+    {
+      "id": "dropdownmenu-component-composition-node-7",
+      "type": "rectangle",
+      "x": 1740,
+      "y": 1020,
+      "width": 180,
+      "height": 120,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a8",
+      "roundness": null,
+      "seed": 1154527012,
+      "version": 1,
+      "versionNonce": 2068903344,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "dropdownmenu-component-composition-node-7-label"
+        },
+        {
+          "id": "dropdownmenu-component-composition-edge-8",
+          "type": "arrow"
+        },
+        {
+          "id": "dropdownmenu-component-composition-edge-11",
+          "type": "arrow"
+        },
+        {
+          "id": "dropdownmenu-component-composition-edge-15",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "dropdownmenu-component-composition",
+        "node": "dropdownmenuitemcontent",
+        "ref": "packages/excalidraw/components/dropdownMenu/DropdownMenuItemContent.tsx"
+      }
+    },
+    {
+      "id": "dropdownmenu-component-composition-node-8",
+      "type": "rectangle",
+      "x": 600,
+      "y": 440,
+      "width": 160,
+      "height": 100,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a9",
+      "roundness": null,
+      "seed": 825911887,
+      "version": 1,
+      "versionNonce": 1943685417,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "dropdownmenu-component-composition-node-8-label"
+        },
+        {
+          "id": "dropdownmenu-component-composition-edge-6",
+          "type": "arrow"
+        },
+        {
+          "id": "dropdownmenu-component-composition-edge-13",
+          "type": "arrow"
+        },
+        {
+          "id": "dropdownmenu-component-composition-edge-14",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "dropdownmenu-component-composition",
+        "node": "dropdownmenusub",
+        "ref": "packages/excalidraw/components/dropdownMenu/DropdownMenuSub.tsx"
+      }
+    },
+    {
+      "id": "dropdownmenu-component-composition-node-9",
+      "type": "rectangle",
+      "x": 1180,
+      "y": 460,
+      "width": 160,
+      "height": 100,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aA",
+      "roundness": null,
+      "seed": 1433267966,
+      "version": 1,
+      "versionNonce": 973785506,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "dropdownmenu-component-composition-node-9-label"
+        },
+        {
+          "id": "dropdownmenu-component-composition-edge-13",
+          "type": "arrow"
+        },
+        {
+          "id": "dropdownmenu-component-composition-edge-15",
+          "type": "arrow"
+        },
+        {
+          "id": "dropdownmenu-component-composition-edge-16",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "dropdownmenu-component-composition",
+        "node": "dropdownmenusubtrigger",
+        "ref": "packages/excalidraw/components/dropdownMenu/DropdownMenuSubTrigger.tsx"
+      }
+    },
+    {
+      "id": "dropdownmenu-component-composition-node-10",
+      "type": "rectangle",
+      "x": 1180,
+      "y": 300,
+      "width": 160,
+      "height": 80,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aB",
+      "roundness": null,
+      "seed": 1790390152,
+      "version": 1,
+      "versionNonce": 1019829732,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "dropdownmenu-component-composition-node-10-label"
+        },
+        {
+          "id": "dropdownmenu-component-composition-edge-14",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "dropdownmenu-component-composition",
+        "node": "dropdownmenusubcontent",
+        "ref": "packages/excalidraw/components/dropdownMenu/DropdownMenuSubContent.tsx"
+      }
+    },
+    {
+      "id": "dropdownmenu-component-composition-node-11",
+      "type": "rectangle",
+      "x": 1740,
+      "y": 800,
+      "width": 160,
+      "height": 140,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aC",
+      "roundness": null,
+      "seed": 1064322225,
+      "version": 1,
+      "versionNonce": 2058516027,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "dropdownmenu-component-composition-node-11-label"
+        },
+        {
+          "id": "dropdownmenu-component-composition-edge-7",
+          "type": "arrow"
+        },
+        {
+          "id": "dropdownmenu-component-composition-edge-9",
+          "type": "arrow"
+        },
+        {
+          "id": "dropdownmenu-component-composition-edge-12",
+          "type": "arrow"
+        },
+        {
+          "id": "dropdownmenu-component-composition-edge-16",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "dropdownmenu-component-composition",
+        "node": "common",
+        "ref": "packages/excalidraw/components/dropdownMenu/common.ts"
+      }
+    },
+    {
+      "id": "dropdownmenu-component-composition-edge-0",
+      "type": "arrow",
+      "x": 192,
+      "y": 593,
+      "width": 403.20000000000005,
+      "height": 541,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aD",
+      "roundness": null,
+      "seed": 2038641736,
+      "version": 1,
+      "versionNonce": 1248856740,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "dropdownmenu-component-composition-edge-0-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "dropdownmenu-component-composition",
+        "edge": {
+          "from": "dropdownmenu",
+          "to": "dropdownmenutrigger",
+          "claim": "needs"
+        }
+      },
+      "points": [
+        [
+          0.5,
+          0
+        ],
+        [
+          32,
+          0
+        ],
+        [
+          32,
+          -440.1
+        ],
+        [
+          32,
+          -541
+        ],
+        [
+          402.70000000000005,
+          -541
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "dropdownmenu-component-composition-node-0",
+        "focus": -0.725,
+        "gap": 8
+      },
+      "endBinding": {
+        "elementId": "dropdownmenu-component-composition-node-1",
+        "focus": 0.2,
+        "gap": 4.7999999999999545
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "dropdownmenu-component-composition-edge-1",
+      "type": "arrow",
+      "x": 192,
+      "y": 623,
+      "width": 413.20000000000005,
+      "height": 411,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aE",
+      "roundness": null,
+      "seed": 570346353,
+      "version": 1,
+      "versionNonce": 1204071163,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "dropdownmenu-component-composition-edge-1-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "dropdownmenu-component-composition",
+        "edge": {
+          "from": "dropdownmenu",
+          "to": "dropdownmenucontent",
+          "claim": "needs"
+        }
+      },
+      "points": [
+        [
+          0.5,
+          0
+        ],
+        [
+          56,
+          0
+        ],
+        [
+          56,
+          -356.1
+        ],
+        [
+          56,
+          -411
+        ],
+        [
+          412.70000000000005,
+          -411
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "dropdownmenu-component-composition-node-0",
+        "focus": -0.475,
+        "gap": 8
+      },
+      "endBinding": {
+        "elementId": "dropdownmenu-component-composition-node-2",
+        "focus": 0.2,
+        "gap": 5.2000000000000455
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "dropdownmenu-component-composition-edge-2",
+      "type": "arrow",
+      "x": 192,
+      "y": 773,
+      "width": 995.2,
+      "height": 342.79999999999995,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aF",
+      "roundness": null,
+      "seed": 1708969254,
+      "version": 1,
+      "versionNonce": 1320213770,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "dropdownmenu-component-composition-edge-2-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "dropdownmenu-component-composition",
+        "edge": {
+          "from": "dropdownmenu",
+          "to": "dropdownmenuitem",
+          "claim": "needs"
+        }
+      },
+      "points": [
+        [
+          0.5,
+          0
+        ],
+        [
+          32,
+          0
+        ],
+        [
+          32,
+          342.79999999999995
+        ],
+        [
+          326.20000000000005,
+          342.79999999999995
+        ],
+        [
+          493.45000000000005,
+          342.79999999999995
+        ],
+        [
+          660.7,
+          342.79999999999995
+        ],
+        [
+          994.7,
+          342.79999999999995
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "dropdownmenu-component-composition-node-0",
+        "focus": 0.775,
+        "gap": 8
+      },
+      "endBinding": {
+        "elementId": "dropdownmenu-component-composition-node-3",
+        "focus": -0.5159999999999995,
+        "gap": 7.2000000000000455
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "dropdownmenu-component-composition-edge-3",
+      "type": "arrow",
+      "x": 192,
+      "y": 713,
+      "width": 403.20000000000005,
+      "height": 122.79999999999995,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aG",
+      "roundness": null,
+      "seed": 441464695,
+      "version": 1,
+      "versionNonce": 1251295185,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "dropdownmenu-component-composition-edge-3-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "dropdownmenu-component-composition",
+        "edge": {
+          "from": "dropdownmenu",
+          "to": "dropdownmenuitemcheckbox",
+          "claim": "needs"
+        }
+      },
+      "points": [
+        [
+          0.5,
+          0
+        ],
+        [
+          80,
+          0
+        ],
+        [
+          80,
+          122.79999999999995
+        ],
+        [
+          140.20000000000005,
+          122.79999999999995
+        ],
+        [
+          205.95000000000005,
+          122.79999999999995
+        ],
+        [
+          271.70000000000005,
+          122.79999999999995
+        ],
+        [
+          402.70000000000005,
+          122.79999999999995
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "dropdownmenu-component-composition-node-0",
+        "focus": 0.275,
+        "gap": 8
+      },
+      "endBinding": {
+        "elementId": "dropdownmenu-component-composition-node-4",
+        "focus": 0.1050000000000006,
+        "gap": 4.7999999999999545
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "dropdownmenu-component-composition-edge-4",
+      "type": "arrow",
+      "x": 192,
+      "y": 743,
+      "width": 403.20000000000005,
+      "height": 252.79999999999995,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aH",
+      "roundness": null,
+      "seed": 1779408772,
+      "version": 1,
+      "versionNonce": 712205712,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "dropdownmenu-component-composition-edge-4-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "dropdownmenu-component-composition",
+        "edge": {
+          "from": "dropdownmenu",
+          "to": "dropdownmenuitemcustom",
+          "claim": "needs"
+        }
+      },
+      "points": [
+        [
+          0.5,
+          0
+        ],
+        [
+          56,
+          0
+        ],
+        [
+          56,
+          252.79999999999995
+        ],
+        [
+          75.20000000000005,
+          252.79999999999995
+        ],
+        [
+          157.20000000000005,
+          252.79999999999995
+        ],
+        [
+          239.20000000000005,
+          252.79999999999995
+        ],
+        [
+          402.70000000000005,
+          252.79999999999995
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "dropdownmenu-component-composition-node-0",
+        "focus": 0.525,
+        "gap": 8
+      },
+      "endBinding": {
+        "elementId": "dropdownmenu-component-composition-node-5",
+        "focus": 0.10499999999999998,
+        "gap": 4.7999999999999545
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "dropdownmenu-component-composition-edge-5",
+      "type": "arrow",
+      "x": 192,
+      "y": 683,
+      "width": 995.2,
+      "height": 0,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aI",
+      "roundness": null,
+      "seed": 2128749597,
+      "version": 1,
+      "versionNonce": 1057701767,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "dropdownmenu-component-composition-edge-5-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "dropdownmenu-component-composition",
+        "edge": {
+          "from": "dropdownmenu",
+          "to": "dropdownmenuitemlink",
+          "claim": "needs"
+        }
+      },
+      "points": [
+        [
+          0.5,
+          0
+        ],
+        [
+          497.6,
+          0
+        ],
+        [
+          994.7,
+          0
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "dropdownmenu-component-composition-node-0",
+        "focus": 0.025,
+        "gap": 8
+      },
+      "endBinding": {
+        "elementId": "dropdownmenu-component-composition-node-6",
+        "focus": 0.1400000000000004,
+        "gap": 7.2000000000000455
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "dropdownmenu-component-composition-edge-6",
+      "type": "arrow",
+      "x": 192,
+      "y": 653,
+      "width": 416.5333333333334,
+      "height": 166.66666666666663,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aJ",
+      "roundness": null,
+      "seed": 1921524482,
+      "version": 1,
+      "versionNonce": 1794940534,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "dropdownmenu-component-composition-edge-6-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "dropdownmenu-component-composition",
+        "edge": {
+          "from": "dropdownmenu",
+          "to": "dropdownmenusub",
+          "claim": "needs"
+        }
+      },
+      "points": [
+        [
+          0.5,
+          0
+        ],
+        [
+          80,
+          0
+        ],
+        [
+          80,
+          -166.66666666666663
+        ],
+        [
+          124.9333333333334,
+          -166.66666666666663
+        ],
+        [
+          197.83333333333337,
+          -166.66666666666663
+        ],
+        [
+          270.7333333333334,
+          -166.66666666666663
+        ],
+        [
+          416.0333333333334,
+          -166.66666666666663
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "dropdownmenu-component-composition-node-0",
+        "focus": -0.225,
+        "gap": 8
+      },
+      "endBinding": {
+        "elementId": "dropdownmenu-component-composition-node-8",
+        "focus": 0.07333333333333183,
+        "gap": 8.533333333333417
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "dropdownmenu-component-composition-edge-7",
+      "type": "arrow",
+      "x": 765.2,
+      "y": 212,
+      "width": 978.8,
+      "height": 621.8,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aK",
+      "roundness": null,
+      "seed": 1188124595,
+      "version": 1,
+      "versionNonce": 870091917,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "dropdownmenu-component-composition-edge-7-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "dropdownmenu-component-composition",
+        "edge": {
+          "from": "dropdownmenucontent",
+          "to": "common",
+          "claim": "needs"
+        }
+      },
+      "points": [
+        [
+          0.5,
+          0
+        ],
+        [
+          400.14999999999986,
+          0
+        ],
+        [
+          600.2249999999999,
+          0
+        ],
+        [
+          800.3,
+          0
+        ],
+        [
+          946.8,
+          0
+        ],
+        [
+          946.8,
+          621.8
+        ],
+        [
+          978.3,
+          621.8
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "dropdownmenu-component-composition-node-2",
+        "focus": -0.2,
+        "gap": 5.2000000000000455
+      },
+      "endBinding": {
+        "elementId": "dropdownmenu-component-composition-node-11",
+        "focus": 0.5171428571428578,
+        "gap": 4
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "dropdownmenu-component-composition-edge-8",
+      "type": "arrow",
+      "x": 1347.2,
+      "y": 1115.8,
+      "width": 396.79999999999995,
+      "height": 0,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aL",
+      "roundness": null,
+      "seed": 1313284672,
+      "version": 1,
+      "versionNonce": 50463004,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "dropdownmenu-component-composition-edge-8-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "dropdownmenu-component-composition",
+        "edge": {
+          "from": "dropdownmenuitem",
+          "to": "dropdownmenuitemcontent",
+          "claim": "needs"
+        }
+      },
+      "points": [
+        [
+          0.5,
+          0
+        ],
+        [
+          198.39999999999986,
+          0
+        ],
+        [
+          396.29999999999995,
+          0
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "dropdownmenu-component-composition-node-3",
+        "focus": 0.5159999999999995,
+        "gap": 7.2000000000000455
+      },
+      "endBinding": {
+        "elementId": "dropdownmenu-component-composition-node-7",
+        "focus": -0.5966666666666669,
+        "gap": 4
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "dropdownmenu-component-composition-edge-9",
+      "type": "arrow",
+      "x": 1347.2,
+      "y": 1082.4666666666665,
+      "width": 396.79999999999995,
+      "height": 164.66666666666674,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aM",
+      "roundness": null,
+      "seed": 913846665,
+      "version": 1,
+      "versionNonce": 558954515,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "dropdownmenu-component-composition-edge-9-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "dropdownmenu-component-composition",
+        "edge": {
+          "from": "dropdownmenuitem",
+          "to": "common",
+          "claim": "needs"
+        }
+      },
+      "points": [
+        [
+          0.5,
+          0
+        ],
+        [
+          32,
+          2.2737367544323206e-13
+        ],
+        [
+          32,
+          -164.66666666666652
+        ],
+        [
+          116.0666666666666,
+          -164.66666666666652
+        ],
+        [
+          256.43333333333317,
+          -164.66666666666652
+        ],
+        [
+          326.61666666666656,
+          -164.66666666666652
+        ],
+        [
+          396.29999999999995,
+          -164.66666666666652
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "dropdownmenu-component-composition-node-3",
+        "focus": -0.1506666666666834,
+        "gap": 7.2000000000000455
+      },
+      "endBinding": {
+        "elementId": "dropdownmenu-component-composition-node-11",
+        "focus": -0.6828571428571423,
+        "gap": 4
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "dropdownmenu-component-composition-edge-10",
+      "type": "arrow",
+      "x": 775.2,
+      "y": 835.8,
+      "width": 412,
+      "height": 246.66666666666674,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aN",
+      "roundness": null,
+      "seed": 645153389,
+      "version": 1,
+      "versionNonce": 1491559639,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "dropdownmenu-component-composition-edge-10-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "dropdownmenu-component-composition",
+        "edge": {
+          "from": "dropdownmenuitemcheckbox",
+          "to": "dropdownmenuitem",
+          "claim": "needs"
+        }
+      },
+      "points": [
+        [
+          0.5,
+          -0.5
+        ],
+        [
+          304,
+          0
+        ],
+        [
+          304,
+          25.33333333333337
+        ],
+        [
+          304,
+          246.66666666666674
+        ],
+        [
+          411.5,
+          247.16666666666652
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "dropdownmenu-component-composition-node-4",
+        "focus": -0.1050000000000006,
+        "gap": 4.7999999999999545
+      },
+      "endBinding": {
+        "elementId": "dropdownmenu-component-composition-node-3",
+        "focus": 0.15066666666667142,
+        "gap": 7.2000000000000455
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "dropdownmenu-component-composition-edge-11",
+      "type": "arrow",
+      "x": 1347.2,
+      "y": 699.6666666666666,
+      "width": 396.79999999999995,
+      "height": 386.1333333333333,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aO",
+      "roundness": null,
+      "seed": 707817108,
+      "version": 1,
+      "versionNonce": 681794784,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "dropdownmenu-component-composition-edge-11-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "dropdownmenu-component-composition",
+        "edge": {
+          "from": "dropdownmenuitemlink",
+          "to": "dropdownmenuitemcontent",
+          "claim": "needs"
+        }
+      },
+      "points": [
+        [
+          0.5,
+          0
+        ],
+        [
+          268.79999999999995,
+          0
+        ],
+        [
+          268.79999999999995,
+          122.66666666666674
+        ],
+        [
+          268.79999999999995,
+          386.1333333333333
+        ],
+        [
+          396.29999999999995,
+          386.1333333333333
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "dropdownmenu-component-composition-node-6",
+        "focus": 0.19333333333333133,
+        "gap": 7.2000000000000455
+      },
+      "endBinding": {
+        "elementId": "dropdownmenu-component-composition-node-7",
+        "focus": -0.09666666666666679,
+        "gap": 4
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "dropdownmenu-component-composition-edge-12",
+      "type": "arrow",
+      "x": 1347.2,
+      "y": 666.3333333333334,
+      "width": 396.79999999999995,
+      "height": 246.9333333333334,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aP",
+      "roundness": null,
+      "seed": 160783555,
+      "version": 1,
+      "versionNonce": 1216516829,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "dropdownmenu-component-composition-edge-12-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "dropdownmenu-component-composition",
+        "edge": {
+          "from": "dropdownmenuitemlink",
+          "to": "common",
+          "claim": "needs"
+        }
+      },
+      "points": [
+        [
+          0.5,
+          0
+        ],
+        [
+          32,
+          -1.1368683772161603e-13
+        ],
+        [
+          32,
+          -23.46666666666681
+        ],
+        [
+          292.79999999999995,
+          -23.46666666666681
+        ],
+        [
+          292.79999999999995,
+          -6.133333333333439
+        ],
+        [
+          292.79999999999995,
+          51.26666666666654
+        ],
+        [
+          292.79999999999995,
+          108.66666666666663
+        ],
+        [
+          292.79999999999995,
+          223.46666666666658
+        ],
+        [
+          396.29999999999995,
+          223.46666666666658
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "dropdownmenu-component-composition-node-6",
+        "focus": -0.47333333333332345,
+        "gap": 7.2000000000000455
+      },
+      "endBinding": {
+        "elementId": "dropdownmenu-component-composition-node-11",
+        "focus": -0.2828571428571422,
+        "gap": 4
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "dropdownmenu-component-composition-edge-13",
+      "type": "arrow",
+      "x": 768.5333333333334,
+      "y": 503,
+      "width": 418.66666666666663,
+      "height": 0,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aQ",
+      "roundness": null,
+      "seed": 1968002642,
+      "version": 1,
+      "versionNonce": 280038790,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "dropdownmenu-component-composition-edge-13-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "dropdownmenu-component-composition",
+        "edge": {
+          "from": "dropdownmenusub",
+          "to": "dropdownmenusubtrigger",
+          "claim": "needs"
+        }
+      },
+      "points": [
+        [
+          0.5,
+          0
+        ],
+        [
+          209.33333333333337,
+          0
+        ],
+        [
+          418.16666666666663,
+          0
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "dropdownmenu-component-composition-node-8",
+        "focus": 0.25999999999999956,
+        "gap": 8.533333333333417
+      },
+      "endBinding": {
+        "elementId": "dropdownmenu-component-composition-node-9",
+        "focus": 0.1400000000000004,
+        "gap": 7.2000000000000455
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "dropdownmenu-component-composition-edge-14",
+      "type": "arrow",
+      "x": 768.5333333333334,
+      "y": 469.6666666666667,
+      "width": 418.66666666666663,
+      "height": 136.66666666666674,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aR",
+      "roundness": null,
+      "seed": 274993345,
+      "version": 1,
+      "versionNonce": 1284628747,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "dropdownmenu-component-composition-edge-14-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "dropdownmenu-component-composition",
+        "edge": {
+          "from": "dropdownmenusub",
+          "to": "dropdownmenusubcontent",
+          "claim": "needs"
+        }
+      },
+      "points": [
+        [
+          0.5,
+          0
+        ],
+        [
+          38.66666666666663,
+          5.684341886080802e-14
+        ],
+        [
+          38.66666666666663,
+          -136.66666666666669
+        ],
+        [
+          140.9999999999999,
+          -136.66666666666669
+        ],
+        [
+          210.41666666666663,
+          -136.66666666666669
+        ],
+        [
+          279.83333333333337,
+          -136.66666666666669
+        ],
+        [
+          418.16666666666663,
+          -136.66666666666669
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "dropdownmenu-component-composition-node-8",
+        "focus": -0.4066666666666677,
+        "gap": 8.533333333333417
+      },
+      "endBinding": {
+        "elementId": "dropdownmenu-component-composition-node-10",
+        "focus": 0.175,
+        "gap": 7.2000000000000455
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "dropdownmenu-component-composition-edge-15",
+      "type": "arrow",
+      "x": 1347.2,
+      "y": 519.6666666666666,
+      "width": 396.79999999999995,
+      "height": 536.1333333333333,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aS",
+      "roundness": null,
+      "seed": 2084349976,
+      "version": 1,
+      "versionNonce": 1475466484,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "dropdownmenu-component-composition-edge-15-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "dropdownmenu-component-composition",
+        "edge": {
+          "from": "dropdownmenusubtrigger",
+          "to": "dropdownmenuitemcontent",
+          "claim": "needs"
+        }
+      },
+      "points": [
+        [
+          0.5,
+          0
+        ],
+        [
+          316.79999999999995,
+          1.1368683772161603e-13
+        ],
+        [
+          316.79999999999995,
+          149.66666666666674
+        ],
+        [
+          316.79999999999995,
+          536.1333333333333
+        ],
+        [
+          396.29999999999995,
+          536.1333333333333
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "dropdownmenu-component-composition-node-9",
+        "focus": 0.1933333333333334,
+        "gap": 7.2000000000000455
+      },
+      "endBinding": {
+        "elementId": "dropdownmenu-component-composition-node-7",
+        "focus": 0.4033333333333332,
+        "gap": 4
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "dropdownmenu-component-composition-edge-16",
+      "type": "arrow",
+      "x": 1347.2,
+      "y": 486.3333333333333,
+      "width": 396.79999999999995,
+      "height": 398.93333333333317,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aT",
+      "roundness": null,
+      "seed": 1551367879,
+      "version": 1,
+      "versionNonce": 524004065,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "dropdownmenu-component-composition-edge-16-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "dropdownmenu-component-composition",
+        "edge": {
+          "from": "dropdownmenusubtrigger",
+          "to": "common",
+          "claim": "needs"
+        }
+      },
+      "points": [
+        [
+          0.5,
+          0
+        ],
+        [
+          32,
+          5.684341886080802e-14
+        ],
+        [
+          32,
+          -23.466666666666526
+        ],
+        [
+          340.79999999999995,
+          -23.466666666666526
+        ],
+        [
+          340.79999999999995,
+          21.866666666666788
+        ],
+        [
+          340.79999999999995,
+          198.66666666666669
+        ],
+        [
+          340.79999999999995,
+          287.06666666666666
+        ],
+        [
+          340.79999999999995,
+          375.46666666666664
+        ],
+        [
+          396.29999999999995,
+          375.46666666666664
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "dropdownmenu-component-composition-node-9",
+        "focus": -0.47333333333333477,
+        "gap": 7.2000000000000455
+      },
+      "endBinding": {
+        "elementId": "dropdownmenu-component-composition-node-11",
+        "focus": 0.1171428571428578,
+        "gap": 4
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "dropdownmenu-component-composition-node-0-label",
+      "type": "text",
+      "x": 44,
+      "y": 667.5,
+      "width": 132,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aU",
+      "roundness": null,
+      "seed": 1486179602,
+      "version": 1,
+      "versionNonce": 2134124870,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "dropdownmenu-component-composition"
+      },
+      "text": "DropdownMenu",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "dropdownmenu-component-composition-node-0",
+      "originalText": "DropdownMenu",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "dropdownmenu-component-composition-node-1-label",
+      "type": "text",
+      "x": 641.5,
+      "y": 47.5,
+      "width": 77,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aV",
+      "roundness": null,
+      "seed": 1359772599,
+      "version": 1,
+      "versionNonce": 2055290897,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "dropdownmenu-component-composition"
+      },
+      "text": "Trigger",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "dropdownmenu-component-composition-node-1",
+      "originalText": "Trigger",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "dropdownmenu-component-composition-node-2-label",
+      "type": "text",
+      "x": 641.5,
+      "y": 207.5,
+      "width": 77,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aW",
+      "roundness": null,
+      "seed": 1242830056,
+      "version": 1,
+      "versionNonce": 2080823492,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "dropdownmenu-component-composition"
+      },
+      "text": "Content",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "dropdownmenu-component-composition-node-2",
+      "originalText": "Content",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "dropdownmenu-component-composition-node-3-label",
+      "type": "text",
+      "x": 1238,
+      "y": 1077.5,
+      "width": 44,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aX",
+      "roundness": null,
+      "seed": 2077477685,
+      "version": 1,
+      "versionNonce": 1576320447,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "dropdownmenu-component-composition"
+      },
+      "text": "Item",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "dropdownmenu-component-composition-node-3",
+      "originalText": "Item",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "dropdownmenu-component-composition-node-4-label",
+      "type": "text",
+      "x": 624,
+      "y": 827.5,
+      "width": 132,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aY",
+      "roundness": null,
+      "seed": 895761582,
+      "version": 1,
+      "versionNonce": 1287807442,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "dropdownmenu-component-composition"
+      },
+      "text": "ItemCheckbox",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "dropdownmenu-component-composition-node-4",
+      "originalText": "ItemCheckbox",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "dropdownmenu-component-composition-node-5-label",
+      "type": "text",
+      "x": 625,
+      "y": 987.5,
+      "width": 110.00000000000001,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aZ",
+      "roundness": null,
+      "seed": 2096663299,
+      "version": 1,
+      "versionNonce": 1466449949,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "dropdownmenu-component-composition"
+      },
+      "text": "ItemCustom",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "dropdownmenu-component-composition-node-5",
+      "originalText": "ItemCustom",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "dropdownmenu-component-composition-node-6-label",
+      "type": "text",
+      "x": 1216,
+      "y": 677.5,
+      "width": 88,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aa",
+      "roundness": null,
+      "seed": 1660061812,
+      "version": 1,
+      "versionNonce": 573734208,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "dropdownmenu-component-composition"
+      },
+      "text": "ItemLink",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "dropdownmenu-component-composition-node-6",
+      "originalText": "ItemLink",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "dropdownmenu-component-composition-node-7-label",
+      "type": "text",
+      "x": 1769.5,
+      "y": 1067.5,
+      "width": 121.00000000000001,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "ab",
+      "roundness": null,
+      "seed": 990167729,
+      "version": 1,
+      "versionNonce": 91541563,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "dropdownmenu-component-composition"
+      },
+      "text": "ItemContent",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "dropdownmenu-component-composition-node-7",
+      "originalText": "ItemContent",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "dropdownmenu-component-composition-node-8-label",
+      "type": "text",
+      "x": 663.5,
+      "y": 477.5,
+      "width": 33,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "ac",
+      "roundness": null,
+      "seed": 1878285978,
+      "version": 1,
+      "versionNonce": 818922350,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "dropdownmenu-component-composition"
+      },
+      "text": "Sub",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "dropdownmenu-component-composition-node-8",
+      "originalText": "Sub",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "dropdownmenu-component-composition-node-9-label",
+      "type": "text",
+      "x": 1205,
+      "y": 497.5,
+      "width": 110.00000000000001,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "ad",
+      "roundness": null,
+      "seed": 886431583,
+      "version": 1,
+      "versionNonce": 385222137,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "dropdownmenu-component-composition"
+      },
+      "text": "SubTrigger",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "dropdownmenu-component-composition-node-9",
+      "originalText": "SubTrigger",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "dropdownmenu-component-composition-node-10-label",
+      "type": "text",
+      "x": 1205,
+      "y": 327.5,
+      "width": 110.00000000000001,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "ae",
+      "roundness": null,
+      "seed": 1326364245,
+      "version": 1,
+      "versionNonce": 1836655711,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "dropdownmenu-component-composition"
+      },
+      "text": "SubContent",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "dropdownmenu-component-composition-node-10",
+      "originalText": "SubContent",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "dropdownmenu-component-composition-node-11-label",
+      "type": "text",
+      "x": 1787,
+      "y": 857.5,
+      "width": 66,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "af",
+      "roundness": null,
+      "seed": 2083238280,
+      "version": 1,
+      "versionNonce": 926024676,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "dropdownmenu-component-composition"
+      },
+      "text": "common",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "dropdownmenu-component-composition-node-11",
+      "originalText": "common",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "dropdownmenu-component-composition-edge-0-label",
+      "type": "text",
+      "x": 162.39999999999998,
+      "y": 142.89999999999998,
+      "width": 123.20000000000002,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "ag",
+      "roundness": null,
+      "seed": 75742613,
+      "version": 1,
+      "versionNonce": 720351135,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "dropdownmenu-component-composition"
+      },
+      "text": "exports @needs",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "dropdownmenu-component-composition-edge-0",
+      "originalText": "exports @needs",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "dropdownmenu-component-composition-edge-1-label",
+      "type": "text",
+      "x": 186.39999999999998,
+      "y": 256.9,
+      "width": 123.20000000000002,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "ah",
+      "roundness": null,
+      "seed": 707838920,
+      "version": 1,
+      "versionNonce": 1806233892,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "dropdownmenu-component-composition"
+      },
+      "text": "exports @needs",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "dropdownmenu-component-composition-edge-1",
+      "originalText": "exports @needs",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "dropdownmenu-component-composition-edge-2-label",
+      "type": "text",
+      "x": 456.6,
+      "y": 1105.8,
+      "width": 123.20000000000002,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "ai",
+      "roundness": null,
+      "seed": 168381463,
+      "version": 1,
+      "versionNonce": 608082673,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "dropdownmenu-component-composition"
+      },
+      "text": "exports @needs",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "dropdownmenu-component-composition-edge-2",
+      "originalText": "exports @needs",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "dropdownmenu-component-composition-edge-3-label",
+      "type": "text",
+      "x": 270.6,
+      "y": 825.8,
+      "width": 123.20000000000002,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aj",
+      "roundness": null,
+      "seed": 1285382386,
+      "version": 1,
+      "versionNonce": 930238886,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "dropdownmenu-component-composition"
+      },
+      "text": "exports @needs",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "dropdownmenu-component-composition-edge-3",
+      "originalText": "exports @needs",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "dropdownmenu-component-composition-edge-4-label",
+      "type": "text",
+      "x": 205.60000000000002,
+      "y": 985.8,
+      "width": 123.20000000000002,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "ak",
+      "roundness": null,
+      "seed": 1971012881,
+      "version": 1,
+      "versionNonce": 772043291,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "dropdownmenu-component-composition"
+      },
+      "text": "exports @needs",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "dropdownmenu-component-composition-edge-4",
+      "originalText": "exports @needs",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "dropdownmenu-component-composition-edge-5-label",
+      "type": "text",
+      "x": 628,
+      "y": 673,
+      "width": 123.20000000000002,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "al",
+      "roundness": null,
+      "seed": 1778806484,
+      "version": 1,
+      "versionNonce": 2102974240,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "dropdownmenu-component-composition"
+      },
+      "text": "exports @needs",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "dropdownmenu-component-composition-edge-5",
+      "originalText": "exports @needs",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "dropdownmenu-component-composition-edge-6-label",
+      "type": "text",
+      "x": 255.33333333333337,
+      "y": 476.33333333333337,
+      "width": 123.20000000000002,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "am",
+      "roundness": null,
+      "seed": 760001891,
+      "version": 1,
+      "versionNonce": 1604864253,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "dropdownmenu-component-composition"
+      },
+      "text": "exports @needs",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "dropdownmenu-component-composition-edge-6",
+      "originalText": "exports @needs",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "dropdownmenu-component-composition-edge-7-label",
+      "type": "text",
+      "x": 1539.1,
+      "y": 202,
+      "width": 52.800000000000004,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "an",
+      "roundness": null,
+      "seed": 1014506254,
+      "version": 1,
+      "versionNonce": 1691836082,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "dropdownmenu-component-composition"
+      },
+      "text": "@needs",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "dropdownmenu-component-composition-edge-7",
+      "originalText": "@needs",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "dropdownmenu-component-composition-edge-8-label",
+      "type": "text",
+      "x": 1497.1999999999998,
+      "y": 1105.8,
+      "width": 96.80000000000001,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "ao",
+      "roundness": null,
+      "seed": 1560896413,
+      "version": 1,
+      "versionNonce": 1993618951,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "dropdownmenu-component-composition"
+      },
+      "text": "uses @needs",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "dropdownmenu-component-composition-edge-8",
+      "originalText": "uses @needs",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "dropdownmenu-component-composition-edge-9-label",
+      "type": "text",
+      "x": 1436.8666666666666,
+      "y": 907.8,
+      "width": 52.800000000000004,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "ap",
+      "roundness": null,
+      "seed": 1161687504,
+      "version": 1,
+      "versionNonce": 530015404,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "dropdownmenu-component-composition"
+      },
+      "text": "@needs",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "dropdownmenu-component-composition-edge-9",
+      "originalText": "@needs",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "dropdownmenu-component-composition-edge-10-label",
+      "type": "text",
+      "x": 1026.4,
+      "y": 851.1333333333333,
+      "width": 105.60000000000001,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aq",
+      "roundness": null,
+      "seed": 310180516,
+      "version": 1,
+      "versionNonce": 1099681840,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "dropdownmenu-component-composition"
+      },
+      "text": "wraps @needs",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "dropdownmenu-component-composition-edge-10",
+      "originalText": "wraps @needs",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "dropdownmenu-component-composition-edge-11-label",
+      "type": "text",
+      "x": 1567.6,
+      "y": 812.3333333333334,
+      "width": 96.80000000000001,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "ar",
+      "roundness": null,
+      "seed": 653566049,
+      "version": 1,
+      "versionNonce": 882769451,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "dropdownmenu-component-composition"
+      },
+      "text": "uses @needs",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "dropdownmenu-component-composition-edge-11",
+      "originalText": "uses @needs",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "dropdownmenu-component-composition-edge-12-label",
+      "type": "text",
+      "x": 1613.6,
+      "y": 650.1999999999999,
+      "width": 52.800000000000004,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "as",
+      "roundness": null,
+      "seed": 2010999774,
+      "version": 1,
+      "versionNonce": 685340674,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "dropdownmenu-component-composition"
+      },
+      "text": "@needs",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "dropdownmenu-component-composition-edge-12",
+      "originalText": "@needs",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "dropdownmenu-component-composition-edge-13-label",
+      "type": "text",
+      "x": 911.8666666666668,
+      "y": 493,
+      "width": 132,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "at",
+      "roundness": null,
+      "seed": 399951859,
+      "version": 1,
+      "versionNonce": 31842509,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "dropdownmenu-component-composition"
+      },
+      "text": "contains @needs",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "dropdownmenu-component-composition-edge-13",
+      "originalText": "contains @needs",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "dropdownmenu-component-composition-edge-14-label",
+      "type": "text",
+      "x": 843.5333333333333,
+      "y": 323,
+      "width": 132,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "au",
+      "roundness": null,
+      "seed": 1213717912,
+      "version": 1,
+      "versionNonce": 650579316,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "dropdownmenu-component-composition"
+      },
+      "text": "contains @needs",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "dropdownmenu-component-composition-edge-14",
+      "originalText": "contains @needs",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "dropdownmenu-component-composition-edge-15-label",
+      "type": "text",
+      "x": 1615.6,
+      "y": 659.3333333333334,
+      "width": 96.80000000000001,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "av",
+      "roundness": null,
+      "seed": 337591909,
+      "version": 1,
+      "versionNonce": 749981423,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "dropdownmenu-component-composition"
+      },
+      "text": "uses @needs",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "dropdownmenu-component-composition-edge-15",
+      "originalText": "uses @needs",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "dropdownmenu-component-composition-edge-16-label",
+      "type": "text",
+      "x": 1661.6,
+      "y": 498.2000000000001,
+      "width": 52.800000000000004,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aw",
+      "roundness": null,
+      "seed": 63307202,
+      "version": 1,
+      "versionNonce": 1714257206,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "dropdownmenu-component-composition"
+      },
+      "text": "@needs",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "dropdownmenu-component-composition-edge-16",
+      "originalText": "@needs",
+      "autoResize": true,
+      "lineHeight": 1.25
+    }
+  ],
+  "appState": {
+    "gridSize": null,
+    "viewBackgroundColor": "#ffffff"
+  },
+  "files": {},
+  "diagramos": {
+    "version": "0.2.0-rc.6",
+    "schema": 1
+  }
+}

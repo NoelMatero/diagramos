@@ -1,0 +1,2056 @@
+{
+  "type": "excalidraw",
+  "version": 2,
+  "source": "diagramos",
+  "elements": [
+    {
+      "id": "vite-ssr-transform-and-module-loading-pi-title",
+      "type": "text",
+      "x": 0,
+      "y": -115,
+      "width": 607.2,
+      "height": 30,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a0",
+      "roundness": null,
+      "seed": 999483429,
+      "version": 1,
+      "versionNonce": 89024687,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "vite-ssr-transform-and-module-loading-pi",
+        "role": "title"
+      },
+      "text": "Vite SSR Transform and Module Loading Pipeline",
+      "fontSize": 24,
+      "fontFamily": 5,
+      "textAlign": "left",
+      "verticalAlign": "middle",
+      "containerId": null,
+      "originalText": "Vite SSR Transform and Module Loading Pipeline",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "vite-ssr-transform-and-module-loading-pi-node-0",
+      "type": "rectangle",
+      "x": 580,
+      "y": 20,
+      "width": 180,
+      "height": 120,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a1",
+      "roundness": null,
+      "seed": 1436284428,
+      "version": 1,
+      "versionNonce": 738476504,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "vite-ssr-transform-and-module-loading-pi-node-0-label"
+        },
+        {
+          "id": "vite-ssr-transform-and-module-loading-pi-edge-0",
+          "type": "arrow"
+        },
+        {
+          "id": "vite-ssr-transform-and-module-loading-pi-edge-1",
+          "type": "arrow"
+        },
+        {
+          "id": "vite-ssr-transform-and-module-loading-pi-edge-2",
+          "type": "arrow"
+        },
+        {
+          "id": "vite-ssr-transform-and-module-loading-pi-edge-3",
+          "type": "arrow"
+        },
+        {
+          "id": "vite-ssr-transform-and-module-loading-pi-edge-8",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "vite-ssr-transform-and-module-loading-pi",
+        "node": "transform",
+        "ref": "packages/vite/src/node/ssr/ssrTransform.ts#ssrTransform"
+      }
+    },
+    {
+      "id": "vite-ssr-transform-and-module-loading-pi-node-1",
+      "type": "rectangle",
+      "x": 1120,
+      "y": 20,
+      "width": 260,
+      "height": 80,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a2",
+      "roundness": null,
+      "seed": 1576173605,
+      "version": 1,
+      "versionNonce": 566931631,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "vite-ssr-transform-and-module-loading-pi-node-1-label"
+        },
+        {
+          "id": "vite-ssr-transform-and-module-loading-pi-edge-0",
+          "type": "arrow"
+        },
+        {
+          "id": "vite-ssr-transform-and-module-loading-pi-edge-2",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "vite-ssr-transform-and-module-loading-pi",
+        "node": "transform_script",
+        "ref": "packages/vite/src/node/ssr/ssrTransform.ts#ssrTransformScript"
+      }
+    },
+    {
+      "id": "vite-ssr-transform-and-module-loading-pi-node-2",
+      "type": "rectangle",
+      "x": 1120,
+      "y": 180,
+      "width": 240,
+      "height": 80,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a3",
+      "roundness": null,
+      "seed": 422057802,
+      "version": 1,
+      "versionNonce": 1728524702,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "vite-ssr-transform-and-module-loading-pi-node-2-label"
+        },
+        {
+          "id": "vite-ssr-transform-and-module-loading-pi-edge-1",
+          "type": "arrow"
+        },
+        {
+          "id": "vite-ssr-transform-and-module-loading-pi-edge-3",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "vite-ssr-transform-and-module-loading-pi",
+        "node": "transform_json",
+        "ref": "packages/vite/src/node/ssr/ssrTransform.ts#ssrTransformJSON"
+      }
+    },
+    {
+      "id": "vite-ssr-transform-and-module-loading-pi-node-3",
+      "type": "rectangle",
+      "x": 20,
+      "y": 440,
+      "width": 200,
+      "height": 80,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a4",
+      "roundness": null,
+      "seed": 1183876763,
+      "version": 1,
+      "versionNonce": 1043494037,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "vite-ssr-transform-and-module-loading-pi-node-3-label"
+        },
+        {
+          "id": "vite-ssr-transform-and-module-loading-pi-edge-4",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "vite-ssr-transform-and-module-loading-pi",
+        "node": "load_module",
+        "ref": "packages/vite/src/node/ssr/ssrModuleLoader.ts#ssrLoadModule"
+      }
+    },
+    {
+      "id": "vite-ssr-transform-and-module-loading-pi-node-4",
+      "type": "rectangle",
+      "x": 540,
+      "y": 440,
+      "width": 240,
+      "height": 80,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a5",
+      "roundness": null,
+      "seed": 963632528,
+      "version": 1,
+      "versionNonce": 263852908,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "vite-ssr-transform-and-module-loading-pi-node-4-label"
+        },
+        {
+          "id": "vite-ssr-transform-and-module-loading-pi-edge-4",
+          "type": "arrow"
+        },
+        {
+          "id": "vite-ssr-transform-and-module-loading-pi-edge-5",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "vite-ssr-transform-and-module-loading-pi",
+        "node": "instantiate",
+        "ref": "packages/vite/src/node/ssr/ssrModuleLoader.ts#instantiateModule"
+      }
+    },
+    {
+      "id": "vite-ssr-transform-and-module-loading-pi-node-5",
+      "type": "rectangle",
+      "x": 1140,
+      "y": 300,
+      "width": 280,
+      "height": 120,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a6",
+      "roundness": null,
+      "seed": 234661529,
+      "version": 1,
+      "versionNonce": 2008259811,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "vite-ssr-transform-and-module-loading-pi-node-5-label"
+        },
+        {
+          "id": "vite-ssr-transform-and-module-loading-pi-edge-5",
+          "type": "arrow"
+        },
+        {
+          "id": "vite-ssr-transform-and-module-loading-pi-edge-6",
+          "type": "arrow"
+        },
+        {
+          "id": "vite-ssr-transform-and-module-loading-pi-edge-7",
+          "type": "arrow"
+        },
+        {
+          "id": "vite-ssr-transform-and-module-loading-pi-edge-9",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "vite-ssr-transform-and-module-loading-pi",
+        "node": "compat_runner",
+        "ref": "packages/vite/src/node/ssr/ssrModuleLoader.ts#SSRCompatModuleRunner"
+      }
+    },
+    {
+      "id": "vite-ssr-transform-and-module-loading-pi-node-6",
+      "type": "rectangle",
+      "x": 600,
+      "y": 600,
+      "width": 180,
+      "height": 80,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a7",
+      "roundness": null,
+      "seed": 1984024110,
+      "version": 1,
+      "versionNonce": 1770942034,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "vite-ssr-transform-and-module-loading-pi-node-6-label"
+        },
+        {
+          "id": "vite-ssr-transform-and-module-loading-pi-edge-6",
+          "type": "arrow"
+        },
+        {
+          "id": "vite-ssr-transform-and-module-loading-pi-edge-7",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "vite-ssr-transform-and-module-loading-pi",
+        "node": "fetch_module",
+        "ref": "packages/vite/src/node/ssr/fetchModule.ts#fetchModule"
+      }
+    },
+    {
+      "id": "vite-ssr-transform-and-module-loading-pi-node-7",
+      "type": "rectangle",
+      "x": 20,
+      "y": 40,
+      "width": 240,
+      "height": 80,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a8",
+      "roundness": null,
+      "seed": 1513939135,
+      "version": 1,
+      "versionNonce": 404591833,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "vite-ssr-transform-and-module-loading-pi-node-7-label"
+        },
+        {
+          "id": "vite-ssr-transform-and-module-loading-pi-edge-8",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "vite-ssr-transform-and-module-loading-pi",
+        "node": "manifest_plugin",
+        "ref": "packages/vite/src/node/ssr/ssrManifestPlugin.ts#ssrManifestPlugin"
+      }
+    },
+    {
+      "id": "vite-ssr-transform-and-module-loading-pi-node-8",
+      "type": "rectangle",
+      "x": 600,
+      "y": 280,
+      "width": 180,
+      "height": 80,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a9",
+      "roundness": null,
+      "seed": 260294612,
+      "version": 1,
+      "versionNonce": 28045856,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "vite-ssr-transform-and-module-loading-pi-node-8-label"
+        },
+        {
+          "id": "vite-ssr-transform-and-module-loading-pi-edge-9",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "vite-ssr-transform-and-module-loading-pi",
+        "node": "runner_import",
+        "ref": "packages/vite/src/node/ssr/runnerImport.ts#runnerImport"
+      }
+    },
+    {
+      "id": "vite-ssr-transform-and-module-loading-pi-edge-0",
+      "type": "arrow",
+      "x": 764.8,
+      "y": 67.8,
+      "width": 350.39999999999986,
+      "height": 2.6666666666666714,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aA",
+      "roundness": null,
+      "seed": 1650093955,
+      "version": 1,
+      "versionNonce": 1887630749,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "vite-ssr-transform-and-module-loading-pi-edge-0-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "vite-ssr-transform-and-module-loading-pi",
+        "edge": {
+          "from": "transform",
+          "to": "transform_script",
+          "claim": "calls"
+        }
+      },
+      "points": [
+        [
+          0.5,
+          0
+        ],
+        [
+          32,
+          0
+        ],
+        [
+          32,
+          1
+        ],
+        [
+          175.5333333333333,
+          1
+        ],
+        [
+          242.39999999999998,
+          1
+        ],
+        [
+          242.39999999999998,
+          2.6666666666666714
+        ],
+        [
+          349.89999999999986,
+          2.6666666666666714
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "vite-ssr-transform-and-module-loading-pi-node-0",
+        "focus": -0.20333333333333298,
+        "gap": 4.7999999999999545
+      },
+      "endBinding": {
+        "elementId": "vite-ssr-transform-and-module-loading-pi-node-1",
+        "focus": -0.2616666666666666,
+        "gap": 4.800000000000182
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "vite-ssr-transform-and-module-loading-pi-edge-1",
+      "type": "arrow",
+      "x": 764.8,
+      "y": 115.8,
+      "width": 350.39999999999986,
+      "height": 114.66666666666667,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aB",
+      "roundness": null,
+      "seed": 885371922,
+      "version": 1,
+      "versionNonce": 526798406,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "vite-ssr-transform-and-module-loading-pi-edge-1-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "vite-ssr-transform-and-module-loading-pi",
+        "edge": {
+          "from": "transform",
+          "to": "transform_json",
+          "claim": "calls"
+        }
+      },
+      "points": [
+        [
+          0.5,
+          0
+        ],
+        [
+          32,
+          0
+        ],
+        [
+          32,
+          113.00000000000001
+        ],
+        [
+          119.53333333333319,
+          113.00000000000001
+        ],
+        [
+          242.39999999999998,
+          113.00000000000001
+        ],
+        [
+          242.39999999999998,
+          114.66666666666667
+        ],
+        [
+          349.89999999999986,
+          114.66666666666667
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "vite-ssr-transform-and-module-loading-pi-node-0",
+        "focus": 0.596666666666667,
+        "gap": 4.7999999999999545
+      },
+      "endBinding": {
+        "elementId": "vite-ssr-transform-and-module-loading-pi-node-2",
+        "focus": -0.2616666666666673,
+        "gap": 4.800000000000182
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "vite-ssr-transform-and-module-loading-pi-edge-2",
+      "type": "arrow",
+      "x": 1115.1999999999998,
+      "y": 43.8,
+      "width": 350.39999999999986,
+      "height": 0,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aC",
+      "roundness": null,
+      "seed": 2134360621,
+      "version": 1,
+      "versionNonce": 1462022807,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "vite-ssr-transform-and-module-loading-pi-edge-2-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "vite-ssr-transform-and-module-loading-pi",
+        "edge": {
+          "from": "transform_script",
+          "to": "transform",
+          "claim": "returns"
+        }
+      },
+      "points": [
+        [
+          -0.5,
+          0
+        ],
+        [
+          -175.19999999999993,
+          0
+        ],
+        [
+          -349.89999999999986,
+          0
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "vite-ssr-transform-and-module-loading-pi-node-1",
+        "focus": 0.4050000000000007,
+        "gap": 4.800000000000182
+      },
+      "endBinding": {
+        "elementId": "vite-ssr-transform-and-module-loading-pi-node-0",
+        "focus": -0.603333333333333,
+        "gap": 4.7999999999999545
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "vite-ssr-transform-and-module-loading-pi-edge-3",
+      "type": "arrow",
+      "x": 1115.1999999999998,
+      "y": 203.79999999999998,
+      "width": 350.39999999999986,
+      "height": 112.00000000000001,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aD",
+      "roundness": null,
+      "seed": 1071916116,
+      "version": 1,
+      "versionNonce": 693997472,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "vite-ssr-transform-and-module-loading-pi-edge-3-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "vite-ssr-transform-and-module-loading-pi",
+        "edge": {
+          "from": "transform_json",
+          "to": "transform",
+          "claim": "returns"
+        }
+      },
+      "points": [
+        [
+          -0.5,
+          0
+        ],
+        [
+          -115.59999999999991,
+          2.842170943040401e-14
+        ],
+        [
+          -173.39999999999986,
+          2.842170943040401e-14
+        ],
+        [
+          -231.19999999999993,
+          2.842170943040401e-14
+        ],
+        [
+          -294.39999999999986,
+          2.842170943040401e-14
+        ],
+        [
+          -294.39999999999986,
+          -111.99999999999999
+        ],
+        [
+          -349.89999999999986,
+          -111.99999999999999
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "vite-ssr-transform-and-module-loading-pi-node-2",
+        "focus": 0.4050000000000011,
+        "gap": 4.800000000000182
+      },
+      "endBinding": {
+        "elementId": "vite-ssr-transform-and-module-loading-pi-node-0",
+        "focus": 0.196666666666667,
+        "gap": 4.7999999999999545
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "vite-ssr-transform-and-module-loading-pi-edge-4",
+      "type": "arrow",
+      "x": 212,
+      "y": 481.6,
+      "width": 332.79999999999995,
+      "height": 0,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aE",
+      "roundness": null,
+      "seed": 934668167,
+      "version": 1,
+      "versionNonce": 1195221153,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "vite-ssr-transform-and-module-loading-pi-edge-4-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "vite-ssr-transform-and-module-loading-pi",
+        "edge": {
+          "from": "load_module",
+          "to": "instantiate",
+          "claim": "calls"
+        }
+      },
+      "points": [
+        [
+          0.5,
+          0
+        ],
+        [
+          166.39999999999998,
+          0
+        ],
+        [
+          332.29999999999995,
+          0
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "vite-ssr-transform-and-module-loading-pi-node-3",
+        "focus": 0.040000000000000084,
+        "gap": 8
+      },
+      "endBinding": {
+        "elementId": "vite-ssr-transform-and-module-loading-pi-node-4",
+        "focus": -0.039999999999999716,
+        "gap": 4.7999999999999545
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "vite-ssr-transform-and-module-loading-pi-edge-5",
+      "type": "arrow",
+      "x": 784.8,
+      "y": 481.6,
+      "width": 350.39999999999986,
+      "height": 136,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aF",
+      "roundness": null,
+      "seed": 1746584310,
+      "version": 1,
+      "versionNonce": 1651556954,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "vite-ssr-transform-and-module-loading-pi-edge-5-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "vite-ssr-transform-and-module-loading-pi",
+        "edge": {
+          "from": "instantiate",
+          "to": "compat_runner",
+          "claim": "calls"
+        }
+      },
+      "points": [
+        [
+          0.5,
+          0
+        ],
+        [
+          242.39999999999986,
+          0
+        ],
+        [
+          242.39999999999986,
+          -0.8000000000000682
+        ],
+        [
+          242.39999999999986,
+          -136
+        ],
+        [
+          349.89999999999986,
+          -136
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "vite-ssr-transform-and-module-loading-pi-node-4",
+        "focus": 0.039999999999999716,
+        "gap": 4.7999999999999545
+      },
+      "endBinding": {
+        "elementId": "vite-ssr-transform-and-module-loading-pi-node-5",
+        "focus": 0.23999999999999935,
+        "gap": 4.800000000000182
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "vite-ssr-transform-and-module-loading-pi-edge-6",
+      "type": "arrow",
+      "x": 1135.1999999999998,
+      "y": 369.6,
+      "width": 350.39999999999986,
+      "height": 258.66666666666663,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aG",
+      "roundness": null,
+      "seed": 1063446657,
+      "version": 1,
+      "versionNonce": 596077515,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "vite-ssr-transform-and-module-loading-pi-edge-6-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "vite-ssr-transform-and-module-loading-pi",
+        "edge": {
+          "from": "compat_runner",
+          "to": "fetch_module",
+          "claim": "calls"
+        }
+      },
+      "points": [
+        [
+          -0.5,
+          0
+        ],
+        [
+          -84,
+          0
+        ],
+        [
+          -84,
+          220.5333333333332
+        ],
+        [
+          -84,
+          258.66666666666663
+        ],
+        [
+          -349.89999999999986,
+          258.66666666666663
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "vite-ssr-transform-and-module-loading-pi-node-5",
+        "focus": -0.16000000000000061,
+        "gap": 4.800000000000182
+      },
+      "endBinding": {
+        "elementId": "vite-ssr-transform-and-module-loading-pi-node-6",
+        "focus": -0.29333333333333317,
+        "gap": 4.7999999999999545
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "vite-ssr-transform-and-module-loading-pi-edge-7",
+      "type": "arrow",
+      "x": 784.8,
+      "y": 654.9333333333334,
+      "width": 350.39999999999986,
+      "height": 261.33333333333337,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aH",
+      "roundness": null,
+      "seed": 259388632,
+      "version": 1,
+      "versionNonce": 1063211700,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "vite-ssr-transform-and-module-loading-pi-edge-7-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "vite-ssr-transform-and-module-loading-pi",
+        "edge": {
+          "from": "fetch_module",
+          "to": "compat_runner",
+          "claim": "returns"
+        }
+      },
+      "points": [
+        [
+          0.5,
+          0
+        ],
+        [
+          32,
+          0
+        ],
+        [
+          32,
+          -1.6666666666667425
+        ],
+        [
+          290.39999999999986,
+          -1.6666666666667425
+        ],
+        [
+          290.39999999999986,
+          -15.466666666666697
+        ],
+        [
+          290.39999999999986,
+          -76.9333333333334
+        ],
+        [
+          290.39999999999986,
+          -138.4000000000001
+        ],
+        [
+          290.39999999999986,
+          -261.33333333333337
+        ],
+        [
+          349.89999999999986,
+          -261.33333333333337
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "vite-ssr-transform-and-module-loading-pi-node-6",
+        "focus": 0.3733333333333349,
+        "gap": 4.7999999999999545
+      },
+      "endBinding": {
+        "elementId": "vite-ssr-transform-and-module-loading-pi-node-5",
+        "focus": -0.5600000000000006,
+        "gap": 4.800000000000182
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "vite-ssr-transform-and-module-loading-pi-edge-8",
+      "type": "arrow",
+      "x": 252,
+      "y": 79.8,
+      "width": 332.79999999999995,
+      "height": 0,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aI",
+      "roundness": null,
+      "seed": 1995498267,
+      "version": 1,
+      "versionNonce": 1709445653,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "vite-ssr-transform-and-module-loading-pi-edge-8-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "vite-ssr-transform-and-module-loading-pi",
+        "edge": {
+          "from": "manifest_plugin",
+          "to": "transform",
+          "claim": "feeds"
+        }
+      },
+      "points": [
+        [
+          0.5,
+          0
+        ],
+        [
+          166.39999999999998,
+          0
+        ],
+        [
+          332.29999999999995,
+          0
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "vite-ssr-transform-and-module-loading-pi-node-7",
+        "focus": -0.0049999999999999645,
+        "gap": 8
+      },
+      "endBinding": {
+        "elementId": "vite-ssr-transform-and-module-loading-pi-node-0",
+        "focus": 0.003333333333332998,
+        "gap": 4.7999999999999545
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "vite-ssr-transform-and-module-loading-pi-edge-9",
+      "type": "arrow",
+      "x": 784.8,
+      "y": 321.6,
+      "width": 350.39999999999986,
+      "height": 0,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aJ",
+      "roundness": null,
+      "seed": 1233679306,
+      "version": 1,
+      "versionNonce": 246992670,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "vite-ssr-transform-and-module-loading-pi-edge-9-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "vite-ssr-transform-and-module-loading-pi",
+        "edge": {
+          "from": "runner_import",
+          "to": "compat_runner",
+          "claim": "calls"
+        }
+      },
+      "points": [
+        [
+          0.5,
+          0
+        ],
+        [
+          175.19999999999993,
+          0
+        ],
+        [
+          349.89999999999986,
+          0
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "vite-ssr-transform-and-module-loading-pi-node-8",
+        "focus": 0.04000000000000136,
+        "gap": 4.7999999999999545
+      },
+      "endBinding": {
+        "elementId": "vite-ssr-transform-and-module-loading-pi-node-5",
+        "focus": 0.6399999999999992,
+        "gap": 4.800000000000182
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "vite-ssr-transform-and-module-loading-pi-node-0-label",
+      "type": "text",
+      "x": 604,
+      "y": 67.5,
+      "width": 132,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aK",
+      "roundness": null,
+      "seed": 1819826089,
+      "version": 1,
+      "versionNonce": 843556019,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "vite-ssr-transform-and-module-loading-pi"
+      },
+      "text": "ssrTransform",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "vite-ssr-transform-and-module-loading-pi-node-0",
+      "originalText": "ssrTransform",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "vite-ssr-transform-and-module-loading-pi-node-1-label",
+      "type": "text",
+      "x": 1151,
+      "y": 47.5,
+      "width": 198.00000000000003,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aL",
+      "roundness": null,
+      "seed": 1188510988,
+      "version": 1,
+      "versionNonce": 1817511640,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "vite-ssr-transform-and-module-loading-pi"
+      },
+      "text": "ssrTransformScript",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "vite-ssr-transform-and-module-loading-pi-node-1",
+      "originalText": "ssrTransformScript",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "vite-ssr-transform-and-module-loading-pi-node-2-label",
+      "type": "text",
+      "x": 1152,
+      "y": 207.5,
+      "width": 176,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aM",
+      "roundness": null,
+      "seed": 287189627,
+      "version": 1,
+      "versionNonce": 568270325,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "vite-ssr-transform-and-module-loading-pi"
+      },
+      "text": "ssrTransformJSON",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "vite-ssr-transform-and-module-loading-pi-node-2",
+      "originalText": "ssrTransformJSON",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "vite-ssr-transform-and-module-loading-pi-node-3-label",
+      "type": "text",
+      "x": 48.5,
+      "y": 467.5,
+      "width": 143,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aN",
+      "roundness": null,
+      "seed": 676494022,
+      "version": 1,
+      "versionNonce": 1266152746,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "vite-ssr-transform-and-module-loading-pi"
+      },
+      "text": "ssrLoadModule",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "vite-ssr-transform-and-module-loading-pi-node-3",
+      "originalText": "ssrLoadModule",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "vite-ssr-transform-and-module-loading-pi-node-4-label",
+      "type": "text",
+      "x": 566.5,
+      "y": 467.5,
+      "width": 187.00000000000003,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aO",
+      "roundness": null,
+      "seed": 326589037,
+      "version": 1,
+      "versionNonce": 1959144663,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "vite-ssr-transform-and-module-loading-pi"
+      },
+      "text": "instantiateModule",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "vite-ssr-transform-and-module-loading-pi-node-4",
+      "originalText": "instantiateModule",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "vite-ssr-transform-and-module-loading-pi-node-5-label",
+      "type": "text",
+      "x": 1164.5,
+      "y": 347.5,
+      "width": 231.00000000000003,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aP",
+      "roundness": null,
+      "seed": 594633376,
+      "version": 1,
+      "versionNonce": 881076732,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "vite-ssr-transform-and-module-loading-pi"
+      },
+      "text": "SSRCompatModuleRunner",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "vite-ssr-transform-and-module-loading-pi-node-5",
+      "originalText": "SSRCompatModuleRunner",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "vite-ssr-transform-and-module-loading-pi-node-6-label",
+      "type": "text",
+      "x": 629.5,
+      "y": 627.5,
+      "width": 121.00000000000001,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aQ",
+      "roundness": null,
+      "seed": 1423346767,
+      "version": 1,
+      "versionNonce": 44289833,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "vite-ssr-transform-and-module-loading-pi"
+      },
+      "text": "fetchModule",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "vite-ssr-transform-and-module-loading-pi-node-6",
+      "originalText": "fetchModule",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "vite-ssr-transform-and-module-loading-pi-node-7-label",
+      "type": "text",
+      "x": 46.499999999999986,
+      "y": 67.5,
+      "width": 187.00000000000003,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aR",
+      "roundness": null,
+      "seed": 1294267978,
+      "version": 1,
+      "versionNonce": 1041907358,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "vite-ssr-transform-and-module-loading-pi"
+      },
+      "text": "ssrManifestPlugin",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "vite-ssr-transform-and-module-loading-pi-node-7",
+      "originalText": "ssrManifestPlugin",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "vite-ssr-transform-and-module-loading-pi-node-8-label",
+      "type": "text",
+      "x": 624,
+      "y": 307.5,
+      "width": 132,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aS",
+      "roundness": null,
+      "seed": 1189198625,
+      "version": 1,
+      "versionNonce": 136735211,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "vite-ssr-transform-and-module-loading-pi"
+      },
+      "text": "runnerImport",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "vite-ssr-transform-and-module-loading-pi-node-8",
+      "originalText": "runnerImport",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "vite-ssr-transform-and-module-loading-pi-edge-0-label",
+      "type": "text",
+      "x": 913.9333333333333,
+      "y": 58.8,
+      "width": 52.800000000000004,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aT",
+      "roundness": null,
+      "seed": 1905079582,
+      "version": 1,
+      "versionNonce": 193359170,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "vite-ssr-transform-and-module-loading-pi"
+      },
+      "text": "@calls",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "vite-ssr-transform-and-module-loading-pi-edge-0",
+      "originalText": "@calls",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "vite-ssr-transform-and-module-loading-pi-edge-1-label",
+      "type": "text",
+      "x": 857.9333333333332,
+      "y": 218.8,
+      "width": 52.800000000000004,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aU",
+      "roundness": null,
+      "seed": 1952382515,
+      "version": 1,
+      "versionNonce": 1775872013,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "vite-ssr-transform-and-module-loading-pi"
+      },
+      "text": "@calls",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "vite-ssr-transform-and-module-loading-pi-edge-1",
+      "originalText": "@calls",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "vite-ssr-transform-and-module-loading-pi-edge-2-label",
+      "type": "text",
+      "x": 904.7999999999998,
+      "y": 33.8,
+      "width": 70.4,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aV",
+      "roundness": null,
+      "seed": 245837028,
+      "version": 1,
+      "versionNonce": 289827184,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "vite-ssr-transform-and-module-loading-pi"
+      },
+      "text": "@returns",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "vite-ssr-transform-and-module-loading-pi-edge-2",
+      "originalText": "@returns",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "vite-ssr-transform-and-module-loading-pi-edge-3-label",
+      "type": "text",
+      "x": 848.7999999999998,
+      "y": 193.8,
+      "width": 70.4,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aW",
+      "roundness": null,
+      "seed": 73085857,
+      "version": 1,
+      "versionNonce": 1314855787,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "vite-ssr-transform-and-module-loading-pi"
+      },
+      "text": "@returns",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "vite-ssr-transform-and-module-loading-pi-edge-3",
+      "originalText": "@returns",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "vite-ssr-transform-and-module-loading-pi-edge-4-label",
+      "type": "text",
+      "x": 352,
+      "y": 471.6,
+      "width": 52.800000000000004,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aX",
+      "roundness": null,
+      "seed": 1297761538,
+      "version": 1,
+      "versionNonce": 1674060918,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "vite-ssr-transform-and-module-loading-pi"
+      },
+      "text": "@calls",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "vite-ssr-transform-and-module-loading-pi-edge-4",
+      "originalText": "@calls",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "vite-ssr-transform-and-module-loading-pi-edge-5-label",
+      "type": "text",
+      "x": 1000.7999999999998,
+      "y": 470.79999999999995,
+      "width": 52.800000000000004,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aY",
+      "roundness": null,
+      "seed": 112187303,
+      "version": 1,
+      "versionNonce": 2058501697,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "vite-ssr-transform-and-module-loading-pi"
+      },
+      "text": "@calls",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "vite-ssr-transform-and-module-loading-pi-edge-5",
+      "originalText": "@calls",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "vite-ssr-transform-and-module-loading-pi-edge-6-label",
+      "type": "text",
+      "x": 1024.7999999999997,
+      "y": 580.1333333333332,
+      "width": 52.800000000000004,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aZ",
+      "roundness": null,
+      "seed": 98044120,
+      "version": 1,
+      "versionNonce": 465882804,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "vite-ssr-transform-and-module-loading-pi"
+      },
+      "text": "@calls",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "vite-ssr-transform-and-module-loading-pi-edge-6",
+      "originalText": "@calls",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "vite-ssr-transform-and-module-loading-pi-edge-7-label",
+      "type": "text",
+      "x": 1039.9999999999998,
+      "y": 629.4666666666667,
+      "width": 70.4,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aa",
+      "roundness": null,
+      "seed": 2126305189,
+      "version": 1,
+      "versionNonce": 1079144239,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "vite-ssr-transform-and-module-loading-pi"
+      },
+      "text": "@returns",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "vite-ssr-transform-and-module-loading-pi-edge-7",
+      "originalText": "@returns",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "vite-ssr-transform-and-module-loading-pi-edge-8-label",
+      "type": "text",
+      "x": 392,
+      "y": 69.8,
+      "width": 52.800000000000004,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "ab",
+      "roundness": null,
+      "seed": 1707864902,
+      "version": 1,
+      "versionNonce": 296789674,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "vite-ssr-transform-and-module-loading-pi"
+      },
+      "text": "@feeds",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "vite-ssr-transform-and-module-loading-pi-edge-8",
+      "originalText": "@feeds",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "vite-ssr-transform-and-module-loading-pi-edge-9-label",
+      "type": "text",
+      "x": 933.5999999999999,
+      "y": 311.6,
+      "width": 52.800000000000004,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "ac",
+      "roundness": null,
+      "seed": 1318560507,
+      "version": 1,
+      "versionNonce": 1746390901,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "vite-ssr-transform-and-module-loading-pi"
+      },
+      "text": "@calls",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "vite-ssr-transform-and-module-loading-pi-edge-9",
+      "originalText": "@calls",
+      "autoResize": true,
+      "lineHeight": 1.25
+    }
+  ],
+  "appState": {
+    "gridSize": null,
+    "viewBackgroundColor": "#ffffff"
+  },
+  "files": {},
+  "diagramos": {
+    "version": "0.2.0-rc.6",
+    "schema": 1
+  }
+}

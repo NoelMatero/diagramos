@@ -1,0 +1,1937 @@
+{
+  "type": "excalidraw",
+  "version": 2,
+  "source": "diagramos",
+  "elements": [
+    {
+      "id": "poetry-installation-flow-title",
+      "type": "text",
+      "x": 0,
+      "y": -115,
+      "width": 316.8,
+      "height": 30,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a0",
+      "roundness": null,
+      "seed": 639747696,
+      "version": 1,
+      "versionNonce": 529231052,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "poetry-installation-flow",
+        "role": "title"
+      },
+      "text": "Poetry Installation Flow",
+      "fontSize": 24,
+      "fontFamily": 5,
+      "textAlign": "left",
+      "verticalAlign": "middle",
+      "containerId": null,
+      "originalText": "Poetry Installation Flow",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "poetry-installation-flow-node-0",
+      "type": "rectangle",
+      "x": 20,
+      "y": 20,
+      "width": 160,
+      "height": 100,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a1",
+      "roundness": null,
+      "seed": 1426165951,
+      "version": 1,
+      "versionNonce": 1539220697,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "poetry-installation-flow-node-0-label"
+        },
+        {
+          "id": "poetry-installation-flow-edge-0",
+          "type": "arrow"
+        },
+        {
+          "id": "poetry-installation-flow-edge-1",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "poetry-installation-flow",
+        "node": "installer",
+        "ref": "src/poetry/installation/installer.py#Installer"
+      }
+    },
+    {
+      "id": "poetry-installation-flow-node-1",
+      "type": "rectangle",
+      "x": 680,
+      "y": 20,
+      "width": 180,
+      "height": 80,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a2",
+      "roundness": null,
+      "seed": 1896250926,
+      "version": 1,
+      "versionNonce": 758087250,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "poetry-installation-flow-node-1-label"
+        },
+        {
+          "id": "poetry-installation-flow-edge-0",
+          "type": "arrow"
+        },
+        {
+          "id": "poetry-installation-flow-edge-2",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "poetry-installation-flow",
+        "node": "transaction",
+        "ref": "src/poetry/puzzle/transaction.py#Transaction"
+      }
+    },
+    {
+      "id": "poetry-installation-flow-node-2",
+      "type": "rectangle",
+      "x": 700,
+      "y": 320,
+      "width": 160,
+      "height": 200,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a3",
+      "roundness": null,
+      "seed": 146888345,
+      "version": 1,
+      "versionNonce": 995405027,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "poetry-installation-flow-node-2-label"
+        },
+        {
+          "id": "poetry-installation-flow-edge-1",
+          "type": "arrow"
+        },
+        {
+          "id": "poetry-installation-flow-edge-3",
+          "type": "arrow"
+        },
+        {
+          "id": "poetry-installation-flow-edge-4",
+          "type": "arrow"
+        },
+        {
+          "id": "poetry-installation-flow-edge-5",
+          "type": "arrow"
+        },
+        {
+          "id": "poetry-installation-flow-edge-6",
+          "type": "arrow"
+        },
+        {
+          "id": "poetry-installation-flow-edge-7",
+          "type": "arrow"
+        },
+        {
+          "id": "poetry-installation-flow-edge-8",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "poetry-installation-flow",
+        "node": "executor",
+        "ref": "src/poetry/installation/executor.py#Executor"
+      }
+    },
+    {
+      "id": "poetry-installation-flow-node-3",
+      "type": "rectangle",
+      "x": 1300,
+      "y": 20,
+      "width": 160,
+      "height": 100,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a4",
+      "roundness": null,
+      "seed": 875859344,
+      "version": 1,
+      "versionNonce": 1398481772,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "poetry-installation-flow-node-3-label"
+        },
+        {
+          "id": "poetry-installation-flow-edge-2",
+          "type": "arrow"
+        },
+        {
+          "id": "poetry-installation-flow-edge-3",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "poetry-installation-flow",
+        "node": "operation",
+        "ref": "src/poetry/installation/operations/operation.py#Operation"
+      }
+    },
+    {
+      "id": "poetry-installation-flow-node-4",
+      "type": "rectangle",
+      "x": 1300,
+      "y": 200,
+      "width": 220,
+      "height": 80,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a5",
+      "roundness": null,
+      "seed": 1096103579,
+      "version": 1,
+      "versionNonce": 30639253,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "poetry-installation-flow-node-4-label"
+        },
+        {
+          "id": "poetry-installation-flow-edge-4",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "poetry-installation-flow",
+        "node": "wheel_installer",
+        "ref": "src/poetry/installation/wheel_installer.py#WheelInstaller"
+      }
+    },
+    {
+      "id": "poetry-installation-flow-node-5",
+      "type": "rectangle",
+      "x": 1300,
+      "y": 840,
+      "width": 160,
+      "height": 80,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a6",
+      "roundness": null,
+      "seed": 334284618,
+      "version": 1,
+      "versionNonce": 715669918,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "poetry-installation-flow-node-5-label"
+        },
+        {
+          "id": "poetry-installation-flow-edge-5",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "poetry-installation-flow",
+        "node": "chef",
+        "ref": "src/poetry/installation/chef.py#Chef"
+      }
+    },
+    {
+      "id": "poetry-installation-flow-node-6",
+      "type": "rectangle",
+      "x": 1300,
+      "y": 360,
+      "width": 160,
+      "height": 80,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a7",
+      "roundness": null,
+      "seed": 1488400421,
+      "version": 1,
+      "versionNonce": 1701560495,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "poetry-installation-flow-node-6-label"
+        },
+        {
+          "id": "poetry-installation-flow-edge-6",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "poetry-installation-flow",
+        "node": "chooser",
+        "ref": "src/poetry/installation/chooser.py#Chooser"
+      }
+    },
+    {
+      "id": "poetry-installation-flow-node-7",
+      "type": "rectangle",
+      "x": 1300,
+      "y": 680,
+      "width": 160,
+      "height": 80,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a8",
+      "roundness": null,
+      "seed": 1348511244,
+      "version": 1,
+      "versionNonce": 1873105368,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "poetry-installation-flow-node-7-label"
+        },
+        {
+          "id": "poetry-installation-flow-edge-7",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "poetry-installation-flow",
+        "node": "downloader",
+        "ref": "src/poetry/utils/download.py#Downloader"
+      }
+    },
+    {
+      "id": "poetry-installation-flow-node-8",
+      "type": "rectangle",
+      "x": 1300,
+      "y": 520,
+      "width": 160,
+      "height": 80,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a9",
+      "roundness": null,
+      "seed": 35273479,
+      "version": 1,
+      "versionNonce": 1663898401,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "poetry-installation-flow-node-8-label"
+        },
+        {
+          "id": "poetry-installation-flow-edge-8",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "poetry-installation-flow",
+        "node": "git",
+        "ref": "src/poetry/vcs/git.py#Git"
+      }
+    },
+    {
+      "id": "poetry-installation-flow-edge-0",
+      "type": "arrow",
+      "x": 172,
+      "y": 52,
+      "width": 517.6,
+      "height": 0,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aA",
+      "roundness": null,
+      "seed": 939390384,
+      "version": 1,
+      "versionNonce": 2141520140,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "poetry-installation-flow-edge-0-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "poetry-installation-flow",
+        "edge": {
+          "from": "installer",
+          "to": "transaction",
+          "claim": "calls"
+        }
+      },
+      "points": [
+        [
+          0.5,
+          0
+        ],
+        [
+          258.8,
+          0
+        ],
+        [
+          517.1,
+          0
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "poetry-installation-flow-node-0",
+        "focus": -0.36,
+        "gap": 8
+      },
+      "endBinding": {
+        "elementId": "poetry-installation-flow-node-1",
+        "focus": 0.19999999999999898,
+        "gap": 9.600000000000023
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "poetry-installation-flow-edge-1",
+      "type": "arrow",
+      "x": 172,
+      "y": 85.33333333333333,
+      "width": 534.7428571428571,
+      "height": 327.61904761904765,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aB",
+      "roundness": null,
+      "seed": 1613668409,
+      "version": 1,
+      "versionNonce": 312116995,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "poetry-installation-flow-edge-1-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "poetry-installation-flow",
+        "edge": {
+          "from": "installer",
+          "to": "executor",
+          "claim": "calls"
+        }
+      },
+      "points": [
+        [
+          0.5,
+          0
+        ],
+        [
+          32,
+          0
+        ],
+        [
+          32,
+          327.61904761904765
+        ],
+        [
+          103.56190476190471,
+          327.61904761904765
+        ],
+        [
+          319.1523809523809,
+          327.61904761904765
+        ],
+        [
+          426.947619047619,
+          327.61904761904765
+        ],
+        [
+          534.2428571428571,
+          327.61904761904765
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "poetry-installation-flow-node-0",
+        "focus": 0.30666666666666687,
+        "gap": 8
+      },
+      "endBinding": {
+        "elementId": "poetry-installation-flow-node-2",
+        "focus": 0.07047619047618969,
+        "gap": 6.742857142857133
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "poetry-installation-flow-edge-2",
+      "type": "arrow",
+      "x": 869.6,
+      "y": 52,
+      "width": 429.6,
+      "height": 0,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aC",
+      "roundness": null,
+      "seed": 1681581518,
+      "version": 1,
+      "versionNonce": 1797825394,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "poetry-installation-flow-edge-2-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "poetry-installation-flow",
+        "edge": {
+          "from": "transaction",
+          "to": "operation",
+          "claim": "builds"
+        }
+      },
+      "points": [
+        [
+          0.5,
+          0
+        ],
+        [
+          214.80000000000007,
+          0
+        ],
+        [
+          429.1,
+          0
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "poetry-installation-flow-node-1",
+        "focus": -0.19999999999999998,
+        "gap": 9.600000000000023
+      },
+      "endBinding": {
+        "elementId": "poetry-installation-flow-node-3",
+        "focus": 0.3599999999999996,
+        "gap": 1
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "poetry-installation-flow-edge-3",
+      "type": "arrow",
+      "x": 866.7428571428571,
+      "y": 341.5238095238095,
+      "width": 432.4571428571429,
+      "height": 256.1904761904762,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aD",
+      "roundness": null,
+      "seed": 1489696991,
+      "version": 1,
+      "versionNonce": 835529337,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "poetry-installation-flow-edge-3-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "poetry-installation-flow",
+        "edge": {
+          "from": "executor",
+          "to": "operation",
+          "claim": "calls"
+        }
+      },
+      "points": [
+        [
+          0.5,
+          0
+        ],
+        [
+          34.85714285714289,
+          0
+        ],
+        [
+          34.85714285714289,
+          -232.7238095238095
+        ],
+        [
+          111.60000000000002,
+          -232.7238095238095
+        ],
+        [
+          324.4571428571429,
+          -232.7238095238095
+        ],
+        [
+          324.4571428571429,
+          -256.1904761904762
+        ],
+        [
+          431.9571428571429,
+          -256.1904761904762
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "poetry-installation-flow-node-2",
+        "focus": -0.7847619047619048,
+        "gap": 6.742857142857133
+      },
+      "endBinding": {
+        "elementId": "poetry-installation-flow-node-3",
+        "focus": -0.30666666666666625,
+        "gap": 1
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "poetry-installation-flow-edge-4",
+      "type": "arrow",
+      "x": 866.7428571428571,
+      "y": 370.09523809523813,
+      "width": 432.4571428571429,
+      "height": 131.42857142857144,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aE",
+      "roundness": null,
+      "seed": 1412042284,
+      "version": 1,
+      "versionNonce": 427083384,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "poetry-installation-flow-edge-4-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "poetry-installation-flow",
+        "edge": {
+          "from": "executor",
+          "to": "wheel_installer",
+          "claim": "calls"
+        }
+      },
+      "points": [
+        [
+          0.5,
+          0
+        ],
+        [
+          58.85714285714289,
+          0
+        ],
+        [
+          58.85714285714289,
+          -131.42857142857144
+        ],
+        [
+          150.51428571428573,
+          -131.42857142857144
+        ],
+        [
+          221.0000000000001,
+          -131.42857142857144
+        ],
+        [
+          291.4857142857144,
+          -131.42857142857144
+        ],
+        [
+          431.9571428571429,
+          -131.42857142857144
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "poetry-installation-flow-node-2",
+        "focus": -0.4990476190476183,
+        "gap": 6.742857142857133
+      },
+      "endBinding": {
+        "elementId": "poetry-installation-flow-node-4",
+        "focus": 0.0333333333333338,
+        "gap": 1
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "poetry-installation-flow-edge-5",
+      "type": "arrow",
+      "x": 866.7428571428571,
+      "y": 484.3809523809524,
+      "width": 432.4571428571429,
+      "height": 394.28571428571433,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aF",
+      "roundness": null,
+      "seed": 1976388933,
+      "version": 1,
+      "versionNonce": 255538511,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "poetry-installation-flow-edge-5-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "poetry-installation-flow",
+        "edge": {
+          "from": "executor",
+          "to": "chef",
+          "claim": "calls"
+        }
+      },
+      "points": [
+        [
+          0.5,
+          0
+        ],
+        [
+          34.85714285714289,
+          0
+        ],
+        [
+          34.85714285714289,
+          378.51428571428573
+        ],
+        [
+          34.85714285714289,
+          394.28571428571433
+        ],
+        [
+          431.9571428571429,
+          394.28571428571433
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "poetry-installation-flow-node-2",
+        "focus": 0.6438095238095243,
+        "gap": 6.742857142857133
+      },
+      "endBinding": {
+        "elementId": "poetry-installation-flow-node-5",
+        "focus": 0.033333333333328594,
+        "gap": 1
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "poetry-installation-flow-edge-6",
+      "type": "arrow",
+      "x": 866.7428571428571,
+      "y": 398.6666666666667,
+      "width": 432.4571428571429,
+      "height": 0,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aG",
+      "roundness": null,
+      "seed": 820369130,
+      "version": 1,
+      "versionNonce": 649819582,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "poetry-installation-flow-edge-6-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "poetry-installation-flow",
+        "edge": {
+          "from": "executor",
+          "to": "chooser",
+          "claim": "calls"
+        }
+      },
+      "points": [
+        [
+          0.5,
+          0
+        ],
+        [
+          216.2285714285714,
+          0
+        ],
+        [
+          431.9571428571429,
+          0
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "poetry-installation-flow-node-2",
+        "focus": -0.21333333333333315,
+        "gap": 6.742857142857133
+      },
+      "endBinding": {
+        "elementId": "poetry-installation-flow-node-6",
+        "focus": 0.03333333333333371,
+        "gap": 1
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "poetry-installation-flow-edge-7",
+      "type": "arrow",
+      "x": 866.7428571428571,
+      "y": 455.80952380952385,
+      "width": 432.4571428571429,
+      "height": 262.8571428571429,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aH",
+      "roundness": null,
+      "seed": 415399995,
+      "version": 1,
+      "versionNonce": 1453258165,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "poetry-installation-flow-edge-7-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "poetry-installation-flow",
+        "edge": {
+          "from": "executor",
+          "to": "downloader",
+          "claim": "builds"
+        }
+      },
+      "points": [
+        [
+          0.5,
+          0
+        ],
+        [
+          58.85714285714289,
+          0
+        ],
+        [
+          58.85714285714289,
+          262.8571428571429
+        ],
+        [
+          84.79999999999995,
+          262.8571428571429
+        ],
+        [
+          171.71428571428567,
+          262.8571428571429
+        ],
+        [
+          258.6285714285715,
+          262.8571428571429
+        ],
+        [
+          431.9571428571429,
+          262.8571428571429
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "poetry-installation-flow-node-2",
+        "focus": 0.35809523809523813,
+        "gap": 6.742857142857133
+      },
+      "endBinding": {
+        "elementId": "poetry-installation-flow-node-7",
+        "focus": 0.03333333333333144,
+        "gap": 1
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "poetry-installation-flow-edge-8",
+      "type": "arrow",
+      "x": 866.7428571428571,
+      "y": 427.23809523809524,
+      "width": 432.4571428571429,
+      "height": 131.4285714285715,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aI",
+      "roundness": null,
+      "seed": 1993562104,
+      "version": 1,
+      "versionNonce": 1466038612,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "poetry-installation-flow-edge-8-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "poetry-installation-flow",
+        "edge": {
+          "from": "executor",
+          "to": "git",
+          "claim": "calls"
+        }
+      },
+      "points": [
+        [
+          0.5,
+          0
+        ],
+        [
+          82.85714285714289,
+          0
+        ],
+        [
+          82.85714285714289,
+          131.4285714285715
+        ],
+        [
+          150.51428571428562,
+          131.4285714285715
+        ],
+        [
+          291.48571428571415,
+          131.4285714285715
+        ],
+        [
+          361.97142857142865,
+          131.4285714285715
+        ],
+        [
+          431.9571428571429,
+          131.4285714285715
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "poetry-installation-flow-node-2",
+        "focus": 0.0723809523809532,
+        "gap": 6.742857142857133
+      },
+      "endBinding": {
+        "elementId": "poetry-installation-flow-node-8",
+        "focus": 0.03333333333333144,
+        "gap": 1
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "poetry-installation-flow-node-0-label",
+      "type": "text",
+      "x": 50.49999999999999,
+      "y": 57.5,
+      "width": 99.00000000000001,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aJ",
+      "roundness": null,
+      "seed": 1816405578,
+      "version": 1,
+      "versionNonce": 1009962654,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "poetry-installation-flow"
+      },
+      "text": "Installer",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "poetry-installation-flow-node-0",
+      "originalText": "Installer",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "poetry-installation-flow-node-1-label",
+      "type": "text",
+      "x": 709.5,
+      "y": 47.5,
+      "width": 121.00000000000001,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aK",
+      "roundness": null,
+      "seed": 1945484367,
+      "version": 1,
+      "versionNonce": 12345129,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "poetry-installation-flow"
+      },
+      "text": "Transaction",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "poetry-installation-flow-node-1",
+      "originalText": "Transaction",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "poetry-installation-flow-node-2-label",
+      "type": "text",
+      "x": 736,
+      "y": 407.5,
+      "width": 88,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aL",
+      "roundness": null,
+      "seed": 1116770976,
+      "version": 1,
+      "versionNonce": 849132028,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "poetry-installation-flow"
+      },
+      "text": "Executor",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "poetry-installation-flow-node-2",
+      "originalText": "Executor",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "poetry-installation-flow-node-3-label",
+      "type": "text",
+      "x": 1330.5,
+      "y": 57.5,
+      "width": 99.00000000000001,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aM",
+      "roundness": null,
+      "seed": 848726637,
+      "version": 1,
+      "versionNonce": 1927199959,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "poetry-installation-flow"
+      },
+      "text": "Operation",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "poetry-installation-flow-node-3",
+      "originalText": "Operation",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "poetry-installation-flow-node-4-label",
+      "type": "text",
+      "x": 1333,
+      "y": 227.5,
+      "width": 154,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aN",
+      "roundness": null,
+      "seed": 1198631622,
+      "version": 1,
+      "versionNonce": 1234208042,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "poetry-installation-flow"
+      },
+      "text": "WheelInstaller",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "poetry-installation-flow-node-4",
+      "originalText": "WheelInstaller",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "poetry-installation-flow-node-5-label",
+      "type": "text",
+      "x": 1358,
+      "y": 867.5,
+      "width": 44,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aO",
+      "roundness": null,
+      "seed": 809327227,
+      "version": 1,
+      "versionNonce": 536325621,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "poetry-installation-flow"
+      },
+      "text": "Chef",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "poetry-installation-flow-node-5",
+      "originalText": "Chef",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "poetry-installation-flow-node-6-label",
+      "type": "text",
+      "x": 1341.5,
+      "y": 387.5,
+      "width": 77,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aP",
+      "roundness": null,
+      "seed": 1710648588,
+      "version": 1,
+      "versionNonce": 1785566936,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "poetry-installation-flow"
+      },
+      "text": "Chooser",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "poetry-installation-flow-node-6",
+      "originalText": "Chooser",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "poetry-installation-flow-node-7-label",
+      "type": "text",
+      "x": 1325,
+      "y": 707.5,
+      "width": 110.00000000000001,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aQ",
+      "roundness": null,
+      "seed": 194480041,
+      "version": 1,
+      "versionNonce": 811611315,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "poetry-installation-flow"
+      },
+      "text": "Downloader",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "poetry-installation-flow-node-7",
+      "originalText": "Downloader",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "poetry-installation-flow-node-8-label",
+      "type": "text",
+      "x": 1363.5,
+      "y": 547.5,
+      "width": 33,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aR",
+      "roundness": null,
+      "seed": 788528258,
+      "version": 1,
+      "versionNonce": 463995638,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "poetry-installation-flow"
+      },
+      "text": "Git",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "poetry-installation-flow-node-8",
+      "originalText": "Git",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "poetry-installation-flow-edge-0-label",
+      "type": "text",
+      "x": 312,
+      "y": 42,
+      "width": 237.60000000000002,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aS",
+      "roundness": null,
+      "seed": 1803656461,
+      "version": 1,
+      "versionNonce": 1869026039,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "poetry-installation-flow"
+      },
+      "text": "calculate_operations @calls",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "poetry-installation-flow-edge-0",
+      "originalText": "calculate_operations @calls",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "poetry-installation-flow-edge-1-label",
+      "type": "text",
+      "x": 213.9619047619047,
+      "y": 402.95238095238096,
+      "width": 123.20000000000002,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aT",
+      "roundness": null,
+      "seed": 580523840,
+      "version": 1,
+      "versionNonce": 1100591132,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "poetry-installation-flow"
+      },
+      "text": "execute @calls",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "poetry-installation-flow-edge-1",
+      "originalText": "execute @calls",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "poetry-installation-flow-edge-2-label",
+      "type": "text",
+      "x": 1018.4000000000001,
+      "y": 42,
+      "width": 132,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aU",
+      "roundness": null,
+      "seed": 519519727,
+      "version": 1,
+      "versionNonce": 2060342345,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "poetry-installation-flow"
+      },
+      "text": "creates @builds",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "poetry-installation-flow-edge-2",
+      "originalText": "creates @builds",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "poetry-installation-flow-edge-3-label",
+      "type": "text",
+      "x": 912.3428571428572,
+      "y": 98.80000000000001,
+      "width": 132,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aV",
+      "roundness": null,
+      "seed": 1014545130,
+      "version": 1,
+      "versionNonce": 1593336254,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "poetry-installation-flow"
+      },
+      "text": "executes @calls",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "poetry-installation-flow-edge-3",
+      "originalText": "executes @calls",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "poetry-installation-flow-edge-4-label",
+      "type": "text",
+      "x": 955.6571428571428,
+      "y": 228.66666666666669,
+      "width": 123.20000000000002,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aW",
+      "roundness": null,
+      "seed": 92603465,
+      "version": 1,
+      "versionNonce": 1743669971,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "poetry-installation-flow"
+      },
+      "text": "install @calls",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "poetry-installation-flow-edge-4",
+      "originalText": "install @calls",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "poetry-installation-flow-edge-5-label",
+      "type": "text",
+      "x": 840,
+      "y": 852.8952380952381,
+      "width": 123.20000000000002,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aX",
+      "roundness": null,
+      "seed": 486234668,
+      "version": 1,
+      "versionNonce": 988768888,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "poetry-installation-flow"
+      },
+      "text": "prepare @calls",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "poetry-installation-flow-edge-5",
+      "originalText": "prepare @calls",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "poetry-installation-flow-edge-6-label",
+      "type": "text",
+      "x": 1008.1714285714286,
+      "y": 388.6666666666667,
+      "width": 149.60000000000002,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aY",
+      "roundness": null,
+      "seed": 1876741147,
+      "version": 1,
+      "versionNonce": 1094966549,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "poetry-installation-flow"
+      },
+      "text": "choose_for @calls",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "poetry-installation-flow-edge-6",
+      "originalText": "choose_for @calls",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "poetry-installation-flow-edge-7-label",
+      "type": "text",
+      "x": 876.742857142857,
+      "y": 708.6666666666667,
+      "width": 149.60000000000002,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aZ",
+      "roundness": null,
+      "seed": 699545958,
+      "version": 1,
+      "versionNonce": 1429251658,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "poetry-installation-flow"
+      },
+      "text": "downloads @builds",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "poetry-installation-flow-edge-7",
+      "originalText": "downloads @builds",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "poetry-installation-flow-edge-8-label",
+      "type": "text",
+      "x": 964.4571428571428,
+      "y": 548.6666666666667,
+      "width": 105.60000000000001,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aa",
+      "roundness": null,
+      "seed": 1586102725,
+      "version": 1,
+      "versionNonce": 1883986639,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "poetry-installation-flow"
+      },
+      "text": "clone @calls",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "poetry-installation-flow-edge-8",
+      "originalText": "clone @calls",
+      "autoResize": true,
+      "lineHeight": 1.25
+    }
+  ],
+  "appState": {
+    "gridSize": null,
+    "viewBackgroundColor": "#ffffff"
+  },
+  "files": {},
+  "diagramos": {
+    "version": "0.2.0-rc.6",
+    "schema": 1
+  }
+}

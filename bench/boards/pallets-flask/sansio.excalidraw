@@ -1,0 +1,2129 @@
+{
+  "type": "excalidraw",
+  "version": 2,
+  "source": "diagramos",
+  "elements": [
+    {
+      "id": "flask-sansio-route-registration-title",
+      "type": "text",
+      "x": 0,
+      "y": -115,
+      "width": 409.20000000000005,
+      "height": 30,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a0",
+      "roundness": null,
+      "seed": 902392440,
+      "version": 1,
+      "versionNonce": 1958811860,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "flask-sansio-route-registration",
+        "role": "title"
+      },
+      "text": "Flask sansio route registration",
+      "fontSize": 24,
+      "fontFamily": 5,
+      "textAlign": "left",
+      "verticalAlign": "middle",
+      "containerId": null,
+      "originalText": "Flask sansio route registration",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "flask-sansio-route-registration-node-0",
+      "type": "rectangle",
+      "x": 2300,
+      "y": 280,
+      "width": 160,
+      "height": 100,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a1",
+      "roundness": {
+        "type": 3
+      },
+      "seed": 1118210567,
+      "version": 1,
+      "versionNonce": 880673,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "flask-sansio-route-registration-node-0-label"
+        },
+        {
+          "id": "flask-sansio-route-registration-edge-0",
+          "type": "arrow"
+        },
+        {
+          "id": "flask-sansio-route-registration-edge-1",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "flask-sansio-route-registration",
+        "node": "scaffold",
+        "ref": "src/flask/sansio/scaffold.py#Scaffold"
+      }
+    },
+    {
+      "id": "flask-sansio-route-registration-node-1",
+      "type": "rectangle",
+      "x": 1780,
+      "y": 440,
+      "width": 160,
+      "height": 80,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a2",
+      "roundness": {
+        "type": 3
+      },
+      "seed": 1930126710,
+      "version": 1,
+      "versionNonce": 457216474,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "flask-sansio-route-registration-node-1-label"
+        },
+        {
+          "id": "flask-sansio-route-registration-edge-0",
+          "type": "arrow"
+        },
+        {
+          "id": "flask-sansio-route-registration-edge-4",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "flask-sansio-route-registration",
+        "node": "app",
+        "ref": "src/flask/sansio/app.py#App"
+      }
+    },
+    {
+      "id": "flask-sansio-route-registration-node-2",
+      "type": "rectangle",
+      "x": 1420,
+      "y": 20,
+      "width": 180,
+      "height": 100,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a3",
+      "roundness": null,
+      "seed": 1246989057,
+      "version": 1,
+      "versionNonce": 1549220683,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "flask-sansio-route-registration-node-2-label"
+        },
+        {
+          "id": "flask-sansio-route-registration-edge-6",
+          "type": "arrow"
+        },
+        {
+          "id": "flask-sansio-route-registration-edge-7",
+          "type": "arrow"
+        },
+        {
+          "id": "flask-sansio-route-registration-edge-8",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "flask-sansio-route-registration",
+        "node": "app_add_url_rule",
+        "ref": "src/flask/sansio/app.py#App"
+      }
+    },
+    {
+      "id": "flask-sansio-route-registration-node-3",
+      "type": "rectangle",
+      "x": 20,
+      "y": 440,
+      "width": 260,
+      "height": 80,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a4",
+      "roundness": null,
+      "seed": 442931032,
+      "version": 1,
+      "versionNonce": 2016354868,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "flask-sansio-route-registration-node-3-label"
+        },
+        {
+          "id": "flask-sansio-route-registration-edge-2",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "flask-sansio-route-registration",
+        "node": "app_register_blueprint",
+        "ref": "src/flask/sansio/app.py#App"
+      }
+    },
+    {
+      "id": "flask-sansio-route-registration-node-4",
+      "type": "rectangle",
+      "x": 1780,
+      "y": 280,
+      "width": 160,
+      "height": 80,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a5",
+      "roundness": {
+        "type": 3
+      },
+      "seed": 1833636355,
+      "version": 1,
+      "versionNonce": 693290269,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "flask-sansio-route-registration-node-4-label"
+        },
+        {
+          "id": "flask-sansio-route-registration-edge-1",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "flask-sansio-route-registration",
+        "node": "blueprint",
+        "ref": "src/flask/sansio/blueprints.py#Blueprint"
+      }
+    },
+    {
+      "id": "flask-sansio-route-registration-node-5",
+      "type": "rectangle",
+      "x": 20,
+      "y": 20,
+      "width": 180,
+      "height": 80,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a6",
+      "roundness": null,
+      "seed": 1068914322,
+      "version": 1,
+      "versionNonce": 1479941574,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "flask-sansio-route-registration-node-5-label"
+        },
+        {
+          "id": "flask-sansio-route-registration-edge-5",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "flask-sansio-route-registration",
+        "node": "blueprint_add_url_rule",
+        "ref": "src/flask/sansio/blueprints.py#Blueprint"
+      }
+    },
+    {
+      "id": "flask-sansio-route-registration-node-6",
+      "type": "rectangle",
+      "x": 600,
+      "y": 440,
+      "width": 160,
+      "height": 80,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a7",
+      "roundness": null,
+      "seed": 170419373,
+      "version": 1,
+      "versionNonce": 267682327,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "flask-sansio-route-registration-node-6-label"
+        },
+        {
+          "id": "flask-sansio-route-registration-edge-2",
+          "type": "arrow"
+        },
+        {
+          "id": "flask-sansio-route-registration-edge-3",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "flask-sansio-route-registration",
+        "node": "blueprint_register",
+        "ref": "src/flask/sansio/blueprints.py#Blueprint"
+      }
+    },
+    {
+      "id": "flask-sansio-route-registration-node-7",
+      "type": "rectangle",
+      "x": 1100,
+      "y": 440,
+      "width": 260,
+      "height": 80,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a8",
+      "roundness": {
+        "type": 3
+      },
+      "seed": 1255458516,
+      "version": 1,
+      "versionNonce": 1647140640,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "flask-sansio-route-registration-node-7-label"
+        },
+        {
+          "id": "flask-sansio-route-registration-edge-3",
+          "type": "arrow"
+        },
+        {
+          "id": "flask-sansio-route-registration-edge-4",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "flask-sansio-route-registration",
+        "node": "setup_state",
+        "ref": "src/flask/sansio/blueprints.py#BlueprintSetupState"
+      }
+    },
+    {
+      "id": "flask-sansio-route-registration-node-8",
+      "type": "rectangle",
+      "x": 900,
+      "y": 20,
+      "width": 180,
+      "height": 80,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a9",
+      "roundness": null,
+      "seed": 361619391,
+      "version": 1,
+      "versionNonce": 2023686617,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "flask-sansio-route-registration-node-8-label"
+        },
+        {
+          "id": "flask-sansio-route-registration-edge-6",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "flask-sansio-route-registration",
+        "node": "setup_add_url_rule",
+        "ref": "src/flask/sansio/blueprints.py#BlueprintSetupState"
+      }
+    },
+    {
+      "id": "flask-sansio-route-registration-node-9",
+      "type": "rectangle",
+      "x": 2040,
+      "y": 20,
+      "width": 160,
+      "height": 80,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aA",
+      "roundness": null,
+      "seed": 831704366,
+      "version": 1,
+      "versionNonce": 1242553170,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "flask-sansio-route-registration-node-9-label"
+        },
+        {
+          "id": "flask-sansio-route-registration-edge-7",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "flask-sansio-route-registration",
+        "node": "url_map",
+        "ref": "src/flask/sansio/app.py#App"
+      }
+    },
+    {
+      "id": "flask-sansio-route-registration-node-10",
+      "type": "rectangle",
+      "x": 2040,
+      "y": 180,
+      "width": 220,
+      "height": 80,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aB",
+      "roundness": null,
+      "seed": 1984487736,
+      "version": 1,
+      "versionNonce": 1030242196,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "flask-sansio-route-registration-node-10-label"
+        },
+        {
+          "id": "flask-sansio-route-registration-edge-8",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "flask-sansio-route-registration",
+        "node": "view_functions",
+        "ref": "src/flask/sansio/scaffold.py#Scaffold"
+      }
+    },
+    {
+      "id": "flask-sansio-route-registration-node-11",
+      "type": "rectangle",
+      "x": 620,
+      "y": 20,
+      "width": 260,
+      "height": 80,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aC",
+      "roundness": null,
+      "seed": 599485409,
+      "version": 1,
+      "versionNonce": 563108011,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "flask-sansio-route-registration-node-11-label"
+        },
+        {
+          "id": "flask-sansio-route-registration-edge-5",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "flask-sansio-route-registration",
+        "node": "deferred_functions",
+        "ref": "src/flask/sansio/blueprints.py#Blueprint"
+      }
+    },
+    {
+      "id": "flask-sansio-route-registration-edge-0",
+      "type": "arrow",
+      "x": 1947.2,
+      "y": 472,
+      "width": 359.1999999999996,
+      "height": 126.66666666666669,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aD",
+      "roundness": null,
+      "seed": 1791269112,
+      "version": 1,
+      "versionNonce": 1546341460,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "flask-sansio-route-registration-edge-0-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "flask-sansio-route-registration",
+        "edge": {
+          "from": "app",
+          "to": "scaffold",
+          "claim": "conforms"
+        }
+      },
+      "points": [
+        [
+          0.5,
+          0.5
+        ],
+        [
+          121.46666666666647,
+          0
+        ],
+        [
+          182.1999999999996,
+          0
+        ],
+        [
+          242.93333333333317,
+          0
+        ],
+        [
+          251.1999999999996,
+          0
+        ],
+        [
+          251.1999999999996,
+          -126.66666666666669
+        ],
+        [
+          358.6999999999996,
+          -127.16666666666663
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "flask-sansio-route-registration-node-1",
+        "focus": -0.2,
+        "gap": 7.2000000000000455
+      },
+      "endBinding": {
+        "elementId": "flask-sansio-route-registration-node-0",
+        "focus": -0.30666666666667103,
+        "gap": 6.399999999999636
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "flask-sansio-route-registration-edge-1",
+      "type": "arrow",
+      "x": 1947.2,
+      "y": 312,
+      "width": 359.1999999999996,
+      "height": 0,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aE",
+      "roundness": null,
+      "seed": 1428642209,
+      "version": 1,
+      "versionNonce": 2143219051,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "flask-sansio-route-registration-edge-1-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "flask-sansio-route-registration",
+        "edge": {
+          "from": "blueprint",
+          "to": "scaffold",
+          "claim": "conforms"
+        }
+      },
+      "points": [
+        [
+          0.5,
+          0
+        ],
+        [
+          179.59999999999968,
+          0
+        ],
+        [
+          358.6999999999996,
+          0
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "flask-sansio-route-registration-node-4",
+        "focus": -0.2,
+        "gap": 7.2000000000000455
+      },
+      "endBinding": {
+        "elementId": "flask-sansio-route-registration-node-0",
+        "focus": 0.3600000000000016,
+        "gap": 6.399999999999636
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "flask-sansio-route-registration-edge-2",
+      "type": "arrow",
+      "x": 272,
+      "y": 472,
+      "width": 332.79999999999995,
+      "height": 0,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aF",
+      "roundness": null,
+      "seed": 1132885142,
+      "version": 1,
+      "versionNonce": 330057594,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "flask-sansio-route-registration-edge-2-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "flask-sansio-route-registration",
+        "edge": {
+          "from": "app_register_blueprint",
+          "to": "blueprint_register",
+          "claim": "calls"
+        }
+      },
+      "points": [
+        [
+          0.5,
+          0
+        ],
+        [
+          166.39999999999998,
+          0
+        ],
+        [
+          332.29999999999995,
+          0
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "flask-sansio-route-registration-node-3",
+        "focus": -0.2,
+        "gap": 8
+      },
+      "endBinding": {
+        "elementId": "flask-sansio-route-registration-node-6",
+        "focus": 0.2,
+        "gap": 4.7999999999999545
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "flask-sansio-route-registration-edge-3",
+      "type": "arrow",
+      "x": 764.8,
+      "y": 472,
+      "width": 341.60000000000014,
+      "height": 0,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aG",
+      "roundness": null,
+      "seed": 320968999,
+      "version": 1,
+      "versionNonce": 298179265,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "flask-sansio-route-registration-edge-3-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "flask-sansio-route-registration",
+        "edge": {
+          "from": "blueprint_register",
+          "to": "setup_state",
+          "claim": "builds"
+        }
+      },
+      "points": [
+        [
+          0.5,
+          0
+        ],
+        [
+          170.80000000000007,
+          0
+        ],
+        [
+          341.10000000000014,
+          0
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "flask-sansio-route-registration-node-6",
+        "focus": -0.2,
+        "gap": 4.7999999999999545
+      },
+      "endBinding": {
+        "elementId": "flask-sansio-route-registration-node-7",
+        "focus": 0.2,
+        "gap": 6.400000000000091
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "flask-sansio-route-registration-edge-4",
+      "type": "arrow",
+      "x": 1366.4,
+      "y": 472,
+      "width": 420.79999999999995,
+      "height": 0,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aH",
+      "roundness": null,
+      "seed": 1200547572,
+      "version": 1,
+      "versionNonce": 73089216,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "flask-sansio-route-registration-edge-4-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "flask-sansio-route-registration",
+        "edge": {
+          "from": "setup_state",
+          "to": "app",
+          "claim": "holds"
+        }
+      },
+      "points": [
+        [
+          0.5,
+          0
+        ],
+        [
+          210.4000000000001,
+          0
+        ],
+        [
+          420.29999999999995,
+          0
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "flask-sansio-route-registration-node-7",
+        "focus": -0.2,
+        "gap": 6.400000000000091
+      },
+      "endBinding": {
+        "elementId": "flask-sansio-route-registration-node-1",
+        "focus": 0.2000000000000026,
+        "gap": 7.2000000000000455
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "flask-sansio-route-registration-edge-5",
+      "type": "arrow",
+      "x": 192,
+      "y": 52,
+      "width": 429.6,
+      "height": 0,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aI",
+      "roundness": null,
+      "seed": 393546061,
+      "version": 1,
+      "versionNonce": 1286138167,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "flask-sansio-route-registration-edge-5-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "flask-sansio-route-registration",
+        "edge": {
+          "from": "blueprint_add_url_rule",
+          "to": "deferred_functions",
+          "claim": "accesses"
+        }
+      },
+      "points": [
+        [
+          0.5,
+          0
+        ],
+        [
+          214.8,
+          0
+        ],
+        [
+          429.1,
+          0
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "flask-sansio-route-registration-node-5",
+        "focus": -0.19999999999999998,
+        "gap": 8
+      },
+      "endBinding": {
+        "elementId": "flask-sansio-route-registration-node-11",
+        "focus": 0.19999999999999923,
+        "gap": 1.6000000000000227
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "flask-sansio-route-registration-edge-6",
+      "type": "arrow",
+      "x": 1081.6,
+      "y": 68.66666666666667,
+      "width": 332.8000000000002,
+      "height": 0,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aJ",
+      "roundness": null,
+      "seed": 271672754,
+      "version": 1,
+      "versionNonce": 1777240166,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "flask-sansio-route-registration-edge-6-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "flask-sansio-route-registration",
+        "edge": {
+          "from": "setup_add_url_rule",
+          "to": "app_add_url_rule",
+          "claim": "calls"
+        }
+      },
+      "points": [
+        [
+          0.5,
+          0
+        ],
+        [
+          166.4000000000001,
+          0
+        ],
+        [
+          332.3000000000002,
+          0
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "flask-sansio-route-registration-node-8",
+        "focus": 0.21666666666666667,
+        "gap": 1.599999999999909
+      },
+      "endBinding": {
+        "elementId": "flask-sansio-route-registration-node-2",
+        "focus": 0.02666666666666741,
+        "gap": 5.599999999999909
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "flask-sansio-route-registration-edge-7",
+      "type": "arrow",
+      "x": 1594.4,
+      "y": 52,
+      "width": 447.1999999999998,
+      "height": 0,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aK",
+      "roundness": null,
+      "seed": 653514019,
+      "version": 1,
+      "versionNonce": 566234557,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "flask-sansio-route-registration-edge-7-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "flask-sansio-route-registration",
+        "edge": {
+          "from": "app_add_url_rule",
+          "to": "url_map",
+          "claim": "accesses"
+        }
+      },
+      "points": [
+        [
+          0.5,
+          0
+        ],
+        [
+          223.5999999999999,
+          0
+        ],
+        [
+          446.6999999999998,
+          0
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "flask-sansio-route-registration-node-2",
+        "focus": -0.36000000000000076,
+        "gap": 5.599999999999909
+      },
+      "endBinding": {
+        "elementId": "flask-sansio-route-registration-node-9",
+        "focus": 0.2,
+        "gap": 1.599999999999909
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "flask-sansio-route-registration-edge-8",
+      "type": "arrow",
+      "x": 1594.4,
+      "y": 85.33333333333333,
+      "width": 447.1999999999998,
+      "height": 126.66666666666667,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aL",
+      "roundness": null,
+      "seed": 737097392,
+      "version": 1,
+      "versionNonce": 74339340,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "flask-sansio-route-registration-edge-8-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "flask-sansio-route-registration",
+        "edge": {
+          "from": "app_add_url_rule",
+          "to": "view_functions",
+          "claim": "accesses"
+        }
+      },
+      "points": [
+        [
+          0.5,
+          0
+        ],
+        [
+          32,
+          0
+        ],
+        [
+          32,
+          126.66666666666667
+        ],
+        [
+          160.26666666666665,
+          126.66666666666667
+        ],
+        [
+          303.7333333333331,
+          126.66666666666667
+        ],
+        [
+          375.46666666666647,
+          126.66666666666667
+        ],
+        [
+          446.6999999999998,
+          126.66666666666667
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "flask-sansio-route-registration-node-2",
+        "focus": 0.3066666666666658,
+        "gap": 5.599999999999909
+      },
+      "endBinding": {
+        "elementId": "flask-sansio-route-registration-node-10",
+        "focus": 0.2,
+        "gap": 1.599999999999909
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "flask-sansio-route-registration-node-0-label",
+      "type": "text",
+      "x": 2336,
+      "y": 317.5,
+      "width": 88,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aM",
+      "roundness": null,
+      "seed": 313643906,
+      "version": 1,
+      "versionNonce": 211646454,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "flask-sansio-route-registration"
+      },
+      "text": "Scaffold",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "flask-sansio-route-registration-node-0",
+      "originalText": "Scaffold",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "flask-sansio-route-registration-node-1-label",
+      "type": "text",
+      "x": 1843.5,
+      "y": 467.5,
+      "width": 33,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aN",
+      "roundness": null,
+      "seed": 1275553319,
+      "version": 1,
+      "versionNonce": 596087233,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "flask-sansio-route-registration"
+      },
+      "text": "App",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "flask-sansio-route-registration-node-1",
+      "originalText": "App",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "flask-sansio-route-registration-node-2-label",
+      "type": "text",
+      "x": 1444,
+      "y": 57.5,
+      "width": 132,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aO",
+      "roundness": null,
+      "seed": 1261410136,
+      "version": 1,
+      "versionNonce": 1150951988,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "flask-sansio-route-registration"
+      },
+      "text": "add_url_rule",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "flask-sansio-route-registration-node-2",
+      "originalText": "add_url_rule",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "flask-sansio-route-registration-node-3-label",
+      "type": "text",
+      "x": 50.999999999999986,
+      "y": 467.5,
+      "width": 198.00000000000003,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aP",
+      "roundness": null,
+      "seed": 1142187557,
+      "version": 1,
+      "versionNonce": 1764213423,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "flask-sansio-route-registration"
+      },
+      "text": "register_blueprint",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "flask-sansio-route-registration-node-3",
+      "originalText": "register_blueprint",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "flask-sansio-route-registration-node-4-label",
+      "type": "text",
+      "x": 1810.5,
+      "y": 307.5,
+      "width": 99.00000000000001,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aQ",
+      "roundness": null,
+      "seed": 920961950,
+      "version": 1,
+      "versionNonce": 878428354,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "flask-sansio-route-registration"
+      },
+      "text": "Blueprint",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "flask-sansio-route-registration-node-4",
+      "originalText": "Blueprint",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "flask-sansio-route-registration-node-5-label",
+      "type": "text",
+      "x": 44,
+      "y": 47.5,
+      "width": 132,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aR",
+      "roundness": null,
+      "seed": 968264883,
+      "version": 1,
+      "versionNonce": 313457549,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "flask-sansio-route-registration"
+      },
+      "text": "add_url_rule",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "flask-sansio-route-registration-node-5",
+      "originalText": "add_url_rule",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "flask-sansio-route-registration-node-6-label",
+      "type": "text",
+      "x": 636,
+      "y": 467.5,
+      "width": 88,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aS",
+      "roundness": null,
+      "seed": 1409203044,
+      "version": 1,
+      "versionNonce": 974896368,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "flask-sansio-route-registration"
+      },
+      "text": "register",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "flask-sansio-route-registration-node-6",
+      "originalText": "register",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "flask-sansio-route-registration-node-7-label",
+      "type": "text",
+      "x": 1125.5,
+      "y": 467.5,
+      "width": 209.00000000000003,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aT",
+      "roundness": null,
+      "seed": 1236451873,
+      "version": 1,
+      "versionNonce": 1999924971,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "flask-sansio-route-registration"
+      },
+      "text": "BlueprintSetupState",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "flask-sansio-route-registration-node-7",
+      "originalText": "BlueprintSetupState",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "flask-sansio-route-registration-node-8-label",
+      "type": "text",
+      "x": 924,
+      "y": 47.5,
+      "width": 132,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aU",
+      "roundness": null,
+      "seed": 1341521226,
+      "version": 1,
+      "versionNonce": 757613470,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "flask-sansio-route-registration"
+      },
+      "text": "add_url_rule",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "flask-sansio-route-registration-node-8",
+      "originalText": "add_url_rule",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "flask-sansio-route-registration-node-9-label",
+      "type": "text",
+      "x": 2081.5,
+      "y": 47.5,
+      "width": 77,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aV",
+      "roundness": null,
+      "seed": 1470600015,
+      "version": 1,
+      "versionNonce": 1907479593,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "flask-sansio-route-registration"
+      },
+      "text": "url_map",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "flask-sansio-route-registration-node-9",
+      "originalText": "url_map",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "flask-sansio-route-registration-node-10-label",
+      "type": "text",
+      "x": 2073,
+      "y": 207.5,
+      "width": 154,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aW",
+      "roundness": null,
+      "seed": 170403461,
+      "version": 1,
+      "versionNonce": 1555616911,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "flask-sansio-route-registration"
+      },
+      "text": "view_functions",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "flask-sansio-route-registration-node-10",
+      "originalText": "view_functions",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "flask-sansio-route-registration-node-11-label",
+      "type": "text",
+      "x": 651,
+      "y": 47.5,
+      "width": 198.00000000000003,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aX",
+      "roundness": null,
+      "seed": 1853920056,
+      "version": 1,
+      "versionNonce": 2098558356,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "flask-sansio-route-registration"
+      },
+      "text": "deferred_functions",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "flask-sansio-route-registration-node-11",
+      "originalText": "deferred_functions",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "flask-sansio-route-registration-edge-0-label",
+      "type": "text",
+      "x": 2150.5333333333333,
+      "y": 462,
+      "width": 79.2,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aY",
+      "roundness": null,
+      "seed": 2129214149,
+      "version": 1,
+      "versionNonce": 1714558415,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "flask-sansio-route-registration"
+      },
+      "text": "@conforms",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "flask-sansio-route-registration-edge-0",
+      "originalText": "@conforms",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "flask-sansio-route-registration-edge-1-label",
+      "type": "text",
+      "x": 2087.2,
+      "y": 302,
+      "width": 79.2,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aZ",
+      "roundness": null,
+      "seed": 1741254776,
+      "version": 1,
+      "versionNonce": 717916884,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "flask-sansio-route-registration"
+      },
+      "text": "@conforms",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "flask-sansio-route-registration-edge-1",
+      "originalText": "@conforms",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "flask-sansio-route-registration-edge-2-label",
+      "type": "text",
+      "x": 412,
+      "y": 462,
+      "width": 52.800000000000004,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aa",
+      "roundness": null,
+      "seed": 536555975,
+      "version": 1,
+      "versionNonce": 1724183521,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "flask-sansio-route-registration"
+      },
+      "text": "@calls",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "flask-sansio-route-registration-edge-2",
+      "originalText": "@calls",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "flask-sansio-route-registration-edge-3-label",
+      "type": "text",
+      "x": 904.8000000000001,
+      "y": 462,
+      "width": 61.60000000000001,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "ab",
+      "roundness": null,
+      "seed": 289870114,
+      "version": 1,
+      "versionNonce": 831329814,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "flask-sansio-route-registration"
+      },
+      "text": "@builds",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "flask-sansio-route-registration-edge-3",
+      "originalText": "@builds",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "flask-sansio-route-registration-edge-4-label",
+      "type": "text",
+      "x": 1506.4,
+      "y": 462,
+      "width": 140.8,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "ac",
+      "roundness": null,
+      "seed": 462357825,
+      "version": 1,
+      "versionNonce": 1630586507,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "flask-sansio-route-registration"
+      },
+      "text": "app field @holds",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "flask-sansio-route-registration-edge-4",
+      "originalText": "app field @holds",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "flask-sansio-route-registration-edge-5-label",
+      "type": "text",
+      "x": 332,
+      "y": 42,
+      "width": 149.60000000000002,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "ad",
+      "roundness": null,
+      "seed": 1942967428,
+      "version": 1,
+      "versionNonce": 54350992,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "flask-sansio-route-registration"
+      },
+      "text": "records @accesses",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "flask-sansio-route-registration-edge-5",
+      "originalText": "records @accesses",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "flask-sansio-route-registration-edge-6-label",
+      "type": "text",
+      "x": 1221.6,
+      "y": 58.66666666666667,
+      "width": 52.800000000000004,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "ae",
+      "roundness": null,
+      "seed": 7276243,
+      "version": 1,
+      "versionNonce": 1658713389,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "flask-sansio-route-registration"
+      },
+      "text": "@calls",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "flask-sansio-route-registration-edge-6",
+      "originalText": "@calls",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "flask-sansio-route-registration-edge-7-label",
+      "type": "text",
+      "x": 1734.4,
+      "y": 42,
+      "width": 167.20000000000002,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "af",
+      "roundness": null,
+      "seed": 1027115582,
+      "version": 1,
+      "versionNonce": 1618502114,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "flask-sansio-route-registration"
+      },
+      "text": "adds rule @accesses",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "flask-sansio-route-registration-edge-7",
+      "originalText": "adds rule @accesses",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "flask-sansio-route-registration-edge-8-label",
+      "type": "text",
+      "x": 1693.0666666666668,
+      "y": 202,
+      "width": 123.20000000000002,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "ag",
+      "roundness": null,
+      "seed": 199284237,
+      "version": 1,
+      "versionNonce": 1699597815,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "flask-sansio-route-registration"
+      },
+      "text": "maps @accesses",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "flask-sansio-route-registration-edge-8",
+      "originalText": "maps @accesses",
+      "autoResize": true,
+      "lineHeight": 1.25
+    }
+  ],
+  "appState": {
+    "gridSize": null,
+    "viewBackgroundColor": "#ffffff"
+  },
+  "files": {},
+  "diagramos": {
+    "version": "0.2.0-rc.6",
+    "schema": 1
+  }
+}

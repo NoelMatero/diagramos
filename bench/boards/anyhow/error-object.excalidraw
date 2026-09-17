@@ -1,0 +1,2113 @@
+{
+  "type": "excalidraw",
+  "version": 2,
+  "source": "diagramos",
+  "elements": [
+    {
+      "id": "type-erased-error-object-and-vtable-layo-title",
+      "type": "text",
+      "x": 0,
+      "y": -115,
+      "width": 554.4000000000001,
+      "height": 30,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a0",
+      "roundness": null,
+      "seed": 1799262334,
+      "version": 1,
+      "versionNonce": 293144098,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "type-erased-error-object-and-vtable-layo",
+        "role": "title",
+        "direction": "DOWN"
+      },
+      "text": "Type-Erased Error Object and VTable Layout",
+      "fontSize": 24,
+      "fontFamily": 5,
+      "textAlign": "left",
+      "verticalAlign": "middle",
+      "containerId": null,
+      "originalText": "Type-Erased Error Object and VTable Layout",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "type-erased-error-object-and-vtable-layo-node-0",
+      "type": "rectangle",
+      "x": 600,
+      "y": 20,
+      "width": 220,
+      "height": 80,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a1",
+      "roundness": null,
+      "seed": 1981349601,
+      "version": 1,
+      "versionNonce": 1256112555,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "type-erased-error-object-and-vtable-layo-node-0-label"
+        },
+        {
+          "id": "type-erased-error-object-and-vtable-layo-edge-0",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "type-erased-error-object-and-vtable-layo",
+        "node": "error_struct",
+        "ref": "src/lib.rs#Error"
+      }
+    },
+    {
+      "id": "type-erased-error-object-and-vtable-layo-node-1",
+      "type": "rectangle",
+      "x": 520,
+      "y": 800,
+      "width": 300,
+      "height": 100,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a2",
+      "roundness": null,
+      "seed": 1218868280,
+      "version": 1,
+      "versionNonce": 1723246740,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "type-erased-error-object-and-vtable-layo-node-1-label"
+        },
+        {
+          "id": "type-erased-error-object-and-vtable-layo-edge-1",
+          "type": "arrow"
+        },
+        {
+          "id": "type-erased-error-object-and-vtable-layo-edge-4",
+          "type": "arrow"
+        },
+        {
+          "id": "type-erased-error-object-and-vtable-layo-edge-6",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "type-erased-error-object-and-vtable-layo",
+        "node": "error_impl_box",
+        "ref": "src/error.rs#construct"
+      }
+    },
+    {
+      "id": "type-erased-error-object-and-vtable-layo-node-2",
+      "type": "rectangle",
+      "x": 860,
+      "y": 1200,
+      "width": 320,
+      "height": 80,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a3",
+      "roundness": null,
+      "seed": 1854475111,
+      "version": 1,
+      "versionNonce": 475084545,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "type-erased-error-object-and-vtable-layo-node-2-label"
+        },
+        {
+          "id": "type-erased-error-object-and-vtable-layo-edge-2",
+          "type": "arrow"
+        },
+        {
+          "id": "type-erased-error-object-and-vtable-layo-edge-3",
+          "type": "arrow"
+        },
+        {
+          "id": "type-erased-error-object-and-vtable-layo-edge-6",
+          "type": "arrow"
+        },
+        {
+          "id": "type-erased-error-object-and-vtable-layo-edge-7",
+          "type": "arrow"
+        },
+        {
+          "id": "type-erased-error-object-and-vtable-layo-edge-8",
+          "type": "arrow"
+        },
+        {
+          "id": "type-erased-error-object-and-vtable-layo-edge-9",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "type-erased-error-object-and-vtable-layo",
+        "node": "error_impl_layout",
+        "ref": "src/error.rs#ErrorImpl"
+      }
+    },
+    {
+      "id": "type-erased-error-object-and-vtable-layo-node-3",
+      "type": "rectangle",
+      "x": 520,
+      "y": 1580,
+      "width": 340,
+      "height": 80,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a4",
+      "roundness": null,
+      "seed": 1302711766,
+      "version": 1,
+      "versionNonce": 1590434746,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "type-erased-error-object-and-vtable-layo-node-3-label"
+        },
+        {
+          "id": "type-erased-error-object-and-vtable-layo-edge-2",
+          "type": "arrow"
+        },
+        {
+          "id": "type-erased-error-object-and-vtable-layo-edge-5",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "type-erased-error-object-and-vtable-layo",
+        "node": "vtable_struct",
+        "ref": "src/error.rs#ErrorVTable"
+      }
+    },
+    {
+      "id": "type-erased-error-object-and-vtable-layo-node-4",
+      "type": "rectangle",
+      "x": 1300,
+      "y": 800,
+      "width": 300,
+      "height": 100,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a5",
+      "roundness": null,
+      "seed": 204025997,
+      "version": 1,
+      "versionNonce": 1463043447,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "type-erased-error-object-and-vtable-layo-node-4-label"
+        },
+        {
+          "id": "type-erased-error-object-and-vtable-layo-edge-8",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "type-erased-error-object-and-vtable-layo",
+        "node": "downcast_fn",
+        "ref": "src/error.rs#object_downcast"
+      }
+    },
+    {
+      "id": "type-erased-error-object-and-vtable-layo-node-5",
+      "type": "rectangle",
+      "x": 560,
+      "y": 400,
+      "width": 300,
+      "height": 100,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a6",
+      "roundness": null,
+      "seed": 586570036,
+      "version": 1,
+      "versionNonce": 632875264,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "type-erased-error-object-and-vtable-layo-node-5-label"
+        },
+        {
+          "id": "type-erased-error-object-and-vtable-layo-edge-0",
+          "type": "arrow"
+        },
+        {
+          "id": "type-erased-error-object-and-vtable-layo-edge-1",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "type-erased-error-object-and-vtable-layo",
+        "node": "own_wrapper",
+        "ref": "src/ptr.rs#Own"
+      }
+    },
+    {
+      "id": "type-erased-error-object-and-vtable-layo-node-6",
+      "type": "rectangle",
+      "x": 900,
+      "y": 820,
+      "width": 320,
+      "height": 80,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a7",
+      "roundness": null,
+      "seed": 463993955,
+      "version": 1,
+      "versionNonce": 425266685,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "type-erased-error-object-and-vtable-layo-node-6-label"
+        },
+        {
+          "id": "type-erased-error-object-and-vtable-layo-edge-7",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "type-erased-error-object-and-vtable-layo",
+        "node": "object_ref_fn",
+        "ref": "src/error.rs#object_ref"
+      }
+    },
+    {
+      "id": "type-erased-error-object-and-vtable-layo-node-7",
+      "type": "rectangle",
+      "x": 180,
+      "y": 400,
+      "width": 300,
+      "height": 100,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a8",
+      "roundness": null,
+      "seed": 441499378,
+      "version": 1,
+      "versionNonce": 147803046,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "type-erased-error-object-and-vtable-layo-node-7-label"
+        },
+        {
+          "id": "type-erased-error-object-and-vtable-layo-edge-4",
+          "type": "arrow"
+        },
+        {
+          "id": "type-erased-error-object-and-vtable-layo-edge-5",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "type-erased-error-object-and-vtable-layo",
+        "node": "construct_fn",
+        "ref": "src/error.rs#construct"
+      }
+    },
+    {
+      "id": "type-erased-error-object-and-vtable-layo-node-8",
+      "type": "rectangle",
+      "x": 120,
+      "y": 820,
+      "width": 320,
+      "height": 80,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a9",
+      "roundness": null,
+      "seed": 1221855353,
+      "version": 1,
+      "versionNonce": 952205891,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "type-erased-error-object-and-vtable-layo-node-8-label"
+        },
+        {
+          "id": "type-erased-error-object-and-vtable-layo-edge-9",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "type-erased-error-object-and-vtable-layo",
+        "node": "drop_fn",
+        "ref": "src/error.rs#object_drop"
+      }
+    },
+    {
+      "id": "type-erased-error-object-and-vtable-layo-node-9",
+      "type": "rectangle",
+      "x": 940,
+      "y": 1580,
+      "width": 280,
+      "height": 80,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aA",
+      "roundness": null,
+      "seed": 1331484656,
+      "version": 1,
+      "versionNonce": 126351692,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "type-erased-error-object-and-vtable-layo-node-9-label"
+        },
+        {
+          "id": "type-erased-error-object-and-vtable-layo-edge-3",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "type-erased-error-object-and-vtable-layo",
+        "node": "backtrace_field",
+        "ref": "src/error.rs#ErrorImpl"
+      }
+    },
+    {
+      "id": "type-erased-error-object-and-vtable-layo-edge-0",
+      "type": "arrow",
+      "x": 715.8,
+      "y": 92,
+      "width": 0,
+      "height": 300.8,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aB",
+      "roundness": null,
+      "seed": 1012095958,
+      "version": 1,
+      "versionNonce": 436381114,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "type-erased-error-object-and-vtable-layo-edge-0-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "type-erased-error-object-and-vtable-layo",
+        "edge": {
+          "from": "error_struct",
+          "to": "own_wrapper",
+          "claim": "holds"
+        }
+      },
+      "points": [
+        [
+          0,
+          0.5
+        ],
+        [
+          0,
+          150.4
+        ],
+        [
+          0,
+          300.3
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "type-erased-error-object-and-vtable-layo-node-0",
+        "focus": -0.052727272727272366,
+        "gap": 8
+      },
+      "endBinding": {
+        "elementId": "type-erased-error-object-and-vtable-layo-node-5",
+        "focus": 0.038666666666666405,
+        "gap": 7.199999999999989
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "type-erased-error-object-and-vtable-layo-edge-1",
+      "type": "arrow",
+      "x": 715.8,
+      "y": 492.8,
+      "width": 0,
+      "height": 300.7999999999999,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aC",
+      "roundness": null,
+      "seed": 1563859303,
+      "version": 1,
+      "versionNonce": 1468514561,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "type-erased-error-object-and-vtable-layo-edge-1-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "type-erased-error-object-and-vtable-layo",
+        "edge": {
+          "from": "own_wrapper",
+          "to": "error_impl_box",
+          "claim": "needs"
+        }
+      },
+      "points": [
+        [
+          0,
+          0.5
+        ],
+        [
+          0,
+          150.39999999999992
+        ],
+        [
+          0,
+          300.2999999999999
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "type-erased-error-object-and-vtable-layo-node-5",
+        "focus": -0.038666666666666405,
+        "gap": 7.199999999999989
+      },
+      "endBinding": {
+        "elementId": "type-erased-error-object-and-vtable-layo-node-1",
+        "focus": 0.305333333333333,
+        "gap": 6.400000000000091
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "type-erased-error-object-and-vtable-layo-edge-2",
+      "type": "arrow",
+      "x": 970.4666666666666,
+      "y": 1274.3999999999999,
+      "width": 226.66666666666674,
+      "height": 300.79999999999995,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aD",
+      "roundness": null,
+      "seed": 928252472,
+      "version": 1,
+      "versionNonce": 569193108,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "type-erased-error-object-and-vtable-layo-edge-2-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "type-erased-error-object-and-vtable-layo",
+        "edge": {
+          "from": "error_impl_layout",
+          "to": "vtable_struct",
+          "claim": "holds"
+        }
+      },
+      "points": [
+        [
+          0,
+          0.5
+        ],
+        [
+          1.1368683772161603e-13,
+          32
+        ],
+        [
+          -226.66666666666663,
+          32
+        ],
+        [
+          -226.66666666666663,
+          37.066666666666606
+        ],
+        [
+          -226.66666666666663,
+          168.93333333333317
+        ],
+        [
+          -226.66666666666663,
+          234.86666666666656
+        ],
+        [
+          -226.66666666666663,
+          300.29999999999995
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "type-erased-error-object-and-vtable-layo-node-2",
+        "focus": 0.3095833333333346,
+        "gap": 5.600000000000136
+      },
+      "endBinding": {
+        "elementId": "type-erased-error-object-and-vtable-layo-node-3",
+        "focus": 0.31647058823529395,
+        "gap": 4.800000000000182
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "type-erased-error-object-and-vtable-layo-edge-3",
+      "type": "arrow",
+      "x": 1077.1333333333332,
+      "y": 1274.3999999999999,
+      "width": 0,
+      "height": 300.79999999999995,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aE",
+      "roundness": null,
+      "seed": 1690733793,
+      "version": 1,
+      "versionNonce": 102058923,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "type-erased-error-object-and-vtable-layo-edge-3-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "type-erased-error-object-and-vtable-layo",
+        "edge": {
+          "from": "error_impl_layout",
+          "to": "backtrace_field",
+          "claim": "holds"
+        }
+      },
+      "points": [
+        [
+          0,
+          0.5
+        ],
+        [
+          0,
+          150.39999999999986
+        ],
+        [
+          0,
+          300.29999999999995
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "type-erased-error-object-and-vtable-layo-node-2",
+        "focus": -0.3570833333333326,
+        "gap": 5.600000000000136
+      },
+      "endBinding": {
+        "elementId": "type-erased-error-object-and-vtable-layo-node-9",
+        "focus": -0.020476190476191095,
+        "gap": 4.800000000000182
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "type-erased-error-object-and-vtable-layo-edge-4",
+      "type": "arrow",
+      "x": 385.79999999999995,
+      "y": 492.8,
+      "width": 230,
+      "height": 300.7999999999999,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aF",
+      "roundness": null,
+      "seed": 150883570,
+      "version": 1,
+      "versionNonce": 1141233062,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "type-erased-error-object-and-vtable-layo-edge-4-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "type-erased-error-object-and-vtable-layo",
+        "edge": {
+          "from": "construct_fn",
+          "to": "error_impl_box",
+          "claim": "builds"
+        }
+      },
+      "points": [
+        [
+          0,
+          0.5
+        ],
+        [
+          0,
+          192.7999999999999
+        ],
+        [
+          72.60000000000008,
+          192.7999999999999
+        ],
+        [
+          230,
+          192.7999999999999
+        ],
+        [
+          230,
+          300.2999999999999
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "type-erased-error-object-and-vtable-layo-node-7",
+        "focus": -0.3719999999999998,
+        "gap": 7.199999999999989
+      },
+      "endBinding": {
+        "elementId": "type-erased-error-object-and-vtable-layo-node-1",
+        "focus": -0.3613333333333337,
+        "gap": 6.400000000000091
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "type-erased-error-object-and-vtable-layo-edge-5",
+      "type": "arrow",
+      "x": 285.79999999999995,
+      "y": 492.8,
+      "width": 555.6666666666667,
+      "height": 1082.3999999999999,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aG",
+      "roundness": null,
+      "seed": 173378147,
+      "version": 1,
+      "versionNonce": 1418696701,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "type-erased-error-object-and-vtable-layo-edge-5-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "type-erased-error-object-and-vtable-layo",
+        "edge": {
+          "from": "construct_fn",
+          "to": "vtable_struct",
+          "claim": "takes"
+        }
+      },
+      "points": [
+        [
+          0,
+          0.5
+        ],
+        [
+          0,
+          31.999999999999943
+        ],
+        [
+          -211,
+          31.999999999999943
+        ],
+        [
+          -211,
+          713.5333333333333
+        ],
+        [
+          -211,
+          974.3999999999999
+        ],
+        [
+          344.66666666666674,
+          974.3999999999999
+        ],
+        [
+          344.66666666666674,
+          1081.8999999999999
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "type-erased-error-object-and-vtable-layo-node-7",
+        "focus": 0.29466666666666697,
+        "gap": 7.2000000000000455
+      },
+      "endBinding": {
+        "elementId": "type-erased-error-object-and-vtable-layo-node-3",
+        "focus": -0.35019607843137235,
+        "gap": 4.800000000000182
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "type-erased-error-object-and-vtable-layo-edge-6",
+      "type": "arrow",
+      "x": 665.8,
+      "y": 893.5999999999999,
+      "width": 326,
+      "height": 300.79999999999995,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aH",
+      "roundness": null,
+      "seed": 295954228,
+      "version": 1,
+      "versionNonce": 1626305280,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "type-erased-error-object-and-vtable-layo-edge-6-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "type-erased-error-object-and-vtable-layo",
+        "edge": {
+          "from": "error_impl_box",
+          "to": "error_impl_layout",
+          "claim": "builds"
+        }
+      },
+      "points": [
+        [
+          0,
+          0.5
+        ],
+        [
+          0,
+          192.79999999999995
+        ],
+        [
+          120.60000000000002,
+          192.79999999999995
+        ],
+        [
+          326,
+          192.79999999999995
+        ],
+        [
+          326,
+          300.29999999999995
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "type-erased-error-object-and-vtable-layo-node-1",
+        "focus": 0.02800000000000023,
+        "gap": 6.400000000000091
+      },
+      "endBinding": {
+        "elementId": "type-erased-error-object-and-vtable-layo-node-2",
+        "focus": -0.17625000000000018,
+        "gap": 5.600000000000136
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "type-erased-error-object-and-vtable-layo-edge-7",
+      "type": "arrow",
+      "x": 1055.8,
+      "y": 893.5999999999999,
+      "width": 0,
+      "height": 300.79999999999995,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aI",
+      "roundness": null,
+      "seed": 2060893837,
+      "version": 1,
+      "versionNonce": 308989815,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "type-erased-error-object-and-vtable-layo-edge-7-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "type-erased-error-object-and-vtable-layo",
+        "edge": {
+          "from": "object_ref_fn",
+          "to": "error_impl_layout",
+          "claim": "takes"
+        }
+      },
+      "points": [
+        [
+          0,
+          0.5
+        ],
+        [
+          0,
+          150.4000000000001
+        ],
+        [
+          0,
+          300.29999999999995
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "type-erased-error-object-and-vtable-layo-node-6",
+        "focus": 0.026250000000000197,
+        "gap": 6.400000000000091
+      },
+      "endBinding": {
+        "elementId": "type-erased-error-object-and-vtable-layo-node-2",
+        "focus": 0.2237499999999998,
+        "gap": 5.600000000000136
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "type-erased-error-object-and-vtable-layo-edge-8",
+      "type": "arrow",
+      "x": 1445.8,
+      "y": 893.5999999999999,
+      "width": 326,
+      "height": 300.79999999999995,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aJ",
+      "roundness": null,
+      "seed": 574695182,
+      "version": 1,
+      "versionNonce": 541633202,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "type-erased-error-object-and-vtable-layo-edge-8-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "type-erased-error-object-and-vtable-layo",
+        "edge": {
+          "from": "downcast_fn",
+          "to": "error_impl_layout",
+          "claim": "takes"
+        }
+      },
+      "points": [
+        [
+          0,
+          0.5
+        ],
+        [
+          0,
+          192.79999999999995
+        ],
+        [
+          -120.60000000000014,
+          192.79999999999995
+        ],
+        [
+          -326,
+          192.79999999999995
+        ],
+        [
+          -326,
+          300.29999999999995
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "type-erased-error-object-and-vtable-layo-node-4",
+        "focus": 0.02800000000000023,
+        "gap": 6.400000000000091
+      },
+      "endBinding": {
+        "elementId": "type-erased-error-object-and-vtable-layo-node-2",
+        "focus": 0.6237499999999997,
+        "gap": 5.600000000000136
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "type-erased-error-object-and-vtable-layo-edge-9",
+      "type": "arrow",
+      "x": 275.79999999999995,
+      "y": 893.5999999999999,
+      "width": 652,
+      "height": 300.79999999999995,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aK",
+      "roundness": null,
+      "seed": 1591175455,
+      "version": 1,
+      "versionNonce": 2002851257,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "type-erased-error-object-and-vtable-layo-edge-9-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "type-erased-error-object-and-vtable-layo",
+        "edge": {
+          "from": "drop_fn",
+          "to": "error_impl_layout",
+          "claim": "takes"
+        }
+      },
+      "points": [
+        [
+          0,
+          0.5
+        ],
+        [
+          0,
+          216.79999999999995
+        ],
+        [
+          259.6,
+          216.79999999999995
+        ],
+        [
+          652,
+          216.79999999999995
+        ],
+        [
+          652,
+          300.29999999999995
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "type-erased-error-object-and-vtable-layo-node-8",
+        "focus": 0.026250000000000197,
+        "gap": 6.400000000000091
+      },
+      "endBinding": {
+        "elementId": "type-erased-error-object-and-vtable-layo-node-2",
+        "focus": -0.5762500000000002,
+        "gap": 5.600000000000136
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "type-erased-error-object-and-vtable-layo-node-0-label",
+      "type": "text",
+      "x": 666,
+      "y": 35,
+      "width": 88,
+      "height": 50,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aL",
+      "roundness": null,
+      "seed": 593071672,
+      "version": 1,
+      "versionNonce": 782800532,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "type-erased-error-object-and-vtable-layo"
+      },
+      "text": "Error\nthin ptr",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "type-erased-error-object-and-vtable-layo-node-0",
+      "originalText": "Error\nthin ptr",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "type-erased-error-object-and-vtable-layo-node-1-label",
+      "type": "text",
+      "x": 576.5,
+      "y": 825,
+      "width": 187.00000000000003,
+      "height": 50,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aM",
+      "roundness": null,
+      "seed": 1057038725,
+      "version": 1,
+      "versionNonce": 239859087,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "type-erased-error-object-and-vtable-layo"
+      },
+      "text": "Box<ErrorImpl<E>>\nheap alloc",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "type-erased-error-object-and-vtable-layo-node-1",
+      "originalText": "Box<ErrorImpl<E>>\nheap alloc",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "type-erased-error-object-and-vtable-layo-node-2-label",
+      "type": "text",
+      "x": 954,
+      "y": 1215,
+      "width": 132,
+      "height": 50,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aN",
+      "roundness": null,
+      "seed": 308475106,
+      "version": 1,
+      "versionNonce": 1195778006,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "type-erased-error-object-and-vtable-layo"
+      },
+      "text": "ErrorImpl<E>\n[C layout]",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "type-erased-error-object-and-vtable-layo-node-2",
+      "originalText": "ErrorImpl<E>\n[C layout]",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "type-erased-error-object-and-vtable-layo-node-3-label",
+      "type": "text",
+      "x": 618.5,
+      "y": 1595,
+      "width": 143,
+      "height": 50,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aO",
+      "roundness": null,
+      "seed": 1611864199,
+      "version": 1,
+      "versionNonce": 1374798753,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "type-erased-error-object-and-vtable-layo"
+      },
+      "text": "ErrorVTable\nfunction ptrs",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "type-erased-error-object-and-vtable-layo-node-3",
+      "originalText": "ErrorVTable\nfunction ptrs",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "type-erased-error-object-and-vtable-layo-node-4-label",
+      "type": "text",
+      "x": 1367.5,
+      "y": 825,
+      "width": 165,
+      "height": 50,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aP",
+      "roundness": null,
+      "seed": 113888580,
+      "version": 1,
+      "versionNonce": 914133072,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "type-erased-error-object-and-vtable-layo"
+      },
+      "text": "object_downcast\nTypeId lookup",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "type-erased-error-object-and-vtable-layo-node-4",
+      "originalText": "object_downcast\nTypeId lookup",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "type-erased-error-object-and-vtable-layo-node-5-label",
+      "type": "text",
+      "x": 633,
+      "y": 425,
+      "width": 154,
+      "height": 50,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aQ",
+      "roundness": null,
+      "seed": 1814472705,
+      "version": 1,
+      "versionNonce": 464380491,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "type-erased-error-object-and-vtable-layo"
+      },
+      "text": "Own<ErrorImpl>\nNonNull thin",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "type-erased-error-object-and-vtable-layo-node-5",
+      "originalText": "Own<ErrorImpl>\nNonNull thin",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "type-erased-error-object-and-vtable-layo-node-6-label",
+      "type": "text",
+      "x": 994,
+      "y": 835,
+      "width": 132,
+      "height": 50,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aR",
+      "roundness": null,
+      "seed": 1035563006,
+      "version": 1,
+      "versionNonce": 1759960226,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "type-erased-error-object-and-vtable-layo"
+      },
+      "text": "object_ref\nto dyn Error",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "type-erased-error-object-and-vtable-layo-node-6",
+      "originalText": "object_ref\nto dyn Error",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "type-erased-error-object-and-vtable-layo-node-7-label",
+      "type": "text",
+      "x": 242,
+      "y": 425,
+      "width": 176,
+      "height": 50,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aS",
+      "roundness": null,
+      "seed": 379497619,
+      "version": 1,
+      "versionNonce": 1989408493,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "type-erased-error-object-and-vtable-layo"
+      },
+      "text": "Error::construct\nbox & erase",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "type-erased-error-object-and-vtable-layo-node-7",
+      "originalText": "Error::construct\nbox & erase",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "type-erased-error-object-and-vtable-layo-node-8-label",
+      "type": "text",
+      "x": 219.5,
+      "y": 835,
+      "width": 121.00000000000001,
+      "height": 50,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aT",
+      "roundness": null,
+      "seed": 1442040064,
+      "version": 1,
+      "versionNonce": 1790841820,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "type-erased-error-object-and-vtable-layo"
+      },
+      "text": "object_drop\ndrop & free",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "type-erased-error-object-and-vtable-layo-node-8",
+      "originalText": "object_drop\ndrop & free",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "type-erased-error-object-and-vtable-layo-node-9-label",
+      "type": "text",
+      "x": 1025,
+      "y": 1595,
+      "width": 110.00000000000001,
+      "height": 50,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aU",
+      "roundness": null,
+      "seed": 297030349,
+      "version": 1,
+      "versionNonce": 1045011895,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "type-erased-error-object-and-vtable-layo"
+      },
+      "text": "backtrace\nOption<BT>",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "type-erased-error-object-and-vtable-layo-node-9",
+      "originalText": "backtrace\nOption<BT>",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "type-erased-error-object-and-vtable-layo-edge-0-label",
+      "type": "text",
+      "x": 663,
+      "y": 232.4,
+      "width": 105.60000000000001,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aV",
+      "roundness": null,
+      "seed": 551827079,
+      "version": 1,
+      "versionNonce": 1529085345,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "type-erased-error-object-and-vtable-layo"
+      },
+      "text": "inner @holds",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "type-erased-error-object-and-vtable-layo-edge-0",
+      "originalText": "inner @holds",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "type-erased-error-object-and-vtable-layo-edge-1-label",
+      "type": "text",
+      "x": 689.4,
+      "y": 633.1999999999999,
+      "width": 52.800000000000004,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aW",
+      "roundness": null,
+      "seed": 1395921634,
+      "version": 1,
+      "versionNonce": 1350064598,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "type-erased-error-object-and-vtable-layo"
+      },
+      "text": "@needs",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "type-erased-error-object-and-vtable-layo-edge-1",
+      "originalText": "@needs",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "type-erased-error-object-and-vtable-layo-edge-2-label",
+      "type": "text",
+      "x": 686.5999999999999,
+      "y": 1301.4666666666665,
+      "width": 114.4,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aX",
+      "roundness": null,
+      "seed": 2144485253,
+      "version": 1,
+      "versionNonce": 394145679,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "type-erased-error-object-and-vtable-layo"
+      },
+      "text": "vtable @holds",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "type-erased-error-object-and-vtable-layo-edge-2",
+      "originalText": "vtable @holds",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "type-erased-error-object-and-vtable-layo-edge-3-label",
+      "type": "text",
+      "x": 1006.7333333333332,
+      "y": 1414.7999999999997,
+      "width": 140.8,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aY",
+      "roundness": null,
+      "seed": 1680518200,
+      "version": 1,
+      "versionNonce": 937087124,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "type-erased-error-object-and-vtable-layo"
+      },
+      "text": "backtrace @holds",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "type-erased-error-object-and-vtable-layo-edge-3",
+      "originalText": "backtrace @holds",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "type-erased-error-object-and-vtable-layo-edge-4-label",
+      "type": "text",
+      "x": 427.6,
+      "y": 675.5999999999999,
+      "width": 61.60000000000001,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aZ",
+      "roundness": null,
+      "seed": 1466944147,
+      "version": 1,
+      "versionNonce": 2143695085,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "type-erased-error-object-and-vtable-layo"
+      },
+      "text": "@builds",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "type-erased-error-object-and-vtable-layo-edge-4",
+      "originalText": "@builds",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "type-erased-error-object-and-vtable-layo-edge-5-label",
+      "type": "text",
+      "x": 48.39999999999995,
+      "y": 1196.3333333333333,
+      "width": 52.800000000000004,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aa",
+      "roundness": null,
+      "seed": 2123009534,
+      "version": 1,
+      "versionNonce": 1914246818,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "type-erased-error-object-and-vtable-layo"
+      },
+      "text": "@takes",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "type-erased-error-object-and-vtable-layo-edge-5",
+      "originalText": "@takes",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "type-erased-error-object-and-vtable-layo-edge-6-label",
+      "type": "text",
+      "x": 755.6,
+      "y": 1076.3999999999999,
+      "width": 61.60000000000001,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "ab",
+      "roundness": null,
+      "seed": 754435585,
+      "version": 1,
+      "versionNonce": 618667083,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "type-erased-error-object-and-vtable-layo"
+      },
+      "text": "@builds",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "type-erased-error-object-and-vtable-layo-edge-6",
+      "originalText": "@builds",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "type-erased-error-object-and-vtable-layo-edge-7-label",
+      "type": "text",
+      "x": 1029.3999999999999,
+      "y": 1034,
+      "width": 52.800000000000004,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "ac",
+      "roundness": null,
+      "seed": 1201335108,
+      "version": 1,
+      "versionNonce": 1068419664,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "type-erased-error-object-and-vtable-layo"
+      },
+      "text": "@takes",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "type-erased-error-object-and-vtable-layo-edge-7",
+      "originalText": "@takes",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "type-erased-error-object-and-vtable-layo-edge-8-label",
+      "type": "text",
+      "x": 1298.7999999999997,
+      "y": 1076.3999999999999,
+      "width": 52.800000000000004,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "ad",
+      "roundness": null,
+      "seed": 414919087,
+      "version": 1,
+      "versionNonce": 59240969,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "type-erased-error-object-and-vtable-layo"
+      },
+      "text": "@takes",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "type-erased-error-object-and-vtable-layo-edge-8",
+      "originalText": "@takes",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "type-erased-error-object-and-vtable-layo-edge-9-label",
+      "type": "text",
+      "x": 509,
+      "y": 1100.3999999999999,
+      "width": 52.800000000000004,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "ae",
+      "roundness": null,
+      "seed": 364666026,
+      "version": 1,
+      "versionNonce": 186914686,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "type-erased-error-object-and-vtable-layo"
+      },
+      "text": "@takes",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "type-erased-error-object-and-vtable-layo-edge-9",
+      "originalText": "@takes",
+      "autoResize": true,
+      "lineHeight": 1.25
+    }
+  ],
+  "appState": {
+    "gridSize": null,
+    "viewBackgroundColor": "#ffffff"
+  },
+  "files": {},
+  "diagramos": {
+    "version": "0.2.0-rc.6",
+    "schema": 1
+  }
+}

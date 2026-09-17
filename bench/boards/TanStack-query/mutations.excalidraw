@@ -1,0 +1,1778 @@
+{
+  "type": "excalidraw",
+  "version": 2,
+  "source": "diagramos",
+  "elements": [
+    {
+      "id": "mutations-title",
+      "type": "text",
+      "x": 0,
+      "y": -115,
+      "width": 541.2,
+      "height": 30,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a0",
+      "roundness": null,
+      "seed": 1894201427,
+      "version": 1,
+      "versionNonce": 1880351149,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "mutations",
+        "role": "title"
+      },
+      "text": "Mutation Creation, Caching, and Execution",
+      "fontSize": 24,
+      "fontFamily": 5,
+      "textAlign": "left",
+      "verticalAlign": "middle",
+      "containerId": null,
+      "originalText": "Mutation Creation, Caching, and Execution",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "mutations-node-0",
+      "type": "rectangle",
+      "x": 20,
+      "y": 20,
+      "width": 160,
+      "height": 120,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a1",
+      "roundness": null,
+      "seed": 534840918,
+      "version": 1,
+      "versionNonce": 1376128314,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "mutations-node-0-label"
+        },
+        {
+          "id": "mutations-edge-0",
+          "type": "arrow"
+        },
+        {
+          "id": "mutations-edge-1",
+          "type": "arrow"
+        },
+        {
+          "id": "mutations-edge-3",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "mutations",
+        "node": "mutate",
+        "ref": "packages/query-core/src/mutationObserver.ts#mutate"
+      }
+    },
+    {
+      "id": "mutations-node-1",
+      "type": "rectangle",
+      "x": 500,
+      "y": 20,
+      "width": 200,
+      "height": 80,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a2",
+      "roundness": null,
+      "seed": 1086604263,
+      "version": 1,
+      "versionNonce": 260778113,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "mutations-node-1-label"
+        },
+        {
+          "id": "mutations-edge-0",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "mutations",
+        "node": "mutationcache",
+        "ref": "packages/query-core/src/mutationCache.ts#MutationCache"
+      }
+    },
+    {
+      "id": "mutations-node-2",
+      "type": "rectangle",
+      "x": 520,
+      "y": 180,
+      "width": 160,
+      "height": 80,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a3",
+      "roundness": null,
+      "seed": 450997432,
+      "version": 1,
+      "versionNonce": 1508940308,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "mutations-node-2-label"
+        },
+        {
+          "id": "mutations-edge-1",
+          "type": "arrow"
+        },
+        {
+          "id": "mutations-edge-2",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "mutations",
+        "node": "build",
+        "ref": "packages/query-core/src/mutationCache.ts#build"
+      }
+    },
+    {
+      "id": "mutations-node-3",
+      "type": "rectangle",
+      "x": 1040,
+      "y": 180,
+      "width": 160,
+      "height": 80,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a4",
+      "roundness": null,
+      "seed": 1213478753,
+      "version": 1,
+      "versionNonce": 1041806123,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "mutations-node-3-label"
+        },
+        {
+          "id": "mutations-edge-2",
+          "type": "arrow"
+        },
+        {
+          "id": "mutations-edge-7",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "mutations",
+        "node": "mutation",
+        "ref": "packages/query-core/src/mutation.ts#Mutation"
+      }
+    },
+    {
+      "id": "mutations-node-4",
+      "type": "rectangle",
+      "x": 540,
+      "y": 340,
+      "width": 160,
+      "height": 100,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a5",
+      "roundness": null,
+      "seed": 1821112178,
+      "version": 1,
+      "versionNonce": 2080980262,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "mutations-node-4-label"
+        },
+        {
+          "id": "mutations-edge-3",
+          "type": "arrow"
+        },
+        {
+          "id": "mutations-edge-4",
+          "type": "arrow"
+        },
+        {
+          "id": "mutations-edge-5",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "mutations",
+        "node": "execute",
+        "ref": "packages/query-core/src/mutation.ts#execute"
+      }
+    },
+    {
+      "id": "mutations-node-5",
+      "type": "rectangle",
+      "x": 1040,
+      "y": 500,
+      "width": 160,
+      "height": 80,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a6",
+      "roundness": null,
+      "seed": 1843606755,
+      "version": 1,
+      "versionNonce": 210960253,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "mutations-node-5-label"
+        },
+        {
+          "id": "mutations-edge-4",
+          "type": "arrow"
+        },
+        {
+          "id": "mutations-edge-6",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "mutations",
+        "node": "dispatch",
+        "ref": "packages/query-core/src/mutation.ts#dispatch"
+      }
+    },
+    {
+      "id": "mutations-node-6",
+      "type": "rectangle",
+      "x": 1040,
+      "y": 340,
+      "width": 160,
+      "height": 80,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a7",
+      "roundness": null,
+      "seed": 1966182836,
+      "version": 1,
+      "versionNonce": 418568832,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "mutations-node-6-label"
+        },
+        {
+          "id": "mutations-edge-5",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "mutations",
+        "node": "retryer",
+        "ref": "packages/query-core/src/retryer.ts#Retryer"
+      }
+    },
+    {
+      "id": "mutations-node-7",
+      "type": "rectangle",
+      "x": 1540,
+      "y": 180,
+      "width": 200,
+      "height": 80,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a8",
+      "roundness": null,
+      "seed": 1583638797,
+      "version": 1,
+      "versionNonce": 1248737015,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "mutations-node-7-label"
+        },
+        {
+          "id": "mutations-edge-7",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "mutations",
+        "node": "state",
+        "ref": "packages/query-core/src/mutation.ts#MutationState"
+      }
+    },
+    {
+      "id": "mutations-node-8",
+      "type": "rectangle",
+      "x": 1540,
+      "y": 500,
+      "width": 160,
+      "height": 80,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a9",
+      "roundness": null,
+      "seed": 97440142,
+      "version": 1,
+      "versionNonce": 1481380402,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "mutations-node-8-label"
+        },
+        {
+          "id": "mutations-edge-6",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "mutations",
+        "node": "action",
+        "ref": "packages/query-core/src/mutation.ts#Action"
+      }
+    },
+    {
+      "id": "mutations-edge-0",
+      "type": "arrow",
+      "x": 172,
+      "y": 52,
+      "width": 332.8,
+      "height": 0,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aA",
+      "roundness": null,
+      "seed": 1534238825,
+      "version": 1,
+      "versionNonce": 1622907763,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "mutations-edge-0-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "mutations",
+        "edge": {
+          "from": "mutate",
+          "to": "mutationcache",
+          "claim": "needs"
+        }
+      },
+      "points": [
+        [
+          0.5,
+          0
+        ],
+        [
+          166.39999999999998,
+          0
+        ],
+        [
+          332.3,
+          0
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "mutations-node-0",
+        "focus": -0.46666666666666673,
+        "gap": 8
+      },
+      "endBinding": {
+        "elementId": "mutations-node-1",
+        "focus": 0.19999999999999904,
+        "gap": 4.800000000000011
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "mutations-edge-1",
+      "type": "arrow",
+      "x": 172,
+      "y": 82,
+      "width": 352.79999999999995,
+      "height": 130,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aB",
+      "roundness": null,
+      "seed": 1973452704,
+      "version": 1,
+      "versionNonce": 347001084,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "mutations-edge-1-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "mutations",
+        "edge": {
+          "from": "mutate",
+          "to": "build",
+          "claim": "calls"
+        }
+      },
+      "points": [
+        [
+          0.5,
+          0
+        ],
+        [
+          56,
+          0
+        ],
+        [
+          56,
+          130
+        ],
+        [
+          111.39999999999998,
+          130
+        ],
+        [
+          171.75,
+          130
+        ],
+        [
+          232.09999999999997,
+          130
+        ],
+        [
+          352.29999999999995,
+          130
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "mutations-node-0",
+        "focus": 0.03333333333333337,
+        "gap": 8
+      },
+      "endBinding": {
+        "elementId": "mutations-node-2",
+        "focus": 0.2,
+        "gap": 4.7999999999999545
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "mutations-edge-2",
+      "type": "arrow",
+      "x": 684.8,
+      "y": 212,
+      "width": 361.60000000000014,
+      "height": 0,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aC",
+      "roundness": null,
+      "seed": 1449940111,
+      "version": 1,
+      "versionNonce": 1139256169,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "mutations-edge-2-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "mutations",
+        "edge": {
+          "from": "build",
+          "to": "mutation",
+          "claim": "builds"
+        }
+      },
+      "points": [
+        [
+          0.5,
+          0
+        ],
+        [
+          180.80000000000007,
+          0
+        ],
+        [
+          361.10000000000014,
+          0
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "mutations-node-2",
+        "focus": -0.2,
+        "gap": 4.7999999999999545
+      },
+      "endBinding": {
+        "elementId": "mutations-node-3",
+        "focus": 0.2,
+        "gap": 6.400000000000091
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "mutations-edge-3",
+      "type": "arrow",
+      "x": 172,
+      "y": 112,
+      "width": 359.4666666666667,
+      "height": 276.6666666666667,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aD",
+      "roundness": null,
+      "seed": 1273388862,
+      "version": 1,
+      "versionNonce": 2082386146,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "mutations-edge-3-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "mutations",
+        "edge": {
+          "from": "mutate",
+          "to": "execute",
+          "claim": "calls"
+        }
+      },
+      "points": [
+        [
+          0.5,
+          0
+        ],
+        [
+          32,
+          0
+        ],
+        [
+          32,
+          276.6666666666667
+        ],
+        [
+          41.400000000000034,
+          276.6666666666667
+        ],
+        [
+          120.91666666666674,
+          276.6666666666667
+        ],
+        [
+          200.4333333333334,
+          276.6666666666667
+        ],
+        [
+          358.9666666666667,
+          276.6666666666667
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "mutations-node-0",
+        "focus": 0.5333333333333333,
+        "gap": 8
+      },
+      "endBinding": {
+        "elementId": "mutations-node-4",
+        "focus": 0.02666666666666547,
+        "gap": 8.533333333333303
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "mutations-edge-4",
+      "type": "arrow",
+      "x": 691.4666666666667,
+      "y": 405.33333333333337,
+      "width": 354.9333333333334,
+      "height": 126.66666666666663,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aE",
+      "roundness": null,
+      "seed": 1692399285,
+      "version": 1,
+      "versionNonce": 1008547903,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "mutations-edge-4-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "mutations",
+        "edge": {
+          "from": "execute",
+          "to": "dispatch",
+          "claim": "calls"
+        }
+      },
+      "points": [
+        [
+          0.5,
+          0
+        ],
+        [
+          45.33333333333326,
+          0
+        ],
+        [
+          45.33333333333326,
+          126.66666666666663
+        ],
+        [
+          114.13333333333344,
+          126.66666666666663
+        ],
+        [
+          174.33333333333348,
+          126.66666666666663
+        ],
+        [
+          234.53333333333342,
+          126.66666666666663
+        ],
+        [
+          354.4333333333334,
+          126.66666666666663
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "mutations-node-4",
+        "focus": 0.306666666666668,
+        "gap": 8.533333333333303
+      },
+      "endBinding": {
+        "elementId": "mutations-node-5",
+        "focus": 0.2,
+        "gap": 6.400000000000091
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "mutations-edge-5",
+      "type": "arrow",
+      "x": 691.4666666666667,
+      "y": 372,
+      "width": 354.9333333333334,
+      "height": 0,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aF",
+      "roundness": null,
+      "seed": 1341154460,
+      "version": 1,
+      "versionNonce": 720467624,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "mutations-edge-5-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "mutations",
+        "edge": {
+          "from": "execute",
+          "to": "retryer",
+          "claim": "builds"
+        }
+      },
+      "points": [
+        [
+          0.5,
+          0
+        ],
+        [
+          177.4666666666667,
+          0
+        ],
+        [
+          354.4333333333334,
+          0
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "mutations-node-4",
+        "focus": -0.3599999999999996,
+        "gap": 8.533333333333303
+      },
+      "endBinding": {
+        "elementId": "mutations-node-6",
+        "focus": 0.2,
+        "gap": 6.400000000000091
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "mutations-edge-6",
+      "type": "arrow",
+      "x": 1206.4,
+      "y": 532,
+      "width": 332.79999999999995,
+      "height": 0,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aG",
+      "roundness": null,
+      "seed": 14979179,
+      "version": 1,
+      "versionNonce": 811560293,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "mutations-edge-6-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "mutations",
+        "edge": {
+          "from": "dispatch",
+          "to": "action",
+          "claim": "takes"
+        }
+      },
+      "points": [
+        [
+          0.5,
+          0
+        ],
+        [
+          166.4000000000001,
+          0
+        ],
+        [
+          332.29999999999995,
+          0
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "mutations-node-5",
+        "focus": -0.2,
+        "gap": 6.400000000000091
+      },
+      "endBinding": {
+        "elementId": "mutations-node-8",
+        "focus": 0.2,
+        "gap": 1
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "mutations-edge-7",
+      "type": "arrow",
+      "x": 1206.4,
+      "y": 212,
+      "width": 332.79999999999995,
+      "height": 0,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aH",
+      "roundness": null,
+      "seed": 751385306,
+      "version": 1,
+      "versionNonce": 1147091118,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "mutations-edge-7-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "mutations",
+        "edge": {
+          "from": "mutation",
+          "to": "state",
+          "claim": "holds"
+        }
+      },
+      "points": [
+        [
+          0.5,
+          0
+        ],
+        [
+          166.4000000000001,
+          0
+        ],
+        [
+          332.29999999999995,
+          0
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "mutations-node-3",
+        "focus": -0.2,
+        "gap": 6.400000000000091
+      },
+      "endBinding": {
+        "elementId": "mutations-node-7",
+        "focus": 0.20000000000000004,
+        "gap": 1
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "mutations-node-0-label",
+      "type": "text",
+      "x": 56,
+      "y": 67.5,
+      "width": 88,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aI",
+      "roundness": null,
+      "seed": 1102089479,
+      "version": 1,
+      "versionNonce": 2094016801,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "mutations"
+      },
+      "text": "mutate()",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "mutations-node-0",
+      "originalText": "mutate()",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "mutations-node-1-label",
+      "type": "text",
+      "x": 528.5,
+      "y": 47.5,
+      "width": 143,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aJ",
+      "roundness": null,
+      "seed": 1946184034,
+      "version": 1,
+      "versionNonce": 1914996054,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "mutations"
+      },
+      "text": "MutationCache",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "mutations-node-1",
+      "originalText": "MutationCache",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "mutations-node-2-label",
+      "type": "text",
+      "x": 561.5,
+      "y": 207.5,
+      "width": 77,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aK",
+      "roundness": null,
+      "seed": 547264005,
+      "version": 1,
+      "versionNonce": 959077135,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "mutations"
+      },
+      "text": "build()",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "mutations-node-2",
+      "originalText": "build()",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "mutations-node-3-label",
+      "type": "text",
+      "x": 1076,
+      "y": 207.5,
+      "width": 88,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aL",
+      "roundness": null,
+      "seed": 83296952,
+      "version": 1,
+      "versionNonce": 1502018580,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "mutations"
+      },
+      "text": "Mutation",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "mutations-node-3",
+      "originalText": "Mutation",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "mutations-node-4-label",
+      "type": "text",
+      "x": 570.5,
+      "y": 377.5,
+      "width": 99.00000000000001,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aM",
+      "roundness": null,
+      "seed": 2017206547,
+      "version": 1,
+      "versionNonce": 561142893,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "mutations"
+      },
+      "text": "execute()",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "mutations-node-4",
+      "originalText": "execute()",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "mutations-node-5-label",
+      "type": "text",
+      "x": 1065,
+      "y": 527.5,
+      "width": 110.00000000000001,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aN",
+      "roundness": null,
+      "seed": 525788286,
+      "version": 1,
+      "versionNonce": 331694626,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "mutations"
+      },
+      "text": "dispatch()",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "mutations-node-5",
+      "originalText": "dispatch()",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "mutations-node-6-label",
+      "type": "text",
+      "x": 1081.5,
+      "y": 367.5,
+      "width": 77,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aO",
+      "roundness": null,
+      "seed": 1304697985,
+      "version": 1,
+      "versionNonce": 1183598539,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "mutations"
+      },
+      "text": "Retryer",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "mutations-node-6",
+      "originalText": "Retryer",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "mutations-node-7-label",
+      "type": "text",
+      "x": 1568.5,
+      "y": 207.5,
+      "width": 143,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aP",
+      "roundness": null,
+      "seed": 1751597508,
+      "version": 1,
+      "versionNonce": 1633351120,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "mutations"
+      },
+      "text": "MutationState",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "mutations-node-7",
+      "originalText": "MutationState",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "mutations-node-8-label",
+      "type": "text",
+      "x": 1587,
+      "y": 527.5,
+      "width": 66,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aQ",
+      "roundness": null,
+      "seed": 965181487,
+      "version": 1,
+      "versionNonce": 624172425,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "mutations"
+      },
+      "text": "Action",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "mutations-node-8",
+      "originalText": "Action",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "mutations-edge-0-label",
+      "type": "text",
+      "x": 312,
+      "y": 42,
+      "width": 52.800000000000004,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aR",
+      "roundness": null,
+      "seed": 2085584432,
+      "version": 1,
+      "versionNonce": 201253516,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "mutations"
+      },
+      "text": "@needs",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "mutations-edge-0",
+      "originalText": "@needs",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "mutations-edge-1-label",
+      "type": "text",
+      "x": 257,
+      "y": 202,
+      "width": 52.800000000000004,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aS",
+      "roundness": null,
+      "seed": 2023194237,
+      "version": 1,
+      "versionNonce": 2005461351,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "mutations"
+      },
+      "text": "@calls",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "mutations-edge-1",
+      "originalText": "@calls",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "mutations-edge-2-label",
+      "type": "text",
+      "x": 834.8000000000001,
+      "y": 202,
+      "width": 61.60000000000001,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aT",
+      "roundness": null,
+      "seed": 1286355290,
+      "version": 1,
+      "versionNonce": 1991629870,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "mutations"
+      },
+      "text": "@builds",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "mutations-edge-2",
+      "originalText": "@builds",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "mutations-edge-3-label",
+      "type": "text",
+      "x": 187.00000000000003,
+      "y": 378.6666666666667,
+      "width": 52.800000000000004,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aU",
+      "roundness": null,
+      "seed": 1996705823,
+      "version": 1,
+      "versionNonce": 75348665,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "mutations"
+      },
+      "text": "@calls",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "mutations-edge-3",
+      "originalText": "@calls",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "mutations-edge-4-label",
+      "type": "text",
+      "x": 779.2000000000002,
+      "y": 522,
+      "width": 52.800000000000004,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aV",
+      "roundness": null,
+      "seed": 165926108,
+      "version": 1,
+      "versionNonce": 623637736,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "mutations"
+      },
+      "text": "@calls",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "mutations-edge-4",
+      "originalText": "@calls",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "mutations-edge-5-label",
+      "type": "text",
+      "x": 838.1333333333334,
+      "y": 362,
+      "width": 61.60000000000001,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aW",
+      "roundness": null,
+      "seed": 594471097,
+      "version": 1,
+      "versionNonce": 1892460675,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "mutations"
+      },
+      "text": "@builds",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "mutations-edge-5",
+      "originalText": "@builds",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "mutations-edge-6-label",
+      "type": "text",
+      "x": 1346.4,
+      "y": 522,
+      "width": 52.800000000000004,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aX",
+      "roundness": null,
+      "seed": 1556585238,
+      "version": 1,
+      "versionNonce": 1429988090,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "mutations"
+      },
+      "text": "@takes",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "mutations-edge-6",
+      "originalText": "@takes",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "mutations-edge-7-label",
+      "type": "text",
+      "x": 1346.4,
+      "y": 202,
+      "width": 52.800000000000004,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aY",
+      "roundness": null,
+      "seed": 2040538827,
+      "version": 1,
+      "versionNonce": 1563632197,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "mutations"
+      },
+      "text": "@holds",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "mutations-edge-7",
+      "originalText": "@holds",
+      "autoResize": true,
+      "lineHeight": 1.25
+    }
+  ],
+  "appState": {
+    "gridSize": null,
+    "viewBackgroundColor": "#ffffff"
+  },
+  "files": {},
+  "diagramos": {
+    "version": "0.2.0-rc.6",
+    "schema": 1
+  }
+}

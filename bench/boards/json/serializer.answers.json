@@ -1,0 +1,83 @@
+{
+  "board": "bench/boards/json/serializer.excalidraw",
+  "project": "json",
+  "topic": "serializer",
+  "language": "rust",
+  "scope": "src",
+  "pin": "afdf6fc672",
+  "tool": "rust-analyzer 0.0.0 (7cb789d982 2026-02-01)",
+  "claims": [
+    {
+      "id": "builds|src/ser.rs#to_string|src/ser.rs#Serializer|",
+      "word": "builds",
+      "from": "src/ser.rs#to_string",
+      "to": "src/ser.rs#Serializer",
+      "fromLabel": "to_string()",
+      "toLabel": "Serializer<W, F>",
+      "language": "rust",
+      "source": "drawn",
+      "truth": "false",
+      "why": "nothing in it makes one"
+    },
+    {
+      "id": "holds|src/ser.rs#Serializer|src/ser.rs#Formatter|",
+      "word": "holds",
+      "from": "src/ser.rs#Serializer",
+      "to": "src/ser.rs#Formatter",
+      "fromLabel": "Serializer<W, F>",
+      "toLabel": "Formatter trait",
+      "language": "rust",
+      "source": "drawn",
+      "truth": "undecidable",
+      "why": "W resolves to something undeclared here (a generic or a local)"
+    },
+    {
+      "id": "conforms|src/ser.rs#Formatter|src/ser.rs#CompactFormatter|",
+      "word": "conforms",
+      "from": "src/ser.rs#Formatter",
+      "to": "src/ser.rs#CompactFormatter",
+      "fromLabel": "Formatter trait",
+      "toLabel": "CompactFormatter",
+      "language": "rust",
+      "source": "drawn",
+      "truth": "false",
+      "why": "the far end is not a trait, so nothing can implement it"
+    },
+    {
+      "id": "conforms|src/ser.rs#Formatter|src/ser.rs#PrettyFormatter|",
+      "word": "conforms",
+      "from": "src/ser.rs#Formatter",
+      "to": "src/ser.rs#PrettyFormatter",
+      "fromLabel": "Formatter trait",
+      "toLabel": "PrettyFormatter",
+      "language": "rust",
+      "source": "drawn",
+      "truth": "false",
+      "why": "the far end is not a trait, so nothing can implement it"
+    },
+    {
+      "id": "calls|src/ser.rs#Formatter|src/io/core.rs#Write|",
+      "word": "calls",
+      "from": "src/ser.rs#Formatter",
+      "to": "src/io/core.rs#Write",
+      "fromLabel": "Formatter trait",
+      "toLabel": "io::Write trait",
+      "language": "rust",
+      "source": "drawn",
+      "truth": "false",
+      "why": "the from end is a type, and only something that runs can call"
+    },
+    {
+      "id": "holds|src/ser.rs#Serializer|src/io/core.rs#Write|",
+      "word": "holds",
+      "from": "src/ser.rs#Serializer",
+      "to": "src/io/core.rs#Write",
+      "fromLabel": "Serializer<W, F>",
+      "toLabel": "io::Write trait",
+      "language": "rust",
+      "source": "drawn",
+      "truth": "undecidable",
+      "why": "W resolves to something undeclared here (a generic or a local)"
+    }
+  ]
+}
