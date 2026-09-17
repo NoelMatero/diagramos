@@ -1,0 +1,1573 @@
+{
+  "type": "excalidraw",
+  "version": 2,
+  "source": "diagramos",
+  "elements": [
+    {
+      "id": "pydantic-dataclass-completion-flow-title",
+      "type": "text",
+      "x": 0,
+      "y": -115,
+      "width": 448.8,
+      "height": 30,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a0",
+      "roundness": null,
+      "seed": 123116764,
+      "version": 1,
+      "versionNonce": 551341288,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "pydantic-dataclass-completion-flow",
+        "role": "title"
+      },
+      "text": "Pydantic Dataclass Completion Flow",
+      "fontSize": 24,
+      "fontFamily": 5,
+      "textAlign": "left",
+      "verticalAlign": "middle",
+      "containerId": null,
+      "originalText": "Pydantic Dataclass Completion Flow",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "pydantic-dataclass-completion-flow-node-0",
+      "type": "rectangle",
+      "x": 20,
+      "y": 20,
+      "width": 260,
+      "height": 180,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a1",
+      "roundness": null,
+      "seed": 1405337739,
+      "version": 1,
+      "versionNonce": 95931141,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "pydantic-dataclass-completion-flow-node-0-label"
+        },
+        {
+          "id": "pydantic-dataclass-completion-flow-edge-0",
+          "type": "arrow"
+        },
+        {
+          "id": "pydantic-dataclass-completion-flow-edge-2",
+          "type": "arrow"
+        },
+        {
+          "id": "pydantic-dataclass-completion-flow-edge-3",
+          "type": "arrow"
+        },
+        {
+          "id": "pydantic-dataclass-completion-flow-edge-4",
+          "type": "arrow"
+        },
+        {
+          "id": "pydantic-dataclass-completion-flow-edge-6",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "pydantic-dataclass-completion-flow",
+        "node": "complete_dataclass",
+        "ref": "pydantic/_internal/_dataclasses.py#complete_dataclass"
+      }
+    },
+    {
+      "id": "pydantic-dataclass-completion-flow-node-1",
+      "type": "rectangle",
+      "x": 640,
+      "y": 180,
+      "width": 280,
+      "height": 80,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a2",
+      "roundness": null,
+      "seed": 1715382394,
+      "version": 1,
+      "versionNonce": 1811633614,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "pydantic-dataclass-completion-flow-node-1-label"
+        },
+        {
+          "id": "pydantic-dataclass-completion-flow-edge-0",
+          "type": "arrow"
+        },
+        {
+          "id": "pydantic-dataclass-completion-flow-edge-1",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "pydantic-dataclass-completion-flow",
+        "node": "set_dataclass_fields",
+        "ref": "pydantic/_internal/_dataclasses.py#set_dataclass_fields"
+      }
+    },
+    {
+      "id": "pydantic-dataclass-completion-flow-node-2",
+      "type": "rectangle",
+      "x": 1280,
+      "y": 180,
+      "width": 320,
+      "height": 80,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a3",
+      "roundness": null,
+      "seed": 191142741,
+      "version": 1,
+      "versionNonce": 1756406623,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "pydantic-dataclass-completion-flow-node-2-label"
+        },
+        {
+          "id": "pydantic-dataclass-completion-flow-edge-1",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "pydantic-dataclass-completion-flow",
+        "node": "collect_dataclass_fields",
+        "ref": "pydantic/_internal/_fields.py#collect_dataclass_fields"
+      }
+    },
+    {
+      "id": "pydantic-dataclass-completion-flow-node-3",
+      "type": "rectangle",
+      "x": 620,
+      "y": 20,
+      "width": 220,
+      "height": 80,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a4",
+      "roundness": null,
+      "seed": 584029372,
+      "version": 1,
+      "versionNonce": 4838472,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "pydantic-dataclass-completion-flow-node-3-label"
+        },
+        {
+          "id": "pydantic-dataclass-completion-flow-edge-3",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "pydantic-dataclass-completion-flow",
+        "node": "generate_schema_class",
+        "ref": "pydantic/_internal/_generate_schema.py#GenerateSchema"
+      }
+    },
+    {
+      "id": "pydantic-dataclass-completion-flow-node-4",
+      "type": "rectangle",
+      "x": 620,
+      "y": 660,
+      "width": 320,
+      "height": 80,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a5",
+      "roundness": null,
+      "seed": 692918191,
+      "version": 1,
+      "versionNonce": 423730185,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "pydantic-dataclass-completion-flow-node-4-label"
+        },
+        {
+          "id": "pydantic-dataclass-completion-flow-edge-4",
+          "type": "arrow"
+        },
+        {
+          "id": "pydantic-dataclass-completion-flow-edge-5",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "pydantic-dataclass-completion-flow",
+        "node": "create_validator",
+        "ref": "pydantic/plugin/_schema_validator.py#create_schema_validator"
+      }
+    },
+    {
+      "id": "pydantic-dataclass-completion-flow-node-5",
+      "type": "rectangle",
+      "x": 1280,
+      "y": 660,
+      "width": 220,
+      "height": 80,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "dotted",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a6",
+      "roundness": null,
+      "seed": 1300274270,
+      "version": 1,
+      "versionNonce": 2025771394,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "pydantic-dataclass-completion-flow-node-5-label"
+        },
+        {
+          "id": "pydantic-dataclass-completion-flow-edge-5",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "pydantic-dataclass-completion-flow",
+        "node": "schema_validator",
+        "ref": "pydantic_core#SchemaValidator",
+        "state": "external"
+      }
+    },
+    {
+      "id": "pydantic-dataclass-completion-flow-node-6",
+      "type": "rectangle",
+      "x": 620,
+      "y": 500,
+      "width": 240,
+      "height": 80,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "dotted",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a7",
+      "roundness": null,
+      "seed": 816889609,
+      "version": 1,
+      "versionNonce": 139966611,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "pydantic-dataclass-completion-flow-node-6-label"
+        },
+        {
+          "id": "pydantic-dataclass-completion-flow-edge-6",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "pydantic-dataclass-completion-flow",
+        "node": "schema_serializer",
+        "ref": "pydantic_core#SchemaSerializer",
+        "state": "external"
+      }
+    },
+    {
+      "id": "pydantic-dataclass-completion-flow-node-7",
+      "type": "rectangle",
+      "x": 620,
+      "y": 340,
+      "width": 200,
+      "height": 80,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a8",
+      "roundness": null,
+      "seed": 1216327616,
+      "version": 1,
+      "versionNonce": 1778958748,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "pydantic-dataclass-completion-flow-node-7-label"
+        },
+        {
+          "id": "pydantic-dataclass-completion-flow-edge-2",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "pydantic-dataclass-completion-flow",
+        "node": "config_wrapper",
+        "ref": "pydantic/_internal/_config.py#ConfigWrapper"
+      }
+    },
+    {
+      "id": "pydantic-dataclass-completion-flow-edge-0",
+      "type": "arrow",
+      "x": 272,
+      "y": 82,
+      "width": 361.6,
+      "height": 130,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a9",
+      "roundness": null,
+      "seed": 924403996,
+      "version": 1,
+      "versionNonce": 273755176,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "pydantic-dataclass-completion-flow-edge-0-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "pydantic-dataclass-completion-flow",
+        "edge": {
+          "from": "complete_dataclass",
+          "to": "set_dataclass_fields",
+          "claim": "calls"
+        }
+      },
+      "points": [
+        [
+          0.5,
+          0
+        ],
+        [
+          104,
+          0
+        ],
+        [
+          104,
+          130
+        ],
+        [
+          115.80000000000001,
+          130
+        ],
+        [
+          177.25,
+          130
+        ],
+        [
+          238.70000000000005,
+          130
+        ],
+        [
+          361.1,
+          130
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "pydantic-dataclass-completion-flow-node-0",
+        "focus": -0.31111111111111106,
+        "gap": 8
+      },
+      "endBinding": {
+        "elementId": "pydantic-dataclass-completion-flow-node-1",
+        "focus": 0.20000000000000076,
+        "gap": 6.399999999999977
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "pydantic-dataclass-completion-flow-edge-1",
+      "type": "arrow",
+      "x": 913.6,
+      "y": 212,
+      "width": 361.5999999999998,
+      "height": 0,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aA",
+      "roundness": null,
+      "seed": 1275648821,
+      "version": 1,
+      "versionNonce": 561835455,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "pydantic-dataclass-completion-flow-edge-1-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "pydantic-dataclass-completion-flow",
+        "edge": {
+          "from": "set_dataclass_fields",
+          "to": "collect_dataclass_fields",
+          "claim": "calls"
+        }
+      },
+      "points": [
+        [
+          0.5,
+          0
+        ],
+        [
+          180.79999999999984,
+          0
+        ],
+        [
+          361.0999999999998,
+          0
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "pydantic-dataclass-completion-flow-node-1",
+        "focus": -0.2,
+        "gap": 6.399999999999977
+      },
+      "endBinding": {
+        "elementId": "pydantic-dataclass-completion-flow-node-2",
+        "focus": 0.19999999999999998,
+        "gap": 4.800000000000182
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "pydantic-dataclass-completion-flow-edge-2",
+      "type": "arrow",
+      "x": 272,
+      "y": 112,
+      "width": 341.6,
+      "height": 260,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aB",
+      "roundness": null,
+      "seed": 334634842,
+      "version": 1,
+      "versionNonce": 700378670,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "pydantic-dataclass-completion-flow-edge-2-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "pydantic-dataclass-completion-flow",
+        "edge": {
+          "from": "complete_dataclass",
+          "to": "config_wrapper",
+          "claim": "takes"
+        }
+      },
+      "points": [
+        [
+          0.5,
+          0
+        ],
+        [
+          80,
+          0
+        ],
+        [
+          80,
+          220.8
+        ],
+        [
+          80,
+          260
+        ],
+        [
+          341.1,
+          260
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "pydantic-dataclass-completion-flow-node-0",
+        "focus": 0.022222222222222202,
+        "gap": 8
+      },
+      "endBinding": {
+        "elementId": "pydantic-dataclass-completion-flow-node-7",
+        "focus": 0.20000000000000004,
+        "gap": 6.399999999999977
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "pydantic-dataclass-completion-flow-edge-3",
+      "type": "arrow",
+      "x": 272,
+      "y": 52,
+      "width": 341.6,
+      "height": 0,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aC",
+      "roundness": null,
+      "seed": 1745712363,
+      "version": 1,
+      "versionNonce": 364847845,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "pydantic-dataclass-completion-flow-edge-3-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "pydantic-dataclass-completion-flow",
+        "edge": {
+          "from": "complete_dataclass",
+          "to": "generate_schema_class",
+          "claim": "builds"
+        }
+      },
+      "points": [
+        [
+          0.5,
+          0
+        ],
+        [
+          170.8,
+          0
+        ],
+        [
+          341.1,
+          0
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "pydantic-dataclass-completion-flow-node-0",
+        "focus": -0.6444444444444443,
+        "gap": 8
+      },
+      "endBinding": {
+        "elementId": "pydantic-dataclass-completion-flow-node-3",
+        "focus": 0.1999999999999991,
+        "gap": 6.399999999999977
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "pydantic-dataclass-completion-flow-edge-4",
+      "type": "arrow",
+      "x": 272,
+      "y": 172,
+      "width": 341.6,
+      "height": 520,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aD",
+      "roundness": null,
+      "seed": 1556702240,
+      "version": 1,
+      "versionNonce": 2047772284,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "pydantic-dataclass-completion-flow-edge-4-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "pydantic-dataclass-completion-flow",
+        "edge": {
+          "from": "complete_dataclass",
+          "to": "create_validator",
+          "claim": "calls"
+        }
+      },
+      "points": [
+        [
+          0.5,
+          0
+        ],
+        [
+          32,
+          0
+        ],
+        [
+          32,
+          398.79999999999995
+        ],
+        [
+          32,
+          520
+        ],
+        [
+          341.1,
+          520
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "pydantic-dataclass-completion-flow-node-0",
+        "focus": 0.6888888888888887,
+        "gap": 8
+      },
+      "endBinding": {
+        "elementId": "pydantic-dataclass-completion-flow-node-4",
+        "focus": 0.19999999999999865,
+        "gap": 6.399999999999977
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "pydantic-dataclass-completion-flow-edge-5",
+      "type": "arrow",
+      "x": 933.6,
+      "y": 692,
+      "width": 341.5999999999998,
+      "height": 0,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aE",
+      "roundness": null,
+      "seed": 1117488361,
+      "version": 1,
+      "versionNonce": 1176195315,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "pydantic-dataclass-completion-flow-edge-5-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "pydantic-dataclass-completion-flow",
+        "edge": {
+          "from": "create_validator",
+          "to": "schema_validator",
+          "claim": "builds"
+        }
+      },
+      "points": [
+        [
+          0.5,
+          0
+        ],
+        [
+          170.79999999999984,
+          0
+        ],
+        [
+          341.0999999999998,
+          0
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "pydantic-dataclass-completion-flow-node-4",
+        "focus": -0.19999999999999998,
+        "gap": 6.399999999999977
+      },
+      "endBinding": {
+        "elementId": "pydantic-dataclass-completion-flow-node-5",
+        "focus": 0.2,
+        "gap": 4.800000000000182
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "pydantic-dataclass-completion-flow-edge-6",
+      "type": "arrow",
+      "x": 272,
+      "y": 142,
+      "width": 341.6,
+      "height": 390,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aF",
+      "roundness": null,
+      "seed": 856638398,
+      "version": 1,
+      "versionNonce": 1635673698,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "pydantic-dataclass-completion-flow-edge-6-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "pydantic-dataclass-completion-flow",
+        "edge": {
+          "from": "complete_dataclass",
+          "to": "schema_serializer",
+          "claim": "builds"
+        }
+      },
+      "points": [
+        [
+          0.5,
+          0
+        ],
+        [
+          56,
+          0
+        ],
+        [
+          56,
+          309.8
+        ],
+        [
+          56,
+          390
+        ],
+        [
+          341.1,
+          390
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "pydantic-dataclass-completion-flow-node-0",
+        "focus": 0.35555555555555557,
+        "gap": 8
+      },
+      "endBinding": {
+        "elementId": "pydantic-dataclass-completion-flow-node-6",
+        "focus": 0.1999999999999983,
+        "gap": 6.399999999999977
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "pydantic-dataclass-completion-flow-node-0-label",
+      "type": "text",
+      "x": 50.999999999999986,
+      "y": 97.5,
+      "width": 198.00000000000003,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aG",
+      "roundness": null,
+      "seed": 1648311222,
+      "version": 1,
+      "versionNonce": 1351440922,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "pydantic-dataclass-completion-flow"
+      },
+      "text": "complete_dataclass",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "pydantic-dataclass-completion-flow-node-0",
+      "originalText": "complete_dataclass",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "pydantic-dataclass-completion-flow-node-1-label",
+      "type": "text",
+      "x": 670,
+      "y": 207.5,
+      "width": 220.00000000000003,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aH",
+      "roundness": null,
+      "seed": 1017633771,
+      "version": 1,
+      "versionNonce": 1154435045,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "pydantic-dataclass-completion-flow"
+      },
+      "text": "set_dataclass_fields",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "pydantic-dataclass-completion-flow-node-1",
+      "originalText": "set_dataclass_fields",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "pydantic-dataclass-completion-flow-node-2-label",
+      "type": "text",
+      "x": 1308,
+      "y": 207.5,
+      "width": 264,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aI",
+      "roundness": null,
+      "seed": 1754027644,
+      "version": 1,
+      "versionNonce": 925440264,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "pydantic-dataclass-completion-flow"
+      },
+      "text": "collect_dataclass_fields",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "pydantic-dataclass-completion-flow-node-2",
+      "originalText": "collect_dataclass_fields",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "pydantic-dataclass-completion-flow-node-3-label",
+      "type": "text",
+      "x": 653,
+      "y": 47.5,
+      "width": 154,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aJ",
+      "roundness": null,
+      "seed": 476651993,
+      "version": 1,
+      "versionNonce": 1819859235,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "pydantic-dataclass-completion-flow"
+      },
+      "text": "GenerateSchema",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "pydantic-dataclass-completion-flow-node-3",
+      "originalText": "GenerateSchema",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "pydantic-dataclass-completion-flow-node-4-label",
+      "type": "text",
+      "x": 653.5,
+      "y": 687.5,
+      "width": 253.00000000000003,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aK",
+      "roundness": null,
+      "seed": 1539023098,
+      "version": 1,
+      "versionNonce": 1605797710,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "pydantic-dataclass-completion-flow"
+      },
+      "text": "create_schema_validator",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "pydantic-dataclass-completion-flow-node-4",
+      "originalText": "create_schema_validator",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "pydantic-dataclass-completion-flow-node-5-label",
+      "type": "text",
+      "x": 1307.5,
+      "y": 687.5,
+      "width": 165,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aL",
+      "roundness": null,
+      "seed": 1931500479,
+      "version": 1,
+      "versionNonce": 1178088921,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "pydantic-dataclass-completion-flow"
+      },
+      "text": "SchemaValidator",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "pydantic-dataclass-completion-flow-node-5",
+      "originalText": "SchemaValidator",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "pydantic-dataclass-completion-flow-node-6-label",
+      "type": "text",
+      "x": 652,
+      "y": 527.5,
+      "width": 176,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aM",
+      "roundness": null,
+      "seed": 843453264,
+      "version": 1,
+      "versionNonce": 1130635564,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "pydantic-dataclass-completion-flow"
+      },
+      "text": "SchemaSerializer",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "pydantic-dataclass-completion-flow-node-6",
+      "originalText": "SchemaSerializer",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "pydantic-dataclass-completion-flow-node-7-label",
+      "type": "text",
+      "x": 648.5,
+      "y": 367.5,
+      "width": 143,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aN",
+      "roundness": null,
+      "seed": 1242662173,
+      "version": 1,
+      "versionNonce": 446755463,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "pydantic-dataclass-completion-flow"
+      },
+      "text": "ConfigWrapper",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "pydantic-dataclass-completion-flow-node-7",
+      "originalText": "ConfigWrapper",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "pydantic-dataclass-completion-flow-edge-0-label",
+      "type": "text",
+      "x": 361.40000000000003,
+      "y": 202,
+      "width": 52.800000000000004,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aO",
+      "roundness": null,
+      "seed": 1294772537,
+      "version": 1,
+      "versionNonce": 646099459,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "pydantic-dataclass-completion-flow"
+      },
+      "text": "@calls",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "pydantic-dataclass-completion-flow-edge-0",
+      "originalText": "@calls",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "pydantic-dataclass-completion-flow-edge-1-label",
+      "type": "text",
+      "x": 1067.9999999999998,
+      "y": 202,
+      "width": 52.800000000000004,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aP",
+      "roundness": null,
+      "seed": 866227548,
+      "version": 1,
+      "versionNonce": 1524760168,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "pydantic-dataclass-completion-flow"
+      },
+      "text": "@calls",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "pydantic-dataclass-completion-flow-edge-1",
+      "originalText": "@calls",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "pydantic-dataclass-completion-flow-edge-2-label",
+      "type": "text",
+      "x": 325.6,
+      "y": 322.8,
+      "width": 52.800000000000004,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aQ",
+      "roundness": null,
+      "seed": 593356619,
+      "version": 1,
+      "versionNonce": 317270981,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "pydantic-dataclass-completion-flow"
+      },
+      "text": "@takes",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "pydantic-dataclass-completion-flow-edge-2",
+      "originalText": "@takes",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "pydantic-dataclass-completion-flow-edge-3-label",
+      "type": "text",
+      "x": 412,
+      "y": 42,
+      "width": 61.60000000000001,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aR",
+      "roundness": null,
+      "seed": 109403030,
+      "version": 1,
+      "versionNonce": 183626874,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "pydantic-dataclass-completion-flow"
+      },
+      "text": "@builds",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "pydantic-dataclass-completion-flow-edge-3",
+      "originalText": "@builds",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "pydantic-dataclass-completion-flow-edge-4-label",
+      "type": "text",
+      "x": 277.6,
+      "y": 560.8,
+      "width": 52.800000000000004,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aS",
+      "roundness": null,
+      "seed": 576012029,
+      "version": 1,
+      "versionNonce": 759100135,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "pydantic-dataclass-completion-flow"
+      },
+      "text": "@calls",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "pydantic-dataclass-completion-flow-edge-4",
+      "originalText": "@calls",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "pydantic-dataclass-completion-flow-edge-5-label",
+      "type": "text",
+      "x": 1073.6,
+      "y": 682,
+      "width": 61.60000000000001,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aT",
+      "roundness": null,
+      "seed": 638402224,
+      "version": 1,
+      "versionNonce": 1102375948,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "pydantic-dataclass-completion-flow"
+      },
+      "text": "@builds",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "pydantic-dataclass-completion-flow-edge-5",
+      "originalText": "@builds",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "pydantic-dataclass-completion-flow-edge-6-label",
+      "type": "text",
+      "x": 297.2,
+      "y": 441.8,
+      "width": 61.60000000000001,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aU",
+      "roundness": null,
+      "seed": 549523615,
+      "version": 1,
+      "versionNonce": 976471097,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "pydantic-dataclass-completion-flow"
+      },
+      "text": "@builds",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "pydantic-dataclass-completion-flow-edge-6",
+      "originalText": "@builds",
+      "autoResize": true,
+      "lineHeight": 1.25
+    }
+  ],
+  "appState": {
+    "gridSize": null,
+    "viewBackgroundColor": "#ffffff"
+  },
+  "files": {},
+  "diagramos": {
+    "version": "0.2.0-rc.6",
+    "schema": 1
+  }
+}

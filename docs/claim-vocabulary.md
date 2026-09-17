@@ -662,6 +662,12 @@ and never fail.
 | `npm run measure:dataflow` | what following a value through one body buys, confirming and refuting |
 | `npm run measure:licence` | reproduces the per-language dependency numbers, then prints the whole (word, language) grid — `--only=python` for one |
 | `npx tsx scripts/probe-generative.mts` | draws boards of unseen code and counts what could not be said |
+| `npm run bench:planted` | of the mistakes planted in 44 boards of the pinned clones, how many go red, how many show as not sure, how many pass silently -- and how many true claims go red (#296, `bench/README.md`) |
+
+The last one is the only one whose answer key is not a second reader written
+here: every claim in it was decided by rust-analyzer, pyright or the
+TypeScript compiler, and a test fails if its three files ever import
+`src/engine`.
 
 The pattern in all of them is a **referee**: count the shape one way, count it
 again by a completely different mechanism, report the disagreement. It is not

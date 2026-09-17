@@ -42,6 +42,7 @@
     "graph:refresh": "node scripts/refresh-code-graph.mjs",
     "typecheck": "tsc --noEmit",
     "check:drift": "tsx scripts/check-drift.mjs",
+    "bench:planted": "tsx scripts/bench-planted.mts",
     "measure:accesses": "tsx scripts/measure-accesses.mts",
     "measure:accesses-closed": "NODE_OPTIONS=--max-old-space-size=8192 tsx scripts/measure-accesses-closed.mts",
     "measure:accesses-absence": "NODE_OPTIONS=--max-old-space-size=8192 tsx scripts/measure-accesses-absence.mts",
@@ -74,7 +75,9 @@
     "diagram:example": "tsx scripts/make-example-diagram.mjs",
     "diagram:render": "tsx scripts/render-diagram.mjs",
     "measure:reach": "NODE_OPTIONS=--max-old-space-size=8192 tsx scripts/measure-reach.mts",
-    "trace:reach": "tsx scripts/trace-reach.mts"
+    "trace:reach": "tsx scripts/trace-reach.mts",
+    "bench:claims": "tsx scripts/bench-claims.mts",
+    "bench:claims:draw": "tsx scripts/draw-claim-fixtures.mts"
   },
   "dependencies": {
     "@modelcontextprotocol/sdk": "^1.29.0",

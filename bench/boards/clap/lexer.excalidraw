@@ -1,0 +1,2224 @@
+{
+  "type": "excalidraw",
+  "version": 2,
+  "source": "diagramos",
+  "elements": [
+    {
+      "id": "clap-lex-argument-tokenization-flow-title",
+      "type": "text",
+      "x": 0,
+      "y": -115,
+      "width": 475.20000000000005,
+      "height": 30,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a0",
+      "roundness": null,
+      "seed": 911781872,
+      "version": 1,
+      "versionNonce": 637337932,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "clap-lex-argument-tokenization-flow",
+        "role": "title",
+        "direction": "DOWN"
+      },
+      "text": "clap_lex: Argument Tokenization Flow",
+      "fontSize": 24,
+      "fontFamily": 5,
+      "textAlign": "left",
+      "verticalAlign": "middle",
+      "containerId": null,
+      "originalText": "clap_lex: Argument Tokenization Flow",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "clap-lex-argument-tokenization-flow-node-0",
+      "type": "rectangle",
+      "x": 120,
+      "y": 20,
+      "width": 180,
+      "height": 80,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a1",
+      "roundness": null,
+      "seed": 1534272831,
+      "version": 1,
+      "versionNonce": 9136729,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "clap-lex-argument-tokenization-flow-node-0-label"
+        },
+        {
+          "id": "clap-lex-argument-tokenization-flow-edge-0",
+          "type": "arrow"
+        },
+        {
+          "id": "clap-lex-argument-tokenization-flow-edge-1",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "clap-lex-argument-tokenization-flow",
+        "node": "argv",
+        "ref": "clap_lex/src/lib.rs#RawArgs"
+      }
+    },
+    {
+      "id": "clap-lex-argument-tokenization-flow-node-1",
+      "type": "rectangle",
+      "x": 60,
+      "y": 400,
+      "width": 220,
+      "height": 80,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a2",
+      "roundness": null,
+      "seed": 2004357806,
+      "version": 1,
+      "versionNonce": 1375486930,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "clap-lex-argument-tokenization-flow-node-1-label"
+        },
+        {
+          "id": "clap-lex-argument-tokenization-flow-edge-0",
+          "type": "arrow"
+        },
+        {
+          "id": "clap-lex-argument-tokenization-flow-edge-2",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "clap-lex-argument-tokenization-flow",
+        "node": "cursor",
+        "ref": "clap_lex/src/lib.rs#ArgCursor"
+      }
+    },
+    {
+      "id": "clap-lex-argument-tokenization-flow-node-2",
+      "type": "rectangle",
+      "x": 100,
+      "y": 780,
+      "width": 220,
+      "height": 80,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a3",
+      "roundness": null,
+      "seed": 254995225,
+      "version": 1,
+      "versionNonce": 1612804707,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "clap-lex-argument-tokenization-flow-node-2-label"
+        },
+        {
+          "id": "clap-lex-argument-tokenization-flow-edge-1",
+          "type": "arrow"
+        },
+        {
+          "id": "clap-lex-argument-tokenization-flow-edge-2",
+          "type": "arrow"
+        },
+        {
+          "id": "clap-lex-argument-tokenization-flow-edge-3",
+          "type": "arrow"
+        },
+        {
+          "id": "clap-lex-argument-tokenization-flow-edge-5",
+          "type": "arrow"
+        },
+        {
+          "id": "clap-lex-argument-tokenization-flow-edge-9",
+          "type": "arrow"
+        },
+        {
+          "id": "clap-lex-argument-tokenization-flow-edge-10",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "clap-lex-argument-tokenization-flow",
+        "node": "parsed_arg",
+        "ref": "clap_lex/src/lib.rs#ParsedArg"
+      }
+    },
+    {
+      "id": "clap-lex-argument-tokenization-flow-node-3",
+      "type": "diamond",
+      "x": 360,
+      "y": 1160,
+      "width": 260,
+      "height": 140,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a4",
+      "roundness": null,
+      "seed": 983966224,
+      "version": 2,
+      "versionNonce": 2015881452,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "clap-lex-argument-tokenization-flow-node-3-label"
+        },
+        {
+          "id": "clap-lex-argument-tokenization-flow-edge-3",
+          "type": "arrow"
+        },
+        {
+          "id": "clap-lex-argument-tokenization-flow-edge-4",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "clap-lex-argument-tokenization-flow",
+        "node": "is_long",
+        "ref": "clap_lex/src/lib.rs#is_long"
+      }
+    },
+    {
+      "id": "clap-lex-argument-tokenization-flow-node-4",
+      "type": "rectangle",
+      "x": 360,
+      "y": 1600,
+      "width": 240,
+      "height": 80,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a5",
+      "roundness": null,
+      "seed": 1204210459,
+      "version": 2,
+      "versionNonce": 648038933,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "clap-lex-argument-tokenization-flow-node-4-label"
+        },
+        {
+          "id": "clap-lex-argument-tokenization-flow-edge-4",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "clap-lex-argument-tokenization-flow",
+        "node": "to_long",
+        "ref": "clap_lex/src/lib.rs#to_long"
+      }
+    },
+    {
+      "id": "clap-lex-argument-tokenization-flow-node-5",
+      "type": "diamond",
+      "x": 700,
+      "y": 1160,
+      "width": 280,
+      "height": 140,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a6",
+      "roundness": null,
+      "seed": 442391498,
+      "version": 2,
+      "versionNonce": 1333069598,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "clap-lex-argument-tokenization-flow-node-5-label"
+        },
+        {
+          "id": "clap-lex-argument-tokenization-flow-edge-5",
+          "type": "arrow"
+        },
+        {
+          "id": "clap-lex-argument-tokenization-flow-edge-6",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "clap-lex-argument-tokenization-flow",
+        "node": "is_short",
+        "ref": "clap_lex/src/lib.rs#is_short"
+      }
+    },
+    {
+      "id": "clap-lex-argument-tokenization-flow-node-6",
+      "type": "rectangle",
+      "x": 700,
+      "y": 1600,
+      "width": 260,
+      "height": 80,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a7",
+      "roundness": null,
+      "seed": 1596507301,
+      "version": 2,
+      "versionNonce": 171476527,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "clap-lex-argument-tokenization-flow-node-6-label"
+        },
+        {
+          "id": "clap-lex-argument-tokenization-flow-edge-6",
+          "type": "arrow"
+        },
+        {
+          "id": "clap-lex-argument-tokenization-flow-edge-7",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "clap-lex-argument-tokenization-flow",
+        "node": "to_short",
+        "ref": "clap_lex/src/lib.rs#to_short"
+      }
+    },
+    {
+      "id": "clap-lex-argument-tokenization-flow-node-7",
+      "type": "rectangle",
+      "x": 700,
+      "y": 1980,
+      "width": 260,
+      "height": 80,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a8",
+      "roundness": null,
+      "seed": 1456618124,
+      "version": 1,
+      "versionNonce": 343021400,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "clap-lex-argument-tokenization-flow-node-7-label"
+        },
+        {
+          "id": "clap-lex-argument-tokenization-flow-edge-7",
+          "type": "arrow"
+        },
+        {
+          "id": "clap-lex-argument-tokenization-flow-edge-8",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "clap-lex-argument-tokenization-flow",
+        "node": "shortflags",
+        "ref": "clap_lex/src/lib.rs#ShortFlags"
+      }
+    },
+    {
+      "id": "clap-lex-argument-tokenization-flow-node-8",
+      "type": "rectangle",
+      "x": 220,
+      "y": 2360,
+      "width": 220,
+      "height": 80,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a9",
+      "roundness": null,
+      "seed": 143380359,
+      "version": 1,
+      "versionNonce": 133814433,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "clap-lex-argument-tokenization-flow-node-8-label"
+        },
+        {
+          "id": "clap-lex-argument-tokenization-flow-edge-8",
+          "type": "arrow"
+        },
+        {
+          "id": "clap-lex-argument-tokenization-flow-edge-10",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "clap-lex-argument-tokenization-flow",
+        "node": "osext",
+        "ref": "clap_lex/src/ext.rs#OsStrExt"
+      }
+    },
+    {
+      "id": "clap-lex-argument-tokenization-flow-node-9",
+      "type": "rectangle",
+      "x": 40,
+      "y": 1160,
+      "width": 200,
+      "height": 80,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aA",
+      "roundness": null,
+      "seed": 955296502,
+      "version": 2,
+      "versionNonce": 590150234,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "clap-lex-argument-tokenization-flow-node-9-label"
+        },
+        {
+          "id": "clap-lex-argument-tokenization-flow-edge-9",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "clap-lex-argument-tokenization-flow",
+        "node": "value",
+        "ref": "clap_lex/src/lib.rs#to_value_os"
+      }
+    },
+    {
+      "id": "clap-lex-argument-tokenization-flow-edge-0",
+      "type": "arrow",
+      "x": 174.53333333333336,
+      "y": 92,
+      "width": 0,
+      "height": 300.8,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aB",
+      "roundness": null,
+      "seed": 1047497264,
+      "version": 1,
+      "versionNonce": 611436172,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "clap-lex-argument-tokenization-flow-edge-0-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "clap-lex-argument-tokenization-flow",
+        "edge": {
+          "from": "argv",
+          "to": "cursor",
+          "claim": "builds"
+        }
+      },
+      "points": [
+        [
+          0,
+          0.5
+        ],
+        [
+          0,
+          150.4
+        ],
+        [
+          0,
+          300.3
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "clap-lex-argument-tokenization-flow-node-0",
+        "focus": 0.3940740740740738,
+        "gap": 8
+      },
+      "endBinding": {
+        "elementId": "clap-lex-argument-tokenization-flow-node-1",
+        "focus": 0.04121212121212152,
+        "gap": 7.199999999999989
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "clap-lex-argument-tokenization-flow-edge-1",
+      "type": "arrow",
+      "x": 234.53333333333336,
+      "y": 92,
+      "width": 130,
+      "height": 681.5999999999999,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aC",
+      "roundness": null,
+      "seed": 1721775289,
+      "version": 1,
+      "versionNonce": 929516675,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "clap-lex-argument-tokenization-flow-edge-1-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "clap-lex-argument-tokenization-flow",
+        "edge": {
+          "from": "argv",
+          "to": "parsed_arg",
+          "claim": "feeds"
+        }
+      },
+      "points": [
+        [
+          0,
+          0.5
+        ],
+        [
+          0,
+          32
+        ],
+        [
+          130,
+          32
+        ],
+        [
+          130,
+          334.13333333333327
+        ],
+        [
+          130,
+          573.5999999999999
+        ],
+        [
+          13.333333333333343,
+          573.5999999999999
+        ],
+        [
+          13.333333333333343,
+          681.0999999999999
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "clap-lex-argument-tokenization-flow-node-0",
+        "focus": -0.2725925925925929,
+        "gap": 8
+      },
+      "endBinding": {
+        "elementId": "clap-lex-argument-tokenization-flow-node-2",
+        "focus": 0.34424242424242424,
+        "gap": 6.400000000000091
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "clap-lex-argument-tokenization-flow-edge-2",
+      "type": "arrow",
+      "x": 174.53333333333336,
+      "y": 472.8,
+      "width": 0,
+      "height": 300.7999999999999,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aD",
+      "roundness": null,
+      "seed": 1789688398,
+      "version": 1,
+      "versionNonce": 267741426,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "clap-lex-argument-tokenization-flow-edge-2-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "clap-lex-argument-tokenization-flow",
+        "edge": {
+          "from": "cursor",
+          "to": "parsed_arg",
+          "claim": "takes"
+        }
+      },
+      "points": [
+        [
+          0,
+          0.5
+        ],
+        [
+          0,
+          150.39999999999992
+        ],
+        [
+          0,
+          300.2999999999999
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "clap-lex-argument-tokenization-flow-node-1",
+        "focus": -0.04121212121212114,
+        "gap": 7.199999999999989
+      },
+      "endBinding": {
+        "elementId": "clap-lex-argument-tokenization-flow-node-2",
+        "focus": -0.32242424242424234,
+        "gap": 6.400000000000091
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "clap-lex-argument-tokenization-flow-edge-3",
+      "type": "arrow",
+      "x": 233.20000000000002,
+      "y": 853.5999999999999,
+      "width": 253.00000000000003,
+      "height": 300.79999999999995,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aE",
+      "roundness": null,
+      "seed": 1597803871,
+      "version": 1,
+      "versionNonce": 1452929017,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "clap-lex-argument-tokenization-flow-edge-3-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "clap-lex-argument-tokenization-flow",
+        "edge": {
+          "from": "parsed_arg",
+          "to": "is_long",
+          "claim": "calls"
+        }
+      },
+      "points": [
+        [
+          0,
+          0.5
+        ],
+        [
+          0,
+          56
+        ],
+        [
+          220.9,
+          56
+        ],
+        [
+          253.00000000000003,
+          56
+        ],
+        [
+          253.00000000000003,
+          300.29999999999995
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "clap-lex-argument-tokenization-flow-node-2",
+        "focus": -0.21090909090909107,
+        "gap": 6.400000000000091
+      },
+      "endBinding": {
+        "elementId": "clap-lex-argument-tokenization-flow-node-3",
+        "focus": -0.05428571428571364,
+        "gap": 7.210575863819964
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "clap-lex-argument-tokenization-flow-edge-4",
+      "type": "arrow",
+      "x": 486.20000000000005,
+      "y": 1294.3999999999999,
+      "width": 0,
+      "height": 300.79999999999995,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aF",
+      "roundness": null,
+      "seed": 1520149164,
+      "version": 1,
+      "versionNonce": 1044483064,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "clap-lex-argument-tokenization-flow-edge-4-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "clap-lex-argument-tokenization-flow",
+        "edge": {
+          "from": "is_long",
+          "to": "to_long",
+          "claim": "calls"
+        }
+      },
+      "points": [
+        [
+          0,
+          0.5
+        ],
+        [
+          0,
+          150.39999999999986
+        ],
+        [
+          0,
+          300.29999999999995
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "clap-lex-argument-tokenization-flow-node-3",
+        "focus": 0.05428571428571364,
+        "gap": 2.7178024470906244
+      },
+      "endBinding": {
+        "elementId": "clap-lex-argument-tokenization-flow-node-4",
+        "focus": 0.051666666666667284,
+        "gap": 4.800000000000182
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "clap-lex-argument-tokenization-flow-edge-5",
+      "type": "arrow",
+      "x": 277.20000000000005,
+      "y": 853.5999999999999,
+      "width": 559,
+      "height": 300.79999999999995,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aG",
+      "roundness": null,
+      "seed": 2084495813,
+      "version": 1,
+      "versionNonce": 872938191,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "clap-lex-argument-tokenization-flow-edge-5-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "clap-lex-argument-tokenization-flow",
+        "edge": {
+          "from": "parsed_arg",
+          "to": "is_short",
+          "claim": "calls"
+        }
+      },
+      "points": [
+        [
+          0,
+          0.5
+        ],
+        [
+          0,
+          32
+        ],
+        [
+          397.9,
+          32
+        ],
+        [
+          559,
+          32
+        ],
+        [
+          559,
+          300.29999999999995
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "clap-lex-argument-tokenization-flow-node-2",
+        "focus": -0.610909090909091,
+        "gap": 6.400000000000091
+      },
+      "endBinding": {
+        "elementId": "clap-lex-argument-tokenization-flow-node-5",
+        "focus": -0.05428571428571364,
+        "gap": 7.160456372511803
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "clap-lex-argument-tokenization-flow-edge-6",
+      "type": "arrow",
+      "x": 836.2,
+      "y": 1294.3999999999999,
+      "width": 0,
+      "height": 300.79999999999995,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aH",
+      "roundness": null,
+      "seed": 928476010,
+      "version": 1,
+      "versionNonce": 1267219262,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "clap-lex-argument-tokenization-flow-edge-6-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "clap-lex-argument-tokenization-flow",
+        "edge": {
+          "from": "is_short",
+          "to": "to_short",
+          "claim": "calls"
+        }
+      },
+      "points": [
+        [
+          0,
+          0.5
+        ],
+        [
+          0,
+          150.39999999999986
+        ],
+        [
+          0,
+          300.29999999999995
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "clap-lex-argument-tokenization-flow-node-5",
+        "focus": 0.05428571428571364,
+        "gap": 2.9201598963597335
+      },
+      "endBinding": {
+        "elementId": "clap-lex-argument-tokenization-flow-node-6",
+        "focus": 0.04769230769230797,
+        "gap": 4.800000000000182
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "clap-lex-argument-tokenization-flow-edge-7",
+      "type": "arrow",
+      "x": 836.2,
+      "y": 1675.1999999999998,
+      "width": 0,
+      "height": 300.79999999999995,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aI",
+      "roundness": null,
+      "seed": 523506875,
+      "version": 1,
+      "versionNonce": 2070657845,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "clap-lex-argument-tokenization-flow-edge-7-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "clap-lex-argument-tokenization-flow",
+        "edge": {
+          "from": "to_short",
+          "to": "shortflags",
+          "claim": "builds"
+        }
+      },
+      "points": [
+        [
+          0,
+          0.5
+        ],
+        [
+          0,
+          150.4000000000001
+        ],
+        [
+          0,
+          300.29999999999995
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "clap-lex-argument-tokenization-flow-node-6",
+        "focus": -0.04769230769230797,
+        "gap": 4.800000000000182
+      },
+      "endBinding": {
+        "elementId": "clap-lex-argument-tokenization-flow-node-7",
+        "focus": 0.047692307692308464,
+        "gap": 4.000000000000227
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "clap-lex-argument-tokenization-flow-edge-8",
+      "type": "arrow",
+      "x": 836.2,
+      "y": 2056,
+      "width": 477.66666666666663,
+      "height": 300.8000000000002,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aJ",
+      "roundness": null,
+      "seed": 2101668984,
+      "version": 1,
+      "versionNonce": 2083438292,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "clap-lex-argument-tokenization-flow-edge-8-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "clap-lex-argument-tokenization-flow",
+        "edge": {
+          "from": "shortflags",
+          "to": "osext",
+          "claim": "needs"
+        }
+      },
+      "points": [
+        [
+          0,
+          0.5
+        ],
+        [
+          0,
+          192.80000000000018
+        ],
+        [
+          -196.43333333333317,
+          192.80000000000018
+        ],
+        [
+          -477.66666666666663,
+          192.80000000000018
+        ],
+        [
+          -477.66666666666663,
+          300.3000000000002
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "clap-lex-argument-tokenization-flow-node-7",
+        "focus": -0.04769230769230797,
+        "gap": 4
+      },
+      "endBinding": {
+        "elementId": "clap-lex-argument-tokenization-flow-node-8",
+        "focus": 0.2593939393939404,
+        "gap": 3.199999999999818
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "clap-lex-argument-tokenization-flow-edge-9",
+      "type": "arrow",
+      "x": 145.20000000000002,
+      "y": 853.5999999999999,
+      "width": 0,
+      "height": 300.79999999999995,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aK",
+      "roundness": null,
+      "seed": 1739042081,
+      "version": 1,
+      "versionNonce": 532832235,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "clap-lex-argument-tokenization-flow-edge-9-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "clap-lex-argument-tokenization-flow",
+        "edge": {
+          "from": "parsed_arg",
+          "to": "value",
+          "claim": "calls"
+        }
+      },
+      "points": [
+        [
+          0,
+          0.5
+        ],
+        [
+          0,
+          150.39999999999998
+        ],
+        [
+          0,
+          300.29999999999995
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "clap-lex-argument-tokenization-flow-node-2",
+        "focus": 0.589090909090909,
+        "gap": 6.400000000000091
+      },
+      "endBinding": {
+        "elementId": "clap-lex-argument-tokenization-flow-node-9",
+        "focus": 0.0519999999999999,
+        "gap": 5.600000000000136
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "clap-lex-argument-tokenization-flow-edge-10",
+      "type": "arrow",
+      "x": 189.20000000000002,
+      "y": 853.5999999999999,
+      "width": 96.00000000000003,
+      "height": 1503.2000000000003,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aL",
+      "roundness": null,
+      "seed": 209763013,
+      "version": 1,
+      "versionNonce": 1269863887,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "clap-lex-argument-tokenization-flow-edge-10-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "clap-lex-argument-tokenization-flow",
+        "edge": {
+          "from": "parsed_arg",
+          "to": "osext",
+          "claim": "needs"
+        }
+      },
+      "points": [
+        [
+          0,
+          0.5
+        ],
+        [
+          0,
+          80
+        ],
+        [
+          96.00000000000003,
+          80
+        ],
+        [
+          96.00000000000003,
+          703.6000000000001
+        ],
+        [
+          96.00000000000003,
+          1103.4
+        ],
+        [
+          96.00000000000003,
+          1303.3000000000002
+        ],
+        [
+          96.00000000000003,
+          1502.7000000000003
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "clap-lex-argument-tokenization-flow-node-2",
+        "focus": 0.18909090909090912,
+        "gap": 6.400000000000091
+      },
+      "endBinding": {
+        "elementId": "clap-lex-argument-tokenization-flow-node-8",
+        "focus": -0.40727272727272745,
+        "gap": 3.199999999999818
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "clap-lex-argument-tokenization-flow-node-0-label",
+      "type": "text",
+      "x": 144,
+      "y": 47.5,
+      "width": 132,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aM",
+      "roundness": null,
+      "seed": 361043658,
+      "version": 1,
+      "versionNonce": 762144798,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "clap-lex-argument-tokenization-flow"
+      },
+      "text": "OS Arguments",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "clap-lex-argument-tokenization-flow-node-0",
+      "originalText": "OS Arguments",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "clap-lex-argument-tokenization-flow-node-1-label",
+      "type": "text",
+      "x": 87.5,
+      "y": 427.5,
+      "width": 165,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aN",
+      "roundness": null,
+      "seed": 490122447,
+      "version": 1,
+      "versionNonce": 1912010921,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "clap-lex-argument-tokenization-flow"
+      },
+      "text": "Cursor Position",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "clap-lex-argument-tokenization-flow-node-1",
+      "originalText": "Cursor Position",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "clap-lex-argument-tokenization-flow-node-2-label",
+      "type": "text",
+      "x": 133,
+      "y": 807.5,
+      "width": 154,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aO",
+      "roundness": null,
+      "seed": 1808892704,
+      "version": 1,
+      "versionNonce": 601314172,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "clap-lex-argument-tokenization-flow"
+      },
+      "text": "Parse Argument",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "clap-lex-argument-tokenization-flow-node-2",
+      "originalText": "Parse Argument",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "clap-lex-argument-tokenization-flow-node-3-label",
+      "type": "text",
+      "x": 440.5,
+      "y": 1205,
+      "width": 99.00000000000001,
+      "height": 50,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aP",
+      "roundness": null,
+      "seed": 1540848365,
+      "version": 1,
+      "versionNonce": 1679382103,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "clap-lex-argument-tokenization-flow"
+      },
+      "text": "Test Long\nFlag",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "clap-lex-argument-tokenization-flow-node-3",
+      "originalText": "Test Long Flag",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "clap-lex-argument-tokenization-flow-node-4-label",
+      "type": "text",
+      "x": 386.5,
+      "y": 1627.5,
+      "width": 187.00000000000003,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aQ",
+      "roundness": null,
+      "seed": 1890753350,
+      "version": 1,
+      "versionNonce": 986390186,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "clap-lex-argument-tokenization-flow"
+      },
+      "text": "Extract Long Flag",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "clap-lex-argument-tokenization-flow-node-4",
+      "originalText": "Extract Long Flag",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "clap-lex-argument-tokenization-flow-node-5-label",
+      "type": "text",
+      "x": 785,
+      "y": 1205,
+      "width": 110.00000000000001,
+      "height": 50,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aR",
+      "roundness": null,
+      "seed": 1501448955,
+      "version": 1,
+      "versionNonce": 288507765,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "clap-lex-argument-tokenization-flow"
+      },
+      "text": "Test Short\nFlag",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "clap-lex-argument-tokenization-flow-node-5",
+      "originalText": "Test Short Flag",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "clap-lex-argument-tokenization-flow-node-6-label",
+      "type": "text",
+      "x": 731,
+      "y": 1627.5,
+      "width": 198.00000000000003,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aS",
+      "roundness": null,
+      "seed": 255286668,
+      "version": 1,
+      "versionNonce": 1537749080,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "clap-lex-argument-tokenization-flow"
+      },
+      "text": "Unpack Short Flags",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "clap-lex-argument-tokenization-flow-node-6",
+      "originalText": "Unpack Short Flags",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "clap-lex-argument-tokenization-flow-node-7-label",
+      "type": "text",
+      "x": 725.5,
+      "y": 2007.5,
+      "width": 209.00000000000003,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aT",
+      "roundness": null,
+      "seed": 886601769,
+      "version": 1,
+      "versionNonce": 563793459,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "clap-lex-argument-tokenization-flow"
+      },
+      "text": "Short Flag Iterator",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "clap-lex-argument-tokenization-flow-node-7",
+      "originalText": "Short Flag Iterator",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "clap-lex-argument-tokenization-flow-node-8-label",
+      "type": "text",
+      "x": 247.5,
+      "y": 2387.5,
+      "width": 165,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aU",
+      "roundness": null,
+      "seed": 1480649986,
+      "version": 1,
+      "versionNonce": 216177782,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "clap-lex-argument-tokenization-flow"
+      },
+      "text": "OsStr Utilities",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "clap-lex-argument-tokenization-flow-node-8",
+      "originalText": "OsStr Utilities",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "clap-lex-argument-tokenization-flow-node-9-label",
+      "type": "text",
+      "x": 68.5,
+      "y": 1187.5,
+      "width": 143,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aV",
+      "roundness": null,
+      "seed": 295075751,
+      "version": 1,
+      "versionNonce": 600618561,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "clap-lex-argument-tokenization-flow"
+      },
+      "text": "Consume Value",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "clap-lex-argument-tokenization-flow-node-9",
+      "originalText": "Consume Value",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "clap-lex-argument-tokenization-flow-edge-0-label",
+      "type": "text",
+      "x": 112.93333333333335,
+      "y": 232.4,
+      "width": 123.20000000000002,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aW",
+      "roundness": null,
+      "seed": 348294541,
+      "version": 1,
+      "versionNonce": 1621208183,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "clap-lex-argument-tokenization-flow"
+      },
+      "text": "cursor @builds",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "clap-lex-argument-tokenization-flow-edge-0",
+      "originalText": "cursor @builds",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "clap-lex-argument-tokenization-flow-edge-1-label",
+      "type": "text",
+      "x": 276.53333333333336,
+      "y": 406.13333333333327,
+      "width": 176,
+      "height": 40,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aX",
+      "roundness": null,
+      "seed": 1272645568,
+      "version": 1,
+      "versionNonce": 852773276,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "clap-lex-argument-tokenization-flow"
+      },
+      "text": "items[cursor.cursor]\n@feeds",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "clap-lex-argument-tokenization-flow-edge-1",
+      "originalText": "items[cursor.cursor] @feeds",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "clap-lex-argument-tokenization-flow-edge-2-label",
+      "type": "text",
+      "x": 117.33333333333336,
+      "y": 613.1999999999999,
+      "width": 114.4,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aY",
+      "roundness": null,
+      "seed": 1211641455,
+      "version": 1,
+      "versionNonce": 1812524489,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "clap-lex-argument-tokenization-flow"
+      },
+      "text": "cursor @takes",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "clap-lex-argument-tokenization-flow-edge-2",
+      "originalText": "cursor @takes",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "clap-lex-argument-tokenization-flow-edge-3-label",
+      "type": "text",
+      "x": 401.3,
+      "y": 899.5999999999999,
+      "width": 105.60000000000001,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aZ",
+      "roundness": null,
+      "seed": 1706666858,
+      "version": 1,
+      "versionNonce": 1345518398,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "clap-lex-argument-tokenization-flow"
+      },
+      "text": "check @calls",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "clap-lex-argument-tokenization-flow-edge-3",
+      "originalText": "check @calls",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "clap-lex-argument-tokenization-flow-edge-4-label",
+      "type": "text",
+      "x": 442.20000000000005,
+      "y": 1434.7999999999997,
+      "width": 88,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aa",
+      "roundness": null,
+      "seed": 784725193,
+      "version": 1,
+      "versionNonce": 1495852115,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "clap-lex-argument-tokenization-flow"
+      },
+      "text": "yes @calls",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "clap-lex-argument-tokenization-flow-edge-4",
+      "originalText": "yes @calls",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "clap-lex-argument-tokenization-flow-edge-5-label",
+      "type": "text",
+      "x": 622.3000000000001,
+      "y": 875.5999999999999,
+      "width": 105.60000000000001,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "ab",
+      "roundness": null,
+      "seed": 1178356396,
+      "version": 1,
+      "versionNonce": 740951032,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "clap-lex-argument-tokenization-flow"
+      },
+      "text": "check @calls",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "clap-lex-argument-tokenization-flow-edge-5",
+      "originalText": "check @calls",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "clap-lex-argument-tokenization-flow-edge-6-label",
+      "type": "text",
+      "x": 792.2,
+      "y": 1434.7999999999997,
+      "width": 88,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "ac",
+      "roundness": null,
+      "seed": 421379227,
+      "version": 1,
+      "versionNonce": 847148693,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "clap-lex-argument-tokenization-flow"
+      },
+      "text": "yes @calls",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "clap-lex-argument-tokenization-flow-edge-6",
+      "originalText": "yes @calls",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "clap-lex-argument-tokenization-flow-edge-7-label",
+      "type": "text",
+      "x": 757,
+      "y": 1815.6,
+      "width": 158.4,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "ad",
+      "roundness": null,
+      "seed": 1391667686,
+      "version": 1,
+      "versionNonce": 1181433802,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "clap-lex-argument-tokenization-flow"
+      },
+      "text": "ShortFlags @builds",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "clap-lex-argument-tokenization-flow-edge-7",
+      "originalText": "ShortFlags @builds",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "clap-lex-argument-tokenization-flow-edge-8-label",
+      "type": "text",
+      "x": 573.7666666666669,
+      "y": 2238.8,
+      "width": 132,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "ae",
+      "roundness": null,
+      "seed": 130740805,
+      "version": 1,
+      "versionNonce": 1636168783,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "clap-lex-argument-tokenization-flow"
+      },
+      "text": "split_at @needs",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "clap-lex-argument-tokenization-flow-edge-8",
+      "originalText": "split_at @needs",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "clap-lex-argument-tokenization-flow-edge-9-label",
+      "type": "text",
+      "x": 83.60000000000001,
+      "y": 993.9999999999999,
+      "width": 123.20000000000002,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "af",
+      "roundness": null,
+      "seed": 1890265080,
+      "version": 1,
+      "versionNonce": 639527252,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "clap-lex-argument-tokenization-flow"
+      },
+      "text": "default @calls",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "clap-lex-argument-tokenization-flow-edge-9",
+      "originalText": "default @calls",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "clap-lex-argument-tokenization-flow-edge-10-label",
+      "type": "text",
+      "x": 201.60000000000002,
+      "y": 1547.2,
+      "width": 167.20000000000002,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "ag",
+      "roundness": null,
+      "seed": 732388268,
+      "version": 1,
+      "versionNonce": 1404421880,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "clap-lex-argument-tokenization-flow"
+      },
+      "text": "strip_prefix @needs",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "clap-lex-argument-tokenization-flow-edge-10",
+      "originalText": "strip_prefix @needs",
+      "autoResize": true,
+      "lineHeight": 1.25
+    }
+  ],
+  "appState": {
+    "gridSize": null,
+    "viewBackgroundColor": "#ffffff"
+  },
+  "files": {},
+  "diagramos": {
+    "version": "0.2.0-rc.6",
+    "schema": 1
+  }
+}

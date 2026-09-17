@@ -1,0 +1,2056 @@
+{
+  "type": "excalidraw",
+  "version": 2,
+  "source": "diagramos",
+  "elements": [
+    {
+      "id": "error-chain-walking-and-formatting-title",
+      "type": "text",
+      "x": 0,
+      "y": -115,
+      "width": 448.8,
+      "height": 30,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a0",
+      "roundness": null,
+      "seed": 2007077593,
+      "version": 1,
+      "versionNonce": 106085411,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "error-chain-walking-and-formatting",
+        "role": "title",
+        "direction": "DOWN"
+      },
+      "text": "Error Chain Walking and Formatting",
+      "fontSize": 24,
+      "fontFamily": 5,
+      "textAlign": "left",
+      "verticalAlign": "middle",
+      "containerId": null,
+      "originalText": "Error Chain Walking and Formatting",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "error-chain-walking-and-formatting-node-0",
+      "type": "rectangle",
+      "x": 340,
+      "y": 20,
+      "width": 200,
+      "height": 80,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a1",
+      "roundness": null,
+      "seed": 480802432,
+      "version": 1,
+      "versionNonce": 959132764,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "error-chain-walking-and-formatting-node-0-label"
+        },
+        {
+          "id": "error-chain-walking-and-formatting-edge-0",
+          "type": "arrow"
+        },
+        {
+          "id": "error-chain-walking-and-formatting-edge-1",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "error-chain-walking-and-formatting",
+        "node": "error_type",
+        "ref": "src/error.rs#Error"
+      }
+    },
+    {
+      "id": "error-chain-walking-and-formatting-node-1",
+      "type": "rectangle",
+      "x": 280,
+      "y": 900,
+      "width": 240,
+      "height": 80,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a2",
+      "roundness": null,
+      "seed": 1486517449,
+      "version": 1,
+      "versionNonce": 850289747,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "error-chain-walking-and-formatting-node-1-label"
+        },
+        {
+          "id": "error-chain-walking-and-formatting-edge-0",
+          "type": "arrow"
+        },
+        {
+          "id": "error-chain-walking-and-formatting-edge-7",
+          "type": "arrow"
+        },
+        {
+          "id": "error-chain-walking-and-formatting-edge-8",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "error-chain-walking-and-formatting",
+        "node": "error_impl",
+        "ref": "src/error.rs#ErrorImpl"
+      }
+    },
+    {
+      "id": "error-chain-walking-and-formatting-node-2",
+      "type": "rectangle",
+      "x": 620,
+      "y": 240,
+      "width": 220,
+      "height": 80,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a3",
+      "roundness": null,
+      "seed": 1969902110,
+      "version": 1,
+      "versionNonce": 547034178,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "error-chain-walking-and-formatting-node-2-label"
+        },
+        {
+          "id": "error-chain-walking-and-formatting-edge-1",
+          "type": "arrow"
+        },
+        {
+          "id": "error-chain-walking-and-formatting-edge-2",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "error-chain-walking-and-formatting",
+        "node": "chain_method",
+        "ref": "src/error.rs#chain@declared"
+      }
+    },
+    {
+      "id": "error-chain-walking-and-formatting-node-3",
+      "type": "rectangle",
+      "x": 640,
+      "y": 460,
+      "width": 180,
+      "height": 80,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a4",
+      "roundness": null,
+      "seed": 2104876655,
+      "version": 1,
+      "versionNonce": 1009057225,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "error-chain-walking-and-formatting-node-3-label"
+        },
+        {
+          "id": "error-chain-walking-and-formatting-edge-2",
+          "type": "arrow"
+        },
+        {
+          "id": "error-chain-walking-and-formatting-edge-3",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "error-chain-walking-and-formatting",
+        "node": "chain_new",
+        "ref": "src/chain.rs#new"
+      }
+    },
+    {
+      "id": "error-chain-walking-and-formatting-node-4",
+      "type": "rectangle",
+      "x": 620,
+      "y": 680,
+      "width": 220,
+      "height": 80,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a5",
+      "roundness": null,
+      "seed": 1295233916,
+      "version": 1,
+      "versionNonce": 715161608,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "error-chain-walking-and-formatting-node-4-label"
+        },
+        {
+          "id": "error-chain-walking-and-formatting-edge-3",
+          "type": "arrow"
+        },
+        {
+          "id": "error-chain-walking-and-formatting-edge-4",
+          "type": "arrow"
+        },
+        {
+          "id": "error-chain-walking-and-formatting-edge-9",
+          "type": "arrow"
+        },
+        {
+          "id": "error-chain-walking-and-formatting-edge-10",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "error-chain-walking-and-formatting",
+        "node": "chain_iter",
+        "ref": "src/chain.rs#Chain"
+      }
+    },
+    {
+      "id": "error-chain-walking-and-formatting-node-5",
+      "type": "diamond",
+      "x": 680,
+      "y": 1120,
+      "width": 280,
+      "height": 140,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a6",
+      "roundness": null,
+      "seed": 1220220437,
+      "version": 1,
+      "versionNonce": 235929887,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "error-chain-walking-and-formatting-node-5-label"
+        },
+        {
+          "id": "error-chain-walking-and-formatting-edge-4",
+          "type": "arrow"
+        },
+        {
+          "id": "error-chain-walking-and-formatting-edge-5",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "error-chain-walking-and-formatting",
+        "node": "chain_state",
+        "ref": "src/chain.rs#ChainState"
+      }
+    },
+    {
+      "id": "error-chain-walking-and-formatting-node-6",
+      "type": "rectangle",
+      "x": 720,
+      "y": 1620,
+      "width": 180,
+      "height": 80,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a7",
+      "roundness": null,
+      "seed": 279103290,
+      "version": 1,
+      "versionNonce": 798930574,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "error-chain-walking-and-formatting-node-6-label"
+        },
+        {
+          "id": "error-chain-walking-and-formatting-edge-5",
+          "type": "arrow"
+        },
+        {
+          "id": "error-chain-walking-and-formatting-edge-6",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "error-chain-walking-and-formatting",
+        "node": "iter_next",
+        "ref": "src/chain.rs"
+      }
+    },
+    {
+      "id": "error-chain-walking-and-formatting-node-7",
+      "type": "rectangle",
+      "x": 60,
+      "y": 1120,
+      "width": 240,
+      "height": 80,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a8",
+      "roundness": null,
+      "seed": 711492427,
+      "version": 1,
+      "versionNonce": 681361349,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "error-chain-walking-and-formatting-node-7-label"
+        },
+        {
+          "id": "error-chain-walking-and-formatting-edge-7",
+          "type": "arrow"
+        },
+        {
+          "id": "error-chain-walking-and-formatting-edge-9",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "error-chain-walking-and-formatting",
+        "node": "display_fmt",
+        "ref": "src/fmt.rs#display"
+      }
+    },
+    {
+      "id": "error-chain-walking-and-formatting-node-8",
+      "type": "rectangle",
+      "x": 380,
+      "y": 1140,
+      "width": 220,
+      "height": 80,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a9",
+      "roundness": null,
+      "seed": 505508744,
+      "version": 1,
+      "versionNonce": 756181476,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "error-chain-walking-and-formatting-node-8-label"
+        },
+        {
+          "id": "error-chain-walking-and-formatting-edge-8",
+          "type": "arrow"
+        },
+        {
+          "id": "error-chain-walking-and-formatting-edge-10",
+          "type": "arrow"
+        },
+        {
+          "id": "error-chain-walking-and-formatting-edge-11",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "error-chain-walking-and-formatting",
+        "node": "debug_fmt",
+        "ref": "src/fmt.rs#debug"
+      }
+    },
+    {
+      "id": "error-chain-walking-and-formatting-node-9",
+      "type": "rectangle",
+      "x": 380,
+      "y": 1400,
+      "width": 220,
+      "height": 80,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aA",
+      "roundness": null,
+      "seed": 1926924465,
+      "version": 1,
+      "versionNonce": 1794867771,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "error-chain-walking-and-formatting-node-9-label"
+        },
+        {
+          "id": "error-chain-walking-and-formatting-edge-11",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "error-chain-walking-and-formatting",
+        "node": "indented",
+        "ref": "src/fmt.rs#Indented"
+      }
+    },
+    {
+      "id": "error-chain-walking-and-formatting-node-10",
+      "type": "ellipse",
+      "x": 640,
+      "y": 1840,
+      "width": 340,
+      "height": 80,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "dotted",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aB",
+      "roundness": null,
+      "seed": 149225941,
+      "version": 1,
+      "versionNonce": 2043805407,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "error-chain-walking-and-formatting-node-10-label"
+        },
+        {
+          "id": "error-chain-walking-and-formatting-edge-6",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "error-chain-walking-and-formatting",
+        "node": "std_source",
+        "state": "external"
+      }
+    },
+    {
+      "id": "error-chain-walking-and-formatting-edge-0",
+      "type": "arrow",
+      "x": 409.73333333333335,
+      "y": 92,
+      "width": 0,
+      "height": 800,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aC",
+      "roundness": null,
+      "seed": 85456887,
+      "version": 1,
+      "versionNonce": 1661552977,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "error-chain-walking-and-formatting-edge-0-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "error-chain-walking-and-formatting",
+        "edge": {
+          "from": "error_type",
+          "to": "error_impl"
+        }
+      },
+      "points": [
+        [
+          0,
+          0.5
+        ],
+        [
+          0,
+          400
+        ],
+        [
+          0,
+          799.5
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "error-chain-walking-and-formatting-node-0",
+        "focus": 0.30266666666666653,
+        "gap": 8
+      },
+      "endBinding": {
+        "elementId": "error-chain-walking-and-formatting-node-1",
+        "focus": 0.08111111111111115,
+        "gap": 8
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "error-chain-walking-and-formatting-edge-1",
+      "type": "arrow",
+      "x": 476.40000000000003,
+      "y": 92,
+      "width": 257.7333333333333,
+      "height": 140,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aD",
+      "roundness": null,
+      "seed": 1352961446,
+      "version": 1,
+      "versionNonce": 1730471562,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "error-chain-walking-and-formatting",
+        "edge": {
+          "from": "error_type",
+          "to": "chain_method"
+        }
+      },
+      "points": [
+        [
+          0,
+          0.5
+        ],
+        [
+          0,
+          32
+        ],
+        [
+          257.7333333333333,
+          32
+        ],
+        [
+          257.7333333333333,
+          139.5
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "error-chain-walking-and-formatting-node-0",
+        "focus": -0.3639999999999998,
+        "gap": 8
+      },
+      "endBinding": {
+        "elementId": "error-chain-walking-and-formatting-node-2",
+        "focus": 0.037575757575757505,
+        "gap": 8
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "error-chain-walking-and-formatting-edge-2",
+      "type": "arrow",
+      "x": 734.1333333333333,
+      "y": 312,
+      "width": 0,
+      "height": 140,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aE",
+      "roundness": null,
+      "seed": 214338545,
+      "version": 1,
+      "versionNonce": 1614328955,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "error-chain-walking-and-formatting",
+        "edge": {
+          "from": "chain_method",
+          "to": "chain_new"
+        }
+      },
+      "points": [
+        [
+          0,
+          0.5
+        ],
+        [
+          0,
+          139.5
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "error-chain-walking-and-formatting-node-2",
+        "focus": -0.037575757575757505,
+        "gap": 8
+      },
+      "endBinding": {
+        "elementId": "error-chain-walking-and-formatting-node-3",
+        "focus": 0.0459259259259258,
+        "gap": 8
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "error-chain-walking-and-formatting-edge-3",
+      "type": "arrow",
+      "x": 734.1333333333333,
+      "y": 532,
+      "width": 0,
+      "height": 140,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aF",
+      "roundness": null,
+      "seed": 1682633928,
+      "version": 1,
+      "versionNonce": 1659114532,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "error-chain-walking-and-formatting",
+        "edge": {
+          "from": "chain_new",
+          "to": "chain_iter"
+        }
+      },
+      "points": [
+        [
+          0,
+          0.5
+        ],
+        [
+          0,
+          139.5
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "error-chain-walking-and-formatting-node-3",
+        "focus": -0.0459259259259258,
+        "gap": 8
+      },
+      "endBinding": {
+        "elementId": "error-chain-walking-and-formatting-node-4",
+        "focus": 0.037575757575757505,
+        "gap": 8
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "error-chain-walking-and-formatting-edge-4",
+      "type": "arrow",
+      "x": 789.1333333333333,
+      "y": 752,
+      "width": 27.26666666666665,
+      "height": 360,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aG",
+      "roundness": null,
+      "seed": 832116787,
+      "version": 1,
+      "versionNonce": 1280349709,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "error-chain-walking-and-formatting-edge-4-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "error-chain-walking-and-formatting",
+        "edge": {
+          "from": "chain_iter",
+          "to": "chain_state"
+        }
+      },
+      "points": [
+        [
+          0,
+          0.5
+        ],
+        [
+          0,
+          32
+        ],
+        [
+          27.26666666666665,
+          32
+        ],
+        [
+          27.26666666666665,
+          166.36666666666667
+        ],
+        [
+          27.26666666666665,
+          214.7750000000001
+        ],
+        [
+          27.26666666666665,
+          263.1833333333334
+        ],
+        [
+          27.26666666666665,
+          359.5
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "error-chain-walking-and-formatting-node-4",
+        "focus": -0.5375757575757575,
+        "gap": 8
+      },
+      "endBinding": {
+        "elementId": "error-chain-walking-and-formatting-node-5",
+        "focus": -0.051428571428571754,
+        "gap": 9.21408336823729
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "error-chain-walking-and-formatting-edge-5",
+      "type": "arrow",
+      "x": 816.4,
+      "y": 1252,
+      "width": 0,
+      "height": 360,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aH",
+      "roundness": null,
+      "seed": 1565516674,
+      "version": 1,
+      "versionNonce": 57714678,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "error-chain-walking-and-formatting-edge-5-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "error-chain-walking-and-formatting",
+        "edge": {
+          "from": "chain_state",
+          "to": "iter_next",
+          "claim": "feeds"
+        }
+      },
+      "points": [
+        [
+          0,
+          0.5
+        ],
+        [
+          0,
+          180
+        ],
+        [
+          0,
+          359.5
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "error-chain-walking-and-formatting-node-5",
+        "focus": 0.051428571428571754,
+        "gap": 5.163790602070473
+      },
+      "endBinding": {
+        "elementId": "error-chain-walking-and-formatting-node-6",
+        "focus": 0.07111111111111086,
+        "gap": 8
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "error-chain-walking-and-formatting-edge-6",
+      "type": "arrow",
+      "x": 816.4,
+      "y": 1692,
+      "width": 0,
+      "height": 140,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aI",
+      "roundness": null,
+      "seed": 1772741789,
+      "version": 1,
+      "versionNonce": 1467959559,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "error-chain-walking-and-formatting",
+        "edge": {
+          "from": "iter_next",
+          "to": "std_source"
+        }
+      },
+      "points": [
+        [
+          0,
+          0.5
+        ],
+        [
+          0,
+          139.5
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "error-chain-walking-and-formatting-node-6",
+        "focus": -0.07111111111111086,
+        "gap": 8
+      },
+      "endBinding": {
+        "elementId": "error-chain-walking-and-formatting-node-10",
+        "focus": 0.03764705882352928,
+        "gap": 8.028044137692609
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "error-chain-walking-and-formatting-edge-7",
+      "type": "arrow",
+      "x": 369.73333333333335,
+      "y": 972,
+      "width": 153.33333333333334,
+      "height": 140,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aJ",
+      "roundness": null,
+      "seed": 1423400964,
+      "version": 1,
+      "versionNonce": 1122463504,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "error-chain-walking-and-formatting",
+        "edge": {
+          "from": "error_impl",
+          "to": "display_fmt"
+        }
+      },
+      "points": [
+        [
+          0,
+          0.5
+        ],
+        [
+          0,
+          32
+        ],
+        [
+          -153.33333333333334,
+          32
+        ],
+        [
+          -153.33333333333334,
+          139.5
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "error-chain-walking-and-formatting-node-1",
+        "focus": 0.252222222222222,
+        "gap": 8
+      },
+      "endBinding": {
+        "elementId": "error-chain-walking-and-formatting-node-7",
+        "focus": 0.3033333333333336,
+        "gap": 8
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "error-chain-walking-and-formatting-edge-8",
+      "type": "arrow",
+      "x": 449.73333333333335,
+      "y": 972,
+      "width": 0,
+      "height": 160,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aK",
+      "roundness": null,
+      "seed": 433867439,
+      "version": 1,
+      "versionNonce": 1252975881,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "error-chain-walking-and-formatting",
+        "edge": {
+          "from": "error_impl",
+          "to": "debug_fmt"
+        }
+      },
+      "points": [
+        [
+          0,
+          0.5
+        ],
+        [
+          0,
+          159.5
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "error-chain-walking-and-formatting-node-1",
+        "focus": -0.41444444444444456,
+        "gap": 8
+      },
+      "endBinding": {
+        "elementId": "error-chain-walking-and-formatting-node-8",
+        "focus": -0.3660606060606058,
+        "gap": 8
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "error-chain-walking-and-formatting-edge-9",
+      "type": "arrow",
+      "x": 679.1333333333333,
+      "y": 752,
+      "width": 542.7333333333333,
+      "height": 360,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aL",
+      "roundness": null,
+      "seed": 1041223518,
+      "version": 1,
+      "versionNonce": 707533442,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "error-chain-walking-and-formatting-edge-9-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "error-chain-walking-and-formatting",
+        "edge": {
+          "from": "chain_iter",
+          "to": "display_fmt",
+          "claim": "feeds"
+        }
+      },
+      "points": [
+        [
+          0,
+          0.5
+        ],
+        [
+          0,
+          32
+        ],
+        [
+          -419.3666666666667,
+          32
+        ],
+        [
+          -542.7333333333333,
+          32
+        ],
+        [
+          -542.7333333333333,
+          359.5
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "error-chain-walking-and-formatting-node-4",
+        "focus": 0.4624242424242425,
+        "gap": 8
+      },
+      "endBinding": {
+        "elementId": "error-chain-walking-and-formatting-node-7",
+        "focus": -0.3633333333333334,
+        "gap": 8
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "error-chain-walking-and-formatting-edge-10",
+      "type": "arrow",
+      "x": 734.1333333333333,
+      "y": 752,
+      "width": 211.06666666666672,
+      "height": 380,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aM",
+      "roundness": null,
+      "seed": 1843915240,
+      "version": 1,
+      "versionNonce": 1652500420,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "error-chain-walking-and-formatting-edge-10-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "error-chain-walking-and-formatting",
+        "edge": {
+          "from": "chain_iter",
+          "to": "debug_fmt",
+          "claim": "feeds"
+        }
+      },
+      "points": [
+        [
+          0,
+          0.5
+        ],
+        [
+          0,
+          252
+        ],
+        [
+          -43.53333333333342,
+          252
+        ],
+        [
+          -211.06666666666672,
+          252
+        ],
+        [
+          -211.06666666666672,
+          379.5
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "error-chain-walking-and-formatting-node-4",
+        "focus": -0.037575757575757505,
+        "gap": 8
+      },
+      "endBinding": {
+        "elementId": "error-chain-walking-and-formatting-node-8",
+        "focus": 0.300606060606061,
+        "gap": 8
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "error-chain-walking-and-formatting-edge-11",
+      "type": "arrow",
+      "x": 486.4,
+      "y": 1212,
+      "width": 0,
+      "height": 180,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aN",
+      "roundness": null,
+      "seed": 373612689,
+      "version": 1,
+      "versionNonce": 1264860315,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "error-chain-walking-and-formatting",
+        "edge": {
+          "from": "debug_fmt",
+          "to": "indented"
+        }
+      },
+      "points": [
+        [
+          0,
+          0.5
+        ],
+        [
+          0,
+          179.5
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "error-chain-walking-and-formatting-node-8",
+        "focus": 0.03272727272727275,
+        "gap": 8
+      },
+      "endBinding": {
+        "elementId": "error-chain-walking-and-formatting-node-9",
+        "focus": -0.03272727272727275,
+        "gap": 8
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "error-chain-walking-and-formatting-node-0-label",
+      "type": "text",
+      "x": 368.5,
+      "y": 47.5,
+      "width": 143,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aO",
+      "roundness": null,
+      "seed": 1127886429,
+      "version": 1,
+      "versionNonce": 1302199495,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "error-chain-walking-and-formatting"
+      },
+      "text": "Error wrapper",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "error-chain-walking-and-formatting-node-0",
+      "originalText": "Error wrapper",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "error-chain-walking-and-formatting-node-1-label",
+      "type": "text",
+      "x": 306.5,
+      "y": 927.5,
+      "width": 187.00000000000003,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aP",
+      "roundness": null,
+      "seed": 2066866576,
+      "version": 1,
+      "versionNonce": 338059116,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "error-chain-walking-and-formatting"
+      },
+      "text": "ErrorImpl storage",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "error-chain-walking-and-formatting-node-1",
+      "originalText": "ErrorImpl storage",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "error-chain-walking-and-formatting-node-2-label",
+      "type": "text",
+      "x": 653,
+      "y": 267.5,
+      "width": 154,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aQ",
+      "roundness": null,
+      "seed": 1116740863,
+      "version": 1,
+      "versionNonce": 321168409,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "error-chain-walking-and-formatting"
+      },
+      "text": "chain() method",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "error-chain-walking-and-formatting-node-2",
+      "originalText": "chain() method",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "error-chain-walking-and-formatting-node-3-label",
+      "type": "text",
+      "x": 664,
+      "y": 487.5,
+      "width": 132,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aR",
+      "roundness": null,
+      "seed": 790919738,
+      "version": 1,
+      "versionNonce": 902528910,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "error-chain-walking-and-formatting"
+      },
+      "text": "Chain::new()",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "error-chain-walking-and-formatting-node-3",
+      "originalText": "Chain::new()",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "error-chain-walking-and-formatting-node-4-label",
+      "type": "text",
+      "x": 653,
+      "y": 707.5,
+      "width": 154,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aS",
+      "roundness": null,
+      "seed": 1983157529,
+      "version": 1,
+      "versionNonce": 130027619,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "error-chain-walking-and-formatting"
+      },
+      "text": "Chain iterator",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "error-chain-walking-and-formatting-node-4",
+      "originalText": "Chain iterator",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "error-chain-walking-and-formatting-node-5-label",
+      "type": "text",
+      "x": 765,
+      "y": 1165,
+      "width": 110.00000000000001,
+      "height": 50,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aT",
+      "roundness": null,
+      "seed": 1857565628,
+      "version": 1,
+      "versionNonce": 2138841416,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "error-chain-walking-and-formatting"
+      },
+      "text": "ChainState\nenum",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "error-chain-walking-and-formatting-node-5",
+      "originalText": "ChainState\nenum",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "error-chain-walking-and-formatting-node-6-label",
+      "type": "text",
+      "x": 749.5,
+      "y": 1647.5,
+      "width": 121.00000000000001,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aU",
+      "roundness": null,
+      "seed": 1358631467,
+      "version": 1,
+      "versionNonce": 63862821,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "error-chain-walking-and-formatting"
+      },
+      "text": "next() walk",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "error-chain-walking-and-formatting-node-6",
+      "originalText": "next() walk",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "error-chain-walking-and-formatting-node-7-label",
+      "type": "text",
+      "x": 92,
+      "y": 1147.5,
+      "width": 176,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aV",
+      "roundness": null,
+      "seed": 1061252854,
+      "version": 1,
+      "versionNonce": 340887130,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "error-chain-walking-and-formatting"
+      },
+      "text": "display() format",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "error-chain-walking-and-formatting-node-7",
+      "originalText": "display() format",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "error-chain-walking-and-formatting-node-8-label",
+      "type": "text",
+      "x": 413,
+      "y": 1167.5,
+      "width": 154,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aW",
+      "roundness": null,
+      "seed": 1829165653,
+      "version": 1,
+      "versionNonce": 454676575,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "error-chain-walking-and-formatting"
+      },
+      "text": "debug() format",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "error-chain-walking-and-formatting-node-8",
+      "originalText": "debug() format",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "error-chain-walking-and-formatting-node-9-label",
+      "type": "text",
+      "x": 407.5,
+      "y": 1427.5,
+      "width": 165,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aX",
+      "roundness": null,
+      "seed": 438556040,
+      "version": 1,
+      "versionNonce": 1691529188,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "error-chain-walking-and-formatting"
+      },
+      "text": "Indented helper",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "error-chain-walking-and-formatting-node-9",
+      "originalText": "Indented helper",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "error-chain-walking-and-formatting-node-10-label",
+      "type": "text",
+      "x": 710.7918471982869,
+      "y": 1867.715728752538,
+      "width": 198.00000000000003,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aY",
+      "roundness": null,
+      "seed": 1708493052,
+      "version": 1,
+      "versionNonce": 1902352520,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "error-chain-walking-and-formatting"
+      },
+      "text": "StdError::source()",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "error-chain-walking-and-formatting-node-10",
+      "originalText": "StdError::source()",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "error-chain-walking-and-formatting-edge-0-label",
+      "type": "text",
+      "x": 387.73333333333335,
+      "y": 482,
+      "width": 44,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aZ",
+      "roundness": null,
+      "seed": 1310924146,
+      "version": 1,
+      "versionNonce": 486149926,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "error-chain-walking-and-formatting"
+      },
+      "text": "inner",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "error-chain-walking-and-formatting-edge-0",
+      "originalText": "inner",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "error-chain-walking-and-formatting-edge-4-label",
+      "type": "text",
+      "x": 794.4,
+      "y": 908.3666666666667,
+      "width": 44,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aa",
+      "roundness": null,
+      "seed": 1040048014,
+      "version": 1,
+      "versionNonce": 1247747122,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "error-chain-walking-and-formatting"
+      },
+      "text": "state",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "error-chain-walking-and-formatting-edge-4",
+      "originalText": "state",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "error-chain-walking-and-formatting-edge-5-label",
+      "type": "text",
+      "x": 790,
+      "y": 1422,
+      "width": 52.800000000000004,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "ab",
+      "roundness": null,
+      "seed": 785543651,
+      "version": 1,
+      "versionNonce": 1160775293,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "error-chain-walking-and-formatting"
+      },
+      "text": "@feeds",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "error-chain-walking-and-formatting-edge-5",
+      "originalText": "@feeds",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "error-chain-walking-and-formatting-edge-9-label",
+      "type": "text",
+      "x": 202.56666666666666,
+      "y": 774,
+      "width": 114.4,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "ac",
+      "roundness": null,
+      "seed": 127792831,
+      "version": 1,
+      "versionNonce": 133379801,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "error-chain-walking-and-formatting"
+      },
+      "text": "causes @feeds",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "error-chain-walking-and-formatting-edge-9",
+      "originalText": "causes @feeds",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "error-chain-walking-and-formatting-edge-10-label",
+      "type": "text",
+      "x": 633.3999999999999,
+      "y": 994,
+      "width": 114.4,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "ad",
+      "roundness": null,
+      "seed": 1076670005,
+      "version": 1,
+      "versionNonce": 1977751231,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "error-chain-walking-and-formatting"
+      },
+      "text": "causes @feeds",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "error-chain-walking-and-formatting-edge-10",
+      "originalText": "causes @feeds",
+      "autoResize": true,
+      "lineHeight": 1.25
+    }
+  ],
+  "appState": {
+    "gridSize": null,
+    "viewBackgroundColor": "#ffffff"
+  },
+  "files": {},
+  "diagramos": {
+    "version": "0.2.0-rc.6",
+    "schema": 1
+  }
+}

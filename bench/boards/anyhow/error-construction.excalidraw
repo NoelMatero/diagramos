@@ -1,0 +1,1969 @@
+{
+  "type": "excalidraw",
+  "version": 2,
+  "source": "diagramos",
+  "elements": [
+    {
+      "id": "anyhow-error-construction-amp-context-title",
+      "type": "text",
+      "x": 0,
+      "y": -115,
+      "width": 514.8000000000001,
+      "height": 30,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a0",
+      "roundness": null,
+      "seed": 141090109,
+      "version": 1,
+      "versionNonce": 39397927,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "anyhow-error-construction-amp-context",
+        "role": "title"
+      },
+      "text": "Anyhow Error Construction &amp; Context",
+      "fontSize": 24,
+      "fontFamily": 5,
+      "textAlign": "left",
+      "verticalAlign": "middle",
+      "containerId": null,
+      "originalText": "Anyhow Error Construction &amp; Context",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "anyhow-error-construction-amp-context-node-0",
+      "type": "rectangle",
+      "x": 40,
+      "y": 20,
+      "width": 180,
+      "height": 80,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a1",
+      "roundness": null,
+      "seed": 2137874596,
+      "version": 1,
+      "versionNonce": 1073504816,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "anyhow-error-construction-amp-context-node-0-label"
+        },
+        {
+          "id": "anyhow-error-construction-amp-context-edge-0",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "anyhow-error-construction-amp-context",
+        "node": "msg_func",
+        "ref": "src/error.rs#msg"
+      }
+    },
+    {
+      "id": "anyhow-error-construction-amp-context-node-1",
+      "type": "rectangle",
+      "x": 40,
+      "y": 200,
+      "width": 180,
+      "height": 80,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a2",
+      "roundness": null,
+      "seed": 1744987965,
+      "version": 1,
+      "versionNonce": 17655847,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "anyhow-error-construction-amp-context-node-1-label"
+        },
+        {
+          "id": "anyhow-error-construction-amp-context-edge-1",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "anyhow-error-construction-amp-context",
+        "node": "new_func",
+        "ref": "src/error.rs#new"
+      }
+    },
+    {
+      "id": "anyhow-error-construction-amp-context-node-2",
+      "type": "rectangle",
+      "x": 20,
+      "y": 360,
+      "width": 200,
+      "height": 80,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a3",
+      "roundness": null,
+      "seed": 368967586,
+      "version": 1,
+      "versionNonce": 495356310,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "anyhow-error-construction-amp-context-node-2-label"
+        },
+        {
+          "id": "anyhow-error-construction-amp-context-edge-5",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "anyhow-error-construction-amp-context",
+        "node": "context_ext",
+        "ref": "src/context.rs"
+      }
+    },
+    {
+      "id": "anyhow-error-construction-amp-context-node-3",
+      "type": "rectangle",
+      "x": 560,
+      "y": 20,
+      "width": 280,
+      "height": 100,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a4",
+      "roundness": null,
+      "seed": 845836499,
+      "version": 1,
+      "versionNonce": 296080173,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "anyhow-error-construction-amp-context-node-3-label"
+        },
+        {
+          "id": "anyhow-error-construction-amp-context-edge-0",
+          "type": "arrow"
+        },
+        {
+          "id": "anyhow-error-construction-amp-context-edge-2",
+          "type": "arrow"
+        },
+        {
+          "id": "anyhow-error-construction-amp-context-edge-3",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "anyhow-error-construction-amp-context",
+        "node": "adhoc_construct",
+        "ref": "src/error.rs#construct_from_adhoc"
+      }
+    },
+    {
+      "id": "anyhow-error-construction-amp-context-node-4",
+      "type": "rectangle",
+      "x": 560,
+      "y": 200,
+      "width": 260,
+      "height": 80,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a5",
+      "roundness": null,
+      "seed": 1696456808,
+      "version": 1,
+      "versionNonce": 208810820,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "anyhow-error-construction-amp-context-node-4-label"
+        },
+        {
+          "id": "anyhow-error-construction-amp-context-edge-1",
+          "type": "arrow"
+        },
+        {
+          "id": "anyhow-error-construction-amp-context-edge-4",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "anyhow-error-construction-amp-context",
+        "node": "std_construct",
+        "ref": "src/error.rs#construct_from_std"
+      }
+    },
+    {
+      "id": "anyhow-error-construction-amp-context-node-5",
+      "type": "rectangle",
+      "x": 540,
+      "y": 360,
+      "width": 300,
+      "height": 100,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a6",
+      "roundness": null,
+      "seed": 226154257,
+      "version": 1,
+      "versionNonce": 1968654363,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "anyhow-error-construction-amp-context-node-5-label"
+        },
+        {
+          "id": "anyhow-error-construction-amp-context-edge-5",
+          "type": "arrow"
+        },
+        {
+          "id": "anyhow-error-construction-amp-context-edge-6",
+          "type": "arrow"
+        },
+        {
+          "id": "anyhow-error-construction-amp-context-edge-7",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "anyhow-error-construction-amp-context",
+        "node": "context_construct",
+        "ref": "src/error.rs#construct_from_context"
+      }
+    },
+    {
+      "id": "anyhow-error-construction-amp-context-node-6",
+      "type": "rectangle",
+      "x": 1200,
+      "y": 180,
+      "width": 180,
+      "height": 120,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a7",
+      "roundness": null,
+      "seed": 156515526,
+      "version": 1,
+      "versionNonce": 20732714,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "anyhow-error-construction-amp-context-node-6-label"
+        },
+        {
+          "id": "anyhow-error-construction-amp-context-edge-3",
+          "type": "arrow"
+        },
+        {
+          "id": "anyhow-error-construction-amp-context-edge-4",
+          "type": "arrow"
+        },
+        {
+          "id": "anyhow-error-construction-amp-context-edge-7",
+          "type": "arrow"
+        },
+        {
+          "id": "anyhow-error-construction-amp-context-edge-8",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "anyhow-error-construction-amp-context",
+        "node": "construct_core",
+        "ref": "src/error.rs#construct"
+      }
+    },
+    {
+      "id": "anyhow-error-construction-amp-context-node-7",
+      "type": "rectangle",
+      "x": 1180,
+      "y": 20,
+      "width": 220,
+      "height": 80,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a8",
+      "roundness": null,
+      "seed": 99279767,
+      "version": 1,
+      "versionNonce": 677386609,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "anyhow-error-construction-amp-context-node-7-label"
+        },
+        {
+          "id": "anyhow-error-construction-amp-context-edge-2",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "anyhow-error-construction-amp-context",
+        "node": "msg_error",
+        "ref": "src/wrapper.rs#MessageError"
+      }
+    },
+    {
+      "id": "anyhow-error-construction-amp-context-node-8",
+      "type": "rectangle",
+      "x": 1180,
+      "y": 400,
+      "width": 240,
+      "height": 80,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a9",
+      "roundness": null,
+      "seed": 1741947356,
+      "version": 1,
+      "versionNonce": 105040872,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "anyhow-error-construction-amp-context-node-8-label"
+        },
+        {
+          "id": "anyhow-error-construction-amp-context-edge-6",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "anyhow-error-construction-amp-context",
+        "node": "ctx_error",
+        "ref": "src/error.rs#ContextError"
+      }
+    },
+    {
+      "id": "anyhow-error-construction-amp-context-node-9",
+      "type": "rectangle",
+      "x": 1760,
+      "y": 200,
+      "width": 180,
+      "height": 80,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aA",
+      "roundness": null,
+      "seed": 263684853,
+      "version": 1,
+      "versionNonce": 1794466175,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "anyhow-error-construction-amp-context-node-9-label"
+        },
+        {
+          "id": "anyhow-error-construction-amp-context-edge-8",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "anyhow-error-construction-amp-context",
+        "node": "error_impl",
+        "ref": "src/error.rs#ErrorImpl"
+      }
+    },
+    {
+      "id": "anyhow-error-construction-amp-context-edge-0",
+      "type": "arrow",
+      "x": 212,
+      "y": 68.66666666666667,
+      "width": 346.1333333333333,
+      "height": 0,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aB",
+      "roundness": null,
+      "seed": 657427067,
+      "version": 1,
+      "versionNonce": 1597586933,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "anyhow-error-construction-amp-context-edge-0-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "anyhow-error-construction-amp-context",
+        "edge": {
+          "from": "msg_func",
+          "to": "adhoc_construct",
+          "claim": "calls"
+        }
+      },
+      "points": [
+        [
+          0.5,
+          0
+        ],
+        [
+          173.06666666666666,
+          0
+        ],
+        [
+          345.6333333333333,
+          0
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "anyhow-error-construction-amp-context-node-0",
+        "focus": 0.21666666666666667,
+        "gap": 8
+      },
+      "endBinding": {
+        "elementId": "anyhow-error-construction-amp-context-node-3",
+        "focus": 0.026666666666666033,
+        "gap": 1.8666666666666742
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "anyhow-error-construction-amp-context-edge-1",
+      "type": "arrow",
+      "x": 212,
+      "y": 238.66666666666669,
+      "width": 352.79999999999995,
+      "height": 0,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aC",
+      "roundness": null,
+      "seed": 2043091754,
+      "version": 1,
+      "versionNonce": 135133950,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "anyhow-error-construction-amp-context-edge-1-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "anyhow-error-construction-amp-context",
+        "edge": {
+          "from": "new_func",
+          "to": "std_construct",
+          "claim": "calls"
+        }
+      },
+      "points": [
+        [
+          0.5,
+          0
+        ],
+        [
+          176.39999999999998,
+          0
+        ],
+        [
+          352.29999999999995,
+          0
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "anyhow-error-construction-amp-context-node-1",
+        "focus": -0.033333333333333375,
+        "gap": 8
+      },
+      "endBinding": {
+        "elementId": "anyhow-error-construction-amp-context-node-4",
+        "focus": 0.033333333333333624,
+        "gap": 4.7999999999999545
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "anyhow-error-construction-amp-context-edge-2",
+      "type": "arrow",
+      "x": 838.1333333333333,
+      "y": 52,
+      "width": 348.26666666666654,
+      "height": 0,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aD",
+      "roundness": null,
+      "seed": 112405893,
+      "version": 1,
+      "versionNonce": 1804917135,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "anyhow-error-construction-amp-context-edge-2-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "anyhow-error-construction-amp-context",
+        "edge": {
+          "from": "adhoc_construct",
+          "to": "msg_error",
+          "claim": "builds"
+        }
+      },
+      "points": [
+        [
+          0.5,
+          0
+        ],
+        [
+          174.13333333333333,
+          0
+        ],
+        [
+          347.76666666666654,
+          0
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "anyhow-error-construction-amp-context-node-3",
+        "focus": -0.3599999999999999,
+        "gap": 1.8666666666666742
+      },
+      "endBinding": {
+        "elementId": "anyhow-error-construction-amp-context-node-7",
+        "focus": 0.2,
+        "gap": 6.399999999999864
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "anyhow-error-construction-amp-context-edge-3",
+      "type": "arrow",
+      "x": 838.1333333333333,
+      "y": 85.33333333333333,
+      "width": 363.26666666666654,
+      "height": 123.33333333333336,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aE",
+      "roundness": null,
+      "seed": 1654069356,
+      "version": 1,
+      "versionNonce": 1976565176,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "anyhow-error-construction-amp-context-edge-3-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "anyhow-error-construction-amp-context",
+        "edge": {
+          "from": "adhoc_construct",
+          "to": "construct_core",
+          "claim": "calls"
+        }
+      },
+      "points": [
+        [
+          0.5,
+          0
+        ],
+        [
+          38.66666666666663,
+          0
+        ],
+        [
+          38.66666666666663,
+          23.46666666666667
+        ],
+        [
+          219.83333333333337,
+          23.46666666666667
+        ],
+        [
+          240.26666666666654,
+          23.46666666666667
+        ],
+        [
+          240.26666666666654,
+          123.33333333333336
+        ],
+        [
+          362.76666666666654,
+          123.33333333333336
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "anyhow-error-construction-amp-context-node-3",
+        "focus": 0.30666666666666637,
+        "gap": 1.8666666666666742
+      },
+      "endBinding": {
+        "elementId": "anyhow-error-construction-amp-context-node-6",
+        "focus": 0.5222222222222223,
+        "gap": 1.3999999999998636
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "anyhow-error-construction-amp-context-edge-4",
+      "type": "arrow",
+      "x": 824.8,
+      "y": 238.66666666666669,
+      "width": 376.5999999999999,
+      "height": 0,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aF",
+      "roundness": null,
+      "seed": 1773300767,
+      "version": 1,
+      "versionNonce": 237424313,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "anyhow-error-construction-amp-context-edge-4-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "anyhow-error-construction-amp-context",
+        "edge": {
+          "from": "std_construct",
+          "to": "construct_core",
+          "claim": "calls"
+        }
+      },
+      "points": [
+        [
+          0.5,
+          0
+        ],
+        [
+          188.29999999999995,
+          0
+        ],
+        [
+          376.0999999999999,
+          0
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "anyhow-error-construction-amp-context-node-4",
+        "focus": -0.033333333333333624,
+        "gap": 4.7999999999999545
+      },
+      "endBinding": {
+        "elementId": "anyhow-error-construction-amp-context-node-6",
+        "focus": 0.02222222222222227,
+        "gap": 1.3999999999998636
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "anyhow-error-construction-amp-context-edge-5",
+      "type": "arrow",
+      "x": 212,
+      "y": 408.6666666666667,
+      "width": 332.79999999999995,
+      "height": 0,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aG",
+      "roundness": null,
+      "seed": 756820494,
+      "version": 1,
+      "versionNonce": 923689906,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "anyhow-error-construction-amp-context-edge-5-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "anyhow-error-construction-amp-context",
+        "edge": {
+          "from": "context_ext",
+          "to": "context_construct",
+          "claim": "calls"
+        }
+      },
+      "points": [
+        [
+          0.5,
+          0
+        ],
+        [
+          166.39999999999998,
+          0
+        ],
+        [
+          332.29999999999995,
+          0
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "anyhow-error-construction-amp-context-node-2",
+        "focus": 0.2166666666666683,
+        "gap": 8
+      },
+      "endBinding": {
+        "elementId": "anyhow-error-construction-amp-context-node-5",
+        "focus": 0.026666666666666627,
+        "gap": 4.7999999999999545
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "anyhow-error-construction-amp-context-edge-6",
+      "type": "arrow",
+      "x": 844.8,
+      "y": 425.33333333333337,
+      "width": 341.5999999999999,
+      "height": 23.46666666666664,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aH",
+      "roundness": null,
+      "seed": 1113364857,
+      "version": 1,
+      "versionNonce": 180208963,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "anyhow-error-construction-amp-context-edge-6-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "anyhow-error-construction-amp-context",
+        "edge": {
+          "from": "context_construct",
+          "to": "ctx_error",
+          "claim": "builds"
+        }
+      },
+      "points": [
+        [
+          0.5,
+          0
+        ],
+        [
+          32,
+          0
+        ],
+        [
+          32,
+          23.46666666666664
+        ],
+        [
+          159.0666666666666,
+          23.46666666666664
+        ],
+        [
+          204.70000000000005,
+          23.46666666666664
+        ],
+        [
+          250.33333333333326,
+          23.46666666666664
+        ],
+        [
+          341.0999999999999,
+          23.46666666666664
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "anyhow-error-construction-amp-context-node-5",
+        "focus": 0.3066666666666676,
+        "gap": 4.7999999999999545
+      },
+      "endBinding": {
+        "elementId": "anyhow-error-construction-amp-context-node-8",
+        "focus": -0.22000000000000072,
+        "gap": 6.399999999999864
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "anyhow-error-construction-amp-context-edge-7",
+      "type": "arrow",
+      "x": 844.8,
+      "y": 392,
+      "width": 356.5999999999999,
+      "height": 123.33333333333331,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aI",
+      "roundness": null,
+      "seed": 1222994160,
+      "version": 1,
+      "versionNonce": 1501838412,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "anyhow-error-construction-amp-context-edge-7-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "anyhow-error-construction-amp-context",
+        "edge": {
+          "from": "context_construct",
+          "to": "construct_core",
+          "claim": "calls"
+        }
+      },
+      "points": [
+        [
+          0.5,
+          0
+        ],
+        [
+          233.5999999999999,
+          0
+        ],
+        [
+          233.5999999999999,
+          -6.366666666666674
+        ],
+        [
+          233.5999999999999,
+          -123.33333333333331
+        ],
+        [
+          356.0999999999999,
+          -123.33333333333331
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "anyhow-error-construction-amp-context-node-5",
+        "focus": -0.36,
+        "gap": 4.7999999999999545
+      },
+      "endBinding": {
+        "elementId": "anyhow-error-construction-amp-context-node-6",
+        "focus": -0.4777777777777779,
+        "gap": 1.3999999999998636
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "anyhow-error-construction-amp-context-edge-8",
+      "type": "arrow",
+      "x": 1381.3999999999999,
+      "y": 238.66666666666669,
+      "width": 386.5999999999999,
+      "height": 0,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aJ",
+      "roundness": null,
+      "seed": 355503459,
+      "version": 1,
+      "versionNonce": 1800753405,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "anyhow-error-construction-amp-context-edge-8-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "anyhow-error-construction-amp-context",
+        "edge": {
+          "from": "construct_core",
+          "to": "error_impl",
+          "claim": "builds"
+        }
+      },
+      "points": [
+        [
+          0.5,
+          0
+        ],
+        [
+          193.29999999999995,
+          0
+        ],
+        [
+          386.0999999999999,
+          0
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "anyhow-error-construction-amp-context-node-6",
+        "focus": -0.02222222222222227,
+        "gap": 1.3999999999998636
+      },
+      "endBinding": {
+        "elementId": "anyhow-error-construction-amp-context-node-9",
+        "focus": 0.03333333333333115,
+        "gap": 7.999999999999773
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "anyhow-error-construction-amp-context-node-0-label",
+      "type": "text",
+      "x": 64,
+      "y": 47.5,
+      "width": 132,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aK",
+      "roundness": null,
+      "seed": 1546643505,
+      "version": 1,
+      "versionNonce": 1012979899,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "anyhow-error-construction-amp-context"
+      },
+      "text": "Error::msg()",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "anyhow-error-construction-amp-context-node-0",
+      "originalText": "Error::msg()",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "anyhow-error-construction-amp-context-node-1-label",
+      "type": "text",
+      "x": 64,
+      "y": 227.5,
+      "width": 132,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aL",
+      "roundness": null,
+      "seed": 69053940,
+      "version": 1,
+      "versionNonce": 1495172544,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "anyhow-error-construction-amp-context"
+      },
+      "text": "Error::new()",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "anyhow-error-construction-amp-context-node-1",
+      "originalText": "Error::new()",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "anyhow-error-construction-amp-context-node-2-label",
+      "type": "text",
+      "x": 48.5,
+      "y": 387.5,
+      "width": 143,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aM",
+      "roundness": null,
+      "seed": 505655427,
+      "version": 1,
+      "versionNonce": 240404637,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "anyhow-error-construction-amp-context"
+      },
+      "text": "Context trait",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "anyhow-error-construction-amp-context-node-2",
+      "originalText": "Context trait",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "anyhow-error-construction-amp-context-node-3-label",
+      "type": "text",
+      "x": 590,
+      "y": 57.5,
+      "width": 220.00000000000003,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aN",
+      "roundness": null,
+      "seed": 1452237358,
+      "version": 1,
+      "versionNonce": 61762130,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "anyhow-error-construction-amp-context"
+      },
+      "text": "construct_from_adhoc",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "anyhow-error-construction-amp-context-node-3",
+      "originalText": "construct_from_adhoc",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "anyhow-error-construction-amp-context-node-4-label",
+      "type": "text",
+      "x": 591,
+      "y": 227.5,
+      "width": 198.00000000000003,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aO",
+      "roundness": null,
+      "seed": 486469813,
+      "version": 1,
+      "versionNonce": 350275135,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "anyhow-error-construction-amp-context"
+      },
+      "text": "construct_from_std",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "anyhow-error-construction-amp-context-node-4",
+      "originalText": "construct_from_std",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "anyhow-error-construction-amp-context-node-5-label",
+      "type": "text",
+      "x": 569,
+      "y": 397.5,
+      "width": 242.00000000000003,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aP",
+      "roundness": null,
+      "seed": 1799305832,
+      "version": 1,
+      "versionNonce": 854778180,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "anyhow-error-construction-amp-context"
+      },
+      "text": "construct_from_context",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "anyhow-error-construction-amp-context-node-5",
+      "originalText": "construct_from_context",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "anyhow-error-construction-amp-context-node-6-label",
+      "type": "text",
+      "x": 1229.5,
+      "y": 227.5,
+      "width": 121.00000000000001,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aQ",
+      "roundness": null,
+      "seed": 1916248375,
+      "version": 1,
+      "versionNonce": 829245585,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "anyhow-error-construction-amp-context"
+      },
+      "text": "construct()",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "anyhow-error-construction-amp-context-node-6",
+      "originalText": "construct()",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "anyhow-error-construction-amp-context-node-7-label",
+      "type": "text",
+      "x": 1207.5,
+      "y": 47.5,
+      "width": 165,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aR",
+      "roundness": null,
+      "seed": 2042655378,
+      "version": 1,
+      "versionNonce": 908079558,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "anyhow-error-construction-amp-context"
+      },
+      "text": "MessageError<M>",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "anyhow-error-construction-amp-context-node-7",
+      "originalText": "MessageError<M>",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "anyhow-error-construction-amp-context-node-8-label",
+      "type": "text",
+      "x": 1206.5,
+      "y": 427.5,
+      "width": 187.00000000000003,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aS",
+      "roundness": null,
+      "seed": 596736889,
+      "version": 1,
+      "versionNonce": 285051715,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "anyhow-error-construction-amp-context"
+      },
+      "text": "ContextError<C,E>",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "anyhow-error-construction-amp-context-node-8",
+      "originalText": "ContextError<C,E>",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "anyhow-error-construction-amp-context-node-9-label",
+      "type": "text",
+      "x": 1784,
+      "y": 227.5,
+      "width": 132,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aT",
+      "roundness": null,
+      "seed": 1918221980,
+      "version": 1,
+      "versionNonce": 1350444200,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "anyhow-error-construction-amp-context"
+      },
+      "text": "ErrorImpl<E>",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "anyhow-error-construction-amp-context-node-9",
+      "originalText": "ErrorImpl<E>",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "anyhow-error-construction-amp-context-edge-0-label",
+      "type": "text",
+      "x": 358.6666666666667,
+      "y": 58.66666666666667,
+      "width": 52.800000000000004,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aU",
+      "roundness": null,
+      "seed": 1154237990,
+      "version": 1,
+      "versionNonce": 1101813770,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "anyhow-error-construction-amp-context"
+      },
+      "text": "@calls",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "anyhow-error-construction-amp-context-edge-0",
+      "originalText": "@calls",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "anyhow-error-construction-amp-context-edge-1-label",
+      "type": "text",
+      "x": 362,
+      "y": 228.66666666666669,
+      "width": 52.800000000000004,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aV",
+      "roundness": null,
+      "seed": 303314651,
+      "version": 1,
+      "versionNonce": 884804309,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "anyhow-error-construction-amp-context"
+      },
+      "text": "@calls",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "anyhow-error-construction-amp-context-edge-1",
+      "originalText": "@calls",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "anyhow-error-construction-amp-context-edge-2-label",
+      "type": "text",
+      "x": 981.4666666666667,
+      "y": 42,
+      "width": 61.60000000000001,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aW",
+      "roundness": null,
+      "seed": 1863493612,
+      "version": 1,
+      "versionNonce": 475194424,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "anyhow-error-construction-amp-context"
+      },
+      "text": "@builds",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "anyhow-error-construction-amp-context-edge-2",
+      "originalText": "@builds",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "anyhow-error-construction-amp-context-edge-3-label",
+      "type": "text",
+      "x": 1031.5666666666666,
+      "y": 98.8,
+      "width": 52.800000000000004,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aX",
+      "roundness": null,
+      "seed": 873853193,
+      "version": 1,
+      "versionNonce": 1621454483,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "anyhow-error-construction-amp-context"
+      },
+      "text": "@calls",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "anyhow-error-construction-amp-context-edge-3",
+      "originalText": "@calls",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "anyhow-error-construction-amp-context-edge-4-label",
+      "type": "text",
+      "x": 986.6999999999999,
+      "y": 228.66666666666669,
+      "width": 52.800000000000004,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aY",
+      "roundness": null,
+      "seed": 1940342698,
+      "version": 1,
+      "versionNonce": 1676937342,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "anyhow-error-construction-amp-context"
+      },
+      "text": "@calls",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "anyhow-error-construction-amp-context-edge-4",
+      "originalText": "@calls",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "anyhow-error-construction-amp-context-edge-5-label",
+      "type": "text",
+      "x": 352,
+      "y": 398.6666666666667,
+      "width": 52.800000000000004,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aZ",
+      "roundness": null,
+      "seed": 1990595759,
+      "version": 1,
+      "versionNonce": 1549263625,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "anyhow-error-construction-amp-context"
+      },
+      "text": "@calls",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "anyhow-error-construction-amp-context-edge-5",
+      "originalText": "@calls",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "anyhow-error-construction-amp-context-edge-6-label",
+      "type": "text",
+      "x": 973.0666666666666,
+      "y": 438.8,
+      "width": 61.60000000000001,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aa",
+      "roundness": null,
+      "seed": 1957679616,
+      "version": 1,
+      "versionNonce": 1287667420,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "anyhow-error-construction-amp-context"
+      },
+      "text": "@builds",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "anyhow-error-construction-amp-context-edge-6",
+      "originalText": "@builds",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "anyhow-error-construction-amp-context-edge-7-label",
+      "type": "text",
+      "x": 1051.9999999999998,
+      "y": 375.6333333333333,
+      "width": 52.800000000000004,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "ab",
+      "roundness": null,
+      "seed": 812669901,
+      "version": 1,
+      "versionNonce": 541837495,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "anyhow-error-construction-amp-context"
+      },
+      "text": "@calls",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "anyhow-error-construction-amp-context-edge-7",
+      "originalText": "@calls",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "anyhow-error-construction-amp-context-edge-8-label",
+      "type": "text",
+      "x": 1543.8999999999999,
+      "y": 228.66666666666669,
+      "width": 61.60000000000001,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "ac",
+      "roundness": null,
+      "seed": 1551202558,
+      "version": 1,
+      "versionNonce": 1256785826,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "anyhow-error-construction-amp-context"
+      },
+      "text": "@builds",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "anyhow-error-construction-amp-context-edge-8",
+      "originalText": "@builds",
+      "autoResize": true,
+      "lineHeight": 1.25
+    }
+  ],
+  "appState": {
+    "gridSize": null,
+    "viewBackgroundColor": "#ffffff"
+  },
+  "files": {},
+  "diagramos": {
+    "version": "0.2.0-rc.6",
+    "schema": 1
+  }
+}

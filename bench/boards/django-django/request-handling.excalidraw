@@ -1,0 +1,1963 @@
+{
+  "type": "excalidraw",
+  "version": 2,
+  "source": "diagramos",
+  "elements": [
+    {
+      "id": "django-request-handling-flow-title",
+      "type": "text",
+      "x": 0,
+      "y": -115,
+      "width": 369.6,
+      "height": 30,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a0",
+      "roundness": null,
+      "seed": 1348918915,
+      "version": 1,
+      "versionNonce": 773173917,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "django-request-handling-flow",
+        "role": "title",
+        "direction": "DOWN"
+      },
+      "text": "Django Request Handling Flow",
+      "fontSize": 24,
+      "fontFamily": 5,
+      "textAlign": "left",
+      "verticalAlign": "middle",
+      "containerId": null,
+      "originalText": "Django Request Handling Flow",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "django-request-handling-flow-node-0",
+      "type": "rectangle",
+      "x": 520,
+      "y": 20,
+      "width": 280,
+      "height": 80,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a1",
+      "roundness": null,
+      "seed": 874131846,
+      "version": 1,
+      "versionNonce": 849541610,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "django-request-handling-flow-node-0-label"
+        },
+        {
+          "id": "django-request-handling-flow-edge-0",
+          "type": "arrow"
+        },
+        {
+          "id": "django-request-handling-flow-edge-1",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "django-request-handling-flow",
+        "node": "wsgi_handler_call",
+        "ref": "django/core/handlers/wsgi.py#WSGIHandler.__call__"
+      }
+    },
+    {
+      "id": "django-request-handling-flow-node-1",
+      "type": "rectangle",
+      "x": 280,
+      "y": 400,
+      "width": 180,
+      "height": 80,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a2",
+      "roundness": null,
+      "seed": 32988759,
+      "version": 1,
+      "versionNonce": 1123477553,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "django-request-handling-flow-node-1-label"
+        },
+        {
+          "id": "django-request-handling-flow-edge-0",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "django-request-handling-flow",
+        "node": "wsgi_request",
+        "ref": "django/core/handlers/wsgi.py#WSGIRequest"
+      }
+    },
+    {
+      "id": "django-request-handling-flow-node-2",
+      "type": "rectangle",
+      "x": 540,
+      "y": 400,
+      "width": 320,
+      "height": 80,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a3",
+      "roundness": null,
+      "seed": 1630165800,
+      "version": 1,
+      "versionNonce": 1121039108,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "django-request-handling-flow-node-2-label"
+        },
+        {
+          "id": "django-request-handling-flow-edge-1",
+          "type": "arrow"
+        },
+        {
+          "id": "django-request-handling-flow-edge-2",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "django-request-handling-flow",
+        "node": "get_response",
+        "ref": "django/core/handlers/base.py#BaseHandler.get_response"
+      }
+    },
+    {
+      "id": "django-request-handling-flow-node-3",
+      "type": "rectangle",
+      "x": 580,
+      "y": 780,
+      "width": 240,
+      "height": 80,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a4",
+      "roundness": null,
+      "seed": 1882889425,
+      "version": 1,
+      "versionNonce": 691719131,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "django-request-handling-flow-node-3-label"
+        },
+        {
+          "id": "django-request-handling-flow-edge-2",
+          "type": "arrow"
+        },
+        {
+          "id": "django-request-handling-flow-edge-3",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "django-request-handling-flow",
+        "node": "middleware_chain",
+        "ref": "django/core/handlers/base.py#BaseHandler._middleware_chain"
+      }
+    },
+    {
+      "id": "django-request-handling-flow-node-4",
+      "type": "rectangle",
+      "x": 520,
+      "y": 1160,
+      "width": 380,
+      "height": 80,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a5",
+      "roundness": null,
+      "seed": 1086687074,
+      "version": 1,
+      "versionNonce": 1282588502,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "django-request-handling-flow-node-4-label"
+        },
+        {
+          "id": "django-request-handling-flow-edge-3",
+          "type": "arrow"
+        },
+        {
+          "id": "django-request-handling-flow-edge-4",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "django-request-handling-flow",
+        "node": "convert_exception",
+        "ref": "django/core/handlers/exception.py#convert_exception_to_response"
+      }
+    },
+    {
+      "id": "django-request-handling-flow-node-5",
+      "type": "rectangle",
+      "x": 540,
+      "y": 1540,
+      "width": 340,
+      "height": 80,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a6",
+      "roundness": null,
+      "seed": 355088019,
+      "version": 1,
+      "versionNonce": 742274285,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "django-request-handling-flow-node-5-label"
+        },
+        {
+          "id": "django-request-handling-flow-edge-4",
+          "type": "arrow"
+        },
+        {
+          "id": "django-request-handling-flow-edge-5",
+          "type": "arrow"
+        },
+        {
+          "id": "django-request-handling-flow-edge-6",
+          "type": "arrow"
+        },
+        {
+          "id": "django-request-handling-flow-edge-8",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "django-request-handling-flow",
+        "node": "get_response_inner",
+        "ref": "django/core/handlers/base.py#BaseHandler._get_response"
+      }
+    },
+    {
+      "id": "django-request-handling-flow-node-6",
+      "type": "rectangle",
+      "x": 20,
+      "y": 1920,
+      "width": 220,
+      "height": 80,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a7",
+      "roundness": null,
+      "seed": 2113160292,
+      "version": 1,
+      "versionNonce": 1201825776,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "django-request-handling-flow-node-6-label"
+        },
+        {
+          "id": "django-request-handling-flow-edge-5",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "django-request-handling-flow",
+        "node": "resolve_request",
+        "ref": "django/core/handlers/base.py#BaseHandler.resolve_request"
+      }
+    },
+    {
+      "id": "django-request-handling-flow-node-7",
+      "type": "rectangle",
+      "x": 320,
+      "y": 1920,
+      "width": 200,
+      "height": 80,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "dotted",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a8",
+      "roundness": null,
+      "seed": 2038146813,
+      "version": 1,
+      "versionNonce": 1588898535,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "django-request-handling-flow-node-7-label"
+        },
+        {
+          "id": "django-request-handling-flow-edge-6",
+          "type": "arrow"
+        },
+        {
+          "id": "django-request-handling-flow-edge-7",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "django-request-handling-flow",
+        "node": "view_callback",
+        "state": "external"
+      }
+    },
+    {
+      "id": "django-request-handling-flow-node-8",
+      "type": "rectangle",
+      "x": 320,
+      "y": 2300,
+      "width": 180,
+      "height": 80,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "dotted",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a9",
+      "roundness": null,
+      "seed": 1925867070,
+      "version": 1,
+      "versionNonce": 890615266,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "django-request-handling-flow-node-8-label"
+        },
+        {
+          "id": "django-request-handling-flow-edge-7",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "django-request-handling-flow",
+        "node": "http_response",
+        "ref": "django/http/response.py#HttpResponse",
+        "state": "external"
+      }
+    },
+    {
+      "id": "django-request-handling-flow-node-9",
+      "type": "rectangle",
+      "x": 600,
+      "y": 1920,
+      "width": 400,
+      "height": 80,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aA",
+      "roundness": null,
+      "seed": 2102418319,
+      "version": 1,
+      "versionNonce": 2094968937,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "django-request-handling-flow-node-9-label"
+        },
+        {
+          "id": "django-request-handling-flow-edge-8",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "django-request-handling-flow",
+        "node": "process_exception",
+        "ref": "django/core/handlers/base.py#BaseHandler.process_exception_by_middleware"
+      }
+    },
+    {
+      "id": "django-request-handling-flow-edge-0",
+      "type": "arrow",
+      "x": 613.6666666666667,
+      "y": 92,
+      "width": 236.66666666666674,
+      "height": 300.8,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aB",
+      "roundness": null,
+      "seed": 376440089,
+      "version": 1,
+      "versionNonce": 1162960995,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "django-request-handling-flow-edge-0-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "django-request-handling-flow",
+        "edge": {
+          "from": "wsgi_handler_call",
+          "to": "wsgi_request",
+          "claim": "builds"
+        }
+      },
+      "points": [
+        [
+          0,
+          0.5
+        ],
+        [
+          -1.1368683772161603e-13,
+          32
+        ],
+        [
+          -236.66666666666674,
+          32
+        ],
+        [
+          -236.66666666666674,
+          32.06666666666672
+        ],
+        [
+          -236.66666666666674,
+          99.25000000000006
+        ],
+        [
+          -236.66666666666674,
+          166.4333333333334
+        ],
+        [
+          -236.66666666666674,
+          300.3
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "django-request-handling-flow-node-0",
+        "focus": 0.33095238095237883,
+        "gap": 8
+      },
+      "endBinding": {
+        "elementId": "django-request-handling-flow-node-1",
+        "focus": 0.07777777777777745,
+        "gap": 7.199999999999989
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "django-request-handling-flow-edge-1",
+      "type": "arrow",
+      "x": 707,
+      "y": 92,
+      "width": 0,
+      "height": 300.8,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aC",
+      "roundness": null,
+      "seed": 1105411088,
+      "version": 1,
+      "versionNonce": 1566037740,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "django-request-handling-flow-edge-1-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "django-request-handling-flow",
+        "edge": {
+          "from": "wsgi_handler_call",
+          "to": "get_response",
+          "claim": "calls"
+        }
+      },
+      "points": [
+        [
+          0,
+          0.5
+        ],
+        [
+          0,
+          150.4
+        ],
+        [
+          0,
+          300.3
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "django-request-handling-flow-node-0",
+        "focus": -0.33571428571428574,
+        "gap": 8
+      },
+      "endBinding": {
+        "elementId": "django-request-handling-flow-node-2",
+        "focus": 0.04375,
+        "gap": 7.199999999999989
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "django-request-handling-flow-edge-2",
+      "type": "arrow",
+      "x": 707,
+      "y": 472.8,
+      "width": 0,
+      "height": 300.7999999999999,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aD",
+      "roundness": null,
+      "seed": 1655717695,
+      "version": 1,
+      "versionNonce": 1706776665,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "django-request-handling-flow-edge-2-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "django-request-handling-flow",
+        "edge": {
+          "from": "get_response",
+          "to": "middleware_chain",
+          "claim": "calls"
+        }
+      },
+      "points": [
+        [
+          0,
+          0.5
+        ],
+        [
+          0,
+          150.39999999999992
+        ],
+        [
+          0,
+          300.2999999999999
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "django-request-handling-flow-node-2",
+        "focus": -0.04375,
+        "gap": 7.199999999999989
+      },
+      "endBinding": {
+        "elementId": "django-request-handling-flow-node-3",
+        "focus": 0.058333333333333424,
+        "gap": 6.400000000000091
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "django-request-handling-flow-edge-3",
+      "type": "arrow",
+      "x": 707,
+      "y": 853.5999999999999,
+      "width": 0,
+      "height": 300.79999999999995,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aE",
+      "roundness": null,
+      "seed": 2125802670,
+      "version": 1,
+      "versionNonce": 925643218,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "django-request-handling-flow-edge-3-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "django-request-handling-flow",
+        "edge": {
+          "from": "middleware_chain",
+          "to": "convert_exception",
+          "claim": "calls"
+        }
+      },
+      "points": [
+        [
+          0,
+          0.5
+        ],
+        [
+          0,
+          150.39999999999998
+        ],
+        [
+          0,
+          300.29999999999995
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "django-request-handling-flow-node-3",
+        "focus": -0.058333333333333424,
+        "gap": 6.400000000000091
+      },
+      "endBinding": {
+        "elementId": "django-request-handling-flow-node-4",
+        "focus": -0.015789473684210423,
+        "gap": 5.600000000000136
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "django-request-handling-flow-edge-4",
+      "type": "arrow",
+      "x": 707,
+      "y": 1234.3999999999999,
+      "width": 0,
+      "height": 300.79999999999995,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aF",
+      "roundness": null,
+      "seed": 1717952165,
+      "version": 1,
+      "versionNonce": 1869116463,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "django-request-handling-flow-edge-4-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "django-request-handling-flow",
+        "edge": {
+          "from": "convert_exception",
+          "to": "get_response_inner",
+          "claim": "calls"
+        }
+      },
+      "points": [
+        [
+          0,
+          0.5
+        ],
+        [
+          0,
+          150.39999999999986
+        ],
+        [
+          0,
+          300.29999999999995
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "django-request-handling-flow-node-4",
+        "focus": 0.015789473684210423,
+        "gap": 5.600000000000136
+      },
+      "endBinding": {
+        "elementId": "django-request-handling-flow-node-5",
+        "focus": -0.017647058823529467,
+        "gap": 4.800000000000182
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "django-request-handling-flow-edge-5",
+      "type": "arrow",
+      "x": 622,
+      "y": 1615.1999999999998,
+      "width": 500,
+      "height": 300.79999999999995,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aG",
+      "roundness": null,
+      "seed": 1578062988,
+      "version": 1,
+      "versionNonce": 2040661336,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "django-request-handling-flow-edge-5-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "django-request-handling-flow",
+        "edge": {
+          "from": "get_response_inner",
+          "to": "resolve_request",
+          "claim": "calls"
+        }
+      },
+      "points": [
+        [
+          0,
+          0.5
+        ],
+        [
+          0,
+          32
+        ],
+        [
+          -368.4,
+          32
+        ],
+        [
+          -500,
+          32
+        ],
+        [
+          -500,
+          300.29999999999995
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "django-request-handling-flow-node-5",
+        "focus": 0.5176470588235295,
+        "gap": 4.800000000000182
+      },
+      "endBinding": {
+        "elementId": "django-request-handling-flow-node-6",
+        "focus": -0.07272727272727297,
+        "gap": 4.000000000000227
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "django-request-handling-flow-edge-6",
+      "type": "arrow",
+      "x": 707,
+      "y": 1615.1999999999998,
+      "width": 295,
+      "height": 300.79999999999995,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aH",
+      "roundness": null,
+      "seed": 1325655323,
+      "version": 1,
+      "versionNonce": 198195221,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "django-request-handling-flow-edge-6-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "django-request-handling-flow",
+        "edge": {
+          "from": "get_response_inner",
+          "to": "view_callback",
+          "claim": "calls"
+        }
+      },
+      "points": [
+        [
+          0,
+          0.5
+        ],
+        [
+          0,
+          56
+        ],
+        [
+          -241.89999999999998,
+          56
+        ],
+        [
+          -295,
+          56
+        ],
+        [
+          -295,
+          300.29999999999995
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "django-request-handling-flow-node-5",
+        "focus": 0.017647058823529467,
+        "gap": 4.800000000000182
+      },
+      "endBinding": {
+        "elementId": "django-request-handling-flow-node-7",
+        "focus": -0.08000000000000017,
+        "gap": 4.000000000000227
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "django-request-handling-flow-edge-7",
+      "type": "arrow",
+      "x": 412,
+      "y": 1995.9999999999998,
+      "width": 0,
+      "height": 300.8000000000004,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aI",
+      "roundness": null,
+      "seed": 563836362,
+      "version": 1,
+      "versionNonce": 883225886,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "django-request-handling-flow-edge-7-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "django-request-handling-flow",
+        "edge": {
+          "from": "view_callback",
+          "to": "http_response",
+          "claim": "feeds"
+        }
+      },
+      "points": [
+        [
+          0,
+          0.5
+        ],
+        [
+          0,
+          150.40000000000032
+        ],
+        [
+          0,
+          300.3000000000004
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "django-request-handling-flow-node-7",
+        "focus": 0.08000000000000017,
+        "gap": 4.000000000000227
+      },
+      "endBinding": {
+        "elementId": "django-request-handling-flow-node-8",
+        "focus": 0.022222222222221387,
+        "gap": 3.199999999999818
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "django-request-handling-flow-edge-8",
+      "type": "arrow",
+      "x": 792,
+      "y": 1615.1999999999998,
+      "width": 0,
+      "height": 300.79999999999995,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aJ",
+      "roundness": null,
+      "seed": 393603713,
+      "version": 1,
+      "versionNonce": 1232310731,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "django-request-handling-flow-edge-8-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "django-request-handling-flow",
+        "edge": {
+          "from": "get_response_inner",
+          "to": "process_exception",
+          "claim": "calls"
+        }
+      },
+      "points": [
+        [
+          0,
+          0.5
+        ],
+        [
+          0,
+          150.4000000000001
+        ],
+        [
+          0,
+          300.29999999999995
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "django-request-handling-flow-node-5",
+        "focus": -0.4823529411764705,
+        "gap": 4.800000000000182
+      },
+      "endBinding": {
+        "elementId": "django-request-handling-flow-node-9",
+        "focus": -0.039999999999999904,
+        "gap": 4.000000000000227
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "django-request-handling-flow-node-0-label",
+      "type": "text",
+      "x": 550,
+      "y": 47.5,
+      "width": 220.00000000000003,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aK",
+      "roundness": null,
+      "seed": 1137277303,
+      "version": 1,
+      "versionNonce": 343418321,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "django-request-handling-flow"
+      },
+      "text": "WSGIHandler.__call__",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "django-request-handling-flow-node-0",
+      "originalText": "WSGIHandler.__call__",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "django-request-handling-flow-node-1-label",
+      "type": "text",
+      "x": 309.5,
+      "y": 427.5,
+      "width": 121.00000000000001,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aL",
+      "roundness": null,
+      "seed": 473528530,
+      "version": 1,
+      "versionNonce": 1449876742,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "django-request-handling-flow"
+      },
+      "text": "WSGIRequest",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "django-request-handling-flow-node-1",
+      "originalText": "WSGIRequest",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "django-request-handling-flow-node-2-label",
+      "type": "text",
+      "x": 568,
+      "y": 427.5,
+      "width": 264,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aM",
+      "roundness": null,
+      "seed": 1382802933,
+      "version": 1,
+      "versionNonce": 1827486335,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "django-request-handling-flow"
+      },
+      "text": "BaseHandler.get_response",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "django-request-handling-flow-node-2",
+      "originalText": "BaseHandler.get_response",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "django-request-handling-flow-node-3-label",
+      "type": "text",
+      "x": 612,
+      "y": 807.5,
+      "width": 176,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aN",
+      "roundness": null,
+      "seed": 1630916776,
+      "version": 1,
+      "versionNonce": 1423682436,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "django-request-handling-flow"
+      },
+      "text": "Middleware Chain",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "django-request-handling-flow-node-3",
+      "originalText": "Middleware Chain",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "django-request-handling-flow-node-4-label",
+      "type": "text",
+      "x": 550.5,
+      "y": 1187.5,
+      "width": 319,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aO",
+      "roundness": null,
+      "seed": 1678692035,
+      "version": 1,
+      "versionNonce": 900794589,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "django-request-handling-flow"
+      },
+      "text": "convert_exception_to_response",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "django-request-handling-flow-node-4",
+      "originalText": "convert_exception_to_response",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "django-request-handling-flow-node-5-label",
+      "type": "text",
+      "x": 572.5,
+      "y": 1567.5,
+      "width": 275,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aP",
+      "roundness": null,
+      "seed": 1606136686,
+      "version": 1,
+      "versionNonce": 179205010,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "django-request-handling-flow"
+      },
+      "text": "BaseHandler._get_response",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "django-request-handling-flow-node-5",
+      "originalText": "BaseHandler._get_response",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "django-request-handling-flow-node-6-label",
+      "type": "text",
+      "x": 47.5,
+      "y": 1947.5,
+      "width": 165,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aQ",
+      "roundness": null,
+      "seed": 1587529329,
+      "version": 1,
+      "versionNonce": 959433723,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "django-request-handling-flow"
+      },
+      "text": "resolve_request",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "django-request-handling-flow-node-6",
+      "originalText": "resolve_request",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "django-request-handling-flow-node-7-label",
+      "type": "text",
+      "x": 348.5,
+      "y": 1947.5,
+      "width": 143,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aR",
+      "roundness": null,
+      "seed": 1210774580,
+      "version": 1,
+      "versionNonce": 931719680,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "django-request-handling-flow"
+      },
+      "text": "View Callback",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "django-request-handling-flow-node-7",
+      "originalText": "View Callback",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "django-request-handling-flow-node-8-label",
+      "type": "text",
+      "x": 344,
+      "y": 2327.5,
+      "width": 132,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aS",
+      "roundness": null,
+      "seed": 546250527,
+      "version": 1,
+      "versionNonce": 1804900281,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "django-request-handling-flow"
+      },
+      "text": "HttpResponse",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "django-request-handling-flow-node-8",
+      "originalText": "HttpResponse",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "django-request-handling-flow-node-9-label",
+      "type": "text",
+      "x": 629.5,
+      "y": 1947.5,
+      "width": 341,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aT",
+      "roundness": null,
+      "seed": 1983383642,
+      "version": 1,
+      "versionNonce": 1573697838,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "django-request-handling-flow"
+      },
+      "text": "process_exception_by_middleware",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "django-request-handling-flow-node-9",
+      "originalText": "process_exception_by_middleware",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "django-request-handling-flow-edge-0-label",
+      "type": "text",
+      "x": 346.2,
+      "y": 114.06666666666672,
+      "width": 61.60000000000001,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aU",
+      "roundness": null,
+      "seed": 206949664,
+      "version": 1,
+      "versionNonce": 1410847100,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "django-request-handling-flow"
+      },
+      "text": "@builds",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "django-request-handling-flow-edge-0",
+      "originalText": "@builds",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "django-request-handling-flow-edge-1-label",
+      "type": "text",
+      "x": 680.6,
+      "y": 232.4,
+      "width": 52.800000000000004,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aV",
+      "roundness": null,
+      "seed": 2086388973,
+      "version": 1,
+      "versionNonce": 341431383,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "django-request-handling-flow"
+      },
+      "text": "@calls",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "django-request-handling-flow-edge-1",
+      "originalText": "@calls",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "django-request-handling-flow-edge-2-label",
+      "type": "text",
+      "x": 680.6,
+      "y": 613.1999999999999,
+      "width": 52.800000000000004,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aW",
+      "roundness": null,
+      "seed": 906584266,
+      "version": 1,
+      "versionNonce": 1571677726,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "django-request-handling-flow"
+      },
+      "text": "@calls",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "django-request-handling-flow-edge-2",
+      "originalText": "@calls",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "django-request-handling-flow-edge-3-label",
+      "type": "text",
+      "x": 680.6,
+      "y": 993.9999999999999,
+      "width": 52.800000000000004,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aX",
+      "roundness": null,
+      "seed": 1035663055,
+      "version": 1,
+      "versionNonce": 574060201,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "django-request-handling-flow"
+      },
+      "text": "@calls",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "django-request-handling-flow-edge-3",
+      "originalText": "@calls",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "django-request-handling-flow-edge-4-label",
+      "type": "text",
+      "x": 680.6,
+      "y": 1374.7999999999997,
+      "width": 52.800000000000004,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aY",
+      "roundness": null,
+      "seed": 800827276,
+      "version": 1,
+      "versionNonce": 199798360,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "django-request-handling-flow"
+      },
+      "text": "@calls",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "django-request-handling-flow-edge-4",
+      "originalText": "@calls",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "django-request-handling-flow-edge-5-label",
+      "type": "text",
+      "x": 227.20000000000002,
+      "y": 1637.1999999999998,
+      "width": 52.800000000000004,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aZ",
+      "roundness": null,
+      "seed": 1432142377,
+      "version": 1,
+      "versionNonce": 1373326387,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "django-request-handling-flow"
+      },
+      "text": "@calls",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "django-request-handling-flow-edge-5",
+      "originalText": "@calls",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "django-request-handling-flow-edge-6-label",
+      "type": "text",
+      "x": 438.70000000000005,
+      "y": 1661.1999999999998,
+      "width": 52.800000000000004,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aa",
+      "roundness": null,
+      "seed": 288810310,
+      "version": 1,
+      "versionNonce": 1795923114,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "django-request-handling-flow"
+      },
+      "text": "@calls",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "django-request-handling-flow-edge-6",
+      "originalText": "@calls",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "django-request-handling-flow-edge-7-label",
+      "type": "text",
+      "x": 385.6,
+      "y": 2136.4,
+      "width": 52.800000000000004,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "ab",
+      "roundness": null,
+      "seed": 2046989563,
+      "version": 1,
+      "versionNonce": 1098040693,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "django-request-handling-flow"
+      },
+      "text": "@feeds",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "django-request-handling-flow-edge-7",
+      "originalText": "@feeds",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "django-request-handling-flow-edge-8-label",
+      "type": "text",
+      "x": 765.6,
+      "y": 1755.6,
+      "width": 52.800000000000004,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "ac",
+      "roundness": null,
+      "seed": 826473176,
+      "version": 1,
+      "versionNonce": 1965016244,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "django-request-handling-flow"
+      },
+      "text": "@calls",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "django-request-handling-flow-edge-8",
+      "originalText": "@calls",
+      "autoResize": true,
+      "lineHeight": 1.25
+    }
+  ],
+  "appState": {
+    "gridSize": null,
+    "viewBackgroundColor": "#ffffff"
+  },
+  "files": {},
+  "diagramos": {
+    "version": "0.2.0-rc.6",
+    "schema": 1
+  }
+}
