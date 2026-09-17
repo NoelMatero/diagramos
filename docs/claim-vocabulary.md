@@ -783,12 +783,15 @@ the file".
   language before reading anything. The fact *is* in the file. The import that
   binds `Response` names the file declaring `class Response`, and `calls.ts`
   already follows it.
-- **`@needs`** loses 19.8% to `dynamic` (plus 0.8% to `incomplete`).
-  `needs.ts` refuses when **either** file does something at run time or has a
-  parse error anywhere, even when the import it was asked about is written
-  plainly in the tail. In the case read, `flask/__init__.py -> app.py` was
-  refused over a `table[name]()` in `app.py`. Only the accusation needs the
-  whole file. `cycle` is another 3.6%.
+- **`@needs`** lost 19.8% to `dynamic` (plus 0.8% to `incomplete`), and another
+  3.6% to `cycle`. `needs.ts` refused when **either** file did something at run
+  time or had a parse error anywhere, even when the import it was asked about
+  was written plainly in the tail. In the case read, `flask/__init__.py ->
+  app.py` was refused over a `table[name]()` in `app.py`. Only the accusation
+  needs the whole file, and **#308 split the two questions** so that finding the
+  import confirms on its own and a cycle confirms both its arrows. The row above
+  is the figure from before that change — the corpus has not been re-measured
+  yet, and until it has, the number to quote for `@needs` recall is this one.
 - **`@calls` in Python** is 64.0%, and **1,900 of its 2,100 `unbound` are the
   referee's**: calls to a built-in (`super` alone is 1,610) that the tree also
   declares once. With built-ins left out it is 83.6% (5,400 of 6,461), and
