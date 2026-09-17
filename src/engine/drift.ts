@@ -1183,7 +1183,7 @@ export interface ClaimTally {
    * counts `planned` arrows too, so it is the larger number -- and the ones it
    * counts and this does not are in `plannedWithheld` below.
    */
-  needsWithheld: SkipBreakdown<NeedsWithheld | "cycle" | EdgeSkipReason>;
+  needsWithheld: SkipBreakdown<NeedsWithheld | EdgeSkipReason>;
   /**
    * The same fact about the claims on `planned` arrows: nobody could read them.
    *
@@ -3909,9 +3909,11 @@ export function checkDrift(
        * nothing.
        *
        * Four gates, all required, and three of them are already above: the arrow
-       * carried the claim, its state is `built`, and `checkNeeds` refuses unless
-       * both files are in a measured language, both vouched for by a source
-       * index, both parsed to the end, and neither reaches out at runtime.
+       * carried the claim, its state is `built`, and `checkNeeds` refuses to
+       * accuse unless both files are in a measured language, both vouched for by
+       * a source index, both parsed to the end, and neither reaches out at
+       * runtime. The last two guard the accusation only: since #308, an import
+       * written plainly in the tail is confirmed whatever else its file does.
        *
        * Every verdict is acted on here now (#304). It used to be only
        * `backwards`: a confirmed `needs` fell through and was confirmed again
@@ -3957,9 +3959,9 @@ export function checkDrift(
          *
          * So the question is asked here instead, before the promotion is
          * offered rather than a run after it was taken. Only `backwards` is
-         * acted on. Everything else -- confirmed, withheld, a cycle -- falls
-         * through to the ordinary channels untouched, which is what keeps this
-         * from being a second checker with its own opinions about plans.
+         * acted on. Everything else -- confirmed, withheld -- falls through to
+         * the ordinary channels untouched, which is what keeps this from being a
+         * second checker with its own opinions about plans.
          *
          * The claim tallies are deliberately not touched. They answer "are the
          * live claims on this board being held to anything", and a plan makes no
@@ -4002,17 +4004,6 @@ export function checkDrift(
         } else if (needs.verdict === "withheld") {
           claims.needsWithheld[needs.why] = (claims.needsWithheld[needs.why] ?? 0) + 1;
           unanswered(needs.why);
-        } else if (needs.verdict === "cycle") {
-          /*
-           * Both directions exist, so neither arrow is more correct than the
-           * other. Cycles are legal in every language licensed here, and the
-           * rule is *if both directions exist, say nothing* -- never *ties do
-           * not happen*. This repository has none today, which is luck rather
-           * than law; Rust crates have them constantly, because a module naming
-           * `crate::` and a root naming `mod` is a cycle by construction.
-           */
-          claims.needsWithheld.cycle = (claims.needsWithheld.cycle ?? 0) + 1;
-          unanswered("a cycle, where neither direction is more correct");
         } else {
           claims.needsChecked += 1;
           if (needs.verdict === "backwards") {

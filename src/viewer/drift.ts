@@ -247,7 +247,6 @@ const WITHHELD_WORDS: Record<string, string> = {
   dynamic: "with an end that reaches out at runtime",
   unvouched: "with an end no source index has ever read",
   "same-file": "pointing at their own file",
-  cycle: "in a cycle, where neither direction is more correct",
   "ends-not-bound": "with an end not snapped to its box — drag it on until the box highlights",
   "endpoint-missing": "with an end that points at no box",
   "endpoint-external": "with an end marked external",

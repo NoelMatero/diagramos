@@ -11,22 +11,38 @@
  * else* is proof the arrow is drawn backwards. That is the one thing here worth
  * having, and the one thing that can cost trust if it is ever wrong.
  *
- * So the whole file is written as reasons not to answer. A verdict needs all of:
+ * So the whole file is written as reasons not to answer -- but the reasons are
+ * not all reasons to refuse the same question, and #308 is what it cost to run
+ * them together. **Confirming and accusing rest on opposite evidence.**
+ *
+ * Confirming is *presence*: the import is written in the tail, we found it, and
+ * what else that file does elsewhere cannot unwrite it. Two gates only, and both
+ * are about whether the text is ours to read at all:
  *
  * - both files in a language whose reader has been **measured** (`licence.ts`);
  * - both files **vouched for** by a source index (`ledger.ts`), so the text we
  *   read is text some other tool also thinks is source of this repository, and
- *   not a generated bundle or a script hidden away in a dotted directory;
- * - both files **parsed to the end**, because "there is no dependency in here"
- *   is a statement about the whole file and a recovered parse read less than one;
- * - neither file **reaching out at runtime**, where no reader can follow;
- * - the dependency in **exactly one** direction. Both ways is a cycle, which is
- *   legal in TypeScript and in Rust, and unanswerable either way: neither
- *   arrow is more correct.
+ *   not a generated bundle or a script hidden away in a dotted directory.
  *
- * Miss any of those and this returns `withheld` with the reason, and the caller
- * falls back to the amber it would have shown anyway. Silence is always available
- * and always safe; the accusation is not.
+ * Accusing is *absence*: "the dependency is not in the tail, and it is in the
+ * head". That is a statement about a whole file, so it needs the whole file:
+ *
+ * - both files **parsed to the end**, because a recovered parse read less than
+ *   one, and nothing can be proved absent in what we did not read;
+ * - neither file **reaching out at runtime**, where no reader can follow, so
+ *   "it declares nothing on it" is not a fact about the file.
+ *
+ * Running those four together refused 19.8% of true imports in #302's corpus --
+ * `flask/__init__.py` imports `app.py` in plain sight, and the answer was
+ * withheld because `app.py` writes one `table[name]()` somewhere else in the
+ * file. A cycle was refused for the same kind of reason: both files import each
+ * other, so neither *accusation* is available, but the arrow that was drawn is
+ * still an import somebody can point at.
+ *
+ * Miss a gate that the question at hand actually needs and this returns
+ * `withheld` with the reason, and the caller falls back to the amber it would
+ * have shown anyway. Silence is always available and always safe; the accusation
+ * is not.
  */
 import { readDependencies } from "./deps";
 import { vouchedFor, type Ledger } from "./ledger";
@@ -67,11 +83,34 @@ export type NeedsVerdict =
   | { verdict: "confirmed"; evidence: NeedsEvidence }
   /** It runs the other way, and only the other way. The arrow is backwards. */
   | { verdict: "backwards"; evidence: NeedsEvidence }
-  /** Both directions exist. Legal, and unanswerable. */
-  | { verdict: "cycle" }
   /** Neither file declares the other. Amber, exactly as before claims existed. */
   | { verdict: "absent" }
   | { verdict: "withheld"; why: NeedsWithheld };
+
+/**
+ * What one file declares about another, and what its silence is worth.
+ *
+ * The two fields answer the two different questions this file asks, and keeping
+ * them apart is the whole of #308:
+ *
+ * - `on` is what we found written. Every entry is a dependency somebody can open
+ *   the file and point at, so it is evidence enough to **confirm** on its own.
+ * - `blind` is set when *not* finding something here means nothing. That refuses
+ *   the **accusation** and leaves the confirmation alone, which is the right way
+ *   round: a file that calls `table[name]()` in its tail has not thereby stopped
+ *   importing what it imports at the top.
+ *
+ * `refused` is the harder version of the same thing: no list was read at all, so
+ * there is nothing to confirm on either, and the question ends there.
+ */
+interface Declared {
+  /** Every repo file this one declares a dependency on. Empty when `refused`. */
+  on: Map<string, NeedsEvidence>;
+  /** No list was read at all: neither verdict is available. */
+  refused?: NeedsWithheld;
+  /** A list was read and may be short, so absence in it proves nothing. */
+  blind?: NeedsWithheld;
+}
 
 /** What one file declares about another, and whether it can be trusted to. */
 function declares(
@@ -79,30 +118,23 @@ function declares(
   workspace: Workspace,
   cache: ConfigCache,
   ledger?: Ledger,
-): { on: Map<string, NeedsEvidence>; why?: NeedsWithheld } {
-  if (!licenceFor(file)) return { on: new Map(), why: "unlicensed" };
+): Declared {
+  if (!licenceFor(file)) return { on: new Map(), refused: "unlicensed" };
 
   const absolute = workspace.resolve(file);
-  if (!absolute || workspace.stat(absolute) !== "file") return { on: new Map(), why: "unreadable" };
+  if (!absolute || workspace.stat(absolute) !== "file") {
+    return { on: new Map(), refused: "unreadable" };
+  }
 
   /*
    * Checked before the parse, and after the stat, so a file that is simply gone
    * is told that rather than this. The order costs one directory lookup and buys
    * the more useful sentence.
    */
-  if (!vouchedFor(ledger, file)) return { on: new Map(), why: "unvouched" };
+  if (!vouchedFor(ledger, file)) return { on: new Map(), refused: "unvouched" };
 
   const read = readDependencies(file, workspace.read(absolute), workspace, cache);
-  if (!read) return { on: new Map(), why: "unreadable" };
-  /*
-   * Order matters here, and it is the pessimistic one: a file that is both
-   * incompletely read and dynamic reports as incomplete, because that is the
-   * more fundamental problem. Either way the caller says nothing, so the only
-   * thing at stake is which reason a person is told, and "we could not read all
-   * of this" is the more useful one to hear first.
-   */
-  if (!read.complete) return { on: new Map(), why: "incomplete" };
-  if (read.dynamic.length > 0) return { on: new Map(), why: "dynamic" };
+  if (!read) return { on: new Map(), refused: "unreadable" };
 
   const on = new Map<string, NeedsEvidence>();
   for (const dependency of read.dependencies) {
@@ -118,6 +150,21 @@ function declares(
       });
     }
   }
+
+  /*
+   * Order matters here, and it is the pessimistic one: a file that is both
+   * incompletely read and dynamic reports as incomplete, because that is the
+   * more fundamental problem. Either way the caller says nothing about absence,
+   * so the only thing at stake is which reason a person is told, and "we could
+   * not read all of this" is the more useful one to hear first.
+   *
+   * An incomplete parse leaves the list standing rather than dropping it, and
+   * that is deliberate: recovery is local, so an `import` the grammar did read
+   * is still an `import` in the text. What it cannot support is the sentence
+   * "and there is no other one anywhere in here".
+   */
+  if (!read.complete) return { on, blind: "incomplete" };
+  if (read.dynamic.length > 0) return { on, blind: "dynamic" };
   return { on };
 }
 
@@ -137,15 +184,34 @@ export function checkNeeds(
   if (from === to) return { verdict: "withheld", why: "same-file" };
 
   const tail = declares(from, workspace, cache, ledger);
-  if (tail.why) return { verdict: "withheld", why: tail.why };
+  if (tail.refused) return { verdict: "withheld", why: tail.refused };
   const head = declares(to, workspace, cache, ledger);
-  if (head.why) return { verdict: "withheld", why: head.why };
+  if (head.refused) return { verdict: "withheld", why: head.refused };
 
+  /*
+   * The confirmation, and it is the whole of the evidence it needs.
+   *
+   * The tail declares the head. That is the arrow, written down, in a file a
+   * licence covers and a source index vouches for. Nothing the rest of either
+   * file does can make that import not be there -- not a computed call further
+   * down, not a torn parse in another function, and not the head importing the
+   * tail back. So this is asked before any of them, and the cycle that used to
+   * be refused here confirms: both arrows in a mutual import are true, and
+   * being unable to pick between two accusations was never a reason to decline
+   * the one fact on the board.
+   */
   const forward = tail.on.get(to);
-  const backward = head.on.get(from);
-
-  if (forward && backward) return { verdict: "cycle" };
   if (forward) return { verdict: "confirmed", evidence: forward };
+
+  /*
+   * Past here everything rests on an *absence* -- either "nothing connects
+   * these", or the accusation, which is "not in the tail, and in the head". A
+   * file we could not read to the end cannot support a sentence about the whole
+   * of it, so the gates that were skipped above are the gates now.
+   */
+  if (tail.blind) return { verdict: "withheld", why: tail.blind };
+  if (head.blind) return { verdict: "withheld", why: head.blind };
+
   /*
    * The accusation, and the last gate before it. `declares` has already refused
    * both files unless a licence names their extensions, so this is true
@@ -154,6 +220,7 @@ export function checkNeeds(
    * word's reader measured here" (#207). Both files, because saying backwards
    * rests on finding the import in `to` and on not finding it in `from`.
    */
+  const backward = head.on.get(from);
   const bothMeasured = [from, to].every((file) => {
     const language = languageOf(file);
     return language !== undefined && mayAccuse("needs", language);

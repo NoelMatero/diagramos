@@ -9,15 +9,28 @@
  * Which makes this the one check here that can cost trust. A false accusation
  * about somebody's diagram is not recoverable by being right the next time, so
  * almost every test below is about a case where the tool has an answer available
- * and refuses to give it. In order of how much they cost to give up:
+ * and refuses to give it.
  *
- * - a **cycle** -- both directions exist, and neither arrow is more correct;
- * - a **dynamic** end -- the file reaches out at runtime and the text is not the
- *   whole story;
- * - an **incompletely parsed** end -- "there is no dependency in here" is a claim
- *   about a whole file, and a recovered parse read less than one;
+ * Since #308 they refuse two different questions, and which one they refuse is
+ * most of what is tested here. **Confirming needs the import; accusing needs the
+ * file.** So these two refuse everything:
+ *
  * - an **unlicensed** language -- nobody measured that reader, so it has not
  *   earned the right;
+ * - an **unvouched** end -- no source index says that text is source at all.
+ *
+ * And these refuse the accusation and leave the confirmation standing, because
+ * neither of them can unwrite an import somebody can point at:
+ *
+ * - a **dynamic** end -- the file reaches out at runtime, so "it declares
+ *   nothing on that" is not a fact about it;
+ * - an **incompletely parsed** end -- "there is no dependency in here" is a claim
+ *   about a whole file, and a recovered parse read less than one;
+ * - a **cycle** -- both directions exist, so neither *accusation* is available.
+ *   The arrow that was drawn is still an import, and confirms.
+ *
+ * Two more refuse everything for reasons that are not about reading at all:
+ *
  * - a **planned** arrow -- sketching a dependency that currently runs the other
  *   way is a thing people do on purpose;
  * - **no claim at all** -- an unclaimed arrow still only means "related somehow".
@@ -117,18 +130,21 @@ describe("which way the dependency runs", () => {
 });
 
 describe("the reasons not to answer", () => {
-  it("says nothing when both directions exist", () => {
-    // Legal in TypeScript, and unanswerable: neither arrow is more correct. The
-    // rule is *if both directions exist, say nothing*, never *ties do not happen*.
+  it("says nothing about which way round a cycle is, and confirms both arrows", () => {
+    // Legal in TypeScript, and no *accusation* is available: neither arrow is
+    // more wrong than the other. Both are true, though, and before #308 a mutual
+    // import refused to confirm either -- 3.6% of true imports in #302's corpus.
     const cycle = {
       "x.ts": 'import type { Y } from "./y";\nexport type X = Y;\n',
       "y.ts": 'import type { X } from "./x";\nexport type Y = X | null;\n',
     };
-    expect(checkNeeds("x.ts", "y.ts", fakeWorkspace(cycle))).toEqual({ verdict: "cycle" });
-    expect(checkNeeds("y.ts", "x.ts", fakeWorkspace(cycle))).toEqual({ verdict: "cycle" });
+    expect(checkNeeds("x.ts", "y.ts", fakeWorkspace(cycle)))
+      .toMatchObject({ verdict: "confirmed", evidence: { file: "x.ts", on: "y.ts", line: 1 } });
+    expect(checkNeeds("y.ts", "x.ts", fakeWorkspace(cycle)))
+      .toMatchObject({ verdict: "confirmed", evidence: { file: "y.ts", on: "x.ts", line: 1 } });
   });
 
-  it("says nothing when an end reaches out at runtime", () => {
+  it("says nothing about an absence when an end reaches out at runtime", () => {
     // font.ts/layout.ts in this repository is exactly this shape, and both ends
     // have to trip on their own or a board drawn the wrong way round gets called
     // right by one of them.
@@ -138,11 +154,9 @@ describe("the reasons not to answer", () => {
     };
     expect(checkNeeds("plugin.ts", "host.ts", fakeWorkspace(dynamic)))
       .toEqual({ verdict: "withheld", why: "dynamic" });
-    expect(checkNeeds("host.ts", "plugin.ts", fakeWorkspace(dynamic)))
-      .toEqual({ verdict: "withheld", why: "dynamic" });
   });
 
-  it("says nothing when an end could not be parsed to the end", () => {
+  it("says nothing about an absence when an end could not be parsed to the end", () => {
     const broken = {
       "ok.ts": "export const ok = 1;\n",
       // Unbalanced braces: tree-sitter recovers, and a recovered parse read less
@@ -170,6 +184,112 @@ describe("the reasons not to answer", () => {
   it("says nothing about a file that is not there", () => {
     expect(checkNeeds("a.ts", "gone.ts", fakeWorkspace({ "a.ts": "" })))
       .toEqual({ verdict: "withheld", why: "unreadable" });
+  });
+});
+
+/**
+ * #308: finding the import is enough to confirm.
+ *
+ * `@needs` confirmed 75.7% of true imports on #302's corpus, and the single
+ * biggest thing it was throwing away was this: `flask/__init__.py` imports
+ * `app.py` in plain sight, and the answer was withheld because `app.py` writes
+ * one `table[name]()` somewhere else in the file. 19.8% of every true import,
+ * refused for something that happened in a different part of the file.
+ *
+ * One shape per way a file can be less than fully readable, and one per end,
+ * because a gate that only trips on the tail lets half of them through.
+ */
+describe("an import written in plain sight", () => {
+  it("confirms although the tail also does something at runtime", () => {
+    // The tail is the flask shape: a plain import at the top, a computed call
+    // further down. The import did not stop being written.
+    const files = {
+      "app.ts": 'import { route } from "./routes";\nconst table: Record<string, () => void> = {};\n'
+        + 'export const go = (name: string) => table[name]();\nexport const r = route;\n',
+      "routes.ts": "export const route = 1;\n",
+    };
+    expect(checkNeeds("app.ts", "routes.ts", fakeWorkspace(files)))
+      .toMatchObject({ verdict: "confirmed", evidence: { file: "app.ts", on: "routes.ts", line: 1 } });
+  });
+
+  it("confirms although the head does something at runtime", () => {
+    // The literal case from the issue, with the dynamic half at the far end:
+    // what `app.py` does cannot unwrite what `__init__.py` declares about it.
+    const files = {
+      "init.ts": 'import { app } from "./app";\nexport const boot = app;\n',
+      "app.ts": 'const table: Record<string, () => void> = {};\n'
+        + 'export const app = (name: string) => table[name]();\n',
+    };
+    expect(checkNeeds("init.ts", "app.ts", fakeWorkspace(files)))
+      .toMatchObject({ verdict: "confirmed", evidence: { file: "init.ts", on: "app.ts", line: 1 } });
+  });
+
+  it("confirms although the tail could not be parsed to the end", () => {
+    // Recovery is local. The `import` the grammar did read is still in the text;
+    // what the torn file cannot support is "and there is no other one in here".
+    const files = {
+      "torn.ts": 'import { ok } from "./ok";\nexport function f() { if (true { return ok;\n',
+      "ok.ts": "export const ok = 1;\n",
+    };
+    expect(checkNeeds("torn.ts", "ok.ts", fakeWorkspace(files)))
+      .toMatchObject({ verdict: "confirmed", evidence: { file: "torn.ts", on: "ok.ts", line: 1 } });
+  });
+
+  it("confirms a deferred import, which is written down like any other", () => {
+    const files = {
+      "host.ts": 'const later = await import("./plugin");\nexport const host = later;\n',
+      "plugin.ts": "export const plugin = 1;\n",
+    };
+    expect(checkNeeds("host.ts", "plugin.ts", fakeWorkspace(files)))
+      .toMatchObject({ verdict: "confirmed", evidence: { file: "host.ts", on: "plugin.ts", line: 1 } });
+  });
+
+  it("confirms nothing when the dynamic import is genuinely unreadable", () => {
+    /*
+     * The other half of the same shape, and the one that keeps the change
+     * honest: the specifier is built at runtime, so no reader knows what file
+     * this is. Nothing is found, and the answer is the refusal it always was.
+     */
+    const files = {
+      "host.ts": "const name = String(1);\nconst later = await import(`./${name}`);\nexport const host = later;\n",
+      "plugin.ts": "export const plugin = 1;\n",
+    };
+    expect(checkNeeds("host.ts", "plugin.ts", fakeWorkspace(files)))
+      .toEqual({ verdict: "withheld", why: "dynamic" });
+  });
+
+  it("still refuses to call an arrow backwards on a file it could not read", () => {
+    /*
+     * The gate that must not move. The dependency runs head-to-tail only, which
+     * is the accusation -- and it rests on "the tail declares nothing on the
+     * head", which a file reaching out at runtime cannot support. Withheld
+     * before #308 and withheld after it, for both ways a file can be unreadable.
+     */
+    const dynamicTail = {
+      "reader.ts": 'const table: Record<string, () => void> = {};\nexport const go = (n: string) => table[n]();\n',
+      "writer.ts": 'import { go } from "./reader";\nexport const w = go;\n',
+    };
+    expect(checkNeeds("reader.ts", "writer.ts", fakeWorkspace(dynamicTail)))
+      .toEqual({ verdict: "withheld", why: "dynamic" });
+
+    const tornTail = {
+      "reader.ts": "export function f() { if (true { return 1;\n",
+      "writer.ts": 'import { f } from "./reader";\nexport const w = f;\n',
+    };
+    expect(checkNeeds("reader.ts", "writer.ts", fakeWorkspace(tornTail)))
+      .toEqual({ verdict: "withheld", why: "incomplete" });
+  });
+
+  it("still refuses everything about a file no source index vouches for", () => {
+    // Unchanged by #308, and deliberately so: this gate is not about whether the
+    // text can be read but about whether it is source of this repository at all.
+    const files = {
+      "src/app.ts": 'import { bundled } from "../vendor/bundle.mjs";\nexport const app = bundled;\n',
+      "vendor/bundle.mjs": "export const bundled = 1;\n",
+    };
+    const ledger = { files: new Set(["src/app.ts"]) };
+    expect(checkNeeds("src/app.ts", "vendor/bundle.mjs", fakeWorkspace(files), new Map(), ledger))
+      .toEqual({ verdict: "withheld", why: "unvouched" });
   });
 });
 
@@ -230,13 +350,14 @@ describe("what the board does with it", () => {
     expect(report.claims.needsWithheld).toEqual({ dynamic: 1 });
   });
 
-  it("counts a cycle as withheld, not as checked", async () => {
+  it("counts an arrow in a cycle as checked, and says nothing about it", async () => {
     const cycle = {
       "x.ts": 'import type { Y } from "./y";\nexport type X = Y;\n',
       "y.ts": 'import type { X } from "./x";\nexport type Y = X | null;\n',
     };
     const report = await verdicts(await boardOf("x.ts", "y.ts", { claim: "needs" }), cycle);
-    expect(report.claims.needsWithheld).toEqual({ cycle: 1 });
+    expect(report.claims.needsChecked).toBe(1);
+    expect(report.claims.needsWithheld).toEqual({});
     expect(report.edges).toEqual([]);
   });
 });
