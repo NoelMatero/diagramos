@@ -4008,7 +4008,7 @@ export function checkDrift(
            * `crate::` and a root naming `mod` is a cycle by construction.
            */
           claims.needsWithheld.cycle = (claims.needsWithheld.cycle ?? 0) + 1;
-          unanswered("cycle");
+          unanswered("a cycle, where neither direction is more correct");
         } else {
           claims.needsChecked += 1;
           if (needs.verdict === "backwards") {
@@ -4088,7 +4088,7 @@ export function checkDrift(
            * of the opposite import, never from an absence -- so the arrow is
            * not verified, with that as the reason.
            */
-          unanswered("absent");
+          unanswered("no import either way");
         }
       }
 
