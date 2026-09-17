@@ -3874,16 +3874,23 @@ export function checkDrift(
           : wholeRef(toAnchor);
         if (
           !missing && fromEvidence && toEvidence
+          /*
+           * Never for a claimed arrow (#304).
+           *
+           * The comment this replaces said the thing and then did the
+           * opposite: "the claim still got no verdict and still has to be
+           * counted as one that got none" -- and then confirmed the arrow, so
+           * a claim nothing verified was counted as withheld *and* rendered
+           * green. The graph answers whether anything under this directory
+           * reaches the other end, which is not what `@needs` or `@calls`
+           * says, so a claimed arrow goes back to being the skip it was before
+           * this channel existed. A plan keeps the promotion: `claimed` is
+           * false on a `planned` arrow.
+           */
+          && !claimed
           && codeGraphConfirms(options?.codeGraph, fromEvidence, toEvidence)
         ) {
           edgesChecked += 1;
-          /*
-           * The connection is corroborated; the *direction* is not. `checkNeeds`
-           * reads two files, and one end here stands for a whole directory or a
-           * set of them, so the claim still got no verdict and still has to be
-           * counted as one that got none.
-           */
-          if (claimed) withheld[shape] = (withheld[shape] ?? 0) + 1;
           recordEdge(edge, fromNode, toNode, { kind: "confirmed" });
           continue;
         }

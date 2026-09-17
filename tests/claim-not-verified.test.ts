@@ -27,6 +27,7 @@ import { beforeAll, describe, expect, it } from "vitest";
 import { emptyBoard, type BoardFile } from "../src/engine/board-file";
 import { createDiagram } from "../src/engine/diagram";
 import { checkDrift, type Workspace } from "../src/engine/drift";
+import { loadCodeGraph } from "../src/engine/codegraph";
 import { initEngine } from "../src/engine/parse";
 import { ARROW_CLAIMS, type ArrowClaim } from "../src/engine/claim";
 import { installExcalifontMeasurer } from "./helpers/excalifont";
@@ -272,5 +273,83 @@ describe("a call chain is not the claim's own check", () => {
     expect(red).toBeUndefined();
     expect(notVerified).toBeUndefined();
     expect(confirmed).toBe(1);
+  });
+});
+
+/**
+ * The same defect one step earlier in the loop: an end standing for a whole
+ * directory, where the code graph knows something under it reaches the other
+ * end (#304).
+ *
+ * That is a real answer to "are these connected" and no answer at all to
+ * "@needs" -- the claim is about two files and one end here is a set of them.
+ * The comment at that call site said exactly that, counted the claim as one
+ * that got no verdict, and confirmed the arrow anyway.
+ */
+describe("the code graph does not confirm a claim over a directory", () => {
+  const files = {
+    "src/sub/inner.ts": "export function inner() {}",
+    "src/b.ts": "export function called() {}",
+  };
+
+  /** `src/sub` is a directory; the graph knows a file inside it reaches `b`. */
+  const workspace: Workspace = {
+    resolve: (relative) => (relative.startsWith("../") ? undefined : relative),
+    stat: (target) =>
+      target === "src/sub" ? "directory"
+        : files[target as keyof typeof files] === undefined ? "missing" : "file",
+    read: (target) => files[target as keyof typeof files] ?? "",
+    list: () => [],
+  };
+
+  const graph = () => {
+    const loaded = loadCodeGraph(
+      {
+        nodes: [
+          { id: "inner", source_file: "src/sub/inner.ts" },
+          { id: "b_target", source_file: "src/b.ts" },
+        ],
+        links: [{ source: "inner", target: "b_target", relation: "calls", confidence: "EXTRACTED" }],
+      },
+      "0.9.47",
+    );
+    expect(loaded).toBeDefined();
+    return loaded!;
+  };
+
+  async function board(claim: ArrowClaim | undefined) {
+    const { board: built } = await createDiagram(emptyBoard(), {
+      name: "arch",
+      nodes: [
+        { id: "a", label: "A", ref: "src/sub" },
+        { id: "b", label: "B", ref: "src/b.ts" },
+      ],
+      edges: [{ from: "a", to: "b", ...(claim ? { claim } : {}) }],
+    });
+    return built;
+  }
+
+  it("leaves a @needs arrow over a directory unread, with the reason", async () => {
+    const report = checkDrift(await board("needs"), workspace, {
+      edges: true,
+      codeGraph: { graph: graph(), modified: new Set() },
+    });
+
+    expect(report.edges).toHaveLength(0);
+    expect(report.edgesSkippedWhy["directory-ref"]).toBe(1);
+    expect(report.claims.needsWithheld).toEqual({ "directory-ref": 1 });
+    expect(report.edgesChecked).toBe(0);
+  });
+
+  it("still confirms the same arrow when it claims nothing", async () => {
+    const report = checkDrift(await board(undefined), workspace, {
+      edges: true,
+      codeGraph: { graph: graph(), modified: new Set() },
+    });
+
+    expect(report.edges).toHaveLength(0);
+    expect(report.unconfirmedEdges).toHaveLength(0);
+    expect(report.edgesSkippedWhy["directory-ref"]).toBeUndefined();
+    expect(report.edgesChecked).toBe(1);
   });
 });
