@@ -1,0 +1,1029 @@
+{
+  "type": "excalidraw",
+  "version": 2,
+  "source": "diagramos",
+  "elements": [
+    {
+      "id": "builds-rust-title",
+      "type": "text",
+      "x": 0,
+      "y": -115,
+      "width": 171.60000000000002,
+      "height": 30,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a0",
+      "roundness": null,
+      "seed": 743594437,
+      "version": 1,
+      "versionNonce": 1655562959,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "builds-rust",
+        "role": "title"
+      },
+      "text": "builds · rust",
+      "fontSize": 24,
+      "fontFamily": 5,
+      "textAlign": "left",
+      "verticalAlign": "middle",
+      "containerId": null,
+      "originalText": "builds · rust",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "builds-rust-node-0",
+      "type": "rectangle",
+      "x": 1100,
+      "y": 120,
+      "width": 160,
+      "height": 120,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a1",
+      "roundness": null,
+      "seed": 1152038828,
+      "version": 1,
+      "versionNonce": 872389368,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "builds-rust-node-0-label"
+        },
+        {
+          "id": "builds-rust-edge-0",
+          "type": "arrow"
+        },
+        {
+          "id": "builds-rust-edge-1",
+          "type": "arrow"
+        },
+        {
+          "id": "builds-rust-edge-2",
+          "type": "arrow"
+        },
+        {
+          "id": "builds-rust-edge-3",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "builds-rust",
+        "node": "request",
+        "ref": "bench/fixtures/builds/rust/src/model.rs#Request"
+      }
+    },
+    {
+      "id": "builds-rust-node-1",
+      "type": "rectangle",
+      "x": 20,
+      "y": 20,
+      "width": 160,
+      "height": 100,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a2",
+      "roundness": null,
+      "seed": 1716385477,
+      "version": 1,
+      "versionNonce": 700844495,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "builds-rust-node-1-label"
+        },
+        {
+          "id": "builds-rust-edge-0",
+          "type": "arrow"
+        },
+        {
+          "id": "builds-rust-edge-2",
+          "type": "arrow"
+        },
+        {
+          "id": "builds-rust-edge-4",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "builds-rust",
+        "node": "build",
+        "ref": "bench/fixtures/builds/rust/src/make.rs#build"
+      }
+    },
+    {
+      "id": "builds-rust-node-2",
+      "type": "rectangle",
+      "x": 520,
+      "y": 280,
+      "width": 240,
+      "height": 80,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a3",
+      "roundness": null,
+      "seed": 560365674,
+      "version": 1,
+      "versionNonce": 1095125566,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "builds-rust-node-2-label"
+        },
+        {
+          "id": "builds-rust-edge-1",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "builds-rust",
+        "node": "viaFactory",
+        "ref": "bench/fixtures/builds/rust/src/make.rs#build_via_factory"
+      }
+    },
+    {
+      "id": "builds-rust-node-3",
+      "type": "rectangle",
+      "x": 560,
+      "y": 20,
+      "width": 160,
+      "height": 80,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a4",
+      "roundness": null,
+      "seed": 155396539,
+      "version": 1,
+      "versionNonce": 1898564149,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "builds-rust-node-3-label"
+        },
+        {
+          "id": "builds-rust-edge-3",
+          "type": "arrow"
+        },
+        {
+          "id": "builds-rust-edge-4",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "builds-rust",
+        "node": "unrelated",
+        "ref": "bench/fixtures/builds/rust/src/make.rs#unrelated"
+      }
+    },
+    {
+      "id": "builds-rust-edge-0",
+      "type": "arrow",
+      "x": 172,
+      "y": 77,
+      "width": 923.2,
+      "height": 95,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a5",
+      "roundness": null,
+      "seed": 1921284387,
+      "version": 1,
+      "versionNonce": 376584637,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "builds-rust-edge-0-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "builds-rust",
+        "edge": {
+          "from": "build",
+          "to": "request",
+          "claim": "builds"
+        }
+      },
+      "points": [
+        [
+          0.5,
+          0
+        ],
+        [
+          56,
+          0
+        ],
+        [
+          56,
+          95
+        ],
+        [
+          414.1,
+          95
+        ],
+        [
+          541.375,
+          95
+        ],
+        [
+          668.6500000000001,
+          95
+        ],
+        [
+          922.7,
+          95
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "builds-rust-node-1",
+        "focus": 0.14,
+        "gap": 8
+      },
+      "endBinding": {
+        "elementId": "builds-rust-node-0",
+        "focus": 0.13333333333333394,
+        "gap": 4.7999999999999545
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "builds-rust-edge-1",
+      "type": "arrow",
+      "x": 753.6,
+      "y": 324.8,
+      "width": 341.6,
+      "height": 128.8,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a6",
+      "roundness": null,
+      "seed": 1539443122,
+      "version": 1,
+      "versionNonce": 1587590246,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "builds-rust-edge-1-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "builds-rust",
+        "edge": {
+          "from": "viaFactory",
+          "to": "request",
+          "claim": "builds"
+        }
+      },
+      "points": [
+        [
+          0.5,
+          0
+        ],
+        [
+          233.60000000000002,
+          0
+        ],
+        [
+          233.60000000000002,
+          -1.599999999999966
+        ],
+        [
+          233.60000000000002,
+          -128.8
+        ],
+        [
+          341.1,
+          -128.8
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "builds-rust-node-2",
+        "focus": 0.11999999999999987,
+        "gap": 6.399999999999977
+      },
+      "endBinding": {
+        "elementId": "builds-rust-node-0",
+        "focus": -0.26666666666666605,
+        "gap": 4.7999999999999545
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "builds-rust-edge-2",
+      "type": "arrow",
+      "x": 1095.2,
+      "y": 220,
+      "width": 923.2,
+      "height": 342.8,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a7",
+      "roundness": null,
+      "seed": 1661316429,
+      "version": 1,
+      "versionNonce": 1096488247,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "builds-rust-edge-2-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "builds-rust",
+        "edge": {
+          "from": "request",
+          "to": "build",
+          "claim": "builds"
+        }
+      },
+      "points": [
+        [
+          -0.5,
+          0
+        ],
+        [
+          -84,
+          0
+        ],
+        [
+          -84,
+          224.8
+        ],
+        [
+          -520.5999999999999,
+          224.8
+        ],
+        [
+          -891.2,
+          224.8
+        ],
+        [
+          -891.2,
+          -118
+        ],
+        [
+          -922.7,
+          -118
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "builds-rust-node-0",
+        "focus": -0.666666666666666,
+        "gap": 4.7999999999999545
+      },
+      "endBinding": {
+        "elementId": "builds-rust-node-1",
+        "focus": 0.6399999999999999,
+        "gap": 8
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "builds-rust-edge-3",
+      "type": "arrow",
+      "x": 713.6,
+      "y": 52,
+      "width": 381.6,
+      "height": 96,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a8",
+      "roundness": null,
+      "seed": 320834292,
+      "version": 1,
+      "versionNonce": 2030922944,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "builds-rust-edge-3-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "builds-rust",
+        "edge": {
+          "from": "unrelated",
+          "to": "request",
+          "claim": "builds"
+        }
+      },
+      "points": [
+        [
+          0.5,
+          0
+        ],
+        [
+          119.39999999999998,
+          0
+        ],
+        [
+          179.10000000000002,
+          0
+        ],
+        [
+          238.80000000000007,
+          0
+        ],
+        [
+          273.6,
+          0
+        ],
+        [
+          273.6,
+          96
+        ],
+        [
+          381.1,
+          96
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "builds-rust-node-3",
+        "focus": -0.2,
+        "gap": 6.399999999999977
+      },
+      "endBinding": {
+        "elementId": "builds-rust-node-0",
+        "focus": 0.5333333333333339,
+        "gap": 4.7999999999999545
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "builds-rust-edge-4",
+      "type": "arrow",
+      "x": 172,
+      "y": 52,
+      "width": 381.6,
+      "height": 0,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a9",
+      "roundness": null,
+      "seed": 1588739367,
+      "version": 1,
+      "versionNonce": 108529345,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "builds-rust-edge-4-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "builds-rust",
+        "edge": {
+          "from": "build",
+          "to": "unrelated",
+          "claim": "builds"
+        }
+      },
+      "points": [
+        [
+          0.5,
+          0
+        ],
+        [
+          190.8,
+          0
+        ],
+        [
+          381.1,
+          0
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "builds-rust-node-1",
+        "focus": -0.36,
+        "gap": 8
+      },
+      "endBinding": {
+        "elementId": "builds-rust-node-3",
+        "focus": 0.2,
+        "gap": 6.399999999999977
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "builds-rust-node-0-label",
+      "type": "text",
+      "x": 1141.5,
+      "y": 167.5,
+      "width": 77,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aA",
+      "roundness": null,
+      "seed": 1572102601,
+      "version": 1,
+      "versionNonce": 981367635,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "builds-rust"
+      },
+      "text": "Request",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "builds-rust-node-0",
+      "originalText": "Request",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "builds-rust-node-1-label",
+      "type": "text",
+      "x": 72.5,
+      "y": 57.5,
+      "width": 55.00000000000001,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aB",
+      "roundness": null,
+      "seed": 1965733804,
+      "version": 1,
+      "versionNonce": 226466552,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "builds-rust"
+      },
+      "text": "build",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "builds-rust-node-1",
+      "originalText": "build",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "builds-rust-node-2-label",
+      "type": "text",
+      "x": 546.5,
+      "y": 307.5,
+      "width": 187.00000000000003,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aC",
+      "roundness": null,
+      "seed": 1208756635,
+      "version": 1,
+      "versionNonce": 332664213,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "builds-rust"
+      },
+      "text": "build via factory",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "builds-rust-node-2",
+      "originalText": "build via factory",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "builds-rust-node-3-label",
+      "type": "text",
+      "x": 590.5,
+      "y": 47.5,
+      "width": 99.00000000000001,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aD",
+      "roundness": null,
+      "seed": 31561446,
+      "version": 1,
+      "versionNonce": 666949322,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "builds-rust"
+      },
+      "text": "unrelated",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "builds-rust-node-3",
+      "originalText": "unrelated",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "builds-rust-edge-0-label",
+      "type": "text",
+      "x": 555.3000000000001,
+      "y": 162,
+      "width": 61.60000000000001,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aE",
+      "roundness": null,
+      "seed": 1059327550,
+      "version": 1,
+      "versionNonce": 1715023330,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "builds-rust"
+      },
+      "text": "@builds",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "builds-rust-edge-0",
+      "originalText": "@builds",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "builds-rust-edge-1-label",
+      "type": "text",
+      "x": 956.4000000000001,
+      "y": 313.20000000000005,
+      "width": 61.60000000000001,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aF",
+      "roundness": null,
+      "seed": 39488211,
+      "version": 1,
+      "versionNonce": 1755234605,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "builds-rust"
+      },
+      "text": "@builds",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "builds-rust-edge-1",
+      "originalText": "@builds",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "builds-rust-edge-2-label",
+      "type": "text",
+      "x": 543.8000000000002,
+      "y": 434.8,
+      "width": 61.60000000000001,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aG",
+      "roundness": null,
+      "seed": 1975179396,
+      "version": 1,
+      "versionNonce": 150872208,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "builds-rust"
+      },
+      "text": "@builds",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "builds-rust-edge-2",
+      "originalText": "@builds",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "builds-rust-edge-3-label",
+      "type": "text",
+      "x": 921.6000000000001,
+      "y": 42,
+      "width": 61.60000000000001,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aH",
+      "roundness": null,
+      "seed": 494569793,
+      "version": 1,
+      "versionNonce": 1727107723,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "builds-rust"
+      },
+      "text": "@builds",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "builds-rust-edge-3",
+      "originalText": "@builds",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "builds-rust-edge-4-label",
+      "type": "text",
+      "x": 332,
+      "y": 42,
+      "width": 61.60000000000001,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aI",
+      "roundness": null,
+      "seed": 322082082,
+      "version": 1,
+      "versionNonce": 927851030,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "builds-rust"
+      },
+      "text": "@builds",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "builds-rust-edge-4",
+      "originalText": "@builds",
+      "autoResize": true,
+      "lineHeight": 1.25
+    }
+  ],
+  "appState": {
+    "gridSize": null,
+    "viewBackgroundColor": "#ffffff"
+  },
+  "files": {},
+  "diagramos": {
+    "version": "0.2.0-rc.6",
+    "schema": 1
+  }
+}

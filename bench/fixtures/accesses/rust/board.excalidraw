@@ -1,0 +1,974 @@
+{
+  "type": "excalidraw",
+  "version": 2,
+  "source": "diagramos",
+  "elements": [
+    {
+      "id": "accesses-rust-title",
+      "type": "text",
+      "x": 0,
+      "y": -115,
+      "width": 198.00000000000003,
+      "height": 30,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a0",
+      "roundness": null,
+      "seed": 1335537890,
+      "version": 1,
+      "versionNonce": 637735894,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "accesses-rust",
+        "role": "title"
+      },
+      "text": "accesses · rust",
+      "fontSize": 24,
+      "fontFamily": 5,
+      "textAlign": "left",
+      "verticalAlign": "middle",
+      "containerId": null,
+      "originalText": "accesses · rust",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "accesses-rust-node-0",
+      "type": "rectangle",
+      "x": 640,
+      "y": 160,
+      "width": 160,
+      "height": 140,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a1",
+      "roundness": null,
+      "seed": 575389701,
+      "version": 1,
+      "versionNonce": 1556314383,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "accesses-rust-node-0-label"
+        },
+        {
+          "id": "accesses-rust-edge-0",
+          "type": "arrow"
+        },
+        {
+          "id": "accesses-rust-edge-1",
+          "type": "arrow"
+        },
+        {
+          "id": "accesses-rust-edge-2",
+          "type": "arrow"
+        },
+        {
+          "id": "accesses-rust-edge-3",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "accesses-rust",
+        "node": "config",
+        "ref": "bench/fixtures/accesses/rust/src/model.rs#Config"
+      }
+    },
+    {
+      "id": "accesses-rust-node-1",
+      "type": "rectangle",
+      "x": 80,
+      "y": 180,
+      "width": 160,
+      "height": 80,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a2",
+      "roundness": null,
+      "seed": 2117053164,
+      "version": 1,
+      "versionNonce": 1727962424,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "accesses-rust-node-1-label"
+        },
+        {
+          "id": "accesses-rust-edge-0",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "accesses-rust",
+        "node": "draw",
+        "ref": "bench/fixtures/accesses/rust/src/reader.rs#draw"
+      }
+    },
+    {
+      "id": "accesses-rust-node-2",
+      "type": "rectangle",
+      "x": 20,
+      "y": 340,
+      "width": 220,
+      "height": 80,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a3",
+      "roundness": null,
+      "seed": 1120410875,
+      "version": 1,
+      "versionNonce": 1348984181,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "accesses-rust-node-2-label"
+        },
+        {
+          "id": "accesses-rust-edge-1",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "accesses-rust",
+        "node": "viaHelper",
+        "ref": "bench/fixtures/accesses/rust/src/reader.rs#draw_via_helper"
+      }
+    },
+    {
+      "id": "accesses-rust-node-3",
+      "type": "rectangle",
+      "x": 80,
+      "y": 20,
+      "width": 160,
+      "height": 80,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a4",
+      "roundness": null,
+      "seed": 358591914,
+      "version": 1,
+      "versionNonce": 2034014846,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "accesses-rust-node-3-label"
+        },
+        {
+          "id": "accesses-rust-edge-3",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "accesses-rust",
+        "node": "unrelated",
+        "ref": "bench/fixtures/accesses/rust/src/reader.rs#unrelated"
+      }
+    },
+    {
+      "id": "accesses-rust-node-4",
+      "type": "rectangle",
+      "x": 80,
+      "y": 500,
+      "width": 160,
+      "height": 80,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a5",
+      "roundness": null,
+      "seed": 1576348665,
+      "version": 1,
+      "versionNonce": 2079089859,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "accesses-rust-node-4-label"
+        },
+        {
+          "id": "accesses-rust-edge-2",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "accesses-rust",
+        "node": "measure",
+        "ref": "bench/fixtures/accesses/rust/src/reader.rs#measure"
+      }
+    },
+    {
+      "id": "accesses-rust-edge-0",
+      "type": "arrow",
+      "x": 232,
+      "y": 212,
+      "width": 412,
+      "height": 0,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a6",
+      "roundness": null,
+      "seed": 1402231658,
+      "version": 1,
+      "versionNonce": 1064700734,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "accesses-rust-edge-0-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "accesses-rust",
+        "edge": {
+          "from": "draw",
+          "to": "config",
+          "claim": "accesses"
+        }
+      },
+      "points": [
+        [
+          0.5,
+          0
+        ],
+        [
+          206,
+          0
+        ],
+        [
+          411.5,
+          0
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "accesses-rust-node-1",
+        "focus": -0.2,
+        "gap": 8
+      },
+      "endBinding": {
+        "elementId": "accesses-rust-node-0",
+        "focus": 0.25714285714285706,
+        "gap": 4
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "accesses-rust-edge-1",
+      "type": "arrow",
+      "x": 232,
+      "y": 372,
+      "width": 412,
+      "height": 132,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a7",
+      "roundness": null,
+      "seed": 997262523,
+      "version": 1,
+      "versionNonce": 1868139317,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "accesses-rust-edge-1-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "accesses-rust",
+        "edge": {
+          "from": "viaHelper",
+          "to": "config",
+          "claim": "accesses"
+        }
+      },
+      "points": [
+        [
+          0.5,
+          0
+        ],
+        [
+          68,
+          0
+        ],
+        [
+          136,
+          0
+        ],
+        [
+          272,
+          0
+        ],
+        [
+          304,
+          0
+        ],
+        [
+          304,
+          -132
+        ],
+        [
+          411.5,
+          -132
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "accesses-rust-node-2",
+        "focus": -0.2,
+        "gap": 8
+      },
+      "endBinding": {
+        "elementId": "accesses-rust-node-0",
+        "focus": -0.142857142857143,
+        "gap": 4
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "accesses-rust-edge-2",
+      "type": "arrow",
+      "x": 232,
+      "y": 532,
+      "width": 412,
+      "height": 264,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a8",
+      "roundness": null,
+      "seed": 1993904812,
+      "version": 1,
+      "versionNonce": 841964536,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "accesses-rust-edge-2-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "accesses-rust",
+        "edge": {
+          "from": "measure",
+          "to": "config",
+          "claim": "accesses"
+        }
+      },
+      "points": [
+        [
+          0.5,
+          0
+        ],
+        [
+          328,
+          0
+        ],
+        [
+          328,
+          -10
+        ],
+        [
+          328,
+          -264
+        ],
+        [
+          411.5,
+          -264
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "accesses-rust-node-4",
+        "focus": -0.2,
+        "gap": 8
+      },
+      "endBinding": {
+        "elementId": "accesses-rust-node-0",
+        "focus": -0.542857142857143,
+        "gap": 4
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "accesses-rust-edge-3",
+      "type": "arrow",
+      "x": 232,
+      "y": 52,
+      "width": 412,
+      "height": 132,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a9",
+      "roundness": null,
+      "seed": 410767813,
+      "version": 1,
+      "versionNonce": 670419663,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "accesses-rust-edge-3-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "accesses-rust",
+        "edge": {
+          "from": "unrelated",
+          "to": "config",
+          "claim": "accesses"
+        }
+      },
+      "points": [
+        [
+          0.5,
+          0
+        ],
+        [
+          68,
+          0
+        ],
+        [
+          136,
+          0
+        ],
+        [
+          272,
+          0
+        ],
+        [
+          304,
+          0
+        ],
+        [
+          304,
+          132
+        ],
+        [
+          411.5,
+          132
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "accesses-rust-node-3",
+        "focus": -0.2,
+        "gap": 8
+      },
+      "endBinding": {
+        "elementId": "accesses-rust-node-0",
+        "focus": 0.657142857142857,
+        "gap": 4
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "accesses-rust-node-0-label",
+      "type": "text",
+      "x": 687,
+      "y": 217.5,
+      "width": 66,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aA",
+      "roundness": null,
+      "seed": 542287468,
+      "version": 1,
+      "versionNonce": 605063096,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "accesses-rust"
+      },
+      "text": "Config",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "accesses-rust-node-0",
+      "originalText": "Config",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "accesses-rust-node-1-label",
+      "type": "text",
+      "x": 138,
+      "y": 207.5,
+      "width": 44,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aB",
+      "roundness": null,
+      "seed": 1700130697,
+      "version": 1,
+      "versionNonce": 1751323155,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "accesses-rust"
+      },
+      "text": "draw",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "accesses-rust-node-1",
+      "originalText": "draw",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "accesses-rust-node-2-label",
+      "type": "text",
+      "x": 47.5,
+      "y": 367.5,
+      "width": 165,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aC",
+      "roundness": null,
+      "seed": 1980515494,
+      "version": 1,
+      "versionNonce": 1231682442,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "accesses-rust"
+      },
+      "text": "draw via helper",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "accesses-rust-node-2",
+      "originalText": "draw via helper",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "accesses-rust-node-3-label",
+      "type": "text",
+      "x": 110.5,
+      "y": 47.5,
+      "width": 99.00000000000001,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aD",
+      "roundness": null,
+      "seed": 1129592155,
+      "version": 1,
+      "versionNonce": 1014672981,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "accesses-rust"
+      },
+      "text": "unrelated",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "accesses-rust-node-3",
+      "originalText": "unrelated",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "accesses-rust-node-4-label",
+      "type": "text",
+      "x": 121.5,
+      "y": 527.5,
+      "width": 77,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aE",
+      "roundness": null,
+      "seed": 636473472,
+      "version": 1,
+      "versionNonce": 1417536092,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "accesses-rust"
+      },
+      "text": "measure",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "accesses-rust-node-4",
+      "originalText": "measure",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "accesses-rust-edge-0-label",
+      "type": "text",
+      "x": 372,
+      "y": 202,
+      "width": 132,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aF",
+      "roundness": null,
+      "seed": 200486043,
+      "version": 1,
+      "versionNonce": 2021508757,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "accesses-rust"
+      },
+      "text": "width @accesses",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "accesses-rust-edge-0",
+      "originalText": "width @accesses",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "accesses-rust-edge-1-label",
+      "type": "text",
+      "x": 438,
+      "y": 362,
+      "width": 132,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aG",
+      "roundness": null,
+      "seed": 1170774502,
+      "version": 1,
+      "versionNonce": 208310218,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "accesses-rust"
+      },
+      "text": "width @accesses",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "accesses-rust-edge-1",
+      "originalText": "width @accesses",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "accesses-rust-edge-2-label",
+      "type": "text",
+      "x": 494,
+      "y": 512,
+      "width": 132,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aH",
+      "roundness": null,
+      "seed": 563832009,
+      "version": 1,
+      "versionNonce": 522728531,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "accesses-rust"
+      },
+      "text": "depth @accesses",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "accesses-rust-edge-2",
+      "originalText": "depth @accesses",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "accesses-rust-edge-3-label",
+      "type": "text",
+      "x": 438,
+      "y": 42,
+      "width": 132,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aI",
+      "roundness": null,
+      "seed": 957463212,
+      "version": 1,
+      "versionNonce": 1915311096,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "accesses-rust"
+      },
+      "text": "width @accesses",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "accesses-rust-edge-3",
+      "originalText": "width @accesses",
+      "autoResize": true,
+      "lineHeight": 1.25
+    }
+  ],
+  "appState": {
+    "gridSize": null,
+    "viewBackgroundColor": "#ffffff"
+  },
+  "files": {},
+  "diagramos": {
+    "version": "0.2.0-rc.6",
+    "schema": 1
+  }
+}

@@ -1,0 +1,1579 @@
+{
+  "type": "excalidraw",
+  "version": 2,
+  "source": "diagramos",
+  "elements": [
+    {
+      "id": "takes-python-title",
+      "type": "text",
+      "x": 0,
+      "y": -115,
+      "width": 184.8,
+      "height": 30,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a0",
+      "roundness": null,
+      "seed": 565335826,
+      "version": 1,
+      "versionNonce": 401270598,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "takes-python",
+        "role": "title"
+      },
+      "text": "takes · python",
+      "fontSize": 24,
+      "fontFamily": 5,
+      "textAlign": "left",
+      "verticalAlign": "middle",
+      "containerId": null,
+      "originalText": "takes · python",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "takes-python-node-0",
+      "type": "rectangle",
+      "x": 20,
+      "y": 20,
+      "width": 160,
+      "height": 240,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a1",
+      "roundness": null,
+      "seed": 1158937717,
+      "version": 1,
+      "versionNonce": 1804117503,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "takes-python-node-0-label"
+        },
+        {
+          "id": "takes-python-edge-0",
+          "type": "arrow"
+        },
+        {
+          "id": "takes-python-edge-1",
+          "type": "arrow"
+        },
+        {
+          "id": "takes-python-edge-2",
+          "type": "arrow"
+        },
+        {
+          "id": "takes-python-edge-3",
+          "type": "arrow"
+        },
+        {
+          "id": "takes-python-edge-4",
+          "type": "arrow"
+        },
+        {
+          "id": "takes-python-edge-5",
+          "type": "arrow"
+        },
+        {
+          "id": "takes-python-edge-6",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "takes-python",
+        "node": "request",
+        "ref": "bench/fixtures/takes/python/model.py#Request"
+      }
+    },
+    {
+      "id": "takes-python-node-1",
+      "type": "rectangle",
+      "x": 540,
+      "y": 340,
+      "width": 160,
+      "height": 80,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a2",
+      "roundness": null,
+      "seed": 489716572,
+      "version": 1,
+      "versionNonce": 114692200,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "takes-python-node-1-label"
+        },
+        {
+          "id": "takes-python-edge-6",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "takes-python",
+        "node": "response",
+        "ref": "bench/fixtures/takes/python/model.py#Response"
+      }
+    },
+    {
+      "id": "takes-python-node-2",
+      "type": "rectangle",
+      "x": 540,
+      "y": 820,
+      "width": 160,
+      "height": 80,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a3",
+      "roundness": null,
+      "seed": 1311024939,
+      "version": 1,
+      "versionNonce": 205784869,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "takes-python-node-2-label"
+        },
+        {
+          "id": "takes-python-edge-0",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "takes-python",
+        "node": "right",
+        "ref": "bench/fixtures/takes/python/api.py#handle"
+      }
+    },
+    {
+      "id": "takes-python-node-3",
+      "type": "rectangle",
+      "x": 540,
+      "y": 980,
+      "width": 180,
+      "height": 80,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a4",
+      "roundness": null,
+      "seed": 217820570,
+      "version": 1,
+      "versionNonce": 1666261102,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "takes-python-node-3-label"
+        },
+        {
+          "id": "takes-python-edge-1",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "takes-python",
+        "node": "alias",
+        "ref": "bench/fixtures/takes/python/api.py#handle_alias"
+      }
+    },
+    {
+      "id": "takes-python-node-4",
+      "type": "rectangle",
+      "x": 540,
+      "y": 20,
+      "width": 160,
+      "height": 80,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a5",
+      "roundness": null,
+      "seed": 1425234729,
+      "version": 1,
+      "versionNonce": 737027891,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "takes-python-node-4-label"
+        },
+        {
+          "id": "takes-python-edge-2",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "takes-python",
+        "node": "count",
+        "ref": "bench/fixtures/takes/python/api.py#count"
+      }
+    },
+    {
+      "id": "takes-python-node-5",
+      "type": "rectangle",
+      "x": 540,
+      "y": 180,
+      "width": 200,
+      "height": 80,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a6",
+      "roundness": null,
+      "seed": 1080438112,
+      "version": 1,
+      "versionNonce": 908013756,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "takes-python-node-5-label"
+        },
+        {
+          "id": "takes-python-edge-3",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "takes-python",
+        "node": "opaque",
+        "ref": "bench/fixtures/takes/python/api.py#handle_opaque"
+      }
+    },
+    {
+      "id": "takes-python-node-6",
+      "type": "rectangle",
+      "x": 540,
+      "y": 660,
+      "width": 160,
+      "height": 80,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a7",
+      "roundness": null,
+      "seed": 557028687,
+      "version": 1,
+      "versionNonce": 957938217,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "takes-python-node-6-label"
+        },
+        {
+          "id": "takes-python-edge-5",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "takes-python",
+        "node": "other",
+        "ref": "bench/fixtures/takes/python/api.py#produce"
+      }
+    },
+    {
+      "id": "takes-python-node-7",
+      "type": "rectangle",
+      "x": 540,
+      "y": 500,
+      "width": 260,
+      "height": 80,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a8",
+      "roundness": null,
+      "seed": 1164384766,
+      "version": 1,
+      "versionNonce": 2135521954,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "takes-python-node-7-label"
+        },
+        {
+          "id": "takes-python-edge-4",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "takes-python",
+        "node": "local",
+        "ref": "bench/fixtures/takes/python/api.py#handle_local_alias"
+      }
+    },
+    {
+      "id": "takes-python-edge-0",
+      "type": "arrow",
+      "x": 172,
+      "y": 202,
+      "width": 376.79999999999995,
+      "height": 650,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a9",
+      "roundness": null,
+      "seed": 1606754266,
+      "version": 1,
+      "versionNonce": 115914670,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "takes-python-edge-0-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "takes-python",
+        "edge": {
+          "from": "request",
+          "to": "right",
+          "claim": "takes"
+        }
+      },
+      "points": [
+        [
+          0.5,
+          0
+        ],
+        [
+          56,
+          0
+        ],
+        [
+          56,
+          457.4
+        ],
+        [
+          56,
+          650
+        ],
+        [
+          376.29999999999995,
+          650
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "takes-python-node-0",
+        "focus": 0.5166666666666667,
+        "gap": 8
+      },
+      "endBinding": {
+        "elementId": "takes-python-node-2",
+        "focus": 0.2,
+        "gap": 8.799999999999955
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "takes-python-edge-1",
+      "type": "arrow",
+      "x": 172,
+      "y": 232,
+      "width": 376.79999999999995,
+      "height": 780,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aA",
+      "roundness": null,
+      "seed": 870348139,
+      "version": 1,
+      "versionNonce": 1927867493,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "takes-python-edge-1-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "takes-python",
+        "edge": {
+          "from": "request",
+          "to": "alias",
+          "claim": "takes"
+        }
+      },
+      "points": [
+        [
+          0.5,
+          0
+        ],
+        [
+          32,
+          0
+        ],
+        [
+          32,
+          546.4
+        ],
+        [
+          32,
+          780
+        ],
+        [
+          376.29999999999995,
+          780
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "takes-python-node-0",
+        "focus": 0.7666666666666667,
+        "gap": 8
+      },
+      "endBinding": {
+        "elementId": "takes-python-node-3",
+        "focus": 0.19999999999999998,
+        "gap": 8.799999999999955
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "takes-python-edge-2",
+      "type": "arrow",
+      "x": 172,
+      "y": 52,
+      "width": 376.79999999999995,
+      "height": 0,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aB",
+      "roundness": null,
+      "seed": 49039772,
+      "version": 1,
+      "versionNonce": 1836774824,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "takes-python-edge-2-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "takes-python",
+        "edge": {
+          "from": "request",
+          "to": "count",
+          "claim": "takes"
+        }
+      },
+      "points": [
+        [
+          0.5,
+          0
+        ],
+        [
+          188.39999999999998,
+          0
+        ],
+        [
+          376.29999999999995,
+          0
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "takes-python-node-0",
+        "focus": -0.7333333333333332,
+        "gap": 8
+      },
+      "endBinding": {
+        "elementId": "takes-python-node-4",
+        "focus": 0.2,
+        "gap": 8.799999999999955
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "takes-python-edge-3",
+      "type": "arrow",
+      "x": 172,
+      "y": 82,
+      "width": 376.79999999999995,
+      "height": 130,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aC",
+      "roundness": null,
+      "seed": 400284597,
+      "version": 1,
+      "versionNonce": 2124855103,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "takes-python-edge-3-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "takes-python",
+        "edge": {
+          "from": "request",
+          "to": "opaque",
+          "claim": "takes"
+        }
+      },
+      "points": [
+        [
+          0.5,
+          0
+        ],
+        [
+          152,
+          0
+        ],
+        [
+          152,
+          101.39999999999998
+        ],
+        [
+          152,
+          130
+        ],
+        [
+          376.29999999999995,
+          130
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "takes-python-node-0",
+        "focus": -0.4833333333333333,
+        "gap": 8
+      },
+      "endBinding": {
+        "elementId": "takes-python-node-5",
+        "focus": 0.20000000000000004,
+        "gap": 8.799999999999955
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "takes-python-edge-4",
+      "type": "arrow",
+      "x": 172,
+      "y": 142,
+      "width": 376.79999999999995,
+      "height": 390,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aD",
+      "roundness": null,
+      "seed": 2128757822,
+      "version": 1,
+      "versionNonce": 1051209698,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "takes-python-edge-4-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "takes-python",
+        "edge": {
+          "from": "request",
+          "to": "local",
+          "claim": "takes"
+        }
+      },
+      "points": [
+        [
+          0.5,
+          0
+        ],
+        [
+          104,
+          0
+        ],
+        [
+          104,
+          279.4
+        ],
+        [
+          104,
+          390
+        ],
+        [
+          376.29999999999995,
+          390
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "takes-python-node-0",
+        "focus": 0.01666666666666665,
+        "gap": 8
+      },
+      "endBinding": {
+        "elementId": "takes-python-node-7",
+        "focus": 0.2,
+        "gap": 8.799999999999955
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "takes-python-edge-5",
+      "type": "arrow",
+      "x": 172,
+      "y": 172,
+      "width": 376.79999999999995,
+      "height": 520,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aE",
+      "roundness": null,
+      "seed": 157825423,
+      "version": 1,
+      "versionNonce": 108079721,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "takes-python-edge-5-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "takes-python",
+        "edge": {
+          "from": "request",
+          "to": "other",
+          "claim": "takes"
+        }
+      },
+      "points": [
+        [
+          0.5,
+          0
+        ],
+        [
+          80,
+          0
+        ],
+        [
+          80,
+          368.4
+        ],
+        [
+          80,
+          520
+        ],
+        [
+          376.29999999999995,
+          520
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "takes-python-node-0",
+        "focus": 0.2666666666666666,
+        "gap": 8
+      },
+      "endBinding": {
+        "elementId": "takes-python-node-6",
+        "focus": 0.2,
+        "gap": 8.799999999999955
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "takes-python-edge-6",
+      "type": "arrow",
+      "x": 172,
+      "y": 112,
+      "width": 376.79999999999995,
+      "height": 260,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aF",
+      "roundness": null,
+      "seed": 681338016,
+      "version": 1,
+      "versionNonce": 1463308284,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "takes-python-edge-6-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "takes-python",
+        "edge": {
+          "from": "request",
+          "to": "response",
+          "claim": "takes"
+        }
+      },
+      "points": [
+        [
+          0.5,
+          0
+        ],
+        [
+          128,
+          0
+        ],
+        [
+          128,
+          190.39999999999998
+        ],
+        [
+          128,
+          260
+        ],
+        [
+          376.29999999999995,
+          260
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "takes-python-node-0",
+        "focus": -0.23333333333333334,
+        "gap": 8
+      },
+      "endBinding": {
+        "elementId": "takes-python-node-1",
+        "focus": 0.2,
+        "gap": 8.799999999999955
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "takes-python-node-0-label",
+      "type": "text",
+      "x": 61.5,
+      "y": 127.5,
+      "width": 77,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aG",
+      "roundness": null,
+      "seed": 1778543644,
+      "version": 1,
+      "versionNonce": 894649640,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "takes-python"
+      },
+      "text": "Request",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "takes-python-node-0",
+      "originalText": "Request",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "takes-python-node-1-label",
+      "type": "text",
+      "x": 576,
+      "y": 367.5,
+      "width": 88,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aH",
+      "roundness": null,
+      "seed": 457058553,
+      "version": 1,
+      "versionNonce": 1976740803,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "takes-python"
+      },
+      "text": "Response",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "takes-python-node-1",
+      "originalText": "Response",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "takes-python-node-2-label",
+      "type": "text",
+      "x": 587,
+      "y": 847.5,
+      "width": 66,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aI",
+      "roundness": null,
+      "seed": 356447318,
+      "version": 1,
+      "versionNonce": 350467898,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "takes-python"
+      },
+      "text": "handle",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "takes-python-node-2",
+      "originalText": "handle",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "takes-python-node-3-label",
+      "type": "text",
+      "x": 564,
+      "y": 1007.5,
+      "width": 132,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aJ",
+      "roundness": null,
+      "seed": 1982267403,
+      "version": 1,
+      "versionNonce": 670351749,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "takes-python"
+      },
+      "text": "handle_alias",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "takes-python-node-3",
+      "originalText": "handle_alias",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "takes-python-node-4-label",
+      "type": "text",
+      "x": 592.5,
+      "y": 47.5,
+      "width": 55.00000000000001,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aK",
+      "roundness": null,
+      "seed": 454668144,
+      "version": 1,
+      "versionNonce": 1104099276,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "takes-python"
+      },
+      "text": "count",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "takes-python-node-4",
+      "originalText": "count",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "takes-python-node-5-label",
+      "type": "text",
+      "x": 568.5,
+      "y": 207.5,
+      "width": 143,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aL",
+      "roundness": null,
+      "seed": 1038951357,
+      "version": 1,
+      "versionNonce": 1100228007,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "takes-python"
+      },
+      "text": "handle_opaque",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "takes-python-node-5",
+      "originalText": "handle_opaque",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "takes-python-node-6-label",
+      "type": "text",
+      "x": 581.5,
+      "y": 687.5,
+      "width": 77,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aM",
+      "roundness": null,
+      "seed": 147599770,
+      "version": 1,
+      "versionNonce": 1284566126,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "takes-python"
+      },
+      "text": "produce",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "takes-python-node-6",
+      "originalText": "produce",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "takes-python-node-7-label",
+      "type": "text",
+      "x": 571,
+      "y": 527.5,
+      "width": 198.00000000000003,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aN",
+      "roundness": null,
+      "seed": 1303229023,
+      "version": 1,
+      "versionNonce": 850865913,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "takes-python"
+      },
+      "text": "handle_local_alias",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "takes-python-node-7",
+      "originalText": "handle_local_alias",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "takes-python-edge-0-label",
+      "type": "text",
+      "x": 201.6,
+      "y": 649.4,
+      "width": 52.800000000000004,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aO",
+      "roundness": null,
+      "seed": 596960203,
+      "version": 1,
+      "versionNonce": 1769515333,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "takes-python"
+      },
+      "text": "@takes",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "takes-python-edge-0",
+      "originalText": "@takes",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "takes-python-edge-1-label",
+      "type": "text",
+      "x": 177.6,
+      "y": 768.4,
+      "width": 52.800000000000004,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aP",
+      "roundness": null,
+      "seed": 113006614,
+      "version": 1,
+      "versionNonce": 1635871226,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "takes-python"
+      },
+      "text": "@takes",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "takes-python-edge-1",
+      "originalText": "@takes",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "takes-python-edge-2-label",
+      "type": "text",
+      "x": 334,
+      "y": 42,
+      "width": 52.800000000000004,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aQ",
+      "roundness": null,
+      "seed": 1298376121,
+      "version": 1,
+      "versionNonce": 2098343811,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "takes-python"
+      },
+      "text": "@takes",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "takes-python-edge-2",
+      "originalText": "@takes",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "takes-python-edge-3-label",
+      "type": "text",
+      "x": 297.6,
+      "y": 173.39999999999998,
+      "width": 52.800000000000004,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aR",
+      "roundness": null,
+      "seed": 869831132,
+      "version": 1,
+      "versionNonce": 829520872,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "takes-python"
+      },
+      "text": "@takes",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "takes-python-edge-3",
+      "originalText": "@takes",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "takes-python-edge-4-label",
+      "type": "text",
+      "x": 249.6,
+      "y": 411.4,
+      "width": 52.800000000000004,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aS",
+      "roundness": null,
+      "seed": 553127199,
+      "version": 1,
+      "versionNonce": 281231801,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "takes-python"
+      },
+      "text": "@takes",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "takes-python-edge-4",
+      "originalText": "@takes",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "takes-python-edge-5-label",
+      "type": "text",
+      "x": 225.6,
+      "y": 530.4,
+      "width": 52.800000000000004,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aT",
+      "roundness": null,
+      "seed": 1990260314,
+      "version": 1,
+      "versionNonce": 50029358,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "takes-python"
+      },
+      "text": "@takes",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "takes-python-edge-5",
+      "originalText": "@takes",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "takes-python-edge-6-label",
+      "type": "text",
+      "x": 273.6,
+      "y": 292.4,
+      "width": 52.800000000000004,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aU",
+      "roundness": null,
+      "seed": 579615613,
+      "version": 1,
+      "versionNonce": 63860839,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "takes-python"
+      },
+      "text": "@takes",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "takes-python-edge-6",
+      "originalText": "@takes",
+      "autoResize": true,
+      "lineHeight": 1.25
+    }
+  ],
+  "appState": {
+    "gridSize": null,
+    "viewBackgroundColor": "#ffffff"
+  },
+  "files": {},
+  "diagramos": {
+    "version": "0.2.0-rc.6",
+    "schema": 1
+  }
+}
