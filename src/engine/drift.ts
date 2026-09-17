@@ -762,6 +762,7 @@ const LACKING_FIX: Record<LackingEnd["part"], string> = {
   result: "Start the arrow at the function that produces the value",
   fields: "Anchor that end at the type that has the field",
   bases: "Start the arrow at the type that declares the base",
+  type: "Point that end at the type the claim is about",
 };
 
 /**
@@ -777,7 +778,7 @@ export function lackingSentence(
 ): string {
   const side = lacking.end === "from" ? from : to;
   const which = lacking.end === "from" ? "start" : "end";
-  return `${lacking.noun} has ${PART_WORDS[lacking.part]}: `
+  return `${lacking.noun} ${PART_WORDS[lacking.part]}: `
     + `${side.label} is anchored at \`${lacking.name}\`, ${lacking.noun}, and @${claim} needs `
     + `${PART_NEEDED[lacking.part]} at the ${which} of the arrow. `
     + `${LACKING_FIX[lacking.part]}, or drop the claim.`;

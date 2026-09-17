@@ -70,6 +70,13 @@ describe("Rust", () => {
     });
   });
 
+  it("reads a function as never a type, and a struct as one", () => {
+    expect(read(source, "receive", "rust")?.type).toBe("lacks");
+    expect(read(source, "Client", "rust")?.type).toBe("has");
+    // A constant may name a type alias's worth of anything; it is never judged.
+    expect(read(source, "LIMIT", "rust")?.type).toBe("unsure");
+  });
+
   it("reads a trait method with no default as a function with no body", () => {
     expect(read(source, "handle", "rust")).toMatchObject({ signature: "has", body: "lacks" });
   });

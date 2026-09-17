@@ -144,8 +144,16 @@ describe("@feeds from something with no result", () => {
   });
 });
 
+/*
+ * Not Rust. A Rust type's code is its `impl` blocks, which may be in any file
+ * of the crate, so "this struct has no code" cannot be read off the struct --
+ * `measure:parts` counts 1,068 structs the reader would have called bodiless
+ * that are not. See the Rust tests at the bottom of this file.
+ */
+const WITH_CLASS_BODIES = LANGUAGES.filter((language) => language !== "rust");
+
 describe("@calls and @builds from something with no code in it", () => {
-  it.each(LANGUAGES)("is red in %s for @calls", async (language) => {
+  it.each(WITH_CLASS_BODIES)("is red in %s for @calls", async (language) => {
     const { file } = SOURCES[language]!;
     const board = await boardOf(`${file}#Client`, `${file}#helper`, "calls");
     const { report, finding } = wrongKind(board, language);
@@ -154,7 +162,7 @@ describe("@calls and @builds from something with no code in it", () => {
     expect(report.clean).toBe(false);
   });
 
-  it.each(LANGUAGES)("is red in %s for @builds", async (language) => {
+  it.each(WITH_CLASS_BODIES)("is red in %s for @builds", async (language) => {
     const { file } = SOURCES[language]!;
     const board = await boardOf(`${file}#Client`, `${file}#Buffer`, "builds");
     const { report, finding } = wrongKind(board, language);
@@ -169,7 +177,7 @@ describe("@takes and @returns into something with no signature", () => {
     const { file } = SOURCES[language]!;
     // The declaration both words read sits at the head of the arrow, so this
     // says "Client's parameters take receive" -- of a type that has none.
-    const board = await boardOf(`${file}#receive`, `${file}#Client`, "takes");
+    const board = await boardOf(`${file}#Buffer`, `${file}#Client`, "takes");
     const { report, finding } = wrongKind(board, language);
 
     expect(finding?.detail).toContain("no parameters or return type");
@@ -178,7 +186,7 @@ describe("@takes and @returns into something with no signature", () => {
 
   it.each(LANGUAGES)("is red in %s for @returns", async (language) => {
     const { file } = SOURCES[language]!;
-    const board = await boardOf(`${file}#receive`, `${file}#Client`, "returns");
+    const board = await boardOf(`${file}#Buffer`, `${file}#Client`, "returns");
     const { report, finding } = wrongKind(board, language);
 
     expect(finding?.detail).toContain("no parameters or return type");
@@ -216,7 +224,7 @@ describe("@holds and @conforms from a function", () => {
 });
 
 describe("@accesses, whose two ends want different things", () => {
-  it.each(LANGUAGES)("is red in %s when the reader has no body", async (language) => {
+  it.each(WITH_CLASS_BODIES)("is red in %s when the reader has no body", async (language) => {
     const { file } = SOURCES[language]!;
     const board = await boardOf(`${file}#Client`, `${file}#Buffer`, "accesses", { label: "bytes" });
     const { report, finding } = wrongKind(board, language);
@@ -323,4 +331,120 @@ describe("a class body that does run code is not accused", () => {
 
     expect(report.edges.filter((edge) => edge.kind === "end-lacks-part")).toEqual([]);
   });
+});
+
+describe("a Rust type's code lives in its impl blocks", () => {
+  /*
+   * The two false reds #301's test set found (ripgrep's `GlobSet` and `Core`).
+   * A Rust struct's methods are written in `impl GlobSet { ... }`, outside the
+   * struct and possibly in another file, so reading the struct alone and
+   * calling it "no code" is a red on an arrow that is true.
+   */
+  it("does not say a struct with methods has no code", async () => {
+    const source = [
+      "pub struct Strategy;",
+      "pub struct GlobSet { strats: Vec<Strategy> }",
+      "impl GlobSet {",
+      "    pub fn new() -> GlobSet { GlobSet { strats: vec![Strategy] } }",
+      "}",
+      "",
+    ].join("\n");
+    const board = await boardOf("src/lib.rs#GlobSet", "src/lib.rs#Strategy", "builds");
+    const report = checkDrift(board, fakeWorkspace({ "src/lib.rs": source }), { edges: true });
+
+    expect(report.edges.filter((edge) => edge.kind === "end-lacks-part")).toEqual([]);
+  });
+
+  it("does not say it when the impl is in another file either", async () => {
+    const files = {
+      "src/lib.rs": "pub struct Strategy;\npub struct GlobSet { strats: Vec<Strategy> }\n",
+      "src/build.rs": "use crate::*;\nimpl GlobSet { pub fn new() -> GlobSet { GlobSet { strats: vec![Strategy] } } }\n",
+    };
+    const board = await boardOf("src/lib.rs#GlobSet", "src/lib.rs#Strategy", "builds");
+    const report = checkDrift(board, fakeWorkspace(files), { edges: true });
+
+    expect(report.edges.filter((edge) => edge.kind === "end-lacks-part")).toEqual([]);
+  });
+});
+
+describe("the other end: a function where a type should be", () => {
+  /*
+   * #301's test set plants the wrong-kind mistake on the end #297 did not
+   * list: `@holds` *into* a function, `@takes` *from* one. Same question the
+   * reader already answers -- a declaration with parameters is never a type --
+   * so it is the same red with one more line in `NEEDS` per word.
+   */
+  const intoAFunction: Array<[ArrowClaim, string, string]> = [
+    ["takes", "helper", "receive"],
+    ["returns", "helper", "receive"],
+    ["holds", "Client", "helper"],
+    ["conforms", "Client", "helper"],
+    ["builds", "receive", "helper"],
+  ];
+
+  for (const [claim, from, to] of intoAFunction) {
+    it.each(LANGUAGES)(`is red in %s for @${claim} with a function at the wrong end`, async (language) => {
+      const { file } = SOURCES[language]!;
+      const board = await boardOf(`${file}#${from}`, `${file}#${to}`, claim);
+      const { report, finding } = wrongKind(board, language);
+
+      if (claim === "takes" || claim === "returns") {
+        // Red before #297 too: the signature is readable and does not name
+        // `helper`. Either sentence is a true one; the arrow must not pass.
+        expect(report.edges.some((edge) => edge.kind === "signature-absent" || edge.kind === "end-lacks-part"))
+          .toBe(true);
+      } else {
+        expect(finding?.detail).toContain("a function is not a type");
+      }
+      expect(report.garbledClaims ?? []).toEqual([]);
+      expect(report.clean).toBe(false);
+    });
+  }
+
+  /*
+   * Where the new line is the only thing that can speak: a signature the
+   * reader refuses to judge, because a name in it may stand for another.
+   */
+  const aliased: Record<string, { file: string; source: string }> = {
+    rust: {
+      file: "src/lib.rs",
+      source: "pub struct Buffer;\ntype B = Buffer;\npub fn receive(b: B) -> B { b }\npub fn helper() {}\n",
+    },
+    python: {
+      file: "src/client.py",
+      source: "class Buffer:\n    pass\n\ndef receive(b: \"Buffer\") -> \"Buffer\":\n    return b\n\ndef helper():\n    pass\n",
+    },
+    ts: {
+      file: "src/client.ts",
+      source: "export class Buffer {}\ntype B = Buffer;\nexport function receive(b: B): B { return b; }\nexport function helper() {}\n",
+    },
+  };
+
+  for (const claim of ["takes", "returns"] as const) {
+    it.each(LANGUAGES)(`says a function is not a type in %s when @${claim}'s signature cannot be judged`, async (language) => {
+      const { file, source } = aliased[language]!;
+      const board = await boardOf(`${file}#helper`, `${file}#receive`, claim);
+      const report = checkDrift(board, fakeWorkspace({ [file]: source }), { edges: true });
+
+      const finding = report.edges.find((edge) => edge.kind === "end-lacks-part");
+      expect(finding?.detail).toContain("a function is not a type");
+      expect(report.clean).toBe(false);
+    });
+  }
+});
+
+describe("Rust structs are not accused of having no code", () => {
+  for (const [claim, from, to, label] of [
+    ["calls", "Client", "helper", undefined],
+    ["builds", "Client", "Buffer", undefined],
+    ["accesses", "Client", "Buffer", "bytes"],
+  ] as Array<[ArrowClaim, string, string, string | undefined]>) {
+    it(`stays quiet on @${claim} from a struct`, async () => {
+      const { file } = SOURCES.rust!;
+      const board = await boardOf(`${file}#${from}`, `${file}#${to}`, claim, label ? { label } : {});
+      const { finding } = wrongKind(board, "rust");
+
+      expect(finding).toBeUndefined();
+    });
+  }
 });

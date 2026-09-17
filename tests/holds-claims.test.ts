@@ -121,7 +121,7 @@ describe("@holds on an arrow the code contradicts", () => {
 });
 
 describe("a category error is not a wrong diagram", () => {
-  it("says nothing when the far end is a function rather than a type", async () => {
+  it("calls it the wrong kind of end when the far end is a function rather than a type", async () => {
     /*
      * The live arrow on orangutan's board, which is what this word was added
      * for -- and it turns out `@holds` is not true of it either. `RouteInfo`
@@ -131,7 +131,12 @@ describe("a category error is not a wrong diagram", () => {
      * So the far end is the wrong *sort* of thing, which is #190's layer 1: a
      * claim between a type and a routine is a category error rather than a
      * false statement, and the engine must not answer a question it was never
-     * going to be able to answer. Silence, never red.
+     * going to be able to answer.
+     *
+     * #297 changed what that sounds like. It was an unreadable claim, and it is
+     * a red now -- not `holds-absent`, which would send somebody to read a
+     * field list that was never the problem, but the wrong kind of end, which
+     * says what to point the arrow at instead.
      */
     const files = {
       "src/route.rs": "pub struct RouteInfo { pub handler: fn(&Request) -> Response }\n",
@@ -147,24 +152,14 @@ describe("a category error is not a wrong diagram", () => {
     });
     const report = checkDrift(board, fakeWorkspace(files), { edges: true });
 
-    // Not red -- a red says the code disagrees, and the code does not disagree
-    // with anything here; nothing was ever asked of it.
     expect(report.edges.filter((finding) => finding.kind === "holds-absent")).toEqual([]);
-    expect(report.claims.holdsWithheld["not-a-type"]).toBe(1);
-
-    /*
-     * But loud. The first version of this went silent, and that was backwards:
-     * a claim that can never be satisfied is a line on the board no check can
-     * ever read, which is exactly what `garbledClaims` is for and exactly the
-     * comment on `clean` -- "leaving it out would let it sit there quietly
-     * forever". #190 says a category error should be caught the moment the
-     * arrow is drawn rather than silently withheld, and silence is what a
-     * checker that was never going to answer looks like.
-     */
-    const garbled = report.garbledClaims.find((claim) => claim.written === "holds");
-    expect(garbled).toBeDefined();
-    expect(garbled?.on).toBe("arrow");
-    expect(garbled?.detail).toContain("hello_handler");
+    const wrongKind = report.edges.filter((finding) => finding.kind === "end-lacks-part");
+    expect(wrongKind).toHaveLength(1);
+    expect(wrongKind[0]!.detail).toContain("hello_handler");
+    expect(wrongKind[0]!.detail).toContain("a function is not a type");
+    // Once: red, and not also an unreadable claim or an unanswered one.
+    expect(report.garbledClaims).toEqual([]);
+    expect(report.claims.holdsWithheld["not-a-type"]).toBeUndefined();
     expect(report.clean).toBe(false);
   });
 });

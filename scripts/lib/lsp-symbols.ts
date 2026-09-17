@@ -73,10 +73,11 @@ export function refereeParts(
       result: "has",
       fields: "lacks",
       bases: "lacks",
+      type: "lacks",
     };
   }
   if (CONTAINERS.has(kind)) {
-    return { body: "lacks", signature: "lacks", result: "lacks", fields: "unknown", bases: "unknown" };
+    return { body: "lacks", signature: "lacks", result: "lacks", fields: "unknown", bases: "unknown", type: "has" };
   }
-  return { body: "unknown", signature: "unknown", result: "unknown", fields: "unknown", bases: "unknown" };
+  return { body: "unknown", signature: "unknown", result: "unknown", fields: "unknown", bases: "unknown", type: "unknown" };
 }

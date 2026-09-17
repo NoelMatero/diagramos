@@ -103,6 +103,7 @@ function score(
   file: string, source: string, language: Language,
   referee: RefereeByLine | undefined,
   refereeRan = true,
+  implemented?: ReadonlySet<string>,
 ) {
   const shapes = declaredShapes(source, language);
   if (!shapes) return;
@@ -121,6 +122,19 @@ function score(
       if (text) byText += 1;
       return text ?? listed;
     });
+    if (implemented) {
+      /*
+       * A Rust type's code is its `impl` blocks, which sit outside the type and
+       * may be in any file of the crate (#299, found by #301's test set). So a
+       * type has a body when one is in sight here, and otherwise nobody can say.
+       */
+      for (let index = 0; index < theirs.length; index += 1) {
+        const reading = theirs[index];
+        if (reading && reading.signature === "lacks" && reading.body === "lacks") {
+          theirs[index] = { ...reading, body: implemented.has(name) ? "has" : "unknown" };
+        }
+      }
+    }
     if (theirs.some((one) => one !== undefined)) counts.refereed += 1;
     const where = `${file}:${lineAt(source, declarations[0]!.nameNode.startIndex) + 1} ${name}`;
     for (const part of PARTS) {
@@ -187,6 +201,7 @@ function typescriptReferee(file: string, source: string): RefereeByLine {
       const at = node.getStart(tree) + node.getText(tree).indexOf("constructor");
       found.set(`${tree.getLineAndCharacterOfPosition(at).line}\tconstructor`, {
         body: node.body ? "has" : "lacks", signature: "has", result: "has", fields: "lacks", bases: "lacks",
+        type: "lacks",
       });
     }
     if (name && (ts.isIdentifier(name) || ts.isPrivateIdentifier(name))) {
@@ -194,11 +209,11 @@ function typescriptReferee(file: string, source: string): RefereeByLine {
       if (ts.isFunctionLike(node)) {
         reading = {
           body: (node as { body?: ts.Node }).body ? "has" : "lacks",
-          signature: "has", result: "has", fields: "lacks", bases: "lacks",
+          signature: "has", result: "has", fields: "lacks", bases: "lacks", type: "lacks",
         };
       } else if (ts.isClassLike(node) || ts.isInterfaceDeclaration(node)
         || ts.isEnumDeclaration(node) || ts.isModuleDeclaration(node)) {
-        reading = { body: "lacks", signature: "lacks", result: "lacks", fields: "unknown", bases: "unknown" };
+        reading = { body: "lacks", signature: "lacks", result: "lacks", fields: "unknown", bases: "unknown", type: "has" };
       }
       if (reading) {
         const line = tree.getLineAndCharacterOfPosition(name.getStart(tree)).line;
@@ -255,7 +270,8 @@ for (const tree of roots) {
       const source = readFileSync(file, "utf8");
       const symbols = referee ? await referee.documentSymbols(file) : undefined;
       if (!symbols) silent += 1;
-      score(file, source, "rust", symbols ? byLine(symbols, source, false) : undefined);
+      score(file, source, "rust", symbols ? byLine(symbols, source, false) : undefined, true,
+        implementedNames(symbols, source));
     }
     referee?.close();
     console.error(`rust ${path.relative(tree, root) || "."}: ${group.length} files, ${silent} unanswered`
@@ -285,6 +301,35 @@ for (const tree of roots) {
     referee?.close();
     console.error(`python ${path.basename(tree)}: ${pythonFiles.length} files, ${silent} unanswered`);
   }
+}
+
+/**
+ * The names a Rust file writes an `impl` for, read off rust-analyzer's own
+ * `impl ...` symbols -- or, for a file it would not answer, off the source
+ * lines that open one. `impl<T> Trait for Foo<T>` implements `Foo`.
+ */
+function implementedNames(symbols: Parameters<typeof flatten>[0] | undefined, source: string): Set<string> {
+  const headers = symbols
+    ? flatten(symbols).map((symbol) => symbol.name).filter((name) => /^impl\b/.test(name))
+    : source.split("\n").filter((line) => /^\s*(pub\s+)?(unsafe\s+)?impl\b/.test(line));
+  const names = new Set<string>();
+  for (const header of headers) {
+    let rest = header.replace(/^\s*(pub\s+)?(unsafe\s+)?impl\s*/, "");
+    // Drop the impl's own generic list, which may nest.
+    if (rest.startsWith("<")) {
+      let depth = 0;
+      let cut = 0;
+      for (; cut < rest.length; cut += 1) {
+        if (rest[cut] === "<") depth += 1;
+        if (rest[cut] === ">" && --depth === 0) break;
+      }
+      rest = rest.slice(cut + 1);
+    }
+    const target = / for\s+(.*)$/.exec(rest)?.[1] ?? rest;
+    const path = /^\s*&?(?:mut\s+)?((?:\w+::)*\w+)/.exec(target)?.[1];
+    if (path) names.add(path.split("::").pop()!);
+  }
+  return names;
 }
 
 function byLine(symbols: Parameters<typeof flatten>[0], source: string, python: boolean): RefereeByLine {

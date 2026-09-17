@@ -443,17 +443,23 @@ arrow, one layer up.
 **What each claim needs from each end is written by hand, once, and it is the
 only hand-written part.** Nine lines, in `NEEDS` in `parts.ts`:
 
-| word | wants | at which end |
+| word | at the tail | at the head |
 |---|---|---|
-| `@needs` | nothing -- every declaration lives in a file, and a file has imports | — |
-| `@feeds` | a result | the tail |
-| `@calls` | a body of code that runs | the tail |
-| `@builds` | a body of code that runs | the tail |
-| `@takes` | parameters or a return type | the head |
-| `@returns` | parameters or a return type | the head |
-| `@holds` | a field list | the tail |
-| `@conforms` | a base list | the tail |
-| `@accesses` | a body at the tail, a field list at the head | both |
+| `@needs` | nothing -- every declaration lives in a file, and a file has imports | nothing |
+| `@feeds` | a result | — |
+| `@calls` | a body of code that runs | — (calling a class is how Python constructs one) |
+| `@builds` | a body of code that runs | a type |
+| `@takes` | a type | parameters or a return type |
+| `@returns` | a type | parameters or a return type |
+| `@holds` | a field list | a type |
+| `@conforms` | a base list | a type |
+| `@accesses` | a body of code that runs | a field list |
+
+The first cut had one column. #297 listed one end per word and that is what was
+built; #301's test set plants its wrong-kind mistakes mostly on the other end
+-- `@holds` *into* a function rather than *from* one -- and scored the first cut
+at 7 of 146 of them. The second column is the same reading ("a declaration
+with parameters is never a type") and was measured before it was switched on.
 
 **Whether an end has that part is read from the grammar's fields**, which is
 the whole point: a table of "a struct cannot feed" per language is the list
@@ -486,8 +492,21 @@ class with methods holds routines somebody may well have drawn the box for. So
 a container whose body contains anything invoked (`function`, `macro` or
 `arguments` on a node) or any routine at all is read as *not sure*. What is
 left saying "no body" is a field list and a class of nothing but attributes.
-The cost is on the record below: 8,299 Python lacks and 1,084 TypeScript ones
+The cost is on the record below: 8,959 Python lacks and 1,621 TypeScript ones
 given up.
+
+**In Rust, no struct is ever said to have no code.** A Rust type's code is its
+`impl` blocks, which live outside the declaration and may be in any file of the
+crate -- the same footing as `@conforms` in Rust. That square was open for a
+day, and the measurement agreed with it only because its referee had been told
+the same wrong thing: a rust-analyzer `Struct` has no body. #301's test set
+found it as two false reds (ripgrep's `GlobSet` and `Core`, both of which build
+what the arrow says, in their `impl`). With the referee counting `impl` blocks
+the square reads **1,068 wrong lacks**, and it is closed.
+
+The lesson: a referee that shares the reader's definition is not independent
+of it, however different its machinery. It took an answer key written from a
+different definition to see it.
 
 **A plan is never accused**, as with every other red here.
 
@@ -507,34 +526,52 @@ whose name is a keyword in the 2024 edition -- the line itself is read for the
 keyword the language writes. That is a third mechanism, and it is in the
 referee only.
 
-| language | part | wrong lacks | unjudged | agreed lacks | missed |
-|---|---|---:|---:|---:|---:|
-| rust | body | 0 | 0 | 1,402 | 1,265 |
-| rust | signature / result | 0 | 0 | 1,817 | 797 |
-| rust | fields / bases | 0 | 0 | 10,264 | 308 |
-| python | body | 0 | 0 | 3,471 | 8,959 |
-| python | signature / result | 0 | 0 | 12,430 | 0 |
-| python | fields / bases | 0 | 0 | 42,222 | 0 |
-| ts | body | 0 | 0 | 1,966 | 1,621 |
-| ts | signature / result | 0 | 0 | 3,090 | 0 |
-| ts | fields / bases | 0 | 0 | 8,615 | 2 |
-| tsx | body | 0 | 0 | 71 | 59 |
-| tsx | signature / result | 0 | 0 | 120 | 0 |
-| tsx | fields / bases | 0 | 0 | 733 | 0 |
-| js | body | 0 | 0 | 3 | 12 |
-| js | signature / result | 0 | 0 | 15 | 0 |
-| js | fields / bases | 0 | 0 | 542 | 0 |
+| language | part | wrong lacks | unjudged | agreed lacks | missed | may accuse |
+|---|---|---:|---:|---:|---:|---|
+| rust | body | **1,068** | 283 | 51 | 1 | **no** |
+| rust | signature / result | 0 | 0 | 1,817 | 797 | yes |
+| rust | fields / bases / type | 0 | 0 | 10,264 | 308 | yes |
+| python | body | 0 | 0 | 3,471 | 8,959 | yes |
+| python | signature / result | 0 | 0 | 12,430 | 0 | yes |
+| python | fields / bases / type | 0 | 0 | 42,222 | 0 | yes |
+| ts | body | 0 | 0 | 1,966 | 1,621 | yes |
+| ts | signature / result | 0 | 0 | 3,090 | 0 | yes |
+| ts | fields / bases / type | 0 | 0 | 8,615 | 2 | yes |
+| tsx | body | 0 | 0 | 71 | 59 | yes |
+| tsx | signature / result | 0 | 0 | 120 | 0 | yes |
+| tsx | fields / bases / type | 0 | 0 | 733 | 0 | yes |
+| js | body | 0 | 0 | 3 | 12 | yes |
+| js | signature / result | 0 | 0 | 15 | 0 | yes |
+| js | fields / bases / type | 0 | 0 | 542 | 0 | yes |
 
 17,955 Rust names, 100,346 Python, 49,146 TS, 10,258 TSX, 2,733 JS, over all
-fifteen pinned repositories, in 2m54s. **Not one wrong "lacks" in any square,
-and none the referee could not judge**, so every part may accuse in every
-language. `missed` is the cheap direction -- the tooling says "lacks" and the
-reader will not commit -- and it costs a red that never fires.
+fifteen pinned repositories, in 2m53s. `missed` is the cheap direction -- the
+tooling says "lacks" and the reader will not commit -- and it costs a red that
+never fires.
 
-Every square open is not the usual outcome in this document, so the measurement
-was broken on purpose twice to check that it can fail. Made to say a struct
-lacks fields, it refuses all five languages. Made to say a function lacks a
-signature, it reports 926 wrong lacks in Python and 208 in Rust.
+The measurement was broken on purpose twice to check that it can fail. Made to
+say a struct lacks fields, it refuses all five languages. Made to say a
+function lacks a signature, it reports 926 wrong lacks in Python and 208 in
+Rust. Neither control would have caught the Rust `body` square, because both
+broke the reader and left the shared definition alone -- which is the case
+above.
+
+### What #301's test set says
+
+`npm run bench:planted`, 855 planted and drawn mistakes and 428 true claims:
+
+| | before #297 | first cut | with both ends, Rust body closed |
+|---|---:|---:|---:|
+| mistakes called wrong | 229 (27%) | 303 (35%) | **386 (45%)** |
+| of which planted wrong-kind | 7 of 146 | 11 | **52** |
+| true claims called wrong | 8 | 10 | **8** |
+
+The 8 that remain are the same 8 as before any of this -- seven are the field
+reader missing a TypeScript parameter property or a Python attribute set in
+`__init__`, one is a clap import cycle -- and none is an end of the wrong kind.
+The wrong-kind row does not reach 146 for two reasons on the record: `@calls`
+into a constant is left alone by design (a constant may hold a function), and
+Rust structs are never said to have no code.
 
 What the licence costs when a square closes is one accusation and nothing else,
 exactly as in `licence.ts`: the claim's own reader is untouched, and the arrow

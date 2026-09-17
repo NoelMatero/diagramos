@@ -38,7 +38,7 @@ import type { ArrowClaim } from "./claim";
 import { declaredShapes } from "./body";
 import { each, type Language, type Node } from "./parse";
 
-export const PARTS = ["body", "signature", "result", "fields", "bases"] as const;
+export const PARTS = ["body", "signature", "result", "fields", "bases", "type"] as const;
 export type Part = (typeof PARTS)[number];
 
 export type PartReading = "has" | "lacks" | "unsure";
@@ -48,27 +48,35 @@ export type PartReading = "has" | "lacks" | "unsure";
  *
  * `needs` asks nothing of either end: every declaration lives in a file, and a
  * file has imports. `takes` and `returns` read the signature at the head, which
- * is where `signature.ts` reads it. The rest read their tail.
+ * is where `signature.ts` reads it, and want a type at the tail.
+ *
+ * The second end of `takes`, `returns`, `holds`, `conforms` and `builds` --
+ * "this end is a type" -- was added when #301's test set planted its
+ * wrong-kind mistakes there and #297's first cut never looked. `calls` has no
+ * second line: calling a class is how Python and a Rust tuple struct construct
+ * one, so a type at its head is not a wrong kind, and a constant there may hold
+ * a function.
  */
 export const NEEDS: Record<ArrowClaim, { from?: Part; to?: Part }> = {
   needs: {},
   feeds: { from: "result" },
   calls: { from: "body" },
-  builds: { from: "body" },
-  takes: { to: "signature" },
-  returns: { to: "signature" },
-  holds: { from: "fields" },
-  conforms: { from: "bases" },
+  builds: { from: "body", to: "type" },
+  takes: { from: "type", to: "signature" },
+  returns: { from: "type", to: "signature" },
+  holds: { from: "fields", to: "type" },
+  conforms: { from: "bases", to: "type" },
   accesses: { from: "body", to: "fields" },
 };
 
-/** The same part, in the words a person reads on the board. */
+/** An end without the part, in the words a person reads on the board. */
 export const PART_WORDS: Record<Part, string> = {
-  body: "no body of code that runs",
-  signature: "no parameters or return type",
-  result: "no result",
-  fields: "no fields",
-  bases: "no base types",
+  body: "has no body of code that runs",
+  signature: "has no parameters or return type",
+  result: "has no result",
+  fields: "has no fields",
+  bases: "has no base types",
+  type: "is not a type",
 };
 
 /** And the other way round: what the claim wanted to find there. */
@@ -78,6 +86,7 @@ export const PART_NEEDED: Record<Part, string> = {
   result: "a result",
   fields: "a field list",
   bases: "a base list",
+  type: "a type",
 };
 
 const has = (node: Node, field: string) => node.childForFieldName(field) !== null;
@@ -116,6 +125,7 @@ function readDeclaration(node: Node): Record<Part, PartReading> {
       result: "has",
       fields: "lacks",
       bases: "lacks",
+      type: "lacks",
     };
   }
   const container = has(node, "name") && has(node, "body")
@@ -132,14 +142,14 @@ function readDeclaration(node: Node): Record<Part, PartReading> {
     const runs = holdsCode(node.childForFieldName("body")!);
     return {
       body: runs ? "unsure" : "lacks",
-      signature: "lacks", result: "lacks", fields: "unsure", bases: "unsure",
+      signature: "lacks", result: "lacks", fields: "unsure", bases: "unsure", type: "has",
     };
   }
-  return { body: "unsure", signature: "unsure", result: "unsure", fields: "unsure", bases: "unsure" };
+  return { body: "unsure", signature: "unsure", result: "unsure", fields: "unsure", bases: "unsure", type: "unsure" };
 }
 
 const UNSURE: Record<Part, PartReading> = {
-  body: "unsure", signature: "unsure", result: "unsure", fields: "unsure", bases: "unsure",
+  body: "unsure", signature: "unsure", result: "unsure", fields: "unsure", bases: "unsure", type: "unsure",
 };
 
 /**
@@ -177,9 +187,10 @@ export function declaredNames(source: string, language: Language): string[] {
  * Every square measured by `npm run measure:parts -- .corpus/*` against
  * rust-analyzer, pyright and the TypeScript compiler, over all fifteen pinned
  * repositories: 17,955 Rust names, 100,346 Python, 49,146 TS, 10,258 TSX,
- * 2,733 JS. **Zero wrong lacks and zero unjudged lacks in every square** --
- * 1,402 agreed body-lacks in Rust, 42,222 agreed field-lacks in Python, and so
- * on through docs/claim-vocabulary.md's table -- so every square is open.
+ * 2,733 JS. **Zero wrong lacks and zero unjudged lacks in every square but
+ * one** -- 42,222 agreed field-lacks in Python, 10,264 agreed "not a type" in
+ * Rust, and so on through docs/claim-vocabulary.md's table. The one is Rust's
+ * `body`, below.
  *
  * That is not the usual outcome in this codebase and is worth being suspicious
  * of, so the measurement was broken on purpose twice to check it can fail:
@@ -192,11 +203,21 @@ export function declaredNames(source: string, language: Language): string[] {
  * accusation and nothing else, exactly as `licence.ts` has it.
  */
 export const PART_LICENCE: Record<Language, Record<Part, boolean>> = {
-  ts: { body: true, signature: true, result: true, fields: true, bases: true },
-  tsx: { body: true, signature: true, result: true, fields: true, bases: true },
-  js: { body: true, signature: true, result: true, fields: true, bases: true },
-  rust: { body: true, signature: true, result: true, fields: true, bases: true },
-  python: { body: true, signature: true, result: true, fields: true, bases: true },
+  ts: { body: true, signature: true, result: true, fields: true, bases: true, type: true },
+  tsx: { body: true, signature: true, result: true, fields: true, bases: true, type: true },
+  js: { body: true, signature: true, result: true, fields: true, bases: true, type: true },
+  /*
+   * Closed on `body`, and it was open for a day. A Rust type's code is its
+   * `impl` blocks, which live outside the declaration and may be in any file of
+   * the crate, so "this struct has no code" cannot be read off the struct. The
+   * first measurement agreed with the reader only because its referee was told
+   * the same wrong thing; #301's test set caught it as two false reds
+   * (ripgrep's `GlobSet` and `Core`), and with the referee counting `impl`
+   * blocks the square reads 1,068 wrong lacks. The same footing as `@conforms`
+   * in Rust: the fact is somewhere in the crate.
+   */
+  rust: { body: false, signature: true, result: true, fields: true, bases: true, type: true },
+  python: { body: true, signature: true, result: true, fields: true, bases: true, type: true },
 };
 
 /** One end of an arrow, as the check has it. */
