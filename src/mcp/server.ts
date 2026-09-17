@@ -584,6 +584,7 @@ function unconfirmedArrowNote(unconfirmed: ReadonlyArray<UnconfirmedEdge>): Reco
  */
 function drawTimeNotes(drawn: {
   findings: ReadonlyArray<{ node: string; label?: string; ref: string; kind: string; detail: string }>;
+  edges: ReadonlyArray<{ kind: string; detail: string }>;
   garbledClaims: ReadonlyArray<{ detail: string }>;
   workItems: ReadonlyArray<unknown>;
   unconfirmedEdges: ReadonlyArray<UnconfirmedEdge>;
@@ -602,6 +603,7 @@ function drawTimeNotes(drawn: {
    * directory generated what (#166).
    */
   const generated = drawn.findings.filter((finding) => finding.kind === "generated-ref");
+  const wrongKindOfEnd = drawn.edges.filter((finding) => finding.kind === "end-lacks-part");
   // Not a typo and not a plan: the code is there, the pointer can never reach
   // it. The finding's detail already says what to write instead (#286).
   const lines = drawn.findings.filter(pointsAtLines);
@@ -682,6 +684,23 @@ function drawTimeNotes(drawn: {
     // would otherwise sit on the board until somebody noticed the colour.
     ...(drawn.garbledClaims.length
       ? { garbledClaims: drawn.garbledClaims.map((finding) => finding.detail) }
+      : {}),
+    /*
+     * An arrow asking an end for something it cannot have (#297) -- said here
+     * for the reason a garbled claim is, and it used to *be* one: a `@holds`
+     * from a function was reported as a claim no check could read. It is a red
+     * now, which means the end-of-turn check reports it to the user, so the
+     * one turn it can be fixed for free is this one.
+     */
+    ...(wrongKindOfEnd.length
+      ? {
+          arrowsAtTheWrongKindOfEnd: wrongKindOfEnd.map((finding) => finding.detail),
+          fixWrongKindOfEnd:
+            "Each of those is a claim the code can never answer, because the end it reads has no "
+            + "result, no body, no fields at all. Move that end of the arrow to the declaration "
+            + "the claim is about, or drop the claim -- left as is, the end-of-turn check reports "
+            + "it to the user in red.",
+        }
       : {}),
     ...(drawn.workItems.length
       ? {

@@ -61,6 +61,7 @@
     "measure:altitude": "tsx scripts/measure-altitude.mts",
     "measure:holds": "tsx scripts/measure-holds.mts",
     "measure:licence": "tsx scripts/measure-licence.mts",
+    "measure:parts": "NODE_OPTIONS=--max-old-space-size=8192 tsx scripts/measure-parts.mts",
     "measure:rebind": "tsx scripts/measure-rebind.mts",
     "measure:resolution": "NODE_OPTIONS=--max-old-space-size=8192 tsx scripts/measure-resolution.mts",
     "measure:signature": "tsx scripts/measure-signature.mts",

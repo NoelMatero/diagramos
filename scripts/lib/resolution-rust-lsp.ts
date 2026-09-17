@@ -83,6 +83,8 @@ import path from "node:path";
 import { fileURLToPath, pathToFileURL } from "node:url";
 import type { MessageConnection } from "vscode-jsonrpc/node";
 
+import type { LspDocumentSymbol } from "./lsp-symbols";
+
 /**
  * The transport, fetched when a server is actually started.
  *
@@ -453,6 +455,11 @@ export interface RustLspReferee {
    * said it was ready should report that rather than print the number plainly.
    */
   primedCleanly(): boolean;
+  /**
+   * `textDocument/documentSymbol` -- what rust-analyzer says each item in a
+   * file *is* (#297). `undefined` when it would not answer.
+   */
+  documentSymbols(file: string): Promise<LspDocumentSymbol[] | undefined>;
   /** The server's own version string, for the record in a measurement. */
   version(): string;
   close(): void;
@@ -576,6 +583,7 @@ export async function createRustAnalyzerReferee(root: string): Promise<RustLspRe
         textDocument: {
           definition: { linkSupport: true },
           typeDefinition: { linkSupport: true },
+          documentSymbol: { hierarchicalDocumentSymbolSupport: true },
         },
         // Without this rust-analyzer sends no `$/progress` at all, and the
         // readiness gate above would wait out its whole timeout on every crate.
@@ -669,6 +677,25 @@ export async function createRustAnalyzerReferee(root: string): Promise<RustLspRe
     },
     methodDeclarationAt: (file, source, start) => ask("definition", file, source, start),
     methodDeclarationLocationAt: (file, source, start) => askLocation("definition", file, source, start),
+    documentSymbols: async (file) => {
+      await whenPrimed();
+      for (let attempt = 0; !closed; attempt++) {
+        try {
+          const request = connection.sendRequest("textDocument/documentSymbol", {
+            textDocument: { uri: pathToFileURL(file).toString() },
+          });
+          const timeout = new Promise<never>((_, reject) => setTimeout(
+            () => reject(new Error("textDocument/documentSymbol timed out")), REQUEST_TIMEOUT_MS).unref());
+          const result = (await Promise.race([request, timeout])) as LspDocumentSymbol[] | null;
+          if (result) return result;
+        } catch (error) {
+          if (!isNotReadyError(error)) return undefined;
+        }
+        if (attempt >= RETRY_MS.length) return undefined;
+        await new Promise((resolve) => setTimeout(resolve, RETRY_MS[attempt]));
+      }
+      return undefined;
+    },
     warmUp: whenPrimed,
     primedCleanly: () => primed,
     version: () => serverVersion,

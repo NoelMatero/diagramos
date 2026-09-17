@@ -20,7 +20,7 @@
  */
 
 import { pointsAtLines, pointsAtQualified } from "../engine/lines";
-import { summaryOf as sentenceFor } from "../engine/summary";
+import { lackingPhrase, summaryOf as sentenceFor } from "../engine/summary";
 
 export type Tone = "bad" | "warn" | "good" | "dim";
 
@@ -78,6 +78,7 @@ const KNOWN_EDGE_KINDS = new Set([
   "accesses-not-read",
   "conforms-absent",
   "calls-one-level-up",
+  "end-lacks-part",
 ]);
 
 /**
@@ -91,6 +92,7 @@ const KNOWN_EDGE_KINDS = new Set([
 const WRONG_EDGE_KINDS = new Set([
   "backwards-edge", "signature-absent", "holds-absent", "builds-backwards",
   "calls-backwards", "calls-refuted", "accesses-absent", "accesses-not-read", "conforms-absent",
+  "end-lacks-part",
 ]);
 
 /**
@@ -391,6 +393,7 @@ export function tallyOf(report: DriftView): TallyPart[] {
   const wrongMembers = report.edges.filter((finding) => finding.kind === "accesses-absent").length;
   const unreadMembers = report.edges.filter((finding) => finding.kind === "accesses-not-read").length;
   const wrongBases = report.edges.filter((finding) => finding.kind === "conforms-absent").length;
+  const wrongKind = report.edges.filter((finding) => finding.kind === "end-lacks-part").length;
   const unsupported = report.edges.filter(
     (finding) => !WRONG_EDGE_KINDS.has(finding.kind) && KNOWN_EDGE_KINDS.has(finding.kind),
   ).length;
@@ -492,6 +495,18 @@ export function tallyOf(report: DriftView): TallyPart[] {
   if (wrongBases) {
     parts.push({
       text: `${wrongBases} ${wrongBases === 1 ? "base disagrees" : "bases disagree"}`,
+      tone: "bad",
+    });
+  }
+  /*
+   * The one red chip that is not about a disagreement (#297). These arrows ask
+   * a struct for a result or a function for its fields, so there is nothing to
+   * compare and nothing to go and read -- "1 field disagrees" would send
+   * somebody to a field list that was never the problem.
+   */
+  if (wrongKind) {
+    parts.push({
+      text: `${wrongKind} at the wrong kind of end`,
       tone: "bad",
     });
   }
@@ -643,6 +658,9 @@ export function rowsOf(report: DriftView): StatusRow[] {
         + (finding.kind === "accesses-absent" ? " · no such member" : "")
         + (finding.kind === "accesses-not-read" ? " · never read here" : "")
         + (finding.kind === "conforms-absent" ? " · not a base" : "")
+        // The engine's own phrase, the front of its sentence: what this end is
+        // and what a claim asked of it that it cannot have (#297).
+        + (finding.kind === "end-lacks-part" ? ` · ${lackingPhrase(finding.detail ?? "")}` : "")
         + (KNOWN_EDGE_KINDS.has(finding.kind)
           ? ""
           : ` · ${finding.kind}${finding.detail ? `: ${finding.detail}` : ""}`),

@@ -221,10 +221,13 @@ describe("a claim nothing can ever read", () => {
     );
     const report = checkDrift(board, fakeWorkspace(files), { edges: true });
 
-    const garbled = report.garbledClaims?.find((one) => one.written === "conforms");
-    expect(garbled).toBeDefined();
-    expect(garbled?.detail).toContain("function rather than a type");
-    // Not a red: the code has not been asked anything. The board is wrong.
+    // Red since #297's second end, where this was an unreadable claim: a
+    // function is not a type, so nothing is ever one of it, and the person
+    // whose board it is should be the one told. Still not `conforms-absent`:
+    // the base list was never the problem.
+    const wrongKind = report.edges.find((one) => one.kind === "end-lacks-part");
+    expect(wrongKind?.detail).toContain("a function is not a type");
+    expect(report.garbledClaims ?? []).toEqual([]);
     expect(report.edges.some((one) => one.kind === "conforms-absent")).toBe(false);
   });
 
@@ -239,8 +242,13 @@ describe("a claim nothing can ever read", () => {
     );
     const report = checkDrift(board, fakeWorkspace(files), { edges: true });
 
-    const garbled = report.garbledClaims?.find((one) => one.written === "conforms");
-    expect(garbled?.detail).toContain("Draw it from the type that has the base");
+    // Red since #297, where this was an unreadable claim: a function has no
+    // base list, so no code will ever answer this arrow either way, and the
+    // person whose board it is should be the one told.
+    const wrongKind = report.edges.find((one) => one.kind === "end-lacks-part");
+    expect(wrongKind?.detail).toContain("a function has no base types");
+    expect(wrongKind?.detail).toContain("Start the arrow at the type that declares the base");
+    expect(report.garbledClaims).toEqual([]);
   });
 });
 

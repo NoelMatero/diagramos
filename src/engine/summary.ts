@@ -183,3 +183,19 @@ export function summaryOf(facts: Checked): string {
     : "";
   return `${coverage} — all still true${unproven}${anchorableNotice}${neverRead}${unread}`;
 }
+
+/**
+ * The short phrase a wrong-kind-of-end finding leads with: everything before
+ * its first colon (#297).
+ *
+ * Here rather than beside the sentence it reads, because both surfaces that
+ * print it are a row in a narrow box -- the CLI's and the board page's -- and
+ * the board page is a browser bundle that cannot import the engine's checker.
+ * The alternative was each of them writing the phrase again, which is how
+ * `accesses-absent` came to print red in one place and amber in the other.
+ */
+export function lackingPhrase(detail: string): string {
+  const head = detail.replace(/^a claim written this turn is already wrong: /, "");
+  const colon = head.indexOf(":");
+  return colon > 0 ? head.slice(0, colon) : head;
+}

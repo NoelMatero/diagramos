@@ -56,6 +56,8 @@ const flag = (name: string) => argv.find((a) => a.startsWith(`--${name}=`))?.spl
 const wantLanguage = flag("language");
 const wantWord = flag("word");
 const wantProject = flag("project");
+/** One kind of planted mistake: `wrong-kind`, `retarget`, `reverse`, `swap`, `drawn`. */
+const wantSource = flag("source");
 const details = argv.includes("--details");
 
 function keys(): Key[] {
@@ -180,6 +182,7 @@ for (const key of loaded) {
   for (const claim of key.claims) {
     if (wantWord && claim.word !== wantWord) continue;
     if (wantLanguage && claim.language !== wantLanguage) continue;
+    if (wantSource && claim.source !== wantSource) continue;
     if (claim.truth === "undecidable") {
       undecidableCount++;
       undecidable.set(claim.why, (undecidable.get(claim.why) ?? 0) + 1);
