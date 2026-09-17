@@ -697,6 +697,7 @@ and never fail.
 | `npm run measure:constructs` | can the construction reader be trusted to say backwards — `--all` prints every miss |
 | `npm run measure:signature` | the same for parameters and return types |
 | `npm run measure:dataflow` | what following a value through one body buys, confirming and refuting |
+| `npm run measure:recall -- .corpus/*` | when an arrow is true, how often its word says yes -- every word, per language, with ranked refusal reasons (#302); `--words=`, `--refuse-all` to switch every reader off, `--dump=<file>` for every unconfirmed ask |
 | `npm run measure:licence` | reproduces the per-language dependency numbers, then prints the whole (word, language) grid — `--only=python` for one |
 | `npx tsx scripts/probe-generative.mts` | draws boards of unseen code and counts what could not be said |
 | `npm run bench:planted` | of the mistakes planted in 44 boards of the pinned clones, how many go red, how many show as not sure, how many pass silently -- and how many true claims go red (#296, `bench/README.md`) |
@@ -740,6 +741,81 @@ are `ripgrep`, `anyhow`, `clap`, `regex` and `json`; the rest are
 Boards: the real ones, excluding worktree copies under `.claude` and test
 fixtures. That is ~20 of the 1,902 `.excalidraw` files on the machine this was
 written on; the rest are the same thirteen boards at six different ages.
+
+## How often each word says yes (#302)
+
+Every number above answers one question: **is it safe for this word to say
+wrong?** A word that is perfectly safe and never confirms anything goes from
+"not sure" to "not sure" forever, and no accusation count would show it. This
+table answers the other question: **when the arrow is true, how often does the
+word confirm it?**
+
+```
+npm run measure:recall -- .corpus/*      all fifteen pinned clones, ~26 minutes
+```
+
+**Unit:** one relationship that the word's own referee finds in the code. The
+referee is the one its licence was measured with, now in `scripts/lib` so both
+scripts share it. `@feeds` never accused, so it never had a referee, and
+`feeds-scan.ts` is new. Both ends must be declared in the tree, and the far
+end's name must be declared exactly once, which is `measure-calls`' rule. The
+reader is asked with the arguments `drift.ts` passes it, including the far
+end's file. **Recall = confirmed / asked.**
+
+| word | python | ts | tsx | js | rust | all |
+|---|---:|---:|---:|---:|---:|---:|
+| `@needs` | 79.7% of 12,693 | 78.6% of 9,631 | 80.0% of 2,444 | 38.1% of 749 | 51.0% of 2,539 | 75.7% of 28,056 |
+| `@takes` | 100.0% of 2,380 | 99.6% of 2,739 | 100.0% of 52 | — | 100.0% of 1,960 | 99.9% of 7,131 |
+| `@returns` | 100.0% of 590 | 99.4% of 868 | 100.0% of 9 | — | 99.9% of 1,668 | 99.8% of 3,135 |
+| `@holds` | 78.1% of 183 | 99.4% of 165 | 100.0% of 44 | — | 99.9% of 772 | 96.4% of 1,164 |
+| `@builds` | 0.0% of 12,127 | 96.6% of 89 | 98.1% of 54 | 100.0% of 8 | 83.0% of 341 | 3.4% of 12,619 |
+| `@calls` | 64.0% of 8,437 | 86.0% of 4,963 | 77.5% of 1,012 | 85.1% of 168 | 70.7% of 2,462 | 72.4% of 17,042 |
+| `@accesses` | 99.0% of 24,536 | 91.3% of 1,053 | 83.1% of 468 | 81.6% of 87 | 67.8% of 3,758 | 94.5% of 29,902 |
+| `@conforms` | 100.0% of 4,782 | 88.7% of 477 | 100.0% of 3 | — | 95.1% of 485 | 98.6% of 5,747 |
+| `@feeds` | 100.0% of 140 | 96.6% of 417 | 100.0% of 48 | 100.0% of 12 | 68.8% of 16 | 97.0% of 633 |
+| `@handles` | 33.3% of 6 | 37.6% of 133 | 16.7% of 12 | 20.0% of 5 | 71.5% of 1,131 | 67.1% of 1,287 |
+
+**The three low figures have three different causes.** Each is labelled in the
+script's `REASONS` table as "the reader cannot see it" or "the fact is not in
+the file".
+
+- **`@builds` in Python** is `call-shaped`: `constructs.ts` refuses the whole
+  language before reading anything. The fact *is* in the file. The import that
+  binds `Response` names the file declaring `class Response`, and `calls.ts`
+  already follows it.
+- **`@needs`** loses 19.8% to `dynamic` (plus 0.8% to `incomplete`).
+  `needs.ts` refuses when **either** file does something at run time or has a
+  parse error anywhere, even when the import it was asked about is written
+  plainly in the tail. In the case read, `flask/__init__.py -> app.py` was
+  refused over a `table[name]()` in `app.py`. Only the accusation needs the
+  whole file. `cycle` is another 3.6%.
+- **`@calls` in Python** is 64.0%, and **1,900 of its 2,100 `unbound` are the
+  referee's**: calls to a built-in (`super` alone is 1,610) that the tree also
+  declares once. With built-ins left out it is 83.6% (5,400 of 6,461), and
+  Rust's is 72.2%. The rest of `unbound`, and `unplaced`, are genuinely not
+  in the file: a pytest fixture, a browser global, a package path.
+
+Two more that are not what they look like:
+
+- **`@handles` at 67.1%** is mostly `several-dispatches` (251 Rust routines
+  with more than one `match`). A box names one case set, and the reader will
+  not guess which one.
+- **Python `@accesses` at 99.0%** is partly agreement by construction. The
+  population is "`.m` read in a routine, and one type in the tree declares
+  `m`", and the routine end confirms by name (see #304).
+
+Fact-not-in-the-file is small wherever it is measured: `region-is-the-crate`
+is 0.2% of `@conforms`, `impl-elsewhere` and `open` are 1.5% and 1.2% of
+`@accesses`, and `unplaced` is 2.1% of `@calls`.
+
+**`said:` rows in the report are mostly referee mistakes.** In every case read
+from `@calls said:refuted`, `@holds said:absent` and `@handles said:wrong`, the
+text scan had misbounded a routine (`function CustomObject() {}` never closes)
+or read a dict literal as fields. The recall figures are a floor.
+
+**Broken on purpose:** `--refuse-all` switches every reader off, and every
+cell falls to 0.0% over the same populations. `tests/measure-recall.test.ts`
+keeps that true on a fixture.
 
 ## Where it stands
 
