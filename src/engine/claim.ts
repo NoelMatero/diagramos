@@ -379,6 +379,21 @@ export interface ClosedClaim {
 export interface HandlesClaim {
   handles: true;
   cases: string[];
+  /**
+   * Which dispatch, when the routine holds more than one (#310).
+   *
+   * The subject as the code writes it -- `self.state`, `a.kind`, `m` -- which
+   * is a thing to copy rather than a thing to compose, and that is why it is
+   * this and not a position or a narrower anchor. A routine's first `match` is
+   * a fact about line order that a refactor changes silently; a ref that names
+   * a line is a ref that rots on the next edit, and `@ref` names one plain
+   * symbol on purpose (#288).
+   *
+   * Absent is the ordinary case: a routine with one dispatch needs no word for
+   * which. Present and matching nothing is refused rather than red -- see
+   * `HandlesWithheld`'s `no-such-dispatch`.
+   */
+  of?: string;
 }
 
 /** Narrowing helpers, so no caller has to remember which key discriminates. */
@@ -422,7 +437,7 @@ export function parseBoxClaim(value: unknown): ParsedBoxClaim | undefined {
      * in made a box with doors read as claiming "closed+through", which is a
      * word nobody wrote and a refusal nobody could act on.
      */
-    const { through: listed, cases: listedCases, ...words } = record;
+    const { through: listed, cases: listedCases, of: listedOf, ...words } = record;
     const set = Object.keys(words).filter((key) => words[key]);
     if (set.length === 0) return { garbled: Object.keys(words).join("+") || "{}" };
     if (set.length !== 1) return { garbled: set.join("+") };
@@ -435,7 +450,8 @@ export function parseBoxClaim(value: unknown): ParsedBoxClaim | undefined {
         : [];
       // An empty set is not a claim about a dispatch, it is an unfinished one.
       if (cases.length === 0) return { garbled: "handles with no cases" };
-      return { claim: { handles: true, cases } };
+      const of = typeof listedOf === "string" && listedOf.trim() ? listedOf.trim() : undefined;
+      return { claim: { handles: true, cases, ...(of ? { of } : {}) } };
     }
 
     if (set[0] !== "closed") return { garbled: set.join("+") };

@@ -50,8 +50,12 @@ export type GraphNode = {
   /**
    * The cases this box's routine dispatches on. Carried through to customData;
    * layout ignores it.
+   *
+   * The object form names which dispatch, for a routine holding more than one
+   * (#310). A bare list is the same claim with nothing to disambiguate, which
+   * is every routine with a single `match`.
    */
-  handles?: string[];
+  handles?: string[] | { of?: string; cases: string[] };
 };
 export type GraphEdge = {
   from: string;

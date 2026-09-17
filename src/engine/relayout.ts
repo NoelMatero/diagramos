@@ -129,7 +129,8 @@ export function recoverDiagram(board: BoardFile, name: string): RecoveredDiagram
     .map((element) => {
       const custom = customOf(element);
       const claim = custom.claim as
-        { closed?: unknown; through?: unknown; handles?: unknown; cases?: unknown } | undefined;
+        { closed?: unknown; through?: unknown; handles?: unknown; cases?: unknown; of?: unknown }
+        | undefined;
       const background = stringOf(element.backgroundColor);
       const stroke = stringOf(element.strokeColor);
       return {
@@ -146,7 +147,20 @@ export function recoverDiagram(board: BoardFile, name: string): RecoveredDiagram
         ...(stringsOf(custom.refs) ? { refs: stringsOf(custom.refs)! } : {}),
         ...(stateOf(custom.state) ? { state: stateOf(custom.state)! } : {}),
         ...(claim?.closed ? { closed: { through: stringsOf(claim.through) ?? [] } } : {}),
-        ...(claim?.handles ? { handles: stringsOf(claim.cases) ?? [] } : {}),
+        /*
+         * `of` is recovered with the cases rather than dropped. A relayout
+         * that quietly narrowed a claim from "this dispatch" to "the only
+         * dispatch" is #162's failure with a different field: the board would
+         * still show a claim, and the claim would have stopped being the one
+         * its author wrote (#310).
+         */
+        ...(claim?.handles
+          ? {
+            handles: typeof claim.of === "string" && claim.of.trim()
+              ? { of: claim.of.trim(), cases: stringsOf(claim.cases) ?? [] }
+              : stringsOf(claim.cases) ?? [],
+          }
+          : {}),
       };
     });
 

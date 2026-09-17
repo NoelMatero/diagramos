@@ -198,6 +198,31 @@ export interface DeleteDiagramResult {
  * attached rather than silently deleting nothing, since a no-op reported as
  * success reads exactly like a successful delete.
  */
+/** The stored shape of a `handles` claim, as `customData.claim` carries it. */
+type HandlesClaimShape = { handles: true; cases: string[]; of?: string };
+
+/**
+ * A `handles` claim out of either shape a caller may write it in.
+ *
+ * A bare list is a claim about the routine's one dispatch. `{ of, cases }`
+ * names which dispatch, for a routine holding more than one (#310) -- `of` is
+ * the subject as the code writes it, so a box can be specific without anybody
+ * inventing a second way to point at code. Both land in one stored shape, so
+ * nothing downstream has to know which was typed.
+ *
+ * `undefined` for anything with no cases in it: an empty set states nothing
+ * about a dispatch, and `of` alone is a pointer to a claim somebody did not
+ * finish writing.
+ */
+function handlesClaim(value: unknown): HandlesClaimShape | undefined {
+  if (value === undefined || value === null) return undefined;
+  const cases = trimmedList(Array.isArray(value) ? value : (value as { cases?: unknown }).cases);
+  if (cases.length === 0) return undefined;
+  const subject = Array.isArray(value) ? undefined : (value as { of?: unknown }).of;
+  const of = typeof subject === "string" && subject.trim() ? subject.trim() : undefined;
+  return { handles: true, cases, ...(of ? { of } : {}) };
+}
+
 export function deleteDiagram(board: BoardFile, name?: string): DeleteDiagramResult {
   const present = listDiagrams(board).map((summary) => summary.name);
   if (name !== undefined && !present.includes(name)) {
@@ -417,11 +442,8 @@ export async function createDiagram(
    */
   const handlesByNode = new Map(
     params.nodes
-      .filter((node) => node.handles?.length)
-      .map((node) => [
-        node.id,
-        { handles: true, cases: node.handles!.map((entry) => entry.trim()).filter(Boolean) },
-      ]),
+      .map((node) => [node.id, handlesClaim(node.handles)] as const)
+      .filter((pair): pair is readonly [string, HandlesClaimShape] => pair[1] !== undefined),
   );
   for (const [nodeId, elementId] of plan.elementIdByNode) {
     const ref = refByNode.get(nodeId);
@@ -769,9 +791,9 @@ function anchorEdit(
     // `handles: []` is how a box drops the claim, the same way `refs: []` drops
     // its extra anchors: an empty case set states nothing, so it cannot be a
     // claim that merely happens to be empty.
-    const cases = trimmedList(patch.handles);
-    if (cases.length) existing.claim = { handles: true, cases };
-    else if (patch.handles !== undefined && Array.isArray(patch.handles)) delete existing.claim;
+    const claim = handlesClaim(patch.handles);
+    if (claim) existing.claim = claim;
+    else delete existing.claim;
   }
   return existing;
 }

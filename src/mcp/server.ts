@@ -204,12 +204,21 @@ const nodeSchema = z.object({
       + "apart). Check check_drift's closedBreaches before claiming it.",
     ),
   handles: z
-    .array(z.string())
+    .union([
+      z.array(z.string()),
+      z.object({
+        of: z
+          .string()
+          .describe("The subject as the code writes it: `self.state`, `a.kind`, `m`."),
+        cases: z.array(z.string()),
+      }),
+    ])
     .optional()
     .describe(
       "Only on a box whose ref names one routine (path#symbol) that dispatches on fixed cases "
       + "(a match, a switch). List EVERY case, from the arms you read. Red when the code has a case "
-      + "the list lacks, or the reverse.",
+      + "the list lacks, or the reverse. If the routine has more than one match/switch, say which "
+      + "with {of, cases} -- without it nothing is checked.",
     ),
   state: z
     .enum(["planned", "built", "external"])
@@ -1389,7 +1398,7 @@ server.registerTool(
     title: "Edit diagram",
     description:
       "Change part of a board without redrawing it. Patch a box or arrow by node id: ref, refs, "
-      + "state, closed, a colour, a size. Delete by id (a shape takes its label). Set the whole "
+      + "state, closed, handles, a colour, a size. Delete by id (a shape takes its label). Set the whole "
       + "board's describes with the top-level field. Everything you do not name stays. Read the "
       + "board first. The response re-checks anchors after a ref, state or describes change: fix "
       + "what it names. Cannot add or remove boxes (create_diagram) or change the flow "
@@ -1424,6 +1433,28 @@ server.registerTool(
                 .optional()
                 .describe(
                   "Set, or with null drop, the closed claim on a directory box.",
+                ),
+              /*
+               * Editable since #206 and declared here since #310.
+               *
+               * `anchorEdit` has always accepted it -- `handles` is in
+               * `ANCHOR_FIELDS`, and the outer `.passthrough()` let it
+               * through. Nothing said so, which is the shape of gap this
+               * repository's own notes are about: a caller who cannot
+               * discover the one-field edit redraws the board instead, and a
+               * redraw is the expensive path *and* the one that loses hand
+               * work. It matters more now that a box may need `of` added to a
+               * claim it already carries.
+               */
+              handles: z
+                .union([
+                  z.array(z.string()),
+                  z.object({ of: z.string(), cases: z.array(z.string()) }),
+                ])
+                .optional()
+                .describe(
+                  "Set the case set on a routine box, or {of, cases} to say which dispatch. An "
+                  + "empty array drops the claim.",
                 ),
             })
             .passthrough(),

@@ -49,6 +49,21 @@ a dispatch are enumerable from the text — so both can say wrong. The second on
 withholds where the routine has a `_` or a `default`, because a fallback really
 is handling the case and calling that wrong would be a false red.
 
+`@handles` is also the one word with an **argument beyond its set**. A routine
+can hold more than one dispatch, and the case list alone does not say which
+one, so `handles: { of: "self.state", cases: [...] }` names the subject as the
+code writes it (#310). Two things were weighed against it and lost: the
+*position* of a dispatch, which a refactor changes with no diff a person would
+read as a change, and a *narrower anchor*, which would mean a ref naming a line
+— and `@ref` names one plain symbol on purpose (#288). Naming the value is the
+only one of the three that a reader can check, that a model copies rather than
+composes, and that stays true when the routine moves.
+
+A subject that matches nothing is **refused and never red**: the box has said
+something false about *which* dispatch, and grading its cases against the one
+that happens to be there would accuse a picture that was merely out of date
+about one word. The refusal names the subjects that are there instead.
+
 The **may say wrong** column is about the word, not about any particular board.
 Whether it may say so *here* is a second question with its own answer per
 language — [the grid](#the-grid) below. `@conforms` is where that distinction
@@ -780,7 +795,7 @@ end's file. **Recall = confirmed / asked.**
 | `@accesses` | 99.0% of 24,536 | 91.3% of 1,053 | 83.1% of 468 | 81.6% of 87 | 67.8% of 3,758 | 94.5% of 29,902 |
 | `@conforms` | 100.0% of 4,782 | 88.7% of 477 | 100.0% of 3 | — | 95.1% of 485 | 98.6% of 5,747 |
 | `@feeds` | 100.0% of 140 | 96.6% of 417 | 100.0% of 48 | 100.0% of 12 | 68.8% of 16 | 97.0% of 633 |
-| `@handles` | 33.3% of 6 | 37.6% of 133 | 16.7% of 12 | 20.0% of 5 | 71.5% of 1,131 | 67.1% of 1,287 |
+| `@handles` | 33.3% of 6 | 37.6% of 133 | 16.7% of 12 | 20.0% of 5 | 85.5% of 1,535 | 80.9% of 1,691 |
 
 **Three rows were low when this table was first written, for three different
 causes.** Each is labelled in the script's `REASONS` table as "the reader cannot
@@ -850,9 +865,30 @@ the argument for reading the labels rather than the number.
 
 Two more that are not what they look like:
 
-- **`@handles` at 67.1%** is mostly `several-dispatches` (251 Rust routines
-  with more than one `match`). A box names one case set, and the reader will
-  not guess which one.
+- **`@handles` was 67.1%, and is 80.9% since #310.** It was mostly
+  `several-dispatches`: 251 Rust routines with more than one `match`, where a
+  box named one case set and the reader would not guess which. A box can now
+  say which with `handles: { of, cases }`, and the population is one ask per
+  dispatch rather than per routine (1,287 -> 1,691), so a routine with two
+  `match`es is two of the claims a board could write.
+
+  Two things the re-run is worth reading for. **`said:wrong` did not move at
+  all** -- 43 before and 43 after, per language to the case -- so narrowing to
+  one dispatch introduced no new disagreement anywhere; the population grew and
+  the accusation rate did not. And **the 134 Rust routines still refused are
+  the honest limit of naming a value**: every one of them dispatches on the
+  *same* subject twice (`match parse_result` at two lines of one `fn`), which
+  is a question `of` cannot answer and position would only appear to.
+
+  The first run of that measurement was wrong, and how it was wrong is the
+  point. Asking per dispatch needs to know which routine a `match` is in, and
+  bounding a routine by the next one the line scan found put 40 routines on an
+  1,800-line file -- so every `match` in a gap was blamed on the routine
+  before it. That printed 49 refusals and 15 definite noes, every one of them
+  the reader correctly reading the real routine. Having `syn` report each
+  `match`'s enclosing `fn` -- a second parser, so no independence is spent --
+  took all 64 away. A number that moves when the referee is fixed was never a
+  number about the reader.
 - **Python `@accesses` at 99.0%** is partly agreement by construction. The
   population is "`.m` read in a routine, and one type in the tree declares
   `m`", and the routine end confirms by name (see #304).

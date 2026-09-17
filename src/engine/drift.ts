@@ -3410,7 +3410,7 @@ export function checkDrift(
      * As measured, this is `yes` in TypeScript and `no` in TSX, JavaScript,
      * Rust and Python. Rust is the square #206 predicted would be strongest.
      */
-    const reading = checkHandles(source, parsed.symbol, claim.cases, language);
+    const reading = checkHandles(source, parsed.symbol, claim.cases, language, claim.of);
     if (reading.verdict === "wrong" && !mayAccuse("handles", language)) {
       claims.handlesWithheld.push({ label, why: "unlicensed", detail: language });
       continue;

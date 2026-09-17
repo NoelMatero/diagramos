@@ -176,6 +176,8 @@ On a box:
 
 - `handles: ["GET", "POST"]` on a box whose ref names one routine: every case it
   dispatches on. Red when the code has a case the list lacks, or the reverse.
+  Two dispatches in that routine? Name which, or nothing is checked:
+  `handles: { of: "self.state", cases: [...] }` — `of` is the matched value.
 - `closed: { through: ["src/engine/index.ts"] }` on a box whose ref is a
   directory: nothing outside imports into it except through those files. Red on
   the first outside import. Check `check_drift`'s `closedBreaches` before
