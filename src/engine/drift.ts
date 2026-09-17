@@ -753,7 +753,7 @@ export const UNCONFIRMED_WORDS: Record<EdgeUnconfirmedReason, string> = {
   "no-call-either-way": "nothing calls the other, either way",
   "an-end-is-data": "an end names data, not something that runs — anchor that end at file level, or at the routine that uses it when both are in one file",
   "nothing-connects-them": "no import, shared importer or shared route connects them",
-  "claim-not-checked": "its own claim could not be read, and no looser check may answer for it",
+  "claim-not-checked": "the claim's own check could not answer, and nothing looser may answer for it",
   "feeds-runs-the-other-way": "the only flow found runs the other way",
   "signature-other-half": "the type is in the other half of the signature — the arrow may be the wrong way round",
 };
