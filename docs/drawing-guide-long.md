@@ -343,6 +343,23 @@ wrong about the **direction**, never about an absence. One of them —
 what a Rust type implements is not written on the type. Each says why under its
 own heading.
 
+**An end of the wrong kind is red, in every language.** Each claim needs
+something particular at each end — `takes` and `returns` need parameters or a
+return type at the head, `holds` needs a field list at the tail and a type at
+the head, `conforms` needs a base list — and a type has no parameters while a
+function has neither fields nor bases. Drawing `Request --takes--> Response`
+between two types is not a claim the code disagrees with; it is a claim nothing
+could ever read, and #297 made it red because reporting it as *not sure* left
+the one mistake on the board a person could have fixed in a second looking like
+a limit of the tool. The report names the end and the kind of thing it found.
+
+The reason a language can give differs, and it is worth knowing why. Rust and
+TypeScript say so in those words. Python says the signature does not name the
+type and quotes `__init__`, because a Python class really does have a
+constructor with a signature, and the signature reader answers before the
+question about the end's kind is reached. Same verdict, and the arrow is wrong
+either way; only the sentence is less direct.
+
 They are all optional. An arrow with no claim and a box with no claim are the
 normal case, not a shortfall.
 
@@ -463,6 +480,13 @@ Nothing is reported either way when the type could be written under a different
 name — a type alias, or an import renamed on the way in. A signature that might
 be hiding it proves nothing, so the check withholds instead of accusing.
 
+That includes an alias declared beside the type rather than beside the
+signature, which is where real code puts one: `use crate::model::{Req,
+Request}` marks neither name as a rename, and only `model.rs` says
+`pub type Req = Request`. So the file declaring the type is read too, for the
+other names it calls it by. One hop — a chain of aliases is a question for a
+type checker, and what a chain costs is a red where there should be silence.
+
 So the same rule as `needs` applies, for the same reason: write it from a
 signature you read.
 
@@ -491,6 +515,15 @@ project's history was drawn. Both ends must name a type (`path#symbol`).
 from all of them is genuinely absent. The report names the arrow and quotes the
 field list it read.
 
+**A field declared in the constructor is a field.** `constructor(public dep:
+Dep)` in TypeScript and `self.dep: Dep = dep` in a Python `__init__` both
+declare one with nothing in the class body to say so, and reading only the body
+made a real class look as though it held almost nothing — 7 of the 8
+correct arrows #301 found being called wrong, across vue, nest, httpx, flask and
+poetry. Only a TypeScript parameter carrying a modifier counts: a plain
+`constructor(dep: Dep)` declares nothing. Rust has neither shape, because a
+struct lists every field on its declaration.
+
 The generic wrappers are read through, so all of these confirm: `Vec<RouteInfo>`,
 `Promise<Response>`, `Optional[Handler]`, `list[Route]`, `Client[]`. A field
 holding a collection of the thing still holds the thing.
@@ -499,7 +532,10 @@ Nothing is reported either way when a field's type could be written under
 another name — a type alias, an import renamed on the way in, or a Python
 annotation written as a string (`x: "Path | FileSlice"`, which is how a forward
 reference is spelled). A field list that might be hiding it proves nothing, so
-the check withholds instead of accusing.
+the check withholds instead of accusing. As with a signature, the alias
+counts wherever it is declared: the file holding the type is read for the other
+names it calls it by, so a field typed `Req` beside `pub type Req = Request`
+two files away is silence rather than a red.
 
 Same rule as the others: write it from a field list you read.
 

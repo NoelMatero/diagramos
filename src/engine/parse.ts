@@ -98,6 +98,41 @@ interface Parser {
  */
 export const MEMBER_ACCESS = /^(field_expression|member_expression|attribute)$/;
 
+/**
+ * What a routine calls the thing it belongs to: `self.x`, `cls.x`, `this.x`.
+ *
+ * Here rather than in either of its readers, for the reason `MEMBER_ACCESS` is:
+ * `accesses.ts` reads these to find the *names* a type declares and `holds.ts`
+ * reads them to find the *types* those names are annotated with, and a class
+ * whose field list one of them can see and the other cannot is two
+ * hand-written lists that must agree -- the failure
+ * `docs/reading-a-grammar.md` records four times in one sitting.
+ */
+export const INSTANCE_NAMES = new Set(["self", "cls", "this"]);
+
+/**
+ * Whether a parameter *declares* a field rather than only binding an argument.
+ *
+ * TypeScript's parameter properties: `constructor(public dep: Dep)` declares a
+ * member, and there is no line anywhere in the class body for it. The modifier
+ * is the whole of the difference -- a plain `constructor(dep: Dep)` declares
+ * nothing -- so the modifier is what is read, and never the position. There is
+ * no field for it in the grammar: an accessibility modifier is its own node
+ * type and `readonly` is an anonymous token, so its type is its own text.
+ *
+ * Reading the position instead would buy a false green in both directions: a
+ * type would be credited with holding every argument its constructor takes,
+ * and `@accesses` would credit it with a member that is thrown away when the
+ * call returns.
+ */
+export function declaresField(parameter: Node): boolean {
+  for (let index = 0; index < parameter.childCount; index += 1) {
+    const part = parameter.child(index);
+    if (part && (part.type === "accessibility_modifier" || part.text === "readonly")) return true;
+  }
+  return false;
+}
+
 export interface Node {
   type: string;
   text: string;

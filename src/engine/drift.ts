@@ -2106,6 +2106,18 @@ export interface ClosedBodyReferee {
  * that line answers. What is left is counted and returned, never guessed at.
  */
 function helperReading(
+  /**
+   * Repo-relative, and it has to be: everything below resolves it again.
+   *
+   * `callSide` and `sourceOf` both go through `workspace.resolve`, which
+   * refuses an absolute path by design (`AGENTS.md`'s confinement rule), and
+   * `declarationAt` is asked and answers in repo-relative paths too. Handed the
+   * absolute path this check had in hand, every one of those failed silently
+   * and the routine came back as one call nobody could see into -- so the red
+   * described a call the routine did not make, and the one refusal this
+   * function exists for never fired on a real board. Every test it had passed,
+   * because the workspace they build resolves a relative path to itself.
+   */
   file: string,
   evidence: NotReadEvidence,
   member: string,
@@ -4084,8 +4096,17 @@ export function checkDrift(
         } else if (!language) {
           noteWithheld("unreadable");
         } else {
+          /*
+           * The tail's own source is passed so an alias declared beside the
+           * type can be seen (#303). `use crate::model::{Req, Request}` marks
+           * neither name as a rename, and only the file declaring Request says
+           * that `Req` is another spelling of it -- so a signature naming `Req`
+           * read without that file is an absence built on not having looked.
+           */
+          const fromLanguage = languageOf(fromFile);
           const verdict = signatureNames(
             workspace.read(toFile), toEnd.symbols[0]!, fromEnd.symbols, position, language,
+            fromLanguage ? { source: workspace.read(fromFile), language: fromLanguage } : undefined,
           );
 
           if (verdict.verdict === "confirmed") {
@@ -4804,7 +4825,7 @@ export function checkDrift(
           } else if (verdict.verdict === "not-read") {
             const member = memberNamed(edge.label) ?? "";
             const helper = helperReading(
-              fromFile, verdict.evidence, member, workspace, importCache.configs, options?.closedBodyReferee,
+              fromPath, verdict.evidence, member, workspace, importCache.configs, options?.closedBodyReferee,
             );
             if ("unseen" in helper) {
               edgesChecked += 1;

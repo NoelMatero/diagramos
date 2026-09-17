@@ -109,7 +109,7 @@ that sentence have different evidence behind them:
   `.width` off something else, and that is exactly where the typed design made
   its false reds. So the routine end now refutes **by name**, and stays silent
   wherever the body reads a member without a name, reads none at all, or calls
-  a function that visibly reads the member ([item 25](#forty-one-times-a-measurement-contradicted-the-design)).
+  a function that visibly reads the member ([item 25](#forty-two-times-a-measurement-contradicted-the-design)).
 
 So the two ends refute on two different footings: the type end from a
 declaration, the routine end from a body read whole by name. Neither accuses
@@ -871,7 +871,7 @@ to pass every check this tool had.
 deliberate: almost all of it is `Vec<T>`, `Promise<T>`, `list[str]`, which
 nobody draws as two boxes.
 
-## Forty-one times a measurement contradicted the design
+## Forty-two times a measurement contradicted the design
 
 Kept because the pattern is the point: eleven of the first thirteen came from
 building one word or one reader, not from reviewing the design. Nothing since
@@ -3668,6 +3668,90 @@ duplicate from conflitcts, requires reading prs "An arrow can be three calls lon
     file both moved from no to yes on these numbers. `src/engine/handles.ts`
     itself -- the reader every language shares -- is more correct than it was
     for TypeScript, Python and JavaScript too, not only for Rust.
+
+42. **A field list is not a closed region if most of it is written in the
+    constructor, and three readers of one declaration disagreed about the same
+    class.** #303, from #300's fixtures and #301's test set. Three findings
+    under one heading, because each one is a reader believing it had read the
+    whole of something.
+
+    **Fields declared in a constructor.** `constructor(public dep: Dep)` and
+    `self._request: Request | None = request` both declare a field with nothing
+    in the class body to say so, and `holds.ts` stopped at the first member
+    carrying a parameter list. That is **7 of the 8 false reds `bench:planted`
+    reported** — vue's `Link`, two classes in nest, and one each in httpx,
+    flask and poetry — and the shape is in almost every TypeScript and Python
+    class ever written. It needed no licence, because reading more names can
+    only turn an absence into a confirmation: no accusation here is new.
+
+    `accesses.ts` had already found both shapes, for member *names*, and read
+    them correctly. So the field reader and the member reader disagreed about
+    what one class declares, which is `docs/reading-a-grammar.md`'s failure in
+    its purest form — two hand-written readings of one grammar, silently out of
+    step. Both now read `declaresField` and `INSTANCE_NAMES` out of `parse.ts`,
+    beside `MEMBER_ACCESS`, which is there for the same reason. Sharing the name
+    set also closed a latent false red on `@accesses`: `this.x = v` was not read
+    as a member, so a TypeScript class that sets its members in its constructor
+    and writes none of them in its body refuted every arrow naming one.
+
+    **An alias declared beside the type, not beside the signature.** Both
+    refutable readers of a declaration kept their own copy of "what in this file
+    stands for something else", and neither copy could see the ordinary case:
+    `use crate::model::{Req, Request}` marks neither name as a rename, and only
+    `model.rs` says `pub type Req = Request`. #300's fixtures scored that at
+    **9 of 9** — `@takes`, `@returns` and `@holds`, in all three languages —
+    against a guide that promises silence. Python was worse: it went red for an
+    alias declared on the line above, because Python spells one as an ordinary
+    assignment and has no node type for it. The stale list again.
+
+    Both copies are now `alias.ts`, and the file declaring the type is read for
+    the other names it calls it by. One hop, deliberately: a chain is a question
+    for a type checker, and what a chain costs is the red that was already
+    there. The refusal stays a set of *names* rather than a flag on a file,
+    which is what keeps the word firing — a signature whose every name means
+    itself is still refutable however many aliases sit elsewhere, and
+    `bench:claims` shows every `false and provable` square still red.
+
+    **A reason invented out of a path resolved twice.** `@accesses`' one escape
+    hatch is the routine that calls a helper which reads the member — `draw
+    --calls--> paint --accesses--> Config` drawn one level too high rather than
+    wrong. `helperReading` was handed an absolute path, and `workspace.resolve`
+    refuses one by design, so it failed on every real board and reported the
+    routine as making one call nobody could see into. The red then described a
+    call the routine did not make, on a routine that called nothing at all.
+    Every test it had passed, because the workspace the tests build resolves a
+    relative path to itself — `AGENTS.md`'s own lesson about the board-sync bug,
+    one file over. Its tests now resolve the way `createWorkspace` does.
+
+    **What is left, and it is not fixable from here.** The eighth false red is
+    `@needs` in clap. `debug_asserts.rs` imports `Command` and writes the path
+    the crate root re-exports it under; `resolveRustPath` stops at the first
+    segment with no file of its own, by design — a re-exported *item* lives
+    inside a file the re-exporting module already depends on, which is true of
+    that module and not of the file importing through it. So the forward
+    dependency lands on `lib.rs`, the backward one is read directly, and a legal
+    cycle is reported as an arrow drawn backwards.
+
+    Following item re-exports would fix it and confirm the arrow: `lib.rs` says
+    `pub use crate::builder::Command`, `builder/mod.rs` says `pub use
+    command::Command`, and two hops reach the declaration. It also adds resolved
+    dependency edges everywhere, and an edge found only in the head turns an
+    `absent` into a `backwards` — a new accusation, which needs `measure:deps`
+    against an independent referee before it may ship. Refusing instead is sound
+    and far too wide: `use crate::X` is how Rust is written, so withholding
+    wherever a name arrives through a facade would withdraw most of Rust's
+    `backwards` verdicts, and that is the column this work may not spend.
+
+    **The wrong kind of end, decided and written down.** #297 made it red and
+    left the `@takes`/`@returns`-at-a-type square open. It is red in all three
+    languages, and `bench/claim-fixtures.ts` now says so. Python reaches the
+    verdict by a different sentence — the signature reader finds `__init__` and
+    quotes it, because a Python class really does have a constructor with a
+    signature and answers before the end's kind is asked about. Same verdict,
+    less direct sentence; making the sentences agree would mean stopping
+    `signatureNode` descending into a class body, which turns a green into a red
+    wherever a constructor's parameter names the type, and that is a new
+    accusation too.
 
 ## Open, in the order worth doing
 

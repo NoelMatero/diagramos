@@ -79,7 +79,9 @@
  *    numbers were counting, and the measurement would not notice.
  */
 import { mayAccuse } from "./licence";
-import { each, MEMBER_ACCESS, parseSource, type Language, type Node } from "./parse";
+import {
+  declaresField, each, INSTANCE_NAMES, MEMBER_ACCESS, parseSource, type Language, type Node,
+} from "./parse";
 import { memberReadsIn } from "./resolution";
 
 /**
@@ -441,14 +443,9 @@ function parameterProperties(parameters: Node): string[] {
   const found: string[] = [];
   for (let index = 0; index < parameters.childCount; index += 1) {
     const parameter = parameters.child(index);
-    if (!parameter) continue;
-    let modified = false;
-    for (let child = 0; child < parameter.childCount; child += 1) {
-      const part = parameter.child(child);
-      if (part && (part.type === "accessibility_modifier" || part.text === "readonly")) modified = true;
-    }
+    if (!parameter || !declaresField(parameter)) continue;
     const pattern = parameter.childForFieldName("pattern");
-    if (modified && pattern && pattern.childCount === 0) found.push(pattern.text);
+    if (pattern && pattern.childCount === 0) found.push(pattern.text);
   }
   return found;
 }
@@ -464,6 +461,11 @@ function parameterProperties(parameters: Node): string[] {
  * Collected from anywhere inside the declaration rather than from `__init__`
  * alone, because an attribute set in any method is still an attribute -- and
  * this is the direction where being wide only ever costs a refutation.
+ *
+ * `this.width = w` in a TypeScript class is the same fact about the same kind
+ * of class, and was not read here until #303 shared the name set with
+ * `holds.ts`: a class that sets its members in its constructor and writes none
+ * of them in its body refuted every `@accesses` arrow naming one.
  */
 function selfAssigned(declaration: Node): Set<string> {
   const members = new Set<string>();
@@ -472,7 +474,7 @@ function selfAssigned(declaration: Node): Set<string> {
     const object = node.childForFieldName("object");
     const attribute = node.childForFieldName("attribute");
     if (!object || !attribute) return;
-    if (object.text !== "self" && object.text !== "cls") return;
+    if (!INSTANCE_NAMES.has(object.text)) return;
     if (attribute.childCount === 0) members.add(attribute.text);
   });
   return members;

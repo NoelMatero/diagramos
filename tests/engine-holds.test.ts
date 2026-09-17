@@ -242,3 +242,174 @@ describe("refuses rather than accuses", () => {
       .toBe("withheld/not-declared");
   });
 });
+
+/**
+ * Fields a class declares inside its constructor (#303).
+ *
+ * The largest source of false reds #301 found: 7 of its 8, spread across vue,
+ * nest, httpx, flask and poetry. In both languages the declaration is nowhere
+ * in the class body, so a walk that stops at the first thing with a parameter
+ * list reads the class as holding almost nothing and then refutes almost every
+ * arrow drawn at one.
+ *
+ * `accesses.ts` already reads both shapes for member *names*
+ * (`parameterProperties` and `selfAssigned`); what is new here is reading the
+ * *type* off them, which is what a field claim is about.
+ */
+describe("a field declared in the constructor", () => {
+  it("reads a TypeScript parameter property", () => {
+    // vuejs-core/packages/reactivity/src/dep.ts: `class Link` declares `sub`
+    // and `dep` in its constructor and nowhere else, and `Dep --holds--> Link`
+    // drawn the other way round was one of #301's false reds.
+    const source = [
+      "export class Link {",
+      "  version: number",
+      "  constructor(",
+      "    public sub: Subscriber,",
+      "    public dep: Dep,",
+      "  ) {}",
+      "}",
+    ].join("\n");
+    expect(verdictOf(heldTypes(source, "Link", ["Dep"], "ts"))).toBe("confirmed");
+  });
+
+  it("reads a Python attribute annotated in `__init__`", () => {
+    // encode-httpx/httpx/_models.py: `Response` holds a `Request` and says so
+    // only on this line.
+    const source = [
+      "class Response:",
+      "    def __init__(self, request=None):",
+      "        self._request: Request | None = request",
+    ].join("\n");
+    expect(verdictOf(heldTypes(source, "Response", ["Request"], "python"))).toBe("confirmed");
+  });
+
+  it("reads through the wrapper on one of those, the way it does on a plain field", () => {
+    // src/poetry/mixology/partial_solution.py and src/flask/json/tag.py are
+    // both this: the type is inside a `list[..]` or a `dict[str, ..]`.
+    const source = [
+      "class PartialSolution:",
+      "    def __init__(self) -> None:",
+      "        self._assignments: list[Assignment] = []",
+    ].join("\n");
+    expect(verdictOf(heldTypes(source, "PartialSolution", ["Assignment"], "python")))
+      .toBe("confirmed");
+  });
+
+  it("does not read a plain constructor parameter as a field", () => {
+    /*
+     * The direction this could buy a false green. `constructor(dep: Dep)`
+     * with no modifier declares no member -- TypeScript's parameter properties
+     * are the modifier, which is why `accesses.ts` reads it rather than the
+     * position. A reader taking every parameter would confirm a field claim
+     * off an argument that is thrown away at the end of the call.
+     */
+    const source = [
+      "export class Link {",
+      "  version: number",
+      "  constructor(dep: Dep) { this.version = 0 }",
+      "}",
+    ].join("\n");
+    expect(verdictOf(heldTypes(source, "Link", ["Dep"], "ts"))).toBe("absent");
+  });
+
+  it("does not read a Python local as a field, however it is annotated", () => {
+    // A name annotated inside a method and never put on the instance is a
+    // local. Counting one would make the class look like it holds everything
+    // any of its methods mentions.
+    const source = [
+      "class Response:",
+      "    def __init__(self) -> None:",
+      "        scratch: Request = build()",
+      "        self.code: int = 0",
+    ].join("\n");
+    expect(verdictOf(heldTypes(source, "Response", ["Request"], "python"))).toBe("absent");
+  });
+
+  it("leaves Rust alone, which declares every field on the struct", () => {
+    // Rust has neither shape: a `new` in an `impl` block assigns fields that
+    // the struct already lists. Nothing here should make a Rust absence
+    // anything other than what it was.
+    const source = [
+      "pub struct Core { config: Config }",
+      "impl Core {",
+      "    pub fn new(request: Request) -> Self { Core { config: Config::new(request) } }",
+      "}",
+    ].join("\n");
+    expect(verdictOf(heldTypes(source, "Core", ["Request"], "rust"))).toBe("absent");
+  });
+});
+
+/**
+ * A type used under another name (#303).
+ *
+ * `alias.ts` is the reader; these are the two shapes #300's fixtures found
+ * going red in all three languages. Both are the documented promise in
+ * `docs/drawing-guide-long.md`: "Nothing is reported either way when a field's
+ * type could be written under another name."
+ */
+describe("a field whose type is the target under another name", () => {
+  it("withholds on a Python alias declared in the same file", () => {
+    // Python spells an alias as an ordinary module-level assignment, with no
+    // keyword and no node type to say so. Rust and TypeScript passed this from
+    // the day the word shipped; Python refuted it.
+    const source = [
+      "LocalReq = Request",
+      "",
+      "class Aliased:",
+      "    request: LocalReq",
+    ].join("\n");
+    expect(verdictOf(heldTypes(source, "Aliased", ["Request"], "python")))
+      .toBe("withheld/aliased");
+  });
+
+  it("withholds on an alias declared beside the type and imported plainly", () => {
+    // `use crate::model::{Req, Request}` says nothing: both are plain imports,
+    // and only model.rs knows that one of them is `pub type Req = Request`.
+    const holder = [
+      "use crate::model::{Req, Request};",
+      "pub struct Aliased { pub request: Req }",
+    ].join("\n");
+    const model = [
+      "pub struct Request { pub path: String }",
+      "pub type Req = Request;",
+    ].join("\n");
+    expect(verdictOf(heldTypes(holder, "Aliased", ["Request"], "rust",
+      { source: model, language: "rust" }))).toBe("withheld/aliased");
+  });
+
+  it("withholds on the same shape in Python and in TypeScript", () => {
+    const pythonHolder = ["from .model import Req", "", "class Aliased:", "    request: Req"].join("\n");
+    const pythonModel = ["class Request:", "    path: str", "", "Req = Request"].join("\n");
+    expect(verdictOf(heldTypes(pythonHolder, "Aliased", ["Request"], "python",
+      { source: pythonModel, language: "python" }))).toBe("withheld/aliased");
+
+    const tsHolder = [
+      'import type { Req } from "./model";',
+      "export interface Aliased { request: Req }",
+    ].join("\n");
+    const tsModel = [
+      "export interface Request { path: string }",
+      "export type Req = Request;",
+    ].join("\n");
+    expect(verdictOf(heldTypes(tsHolder, "Aliased", ["Request"], "ts",
+      { source: tsModel, language: "ts" }))).toBe("withheld/aliased");
+  });
+
+  it("still refutes a field list with no alias in it, in every language", () => {
+    /*
+     * The cost side, and the reason the refusal is a set of names rather than a
+     * flag on a file: a field list whose every name means itself is still a
+     * closed region, whatever else the target's file happens to declare.
+     */
+    const model = ["pub struct Request { pub path: String }", "pub type Req = Request;"].join("\n");
+    const holder = ["use crate::model::Request;", "pub struct Empty { pub n: usize }"].join("\n");
+    expect(verdictOf(heldTypes(holder, "Empty", ["Request"], "rust",
+      { source: model, language: "rust" }))).toBe("absent");
+
+    const pythonModel = ["class Request:", "    path: str", "", "Req = Request"].join("\n");
+    const pythonHolder = ["from .model import Request", "", "class Empty:", "    n: int"].join("\n");
+    expect(verdictOf(heldTypes(pythonHolder, "Empty", ["Request"], "python",
+      { source: pythonModel, language: "python" }))).toBe("absent");
+  });
+});

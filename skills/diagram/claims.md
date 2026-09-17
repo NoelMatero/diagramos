@@ -9,6 +9,10 @@ proved it either way; not a finding), or **red** (the code contradicts it, with
 a file and a line). Where the checker cannot see enough, it says nothing rather
 than guessing.
 
+**Each claim needs a kind of thing at each end, and the wrong kind is red.** A
+type has no parameters, a function has no fields and no base list. Point the end
+at the thing the claim is about, or drop the claim.
+
 ## `claim: "needs"`
 
 `from` imports, requires or includes `to`. Ends may be files or symbols.
@@ -39,7 +43,9 @@ could be hiding behind an alias or a renamed import.
 
 The arrow runs from the **container** type to the type of one of its fields:
 `route_info → response` means RouteInfo has a Response field. Wrappers count:
-`Vec<T>`, `Promise<T>`, `Optional[T]`, `T[]`. Red when no field has that type.
+`Vec<T>`, `Promise<T>`, `Optional[T]`, `T[]`. Fields declared in the constructor
+count too: `constructor(public dep: Dep)`, `self.dep: Dep = dep`. Red when no
+field has that type.
 
 ## `claim: "builds"`
 

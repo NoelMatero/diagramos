@@ -460,3 +460,82 @@ describe("refuses rather than accuses", () => {
       .toBe("absent");
   });
 });
+
+/**
+ * A type used under another name (#303).
+ *
+ * The promise in `docs/drawing-guide-long.md`: "Nothing is reported either way
+ * when the type could be written under a different name -- a type alias, or an
+ * import renamed on the way in." #300's fixtures found `@takes` and `@returns`
+ * breaking it in all three languages, and Python breaking it even for an alias
+ * declared on the line above the signature. `alias.ts` is the shared reader.
+ */
+describe("a signature naming the type under another name", () => {
+  it("withholds on a Python alias declared in the same file", () => {
+    // An alias is an ordinary module-level assignment in Python, with no
+    // keyword and no node type of its own, so the reader never saw one.
+    const source = [
+      "LocalReq = Request",
+      "",
+      "def handle_local_alias(request: LocalReq) -> int:",
+      "    return len(request.path)",
+    ].join("\n");
+    expect(verdictOf(signatureNames(source, "handle_local_alias", ["Request"], "parameter", "python")))
+      .toBe("withheld/aliased");
+  });
+
+  it("withholds on an alias declared beside the type and imported plainly", () => {
+    // `use crate::model::{Req, Request}` marks neither as a rename. Only
+    // model.rs knows that `Req` is `Request`.
+    const api = [
+      "use crate::model::{Req, Request};",
+      "pub fn handle_alias(request: &Req) -> usize { request.path.len() }",
+    ].join("\n");
+    const model = [
+      "pub struct Request { pub path: String }",
+      "pub type Req = Request;",
+    ].join("\n");
+    expect(verdictOf(signatureNames(api, "handle_alias", ["Request"], "parameter", "rust",
+      { source: model, language: "rust" }))).toBe("withheld/aliased");
+  });
+
+  it("withholds on the same shape on a return type, in Python and TypeScript", () => {
+    const pythonApi = [
+      "from .model import Req",
+      "",
+      "def produce_alias() -> Req:",
+      "    return Req('')",
+    ].join("\n");
+    const pythonModel = ["class Request:", "    path: str", "", "Req = Request"].join("\n");
+    expect(verdictOf(signatureNames(pythonApi, "produce_alias", ["Request"], "return", "python",
+      { source: pythonModel, language: "python" }))).toBe("withheld/aliased");
+
+    const tsApi = [
+      'import type { Req } from "./model";',
+      "export function produceAlias(): Req { return { path: '' }; }",
+    ].join("\n");
+    const tsModel = [
+      "export interface Request { path: string }",
+      "export type Req = Request;",
+    ].join("\n");
+    expect(verdictOf(signatureNames(tsApi, "produceAlias", ["Request"], "return", "ts",
+      { source: tsModel, language: "ts" }))).toBe("withheld/aliased");
+  });
+
+  it("still refutes a signature with no alias in it, whatever the target's file declares", () => {
+    /*
+     * The cost side. The refusal is a set of names rather than a flag on a
+     * file, so a signature whose every name means itself is still a closed
+     * region even when an alias for the target exists somewhere else.
+     */
+    const model = ["pub struct Request { pub path: String }", "pub type Req = Request;"].join("\n");
+    const api = "pub fn count(n: usize) -> usize { n }";
+    expect(verdictOf(signatureNames(api, "count", ["Request"], "parameter", "rust",
+      { source: model, language: "rust" }))).toBe("absent");
+
+    const pythonModel = ["class Request:", "    path: str", "", "Req = Request"].join("\n");
+    const pythonApi = ["def count(n: int) -> int:", "    return n"].join("\n");
+    expect(verdictOf(signatureNames(pythonApi, "count", ["Request"], "parameter", "python",
+      { source: pythonModel, language: "python" }))).toBe("absent");
+  });
+});
