@@ -73,8 +73,10 @@ describe("Rust", () => {
   it("reads a function as never a type, and a struct as one", () => {
     expect(read(source, "receive", "rust")?.type).toBe("lacks");
     expect(read(source, "Client", "rust")?.type).toBe("has");
-    // A constant may name a type alias's worth of anything; it is never judged.
-    expect(read(source, "LIMIT", "rust")?.type).toBe("unsure");
+    // A constant whose value is written out in full is not a type either
+    // (#307); one holding a name still is not judged.
+    expect(read(source, "LIMIT", "rust")?.type).toBe("lacks");
+    expect(read("pub const MAKER: fn() -> u32 = build;\n", "MAKER", "rust")?.type).toBe("unsure");
   });
 
   it("reads a trait method with no default as a function with no body", () => {
@@ -192,6 +194,93 @@ describe("Python", () => {
   it("says nothing about a name bound to a lambda or a number", () => {
     expect(read(source, "draw", "python")?.fields).toBe("unsure");
     expect(read(source, "LIMIT", "python")?.result).toBe("unsure");
+  });
+});
+
+describe("a value written out in full (#307)", () => {
+  const sources: Record<string, { file: string; source: string }> = {
+    rust: {
+      file: "src/lib.rs",
+      source: [
+        "pub const LIMIT: usize = 4;",
+        "pub const NAME: &str = \"utf-8\";",
+        "pub const SIZES: [u32; 3] = [1, 2, 3];",
+        "pub const MAKER: fn() -> u32 = build;",
+        "pub static READY: bool = true;",
+        "pub fn build() -> u32 { 4 }",
+        "",
+      ].join("\n"),
+    },
+    python: {
+      file: "src/limits.py",
+      source: [
+        "LIMIT = 4",
+        "NAME = \"utf-8\"",
+        "SIZES = [1, 2, 3]",
+        "MAKER = build",
+        "READY = True",
+        "DRAW = lambda: 4",
+        "MADE = build()",
+        "",
+        "def build():",
+        "    return 4",
+        "",
+      ].join("\n"),
+    },
+    ts: {
+      file: "src/limits.ts",
+      source: [
+        "export const LIMIT = 4;",
+        "export const NAME = \"utf-8\";",
+        "export const SIZES = [1, 2, 3];",
+        "export const MAKER = build;",
+        "export const READY = true;",
+        "export const DRAW = () => 4;",
+        "export const MADE = build();",
+        "export function build() { return 4; }",
+        "",
+      ].join("\n"),
+    },
+  };
+
+  it.each(Object.keys(sources))("in %s, a number, a string and a list cannot be called", (language) => {
+    const { source } = sources[language]!;
+    for (const name of ["LIMIT", "NAME", "SIZES", "READY"]) {
+      expect(read(source, name, language as Language)).toMatchObject({
+        callable: "lacks", type: "lacks", body: "lacks",
+      });
+    }
+  });
+
+  it.each(Object.keys(sources))("in %s, a value that is another name is never judged", (language) => {
+    // `MAKER = build` is a function under another name, which is exactly the
+    // case the silence is for.
+    expect(read(sources[language]!.source, "MAKER", language as Language)?.callable).toBe("unsure");
+  });
+
+  it.each(["python", "ts"])("in %s, a lambda and a call's result are never judged", (language) => {
+    const { source } = sources[language]!;
+    expect(read(source, "DRAW", language as Language)?.callable).toBe("unsure");
+    expect(read(source, "MADE", language as Language)?.callable).toBe("unsure");
+  });
+
+  it.each(["ts", "rust"])("does not call a type alias a plain value in %s", (language) => {
+    // Found by the corpus: `readonly [string, string]` is keywords all the way
+    // down, and `type Mode = "on" | "off"` is a value where a type belongs.
+    const sources: Record<string, string> = {
+      ts: "export type Tuple = readonly [string, string];\nexport type Mode = \"on\" | \"off\";\n",
+      rust: "pub type Pair = (u32, u32);\n",
+    };
+    const names: Record<string, string[]> = { ts: ["Tuple", "Mode"], rust: ["Pair"] };
+    for (const name of names[language]!) {
+      expect(read(sources[language]!, name, language as Language)?.type).toBe("unsure");
+      expect(read(sources[language]!, name, language as Language)?.callable).toBe("unsure");
+    }
+  });
+
+  it("does not judge a type, which Python and Rust construct by calling it", () => {
+    const source = "class Config:\n    width: int\n";
+    expect(read(source, "Config", "python")?.callable).toBe("unsure");
   });
 });
 

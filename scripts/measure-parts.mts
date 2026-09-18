@@ -33,7 +33,7 @@ import path from "node:path";
 import ts from "typescript";
 
 import { sourceFiles } from "./lib/source-files";
-import { flatten, refereeParts, type RefereeReading } from "./lib/lsp-symbols";
+import { flatten, literalValue, refereeParts, type RefereeReading } from "./lib/lsp-symbols";
 import { createRustAnalyzerReferee } from "./lib/resolution-rust-lsp";
 import { createPyrightLspReferee } from "./lib/resolution-python-lsp";
 
@@ -92,6 +92,17 @@ const lineAt = (source: string, offset: number) => {
   }
   return low;
 };
+
+/** One split per source, reused: these files are read name by name. */
+const splitCache = new Map<string, string[]>();
+function linesOf(source: string): string[] {
+  const cached = splitCache.get(source);
+  if (cached) return cached;
+  const lines = source.split("\n");
+  splitCache.clear();
+  splitCache.set(source, lines);
+  return lines;
+}
 
 type RefereeByLine = Map<string, Record<Part, RefereeReading>>;
 
@@ -181,6 +192,33 @@ function declaringLine(
   const container = language === "python"
     ? new RegExp(`^\\s*class\\s+${escaped}\\s*[(:]`)
     : new RegExp(`\\b(struct|enum|trait|union|mod)\\s+${escaped}\\b`);
+  /*
+   * An assignment on the reader's own line, which the servers often file
+   * elsewhere: pyright lists one symbol per name per scope, so the `brotli =
+   * None` in an `except ImportError:` hides behind the `import ... as brotli`
+   * above it. The value is read the same way as everywhere else here.
+   */
+  const statement = statementAt(linesOf(source), line, language === "rust");
+  /*
+   * The name has to open the statement. Allowing it after a bracket or a comma
+   * read `def save(self, name, content, save=True)` as an assignment of `True`
+   * to `save`, and called a Django method a plain value -- the referee's own
+   * version of the mistake this whole file measures.
+   */
+  const assigns = new RegExp(
+    `^\\s*((pub(\\([^)]*\\))?\\s+)?(const|static|let|var|export|declare|mut|readonly)\\s+)*`
+    // `count += 1` binds a number to a name as surely as `count = 1` does.
+    + `${escaped}\\s*(:[^=]*)?[+\\-*/|&^%]?=[^=]`,
+  );
+  if (statement && assigns.test(statement) && !routine.test(text)) {
+    const literal = literalValue(statement, language === "rust");
+    if (literal === "lacks") {
+      return {
+        body: "lacks", signature: "lacks", result: "unknown", fields: "unknown", bases: "unknown",
+        type: "lacks", callable: "lacks",
+      };
+    }
+  }
   if (routine.test(text)) {
     return refereeParts(12, language === "python" ? "" : text.trimEnd().endsWith(";") ? ";" : "}", language === "python");
   }
@@ -201,7 +239,7 @@ function typescriptReferee(file: string, source: string): RefereeByLine {
       const at = node.getStart(tree) + node.getText(tree).indexOf("constructor");
       found.set(`${tree.getLineAndCharacterOfPosition(at).line}\tconstructor`, {
         body: node.body ? "has" : "lacks", signature: "has", result: "has", fields: "lacks", bases: "lacks",
-        type: "lacks",
+        type: "lacks", callable: "has",
       });
     }
     if (name && (ts.isIdentifier(name) || ts.isPrivateIdentifier(name))) {
@@ -210,10 +248,68 @@ function typescriptReferee(file: string, source: string): RefereeByLine {
         reading = {
           body: (node as { body?: ts.Node }).body ? "has" : "lacks",
           signature: "has", result: "has", fields: "lacks", bases: "lacks", type: "lacks",
+          callable: "has",
         };
       } else if (ts.isClassLike(node) || ts.isInterfaceDeclaration(node)
         || ts.isEnumDeclaration(node) || ts.isModuleDeclaration(node)) {
-        reading = { body: "lacks", signature: "lacks", result: "lacks", fields: "unknown", bases: "unknown", type: "has" };
+        reading = {
+          body: "lacks", signature: "lacks", result: "lacks", fields: "unknown", bases: "unknown",
+          type: "has", callable: "unknown",
+        };
+      } else if ((ts.isVariableDeclaration(node) || ts.isPropertyDeclaration(node)) && node.initializer) {
+        /*
+         * The compiler's own classification of an initialiser (#307). A literal
+         * is not callable and is not a type; anything else -- a call, an arrow
+         * function, a name -- it declines to judge, which is the reader's own
+         * stance and arrived at through a different tree.
+         */
+        /*
+         * Through the wrappers that do not change what is written: `-1` is a
+         * unary expression around a number, and `{ 1: 8 } as const` is an
+         * assertion around an object.
+         */
+        let written: ts.Expression = node.initializer;
+        for (let step = 0; step < 4; step += 1) {
+          if (ts.isAsExpression(written) || ts.isTypeAssertionExpression(written)
+            || ts.isParenthesizedExpression(written) || ts.isSatisfiesExpression(written)
+            || ts.isNonNullExpression(written)) {
+            written = written.expression;
+          } else if (ts.isPrefixUnaryExpression(written)
+            && (written.operator === ts.SyntaxKind.MinusToken || written.operator === ts.SyntaxKind.PlusToken)) {
+            written = written.operand;
+          } else break;
+        }
+        const literal = ts.isNumericLiteral(written) || ts.isStringLiteral(written)
+          || ts.isNoSubstitutionTemplateLiteral(written) || ts.isBigIntLiteral(written)
+          || written.kind === ts.SyntaxKind.TrueKeyword || written.kind === ts.SyntaxKind.FalseKeyword
+          || written.kind === ts.SyntaxKind.NullKeyword
+          || (ts.isArrayLiteralExpression(written)
+            && written.elements.every((one) => ts.isNumericLiteral(one) || ts.isStringLiteral(one)))
+          || (ts.isObjectLiteralExpression(written) && written.properties.every((one) =>
+            ts.isPropertyAssignment(one)
+            && (ts.isNumericLiteral(one.initializer) || ts.isStringLiteral(one.initializer))));
+        reading = {
+          body: literal ? "lacks" : "unknown", signature: literal ? "lacks" : "unknown",
+          result: "unknown", fields: "unknown", bases: "unknown",
+          type: literal ? "lacks" : "unknown", callable: literal ? "lacks" : "unknown",
+        };
+      }
+      if (!reading && ts.isVariableDeclaration(node) && !node.initializer
+        && node.parent && ts.isVariableDeclarationList(node.parent)
+        && node.parent.parent
+        && (ts.isForOfStatement(node.parent.parent) || ts.isForInStatement(node.parent.parent))) {
+        // `for (const noise of [0, 3])`: the value is on the statement, and
+        // what the name is bound to is each element of it.
+        const over = node.parent.parent.expression;
+        const literal = ts.isArrayLiteralExpression(over)
+          && over.elements.length > 0
+          && over.elements.every((one) => ts.isNumericLiteral(one) || ts.isStringLiteral(one));
+        if (literal) {
+          reading = {
+            body: "lacks", signature: "lacks", result: "unknown", fields: "unknown",
+            bases: "unknown", type: "lacks", callable: "lacks",
+          };
+        }
       }
       if (reading) {
         const line = tree.getLineAndCharacterOfPosition(name.getStart(tree)).line;
@@ -332,6 +428,44 @@ function implementedNames(symbols: Parameters<typeof flatten>[0] | undefined, so
   return names;
 }
 
+/**
+ * The declaration that starts on this line, as text, to wherever its brackets
+ * close. `undefined` when the line assigns nothing.
+ */
+function statementAt(lines: string[], line: number, rust: boolean): string | undefined {
+  if (!(lines[line] ?? "").includes("=")) return undefined;
+  let depth = 0;
+  let quote = "";
+  let out = "";
+  for (let index = line; index < lines.length && index < line + 40; index += 1) {
+    const text = lines[index]!;
+    out += (index === line ? "" : "\n") + text;
+    for (let at = 0; at < text.length; at += 1) {
+      const character = text[at]!;
+      if (quote) {
+        if (character === "\\") at += 1;
+        else if (character === quote) quote = "";
+        continue;
+      }
+      // A Rust lifetime opens with `'` and closes with nothing, and reading one
+      // as a string swallowed the next forty lines of code (#307). Rust only:
+      // Python writes `# '2006-10-25'` and that is a pair of quotes.
+      if (rust && character === "'" && /^'\w+\b(?!')/.test(text.slice(at))) continue;
+      if (character === '"' || character === "'" || character === "`") { quote = character; continue; }
+      if ("([{".includes(character)) depth += 1;
+      if (")]}".includes(character)) depth -= 1;
+    }
+    /*
+     * Keep going while the value has not started: `static NO_EQUALS_ERROR: &str
+     * =` puts it on the next line, and stopping here reads it as assigning
+     * nothing at all.
+     */
+    const started = out.slice(out.indexOf("=") + 1).trim() !== "";
+    if (depth <= 0 && !quote && started) break;
+  }
+  return out;
+}
+
 function byLine(symbols: Parameters<typeof flatten>[0], source: string, python: boolean): RefereeByLine {
   const lines = source.split("\n");
   const found: RefereeByLine = new Map();
@@ -341,7 +475,15 @@ function byLine(symbols: Parameters<typeof flatten>[0], source: string, python: 
       ? (lines[start.line] ?? "").slice(start.character, end.character)
       : [(lines[start.line] ?? "").slice(start.character), ...lines.slice(start.line + 1, end.line),
         (lines[end.line] ?? "").slice(0, end.character)].join("\n");
-    found.set(`${symbol.line}\t${symbol.name}`, refereeParts(symbol.kind, text, python));
+    /*
+     * A server's range for a constant is often the name alone (pyright does
+     * this for `__version__ = "0.28.1"`), and `literalValue` needs the whole
+     * statement -- which can run over several lines, as a parenthesised string
+     * does. So the statement is read from the source instead, by counting
+     * brackets, and that stays a text reading rather than a parse.
+     */
+    const whole = statementAt(lines, start.line, !python) ?? text;
+    found.set(`${symbol.line}\t${symbol.name}`, refereeParts(symbol.kind, whole, python, !python));
   }
   return found;
 }

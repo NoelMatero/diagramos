@@ -469,7 +469,7 @@ only hand-written part.** Nine lines, in `NEEDS` in `parts.ts`:
 |---|---|---|
 | `@needs` | nothing -- every declaration lives in a file, and a file has imports | nothing |
 | `@feeds` | a result | — |
-| `@calls` | a body of code that runs | — (calling a class is how Python constructs one) |
+| `@calls` | a body of code that runs | something that can be called |
 | `@builds` | a body of code that runs | a type |
 | `@takes` | a type | parameters or a return type |
 | `@returns` | a type | parameters or a return type |
@@ -529,6 +529,37 @@ the square reads **1,068 wrong lacks**, and it is closed.
 The lesson: a referee that shares the reader's definition is not independent
 of it, however different its machinery. It took an answer key written from a
 different definition to see it.
+
+**A constant is left alone unless its value is written out in full.** `const
+draw = () => {}` is a function under another name and `const handler =
+makeHandler()` may be one, so #297 said nothing about any constant -- which is
+87 of the 94 wrong-kind mistakes #301's test set plants that it did not catch,
+all of them `@calls` or `@builds` into one. What can be said without guessing is
+narrower: a value with **no name in it, nothing invoked, and nothing carrying
+parameters or a body** is a literal, and a literal is not a function and not a
+type (#307). `4`, `"utf-8"` and `[1, 2]` qualify; `OTHER`, `makeIt()` and `() =>
+{}` do not.
+
+That is why "can this be called" is a separate question from "has a signature".
+A class has no signature and is called all the time -- that is how Python and a
+Rust tuple struct construct one -- so `@calls` into a type stays quiet while
+`@takes` into one goes red.
+
+Measured the same way as the rest, over 180,438 names: **0 wrong lacks in every
+language**, with 874 agreed in Rust, 5,276 in Python, 2,380 in TS, 395 in TSX,
+254 in JavaScript. The referee is the TypeScript compiler's reading of an
+initialiser and, for Rust and Python, a text reading of the declaration -- and
+that text reading cannot parse everything: **160 Python and 20 TypeScript lacks
+went unjudged**, 2.9% and 0.8% of what the reader claimed there. Each was read:
+a value spread over lines, a chained `first = second = None`, a name the server
+lists at another line. None was a reader mistake, and the squares are licensed
+on that basis rather than on a clean sweep.
+
+Two reader bugs came out of it, both found by the corpus rather than by
+thinking. `export type ColorTuple = readonly [string, string]` read as a value
+written out in full, because its `string` is a keyword rather than a name --
+which would have told a type it is not a type. And Python capitalises `True`,
+which the first cut read as a name.
 
 **A plan is never accused**, as with every other red here.
 
