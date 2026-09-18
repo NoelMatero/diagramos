@@ -60,8 +60,11 @@
  * The last clause is not decoration: a method declared in a class body carries a
  * return type, and counting it would make every method a field.
  */
+import { aliasesFor, aliasNames } from "./alias";
 import { mayAccuse } from "./licence";
-import { each, parseSource, type Language, type Node } from "./parse";
+import {
+  declaresField, each, INSTANCE_NAMES, parseSource, type Language, type Node,
+} from "./parse";
 
 /**
  * Why no verdict was reached. Every one of these is a reason to stay quiet, and
@@ -152,46 +155,6 @@ const TYPE_DECLARATION =
 /** A name a reader would recognise, wherever a grammar puts type names. */
 const TYPE_NAME = /(type_identifier|primitive_type|predefined_type)$/;
 
-/** Node types that can rename something on the way in, if they actually do. */
-const RENAMES = new Set([
-  "import_specifier", "aliased_import", "export_specifier", "use_as_clause",
-]);
-
-/** Node types that introduce a name for a type written elsewhere. */
-const ALIASES = new Set(["type_alias_declaration", "type_item"]);
-
-/**
- * Names in this file that stand for something other than themselves.
- *
- * The whole reason a refutable word needs a file like this one. A field typed
- * `Res`, where `type Res = Response` sits above it, is a field that holds a
- * Response -- and a reader that only compares spellings calls the arrow wrong.
- *
- * Only a rename that actually renames. Every grammar gives a plain named import
- * the same node type as a renamed one, and the `alias` field is the only thing
- * separating them; treating every import as a possible rename took the
- * signature reader's refusal rate to 42% when #169 measured it, which is a word
- * that ships and never fires.
- *
- * Written here rather than shared with `signature.ts`, which keeps this reader
- * independent of the file #195 is changing.
- */
-function shadowNames(root: Node): Set<string> {
-  const shadows = new Set<string>();
-  each(root, (node) => {
-    if (RENAMES.has(node.type)) {
-      const alias = node.childForFieldName("alias");
-      if (alias && alias.childCount === 0) shadows.add(alias.text);
-      return;
-    }
-    if (ALIASES.has(node.type)) {
-      const name = node.childForFieldName("name");
-      if (name) shadows.add(name.text);
-    }
-  });
-  return shadows;
-}
-
 /** The name a declaration goes by. Python annotates through `left`, not `name`. */
 function nameOf(node: Node): string | undefined {
   const name = node.childForFieldName("name") ?? node.childForFieldName("left");
@@ -275,6 +238,70 @@ function quotedTypeIn(body: Node): boolean {
 }
 
 /**
+ * Fields a class declares inside one of its own routines.
+ *
+ * The largest source of false reds #301 found -- 7 of its 8, across vue, nest,
+ * httpx, flask and poetry. A field list is only a closed region if it is the
+ * whole list, and in two of these languages a great deal of it is written
+ * inside the constructor instead:
+ *
+ *     constructor(public dep: Dep)            TypeScript declares it here
+ *     self._request: Request | None = request  Python declares it here
+ *
+ * Neither appears anywhere in the class body, so a walk that stops at the
+ * first thing with a parameter list reads the class as holding almost nothing
+ * and then refutes almost every arrow drawn at one. Rust has neither shape --
+ * a struct lists every field on the declaration -- so nothing here changes a
+ * Rust answer.
+ *
+ * Both signals come from `parse.ts` so that `accesses.ts`, which reads the
+ * same two shapes for member *names*, cannot disagree with this about what a
+ * class declares.
+ *
+ * It only ever adds names, so it can turn an absence into a confirmation and
+ * never the other way about: no accusation here is new.
+ */
+function declaredInRoutine(routine: Node): Array<{ name: string; line: number }> {
+  const found: Array<{ name: string; line: number }> = [];
+
+  const parameters = routine.childForFieldName("parameters");
+  if (parameters) {
+    for (let index = 0; index < parameters.childCount; index += 1) {
+      const parameter = parameters.child(index);
+      if (!parameter || !declaresField(parameter)) continue;
+      const type = parameter.childForFieldName("type");
+      if (type) found.push(...typeNamesIn(type));
+    }
+  }
+
+  /*
+   * An annotated assignment onto the instance. Read through the grammar's own
+   * fields -- `left` and `type` on the assignment, `object` on the member
+   * access -- rather than by node type, which spells this differently in every
+   * language that has it.
+   *
+   * Annotated only, because an unannotated `self.x = x` writes no type down
+   * and there is nothing for a field claim to read. That is the reason this
+   * cannot silence an absence instead of answering it: a Python class that
+   * assigns its attributes without annotating them says nothing either way,
+   * which is what it said before.
+   */
+  const body = routine.childForFieldName("body");
+  if (body) {
+    each(body, (node) => {
+      const left = node.childForFieldName("left");
+      const type = node.childForFieldName("type");
+      if (!left || !type) return;
+      const object = left.childForFieldName("object");
+      if (!object || !INSTANCE_NAMES.has(object.text)) return;
+      found.push(...typeNamesIn(type));
+    });
+  }
+
+  return found;
+}
+
+/**
  * Whether a name is declared as a routine in this source.
  *
  * `parse.ts`'s generic rule: a function is a declaration that also has a `body`.
@@ -345,7 +372,15 @@ export function heldTypes(
     return { verdict: "withheld", why: "not-a-type" };
   }
 
-  const shadows = shadowNames(tree.rootNode);
+  /*
+   * Names that are not what they say, from the two places one can be hidden:
+   * this file's own renames and aliases, and what the *target's* file calls the
+   * type besides its own name -- `use crate::model::{Req, Request}` where
+   * `model.rs` says `pub type Req = Request`, which nothing in this file marks
+   * as anything but an import (#303).
+   */
+  const shadows = aliasNames(tree.rootNode);
+  if (target) for (const name of aliasesFor(target.source, target.language, targets)) shadows.add(name);
   const wanted = new Set(targets);
   let sawFields = false;
   let quoted = "";
@@ -392,7 +427,12 @@ export function heldTypes(
        * is an `enum_variant` carrying a body, and a variant's payload is held by
        * the enum in exactly the sense a struct field is.
        */
-      if (depth > 0 && member.childForFieldName("parameters")) return;
+      if (depth > 0 && member.childForFieldName("parameters")) {
+        // ... unless it declares one on the way. A constructor is where
+        // TypeScript and Python put most of a real class's fields (#303).
+        found.push(...declaredInRoutine(member));
+        return;
+      }
       // A nested type is its own declaration and `each` reaches it on its own;
       // descending here as well would count its fields twice.
       if (depth > 0 && (member.type === "object_type" || TYPE_DECLARATION.test(member.type))) return;

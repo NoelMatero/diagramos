@@ -96,10 +96,13 @@ const SIGNATURE_DOC =
   + "absent from both is genuinely absent; nothing is reported when the type could be "
   + "written under another name.";
 
-const WRONG_KIND_OPEN =
-  "SKILL.md says the `to` end of a signature arrow must anchor a routine, and does not "
-  + "say what happens when it anchors a type instead. #297 is deciding whether a "
-  + "wrong-kind end goes red.";
+const WRONG_KIND_DOC =
+  "claims.md: each claim needs a kind of thing at each end, and the wrong kind is red. "
+  + "A type has no parameters, so an arrow whose head is one is a claim nothing can read "
+  + "rather than one the code disagrees with -- #297 made it red and #303 wrote it down. "
+  + "Python reaches the same verdict by a different sentence: a class has an `__init__` "
+  + "with a signature, and the signature reader answers before the end's kind is asked "
+  + "about.";
 
 function signatureFixture(claim: "takes" | "returns", dialect: Dialect): Fixture {
   const dir = `bench/fixtures/${claim}/${dialect.language}`;
@@ -155,8 +158,7 @@ function signatureFixture(claim: "takes" | "returns", dialect: Dialect): Fixture
       },
       {
         shape: "wrong-kind-of-end", from: "request", to: "response",
-        expect: "not-verified", open: WRONG_KIND_OPEN,
-        because: "nothing documented",
+        expect: "red", because: WRONG_KIND_DOC,
       },
     ],
   };

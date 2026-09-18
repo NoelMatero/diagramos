@@ -315,3 +315,69 @@ describe("the routine end says wrong when nothing in the body is called the memb
     expect(report.clean).toBe(true);
   });
 });
+
+/**
+ * The same questions asked through a workspace that resolves the way the real
+ * one does (#303).
+ *
+ * `fakeWorkspace` above hands back the repo-relative path it was given, so
+ * every path in this file is both relative and absolute at once. The live
+ * `createWorkspace` does not: `resolve` returns an absolute path and *refuses*
+ * one, which is the confinement rule in `AGENTS.md`. Anything that resolves a
+ * path twice therefore works in every test here and fails on every real board,
+ * and that is how the report below came to describe calls a routine does not
+ * make.
+ */
+function rootedWorkspace(files: Record<string, string>): Workspace {
+  const root = "/repo";
+  return {
+    resolve: (relative) => {
+      if (!relative || relative.startsWith("/") || relative.startsWith("../")) return undefined;
+      return `${root}/${relative}`;
+    },
+    stat: (target) => {
+      const relative = target.startsWith(`${root}/`) ? target.slice(root.length + 1) : target;
+      if (files[relative] !== undefined) return "file";
+      return Object.keys(files).some((file) => file.startsWith(`${relative}/`)) ? "directory" : "missing";
+    },
+    read: (target) => {
+      const relative = target.startsWith(`${root}/`) ? target.slice(root.length + 1) : target;
+      return files[relative] ?? "";
+    },
+    list: () => [],
+  };
+}
+
+describe("@accesses on a workspace whose paths are confined", () => {
+  it("does not say a routine calls anything when it calls nothing", async () => {
+    const render = "export function render(config: Config) { return config.height; }\n";
+    const board = await boardOf("width", { claim: "accesses" });
+    const report = checkDrift(board, rootedWorkspace(files(CONFIG, render)), { edges: true });
+
+    const wrong = report.edges.filter((finding) => finding.kind === "accesses-not-read");
+    expect(wrong).toHaveLength(1);
+    expect(wrong[0]!.detail).not.toContain("could not see into");
+  });
+
+  it("stays quiet when a function in the same file reads the member for it", async () => {
+    const render = [
+      "function paint(config: Config) { return config.width; }",
+      "export function render(config: Config) { return paint(config) + config.height; }",
+    ].join("\n");
+    const board = await boardOf("width", { claim: "accesses" });
+    const report = checkDrift(board, rootedWorkspace(files(CONFIG, render)), { edges: true });
+
+    expect(report.edges.filter((finding) => finding.kind === "accesses-not-read")).toEqual([]);
+  });
+
+  it("stays quiet when an imported function reads the member for it", async () => {
+    const board = await boardOf("width", { claim: "accesses" });
+    const report = checkDrift(board, rootedWorkspace({
+      "src/config.ts": CONFIG,
+      "src/paint.ts": "import { Config } from './config';\nexport function paint(config: Config) { return config.width; }\n",
+      "src/render.ts": "import { paint } from './paint';\nexport function render(config: Config) { return paint(config) + config.height; }\n",
+    }), { edges: true });
+
+    expect(report.edges.filter((finding) => finding.kind === "accesses-not-read")).toEqual([]);
+  });
+});

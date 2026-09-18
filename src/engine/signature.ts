@@ -139,6 +139,7 @@
  * will inherit that permission without having earned it. That hole has a name
  * in `docs/claim-vocabulary.md` and is the licence grid.
  */
+import { aliasesFor, aliasNames } from "./alias";
 import { mayAccuse } from "./licence";
 import { parseSource, type Language, type Node } from "./parse";
 
@@ -246,13 +247,6 @@ const isName = (node: Node): boolean => node.childCount === 0 && IDENTIFIER.test
 const WORD = /^[A-Za-z_][A-Za-z0-9_]*$/;
 const isTypeWord = (node: Node): boolean => node.childCount === 0 && WORD.test(node.text);
 
-/** Node types that can rename something on the way in, if they actually do. */
-const RENAMES = new Set([
-  "import_specifier", "aliased_import", "export_specifier", "use_as_clause",
-]);
-/** Node types that introduce a name for a type written elsewhere. */
-const ALIASES = new Set(["type_alias_declaration", "type_item"]);
-
 function each(node: Node, visit: (node: Node) => void): void {
   visit(node);
   for (let index = 0; index < node.childCount; index += 1) {
@@ -263,44 +257,6 @@ function each(node: Node, visit: (node: Node) => void): void {
 
 const lineOf = (source: string, index: number): number =>
   source.slice(0, index).split("\n").length;
-
-/**
- * Names in this file that stand for something other than themselves.
- *
- * The last name in a rename is the one the file goes on to use -- `use a::B as
- * C`, `import { B as C }`, `from a import B as C` all end in the alias -- and
- * the name of a type alias is the one it introduces. Either way, seeing that
- * name in a signature means the signature might be naming the target under
- * another spelling, and nothing here may refute.
- *
- * Deliberately a set of names rather than a flag on the file. A file with one
- * alias in it that no signature uses is still a file whose signatures can be
- * refuted, and the whole-file version would have withheld on most real code.
- */
-function shadowNames(tree: Tree): Set<string> {
-  const shadows = new Set<string>();
-  each(tree.rootNode, (node) => {
-    if (RENAMES.has(node.type)) {
-      /*
-       * Only when it renames something. Every grammar here gives a plain named
-       * import the same node type as a renamed one -- `import { Request }` and
-       * `import { Request as Req }` are both `import_specifier` -- and the
-       * `alias` field is the only thing that tells them apart. Reading the node
-       * type alone treated every import in the file as a name that might mean
-       * something else, and measured on this repository that withheld on 212 of
-       * 522 functions: the word would have shipped and almost never fired.
-       */
-      const alias = node.childForFieldName("alias");
-      if (alias && alias.childCount === 0) shadows.add(alias.text);
-      return;
-    }
-    if (ALIASES.has(node.type)) {
-      const name = node.childForFieldName("name");
-      if (name) shadows.add(name.text);
-    }
-  });
-  return shadows;
-}
 
 interface Tree {
   rootNode: Node;
@@ -477,6 +433,21 @@ export function signatureNames(
   targets: string[],
   position: SignaturePosition,
   language: Language,
+  /**
+   * The *type* end's own file, when the caller has it (#303).
+   *
+   * A type is usually aliased beside itself and imported plainly from there --
+   * `use crate::model::{Req, Request}`, where only `model.rs` says
+   * `pub type Req = Request`. Nothing in the file being read marks `Req` as
+   * anything but an import, so this is the only place that question can be
+   * asked, and every one of #300's nine aliased false reds was this shape.
+   *
+   * Optional because the reader is useful without it -- every test naming a
+   * type and a function in one source passes nothing -- and because a caller
+   * that cannot produce the file should get the answer it always did rather
+   * than a refusal it cannot act on.
+   */
+  subject?: { source: string; language: Language },
 ): SignatureVerdict {
   if (language === "js" && position === "return") return { verdict: "withheld", why: "untyped-return" };
 
@@ -484,7 +455,8 @@ export function signatureNames(
   if (!tree) return { verdict: "withheld", why: "unreadable" };
   if (tree.rootNode.hasError) return { verdict: "withheld", why: "incomplete" };
 
-  const shadows = shadowNames(tree);
+  const shadows = aliasNames(tree.rootNode);
+  if (subject) for (const name of aliasesFor(subject.source, subject.language, targets)) shadows.add(name);
   let sawName = false;
   let sawSignature = false;
 
