@@ -432,6 +432,36 @@ describe("board MCP server", () => {
     expect(texts).toContain("@needs");
   }, 120_000);
 
+  /**
+   * The box claim that names its dispatch, over the wire (#310).
+   *
+   * The engine tests cover the reading. This covers the schema slot, which is
+   * where a claim with two accepted spellings breaks: the tool takes a bare
+   * list or `{ of, cases }`, and an agent that writes the second one and gets
+   * the first one back has silently had its claim widened.
+   */
+  it("carries `handles: { of, cases }` through the tools and back", async () => {
+    const board = "docs/diagrams/dispatch.excalidraw";
+    await call("create_diagram", {
+      path: board,
+      nodes: [{
+        id: "step", label: "step", ref: "src/machine.ts#step",
+        handles: { of: "self.state", cases: ["Idle", "Running"] },
+      }],
+      edges: [],
+    });
+    const read = jsonOf(await call("read_diagram", { path: board }));
+    expect((read.nodes as Array<{ claim?: unknown }>)[0].claim)
+      .toEqual({ handles: true, cases: ["Idle", "Running"], of: "self.state" });
+
+    // The bare list still works, and it is what drops `of` when the routine
+    // stops needing it.
+    await call("edit_diagram", { path: board, updates: [{ id: "step", handles: ["Idle", "Running"] }] });
+    const again = jsonOf(await call("read_diagram", { path: board }));
+    expect((again.nodes as Array<{ claim?: unknown }>)[0].claim)
+      .toEqual({ handles: true, cases: ["Idle", "Running"] });
+  }, 120_000);
+
   /*
    * #183: the price of drawing two boards was $1.94, and none of it went on
    * drawing. It went on finding out whether what had been drawn could be looked

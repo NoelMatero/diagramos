@@ -479,6 +479,29 @@ const subjectOf = (node: Node) => {
   return /^\(.*\)$/.test(text) ? text.slice(1, -1).trim() : text;
 };
 
+/**
+ * A subject reduced to the only thing two people will spell the same way.
+ *
+ * Whitespace goes and nothing else does. `self.state`, `self . state` and
+ * `switch ( a.kind )` are one dispatch written three ways -- a formatter's
+ * opinion, a token stream's spacing, somebody typing a line off the screen --
+ * and none of those is a different `match`. Case is kept, because an
+ * identifier's case is not a matter of taste, and the parentheses come off the
+ * same way `subjectOf` takes them off the code, so the box may write either.
+ *
+ * Deliberately no looser than that. A suffix match would let `kind` select a
+ * dispatch on `other.kind`, and a claim graded against the wrong dispatch is
+ * the false red this whole word is built to avoid (#310).
+ */
+const sameSubject = (one: string, other: string) => {
+  const reduce = (text: string) => {
+    const trimmed = text.trim();
+    const bare = /^\(.*\)$/.test(trimmed) ? trimmed.slice(1, -1) : trimmed;
+    return bare.replace(/\s+/g, "");
+  };
+  return reduce(one) === reduce(other) && reduce(one) !== "";
+};
+
 /** One side of a comparison, by field where there is one and by position where there is not. */
 function sideOf(condition: Node, field: "left" | "right"): Node | undefined {
   const named = condition.childForFieldName(field);
@@ -708,6 +731,17 @@ export type HandlesWithheld =
   | "no-body"
   | "no-dispatch"
   | "several-dispatches"
+  /**
+   * The box named a subject (`of`) and no dispatch in the routine is on it.
+   *
+   * A refusal rather than a red, and the distinction is the whole of #310's
+   * safety. A box pointing at something that is not there has said nothing
+   * about the case list -- the routine may have been rewritten under it -- and
+   * grading its cases against a dispatch it was not talking about is a red on
+   * a picture that was merely out of date about one word. The detail names
+   * every subject that *is* there, so the box can be corrected.
+   */
+  | "no-such-dispatch"
   | "unreadable-case"
   | "catch-all"
   | "chain-unmeasured"
@@ -767,6 +801,13 @@ export function checkHandles(
   symbol: string,
   claimed: readonly string[],
   language: Language,
+  /**
+   * Which dispatch the box means, as the subject is written in the code:
+   * `self.state`, `a.kind`, `m`. Omitted is the ordinary case and reads
+   * exactly as it always did -- a routine with one dispatch is judged, a
+   * routine with several is refused.
+   */
+  of?: string,
 ): HandlesReading {
   const tree = parseSource(source, language);
   if (!tree) return { verdict: "withheld", why: "no-grammar" };
@@ -779,14 +820,31 @@ export function checkHandles(
     return { verdict: "withheld", why: "not-declared" };
   }
 
-  const dispatches = bodies.flatMap((body) => findDispatchesIn(body, source));
-  if (dispatches.length === 0) return { verdict: "withheld", why: "no-dispatch" };
+  const all = bodies.flatMap((body) => findDispatchesIn(body, source));
+  if (all.length === 0) return { verdict: "withheld", why: "no-dispatch" };
+  const where = (some: readonly Dispatch[]) =>
+    some.map((dispatch) => `${dispatch.subject} at line ${dispatch.line}`).join(", ");
+
+  /*
+   * #310. A box that names its subject is asking about one `match`, so the
+   * rest of the routine is not evidence about it either way -- their arms are
+   * not `extra` and their absence is not `missing`.
+   *
+   * The narrowing is applied even when the routine has a single dispatch. A
+   * box that names a subject the code does not dispatch on has said something
+   * false about *which* dispatch, and reading it as a claim about the one that
+   * happens to be there grades a case list against a `match` nobody was
+   * talking about.
+   */
+  const dispatches = of === undefined ? all : all.filter((one) => sameSubject(one.subject, of));
+  if (dispatches.length === 0) {
+    return { verdict: "withheld", why: "no-such-dispatch", detail: where(all) };
+  }
   if (dispatches.length > 1) {
-    return {
-      verdict: "withheld",
-      why: "several-dispatches",
-      detail: dispatches.map((dispatch) => `${dispatch.subject} at line ${dispatch.line}`).join(", "),
-    };
+    // Either nothing was named, or what was named is there twice. Both are the
+    // same unanswered question, and `of` is the only thing that could have
+    // answered it.
+    return { verdict: "withheld", why: "several-dispatches", detail: where(dispatches) };
   }
 
   const [dispatch] = dispatches;

@@ -94,9 +94,27 @@ The box's ref names one routine that dispatches on a fixed set of cases: a
 ```
 
 Red when the code has a case the list lacks, or the list has a case the code
-lacks. A partial list is a false claim. Not judged: a `_` or `default` arm (for
-the missing-case half), two dispatches in one routine, cases it cannot name,
-`if`/`elif` ladders, and languages other than TypeScript (it confirms there).
+lacks. A partial list is a false claim.
+
+When the routine holds more than one `match`/`switch`, say which one the box is
+about, or nothing is checked:
+
+```
+{ id: "step", ref: "src/machine.rs#step",
+  handles: { of: "self.state", cases: ["Idle", "Running", "Done"] } }
+```
+
+`of` is the subject as the code writes it — the text between `match` or
+`switch (` and the arms. Whitespace and one pair of wrapping parentheses do not
+matter; nothing else is guessed, so `kind` does not select a dispatch on
+`other.kind`. Only the named dispatch is read: the other one's arms are neither
+missing nor extra.
+
+Not judged: a `_` or `default` arm (for the missing-case half), a routine with
+several dispatches and no `of`, an `of` that names no dispatch there (it says
+which subjects are there instead), the same subject dispatched on twice, cases
+it cannot name, `if`/`elif` ladders, and languages other than TypeScript and
+Rust (it confirms in the rest).
 
 ## `closed: {...}` on a box
 

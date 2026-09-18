@@ -58,7 +58,7 @@ import { distinctReads, refereeRoutines as accessRoutines, refereeTypes as acces
 import { refereeRoutines as callRoutines, bindsLocally, stripNoise } from "./lib/call-scan";
 import { BUILT_IN as NOT_BUILT, refereeRoutines as constructRoutines } from "./lib/construct-scan";
 import { labelsIn, type ScanLanguage } from "./lib/dispatch-scan";
-import { labelsInRust } from "./lib/dispatch-scan-rust";
+import { dispatchesInRust, flatten, type RustDispatch } from "./lib/dispatch-scan-rust";
 import { refereeFlows } from "./lib/feeds-scan";
 import { refereeHeritage } from "./lib/heritage-scan";
 import { BUILT_IN as NOT_HELD, refereeTypes as holdsTypes } from "./lib/holds-scan";
@@ -198,7 +198,8 @@ const REASONS: Record<string, Label> = {
   "handles/no-grammar": { kind: "cannot-see", why: "no grammar for the file" },
   "handles/no-body": { kind: "cannot-see", why: "declared, and the reader reads no body off it" },
   "handles/no-dispatch": { kind: "cannot-see", why: "the text scan reads case labels in the routine and the reader finds no dispatch" },
-  "handles/several-dispatches": { kind: "cannot-see", why: "the routine has more than one `match`/`switch`; a box names one case set and the reader will not guess which" },
+  "handles/several-dispatches": { kind: "cannot-see", why: "the routine has more than one `match`/`switch` and the box does not say which -- or says a subject that is there twice (#310)" },
+  "handles/no-such-dispatch": { kind: "cannot-see", why: "the subject named is not one the reader dispatches on in that routine. One case in the corpus, and it is a spelling difference: `syn` drops an inline comment out of `f(x, /* is_dir */ true)` and tree-sitter keeps it" },
   "handles/unreadable-case": { kind: "cannot-see", why: "an arm the reader cannot name" },
   "handles/catch-all": { kind: "cannot-see", why: "a `_` or `default` arm; the listed cases are all there" },
   "handles/chain-unmeasured": { kind: "cannot-see", why: "an if/elif chain, which has no referee yet so it may not be judged" },
@@ -390,9 +391,10 @@ for (const tree of trees) {
    * `macro_rules!` arm as a case, which is why #267 built the `syn` referee.
    * That referee has no routine bounds, so it cannot be used alone.
    */
-  const rustLabels = only.has("handles")
-    ? await labelsInRust(paths.filter((rel) => languageOf(rel) === "rust").map((rel) => path.join(tree, rel)))
+  const rustReadings = only.has("handles")
+    ? await dispatchesInRust(paths.filter((rel) => languageOf(rel) === "rust").map((rel) => path.join(tree, rel)))
     : {};
+  const rustLabels = flatten(rustReadings);
 
   for (const rel of paths) {
     const source = read(rel);
@@ -596,6 +598,34 @@ for (const tree of trees) {
     /* -- @handles: the case labels between a routine's opening and the next one -- */
     if (only.has("handles")) {
       const lines = source.split("\n");
+      /*
+       * The `syn` reading, grouped by `match` and by the `fn` it sits in
+       * (#310). A box that names its dispatch is asking about one of them, so
+       * the ask has to be one of them too -- and both the grouping and the
+       * routine have to come from the referee, or the reader would be marking
+       * its own partition.
+       *
+       * The routine matters as much as the grouping. Bounding a routine by the
+       * next routine the *line* scan found put 40 routines on a 1,800-line
+       * file: every `match` in a gap was attributed to whichever routine came
+       * before it, and reading the real routine correctly then came back as a
+       * disagreement. Measured before the fix, that alone was 49 refusals and
+       * 15 definite noes, none of them about the reader.
+       *
+       * Rust only, because only Rust has a referee that can bound a dispatch.
+       * The line scan reads a file as lines and knows nothing about where one
+       * `match` stops, which is stated as its limitation in `dispatch-scan.ts`
+       * rather than worked around here.
+       */
+      const synByRoutine = new Map<string, RustDispatch[]>();
+      if (language === "rust") {
+        for (const dispatch of rustReadings[path.join(tree, rel)]?.dispatches ?? []) {
+          if (!dispatch.routine) continue;
+          const kept = synByRoutine.get(dispatch.routine) ?? [];
+          kept.push(dispatch);
+          synByRoutine.set(dispatch.routine, kept);
+        }
+      }
       routines.forEach((routine, index) => {
         const end = routines[index + 1]?.line ?? lines.length + 1;
         const slice = lines.slice(routine.line - 1, end - 1).join("\n");
@@ -608,6 +638,32 @@ for (const tree of trees) {
         }
         if (cases.length === 0) return;
         if (!uniqueRoutine(routine.name)) { exclude("handles", "routine declared twice in its file"); return; }
+
+        /*
+         * A routine the referee sees several `match`es in is asked about each
+         * one separately, the way a box would have to name them. One ask per
+         * dispatch rather than one per routine, so the population grows -- and
+         * that is reported rather than hidden: `asked` is the number of claims
+         * a board could write, and a routine with two dispatches is two of
+         * them.
+         *
+         * Routines the line scan never named are still not asked about, even
+         * though `syn` now knows them. That gap is the line scan's and it
+         * predates this, and closing it here would change the population under
+         * the before-and-after rather than the reader.
+         */
+        const mine: RustDispatch[] = synByRoutine.get(routine.name) ?? [];
+        if (mine.length > 1) {
+          for (const dispatch of mine) {
+            const own = [...new Set(dispatch.cases)];
+            if (own.length === 0) continue;
+            ask("handles", language, false,
+              `${at(rel, dispatch.line)} ${routine.name} of ${dispatch.subject} [${own.slice(0, 4).join(", ")}${own.length > 4 ? ", .." : ""}]`,
+              () => bucket(checkHandles(source, routine.name, own, language, dispatch.subject), "held"));
+          }
+          return;
+        }
+
         ask("handles", language, false, `${at(rel, routine.line)} ${routine.name} [${cases.slice(0, 4).join(", ")}${cases.length > 4 ? ", .." : ""}]`,
           () => bucket(checkHandles(source, routine.name, cases, language), "held"));
       });

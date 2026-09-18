@@ -597,3 +597,81 @@ impl Handler for Reactor {
     expect(reading).toMatchObject({ verdict: "held" });
   });
 });
+
+describe("naming which dispatch a claim is about", () => {
+  /*
+   * #310. A routine with two `match`es was refused outright, which is 251 Rust
+   * routines in the pinned corpus and the largest fixable part of `@handles`'s
+   * 67.1% recall. `of` is the subject as written -- the thing between `match`
+   * or `switch (` and the arms -- so it costs no new vocabulary and the model
+   * copies it rather than composing it.
+   */
+  const TWO = `
+function handle(kind: string, verb: string) {
+  switch (kind) { case "a": return 1; case "b": return 2; }
+  switch (verb) { case "GET": return 3; case "PUT": return 4; }
+}`;
+
+  it("judges the dispatch the box names, out of two in the routine", () => {
+    expect(checkHandles(TWO, "handle", ["a", "b"], "ts", "kind"))
+      .toMatchObject({ verdict: "held", cases: ["a", "b"] });
+    expect(checkHandles(TWO, "handle", ["GET", "PUT"], "ts", "verb"))
+      .toMatchObject({ verdict: "held", cases: ["GET", "PUT"] });
+  });
+
+  it("refutes against the named dispatch only, and never the other one's arms", () => {
+    // The other switch's cases are not `extra`: the box was never talking
+    // about them. Reading them in would be a red on a correct picture.
+    expect(checkHandles(TWO, "handle", ["a"], "ts", "kind"))
+      .toMatchObject({ verdict: "wrong", extra: ["b"], missing: [] });
+  });
+
+  it("keeps today's refusal when the box names neither", () => {
+    expect(checkHandles(TWO, "handle", ["a", "b"], "ts"))
+      .toMatchObject({ verdict: "withheld", why: "several-dispatches" });
+  });
+
+  it("refuses rather than reds when the named subject is not dispatched on", () => {
+    /*
+     * `a-false-red-costs-trust`. A box pointing at something that is not
+     * there is a box that cannot be judged, not a box that is wrong -- the
+     * routine may have been renamed under it, and accusing it of a case list
+     * it never claimed is the unrecoverable direction.
+     */
+    const reading = checkHandles(TWO, "handle", ["a", "b"], "ts", "state");
+    expect(reading).toMatchObject({ verdict: "withheld", why: "no-such-dispatch" });
+    // and it says what is there, so the box can be fixed
+    expect(reading).toMatchObject({ detail: expect.stringContaining("kind") });
+  });
+
+  it("keeps refusing when the named subject is dispatched on twice", () => {
+    // `of` answers "which one"; two `match self.state` in one routine is the
+    // same unanswered question wearing the same name.
+    const reading = checkHandles(`
+fn step(&mut self) {
+    match self.state { State::A => 1, State::B => 2 };
+    match self.state { State::A => 3, State::C => 4 };
+}`, "step", ["A", "B"], "rust", "self.state");
+    expect(reading).toMatchObject({ verdict: "withheld", why: "several-dispatches" });
+  });
+
+  it("matches the subject past whitespace and the parentheses a switch writes", () => {
+    // `switch (a.kind)` is read as `a.kind`; somebody typing the line off the
+    // screen writes either, and neither is a different dispatch.
+    expect(checkHandles(`
+function f(a: Shape, b: string) {
+  switch ( a.kind ) { case "circle": return 1; }
+  switch (b) { case "x": return 2; }
+}`, "f", ["circle"], "ts", "(a . kind)")).toMatchObject({ verdict: "held" });
+  });
+
+  it("refuses a named subject that misses the routine's only dispatch", () => {
+    // One dispatch, and the box points somewhere else. Judging it anyway would
+    // grade a claim about a `match` that is not the one being read.
+    expect(checkHandles(`
+fn status(m: Method) -> u16 {
+    match m { Method::Get => 200, Method::Post => 201 }
+}`, "status", ["Get", "Post"], "rust", "self.state"))
+      .toMatchObject({ verdict: "withheld", why: "no-such-dispatch" });
+  });
+});

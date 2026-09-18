@@ -1,7 +1,51 @@
+use quote::ToTokens;
+use serde::Serialize;
 use std::collections::HashMap;
 use std::io::{self, BufRead};
+use syn::spanned::Spanned;
 use syn::visit::Visit;
 use syn::{parse_file, ExprMatch, Pat, Lit};
+
+/// One `match`, kept apart from the others in its file (#310).
+///
+/// The flat per-file list this helper used to print is the right unit for
+/// asking whether the reader invents or loses a label. It is the wrong unit for
+/// asking whether a box that names *one* dispatch gets that dispatch judged:
+/// with the labels of two `match`es in one bag, a correct claim about one of
+/// them reads as a claim missing half its cases.
+///
+/// So the grouping is reported too, and the file total is still derived from
+/// it, which is what keeps the two from drifting apart.
+#[derive(Serialize)]
+struct Dispatch {
+    /// The matched expression, as `syn` prints it back: `self . state`. The
+    /// spacing is a token stream's and nothing else's, so whoever compares it
+    /// compares it past whitespace.
+    subject: String,
+    cases: Vec<String>,
+    /// 1-based line of the `match` keyword, for attributing it to a routine.
+    line: usize,
+    /// The function this `match` is written inside, innermost first.
+    ///
+    /// Reported by the referee rather than worked out by the caller, and that
+    /// is the point. The line-based harness bounded a routine by *the next
+    /// routine it happened to find*, which in one 1,800-line file was 40 of
+    /// them -- so every `match` in the gap was attributed to whichever routine
+    /// came before it, and a correct reading of the real routine came back as
+    /// a disagreement (#310). `syn` knows which `fn` it is inside, and it is
+    /// not the parser the reader uses, so saying so costs no independence.
+    ///
+    /// Empty for a `match` outside any function: a `const`, a static
+    /// initialiser.
+    routine: Option<String>,
+}
+
+#[derive(Serialize)]
+struct FileReading {
+    /// Every label in the file, in source order. What the flat reading was.
+    cases: Vec<String>,
+    dispatches: Vec<Dispatch>,
+}
 
 /// Extract case names from a Rust pattern, following the same rules as src/engine/handles.ts
 fn extract_case_names(pat: &Pat) -> Vec<String> {
@@ -132,40 +176,81 @@ fn is_binding(text: &str) -> bool {
         && text.chars().all(|c| c.is_alphanumeric() || c == '_')
 }
 
-/// A visitor that collects all match expressions
+/// A visitor that collects all match expressions, with the `fn` each is inside.
 struct MatchVisitor {
-    matches: Vec<ExprMatch>,
+    matches: Vec<(ExprMatch, Option<String>)>,
+    /// The functions currently open, outermost first. A closure does not push:
+    /// it is part of the body of the `fn` that writes it, which is the routine
+    /// a box would point at.
+    open: Vec<String>,
+}
+
+impl MatchVisitor {
+    fn innermost(&self) -> Option<String> {
+        self.open.last().cloned()
+    }
 }
 
 impl<'a> Visit<'a> for MatchVisitor {
     fn visit_expr_match(&mut self, node: &'a ExprMatch) {
-        self.matches.push(node.clone());
+        self.matches.push((node.clone(), self.innermost()));
         // Continue visiting nested matches
         syn::visit::visit_expr_match(self, node);
     }
+
+    fn visit_item_fn(&mut self, node: &'a syn::ItemFn) {
+        self.open.push(node.sig.ident.to_string());
+        syn::visit::visit_item_fn(self, node);
+        self.open.pop();
+    }
+
+    fn visit_impl_item_fn(&mut self, node: &'a syn::ImplItemFn) {
+        self.open.push(node.sig.ident.to_string());
+        syn::visit::visit_impl_item_fn(self, node);
+        self.open.pop();
+    }
+
+    fn visit_trait_item_fn(&mut self, node: &'a syn::TraitItemFn) {
+        self.open.push(node.sig.ident.to_string());
+        syn::visit::visit_trait_item_fn(self, node);
+        self.open.pop();
+    }
 }
 
-/// Process one Rust file and extract match arm case names
-fn process_file(path: &str, code: &str) -> Result<Vec<String>, String> {
+/// Process one Rust file and extract match arm case names, per `match`.
+fn process_file(path: &str, code: &str) -> Result<FileReading, String> {
     let file = parse_file(code).map_err(|e| format!("Parse error in {}: {}", path, e))?;
 
     // Collect all match expressions
     let mut visitor = MatchVisitor {
         matches: Vec::new(),
+        open: Vec::new(),
     };
     visitor.visit_file(&file);
 
-    let mut all_cases = Vec::new();
+    let mut dispatches = Vec::new();
 
     // Extract cases from each match
-    for match_expr in visitor.matches {
+    for (match_expr, routine) in visitor.matches {
+        let mut cases = Vec::new();
         for arm in &match_expr.arms {
-            let cases = extract_case_names(&arm.pat);
-            all_cases.extend(cases);
+            cases.extend(extract_case_names(&arm.pat));
         }
+        dispatches.push(Dispatch {
+            subject: match_expr.expr.to_token_stream().to_string(),
+            cases,
+            line: match_expr.match_token.span().start().line,
+            routine,
+        });
     }
 
-    Ok(all_cases)
+    // The flat reading, derived rather than collected a second time.
+    let all_cases = dispatches
+        .iter()
+        .flat_map(|dispatch| dispatch.cases.iter().cloned())
+        .collect();
+
+    Ok(FileReading { cases: all_cases, dispatches })
 }
 
 fn main() -> io::Result<()> {
@@ -183,18 +268,18 @@ fn main() -> io::Result<()> {
         match std::fs::read_to_string(&path) {
             Ok(code) => {
                 match process_file(&path, &code) {
-                    Ok(cases) => {
-                        results.insert(path, cases);
+                    Ok(reading) => {
+                        results.insert(path, reading);
                     }
                     Err(e) => {
                         eprintln!("Error processing {}: {}", path, e);
-                        results.insert(path, Vec::new());
+                        results.insert(path, FileReading { cases: Vec::new(), dispatches: Vec::new() });
                     }
                 }
             }
             Err(e) => {
                 eprintln!("Error reading {}: {}", path, e);
-                results.insert(path, Vec::new());
+                results.insert(path, FileReading { cases: Vec::new(), dispatches: Vec::new() });
             }
         }
     }

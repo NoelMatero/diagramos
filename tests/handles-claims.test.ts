@@ -15,9 +15,10 @@ import { describe, expect, it } from "vitest";
 
 import { emptyBoard, type BoardFile } from "../src/engine/board-file";
 import { parseBoxClaim } from "../src/engine/claim";
-import { createDiagram } from "../src/engine/diagram";
+import { applyEdits, createDiagram } from "../src/engine/diagram";
 import { DRIFT_KINDS, checkDrift, type Workspace } from "../src/engine/drift";
 import { readGraph } from "../src/engine/graph";
+import { relayoutDiagram } from "../src/engine/relayout";
 import { initEngine } from "../src/engine/parse";
 import { installExcalifontMeasurer } from "./helpers/excalifont";
 
@@ -396,5 +397,105 @@ describe("the report surfaces know about the new verdict", () => {
       expect(viewer, `the board page does not mention "${kind}"`).toContain(`"${kind}"`);
       expect(cli, `the CLI does not mention "${kind}"`).toContain(kind);
     }
+  });
+});
+
+describe("a routine with two dispatches, where the box says which (#310)", () => {
+  /**
+   * TypeScript, which is the licensed square, so a wrong claim here can go red
+   * and the test sees the accusation rather than a withhold standing in for it.
+   * Two `switch`es, on `kind` and on `verb`.
+   */
+  const TWO = `
+export function handle(kind: string, verb: string): number {
+  switch (kind) {
+    case "a": return 1;
+    case "b": return 2;
+  }
+  switch (verb) {
+    case "GET": return 3;
+    case "PUT": return 4;
+  }
+  return 0;
+}
+`;
+  const files = () => fakeWorkspace({ "src/two.ts": TWO });
+  const boardNaming = async (handles: string[] | { of: string; cases: string[] }) => {
+    const { board } = await createDiagram(emptyBoard(), {
+      title: "router",
+      nodes: [{ id: "handle", label: "handle", ref: "src/two.ts#handle", handles }],
+      edges: [],
+    });
+    return board;
+  };
+
+  it("confirms the dispatch the box names", async () => {
+    const report = checkDrift(await boardNaming({ of: "kind", cases: ["a", "b"] }), files());
+    expect(report.findings).toEqual([]);
+    expect(report.claims.handlesHeld).toBe(1);
+    expect(report.claims.handlesWithheld).toEqual([]);
+  });
+
+  it("confirms the other one on the same routine, told to", async () => {
+    const report = checkDrift(await boardNaming({ of: "verb", cases: ["GET", "PUT"] }), files());
+    expect(report.claims.handlesHeld).toBe(1);
+  });
+
+  it("goes red against the named dispatch, and quotes its line", async () => {
+    const report = checkDrift(await boardNaming({ of: "verb", cases: ["GET"] }), files());
+    expect(report.findings).toHaveLength(1);
+    expect(report.findings[0].kind).toBe("mishandled-box");
+    // The other switch's arms are not held against this claim.
+    expect(report.findings[0].detail).toContain("PUT");
+    expect(report.findings[0].detail).not.toContain('"a"');
+    // The second switch's line, not the first: the evidence quoted is the
+    // dispatch the box named.
+    expect(report.findings[0].detail).toContain("src/two.ts:7");
+  });
+
+  it("keeps today's refusal when the box says nothing about which", async () => {
+    const report = checkDrift(await boardNaming(["a", "b"]), files());
+    expect(report.findings).toEqual([]);
+    expect(report.claims.handlesWithheld[0]).toMatchObject({ why: "several-dispatches" });
+  });
+
+  it("refuses, and never accuses, when `of` names no dispatch in the routine", async () => {
+    /*
+     * The box points at something that is not there. That is a claim nothing
+     * can grade, not a claim that is false -- and the withhold names the
+     * subjects that *are* there so the box can be corrected on the spot.
+     */
+    const report = checkDrift(await boardNaming({ of: "state", cases: ["a", "b"] }), files());
+    expect(report.findings).toEqual([]);
+    expect(report.claims.handlesWithheld[0]).toMatchObject({ why: "no-such-dispatch" });
+    expect(report.claims.handlesWithheld[0].detail).toContain("kind");
+    expect(report.clean).toBe(true);
+  });
+
+  it("writes `of` onto the box and reads it back", async () => {
+    const graph = readGraph(await boardNaming({ of: "kind", cases: ["a", "b"] }));
+    expect(graph.nodes[0].claim).toEqual({ handles: true, cases: ["a", "b"], of: "kind" });
+  });
+
+  it("keeps `of` through a relayout, which must not narrow a claim quietly", async () => {
+    const board = await boardNaming({ of: "kind", cases: ["a", "b"] });
+    const { board: again } = await relayoutDiagram(board, { direction: "RIGHT" });
+    expect(readGraph(again).nodes[0].claim).toEqual({ handles: true, cases: ["a", "b"], of: "kind" });
+  });
+
+  it("is what edit_diagram writes, and what it drops", async () => {
+    // The edit path, not a redraw: #310's whole point is that naming the
+    // dispatch on a board that exists costs one field, not a new board.
+    const board = await boardNaming(["a", "b"]);
+    const edited = applyEdits(board, [
+      { id: "handle", handles: { of: "verb", cases: ["GET", "PUT"] } },
+    ]);
+    expect(edited.updated).toHaveLength(1);
+    expect(readGraph(edited.board).nodes[0].claim)
+      .toEqual({ handles: true, cases: ["GET", "PUT"], of: "verb" });
+
+    // And an empty set still drops the claim, the object form included.
+    const dropped = applyEdits(edited.board, [{ id: "handle", handles: [] }]);
+    expect(readGraph(dropped.board).nodes[0].claim).toBeUndefined();
   });
 });
