@@ -649,3 +649,39 @@ describe("a namespace segment that is an aliased import", () => {
   });
 });
 
+/**
+ * `Self` in the namespace position -- `Self::Item`, `Self::Error` (#306).
+ *
+ * The stand-in #193 is about does not only appear on its own. A Rust signature
+ * writes an associated type as a path whose *namespace* is `Self`, and reading
+ * a namespace as a name was the only reason the `Self` treatment ever saw it.
+ * Dropping the segment took 172 Rust signatures in `.corpus/*` from withheld to
+ * absent -- #193's false red, re-introduced by a change about namespaces.
+ */
+describe("`Self` as the namespace of an associated type", () => {
+  it("withholds where the enclosing type cannot be named", () => {
+    const generic = "struct W<T>(T);\nimpl<T> W<T> { fn get(&self) -> Self::Item { } }";
+    expect(verdictOf(signatureNames(generic, "get", ["Nope"], "return", "rust")))
+      .toBe("withheld/self-type");
+    const trait = "trait X { fn get(&self) -> Self::Item; }";
+    expect(verdictOf(signatureNames(trait, "get", ["Nope"], "return", "rust")))
+      .toBe("withheld/self-type");
+  });
+
+  it("withholds in the parameter half too", () => {
+    const source = "impl<T> W<T> { fn put(&self, v: Self::Item) { } }";
+    expect(verdictOf(signatureNames(source, "put", ["Nope"], "parameter", "rust")))
+      .toBe("withheld/self-type");
+  });
+
+  it("reads it as the type the impl names, where there is one", () => {
+    const source = "struct Foo;\nimpl Foo { fn get(&self) -> Self::Error { } }";
+    expect(verdictOf(signatureNames(source, "get", ["Foo"], "return", "rust")))
+      .toBe("confirmed");
+    // And the associated type's own name still confirms, as any tail does.
+    expect(verdictOf(signatureNames(source, "get", ["Error"], "return", "rust")))
+      .toBe("confirmed");
+    expect(verdictOf(signatureNames(source, "get", ["Nope"], "return", "rust")))
+      .toBe("absent");
+  });
+});

@@ -571,13 +571,18 @@ export function signatureNames(
 
     const parameters = signature.childForFieldName("parameters");
     const returned = signature.childForFieldName("return_type");
-    /* Namespace segments from either half, for the alias check only (#306). */
-    const qualifiers = new Set<string>();
+    /*
+     * Namespace segments, per half, which are not names the signature writes
+     * and are still names written in it (#306). Two jobs: the alias check, and
+     * `Self::Item`, whose stand-in sits in the namespace position.
+     */
+    const qualifiedParameters = new Set<string>();
+    const qualifiedReturn = new Set<string>();
     const inParameters = new Set<string>();
     const quotedParameters = parameters
-      ? parameterTypes(parameters, inParameters, quoting, qualifiers) : false;
+      ? parameterTypes(parameters, inParameters, quoting, qualifiedParameters) : false;
     const inReturn = new Set<string>();
-    const quotedReturn = typeNames(returned, inReturn, quoting, qualifiers);
+    const quotedReturn = typeNames(returned, inReturn, quoting, qualifiedReturn);
 
     /*
      * `Self` reads as the type the `impl` names, and where there is no such
@@ -587,8 +592,21 @@ export function signatureNames(
      */
     let selfHeld = false;
     if (selfMeansEnclosing) {
-      for (const half of [inParameters, inReturn]) {
-        if (!half.delete(SELF)) continue;
+      const halves = [
+        [inParameters, qualifiedParameters],
+        [inReturn, qualifiedReturn],
+      ] as const;
+      for (const [half, qualified] of halves) {
+        /*
+         * `Self` on its own, and `Self` as the namespace of an associated type
+         * -- `Self::Item`, `Self::Error`, which is how a third of the Rust
+         * corpus writes a return. The second arrives in the qualifier set now
+         * that a namespace is not read as a name (#306), and leaving it out
+         * there turned 172 withheld Rust signatures into absences: #193's false
+         * red, re-introduced by a change about something else.
+         */
+        const namesSelf = half.delete(SELF) || qualified.has(SELF);
+        if (!namesSelf) continue;
         if (self) half.add(self); else selfHeld = true;
       }
     }
@@ -641,7 +659,9 @@ export function signatureNames(
      * every name that *is* in it means itself. One alias in the signature and
      * the target could be sitting there under another spelling.
      */
-    const spellings = new Set([...inParameters, ...inReturn, ...qualifiers]);
+    const spellings = new Set([
+      ...inParameters, ...inReturn, ...qualifiedParameters, ...qualifiedReturn,
+    ]);
     if ([...spellings].some((name) => shadows.has(name))) {
       withheld ??= { verdict: "withheld", why: "aliased" };
       continue;
