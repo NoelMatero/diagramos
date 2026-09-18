@@ -742,7 +742,8 @@ dependency runs from B to A **and only from B to A**, the arrow is not
 unconfirmed — it is wrong, and the report says so in red, names the file and
 line, and fails the build.
 
-Five gates, all required:
+Five gates, all required — and since #308 the last two guard the accusation
+alone:
 
 | gate | why |
 | --- | --- |
@@ -752,10 +753,25 @@ Five gates, all required:
 | both ends are files of this repository | something other than our own reader has to agree the file is source at all — see the ledger below |
 | neither end is dynamic or half-read | a file that reaches out at runtime, or that we could not parse to the end, cannot support *absence* |
 
-And one more that is not a gate but a rule: **if the dependency exists both ways,
-say nothing.** Cycles are legal in TypeScript and in Rust, and in a cycle neither arrow is
-more correct than the other. The rule is not "ties do not happen" — this
-repository has no cycles today, and that is luck rather than law.
+**Confirming asks less than accusing, and #308 is why that matters.** The bottom
+two rows are about proving something *is not there*, which is a sentence about a
+whole file. Finding the import is a different kind of evidence: it is written
+down, in a file a licence covers and a source index vouches for, and nothing
+else either file does can unwrite it. Run together, those gates refused 19.8% of
+the true imports in #302's corpus — `flask/__init__.py` imports `app.py` in plain
+sight and the answer was withheld over a `table[name]()` elsewhere in `app.py`.
+So an import written in the tail now confirms whatever else its file does, and
+the two bottom rows hold only the red. Over the same corpus that took `@needs`
+recall from 75.7% to 99.8% of 28,056 true imports, with the number of true
+imports it wrongly calls backwards unchanged at 9.
+
+The same split settles what used to be a rule of its own: **if the dependency
+exists both ways, no accusation is available.** Cycles are legal in TypeScript
+and in Rust, and in a cycle neither arrow is more *wrong* than the other. Both
+are true, though, so both confirm. The rule was never "ties do not happen" —
+this repository has no cycles today, and that is luck rather than law; Rust
+crates have them constantly, because a module naming `crate::` and a root naming
+`mod` is a cycle by construction.
 
 Everything that is not `backwards` falls straight through to the checks it always
 went through. A confirmed `needs` gets confirmed again a moment later by the
@@ -778,9 +794,11 @@ does, the message opens with *a claim written this turn is already wrong*.
 **What was not checked is said out loud, in the default report.** A claim that
 passed and a claim that was never checked look identical in a clean report, and
 only one of them means the diagram is being held to anything. So the notice —
-not just `--details` — names them by reason: in a cycle, in a language with no
-measured reader, with an end that reaches out at runtime, with an end that could
-not be parsed to the end, with an end no source index has ever read.
+not just `--details` — names them by reason: in a language with no measured
+reader, with an end that reaches out at runtime, with an end that could not be
+parsed to the end, with an end no source index has ever read. (Those last two
+are now only ever the *accusation* being withheld: the arrow was not confirmed
+either, so nothing found the import at all.)
 
 That list has a second half, and it is the one that caught the project owner
 out (#113). The reasons above are `checkNeeds` reading two files and declining
@@ -1677,11 +1695,11 @@ first is the one people act on.
 **The question is asked before the promotion now.** A `planned` arrow carrying
 `@needs` gets the same direction check a `built` one gets, with the same four
 gates — both ends in a measured language, both vouched for by a source index,
-both parsed to the end, neither reaching out at runtime, and no cycle. Only one
-verdict is acted on. `backwards` holds the promotion back and files a work item;
-confirmed, withheld and cycle all fall through to the ordinary channels exactly
-as before, because each of those is the tool being unable to tell, and *cannot
-tell* must never become *did not land*.
+both parsed to the end, neither reaching out at runtime. Only one verdict is
+acted on. `backwards` holds the promotion back and files a work item; confirmed
+and withheld both fall through to the ordinary channels exactly as before,
+because each of those is the tool being unable to tell, and *cannot tell* must
+never become *did not land*.
 
 ```
 One → Two · built the other way round

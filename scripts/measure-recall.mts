@@ -134,11 +134,10 @@ const REASONS: Record<string, Label> = {
   "*/unlicensed": { kind: "cannot-see", why: "a measurement gate, not a fact about the code (#207)" },
   "*/said:absent": { kind: "cannot-see", why: "the reader looked and did not find what the text scan found" },
 
-  "needs/incomplete": { kind: "cannot-see", why: "EITHER file had a parse error somewhere, and `needs.ts` refuses before it looks, as for `dynamic`" },
+  "needs/incomplete": { kind: "cannot-see", why: "EITHER file had a parse error somewhere, so nothing can be proved absent in it. Since #308 this refuses the accusation only: an import the grammar did read still confirms" },
   "needs/unvouched": { kind: "cannot-see", why: "no source index has read the file" },
-  "needs/dynamic": { kind: "cannot-see", why: "EITHER file reaches out at run time (`table[name]()`, a Rust item macro), and `needs.ts` refuses before it looks -- even when the import it was asked about is written in the tail. Only the accusation needs the whole file" },
+  "needs/dynamic": { kind: "cannot-see", why: "EITHER file reaches out at run time (`table[name]()`, a Rust item macro), so neither can be said to declare nothing. Since #308 this refuses the accusation only: an import written in the tail confirms regardless (the rest here is the tail declaring nothing on the head)" },
   "needs/same-file": { kind: "not-an-arrow", why: "a file depending on itself" },
-  "needs/said:cycle": { kind: "cannot-see", why: "both imports are in the files; the reader declines a cycle rather than confirm the half drawn" },
   "needs/said:backwards": { kind: "cannot-see", why: "the compiler sees the forward import and the reader does not" },
 
   "takes/no-signature": { kind: "cannot-see", why: "the name is declared as something the reader does not read as a function" },
