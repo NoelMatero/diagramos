@@ -20,7 +20,7 @@ import path from "node:path";
 
 import { emptyBoard, readBoard } from "../src/engine/board-file";
 import { createDiagram } from "../src/engine/diagram";
-import { accuses, checkDrift, createWorkspace, UNCONFIRMED_WORDS } from "../src/engine/drift";
+import { accuses, checkDrift, createWorkspace, newCheckCache, UNCONFIRMED_WORDS } from "../src/engine/drift";
 import type { ClaimTally, DriftReport } from "../src/engine/drift";
 import { initEngine } from "../src/engine/parse";
 import { BOARD_FILE, FIXTURES } from "../bench/claim-fixtures";
@@ -102,7 +102,7 @@ async function withheldWhy(fixture: Fixture, edge: FixtureEdge): Promise<string 
     nodes: fixture.nodes.filter((node) => node.id === edge.from || node.id === edge.to),
     edges: [{ from: edge.from, to: edge.to, label: edge.label, claim: fixture.claim }],
   });
-  const report = checkDrift(drawn.board, workspace, { edges: true });
+  const report = checkDrift(drawn.board, workspace, { edges: true, cache });
   const reasons = Object.keys((report.claims[field] ?? {}) as Record<string, number>);
   return reasons.length > 0 ? reasons.join(", ") : undefined;
 }
@@ -115,6 +115,10 @@ interface Row {
 
 await initEngine();
 const workspace = createWorkspace(root);
+// One repository, one cache, for every check this run makes: the fixtures do
+// not change under it. See `CheckCache` for why it is never one for two
+// projects and never the server's (#311).
+const cache = newCheckCache(workspace);
 
 const chosen = FIXTURES.filter((fixture) => only.length === 0 || only.includes(fixture.claim));
 if (chosen.length === 0) {
@@ -130,7 +134,7 @@ for (const fixture of chosen) {
     console.error(`${fixture.dir}/${BOARD_FILE} is missing. Run npm run bench:claims:draw.`);
     process.exit(2);
   }
-  const report = checkDrift(board, workspace, { edges: true });
+  const report = checkDrift(board, workspace, { edges: true, cache });
   if (report.damage.length > 0) {
     console.error(`${fixture.dir}/${BOARD_FILE} contradicts itself; its report means nothing.`);
     process.exit(2);

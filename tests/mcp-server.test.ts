@@ -895,6 +895,48 @@ describe("board MCP server", () => {
   }, 120_000);
 
   /**
+   * A check over MCP reads the code again, every call (#311).
+   *
+   * The measurement scripts may now hold what one check read and hand it to
+   * the next, which is what made `bench:planted` finish in minutes instead of
+   * an hour. The server may not: it outlives the working tree, and a reading
+   * remembered across calls is a fact with a shelf life -- the rot this tool
+   * exists to catch.
+   *
+   * The import below is written between two calls. Boxes are covered by the
+   * ref test above, which deletes a file between two `check_drift` calls; this
+   * one is about the arrow half, where the reading being cached is the file's
+   * imports.
+   */
+  it("re-reads the imports on every call, so one written between two calls counts", async () => {
+    const board = "docs/diagrams/fresh.excalidraw";
+    await writeFile(path.join(workspace, "reader.ts"), "export const read = 1;\n");
+    await writeFile(path.join(workspace, "parser.ts"), "export const parse = 1;\n");
+    const draw = () =>
+      call("create_diagram", {
+        path: board,
+        nodes: [
+          { id: "reader", label: "Reader", ref: "reader.ts" },
+          { id: "parser", label: "Parser", ref: "parser.ts" },
+        ],
+        edges: [{ from: "reader", to: "parser", claim: "needs" }],
+      });
+
+    const before = jsonOf(await draw());
+    expect(String(before.arrowsNotConfirmed)).toMatch(/^1 arrow was read and nothing corroborated it/);
+
+    await writeFile(
+      path.join(workspace, "reader.ts"),
+      'import { parse } from "./parser";\n\nexport const read = parse;\n',
+    );
+    const after = jsonOf(await draw());
+    expect(after.arrowsNotConfirmed).toBeUndefined();
+
+    const checked = jsonOf(await call("check_drift", { path: board }));
+    expect(checked.clean).toBe(true);
+  }, 120_000);
+
+  /**
    * No diagram is "current": a project holds as many as it likes, and checking
    * means checking all of them unless one is named.
    */

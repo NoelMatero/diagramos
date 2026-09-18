@@ -234,6 +234,53 @@ export function readDependencies(
   workspace: Workspace,
   configs: ConfigCache = new Map(),
 ): FileDependencies | undefined {
+  let memo = readings.get(configs);
+  if (!memo) {
+    memo = { workspace, byFile: new Map() };
+    readings.set(configs, memo);
+  }
+  // A cache carried to a second workspace is somebody else's mistake to find;
+  // here it only means nothing is remembered.
+  if (memo.workspace !== workspace) return readUncached(filePath, source, workspace, configs);
+  const hit = memo.byFile.get(filePath);
+  if (hit && hit.source === source) return hit.reading;
+  const read = readUncached(filePath, source, workspace, configs);
+  const reading = read && frozen(read);
+  memo.byFile.set(filePath, { source, reading });
+  return reading;
+}
+
+/**
+ * Readings already made against one config cache, so a file is parsed once
+ * per cache rather than once per question (#311).
+ *
+ * The same lifetime as the cache it hangs off, which is the caller's: one
+ * check for the server, one run for a measurement script. Keyed weakly so a
+ * dropped cache takes its readings with it. The source is kept and compared
+ * because a caller may hand in text that is not what is on disk, and a
+ * reading of other text is not this file's.
+ *
+ * Handed out frozen: every caller shares one object, and a caller that sorted
+ * it in place would change the next caller's answer rather than its own.
+ */
+const readings = new WeakMap<ConfigCache, {
+  workspace: Workspace;
+  byFile: Map<string, { source: string; reading: FileDependencies | undefined }>;
+}>();
+
+function frozen(reading: FileDependencies): FileDependencies {
+  for (const dependency of reading.dependencies) Object.freeze(dependency);
+  Object.freeze(reading.dependencies);
+  Object.freeze(reading.dynamic);
+  return Object.freeze(reading);
+}
+
+function readUncached(
+  filePath: string,
+  source: string,
+  workspace: Workspace,
+  configs: ConfigCache,
+): FileDependencies | undefined {
   const language = languageOf(filePath);
   if (language === "rust") {
     return readRustDependencies(filePath, source, workspace, rustLayoutFor(workspace, configs));
