@@ -567,11 +567,19 @@ above.
 
 `npm run bench:planted`, 855 planted and drawn mistakes and 428 true claims:
 
-| | before #297 | first cut | with both ends, Rust body closed |
-|---|---:|---:|---:|
-| mistakes called wrong | 229 (27%) | 303 (35%) | **386 (45%)** |
-| of which planted wrong-kind | 7 of 146 | 11 | **52** |
-| true claims called wrong | 8 | 10 | **8** |
+| | before #297 | first cut | with both ends, Rust body closed | after #306 |
+|---|---:|---:|---:|---:|
+| mistakes called wrong | 229 (27%) | 303 (35%) | 386 (45%) | **387 (45%)** |
+| of which planted wrong-kind | 7 of 146 | 11 | 52 | **53** |
+| greens on a false claim | -- | -- | 43 | **42** |
+| true claims called wrong | 8 | 10 | 8 | **8** |
+
+#306's column moves one claim and it is the kind worth moving: `@takes
+src/error.rs#fmt -> src/fmt.rs#display` was **confirmed** on anyhow's board and
+is now red. A green is the one verdict nothing re-checks, and it also suppresses
+the wrong-kind check, which runs only after every reader has failed to confirm
+-- so that single claim was costing two verdicts, and the wrong-kind row goes up
+by one without anything else changing.
 
 The 8 that remain are the same 8 as before any of this -- seven are the field
 reader missing a TypeScript parameter property or a Python attribute set in
@@ -3815,6 +3823,77 @@ duplicate from conflitcts, requires reading prs "An arrow can be three calls lon
     `signatureNode` descending into a class body, which turns a green into a red
     wherever a constructor's parameter names the type, and that is a new
     accusation too.
+
+43. **A namespace read as a type name confirmed an arrow that is wrong, and
+    the two fixes for it were both worse than the bug (#306).**
+
+    `@takes src/error.rs#fmt -> src/fmt.rs#display` came back **confirmed** on
+    anyhow's board. `display`'s signature is `unsafe fn display(this:
+    Ref<Self>, f: &mut fmt::Formatter) -> fmt::Result` and it names no type
+    called `fmt`; what it contains is the *module* the type lives in.
+    `signature.ts` walked every leaf under the type position and took each word
+    it found, so the namespace segment counted as a name the signature writes.
+
+    A green is the one verdict nothing re-checks, and #297's wrong-kind check
+    runs only after every reader has failed to confirm -- so that one claim was
+    costing two verdicts. `docs/reading-a-grammar.md`'s rule gives the fix
+    without a per-language list: a separator is an anonymous token, so `::` is a
+    node whose type is its own text, and Rust's `path`, TypeScript's `module`
+    and Python's `object` need no table.
+
+    **Every reader that reads a type name was asked the same question, rather
+    than assumed about:**
+
+    | reader | word | had it |
+    |---|---|---|
+    | `signature.ts` | `takes`, `returns` | yes, in every language |
+    | `holds.ts` | `holds` | Python only -- `fmt.Formatter` is an `attribute` the walk descended into, where Rust and TypeScript hand the whole path over as one leaf |
+    | `accesses.ts` | `accesses` | a narrower one: TypeScript writes `a: NodeJS.Timeout` as a node carrying a `name` field, so `Timeout` read as a *member* the type declares |
+    | `conforms.ts` | `conforms` | no -- takes the text and its tail |
+    | `constructs.ts` | `builds` | no -- takes the tail |
+
+    **The first fix took false reds from 8 to 9**, which is the one number this
+    tool cannot spend. Dropping the segment from the name list dropped it out of
+    the *alias* check as well: `import typing as t` sits above flask's `App`,
+    whose field is typed `t.ValuesView[..]`, and a name standing for something
+    else forbids an absence. So the segments are still recorded, marked as
+    qualifiers -- matched against nothing, still counted as aliases.
+
+    **The second fix was invisible to the bench and to the referee, and
+    `measure:signature` found it.** Rust's `self-type` withholds fell from 325
+    to 153 while `aliased` rose by exactly 153, which is not an improvement in
+    either direction. Rust writes an associated type as a path whose namespace
+    is `Self` -- `Self::Item`, `Self::Error` -- so reading a namespace as a name
+    was the only reason #193's treatment ever saw those signatures, and 172 of
+    them went from withheld to **absent**: #193's false red, re-introduced by a
+    change about something else. The referee deletes `Self` too, for #193's own
+    reason, so both readings agreed on `Item` and the miss count stayed 0. A
+    population both sides are blind to in the same way is where this class of
+    bug lives ([item 24](#forty-two-times-a-measurement-contradicted-the-design)
+    is the same shape).
+
+    **What it costs, on `.corpus/*`, per language: nothing measurable.** Same
+    refutable population, same refusals, same misses, every language:
+
+    | | base | after |
+    |---|---|---|
+    | rust, 12,606 functions | 11,169 refutable, 1,437 withheld, 0 missed | identical |
+    | python, 49,370 functions | 48,749 refutable, 621 withheld, 0 missed | identical |
+    | ts, 11,943 functions | 10,876 refutable, 1,067 withheld, 78 missed | identical |
+    | `measure:holds`, python | recall 74.6%, 242 missed, 0 invented | byte-identical run |
+    | `measure:accesses`, ts | type end 91.4%, refused 8.4% | byte-identical run |
+
+    The only thing that moves anywhere is ~3,600 namespace segments that stop
+    being counted as type names -- by the reader and by the referee, which was
+    counting them too and would otherwise have scored the corrected reader as
+    missing them.
+
+    **What the two null measurements cannot say.** Neither `measure:holds` nor
+    `measure:accesses` can see this bug at all: the first asks only about
+    capitalised names and a Python module segment is lowercase, the second reads
+    a member off its declaration line and never asks whether a type declares
+    `Timeout`. They establish the cost and not the benefit. The benefit is one
+    claim on the planted set and a test per shape.
 
 ## Open, in the order worth doing
 
