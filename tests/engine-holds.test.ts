@@ -441,3 +441,28 @@ describe("what a top-level binding has to do before it counts as an alias", () =
       .toBe("withheld/aliased");
   });
 });
+describe("a namespace on the front of a field's type", () => {
+  it("does not read a Python module as a type the class holds", () => {
+    const source = "class S:\n    a: fmt.Formatter\n";
+    expect(verdictOf(heldTypes(source, "S", ["fmt"], "python"))).toBe("absent");
+    expect(verdictOf(heldTypes(source, "S", ["Formatter"], "python"))).toBe("confirmed");
+  });
+
+  it("does not read a Rust module as a type the struct holds", () => {
+    const source = "struct S { a: fmt::Formatter }";
+    expect(verdictOf(heldTypes(source, "S", ["fmt"], "rust"))).toBe("absent");
+    expect(verdictOf(heldTypes(source, "S", ["Formatter"], "rust"))).toBe("confirmed");
+  });
+
+  it("does not read a TypeScript namespace as a type the interface holds", () => {
+    const source = "interface S { a: NodeJS.Timeout }";
+    expect(verdictOf(heldTypes(source, "S", ["NodeJS"], "ts"))).toBe("absent");
+    expect(verdictOf(heldTypes(source, "S", ["Timeout"], "ts"))).toBe("confirmed");
+  });
+
+  it("still reads through a type argument", () => {
+    const source = "struct S { b: Vec<RouteInfo> }";
+    expect(verdictOf(heldTypes(source, "S", ["RouteInfo"], "rust"))).toBe("confirmed");
+  });
+});
+

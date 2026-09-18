@@ -539,3 +539,87 @@ describe("a signature naming the type under another name", () => {
       { source: pythonModel, language: "python" }))).toBe("absent");
   });
 });
+describe("a namespace on the front of a type name", () => {
+  // anyhow src/fmt.rs, the arrow #301's test set found green on a false claim.
+  const anyhow = "use core::fmt::{self, Debug, Write};\n"
+    + "impl ErrorImpl {\n"
+    + "    pub(crate) unsafe fn display(this: Ref<Self>, f: &mut fmt::Formatter)"
+    + " -> fmt::Result { }\n}";
+
+  it("does not read `fmt` out of `fmt::Formatter`", () => {
+    expect(verdictOf(signatureNames(anyhow, "display", ["fmt"], "parameter", "rust")))
+      .toBe("absent");
+  });
+
+  it("still reads the type itself", () => {
+    expect(verdictOf(signatureNames(anyhow, "display", ["Formatter"], "parameter", "rust")))
+      .toBe("confirmed");
+  });
+});
+
+/**
+ * The shapes a namespace comes in, one per way it is written in real source.
+ * Rust's `::`, Python's `.` and TypeScript's `.` are three spellings of one
+ * idea, and the reader tells them apart by nothing at all: a separator is an
+ * anonymous token, so its node type is its own text.
+ */
+describe("a namespace, in each shape real source writes it", () => {
+  it("drops every segment of a nested path, and keeps the type", () => {
+    const source = "fn nested(e: std::io::Error) { }";
+    expect(verdictOf(signatureNames(source, "nested", ["std"], "parameter", "rust")))
+      .toBe("absent");
+    expect(verdictOf(signatureNames(source, "nested", ["io"], "parameter", "rust")))
+      .toBe("absent");
+    expect(verdictOf(signatureNames(source, "nested", ["Error"], "parameter", "rust")))
+      .toBe("confirmed");
+  });
+
+  it("reads a type argument, which is not a namespace", () => {
+    // The opposite mistake, and the reason this is not a rule about depth: a
+    // parameter typed `Vec<Formatter>` really does take a Formatter.
+    const source = "fn generic(v: Vec<Formatter>) { }";
+    expect(verdictOf(signatureNames(source, "generic", ["Formatter"], "parameter", "rust")))
+      .toBe("confirmed");
+    expect(verdictOf(signatureNames(source, "generic", ["Vec"], "parameter", "rust")))
+      .toBe("confirmed");
+  });
+
+  it("confirms a box anchored at the whole spelling", () => {
+    const source = "fn f(x: fmt::Formatter) { }";
+    expect(verdictOf(signatureNames(source, "f", ["fmt::Formatter"], "parameter", "rust")))
+      .toBe("confirmed");
+  });
+
+  it("drops a Python module, and keeps the type", () => {
+    const source = "def display(f: fmt.Formatter) -> fmt.Result: ...";
+    expect(verdictOf(signatureNames(source, "display", ["fmt"], "parameter", "python")))
+      .toBe("absent");
+    expect(verdictOf(signatureNames(source, "display", ["Formatter"], "parameter", "python")))
+      .toBe("confirmed");
+    expect(verdictOf(signatureNames(source, "display", ["Result"], "return", "python")))
+      .toBe("confirmed");
+  });
+
+  it("drops a TypeScript namespace, and keeps the type", () => {
+    const source = "function display(f: NodeJS.Timeout): void { }";
+    expect(verdictOf(signatureNames(source, "display", ["NodeJS"], "parameter", "ts")))
+      .toBe("absent");
+    expect(verdictOf(signatureNames(source, "display", ["Timeout"], "parameter", "ts")))
+      .toBe("confirmed");
+  });
+
+  it("drops a module written inside a quoted annotation", () => {
+    /*
+     * The same bug one layer out. A quoted type is text to the grammar, so the
+     * names in it are scanned rather than parsed -- and a scan for words took
+     * the module segment too. Refuting stays forbidden here whatever it finds:
+     * `quoted-annotation`, not `absent`.
+     */
+    const source = "def display(f: \"fmt.Formatter\") -> None: ...";
+    expect(verdictOf(signatureNames(source, "display", ["fmt"], "parameter", "python")))
+      .toBe("withheld/quoted-annotation");
+    expect(verdictOf(signatureNames(source, "display", ["Formatter"], "parameter", "python")))
+      .toBe("confirmed");
+  });
+});
+

@@ -63,7 +63,8 @@
 import { aliasesFor, aliasNames } from "./alias";
 import { mayAccuse } from "./licence";
 import {
-  declaresField, each, INSTANCE_NAMES, parseSource, type Language, type Node,
+  declaresField, each, INSTANCE_NAMES, parseSource, qualifiedTail,
+  type Language, type Node,
 } from "./parse";
 
 /**
@@ -193,6 +194,18 @@ function typeNamesIn(node: Node): Array<{ name: string; line: number }> {
       names.push({ name: child.text, line: child.startIndex });
       const tail = child.text.split(/::|\./).pop();
       if (tail && tail !== child.text) names.push({ name: tail, line: child.startIndex });
+      return;
+    }
+    /*
+     * A qualified name the grammar gave a node of its own, which is every
+     * language whose separator is not part of a type identifier. Python writes
+     * `fmt.Formatter` as an `attribute`, and descending into it read `fmt` as a
+     * type this class holds -- the #306 bug, in the reader next door.
+     */
+    const tail = qualifiedTail(child);
+    if (tail) {
+      names.push({ name: child.text, line: child.startIndex });
+      visit(tail);
       return;
     }
     if (child.childCount === 0) {

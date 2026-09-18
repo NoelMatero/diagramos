@@ -141,7 +141,7 @@
  */
 import { aliasesFor, aliasNames } from "./alias";
 import { mayAccuse } from "./licence";
-import { parseSource, type Language, type Node } from "./parse";
+import { parseSource, qualifiedTail, type Language, type Node } from "./parse";
 
 /** Which half of a signature a claim is about. */
 export type SignaturePosition = "parameter" | "return";
@@ -336,8 +336,14 @@ const SELF_MEANS_ENCLOSING = new Set<Language>(["rust", "python"]);
  */
 const QUOTED_TYPES = new Set<Language>(["python"]);
 
-/** Identifiers inside a quoted annotation, read as words rather than parsed. */
-const WORDS = /[A-Za-z_][A-Za-z0-9_]*/g;
+/**
+ * Identifiers inside a quoted annotation, read as words rather than parsed.
+ *
+ * A dotted path is matched whole so that the namespace on the front of it can
+ * be dropped the same way it is in the tree (#306): `"fmt.Formatter"` names
+ * `Formatter`, and taking every word out of the text took `fmt` too.
+ */
+const WORDS = /[A-Za-z_][A-Za-z0-9_]*(?:\s*\.\s*[A-Za-z_][A-Za-z0-9_]*)*/g;
 
 /** A type-position child that is one whole word, or nothing. */
 function plainType(node: Node | null): string | undefined {
@@ -390,6 +396,17 @@ function signatureNode(node: Node): Node | undefined {
  * contributes nothing. Names are read as whole identifiers, never as substrings,
  * so `Client` cannot match `ClientPool`.
  *
+ * A namespace is not a name the signature writes (#306). `fmt::Formatter` is
+ * one type called `Formatter`, and walking to the leaves took `fmt` as well --
+ * so an arrow drawn at the module came back confirmed. The whole spelling is
+ * recorded in case a box was anchored that way, and the reading then carries on
+ * into the last segment only, which is the rule `holds.ts` and `conforms.ts`
+ * already follow.
+ *
+ * Read *through* type arguments, which is `holds.ts`'s decision rather than
+ * `conforms.ts`'s: a parameter typed `Vec<Formatter>` really does take a
+ * Formatter.
+ *
  * Returns whether a quoted annotation was read on the way, because that decides
  * what this half is allowed to say afterwards -- see `QUOTED_TYPES`.
  */
@@ -400,14 +417,30 @@ function typeNames(
 ): boolean {
   if (!node) return false;
   let quoted = false;
-  each(node, (part) => {
+  const visit = (part: Node): void => {
     if (quoting && part.type === "string") {
       quoted = true;
-      for (const word of part.text.matchAll(WORDS)) into.add(word[0]);
+      for (const written of part.text.matchAll(WORDS)) {
+        const path = written[0].replace(/\s+/g, "");
+        into.add(path);
+        const tail = path.split(".").pop();
+        if (tail) into.add(tail);
+      }
+      return;
+    }
+    const tail = qualifiedTail(part);
+    if (tail) {
+      into.add(part.text);
+      visit(tail);
       return;
     }
     if (isTypeWord(part)) into.add(part.text);
-  });
+    for (let index = 0; index < part.childCount; index += 1) {
+      const child = part.child(index);
+      if (child) visit(child);
+    }
+  };
+  visit(node);
   return quoted;
 }
 

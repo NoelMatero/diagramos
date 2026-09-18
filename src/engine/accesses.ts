@@ -80,7 +80,8 @@
  */
 import { mayAccuse } from "./licence";
 import {
-  declaresField, each, INSTANCE_NAMES, MEMBER_ACCESS, parseSource, type Language, type Node,
+  declaresField, each, INSTANCE_NAMES, MEMBER_ACCESS, parseSource, qualifiedTail,
+  type Language, type Node,
 } from "./parse";
 import { memberReadsIn } from "./resolution";
 
@@ -396,6 +397,14 @@ function membersIn(body: Node): Set<string> {
   const visit = (member: Node, depth: number) => {
     // A nested type is its own declaration and its members belong to it.
     if (depth > 0 && (member.type === "object_type" || TYPE_DECLARATION.test(member.type))) return;
+    /*
+     * A qualified type is a type, not a member (#306). TypeScript writes `a:
+     * NodeJS.Timeout` as a node carrying a `name` field, so the rule below --
+     * take the name off anything that has one -- read `Timeout` as a member
+     * this type declares, and an arrow claiming a routine reads it came back
+     * confirmed. A plain `a: Timeout` never did: that node has no `name`.
+     */
+    if (depth > 0 && qualifiedTail(member)) return;
     if (depth > 0) {
       const name = nameOf(member);
       if (name) {

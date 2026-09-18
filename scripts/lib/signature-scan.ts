@@ -66,8 +66,24 @@ export function textTypeNamesIn(region: string, language: Language): Set<string>
     .replace(/=\s*[^,)]*/g, "")
     .replace(/["'`]/g, " ");
   const readable = language === "python" ? unquoted : withoutProse;
+  /*
+   * A fifth, and it is #306: a namespace is not a type name.
+   *
+   * `fmt::Formatter` names one type and it is called `Formatter`. Counting the
+   * segment in front of it asks the reader to find a module in a type position,
+   * and a reader that obliges confirms an arrow drawn at the module -- which is
+   * what a green on a false claim on anyhow's board turned out to be. Every
+   * qualifier is dropped, `std::io::Error` down to `Error`, which is the rule
+   * `docs/claim-vocabulary.md` states and the three other readers follow.
+   *
+   * Still a different mechanism from the reader: this is a regular expression
+   * over text and the reader walks a syntax tree. They agree about the rule and
+   * share no code for applying it.
+   */
+  const unqualified = (text: string) =>
+    text.replace(/[A-Za-z_][A-Za-z0-9_]*\s*(?:::|\.)\s*/g, "");
   for (const match of readable(region).matchAll(typePart)) {
-    for (const word of (match[1] ?? "").matchAll(/[A-Za-z_][A-Za-z0-9_]*/g)) {
+    for (const word of unqualified(match[1] ?? "").matchAll(/[A-Za-z_][A-Za-z0-9_]*/g)) {
       names.add(word[0]);
     }
   }

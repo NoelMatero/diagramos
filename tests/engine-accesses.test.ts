@@ -23,7 +23,7 @@
 import { beforeAll, describe, expect, it } from "vitest";
 
 import { initEngine } from "../src/engine/parse";
-import { memberAccesses, type AccessesVerdict } from "../src/engine/accesses";
+import { declaresMember, memberAccesses, type AccessesVerdict } from "../src/engine/accesses";
 
 beforeAll(async () => { await initEngine(); }, 120_000);
 
@@ -421,5 +421,35 @@ describe("the routine end refuses rather than accuses (#255)", () => {
       "class A { render(config: Config) { return config.height; } }",
       "class B { render(config: Config) { const { height } = config; return height; } }",
     ].join("\n"))).toBe("absent");
+  });
+});
+
+/**
+ * A qualified type in a member list, which is not a member (#306).
+ *
+ * Found while asking every type-name reader the #306 question. TypeScript
+ * writes `a: NodeJS.Timeout` as a `nested_type_identifier`, and that node
+ * carries a `name` field -- so the member walk, which takes the name off
+ * anything that has one, added `Timeout` to the list of members the type
+ * declares. An arrow claiming a routine reads `Timeout` off that type came back
+ * confirmed, on a type that has no such member.
+ *
+ * The narrow shape: only a *qualified* type does it. `a: Timeout` writes a
+ * `type_identifier`, which has no `name` field and was never read as a member.
+ */
+describe("a qualified type in a member list", () => {
+  it("is not a member the type declares", () => {
+    const source = "interface S { a: NodeJS.Timeout }";
+    expect(declaresMember(source, ["S"], "Timeout", "ts")).toEqual({
+      declares: false, members: "a",
+    });
+    expect(declaresMember(source, ["S"], "NodeJS", "ts")).toEqual({
+      declares: false, members: "a",
+    });
+  });
+
+  it("still finds the members that are there", () => {
+    expect(declaresMember("interface S { a: NodeJS.Timeout; b: number }", ["S"], "b", "ts"))
+      .toEqual({ declares: true });
   });
 });
