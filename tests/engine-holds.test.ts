@@ -413,3 +413,31 @@ describe("a field whose type is the target under another name", () => {
       { source: pythonModel, language: "python" }))).toBe("absent");
   });
 });
+
+describe("what a top-level binding has to do before it counts as an alias", () => {
+  it("does not read a name that is only annotated as one", () => {
+    /*
+     * vuejs-core/packages/reactivity/src/computed.ts declares two of these and
+     * brands `ComputedRefImpl` with both. Reading `declare const X: unique
+     * symbol` as a name for something else silenced a field list that was
+     * fully readable, and cost a planted mistake its red.
+     *
+     * A name that is only annotated declares a thing. A name bound to another
+     * name is a name for that thing, and only the second can hide a type.
+     */
+    const source = [
+      "declare const Brand: unique symbol",
+      "export class Ref {",
+      "  readonly [Brand]: true",
+      "  n: number",
+      "}",
+    ].join("\n");
+    expect(verdictOf(heldTypes(source, "Ref", ["Request"], "ts"))).toBe("absent");
+  });
+
+  it("still reads one that is bound to another name", () => {
+    const source = ["LocalReq = Request", "", "class Aliased:", "    request: LocalReq"].join("\n");
+    expect(verdictOf(heldTypes(source, "Aliased", ["Request"], "python")))
+      .toBe("withheld/aliased");
+  });
+});

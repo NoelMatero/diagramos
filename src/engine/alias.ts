@@ -115,12 +115,24 @@ export function aliasNames(root: Node): Set<string> {
  * around one. A local inside a routine is not visible where an annotation is
  * written, and collecting every one of them would have silenced a file for
  * every temporary in it.
+ *
+ * **It must bind something.** A name that is only *annotated* -- `declare const
+ * ComputedRefSymbol: unique symbol`, which vue's `computed.ts` writes twice --
+ * declares a thing rather than a name for another thing, and nothing can be
+ * hiding behind it. So `type` does not count here, where it does in
+ * `aliasesFor`: there the question is what a declaration stands for, and Rust
+ * writes that on `type`.
+ *
+ * No board in the corpus changes verdict on this alone; it is here because the
+ * wider rule was reached for while reading one of these, and a refusal that
+ * cannot be right is worth not making.
  */
 function boundAtTopLevel(root: Node): string[] {
   const names: string[] = [];
   const consider = (node: Node, depth: number): void => {
     if (depth > 2) return;
-    if (isAlias(node)) {
+    const bound = node.childForFieldName("value") ?? node.childForFieldName("right");
+    if (bound && isAlias(node)) {
       const name = nameOf(node);
       if (name && name.childCount === 0) names.push(name.text);
       return;

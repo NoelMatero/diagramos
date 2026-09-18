@@ -3712,6 +3712,16 @@ duplicate from conflitcts, requires reading prs "An arrow can be three calls lon
     itself is still refutable however many aliases sit elsewhere, and
     `bench:claims` shows every `false and provable` square still red.
 
+    **What it cost, exactly one claim, and it is the right answer.** A planted
+    wrong-kind arrow on vue's `ComputedRefImpl` was red and is now *not sure*.
+    Reading the constructor is why: `ComputedRefImpl` declares its fields there
+    as `ComputedGetter<T>` and `ComputedSetter<T>`, both type aliases in that
+    same file, and a field list with an alias in it cannot refute — the rule
+    that was always there, applied to the part of the field list nothing used to
+    read. The mistake is still on the report; it is no longer an accusation.
+    That is the whole of the cost: `bench:planted` moves from 386 reds on false
+    claims to 385, and from 8 false reds to 1.
+
     **A reason invented out of a path resolved twice.** `@accesses`' one escape
     hatch is the routine that calls a helper which reads the member — `draw
     --calls--> paint --accesses--> Config` drawn one level too high rather than
