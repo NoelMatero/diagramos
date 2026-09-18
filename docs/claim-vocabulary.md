@@ -567,16 +567,18 @@ above.
 
 `npm run bench:planted`, 855 planted and drawn mistakes and 428 true claims:
 
-| | before #297 | first cut | with both ends, Rust body closed | after #306 |
-|---|---:|---:|---:|---:|
-| mistakes called wrong | 229 (27%) | 303 (35%) | 386 (45%) | **387 (45%)** |
-| of which planted wrong-kind | 7 of 146 | 11 | 52 | **53** |
-| greens on a false claim | -- | -- | 43 | **42** |
-| true claims called wrong | 8 | 10 | 8 | **8** |
+| | before #297 | first cut | both ends, Rust body closed | at #309 | after #306 |
+|---|---:|---:|---:|---:|---:|
+| mistakes called wrong | 229 (27%) | 303 (35%) | 386 (45%) | 385 (45%) | **386 (45%)** |
+| of which planted wrong-kind | 7 of 146 | 11 | 52 | 51 | **52** |
+| greens on a false claim | -- | -- | 43 | 27 | **26** |
+| true claims called wrong | 8 | 10 | 8 | 1 | **1** |
 
 #306's column moves one claim and it is the kind worth moving: `@takes
 src/error.rs#fmt -> src/fmt.rs#display` was **confirmed** on anyhow's board and
-is now red. A green is the one verdict nothing re-checks, and it also suppresses
+is now red. The `at #309` column is the same test set after #303, #304, #308 and
+#309 landed, measured the hour #306 went in, because a before-and-after is only
+a comparison if both arms ran on the same day's main. A green is the one verdict nothing re-checks, and it also suppresses
 the wrong-kind check, which runs only after every reader has failed to confirm
 -- so that single claim was costing two verdicts, and the wrong-kind row goes up
 by one without anything else changing.
@@ -3894,6 +3896,11 @@ duplicate from conflitcts, requires reading prs "An arrow can be three calls lon
     a member off its declaration line and never asks whether a type declares
     `Timeout`. They establish the cost and not the benefit. The benefit is one
     claim on the planted set and a test per shape.
+
+    The planted score moved 27 greens to 26 and 385 reds to 386, with the false
+    reds unchanged at 1. An earlier run of the same pair against `e08caf6` said
+    43 -> 42 and 8 -> 8: the same one claim, on a main where #303, #304, #308 and
+    #309 had not landed yet.
 
 ## Open, in the order worth doing
 
