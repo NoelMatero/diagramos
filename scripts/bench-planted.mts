@@ -26,30 +26,17 @@
  * a red on a correct board is the one mistake this tool cannot take back
  * (AGENTS.md, `licence.ts`).
  */
-import { existsSync, readFileSync, readdirSync } from "node:fs";
 import path from "node:path";
 
-import { emptyBoard } from "../src/engine/board-file";
-import { createDiagram } from "../src/engine/diagram";
-import { ACCUSING_EDGE_KINDS, checkDrift, createWorkspace } from "../src/engine/drift";
+import { ACCUSING_EDGE_KINDS, checkDrift, createWorkspace, newCheckCache, type CheckCache } from "../src/engine/drift";
 import { initEngine } from "../src/engine/parse";
+import { plantedBoard, plantedKeys, type Key, type KeyClaim } from "./lib/planted-keys";
 
 const REPO = path.resolve(path.dirname(new URL(import.meta.url).pathname), "..");
 const CORPUS = process.env.CORPUS ?? "/Users/noelmatero/board-ai/.corpus";
 const ACCUSES = new Set<string>(ACCUSING_EDGE_KINDS);
 
 type Outcome = "red" | "not sure" | "green" | "silent";
-
-interface KeyClaim {
-  id: string; word: string; from: string; to: string; member?: string;
-  fromLabel: string; toLabel: string; fromState?: string; toState?: string; language: string;
-  source: "drawn" | "labelled" | "swap" | "reverse" | "retarget" | "wrong-kind";
-  parent?: string; truth: "true" | "false" | "undecidable"; why: string;
-}
-interface Key {
-  board: string; project: string; topic: string; language: string; scope: string; pin: string;
-  tool: string; claims: KeyClaim[];
-}
 
 const argv = process.argv.slice(2);
 const flag = (name: string) => argv.find((a) => a.startsWith(`--${name}=`))?.split("=")[1];
@@ -60,43 +47,30 @@ const wantProject = flag("project");
 const wantSource = flag("source");
 const details = argv.includes("--details");
 
-function keys(): Key[] {
-  const root = path.join(REPO, "bench/boards");
-  if (!existsSync(root)) return [];
-  const out: Key[] = [];
-  for (const project of readdirSync(root).sort()) {
-    const dir = path.join(root, project);
-    for (const file of readdirSync(dir).sort()) {
-      if (!file.endsWith(".answers.json")) continue;
-      out.push(JSON.parse(readFileSync(path.join(dir, file), "utf8")) as Key);
-    }
-  }
-  return out;
+/**
+ * One workspace and one cache per project, for the whole run (#311).
+ *
+ * Every arrow is still asked on a board of its own; what is kept between them
+ * is only what was read off disk, which the pinned corpus never changes. Per
+ * project and never one for all: the cache holds a crate layout, and clap's
+ * would resolve ripgrep's modules. `checkDrift` refuses a cache from another
+ * workspace, so a mistake here throws rather than scoring.
+ */
+const held = new Map<string, CheckCache>();
+function cacheFor(project: string): CheckCache {
+  const found = held.get(project);
+  if (found) return found;
+  const cache = newCheckCache(createWorkspace(path.join(CORPUS, project)));
+  held.set(project, cache);
+  return cache;
 }
 
 /** What the checker said about one arrow, run on a board of its own. */
 async function ask(key: Key, claim: KeyClaim): Promise<{ outcome: Outcome; detail: string }> {
-  const root = path.join(CORPUS, key.project);
-  const workspace = createWorkspace(root);
-  const label = (text: string, ref: string) => (text.trim() || ref).slice(0, 60);
-  // The state comes along, or an arrow into a box the board called `external`
-  // is scored as though the board had never said so -- which changed two
-  // verdicts on the httpx board when this was left out.
-  const nodes = [
-    { id: "from", label: label(claim.fromLabel, claim.from), ref: claim.from,
-      ...(claim.fromState ? { state: claim.fromState as never } : {}) },
-    { id: "to", label: label(claim.toLabel, claim.to), ref: claim.to,
-      ...(claim.toState ? { state: claim.toState as never } : {}) },
-  ];
-  const built = await createDiagram(emptyBoard(), {
-    title: `${key.project} ${key.topic}`,
-    nodes,
-    edges: [{
-      from: "from", to: "to", claim: claim.word as never,
-      ...(claim.member ? { label: claim.member } : {}),
-    }],
-  });
-  const report = checkDrift(JSON.parse(JSON.stringify(built.board)), workspace, { edges: true });
+  const cache = cacheFor(key.project);
+  const { workspace } = cache;
+  const board = await plantedBoard(key, claim);
+  const report = checkDrift(board, workspace, { edges: true, cache });
   // The engine quotes the declaration it read, and a Python class runs to
   // thousands of characters. What a reader of this table needs is which
   // verdict it was and the first line of why.
@@ -152,7 +126,7 @@ function table(title: string, note: string, rows: Map<string, Row>, caught: (row
 
 await initEngine();
 
-const loaded = keys().filter((k) => !wantProject || k.project === wantProject);
+const loaded = plantedKeys(REPO).filter((k) => !wantProject || k.project === wantProject);
 if (loaded.length === 0) {
   console.log("No answer keys under bench/boards. Run scripts/bench-planted-key.mts first.");
   process.exit(0);

@@ -43,6 +43,7 @@
     "typecheck": "tsc --noEmit",
     "check:drift": "tsx scripts/check-drift.mjs",
     "bench:planted": "tsx scripts/bench-planted.mts",
+    "probe:check-cost": "tsx scripts/probe-check-cost.mts",
     "measure:accesses": "tsx scripts/measure-accesses.mts",
     "measure:accesses-closed": "NODE_OPTIONS=--max-old-space-size=8192 tsx scripts/measure-accesses-closed.mts",
     "measure:accesses-absence": "NODE_OPTIONS=--max-old-space-size=8192 tsx scripts/measure-accesses-absence.mts",

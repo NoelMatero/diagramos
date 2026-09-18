@@ -2720,11 +2720,47 @@ export function boardCoverage(
   return { onBoard, covered, directories };
 }
 
+/**
+ * What several checks of one repository may share, when one caller runs them
+ * all (#311).
+ *
+ * `bench:planted` asks 1,661 arrows one board at a time. With nothing held
+ * between them, every check re-read the same files and rebuilt the Rust module
+ * tree: one clap arrow did 227 reads and 1,447 directory listings, the same
+ * ones every time it was asked.
+ *
+ * Bound to one workspace **object**, and `checkDrift` refuses it for any
+ * other. The crate layout sits under one fixed key in `read.configs`, so a
+ * cache handed from one project to the next would resolve the second project's
+ * modules against the first one's tree -- a wrong answer, not a slow one.
+ * Identity rather than root path, so that a caller building a fresh workspace
+ * per check cannot share one by accident either.
+ *
+ * For a script's run over files that do not change under it, never for the
+ * long-lived server: a reading remembered across calls is a fact with a shelf
+ * life, the rot this tool exists to catch. `check_drift` over MCP builds its
+ * own per call, which is what passing nothing does.
+ */
+export interface CheckCache {
+  readonly workspace: Workspace;
+  readonly read: ReadCache;
+  readonly reach: ReachCache;
+}
+
+export const newCheckCache = (workspace: Workspace): CheckCache =>
+  ({ workspace, read: { imports: new Map(), configs: new Map() }, reach: newReachCache() });
+
 export function checkDrift(
   board: BoardFile,
   workspace: Workspace,
   options?: {
     edges?: boolean;
+    /**
+     * Held across checks of this same workspace by a caller that runs many.
+     * Absent means the check starts cold, which is every caller but the
+     * measurement scripts. See `CheckCache`.
+     */
+    cache?: CheckCache;
     baseline?: BoardBaseline;
     /**
      * The repository's memory of where code moved to. Absent means the question
@@ -2750,6 +2786,11 @@ export function checkDrift(
     closedBodyReferee?: ClosedBodyReferee;
   },
 ): DriftReport {
+  // Before anything is read: a cache from another project would answer this
+  // board's Rust questions out of that project's module tree. See `CheckCache`.
+  if (options?.cache && options.cache.workspace !== workspace) {
+    throw new Error("checkDrift: this cache belongs to another workspace; a cache is never shared between projects");
+  }
   const findings: DriftFinding[] = [];
   const workItems: WorkItem[] = [];
   const promotions: Promotion[] = [];
@@ -2821,7 +2862,7 @@ export function checkDrift(
     });
   };
   /** Shared by the box checks and the arrow checks: one read per file per run. */
-  const importCache: ReadCache = { imports: new Map(), configs: new Map() };
+  const importCache: ReadCache = options?.cache?.read ?? { imports: new Map(), configs: new Map() };
   /**
    * Bodies the reach walk has already read, for this check and no longer.
    *
@@ -2831,7 +2872,11 @@ export function checkDrift(
    * board's arrows cross the same handful of files over and over, so one
    * reading per file per check is most of what a cache can buy anyway.
    */
-  const reachCache: ReachCache = newReachCache();
+  const reachCache: ReachCache = options?.cache && !options.closedBodyReferee
+    ? options.cache.reach
+    // A body placed through one check's checker is not a reading another
+    // check may reuse, so a referee always gets its own.
+    : newReachCache();
   /**
    * The caller's "go to definition", handed to the reach walk when there is
    * one.

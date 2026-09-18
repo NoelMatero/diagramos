@@ -12,7 +12,13 @@ npm run bench:planted -- --language=rust --details
 ```
 
 That command reads only what is stored here. It calls no model and no language
-server.
+server. It takes about a minute: since #311 one cache is held per project for
+the whole run, instead of every one of the 1,661 arrows re-reading the same
+files -- which is what made it an hour. What one arrow costs, asked twice:
+
+```
+npm run probe:check-cost                   # cold, and through a held cache
+```
 
 ## What is stored
 
