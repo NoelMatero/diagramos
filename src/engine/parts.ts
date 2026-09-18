@@ -38,7 +38,7 @@ import type { ArrowClaim } from "./claim";
 import { declaredShapes } from "./body";
 import { each, type Language, type Node } from "./parse";
 
-export const PARTS = ["body", "signature", "result", "fields", "bases", "type"] as const;
+export const PARTS = ["body", "signature", "result", "fields", "bases", "type", "callable"] as const;
 export type Part = (typeof PARTS)[number];
 
 export type PartReading = "has" | "lacks" | "unsure";
@@ -60,7 +60,7 @@ export type PartReading = "has" | "lacks" | "unsure";
 export const NEEDS: Record<ArrowClaim, { from?: Part; to?: Part }> = {
   needs: {},
   feeds: { from: "result" },
-  calls: { from: "body" },
+  calls: { from: "body", to: "callable" },
   builds: { from: "body", to: "type" },
   takes: { from: "type", to: "signature" },
   returns: { from: "type", to: "signature" },
@@ -77,6 +77,7 @@ export const PART_WORDS: Record<Part, string> = {
   fields: "has no fields",
   bases: "has no base types",
   type: "is not a type",
+  callable: "is a plain value, and cannot be called",
 };
 
 /** And the other way round: what the claim wanted to find there. */
@@ -87,6 +88,7 @@ export const PART_NEEDED: Record<Part, string> = {
   fields: "a field list",
   bases: "a base list",
   type: "a type",
+  callable: "something that can be called",
 };
 
 const has = (node: Node, field: string) => node.childForFieldName(field) !== null;
@@ -116,7 +118,69 @@ function holdsCode(node: Node): boolean {
   return found;
 }
 
-/** How one declaration reads, by the two shapes above. */
+/**
+ * Whether this value is written out in full: a number, a string, `true`, a list
+ * of those.
+ *
+ * The test is what a literal has *not* got, which is the same question in every
+ * grammar and needs no list of what each one calls a number: no name anywhere
+ * inside it, nothing invoked, and nothing carrying parameters or a body. So
+ * `4`, `"utf-8"` and `[1, 2]` qualify; `() => {}` has parameters, `makeIt()`
+ * has a call, and `OTHER` is a name that may stand for anything.
+ *
+ * What it buys is the one thing that can be said about a constant without
+ * guessing: a value spelled out like this is not a function and not a type.
+ */
+/**
+ * The words a language writes for a value that has no name of its own. They
+ * parse as names and are not ones -- Python capitalises its two, which is the
+ * kind of spelling difference this file otherwise never has to know about.
+ */
+const LITERAL_WORDS = new Set([
+  "true", "false", "True", "False", "None", "null", "undefined", "nil",
+]);
+
+function isLiteral(value: Node): boolean {
+  let plain = true;
+  let written = false;
+  each(value, (current) => {
+    if (!plain) return;
+    if (has(current, "function") || has(current, "macro") || has(current, "arguments")
+      || has(current, "parameters") || has(current, "body")) plain = false;
+    if (current.childCount !== 0) return;
+    const text = current.text;
+    if (LITERAL_WORDS.has(text)) { written = true; return; }
+    // A name is a childless node whose text could be one: `OTHER`, `String`.
+    if (current.isNamed && /^[A-Za-z_]\w*$/.test(text)) { plain = false; return; }
+    // A number or a string: what makes this a value rather than punctuation.
+    if (/^["'`]/.test(text) || /^\d/.test(text)) written = true;
+  });
+  /*
+   * Something must actually be written down. Without this, a type expression
+   * made of keywords -- `type ColorTuple = readonly [string, string]`, whose
+   * `string` is a keyword rather than a name -- reads as a value written out in
+   * full, and a type would be told it is not a type.
+   */
+  return plain && written;
+}
+
+/**
+ * The word a declaration opens with, where it has one: `const`, `static`,
+ * `type`, `class`. A keyword is an anonymous token, so its type is its own
+ * text -- the reading `nounOf` uses for the sentence, used here to keep one
+ * word out of the literal rule.
+ */
+function keywordOf(node: Node, nameNode: Node): string | undefined {
+  let keyword: string | undefined;
+  for (let index = 0; index < node.childCount; index += 1) {
+    const child = node.child(index);
+    if (!child || child.startIndex >= nameNode.startIndex) break;
+    if (!child.isNamed && /^[a-z]+$/.test(child.type)) keyword = child.type;
+  }
+  return keyword;
+}
+
+/** How one declaration reads, by the shapes above. */
 function readDeclaration(node: Node): Record<Part, PartReading> {
   if (has(node, "parameters")) {
     return {
@@ -126,6 +190,7 @@ function readDeclaration(node: Node): Record<Part, PartReading> {
       fields: "lacks",
       bases: "lacks",
       type: "lacks",
+      callable: "has",
     };
   }
   const container = has(node, "name") && has(node, "body")
@@ -143,13 +208,37 @@ function readDeclaration(node: Node): Record<Part, PartReading> {
     return {
       body: runs ? "unsure" : "lacks",
       signature: "lacks", result: "lacks", fields: "unsure", bases: "unsure", type: "has",
+      /*
+       * Not "lacks": calling a class is how Python makes one of it, and a Rust
+       * tuple struct is called to construct one. `@calls` into a type is a
+       * board to read, not one to accuse.
+       */
+      callable: "unsure",
     };
   }
-  return { body: "unsure", signature: "unsure", result: "unsure", fields: "unsure", bases: "unsure", type: "unsure" };
+  const value = node.childForFieldName("value") ?? node.childForFieldName("right");
+  const name = node.childForFieldName("name");
+  /*
+   * `type Handler = "a" | "b"` writes a value where a type belongs, and the
+   * one thing that tells it apart from a constant is the word the language
+   * opens it with. Both TypeScript and Rust spell it `type`.
+   */
+  const aliasesAType = name !== null && keywordOf(node, name) === "type";
+  if (value && !aliasesAType && isLiteral(value)) {
+    return {
+      body: "lacks", signature: "lacks", result: "unsure", fields: "unsure", bases: "unsure",
+      type: "lacks", callable: "lacks",
+    };
+  }
+  return {
+    body: "unsure", signature: "unsure", result: "unsure", fields: "unsure", bases: "unsure",
+    type: "unsure", callable: "unsure",
+  };
 }
 
 const UNSURE: Record<Part, PartReading> = {
-  body: "unsure", signature: "unsure", result: "unsure", fields: "unsure", bases: "unsure", type: "unsure",
+  body: "unsure", signature: "unsure", result: "unsure", fields: "unsure", bases: "unsure",
+  type: "unsure", callable: "unsure",
 };
 
 /**
@@ -198,14 +287,22 @@ export function declaredNames(source: string, language: Language): string[] {
  * to say a function lacks a signature, it reports 926 wrong lacks in Python
  * and 208 in Rust.
  *
+ * `callable` and `type` for a value written out in full (#307) were measured
+ * the same way and are 0 wrong across every language. Their referee is a text
+ * reading of the declaration, and it cannot parse everything: **160 Python and
+ * 20 TypeScript** lacks went unjudged, 2.9% and 0.8% of what the reader
+ * claimed there. Those were sampled and read -- a value spread over lines, a
+ * chained `first = second = None`, a name the server lists at another line --
+ * and not one was a reader mistake. Rust, TSX and JavaScript are fully judged.
+ *
  * A square goes `false` the moment a run finds one wrong lack in that
  * language. The claim's reader is unaffected either way: losing this costs the
  * accusation and nothing else, exactly as `licence.ts` has it.
  */
 export const PART_LICENCE: Record<Language, Record<Part, boolean>> = {
-  ts: { body: true, signature: true, result: true, fields: true, bases: true, type: true },
-  tsx: { body: true, signature: true, result: true, fields: true, bases: true, type: true },
-  js: { body: true, signature: true, result: true, fields: true, bases: true, type: true },
+  ts: { body: true, signature: true, result: true, fields: true, bases: true, type: true, callable: true },
+  tsx: { body: true, signature: true, result: true, fields: true, bases: true, type: true, callable: true },
+  js: { body: true, signature: true, result: true, fields: true, bases: true, type: true, callable: true },
   /*
    * Closed on `body`, and it was open for a day. A Rust type's code is its
    * `impl` blocks, which live outside the declaration and may be in any file of
@@ -216,8 +313,8 @@ export const PART_LICENCE: Record<Language, Record<Part, boolean>> = {
    * blocks the square reads 1,068 wrong lacks. The same footing as `@conforms`
    * in Rust: the fact is somewhere in the crate.
    */
-  rust: { body: false, signature: true, result: true, fields: true, bases: true, type: true },
-  python: { body: true, signature: true, result: true, fields: true, bases: true, type: true },
+  rust: { body: false, signature: true, result: true, fields: true, bases: true, type: true, callable: true },
+  python: { body: true, signature: true, result: true, fields: true, bases: true, type: true, callable: true },
 };
 
 /** One end of an arrow, as the check has it. */

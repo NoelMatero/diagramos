@@ -448,3 +448,86 @@ describe("Rust structs are not accused of having no code", () => {
     });
   }
 });
+
+describe("an arrow into a constant (#307)", () => {
+  /*
+   * 87 of the 94 wrong-kind mistakes #301's test set plants that #297 did not
+   * catch are this: `@calls` or `@builds` into a constant. #297 left every
+   * constant alone because one may hold a function -- and a value written out
+   * in full cannot, which is the half that can be said.
+   */
+  const files: Record<string, { file: string; source: string }> = {
+    rust: {
+      file: "src/lib.rs",
+      source: [
+        "pub const LIMIT: usize = 4;",
+        "pub const MAKER: fn() -> usize = build;",
+        "pub fn build() -> usize { LIMIT }",
+        "",
+      ].join("\n"),
+    },
+    python: {
+      file: "src/limits.py",
+      source: [
+        "LIMIT = 4",
+        "MAKER = build",
+        "",
+        "def build():",
+        "    return LIMIT",
+        "",
+      ].join("\n"),
+    },
+    ts: {
+      file: "src/limits.ts",
+      source: [
+        "export const LIMIT = 4;",
+        "export const MAKER = build;",
+        "export function build() { return LIMIT; }",
+        "",
+      ].join("\n"),
+    },
+  };
+
+  const reportFor = async (language: string, to: string, claim: ArrowClaim) => {
+    const { file, source } = files[language]!;
+    const board = await boardOf(`${file}#build`, `${file}#${to}`, claim);
+    return checkDrift(board, fakeWorkspace({ [file]: source }), { edges: true });
+  };
+
+  it.each(Object.keys(files))("is red in %s for @calls into a number", async (language) => {
+    /*
+     * Red in all three, and not always by this check: where `calls.ts` can read
+     * a routine's whole call set it already refutes the arrow (`calls-refuted`,
+     * ts and python only). Both sentences are true and the arrow fails either
+     * way; what this check adds is the languages and the shapes that reader
+     * cannot close -- a macro, a dynamic call, a name it cannot place.
+     */
+    const report = await reportFor(language, "LIMIT", "calls");
+
+    expect(report.edges.some((edge) => edge.kind === "end-lacks-part" || edge.kind === "calls-refuted"))
+      .toBe(true);
+    expect(report.clean).toBe(false);
+  });
+
+  it("says which end it is in Rust, where @calls cannot refute from a call set", async () => {
+    const report = await reportFor("rust", "LIMIT", "calls");
+    const finding = report.edges.find((edge) => edge.kind === "end-lacks-part");
+
+    expect(finding?.detail).toContain("is a plain value, and cannot be called");
+    expect(finding?.detail).toContain("Point the arrow at the routine that is called");
+  });
+
+  it.each(Object.keys(files))("is red in %s for @builds into a number", async (language) => {
+    const report = await reportFor(language, "LIMIT", "builds");
+    const finding = report.edges.find((edge) => edge.kind === "end-lacks-part");
+
+    expect(finding?.detail).toContain("is not a type");
+    expect(report.clean).toBe(false);
+  });
+
+  it.each(Object.keys(files))("stays quiet in %s when the constant holds a function", async (language) => {
+    const report = await reportFor(language, "MAKER", "calls");
+
+    expect(report.edges.filter((edge) => edge.kind === "end-lacks-part")).toEqual([]);
+  });
+});
