@@ -57,7 +57,7 @@ import {
   type CallSide, type CallsWithheld, EXTERNAL_RECEIVER, type ReceiverResolution, callSitesIn, callsBetween,
 } from "./calls";
 import { newReachCache, reachBetween, type ReachCache } from "./reach";
-import { constructions, routineNamesIn, type ConstructsWithheld } from "./constructs";
+import { constructions, routineNamesIn, type ConstructsNames, type ConstructsWithheld } from "./constructs";
 import { type AccessesWithheld, type NotReadEvidence, memberAccesses, memberNamed, membersReadAt, membersReadByName, readsMember } from "./accesses";
 import { heldTypes, type HoldsWithheld } from "./holds";
 import { conformedTypes, type ConformsWithheld } from "./conforms";
@@ -4513,6 +4513,23 @@ export function checkDrift(
            * as a routine to read; the reader ignores the ones that are not.
            */
           const toLanguage = languageOf(toFile);
+          /*
+           * Python's imports, which are the only thing that separates
+           * `Response(body)` from `render(body)` (#309). The same `callSide`
+           * `@calls` is given, and the **anchors** rather than `fromFile` /
+           * `toFile`, for the reason spelled out at the `@calls` block below:
+           * the workspace refuses an absolute path, and a `CallSide.file` is
+           * compared against the repo-relative file a dependency resolved to.
+           *
+           * Built only for Python, because it costs a dependency read per file
+           * and no other language needs it -- everywhere else the grammar has a
+           * node that means construction and nothing else.
+           */
+          let names: ConstructsNames | undefined;
+          if (language === "python") {
+            const tail = callSide(fromAnchor, workspace, importCache.configs);
+            if (tail) names = { side: tail, target: toAnchor };
+          }
           const verdict = constructions(
             workspace.read(fromFile), fromEnd.symbols[0]!, toEnd.symbols, language,
             toLanguage && edge.state !== "planned"
@@ -4523,6 +4540,7 @@ export function checkDrift(
                 names: fromEnd.symbols,
               }
               : undefined,
+            names,
           );
 
           if (verdict.verdict === "confirmed") {

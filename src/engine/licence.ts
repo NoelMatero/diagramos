@@ -1301,10 +1301,16 @@ export const LICENCES: readonly Licence[] = [
             "Python spells making one of something as an ordinary call, so the " +
             "referee has no pattern to count and the reader has no verdict to " +
             "give: `measure:constructs` asks it 0 times over the 4,077 files " +
-            "of the pinned clones. " +
-            "`constructs.ts` withholds Python before any licence is consulted, so " +
-            "nothing changes by saying so here -- but until #207 this square read " +
-            "`yes`, on the strength of three measurements of other words.",
+            "of the pinned clones. Until #207 this square read `yes`, on the " +
+            "strength of three measurements of other words. " +
+            "#309 changed what the reader can *confirm* and deliberately not " +
+            "this: resolving the called name through the file's imports tells " +
+            "`Response(body)` from `render(body)` where the import places the " +
+            "name, and `constructs.ts` answers only `confirmed` or a refusal on " +
+            "that path -- Python never reaches `absent`, which is the door " +
+            "`backwards` stands behind. So the accusation is still unmeasured " +
+            "and still refused, and giving it a licence would need its own run " +
+            "against pyright first.",
         },
         absence: NOT_DESIGNED_YET,
       },

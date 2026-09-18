@@ -24,8 +24,9 @@
  */
 import { beforeAll, describe, expect, it } from "vitest";
 
-import { initEngine } from "../src/engine/parse";
-import { constructions, type ConstructsVerdict } from "../src/engine/constructs";
+import { initEngine, type Language } from "../src/engine/parse";
+import { constructions, type ConstructsNames, type ConstructsVerdict } from "../src/engine/constructs";
+import { type CallSide } from "../src/engine/calls";
 
 beforeAll(async () => { await initEngine(); }, 120_000);
 
@@ -135,6 +136,103 @@ describe("absent is not a finding, and must never become one", () => {
      */
     const source = "function build() { return makeWidget(); }";
     expect(verdictOf(constructions(source, "build", ["Widget"], "ts"))).toBe("absent");
+  });
+});
+
+/**
+ * A tree of Python files, and the question "does this routine make one of that
+ * class".
+ *
+ * The imports each file declares are given as specifier-to-file pairs, which is
+ * the shape `deps.ts` hands over. The reader never resolves a specifier itself,
+ * and a test that pretended otherwise would be testing something other than the
+ * thing that runs -- the same reason `engine-calls.test.ts` builds its sides
+ * this way.
+ */
+function asks(
+  files: Record<string, { source: string; imports?: Array<[string, string?]> }>,
+  from: { file: string; routine: string },
+  to: { file: string; names: string[] },
+): ConstructsVerdict {
+  const language: Language = "python";
+  const declaredIn = (file: string) => (files[file]?.imports ?? []).map(([specifier, target]) => ({
+    specifier,
+    ...(target ? { file: target } : {}),
+  }));
+  const side: CallSide = {
+    file: from.file,
+    source: files[from.file]!.source,
+    language,
+    imports: declaredIn(from.file),
+    open: (wanted) => {
+      const other = files[wanted];
+      return other ? { source: other.source, language, imports: declaredIn(wanted) } : undefined;
+    },
+  };
+  const names: ConstructsNames = { side, target: to.file };
+  return constructions(files[from.file]!.source, from.routine, to.names, language, undefined, names);
+}
+
+describe("Python, where a construction and a call are spelled the same (#309)", () => {
+  it("confirms a class brought in by a plain import", () => {
+    // The whole of the change: `Response(body)` is a construction because
+    // `wsgi.py` declares `Response` as a class, and the import in `views.py`
+    // says that is the `Response` this file means.
+    const verdict = asks({
+      "app/views.py": {
+        source: "from app.wsgi import Response\n\ndef build(body):\n    return Response(body)\n",
+        imports: [["app.wsgi", "app/wsgi.py"], ["app.wsgi.Response", "app/wsgi.py"]],
+      },
+      "app/wsgi.py": { source: "class Response:\n    def __init__(self, body):\n        self.body = body\n" },
+    }, { file: "app/views.py", routine: "build" }, { file: "app/wsgi.py", names: ["Response"] });
+    expect(verdict.verdict).toBe("confirmed");
+    if (verdict.verdict !== "confirmed") return;
+    expect(verdict.evidence.name).toBe("Response");
+    expect(verdict.evidence.line).toBe(4);
+    expect(verdict.evidence.wrote).toContain("Response(body)");
+  });
+
+  it("confirms a class the import renamed on the way in", () => {
+    // `Res(body)` and the box says `Response`, and the import is the only thing
+    // in the file that says those are the same class. A reader comparing
+    // spellings answers `not-constructed` on an arrow that is written in plain
+    // sight -- the `aliased` gap #227 named, one word over.
+    const verdict = asks({
+      "app/views.py": {
+        source: "from app.wsgi import Response as Res\n\ndef build(body):\n    return Res(body)\n",
+        imports: [["app.wsgi", "app/wsgi.py"], ["app.wsgi.Response", "app/wsgi.py"]],
+      },
+      "app/wsgi.py": { source: "class Response:\n    pass\n" },
+    }, { file: "app/views.py", routine: "build" }, { file: "app/wsgi.py", names: ["Response"] });
+    expect(verdictOf(verdict)).toBe("confirmed");
+  });
+
+  it("confirms a class brought in by a relative import", () => {
+    // `deps-python.ts` resolves `.wsgi` to a file, and the reader compares the
+    // specifier it was handed rather than the dots it was written with.
+    const verdict = asks({
+      "app/views.py": {
+        source: "from .wsgi import Response\n\ndef build(body):\n    return Response(body)\n",
+        imports: [[".wsgi", "app/wsgi.py"], [".wsgi.Response", "app/wsgi.py"]],
+      },
+      "app/wsgi.py": { source: "class Response:\n    pass\n" },
+    }, { file: "app/views.py", routine: "build" }, { file: "app/wsgi.py", names: ["Response"] });
+    expect(verdictOf(verdict)).toBe("confirmed");
+  });
+
+  it("refuses a plain function call, which makes nothing", () => {
+    // The case that made this word refuse the whole language: `render(body)` is
+    // the same syntax and the arrow would be a green nobody earned. What answers
+    // it is not the capital letter -- `Widget` is capitalised here too -- but
+    // that `widget.py` declares it with a parameter list.
+    const verdict = asks({
+      "app/views.py": {
+        source: "from app.widget import Widget\n\ndef build(body):\n    return Widget(body)\n",
+        imports: [["app.widget", "app/widget.py"], ["app.widget.Widget", "app/widget.py"]],
+      },
+      "app/widget.py": { source: "def Widget(body):\n    return body\n" },
+    }, { file: "app/views.py", routine: "build" }, { file: "app/widget.py", names: ["Widget"] });
+    expect(verdictOf(verdict)).toBe("withheld/not-a-class");
   });
 });
 

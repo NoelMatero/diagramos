@@ -155,7 +155,13 @@ const REASONS: Record<string, Label> = {
   "holds/not-a-type": { kind: "not-an-arrow", why: "the far end is a routine, not a type" },
 
   "builds/no-body": { kind: "cannot-see", why: "declared, and the reader reads no body off it" },
-  "builds/call-shaped": { kind: "cannot-see", why: "Python writes `Response(body)` for a construction; the reader refuses the whole language (#188). The import that binds `Response` is in the file, and `calls.ts` already follows it to the file declaring `class Response`" },
+  "builds/call-shaped": { kind: "cannot-see", why: "Python writes `Response(body)` for a construction and no import table was handed in, so the reader has nothing to tell it from an ordinary call (#188). Since #309 this is a caller holding one file, not the whole language" },
+  "builds/not-constructed": { kind: "cannot-see", why: "the reader read the body and found no call to that name written in it at all -- the referee saw one, so this is the two call scans disagreeing (#309)" },
+  "builds/unbound": { kind: "not-in-file", why: "nothing in the file binds the constructed name: a wildcard import, a builtin, a global (#189's hazard, #309's share of it)" },
+  "builds/unplaced": { kind: "not-in-file", why: "the import that binds the name resolves to no file in the tree -- a package path, a build alias (#189)" },
+  "builds/ambiguous": { kind: "cannot-see", why: "the file binds the constructed name more than one way" },
+  "builds/elsewhere": { kind: "cannot-see", why: "the name comes to rest in a file other than the one the far box points at" },
+  "builds/not-a-class": { kind: "cannot-see", why: "the name resolves to the far end and that file declares it with a parameter list -- a function, which constructs nothing. In this population that is the two readers disagreeing, not a fact about the code: the referee only asks about a name its own index calls a class in that file (#309)" },
   "builds/computed": { kind: "cannot-see", why: "the constructed name is written, through an expression the reader does not follow" },
   "builds/said:backwards": { kind: "cannot-see", why: "the reader finds the construction the other way and not this way" },
   "builds/said:cycle": { kind: "cannot-see", why: "both constructions are in the files; the reader declines a cycle" },
@@ -443,11 +449,34 @@ for (const tree of trees) {
     if (only.has("builds")) {
       const made: Array<{ routine: string; type: string; line: number }> = [];
       if (language === "python") {
-        // Python has no construction syntax, so the referee is the call scan:
-        // a bare call to a name the tree declares once as a class.
+        /*
+         * Python has no construction syntax, so the referee is the call scan: a
+         * bare call to a name the tree declares once as a class.
+         *
+         * With one shape taken back out, found by building the reader (#309).
+         * `CALL_TOKEN` is a name in front of a bracket and nothing more, so
+         * `class E1(Exception):` reads as a bare call to `E1` -- the line that
+         * *declares* the class, credited to whatever function it is nested in.
+         * Not one of those is a construction, and on `pallets-flask` they were
+         * 26 of 79 asks: a third of that tree's population, every one of them
+         * counted against the reader for refusing to hallucinate a call.
+         *
+         * Filtered here rather than in `call-scan.ts`. That referee is shared
+         * with `@calls`, which never sees these -- a class name is not in the
+         * `routinesIn` index that word draws its population from -- so widening
+         * the fix would move a number nothing is wrong with.
+         */
+        const lines = source.split("\n");
+        const declaresItself = (name: string, line: number) =>
+          new RegExp(`^\\s*class\\s+${name.replace(/[$]/g, "\\$&")}\\s*\\(`).test(lines[line - 1] ?? "");
         for (const routine of routines) {
           for (const call of routine.calls) {
-            if (call.via === "bare" && typeFile(call.name)) made.push({ routine: routine.name, type: call.name, line: call.line });
+            if (call.via !== "bare" || !typeFile(call.name)) continue;
+            if (declaresItself(call.name, call.line)) {
+              exclude("builds", "a class declaration read as a call by the referee");
+              continue;
+            }
+            made.push({ routine: routine.name, type: call.name, line: call.line });
           }
         }
       } else {
@@ -467,6 +496,15 @@ for (const tree of trees) {
         ask("builds", language, far !== rel, at(rel, one.line), () => bucket(constructions(
           source, one.routine, [one.type], language,
           { source: farSource, routines: routineNamesIn(farSource, farLanguage), language: farLanguage, names: [one.routine] },
+          /*
+           * Python's imports (#309), the same way `drift.ts` hands them over.
+           * Without this the reader has nothing to tell `Response(body)` from
+           * `render(body)` with, and the column below is the 0.0% of 12,127 the
+           * issue is about.
+           */
+          language === "python"
+            ? { side: { file: rel, source, language, imports: imports(rel, source), open }, target: far }
+            : undefined,
         )));
       }
     }

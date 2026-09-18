@@ -156,9 +156,36 @@ describe("@builds on an arrow drawn the wrong way round", () => {
 });
 
 describe("a claim nobody could check is not a claim that passed", () => {
-  it("counts a Python claim as withheld rather than confirmed", async () => {
-    // Construction is spelled as a call in Python, so there is nothing to read
-    // in either direction and the word says so.
+  /** The same two boxes, in Python, over whatever the two files happen to say. */
+  const pythonReport = async (files: Record<string, string>) => {
+    const { board } = await createDiagram(emptyBoard(), {
+      name: "arch",
+      nodes: [
+        { id: "maker", label: "build", ref: "src/factory.py#build" },
+        { id: "made", label: "Widget", ref: "src/widget.py#Widget" },
+      ],
+      edges: [{ from: "maker", to: "made", claim: "builds" }],
+    });
+    return checkDrift(board, fakeWorkspace(files), { edges: true });
+  };
+
+  it("counts a Python claim whose name nothing binds as withheld", async () => {
+    // `Widget()` with no import above it. Nothing in the file says which
+    // `Widget` this is, so the reader is exactly where it was -- and it says
+    // which dead end it hit rather than blaming the language (#309).
+    const report = await pythonReport({
+      "src/factory.py": "def build():\n    return Widget()\n",
+      "src/widget.py": "class Widget:\n    pass\n",
+    });
+
+    expect(report.claims.buildsConfirmed).toBe(0);
+    expect(report.claims.buildsWithheld["unbound"]).toBe(1);
+    expect(report.clean).toBe(true);
+  });
+});
+
+describe("@builds on a Python board, which used to confirm nothing at all (#309)", () => {
+  it("confirms a construction the import places", async () => {
     const { board } = await createDiagram(emptyBoard(), {
       name: "arch",
       nodes: [
@@ -168,14 +195,27 @@ describe("a claim nobody could check is not a claim that passed", () => {
       edges: [{ from: "maker", to: "made", claim: "builds" }],
     });
     const report = checkDrift(board, fakeWorkspace({
-      "src/factory.py": "def build():\n    return Widget()\n",
+      "src/factory.py": "from .widget import Widget\n\ndef build():\n    return Widget()\n",
       "src/widget.py": "class Widget:\n    pass\n",
     }), { edges: true });
 
-    expect(report.claims.buildsConfirmed).toBe(0);
-    expect(report.claims.buildsWithheld["call-shaped"]).toBe(1);
+    expect(report.claims.buildsConfirmed).toBe(1);
     expect(report.clean).toBe(true);
   });
+
+  /*
+   * The function case a reader test covers and a board test cannot.
+   *
+   * `engine-constructs.test.ts` asks the reader directly and gets
+   * `withheld/not-a-class` for an imported `Widget` that `widget.py` declares
+   * with a parameter list. On a board that answer is unreachable, and the
+   * reason is upstream of this word: #297's end-kind check sees a `@builds`
+   * arrow whose head is a function and refuses the claim before `constructs.ts`
+   * is called at all. Probed on `origin/main` and on this branch, and both
+   * answer `end-lacks-part` -- so it is not something #309 introduced, and a
+   * board test here would be testing #297's guard while appearing to test this
+   * one.
+   */
 });
 
 describe("a planned arrow is a specification, not an accusation", () => {
