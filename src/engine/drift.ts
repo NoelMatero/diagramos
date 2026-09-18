@@ -681,11 +681,31 @@ export interface UnreadEdgeFinding {
  * - `nothing-connects-them` is the file-level channels coming up empty: no
  *   import either way, no shared importer, no shared route, nothing in the code
  *   graph.
+ * - `claim-not-checked` is the one that is not about the code at all. The
+ *   arrow carries a claim, that claim's own reader declined, and nothing
+ *   else here is entitled to answer for it.
  */
 export type EdgeUnconfirmedReason =
   | "no-call-either-way"
   | "an-end-is-data"
   | "nothing-connects-them"
+  /**
+   * A claimed arrow whose own claim could not be read (#304).
+   *
+   * The three above are the plain channels reporting what they searched for
+   * and did not find. This one is a refusal to search: `@needs` means a direct
+   * import and `@calls` means a call, so an import the other way, a file that
+   * imports both ends, or a call two hops out is evidence for neither. Before
+   * this reason existed such an arrow fell through to those channels and came
+   * back green -- 43 false claims on `bench:planted`, the worst of them a
+   * `@needs` between two files where neither imports the other, confirmed
+   * because a third file imported both.
+   *
+   * So a claim decides its own arrow or nothing does. The channels stay
+   * exactly as they were for an arrow that claims nothing, which is what they
+   * were built for.
+   */
+  | "claim-not-checked"
   /**
    * A `@feeds` arrow where the only flow found runs the other way.
    *
@@ -733,6 +753,7 @@ export const UNCONFIRMED_WORDS: Record<EdgeUnconfirmedReason, string> = {
   "no-call-either-way": "nothing calls the other, either way",
   "an-end-is-data": "an end names data, not something that runs — anchor that end at file level, or at the routine that uses it when both are in one file",
   "nothing-connects-them": "no import, shared importer or shared route connects them",
+  "claim-not-checked": "the claim's own check could not answer, and nothing looser may answer for it",
   "feeds-runs-the-other-way": "the only flow found runs the other way",
   "signature-other-half": "the type is in the other half of the signature — the arrow may be the wrong way round",
 };
@@ -3853,16 +3874,23 @@ export function checkDrift(
           : wholeRef(toAnchor);
         if (
           !missing && fromEvidence && toEvidence
+          /*
+           * Never for a claimed arrow (#304).
+           *
+           * The comment this replaces said the thing and then did the
+           * opposite: "the claim still got no verdict and still has to be
+           * counted as one that got none" -- and then confirmed the arrow, so
+           * a claim nothing verified was counted as withheld *and* rendered
+           * green. The graph answers whether anything under this directory
+           * reaches the other end, which is not what `@needs` or `@calls`
+           * says, so a claimed arrow goes back to being the skip it was before
+           * this channel existed. A plan keeps the promotion: `claimed` is
+           * false on a `planned` arrow.
+           */
+          && !claimed
           && codeGraphConfirms(options?.codeGraph, fromEvidence, toEvidence)
         ) {
           edgesChecked += 1;
-          /*
-           * The connection is corroborated; the *direction* is not. `checkNeeds`
-           * reads two files, and one end here stands for a whole directory or a
-           * set of them, so the claim still got no verdict and still has to be
-           * counted as one that got none.
-           */
-          if (claimed) withheld[shape] = (withheld[shape] ?? 0) + 1;
           recordEdge(edge, fromNode, toNode, { kind: "confirmed" });
           continue;
         }
@@ -3885,12 +3913,27 @@ export function checkDrift(
        * both files are in a measured language, both vouched for by a source
        * index, both parsed to the end, and neither reaches out at runtime.
        *
-       * A verdict of anything but `backwards` falls straight through to the
-       * checks below, untouched. That is deliberate and it is what keeps the
-       * claim from quietly changing anything else: a confirmed `needs` is
-       * confirmed again by the ordinary channels a moment later, and an absent
-       * one goes amber exactly as it did before claims existed.
+       * Every verdict is acted on here now (#304). It used to be only
+       * `backwards`: a confirmed `needs` fell through and was confirmed again
+       * by the ordinary channels a moment later, and an absent one went to
+       * them too. That reads as harmless and was not -- those channels confirm
+       * on an import *either* way and on a third file importing both ends, so
+       * they would have given the same green to the arrow drawn backwards.
+       * `confirmed` now ends here on the import this reader found, and
+       * anything else ends at the gate below.
        */
+
+      /*
+       * Why this claim's own reader did not answer, kept for the arrow to say
+       * (#304). Set by whichever reader withheld, and read only at the gate
+       * below, which is the one place that knows every reader has had its turn.
+       *
+       * A plan sets nothing: `claimed` is false on a `planned` arrow, which
+       * asks its one question and then takes the ordinary channels as before.
+       */
+      let unansweredWhy: string | undefined;
+      const unanswered = (why: string) => { if (claimed) unansweredWhy ??= why; };
+
       if (edge.claim === "needs" && (claimed || edge.state === "planned")) {
         const needs = checkNeeds(fromPath, toPath, workspace, importCache.configs, options?.ledger);
         /*
@@ -3958,6 +4001,7 @@ export function checkDrift(
           }
         } else if (needs.verdict === "withheld") {
           claims.needsWithheld[needs.why] = (claims.needsWithheld[needs.why] ?? 0) + 1;
+          unanswered(needs.why);
         } else if (needs.verdict === "cycle") {
           /*
            * Both directions exist, so neither arrow is more correct than the
@@ -3968,6 +4012,7 @@ export function checkDrift(
            * `crate::` and a root naming `mod` is a cycle by construction.
            */
           claims.needsWithheld.cycle = (claims.needsWithheld.cycle ?? 0) + 1;
+          unanswered("a cycle, where neither direction is more correct");
         } else {
           claims.needsChecked += 1;
           if (needs.verdict === "backwards") {
@@ -4025,6 +4070,29 @@ export function checkDrift(
             } });
             continue;
           }
+          if (needs.verdict === "confirmed") {
+            /*
+             * Confirmed here, on the import this reader found, rather than by
+             * falling through (#304).
+             *
+             * Falling through worked and rested on the wrong evidence: the
+             * channels below confirm on an import *either* way and on a third
+             * file importing both ends, and `@needs` means a direct import
+             * from this end to that one. A true claim was getting its green
+             * from a check that would have given the same green to the arrow
+             * drawn backwards -- and did, 43 times on `bench:planted`.
+             */
+            edgesChecked += 1;
+            recordEdge(edge, fromNode, toNode, { kind: "confirmed" });
+            continue;
+          }
+          /*
+           * `absent`: both files were read well enough to refute, and neither
+           * declares the other. Not a red -- `needs` refutes from the presence
+           * of the opposite import, never from an absence -- so the arrow is
+           * not verified, with that as the reason.
+           */
+          unanswered("no import either way");
         }
       }
 
@@ -4086,6 +4154,7 @@ export function checkDrift(
         const language = languageOf(toFile);
         const noteWithheld = (why: SignatureWithheld | "misplaced" | EdgeSkipReason) => {
           if (claimed) claims.signatureWithheld[why] = (claims.signatureWithheld[why] ?? 0) + 1;
+          unanswered(why);
         };
 
         if (toEnd.symbols.length === 0 || fromEnd.symbols.length === 0) {
@@ -4195,6 +4264,7 @@ export function checkDrift(
         const language = languageOf(fromFile);
         const noteHeld = (why: HoldsWithheld | EdgeSkipReason) => {
           if (claimed) claims.holdsWithheld[why] = (claims.holdsWithheld[why] ?? 0) + 1;
+          unanswered(why);
         };
 
         if (fromEnd.symbols.length === 0 || toEnd.symbols.length === 0) {
@@ -4317,6 +4387,7 @@ export function checkDrift(
         const language = languageOf(fromFile);
         const noteConforms = (why: ConformsWithheld | EdgeSkipReason) => {
           if (claimed) claims.conformsWithheld[why] = (claims.conformsWithheld[why] ?? 0) + 1;
+          unanswered(why);
         };
 
         if (fromEnd.symbols.length === 0 || toEnd.symbols.length === 0) {
@@ -4437,6 +4508,7 @@ export function checkDrift(
         const language = languageOf(fromFile);
         const noteBuilt = (why: ConstructsWithheld | EdgeSkipReason) => {
           if (claimed) claims.buildsWithheld[why] = (claims.buildsWithheld[why] ?? 0) + 1;
+          unanswered(why);
         };
 
         if (fromEnd.symbols.length === 0 || toEnd.symbols.length === 0) {
@@ -4494,9 +4566,10 @@ export function checkDrift(
             continue;
           }
           /*
-           * `absent` and `cycle` both fall through to the ordinary channels,
-           * untouched. That is the point of the word: not finding a
-           * construction is not evidence there is none.
+           * `absent` and `cycle` are both silent here. That is the point of
+           * the word: not finding a construction is not evidence there is
+           * none. A claimed arrow then reaches the gate below and is not
+           * verified; a plan takes the ordinary channels as it always did.
            */
         }
       }
@@ -4535,6 +4608,7 @@ export function checkDrift(
       if (edge.claim === "calls" && (claimed || edge.state === "planned")) {
         const noteCalled = (why: CallsWithheld | EdgeSkipReason) => {
           if (claimed) claims.callsWithheld[why] = (claims.callsWithheld[why] ?? 0) + 1;
+          unanswered(why);
         };
 
         if (fromEnd.symbols.length === 0 || toEnd.symbols.length === 0) {
@@ -4695,9 +4769,10 @@ export function checkDrift(
               continue;
             }
             /*
-             * `absent` falls through to the ordinary channels, untouched. That is
-             * the point of the word: not finding a call is not evidence there is
-             * none.
+             * `absent` is silent here. That is the point of the word: not
+             * finding a call is not evidence there is none. A claimed arrow
+             * then reaches the gate below and is not verified; a plan takes
+             * the ordinary channels as it always did.
              */
           }
         }
@@ -4734,6 +4809,7 @@ export function checkDrift(
         const toLanguage = languageOf(toFile);
         const noteRead = (why: AccessesWithheld | EdgeSkipReason) => {
           if (claimed) claims.accessesWithheld[why] = (claims.accessesWithheld[why] ?? 0) + 1;
+          unanswered(why);
         };
 
         if (fromEnd.symbols.length === 0 || toEnd.symbols.length === 0) {
@@ -4863,11 +4939,12 @@ export function checkDrift(
              */
           }
           /*
-           * `absent` falls through to the ordinary channels, untouched. The
-           * type has the member and this routine was not seen reading it, and
-           * nothing here can say that is a mistake: the body reads a member
-           * without a name, reads none at all, is a class, or a function it
-           * calls reads the member (#255).
+           * `absent` is silent here. The type has the member and this routine
+           * was not seen reading it, and nothing here can say that is a
+           * mistake: the body reads a member without a name, reads none at
+           * all, is a class, or a function it calls reads the member (#255).
+           * A claimed arrow then reaches the gate below and is not verified;
+           * a plan takes the ordinary channels as it always did.
            */
         }
       }
@@ -4911,6 +4988,7 @@ export function checkDrift(
         if (!bothNamed) {
           if (claimed) {
             claims.feedsWithheld["not-symbols"] = (claims.feedsWithheld["not-symbols"] ?? 0) + 1;
+            unanswered("not-symbols");
           }
         } else {
           const pool = feedsCandidates();
@@ -4942,13 +5020,15 @@ export function checkDrift(
             continue;
           }
           /*
-           * Nothing found, or nowhere to look. Counted, and then straight on to
-           * the ordinary channels: a `feeds` arrow between two files that import
-           * each other is still a corroborated arrow, and the claim going
-           * unconfirmed does not take that away.
+           * Nothing found, or nowhere to look. Counted, and then the gate
+           * below: a `feeds` arrow between two files that import each other
+           * used to be confirmed on that import, which is a fact about the
+           * files and not about the flow the arrow draws (#304). A plan still
+           * takes the ordinary channels.
            */
           const why = feeds.verdict === "withheld" ? feeds.why : "absent";
           if (claimed) claims.feedsWithheld[why] = (claims.feedsWithheld[why] ?? 0) + 1;
+          unanswered(why);
         }
       }
 
@@ -5053,6 +5133,43 @@ export function checkDrift(
               } }
             : { kind: "confirmed" },
         );
+        continue;
+      }
+
+      /*
+       * A claim is confirmed by its own check, or it is not confirmed (#304).
+       *
+       * Everything below this line is the check for an arrow that claims
+       * nothing: a call chain found in a body, an import either way, a file
+       * that imports both ends, a shared route, the code graph. Every one of
+       * them only ever confirms, and none of them reads the thing the claim
+       * says -- so on a claimed arrow they confirm something nobody checked,
+       * and the arrow then renders exactly like one whose claim held.
+       *
+       * It measured badly rather than theoretically: 43 false claims came back
+       * green on `bench:planted`, and a `@needs` arrow between two files where
+       * neither imports the other was confirmed because a third file imported
+       * both. `@needs` means a direct import. A third file importing both is
+       * not evidence of one.
+       *
+       * Reached only by an arrow every reader above declined on: a claim one
+       * of them confirmed continued at its own block, and a claim one of them
+       * refuted went red there. A `planned` arrow has `claimed` false and
+       * passes straight through, because a plan is promoted by the connection
+       * landing rather than by its claim holding.
+       */
+      if (claimed && edge.claim) {
+        edgesChecked += 1;
+        recordEdge(edge, fromNode, toNode, {
+          kind: "unconfirmed",
+          reason: "claim-not-checked",
+          detail:
+            `this arrow claims @${edge.claim}, and only the @${edge.claim} check can confirm `
+            + `it — that check could not answer`
+            + (unansweredWhy ? ` (${unansweredWhy})` : "")
+            + `, so the arrow is not verified. The two ends may well be connected; whether `
+            + `they are connected the way @${edge.claim} says is what nothing here could read.`,
+        });
         continue;
       }
 

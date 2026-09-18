@@ -665,6 +665,7 @@ arrow by both box labels and groups them by reason:
 | `no-call-either-way` | both ends name something with a body, both bodies were read, neither reaches the other. The sharpest "nothing found" available here |
 | `an-end-is-data` | an end names a struct, a static or a field, so there is no body on that side to search from — and the declarations were read too (below), so the signature, the field's own type and the enclosing block name nothing either. **Anchor that end at file level** and the import channels can answer instead — unless the other end is in that same file, where file level leaves nothing to check (`ends-in-one-file`, #280) and the routine that uses the data is the anchor to use |
 | `nothing-connects-them` | the file-level channels came up empty: no import either way, no shared importer, no shared route, nothing in the code graph |
+| `claim-not-checked` | the arrow carries a claim and that claim's own reader declined, so nothing here is entitled to confirm it (#304). Every channel above answers a looser question than the claim asks -- `@needs` means a direct import, and an import the other way or a third file importing both is evidence for neither -- so a claimed arrow is decided by its own check or it is not decided. The reason the reader gave rides in the sentence |
 
 The second one is the only line in this report that can be acted on into
 *better* coverage rather than a fix, which is why it carries the instruction in
