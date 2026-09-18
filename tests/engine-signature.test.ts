@@ -623,3 +623,29 @@ describe("a namespace, in each shape real source writes it", () => {
   });
 });
 
+/**
+ * The same alias doubt, in the signature reader (#306).
+ *
+ * `import typing as t` then `def f(v: t.ValuesView) -> None` -- the segment is
+ * not a type name and it is a name standing for something else, so it belongs
+ * in the alias check and out of the match.
+ */
+describe("a namespace segment that is an aliased import", () => {
+  const source = "import typing as t\ndef f(v: t.ValuesView) -> None: ...";
+
+  it("withholds rather than accusing", () => {
+    expect(verdictOf(signatureNames(source, "f", ["Nope"], "parameter", "python")))
+      .toBe("withheld/aliased");
+  });
+
+  it("does not confirm the alias itself", () => {
+    expect(verdictOf(signatureNames(source, "f", ["t"], "parameter", "python")))
+      .toBe("withheld/aliased");
+  });
+
+  it("still confirms the type inside it", () => {
+    expect(verdictOf(signatureNames(source, "f", ["ValuesView"], "parameter", "python")))
+      .toBe("confirmed");
+  });
+});
+

@@ -466,3 +466,31 @@ describe("a namespace on the front of a field's type", () => {
   });
 });
 
+/**
+ * The alias doubt a namespace segment used to carry by accident (#306).
+ *
+ * Dropping the segment from the name list dropped it out of the alias check
+ * too, and flask's `App` went from withheld to *red*: `import typing as t`
+ * sits above it, `t` is a name standing for something else, and that is a
+ * reason not to accuse. The segment is still recorded -- it just cannot be
+ * matched as a type the class holds.
+ */
+describe("a namespace segment that is an aliased import", () => {
+  const flask = [
+    "import typing as t",
+    "class App:",
+    "    blueprints: t.ValuesView[Blueprint]",
+  ].join("\n");
+
+  it("withholds rather than accusing", () => {
+    expect(verdictOf(heldTypes(flask, "App", ["Nope"], "python"))).toBe("withheld/aliased");
+  });
+
+  it("does not confirm the alias itself", () => {
+    expect(verdictOf(heldTypes(flask, "App", ["t"], "python"))).toBe("withheld/aliased");
+  });
+
+  it("still confirms the type inside it", () => {
+    expect(verdictOf(heldTypes(flask, "App", ["Blueprint"], "python"))).toBe("confirmed");
+  });
+});

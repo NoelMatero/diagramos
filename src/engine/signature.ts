@@ -414,6 +414,17 @@ function typeNames(
   node: Node | null | undefined,
   into: Set<string>,
   quoting: boolean,
+  /**
+   * The namespace segments, which are not names the signature writes and are
+   * still names written in it.
+   *
+   * Kept apart rather than dropped, because they were doing a second job by
+   * accident: a segment that is an aliased import -- `import typing as t`,
+   * then a parameter typed `t.ValuesView[..]` -- is a name standing for
+   * something else, which forbids an absence. The caller matches on `into` and
+   * asks both sets whether anything in the signature is an alias.
+   */
+  qualifiers?: Set<string>,
 ): boolean {
   if (!node) return false;
   let quoted = false;
@@ -423,14 +434,20 @@ function typeNames(
       for (const written of part.text.matchAll(WORDS)) {
         const path = written[0].replace(/\s+/g, "");
         into.add(path);
-        const tail = path.split(".").pop();
-        if (tail) into.add(tail);
+        const segments = path.split(".");
+        into.add(segments[segments.length - 1]!);
+        for (const segment of segments.slice(0, -1)) qualifiers?.add(segment);
       }
       return;
     }
     const tail = qualifiedTail(part);
     if (tail) {
       into.add(part.text);
+      for (let index = 0; index < part.childCount; index += 1) {
+        const segment = part.child(index);
+        if (!segment || segment.id === tail.id || !segment.isNamed) continue;
+        each(segment, (leaf) => { if (isTypeWord(leaf)) qualifiers?.add(leaf.text); });
+      }
       visit(tail);
       return;
     }
@@ -444,12 +461,17 @@ function typeNames(
   return quoted;
 }
 
-function parameterTypes(parameters: Node, into: Set<string>, quoting: boolean): boolean {
+function parameterTypes(
+  parameters: Node,
+  into: Set<string>,
+  quoting: boolean,
+  qualifiers?: Set<string>,
+): boolean {
   let quoted = false;
   for (let index = 0; index < parameters.childCount; index += 1) {
     const parameter = parameters.child(index);
     if (!parameter || parameter.childCount === 0) continue;
-    if (typeNames(parameter.childForFieldName("type"), into, quoting)) quoted = true;
+    if (typeNames(parameter.childForFieldName("type"), into, quoting, qualifiers)) quoted = true;
   }
   return quoted;
 }
@@ -549,11 +571,13 @@ export function signatureNames(
 
     const parameters = signature.childForFieldName("parameters");
     const returned = signature.childForFieldName("return_type");
+    /* Namespace segments from either half, for the alias check only (#306). */
+    const qualifiers = new Set<string>();
     const inParameters = new Set<string>();
     const quotedParameters = parameters
-      ? parameterTypes(parameters, inParameters, quoting) : false;
+      ? parameterTypes(parameters, inParameters, quoting, qualifiers) : false;
     const inReturn = new Set<string>();
-    const quotedReturn = typeNames(returned, inReturn, quoting);
+    const quotedReturn = typeNames(returned, inReturn, quoting, qualifiers);
 
     /*
      * `Self` reads as the type the `impl` names, and where there is no such
@@ -617,7 +641,7 @@ export function signatureNames(
      * every name that *is* in it means itself. One alias in the signature and
      * the target could be sitting there under another spelling.
      */
-    const spellings = new Set([...inParameters, ...inReturn]);
+    const spellings = new Set([...inParameters, ...inReturn, ...qualifiers]);
     if ([...spellings].some((name) => shadows.has(name))) {
       withheld ??= { verdict: "withheld", why: "aliased" };
       continue;
