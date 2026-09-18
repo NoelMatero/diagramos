@@ -784,8 +784,8 @@ end's file. **Recall = confirmed / asked.**
 
 **Three rows were low when this table was first written, for three different
 causes.** Each is labelled in the script's `REASONS` table as "the reader cannot
-see it" or "the fact is not in the file". One of the three has since been
-closed, and it is kept here because what it cost and what it left behind are
+see it" or "the fact is not in the file". Two of the three have since been
+closed (#309, #308), and they are kept here because what each cost and left behind are
 the argument for reading the labels rather than the number.
 
 - **`@builds` in Python was 0.0% of 12,127** and is **79.8% of 11,199** (#309).
