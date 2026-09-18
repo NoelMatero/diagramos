@@ -761,7 +761,9 @@ else either file does can unwrite it. Run together, those gates refused 19.8% of
 the true imports in #302's corpus — `flask/__init__.py` imports `app.py` in plain
 sight and the answer was withheld over a `table[name]()` elsewhere in `app.py`.
 So an import written in the tail now confirms whatever else its file does, and
-the two bottom rows hold only the red.
+the two bottom rows hold only the red. Over the same corpus that took `@needs`
+recall from 75.7% to 99.8% of 28,056 true imports, with the number of true
+imports it wrongly calls backwards unchanged at 9.
 
 The same split settles what used to be a rule of its own: **if the dependency
 exists both ways, no accusation is available.** Cycles are legal in TypeScript

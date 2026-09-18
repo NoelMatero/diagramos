@@ -764,7 +764,7 @@ end's file. **Recall = confirmed / asked.**
 
 | word | python | ts | tsx | js | rust | all |
 |---|---:|---:|---:|---:|---:|---:|
-| `@needs` | 79.7% of 12,693 | 78.6% of 9,631 | 80.0% of 2,444 | 38.1% of 749 | 51.0% of 2,539 | 75.7% of 28,056 |
+| `@needs` | 99.7% of 12,693 | 100.0% of 9,631 | 100.0% of 2,444 | 99.9% of 749 | 99.8% of 2,539 | 99.8% of 28,056 |
 | `@takes` | 100.0% of 2,380 | 99.6% of 2,739 | 100.0% of 52 | — | 100.0% of 1,960 | 99.9% of 7,131 |
 | `@returns` | 100.0% of 590 | 99.4% of 868 | 100.0% of 9 | — | 99.9% of 1,668 | 99.8% of 3,135 |
 | `@holds` | 78.1% of 183 | 99.4% of 165 | 100.0% of 44 | — | 99.9% of 772 | 96.4% of 1,164 |
@@ -783,15 +783,28 @@ the file".
   language before reading anything. The fact *is* in the file. The import that
   binds `Response` names the file declaring `class Response`, and `calls.ts`
   already follows it.
-- **`@needs`** lost 19.8% to `dynamic` (plus 0.8% to `incomplete`), and another
-  3.6% to `cycle`. `needs.ts` refused when **either** file did something at run
-  time or had a parse error anywhere, even when the import it was asked about
-  was written plainly in the tail. In the case read, `flask/__init__.py ->
-  app.py` was refused over a `table[name]()` in `app.py`. Only the accusation
-  needs the whole file, and **#308 split the two questions** so that finding the
-  import confirms on its own and a cycle confirms both its arrows. The row above
-  is the figure from before that change — the corpus has not been re-measured
-  yet, and until it has, the number to quote for `@needs` recall is this one.
+- **`@needs` was 75.7% and is 99.8%**, and the row above is the second run.
+  It lost 19.8% to `dynamic`, 3.6% to `cycle` and 0.8% to `incomplete`, because
+  `needs.ts` refused when **either** file did something at run time or had a
+  parse error anywhere — even when the import it was asked about was written
+  plainly in the tail. `flask/__init__.py -> app.py` was refused over a
+  `table[name]()` elsewhere in `app.py`. **#308 split the two questions.**
+  Finding the import confirms; only the accusation needs the whole file, and a
+  cycle confirms both its arrows because both are true. What the gates cost,
+  measured either side of the change on the same corpus:
+
+  | reason | before | after |
+  |---|---:|---:|
+  | `dynamic` | 5,545 | 1 |
+  | `said:cycle` | 1,005 | — |
+  | `incomplete` | 235 | 1 |
+  | `said:absent` | 37 | 37 |
+  | `said:backwards` | 9 | 9 |
+
+  **The bottom two rows are the ones to read.** They are the definite noes — the
+  reader contradicting the referee — and neither moved, which is the check that
+  the confirmations were bought with nothing. The 37 are mostly Django
+  re-export chains. The 48 that remain are 0.2% of 28,056.
 - **`@calls` in Python** is 64.0%, and **1,900 of its 2,100 `unbound` are the
   referee's**: calls to a built-in (`super` alone is 1,610) that the tree also
   declares once. With built-ins left out it is 83.6% (5,400 of 6,461), and
