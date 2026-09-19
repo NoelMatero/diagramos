@@ -333,6 +333,34 @@ const NOT_DESIGNED_YET: RelationUnmeasured = {
 };
 
 /**
+ * `@needs`' absence licence (#323): no import, and no chain of imports either.
+ *
+ * Measured the way the presence row is, on the same compiler edges over the
+ * pinned clones, asking the other question: of the imports the compiler says
+ * are there, how many would this call wrong. A miss is a true import the reader
+ * could not see *and* could not reach through any other file, which is the
+ * only way this row turns into a false red. The chain is what keeps
+ * `app -> database` drawn over three files from being one: that arrow is
+ * reached, and is told so, never accused.
+ */
+const NEEDS_ABSENCE = (
+  asked: number,
+  missed: number,
+  note: string,
+  known?: readonly string[],
+): RelationMeasured => ({
+  reproduce: "npm run measure:recall -- .corpus/* --words=needs",
+  measured: "2026-09-19",
+  referee:
+    "the compiler's own import edges (tsc, pyright, rust-analyzer) over the " +
+    "pinned clones -- the referee the presence row stands on",
+  unit: "true imports asked, and how many were called absent",
+  counts: { asked, missed },
+  note,
+  ...(known ? { known } : {}),
+});
+
+/**
  * `@calls`' absence licence outside TypeScript/TSX, and now Python (#242).
  *
  * #230 built the closed-body resolver against `tsc` alone; rust has no
@@ -563,7 +591,16 @@ export const LICENCES: readonly Licence[] = [
           unit: "dependency edges",
           counts: "corpus",
         },
-        absence: NOT_DESIGNED_YET,
+        absence: NEEDS_ABSENCE(12824, 1,
+          "ts 9,631, tsx 2,444, js 749. The miss is the known entry above: a " +
+            "TanStack test importing its own package by name through a tsconfig " +
+            "condition only its build defines. Neither file imports the other as " +
+            "the reader resolves it, and no chain reaches.",
+          [
+            "TanStack/query: `use-queries-with-persist.test.tsx` imports its own " +
+              "package by its published name, routed to `src/index.ts` by a " +
+              "custom tsconfig condition. The same miss the presence row carries.",
+          ]),
       },
       takes: { presence: TYPESCRIPT_SIGNATURE, absence: NOT_DESIGNED_YET },
       returns: { presence: TYPESCRIPT_SIGNATURE, absence: NOT_DESIGNED_YET },
@@ -902,7 +939,10 @@ export const LICENCES: readonly Licence[] = [
           unit: "dependency edges",
           counts: "corpus",
         },
-        absence: NOT_DESIGNED_YET,
+        absence: NEEDS_ABSENCE(2539, 0,
+          "A `use` is walked to the file it lands on, not through every module " +
+            "on its path: `lib.rs` declares every module in the crate, and a walk " +
+            "through it would reach everything and never accuse."),
       },
       takes: { presence: RUST_SIGNATURE, absence: NOT_DESIGNED_YET },
       returns: { presence: RUST_SIGNATURE, absence: NOT_DESIGNED_YET },
@@ -1255,7 +1295,10 @@ export const LICENCES: readonly Licence[] = [
           unit: "dependency edges",
           counts: "corpus",
         },
-        absence: NOT_DESIGNED_YET,
+        absence: NEEDS_ABSENCE(12693, 0,
+          "36 true imports come back as reached through another file rather " +
+            "than direct -- Django `__init__.py` files naming a module the " +
+            "compiler follows through a re-export -- which is amber, never red."),
       },
       takes: { presence: PYTHON_SIGNATURE, absence: NOT_DESIGNED_YET },
       returns: { presence: PYTHON_SIGNATURE, absence: NOT_DESIGNED_YET },

@@ -901,6 +901,13 @@ function rowsFor({ report, promoted = [] }, colour, all = false) {
        */
       const reachedNotCalled = finding.kind === "calls-one-level-up";
       /*
+       * The same pair for `needs` (#323): nothing the tail imports leads to
+       * the head, which is red; or it leads there through other files, which
+       * is the arrow drawn one level up and amber for the reason above.
+       */
+      const neverImported = finding.kind === "needs-absent";
+      const reachedNotImported = finding.kind === "needs-one-level-up";
+      /*
        * The eighth (#297), and the only one whose row says what the *end* is
        * rather than what the code does: this arrow asks a struct for a result
        * or a function for its fields, so there is nothing to go and compare.
@@ -948,6 +955,8 @@ function rowsFor({ report, promoted = [] }, colour, all = false) {
         + (wrongCalls ? " \u00b7 called the other way" : "")
         + (wrongCallsRefuted ? " \u00b7 never called" : "")
         + (reachedNotCalled ? " \u00b7 reached, not called" : "")
+        + (neverImported ? " \u00b7 never imported" : "")
+        + (reachedNotImported ? " \u00b7 reached, not imported" : "")
         // The same words the board page uses, so one board does not read as two
         // different findings depending on where somebody looked at it.
         + (wrongMembers ? " \u00b7 no such member" : "")
@@ -956,7 +965,7 @@ function rowsFor({ report, promoted = [] }, colour, all = false) {
         + (wrongKindOfEnd ? ` \u00b7 ${wrongKindOfEnd}` : "")
         + (hop ? ` \u00b7 ${hop}` : ""),
         backwards || wrongSignature || wrongHolds || wrongBuilds || wrongCalls || wrongCallsRefuted
-          || wrongMembers || wrongUnread || wrongBase || wrongKindOfEnd
+          || neverImported || wrongMembers || wrongUnread || wrongBase || wrongKindOfEnd
           ? "red"
           : "yellow",
         colour,

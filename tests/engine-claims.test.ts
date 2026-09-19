@@ -405,8 +405,10 @@ describe("a claim changes exactly one verdict", () => {
    * Two boards, identical but for the claims, checked against the same tree.
    * `a -> b` claims `needs` and is drawn backwards: b.ts imports a.ts. That one
    * is now called wrong. `b -> c` claims `needs` too and has no connection in
-   * either direction, so it stays amber -- which is the more important half,
-   * because an absence is not evidence and never becomes one.
+   * either direction. That stayed amber until #323, on the footing that an
+   * absence is not evidence; #308 made the reader find 99.8% of real imports,
+   * and it is now called wrong too -- after a walk through everything `b.ts`
+   * imports has ruled out the arrow drawn over files in between.
    */
   const files = {
     "a.ts": "export const a = 1;\n",
@@ -426,7 +428,7 @@ describe("a claim changes exactly one verdict", () => {
       edges: [
         // Backwards on purpose: b imports a, and this says a needs b.
         { from: "a", to: "b", ...(claim ? { claim } : {}) },
-        // Nothing connects these two at all: amber with or without a claim.
+        // Nothing connects these two at all: wrong with the claim (#323).
         { from: "b", to: "c", ...(claim ? { claim } : {}) },
       ],
     });
@@ -440,14 +442,12 @@ describe("a claim changes exactly one verdict", () => {
     expect(claimed.garbledClaims).toEqual([]);
 
     /*
-     * One finding, not two. The second arrow's claim could not be answered
-     * either way, and an unanswerable claim is counted rather than accused
-     * (#133) -- so the only verdict here is the one with a line of code behind
-     * it, which is exactly the arrow a reader should be looking at.
+     * Two findings, each with its own evidence: the import running the other
+     * way, and -- since #323 -- nothing `b.ts` imports leading to `c.ts`.
      */
     const byKind = new Map(claimed.edges.map((finding) => [finding.kind, finding]));
-    expect([...byKind.keys()]).toEqual(["backwards-edge"]);
-    expect(claimed.unconfirmedEdges).toHaveLength(1);
+    expect([...byKind.keys()]).toEqual(["backwards-edge", "needs-absent"]);
+    expect(claimed.unconfirmedEdges).toHaveLength(0);
 
     // The accusation names its evidence, or it is not worth making.
     const wrong = byKind.get("backwards-edge")!;
