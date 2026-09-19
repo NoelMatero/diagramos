@@ -539,3 +539,149 @@ describe("a signature naming the type under another name", () => {
       { source: pythonModel, language: "python" }))).toBe("absent");
   });
 });
+describe("a namespace on the front of a type name", () => {
+  // anyhow src/fmt.rs, the arrow #301's test set found green on a false claim.
+  const anyhow = "use core::fmt::{self, Debug, Write};\n"
+    + "impl ErrorImpl {\n"
+    + "    pub(crate) unsafe fn display(this: Ref<Self>, f: &mut fmt::Formatter)"
+    + " -> fmt::Result { }\n}";
+
+  it("does not read `fmt` out of `fmt::Formatter`", () => {
+    expect(verdictOf(signatureNames(anyhow, "display", ["fmt"], "parameter", "rust")))
+      .toBe("absent");
+  });
+
+  it("still reads the type itself", () => {
+    expect(verdictOf(signatureNames(anyhow, "display", ["Formatter"], "parameter", "rust")))
+      .toBe("confirmed");
+  });
+});
+
+/**
+ * The shapes a namespace comes in, one per way it is written in real source.
+ * Rust's `::`, Python's `.` and TypeScript's `.` are three spellings of one
+ * idea, and the reader tells them apart by nothing at all: a separator is an
+ * anonymous token, so its node type is its own text.
+ */
+describe("a namespace, in each shape real source writes it", () => {
+  it("drops every segment of a nested path, and keeps the type", () => {
+    const source = "fn nested(e: std::io::Error) { }";
+    expect(verdictOf(signatureNames(source, "nested", ["std"], "parameter", "rust")))
+      .toBe("absent");
+    expect(verdictOf(signatureNames(source, "nested", ["io"], "parameter", "rust")))
+      .toBe("absent");
+    expect(verdictOf(signatureNames(source, "nested", ["Error"], "parameter", "rust")))
+      .toBe("confirmed");
+  });
+
+  it("reads a type argument, which is not a namespace", () => {
+    // The opposite mistake, and the reason this is not a rule about depth: a
+    // parameter typed `Vec<Formatter>` really does take a Formatter.
+    const source = "fn generic(v: Vec<Formatter>) { }";
+    expect(verdictOf(signatureNames(source, "generic", ["Formatter"], "parameter", "rust")))
+      .toBe("confirmed");
+    expect(verdictOf(signatureNames(source, "generic", ["Vec"], "parameter", "rust")))
+      .toBe("confirmed");
+  });
+
+  it("confirms a box anchored at the whole spelling", () => {
+    const source = "fn f(x: fmt::Formatter) { }";
+    expect(verdictOf(signatureNames(source, "f", ["fmt::Formatter"], "parameter", "rust")))
+      .toBe("confirmed");
+  });
+
+  it("drops a Python module, and keeps the type", () => {
+    const source = "def display(f: fmt.Formatter) -> fmt.Result: ...";
+    expect(verdictOf(signatureNames(source, "display", ["fmt"], "parameter", "python")))
+      .toBe("absent");
+    expect(verdictOf(signatureNames(source, "display", ["Formatter"], "parameter", "python")))
+      .toBe("confirmed");
+    expect(verdictOf(signatureNames(source, "display", ["Result"], "return", "python")))
+      .toBe("confirmed");
+  });
+
+  it("drops a TypeScript namespace, and keeps the type", () => {
+    const source = "function display(f: NodeJS.Timeout): void { }";
+    expect(verdictOf(signatureNames(source, "display", ["NodeJS"], "parameter", "ts")))
+      .toBe("absent");
+    expect(verdictOf(signatureNames(source, "display", ["Timeout"], "parameter", "ts")))
+      .toBe("confirmed");
+  });
+
+  it("drops a module written inside a quoted annotation", () => {
+    /*
+     * The same bug one layer out. A quoted type is text to the grammar, so the
+     * names in it are scanned rather than parsed -- and a scan for words took
+     * the module segment too. Refuting stays forbidden here whatever it finds:
+     * `quoted-annotation`, not `absent`.
+     */
+    const source = "def display(f: \"fmt.Formatter\") -> None: ...";
+    expect(verdictOf(signatureNames(source, "display", ["fmt"], "parameter", "python")))
+      .toBe("withheld/quoted-annotation");
+    expect(verdictOf(signatureNames(source, "display", ["Formatter"], "parameter", "python")))
+      .toBe("confirmed");
+  });
+});
+
+/**
+ * The same alias doubt, in the signature reader (#306).
+ *
+ * `import typing as t` then `def f(v: t.ValuesView) -> None` -- the segment is
+ * not a type name and it is a name standing for something else, so it belongs
+ * in the alias check and out of the match.
+ */
+describe("a namespace segment that is an aliased import", () => {
+  const source = "import typing as t\ndef f(v: t.ValuesView) -> None: ...";
+
+  it("withholds rather than accusing", () => {
+    expect(verdictOf(signatureNames(source, "f", ["Nope"], "parameter", "python")))
+      .toBe("withheld/aliased");
+  });
+
+  it("does not confirm the alias itself", () => {
+    expect(verdictOf(signatureNames(source, "f", ["t"], "parameter", "python")))
+      .toBe("withheld/aliased");
+  });
+
+  it("still confirms the type inside it", () => {
+    expect(verdictOf(signatureNames(source, "f", ["ValuesView"], "parameter", "python")))
+      .toBe("confirmed");
+  });
+});
+
+/**
+ * `Self` in the namespace position -- `Self::Item`, `Self::Error` (#306).
+ *
+ * The stand-in #193 is about does not only appear on its own. A Rust signature
+ * writes an associated type as a path whose *namespace* is `Self`, and reading
+ * a namespace as a name was the only reason the `Self` treatment ever saw it.
+ * Dropping the segment took 172 Rust signatures in `.corpus/*` from withheld to
+ * absent -- #193's false red, re-introduced by a change about namespaces.
+ */
+describe("`Self` as the namespace of an associated type", () => {
+  it("withholds where the enclosing type cannot be named", () => {
+    const generic = "struct W<T>(T);\nimpl<T> W<T> { fn get(&self) -> Self::Item { } }";
+    expect(verdictOf(signatureNames(generic, "get", ["Nope"], "return", "rust")))
+      .toBe("withheld/self-type");
+    const trait = "trait X { fn get(&self) -> Self::Item; }";
+    expect(verdictOf(signatureNames(trait, "get", ["Nope"], "return", "rust")))
+      .toBe("withheld/self-type");
+  });
+
+  it("withholds in the parameter half too", () => {
+    const source = "impl<T> W<T> { fn put(&self, v: Self::Item) { } }";
+    expect(verdictOf(signatureNames(source, "put", ["Nope"], "parameter", "rust")))
+      .toBe("withheld/self-type");
+  });
+
+  it("reads it as the type the impl names, where there is one", () => {
+    const source = "struct Foo;\nimpl Foo { fn get(&self) -> Self::Error { } }";
+    expect(verdictOf(signatureNames(source, "get", ["Foo"], "return", "rust")))
+      .toBe("confirmed");
+    // And the associated type's own name still confirms, as any tail does.
+    expect(verdictOf(signatureNames(source, "get", ["Error"], "return", "rust")))
+      .toBe("confirmed");
+    expect(verdictOf(signatureNames(source, "get", ["Nope"], "return", "rust")))
+      .toBe("absent");
+  });
+});

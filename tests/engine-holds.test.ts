@@ -441,3 +441,56 @@ describe("what a top-level binding has to do before it counts as an alias", () =
       .toBe("withheld/aliased");
   });
 });
+describe("a namespace on the front of a field's type", () => {
+  it("does not read a Python module as a type the class holds", () => {
+    const source = "class S:\n    a: fmt.Formatter\n";
+    expect(verdictOf(heldTypes(source, "S", ["fmt"], "python"))).toBe("absent");
+    expect(verdictOf(heldTypes(source, "S", ["Formatter"], "python"))).toBe("confirmed");
+  });
+
+  it("does not read a Rust module as a type the struct holds", () => {
+    const source = "struct S { a: fmt::Formatter }";
+    expect(verdictOf(heldTypes(source, "S", ["fmt"], "rust"))).toBe("absent");
+    expect(verdictOf(heldTypes(source, "S", ["Formatter"], "rust"))).toBe("confirmed");
+  });
+
+  it("does not read a TypeScript namespace as a type the interface holds", () => {
+    const source = "interface S { a: NodeJS.Timeout }";
+    expect(verdictOf(heldTypes(source, "S", ["NodeJS"], "ts"))).toBe("absent");
+    expect(verdictOf(heldTypes(source, "S", ["Timeout"], "ts"))).toBe("confirmed");
+  });
+
+  it("still reads through a type argument", () => {
+    const source = "struct S { b: Vec<RouteInfo> }";
+    expect(verdictOf(heldTypes(source, "S", ["RouteInfo"], "rust"))).toBe("confirmed");
+  });
+});
+
+/**
+ * The alias doubt a namespace segment used to carry by accident (#306).
+ *
+ * Dropping the segment from the name list dropped it out of the alias check
+ * too, and flask's `App` went from withheld to *red*: `import typing as t`
+ * sits above it, `t` is a name standing for something else, and that is a
+ * reason not to accuse. The segment is still recorded -- it just cannot be
+ * matched as a type the class holds.
+ */
+describe("a namespace segment that is an aliased import", () => {
+  const flask = [
+    "import typing as t",
+    "class App:",
+    "    blueprints: t.ValuesView[Blueprint]",
+  ].join("\n");
+
+  it("withholds rather than accusing", () => {
+    expect(verdictOf(heldTypes(flask, "App", ["Nope"], "python"))).toBe("withheld/aliased");
+  });
+
+  it("does not confirm the alias itself", () => {
+    expect(verdictOf(heldTypes(flask, "App", ["t"], "python"))).toBe("withheld/aliased");
+  });
+
+  it("still confirms the type inside it", () => {
+    expect(verdictOf(heldTypes(flask, "App", ["Blueprint"], "python"))).toBe("confirmed");
+  });
+});

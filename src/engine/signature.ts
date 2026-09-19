@@ -141,7 +141,7 @@
  */
 import { aliasesFor, aliasNames } from "./alias";
 import { mayAccuse } from "./licence";
-import { parseSource, type Language, type Node } from "./parse";
+import { parseSource, qualifiedTail, type Language, type Node } from "./parse";
 
 /** Which half of a signature a claim is about. */
 export type SignaturePosition = "parameter" | "return";
@@ -336,8 +336,14 @@ const SELF_MEANS_ENCLOSING = new Set<Language>(["rust", "python"]);
  */
 const QUOTED_TYPES = new Set<Language>(["python"]);
 
-/** Identifiers inside a quoted annotation, read as words rather than parsed. */
-const WORDS = /[A-Za-z_][A-Za-z0-9_]*/g;
+/**
+ * Identifiers inside a quoted annotation, read as words rather than parsed.
+ *
+ * A dotted path is matched whole so that the namespace on the front of it can
+ * be dropped the same way it is in the tree (#306): `"fmt.Formatter"` names
+ * `Formatter`, and taking every word out of the text took `fmt` too.
+ */
+const WORDS = /[A-Za-z_][A-Za-z0-9_]*(?:\s*\.\s*[A-Za-z_][A-Za-z0-9_]*)*/g;
 
 /** A type-position child that is one whole word, or nothing. */
 function plainType(node: Node | null): string | undefined {
@@ -390,6 +396,17 @@ function signatureNode(node: Node): Node | undefined {
  * contributes nothing. Names are read as whole identifiers, never as substrings,
  * so `Client` cannot match `ClientPool`.
  *
+ * A namespace is not a name the signature writes (#306). `fmt::Formatter` is
+ * one type called `Formatter`, and walking to the leaves took `fmt` as well --
+ * so an arrow drawn at the module came back confirmed. The whole spelling is
+ * recorded in case a box was anchored that way, and the reading then carries on
+ * into the last segment only, which is the rule `holds.ts` and `conforms.ts`
+ * already follow.
+ *
+ * Read *through* type arguments, which is `holds.ts`'s decision rather than
+ * `conforms.ts`'s: a parameter typed `Vec<Formatter>` really does take a
+ * Formatter.
+ *
  * Returns whether a quoted annotation was read on the way, because that decides
  * what this half is allowed to say afterwards -- see `QUOTED_TYPES`.
  */
@@ -397,26 +414,64 @@ function typeNames(
   node: Node | null | undefined,
   into: Set<string>,
   quoting: boolean,
+  /**
+   * The namespace segments, which are not names the signature writes and are
+   * still names written in it.
+   *
+   * Kept apart rather than dropped, because they were doing a second job by
+   * accident: a segment that is an aliased import -- `import typing as t`,
+   * then a parameter typed `t.ValuesView[..]` -- is a name standing for
+   * something else, which forbids an absence. The caller matches on `into` and
+   * asks both sets whether anything in the signature is an alias.
+   */
+  qualifiers?: Set<string>,
 ): boolean {
   if (!node) return false;
   let quoted = false;
-  each(node, (part) => {
+  const visit = (part: Node): void => {
     if (quoting && part.type === "string") {
       quoted = true;
-      for (const word of part.text.matchAll(WORDS)) into.add(word[0]);
+      for (const written of part.text.matchAll(WORDS)) {
+        const path = written[0].replace(/\s+/g, "");
+        into.add(path);
+        const segments = path.split(".");
+        into.add(segments[segments.length - 1]!);
+        for (const segment of segments.slice(0, -1)) qualifiers?.add(segment);
+      }
+      return;
+    }
+    const tail = qualifiedTail(part);
+    if (tail) {
+      into.add(part.text);
+      for (let index = 0; index < part.childCount; index += 1) {
+        const segment = part.child(index);
+        if (!segment || segment.id === tail.id || !segment.isNamed) continue;
+        each(segment, (leaf) => { if (isTypeWord(leaf)) qualifiers?.add(leaf.text); });
+      }
+      visit(tail);
       return;
     }
     if (isTypeWord(part)) into.add(part.text);
-  });
+    for (let index = 0; index < part.childCount; index += 1) {
+      const child = part.child(index);
+      if (child) visit(child);
+    }
+  };
+  visit(node);
   return quoted;
 }
 
-function parameterTypes(parameters: Node, into: Set<string>, quoting: boolean): boolean {
+function parameterTypes(
+  parameters: Node,
+  into: Set<string>,
+  quoting: boolean,
+  qualifiers?: Set<string>,
+): boolean {
   let quoted = false;
   for (let index = 0; index < parameters.childCount; index += 1) {
     const parameter = parameters.child(index);
     if (!parameter || parameter.childCount === 0) continue;
-    if (typeNames(parameter.childForFieldName("type"), into, quoting)) quoted = true;
+    if (typeNames(parameter.childForFieldName("type"), into, quoting, qualifiers)) quoted = true;
   }
   return quoted;
 }
@@ -516,11 +571,18 @@ export function signatureNames(
 
     const parameters = signature.childForFieldName("parameters");
     const returned = signature.childForFieldName("return_type");
+    /*
+     * Namespace segments, per half, which are not names the signature writes
+     * and are still names written in it (#306). Two jobs: the alias check, and
+     * `Self::Item`, whose stand-in sits in the namespace position.
+     */
+    const qualifiedParameters = new Set<string>();
+    const qualifiedReturn = new Set<string>();
     const inParameters = new Set<string>();
     const quotedParameters = parameters
-      ? parameterTypes(parameters, inParameters, quoting) : false;
+      ? parameterTypes(parameters, inParameters, quoting, qualifiedParameters) : false;
     const inReturn = new Set<string>();
-    const quotedReturn = typeNames(returned, inReturn, quoting);
+    const quotedReturn = typeNames(returned, inReturn, quoting, qualifiedReturn);
 
     /*
      * `Self` reads as the type the `impl` names, and where there is no such
@@ -530,8 +592,21 @@ export function signatureNames(
      */
     let selfHeld = false;
     if (selfMeansEnclosing) {
-      for (const half of [inParameters, inReturn]) {
-        if (!half.delete(SELF)) continue;
+      const halves = [
+        [inParameters, qualifiedParameters],
+        [inReturn, qualifiedReturn],
+      ] as const;
+      for (const [half, qualified] of halves) {
+        /*
+         * `Self` on its own, and `Self` as the namespace of an associated type
+         * -- `Self::Item`, `Self::Error`, which is how a third of the Rust
+         * corpus writes a return. The second arrives in the qualifier set now
+         * that a namespace is not read as a name (#306), and leaving it out
+         * there turned 172 withheld Rust signatures into absences: #193's false
+         * red, re-introduced by a change about something else.
+         */
+        const namesSelf = half.delete(SELF) || qualified.has(SELF);
+        if (!namesSelf) continue;
         if (self) half.add(self); else selfHeld = true;
       }
     }
@@ -584,7 +659,9 @@ export function signatureNames(
      * every name that *is* in it means itself. One alias in the signature and
      * the target could be sitting there under another spelling.
      */
-    const spellings = new Set([...inParameters, ...inReturn]);
+    const spellings = new Set([
+      ...inParameters, ...inReturn, ...qualifiedParameters, ...qualifiedReturn,
+    ]);
     if ([...spellings].some((name) => shadows.has(name))) {
       withheld ??= { verdict: "withheld", why: "aliased" };
       continue;

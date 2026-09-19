@@ -256,3 +256,43 @@ export function each(node: Node, visit: (node: Node) => void): void {
     if (child) each(child, visit);
   }
 }
+
+/**
+ * The separators a grammar writes between the parts of a qualified name.
+ *
+ * Matched on the node's own type, which is how a tree-sitter grammar spells an
+ * anonymous token: `::` is a node of type `::`. That is a property of the parser
+ * rather than of any one grammar, so it holds wherever a grammar declines to
+ * name the field -- Rust's `path`, TypeScript's `module`, Python's `object` are
+ * three spellings of one idea, and reading them by name would be the list that
+ * goes stale (`docs/reading-a-grammar.md`).
+ */
+const PATH_SEPARATOR = /^(::|\.)$/;
+
+/**
+ * The last part of a qualified name, or nothing where the node is not one (#306).
+ *
+ * `fmt::Formatter` names one type and that type is called `Formatter`; `fmt` is
+ * the module it lives in. A reader that walks to the leaves takes both, and the
+ * namespace segment then matches a box drawn at the *module* -- which is how an
+ * arrow that is wrong came back confirmed on anyhow's board.
+ *
+ * The rule is already written down in `docs/claim-vocabulary.md` and already
+ * followed by `holds.ts` and `conforms.ts`, both of which split the text. This
+ * is the same rule read off the tree, for the readers that descend into it.
+ */
+export function qualifiedTail(node: Node): Node | undefined {
+  let separated = false;
+  let tail: Node | undefined;
+  for (let index = 0; index < node.childCount; index += 1) {
+    const child = node.child(index);
+    if (!child) continue;
+    if (!child.isNamed && PATH_SEPARATOR.test(child.type)) {
+      separated = true;
+      tail = undefined;
+      continue;
+    }
+    if (child.isNamed) tail = child;
+  }
+  return separated ? tail : undefined;
+}

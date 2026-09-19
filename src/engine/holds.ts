@@ -63,7 +63,8 @@
 import { aliasesFor, aliasNames } from "./alias";
 import { mayAccuse } from "./licence";
 import {
-  declaresField, each, INSTANCE_NAMES, parseSource, type Language, type Node,
+  declaresField, each, INSTANCE_NAMES, parseSource, qualifiedTail,
+  type Language, type Node,
 } from "./parse";
 
 /**
@@ -175,8 +176,8 @@ function nameOf(node: Node): string | undefined {
  * `identifier` nodes sees neither, and a field typed `string` yields no name at
  * all -- a third of the fields in a TypeScript interface.
  */
-function typeNamesIn(node: Node): Array<{ name: string; line: number }> {
-  const names: Array<{ name: string; line: number }> = [];
+function typeNamesIn(node: Node): Array<{ name: string; line: number; qualifier?: true }> {
+  const names: Array<{ name: string; line: number; qualifier?: true }> = [];
   const visit = (child: Node) => {
     if (TYPE_NAME.test(child.type)) {
       /*
@@ -193,6 +194,34 @@ function typeNamesIn(node: Node): Array<{ name: string; line: number }> {
       names.push({ name: child.text, line: child.startIndex });
       const tail = child.text.split(/::|\./).pop();
       if (tail && tail !== child.text) names.push({ name: tail, line: child.startIndex });
+      return;
+    }
+    /*
+     * A qualified name the grammar gave a node of its own, which is every
+     * language whose separator is not part of a type identifier. Python writes
+     * `fmt.Formatter` as an `attribute`, and descending into it read `fmt` as a
+     * type this class holds -- the #306 bug, in the reader next door.
+     *
+     * The namespace segments are still recorded, marked as what they are, and
+     * the caller keeps them out of the match and in the alias check. They were
+     * doing that second job by accident before: `import typing as t` above a
+     * field typed `t.ValuesView[..]` is a name in the field list standing for
+     * something else, which is a reason to withhold, and dropping the segment
+     * altogether turned one of flask's withheld arrows into a red.
+     */
+    const tail = qualifiedTail(child);
+    if (tail) {
+      names.push({ name: child.text, line: child.startIndex });
+      for (let index = 0; index < child.childCount; index += 1) {
+        const part = child.child(index);
+        if (!part || part.id === tail.id || !part.isNamed) continue;
+        each(part, (leaf) => {
+          if (leaf.childCount === 0 && leaf.type === "identifier") {
+            names.push({ name: leaf.text, line: leaf.startIndex, qualifier: true });
+          }
+        });
+      }
+      visit(tail);
       return;
     }
     if (child.childCount === 0) {
@@ -415,7 +444,7 @@ export function heldTypes(
     // Walk down from the body rather than asking a member who its parent is:
     // `Node` here exposes no parent, and the census in #187 read 0 fields in
     // every language for exactly that reason.
-    const found: Array<{ name: string; line: number }> = [];
+    const found: Array<{ name: string; line: number; qualifier?: true }> = [];
     const fields = (member: Node, depth: number) => {
       /*
        * A routine, not a field. A method in a class body has a return type and
@@ -455,7 +484,9 @@ export function heldTypes(
      */
     const quotedFields = quotedTypeIn(body);
 
-    const hit = found.find((candidate) => wanted.has(candidate.name));
+    // A namespace segment is not a name this type holds (#306), and it is in
+    // the list only for the alias check below.
+    const hit = found.find((candidate) => !candidate.qualifier && wanted.has(candidate.name));
 
     /*
      * A quoted annotation hides every name it contains, so an absence here is
