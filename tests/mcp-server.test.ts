@@ -952,8 +952,11 @@ describe("board MCP server", () => {
         edges: [{ from: "reader", to: "parser", claim: "needs" }],
       });
 
-    const before = jsonOf(await draw());
-    expect(String(before.arrowsNotConfirmed)).toMatch(/^1 arrow was read and nothing corroborated it/);
+    await draw();
+    // Before the import is written the arrow is wrong: nothing `reader.ts`
+    // imports leads to `parser.ts` (#323).
+    const wrong = jsonOf(await call("check_drift", { path: board }));
+    expect(wrong.clean).toBe(false);
 
     await writeFile(
       path.join(workspace, "reader.ts"),

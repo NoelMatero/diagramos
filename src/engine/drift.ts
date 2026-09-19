@@ -330,6 +330,21 @@ export type EdgeFindingKind =
    */
   | "calls-one-level-up"
   /**
+   * A `needs` arrow whose tail imports nothing that leads to the head, followed
+   * through every file it does import (#323). Refutes from an absence, which
+   * `needs` never did before: #308 made its reader find 99.8% of real imports,
+   * so not finding one finally means something, and the walk rules out the
+   * arrow drawn over files in between before anything is said.
+   */
+  | "needs-absent"
+  /**
+   * A `needs` arrow whose tail does not import the head and does reach it
+   * through other files (#323) -- `calls-one-level-up`'s reading, for imports.
+   * People draw `app -> database` meaning "depends on"; the row names the
+   * files between and leaves the arrow standing.
+   */
+  | "needs-one-level-up"
+  /**
    * An arrow whose end is the wrong kind of thing for its claim (#297):
    * `@feeds` from a struct, `@holds` from a function, `@takes` into a class.
    *
@@ -387,6 +402,8 @@ export const EDGE_FINDING_KINDS = [
   "conforms-absent",
   "calls-one-level-up",
   "end-lacks-part",
+  "needs-absent",
+  "needs-one-level-up",
 ] as const satisfies readonly EdgeFindingKind[];
 
 /**
@@ -422,6 +439,7 @@ export const ACCUSING_EDGE_KINDS = [
   "accesses-not-read",
   "conforms-absent",
   "end-lacks-part",
+  "needs-absent",
 ] as const satisfies readonly EdgeFindingKind[];
 
 /** The rest: an observation about an arrow, never an accusation about one. */
@@ -430,6 +448,7 @@ export const ADVISORY_EDGE_KINDS = [
   "broken-chain",
   "built-backwards",
   "calls-one-level-up",
+  "needs-one-level-up",
 ] as const satisfies readonly EdgeFindingKind[];
 
 /** Whether a verdict says the diagram is wrong rather than worth a look. */
@@ -4078,11 +4097,66 @@ export function checkDrift(
             recordEdge(edge, fromNode, toNode, { kind: "confirmed" });
             continue;
           }
+          if (needs.verdict === "indirect") {
+            /*
+             * No import, and a chain of them (#323): the arrow drawn one level
+             * up. Amber for the reason `calls-one-level-up` is -- `app ->
+             * database` over three files is a reading of the architecture
+             * somebody can keep -- and the row names the files between so the
+             * choice is theirs.
+             */
+            edgesChecked += 1;
+            const hops = needs.via.length + 1;
+            recordEdge(edge, fromNode, toNode, { kind: "finding", finding: {
+              from: fromPath,
+              to: toPath,
+              fromLabel: fromNode.label,
+              toLabel: toNode.label,
+              fromRef,
+              toRef,
+              kind: "needs-one-level-up",
+              detail:
+                `this arrow says ${oneLine(fromNode.label) || fromPath} needs `
+                + `${oneLine(toNode.label) || toPath}, and ${fromPath} does not import it -- `
+                + `it gets there in ${hops} steps, through ${needs.via.join(" -> ")}. `
+                + `Draw the hop, or leave the arrow where it is and read it as "depends on".`,
+            } });
+            continue;
+          }
+          if (needs.verdict === "refuted") {
+            /*
+             * No import, and nothing it imports leads there either (#323).
+             * The one `needs` red that rests on an absence, licensed on its
+             * own axis per language, and reached only after the walk came
+             * back empty through files that could all be read.
+             */
+            edgesChecked += 1;
+            const wasClaimed = baselineGraph?.edges.some(
+              (was) => was.from === edge.from && was.to === edge.to && was.claim === "needs",
+            );
+            const fresh = baselineGraph !== undefined && !wasClaimed;
+            recordEdge(edge, fromNode, toNode, { kind: "finding", finding: {
+              from: fromPath,
+              to: toPath,
+              fromLabel: fromNode.label,
+              toLabel: toNode.label,
+              fromRef,
+              toRef,
+              kind: "needs-absent",
+              detail:
+                (fresh ? "a claim written this turn is already wrong: " : "")
+                + `this arrow says ${oneLine(fromNode.label) || fromPath} needs `
+                + `${oneLine(toNode.label) || toPath}, and ${fromPath} does not import `
+                + `${toPath}, directly or through anything it imports. Point the arrow `
+                + `at what ${fromPath} does import, or drop it.`,
+            } });
+            continue;
+          }
           /*
-           * `absent`: both files were read well enough to refute, and neither
-           * declares the other. Not a red -- `needs` refutes from the presence
-           * of the opposite import, never from an absence -- so the arrow is
-           * not verified, with that as the reason.
+           * `absent`: neither file declares the other, and the accusation was
+           * not available -- a file on the way could not be read to the end,
+           * or this language has no licence to accuse from an absence. The
+           * arrow is not verified, with that as the reason.
            */
           unanswered("no import either way");
         }

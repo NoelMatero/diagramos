@@ -139,6 +139,8 @@ const REASONS: Record<string, Label> = {
   "needs/dynamic": { kind: "cannot-see", why: "EITHER file reaches out at run time (`table[name]()`, a Rust item macro), so neither can be said to declare nothing. Since #308 this refuses the accusation only: an import written in the tail confirms regardless (the rest here is the tail declaring nothing on the head)" },
   "needs/same-file": { kind: "not-an-arrow", why: "a file depending on itself" },
   "needs/said:backwards": { kind: "cannot-see", why: "the compiler sees the forward import and the reader does not" },
+  "needs/said:indirect": { kind: "cannot-see", why: "the compiler sees a direct import and the reader reaches the far end only through another file -- mostly a Python `__init__.py` re-export. Amber, not red (#323)" },
+  "needs/said:refuted": { kind: "cannot-see", why: "the compiler sees the import and the reader finds none, and no chain either: a false red. Every one must be in the licence's `known` (#323)" },
 
   "takes/no-signature": { kind: "cannot-see", why: "the name is declared as something the reader does not read as a function" },
   "returns/no-signature": { kind: "cannot-see", why: "the name is declared as something the reader does not read as a function" },

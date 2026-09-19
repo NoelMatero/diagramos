@@ -251,8 +251,9 @@ describe("a feeds claim on a real board", () => {
      */
     const needs = checkDrift(await pipelineBoard("needs"), treeWorkspace(PIPELINE), { edges: true });
     expect(needs.claims.needsWithheld).toEqual({});
-    expect(needs.edges).toEqual([]);
-    // Nothing declares anything either way, so `needs` has no verdict to give.
+    // Nothing `read.ts` imports leads to `graph.ts`, so as a dependency the
+    // arrow is wrong (#323) -- while the same arrow as a flow is right.
+    expect(needs.edges.map((finding) => finding.kind)).toEqual(["needs-absent"]);
     expect(needs.claims.needsChecked).toBe(1);
   });
 

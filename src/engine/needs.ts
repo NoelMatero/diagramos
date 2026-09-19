@@ -44,7 +44,7 @@
  * have shown anyway. Silence is always available and always safe; the accusation
  * is not.
  */
-import { readDependencies } from "./deps";
+import { readDependencies, readerCanPlace } from "./deps";
 import { vouchedFor, type Ledger } from "./ledger";
 import { licenceFor, mayAccuse } from "./licence";
 import { languageOf } from "./parse";
@@ -83,7 +83,20 @@ export type NeedsVerdict =
   | { verdict: "confirmed"; evidence: NeedsEvidence }
   /** It runs the other way, and only the other way. The arrow is backwards. */
   | { verdict: "backwards"; evidence: NeedsEvidence }
-  /** Neither file declares the other. Amber, exactly as before claims existed. */
+  /**
+   * The tail does not import the head, and does reach it through other files
+   * (#323). Not wrong: `app -> database` drawn over three files in between is
+   * a reading of the architecture, and 26 of the 243 file pairs Haiku drew on
+   * `bench:planted` are that shape. `via` is the files between, in order.
+   */
+  | { verdict: "indirect"; via: string[]; evidence: NeedsEvidence }
+  /**
+   * The tail does not import the head and nothing it imports leads there,
+   * followed to the end through files that could all be read (#323). The
+   * accusation on an absence, and licensed per language on that axis.
+   */
+  | { verdict: "refuted" }
+  /** Neither file declares the other, and no accusation was available. Amber. */
   | { verdict: "absent" }
   | { verdict: "withheld"; why: NeedsWithheld };
 
@@ -163,6 +176,12 @@ function declares(
    * is still an `import` in the text. What it cannot support is the sentence
    * "and there is no other one anywhere in here".
    */
+  /*
+   * A Rust file no crate declares reads as a file that imports nothing, since
+   * `mod` and `crate::` have no root to resolve against. That is the reader's
+   * blindness, not an absence, and since #323 an absence is an accusation.
+   */
+  if (!readerCanPlace(file, workspace, cache)) return { on, blind: "unreadable" };
   if (!read.complete) return { on, blind: "incomplete" };
   if (read.dynamic.length > 0) return { on, blind: "dynamic" };
   return { on };
@@ -200,7 +219,7 @@ export function checkNeeds(
    * being unable to pick between two accusations was never a reason to decline
    * the one fact on the board.
    */
-  const forward = tail.on.get(to);
+  const forward = tail.on.get(to) ?? reexported(from, to, workspace, cache, ledger);
   if (forward) return { verdict: "confirmed", evidence: forward };
 
   /*
@@ -226,5 +245,165 @@ export function checkNeeds(
     return language !== undefined && mayAccuse("needs", language);
   });
   if (backward && bothMeasured) return { verdict: "backwards", evidence: backward };
-  return { verdict: "absent" };
+  if (backward) return { verdict: "absent" };
+
+  /*
+   * Nothing either way, and until #323 that was the end: amber, on the footing
+   * that an absence proves nothing. #308 made the reader find 99.8% of real
+   * imports, so an absence now does prove something -- about the *direct*
+   * import. It proves nothing about the arrow, because people draw
+   * `app -> database` meaning "depends on" with files in between, and are not
+   * wrong. So the chain is ruled out before the accusation is made, the way
+   * `calls` rules out a call two hops away.
+   */
+  const walk = walkImports(from, to, workspace, cache, ledger);
+  if (walk.reached) {
+    return { verdict: "indirect", via: walk.reached.via, evidence: walk.reached.first };
+  }
+  const bothLicensed = [from, to].every((file) => {
+    const language = languageOf(file);
+    return language !== undefined && mayAccuse("needs", language, "absence");
+  });
+  if (walk.blind || !bothLicensed) return { verdict: "absent" };
+  return { verdict: "refuted" };
+}
+
+/**
+ * The files an import leads to, one per import rather than one per module on
+ * the way there.
+ *
+ * Rust reads `use crate::parser::ArgMatcher` as a dependency on `lib.rs`, on
+ * `parser/mod.rs` and on nothing past them, because every module a path passes
+ * through is somewhere the name could have come from. That is right for
+ * confirming an arrow onto `parser/mod.rs` and wrong for walking: `lib.rs`
+ * declares every module in the crate, so a walk through it reaches everything
+ * and no Rust arrow could ever be unreached. The walk takes the last file each
+ * written import landed on, and drops a bare `crate`/`self`/`super`, which is
+ * a path's first segment or a `pub(crate)` read as one (#319), never an import.
+ */
+function landings(read: NonNullable<ReturnType<typeof readDependencies>>): NeedsEvidence[] {
+  const last = new Map<string, { specifier: string; line: number; file: string }>();
+  for (const dependency of read.dependencies) {
+    if (!dependency.file) continue;
+    if (dependency.specifier === "crate" || dependency.specifier === "self" || dependency.specifier === "super") continue;
+    last.set(`${dependency.line} @ ${dependency.specifier}`, {
+      specifier: dependency.specifier, line: dependency.line, file: dependency.file,
+    });
+  }
+  return [...last.values()].map((one) => ({ file: "", on: one.file, specifier: one.specifier, line: one.line }));
+}
+
+/** One file's readable imports for the walk, or why it cannot be walked through. */
+function hopsOf(
+  file: string,
+  workspace: Workspace,
+  cache: ConfigCache,
+  ledger?: Ledger,
+): { hops: NeedsEvidence[]; blind?: NeedsWithheld } {
+  const declared = declares(file, workspace, cache, ledger);
+  if (declared.refused) return { hops: [], blind: declared.refused };
+  const absolute = workspace.resolve(file)!;
+  const read = readDependencies(file, workspace.read(absolute), workspace, cache);
+  if (!read) return { hops: [], blind: "unreadable" };
+  const hops = landings(read).map((hop) => ({ ...hop, file }));
+  return declared.blind ? { hops, blind: declared.blind } : { hops };
+}
+
+/**
+ * A Rust name imported through a module that re-exports it (#323).
+ *
+ * `parser.rs` writes `use crate::parser::ArgMatcher`, which lands on
+ * `parser/mod.rs`, which writes `pub(crate) use self::arg_matcher::ArgMatcher`.
+ * The compiler follows the name to `arg_matcher.rs`, and so does `@needs`' own
+ * referee; the reader stopped at the module. Eleven true arrows on
+ * `bench:planted` were that shape, and one of them was the single true
+ * `@needs` the bench called wrong: read one hop short, the import looked like
+ * it only ran the other way.
+ *
+ * By name, and only where the specifier carries one, which today is Rust:
+ * a module that names `ArgMatcher` in a `use` and is imported for
+ * `ArgMatcher` is passing it along, since a private `use` there would not
+ * compile. A glob or a rename is not followed, and falls through to the walk.
+ */
+function reexported(
+  from: string,
+  to: string,
+  workspace: Workspace,
+  cache: ConfigCache,
+  ledger?: Ledger,
+): NeedsEvidence | undefined {
+  if (languageOf(from) !== "rust") return undefined;
+  const lastSegment = (specifier: string) => specifier.split("::").pop() ?? specifier;
+  const own = hopsOf(from, workspace, cache, ledger).hops;
+  for (const written of own) {
+    const name = lastSegment(written.specifier);
+    if (!/^[A-Za-z_]\w*$/.test(name)) continue;
+    // A few modules deep at most: each one is a `pub use` somebody wrote.
+    let at = written.on;
+    let ended = false;
+    const seen = new Set([from]);
+    for (let depth = 0; depth < 8 && !seen.has(at) && languageOf(at) === "rust"; depth += 1) {
+      seen.add(at);
+      const passed = hopsOf(at, workspace, cache, ledger).hops
+        .find((hop) => hop.on !== at && lastSegment(hop.specifier) === name);
+      if (!passed) { ended = true; break; }
+      at = passed.on;
+    }
+    /*
+     * Only the end of the chain. `clap`'s `parser/mod.rs` passes `ArgMatches`
+     * on from `matches/mod.rs`, which passes it on from `arg_matches.rs`: the
+     * name lives in the last one, and an arrow onto the module in the middle
+     * is the planted mistake that stopping early turned green.
+     */
+    if (ended && at === to && at !== written.on) return written;
+  }
+  return undefined;
+}
+
+/** How far a walk may go before its silence stops meaning anything. */
+const WALK_LIMIT = 5000;
+
+/**
+ * Whether the tail reaches the head through what it imports, and the shortest
+ * way if so.
+ *
+ * Breadth first, so the chain named is the shortest one. A file the walk
+ * could not read to the end -- unlicensed, unvouched, a torn parse, a
+ * `table[name]()` -- is still walked through for what it does declare, and
+ * marks the walk `blind`: finding the head is still a finding, and failing to
+ * is no longer evidence, since that file may reach it in a way nobody can read.
+ */
+export function walkImports(
+  from: string,
+  to: string,
+  workspace: Workspace,
+  cache: ConfigCache,
+  ledger?: Ledger,
+): { reached?: { via: string[]; first: NeedsEvidence }; blind?: NeedsWithheld } {
+  const cameFrom = new Map<string, { parent: string; hop: NeedsEvidence }>();
+  const queue = [from];
+  const seen = new Set([from]);
+  let blind: NeedsWithheld | undefined;
+  for (let next = 0; next < queue.length; next += 1) {
+    const file = queue[next]!;
+    const { hops, blind: here } = hopsOf(file, workspace, cache, ledger);
+    if (here && file !== from) blind ??= here;
+    for (const hop of hops) {
+      if (seen.has(hop.on)) continue;
+      seen.add(hop.on);
+      cameFrom.set(hop.on, { parent: file, hop });
+      if (hop.on === to) {
+        const via: string[] = [];
+        let step = cameFrom.get(to)!;
+        while (step.parent !== from) {
+          via.unshift(step.parent);
+          step = cameFrom.get(step.parent)!;
+        }
+        return { reached: { via, first: step.hop } };
+      }
+      if (seen.size > WALK_LIMIT) return { blind: blind ?? "incomplete" };
+      queue.push(hop.on);
+    }
+  }
+  return blind ? { blind } : {};
 }
