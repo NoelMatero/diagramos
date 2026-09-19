@@ -43,7 +43,7 @@ import { describe, expect, it, beforeAll } from "vitest";
 
 import { emptyBoard, type BoardFile } from "../src/engine/board-file";
 import { createDiagram } from "../src/engine/diagram";
-import { checkDrift, type Workspace } from "../src/engine/drift";
+import { accuses, checkDrift, type Workspace } from "../src/engine/drift";
 import { checkNeeds } from "../src/engine/needs";
 import { initEngine } from "../src/engine/parse";
 import { installExcalifontMeasurer } from "./helpers/excalifont";
@@ -63,6 +63,37 @@ function fakeWorkspace(files: Record<string, string>): Workspace {
     },
     read: (target) => files[target] ?? "",
     list: () => [],
+  };
+}
+
+/**
+ * A workspace that can list directories, which Rust needs: its module tree is
+ * built from the `Cargo.toml` files in the tree (see `engine-arrows.test.ts`).
+ */
+function treeWorkspace(files: Record<string, string>): Workspace {
+  const norm = (target: string) => {
+    const trimmed = target.replace(/^\.\//, "");
+    return trimmed === "" || trimmed === "." ? "." : trimmed;
+  };
+  return {
+    resolve: (relative) => (relative.startsWith("../") ? undefined : norm(relative)),
+    stat: (target) => {
+      const at = norm(target);
+      if (at === ".") return "directory";
+      if (files[at] !== undefined) return "file";
+      return Object.keys(files).some((file) => file.startsWith(`${at}/`)) ? "directory" : "missing";
+    },
+    read: (target) => files[norm(target)] ?? "",
+    list: (target) => {
+      const at = norm(target);
+      const prefix = at === "." ? "" : `${at}/`;
+      const names = new Set<string>();
+      for (const file of Object.keys(files)) {
+        if (!file.startsWith(prefix)) continue;
+        names.add(file.slice(prefix.length).split("/")[0]!);
+      }
+      return [...names];
+    },
   };
 }
 
@@ -111,8 +142,8 @@ describe("which way the dependency runs", () => {
     expect(result).toMatchObject({ evidence: { file: "a.ts", on: "b.ts", line: 1 } });
   });
 
-  it("says absent when neither file mentions the other", () => {
-    expect(checkNeeds("a.ts", "loose.ts", workspace)).toEqual({ verdict: "absent" });
+  it("calls an arrow wrong when nothing the tail imports leads to the head (#323)", () => {
+    expect(checkNeeds("a.ts", "loose.ts", workspace)).toEqual({ verdict: "refuted" });
   });
 
   it("names the line of the first mention, not of the last", () => {
@@ -293,6 +324,90 @@ describe("an import written in plain sight", () => {
   });
 });
 
+describe("an import that is not there (#323)", () => {
+  it("names the files between when the tail reaches the head through them", () => {
+    // `app -> database` drawn meaning "depends on": correct about the
+    // architecture, and not a direct import. Never red.
+    const layered = {
+      "app.ts": 'import { service } from "./service";\nexport const app = service;\n',
+      "service.ts": 'import { repo } from "./repo";\nexport const service = repo;\n',
+      "repo.ts": 'import { db } from "./database";\nexport const repo = db;\n',
+      "database.ts": "export const db = 1;\n",
+    };
+    expect(checkNeeds("app.ts", "database.ts", fakeWorkspace(layered))).toEqual({
+      verdict: "indirect",
+      via: ["service.ts", "repo.ts"],
+      evidence: { file: "app.ts", on: "service.ts", specifier: "./service", line: 1 },
+    });
+  });
+
+  it("goes through a re-export the way any other import is walked", () => {
+    const barrel = {
+      "app.ts": 'import { db } from "./lib";\nexport const app = db;\n',
+      "lib/index.ts": 'export { db } from "./database";\n',
+      "lib/database.ts": "export const db = 1;\n",
+    };
+    expect(checkNeeds("app.ts", "lib/database.ts", fakeWorkspace(barrel)))
+      .toMatchObject({ verdict: "indirect", via: ["lib/index.ts"] });
+  });
+
+  it("confirms a Rust name imported through the module that re-exports it", () => {
+    // clap's `parser.rs` -> `arg_matcher.rs`, which the compiler calls true: the
+    // `use` lands on `parser/mod.rs`, whose `pub(crate) use` passes it along.
+    const crate = {
+      "Cargo.toml": '[package]\nname = "demo"\nversion = "0.1.0"\n',
+      "src/lib.rs": "mod parser;\n",
+      "src/parser/mod.rs": "mod arg_matcher;\nmod run;\npub(crate) use self::arg_matcher::ArgMatcher;\n",
+      "src/parser/arg_matcher.rs": "pub(crate) struct ArgMatcher;\n",
+      "src/parser/run.rs": "use crate::parser::ArgMatcher;\npub(crate) fn run(_: ArgMatcher) {}\n",
+    };
+    expect(checkNeeds("src/parser/run.rs", "src/parser/arg_matcher.rs", treeWorkspace(crate)))
+      .toMatchObject({ verdict: "confirmed", evidence: { file: "src/parser/run.rs", line: 1 } });
+  });
+
+  it("does not confirm the module in the middle of a re-export chain", () => {
+    // The name lives at the end of the chain; an arrow onto the module that
+    // only passes it along is the mistake stopping early turned green.
+    const crate = {
+      "Cargo.toml": '[package]\nname = "demo"\nversion = "0.1.0"\n',
+      "src/lib.rs": "mod parser;\n",
+      "src/parser/mod.rs": "mod matches;\nmod run;\npub use self::matches::ArgMatches;\n",
+      "src/parser/matches/mod.rs": "mod arg_matches;\npub use self::arg_matches::ArgMatches;\n",
+      "src/parser/matches/arg_matches.rs": "pub struct ArgMatches;\n",
+      "src/parser/run.rs": "use crate::parser::ArgMatches;\npub fn run(_: ArgMatches) {}\n",
+    };
+    const workspace = treeWorkspace(crate);
+    expect(checkNeeds("src/parser/run.rs", "src/parser/matches/arg_matches.rs", workspace).verdict)
+      .toBe("confirmed");
+    expect(checkNeeds("src/parser/run.rs", "src/parser/matches/mod.rs", workspace).verdict)
+      .not.toBe("confirmed");
+  });
+
+  it("says nothing about a Rust file no crate declares, which reads as importing nothing", () => {
+    // No `Cargo.toml`: `mod` and `crate::` resolve against nothing, so the
+    // empty import list is the reader's blindness and not an absence.
+    const crateless = { "src/lib.rs": "mod other;\n", "src/other.rs": "pub fn x() {}\n" };
+    expect(checkNeeds("src/other.rs", "src/lib.rs", treeWorkspace(crateless)).verdict)
+      .not.toBe("refuted");
+  });
+
+  it("says nothing when a file on the way reaches out at runtime", () => {
+    // The walk found no path, and one file it walked through could load
+    // anything: not finding the head there is no longer evidence.
+    const plugins = {
+      "app.ts": 'import { load } from "./loader";\nexport const app = load;\n',
+      "loader.ts": 'export const load = (name: string) => import(`./plugins/${name}`);\n',
+      "plugins/db.ts": "export const db = 1;\n",
+    };
+    expect(checkNeeds("app.ts", "plugins/db.ts", fakeWorkspace(plugins))).toEqual({ verdict: "absent" });
+  });
+
+  it("still refuses an arrow within one file", () => {
+    const one = { "a.ts": "export const a = 1;\n" };
+    expect(checkNeeds("a.ts", "a.ts", fakeWorkspace(one))).toEqual({ verdict: "withheld", why: "same-file" });
+  });
+});
+
 describe("what the board does with it", () => {
   const files = {
     "a.ts": "export const a = 1;\n",
@@ -348,6 +463,23 @@ describe("what the board does with it", () => {
     expect(report.claims.needs).toBe(1);
     expect(report.claims.needsChecked).toBe(0);
     expect(report.claims.needsWithheld).toEqual({ dynamic: 1 });
+  });
+
+  it("calls an arrow wrong when nothing connects the two files (#323)", async () => {
+    const apart = { ...files, "c.ts": "export const c = 1;\n" };
+    const report = await verdicts(await boardOf("b.ts", "c.ts", { claim: "needs" }), apart);
+    expect(report.edges.map((finding) => finding.kind)).toEqual(["needs-absent"]);
+    expect(report.edges[0]!.detail).toContain("does not import c.ts, directly or through anything it imports");
+    expect(report.clean).toBe(false);
+  });
+
+  it("names the route, without accusing, when the files connect through another (#323)", async () => {
+    const layered = { ...files, "c.ts": 'import { b } from "./b";\nexport const c = b;\n' };
+    const report = await verdicts(await boardOf("c.ts", "a.ts", { claim: "needs" }), layered);
+    expect(report.edges.map((finding) => finding.kind)).toEqual(["needs-one-level-up"]);
+    expect(report.edges[0]!.detail).toContain("through b.ts");
+    // Amber: a board drawn one level up is a board somebody can keep.
+    expect(accuses(report.edges[0]!.kind)).toBe(false);
   });
 
   it("counts an arrow in a cycle as checked, and says nothing about it", async () => {

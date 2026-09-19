@@ -26,7 +26,7 @@ that took longest to see and it is not in #190:
 
 | word | relation | what it reads | may say wrong | how |
 |---|---|---|---|---|
-| `@needs` | depends | a file's import declarations | yes | **presence** |
+| `@needs` | depends | a file's import declarations, and every file they lead to | yes | **presence**, and **absence** once no chain reaches (#323) |
 | `@takes` | accepts | a function's parameters | yes | **absence** |
 | `@returns` | produces | a function's return type | yes | **absence** |
 | `@holds` | contains | a type's field list | yes | **absence** |
@@ -89,10 +89,19 @@ Available when the reader can find the relationship running the **other way**.
 opposite direction; `@builds` says the same when the construction does.
 
 This rests on something found rather than something missing, which makes it
-robust — and it is what `@needs` has always done. **`@needs` does not refute
-from an absence**: its `absent` verdict is amber, exactly as it was before claims
-existed. Worth knowing, because it means "presence-only" is not a weaker footing
-invented for `@builds` — it is the footing the oldest refutable word stands on.
+robust — and it is what `@needs` did alone until #323. "Presence-only" is not a
+weaker footing invented for `@builds`: it is the footing the oldest refutable
+word stood on for its first two hundred issues.
+
+**Since #323 `@needs` refutes from an absence as well**, and it can because #308
+made its reader find 99.8% of the imports a compiler finds. What it refutes is
+narrower than "no import": nothing the tail imports leads to the head, walked
+file by file through everything reachable, with every file on the way read to
+the end. An arrow whose ends connect through other files is told the route and
+not accused (`needs-one-level-up`), because `app -> database` drawn over three
+files is somebody reading the architecture, and 26 of the 243 file pairs Haiku
+drew on the planted set are that shape. [Item 44](#forty-two-times-a-measurement-contradicted-the-design)
+has the numbers.
 
 ### Never refuting
 
@@ -3968,6 +3977,53 @@ duplicate from conflitcts, requires reading prs "An arrow can be three calls lon
     reds unchanged at 1. An earlier run of the same pair against `e08caf6` said
     43 -> 42 and 8 -> 8: the same one claim, on a main where #303, #304, #308 and
     #309 had not landed yet.
+
+44. **An import that is not there became a red, and the walk that guards it
+    reached everything in Rust until it was told where a `use` lands (#323).**
+
+    `@needs` answered 71 of the planted set's misses with silence: an arrow
+    onto a file the tail never imports was `absent`, and `absent` was amber by
+    design. The risk in changing that was never the reader -- #308 put it at
+    99.8% -- it was the author: `app -> database` means "depends on" with files
+    in between, and the corpus referee defines `needs` as a direct import, so
+    it cannot see the habit. The drawn boards can. Of the 243 file pairs Haiku
+    connected, any word, 142 were a direct import, **26 were reachable only
+    through other files**, 12 only the other way round, and none unconnected.
+    Of the 25 `@needs` arrows it drew, 2 were indirect. Too many to accuse, so
+    the red waits for a walk to come back empty and the rest are told the route.
+
+    **The first walk accused nothing in Rust.** The reader lists every module a
+    `use` passes through -- `crate::parser::ArgMatcher` is a dependency on
+    `lib.rs` and `parser/mod.rs` -- which is right for confirming an arrow onto
+    either and wrong for walking: `lib.rs` declares every module in the crate.
+    The walk takes the file each written import lands on, and drops a bare
+    `crate`, which is a path's first segment or #319's `pub(crate)`.
+
+    **The same listing was hiding eleven true arrows and the one false red.**
+    `parser/mod.rs` writes `pub(crate) use self::arg_matcher::ArgMatcher`, and
+    the compiler follows the name to `arg_matcher.rs`; the reader stopped at the
+    module. Eleven Rust arrows the tooling calls true were `absent` on that, and
+    `debug_asserts.rs -> command.rs` -- the single true claim the bench called
+    wrong -- was `backwards` because the forward import was one hop short.
+    Following a name through the `use` that passes it on confirms all of them.
+    **Stopping at the first match turned one wrong arrow green**: `ArgMatches`
+    passes through two modules, and an arrow onto the middle one is the planted
+    mistake. Only the end of the chain confirms.
+
+    **What it costs, on `.corpus/*`**: of 28,056 imports the compilers read,
+    one comes back refuted -- TanStack's test importing its own package by its
+    published name, the known miss the presence row already carries. 36 more,
+    all Django `__init__.py` re-exports, come back reached through another file
+    rather than direct: amber, never red.
+
+    | `bench:planted` | base | after |
+    |---|---|---|
+    | false `@needs` caught red | 80 of 178 | 91 |
+    | true `@needs` green | 239 of 258 | 248 |
+    | true claims called wrong, all words | 1 | **0** |
+    | false claims green, all words | 26 | 26 |
+
+    The four false `@needs` greens that remain are #319's `pub(crate)`, unmoved.
 
 ## Open, in the order worth doing
 

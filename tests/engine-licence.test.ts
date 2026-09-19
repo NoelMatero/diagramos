@@ -628,11 +628,22 @@ describe("the licence's second axis (#231)", () => {
     }
   });
 
+  it("gives @needs an absence licence in every language its corpus measured", () => {
+    // #323: of 28,056 imports the compilers read over the pinned clones, one
+    // comes back as no import and no chain -- TanStack's self-import through
+    // a build-only condition, the same known miss the presence row carries.
+    for (const language of ["ts", "tsx", "js", "rust", "python"] as const) {
+      expect(mayAccuse("needs", language, "absence"), language).toBe(true);
+    }
+  });
+
   it("leaves every other word's absence axis unmeasured, everywhere", () => {
-    // @calls closes a body's call set with a real compiler, and @accesses
-    // closes a body's reads by name (#255). Every other square on this axis is
-    // a stated absence of a measurement, not a silent yes.
-    for (const relation of ACCUSING_RELATIONS.filter((one) => one !== "calls" && one !== "accesses")) {
+    // @calls closes a body's call set with a real compiler, @accesses closes a
+    // body's reads by name (#255), and @needs a file's imports and everything
+    // they lead to (#323). Every other square on this axis is a stated absence
+    // of a measurement, not a silent yes.
+    const closed = new Set(["calls", "accesses", "needs"]);
+    for (const relation of ACCUSING_RELATIONS.filter((one) => !closed.has(one))) {
       for (const language of LANGUAGES) {
         expect(mayAccuse(relation, language, "absence"), `${relation} in ${language}`)
           .toBe(false);

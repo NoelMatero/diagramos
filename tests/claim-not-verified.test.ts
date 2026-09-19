@@ -158,6 +158,14 @@ describe("a third file importing both ends is not a check of the claim", () => {
       );
       const { red, notVerified, confirmed } = verdictOf(board, files);
 
+      if (claim === "needs") {
+        // Since #323 an import that is not there is a red for `needs`, and
+        // this is that shape: `api` imports nothing, so nothing it imports
+        // leads to `model`. Still never green off the shared importer.
+        expect(red?.kind).toBe("needs-absent");
+        expect(notVerified).toBeUndefined();
+        return;
+      }
       expect(red).toBeUndefined();
       expect(confirmed).toBe(0);
       expect(notVerified).toBeDefined();
@@ -168,11 +176,12 @@ describe("a third file importing both ends is not a check of the claim", () => {
 
   it("says why, and names the claim rather than the channels", async () => {
     const { files } = SHARED_IMPORTER.typescript!;
-    const board = await boardOf("src/api.ts", "src/model.ts", "needs", "src/hub.ts");
+    // `builds`, since `needs` answers this shape with a red (#323).
+    const board = await boardOf("src/api.ts", "src/model.ts", "builds", "src/hub.ts");
     const { notVerified } = verdictOf(board, files);
 
     expect(notVerified?.reason).toBe("claim-not-checked");
-    expect(notVerified?.detail).toContain("@needs");
+    expect(notVerified?.detail).toContain("@builds");
   });
 });
 
