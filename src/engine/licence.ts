@@ -234,7 +234,7 @@ export function isMeasured(row: RelationLicence): row is RelationMeasured {
  * licence for one says nothing about the other, which is why this is an
  * axis rather than a flag beside the existing one.
  */
-export type AccusalAxis = "presence" | "absence";
+export type AccusalAxis = "presence" | "absence" | "indirect";
 
 /**
  * What one word may accuse with, on one axis, in one language.
@@ -249,6 +249,19 @@ export type AccusalAxis = "presence" | "absence";
 export interface AccusalLicence {
   presence: RelationLicence;
   absence: RelationLicence;
+  /**
+   * The third kind, and `@needs` is the only word with a reader for it (#323):
+   * the relationship is not written here, and it *is* reachable through other
+   * files, and that is still wrong because the word means the direct one.
+   *
+   * Measured apart from `absence` because the population is different and so
+   * is the answer. Of the imports the compilers read over the pinned clones,
+   * none in Rust and one in TypeScript are reached only through another file;
+   * five in Python are, all package files handing a name along a chain this
+   * reader stops following. So Rust and TypeScript may call an indirect
+   * `@needs` wrong and Python may not, which is the grid doing its job.
+   */
+  indirect: RelationLicence;
 }
 
 /**
@@ -323,6 +336,56 @@ const DISPATCH_SCAN_TOO_CRUDE = (detail: string): RelationUnmeasured => ({
     "independent oracle that would settle Rust; nothing equivalent is wired in " +
     "for Python. `npm run measure:handles` reproduces every number.",
 });
+
+/**
+ * The answer for every word but `@needs` on the indirect axis (#323).
+ *
+ * Reaching the far end through other files is only a *different* answer for a
+ * word whose relationship is transitive in the first place. An import chain is
+ * one: `a` imports `b` imports `c`, and people draw `a -> c` meaning it. A
+ * call two hops away already has `calls-one-level-up`, and the rest -- a
+ * parameter, a field list, a base -- have nothing a chain could mean.
+ */
+/**
+ * `@needs`' indirect licence (#323): reached through other files, and wrong
+ * anyway, because the word means the import written here.
+ *
+ * The same corpus and referee as the presence row, asked a different question:
+ * of the imports the compiler calls direct, how many does this reader reach
+ * only through a chain? Every one of those is an accusation against a correct
+ * board, so the bar is the usual zero.
+ */
+const NEEDS_INDIRECT = (asked: number, missed: number, note: string): RelationMeasured => ({
+  reproduce: "npm run measure:recall -- .corpus/* --words=needs",
+  measured: "2026-09-20",
+  referee:
+    "the compiler's own import edges (tsc, pyright, rust-analyzer) over the " +
+    "pinned clones, counted as `said:indirect`",
+  unit: "true imports asked, and how many were reached only through another file",
+  counts: { asked, missed },
+  note,
+});
+
+/**
+ * `@depends`' indirect square, which is not a refusal but a category error.
+ *
+ * The word claims the chain. A relationship reached through other files is the
+ * thing it confirms, so there is no accusation on this axis to measure.
+ */
+const DEPENDS_IS_THE_CHAIN: RelationUnmeasured = {
+  unmeasured:
+    "Not an accusation this word can make: `@depends` is satisfied by a chain " +
+    "of imports, so reaching the far end through other files confirms it " +
+    "rather than refuting it (#323). `@needs` is the word with the strict " +
+    "reading, and its row above carries that measurement.",
+};
+
+const NO_INDIRECT_READER: RelationUnmeasured = {
+  unmeasured:
+    "Only @needs has a chain to follow: an import leads to another import, " +
+    "and a diagram drawn over the chain is a reading of the architecture " +
+    "(#323). No other word here has a transitive form a reader could walk.",
+};
 
 const NOT_DESIGNED_YET: RelationUnmeasured = {
   unmeasured:
@@ -601,9 +664,41 @@ export const LICENCES: readonly Licence[] = [
               "package by its published name, routed to `src/index.ts` by a " +
               "custom tsconfig condition. The same miss the presence row carries.",
           ]),
+        indirect: NEEDS_INDIRECT(12824, 0,
+          "Not one true import in ts, tsx or js is reached only through another " +
+            "file. A barrel -- `export * from` -- is followed to what it " +
+            "re-exports and confirms directly (#323)."),
       },
-      takes: { presence: TYPESCRIPT_SIGNATURE, absence: NOT_DESIGNED_YET },
-      returns: { presence: TYPESCRIPT_SIGNATURE, absence: NOT_DESIGNED_YET },
+      /**
+       * `@depends`: the same reader, one question wider (#323).
+       *
+       * Every square here is the `needs` square beside it, because it is the
+       * same reading of the same files by the same corpus -- what differs is
+       * which answer counts. The chain confirms instead of being reported, so
+       * this word has no indirect axis to license: reaching through other
+       * files is what it claims.
+       */
+      depends: {
+        presence: {
+          reproduce: "npm run measure:licence -- --only=typescript",
+          measured: "2026-08-21",
+          referee: "the corpus above, and the referee named beside it",
+          unit: "dependency edges",
+          counts: "corpus",
+        },
+        absence: NEEDS_ABSENCE(12824, 1,
+          "The `needs` row above, and the same single miss: a chain is what " +
+            "this word confirms on, so only a pair nothing connects is wrong.",
+          [
+            "TanStack/query: `use-queries-with-persist.test.tsx` imports its own " +
+              "package by its published name, routed to `src/index.ts` by a " +
+              "custom tsconfig condition. The `needs` row's miss, and the same " +
+              "one: no chain reaches what no specifier resolves to.",
+          ]),
+        indirect: DEPENDS_IS_THE_CHAIN,
+      },
+      takes: { presence: TYPESCRIPT_SIGNATURE, absence: NOT_DESIGNED_YET, indirect: NO_INDIRECT_READER },
+      returns: { presence: TYPESCRIPT_SIGNATURE, absence: NOT_DESIGNED_YET, indirect: NO_INDIRECT_READER },
       holds: {
         presence: {
           reproduce: "npm run measure:holds -- .corpus/*",
@@ -632,6 +727,7 @@ export const LICENCES: readonly Licence[] = [
             "and says something true.",
         },
         absence: NOT_DESIGNED_YET,
+        indirect: NO_INDIRECT_READER,
       },
       builds: {
         presence: {
@@ -663,6 +759,7 @@ export const LICENCES: readonly Licence[] = [
             "reader and a red.",
         },
         absence: NOT_DESIGNED_YET,
+        indirect: NO_INDIRECT_READER,
       },
       calls: {
         presence: {
@@ -746,6 +843,7 @@ export const LICENCES: readonly Licence[] = [
               "this is, not a ceiling on how right.",
           ],
         },
+        indirect: NO_INDIRECT_READER,
       },
       accesses: {
         presence: {
@@ -797,6 +895,7 @@ export const LICENCES: readonly Licence[] = [
             "and there is no second checker to measure placement against (#260). " +
             "docs/claim-vocabulary.md item 25.",
         },
+        indirect: NO_INDIRECT_READER,
       },
       handles: {
         presence: {
@@ -837,6 +936,7 @@ export const LICENCES: readonly Licence[] = [
           ],
         },
         absence: NOT_DESIGNED_YET,
+        indirect: NO_INDIRECT_READER,
       },
       conforms: {
         presence: {
@@ -876,6 +976,7 @@ export const LICENCES: readonly Licence[] = [
             "invisible from the confirming side.",
         },
         absence: NOT_DESIGNED_YET,
+        indirect: NO_INDIRECT_READER,
       },
     },
   },
@@ -943,9 +1044,27 @@ export const LICENCES: readonly Licence[] = [
           "A `use` is walked to the file it lands on, not through every module " +
             "on its path: `lib.rs` declares every module in the crate, and a walk " +
             "through it would reach everything and never accuse."),
+        indirect: NEEDS_INDIRECT(2539, 0,
+          "Not one true import in Rust is reached only through another file, " +
+            "once a name is followed through the module that re-exports it: " +
+            "`pub(crate) use self::arg_matcher::ArgMatcher`, `pub use ..::*` " +
+            "(#323). Before that eleven were, and one was a false red."),
       },
-      takes: { presence: RUST_SIGNATURE, absence: NOT_DESIGNED_YET },
-      returns: { presence: RUST_SIGNATURE, absence: NOT_DESIGNED_YET },
+      depends: {
+        presence: {
+          reproduce: "npm run measure:licence -- --only=rust",
+          measured: "2026-08-22",
+          referee: "the corpus above, and the referee named beside it",
+          unit: "dependency edges",
+          counts: "corpus",
+        },
+        absence: NEEDS_ABSENCE(2539, 0,
+          "The `needs` row above: no true Rust import is left unreached once " +
+            "re-exports are followed, so nothing correct is called wrong here."),
+        indirect: DEPENDS_IS_THE_CHAIN,
+      },
+      takes: { presence: RUST_SIGNATURE, absence: NOT_DESIGNED_YET, indirect: NO_INDIRECT_READER },
+      returns: { presence: RUST_SIGNATURE, absence: NOT_DESIGNED_YET, indirect: NO_INDIRECT_READER },
       holds: {
         presence: {
           reproduce: "npm run measure:holds -- .corpus/*",
@@ -966,6 +1085,7 @@ export const LICENCES: readonly Licence[] = [
             "said little.",
         },
         absence: NOT_DESIGNED_YET,
+        indirect: NO_INDIRECT_READER,
       },
       builds: {
         presence: {
@@ -998,6 +1118,7 @@ export const LICENCES: readonly Licence[] = [
             "hit the other way.",
         },
         absence: NOT_DESIGNED_YET,
+        indirect: NO_INDIRECT_READER,
       },
       calls: {
         presence: {
@@ -1047,6 +1168,7 @@ export const LICENCES: readonly Licence[] = [
             "followable in principle and this corpus has none that matter.",
         },
         absence: NO_CLOSED_BODY_RESOLVER,
+        indirect: NO_INDIRECT_READER,
       },
       accesses: {
         presence: {
@@ -1086,6 +1208,7 @@ export const LICENCES: readonly Licence[] = [
             "unparsed token tree, and 23 of the first 24 reads this reader could " +
             "not see were inside `log_line!`, `assert_eq!` and `json!`.",
         },
+        indirect: NO_INDIRECT_READER,
       },
       handles: {
         /*
@@ -1159,6 +1282,7 @@ export const LICENCES: readonly Licence[] = [
           ],
         },
         absence: NOT_DESIGNED_YET,
+        indirect: NO_INDIRECT_READER,
       },
       conforms: {
         /*
@@ -1204,6 +1328,7 @@ export const LICENCES: readonly Licence[] = [
             "buying for that.",
         },
         absence: NOT_DESIGNED_YET,
+        indirect: NO_INDIRECT_READER,
       },
     },
   },
@@ -1286,6 +1411,7 @@ export const LICENCES: readonly Licence[] = [
           + "one test file that writes a `match` inside a string.",
         ),
         absence: NOT_DESIGNED_YET,
+        indirect: NO_INDIRECT_READER,
       },
       needs: {
         presence: {
@@ -1299,9 +1425,34 @@ export const LICENCES: readonly Licence[] = [
           "36 true imports come back as reached through another file rather " +
             "than direct -- Django `__init__.py` files naming a module the " +
             "compiler follows through a re-export -- which is amber, never red."),
+        indirect: {
+          unmeasured:
+            "Measured and not licensed. Five true Python imports of 12,693 are " +
+            "reached only through another file: a package `__init__.py` names a " +
+            "class the compiler follows two or three re-exports deep, and this " +
+            "reader follows a star import one named step and no further. Calling " +
+            "those wrong is five accusations against correct boards, so an " +
+            "indirect `@needs` in Python stays amber with the route named. " +
+            "`npm run measure:recall -- .corpus/* --words=needs` reproduces it " +
+            "(#323).",
+        },
       },
-      takes: { presence: PYTHON_SIGNATURE, absence: NOT_DESIGNED_YET },
-      returns: { presence: PYTHON_SIGNATURE, absence: NOT_DESIGNED_YET },
+      depends: {
+        presence: {
+          reproduce: "npm run measure:licence -- --only=python",
+          measured: "2026-08-22",
+          referee: "the corpus above, and the referee named beside it",
+          unit: "dependency edges",
+          counts: "corpus",
+        },
+        absence: NEEDS_ABSENCE(12693, 0,
+          "The `needs` row above. Python's indirect square is a no and this " +
+            "word does not need it: the five package chains it stands on are " +
+            "reached, which is what `@depends` claims."),
+        indirect: DEPENDS_IS_THE_CHAIN,
+      },
+      takes: { presence: PYTHON_SIGNATURE, absence: NOT_DESIGNED_YET, indirect: NO_INDIRECT_READER },
+      returns: { presence: PYTHON_SIGNATURE, absence: NOT_DESIGNED_YET, indirect: NO_INDIRECT_READER },
       holds: {
         presence: {
           reproduce: "npm run measure:holds -- .corpus/*",
@@ -1337,6 +1488,7 @@ export const LICENCES: readonly Licence[] = [
             "annotation.",
         },
         absence: NOT_DESIGNED_YET,
+        indirect: NO_INDIRECT_READER,
       },
       builds: {
         presence: {
@@ -1356,6 +1508,7 @@ export const LICENCES: readonly Licence[] = [
             "against pyright first.",
         },
         absence: NOT_DESIGNED_YET,
+        indirect: NO_INDIRECT_READER,
       },
       calls: {
         presence: {
@@ -1440,6 +1593,7 @@ export const LICENCES: readonly Licence[] = [
               "request here asks.",
           ],
         },
+        indirect: NO_INDIRECT_READER,
       },
       accesses: {
         presence: {
@@ -1480,6 +1634,7 @@ export const LICENCES: readonly Licence[] = [
               "read against the source.",
           ],
         },
+        indirect: NO_INDIRECT_READER,
       },
       conforms: {
         presence: {
@@ -1504,6 +1659,7 @@ export const LICENCES: readonly Licence[] = [
             "which `drift.ts` has and a single-file run does not.",
         },
         absence: NOT_DESIGNED_YET,
+        indirect: NO_INDIRECT_READER,
       },
     },
   },

@@ -883,6 +883,9 @@ const LANGUAGES: Language[] = ["rust", "ts", "tsx", "python", "js"];
  * an arrow can carry the word -- and this table is about the second question.
  */
 const RELATION_FOR: Record<ArrowClaim, string> = {
+  // Both words describe the same relation; `needs` is written second so the
+  // inverse map below still answers "@needs" for it, as it did before #323.
+  depends: "depends",
   needs: "depends",
   takes: "accepts",
   returns: "produces",

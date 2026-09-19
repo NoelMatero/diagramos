@@ -220,9 +220,25 @@
  * C` true, or that `fn f<T: Display>` is a conformance. Each is a separate
  * question with its own measurement, and none is on offer here.
  */
+/**
+ * `@depends`, the tenth, and the reason it exists is `@needs`' own strictness.
+ *
+ * `@needs` means the import written in this file. Since #323 an arrow claiming
+ * it and not finding it is wrong -- which left nowhere to put the true and
+ * common thing people draw: `app -> database`, three files apart, meaning the
+ * dependency runs that way through the middle. 26 of the 243 file pairs Haiku
+ * connected on the planted set are that shape.
+ *
+ * So the arrow says which one it means. `@depends` is satisfied by a chain of
+ * imports of any length, and is wrong only when nothing the tail imports leads
+ * to the head at all -- the same reader, the same corpus, one question wider.
+ * A board may use either; what it may not do any more is leave the tool to
+ * guess which was meant, which is what made a real mistake and a correct
+ * drawing look identical.
+ */
 export const ARROW_CLAIMS = [
-  "needs", "feeds", "takes", "returns", "holds", "builds", "calls", "accesses",
-  "conforms",
+  "needs", "depends", "feeds", "takes", "returns", "holds", "builds", "calls",
+  "accesses", "conforms",
 ] as const;
 
 export type ArrowClaim = (typeof ARROW_CLAIMS)[number];

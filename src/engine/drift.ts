@@ -345,6 +345,16 @@ export type EdgeFindingKind =
    */
   | "needs-one-level-up"
   /**
+   * A `@needs` arrow the tail reaches only through other files (#323), where
+   * the language's measurement says no true import hides behind a chain.
+   *
+   * `needs-one-level-up` is the same shape reported rather than accused, and
+   * which one a board gets is `licence.ts`'s indirect axis: Rust and
+   * TypeScript leave nothing correct behind a chain, Python leaves six package
+   * re-exports, so Python's arrows are told the route and left alone.
+   */
+  | "needs-indirect"
+  /**
    * An arrow whose end is the wrong kind of thing for its claim (#297):
    * `@feeds` from a struct, `@holds` from a function, `@takes` into a class.
    *
@@ -404,6 +414,7 @@ export const EDGE_FINDING_KINDS = [
   "end-lacks-part",
   "needs-absent",
   "needs-one-level-up",
+  "needs-indirect",
 ] as const satisfies readonly EdgeFindingKind[];
 
 /**
@@ -440,6 +451,7 @@ export const ACCUSING_EDGE_KINDS = [
   "conforms-absent",
   "end-lacks-part",
   "needs-absent",
+  "needs-indirect",
 ] as const satisfies readonly EdgeFindingKind[];
 
 /** The rest: an observation about an arrow, never an accusation about one. */
@@ -783,6 +795,7 @@ export { lackingPhrase };
 function withheldTallyOf(claims: ClaimTally, claim: ArrowClaim): Record<string, number> {
   const tallies: Record<ArrowClaim, Record<string, number>> = {
     needs: claims.needsWithheld,
+    depends: claims.dependsWithheld,
     feeds: claims.feedsWithheld,
     takes: claims.signatureWithheld,
     returns: claims.signatureWithheld,
@@ -1204,6 +1217,12 @@ export interface ClaimTally {
    * counts and this does not are in `plannedWithheld` below.
    */
   needsWithheld: SkipBreakdown<NeedsWithheld | EdgeSkipReason>;
+  /** Arrows claiming `depends`: a dependency through any number of files (#323). */
+  depends: number;
+  /** Of those, how many got an answer rather than a reason to stay quiet. */
+  dependsChecked: number;
+  /** Why the rest got none, by reason -- `needsWithheld`'s argument, same word's reader. */
+  dependsWithheld: SkipBreakdown<NeedsWithheld | EdgeSkipReason>;
   /**
    * The same fact about the claims on `planned` arrows: nobody could read them.
    *
@@ -2869,6 +2888,7 @@ export function checkDrift(
     handles: 0, handlesHeld: 0, handlesWithheld: [],
     complete: 0, completeHeld: 0,
     needs: 0, needsChecked: 0, needsWithheld: {},
+    depends: 0, dependsChecked: 0, dependsWithheld: {},
     takes: 0, returns: 0, signatureConfirmed: 0, signatureWithheld: {},
     holds: 0, holdsConfirmed: 0, holdsWithheld: {},
     accesses: 0, accessesConfirmed: 0, accessesWithheld: {},
@@ -3956,7 +3976,16 @@ export function checkDrift(
       let unansweredWhy: string | undefined;
       const unanswered = (why: string) => { if (claimed) unansweredWhy ??= why; };
 
-      if (edge.claim === "needs" && (claimed || edge.state === "planned")) {
+      if ((edge.claim === "needs" || edge.claim === "depends") && (claimed || edge.state === "planned")) {
+        /*
+         * One reader, two words (#323). `@needs` means the import written in
+         * the tail; `@depends` means the dependency however many files it runs
+         * through. So the verdicts below are the same and what counts as wrong
+         * is not: a chain confirms `@depends` and is the accusation against
+         * `@needs`, where a language has earned it.
+         */
+        const strict = edge.claim === "needs";
+        const word = edge.claim;
         const needs = checkNeeds(fromPath, toPath, workspace, importCache.configs, options?.ledger);
         /*
          * A `planned` arrow asks this one question and ignores every other
@@ -4022,10 +4051,12 @@ export function checkDrift(
             continue;
           }
         } else if (needs.verdict === "withheld") {
-          claims.needsWithheld[needs.why] = (claims.needsWithheld[needs.why] ?? 0) + 1;
+          const withheld = strict ? claims.needsWithheld : claims.dependsWithheld;
+          withheld[needs.why] = (withheld[needs.why] ?? 0) + 1;
           unanswered(needs.why);
         } else {
-          claims.needsChecked += 1;
+          if (strict) claims.needsChecked += 1;
+          else claims.dependsChecked += 1;
           if (needs.verdict === "backwards") {
             /*
              * Counted as checked here rather than by falling through, because
@@ -4099,14 +4130,22 @@ export function checkDrift(
           }
           if (needs.verdict === "indirect") {
             /*
-             * No import, and a chain of them (#323): the arrow drawn one level
-             * up. Amber for the reason `calls-one-level-up` is -- `app ->
-             * database` over three files is a reading of the architecture
-             * somebody can keep -- and the row names the files between so the
-             * choice is theirs.
+             * No import, and a chain of them (#323).
+             *
+             * `@depends` is claiming exactly that, so it confirms. `@needs`
+             * means the import written here, so the chain is what makes the
+             * arrow wrong -- in a language whose measurement says no true
+             * import hides behind one, which is Rust and TypeScript and not
+             * Python. Where it does not, the route is reported and the arrow
+             * is left standing, the reading `calls-one-level-up` gives.
              */
             edgesChecked += 1;
+            if (!strict) {
+              recordEdge(edge, fromNode, toNode, { kind: "confirmed" });
+              continue;
+            }
             const hops = needs.via.length + 1;
+            const route = `it gets there in ${hops} steps, through ${needs.via.join(" -> ")}`;
             recordEdge(edge, fromNode, toNode, { kind: "finding", finding: {
               from: fromPath,
               to: toPath,
@@ -4114,12 +4153,15 @@ export function checkDrift(
               toLabel: toNode.label,
               fromRef,
               toRef,
-              kind: "needs-one-level-up",
+              kind: needs.mayAccuse ? "needs-indirect" : "needs-one-level-up",
               detail:
                 `this arrow says ${oneLine(fromNode.label) || fromPath} needs `
                 + `${oneLine(toNode.label) || toPath}, and ${fromPath} does not import it -- `
-                + `it gets there in ${hops} steps, through ${needs.via.join(" -> ")}. `
-                + `Draw the hop, or leave the arrow where it is and read it as "depends on".`,
+                + `${route}. `
+                + (needs.mayAccuse
+                  ? `@needs means the import written in ${fromPath}. Draw the hop, or say `
+                    + `\`claim: "depends"\`, which is this chain and is true.`
+                  : `Draw the hop, or leave the arrow where it is and read it as "depends on".`),
             } });
             continue;
           }
@@ -4132,7 +4174,7 @@ export function checkDrift(
              */
             edgesChecked += 1;
             const wasClaimed = baselineGraph?.edges.some(
-              (was) => was.from === edge.from && was.to === edge.to && was.claim === "needs",
+              (was) => was.from === edge.from && was.to === edge.to && was.claim === word,
             );
             const fresh = baselineGraph !== undefined && !wasClaimed;
             recordEdge(edge, fromNode, toNode, { kind: "finding", finding: {
@@ -4145,7 +4187,7 @@ export function checkDrift(
               kind: "needs-absent",
               detail:
                 (fresh ? "a claim written this turn is already wrong: " : "")
-                + `this arrow says ${oneLine(fromNode.label) || fromPath} needs `
+                + `this arrow says ${oneLine(fromNode.label) || fromPath} ${word} `
                 + `${oneLine(toNode.label) || toPath}, and ${fromPath} does not import `
                 + `${toPath}, directly or through anything it imports. Point the arrow `
                 + `at what ${fromPath} does import, or drop it.`,

@@ -103,12 +103,24 @@ export function readRustDependencies(
   const scope = boundModules(filePath, tree.rootNode, layout, workspace, own);
   const fileDirectory = filePath.includes("/") ? filePath.slice(0, filePath.lastIndexOf("/")) : "";
 
-  const record = (node: Node, specifier: string, file?: string): void => {
+  const record = (node: Node, specifier: string, file?: string, star = false): void => {
+    /*
+     * A Rust path carries the name at its end -- `crate::parser::ArgMatcher` --
+     * so the names a `use` binds are read off the specifier rather than from a
+     * clause. `mod x` and a path ending in a module segment name nothing an
+     * item chain could follow, which the capital-letter-or-underscore shape
+     * below is a rough and safe reading of: a miss here reports a route
+     * instead of confirming, never the other way round (#323).
+     */
+    const tail = specifier.split("::").pop() ?? "";
+    const names = !star && /^[A-Za-z_]\w*$/.test(tail) && !specifier.startsWith("mod ") ? [tail] : [];
     dependencies.push({
       specifier,
       ...(file ? { file } : {}),
       line: lineOf(source, node),
       deferred: false,
+      ...(star ? { star: true } : {}),
+      ...(names.length > 0 ? { names } : {}),
     });
   };
 
@@ -143,14 +155,20 @@ export function readRustDependencies(
     }
   };
 
-  const takePath = (node: Node, segments: string[], declaration: boolean, position?: RustPosition): void => {
+  const takePath = (
+    node: Node,
+    segments: string[],
+    declaration: boolean,
+    position?: RustPosition,
+    star = false,
+  ): void => {
     const targets = resolveRustPath(segments, filePath, layout, workspace, declaration, position);
     const written = segments.join("::");
     if (targets.length === 0) {
-      record(node, written);
+      record(node, written, undefined, star);
       return;
     }
-    for (const target of targets) record(node, written, target.file);
+    for (const target of targets) record(node, written, target.file, star);
   };
 
   /**
@@ -247,7 +265,20 @@ export function readRustDependencies(
           takeVisibility(child, position);
           for (const inner of children(child)) {
             if (PUNCTUATION.has(inner.type) || inner.type === "visibility_modifier") continue;
-            for (const segments of expandUse(inner, [])) takePath(child, segments, true, position);
+            /*
+             * Which of these paths is a glob. `expandUse` flattens
+             * `use crate::io::*` to the path and drops the star, which is the
+             * right answer for "what does this file depend on" and the wrong
+             * one for following a name through a module that re-exports
+             * everything (#323). `aliasedUses` reads the same subtree and
+             * keeps the flag, so the two are matched by their written path.
+             */
+            const globs = new Set(
+              aliasedUses(inner, []).filter((use) => use.glob).map((use) => use.segments.join("::")),
+            );
+            for (const segments of expandUse(inner, [])) {
+              takePath(child, segments, true, position, globs.has(segments.join("::")));
+            }
           }
           pathAttribute = undefined;
           continue;

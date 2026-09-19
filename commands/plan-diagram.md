@@ -69,6 +69,11 @@ says what the code does and leaves you to decide which of the two is wrong.
 
 ### `claim: "needs"` on a planned arrow — which way the dependency will run
 
+`depends` is the same sketch drawn wider: the `from` end will depend on the
+`to` end through however many files end up in between, and the check confirms
+it on any chain of imports. Use it for a plan whose two ends are not going to
+be neighbours; use `needs` when one file will import the other.
+
 `needs` says **the `from` end will declare a dependency on the `to` end** — an
 import, a require, a `use`. On the board it reads as `@needs` on the arrow's
 label, after your own words.

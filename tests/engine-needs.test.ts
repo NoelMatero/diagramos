@@ -101,7 +101,7 @@ function treeWorkspace(files: Record<string, string>): Workspace {
 async function boardOf(
   from: string,
   to: string,
-  edge: { claim?: "needs"; state?: "planned" } = {},
+  edge: { claim?: "needs" | "depends"; state?: "planned" } = {},
 ): Promise<BoardFile> {
   const { board } = await createDiagram(emptyBoard(), {
     name: "arch",
@@ -325,6 +325,40 @@ describe("an import written in plain sight", () => {
 });
 
 describe("an import that is not there (#323)", () => {
+  it("calls a TypeScript arrow wrong when it only reaches through other files", () => {
+    // #323's second half: `@needs` means the import written here, and ts/tsx/js
+    // leave no true import hiding behind a chain, so this is the accusation.
+    const layered = {
+      "app.ts": 'import { service } from "./service";\nexport const app = service;\n',
+      "service.ts": 'import { db } from "./database";\nexport const service = db;\n',
+      "database.ts": "export const db = 1;\n",
+    };
+    expect(checkNeeds("app.ts", "database.ts", fakeWorkspace(layered)))
+      .toMatchObject({ verdict: "indirect", via: ["service.ts"], mayAccuse: true });
+  });
+
+  it("leaves a Python chain unaccused, because six true imports hide behind one", () => {
+    const layered = {
+      "app.py": "from .service import run\n",
+      "service.py": "from .database import db\n\ndef run():\n    return db\n",
+      "database.py": "db = 1\n",
+    };
+    expect(checkNeeds("app.py", "database.py", fakeWorkspace(layered)))
+      .toMatchObject({ verdict: "indirect", via: ["service.py"], mayAccuse: false });
+  });
+
+  it("follows a star re-export chain and confirms, rather than reporting a route", () => {
+    // Django's shape: the package hands on what it imported by name, and a file
+    // that star-imports the package has the class (#323).
+    const django = {
+      "gis/__init__.py": "from models import *\n",
+      "models/__init__.py": "from models.base import Model\n",
+      "models/base.py": "class Model:\n    pass\n",
+    };
+    expect(checkNeeds("gis/__init__.py", "models/base.py", fakeWorkspace(django)).verdict)
+      .toBe("confirmed");
+  });
+
   it("names the files between when the tail reaches the head through them", () => {
     // `app -> database` drawn meaning "depends on": correct about the
     // architecture, and not a direct import. Never red.
@@ -337,7 +371,8 @@ describe("an import that is not there (#323)", () => {
     expect(checkNeeds("app.ts", "database.ts", fakeWorkspace(layered))).toEqual({
       verdict: "indirect",
       via: ["service.ts", "repo.ts"],
-      evidence: { file: "app.ts", on: "service.ts", specifier: "./service", line: 1 },
+      evidence: { file: "app.ts", on: "service.ts", specifier: "./service", line: 1, names: ["service"] },
+      mayAccuse: true,
     });
   });
 
@@ -347,8 +382,10 @@ describe("an import that is not there (#323)", () => {
       "lib/index.ts": 'export { db } from "./database";\n',
       "lib/database.ts": "export const db = 1;\n",
     };
-    expect(checkNeeds("app.ts", "lib/database.ts", fakeWorkspace(barrel)))
-      .toMatchObject({ verdict: "indirect", via: ["lib/index.ts"] });
+    // A barrel that re-exports the name confirms instead: `export { db } from`
+    // is that file's export arriving here (#323).
+    expect(checkNeeds("app.ts", "lib/database.ts", fakeWorkspace(barrel)).verdict)
+      .toBe("confirmed");
   });
 
   it("confirms a Rust name imported through the module that re-exports it", () => {
@@ -473,13 +510,30 @@ describe("what the board does with it", () => {
     expect(report.clean).toBe(false);
   });
 
-  it("names the route, without accusing, when the files connect through another (#323)", async () => {
+  it("calls a needs arrow wrong when it only reaches through another file (#323)", async () => {
     const layered = { ...files, "c.ts": 'import { b } from "./b";\nexport const c = b;\n' };
     const report = await verdicts(await boardOf("c.ts", "a.ts", { claim: "needs" }), layered);
-    expect(report.edges.map((finding) => finding.kind)).toEqual(["needs-one-level-up"]);
+    expect(report.edges.map((finding) => finding.kind)).toEqual(["needs-indirect"]);
     expect(report.edges[0]!.detail).toContain("through b.ts");
-    // Amber: a board drawn one level up is a board somebody can keep.
-    expect(accuses(report.edges[0]!.kind)).toBe(false);
+    expect(report.edges[0]!.detail).toContain('claim: "depends"');
+    expect(accuses(report.edges[0]!.kind)).toBe(true);
+  });
+
+  it("confirms the same arrow when it claims depends rather than needs (#323)", async () => {
+    const layered = { ...files, "c.ts": 'import { b } from "./b";\nexport const c = b;\n' };
+    const report = await verdicts(await boardOf("c.ts", "a.ts", { claim: "depends" }), layered);
+    expect(report.edges).toEqual([]);
+    expect(report.claims.depends).toBe(1);
+    expect(report.claims.dependsChecked).toBe(1);
+    expect(report.clean).toBe(true);
+  });
+
+  it("calls a depends arrow wrong only when nothing connects the two files (#323)", async () => {
+    const apart = { ...files, "c.ts": "export const c = 1;\n" };
+    const report = await verdicts(await boardOf("b.ts", "c.ts", { claim: "depends" }), apart);
+    expect(report.edges.map((finding) => finding.kind)).toEqual(["needs-absent"]);
+    expect(report.edges[0]!.detail).toContain("depends");
+    expect(report.clean).toBe(false);
   });
 
   it("counts an arrow in a cycle as checked, and says nothing about it", async () => {

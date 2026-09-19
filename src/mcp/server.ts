@@ -150,7 +150,9 @@ async function guard<T>(run: () => Promise<T>): Promise<T | ReturnType<typeof fa
 const CLAIM_DESCRIPTION =
   "Optional; most arrows carry none. Write one ONLY from code you read. Both ends name a symbol "
   + "(path#symbol) unless noted. "
-  + "needs: from imports to (ends may be files); red if the import runs only the other way. "
+  + "needs: from imports to DIRECTLY (ends may be files); red if that import is not there. "
+  + "depends: from depends on to through any number of files (ends may be files); red only if "
+  + "nothing from imports leads to it. Use it when files sit between the two ends. "
   + "feeds: from's result goes into to; never red. "
   + "takes / returns: from is a TYPE, to is a FUNCTION whose parameter / return type it is; red if "
   + "absent from the signature. "
@@ -241,7 +243,7 @@ const edgeSchema = z.object({
       + "break names the hop. Both ends must name symbols.",
     ),
   claim: z
-    .enum(["needs", "feeds", "takes", "returns", "holds", "builds", "calls",
+    .enum(["needs", "depends", "feeds", "takes", "returns", "holds", "builds", "calls",
       "accesses", "conforms"])
     .optional()
     .describe(
@@ -1367,7 +1369,7 @@ server.registerTool(
             label: z.string().optional(),
             bidirectional: z.boolean().optional(),
             claim: z
-              .enum(["needs", "feeds", "takes", "returns", "holds", "builds", "calls",
+              .enum(["needs", "depends", "feeds", "takes", "returns", "holds", "builds", "calls",
                 "accesses", "conforms"])
               .optional()
               .describe(

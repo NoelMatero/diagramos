@@ -44,8 +44,14 @@ import {
   type Kind, type Language, type Loc, type Sym, type Tooling,
 } from "./bench-tooling";
 
+/*
+ * `depends` is judged (`judgeDepends`) and deliberately not in this list: the
+ * list drives which claims the planted set *generates*, and adding a word
+ * there would change the population the score is measured against, which is
+ * the one thing a benchmark may not do quietly (#323).
+ */
 export const WORDS = ["needs", "takes", "returns", "holds", "builds", "calls", "accesses", "conforms", "feeds"] as const;
-export type Word = (typeof WORDS)[number];
+export type Word = (typeof WORDS)[number] | "depends";
 
 export type Truth = "true" | "false" | "undecidable";
 export interface Answer { truth: Truth; why: string }
@@ -152,6 +158,7 @@ export function kindProblemFor(word: Word, from: Sym, to: Sym): string | undefin
       return want(from, isType(from), "from", "only a type extends or implements")
         ?? want(to, isType(to), "to", "only a type can be a base");
     case "needs":
+    case "depends":
       return undefined;
   }
 }
@@ -574,8 +581,41 @@ export function createOracle(tooling: Tooling): Oracle {
     return { truth: "false", why: "nothing in it imports that file" };
   }
 
+  /**
+   * `@depends`: the same question with the chain allowed (#323).
+   *
+   * Breadth-first over the compiler's own import edges, so an arrow drawn
+   * `app -> database` with files in between is true the way its author meant
+   * it. A file the tool could not read anywhere on the walk leaves the answer
+   * undecidable rather than false, for the reason `judgeNeeds` does the same:
+   * a referee that guesses is worse than one that abstains.
+   */
+  async function judgeDepends(fromRef: string, toRef: string): Promise<Answer> {
+    const direct = await judgeNeeds(fromRef, toRef);
+    if (direct.truth !== "false") return direct;
+    const toFile = abs(toRef.split("#")[0]!);
+    const seen = new Set([abs(fromRef.split("#")[0]!)]);
+    const queue = [...seen];
+    let doubt: string | undefined;
+    for (let next = 0; next < queue.length && seen.size < 2000; next += 1) {
+      const imports = await tooling.importsOf(queue[next]!);
+      if (!imports) { doubt ??= "a file on the way could not be read"; continue; }
+      for (const entry of imports) {
+        if (entry.file === undefined) { doubt ??= `an import (${entry.text}) did not resolve`; continue; }
+        if (entry.file === toFile) {
+          return { truth: "true", why: `it reaches it through ${queue[next]!.split("/").pop()}` };
+        }
+        if (seen.has(entry.file)) continue;
+        seen.add(entry.file);
+        queue.push(entry.file);
+      }
+    }
+    return doubt ? { truth: "undecidable", why: doubt } : { truth: "false", why: "nothing it imports leads there" };
+  }
+
   async function judge(claim: ClaimUnderTest): Promise<Answer> {
     if (claim.word === "needs") return judgeNeeds(claim.from, claim.to);
+    if (claim.word === "depends") return judgeDepends(claim.from, claim.to);
     const ends: Array<[string, Sym[] | undefined]> = [];
     for (const ref of [claim.from, claim.to]) {
       if (!ref.includes("#")) { ends.push([ref, undefined]); continue; }
@@ -613,7 +653,9 @@ export function createOracle(tooling: Tooling): Oracle {
       case "accesses": return judgeAccesses(from, to, claim.member);
       case "conforms": return judgeConforms(from, to);
       case "feeds": return { truth: "undecidable", why: "a value's journey cannot be enumerated" };
-      case "needs": return { truth: "undecidable", why: "handled above" };
+      case "needs":
+      case "depends":
+        return { truth: "undecidable", why: "handled above" };
     }
   }
 

@@ -518,7 +518,7 @@ describe("board MCP server", () => {
     await expect(call("create_diagram", {
       path: board,
       nodes: [{ id: "a", label: "A" }, { id: "b", label: "B" }],
-      edges: [{ from: "a", to: "b", claim: "depends" }],
+      edges: [{ from: "a", to: "b", claim: "relies" }],
     })).rejects.toThrow();
 
     // Typed into a label instead, it is caught the turn it is written rather

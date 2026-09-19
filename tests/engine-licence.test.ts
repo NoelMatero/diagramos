@@ -348,6 +348,8 @@ describe("which words may accuse, and in which languages", () => {
      */
     const grid: Record<AccusingRelation, Record<Language, boolean>> = {
       needs: { ts: true, tsx: true, js: true, rust: true, python: true },
+      // Same reader, same corpus, one question wider (#323).
+      depends: { ts: true, tsx: true, js: true, rust: true, python: true },
       takes: { ts: true, tsx: true, js: false, rust: true, python: true },
       returns: { ts: true, tsx: true, js: false, rust: true, python: true },
       holds: { ts: true, tsx: true, js: false, rust: true, python: true },
@@ -628,6 +630,26 @@ describe("the licence's second axis (#231)", () => {
     }
   });
 
+  it("gives @depends the same absence licence, since it is the same reader (#323)", () => {
+    for (const language of ["ts", "tsx", "js", "rust", "python"] as const) {
+      expect(mayAccuse("depends", language, "absence"), language).toBe(true);
+    }
+    // And no indirect square: reaching through other files is what it claims.
+    for (const language of ["ts", "tsx", "js", "rust", "python"] as const) {
+      expect(mayAccuse("depends", language, "indirect"), language).toBe(false);
+    }
+  });
+
+  it("licenses an indirect @needs where no true import hides behind a chain (#323)", () => {
+    // ts/tsx/js 0 of 12,824 and rust 0 of 2,539 true imports are reached only
+    // through another file; python has five, all package re-exports, so it is
+    // the one square that stays amber.
+    for (const language of ["ts", "tsx", "js", "rust"] as const) {
+      expect(mayAccuse("needs", language, "indirect"), language).toBe(true);
+    }
+    expect(mayAccuse("needs", "python", "indirect")).toBe(false);
+  });
+
   it("gives @needs an absence licence in every language its corpus measured", () => {
     // #323: of 28,056 imports the compilers read over the pinned clones, one
     // comes back as no import and no chain -- TanStack's self-import through
@@ -642,7 +664,7 @@ describe("the licence's second axis (#231)", () => {
     // body's reads by name (#255), and @needs a file's imports and everything
     // they lead to (#323). Every other square on this axis is a stated absence
     // of a measurement, not a silent yes.
-    const closed = new Set(["calls", "accesses", "needs"]);
+    const closed = new Set(["calls", "accesses", "needs", "depends"]);
     for (const relation of ACCUSING_RELATIONS.filter((one) => !closed.has(one))) {
       for (const language of LANGUAGES) {
         expect(mayAccuse(relation, language, "absence"), `${relation} in ${language}`)

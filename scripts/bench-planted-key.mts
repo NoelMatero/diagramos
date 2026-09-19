@@ -75,6 +75,9 @@ function hash(text: string): number {
  */
 const SWAPS: Record<Word, Word[]> = {
   needs: ["calls", "holds"],
+  // No plant swaps *into* `depends`: the population the score is measured
+  // against stays the one #296 built (#323).
+  depends: [],
   takes: ["returns"],
   returns: ["takes"],
   holds: ["conforms", "accesses"],
@@ -88,6 +91,7 @@ const SWAPS: Record<Word, Word[]> = {
 /** Which end a wrong-kind plant corrupts, and what it puts there. */
 const WRONG_KIND: Record<Word, { end: "from" | "to"; want: Array<Sym["kind"]> }> = {
   needs: { end: "to", want: ["routine"] },
+  depends: { end: "to", want: ["routine"] },
   takes: { end: "from", want: ["routine"] },
   returns: { end: "from", want: ["routine"] },
   holds: { end: "to", want: ["routine"] },

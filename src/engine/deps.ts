@@ -132,6 +132,28 @@ export interface FileDependency {
   line: number;
   /** True when the declaration is `import(...)` rather than a static form. */
   deferred: boolean;
+  /**
+   * True when the declaration brings in *whatever that file exports* rather
+   * than named things: `from x import *`, `export * from "./x"`, `use x::*`.
+   *
+   * Recorded because a star is how a name reaches a file the tail never names
+   * (#323). `django/contrib/gis/db/models/__init__.py` star-imports
+   * `django/db/models`, which star-imports `aggregates.py`, and the compiler
+   * says the first file imports the third. A reader that cannot see the star
+   * cannot follow that, and since #323 an absence is an accusation.
+   */
+  star?: boolean;
+  /**
+   * The names this declaration brings in, where the language writes them:
+   * `import { a, b } from`, `export { a } from`, `from x import a, b`, and a
+   * Rust path's last segment. Empty when the form names nothing (`import "./x"`).
+   *
+   * Read when a name is followed through a file that re-exports it (#323).
+   * `lib/index.ts` writing `export { db } from "./database"` is `database.ts`'s
+   * `db` arriving in whatever imports `db` from `lib`, and without the names
+   * there is no way to tell that from a file re-exporting five others.
+   */
+  names?: readonly string[];
 }
 
 export interface FileDependencies {
@@ -141,6 +163,16 @@ export interface FileDependencies {
   complete: boolean;
   /** Empty when the file can be read statically end to end. */
   dynamic: DynamicReason[];
+}
+
+/** A node's children, for the shapes tree-sitter gives no field name to. */
+function children(node: Node): Node[] {
+  const found: Node[] = [];
+  for (let index = 0; index < node.childCount; index += 1) {
+    const child = node.child(index);
+    if (child) found.push(child);
+  }
+  return found;
 }
 
 /** Strips the quotes tree-sitter includes in a string node's text. */
@@ -302,14 +334,41 @@ function readUncached(
   const dependencies: FileDependency[] = [];
   const dynamic = new Set<DynamicReason>();
 
-  const declare = (node: Node, specifier: string, deferred: boolean) => {
+  const declare = (
+    node: Node,
+    specifier: string,
+    deferred: boolean,
+    star = false,
+    names: string[] = [],
+  ) => {
     const resolved = resolveDependency(specifier, filePath, workspace, configs);
     dependencies.push({
       specifier,
       ...(resolved ? { file: resolved.rel } : {}),
       line: lineOf(source, node),
       deferred,
+      ...(star ? { star: true } : {}),
+      ...(names.length > 0 ? { names } : {}),
     });
+  };
+
+  /**
+   * The names an import or a re-export clause binds, and whether it took the
+   * lot. `import * as ns from "./x"` counts as the lot: the names are reached
+   * through `ns` and nothing in the text says which.
+   */
+  const clauseOf = (statement: Node): { names: string[]; star: boolean } => {
+    const names: string[] = [];
+    let star = false;
+    each(statement, (node) => {
+      if (node.type === "namespace_import" || node.type === "namespace_export") star = true;
+      if (node.type !== "import_specifier" && node.type !== "export_specifier") return;
+      // The name as written at the far end, not the local alias: the question
+      // is what that file exports.
+      const name = node.childForFieldName("name");
+      if (name) names.push(name.text);
+    });
+    return { names, star };
   };
 
   each(tree.rootNode, (node) => {
@@ -319,7 +378,14 @@ function readUncached(
         // An `export` carries a source only when it re-exports; a plain
         // `export const x = 1` has nothing to depend on.
         const source_ = node.childForFieldName("source");
-        if (source_) declare(source_, unquote(source_.text), false);
+        // `export * from "./x"` and `export * as ns from "./x"`: a re-export of
+        // whatever that file exports, which is how a name reaches a file this
+        // one never names.
+        if (!source_) return;
+        const clause = clauseOf(node);
+        const star = clause.star
+          || (node.type === "export_statement" && children(node).some((child) => child.type === "*"));
+        declare(source_, unquote(source_.text), false, star, clause.names);
         return;
       }
       case "new_expression": {

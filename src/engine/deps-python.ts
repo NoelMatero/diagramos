@@ -300,7 +300,14 @@ export function readPythonDependencies(
    * file is one dependency, and the prefix walk below would otherwise report
    * `a` once per line that mentions it.
    */
-  const declare = (node: Node, specifier: string, file: string | undefined, deferred: boolean) => {
+  const declare = (
+    node: Node,
+    specifier: string,
+    file: string | undefined,
+    deferred: boolean,
+    star = false,
+    names: string[] = [],
+  ) => {
     const key = `${specifier}\0${file ?? ""}\0${deferred}`;
     if (seen.has(key)) return;
     seen.add(key);
@@ -309,6 +316,8 @@ export function readPythonDependencies(
       ...(file ? { file } : {}),
       line: lineOf(source, node),
       deferred,
+      ...(star ? { star: true } : {}),
+      ...(names.length > 0 ? { names } : {}),
     });
   };
 
@@ -319,6 +328,8 @@ export function readPythonDependencies(
     specifier: string,
     deferred: boolean,
     withPrefixes: boolean,
+    star = false,
+    names: string[] = [],
   ) => {
     if (parts.length === 0) return;
     const from = withPrefixes ? 1 : parts.length;
@@ -329,7 +340,9 @@ export function readPythonDependencies(
       // a namespace package or a third-party name is not this repository's, and
       // naming it would be an edge to nowhere on every line.
       if (file || length === parts.length) {
-        declare(node, length === parts.length ? specifier : prefix.join("."), file, deferred);
+        declare(node, length === parts.length ? specifier : prefix.join("."), file, deferred,
+          star && length === parts.length,
+          length === parts.length ? names : []);
       }
     }
   };
@@ -375,9 +388,30 @@ export function readPythonDependencies(
         if (!moduleNode) return;
         const { parts, specifier } = moduleParts(moduleNode);
         if (!parts) return;
+        /*
+         * `from a.b import *` takes whatever that module has, including what it
+         * imported from somewhere else -- which is how Django's package files
+         * name a class three files away (#323).
+         */
+        let star = false;
+        for (let index = 0; index < node.childCount; index += 1) {
+          if (node.child(index)?.type === "wildcard_import") star = true;
+        }
         // The module itself, without prefixes: `from a.b import x` binds `x`
         // alone, so `a` is loaded and never named.
-        declareModule(moduleNode, parts, specifier, deferred, false);
+        /* What the line asked that module for, so a name can be followed
+         * through a package that imported it from somewhere else (#323). */
+        const names: string[] = [];
+        let afterImportName = false;
+        for (let index = 0; index < node.childCount; index += 1) {
+          const child = node.child(index);
+          if (!child) continue;
+          if (child.type === "import") { afterImportName = true; continue; }
+          if (!afterImportName) continue;
+          const leaf = child.type === "aliased_import" ? child.childForFieldName("name") : child;
+          if (leaf && (leaf.type === "dotted_name" || leaf.type === "identifier")) names.push(leaf.text);
+        }
+        declareModule(moduleNode, parts, specifier, deferred, false, star, names);
         /*
          * Each imported name may itself be a submodule, which is a second file.
          *

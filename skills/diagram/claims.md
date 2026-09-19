@@ -15,9 +15,21 @@ at the thing the claim is about, or drop the claim.
 
 ## `claim: "needs"`
 
-`from` imports, requires or includes `to`. Ends may be files or symbols.
-Red when the dependency runs only the other way: turn the arrow round. It shows
-on the arrow's label as `@needs`, and a person can type that label too.
+`from` imports, requires or includes `to` **itself**. Ends may be files or
+symbols. It shows on the arrow's label as `@needs`, and a person can type that
+label too.
+
+Red when that import is not there: the dependency runs only the other way (turn
+the arrow round), or nothing `from` imports leads to `to` at all, or it gets
+there only through other files. The last one is `depends`, below.
+
+## `claim: "depends"`
+
+`from` depends on `to` **through any number of files**: `app → database` with
+three files in between. Ends may be files or symbols.
+
+Red only when nothing `from` imports leads to `to`. Use it whenever the two ends
+are not neighbours in the code; use `needs` when one file imports the other.
 
 ## `claim: "feeds"`
 

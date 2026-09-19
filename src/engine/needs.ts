@@ -48,6 +48,7 @@ import { readDependencies, readerCanPlace } from "./deps";
 import { vouchedFor, type Ledger } from "./ledger";
 import { licenceFor, mayAccuse } from "./licence";
 import { languageOf } from "./parse";
+import { declaredNames } from "./parts";
 import type { ConfigCache } from "./resolve";
 import type { Workspace } from "./workspace";
 
@@ -76,6 +77,14 @@ export interface NeedsEvidence {
   specifier: string;
   /** 1-based. */
   line: number;
+  /**
+   * True when the import took whatever that file exports rather than named
+   * things (`from x import *`, `export * from`, `use x::*`). Read when a name
+   * is followed through a module that hands it on (#323).
+   */
+  star?: boolean;
+  /** The names it asked that file for, where the language writes them (#323). */
+  names?: readonly string[];
 }
 
 export type NeedsVerdict =
@@ -89,7 +98,7 @@ export type NeedsVerdict =
    * a reading of the architecture, and 26 of the 243 file pairs Haiku drew on
    * `bench:planted` are that shape. `via` is the files between, in order.
    */
-  | { verdict: "indirect"; via: string[]; evidence: NeedsEvidence }
+  | { verdict: "indirect"; via: string[]; evidence: NeedsEvidence; mayAccuse: boolean }
   /**
    * The tail does not import the head and nothing it imports leads there,
    * followed to the end through files that could all be read (#323). The
@@ -256,14 +265,27 @@ export function checkNeeds(
    * wrong. So the chain is ruled out before the accusation is made, the way
    * `calls` rules out a call two hops away.
    */
+  const licensed = (axis: "absence" | "indirect") => [from, to].every((file) => {
+    const language = languageOf(file);
+    return language !== undefined && mayAccuse("needs", language, axis);
+  });
   const walk = walkImports(from, to, workspace, cache, ledger);
   if (walk.reached) {
-    return { verdict: "indirect", via: walk.reached.via, evidence: walk.reached.first };
+    /*
+     * Whether an `@needs` arrow over this chain may be called wrong, which is
+     * a per-language measurement and not a rule (#323). Rust and TypeScript
+     * leave no true import reachable only through another file; Python leaves
+     * six, so there the chain is reported and never accused. `@depends` never
+     * reads this: the chain is what that word claims.
+     */
+    return {
+      verdict: "indirect",
+      via: walk.reached.via,
+      evidence: walk.reached.first,
+      mayAccuse: licensed("indirect"),
+    };
   }
-  const bothLicensed = [from, to].every((file) => {
-    const language = languageOf(file);
-    return language !== undefined && mayAccuse("needs", language, "absence");
-  });
+  const bothLicensed = licensed("absence");
   if (walk.blind || !bothLicensed) return { verdict: "absent" };
   return { verdict: "refuted" };
 }
@@ -282,15 +304,28 @@ export function checkNeeds(
  * a path's first segment or a `pub(crate)` read as one (#319), never an import.
  */
 function landings(read: NonNullable<ReturnType<typeof readDependencies>>): NeedsEvidence[] {
-  const last = new Map<string, { specifier: string; line: number; file: string }>();
+  const last = new Map<string, {
+    specifier: string; line: number; file: string; star: boolean; names: readonly string[];
+  }>();
   for (const dependency of read.dependencies) {
     if (!dependency.file) continue;
     if (dependency.specifier === "crate" || dependency.specifier === "self" || dependency.specifier === "super") continue;
     last.set(`${dependency.line} @ ${dependency.specifier}`, {
-      specifier: dependency.specifier, line: dependency.line, file: dependency.file,
+      specifier: dependency.specifier,
+      line: dependency.line,
+      file: dependency.file,
+      star: dependency.star === true,
+      names: dependency.names ?? [],
     });
   }
-  return [...last.values()].map((one) => ({ file: "", on: one.file, specifier: one.specifier, line: one.line }));
+  return [...last.values()].map((one) => ({
+    file: "",
+    on: one.file,
+    specifier: one.specifier,
+    line: one.line,
+    ...(one.star ? { star: true } : {}),
+    ...(one.names.length > 0 ? { names: one.names } : {}),
+  }));
 }
 
 /** One file's readable imports for the walk, or why it cannot be walked through. */
@@ -325,6 +360,68 @@ function hopsOf(
  * `ArgMatcher` is passing it along, since a private `use` there would not
  * compile. A glob or a rename is not followed, and falls through to the walk.
  */
+/**
+ * Whether a module hands on whatever another file exports, and so on (#323).
+ *
+ * `from django.db.models import *` in `gis/db/models/__init__.py`, and
+ * `from django.db.models.aggregates import *` inside that: the compiler says
+ * the first file imports the third, because that is where the names are. The
+ * same shape is `export * from "./x"` and `use crate::io::*`. Only a star
+ * counts here -- a module that imports something for its own use is not
+ * passing it on, and a named re-export is followed by name below.
+ */
+/**
+ * Whether the file at the end of a star chain declares the name the import
+ * asked for (#323).
+ *
+ * The name is the last segment of what was written -- `crate::MatchKind`,
+ * `regex_automata::util::search::Span`. A specifier that names a module rather
+ * than an item (`httpx`, `./widgets`) matches nothing, which is the point: the
+ * chain is only this file's business when it came for something at the end of
+ * it.
+ */
+function declaresWanted(wanted: string, to: string, workspace: Workspace): boolean {
+  if (!/^[A-Za-z_]\w*$/.test(wanted)) return false;
+  const language = languageOf(to);
+  const absolute = workspace.resolve(to);
+  if (!language || !absolute || workspace.stat(absolute) !== "file") return false;
+  return declaredNames(workspace.read(absolute), language).includes(wanted);
+}
+
+function starReaches(
+  from: string,
+  to: string,
+  workspace: Workspace,
+  cache: ConfigCache,
+  seen: Set<string>,
+  /**
+   * Whether this file was reached by a star import into Python, where the
+   * module's attributes are everything it imported -- named or not.
+   * `django/db/models/__init__.py` writes `from django.db.models.base import
+   * Model`, and a file that star-imports the package has `Model`, so the
+   * compiler calls that an import of `base.py`. A `pub use` and an `export *`
+   * pass on only what the file itself re-exports, so they get no such step.
+   */
+  named = false,
+): boolean {
+  if (seen.has(from) || seen.size > 24) return false;
+  seen.add(from);
+  const absolute = workspace.resolve(from);
+  if (!absolute || workspace.stat(absolute) !== "file") return false;
+  const read = readDependencies(from, workspace.read(absolute), workspace, cache);
+  if (!read) return false;
+  const python = languageOf(from) === "python";
+  for (const dependency of read.dependencies) {
+    if (!dependency.file || dependency.file === from) continue;
+    if (!dependency.star && !named) continue;
+    if (dependency.file === to) return true;
+    if (starReaches(dependency.file, to, workspace, cache, seen, python && dependency.star === true)) {
+      return true;
+    }
+  }
+  return false;
+}
+
 function reexported(
   from: string,
   to: string,
@@ -332,32 +429,64 @@ function reexported(
   cache: ConfigCache,
   ledger?: Ledger,
 ): NeedsEvidence | undefined {
-  if (languageOf(from) !== "rust") return undefined;
-  const lastSegment = (specifier: string) => specifier.split("::").pop() ?? specifier;
   const own = hopsOf(from, workspace, cache, ledger).hops;
   for (const written of own) {
-    const name = lastSegment(written.specifier);
-    if (!/^[A-Za-z_]\w*$/.test(name)) continue;
-    // A few modules deep at most: each one is a `pub use` somebody wrote.
-    let at = written.on;
-    let ended = false;
-    const seen = new Set([from]);
-    for (let depth = 0; depth < 8 && !seen.has(at) && languageOf(at) === "rust"; depth += 1) {
-      seen.add(at);
-      const passed = hopsOf(at, workspace, cache, ledger).hops
-        .find((hop) => hop.on !== at && lastSegment(hop.specifier) === name);
-      if (!passed) { ended = true; break; }
-      at = passed.on;
+    if (written.on === to) continue;
+    /*
+     * A star import takes everything that module has, so the chain alone is
+     * the answer: Django's package files, `export * from`, `use io::*`.
+     */
+    if (written.star) {
+      const reached = starReaches(
+        written.on, to, workspace, cache, new Set([from]),
+        languageOf(written.on) === "python",
+      );
+      if (reached) return written;
+      continue;
     }
     /*
-     * Only the end of the chain. `clap`'s `parser/mod.rs` passes `ArgMatches`
-     * on from `matches/mod.rs`, which passes it on from `arg_matches.rs`: the
-     * name lives in the last one, and an arrow onto the module in the middle
-     * is the planted mistake that stopping early turned green.
+     * Otherwise the import named what it came for, and the name is followed
+     * through the files that hand it on: `export { db } from "./database"`,
+     * `pub(crate) use self::arg_matcher::ArgMatcher`, `from .base import
+     * Model` under a star. Only the end of the chain counts -- `clap` passes
+     * `ArgMatches` through two modules, and an arrow onto the middle one is a
+     * planted mistake that stopping early turned green.
      */
-    if (ended && at === to && at !== written.on) return written;
+    for (const name of written.names ?? []) {
+      if (handsOn(written.on, name, to, workspace, cache, ledger, new Set([from]))) return written;
+    }
   }
   return undefined;
+}
+
+/**
+ * Whether a file passes `name` on from `to`, directly or through more files.
+ *
+ * The file has to import that exact name and not declare it itself: a module
+ * writing `pub use self::arg_matcher::ArgMatcher` is handing `ArgMatcher` on,
+ * and a module that declares its own is the end of the road. Where the
+ * language allows a star at some point in the chain, `starReaches` covers the
+ * rest.
+ */
+function handsOn(
+  at: string,
+  name: string,
+  to: string,
+  workspace: Workspace,
+  cache: ConfigCache,
+  ledger: Ledger | undefined,
+  seen: Set<string>,
+): boolean {
+  if (seen.has(at) || seen.size > 8) return false;
+  seen.add(at);
+  for (const hop of hopsOf(at, workspace, cache, ledger).hops) {
+    if (hop.on === at) continue;
+    const carries = hop.star || (hop.names ?? []).includes(name);
+    if (!carries) continue;
+    if (hop.on === to) return declaresWanted(name, to, workspace);
+    if (handsOn(hop.on, name, to, workspace, cache, ledger, seen)) return true;
+  }
+  return false;
 }
 
 /** How far a walk may go before its silence stops meaning anything. */

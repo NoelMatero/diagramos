@@ -158,10 +158,10 @@ describe("a third file importing both ends is not a check of the claim", () => {
       );
       const { red, notVerified, confirmed } = verdictOf(board, files);
 
-      if (claim === "needs") {
-        // Since #323 an import that is not there is a red for `needs`, and
-        // this is that shape: `api` imports nothing, so nothing it imports
-        // leads to `model`. Still never green off the shared importer.
+      if (claim === "needs" || claim === "depends") {
+        // Since #323 an import that is not there is a red for both import
+        // words, and this is that shape: `api` imports nothing, so nothing it
+        // imports leads to `model`. Still never green off the shared importer.
         expect(red?.kind).toBe("needs-absent");
         expect(notVerified).toBeUndefined();
         return;
