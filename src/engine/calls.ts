@@ -202,8 +202,58 @@ export type CallsVerdict =
    * so this is "no call found", never "no call happens". Reported exactly as an
    * unclaimed arrow is.
    */
-  | { verdict: "absent" }
+  | { verdict: "absent"; notClosed?: CallsNotClosed }
   | { verdict: "withheld"; why: CallsWithheld };
+
+/**
+ * Why the closed-body reading could not close, on an arrow that came back
+ * `absent` (#324).
+ *
+ * `absent` has always been two answers wearing one word. One is *the whole
+ * call set was read and the head is not in it*, which is `refuted` and is a
+ * finding. The other is *the reading stopped somewhere*, which is silence --
+ * and until now it was silence about silence: the reason the reading stopped
+ * was computed, used to return `undefined`, and thrown away. On the planted
+ * boards that left 170 of the 249 missed `@calls` mistakes with no recorded
+ * reason of any kind, so nobody could rank what to fix.
+ *
+ * Carried on the verdict rather than tallied inside this file, because the
+ * same distinction is what an arrow needs to say out loud: "no call found" and
+ * "we could not finish looking" are different sentences to the person holding
+ * the board.
+ *
+ * `SiteUnresolved` is spliced in whole rather than restated, for the reason
+ * given at `SiteUnresolved` itself: a reason this reader can produce and this
+ * type cannot name would be a reason nothing could ever report.
+ */
+export type CallsNotClosed =
+  /**
+   * The language has no absence licence for `@calls`, so the closed reading
+   * was never attempted. Not a fact about this code -- a fact about what has
+   * been measured (`licence.ts`, `#231`).
+   */
+  | "unlicensed"
+  /** `callSitesIn` could not read the tail's file at all. */
+  | "unreadable"
+  /** The tail's file was read and declares no routine by that name. */
+  | "routine-not-found"
+  /**
+   * A call was placed, and placed at a type that is an interface, an abstract
+   * class or a bare type parameter -- item 14's caveat
+   * (docs/claim-vocabulary.md). The method actually reached at runtime can
+   * live on a different class, so the set is enumerable and not conclusive.
+   */
+  | "abstract-receiver"
+  /**
+   * A call in the tail's body does land in the head's file, at some routine
+   * the arrow does not name.
+   *
+   * Not a refusal to read and not a mistake: the two readers agree and the
+   * call set is genuinely open on this question. Named so it can be told
+   * apart from the reasons above, all of which are the reading falling short.
+   */
+  | "reaches-the-file"
+  | SiteUnresolved;
 
 /** One end of the question: a file, its text, and what its imports point at. */
 export interface CallSide {
@@ -1115,12 +1165,12 @@ export function callsBetween(
    * `from`'s body and `to.file` is only ever compared as a string here, never
    * read.
    */
-  if (mayAccuse("calls", from.language, "absence")) {
-    const refuted = closedBodyRefutes(from, to);
-    if (refuted) return { verdict: "refuted", evidence: refuted };
+  if (!mayAccuse("calls", from.language, "absence")) {
+    return { verdict: "absent", notClosed: "unlicensed" };
   }
-
-  return { verdict: "absent" };
+  const closed = closedBodyRefutes(from, to);
+  if ("evidence" in closed) return { verdict: "refuted", evidence: closed.evidence };
+  return { verdict: "absent", notClosed: closed.why };
 }
 
 /**
@@ -1128,13 +1178,24 @@ export function callsBetween(
  * them reaches `to.file` -- the closed-body absence `callsBetween` may now
  * accuse from (#233), independent of the backwards check above.
  *
- * `undefined` for anything short of certain: an unreadable file, a routine
+ * A `why` for anything short of certain: an unreadable file, a routine
  * `callSitesIn` never saw, any call site left unplaced (an open body, exactly
  * as today), any placement landing at `to.file` (genuinely present, not this
  * word's business here), or any placed site whose receiver resolved to a
  * type that is not concrete (item 14's own caveat, docs/claim-vocabulary.md)
  * -- the one known way a closed reading can still be wrong, so it withholds
  * rather than accuses on the strength of one.
+ *
+ * It returns that `why` rather than a bare `undefined` (#324). Every one of
+ * those five exits is a different piece of work to do, and collapsing them
+ * into one absent answer is what left the ranking unbuildable: the caller
+ * could see that the reading stopped and never which wall it hit.
+ *
+ * **The first wall wins, and the walk stops there.** A body with an
+ * unresolvable receiver and a computed call is one arrow, counted once, under
+ * whichever came first in the text. Counting every wall per body would say
+ * more about how long the routine is than about what blocks it, and the
+ * ranking this feeds is a ranking of arrows.
  *
  * `routinesNamed` allows more than one declaration to share a name (an
  * overload set); this asks the same question `callsTo` does, over all of
@@ -1144,22 +1205,23 @@ export function callsBetween(
 function closedBodyRefutes(
   from: CallSide & { routine: string },
   to: CallSide & { names: string[] },
-): CallsRefutedEvidence | undefined {
+): { evidence: CallsRefutedEvidence } | { why: CallsNotClosed } {
   const reading = callSitesIn(from);
-  if (!reading.read) return undefined;
+  if (!reading.read) return { why: "unreadable" };
   const bodies = reading.bodies.filter((body) => body.routine === from.routine);
-  if (bodies.length === 0) return undefined;
+  if (bodies.length === 0) return { why: "routine-not-found" };
 
   let sites = 0;
   for (const body of bodies) {
     for (const site of body.sites) {
-      if (site.file === undefined) return undefined; // open: something unplaced
-      if (site.receiver && site.concrete === false) return undefined; // item 14's guard
-      if (site.file === to.file) return undefined; // genuinely present
+      // Open: something unplaced, and the site says what stopped it.
+      if (site.file === undefined) return { why: site.why ?? "unplaced" };
+      if (site.receiver && site.concrete === false) return { why: "abstract-receiver" };
+      if (site.file === to.file) return { why: "reaches-the-file" };
       sites += 1;
     }
   }
-  return { routine: from.routine, line: bodies[0]!.line, sites };
+  return { evidence: { routine: from.routine, line: bodies[0]!.line, sites } };
 }
 
 /* ------------------------------------------- one body's call sites (#217) */

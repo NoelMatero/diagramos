@@ -509,8 +509,29 @@ describe("an arrow into a constant (#307)", () => {
     expect(report.clean).toBe(false);
   });
 
-  it("says which end it is in Rust, where @calls cannot refute from a call set", async () => {
-    const report = await reportFor("rust", "LIMIT", "calls");
+  it("says which end it is where @calls cannot close the call set", async () => {
+    /*
+     * The sentence this check exists for, on a body the call reader cannot
+     * enumerate: a macro can expand to anything, so the call set never
+     * closes and `calls-refuted` cannot fire. What is left is this check,
+     * and it is the more useful of the two answers anyway -- "that end is a
+     * value, point the arrow at the routine" is something to do, where
+     * "every call was checked and none reaches there" is something to know.
+     *
+     * It used to be pinned on plain Rust, on the grounds that Rust could
+     * never refute from a call set. #324 measured that square and turned it
+     * on, so the premise is gone and the trivially-closed body now refutes
+     * in all three languages. The check itself did not change; what changed
+     * is which arrows reach it.
+     */
+    const board = await boardOf("src/lib.rs#build", "src/lib.rs#LIMIT", "calls");
+    const report = checkDrift(board, fakeWorkspace({
+      "src/lib.rs": [
+        "pub const LIMIT: usize = 4;",
+        "pub fn build() -> usize { println!(\"{}\", LIMIT); LIMIT }",
+        "",
+      ].join("\n"),
+    }), { edges: true });
     const finding = report.edges.find((edge) => edge.kind === "end-lacks-part");
 
     expect(finding?.detail).toContain("is a plain value, and cannot be called");

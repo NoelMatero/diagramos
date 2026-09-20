@@ -203,6 +203,69 @@ describe("an arrow into a routine whose whole call set is checked (#233)", () =>
   });
 });
 
+describe("an unverified @calls arrow says what stopped the check (#324)", () => {
+  /*
+   * What a person got before was "that check could not answer", on every
+   * `@calls` arrow that came back with no call found -- the same eleven words
+   * whether the reader hit a language it has never been measured on, a value
+   * whose type nothing could work out, or a call that does land in the right
+   * file at the wrong routine. Three different things to do about it, told
+   * apart by nothing.
+   *
+   * It was also most of the silence: 170 of the 249 planted `@calls` mistakes
+   * the checker misses stop here.
+   */
+  it("names the wall, and still does not accuse", async () => {
+    /*
+     * The arrow starts at a class. There is no call list to close, because
+     * there is no body -- and "nothing in the calling file declares that
+     * routine" is a sentence somebody can act on, where the old one was not.
+     *
+     * Still silence: `report.edges` is empty. A named reason for not knowing
+     * is not an accusation, and must never become one.
+     */
+    const board = await boardOf("src/a.ts#Dep", "src/b.ts#render", { claim: "calls" });
+    const report = checkDrift(board, fakeWorkspace({
+      "src/a.ts": "export class Dep {\n  track() { return 1; }\n}\n",
+      "src/b.ts": CALLEE,
+    }), { edges: true });
+
+    expect(report.edges).toEqual([]);
+    expect(report.claims.callsNotClosed["routine-not-found"]).toBe(1);
+    expect(report.unconfirmedEdges[0]?.detail)
+      .toContain("nothing in the calling file declares that routine");
+  });
+
+  it("tells a call that lands in the right file apart from one nothing could read", async () => {
+    /*
+     * `run` really does call into `src/b.ts` -- at `other`, not at the
+     * `render` the arrow names. That is a fact about the code, and a
+     * different sentence from any of the reader's own refusals.
+     */
+    const caller = 'import { other } from "./b";\nexport function run() { return other(); }\n';
+    const callee = "export function other() { return 1; }\nexport function render() { return 2; }\n";
+    const board = await boardOf("src/a.ts#run", "src/b.ts#render", { claim: "calls" });
+    const report = checkDrift(board, fakeWorkspace({
+      "src/a.ts": caller, "src/b.ts": callee,
+    }), { edges: true });
+
+    expect(report.edges).toEqual([]);
+    expect(report.claims.callsNotClosed["reaches-the-file"]).toBe(1);
+    expect(report.unconfirmedEdges[0]?.detail)
+      .toContain("at a routine the arrow does not name");
+  });
+
+  it("counts nothing when the arrow was refuted, because nothing fell short", async () => {
+    const board = await boardOf("src/a.ts#run", "src/b.ts#render", { claim: "calls" });
+    const report = checkDrift(board, fakeWorkspace({
+      "src/a.ts": "export function run() { return 1; }\n", "src/b.ts": CALLEE,
+    }), { edges: true });
+
+    expect(report.edges.filter((finding) => finding.kind === "calls-refuted")).toHaveLength(1);
+    expect(report.claims.callsNotClosed).toEqual({});
+  });
+});
+
 describe("@calls on an arrow drawn the wrong way round", () => {
   it("reports it, quoting the call it found", async () => {
     /*

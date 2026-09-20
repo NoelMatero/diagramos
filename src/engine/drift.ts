@@ -54,7 +54,7 @@ import { languageOf, type Language } from "./parse";
 import { ledgerAdditions, type Ledger } from "./ledger";
 import { checkNeeds, type NeedsWithheld } from "./needs";
 import {
-  type CallSide, type CallsWithheld, EXTERNAL_RECEIVER, type ReceiverResolution, callSitesIn, callsBetween,
+  type CallSide, type CallsNotClosed, type CallsWithheld, EXTERNAL_RECEIVER, type ReceiverResolution, callSitesIn, callsBetween,
 } from "./calls";
 import { newReachCache, reachBetween, type ReachCache } from "./reach";
 import { constructions, routineNamesIn, type ConstructsNames, type ConstructsWithheld } from "./constructs";
@@ -789,6 +789,34 @@ export const UNCONFIRMED_WORDS: Record<EdgeUnconfirmedReason, string> = {
   "signature-other-half": "the type is in the other half of the signature — the arrow may be the wrong way round",
 };
 
+/**
+ * Why the tail's call list could not be closed, in words (#324).
+ *
+ * The sentence an arrow says when it found no call and could not prove there
+ * is none. Written for somebody holding a board rather than reading this file:
+ * every one of these is the end of "we could not finish checking because…",
+ * so they name what got in the way and never the internal that raised it.
+ *
+ * A total record, for the reason `UNCONFIRMED_WORDS` is one: a reason word
+ * cannot be added to `CallsNotClosed` without this file being made to say what
+ * it means in English.
+ */
+export const NOT_CLOSED_WORDS: Record<CallsNotClosed, string> = {
+  unlicensed: "this language has not been measured for what a missing call proves",
+  unreadable: "the calling file could not be read",
+  "routine-not-found": "nothing in the calling file declares that routine",
+  "abstract-receiver": "one call goes through an interface, so what it reaches is not fixed",
+  "reaches-the-file": "one call does reach that file, at a routine the arrow does not name",
+  computed: "one call picks its target at run time",
+  dynamic: "the caller can reach a name that is nowhere in its text",
+  receiver: "one call is on a value whose type the text does not give",
+  unbound: "one call is on a name the file never says the origin of",
+  ambiguous: "one call is on a name bound in two places at once",
+  unplaced: "one call could not be traced to any file",
+  elsewhere: "one call leads through a re-export that runs out",
+  macro: "one call comes out of a macro",
+};
+
 export { lackingPhrase };
 
 /** Where a claim's "not sure" answers are counted, for taking one back (#297). */
@@ -1133,6 +1161,28 @@ export interface ClaimTally {
    *   Python's 5,525 asks.
    */
   callsWithheld: SkipBreakdown<CallsWithheld | EdgeSkipReason>;
+  /**
+   * Why the tail's call list could not be closed, on arrows that found no
+   * call either way, by reason (#324).
+   *
+   * Deliberately **not** folded into `callsWithheld`, although both are
+   * "reasons nothing was said". They count different populations and mixing
+   * them would make either one unreadable:
+   *
+   * - `callsWithheld` is the forward read refusing -- the question was never
+   *   asked, and the arrow has no answer at all.
+   * - This is the forward read succeeding and finding nothing, and then the
+   *   second question (is the head *provably* not in the call set) falling
+   *   short. The arrow has an answer, `absent`, and this is why that answer
+   *   could not be sharpened into `calls-refuted`.
+   *
+   * So a number here is a candidate piece of work and a number there is a
+   * different one. `unlicensed` is the odd one out and the reason to read
+   * this per language: it is not a fact about the code but about what
+   * `licence.ts` has measured, and one language carrying all of it means a
+   * measurement to run rather than a reader to fix.
+   */
+  callsNotClosed: SkipBreakdown<CallsNotClosed>;
   /**
    * Arrows asserting that the tail reads a named member off the head's type.
    *
@@ -2894,7 +2944,7 @@ export function checkDrift(
     accesses: 0, accessesConfirmed: 0, accessesWithheld: {},
     conforms: 0, conformsConfirmed: 0, conformsWithheld: {},
     builds: 0, buildsConfirmed: 0, buildsWithheld: {},
-    calls: 0, callsConfirmed: 0, callsWithheld: {},
+    calls: 0, callsConfirmed: 0, callsWithheld: {}, callsNotClosed: {},
     feeds: 0, feedsConfirmed: 0, feedsWithheld: {},
     plannedWithheld: {},
   };
@@ -4899,7 +4949,26 @@ export function checkDrift(
              * finding a call is not evidence there is none. A claimed arrow
              * then reaches the gate below and is not verified; a plan takes
              * the ordinary channels as it always did.
+             *
+             * What is no longer silent is *why* (#324). Reaching this line
+             * means the tail's call list could not be closed, and the reason
+             * is the whole of what decides whether this arrow is fixable:
+             * "we could not work out what `self.inner` is" is a piece of
+             * work, "the language has no licence" is a different one, and
+             * "no call found" is neither. Before this the three were one
+             * answer, and 170 of the 249 `@calls` mistakes `bench:planted`
+             * misses carried no reason of any kind.
+             *
+             * It does not change the verdict and must not: this is a
+             * sentence attached to a silence, not a new accusation.
              */
+            if (verdict.verdict === "absent" && verdict.notClosed) {
+              if (claimed) {
+                claims.callsNotClosed[verdict.notClosed] =
+                  (claims.callsNotClosed[verdict.notClosed] ?? 0) + 1;
+              }
+              unanswered(NOT_CLOSED_WORDS[verdict.notClosed]);
+            }
           }
         }
       }

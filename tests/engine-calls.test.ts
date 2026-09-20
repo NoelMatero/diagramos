@@ -34,6 +34,7 @@ import { beforeAll, describe, expect, it } from "vitest";
 import {
   bindingsIn, callsBetween, type CallSide, type CallsVerdict, type ReceiverResolution,
 } from "../src/engine/calls";
+import { mayAccuse } from "../src/engine/licence";
 import { initEngine, type Language } from "../src/engine/parse";
 
 beforeAll(async () => { await initEngine(); }, 120_000);
@@ -312,26 +313,172 @@ describe("the closed body that provably calls nothing else (#233)", () => {
     expect(verdict.verdict).toBe("refuted");
   });
 
-  it("never refutes for js or rust, however closed the body is", () => {
+  it("never refutes for js, however closed the body is", () => {
     /*
-     * ts/tsx and, since #242, python hold this axis's licence. A
-     * trivially-empty body in rust must still never be accused from -- it
-     * reaches `absent`, the same silence #233 leaves untouched everywhere it
-     * does not apply; `js` never gets that far, because `@calls` has never
-     * held even the older, presence-based licence there (#211) and is
-     * withheld before either check runs.
+     * `js` never gets as far as this check, because `@calls` has never held
+     * even the older, presence-based licence there (#211) and is withheld
+     * before either one runs.
+     *
+     * Rust used to be in this test beside it and is not any more (#324). It
+     * was here on the strength of a licence row saying Rust had no
+     * compiler-backed receiver resolver -- a sentence that stopped being true
+     * at #246 and was still being enforced eleven merges later. The test
+     * pinned the stale row rather than the rule, which is how a test keeps a
+     * mistake alive: it passed every single run.
      */
-    const expected = { js: "withheld/unlicensed", rust: "absent" } as const;
-    for (const language of ["js", "rust"] as const) {
-      const source = language === "rust" ? "fn run() -> u32 { 1 }\n" : "function run() { return 1; }\n";
-      const renderSource = language === "rust" ? "fn render() -> u32 { 2 }\n" : "function render() { return 2; }\n";
-      const verdict = ask({
-        "src/a": { source, language },
-        "src/b": { source: renderSource, language },
-      }, { file: "src/a", routine: "run" }, { file: "src/b", names: ["render"] });
+    const verdict = ask({
+      "src/a.js": { source: "function run() { return 1; }\n", language: "js" },
+      "src/b.js": { source: "function render() { return 2; }\n", language: "js" },
+    }, { file: "src/a.js", routine: "run" }, { file: "src/b.js", names: ["render"] });
 
-      expect(verdictOf(verdict), language).toBe(expected[language]);
+    expect(verdictOf(verdict)).toBe("withheld/unlicensed");
+  });
+
+  it("refutes a Rust body that provably calls nothing else (#324)", () => {
+    // The square #324 turned on, at its simplest: an empty call set is a
+    // complete one. rust-analyzer places Rust's receivers (#246) and rustc
+    // checked those placements at 0.03% wrong (#257), which is a stricter
+    // figure than the 0.7% this axis first shipped on.
+    const verdict = ask({
+      "src/a.rs": { source: "fn run() -> u32 { 1 }\n", language: "rust" },
+      "src/b.rs": { source: "fn render() -> u32 { 2 }\n", language: "rust" },
+    }, { file: "src/a.rs", routine: "run" }, { file: "src/b.rs", names: ["render"] });
+
+    expect(verdict.verdict).toBe("refuted");
+  });
+});
+
+describe("an absent verdict says which wall the reading hit (#324)", () => {
+  /*
+   * `absent` stays silence and these tests do not change that -- every one of
+   * them asserts the verdict is still `absent`. What is new is that the
+   * silence is no longer anonymous.
+   *
+   * It is worth a test per shape because the five walls are five different
+   * pieces of work, and telling them apart is the whole of what makes the
+   * next fix rankable: on the 44 planted boards, 170 of the 249 `@calls`
+   * mistakes the checker misses stop at one of these, and before this they
+   * were one undifferentiated silence. The largest of them turned out not to
+   * be a reader bug at all -- 59 are `unlicensed`, which is a measurement
+   * nobody ran rather than code that cannot read.
+   */
+  it("has no language left to say unlicensed about, and keeps the word anyway", () => {
+    /*
+     * `unlicensed` is the one reason in `CallsNotClosed` nothing can
+     * currently produce, and that is a fact worth a test rather than a dead
+     * branch to delete.
+     *
+     * The shape it names is a language holding `@calls`' presence licence
+     * and not its absence one. Rust was the only one, until #324 measured it.
+     * `js` holds neither, so it withholds before this check is reached.
+     *
+     * Keeping the word means the next language to arrive lands in a named
+     * silence instead of an anonymous one -- which is the whole of what this
+     * issue was about. Deleting it would rebuild the hole on the day it next
+     * matters, and nobody would be counting then either.
+     */
+    const languages = ["ts", "tsx", "python", "rust"] as const;
+    for (const language of languages) {
+      expect(mayAccuse("calls", language, "absence"), `${language} absence`).toBe(true);
     }
+    expect(mayAccuse("calls", "js")).toBe(false);
+  });
+
+  it("says routine-not-found when the arrow starts at a class rather than a routine", () => {
+    /*
+     * The tail names something that is declared and has no call list of its
+     * own. The forward read finds no call and raises no doubt -- there is
+     * nothing wrong with the name -- and then the closed reading has no body
+     * to enumerate, so the two readers disagree about whether the thing
+     * exists at all.
+     *
+     * All 12 of these on the planted boards are exactly this: `Dep`,
+     * `ShapeCache`, `RoutesResolver`, `PydanticDataclass`. The same
+     * board-side mistake behind the 18 arrows the checker outright agrees
+     * with -- an arrow drawn from a type, where only something that runs can
+     * call. Named here so the two can be counted together later.
+     */
+    const verdict = ask({
+      "src/a.ts": {
+        source: "export class Dep {\n  track() { return 1; }\n}\n",
+        language: "ts",
+      },
+      "src/b.ts": { source: "export function render() { return 2; }\n", language: "ts" },
+    }, { file: "src/a.ts", routine: "Dep" }, { file: "src/b.ts", names: ["render"] });
+
+    expect(verdict.verdict).toBe("absent");
+    if (verdict.verdict !== "absent") return;
+    expect(verdict.notClosed).toBe("routine-not-found");
+  });
+
+  it("passes the call site's own reason through when a site is unplaced", () => {
+    // The package this call lands in cannot be read, so the site is
+    // `elsewhere`-shaped rather than merely "open". The reason the site
+    // recorded is the reason the arrow reports -- inventing a second
+    // vocabulary here is what `SiteUnresolved` exists to prevent.
+    const verdict = ask({
+      "src/a.ts": {
+        source: 'import { helper } from "some-package";\n'
+          + "export function run() { return helper(); }\n",
+        language: "ts",
+        imports: [["some-package", undefined]],
+      },
+      "src/b.ts": { source: "export function render() { return 2; }\n", language: "ts" },
+    }, { file: "src/a.ts", routine: "run" }, { file: "src/b.ts", names: ["render"] });
+
+    expect(verdict.verdict).toBe("absent");
+    if (verdict.verdict !== "absent") return;
+    expect(verdict.notClosed).toBeDefined();
+    expect(verdict.notClosed).not.toBe("unlicensed");
+  });
+
+  it("says abstract-receiver under item 14's guard", () => {
+    const verdict = ask({
+      "src/a.ts": {
+        source: "export function run(store) { return store.run(); }\n",
+        language: "ts",
+        resolveReceiver: () => ({ kind: "declared", file: "src/store.ts", concrete: false }),
+      },
+      "src/b.ts": { source: "export function render() { return 2; }\n", language: "ts" },
+    }, { file: "src/a.ts", routine: "run" }, { file: "src/b.ts", names: ["render"] });
+
+    expect(verdict.verdict).toBe("absent");
+    if (verdict.verdict !== "absent") return;
+    expect(verdict.notClosed).toBe("abstract-receiver");
+  });
+
+  it("says reaches-the-file when a call lands there at a routine the arrow does not name", () => {
+    /*
+     * The one reason here that is not the reading falling short. `run` does
+     * call into `src/b.ts` -- just at `other`, not at the `render` the arrow
+     * names. Worth its own word because it is the only one of the five that
+     * describes the code rather than the reader, and 30 of the 170 are it.
+     */
+    const verdict = ask({
+      "src/a.ts": {
+        source: 'import { other } from "./b";\nexport function run() { return other(); }\n',
+        language: "ts",
+        imports: [["./b", "src/b.ts"]],
+      },
+      "src/b.ts": {
+        source: "export function other() { return 1; }\nexport function render() { return 2; }\n",
+        language: "ts",
+      },
+    }, { file: "src/a.ts", routine: "run" }, { file: "src/b.ts", names: ["render"] });
+
+    expect(verdict.verdict).toBe("absent");
+    if (verdict.verdict !== "absent") return;
+    expect(verdict.notClosed).toBe("reaches-the-file");
+  });
+
+  it("carries no reason at all when the body really was closed", () => {
+    // The refuted path. Nothing to explain, because nothing fell short.
+    const verdict = ask({
+      "src/a.ts": { source: "export function run() { return 1; }\n", language: "ts" },
+      "src/b.ts": { source: "export function render() { return 2; }\n", language: "ts" },
+    }, { file: "src/a.ts", routine: "run" }, { file: "src/b.ts", names: ["render"] });
+
+    expect(verdict.verdict).toBe("refuted");
   });
 });
 
