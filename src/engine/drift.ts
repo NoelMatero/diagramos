@@ -2180,11 +2180,13 @@ function callSide(
 /**
  * A live receiver resolver for `@calls`' closed-body absence check (#233).
  *
- * Defined here, in the engine, rather than as `scripts/lib/resolution-ts.ts`'s
- * `TsReferee` directly: the engine does not depend on that file or on the
- * `typescript` package it wraps, and a caller that does -- today, only
- * `scripts/check-drift.mjs` -- adapts one to this shape instead of the engine
- * reaching upward for it. `file` is repo-relative, matching `CallSide.file`,
+ * Defined here rather than as `referee-ts.ts`'s `TsReferee` directly: this
+ * shape is what the check wants asked, and who can answer it differs by
+ * language and by caller. `src/engine/referee.ts` builds the TypeScript one
+ * in process, which is what the MCP server, the live board and
+ * `bench:planted` all now get (#328); `scripts/check-drift.mjs` builds a
+ * wider one that also answers for Python and Rust, over language servers it
+ * can afford to wait for. `file` is repo-relative, matching `CallSide.file`,
  * because the engine never holds an absolute path.
  *
  * `undefined` on this interface is not distinguished from "no referee at all"
@@ -2198,9 +2200,10 @@ export interface ClosedBodyReferee {
    * there is declared, as a repo-relative file and a 1-based line, `"outside"`
    * when that is not in the repository, `undefined` when nothing answered.
    *
-   * Optional, because only a caller holding a checker can answer it -- today
-   * `check-drift.mjs`, for TypeScript. Without it `@accesses` still finds a
-   * helper the call reader placed by itself, and counts the rest as calls it
+   * Optional, because only a caller holding a checker can answer it: the
+   * in-process TypeScript referee everywhere (#328), and `check-drift.mjs`'s
+   * wider one for Python and Rust as well. Without it `@accesses` still finds
+   * a helper the call reader placed by itself, and counts the rest as calls it
    * could not see into.
    */
   declarationAt?(file: string, at: { start: number; end: number }): { file: string; line: number } | "outside" | undefined;
@@ -2902,8 +2905,9 @@ export function checkDrift(
      * (#233). Absent means that licence never fires, whatever
      * `licence.ts` says -- a body `callSitesIn` cannot fully place stays a
      * plain `receiver` refusal, the same silence it was before this axis
-     * existed. Built once per check, not cached across runs: see
-     * `scripts/check-drift.mjs` for where a real one comes from.
+     * existed. `src/engine/referee.ts` is where a real one comes from and
+     * holds it warm across checks; `scripts/check-drift.mjs` assembles a
+     * wider one that answers for Python and Rust too.
      */
     closedBodyReferee?: ClosedBodyReferee;
   },

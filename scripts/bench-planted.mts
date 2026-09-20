@@ -29,6 +29,7 @@
 import path from "node:path";
 
 import { ACCUSING_EDGE_KINDS, checkDrift, createWorkspace, newCheckCache, type CheckCache } from "../src/engine/drift";
+import { refereedCheck } from "../src/engine/referee";
 import { initEngine } from "../src/engine/parse";
 import { plantedBoard, plantedKeys, type Key, type KeyClaim } from "./lib/planted-keys";
 
@@ -70,7 +71,16 @@ async function ask(key: Key, claim: KeyClaim): Promise<{ outcome: Outcome; detai
   const cache = cacheFor(key.project);
   const { workspace } = cache;
   const board = await plantedBoard(key, claim);
-  const report = checkDrift(board, workspace, { edges: true, cache });
+  /*
+   * The same referee a real check gets (#328). This used to be left out, and
+   * the score every change was judged by was therefore the weaker check --
+   * the one where a call on a value whose type is not written down is never
+   * followed at all, which #324 measured as the largest single reason a
+   * `@calls` arrow goes unanswered.
+   */
+  const report = refereedCheck(path.join(CORPUS, key.project), (referee) => checkDrift(board, workspace, {
+    edges: true, cache, ...(referee ? { closedBodyReferee: referee } : {}),
+  }));
   // The engine quotes the declaration it read, and a Python class runs to
   // thousands of characters. What a reader of this table needs is which
   // verdict it was and the first line of why.

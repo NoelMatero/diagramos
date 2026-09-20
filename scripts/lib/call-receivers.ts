@@ -168,6 +168,9 @@ export async function checkerFor(
   if (TYPESCRIPT.has(language)) {
     try {
       const referee = createTsReferee(tree);
+      // `typescript` is resolved at call time now (#328), so "not installed
+      // here" is an answer this has to carry rather than a crash on import.
+      if (!referee) return { unavailable: "tsc is not installed for this tree" };
       return {
         definitionAt: async (file, _source, at) => referee.symbolDeclarationLocationAt(file, at.start, at.end),
         close: () => {},

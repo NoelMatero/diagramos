@@ -761,6 +761,26 @@ function calleeOf(node: Node): Callee | undefined {
   return callee ? calleeOfNode(callee) : undefined;
 }
 
+/**
+ * The thing `new X()` makes, read as though it were a callee (#328).
+ *
+ * `@calls` does not confirm from a construction -- `@builds` is the word for
+ * that, and the two stay separate. But the compiler's own call list does
+ * count one, and a closed reading that leaves it out will refute an arrow
+ * drawn onto the class being constructed. TanStack's `mutationCache.build`
+ * does one interesting thing, `new Mutation(...)`, and the first check able
+ * to close that body accused a correct board of not reaching `mutation.ts`.
+ *
+ * So a construction is a site the closed reading has to place, and nothing
+ * else: it is read only by `callSitesIn`, which means it can stop a
+ * refutation and can never start one.
+ */
+function constructedBy(node: Node): Callee | undefined {
+  if (node.type !== "new_expression") return undefined;
+  const made = node.childForFieldName("constructor");
+  return made ? calleeOfNode(made) : { kind: "computed" };
+}
+
 function calleeOfNode(callee: Node): Callee {
   if (callee.childCount === 0) {
     return NAME_LEAF.test(callee.type)
@@ -1712,7 +1732,7 @@ export function callSitesIn(side: CallSide, only?: string): CallSitesReading {
         });
         return;
       }
-      const callee = calleeOf(inner);
+      const callee = calleeOf(inner) ?? constructedBy(inner);
       if (!callee) return;
       const where = placeOf(callee, side, bindings);
       body.sites.push({

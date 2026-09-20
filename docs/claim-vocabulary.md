@@ -4075,6 +4075,66 @@ duplicate from conflitcts, requires reading prs "An arrow can be three calls lon
     generator: adding a word there would change the population the score is
     measured against, and the score is the point.
 
+46. **The compiler was in the repository and the product never asked it, so
+    every score quoted here was of a weaker check than the one that exists.**
+    A call written `thing.render()` can only be followed once something says
+    what `thing` is, and #324's ranking put a number on how often nothing
+    does: a receiver whose type is not written down is 79 of the 168 `@calls`
+    arrows whose call list could not be closed, the largest single entry on
+    it. The resolver that answers exactly that question has existed since
+    #226. It lived in `scripts/lib/resolution-ts.ts`, the packaged build
+    ships `src/` alone, and so only the standalone `check-drift` CLI ever
+    built one -- the MCP server Claude draws through, the live board page and
+    `bench:planted` all ran without it and said nothing about the difference.
+    The closed-body absence licence above was measured *with* the resolver and
+    granted for a check the product was not running.
+
+    Moved to `src/engine/referee-ts.ts`, with `typescript` resolved at call
+    time rather than imported, because it is a devDependency and a consumer
+    checking a Python or Rust repository has no reason to have it installed.
+    Its absence is an answer -- no referee, the text reading, the same result
+    as before -- rather than a crash on import.
+
+    | `bench:planted` | before #328 | after |
+    |---|---:|---:|
+    | false `@calls` caught red | 53 of 300 | **62** |
+    | every word, caught red | 435 of 855 | **444** |
+    | true claims called wrong | 0 | **0** |
+    | false claims green | 26 | 26 |
+
+    **The first check found a false accusation, and it was not the
+    resolver's.** TanStack's `mutationCache.build` does one interesting
+    thing -- `new Mutation(...)` -- and the reader does not count a
+    construction as a call, because `@builds` is the word for that. Nothing
+    had ever been able to close that body before, so the gap had never
+    shown. A closed reading now counts a construction as a site it must
+    place: it can stop a refutation and can never start one, which cost one
+    caught mistake and bought back the accusation against a correct board.
+
+    **What it costs at draw time**, `npm run probe:referee-cost`, one planted
+    board per corpus project:
+
+    | project | plain | first check | every check after |
+    |---|---:|---:|---:|
+    | TanStack-query | 38ms | 10ms | 9ms |
+    | excalidraw | 323ms | 239ms | 239ms |
+    | nestjs-nest | 95ms | 1,584ms | 294ms |
+    | vitejs-vite | 351ms | 778ms | 262ms |
+    | vuejs-core | 25ms | 14ms | 16ms |
+
+    The program is built once per process and held warm, re-verified against
+    its own files' modification times before every reuse (#234). Most boards
+    never build one at all: the check runs plain first and only asks for a
+    referee when that pass stopped on the one thing a compiler answers -- a
+    call on a value whose type is not written down. Gating on the reason
+    rather than on "anything unsettled" is not only cheaper, it scored
+    better (444 against 442) and ran the whole benchmark in 60 seconds
+    rather than 100.
+
+    Python's and Rust's resolvers answer over a language server, which is
+    asynchronous and costs seconds. They stay in the CLI, and a Python or
+    Rust board checked through the MCP tools still gets the text reading.
+
 ## Open, in the order worth doing
 
 1. ~~**The licence grid.**~~ Built at #207 and shipped at #209. `@accesses` is

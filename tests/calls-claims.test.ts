@@ -203,6 +203,41 @@ describe("an arrow into a routine whose whole call set is checked (#233)", () =>
   });
 });
 
+describe("a routine whose only interesting line is `new X()` (#328)", () => {
+  it("is not refuted for an arrow onto the class it constructs", async () => {
+    /*
+     * `@builds` is the word for construction and this word does not confirm
+     * from one. But the compiler's own call list counts a constructor, and a
+     * closed reading that skipped it called TanStack's `mutationCache.build`
+     * wrong for not reaching `mutation.ts` -- a correct board, accused,
+     * the first time anything could close that body.
+     */
+    const caller = 'import { Mutation } from "./b";\n'
+      + "export function build() { return new Mutation(); }\n";
+    const made = "export class Mutation { run() { return 1; } }\n";
+    const board = await boardOf("src/a.ts#build", "src/b.ts#Mutation", { claim: "calls" });
+    const report = checkDrift(board, fakeWorkspace({
+      "src/a.ts": caller, "src/b.ts": made,
+    }), { edges: true });
+
+    expect(report.edges.filter((finding) => finding.kind === "calls-refuted")).toEqual([]);
+  });
+
+  it("is still refuted for an arrow onto a file the construction does not reach", async () => {
+    // The construction is counted as a site, not as a free pass: it places
+    // at `src/c.ts`, which is not the far end, so the body still closes.
+    const caller = 'import { Mutation } from "./c";\n'
+      + "export function build() { return new Mutation(); }\n";
+    const made = "export class Mutation { run() { return 1; } }\n";
+    const board = await boardOf("src/a.ts#build", "src/b.ts#render", { claim: "calls" });
+    const report = checkDrift(board, fakeWorkspace({
+      "src/a.ts": caller, "src/b.ts": CALLEE, "src/c.ts": made,
+    }), { edges: true });
+
+    expect(report.edges.filter((finding) => finding.kind === "calls-refuted")).toHaveLength(1);
+  });
+});
+
 describe("an unverified @calls arrow says what stopped the check (#324)", () => {
   /*
    * What a person got before was "that check could not answer", on every
