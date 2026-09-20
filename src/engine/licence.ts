@@ -831,7 +831,14 @@ export const LICENCES: readonly Licence[] = [
             "number than item 13's headline 50.3%, not a different finding. " +
             "`js` is excluded from `covers`: `checkJs` is off, so tier 2 " +
             "resolves almost nothing there, and it is out of scope by decision " +
-            "rather than left for later (#231).",
+            "rather than left for later (#231). **#328 is what made this row " +
+            "mean anything in the product.** The tier-2 resolver it rests on " +
+            "lived under `scripts/`, and the packaged build ships `src/` " +
+            "alone -- so the MCP server, the live board and `bench:planted` " +
+            "all ran the closed reading with no receiver resolved at all, and " +
+            "this measurement was always of a check nobody was getting. It " +
+            "now runs in process wherever a board is checked; " +
+            "`npm run probe:referee-cost` prices it.",
           known: [
             "A receiver whose declared type is an interface or a generic " +
               "wrapper, where the concrete implementation is decided by " +

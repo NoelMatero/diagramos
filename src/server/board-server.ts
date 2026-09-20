@@ -25,6 +25,7 @@ import { createCodeGraphOption } from "../engine/codegraph";
 import { createLedger, gitKnown } from "../engine/ledger";
 import { generatedRef } from "../engine/generated";
 import { checkDrift, createGitBaseline, createWorkspace, findBoards } from "../engine/drift";
+import { refereedCheck } from "../engine/referee";
 import { initEngine } from "../engine/parse";
 import { buildIdentity } from "./build-identity";
 import { processAlive, registerServer, updateServer } from "./server-registry";
@@ -533,11 +534,13 @@ export async function startBoardServer(options: BoardServerOptions): Promise<Run
     // has to stay fresh precisely because the tree is what is changing.
     const ledger = full ? createLedger(workspaceRoot) : undefined;
     const board = await readBoard(target);
-    const report = checkDrift(board, createWorkspace(workspaceRoot), {
-      ...(full ? { baseline: createGitBaseline(workspaceRoot, target) } : {}),
-      ...(codeGraph ? { codeGraph } : {}),
-      ...(ledger ? { ledger } : {}),
-    });
+    const report = refereedCheck(workspaceRoot, (referee) =>
+      checkDrift(board, createWorkspace(workspaceRoot), {
+        ...(full ? { baseline: createGitBaseline(workspaceRoot, target) } : {}),
+        ...(codeGraph ? { codeGraph } : {}),
+        ...(ledger ? { ledger } : {}),
+        ...(referee ? { closedBodyReferee: referee } : {}),
+      }));
     return { board, report };
   };
 

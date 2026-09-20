@@ -43,6 +43,7 @@ import {
   UNCONFIRMED_WORDS,
   type UnconfirmedEdge,
 } from "../engine/drift";
+import { refereedCheck } from "../engine/referee";
 import { createGitTrail, type FollowedRef } from "../engine/follow";
 import { computeHonestGaps } from "../engine/gaps";
 import { loadConverter } from "../engine/convert";
@@ -859,9 +860,11 @@ server.registerTool(
       // too -- see unconfirmedArrowNote for why that stopped being a review
       // matter the day the amber went away.
       await initEngine();
-      const drawn = checkDrift(result.board, createWorkspace(WORKSPACE_ROOT), {
-        trail: createGitTrail(WORKSPACE_ROOT),
-      });
+      const drawn = refereedCheck(WORKSPACE_ROOT, (referee) =>
+        checkDrift(result.board, createWorkspace(WORKSPACE_ROOT), {
+          trail: createGitTrail(WORKSPACE_ROOT),
+          ...(referee ? { closedBodyReferee: referee } : {}),
+        }));
       // Named the turn it is written, because a claim nobody saw go on is a
       // claim nobody can refuse. The board shows it too; this is for whoever is
       // reading the transcript rather than the canvas.
@@ -1111,13 +1114,19 @@ server.registerTool(
       // already a finding, so a clean run never touches it.
       const trail = createGitTrail(WORKSPACE_ROOT);
       for (const file of files) {
-        const report = checkDrift(await readBoard(file), workspace, {
+        const board = await readBoard(file);
+        // Hoisted: the check may run twice now (once plain, once with the
+        // referee), and asking git the same question twice per board is a
+        // cost nobody gets anything for.
+        const baseline = createGitBaseline(WORKSPACE_ROOT, file);
+        const report = refereedCheck(WORKSPACE_ROOT, (referee) => checkDrift(board, workspace, {
           coverage,
           trail,
-          baseline: createGitBaseline(WORKSPACE_ROOT, file),
+          baseline,
           ...(codeGraph ? { codeGraph } : {}),
           ...(ledger ? { ledger } : {}),
-        });
+          ...(referee ? { closedBodyReferee: referee } : {}),
+        }));
         totals.checked += report.checked;
         totals.skipped += report.skipped;
         totals.excused += report.excused;
@@ -1517,9 +1526,11 @@ server.registerTool(
       // against, so it is owed the same answer as a ref edit.
       if ((touchedAnchors && result.updated.length) || describes) {
         await initEngine();
-        notes = drawTimeNotes(checkDrift(result.board, createWorkspace(WORKSPACE_ROOT), {
-          trail: createGitTrail(WORKSPACE_ROOT),
-        }));
+        notes = drawTimeNotes(refereedCheck(WORKSPACE_ROOT, (referee) =>
+          checkDrift(result.board, createWorkspace(WORKSPACE_ROOT), {
+            trail: createGitTrail(WORKSPACE_ROOT),
+            ...(referee ? { closedBodyReferee: referee } : {}),
+          })));
       }
       return text({
         wrote: relativeToWorkspace(file),
