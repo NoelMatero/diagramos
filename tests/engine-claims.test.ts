@@ -55,7 +55,9 @@ describe("the claim vocabulary", () => {
 
   it("refuses a word that is not on the whitelist", () => {
     expect(readLabelClaim("@need")).toEqual({ parsed: { garbled: "need" } });
-    expect(readLabelClaim("@depends")).toEqual({ parsed: { garbled: "depends" } });
+    // `@depends` became a word at #323; `@relies` is the nearest thing that is not one.
+    expect(readLabelClaim("@relies")).toEqual({ parsed: { garbled: "relies" } });
+    expect(readLabelClaim("@depends")).toEqual({ parsed: { claim: "depends" } });
     // One arrow, one claim. Two is a question, not two facts.
     expect(readLabelClaim("@needs @needs")).toEqual({ parsed: { garbled: "needs needs" } });
   });

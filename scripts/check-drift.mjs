@@ -446,6 +446,7 @@ function unansweredClaimLines(report) {
   const said = [];
   for (const [word, reasons, table] of [
     ["needs", withheldReasons(report.claims?.needsWithheld), NEEDS_WITHHELD],
+    ["depends", withheldReasons(report.claims?.dependsWithheld), NEEDS_WITHHELD],
     ["feeds", withheldReasons(report.claims?.feedsWithheld, FEEDS_UNANSWERED), FEEDS_NOT_CONFIRMED],
     [
       "conforms",
@@ -907,6 +908,8 @@ function rowsFor({ report, promoted = [] }, colour, all = false) {
        */
       const neverImported = finding.kind === "needs-absent";
       const reachedNotImported = finding.kind === "needs-one-level-up";
+      // The same sentence, red, where the language earned it (#323).
+      const wrongIndirect = finding.kind === "needs-indirect";
       /*
        * The eighth (#297), and the only one whose row says what the *end* is
        * rather than what the code does: this arrow asks a struct for a result
@@ -956,7 +959,7 @@ function rowsFor({ report, promoted = [] }, colour, all = false) {
         + (wrongCallsRefuted ? " \u00b7 never called" : "")
         + (reachedNotCalled ? " \u00b7 reached, not called" : "")
         + (neverImported ? " \u00b7 never imported" : "")
-        + (reachedNotImported ? " \u00b7 reached, not imported" : "")
+        + (reachedNotImported || wrongIndirect ? " \u00b7 reached, not imported" : "")
         // The same words the board page uses, so one board does not read as two
         // different findings depending on where somebody looked at it.
         + (wrongMembers ? " \u00b7 no such member" : "")
@@ -965,7 +968,7 @@ function rowsFor({ report, promoted = [] }, colour, all = false) {
         + (wrongKindOfEnd ? ` \u00b7 ${wrongKindOfEnd}` : "")
         + (hop ? ` \u00b7 ${hop}` : ""),
         backwards || wrongSignature || wrongHolds || wrongBuilds || wrongCalls || wrongCallsRefuted
-          || neverImported || wrongMembers || wrongUnread || wrongBase || wrongKindOfEnd
+          || neverImported || wrongIndirect || wrongMembers || wrongUnread || wrongBase || wrongKindOfEnd
           ? "red"
           : "yellow",
         colour,

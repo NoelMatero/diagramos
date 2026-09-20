@@ -153,7 +153,8 @@ used before.
 
 | claim | the arrow says | direction | can be red when |
 | --- | --- | --- | --- |
-| `needs` | from imports to | importer → imported; ends may be files | the import runs only the other way |
+| `needs` | from imports to directly | importer → imported; ends may be files | that import is not there |
+| `depends` | from depends on to, through any number of files | dependent → dependency; ends may be files | nothing from imports leads there |
 | `feeds` | from's result goes into to | producer → consumer | never |
 | `takes` | the function has a parameter of this type | type → function | the type is not a parameter |
 | `returns` | the function returns this type | type → function | the type is not the return type |

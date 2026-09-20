@@ -59,6 +59,8 @@ export type PartReading = "has" | "lacks" | "unsure";
  */
 export const NEEDS: Record<ArrowClaim, { from?: Part; to?: Part }> = {
   needs: {},
+  // Same as `needs`: every declaration lives in a file, and a file has imports.
+  depends: {},
   feeds: { from: "result" },
   calls: { from: "body", to: "callable" },
   builds: { from: "body", to: "type" },

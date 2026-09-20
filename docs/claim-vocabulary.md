@@ -19,14 +19,15 @@ The rule in `AGENTS.md`: nothing new may say *wrong* until a script has measured
 how often its reader is mistaken, against a referee that shares no machinery
 with it.
 
-## The ten words, and the three footings
+## The eleven words, and the three footings
 
-Ten words, and they do not all refute the same way. This is the distinction
+Eleven words, and they do not all refute the same way. This is the distinction
 that took longest to see and it is not in #190:
 
 | word | relation | what it reads | may say wrong | how |
 |---|---|---|---|---|
-| `@needs` | depends | a file's import declarations, and every file they lead to | yes | **presence**, and **absence** once no chain reaches (#323) |
+| `@needs` | depends | a file's import declarations | yes | **presence**, and **absence**: not imported here, whatever else connects them (#323) |
+| `@depends` | depends | a file's imports, and every file they lead to | yes | **presence**, and **absence** once no chain reaches at all (#323) |
 | `@takes` | accepts | a function's parameters | yes | **absence** |
 | `@returns` | produces | a function's return type | yes | **absence** |
 | `@holds` | contains | a type's field list | yes | **absence** |
@@ -261,6 +262,7 @@ grants a licence nobody measured.
 | word | TS | TSX | JavaScript | Rust | Python | what measured it |
 |---|---|---|---|---|---|---|
 | `@needs` | yes | yes | yes | yes | yes | a compiler, five pinned repositories per language |
+| `@depends` | yes | yes | yes | yes | yes | the same corpus and referee, one question wider |
 | `@takes` | yes | yes | **no** | yes | yes | a text scan of the same signatures |
 | `@returns` | yes | yes | **no** | yes | yes | the same run |
 | `@holds` | yes | yes | **no** | yes | yes | a text scan of the same field lists |
@@ -4024,6 +4026,54 @@ duplicate from conflitcts, requires reading prs "An arrow can be three calls lon
     | false claims green, all words | 26 | 26 |
 
     The four false `@needs` greens that remain are #319's `pub(crate)`, unmoved.
+
+45. **The arrow now says which dependency it means, because the code cannot
+    tell them apart (#323).**
+
+    #323's first half made "no import, and no chain either" a red. The chain
+    was left standing and reported, and 41 of the planted set's mistakes sat in
+    it -- an arrow onto a file the tail reaches through one other file. So does
+    a correct board: `app -> database` with three files in between is somebody
+    reading the architecture, and 26 of the 243 file pairs Haiku drew are that
+    shape. **The two are the same shape in the code.** 24 of those 41 mistakes
+    and 6 of the 9 indirect arrows Haiku drew are one file apart; length does
+    not separate them, and nothing else in the text does either.
+
+    What separates them is what the author meant, so the arrow says it.
+    `@needs` is the import written in this file. `@depends` is the dependency
+    however many files it runs through. Same reader, same corpus, two
+    questions, and a claim that was ambiguous is now two claims that are not.
+
+    **The strict reading needed the reader to stop losing re-exports first.**
+    Three shapes were missing, all of them a name arriving from a file the
+    importer never writes: a star (`from x import *`, `export * from`,
+    `use x::*`), a named re-export (`export { db } from`, `pub use
+    self::arg_matcher::ArgMatcher`), and Python's own -- a module that
+    star-imports a package sees what that package imported by name. So the
+    readers record what each import asks for, and the follower walks the name
+    to the end of the chain. True imports not confirmed on `.corpus/*` went
+    **48 -> 15 of 28,056**, and the `@needs` recall row from 99.8% to 99.9%.
+
+    **Then the accusation is per language, and Python is the no.** Of the
+    imports the compilers call direct, ts/tsx/js leave 0 of 12,824 reachable
+    only through another file and Rust 0 of 2,539 -- so an indirect `@needs`
+    there is wrong. Python leaves 5 of 12,693, all package files handing a name
+    two or three re-exports deep, so Python keeps the route-naming amber. That
+    is the third axis on the licence grid (`indirect`), added the way #231
+    added the second.
+
+    | `bench:planted` | before #323 | after both halves |
+    |---|---:|---:|
+    | false `@needs` caught red | 80 of 178 | **126** |
+    | every word, caught red | 387 of 855 | **433** |
+    | true `@needs` green | 239 of 258 | **250** |
+    | true claims called wrong | 1 | **0** |
+    | false claims green | 26 | 26 |
+
+    `@depends` is judged by the benchmark's referee (a walk over the
+    compiler's own import edges) and deliberately left out of the planted
+    generator: adding a word there would change the population the score is
+    measured against, and the score is the point.
 
 ## Open, in the order worth doing
 

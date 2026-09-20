@@ -81,6 +81,7 @@ const KNOWN_EDGE_KINDS = new Set([
   "end-lacks-part",
   "needs-absent",
   "needs-one-level-up",
+  "needs-indirect",
 ]);
 
 /**
@@ -658,6 +659,7 @@ export function rowsOf(report: DriftView): StatusRow[] {
         + (finding.kind === "calls-one-level-up" ? " · reached, not called" : "")
         + (finding.kind === "needs-absent" ? " · never imported" : "")
         + (finding.kind === "needs-one-level-up" ? " · reached, not imported" : "")
+        + (finding.kind === "needs-indirect" ? " · reached, not imported" : "")
         + (finding.kind === "accesses-absent" ? " · no such member" : "")
         + (finding.kind === "accesses-not-read" ? " · never read here" : "")
         + (finding.kind === "conforms-absent" ? " · not a base" : "")
