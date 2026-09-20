@@ -42,7 +42,7 @@
     "graph:refresh": "node scripts/refresh-code-graph.mjs",
     "typecheck": "tsc --noEmit",
     "check:drift": "tsx scripts/check-drift.mjs",
-    "bench:planted": "tsx scripts/bench-planted.mts",
+    "bench:planted": "NODE_OPTIONS=--max-old-space-size=8192 tsx scripts/bench-planted.mts",
     "probe:check-cost": "tsx scripts/probe-check-cost.mts",
     "measure:accesses": "tsx scripts/measure-accesses.mts",
     "measure:accesses-closed": "NODE_OPTIONS=--max-old-space-size=8192 tsx scripts/measure-accesses-closed.mts",

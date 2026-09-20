@@ -56,7 +56,7 @@ import path from "node:path";
 import { refereeRoutines, stripNoise } from "./lib/call-scan";
 import { resolvePythonReceivers } from "./lib/resolution-python-live";
 import { resolveRustReceivers } from "./lib/resolution-rust-receivers";
-import { createTsReferee } from "./lib/resolution-ts";
+import { createTsReferee } from "../src/engine/referee-ts";
 
 import {
   callSitesIn, EXTERNAL_RECEIVER, type BodyCallSites, type CallSide, type ReceiverResolution,

@@ -807,6 +807,7 @@ export const NOT_CLOSED_WORDS: Record<CallsNotClosed, string> = {
   "routine-not-found": "nothing in the calling file declares that routine",
   "abstract-receiver": "one call goes through an interface, so what it reaches is not fixed",
   "reaches-the-file": "one call does reach that file, at a routine the arrow does not name",
+  construction: "the routine builds something, and building it runs code this check did not follow",
   computed: "one call picks its target at run time",
   dynamic: "the caller can reach a name that is nowhere in its text",
   receiver: "one call is on a value whose type the text does not give",

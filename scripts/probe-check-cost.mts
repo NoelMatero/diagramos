@@ -15,11 +15,22 @@
  * through one held cache, the way a measurement script now does. Cold must
  * stay flat -- that is `check_drift` over MCP keeping no memory of a working
  * tree that changes underneath it. The held column is what the bench buys.
+ *
+ * ## The third block: what the type checker costs (#328)
+ *
+ * The MCP server now hands `checkDrift` a receiver resolver, including at draw
+ * time. That resolver builds a `ts.Program` over the package a query lands in,
+ * which is the single most expensive thing on this path -- and the question
+ * that decides whether it belongs at draw time is not what it costs, but
+ * whether it costs that *again*. So the referee rows reuse one referee across
+ * runs, exactly as the server does: the first row is the compiler being built,
+ * every row after it is the compiler being asked.
  */
 import path from "node:path";
 
 import { checkDrift, createWorkspace, newCheckCache } from "../src/engine/drift";
 import { initEngine } from "../src/engine/parse";
+import { createClosedBodyReferee } from "../src/engine/referee";
 import type { Workspace } from "../src/engine/workspace";
 import { plantedBoard, plantedKeys } from "./lib/planted-keys";
 
@@ -32,7 +43,13 @@ const runs = Number(flag("runs") ?? 3);
 /** Default to the two arrows the issue priced: the worst square and a cheap one. */
 const wanted = [
   { project: flag("project") ?? "clap", word: flag("word") ?? "needs" },
-  ...(flag("project") || flag("word") ? [] : [{ project: "vuejs-core", word: "holds" }]),
+  ...(flag("project") || flag("word") ? [] : [
+    { project: "vuejs-core", word: "holds" },
+    // A TypeScript project, and a big one: the referee rows below are blank
+    // for a language whose resolver cannot run in process, and a small tree
+    // would price the compiler at a number no real repository would see.
+    { project: "vitejs-vite", word: "calls" },
+  ]),
 ];
 
 interface Counts { reads: number; distinct: number; stats: number; lists: number; ms: number }
@@ -88,6 +105,20 @@ for (const pick of wanted) {
     const started = Date.now();
     checkDrift(structuredClone(board), warm.workspace, { edges: true, cache });
     rows.push({ how: `held ${run}`, counts: { ...warm.take(), ms: Date.now() - started } });
+  }
+
+  /*
+   * Cold workspace, one referee, which is the server's own shape: it keeps no
+   * memory of a working tree that changes underneath it, but it does keep the
+   * compiler, because the compiler re-verifies its own programs against every
+   * source file's mtime before answering (#234).
+   */
+  const refereed = counting(root);
+  const closedBodyReferee = createClosedBodyReferee(root);
+  for (let run = 1; run <= runs; run++) {
+    const started = Date.now();
+    checkDrift(structuredClone(board), refereed.workspace, { edges: true, closedBodyReferee });
+    rows.push({ how: `tsc ${run}`, counts: { ...refereed.take(), ms: Date.now() - started } });
   }
 
   console.log(`  ${key.project} @${claim.word} (${claim.language}) · ${claim.from} -> ${claim.to}`);

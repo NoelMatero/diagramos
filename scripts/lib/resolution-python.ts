@@ -29,7 +29,7 @@ import { tmpdir } from "node:os";
 import path from "node:path";
 
 import { PYRIGHT_VERSION } from "./licence-python";
-import { headOfPython } from "./resolution-ts";
+import { headOfPython } from "../../src/engine/referee-ts";
 
 export interface PythonTypeAnswer {
   text: string;

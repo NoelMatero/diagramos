@@ -42,7 +42,7 @@ import path from "node:path";
 import { createPyrightLspReferee } from "./resolution-python-lsp";
 import { cargoRootsIn } from "./resolution-rust-receivers";
 import { createRustAnalyzerReferee, isOutsideRustTree, type RustLspReferee } from "./resolution-rust-lsp";
-import { isOutsideTree } from "./resolution-ts";
+import { isOutsideTree } from "../../src/engine/referee-ts";
 
 /** Structurally `ClosedBodyReferee.declarationAt`'s answer, not imported -- the engine holds no dependency on anything under `scripts/lib`. */
 export type DefinitionAnswer = { file: string; line: number } | "outside";

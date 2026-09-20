@@ -70,7 +70,7 @@ import { initEngine } from "../src/engine/parse.ts";
 import { createCodeGraphOption, TESTED_VERSION_PREFIX } from "../src/engine/codegraph.ts";
 import { createLedger } from "../src/engine/ledger.ts";
 import { goodNewsIds, goodNewsLine, goodNewsSince, novelGoodNews } from "../src/engine/goodnews.ts";
-import { createTsReferee, isOutsideTree, receiverResolutionFrom } from "./lib/resolution-ts.ts";
+import { createClosedBodyReferee } from "../src/engine/referee.ts";
 import { resolvePythonReceivers } from "./lib/resolution-python-live.ts";
 import { resolveRustReceivers } from "./lib/resolution-rust-receivers.ts";
 import { refereePool, resolvePythonDefinitions, resolveRustDefinitions } from "./lib/resolution-definitions.ts";
@@ -78,25 +78,19 @@ import { languageOf } from "../src/engine/parse.ts";
 
 const root = process.cwd();
 
-/**
- * `@calls`' closed-body absence licence (#233), wired into the one live path
- * this check runs -- a real `ts.Program`, built once for the whole run and
- * asked per receiver rather than kept warm across separate invocations of
- * this script. Correctness first: keeping it warm across the MCP server's
- * own long-running process is a real performance question and a separate
- * issue once this one proves the feature worth being fast for.
+/*
+ * `@calls`' closed-body absence licence (#233) used to be wired up right here,
+ * where this command built its own `ts.Program` on startup and nobody else got
+ * one. The note that stood here ended by saying that keeping it warm across
+ * the MCP server's long-running process was "a real performance question and a
+ * separate issue once this one proves the feature worth being fast for".
  *
- * `undefined` on construction failure -- no `tsconfig.json` anywhere findable,
- * a corrupt one, anything `createTsReferee` itself cannot recover from --
- * costs nothing beyond what `@calls` already withheld before this axis
- * existed: `checkDrift` treats an absent referee exactly like one that never
- * resolves a receiver.
- *
- * Python's own version of this (#243) needs the boards loaded first --
- * `closedBodyReferee` itself is assembled further down, once `loaded` exists.
+ * It was worth it -- and the server had gone on running the weaker check that
+ * whole time. #328 is that separate issue: the referee now lives in
+ * `src/engine/referee.ts`, every caller gets it, and it builds its compiler on
+ * the first question rather than on startup. `closedBodyReferee` is assembled
+ * further down, because Python's half (#243) needs the boards loaded first.
  */
-let tsReferee;
-try { tsReferee = createTsReferee(root); } catch { tsReferee = undefined; }
 
 const USAGE = [
   "usage: diagramos drift [board.excalidraw ...] [options]",
@@ -1709,38 +1703,28 @@ if (boardsName("rust") && anythingUnsettled()) {
 }
 
 /**
- * The merged live resolver `checkDrift` actually reports through --
- * TypeScript answered by `tsReferee` in-process and synchronously, Python and
- * Rust by a lookup into what the rounds above already resolved. No half knows
- * the others exist; only `languageOf(file)` decides which one a query reaches.
+ * The merged live resolver `checkDrift` actually reports through.
+ *
+ * The TypeScript half and the routing that picks it live in
+ * `src/engine/referee.ts`, because the MCP server needs exactly the same two
+ * answers and, until #328, did not get them -- so boards drawn and checked
+ * through the tools got a weaker check than these same boards from this
+ * command. Keeping a second copy of that routing here is how the two would
+ * quietly stop agreeing.
+ *
+ * What this command adds is the part only it can afford: Python's and Rust's
+ * answers, harvested above over a language server in a round that takes
+ * seconds to minutes. Nothing at draw time can wait that long.
+ *
+ * `declarationAt` for Python and Rust is `@accesses`' helper rule (#255): a
+ * red stays quiet when a function the routine calls visibly reads the member.
+ * Without an answer, a helper is still found when the call reader places the
+ * call itself, and the red counts the rest as calls it could not see into.
  */
-const closedBodyReferee = (tsReferee || pythonCache || rustCache) ? {
-  resolveReceiver: (file, at) => {
-    if (languageOf(file) === "python") return pythonCache?.get(file, at);
-    if (languageOf(file) === "rust") return rustCache?.get(file, at);
-    if (!tsReferee) return undefined;
-    const absolute = path.resolve(root, file);
-    return receiverResolutionFrom(tsReferee.typeAt(absolute, at.start, at.end), root);
-  },
-  /*
-   * "Go to definition" at a call's name, for `@accesses`' helper rule (#255):
-   * a red stays quiet when a function the routine calls reads the member, and
-   * this is how a call the reader could not place is found. TypeScript only,
-   * in process. Python's would need the recording pass above to ask a second
-   * kind of question; without it a Python helper is still found when the call
-   * reader places the call itself, and the red counts the rest as calls it
-   * could not see into.
-   */
-  declarationAt: (file, at) => {
-    if (languageOf(file) === "python") return pythonDefinitions?.get(file, at);
-    if (languageOf(file) === "rust") return rustDefinitions?.get(file, at);
-    if (!tsReferee) return undefined;
-    const found = tsReferee.symbolDeclarationLocationAt(path.resolve(root, file), at.start, at.end);
-    if (!found) return undefined;
-    if (isOutsideTree(found.file, root)) return "outside";
-    return { file: path.relative(root, found.file), line: found.line + 1 };
-  },
-} : undefined;
+const closedBodyReferee = createClosedBodyReferee(root, {
+  python: { resolveReceiver: pythonCache?.get, declarationAt: pythonDefinitions?.get },
+  rust: { resolveReceiver: rustCache?.get, declarationAt: rustDefinitions?.get },
+});
 
 /*
  * The graph, built here when this project has none.

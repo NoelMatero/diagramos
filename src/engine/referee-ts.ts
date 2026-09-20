@@ -17,9 +17,65 @@
  * many times, which is what makes measuring a real corpus affordable at all.
  */
 import { readdirSync, statSync } from "node:fs";
+import { createRequire } from "node:module";
 import path from "node:path";
 
-import ts from "typescript";
+/*
+ * Type-only, and that matters: this file lives in `src/`, which is what the
+ * package publishes, and `typescript` is a devDependency. A value import here
+ * becomes a bare `import ts from "typescript"` in the bundle -- `packages:
+ * "external"` leaves it for npm to resolve at runtime, and a consumer who
+ * installed this tool has no `typescript` to resolve it to.
+ *
+ * That is not hypothetical. `scripts/check-drift.mjs` imported this module for
+ * value and the published `out/cli/drift.mjs` inherited the bare import, so the
+ * shipped drift command died at load with `Cannot find package 'typescript'` --
+ * before parsing an argument, on every invocation, for everyone who installed
+ * the package rather than cloning it. Moving the resolver into `src/` and onto
+ * the MCP server's path would have spread that to the server too.
+ */
+import type * as TypeScriptApi from "typescript";
+
+type Api = typeof TypeScriptApi;
+
+/**
+ * The compiler, if this installation has one.
+ *
+ * `createRequire` rather than `await import`, because every caller below this
+ * -- `callSitesIn`, `checkDrift`, the whole engine -- is synchronous, and
+ * making the load async would turn the reader inside out for a dependency that
+ * is either present at startup or never.
+ *
+ * `null` is the remembered answer "asked, not installed", so a tree without
+ * TypeScript pays one failed resolution rather than one per query.
+ *
+ * ## Why this finds a compiler in somebody else's repository
+ *
+ * Node resolves a bare specifier by walking `node_modules` up from the
+ * importing file, and the importing file here is inside the consumer's own
+ * tree -- `their-repo/node_modules/diagramos/out/cli/server.mjs`. So the walk
+ * reaches `their-repo/node_modules/typescript`, and **a repository with
+ * TypeScript boards to check is a repository with TypeScript installed**. The
+ * compiler this needs is already there, in the version that repository
+ * actually builds with, which is a better answer than one we could ship.
+ *
+ * That is the whole reason this is not a runtime dependency. Adding
+ * `typescript` to `dependencies` would put ~22MB into every install --
+ * including the Rust and Python repositories that can never use it -- to
+ * supply something the only repositories that can use it already have.
+ */
+let compiler: Api | null | undefined;
+
+export function typeScriptApi(): Api | undefined {
+  if (compiler === undefined) {
+    try {
+      compiler = createRequire(import.meta.url)("typescript") as Api;
+    } catch {
+      compiler = null;
+    }
+  }
+  return compiler ?? undefined;
+}
 
 export interface TsTypeAnswer {
   /** `checker.typeToString`, exactly as the compiler would print it. */
@@ -66,12 +122,12 @@ export interface TsTypeAnswer {
  * satisfied by more than one class, so the file the type is declared in is
  * not necessarily the file its call lands in.
  */
-function isConcreteDeclaration(declaration: ts.Declaration): boolean {
-  if (ts.isInterfaceDeclaration(declaration) || ts.isTypeParameterDeclaration(declaration)) {
+function isConcreteDeclaration(api: Api, declaration: TypeScriptApi.Declaration): boolean {
+  if (api.isInterfaceDeclaration(declaration) || api.isTypeParameterDeclaration(declaration)) {
     return false;
   }
-  if (ts.isClassDeclaration(declaration) || ts.isClassExpression(declaration)) {
-    return !(ts.getCombinedModifierFlags(declaration) & ts.ModifierFlags.Abstract);
+  if (api.isClassDeclaration(declaration) || api.isClassExpression(declaration)) {
+    return !(api.getCombinedModifierFlags(declaration) & api.ModifierFlags.Abstract);
   }
   return true;
 }
@@ -174,11 +230,18 @@ export function headOfPython(typeText: string): string {
   return typeText.trim().split(/[<[(]/)[0]!.trim();
 }
 
-const DEFAULT_OPTIONS: ts.CompilerOptions = {
-  allowJs: true, checkJs: false, target: ts.ScriptTarget.Latest,
-  module: ts.ModuleKind.ESNext, moduleResolution: ts.ModuleResolutionKind.Bundler,
-  skipLibCheck: true, noEmit: true, jsx: ts.JsxEmit.Preserve,
-};
+/*
+ * A function rather than a const: every value in it is an enum member read off
+ * the compiler, and the compiler is now loaded on demand. Evaluated at module
+ * load, this threw before anything could decide whether TypeScript was needed.
+ */
+function defaultOptions(api: Api): TypeScriptApi.CompilerOptions {
+  return {
+    allowJs: true, checkJs: false, target: api.ScriptTarget.Latest,
+    module: api.ModuleKind.ESNext, moduleResolution: api.ModuleResolutionKind.Bundler,
+    skipLibCheck: true, noEmit: true, jsx: api.JsxEmit.Preserve,
+  };
+}
 
 /**
  * The nearest enclosing `tsconfig.json` to `file`, walking up and caching by
@@ -194,7 +257,7 @@ const DEFAULT_OPTIONS: ts.CompilerOptions = {
  * defaults -- and `measure:resolution`'s first monorepo run under-reported
  * tier 2 for exactly this reason before it was named.
  */
-function configFinder(): (file: string) => string | undefined {
+function configFinder(api: Api): (file: string) => string | undefined {
   const byDirectory = new Map<string, string | undefined>();
   return (file: string): string | undefined => {
     let directory = path.dirname(file);
@@ -207,7 +270,7 @@ function configFinder(): (file: string) => string | undefined {
       }
       seen.push(directory);
       const candidate = path.join(directory, "tsconfig.json");
-      if (ts.sys.fileExists(candidate)) {
+      if (api.sys.fileExists(candidate)) {
         for (const each of seen) byDirectory.set(each, candidate);
         return candidate;
       }
@@ -220,18 +283,18 @@ function configFinder(): (file: string) => string | undefined {
   };
 }
 
-function programFrom(configPath: string | undefined, fallbackFiles: string[]): ts.Program {
-  let options = DEFAULT_OPTIONS;
+function programFrom(api: Api, configPath: string | undefined, fallbackFiles: string[]): TypeScriptApi.Program {
+  let options = defaultOptions(api);
   let rootNames = fallbackFiles;
   if (configPath) {
-    const read = ts.readConfigFile(configPath, ts.sys.readFile);
+    const read = api.readConfigFile(configPath, api.sys.readFile);
     if (!read.error && read.config) {
-      const parsed = ts.parseJsonConfigFileContent(read.config, ts.sys, path.dirname(configPath));
+      const parsed = api.parseJsonConfigFileContent(read.config, api.sys, path.dirname(configPath));
       options = { ...parsed.options, allowJs: true, skipLibCheck: true, noEmit: true };
       if (parsed.fileNames.length > 0) rootNames = parsed.fileNames;
     }
   }
-  return ts.createProgram(rootNames, options);
+  return api.createProgram(rootNames, options);
 }
 
 /**
@@ -285,9 +348,23 @@ function programFrom(configPath: string | undefined, fallbackFiles: string[]): t
  * server) ever holds one of these across many edits without exiting
  * between them.
  */
-export function createTsReferee(root: string): TsReferee {
+export function createTsReferee(root: string): TsReferee | undefined {
+  /*
+   * `undefined`, not a throw: the caller that most wants this -- the MCP
+   * server, running inside somebody else's repository -- has a perfectly good
+   * check to fall back to, and the one thing it must not do is fail to start
+   * because a devDependency of ours is absent from their install. Every caller
+   * below already treats a missing referee as "no referee", so this is the
+   * shape they were written for.
+   */
+  const loaded = typeScriptApi();
+  if (!loaded) return undefined;
+  // Annotated, not inferred: the helpers below are hoisted function
+  // declarations, and TypeScript will not carry a narrowing into one.
+  const api: Api = loaded;
+
   const files = sourceFiles(root);
-  const findConfig = configFinder();
+  const findConfig = configFinder(api);
 
   const configOf = new Map<string, string>();
   const filesByConfig = new Map<string, string[]>();
@@ -301,15 +378,15 @@ export function createTsReferee(root: string): TsReferee {
 
   const PROGRAM_CACHE_SIZE = 24;
   interface CachedProgram {
-    program: ts.Program;
-    checker: ts.TypeChecker;
+    program: TypeScriptApi.Program;
+    checker: TypeScriptApi.TypeChecker;
     /** `mtimeMs` of every in-tree file this program was built from, at build time. */
     snapshot: Map<string, number>;
   }
   const programCache = new Map<string, CachedProgram>();
 
   /** The in-tree files a built program actually declares, `node_modules` left out. */
-  function snapshotOf(program: ts.Program): Map<string, number> {
+  function snapshotOf(program: TypeScriptApi.Program): Map<string, number> {
     const snapshot = new Map<string, number>();
     for (const sourceFile of program.getSourceFiles()) {
       const fileName = sourceFile.fileName;
@@ -337,11 +414,11 @@ export function createTsReferee(root: string): TsReferee {
   }
 
   function build(configPath: string): CachedProgram {
-    const program = programFrom(configPath || undefined, filesByConfig.get(configPath) ?? []);
+    const program = programFrom(api, configPath || undefined, filesByConfig.get(configPath) ?? []);
     return { program, checker: program.getTypeChecker(), snapshot: snapshotOf(program) };
   }
 
-  function programFor(configPath: string): { program: ts.Program; checker: ts.TypeChecker } {
+  function programFor(configPath: string): { program: TypeScriptApi.Program; checker: TypeScriptApi.TypeChecker } {
     const cached = programCache.get(configPath);
     if (cached && stillFresh(cached.snapshot)) {
       programCache.delete(configPath); // re-insert to mark most-recently-used
@@ -363,15 +440,15 @@ export function createTsReferee(root: string): TsReferee {
     const { program, checker } = programFor(configPath);
     const sourceFile = program.getSourceFile(file);
     if (!sourceFile) return undefined;
-    const node = findNodeAt(sourceFile, start, end);
+    const node = findNodeAt(api, sourceFile, start, end);
     if (!node) return undefined;
-    let type: ts.Type;
+    let type: TypeScriptApi.Type;
     try {
       type = checker.getTypeAtLocation(node);
     } catch {
       return undefined;
     }
-    const text = checker.typeToString(type, node, ts.TypeFormatFlags.NoTruncation);
+    const text = checker.typeToString(type, node, api.TypeFormatFlags.NoTruncation);
     let declaringFile: string | undefined;
     let concrete = true;
     try {
@@ -388,7 +465,7 @@ export function createTsReferee(root: string): TsReferee {
        */
       const declaration = type.getSymbol()?.getDeclarations()?.[0];
       declaringFile = declaration?.getSourceFile().fileName;
-      if (declaration) concrete = isConcreteDeclaration(declaration);
+      if (declaration) concrete = isConcreteDeclaration(api, declaration);
     } catch {
       declaringFile = undefined;
     }
@@ -401,11 +478,11 @@ export function createTsReferee(root: string): TsReferee {
     const { program, checker } = programFor(configPath);
     const sourceFile = program.getSourceFile(file);
     if (!sourceFile) return undefined;
-    const node = findNodeAt(sourceFile, start, end);
+    const node = findNodeAt(api, sourceFile, start, end);
     if (!node) return undefined;
     try {
       const symbol = checker.getSymbolAtLocation(node);
-      const real = symbol && (symbol.flags & ts.SymbolFlags.Alias) ? checker.getAliasedSymbol(symbol) : symbol;
+      const real = symbol && (symbol.flags & api.SymbolFlags.Alias) ? checker.getAliasedSymbol(symbol) : symbol;
       const declaration = real?.getDeclarations()?.[0];
       if (!declaration) return undefined;
       const declaredIn = declaration.getSourceFile();
@@ -415,7 +492,7 @@ export function createTsReferee(root: string): TsReferee {
        * declaration itself points at the comment's first line and a caller
        * reading that line to see what is declared there reads prose.
        */
-      const named = (declaration as ts.NamedDeclaration).name ?? declaration;
+      const named = (declaration as TypeScriptApi.NamedDeclaration).name ?? declaration;
       const { line } = declaredIn.getLineAndCharacterOfPosition(named.getStart(declaredIn));
       return { file: declaredIn.fileName, line };
     } catch {
@@ -439,14 +516,14 @@ export function createTsReferee(root: string): TsReferee {
  * Descends only into a node that *contains* the target range, so a large file
  * costs one walk down its own nesting rather than a walk of the whole tree.
  */
-function findNodeAt(sourceFile: ts.SourceFile, start: number, end: number): ts.Node | undefined {
-  let found: ts.Node | undefined;
-  const visit = (node: ts.Node): void => {
+function findNodeAt(api: Api, sourceFile: TypeScriptApi.SourceFile, start: number, end: number): TypeScriptApi.Node | undefined {
+  let found: TypeScriptApi.Node | undefined;
+  const visit = (node: TypeScriptApi.Node): void => {
     const nodeStart = node.getStart(sourceFile);
     const nodeEnd = node.getEnd();
     if (nodeStart > start || nodeEnd < end) return;
     if (nodeStart === start && nodeEnd === end) found = node;
-    ts.forEachChild(node, visit);
+    api.forEachChild(node, visit);
   };
   visit(sourceFile);
   return found;

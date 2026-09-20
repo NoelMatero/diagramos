@@ -29,6 +29,7 @@
 import path from "node:path";
 
 import { ACCUSING_EDGE_KINDS, checkDrift, createWorkspace, newCheckCache, type CheckCache } from "../src/engine/drift";
+import { createClosedBodyReferee } from "../src/engine/referee";
 import { initEngine } from "../src/engine/parse";
 import { plantedBoard, plantedKeys, type Key, type KeyClaim } from "./lib/planted-keys";
 
@@ -65,12 +66,30 @@ function cacheFor(project: string): CheckCache {
   return cache;
 }
 
+/**
+ * The same referee a real check gets (#328), one per project for the same
+ * reason the cache is one per project: it holds that tree's compiler.
+ *
+ * This bench exists to say how many planted mistakes the checker catches, and
+ * for as long as it ran without a referee it was answering a question nobody
+ * asks -- how many it catches with a resolver the product has and the bench
+ * withheld. Every score quoted before this was the weak check's.
+ */
+const referees = new Map<string, ReturnType<typeof createClosedBodyReferee>>();
+function refereeFor(project: string): ReturnType<typeof createClosedBodyReferee> {
+  const found = referees.get(project);
+  if (found) return found;
+  const referee = createClosedBodyReferee(path.join(CORPUS, project));
+  referees.set(project, referee);
+  return referee;
+}
+
 /** What the checker said about one arrow, run on a board of its own. */
 async function ask(key: Key, claim: KeyClaim): Promise<{ outcome: Outcome; detail: string }> {
   const cache = cacheFor(key.project);
   const { workspace } = cache;
   const board = await plantedBoard(key, claim);
-  const report = checkDrift(board, workspace, { edges: true, cache });
+  const report = checkDrift(board, workspace, { edges: true, cache, closedBodyReferee: refereeFor(key.project) });
   // The engine quotes the declaration it read, and a Python class runs to
   // thousands of characters. What a reader of this table needs is which
   // verdict it was and the first line of why.

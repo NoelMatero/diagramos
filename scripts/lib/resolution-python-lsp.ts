@@ -65,7 +65,7 @@ import { fileURLToPath, pathToFileURL } from "node:url";
 
 import { PYRIGHT_VERSION } from "./licence-python";
 import type { LspDocumentSymbol } from "./lsp-symbols";
-import { isOutsideTree } from "./resolution-ts";
+import { isOutsideTree } from "../../src/engine/referee-ts";
 
 export { isOutsideTree };
 

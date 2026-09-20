@@ -21,7 +21,7 @@ import { type Language } from "../../src/engine/parse";
 import { PYRIGHT_VERSION } from "./licence-python";
 import { createPyrightLspReferee } from "./resolution-python-lsp";
 import { createRustAnalyzerReferee } from "./resolution-rust-lsp";
-import { createTsReferee } from "./resolution-ts";
+import { createTsReferee } from "../../src/engine/referee-ts";
 
 /** Where a call's name is written, as a byte range into the file. */
 export interface NameRange { start: number; end: number }
@@ -168,6 +168,10 @@ export async function checkerFor(
   if (TYPESCRIPT.has(language)) {
     try {
       const referee = createTsReferee(tree);
+      // The compiler is a devDependency, so `createTsReferee` can decline
+      // rather than throw; a measurement that silently skipped the whole
+      // language would read as "nothing to disagree about".
+      if (!referee) return { unavailable: "tsc is not installed in this tree" };
       return {
         definitionAt: async (file, _source, at) => referee.symbolDeclarationLocationAt(file, at.start, at.end),
         close: () => {},

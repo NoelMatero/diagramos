@@ -43,7 +43,7 @@ import path from "node:path";
 
 import { checkerFor, type CallChecker, type Declared } from "./lib/call-receivers";
 import { isOutsideRustTree } from "./lib/resolution-rust-lsp";
-import { isOutsideTree } from "./lib/resolution-ts";
+import { isOutsideTree } from "../src/engine/referee-ts";
 import { sourceFiles } from "./lib/source-files";
 
 import { LICENCES } from "../src/engine/licence";

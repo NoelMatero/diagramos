@@ -76,6 +76,16 @@ import { each, parseSource, type Language, type Node, type Tree } from "./parse"
 export type CallsWithheld =
   /** No grammar for this language, or the file would not parse at all. */
   | "unreadable"
+  /**
+   * The body constructs something -- `new Foo(...)`, `<Foo />` -- and a
+   * construction runs a routine this enumeration never looked at.
+   *
+   * Produced only by `callSitesIn`, never by the forward read, which is why
+   * it is in `SiteUnresolved` and nothing reports it as a withheld verdict.
+   * It is here because `SiteUnresolved` is cut from this type rather than
+   * restated.
+   */
+  | "construction"
   /** Nothing in that file declares that name. */
   | "not-declared"
   /** The name is declared and it is not a routine. There is no body to read. */
@@ -756,6 +766,15 @@ const OWN = new Set(["self", "this"]);
 /** A name a reader would recognise, wherever a grammar puts one. */
 const NAME_LEAF = /identifier$|^field_identifier$|^property_identifier$/;
 
+/**
+ * Grammar nodes that run a routine without being a call node.
+ *
+ * `constructs.ts`'s `MAKES` minus `struct_expression`, and the difference is
+ * the whole point: that list answers "what does this build", this one answers
+ * "what does this run". A Rust struct literal builds and runs nothing.
+ */
+const RUNS_A_CONSTRUCTOR = /^(new_expression|jsx_opening_element|jsx_self_closing_element)$/;
+
 function calleeOf(node: Node): Callee | undefined {
   const callee = node.childForFieldName("function") ?? node.childForFieldName("macro");
   return callee ? calleeOfNode(callee) : undefined;
@@ -1235,7 +1254,7 @@ function closedBodyRefutes(
  */
 export type SiteUnresolved = Extract<
   CallsWithheld,
-  "computed" | "dynamic" | "receiver" | "unbound" | "ambiguous" | "unplaced" | "elsewhere" | "macro"
+  "computed" | "dynamic" | "receiver" | "unbound" | "ambiguous" | "unplaced" | "elsewhere" | "macro" | "construction"
 >;
 
 /** One call written in a body, and whether the reader can say what it reaches. */
@@ -1708,6 +1727,43 @@ export function callSitesIn(side: CallSide, only?: string): CallSitesReading {
           name: "",
           line: lineOf(side.source, inner.startIndex),
           why: "macro",
+          receiver: false,
+        });
+        return;
+      }
+      /*
+       * A construction runs a routine, and `calleeOf` cannot see it: it reads
+       * the `function` field, and `new Foo()` spells its callee in
+       * `constructor`, a JSX element in `name`. So a body whose only reach
+       * into another file is `new Foo()` looked like a body that reached
+       * nothing -- and once every *other* receiver in it resolved, the closed
+       * reading called that body enumerated and refuted a true arrow.
+       *
+       * That is not a hypothetical. `bench:planted` found it the moment a
+       * receiver resolver was wired into the MCP path (#328):
+       * TanStack-query's `MutationCache.build` calls
+       * `client.defaultMutationOptions()` and `this.add()`, and *builds* a
+       * `Mutation`. With `client` unresolved the body stayed open and the
+       * arrow was merely unverified; with `client` resolved the set closed at
+       * two calls, neither reaching `mutation.ts`, and a correct arrow was
+       * called wrong.
+       *
+       * Left unplaced rather than resolved on purpose. Placing it would make
+       * `new Foo()` *confirm* an `@calls` arrow, and `@builds` is the word for
+       * that -- #296 plants a wrong-kind mistake by swapping exactly those two,
+       * so confirming here would agree with a claim the bench calls false. The
+       * body simply does not close, which is the honest answer: there is a
+       * routine running that this reader did not enumerate.
+       *
+       * Rust's `struct_expression` is deliberately not here. `Foo { x: 1 }`
+       * transfers control to nothing, so a body containing one really is
+       * closed around its calls.
+       */
+      if (RUNS_A_CONSTRUCTOR.test(inner.type)) {
+        body.sites.push({
+          name: "",
+          line: lineOf(side.source, inner.startIndex),
+          why: "construction",
           receiver: false,
         });
         return;

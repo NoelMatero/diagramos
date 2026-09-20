@@ -112,7 +112,7 @@ import { BUILT_IN, refereeRoutines } from "./lib/access-scan";
 import { checkerFor, type Declared, type NameRange } from "./lib/call-receivers";
 import { resolvePythonReceivers } from "./lib/resolution-python-live";
 import { resolveRustReceivers } from "./lib/resolution-rust-receivers";
-import { createTsReferee, isOutsideTree, receiverResolutionFrom } from "./lib/resolution-ts";
+import { createTsReferee, isOutsideTree, receiverResolutionFrom } from "../src/engine/referee-ts";
 import { sourceFiles } from "./lib/source-files";
 import {
   callSitesIn, EXTERNAL_RECEIVER,

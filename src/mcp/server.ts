@@ -30,6 +30,7 @@ import { readGraph } from "../engine/graph";
 import { relayoutDiagram } from "../engine/relayout";
 import { projectGraph } from "./projection";
 import { createCodeGraphOption } from "../engine/codegraph";
+import { createClosedBodyReferee } from "../engine/referee";
 import { createLedger } from "../engine/ledger";
 import { CONFIG_FILE, DEFAULT_DIAGRAM_DIR, diagramDir } from "../engine/config";
 import {
@@ -366,6 +367,20 @@ async function followBoard(file: string): Promise<void> {
     // Losing the live view must never fail the write that succeeded.
   }
 }
+
+/**
+ * The type checker every check in this process asks, built once and held.
+ *
+ * Without it, a call written `thing.render()` is a call the reader cannot
+ * place, so the routine's call set never closes and a wrong `@calls` arrow
+ * goes by in silence. The CLI has had one since #226; this server -- which is
+ * what runs when Claude draws a board and what every `check_drift` goes
+ * through -- did not, so boards checked here got the weaker check (#328).
+ *
+ * Safe at module scope because it loads nothing until the first question: see
+ * `createClosedBodyReferee`.
+ */
+const closedBodyReferee = createClosedBodyReferee(WORKSPACE_ROOT);
 
 const server = new McpServer(
   // Read from package.json rather than restated. Written out by hand this said
@@ -861,6 +876,7 @@ server.registerTool(
       await initEngine();
       const drawn = checkDrift(result.board, createWorkspace(WORKSPACE_ROOT), {
         trail: createGitTrail(WORKSPACE_ROOT),
+        closedBodyReferee,
       });
       // Named the turn it is written, because a claim nobody saw go on is a
       // claim nobody can refuse. The board shows it too; this is for whoever is
@@ -1114,6 +1130,7 @@ server.registerTool(
         const report = checkDrift(await readBoard(file), workspace, {
           coverage,
           trail,
+          closedBodyReferee,
           baseline: createGitBaseline(WORKSPACE_ROOT, file),
           ...(codeGraph ? { codeGraph } : {}),
           ...(ledger ? { ledger } : {}),
@@ -1519,6 +1536,7 @@ server.registerTool(
         await initEngine();
         notes = drawTimeNotes(checkDrift(result.board, createWorkspace(WORKSPACE_ROOT), {
           trail: createGitTrail(WORKSPACE_ROOT),
+          closedBodyReferee,
         }));
       }
       return text({

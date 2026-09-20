@@ -68,7 +68,7 @@
 import { existsSync, readdirSync, readFileSync, realpathSync, statSync } from "node:fs";
 import path from "node:path";
 
-import { createTsReferee } from "./lib/resolution-ts";
+import { createTsReferee } from "../src/engine/referee-ts";
 import { refereePythonTypes, type ResolutionQuery } from "./lib/resolution-python";
 import { createPyrightLspReferee, isOutsideTree as isOutsidePyTree, memberRangeAfter } from "./lib/resolution-python-lsp";
 import {

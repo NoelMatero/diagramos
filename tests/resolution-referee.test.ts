@@ -15,7 +15,19 @@ import path from "node:path";
 
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
 
-import { createTsReferee } from "../scripts/lib/resolution-ts";
+import { createTsReferee } from "../src/engine/referee-ts";
+
+/**
+ * `createTsReferee` declines rather than throws when `typescript` is not
+ * installed, because the published package does not depend on it. This suite
+ * runs inside this repository, where it always is -- so an absent compiler
+ * here is a broken checkout, and saying so beats ten `!`s.
+ */
+function refereeFor(root: string) {
+  const referee = createTsReferee(root);
+  if (!referee) throw new Error("typescript is not installed in this checkout");
+  return referee;
+}
 
 let repo: string;
 
@@ -61,7 +73,7 @@ describe("createTsReferee against a monorepo", () => {
     const index = "import { Thing } from \"@lib/thing\";\nconst t = new Thing();\nt.greet();\n";
     write("pkg/src/index.ts", index);
 
-    const referee = createTsReferee(repo);
+    const referee = refereeFor(repo);
     const file = path.join(repo, "pkg/src/index.ts");
     // `t.greet()`'s receiver -- the line starts with it, so this is
     // unambiguous even though `const t` earlier also binds one letter `t`.
@@ -88,7 +100,7 @@ describe("createTsReferee against a monorepo", () => {
     const bSource = "import { FromB } from \"@x\";\nconst v = new FromB();\nv;\n";
     write("b/index.ts", bSource);
 
-    const referee = createTsReferee(repo);
+    const referee = refereeFor(repo);
 
     const aRange = rangeOf(aSource, "v;");
     const bRange = rangeOf(bSource, "v;");
@@ -114,7 +126,7 @@ describe("createTsReferee's concrete field", () => {
   it("is true for an ordinary class", () => {
     const source = "class Foo {\n  run(): void {}\n}\nconst f = new Foo();\nf.run();\n";
     write("a.ts", source);
-    const referee = createTsReferee(repo);
+    const referee = refereeFor(repo);
     const { start } = rangeOf(source, "f.run()");
     const answer = referee.typeAt(path.join(repo, "a.ts"), start, start + 1);
     expect(answer?.head).toBe("Foo");
@@ -125,7 +137,7 @@ describe("createTsReferee's concrete field", () => {
     const source =
       "interface Foo {\n  run(): void;\n}\nfunction use(f: Foo) {\n  f.run();\n}\n";
     write("a.ts", source);
-    const referee = createTsReferee(repo);
+    const referee = refereeFor(repo);
     const { start } = rangeOf(source, "f.run()");
     const answer = referee.typeAt(path.join(repo, "a.ts"), start, start + 1);
     expect(answer?.head).toBe("Foo");
@@ -136,7 +148,7 @@ describe("createTsReferee's concrete field", () => {
     const source =
       "abstract class Foo {\n  abstract run(): void;\n}\nfunction use(f: Foo) {\n  f.run();\n}\n";
     write("a.ts", source);
-    const referee = createTsReferee(repo);
+    const referee = refereeFor(repo);
     const { start } = rangeOf(source, "f.run()");
     const answer = referee.typeAt(path.join(repo, "a.ts"), start, start + 1);
     expect(answer?.head).toBe("Foo");
@@ -147,7 +159,7 @@ describe("createTsReferee's concrete field", () => {
     const source =
       "function use<T extends { run(): void }>(f: T) {\n  f.run();\n}\n";
     write("a.ts", source);
-    const referee = createTsReferee(repo);
+    const referee = refereeFor(repo);
     const { start } = rangeOf(source, "f.run()");
     const answer = referee.typeAt(path.join(repo, "a.ts"), start, start + 1);
     expect(answer?.concrete).toBe(false);
@@ -178,7 +190,7 @@ describe("a cached program invalidates when a file it was built from changes (#2
 
     // One referee, kept alive across both queries -- a fresh one per query
     // would trivially "pass" this by never having a stale answer to give.
-    const referee = createTsReferee(repo);
+    const referee = refereeFor(repo);
     const { start } = rangeOf(source, "f.run()");
     const before = referee.typeAt(path.join(repo, "a.ts"), start, start + 1);
     expect(before?.concrete).toBe(true);
