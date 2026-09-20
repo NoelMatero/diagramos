@@ -34,6 +34,7 @@ import { beforeAll, describe, expect, it } from "vitest";
 import {
   bindingsIn, callsBetween, type CallSide, type CallsVerdict, type ReceiverResolution,
 } from "../src/engine/calls";
+import { mayAccuse } from "../src/engine/licence";
 import { initEngine, type Language } from "../src/engine/parse";
 
 beforeAll(async () => { await initEngine(); }, 120_000);
@@ -312,26 +313,38 @@ describe("the closed body that provably calls nothing else (#233)", () => {
     expect(verdict.verdict).toBe("refuted");
   });
 
-  it("never refutes for js or rust, however closed the body is", () => {
+  it("never refutes for js, however closed the body is", () => {
     /*
-     * ts/tsx and, since #242, python hold this axis's licence. A
-     * trivially-empty body in rust must still never be accused from -- it
-     * reaches `absent`, the same silence #233 leaves untouched everywhere it
-     * does not apply; `js` never gets that far, because `@calls` has never
-     * held even the older, presence-based licence there (#211) and is
-     * withheld before either check runs.
+     * `js` never gets as far as this check, because `@calls` has never held
+     * even the older, presence-based licence there (#211) and is withheld
+     * before either one runs.
+     *
+     * Rust used to be in this test beside it and is not any more (#324). It
+     * was here on the strength of a licence row saying Rust had no
+     * compiler-backed receiver resolver -- a sentence that stopped being true
+     * at #246 and was still being enforced eleven merges later. The test
+     * pinned the stale row rather than the rule, which is how a test keeps a
+     * mistake alive: it passed every single run.
      */
-    const expected = { js: "withheld/unlicensed", rust: "absent" } as const;
-    for (const language of ["js", "rust"] as const) {
-      const source = language === "rust" ? "fn run() -> u32 { 1 }\n" : "function run() { return 1; }\n";
-      const renderSource = language === "rust" ? "fn render() -> u32 { 2 }\n" : "function render() { return 2; }\n";
-      const verdict = ask({
-        "src/a": { source, language },
-        "src/b": { source: renderSource, language },
-      }, { file: "src/a", routine: "run" }, { file: "src/b", names: ["render"] });
+    const verdict = ask({
+      "src/a.js": { source: "function run() { return 1; }\n", language: "js" },
+      "src/b.js": { source: "function render() { return 2; }\n", language: "js" },
+    }, { file: "src/a.js", routine: "run" }, { file: "src/b.js", names: ["render"] });
 
-      expect(verdictOf(verdict), language).toBe(expected[language]);
-    }
+    expect(verdictOf(verdict)).toBe("withheld/unlicensed");
+  });
+
+  it("refutes a Rust body that provably calls nothing else (#324)", () => {
+    // The square #324 turned on, at its simplest: an empty call set is a
+    // complete one. rust-analyzer places Rust's receivers (#246) and rustc
+    // checked those placements at 0.03% wrong (#257), which is a stricter
+    // figure than the 0.7% this axis first shipped on.
+    const verdict = ask({
+      "src/a.rs": { source: "fn run() -> u32 { 1 }\n", language: "rust" },
+      "src/b.rs": { source: "fn render() -> u32 { 2 }\n", language: "rust" },
+    }, { file: "src/a.rs", routine: "run" }, { file: "src/b.rs", names: ["render"] });
+
+    expect(verdict.verdict).toBe("refuted");
   });
 });
 
@@ -349,18 +362,26 @@ describe("an absent verdict says which wall the reading hit (#324)", () => {
    * be a reader bug at all -- 59 are `unlicensed`, which is a measurement
    * nobody ran rather than code that cannot read.
    */
-  it("says unlicensed where the language has no absence licence at all", () => {
-    // Rust's body is trivially closed and must still never be accused from.
-    // Saying so as `unlicensed` is the difference between "we cannot read
-    // this" and "nobody has measured whether we may say so here".
-    const verdict = ask({
-      "src/a.rs": { source: "fn run() -> u32 { 1 }\n", language: "rust" },
-      "src/b.rs": { source: "fn render() -> u32 { 2 }\n", language: "rust" },
-    }, { file: "src/a.rs", routine: "run" }, { file: "src/b.rs", names: ["render"] });
-
-    expect(verdict.verdict).toBe("absent");
-    if (verdict.verdict !== "absent") return;
-    expect(verdict.notClosed).toBe("unlicensed");
+  it("has no language left to say unlicensed about, and keeps the word anyway", () => {
+    /*
+     * `unlicensed` is the one reason in `CallsNotClosed` nothing can
+     * currently produce, and that is a fact worth a test rather than a dead
+     * branch to delete.
+     *
+     * The shape it names is a language holding `@calls`' presence licence
+     * and not its absence one. Rust was the only one, until #324 measured it.
+     * `js` holds neither, so it withholds before this check is reached.
+     *
+     * Keeping the word means the next language to arrive lands in a named
+     * silence instead of an anonymous one -- which is the whole of what this
+     * issue was about. Deleting it would rebuild the hole on the day it next
+     * matters, and nobody would be counting then either.
+     */
+    const languages = ["ts", "tsx", "python", "rust"] as const;
+    for (const language of languages) {
+      expect(mayAccuse("calls", language, "absence"), `${language} absence`).toBe(true);
+    }
+    expect(mayAccuse("calls", "js")).toBe(false);
   });
 
   it("says routine-not-found when the arrow starts at a class rather than a routine", () => {

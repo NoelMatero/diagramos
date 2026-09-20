@@ -423,23 +423,24 @@ const NEEDS_ABSENCE = (
   ...(known ? { known } : {}),
 });
 
-/**
- * `@calls`' absence licence outside TypeScript/TSX, and now Python (#242).
+/*
+ * `NO_CLOSED_BODY_RESOLVER` lived here and is gone (#324).
  *
- * #230 built the closed-body resolver against `tsc` alone; rust has no
- * compiler-backed receiver resolver wired in for this, so this axis stays
- * unmeasured for it by an explicit scope decision (#231), not oversight.
- * Python had the same gap until #235 measured pyright over its own
- * language-server protocol (docs/claim-vocabulary.md item 17) and #242 gave
- * it a real entry below.
+ * It said Rust had no compiler-backed receiver resolver wired in, so the
+ * closed-body axis was unmeasured for it "by scope decision, not oversight".
+ * That was true when #231 wrote it and stopped being true at #246, which
+ * built the rust-analyzer driver, and again at #257, which checked its
+ * answers against rustc. The sentence outlived the fact by eleven merges and
+ * nothing noticed, because an `unmeasured` row reads as a decision rather
+ * than as a claim about the repository -- and a decision nobody re-reads is
+ * how a licence goes stale without going wrong.
+ *
+ * Kept as a comment rather than deleted silently: the cost of that sentence
+ * was 59 of the 80 planted Rust `@calls` mistakes going unanswered, which is
+ * the largest single reason on #324's ranking. A stale note is not a small
+ * documentation problem here -- `mayAccuse` reads this file, so the prose and
+ * the behaviour are the same object.
  */
-const NO_CLOSED_BODY_RESOLVER: RelationUnmeasured = {
-  unmeasured:
-    "#230 measured the closed-body resolver for ts/tsx/js only, using " +
-    "`tsc` as the receiver resolver. Rust has no compiler-backed resolver " +
-    "wired in for this, so this axis is unmeasured for it by scope decision, " +
-    "not oversight (#231, docs/claim-vocabulary.md items 12-14).",
-};
 
 export interface Licence {
   language: string;
@@ -1167,7 +1168,72 @@ export const LICENCES: readonly Licence[] = [
             "invented, the same before and after. A `use ..::*` is now " +
             "followable in principle and this corpus has none that matter.",
         },
-        absence: NO_CLOSED_BODY_RESOLVER,
+        /*
+         * Rust's second axis, measured at last (#324). The note that used to
+         * sit here said Rust had no compiler-backed receiver resolver; #246
+         * built one and #257 checked it against rustc, so the sentence had
+         * been false for eleven PRs by the time anything read it.
+         */
+        absence: {
+          reproduce:
+            "npm run measure:closed-bodies -- .corpus/ripgrep .corpus/anyhow "
+            + ".corpus/clap .corpus/regex",
+          measured: "2026-09-20",
+          referee:
+            "rustc itself, through `scripts/lib/resolution-rustc.ts` -- a " +
+            "different compiler front end from the rust-analyzer the reader " +
+            "places with, sharing no index, no cache and no query engine with " +
+            "it. That makes this row the **only** closed-body licence on the " +
+            "grid resting on an independent oracle rather than on one checker " +
+            "asked twice: TypeScript's (0.7%) is `tsc` agreeing with itself " +
+            "and Python's (1.76%) is pyright agreeing with itself, and both " +
+            "carry a blind spot neither can see past. Pairing each answer " +
+            "with rustc's verdict on an unrelated site half a corpus away " +
+            "agrees 1.3% of the time, so the agreement below is " +
+            "discrimination and not a referee that cannot tell types apart " +
+            "(docs/claim-vocabulary.md item 20).",
+          unit: "placed receiver types checked against rustc's own",
+          counts: { asked: 6066, missed: 2 },
+          covers: ["rust"],
+          note:
+            "0.03% wrong (2 of the 6,066 rustc could type, out of 6,676 " +
+            "rust-analyzer answered), against 0.7% for the " +
+            "ts/tsx row this axis first shipped on -- so Rust is licensed on a " +
+            "stricter number from a stronger referee, not waved through to " +
+            "catch up. 20 answers disagreed and 18 of them are one type a " +
+            "macro declares, where rustc names the `macro_rules!` line and " +
+            "rust-analyzer names the invocation and neither is wrong; the two " +
+            "left are read one by one in `known` below. 9.1% of answers stay " +
+            "unchecked and are excluded rather " +
+            "than assumed right: 78 rustc never typed at all, 532 it typed as " +
+            "something no declaration states (`Option<T>`, `Vec<_>`), which " +
+            "needs a different question and not a different referee. Reach, " +
+            "separately from wrongness: rust-analyzer answers 84.0% of the " +
+            "30,587 receiver queries it is asked over the four pinned clones, " +
+            "and the closed share those answers buy is 5.9% -> 21.3% of " +
+            "bodies that call anything (563 -> 2,030 of 9,532). A low closed " +
+            "share is a ceiling on how *often* this can speak and says nothing " +
+            "about whether it is right when it does; the miss column is the " +
+            "one this row is held to. `rust-src` must be on the machine or " +
+            "rustc types `Vec` and declares it nowhere, and every such answer " +
+            "falls to the unchecked column -- the run records whether it was " +
+            "(`hasStdSource`), so a thinner figure from a bare toolchain " +
+            "cannot read as a finding.",
+          known: [
+            "rustc names the line inside a `macro_rules!` body where " +
+              "rust-analyzer names the expansion site, so a type declared by a " +
+              "macro disagrees by construction rather than by either being " +
+              "wrong. `declaredByMacro` requires rustc's line to use a " +
+              "metavariable and rust-analyzer's to name the very type rustc " +
+              "printed, which is narrow enough that a real disagreement cannot " +
+              "hide inside it.",
+            "An iterator adaptor chain types as the adaptor rather than as " +
+              "what it yields -- rustc says `Skip<slice::Iter<'_, &str>>` " +
+              "where rust-analyzer says `IntoIter`. Both are true of different " +
+              "positions in the same expression, and the interface guard below " +
+              "is what stops either being accused from.",
+          ],
+        },
         indirect: NO_INDIRECT_READER,
       },
       accesses: {

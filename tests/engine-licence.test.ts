@@ -605,7 +605,7 @@ describe("which words may accuse, and in which languages", () => {
 });
 
 describe("the licence's second axis (#231)", () => {
-  it("gives @calls a closed-body absence licence in ts/tsx and python", () => {
+  it("gives @calls a closed-body absence licence everywhere a resolver was measured", () => {
     // Item 12-14's numbers: a tier-2 compiler resolver can close a body's
     // whole call set, so "not among them" is provable rather than a guess --
     // for TypeScript and TSX. `js` stays excluded: `checkJs` is off, so tier 2
@@ -613,11 +613,19 @@ describe("the licence's second axis (#231)", () => {
     expect(mayAccuse("calls", "ts", "absence")).toBe(true);
     expect(mayAccuse("calls", "tsx", "absence")).toBe(true);
     expect(mayAccuse("calls", "js", "absence")).toBe(false);
-    expect(mayAccuse("calls", "rust", "absence")).toBe(false);
     // Item 17 (#235, #242): pyright over its own LSP closes the same
     // question for Python, at 1.76% wrong once a real anchoring bug was
     // found and fixed -- inside the bar ts/tsx's own reading cleared.
     expect(mayAccuse("calls", "python", "absence")).toBe(true);
+    /*
+     * Rust joined at #324, and its `false` here was the single largest
+     * reason the checker missed a planted Rust `@calls` mistake -- 59 of 80.
+     * The row it rested on said Rust had no compiler-backed resolver; #246
+     * built one and #257 checked it against rustc at 0.03% wrong, which is a
+     * stricter figure from a more independent referee than the 0.7% ts/tsx
+     * shipped on. The sentence was simply out of date.
+     */
+    expect(mayAccuse("calls", "rust", "absence")).toBe(true);
   });
 
   it("gives @accesses a by-name routine-end absence licence in every language it was measured in", () => {
@@ -688,6 +696,21 @@ describe("the licence's second axis (#231)", () => {
   it("reads the 0.7% wrong-rate number off the licence rather than a copy", () => {
     // docs/claim-vocabulary.md item 14's final figure, formalized here.
     expect(relationTotals("calls", "ts", "absence")).toEqual({ asked: 8964, missed: 62 });
+  });
+
+  it("reads Rust's 0.03% off the licence too, and it is the stricter of the two", () => {
+    /*
+     * docs/claim-vocabulary.md item 20. Pinned as a pair with the row above
+     * because the comparison is the argument: Rust's referee is rustc, a
+     * different compiler front end from the rust-analyzer the reader places
+     * with, where TypeScript's is `tsc` asked a second question. An
+     * independent oracle reporting a lower wrong rate is why this square
+     * could be turned on without waiting for anything else to be built.
+     */
+    const rust = relationTotals("calls", "rust", "absence");
+    expect(rust).toEqual({ asked: 6066, missed: 2 });
+    const ts = relationTotals("calls", "ts", "absence");
+    expect(rust!.missed / rust!.asked).toBeLessThan(ts!.missed / ts!.asked);
   });
 });
 

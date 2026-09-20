@@ -216,19 +216,24 @@ describe("an unverified @calls arrow says what stopped the check (#324)", () => 
    * the checker misses stop here.
    */
   it("names the wall, and still does not accuse", async () => {
-    // Rust: the body is trivially closed and the language holds no licence to
-    // say so, which is a fact about what has been measured rather than about
-    // this code -- and the arrow now says which.
-    const board = await boardOf("src/a.rs#run", "src/b.rs#render", { claim: "calls" });
+    /*
+     * The arrow starts at a class. There is no call list to close, because
+     * there is no body -- and "nothing in the calling file declares that
+     * routine" is a sentence somebody can act on, where the old one was not.
+     *
+     * Still silence: `report.edges` is empty. A named reason for not knowing
+     * is not an accusation, and must never become one.
+     */
+    const board = await boardOf("src/a.ts#Dep", "src/b.ts#render", { claim: "calls" });
     const report = checkDrift(board, fakeWorkspace({
-      "src/a.rs": "fn run() -> u32 { 1 }\n",
-      "src/b.rs": "fn render() -> u32 { 2 }\n",
+      "src/a.ts": "export class Dep {\n  track() { return 1; }\n}\n",
+      "src/b.ts": CALLEE,
     }), { edges: true });
 
     expect(report.edges).toEqual([]);
-    expect(report.claims.callsNotClosed.unlicensed).toBe(1);
+    expect(report.claims.callsNotClosed["routine-not-found"]).toBe(1);
     expect(report.unconfirmedEdges[0]?.detail)
-      .toContain("this language has not been measured");
+      .toContain("nothing in the calling file declares that routine");
   });
 
   it("tells a call that lands in the right file apart from one nothing could read", async () => {
