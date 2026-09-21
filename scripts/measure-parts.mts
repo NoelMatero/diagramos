@@ -33,7 +33,7 @@ import path from "node:path";
 import ts from "typescript";
 
 import { sourceFiles } from "./lib/source-files";
-import { flatten, literalValue, refereeParts, type RefereeReading } from "./lib/lsp-symbols";
+import { flatten, literalValue, refereeParts, writtenTypeCallable, type RefereeReading } from "./lib/lsp-symbols";
 import { createRustAnalyzerReferee } from "./lib/resolution-rust-lsp";
 import { createPyrightLspReferee } from "./lib/resolution-python-lsp";
 
@@ -127,11 +127,23 @@ function score(
     const theirs = declarations.map(({ nameNode }) => {
       const line = lineAt(source, nameNode.startIndex);
       const listed = referee?.get(`${line}\t${name}`);
-      const silent = !listed || PARTS.every((part) => listed[part] === "unknown");
-      if (!silent || !refereeRan) return listed;
+      if (!refereeRan) return listed;
+      const answered = listed && PARTS.filter((part) => listed[part] !== "unknown").length;
+      if (answered && PARTS.every((part) => listed![part] !== "unknown")) return listed;
+      /*
+       * Part by part rather than all or nothing (#337). A server that files a
+       * name as a variable has answered "not a type" and said nothing about
+       * calling it -- pyright's range for one covers the name and not the
+       * annotation -- and before this the half-answer kept the line from
+       * being read at all.
+       */
       const text = declaringLine(source, line, name, language);
-      if (text) byText += 1;
-      return text ?? listed;
+      if (!text) return listed;
+      if (!listed) { byText += 1; return text; }
+      byText += 1;
+      const merged = { ...listed };
+      for (const part of PARTS) if (merged[part] === "unknown") merged[part] = text[part];
+      return merged;
     });
     if (implemented) {
       /*
@@ -223,7 +235,61 @@ function declaringLine(
     return refereeParts(12, language === "python" ? "" : text.trimEnd().endsWith(";") ? ";" : "}", language === "python");
   }
   if (container.test(text)) return refereeParts(5, "", language === "python");
+  /*
+   * A name with a type written on it and no value, which the servers miss for
+   * the same reasons as above -- a `const _: () = {...}` inside a `cfg`, a
+   * field of a struct in a file rust-analyzer would not open. The type is on
+   * the line, so the line answers it (#337).
+   */
+  const annotated = new RegExp(
+    `^\\s*((pub(\\([^)]*\\))?\\s+)?(const|static|let|var|export|declare|mut|readonly|public|private|protected)\\s+)*`
+    + `${escaped}\\??\\s*:`,
+  );
+  /*
+   * The line as well as the statement: `#[cfg(feature = "help")]` on the line
+   * above makes the statement open with an attribute, and the annotation this
+   * is about is on the line the name is on.
+   */
+  const declaring = routine.test(text) ? undefined
+    : statement && annotated.test(statement) ? statement
+      : annotated.test(text) ? text : undefined;
+  if (declaring) {
+    const callable = writtenTypeCallable(declaring, language === "python", language === "rust");
+    return {
+      body: callable, signature: callable, result: "unknown", fields: "unknown", bases: "unknown",
+      // The line says this name is a value of that type; a type is not
+      // introduced with a colon in any of the three.
+      type: "lacks", callable,
+    };
+  }
   return undefined;
+}
+
+/**
+ * A written type the compiler's own tree says nothing could call (#337).
+ *
+ * Keywords, literals, and what can be built out of them. A named type is not
+ * in here on purpose: `type NodeTransform = (node, ctx) => void` is a name,
+ * and answering that one needs the whole program rather than this file -- so
+ * it comes back "cannot say", and the reader is held to the same line.
+ */
+function notCallableType(node: ts.TypeNode): boolean {
+  const KEYWORDS = new Set<ts.SyntaxKind>([
+    ts.SyntaxKind.StringKeyword, ts.SyntaxKind.NumberKeyword, ts.SyntaxKind.BooleanKeyword,
+    ts.SyntaxKind.VoidKeyword, ts.SyntaxKind.UndefinedKeyword, ts.SyntaxKind.SymbolKeyword,
+    ts.SyntaxKind.BigIntKeyword, ts.SyntaxKind.NeverKeyword, ts.SyntaxKind.ObjectKeyword,
+  ]);
+  if (KEYWORDS.has(node.kind)) return true;
+  if (ts.isLiteralTypeNode(node)) return true;
+  // An array holds functions without being one: `handlers: Array<() => void>`
+  // is read by subscripting it, never by calling it.
+  if (ts.isArrayTypeNode(node) || ts.isTupleTypeNode(node)) return true;
+  if (ts.isParenthesizedTypeNode(node)) return notCallableType(node.type);
+  if (ts.isTypeOperatorNode(node)) return notCallableType(node.type);
+  if (ts.isUnionTypeNode(node) || ts.isIntersectionTypeNode(node)) {
+    return node.types.every((one) => notCallableType(one));
+  }
+  return false;
 }
 
 /** The TypeScript compiler's reading of one file. */
@@ -241,6 +307,22 @@ function typescriptReferee(file: string, source: string): RefereeByLine {
         body: node.body ? "has" : "lacks", signature: "has", result: "has", fields: "lacks", bases: "lacks",
         type: "lacks", callable: "has",
       });
+    }
+    /*
+     * `{ [key: string]: string }`. The grammar the reader walks files the
+     * index parameter as a name the interface declares, so the referee has to
+     * have an answer for it: it is a parameter standing for a key, which is a
+     * value and never a type.
+     */
+    if (ts.isIndexSignatureDeclaration(node)) {
+      const parameter = node.parameters[0]?.name;
+      if (parameter && ts.isIdentifier(parameter)) {
+        const written = notCallableType(node.type) ? "lacks" : "unknown";
+        found.set(`${tree.getLineAndCharacterOfPosition(parameter.getStart(tree)).line}\t${parameter.text}`, {
+          body: written, signature: written, result: "unknown", fields: "unknown", bases: "unknown",
+          type: "lacks", callable: written,
+        });
+      }
     }
     if (name && (ts.isIdentifier(name) || ts.isPrivateIdentifier(name))) {
       let reading: Record<Part, RefereeReading> | undefined;
@@ -280,6 +362,7 @@ function typescriptReferee(file: string, source: string): RefereeByLine {
           } else break;
         }
         const literal = ts.isNumericLiteral(written) || ts.isStringLiteral(written)
+          || (ts.isIdentifier(written) && written.text === "undefined")
           || ts.isNoSubstitutionTemplateLiteral(written) || ts.isBigIntLiteral(written)
           || written.kind === ts.SyntaxKind.TrueKeyword || written.kind === ts.SyntaxKind.FalseKeyword
           || written.kind === ts.SyntaxKind.NullKeyword
@@ -288,11 +371,54 @@ function typescriptReferee(file: string, source: string): RefereeByLine {
           || (ts.isObjectLiteralExpression(written) && written.properties.every((one) =>
             ts.isPropertyAssignment(one)
             && (ts.isNumericLiteral(one.initializer) || ts.isStringLiteral(one.initializer))));
+        /*
+         * Only when it answers. An all-unknown record reads as silence
+         * further down anyway, and leaving it unset is what lets the two
+         * readings below have their turn at the same declaration (#337).
+         */
+        if (literal) {
+          reading = {
+            body: "lacks", signature: "lacks", result: "unknown", fields: "unknown",
+            bases: "unknown", type: "lacks", callable: "lacks",
+          };
+        }
+      }
+      /*
+       * A name with a type written on it, and nothing assigned that says
+       * otherwise (#337). The compiler's tree gives both halves: that this is
+       * a value declaration rather than a type, and what the written type is
+       * made of.
+       */
+      if (!reading && (ts.isVariableDeclaration(node) || ts.isPropertyDeclaration(node)
+        || ts.isPropertySignature(node)) && node.type) {
+        const assigned = (node as { initializer?: ts.Expression }).initializer;
+        const written = assigned && (ts.isArrowFunction(assigned) || ts.isFunctionExpression(assigned))
+          ? "has"
+          : notCallableType(node.type) ? "lacks" : "unknown";
         reading = {
-          body: literal ? "lacks" : "unknown", signature: literal ? "lacks" : "unknown",
-          result: "unknown", fields: "unknown", bases: "unknown",
-          type: literal ? "lacks" : "unknown", callable: literal ? "lacks" : "unknown",
+          body: written, signature: written, result: "unknown", fields: "unknown", bases: "unknown",
+          type: "lacks", callable: written,
         };
+      }
+      /*
+       * And a value with no type written, whose shape the tree still settles:
+       * `new WeakSet()` is an instance and `(a) => a` is a function. Neither
+       * is a type, and only one of them can be called.
+       */
+      if (!reading && (ts.isVariableDeclaration(node) || ts.isPropertyDeclaration(node))
+        && node.initializer) {
+        const assigned = node.initializer;
+        if (ts.isNewExpression(assigned)) {
+          reading = {
+            body: "lacks", signature: "lacks", result: "unknown", fields: "unknown",
+            bases: "unknown", type: "lacks", callable: "lacks",
+          };
+        } else if (ts.isArrowFunction(assigned) || ts.isFunctionExpression(assigned)) {
+          reading = {
+            body: "has", signature: "has", result: "has", fields: "lacks", bases: "lacks",
+            type: "lacks", callable: "has",
+          };
+        }
       }
       if (!reading && ts.isVariableDeclaration(node) && !node.initializer
         && node.parent && ts.isVariableDeclarationList(node.parent)

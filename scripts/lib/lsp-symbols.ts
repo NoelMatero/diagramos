@@ -66,7 +66,6 @@ export function refereeParts(
   python: boolean,
   rust = false,
 ): Record<Part, RefereeReading> {
-  void VALUES;
   if (ROUTINES.has(kind)) {
     const end = bodyText.trimEnd().slice(-1);
     return {
@@ -86,15 +85,112 @@ export function refereeParts(
     };
   }
   /*
-   * A name the server files as a value -- a constant, a variable, a field. Its
-   * kind says nothing about whether it can be called, and `literalValue` below
-   * is what answers that from the declaration's own text.
+   * A name the server files as a value -- a constant, a variable, a field.
+   *
+   * **It is not a type**, and that is the server's own answer rather than a
+   * reading of anything: `Variable`, `Constant`, `Field` and `Property` are
+   * what its name resolution came back with, and a type would have come back
+   * as one of the kinds above (#337). The one shape this cannot see is a name
+   * bound to a class -- `Model = import_model()` -- which pyright files as a
+   * variable and which is a type; the reader refuses those on its own side,
+   * because a value it cannot read the shape of is never judged.
+   *
+   * **Whether anything can call it** is answered from the declaration's own
+   * text, which is the same footing `literalValue` has stood on since #307: a
+   * value written out in full cannot be called, and neither can one whose
+   * written type is spelled out plainly enough that no name resolution could
+   * change the answer.
    */
   const literal = literalValue(bodyText, rust);
+  /*
+   * Only where the server actually said "value". What is left down here
+   * otherwise is a kind that answers none of this -- a type parameter, a file,
+   * an operator -- and a type parameter is a type, so the line above would be
+   * a wrong answer rather than a missing one.
+   */
+  if (!VALUES.has(kind)) {
+    return {
+      body: literal, signature: literal, result: "unknown", fields: "unknown", bases: "unknown",
+      type: literal, callable: literal,
+    };
+  }
+  const callable = literal === "lacks" ? "lacks" : writtenTypeCallable(bodyText, python, rust);
   return {
-    body: literal, signature: literal, result: "unknown", fields: "unknown", bases: "unknown",
-    type: literal, callable: literal,
+    body: callable, signature: callable, result: "unknown", fields: "unknown", bases: "unknown",
+    type: "lacks", callable,
   };
+}
+
+/**
+ * What a value's written type says about calling it, read off the text the
+ * server's own range covers.
+ *
+ * The referee's half of #337, and a text reading on purpose: it starts from
+ * the server's range and the server's kind, where the reader starts from a
+ * tree-sitter `type` field, so the two agree by accident or not at all.
+ *
+ * Rust is read in full -- a value is callable there only where its type says
+ * `fn`, `Fn`, `dyn` or `impl`, or is a bare parameter whose bound is written
+ * elsewhere. Python and TypeScript are read only where the type is spelled out
+ * of words that no `type` statement can rebind, because in those two a name
+ * can be a function type and this has no more idea than the reader does.
+ *
+ * `unknown` for everything else, including a declaration with no type written
+ * on it at all.
+ */
+export function writtenTypeCallable(declaration: string, python: boolean, rust: boolean): RefereeReading {
+  const at = annotatedAt(declaration, rust);
+  if (at === -1) return "unknown";
+  const assigned = assignedAt(declaration, rust);
+  const written = declaration.slice(at + 1, assigned === -1 ? undefined : assigned).trim()
+    .replace(/[,;]\s*$/, "");
+  if (written === "") return "unknown";
+  if (rust) {
+    if (/^[A-Z]\w?$/.test(written)) return "unknown";
+    return /\b(fn|Fn|FnMut|FnOnce|dyn|impl)\b/.test(written) ? "unknown" : "lacks";
+  }
+  // `() => void` and `{ (): void }` are functions written out of punctuation,
+  // and a reading that counts only words would call them plain values.
+  if (/=>|\(/.test(written)) return "unknown";
+  const plain = python
+    ? /^(int|str|bool|float|complex|bytes|bytearray|list|dict|set|frozenset|tuple|None)$/
+    : /^(string|number|boolean|void|null|undefined|symbol|bigint|never|object|true|false|readonly|unique)$/;
+  const words = written.replace(/(["'`])(?:\\.|(?!\1)[\s\S])*\1/g, "").match(/[A-Za-z_]\w*/g) ?? [];
+  return words.every((word) => plain.test(word)) ? "lacks" : "unknown";
+}
+
+/**
+ * Where a declaration writes its type, which is a `:` **outside every
+ * bracket** and before any `=`.
+ *
+ * The same scan `assignedAt` does for the other half of a declaration, and it
+ * has to be the same scan: `on_done: Callable[[int], None]` has two colons
+ * inside brackets, and a Rust path writes `::` with no type after it at all.
+ */
+function annotatedAt(declaration: string, rust: boolean): number {
+  let depth = 0;
+  let quote = "";
+  for (let index = 0; index < declaration.length; index += 1) {
+    const character = declaration[index]!;
+    if (quote) {
+      if (character === "\\") index += 1;
+      else if (character === quote) quote = "";
+      continue;
+    }
+    if (rust && character === "'" && /^'\w+\b(?!')/.test(declaration.slice(index))) continue;
+    if (character === '"' || character === "'" || character === "`") { quote = character; continue; }
+    if ("([{<".includes(character)) { depth += 1; continue; }
+    if (")]}>".includes(character)) { depth -= 1; continue; }
+    if (depth !== 0) continue;
+    if (character === "=") return -1;
+    if (character === ":") {
+      // `std::io::Error` and TypeScript's `a ? b : c` are not annotations.
+      if (declaration[index + 1] === ":") { index += 1; continue; }
+      if (declaration[index - 1] === ":") continue;
+      return index;
+    }
+  }
+  return -1;
 }
 
 /** The value kinds a server files under Variable, Constant, Field or Property. */
