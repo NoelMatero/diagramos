@@ -247,14 +247,26 @@ const CHAIN: Record<string, Tree> = {
 };
 
 describe("a call chain is not the claim's own check", () => {
-  it.each(LANGUAGES)("@calls two hops away is not verified in %s", async (language) => {
+  it.each(LANGUAGES)("@calls two hops away is not confirmed in %s", async (language) => {
     const { ext, files } = CHAIN[language]!;
     const board = await boardOf(`src/api.${ext}#tail`, `src/api.${ext}#head`, "calls", undefined);
-    const { red, notVerified, confirmed } = verdictOf(board, files);
+    const { red, report } = verdictOf(board, files);
 
-    expect(red).toBeUndefined();
-    expect(confirmed).toBe(0);
-    expect(notVerified).toBeDefined();
+    // Not confirmed, which is what #304 is about, and not accused either:
+    // `tail` does reach `head`, two hops out, and the arrow is drawn one
+    // level too high rather than wrongly. Read off the claim's own tally
+    // rather than off `edgesChecked` arithmetic, which counts any arrow
+    // carrying a finding -- a red included -- as though it were confirmed.
+    expect(report.claims.callsConfirmed).toBe(0);
+    /*
+     * Since #329 this arrow is not silent. The closed reading sees `tail`'s
+     * one call land in the far end's file at `mid` rather than at `head`,
+     * which is an accusation -- and the chain walk stops it and leaves the
+     * advisory `calls-refuted` has always left in the same position. Amber,
+     * never red: `calls-one-level-up` is not in `ACCUSING_EDGE_KINDS`.
+     */
+    expect(red?.kind).toBe("calls-one-level-up");
+    expect(red?.detail).toContain("2 steps");
   });
 
   it.each(LANGUAGES)("@needs inside one file is not verified in %s", async (language) => {

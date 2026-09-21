@@ -400,3 +400,149 @@ describe("the position of a call's own name", () => {
     expect(sitesIn(source).flatMap((one) => one.sites)[0]!.nameAt).toBeUndefined();
   });
 });
+
+/**
+ * The name a call comes to rest under, which is not always the name it was
+ * written as (#329).
+ *
+ * `import { render as r }` and `r()` is a call to `render`, and every grammar
+ * here has a form that does this -- TypeScript's `as`, Python's `as`, Rust's
+ * `as`, and a re-export that renames on the way through. The reader used to
+ * record the name at the call site and throw the other one away, so nothing
+ * downstream could tell an aliased call to the right routine from a call to a
+ * different routine that happens to live in the same file. Those are opposite
+ * answers, and one of them is an accusation.
+ */
+describe("the name a call is declared under where it comes to rest", () => {
+  const declaredAs = (
+    source: string,
+    language: Language = "ts",
+    extra: Partial<CallSide> = {},
+  ) => sitesIn(source, language, extra)
+    .find((one) => one.routine === "f")!
+    .sites.map((one) => one.declaredAs);
+
+  it("reads through a barrel that renames on the way past", () => {
+    // `render` here and `paint` there, with a file in between that never
+    // declares either. The rename is the barrel's, and a reader that follows
+    // the specifier without following the name arrives with the wrong one.
+    const files: Record<string, { source: string; language: Language; imports: CallSide["imports"] }> = {
+      "barrel.ts": {
+        source: 'export { paint as render } from "./b";\n',
+        language: "ts",
+        imports: [{ specifier: "./b", file: "b.ts" }],
+      },
+      "b.ts": { source: "export function paint() {}\n", language: "ts", imports: [] },
+    };
+    expect(declaredAs(
+      'import { render } from "./barrel";\nfunction f() {\n  render();\n}\n',
+      "ts",
+      {
+        imports: [{ specifier: "./barrel", file: "barrel.ts" }],
+        open: (file) => files[file],
+      },
+    )).toEqual(["paint"]);
+  });
+
+  it("reads through a Rust module that re-exports under another name", () => {
+    // `pub use ... as` is Rust's barrel, and it renames with the same clause
+    // an ordinary `use` does -- so the walk has to rename at every hop, not
+    // only at the one the call site can see.
+    const files: Record<string, { source: string; language: Language; imports: CallSide["imports"] }> = {
+      "api.rs": {
+        source: "pub use crate::b::render as paint;\n",
+        language: "rust",
+        imports: [{ specifier: "crate::b", file: "b.rs" }, { specifier: "crate::b::render", file: "b.rs" }],
+      },
+      "b.rs": { source: "pub fn render() {}\n", language: "rust", imports: [] },
+    };
+    expect(declaredAs(
+      "use crate::api::paint;\n\nfn f() {\n    paint();\n}\n",
+      "rust",
+      {
+        imports: [{ specifier: "crate::api", file: "api.rs" }, { specifier: "crate::api::paint", file: "api.rs" }],
+        open: (file) => files[file],
+      },
+    )).toEqual(["render"]);
+  });
+
+  it("reads through a Python package that re-exports under another name", () => {
+    const files: Record<string, { source: string; language: Language; imports: CallSide["imports"] }> = {
+      "pkg/__init__.py": {
+        source: "from pkg.b import render as paint\n",
+        language: "python",
+        imports: [{ specifier: "pkg.b", file: "pkg/b.py" }, { specifier: "pkg.b.render", file: "pkg/b.py" }],
+      },
+      "pkg/b.py": { source: "def render():\n    pass\n", language: "python", imports: [] },
+    };
+    expect(declaredAs(
+      "from pkg import paint\n\ndef f():\n    paint()\n",
+      "python",
+      {
+        imports: [{ specifier: "pkg", file: "pkg/__init__.py" }, { specifier: "pkg.paint", file: "pkg/__init__.py" }],
+        open: (file) => files[file],
+      },
+    )).toEqual(["render"]);
+  });
+
+  it("says nothing about a default import, which the far side never named", () => {
+    // `import anything from "./b"` is the importer's own spelling. Reading it
+    // as the far side's name would be an invention, and an accusation resting
+    // on one is a false accusation.
+    expect(declaredAs(
+      'import render from "./b";\nfunction f() {\n  render();\n}\n',
+      "ts",
+      {
+        imports: [{ specifier: "./b", file: "b.ts" }],
+        open: () => ({ source: "export default function paint() {}\n", language: "ts", imports: [] }),
+      },
+    )).toEqual([undefined]);
+  });
+
+  it("says nothing when the resting file could not be opened", () => {
+    expect(declaredAs(
+      'import { render } from "./b";\nfunction f() {\n  render();\n}\n',
+      "ts",
+      { imports: [{ specifier: "./b", file: "b.ts" }] },
+    )).toEqual([undefined]);
+  });
+
+  it("gives an ordinary call its own name, in every grammar", () => {
+    expect(declaredAs("function helper() {}\nfunction f() {\n  helper();\n}\n")).toEqual(["helper"]);
+    expect(declaredAs("def helper():\n    pass\n\ndef f():\n    helper()\n", "python")).toEqual(["helper"]);
+    expect(declaredAs("fn helper() {}\nfn f() {\n    helper();\n}\n", "rust")).toEqual(["helper"]);
+  });
+
+  it("reads through a Rust use alias", () => {
+    expect(declaredAs(
+      "use crate::b::render as r;\n\nfn f() {\n    r();\n}\n",
+      "rust",
+      {
+        imports: [{ specifier: "crate::b", file: "b.rs" }],
+        open: () => ({ source: "pub fn render() {}\n", language: "rust", imports: [] }),
+      },
+    )).toEqual(["render"]);
+  });
+
+  it("reads through a Python import alias", () => {
+    expect(declaredAs(
+      "from b import render as r\n\ndef f():\n    r()\n",
+      "python",
+      {
+        imports: [{ specifier: "b.render", file: "b.py" }],
+        open: () => ({ source: "def render():\n    pass\n", language: "python", imports: [] }),
+      },
+    )).toEqual(["render"]);
+  });
+
+  it("reads through a TypeScript import alias", () => {
+    expect(declaredAs(
+      'import { render as r } from "./b";\nfunction f() {\n  r();\n}\n',
+      "ts",
+      {
+        imports: [{ specifier: "./b", file: "b.ts" }],
+        open: () => ({ source: "export function render() {}\n", language: "ts", imports: [] }),
+      },
+    )).toEqual(["render"]);
+  });
+});

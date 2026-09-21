@@ -74,6 +74,7 @@ const KNOWN_EDGE_KINDS = new Set([
   "builds-backwards",
   "calls-backwards",
   "calls-refuted",
+  "calls-wrong-routine",
   "accesses-absent",
   "accesses-not-read",
   "conforms-absent",
@@ -94,7 +95,8 @@ const KNOWN_EDGE_KINDS = new Set([
  */
 const WRONG_EDGE_KINDS = new Set([
   "backwards-edge", "signature-absent", "holds-absent", "builds-backwards",
-  "calls-backwards", "calls-refuted", "accesses-absent", "accesses-not-read", "conforms-absent",
+  "calls-backwards", "calls-refuted", "calls-wrong-routine",
+  "accesses-absent", "accesses-not-read", "conforms-absent",
   "end-lacks-part",
 ]);
 
@@ -656,6 +658,7 @@ export function rowsOf(report: DriftView): StatusRow[] {
         + (finding.kind === "builds-backwards" ? " · built the other way" : "")
         + (finding.kind === "calls-backwards" ? " · called the other way" : "")
         + (finding.kind === "calls-refuted" ? " · never called" : "")
+        + (finding.kind === "calls-wrong-routine" ? " · calls something else there" : "")
         + (finding.kind === "calls-one-level-up" ? " · reached, not called" : "")
         + (finding.kind === "needs-absent" ? " · never imported" : "")
         + (finding.kind === "needs-one-level-up" ? " · reached, not imported" : "")

@@ -129,12 +129,15 @@ export type ReceiverScore =
  */
 export function scoreReceiverCall(
   landing: Exclude<Landing, { kind: "silent" }>,
-  verdict: "confirmed" | "withheld" | "absent" | "backwards" | "refuted",
+  verdict: "confirmed" | "withheld" | "absent" | "backwards" | "refuted" | "wrong-routine",
 ): ReceiverScore {
   if (landing.kind === "lands") {
     if (verdict === "confirmed") return "agreed";
     if (verdict === "withheld") return "refused";
-    if (verdict === "backwards") return "accused";
+    // The checker says this site does land at the target and the reader said
+    // the arrow is wrong: a false accusation, whichever of the two accusing
+    // verdicts made it (#329).
+    if (verdict === "backwards" || verdict === "wrong-routine") return "accused";
     return "missed";
   }
   if (verdict === "confirmed") return "invented";
