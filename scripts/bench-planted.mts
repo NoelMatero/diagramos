@@ -32,6 +32,7 @@ import { ACCUSING_EDGE_KINDS, checkDrift, createWorkspace, newCheckCache, type C
 import { refereedCheck } from "../src/engine/referee";
 import { initEngine } from "../src/engine/parse";
 import { plantedBoard, plantedKeys, type Key, type KeyClaim } from "./lib/planted-keys";
+import { UNDECIDED_BUCKETS, type Bucket } from "./lib/undecided-buckets";
 
 const REPO = path.resolve(path.dirname(new URL(import.meta.url).pathname), "..");
 const CORPUS = process.env.CORPUS ?? "/Users/noelmatero/board-ai/.corpus";
@@ -66,8 +67,29 @@ function cacheFor(project: string): CheckCache {
   return cache;
 }
 
+/**
+ * Why an undecided arrow was left undecided, in one slug (#320).
+ *
+ * Read off a board carrying that one arrow, so every count in the tally
+ * belongs to it and to nothing else. The slug is what the split is grouped by,
+ * and `UNDECIDED_BUCKETS` has to name every one of them, so a new refusal word
+ * shows up as a labelling job rather than disappearing into an "other" row.
+ */
+function withheldReasons(report: ReturnType<typeof checkDrift>): string[] {
+  const tally = report.claims as unknown as Record<string, unknown>;
+  return Object.entries(tally)
+    .filter(([name]) => name.endsWith("Withheld") || name === "callsNotClosed")
+    // `handlesWithheld` is a list rather than a breakdown, and a list's own
+    // indices are not reasons.
+    .filter(([, breakdown]) => breakdown && !Array.isArray(breakdown))
+    .flatMap(([name, breakdown]) => Object.entries(breakdown as Record<string, number>)
+      .filter(([, count]) => Number(count) > 0)
+      .map(([why]) => (name === "callsNotClosed" ? `not-closed ${why}` : why)))
+    .sort();
+}
+
 /** What the checker said about one arrow, run on a board of its own. */
-async function ask(key: Key, claim: KeyClaim): Promise<{ outcome: Outcome; detail: string }> {
+async function ask(key: Key, claim: KeyClaim): Promise<{ outcome: Outcome; detail: string; reason: string }> {
   const cache = cacheFor(key.project);
   const { workspace } = cache;
   const board = await plantedBoard(key, claim);
@@ -86,23 +108,39 @@ async function ask(key: Key, claim: KeyClaim): Promise<{ outcome: Outcome; detai
   // verdict it was and the first line of why.
   const short = (text: string) => (text.length > 220 ? `${text.slice(0, 220)}…` : text).replace(/\s+/g, " ");
   const finding = report.edges[0];
-  if (finding && ACCUSES.has(finding.kind)) return { outcome: "red", detail: `${finding.kind}: ${short(finding.detail)}` };
-  if (finding) return { outcome: "not sure", detail: `${finding.kind}: ${short(finding.detail)}` };
-  if (report.garbledClaims.length > 0) return { outcome: "not sure", detail: "garbled claim" };
+  if (finding && ACCUSES.has(finding.kind)) {
+    return { outcome: "red", detail: `${finding.kind}: ${short(finding.detail)}`, reason: "" };
+  }
+  const why = withheldReasons(report);
+  if (finding) {
+    return { outcome: "not sure", detail: `${finding.kind}: ${short(finding.detail)}`, reason: `advisory ${finding.kind}` };
+  }
+  if (report.garbledClaims.length > 0) return { outcome: "not sure", detail: "garbled claim", reason: "garbled claim" };
   const unconfirmed = report.unconfirmedEdges[0];
-  if (unconfirmed) return { outcome: "not sure", detail: `unconfirmed: ${unconfirmed.reason}` };
+  if (unconfirmed) {
+    // `claim-not-checked` says only that the claim's own reader declined; the
+    // reason it declined is the thing anybody would have to fix, so it is the
+    // slug (#304, #320).
+    const reason = unconfirmed.reason !== "claim-not-checked"
+      ? `unconfirmed: ${unconfirmed.reason}`
+      // `@builds` goes silent on `absent` without tallying anything, so on
+      // those arrows there is no reason to report at all -- which is itself
+      // the finding, and is labelled as one.
+      : `declined: ${why.length > 0 ? why.join(" + ") : "nothing recorded"}`;
+    return { outcome: "not sure", detail: `unconfirmed: ${unconfirmed.reason}`, reason };
+  }
   const unread = report.unreadEdges[0];
-  if (unread) return { outcome: "not sure", detail: `unread: ${unread.reason}` };
+  if (unread) return { outcome: "not sure", detail: `unread: ${unread.reason}`, reason: `unread: ${unread.reason}` };
   const tally = report.claims as unknown as Record<string, unknown>;
   const confirmations = Object.entries(tally)
     .filter(([name]) => name.endsWith("Confirmed"))
     .reduce((sum, [, value]) => sum + Number(value ?? 0), 0) + report.claims.needsChecked;
-  if (confirmations > 0) return { outcome: "green", detail: "confirmed" };
-  const withheld = Object.entries(tally)
-    .filter(([name]) => name.endsWith("Withheld"))
-    .flatMap(([, breakdown]) => Object.entries((breakdown ?? {}) as Record<string, number>))
-    .filter(([, count]) => count > 0);
-  return { outcome: "silent", detail: withheld.length > 0 ? `withheld: ${withheld[0]![0]}` : "nothing said" };
+  if (confirmations > 0) return { outcome: "green", detail: "confirmed", reason: "" };
+  return {
+    outcome: "silent",
+    detail: why.length > 0 ? `withheld: ${why[0]}` : "nothing said",
+    reason: why.length > 0 ? `declined: ${why.join(" + ")}` : "nothing said",
+  };
 }
 
 interface Row { red: number; unsure: number; green: number; silent: number }
@@ -114,6 +152,8 @@ const bump = (row: Row, outcome: Outcome) => {
   else row.silent++;
 };
 const total = (row: Row) => row.red + row.unsure + row.green + row.silent;
+const sumRed = (rows: Map<string, Row>) => [...rows.values()].reduce((sum, row) => sum + row.red, 0);
+const sumGreen = (rows: Map<string, Row>) => [...rows.values()].reduce((sum, row) => sum + row.green, 0);
 
 function table(title: string, note: string, rows: Map<string, Row>, caught: (row: Row) => number) {
   console.log(`  ${title}`);
@@ -148,6 +188,18 @@ const plantedByKind = new Map<string, Row>();
 const trueByWord = new Map<string, Row>();
 const trueByLanguage = new Map<string, Row>();
 const undecidable = new Map<string, number>();
+/** The split this run exists to print: one undecided claim, by why (#320). */
+interface Split { total: number; byWord: Map<string, number>; byLanguage: Map<string, number> }
+const splitFalse = new Map<string, Split>();
+const splitTrue = new Map<string, Split>();
+const countIn = (map: Map<string, number>, name: string) => map.set(name, (map.get(name) ?? 0) + 1);
+function split(map: Map<string, Split>, claim: KeyClaim, reason: string) {
+  const row = map.get(reason) ?? { total: 0, byWord: new Map(), byLanguage: new Map() };
+  row.total++;
+  countIn(row.byWord, claim.word);
+  countIn(row.byLanguage, claim.language);
+  map.set(reason, row);
+}
 const falseReds: string[] = [];
 const missed: string[] = [];
 const get = (map: Map<string, Row>, name: string) => {
@@ -172,9 +224,12 @@ for (const key of loaded) {
       undecidable.set(claim.why, (undecidable.get(claim.why) ?? 0) + 1);
       continue;
     }
-    const { outcome, detail } = await ask(key, claim);
+    const { outcome, detail, reason } = await ask(key, claim);
     claimsScored++;
     const planted = claim.source !== "drawn" && claim.source !== "labelled";
+    if (outcome === "not sure" || outcome === "silent") {
+      split(claim.truth === "false" ? splitFalse : splitTrue, claim, reason);
+    }
     const where = `${key.project}/${key.topic}`;
     if (claim.truth === "false") {
       bump(get(plantedByWord, claim.word), outcome);
@@ -193,7 +248,7 @@ for (const key of loaded) {
       }
     }
     if (details) console.log(`    ${outcome.padEnd(9)} ${claim.truth.padEnd(6)} ${claim.source.padEnd(10)} `
-      + `@${claim.word} ${claim.from} -> ${claim.to} | ${detail}`);
+      + `${claim.language.padEnd(6)} [${reason}] @${claim.word} ${claim.from} -> ${claim.to} | ${detail}`);
   }
 }
 
@@ -234,5 +289,95 @@ if (missed.length > 0) {
 console.log("  LEFT OUT -- claims the tooling could not decide, by reason");
 for (const [why, count] of [...undecidable.entries()].sort((a, b) => b[1] - a[1]).slice(0, 15)) {
   console.log(`    ${String(count).padStart(5)}  ${why}`);
+}
+console.log();
+
+/*
+ * #320's split: the undecided half, by why, and what the score can reach.
+ *
+ * The four columns above say how often the checker is right. These say what
+ * is in the way of it being right more often, which is a different question
+ * and the one a worklist comes from.
+ */
+const undecidedTotal = (map: Map<string, Split>) => [...map.values()].reduce((sum, row) => sum + row.total, 0);
+const top = (counts: Map<string, number>) => [...counts.entries()]
+  .sort((a, b) => b[1] - a[1]).map(([name, n]) => `${name} ${n}`).join(", ");
+const labelOf = (reason: string) => UNDECIDED_BUCKETS[reason];
+
+console.log(`  UNDECIDED CLAIMS, BY REASON -- ${undecidedTotal(splitFalse)} wrong, ${undecidedTotal(splitTrue)} true`);
+console.log("    what stands between this claim and a verdict. now = a reader stopped short of a fact that is");
+console.log("    in the code; work = it needs a type, an index or a measurement; never = the text does not say.");
+console.log(`    ${"wrong".padStart(7)}${"true".padStart(6)}${"bucket".padStart(8)}${"cost".padStart(6)}  reason`);
+const reasons = [...new Set([...splitFalse.keys(), ...splitTrue.keys()])]
+  .sort((a, b) => (splitFalse.get(b)?.total ?? 0) + (splitTrue.get(b)?.total ?? 0)
+    - (splitFalse.get(a)?.total ?? 0) - (splitTrue.get(a)?.total ?? 0));
+const unlabelled: string[] = [];
+for (const reason of reasons) {
+  const label = labelOf(reason);
+  if (!label) unlabelled.push(reason);
+  const wrong = splitFalse.get(reason)?.total ?? 0;
+  const yes = splitTrue.get(reason)?.total ?? 0;
+  const words = new Map<string, number>();
+  const languages = new Map<string, number>();
+  for (const map of [splitFalse, splitTrue]) {
+    const row = map.get(reason);
+    if (!row) continue;
+    for (const [name, n] of row.byWord) words.set(name, (words.get(name) ?? 0) + n);
+    for (const [name, n] of row.byLanguage) languages.set(name, (languages.get(name) ?? 0) + n);
+  }
+  console.log(`    ${String(wrong).padStart(7)}${String(yes).padStart(6)}`
+    + `${(label?.bucket ?? "?").padStart(8)}${String(label?.cost ?? "").padStart(6)}  ${reason}`);
+  console.log(`             words: ${top(words)}`);
+  console.log(`             languages: ${top(languages)}`);
+  console.log(`             ${label ? label.why : "NOT LABELLED -- add it to scripts/lib/undecided-buckets.ts"}`);
+}
+console.log();
+
+if (unlabelled.length > 0) {
+  console.log(`  UNLABELLED REASONS -- ${unlabelled.length}. Counted as not decidable, which is the safe way to be wrong.`);
+  for (const reason of unlabelled) console.log(`    ${reason}`);
+  console.log();
+}
+
+/** Every undecided claim, by bucket, with the true claims kept apart. */
+const buckets: Record<Bucket, { wrong: number; yes: number }> = {
+  now: { wrong: 0, yes: 0 }, work: { wrong: 0, yes: 0 }, never: { wrong: 0, yes: 0 },
+};
+for (const reason of reasons) {
+  const bucket = labelOf(reason)?.bucket ?? "never";
+  buckets[bucket].wrong += splitFalse.get(reason)?.total ?? 0;
+  buckets[bucket].yes += splitTrue.get(reason)?.total ?? 0;
+}
+
+const decidedNow = sumRed(plantedByWord) + sumGreen(trueByWord);
+const scored = claimsScored;
+const pct = (n: number) => `${((n / scored) * 100).toFixed(0)}%`;
+const bucketTotal = (name: Bucket) => buckets[name].wrong + buckets[name].yes;
+
+console.log("  THE SCORE, AND WHAT IT COULD REACH");
+console.log("    decided correctly = a wrong claim went red, a true claim went green (#320)");
+console.log(`    today                          ${String(decidedNow).padStart(5)} / ${scored}  ${pct(decidedNow)}`);
+console.log(`    + every 'now' claim decided    ${String(decidedNow + bucketTotal("now")).padStart(5)} / ${scored}  `
+  + `${pct(decidedNow + bucketTotal("now"))}`);
+console.log(`    + every 'work' claim decided   ${String(decidedNow + bucketTotal("now") + bucketTotal("work")).padStart(5)} / ${scored}  `
+  + `${pct(decidedNow + bucketTotal("now") + bucketTotal("work"))}   <- the ceiling`);
+console.log(`    out of reach: ${bucketTotal("never")} undecidable (${buckets.never.wrong} wrong, ${buckets.never.yes} true)`
+  + `, and ${missed.length} wrong claims that came back green.`);
+console.log("    Held fixed while that rises: reds on true claims, and greens on wrong claims.");
+console.log();
+
+console.log("  WORKLIST -- fixable reasons, most claims per unit of work first");
+console.log(`    ${"claims".padStart(7)}${"cost".padStart(6)}${"per".padStart(7)}  reason`);
+const work = reasons
+  .map((reason) => {
+    const label = labelOf(reason);
+    const claims = (splitFalse.get(reason)?.total ?? 0) + (splitTrue.get(reason)?.total ?? 0);
+    return { reason, label, claims };
+  })
+  .filter((row) => row.label && row.label.bucket !== "never")
+  .sort((a, b) => b.claims / b.label!.cost - a.claims / a.label!.cost);
+for (const { reason, label, claims } of work) {
+  console.log(`    ${String(claims).padStart(7)}${String(label!.cost).padStart(6)}`
+    + `${(claims / label!.cost).toFixed(1).padStart(7)}  ${reason}`);
 }
 console.log();

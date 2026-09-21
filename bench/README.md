@@ -20,6 +20,29 @@ files -- which is what made it an hour. What one arrow costs, asked twice:
 npm run probe:check-cost                   # cold, and through a held cache
 ```
 
+## The undecided half, and the ceiling (#320)
+
+Half of every claim here comes back neither red nor green, and that one number
+was covering three different situations. The run now ends with the split: every
+reason an arrow was left undecided, how many wrong and true claims it holds,
+which words and languages, and whether anybody could do anything about it —
+
+- **now** — the fact is in the code and a reader stopped short of it.
+- **work** — it needs a type, a crate-wide index, a language server, or the
+  measurement that licenses a word to accuse.
+- **never** — the text does not say. A callback, a macro, a name built at run
+  time, an end the board put outside the repository.
+
+The labels live in `scripts/lib/undecided-buckets.ts`, one line of reasoning
+each, and `tests/bench-planted.test.ts` fails if a refusal word the engine can
+produce has no entry — an unlabelled reason would silently count as hopeless and
+lower the ceiling by exactly the work nobody did.
+
+From that the run prints **the score this project is judged by** — a wrong claim
+went red, a true claim went green — beside what it would be if every fixable
+claim were decided, and a worklist of the fixable reasons ranked by claims per
+unit of work.
+
 ## What is stored
 
 | | |
