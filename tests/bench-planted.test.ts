@@ -18,7 +18,6 @@ import { describe, expect, it } from "vitest";
 
 import { fieldsOf, signatureOf, splitTop, matchBracket, rustImplBlocks } from "../scripts/lib/bench-shapes";
 import { UNDECIDED_BUCKETS } from "../scripts/lib/undecided-buckets";
-import { NOT_CLOSED_WORDS, UNCONFIRMED_WORDS } from "../src/engine/drift";
 import type { Sym } from "../scripts/lib/bench-tooling";
 
 const REPO = path.resolve(__dirname, "..");
@@ -208,25 +207,13 @@ describe("every reason an arrow can be left undecided is labelled (#320)", () =>
    * The point of the split is that "not sure" stops being one number. A refusal
    * word nobody has bucketed would quietly land in "not decidable" and lower the
    * ceiling by exactly as much as the work nobody did, which is the one way this
-   * table can lie. So the two vocabularies that are total records in the engine
-   * are total records here too.
+   * table can lie.
+   *
+   * That every word the engine can produce *has* a line is `tsc`'s job, through
+   * the `Labelled` type in `undecided-buckets.ts` -- checking it here would mean
+   * this file importing the whole engine to compare two lists of strings. What
+   * is left for a test is that the lines say something.
    */
-  it("names every reason a call list could not be closed", () => {
-    const missing = Object.keys(NOT_CLOSED_WORDS)
-      .filter((why) => !(`declined: not-closed ${why}` in UNDECIDED_BUCKETS));
-    expect(missing).toEqual([]);
-  });
-
-  it("names every reason an arrow came back unconfirmed", () => {
-    // `claim-not-checked` is the one that never reaches the table: it says only
-    // that the claim's own reader declined, and the bench reports what that
-    // reader said instead.
-    const missing = Object.keys(UNCONFIRMED_WORDS)
-      .filter((reason) => reason !== "claim-not-checked")
-      .filter((reason) => !(`unconfirmed: ${reason}` in UNDECIDED_BUCKETS));
-    expect(missing).toEqual([]);
-  });
-
   it("gives every label a bucket, a cost and a sentence", () => {
     for (const [reason, label] of Object.entries(UNDECIDED_BUCKETS)) {
       expect(["now", "work", "never"], reason).toContain(label.bucket);

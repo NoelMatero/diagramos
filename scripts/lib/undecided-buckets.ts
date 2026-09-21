@@ -26,8 +26,13 @@
  *
  * The keys are the slugs `bench-planted.mts` groups by. A reason with no entry
  * here is printed as unlabelled and counted against the ceiling as if nothing
- * could be done about it, which is the safe direction to be wrong in.
+ * could be done about it, which is the safe direction to be wrong in -- and for
+ * the two vocabularies the engine writes as total records, `tsc` will not let
+ * that happen at all: see `Labelled` below.
  */
+import type { CallsNotClosed } from "../../src/engine/calls";
+import type { EdgeUnconfirmedReason } from "../../src/engine/drift";
+
 export type Bucket = "now" | "work" | "never";
 
 export interface BucketLabel {
@@ -37,7 +42,27 @@ export interface BucketLabel {
   why: string;
 }
 
-export const UNDECIDED_BUCKETS: Record<string, BucketLabel> = {
+/**
+ * The reasons that may not be forgotten, as a type.
+ *
+ * `NOT_CLOSED_WORDS` and `UNCONFIRMED_WORDS` are total records in `drift.ts` so
+ * that a new refusal word cannot be added without somebody writing down what it
+ * means in English. This is the same gate one step further on: a new word now
+ * also cannot be added without somebody deciding whether it is work or not.
+ *
+ * Type-only, and on purpose. A runtime check would mean the test suite loading
+ * the whole engine to compare two lists of strings, and `tsc` already reads
+ * both.
+ *
+ * `claim-not-checked` is the one reason that never reaches this table: it says
+ * only that the claim's own reader declined, and the bench reports what that
+ * reader said instead.
+ */
+type Labelled =
+  | `declined: not-closed ${CallsNotClosed}`
+  | `unconfirmed: ${Exclude<EdgeUnconfirmedReason, "claim-not-checked">}`;
+
+export const UNDECIDED_BUCKETS: Record<Labelled, BucketLabel> & Record<string, BucketLabel> = {
   // ---- decidable now -------------------------------------------------------
   "declined: not-closed reaches-the-file": { bucket: "now", cost: 1,
     why: "the call list is closed and one call lands in the head's own file at another routine (#329)" },
