@@ -177,6 +177,31 @@ export interface CallsRefutedEvidence {
   sites: number;
 }
 
+/**
+ * Why a `wrong-routine` verdict is entitled to say wrong (#329).
+ *
+ * The closed reading of `refuted`, plus the one thing it used to throw away:
+ * a call that *does* land in the head's file, at a routine the arrow does not
+ * name. That is the strongest position this reader reaches short of refuting
+ * -- the call list is closed, and the one call going anywhere near the far
+ * end demonstrably goes somewhere else -- and it is more useful than either
+ * colour on its own, because the routine it names is the fix.
+ */
+export interface CallsWrongRoutineEvidence {
+  /** The routine whose entire call set was enumerated and found closed. */
+  routine: string;
+  /** 1-based line the routine opens on. */
+  line: number;
+  /** Every call the routine makes, checked and placed. */
+  sites: number;
+  /**
+   * The calls that land in the head's file, and what each one reaches there
+   * -- the far side's own spelling, never the one written at the call site.
+   * Never empty, or this verdict would be `refuted` instead.
+   */
+  reached: Array<{ name: string; line: number }>;
+}
+
 export type CallsVerdict =
   /** The tail calls the routine the arrow points at. */
   | { verdict: "confirmed"; evidence: CallsEvidence }
@@ -202,6 +227,13 @@ export type CallsVerdict =
    * so this is "no call found", never "no call happens". Reported exactly as an
    * unclaimed arrow is.
    */
+  /**
+   * The call set was closed, and a call in it lands in the head's file at a
+   * routine the arrow does not name (#329). `refuted` with the near miss
+   * named: same closed reading, same licence, and a sentence that says what
+   * to draw instead of only what is wrong.
+   */
+  | { verdict: "wrong-routine"; evidence: CallsWrongRoutineEvidence }
   | { verdict: "absent"; notClosed?: CallsNotClosed }
   | { verdict: "withheld"; why: CallsWithheld };
 
@@ -348,6 +380,21 @@ interface Binding {
   specifier: string;
   /** True when the name stands for a module rather than for a routine. */
   namespace: boolean;
+  /**
+   * The name the *other side* declares it under, when the text says (#329).
+   *
+   * `import { render as r }` binds `r` here and names `render` there, and all
+   * four grammars write that shape the same way: a name, and an alias it is
+   * bound as. Until this field existed the alias was recorded and the name
+   * thrown away, so a call written `r()` could be placed in the right file
+   * and never matched against the routine it actually reaches.
+   *
+   * `undefined` is "the text does not say", which is not the same as the
+   * bound name. A default import -- `import anything from "./b"` -- names the
+   * far side nothing at all, and filling that gap in with the local spelling
+   * would be an invention of exactly the kind a verdict must not rest on.
+   */
+  name?: string;
 }
 
 export interface Bindings {
@@ -418,6 +465,31 @@ function bind(into: Bindings, name: string, binding: Binding): void {
   into.imported.set(name, binding);
 }
 
+/**
+ * The two names in a renaming import: what it is called there, what it is
+ * bound as here (#329).
+ *
+ * Every grammar this reader handles spells a rename with the same two fields.
+ * TypeScript's `import_specifier` and `export_specifier`, Python's
+ * `aliased_import` and Rust's `use_as_clause` all carry a `name` (or `path`,
+ * which is a name with a module in front of it) and an `alias`, and the only
+ * difference between them is which of those two field names the grammar
+ * chose. Read as fields rather than as a list of node types, per
+ * docs/reading-a-grammar.md -- a hand-written list of node names is how the
+ * same mistake got made four times in one sitting, and a rename is one idea
+ * in four languages rather than four ideas.
+ *
+ * `bound` is the name in this file's scope and is what a call writes.
+ * `declared` is the name at the far end, and is `undefined` where the text
+ * does not give one.
+ */
+function renamedBy(node: Node): { bound: string; declared?: string } | undefined {
+  const there = node.childForFieldName("name") ?? node.childForFieldName("path");
+  const here = node.childForFieldName("alias") ?? there;
+  if (!here) return undefined;
+  return { bound: here.text, declared: there ? lastSegment(there.text) : undefined };
+}
+
 /** Direct children of a node, which no grammar exposes as an array. */
 function children(node: Node): Node[] {
   const out: Node[] = [];
@@ -448,17 +520,17 @@ function bindTypeScript(root: Node, into: Bindings): void {
      * barrel file followable and the reason this branch exists at all.
      */
     const into_ = isImport ? into.imported : into.forwarded;
-    const record = (name: string, namespace: boolean) => {
-      if (isImport) bind(into, name, { specifier, namespace });
-      else into_.set(name, { specifier, namespace });
+    const record = (bound: string, namespace: boolean, declared?: string) => {
+      if (isImport) bind(into, bound, { specifier, namespace, name: declared });
+      else into_.set(bound, { specifier, namespace, name: declared });
     };
 
     for (const part of children(node)) {
       if (part.type === "export_clause" || part.type === "named_imports") {
         for (const one of children(part)) {
           if (one.type !== "export_specifier" && one.type !== "import_specifier") continue;
-          const alias = one.childForFieldName("alias") ?? one.childForFieldName("name");
-          if (alias) record(alias.text, false);
+          const renamed = renamedBy(one);
+          if (renamed) record(renamed.bound, false, renamed.declared);
         }
         continue;
       }
@@ -472,16 +544,24 @@ function bindTypeScript(root: Node, into: Bindings): void {
       if (part.type !== "import_clause") continue;
       for (const clause of children(part)) {
         if (clause.type === "identifier") {
-          // `import def from "./y"`.
+          /*
+           * `import def from "./y"`. The far side declares this under whatever
+           * name it likes, or under none at all (`export default function
+           * () {}`), and this spelling is the importer's own choice -- so the
+           * declared name is left unsaid rather than guessed at.
+           */
           record(clause.text, false);
         } else if (clause.type === "namespace_import") {
+          // `import * as ns from "./y"`: the alias renames the *module*, and a
+          // member reached through it keeps its own name, so there is no
+          // routine name for this binding to carry.
           const name = children(clause).find((child) => child.type === "identifier");
           if (name) record(name.text, true);
         } else if (clause.type === "named_imports") {
           for (const one of children(clause)) {
             if (one.type !== "import_specifier") continue;
-            const alias = one.childForFieldName("alias") ?? one.childForFieldName("name");
-            if (alias) record(alias.text, false);
+            const renamed = renamedBy(one);
+            if (renamed) record(renamed.bound, false, renamed.declared);
           }
         }
       }
@@ -510,12 +590,16 @@ function bindPython(root: Node, into: Bindings): void {
       for (const part of children(node)) {
         if (part.id === moduleNode.id) continue;
         if (part.type === "dotted_name") {
-          bind(into, lastSegment(part.text), { specifier: `${module}.${part.text}`, namespace: false });
+          bind(into, lastSegment(part.text), {
+            specifier: `${module}.${part.text}`, namespace: false, name: lastSegment(part.text),
+          });
         } else if (part.type === "aliased_import") {
           const name = part.childForFieldName("name");
-          const alias = part.childForFieldName("alias");
-          if (name && alias) {
-            bind(into, alias.text, { specifier: `${module}.${name.text}`, namespace: false });
+          const renamed = renamedBy(part);
+          if (name && renamed) {
+            bind(into, renamed.bound, {
+              specifier: `${module}.${name.text}`, namespace: false, name: renamed.declared,
+            });
           }
         } else if (part.type === "wildcard_import") {
           into.wildcard = true;
@@ -531,6 +615,9 @@ function bindPython(root: Node, into: Bindings): void {
         const head = part.text.split(".")[0]!;
         bind(into, head, { specifier: head, namespace: true });
       } else if (part.type === "aliased_import") {
+        // `import a.b as m`: the alias renames the module, and `m.go()` calls
+        // whatever `go` that module declares -- so this binding carries no
+        // routine name, exactly as a TypeScript namespace import does not.
         const name = part.childForFieldName("name");
         const alias = part.childForFieldName("alias");
         if (name && alias) bind(into, alias.text, { specifier: name.text, namespace: true });
@@ -565,10 +652,10 @@ function bindRust(root: Node, into: Bindings): void {
       }
       case "use_as_clause": {
         const path = node.childForFieldName("path");
-        const alias = node.childForFieldName("alias");
-        if (!path || !alias) return;
+        const renamed = renamedBy(node);
+        if (!path || !renamed) return;
         const full = prefix ? `${prefix}::${path.text}` : path.text;
-        bind(into, alias.text, { specifier: full, namespace: false });
+        bind(into, renamed.bound, { specifier: full, namespace: false, name: renamed.declared });
         return;
       }
       case "use_wildcard": {
@@ -588,7 +675,7 @@ function bindRust(root: Node, into: Bindings): void {
       case "super": {
         const full = prefix ? `${prefix}::${node.text}` : node.text;
         const name = lastSegment(full);
-        if (name) bind(into, name, { specifier: full, namespace: false });
+        if (name) bind(into, name, { specifier: full, namespace: false, name });
         return;
       }
       default:
@@ -985,7 +1072,9 @@ function arrivesAt(
   if (files.size === 0) return "maybe";
   let maybe = false;
   for (const next of files) {
-    const answer = arrivesAt(name, next, side, target, seen, depth + 1);
+    // Under the far side's own spelling where the hop states one: a barrel
+    // that writes `export { paint as render }` is passing on `paint` (#329).
+    const answer = arrivesAt(onward.name ?? name, next, side, target, seen, depth + 1);
     if (answer === "yes") return "yes";
     if (answer === "maybe") maybe = true;
   }
@@ -1007,7 +1096,21 @@ function resolves(
   if (callee.kind === "computed") return "computed";
   if (callee.kind === "bare" && REACHES_ANYTHING.has(callee.name)) return "dynamic";
   if (callee.kind === "through" && REACHES_ANYTHING.has(callee.name)) return "dynamic";
-  if (!target.names.has(callee.name)) return undefined;
+  /*
+   * The gate: is this call even about the name being asked after? It is when
+   * the call site spells it, and also when an import renamed it on the way in
+   * -- `import { render as r }` makes `r()` a call to `render`, and comparing
+   * only the spelling at the call site answered "not this one" to a call
+   * written in plain sight (#329). Every grammar here has the form, so this
+   * is one rule rather than a TypeScript exception.
+   *
+   * Only for a bare name. The alias in `import * as ns` renames the module,
+   * and `ns.foo()` still calls whatever `foo` lives inside it.
+   */
+  const renamedTo = callee.kind === "bare" ? bindings.imported.get(callee.name)?.name : undefined;
+  if (!target.names.has(callee.name) && !(renamedTo !== undefined && target.names.has(renamedTo))) {
+    return undefined;
+  }
 
   /*
    * A member of `self` is a member of whatever the routine belongs to, and that
@@ -1065,7 +1168,7 @@ function resolves(
   // passing the name on from the far end.
   let maybe = false;
   for (const file of files) {
-    const answer = arrivesAt(callee.name, file, side, target.file, new Set());
+    const answer = arrivesAt(imported.name ?? callee.name, file, side, target.file, new Set());
     if (answer === "yes") return "yes";
     if (answer === "maybe") maybe = true;
   }
@@ -1189,6 +1292,7 @@ export function callsBetween(
     return { verdict: "absent", notClosed: "unlicensed" };
   }
   const closed = closedBodyRefutes(from, to);
+  if ("reached" in closed) return { verdict: "wrong-routine", evidence: closed.reached };
   if ("evidence" in closed) return { verdict: "refuted", evidence: closed.evidence };
   return { verdict: "absent", notClosed: closed.why };
 }
@@ -1225,23 +1329,91 @@ export function callsBetween(
 function closedBodyRefutes(
   from: CallSide & { routine: string },
   to: CallSide & { names: string[] },
-): { evidence: CallsRefutedEvidence } | { why: CallsNotClosed } {
+): { evidence: CallsRefutedEvidence } | { reached: CallsWrongRoutineEvidence } | { why: CallsNotClosed } {
   const reading = callSitesIn(from);
   if (!reading.read) return { why: "unreadable" };
   const bodies = reading.bodies.filter((body) => body.routine === from.routine);
   if (bodies.length === 0) return { why: "routine-not-found" };
 
   let sites = 0;
+  const reached: Array<{ name: string; line: number }> = [];
   for (const body of bodies) {
     for (const site of body.sites) {
       // Open: something unplaced, and the site says what stopped it.
       if (site.file === undefined) return { why: site.why ?? "unplaced" };
       if (site.receiver && site.concrete === false) return { why: "abstract-receiver" };
-      if (site.file === to.file) return { why: "reaches-the-file" };
+      if (site.file === to.file) {
+        /*
+         * The near miss (#329). Three ways this can go, and only one of them
+         * is an accusation:
+         *
+         *   the resting name is one of the head's  the call is the arrow's
+         *                                          own, however it was spelt
+         *                                          at the call site -- present,
+         *                                          and not this word's business
+         *   the resting name was never read        the text does not say what
+         *                                          this reaches, so neither
+         *                                          does this reader
+         *   a different routine, named             the thing worth saying
+         */
+        if (site.declaredAs === undefined) return { why: "reaches-the-file" };
+        if (to.names.includes(site.declaredAs)) return { why: "reaches-the-file" };
+        /*
+         * And the head's file has to actually declare a routine by that name
+         * (#329's measurement). `measure:wrong-routine` put every placed name
+         * to a real compiler over `.corpus`: the *name* was never wrong, and
+         * the **file** was wrong 43 times in ~2,700 -- always the same two
+         * shapes, an inherited method placed at the subclass's file
+         * (`subscribe` at `focusManager.ts`, declared in `subscribable.ts`)
+         * and a standard-library method placed at the file its receiver came
+         * from (`find` at `mutation.ts`, declared in `lib.es2015.core.d.ts`).
+         *
+         * The arrow is still not calling the head in either case, so the
+         * verdict would survive. The *sentence* would not: it would name a
+         * routine to point the arrow at that is not in that file at all. An
+         * accusation whose advice is fiction is not an accusation worth
+         * making, so the reader keeps its silence unless it read the
+         * declaration it is about to name.
+         */
+        if (!isRoutine(to.source, site.declaredAs, to.language)) return { why: "reaches-the-file" };
+        reached.push({ name: site.declaredAs, line: site.line });
+      }
       sites += 1;
     }
   }
-  return { evidence: { routine: from.routine, line: bodies[0]!.line, sites } };
+  if (reached.length === 0) {
+    return { evidence: { routine: from.routine, line: bodies[0]!.line, sites } };
+  }
+  /*
+   * An arrow drawn at a **type** is a different mistake and not this one
+   * (#324 counts it separately). `Renderer.paint()` reaches the Renderer box
+   * by any ordinary reading, and only something that runs can be called -- so
+   * a near miss is only a near miss when every name the head stands for is
+   * itself a routine in that file.
+   */
+  if (!to.names.every((name) => isRoutine(to.source, name, to.language))) {
+    return { why: "reaches-the-file" };
+  }
+  return { reached: { routine: from.routine, line: bodies[0]!.line, sites, reached } };
+}
+
+/**
+ * Whether a name is declared as something that runs, rather than as a type
+ * that has running things inside it.
+ *
+ * `routinesNamed` deliberately answers yes for a class or an `impl` block,
+ * because a box drawn at a type is asked about through its methods. This asks
+ * the narrower question #329 needs: the declaration itself takes parameters.
+ * The test is `parse.ts`'s own -- a routine is a declaration with a
+ * `parameters` field, in every grammar here -- rather than a list of node
+ * names one language spells differently.
+ */
+function isRoutine(source: string, name: string, language: Language): boolean {
+  const { routines } = routinesNamed(source, name, language);
+  return routines.some((node) => Boolean(
+    node.childForFieldName("parameters")
+    ?? node.childForFieldName("value")?.childForFieldName("parameters"),
+  ));
 }
 
 /* ------------------------------------------- one body's call sites (#217) */
@@ -1299,6 +1471,23 @@ export interface CallSitePlaced {
    */
   nameAt?: { start: number; end: number };
   /**
+   * The name the callee is declared under **where it comes to rest** -- the
+   * far side's own spelling, not the one written at the call site (#329).
+   *
+   * `import { render as r }` and `r()` gives `render` here. So does a
+   * re-export that renames on the way through. Present only where a
+   * declaration was actually read at the resting file; a file nobody could
+   * open, a specifier placed without finding the declaration, or an import
+   * form that names the far side nothing (a default import) all leave it
+   * unsaid, because the honest answer there is that the text does not say.
+   *
+   * The distinction is the whole of #329: a call placed in the head's file
+   * is either the arrow's routine under another spelling -- which is a
+   * correct arrow -- or a different routine that happens to live next door,
+   * which is a wrong one. Without this they are one answer.
+   */
+  declaredAs?: string;
+  /**
    * Whether this site's `file` came from a `resolveReceiver` answer whose
    * type is a concrete class -- `false` for an interface, an abstract class,
    * or a bare type parameter, `undefined` when the placement did not go
@@ -1346,7 +1535,7 @@ function comesToRest(
   side: CallSide,
   seen: Set<string>,
   depth = 0,
-): string | undefined {
+): Rest | undefined {
   if (seen.has(file) || depth >= FOLLOW_LIMIT) return undefined;
   seen.add(file);
 
@@ -1356,26 +1545,43 @@ function comesToRest(
    * Counted as placed: this reader's own `resolves` treats a resolved specifier
    * as an answer, and being stricter here than the word itself would measure
    * something `@calls` does not do.
+   *
+   * Placed, and `as` left unsaid: a file nobody opened cannot say what it
+   * calls the thing (#329).
    */
-  if (!opened) return file;
+  if (!opened) return { file };
   const bindings = bindingsIn(opened.source, opened.language);
-  if (!bindings) return file;
+  if (!bindings) return { file };
   if (bindings.ambiguous.has(name)) return undefined;
-  if (bindings.local.has(name)) return file;
+  // Declared right here, under this name. The one branch that can say what
+  // the far end calls it, because it read the declaration.
+  if (bindings.local.has(name)) return { file, as: name };
 
   const onward = bindings.imported.get(name) ?? bindings.forwarded.get(name);
   if (!onward) {
     if (bindings.reExported.length > 0) {
       return throughWildcards(name, bindings, opened.imports, side, seen, depth);
     }
-    return bindings.wildcard ? undefined : file;
+    /*
+     * The permissive step, and it stays permissive about the *file* only. This
+     * file neither declares the name nor forwards it and is still counted as
+     * the resting place, which is right for a specifier somebody wrote down --
+     * but nothing here read a declaration, so the name goes unsaid.
+     */
+    return bindings.wildcard ? undefined : { file };
   }
 
   const { files } = filesFor(onward.specifier, opened.imports);
   if (files.size === 0) return undefined;
   for (const next of files) {
-    const rest = comesToRest(name, next, side, seen, depth + 1);
-    if (rest) return rest;
+    const rest = comesToRest(onward.name ?? name, next, side, seen, depth + 1);
+    if (!rest) continue;
+    /*
+     * A hop that did not say what the far side calls it was followed under
+     * the name this side uses, which is a guess about the spelling and not
+     * about the file. The file stands; the name is dropped.
+     */
+    return onward.name ? rest : { file: rest.file };
   }
   return undefined;
 }
@@ -1396,7 +1602,7 @@ function declaresOrForwards(
   side: CallSide,
   seen: Set<string>,
   depth: number,
-): string | undefined {
+): Rest | undefined {
   if (seen.has(file) || depth >= FOLLOW_LIMIT) return undefined;
   seen.add(file);
   const opened = side.open?.(file);
@@ -1404,13 +1610,14 @@ function declaresOrForwards(
   const bindings = bindingsIn(opened.source, opened.language);
   if (!bindings) return undefined;
   if (bindings.ambiguous.has(name)) return undefined;
-  if (bindings.local.has(name)) return file;
+  if (bindings.local.has(name)) return { file, as: name };
   const onward = bindings.imported.get(name) ?? bindings.forwarded.get(name);
   if (onward) {
     const { files } = filesFor(onward.specifier, opened.imports);
     for (const next of files) {
-      const rest = declaresOrForwards(name, next, side, new Set(seen), depth + 1);
-      if (rest) return rest;
+      const rest = declaresOrForwards(onward.name ?? name, next, side, new Set(seen), depth + 1);
+      if (!rest) continue;
+      return onward.name ? rest : { file: rest.file };
     }
     return undefined;
   }
@@ -1448,15 +1655,15 @@ function throughWildcards(
   side: CallSide,
   seen: Set<string>,
   depth: number,
-): string | undefined {
-  let answer: string | undefined;
+): Rest | undefined {
+  let answer: Rest | undefined;
   for (const specifier of bindings.reExported) {
     const { files } = filesFor(specifier, imports);
     if (files.size === 0) return undefined;
     for (const next of files) {
       const rest = declaresOrForwards(name, next, side, new Set(seen), depth + 1);
       if (!rest) continue;
-      if (answer !== undefined && answer !== rest) return undefined;
+      if (answer !== undefined && answer.file !== rest.file) return undefined;
       answer = rest;
     }
   }
@@ -1464,7 +1671,18 @@ function throughWildcards(
 }
 
 /** Where one call site's callee lives, when it can be placed at all. */
-export type Placement = { file: string; concrete?: boolean };
+export type Placement = { file: string; concrete?: boolean; as?: string };
+
+/**
+ * A name's resting place: the file it settles in, and what that file calls it.
+ *
+ * `as` is present only where a declaration was actually read there (#329).
+ * Every other way of arriving -- a file nobody could open, the permissive
+ * step that counts a resolved specifier as placed without finding the
+ * declaration, a hop whose grammar states no far-side name -- places the file
+ * and says nothing about the spelling, because nothing read one.
+ */
+type Rest = { file: string; as?: string };
 
 /**
  * `placeOf`'s local/imported/comesToRest lookup, factored out so a type name a
@@ -1480,11 +1698,15 @@ export type Placement = { file: string; concrete?: boolean };
 export function placeName(name: string, side: CallSide, bindings: Bindings): Placement | { why: SiteUnresolved } {
   if (bindings.ambiguous.has(name)) return { why: "ambiguous" };
   const imported = bindings.imported.get(name);
-  if (!imported) return bindings.local.has(name) ? { file: side.file } : { why: "unbound" };
+  // Declared in this file, under the name written here: nothing renames a
+  // name on its way into its own file.
+  if (!imported) return bindings.local.has(name) ? { file: side.file, as: name } : { why: "unbound" };
   const { files, known } = filesFor(imported.specifier, side.imports);
   if (files.size === 0) return { why: known ? "unplaced" : "unbound" };
-  const settled = settlesOn(name, files, side);
-  return settled ? { file: settled } : { why: "elsewhere" };
+  // Followed under the name the *import* gives it, which is the far side's
+  // spelling wherever the grammar wrote one down (#329).
+  const settled = settlesOn(imported.name ?? name, files, side);
+  return settled ? settled : { why: "elsewhere" };
 }
 
 /**
@@ -1506,7 +1728,7 @@ export function placeName(name: string, side: CallSide, bindings: Bindings): Pla
  * candidate is unaffected either way, which is every TypeScript and Python
  * import in the corpus.
  */
-function settlesOn(name: string, files: Set<string>, side: CallSide): string | undefined {
+function settlesOn(name: string, files: Set<string>, side: CallSide): Rest | undefined {
   if (files.size > 1) {
     for (const file of files) {
       const declares = declaresOrForwards(name, file, side, new Set(), 0);
@@ -1575,15 +1797,26 @@ function placeOf(
   if (REACHES_ANYTHING.has(callee.name)) return { why: "dynamic" };
 
   // A member of `self` is a member of whatever this routine belongs to, and
-  // that is in this file.
-  if (callee.kind === "own") return { file: side.file };
+  // that is in this file, under the name written on it.
+  if (callee.kind === "own") return { file: side.file, as: callee.name };
 
   const bound = callee.kind === "through" ? callee.through : callee.name;
   const at = callee.kind === "through" ? callee.at : undefined;
-  // A resolver is only ever a fallback for a `through` callee -- `bare` and
-  // `own` calls have no receiver expression for one to be asked about.
-  const throughChecker = (): { why: SiteUnresolved } | Placement =>
-    placeThroughChecker(at, side, bindings) ?? { why: "receiver" };
+  /*
+   * A resolver is only ever a fallback for a `through` callee -- `bare` and
+   * `own` calls have no receiver expression for one to be asked about.
+   *
+   * The resolver answers about the **receiver**, so the file it hands back is
+   * where the receiver's type lives and the name reached there is the member
+   * as written: `x.paint()` is a call to `paint`, whatever `x` turned out to
+   * be. A placement's own `as` here would be the type's name, which is a
+   * different question, so it is replaced rather than passed on (#329).
+   */
+  const throughChecker = (): { why: SiteUnresolved } | Placement => {
+    const placed = placeThroughChecker(at, side, bindings);
+    if (!placed) return { why: "receiver" };
+    return "file" in placed ? { ...placed, as: callee.name } : placed;
+  };
 
   // An expression receiver -- `make().run()`, `a.b.c()` -- names nothing to
   // look up. Dynamic dispatch, and the reader cannot say whose method it is --
@@ -1625,7 +1858,7 @@ function placeOf(
      * the text even though the name it is bound to is -- unless a resolver
      * says what it is.
      */
-    if (callee.kind !== "through") return { file: side.file };
+    if (callee.kind !== "through") return { file: side.file, as: callee.name };
     return throughChecker();
   }
 
@@ -1639,8 +1872,15 @@ function placeOf(
     if (callee.kind === "through") return throughChecker();
     return { why: known ? "unplaced" : "unbound" };
   }
-  const settled = settlesOn(callee.name, files, side);
-  if (settled) return { file: settled };
+  /*
+   * Followed under the far side's own spelling for a bare call -- `import
+   * { render as r }` and `r()` is a call to `render` over there (#329). A
+   * member reached through a namespace keeps its own name: the alias in
+   * `import * as ns` renames the module, never what is inside it.
+   */
+  const under = callee.kind === "through" ? callee.name : imported.name ?? callee.name;
+  const settled = settlesOn(under, files, side);
+  if (settled) return settled;
   return callee.kind === "through" ? throughChecker() : { why: "elsewhere" };
 }
 
@@ -1742,7 +1982,11 @@ export function callSitesIn(side: CallSide, only?: string): CallSitesReading {
         ...(callee.kind === "through" ? { memberAt: callee.memberAt } : {}),
         ...(callee.kind === "computed" ? {} : { nameAt: callee.kind === "through" ? callee.memberAt : callee.nameAt }),
         ...("file" in where
-          ? { file: where.file, ...(where.concrete !== undefined ? { concrete: where.concrete } : {}) }
+          ? {
+              file: where.file,
+              ...(where.concrete !== undefined ? { concrete: where.concrete } : {}),
+              ...(where.as !== undefined ? { declaredAs: where.as } : {}),
+            }
           : { why: where.why }),
       });
     });

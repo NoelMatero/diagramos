@@ -894,6 +894,13 @@ function rowsFor({ report, promoted = [] }, colour, all = false) {
        */
       const wrongCallsRefuted = finding.kind === "calls-refuted";
       /*
+       * The same closed reading with the near miss named (#329): the tail
+       * does call into the far end's file, at a routine the arrow does not
+       * name. Its own sentence, because the fix is a different one -- move
+       * the arrow to what is actually called, rather than delete it.
+       */
+      const wrongCallsRoutine = finding.kind === "calls-wrong-routine";
+      /*
        * And the answer that stops both of the two above from being wrong
        * (#reach): the routine does not call the far end and does reach it
        * through a chain. Amber, not red -- a board drawn one level too high
@@ -957,6 +964,7 @@ function rowsFor({ report, promoted = [] }, colour, all = false) {
         + (wrongBuilds ? " \u00b7 built the other way" : "")
         + (wrongCalls ? " \u00b7 called the other way" : "")
         + (wrongCallsRefuted ? " \u00b7 never called" : "")
+        + (wrongCallsRoutine ? " \u00b7 calls something else there" : "")
         + (reachedNotCalled ? " \u00b7 reached, not called" : "")
         + (neverImported ? " \u00b7 never imported" : "")
         + (reachedNotImported || wrongIndirect ? " \u00b7 reached, not imported" : "")
@@ -968,6 +976,7 @@ function rowsFor({ report, promoted = [] }, colour, all = false) {
         + (wrongKindOfEnd ? ` \u00b7 ${wrongKindOfEnd}` : "")
         + (hop ? ` \u00b7 ${hop}` : ""),
         backwards || wrongSignature || wrongHolds || wrongBuilds || wrongCalls || wrongCallsRefuted
+        || wrongCallsRoutine
           || neverImported || wrongIndirect || wrongMembers || wrongUnread || wrongBase || wrongKindOfEnd
           ? "red"
           : "yellow",

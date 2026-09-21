@@ -1012,7 +1012,7 @@ to pass every check this tool had.
 deliberate: almost all of it is `Vec<T>`, `Promise<T>`, `list[str]`, which
 nobody draws as two boxes.
 
-## Forty-two times a measurement contradicted the design
+## Forty-seven times a measurement contradicted the design
 
 Kept because the pattern is the point: eleven of the first thirteen came from
 building one word or one reader, not from reviewing the design. Nothing since
@@ -4134,6 +4134,100 @@ duplicate from conflitcts, requires reading prs "An arrow can be three calls lon
     Python's and Rust's resolvers answer over a language server, which is
     asynchronous and costs seconds. They stay in the CLI, and a Python or
     Rust board checked through the MCP tools still gets the text reading.
+
+47. **A call that reaches the right file at the wrong routine was silence,
+    and the obvious way to end it would have accused correct boards
+    (#329).**
+
+    The closed reading (item 15, #233) enumerates every call a routine makes
+    and says the arrow is wrong when none of them reaches the far end. When
+    one of them reaches the far end's *file* it stopped instead, under its
+    own word `reaches-the-file`. That is the strongest position the reader
+    ever reaches short of refuting: the list is closed, and the one call
+    going anywhere near the far end demonstrably goes somewhere else.
+
+    **The reason it stayed silence is a spelling.** Every grammar here can
+    rename an import -- `import { render as r }`, `from b import render as
+    r`, `use crate::b::render as r`, and a barrel that renames on the way
+    past -- and the reader recorded the alias and threw the far side's name
+    away. So `r()` and `render` looked exactly like a call to a different
+    routine that happens to live in the same file, and those are opposite
+    answers: one is a correct arrow, the other is a wrong one.
+
+    So the work is not the verdict. It is `Binding.name`: the name the other
+    side declares, carried through every import form in all four grammars
+    and renamed again at every hop of a re-export chain, with the walk
+    reporting `declaredAs` only where it actually read a declaration. A
+    default import names the far side nothing at all, and a file nobody
+    could open says nothing either -- both stay silent rather than guess,
+    because a guess is what an accusation would then rest on.
+
+    One rule rather than four: a rename is a `name` field and an `alias`
+    field in every one of these grammars, so `renamedBy` reads the two
+    fields and the three binders share it (docs/reading-a-grammar.md).
+
+    **It confirms before it accuses.** The same missing name was making the
+    reader answer "no call found" to an aliased call written in plain
+    sight -- `resolves` compared the spelling at the call site against the
+    box and stopped there. That is a green this word should always have had,
+    and it is also the guard: a correct arrow over an alias is confirmed,
+    not near-missed.
+
+    **The referee found the thing that needed guarding, and it was not the
+    names.** `npm run measure:wrong-routine` puts every name the reader
+    reports to a real compiler -- `tsc`, pyright, rust-analyzer, the #254
+    referees -- over seventeen of the corpus's trees:
+
+    | | ts | tsx | js | python | rust |
+    |---|---:|---:|---:|---:|---:|
+    | calls landing in another file | 4,025 | 455 | 321 | 5,545 | 15 |
+    | the reader can name the routine | 4,005 | 277 | 19 | 5,265 | 15 |
+    | of those, written under another name | 22 | 0 | 0 | 81 | 0 |
+    | compiler says the **name** is wrong | **0** | **0** | **0** | **0** | **0** |
+    | compiler says the **file** is wrong | 40 | 2 | 0 | 1 | 0 |
+
+    The name was never wrong. The **file** was, 43 times in 2,756 answers,
+    and always one of two shapes: an inherited method placed at the
+    subclass's file (TanStack's `subscribe` at `focusManager.ts`, declared
+    in `subscribable.ts`; nine of vue's `onError` at `transform.ts`,
+    declared in `options.ts`) and a standard-library method placed at the
+    file its receiver came from (`find` at `mutation.ts`, declared in
+    `lib.es2015.core.d.ts`).
+
+    Neither makes the verdict wrong -- the arrow is not calling the head in
+    either case. Both make the **sentence** wrong, because it would name a
+    routine to point the arrow at that is not in that file at all. So the
+    accusation is refused unless the head's file declares a routine by the
+    name it is about to say. That guard costs exactly one caught mistake,
+    which is the whole of its price:
+
+    | `bench:planted`, both arms on `8deffe0` | before | after |
+    |---|---:|---:|
+    | false `@calls` caught red | 62 of 300 | **65** |
+    | every word, caught red | 444 of 855 | **447** |
+    | true claims called wrong | 0 | **0** |
+    | false claims green | 26 | 26 |
+
+    (Without that guard: 66 and 448.)
+
+    **+3, where #324's ranking said 44, and the gap is the interesting
+    part.** That 44 was counted before #328 wired the compiler in. On
+    today's main the shape is 21 arrows: 3 are two routines and go red, and
+    **15 have a head that names a local variable, a loop counter or an
+    interface** -- vue's `deduped` and `i` and `p`, vite's
+    `TransformOptionsInternal` and `importedMod`, flask's `ctx`. Nothing
+    calls those, so "it calls something else in that file" is the wrong
+    sentence for them: they are the `wrong-kind` plant, whose row is 2%
+    caught and whose word is `end-lacks-part` (#297). The verdict refuses
+    every arrow whose head is not itself a routine, and that refusal is what
+    keeps the 15 out.
+
+    **Four trees did not finish**, and are named rather than quietly
+    dropped: `mundane`, `infrarouter` and `nestjs-nest` ran past the
+    eight-minute budget a tree gets, and `excalidraw` exited. The run is one
+    process per tree and keeps each answer, so a second run costs only what
+    is missing -- fifteen repositories in one process ran out of both the
+    JavaScript heap and tree-sitter's WebAssembly one, in that order.
 
 ## Open, in the order worth doing
 

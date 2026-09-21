@@ -256,6 +256,31 @@ export type EdgeFindingKind =
    */
   | "calls-refuted"
   /**
+   * A `calls` arrow whose routine does call into the far end's file, at a
+   * routine the arrow does not name (#329).
+   *
+   * `calls-refuted`'s own reading, carried one step further. The closure is
+   * the same and the licence is the same; what differs is that the closed
+   * call set is not empty of the far *file* -- one call lands there, at
+   * something else. That is the strongest thing this reader ever knows about
+   * a wrong call arrow short of refuting it, and it used to be silence.
+   *
+   * #329 counted 44 arrows of this shape; that was before #328 wired the
+   * compiler into the path the product runs, and on the planted boards today
+   * it is 21. Three of them are two routines, which this catches. Fifteen
+   * have a head that names a local, a loop counter or an interface --
+   * nothing calls those, and `end-lacks-part` is the word for them, so
+   * `closedBodyRefutes` leaves them alone.
+   *
+   * It says which routine, because that sentence is the fix. And it rests on
+   * a name read at the *declaration*, never on the spelling at the call site:
+   * `import { render as r }` makes `r()` a call to `render`, so a comparison
+   * of spellings would call a correct arrow wrong. Where the far side's name
+   * cannot be read -- a default import, a file nothing could open -- the
+   * answer goes back to silence.
+   */
+  | "calls-wrong-routine"
+  /**
    * An `accesses` arrow naming a member the type does not have (#213).
    *
    * The sixth member that means **wrong**, and it is read at the end of the
@@ -407,6 +432,7 @@ export const EDGE_FINDING_KINDS = [
   "builds-backwards",
   "calls-backwards",
   "calls-refuted",
+  "calls-wrong-routine",
   "accesses-absent",
   "accesses-not-read",
   "conforms-absent",
@@ -446,6 +472,7 @@ export const ACCUSING_EDGE_KINDS = [
   "builds-backwards",
   "calls-backwards",
   "calls-refuted",
+  "calls-wrong-routine",
   "accesses-absent",
   "accesses-not-read",
   "conforms-absent",
@@ -806,7 +833,8 @@ export const NOT_CLOSED_WORDS: Record<CallsNotClosed, string> = {
   unreadable: "the calling file could not be read",
   "routine-not-found": "nothing in the calling file declares that routine",
   "abstract-receiver": "one call goes through an interface, so what it reaches is not fixed",
-  "reaches-the-file": "one call does reach that file, at a routine the arrow does not name",
+  "reaches-the-file": "one call does reach that file, at a routine the arrow does not name "
+    + "-- and the text does not say which one",
   computed: "one call picks its target at run time",
   dynamic: "the caller can reach a name that is nowhere in its text",
   receiver: "one call is on a value whose type the text does not give",
@@ -4904,6 +4932,54 @@ export function checkDrift(
                   + `${oneLine(toNode.label) || toPath}, and it is the other way round -- `
                   + `${toPath} line ${verdict.evidence.line} writes `
                   + `\`${verdict.evidence.wrote}\`. Turn the arrow round.`,
+              } });
+              continue;
+            }
+            if (verdict.verdict === "wrong-routine" && edge.state !== "planned") {
+              /*
+               * The near miss (#329). Every guard `refuted` below carries
+               * applies here unchanged, for the same reasons: a plan is not
+               * accused, and an arrow that reaches the far end through a
+               * chain is drawn one level too high rather than wrongly -- and
+               * this verdict is a likelier way to meet that shape than
+               * `refuted` is, because the call landing in the far file is
+               * often the first hop of exactly such a chain.
+               */
+              const throughAChain = reaching();
+              if (throughAChain.verdict === "reached") {
+                edgesChecked += 1;
+                recordEdge(edge, fromNode, toNode,
+                  oneLevelUp(throughAChain.via, throughAChain.hops.length));
+                continue;
+              }
+              edgesChecked += 1;
+              const wasClaimed = baselineGraph?.edges.some(
+                (was) => was.from === edge.from && was.to === edge.to && was.claim === "calls",
+              );
+              const fresh = baselineGraph !== undefined && !wasClaimed;
+              const near = verdict.evidence.reached;
+              const two = near.slice(0, 2);
+              const named = two.map((one) => `\`${one.name}\``).join(" and ");
+              const where = `${fromPath} line${two.length === 1 ? "" : "s"} `
+                + two.map((one) => one.line).join(" and ");
+              recordEdge(edge, fromNode, toNode, { kind: "finding", finding: {
+                from: fromPath,
+                to: toPath,
+                fromLabel: fromNode.label,
+                toLabel: toNode.label,
+                fromRef,
+                toRef,
+                kind: "calls-wrong-routine",
+                detail:
+                  (fresh ? "a claim written this turn is already wrong: " : "")
+                  + `this arrow says ${oneLine(fromNode.label) || fromPath} calls `
+                  + `${oneLine(toNode.label) || toPath}, and every call `
+                  + `${verdict.evidence.routine} makes was checked -- ${verdict.evidence.sites} of `
+                  + `them. ${near.length === 1 ? "The one that reaches" : "The ones that reach"} `
+                  + `${toPath} ${near.length === 1 ? "calls" : "call"} ${named}, not `
+                  + `${toEnd.symbols.join(" or ")} -- ${where}. Point the arrow at `
+                  + `${near[0]!.name}, or call ${toEnd.symbols[0]!} from `
+                  + `${verdict.evidence.routine}.`,
               } });
               continue;
             }

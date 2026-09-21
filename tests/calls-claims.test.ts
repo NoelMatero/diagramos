@@ -271,14 +271,40 @@ describe("an unverified @calls arrow says what stopped the check (#324)", () => 
       .toContain("nothing in the calling file declares that routine");
   });
 
-  it("tells a call that lands in the right file apart from one nothing could read", async () => {
+  it("calls the arrow wrong, and says which routine it actually reaches (#329)", async () => {
     /*
      * `run` really does call into `src/b.ts` -- at `other`, not at the
-     * `render` the arrow names. That is a fact about the code, and a
-     * different sentence from any of the reader's own refusals.
+     * `render` the arrow names. The whole call list was read, so this is not
+     * a doubt: it is the arrow being wrong, with the right arrow named.
+     *
+     * This was silence until #329, and the silence was the point of the
+     * issue: 44 of the planted mistakes the checker misses are this shape.
      */
     const caller = 'import { other } from "./b";\nexport function run() { return other(); }\n';
     const callee = "export function other() { return 1; }\nexport function render() { return 2; }\n";
+    const board = await boardOf("src/a.ts#run", "src/b.ts#render", { claim: "calls" });
+    const report = checkDrift(board, fakeWorkspace({
+      "src/a.ts": caller, "src/b.ts": callee,
+    }), { edges: true });
+
+    const finding = report.edges.find((edge) => edge.kind === "calls-wrong-routine");
+    expect(finding).toBeDefined();
+    expect(finding?.detail).toContain("calls `other`, not render");
+    expect(finding?.detail).toContain("src/a.ts line 2");
+    expect(report.claims.callsNotClosed["reaches-the-file"]).toBeUndefined();
+  });
+
+  it("stays silent on the same shape when the far side never named what it exports", async () => {
+    /*
+     * The same landing, and the reader cannot say what it reached: a default
+     * export has no name on this side of the import, so `paint` here is the
+     * importer's own spelling and nothing in the text says which routine it
+     * reaches. That is the honest case for the old word, and the guard that
+     * keeps the new verdict off a correct arrow written under an alias.
+     */
+    const caller = 'import paint from "./b";\nexport function run() { return paint(); }\n';
+    const callee = "export default function other() { return 1; }\n"
+      + "export function render() { return 2; }\n";
     const board = await boardOf("src/a.ts#run", "src/b.ts#render", { claim: "calls" });
     const report = checkDrift(board, fakeWorkspace({
       "src/a.ts": caller, "src/b.ts": callee,

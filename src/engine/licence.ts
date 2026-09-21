@@ -1884,6 +1884,15 @@ export function relationTotals(
  * items 12-14. Asking for an axis no word has is not a special case: an
  * unmeasured `NOT_DESIGNED_YET` row answers `false` the same way an
  * unlisted word does.
+ *
+ * **This axis licenses two verdicts, not one (#329).** `refuted` is the
+ * closed call set with the far end absent from it. `wrong-routine` is the
+ * same closed call set with a call landing in the far end's *file*, at a
+ * routine the arrow does not name. Same closure, same reader, same licence
+ * -- what the second one adds is a comparison of names, and that comparison
+ * has a number of its own: `npm run measure:wrong-routine` puts every name
+ * the reader reports to a real compiler, because a name read wrong is a
+ * routine named wrong in an accusation (docs/claim-vocabulary.md item 47).
  */
 export function mayAccuse(
   relation: AccusingRelation,

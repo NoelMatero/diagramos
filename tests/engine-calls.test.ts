@@ -447,21 +447,25 @@ describe("an absent verdict says which wall the reading hit (#324)", () => {
     expect(verdict.notClosed).toBe("abstract-receiver");
   });
 
-  it("says reaches-the-file when a call lands there at a routine the arrow does not name", () => {
+  it("says reaches-the-file when the call lands there and the reader cannot name what it reaches", () => {
     /*
      * The one reason here that is not the reading falling short. `run` does
-     * call into `src/b.ts` -- just at `other`, not at the `render` the arrow
-     * names. Worth its own word because it is the only one of the five that
-     * describes the code rather than the reader, and 30 of the 170 are it.
+     * call into `src/b.ts` -- just not at the `render` the arrow names.
+     *
+     * Where the far side's own spelling *can* be read, this is no longer
+     * silence: it is the `wrong-routine` verdict (#329), and its own group
+     * below carries those shapes. What is left under this word is the case
+     * that keeps it honest -- a default import, which the far side never
+     * named, so nothing here can say which routine the call reaches.
      */
     const verdict = ask({
       "src/a.ts": {
-        source: 'import { other } from "./b";\nexport function run() { return other(); }\n',
+        source: 'import other from "./b";\nexport function run() { return other(); }\n',
         language: "ts",
         imports: [["./b", "src/b.ts"]],
       },
       "src/b.ts": {
-        source: "export function other() { return 1; }\nexport function render() { return 2; }\n",
+        source: "export default function paint() { return 1; }\nexport function render() { return 2; }\n",
         language: "ts",
       },
     }, { file: "src/a.ts", routine: "run" }, { file: "src/b.ts", names: ["render"] });
@@ -807,5 +811,149 @@ describe("what a name in a file is bound to", () => {
     // question with the first answer.
     expect(bindingsIn("import a.b\n", "python")!.imported.get("a")?.namespace).toBe(true);
     expect(bindingsIn("import a.b\n", "ts")!.imported.has("a")).toBe(false);
+  });
+});
+
+/**
+ * A call written under an alias is still a call to the routine it reaches
+ * (#329).
+ *
+ * Every grammar here can rename a name on the way in, and the reader used to
+ * compare the spelling at the call site against the name on the far box and
+ * stop there. So a correct arrow over an aliased import came back as *no call
+ * found* -- silence on something written in plain sight, and the same
+ * mismatch that a closed-body reading would otherwise turn into an
+ * accusation.
+ */
+describe("a call written under a name the importer chose", () => {
+  it("confirms a TypeScript call through `import { render as r }`", () => {
+    const verdict = ask({
+      "src/a.ts": {
+        source: 'import { render as r } from "./b";\nexport function run() { return r(1); }\n',
+        language: "ts",
+        imports: [["./b", "src/b.ts"]],
+      },
+      "src/b.ts": { source: "export function render(n: number) { return n; }\n", language: "ts" },
+    }, { file: "src/a.ts", routine: "run" }, { file: "src/b.ts", names: ["render"] });
+
+    expect(verdictOf(verdict)).toBe("confirmed");
+  });
+
+  it("confirms a Python call through `from b import render as r`", () => {
+    const verdict = ask({
+      "app/a.py": {
+        source: "from app.b import render as r\n\ndef run():\n    return r(1)\n",
+        language: "python",
+        imports: [["app.b", "app/b.py"], ["app.b.render", "app/b.py"]],
+      },
+      "app/b.py": { source: "def render(n):\n    return n\n", language: "python" },
+    }, { file: "app/a.py", routine: "run" }, { file: "app/b.py", names: ["render"] });
+
+    expect(verdictOf(verdict)).toBe("confirmed");
+  });
+
+  it("confirms a Rust call through `use crate::b::render as r`", () => {
+    const verdict = ask({
+      "src/a.rs": {
+        source: "use crate::b::render as r;\n\npub fn run() -> u32 { r(1) }\n",
+        language: "rust",
+        imports: [["crate::b", "src/b.rs"], ["crate::b::render", "src/b.rs"]],
+      },
+      "src/b.rs": { source: "pub fn render(n: u32) -> u32 { n }\n", language: "rust" },
+    }, { file: "src/a.rs", routine: "run" }, { file: "src/b.rs", names: ["render"] });
+
+    expect(verdictOf(verdict)).toBe("confirmed");
+  });
+});
+
+/**
+ * The call that reaches the right file at the wrong routine (#329).
+ *
+ * The strongest position this reader is ever in about a wrong call arrow
+ * short of refuting it, and it used to be silence: the tail's whole call list
+ * was read, every call in it was placed, and the one call that goes anywhere
+ * near the far end demonstrably goes to a different routine in that file.
+ *
+ * It is silence no longer -- but only where the spelling question is settled.
+ * A call named `r()` that reaches `render` is a **correct** arrow, and telling
+ * the two apart is what `declaredAs` is for. Every test that follows the first
+ * one is a shape where the answer must stay quiet.
+ */
+describe("a closed call set that lands in the head's file at another routine", () => {
+  it("names the routine the call actually reaches", () => {
+    const verdict = ask({
+      "src/a.ts": {
+        source: 'import { other } from "./b";\nexport function run() { return other(); }\n',
+        language: "ts",
+        imports: [["./b", "src/b.ts"]],
+      },
+      "src/b.ts": {
+        source: "export function other() { return 1; }\nexport function render() { return 2; }\n",
+        language: "ts",
+      },
+    }, { file: "src/a.ts", routine: "run" }, { file: "src/b.ts", names: ["render"] });
+
+    expect(verdictOf(verdict)).toBe("wrong-routine");
+    if (verdict.verdict !== "wrong-routine") return;
+    expect(verdict.evidence.reached.map((one) => one.name)).toEqual(["other"]);
+    expect(verdict.evidence.reached[0]!.line).toBe(2);
+    expect(verdict.evidence.sites).toBe(1);
+  });
+
+  it("stays quiet when the call is the head's routine under an alias", () => {
+    // The false accusation this whole piece of work exists to avoid: `r()` is
+    // `render`, the arrow is right, and a spelling comparison calls it wrong.
+    const verdict = ask({
+      "src/a.ts": {
+        source: 'import { render as r } from "./b";\nexport function run() { return r(); }\n',
+        language: "ts",
+        imports: [["./b", "src/b.ts"]],
+      },
+      "src/b.ts": {
+        source: "export function other() { return 1; }\nexport function render() { return 2; }\n",
+        language: "ts",
+      },
+    }, { file: "src/a.ts", routine: "run" }, { file: "src/b.ts", names: ["render"] });
+
+    expect(verdictOf(verdict)).toBe("confirmed");
+  });
+
+  it("stays quiet when the resting name was never read", () => {
+    // A default import: the far side named it nothing, so what `paint()`
+    // reaches over there is not in this text at all.
+    const verdict = ask({
+      "src/a.ts": {
+        source: 'import paint from "./b";\nexport function run() { return paint(); }\n',
+        language: "ts",
+        imports: [["./b", "src/b.ts"]],
+      },
+      "src/b.ts": {
+        source: "export default function render() { return 2; }\n",
+        language: "ts",
+      },
+    }, { file: "src/a.ts", routine: "run" }, { file: "src/b.ts", names: ["render"] });
+
+    expect(verdictOf(verdict)).toBe("absent");
+    if (verdict.verdict !== "absent") return;
+    expect(verdict.notClosed).toBe("reaches-the-file");
+  });
+
+  it("stays quiet when the far box names a type rather than a routine", () => {
+    // `Renderer.paint()` does reach the Renderer box, and only something that
+    // runs can be called -- an arrow drawn at a class is its own kind of
+    // mistake (#324) and not this verdict's business.
+    const verdict = ask({
+      "src/a.ts": {
+        source: 'import { Renderer } from "./b";\nexport function run() { return Renderer.paint(); }\n',
+        language: "ts",
+        imports: [["./b", "src/b.ts"]],
+      },
+      "src/b.ts": {
+        source: "export class Renderer {\n  static paint() { return 2; }\n}\n",
+        language: "ts",
+      },
+    }, { file: "src/a.ts", routine: "run" }, { file: "src/b.ts", names: ["Renderer"] });
+
+    expect(verdictOf(verdict)).toBe("absent");
   });
 });
