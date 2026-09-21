@@ -17,6 +17,7 @@ import path from "node:path";
 import { describe, expect, it } from "vitest";
 
 import { fieldsOf, signatureOf, splitTop, matchBracket, rustImplBlocks } from "../scripts/lib/bench-shapes";
+import { UNDECIDED_BUCKETS } from "../scripts/lib/undecided-buckets";
 import type { Sym } from "../scripts/lib/bench-tooling";
 
 const REPO = path.resolve(__dirname, "..");
@@ -199,4 +200,25 @@ describe("an arrow alone is judged as it is on its own board", () => {
         .toBe(verdict(whole, edge.from, edge.to));
     }
   }, 120_000);
+});
+
+describe("every reason an arrow can be left undecided is labelled (#320)", () => {
+  /*
+   * The point of the split is that "not sure" stops being one number. A refusal
+   * word nobody has bucketed would quietly land in "not decidable" and lower the
+   * ceiling by exactly as much as the work nobody did, which is the one way this
+   * table can lie.
+   *
+   * That every word the engine can produce *has* a line is `tsc`'s job, through
+   * the `Labelled` type in `undecided-buckets.ts` -- checking it here would mean
+   * this file importing the whole engine to compare two lists of strings. What
+   * is left for a test is that the lines say something.
+   */
+  it("gives every label a bucket, a cost and a sentence", () => {
+    for (const [reason, label] of Object.entries(UNDECIDED_BUCKETS)) {
+      expect(["now", "work", "never"], reason).toContain(label.bucket);
+      expect([1, 2, 3], reason).toContain(label.cost);
+      expect(label.why.length, reason).toBeGreaterThan(20);
+    }
+  });
 });
