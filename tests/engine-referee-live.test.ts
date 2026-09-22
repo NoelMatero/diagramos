@@ -12,7 +12,7 @@
  * it changes an answer, that a right arrow does not turn red on the way, and
  * that whichever check the board got, the board can say which one it was.
  */
-import { mkdirSync, mkdtempSync, rmSync, writeFileSync } from "node:fs";
+import { mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import path from "node:path";
 
@@ -24,6 +24,7 @@ import { checkDrift, createWorkspace } from "../src/engine/drift";
 import { initEngine } from "../src/engine/parse";
 import { refereedCheckLive, refereeSentence } from "../src/engine/referee-live";
 import { installExcalifontMeasurer } from "./helpers/excalifont";
+import { assertFreshCliBundle } from "./helpers/fresh-bundle";
 
 installExcalifontMeasurer();
 
@@ -227,5 +228,26 @@ describe("saying which check the board got (#334)", () => {
       .toBe("checked against the text only (rust-analyzer did not answer)");
     expect(refereeSentence({ answered: ["typescript"], silent: ["rust"], nothingToAsk: false }))
       .toBe("checked with the TypeScript compiler; rust-analyzer did not answer, so those arrows got the text reading");
+  });
+});
+
+describe("the packaged build", () => {
+  /*
+   * The reason this never happened, pinned so it cannot happen again.
+   *
+   * The resolvers lived under `scripts/`, the product lives under `src/`, and
+   * the product may not import from the harness that measures it. The visible
+   * consequence was that only the standalone `check-drift` CLI ever asked
+   * pyright or rust-analyzer anything: the shipped MCP server -- the thing
+   * that runs when Claude draws a board and when anybody calls `check_drift`
+   * -- carried no language-server code at all.
+   */
+  it("puts the Python and Rust referees in the server the product ships, not only the CLI", () => {
+    assertFreshCliBundle();
+    for (const entry of ["out/cli/server.mjs", "out/cli/drift.mjs"]) {
+      const bundle = readFileSync(path.resolve(import.meta.dirname, "..", entry), "utf8");
+      expect(bundle, `${entry} should be able to start pyright`).toContain("pyright-langserver");
+      expect(bundle, `${entry} should be able to start rust-analyzer`).toContain("createRustAnalyzerReferee");
+    }
   });
 });

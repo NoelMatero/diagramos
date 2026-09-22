@@ -83,7 +83,8 @@
     "bench:claims:draw": "tsx scripts/draw-claim-fixtures.mts",
     "probe:referee-cost": "tsx scripts/probe-referee-cost.mts",
     "probe:lsp-board-cost": "tsx scripts/probe-lsp-board-cost.mts",
-    "probe:python-slow": "tsx scripts/probe-python-slow.mts"
+    "probe:python-slow": "tsx scripts/probe-python-slow.mts",
+    "probe:receiver-wall": "NODE_OPTIONS=--max-old-space-size=8192 tsx scripts/probe-receiver-wall.mts"
   },
   "dependencies": {
     "@modelcontextprotocol/sdk": "^1.29.0",

@@ -41,9 +41,14 @@ import {
   pointsAtLines,
   pointsAtQualified,
   UNCONFIRMED_WORDS,
+  type ClosedBodyReferee,
+  type DriftReport,
   type UnconfirmedEdge,
 } from "../engine/drift";
-import { refereedCheck } from "../engine/referee";
+import {
+  liveRefereePool, refereeSentence, refereedCheckLive, SERVER_BUDGET_MS,
+  type RefereeNote,
+} from "../engine/referee-live";
 import { createGitTrail, type FollowedRef } from "../engine/follow";
 import { computeHonestGaps } from "../engine/gaps";
 import { loadConverter } from "../engine/convert";
@@ -594,6 +599,37 @@ function unconfirmedArrowNote(unconfirmed: ReadonlyArray<UnconfirmedEdge>): Reco
  * typo, a garbled claim is a word no check can read, planned work is on purpose,
  * and the arrows are information about anchoring rather than anything wrong.
  */
+/**
+ * One language-server pool for the life of this process (#337).
+ *
+ * This server checks the same workspace over and over -- every draw, every
+ * edit that moves an anchor, every `check_drift`. Starting pyright or
+ * rust-analyzer per check would pay the only cost that matters each time:
+ * a server loading a project is 1.0s to 4.1s on the boards measured for #337,
+ * and the questions themselves are tens of milliseconds. Held, the first board
+ * that needs one pays the start for every board after it.
+ *
+ * The deadline is asked per check rather than fixed here, which is why
+ * `refereePool` takes a function: a number would mean this process refusing to
+ * start a server ever again twelve seconds after it booted.
+ */
+const SERVERS = liveRefereePool(() => Date.now() + SERVER_BUDGET_MS);
+
+/**
+ * A board checked with everything this repository can be asked, and a note
+ * saying what that turned out to be.
+ *
+ * Every draw-time check in this file goes through here, so a board drawn, a
+ * board re-anchored and a board explicitly checked all get the same answer --
+ * which they did not before #337: Python and Rust got the text reading from
+ * all three, and said nothing about it.
+ */
+function checkedHere(
+  run: (referee?: ClosedBodyReferee) => DriftReport,
+): Promise<{ report: DriftReport; checkedWith: RefereeNote }> {
+  return refereedCheckLive(WORKSPACE_ROOT, run, { pool: SERVERS });
+}
+
 function drawTimeNotes(drawn: {
   findings: ReadonlyArray<{ node: string; label?: string; ref: string; kind: string; detail: string }>;
   edges: ReadonlyArray<{ kind: string; detail: string }>;
@@ -603,7 +639,7 @@ function drawTimeNotes(drawn: {
   followed: ReadonlyArray<FollowedRef>;
   conceptAnchored?: number;
   conceptBoxes?: number;
-}): Record<string, unknown> {
+}, checkedWith?: RefereeNote): Record<string, unknown> {
   /*
    * Build output is reported apart from the rest, because the advice differs.
    *
@@ -624,7 +660,16 @@ function drawTimeNotes(drawn: {
     (finding) => finding.kind !== "generated-ref" && !pointsAtLines(finding) && !pointsAtQualified(finding),
   );
   return {
-    // First, because it decides whether anything below was checked at all (#287).
+    /*
+     * Which check this was (#334). A board checked with a compiler and a board
+     * checked without one are not the same claim, and until #337 they looked
+     * identical -- a Python board got the text reading here and said nothing,
+     * while the same board checked from the terminal got pyright's answer.
+     * Reported whenever a second opinion was in play, so that "quiet" and
+     * "quiet because nothing was asked" stop reading the same.
+     */
+    ...(checkedWith ? { checkedWith: refereeSentence(checkedWith) } : {}),
+    // Then this, because it decides whether anything below was checked at all (#287).
     ...(drawn.conceptAnchored
       ? {
           conceptPointsHere:
@@ -860,7 +905,7 @@ server.registerTool(
       // too -- see unconfirmedArrowNote for why that stopped being a review
       // matter the day the amber went away.
       await initEngine();
-      const drawn = refereedCheck(WORKSPACE_ROOT, (referee) =>
+      const { report: drawn, checkedWith } = await checkedHere((referee) =>
         checkDrift(result.board, createWorkspace(WORKSPACE_ROOT), {
           trail: createGitTrail(WORKSPACE_ROOT),
           ...(referee ? { closedBodyReferee: referee } : {}),
@@ -880,7 +925,7 @@ server.registerTool(
         // a setting that applied itself without saying so is one the caller
         // cannot tell from one that was ignored.
         direction: result.direction,
-        ...drawTimeNotes(drawn),
+        ...drawTimeNotes(drawn, checkedWith),
         ...(result.replacedCount
           ? {
               replaced: { diagrams: result.replacedDiagrams, elements: result.replacedCount },
@@ -1102,6 +1147,8 @@ server.registerTool(
       const workItems: Array<Record<string, unknown>> = [];
       const promotions: Array<Record<string, unknown>> = [];
       const conceptBoards: string[] = [];
+      // Which check each board in this call actually got (#334).
+      const checksGot: RefereeNote[] = [];
       // Boards that contradict themselves. Kept per board rather than pooled:
       // the one thing a caller must do with this is open that file.
       const damaged: Array<{ board: string; summary: string; faults: BindingFault[] }> = [];
@@ -1119,7 +1166,7 @@ server.registerTool(
         // referee), and asking git the same question twice per board is a
         // cost nobody gets anything for.
         const baseline = createGitBaseline(WORKSPACE_ROOT, file);
-        const report = refereedCheck(WORKSPACE_ROOT, (referee) => checkDrift(board, workspace, {
+        const { report, checkedWith } = await checkedHere((referee) => checkDrift(board, workspace, {
           coverage,
           trail,
           baseline,
@@ -1127,6 +1174,10 @@ server.registerTool(
           ...(ledger ? { ledger } : {}),
           ...(referee ? { closedBodyReferee: referee } : {}),
         }));
+        // Boards in one call can differ: the first pays for a server, a later
+        // one may settle on the text alone and need none. Kept apart so the
+        // summary can say so rather than average them away.
+        checksGot.push(checkedWith);
         totals.checked += report.checked;
         totals.skipped += report.skipped;
         totals.excused += report.excused;
@@ -1235,6 +1286,17 @@ server.registerTool(
 
       return text({
         boards: files.map((file) => relativeToWorkspace(file)),
+        /*
+         * Which check these boards got (#334). Before #337 a Python or Rust
+         * board was checked here without ever asking a compiler what a value
+         * was, and the answer looked exactly like one that had. Reported per
+         * distinct answer, because boards in one call can differ: the first to
+         * need a server pays for it, and a board that settles on the text
+         * alone needs none.
+         */
+        ...(checksGot.length
+          ? { checkedWith: [...new Set(checksGot.map(refereeSentence))] }
+          : {}),
         // First in the object, so a reader meets it before `clean`. A board
         // that renders blank can pass every check below this line.
         ...(damaged.length
@@ -1526,11 +1588,12 @@ server.registerTool(
       // against, so it is owed the same answer as a ref edit.
       if ((touchedAnchors && result.updated.length) || describes) {
         await initEngine();
-        notes = drawTimeNotes(refereedCheck(WORKSPACE_ROOT, (referee) =>
+        const edited = await checkedHere((referee) =>
           checkDrift(result.board, createWorkspace(WORKSPACE_ROOT), {
             trail: createGitTrail(WORKSPACE_ROOT),
             ...(referee ? { closedBodyReferee: referee } : {}),
-          })));
+          }));
+        notes = drawTimeNotes(edited.report, edited.checkedWith);
       }
       return text({
         wrote: relativeToWorkspace(file),
