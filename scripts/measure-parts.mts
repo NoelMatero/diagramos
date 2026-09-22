@@ -508,7 +508,7 @@ for (const tree of roots) {
     });
     if (referee) {
       const first = pythonFiles[0]!;
-      await referee.warmUp(first, readFileSync(first, "utf8"), 0);
+      await referee.warmUp([{ file: first, source: readFileSync(first, "utf8"), start: 0 }]);
     }
     let silent = 0;
     const batch = 8;

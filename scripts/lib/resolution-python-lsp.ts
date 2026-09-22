@@ -281,12 +281,20 @@ export interface PyrightLspReferee {
    * Pays this referee's one warm-up cost -- pyright's own binder needs real
    * time before it answers a position it would otherwise get right, and
    * every other query is given a short retry budget on the assumption this
-   * one already paid it. Call once per tree, before any real query, at a
-   * position known to have a real answer; a caller that skips this still
-   * gets correct answers, just at `WARMUP_RETRY_MS` cost on however many of
-   * its first queries land before the binder catches up on its own.
+   * one already paid it. Call once per tree, before any real query.
+   *
+   * Takes *several* positions rather than one (#337). A caller rarely knows
+   * which of its positions pyright can answer, and a position it can never
+   * answer is indistinguishable from a binder that has not run -- so warming
+   * up at a single unlucky position pays the whole 15.75-second ladder for
+   * nothing. `warmUpAcross` sweeps them all before paying for a rung; pass as
+   * many as are cheap, in the order the caller would ask them anyway.
+   *
+   * A caller that skips this still gets correct answers, just at
+   * `WARMUP_RETRY_MS` cost on however many of its first queries land before
+   * the binder catches up on its own.
    */
-  warmUp(file: string, source: string, start: number): Promise<void>;
+  warmUp(candidates: readonly WarmUpCandidate[]): Promise<void>;
   /**
    * How many `typeDefinition` answers this referee has withheld because the
    * line they pointed at declares no type (#259) -- the cost of that rule,
@@ -309,6 +317,54 @@ interface PendingRequest {
 
 /** How long any one request may take before this referee gives up on it. */
 const REQUEST_TIMEOUT_MS = 20_000;
+
+/**
+ * Wait for pyright's binder by asking several positions, not one (#337).
+ *
+ * Nothing tells a client when pyright has finished binding a workspace -- see
+ * the note on `WARMUP_RETRY_MS` below -- so the only way to find out is to ask
+ * something and see whether the answer is real. That makes "not bound yet" and
+ * "no answer exists here" indistinguishable from a single position, and the
+ * ladder resolves the ambiguity the expensive way: it assumes the former and
+ * sleeps 15.75 seconds before concluding the latter.
+ *
+ * Asked at one position that happens to have no answer, that is the whole cost
+ * with nothing to show for it. `encode-httpx/client-send` spent 16.0 seconds
+ * in `warmUp` and then answered all 97 of its real questions in 247ms, because
+ * `resolvePythonReceivers` warmed up at `queries[0]` -- whichever receiver the
+ * board drew first -- and that one was unanswerable.
+ *
+ * Several positions tell the two apart. A bound server answers *something*
+ * across a sweep, and a sweep is cheap: a position with no answer comes back
+ * in single-figure milliseconds, so the whole sweep costs less than the first
+ * rung. A rung is paid only when every candidate came back empty, which is the
+ * case the ladder was written for.
+ *
+ * Worst case is unchanged -- a tree where nothing answers still pays the whole
+ * ladder, once -- so this can only make a warm-up shorter, never longer.
+ */
+/** One position the warm-up sweep may ask about. */
+export interface WarmUpCandidate { file: string; source: string; start: number }
+
+/** How many positions a warm-up sweep asks about before paying for a rung. */
+export const WARM_UP_CANDIDATES = 8;
+
+export async function warmUpAcross<T>(
+  candidates: readonly T[],
+  /** Whether this position came back with a real answer. */
+  ask: (candidate: T) => Promise<boolean>,
+  retryMs: readonly number[],
+  sleep: (ms: number) => Promise<void> = (ms) => new Promise((resolve) => { setTimeout(resolve, ms); }),
+): Promise<boolean> {
+  if (candidates.length === 0) return false;
+  for (let attempt = 0; ; attempt += 1) {
+    for (const candidate of candidates) {
+      if (await ask(candidate)) return true;
+    }
+    if (attempt >= retryMs.length) return false;
+    await sleep(retryMs[attempt]!);
+  }
+}
 
 export async function createPyrightLspReferee(root: string): Promise<PyrightLspReferee> {
   const child: ChildProcessWithoutNullStreams = spawn(
@@ -489,7 +545,17 @@ export async function createPyrightLspReferee(root: string): Promise<PyrightLspR
     methodDeclarationAt: (file, source, start) => ask("definition", file, source, start, STEADY_RETRY_MS),
     methodDeclarationLocationAt: (file, source, start) =>
       askLocation("definition", file, source, start, STEADY_RETRY_MS),
-    warmUp: (file, source, start) => ask("typeDefinition", file, source, start, WARMUP_RETRY_MS).then(() => {}),
+    /*
+     * Each candidate asked with no ladder of its own (`[]`), so a sweep costs
+     * what an unanswerable position costs -- single-figure milliseconds each.
+     * The ladder lives in `warmUpAcross`, between sweeps, where a sleep buys
+     * the binder time rather than re-asking a position that has no answer.
+     */
+    warmUp: (candidates) => warmUpAcross(
+      candidates.slice(0, WARM_UP_CANDIDATES),
+      async (one) => (await askLocation("typeDefinition", one.file, one.source, one.start, [])) !== undefined,
+      WARMUP_RETRY_MS,
+    ).then(() => {}),
     withheldNoType: () => withheldNoType,
     documentSymbols: async (file) => {
       for (const wait of [0, ...STEADY_RETRY_MS]) {

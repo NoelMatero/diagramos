@@ -25,7 +25,7 @@ import path from "node:path";
 
 import { refereePool, type RefereePool } from "./resolution-definitions";
 import {
-  createPyrightLspReferee, isOutsideTree,
+  createPyrightLspReferee, isOutsideTree, WARM_UP_CANDIDATES,
   type PyrightLspReferee,
 } from "./resolution-python-lsp";
 
@@ -162,9 +162,19 @@ export async function resolvePythonReceivers(
     return { cache: { get: () => undefined }, close: () => {}, started: false, withheldNoType: 0 };
   }
 
-  const first = queries[0]!;
+  /*
+   * Several positions, not just `queries[0]` (#337). Which receiver a board
+   * happens to draw first says nothing about whether pyright can place it, and
+   * warming up at one it cannot costs the whole 15.75-second ladder before a
+   * single real question is asked -- `encode-httpx/client-send` paid 16.0s for
+   * that and then answered its 97 questions in 247ms.
+   */
   try {
-    await referee.warmUp(path.resolve(root, first.file), sourceOf(first.file), first.at.start);
+    await referee.warmUp(queries.slice(0, WARM_UP_CANDIDATES).map((query) => ({
+      file: path.resolve(root, query.file),
+      source: sourceOf(query.file),
+      start: query.at.start,
+    })));
   } catch {
     // Warming up only buys speed; every query below still gets its own answer.
   }

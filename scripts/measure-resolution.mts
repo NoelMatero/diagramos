@@ -842,7 +842,7 @@ for (const tree of trees) {
     if (lspReferee) {
       const startedAt = Date.now();
       const first = collectedPyAll[0]!;
-      await lspReferee.warmUp(first.absolute, pySourcesAll.get(first.file)!, first.start);
+      await lspReferee.warmUp([{ file: first.absolute, source: pySourcesAll.get(first.file)!, start: first.start }]);
 
       /*
        * A progress line, not silence: every other referee in this file

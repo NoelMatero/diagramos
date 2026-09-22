@@ -39,7 +39,7 @@
 import { readFileSync } from "node:fs";
 import path from "node:path";
 
-import { createPyrightLspReferee } from "./resolution-python-lsp";
+import { createPyrightLspReferee, WARM_UP_CANDIDATES } from "./resolution-python-lsp";
 import { cargoRootsIn } from "./resolution-rust-receivers";
 import { createRustAnalyzerReferee, isOutsideRustTree, type RustLspReferee } from "./resolution-rust-lsp";
 import { isOutsideTree } from "./resolution-ts";
@@ -190,9 +190,12 @@ export async function resolvePythonDefinitions(
   const referee = await mine.get(root, () => createPyrightLspReferee(root));
   if (!referee) return EMPTY;
 
-  const first = queries[0]!;
   try {
-    await referee.warmUp(path.resolve(root, first.file), sourceOf(first.file), first.at.start);
+    await referee.warmUp(queries.slice(0, WARM_UP_CANDIDATES).map((query) => ({
+      file: path.resolve(root, query.file),
+      source: sourceOf(query.file),
+      start: query.at.start,
+    })));
   } catch {
     // Warming up only buys speed; every query below still gets its own answer.
   }

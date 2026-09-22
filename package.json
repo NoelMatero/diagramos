@@ -81,7 +81,9 @@
     "trace:reach": "tsx scripts/trace-reach.mts",
     "bench:claims": "tsx scripts/bench-claims.mts",
     "bench:claims:draw": "tsx scripts/draw-claim-fixtures.mts",
-    "probe:referee-cost": "tsx scripts/probe-referee-cost.mts"
+    "probe:referee-cost": "tsx scripts/probe-referee-cost.mts",
+    "probe:lsp-board-cost": "tsx scripts/probe-lsp-board-cost.mts",
+    "probe:python-slow": "tsx scripts/probe-python-slow.mts"
   },
   "dependencies": {
     "@modelcontextprotocol/sdk": "^1.29.0",
