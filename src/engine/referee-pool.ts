@@ -258,15 +258,24 @@ export function refereePool<T extends { close(): void }>(
    * Degrading this way costs confirmations in the crates that were not
    * reached and can never produce a wrong answer, which is the direction
    * everything here errs in.
+   *
+   * A function rather than a number when the pool outlives the check (#337).
+   * The MCP server holds one pool for the life of the process so the servers
+   * in it stay warm between checks, and a deadline fixed at construction
+   * would mean that process refusing to start a server ever again fifteen
+   * seconds after it booted. Asked per call, each check gets its own.
    */
-  until?: number,
+  until?: number | (() => number),
 ): RefereePool<T> {
   const open = new Map<string, Promise<T | undefined>>();
+  const deadline = (): number | undefined =>
+    (typeof until === "function" ? until() : until);
   return {
     get(key, start) {
       let held = open.get(key);
       if (!held) {
-        if (until !== undefined && Date.now() >= until) return Promise.resolve(undefined);
+        const by = deadline();
+        if (by !== undefined && Date.now() >= by) return Promise.resolve(undefined);
         held = start().catch(() => undefined);
         open.set(key, held);
       }
