@@ -29,10 +29,25 @@ const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "../..")
  *
  * Generous because the first start pays for the module graph and the viewer's
  * first read, and because failing early here means falling back to "no board",
- * which is a worse answer than a slow one.
+ * which is a worse answer than a slow one. A start costs ~0.3s on an idle
+ * laptop, so fifteen seconds is already fifty times the real price.
+ *
+ * `DIAGRAMOS_START_TIMEOUT_MS` raises it for a machine that cannot promise even
+ * that. The suite sets it, because a shared CI runner with twenty test files
+ * each spawning `tsx` is not the machine this default was measured on -- and the
+ * failure it produces is the one vitest.config.ts already names: a red run that
+ * goes green when you rerun it, teaching everyone to rerun it.
+ *
+ * Read at the call and not at import, so the answer cannot depend on whether
+ * this module was loaded before or after the environment was set.
  */
 const START_TIMEOUT_MS = 15_000;
 const POLL_MS = 100;
+
+function startTimeoutMs(): number {
+  const asked = Number(process.env.DIAGRAMOS_START_TIMEOUT_MS);
+  return Number.isFinite(asked) && asked > 0 ? asked : START_TIMEOUT_MS;
+}
 
 /**
  * Where a detached service writes what it would have printed.
@@ -317,6 +332,23 @@ async function spawnService(root: string, options: EnsureOptions): Promise<{ por
   child.on("error", () => undefined);
 
   /*
+   * A service that died is not a service that is slow, and until this was
+   * watched the difference was invisible: the wait below ran its full length
+   * either way and then said "did not come up within 15s", which sends whoever
+   * reads it looking for a slow machine when the reason is one line in the log.
+   *
+   * Safe to treat as fatal because on a healthy start this process stays alive:
+   * from source it is a `tsx` shim that supervises the grandchild which actually
+   * registers, and measured here it outlives the start rather than handing over
+   * and exiting. The wait below still gives the registry one last look before
+   * believing it, for the race where the grandchild registered as the shim went.
+   */
+  let died: string | undefined;
+  child.on("exit", (code, signal) => {
+    died = signal ? `killed by ${signal}` : `exited with code ${code}`;
+  });
+
+  /*
    * Wait for a service that serves this project, not for one with the pid we
    * were handed. From source the command is a `tsx` shim that re-execs, so the
    * process that registers is a grandchild and the pid here never appears in the
@@ -325,13 +357,32 @@ async function spawnService(root: string, options: EnsureOptions): Promise<{ por
    * Waiting on the port we asked for would be wrong for the same shape of
    * reason: the service may have been pushed onto an ephemeral one.
    */
-  const deadline = Date.now() + START_TIMEOUT_MS;
+  const timeout = startTimeoutMs();
+  const deadline = Date.now() + timeout;
   while (Date.now() < deadline) {
     const found = await findServing(root);
     if (found) return found;
+    if (died) throw new Error(`the board service ${died}${await logTail()}`);
     await new Promise((resolve) => setTimeout(resolve, POLL_MS));
   }
-  throw new Error(`the board service did not come up within ${START_TIMEOUT_MS / 1000}s — see ${logFile()}`);
+  throw new Error(
+    `the board service did not come up within ${timeout / 1000}s — see ${logFile()}${await logTail()}`,
+  );
+}
+
+/**
+ * The end of the service log, for an error that has to survive its machine.
+ *
+ * Naming the file is enough on a laptop and useless anywhere else: a CI runner
+ * is thrown away with the log still on it, so twice now a start failed and the
+ * only record of why went with the runner. The log is shared by every start in
+ * a registry, so this is the last few lines of it rather than of one start --
+ * still the difference between a diagnosis and a rerun.
+ */
+async function logTail(lines = 10): Promise<string> {
+  const text = await fs.readFile(logFile(), "utf8").catch(() => "");
+  const tail = text.trimEnd().split("\n").slice(-lines).join("\n").trim();
+  return tail ? `\n--- the end of ${logFile()} ---\n${tail}` : "";
 }
 
 /**
@@ -341,7 +392,9 @@ async function spawnService(root: string, options: EnsureOptions): Promise<{ por
  * would make every later start wait the full timeout and then spawn anyway. Set
  * above the start timeout so a slow but honest start is never overtaken.
  */
-const LOCK_STALE_MS = START_TIMEOUT_MS + 5_000;
+function lockStaleMs(): number {
+  return startTimeoutMs() + 5_000;
+}
 
 /**
  * Claims the right to start a service for this project.
@@ -352,7 +405,8 @@ const LOCK_STALE_MS = START_TIMEOUT_MS + 5_000;
  */
 async function acquireStartLock(root: string): Promise<() => Promise<void>> {
   const file = path.join(registryDir(), `start-${hash(root)}.lock`);
-  const deadline = Date.now() + LOCK_STALE_MS;
+  const stale = lockStaleMs();
+  const deadline = Date.now() + stale;
   await fs.mkdir(registryDir(), { recursive: true }).catch(() => undefined);
 
   while (Date.now() < deadline) {
@@ -366,7 +420,7 @@ async function acquireStartLock(root: string): Promise<() => Promise<void>> {
         .stat(file)
         .then((stats) => Date.now() - stats.mtimeMs)
         .catch(() => Number.POSITIVE_INFINITY);
-      if (age > LOCK_STALE_MS) {
+      if (age > stale) {
         await fs.rm(file, { force: true }).catch(() => undefined);
         continue;
       }
