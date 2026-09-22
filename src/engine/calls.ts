@@ -65,6 +65,7 @@
  *   re-exports, barrels    the name binds to a file that forwards    -> `elsewhere`
  *   macros                 the call site is generated, not written   -> `macro`
  */
+import { providedByLanguage } from "./builtins";
 import { mayAccuse } from "./licence";
 import { each, parseSource, type Language, type Node, type Tree } from "./parse";
 
@@ -114,6 +115,19 @@ export type CallsWithheld =
    * wildcard import, a global, an ambient declaration.
    */
   | "unbound"
+  /**
+   * The name is called and the *routine* is what binds it: a parameter, or a
+   * value the body set before calling it.
+   *
+   * Apart from `unbound` because the two send a reader to opposite places
+   * (#337). `unbound` says the origin is missing from the text and somebody
+   * could go and find it -- a wildcard import leads to a file, a built-in to a
+   * table. This says the origin is right there on the line above and is a
+   * *value*, so what runs depends on whoever called, and no amount of reading
+   * this file settles it. Counting the second as the first put nine sites of
+   * one vite middleware into a bucket labelled "wildcard imports to follow".
+   */
+  | "local-callee"
   /**
    * The name is bound twice over: declared here *and* imported, or imported
    * from two places. Which one the call means is not in the text.
@@ -907,6 +921,76 @@ function calleeOfNode(callee: Node): Callee {
   };
 }
 
+/**
+ * The names a routine binds for itself: its parameters, and whatever its body
+ * sets before using it (#337).
+ *
+ * Read as *fields*, per docs/reading-a-grammar.md, because a list of node
+ * types is the mistake that file exists to describe. Three fields carry every
+ * binding in all four grammars:
+ *
+ *   `name`      TypeScript's `variable_declarator`, Python's
+ *               `default_parameter`, a nested `function_declaration`
+ *   `pattern`   Rust's `parameter` and `let_declaration`, TypeScript's
+ *               `required_parameter`
+ *   `left`      Python's `assignment`, which spells the same idea a third way
+ *
+ * A `type` field is never descended into, and that is not a detail: Rust puts
+ * the binding and its type on one node, so a walk that took every identifier
+ * under `parameters` would bind `Mystery` from `fn f(x: Mystery)` and then
+ * place a call on it.
+ *
+ * Generous by design. A name collected here that is not really a binding
+ * turns a site's reason from `unbound` into `local-callee`, and both leave the
+ * body open -- so the cost of over-reading is a ranking that is wrong about
+ * the reason, never a verdict that is wrong about the code.
+ */
+function boundByRoutine(routine: Node): Set<string> {
+  const bound = new Set<string>();
+  const take = (node: Node): void => {
+    if (node.childCount === 0) {
+      if (NAME_LEAF.test(node.type)) bound.add(node.text);
+      return;
+    }
+    for (const child of children(node)) take(child);
+  };
+  /**
+   * Inside the parameter list every name is a binding, so the leaves are taken
+   * whether a field points at them or not -- Python writes `def f(hook)` as a
+   * bare `identifier` under `parameters` with no field on it at all, which is
+   * the "where there is no field, read the structure" half of the rule.
+   */
+  const walkParameters = (node: Node): void => {
+    const type = node.childForFieldName("type");
+    if (node.childCount === 0) { take(node); return; }
+    for (const child of children(node)) {
+      if (type && child.id === type.id) continue;
+      walkParameters(child);
+    }
+  };
+  /**
+   * Inside the body only a field says "binding". A bare identifier there is a
+   * *use*, and taking those would bind every name the routine mentions --
+   * which would make `local-callee` mean nothing at all.
+   */
+  const walkBody = (node: Node): void => {
+    for (const field of ["name", "pattern", "left"]) {
+      const named = node.childForFieldName(field);
+      if (named) take(named);
+    }
+    const type = node.childForFieldName("type");
+    for (const child of children(node)) {
+      if (type && child.id === type.id) continue;
+      walkBody(child);
+    }
+  };
+  const parameters = routine.childForFieldName("parameters");
+  if (parameters) walkParameters(parameters);
+  const body = routine.childForFieldName("body");
+  if (body) walkBody(body);
+  return bound;
+}
+
 /** 1-based line of a byte offset, counted the way an editor counts. */
 const lineOf = (source: string, offset: number) => source.slice(0, offset).split("\n").length;
 
@@ -1427,7 +1511,8 @@ function isRoutine(source: string, name: string, language: Language): boolean {
  */
 export type SiteUnresolved = Extract<
   CallsWithheld,
-  "computed" | "dynamic" | "receiver" | "unbound" | "ambiguous" | "unplaced" | "elsewhere" | "macro"
+  "computed" | "dynamic" | "receiver" | "unbound" | "local-callee" | "ambiguous" | "unplaced"
+  | "elsewhere" | "macro"
 >;
 
 /** One call written in a body, and whether the reader can say what it reaches. */
@@ -1792,6 +1877,14 @@ function placeOf(
   callee: Callee,
   side: CallSide,
   bindings: Bindings,
+  /**
+   * The names the enclosing routine binds -- `boundByRoutine`. Optional, and
+   * absent only where there is no routine to ask: `resolves` answers per ask
+   * and never holds a body node. A site left `unbound` there rather than
+   * `local-callee` reports the same openness under a coarser word, which is
+   * the one asymmetry between the two readers and is why it is written down.
+   */
+  scope?: ReadonlySet<string>,
 ): Placement | { why: SiteUnresolved } {
   if (callee.kind === "computed") return { why: "computed" };
   if (REACHES_ANYTHING.has(callee.name)) return { why: "dynamic" };
@@ -1849,7 +1942,30 @@ function placeOf(
   if (imported && callee.kind === "through" && !imported.namespace) return throughChecker();
   if (!imported) {
     if (!bindings.local.has(bound)) {
-      if (callee.kind !== "through") return { why: "unbound" };
+      if (callee.kind !== "through") {
+        /*
+         * The routine's own binding first: a parameter or a local holds a
+         * *value*, and `unbound` would send a reader looking for an import
+         * that is not missing (#337).
+         */
+        if (scope?.has(bound)) return { why: "local-callee" };
+        /*
+         * Before the doubt: is this a name the *language* put here (#337)?
+         * `isinstance`, `Number`, `Ok` -- nothing imported them because
+         * nothing has to, and there is no file in any repository they could
+         * reach. Placed outside the repository, which lets a body close and
+         * can never be what an arrow reaches.
+         *
+         * Not while a wildcard import is in the file. That brings in names
+         * nothing can enumerate, one of which may be a `list` of the
+         * repository's own, and which one the call means is then not in the
+         * text -- the doubt `throughWildcards` already refuses on.
+         */
+        if (!bindings.wildcard && providedByLanguage(bound, side.language)) {
+          return { file: EXTERNAL_RECEIVER };
+        }
+        return { why: "unbound" };
+      }
       return throughChecker();
     }
     /*
@@ -1955,6 +2071,7 @@ export function callSitesIn(side: CallSide, only?: string): CallSitesReading {
      * another's.
      */
     if (only !== undefined && name.text !== only) { bodies.push(body); return; }
+    const scope = boundByRoutine(node);
     each(node, (inner) => {
       /*
        * A macro's arguments are loose tokens rather than a tree, so a call
@@ -1974,7 +2091,7 @@ export function callSitesIn(side: CallSide, only?: string): CallSitesReading {
       }
       const callee = calleeOf(inner) ?? constructedBy(inner);
       if (!callee) return;
-      const where = placeOf(callee, side, bindings);
+      const where = placeOf(callee, side, bindings, scope);
       body.sites.push({
         name: callee.kind === "computed" ? "" : callee.name,
         line: lineOf(side.source, inner.startIndex),
