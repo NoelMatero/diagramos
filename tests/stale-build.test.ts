@@ -150,18 +150,25 @@ describe("asking for a board service", () => {
     return JSON.parse(await fs.readFile(path.join(state, `${pid}.json`), "utf8"));
   }
 
+  /*
+   * Sixty seconds, not the suite's thirty, because three of these start two
+   * services in one test and a start is allowed to take twenty-five under load.
+   * At thirty, vitest cuts the second start off and reports a test that timed
+   * out, which says nothing about which of the two starts was slow.
+   */
+
   it("records which build started it", async () => {
     const service = await ensureBoardServer({ root: work, file: board, startedBy: "a test" });
     const recorded = await entryFor(service.pid);
     expect(recorded.build).toMatchObject({ version: TOOL_VERSION });
-  }, 30_000);
+  }, 60_000);
 
   it("hands back the same service when nothing has changed", async () => {
     const first = await ensureBoardServer({ root: work, file: board, startedBy: "a test" });
     const second = await ensureBoardServer({ root: work, file: board, startedBy: "a test" });
     expect(second.pid).toBe(first.pid);
     expect(second.retired ?? []).toEqual([]);
-  }, 30_000);
+  }, 60_000);
 
   it("replaces a service left behind by another release, and says why", async () => {
     const first = await ensureBoardServer({ root: work, file: board, startedBy: "a test" });
@@ -179,7 +186,7 @@ describe("asking for a board service", () => {
     // is how a pile of invisible services starts.
     const { running } = await listServers();
     expect(running.map((entry) => entry.pid)).toEqual([second.pid]);
-  }, 30_000);
+  }, 60_000);
 
   it("replaces a service whose code was rebuilt underneath it", async () => {
     const first = await ensureBoardServer({ root: work, file: board, startedBy: "a test" });
@@ -193,7 +200,55 @@ describe("asking for a board service", () => {
     const second = await ensureBoardServer({ root: work, file: board, startedBy: "a test" });
     expect(second.pid).not.toBe(first.pid);
     expect(second.retired?.join(" ")).toMatch(/rebuilt since it started/);
-  }, 30_000);
+  }, 60_000);
+});
+
+describe("a board service that never comes up", () => {
+  let state: string;
+  let work: string;
+
+  beforeEach(async () => {
+    state = await fs.mkdtemp(path.join(os.tmpdir(), "diagramos-dead-state-"));
+    process.env.DIAGRAMOS_STATE_DIR = state;
+    // A project with code in it and no board. The service refuses to start on
+    // one, which is the cheapest real way to watch a start fail.
+    work = await fs.realpath(await fs.mkdtemp(path.join(os.tmpdir(), "diagramos-dead-work-")));
+    await fs.mkdir(path.join(work, "src"), { recursive: true });
+    await fs.writeFile(path.join(work, "src/a.ts"), "export function one() { return 1; }\n");
+  });
+
+  afterEach(async () => {
+    for (const entry of (await listServers()).running) await stopServer(entry);
+    delete process.env.DIAGRAMOS_STATE_DIR;
+    await fs.rm(state, { recursive: true, force: true });
+    await fs.rm(work, { recursive: true, force: true });
+  });
+
+  it("says the service died instead of waiting out the clock", async () => {
+    /*
+     * The failure this replaces cost two CI runs and told us nothing. A start
+     * that ended in milliseconds was reported as one that "did not come up
+     * within 15s", so the message accused the machine of being slow and named a
+     * log file on a runner that had already been thrown away.
+     *
+     * Both halves matter and they fail separately: the wait has to notice the
+     * child is gone, and the error has to carry the reason rather than a path
+     * to it.
+     */
+    const began = Date.now();
+    await expect(ensureBoardServer({ root: work, startedBy: "a test" })).rejects.toThrow(
+      /the board service exited with code|killed by/,
+    );
+    // Well inside the ceiling, which is the whole point: it stopped because the
+    // service was gone, not because it ran out of patience.
+    expect(Date.now() - began).toBeLessThan(5_000);
+  }, 60_000);
+
+  it("carries the end of the log, not a path to a machine you may not have", async () => {
+    await expect(ensureBoardServer({ root: work, startedBy: "a test" })).rejects.toThrow(
+      /no boards found/,
+    );
+  }, 60_000);
 });
 
 describe("reading a board that a newer build drew", () => {

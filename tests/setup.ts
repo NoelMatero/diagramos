@@ -51,6 +51,23 @@ process.env.DIAGRAMOS_PORT = String(
   }),
 );
 
+/*
+ * And longer than fifteen seconds to call a board service dead.
+ *
+ * A start costs ~0.3s on an idle laptop. The product waits fifty times that
+ * before giving up, and CI still crossed it twice in two days -- on two
+ * different tests, on branches that touched neither -- because twenty test
+ * files each spawning `tsx` on a shared runner is not the machine that default
+ * was measured on.
+ *
+ * Raised here rather than in the product: a person waiting on a board should
+ * not wait half a minute to be told there is none. Twenty-five seconds keeps it
+ * under the thirty-second test budget, so a slow start still reports itself
+ * instead of being cut off by vitest with a less useful sentence. Inherited by
+ * every subprocess a test spawns, same as the two above.
+ */
+process.env.DIAGRAMOS_START_TIMEOUT_MS = "25000";
+
 beforeAll(async () => { await initEngine(); });
 
 afterAll(async () => {
