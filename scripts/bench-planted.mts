@@ -6,6 +6,22 @@
  *
  *   npm run bench:planted
  *   npm run bench:planted -- --language=rust --word=calls --details
+ *   npm run bench:planted -- --source=wrong-kind
+ *
+ * ## The two halves of the same question
+ *
+ * The four columns below say how often the checker is right. Two tables under
+ * them say why, and they are one ranking read from both ends (#320, #337):
+ *
+ * - **CAUGHT, BY VERDICT** -- which check produced each accusation.
+ * - **UNDECIDED CLAIMS, BY REASON** -- what stood between every other claim
+ *   and a verdict, in the reader's own word for it, with the words and the
+ *   languages it fell on.
+ *
+ * Every filter above narrows both, so a ranking for one word or one kind of
+ * planted mistake is one run and nobody has to write a throwaway script to
+ * get it: `--word=calls` is the `@calls` wall list, `--source=wrong-kind` is
+ * the arrows pointed at the wrong kind of thing.
  *
  * Reads the boards and the stored answer keys and calls no model and no
  * language server: the keys were built once by `bench-planted-key.mts`, from
@@ -109,7 +125,9 @@ async function ask(key: Key, claim: KeyClaim): Promise<{ outcome: Outcome; detai
   const short = (text: string) => (text.length > 220 ? `${text.slice(0, 220)}…` : text).replace(/\s+/g, " ");
   const finding = report.edges[0];
   if (finding && ACCUSES.has(finding.kind)) {
-    return { outcome: "red", detail: `${finding.kind}: ${short(finding.detail)}`, reason: "" };
+    // The verdict that caught it, in the same field the undecided half uses
+    // for the wall it stopped at: one arrow, one line, whichever way it went.
+    return { outcome: "red", detail: `${finding.kind}: ${short(finding.detail)}`, reason: finding.kind };
   }
   const why = withheldReasons(report);
   if (finding) {
@@ -135,7 +153,7 @@ async function ask(key: Key, claim: KeyClaim): Promise<{ outcome: Outcome; detai
   const confirmations = Object.entries(tally)
     .filter(([name]) => name.endsWith("Confirmed"))
     .reduce((sum, [, value]) => sum + Number(value ?? 0), 0) + report.claims.needsChecked;
-  if (confirmations > 0) return { outcome: "green", detail: "confirmed", reason: "" };
+  if (confirmations > 0) return { outcome: "green", detail: "confirmed", reason: "confirmed" };
   return {
     outcome: "silent",
     detail: why.length > 0 ? `withheld: ${why[0]}` : "nothing said",
@@ -192,6 +210,15 @@ const undecidable = new Map<string, number>();
 interface Split { total: number; byWord: Map<string, number>; byLanguage: Map<string, number> }
 const splitFalse = new Map<string, Split>();
 const splitTrue = new Map<string, Split>();
+/**
+ * The other half of the same question (#337): which verdict caught the ones
+ * that were caught.
+ *
+ * The undecided split says what stands in the way of a verdict. This says
+ * which check is paying, and the two are read together: a reason worth work is
+ * one whose neighbours in this table already earn their keep.
+ */
+const caughtBy = new Map<string, Split>();
 const countIn = (map: Map<string, number>, name: string) => map.set(name, (map.get(name) ?? 0) + 1);
 function split(map: Map<string, Split>, claim: KeyClaim, reason: string) {
   const row = map.get(reason) ?? { total: 0, byWord: new Map(), byLanguage: new Map() };
@@ -230,6 +257,7 @@ for (const key of loaded) {
     if (outcome === "not sure" || outcome === "silent") {
       split(claim.truth === "false" ? splitFalse : splitTrue, claim, reason);
     }
+    if (outcome === "red" && claim.truth === "false") split(caughtBy, claim, reason);
     const where = `${key.project}/${key.topic}`;
     if (claim.truth === "false") {
       bump(get(plantedByWord, claim.word), outcome);
@@ -303,6 +331,38 @@ const undecidedTotal = (map: Map<string, Split>) => [...map.values()].reduce((su
 const top = (counts: Map<string, number>) => [...counts.entries()]
   .sort((a, b) => b[1] - a[1]).map(([name, n]) => `${name} ${n}`).join(", ");
 const labelOf = (reason: string) => UNDECIDED_BUCKETS[reason];
+
+/*
+ * #337: the caught half, by the verdict that caught it.
+ *
+ * The undecided table below says what is in the way. This says what is
+ * already working, and they are the same question asked from both ends: a
+ * reason worth a morning is one whose verdict is near the top of this table,
+ * because that check will be the one widened to reach it.
+ */
+/*
+ * Both tables, against the four columns they are meant to explain. A reason
+ * silently dropped would show up as a ranking that is quietly short, which is
+ * the one way a table like this goes wrong without anybody noticing.
+ */
+const accounted = [...caughtBy.values()].reduce((sum, row) => sum + row.total, 0)
+  + undecidedTotal(splitFalse);
+const plantedTotal = [...plantedByWord.values()].reduce((sum, row) => sum + total(row), 0);
+const greens = [...plantedByWord.values()].reduce((sum, row) => sum + row.green, 0);
+if (accounted + greens !== plantedTotal) {
+  console.log(`  !! ${plantedTotal - accounted - greens} planted mistakes are in neither table below.`);
+  console.log();
+}
+
+console.log(`  CAUGHT, BY VERDICT -- the ${sumRed(plantedByWord)} planted mistakes that went red`);
+console.log("    which check produced the accusation. read with the table below, which is the rest of them.");
+console.log(`    ${"caught".padStart(7)}  verdict`);
+for (const [verdict, row] of [...caughtBy.entries()].sort((a, b) => b[1].total - a[1].total)) {
+  console.log(`    ${String(row.total).padStart(7)}  ${verdict}`);
+  console.log(`             words: ${top(row.byWord)}`);
+  console.log(`             languages: ${top(row.byLanguage)}`);
+}
+console.log();
 
 console.log(`  UNDECIDED CLAIMS, BY REASON -- ${undecidedTotal(splitFalse)} wrong, ${undecidedTotal(splitTrue)} true`);
 console.log("    what stands between this claim and a verdict. now = a reader stopped short of a fact that is");
