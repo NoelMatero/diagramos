@@ -13,19 +13,32 @@
  * statement about the vocabulary and it is the same in every language.
  *
  * **Whether an end has that part** is read from the grammar's fields, never
- * from node-type names (`docs/reading-a-grammar.md`). Two shapes are all it
- * knows, and both are the rule `parse.ts` is built on:
+ * from node-type names (`docs/reading-a-grammar.md`). Three shapes are all it
+ * knows, and all three are the rule `parse.ts` is built on:
  *
  *   a routine   is a declaration with a `parameters` field
  *   a container is a declaration with a `body` field and none of
  *               `parameters`, `value`, `right` or `type`
+ *   a value     is a declaration with a `type` field, or one assigned
+ *               something this file can read the shape of
  *
  * A routine has a signature and a result and never a field list or a base
  * list; it has a body when the grammar gave it a `body` field. A container --
  * a struct, a class, an interface, an enum, a trait, a module -- is the other
- * way round. Everything else is "not sure": a constant, a field, a type alias,
- * a variable holding who knows what, a name out of a macro. Those may be a
- * function in disguise, so they never lack anything here.
+ * way round.
+ *
+ * A value is the third, and it is narrower than it sounds (#307, #337). What
+ * can be said about one without resolving a single name is that it is not a
+ * type: `status: QueryStatus` names one thing of that type and is not the type
+ * itself, so `@builds` or `@holds` pointed at it can never be true. Whether
+ * anything can *call* it is a second question, answered only where the type is
+ * written plainly enough that no resolution could change it -- every word of
+ * that is in `couldBeCalled`, and it is the one rule in this file that has to
+ * know how each language spells a function.
+ *
+ * Everything else is "not sure": a type alias, a name assigned a call's result,
+ * a name out of a macro. Those may be a function or a type in disguise, so they
+ * never lack anything here.
  *
  * A name declared more than once lacks a part only when **every** declaration
  * lacks it. `interface Foo` beside `function Foo` has a signature.
@@ -152,6 +165,17 @@ function isLiteral(value: Node): boolean {
     if (current.childCount !== 0) return;
     const text = current.text;
     if (LITERAL_WORDS.has(text)) { written = true; return; }
+    /*
+     * An empty collection is written out in full and writes nothing down:
+     * `[]`, `{}`, `()`. Without this the rule below asks for a number or a
+     * string and finds neither, and `result: Record<string, string[]> = {}`
+     * reads as a value nobody may say anything about.
+     *
+     * An opening bracket only, and only as a token of its own: the closing one
+     * would count the same collection twice, and a bracket *inside* a name is
+     * not a token at all.
+     */
+    if (!current.isNamed && (text === "[" || text === "{" || text === "(")) { written = true; return; }
     // A name is a childless node whose text could be one: `OTHER`, `String`.
     if (current.isNamed && /^[A-Za-z_]\w*$/.test(text)) { plain = false; return; }
     // A number or a string: what makes this a value rather than punctuation.
@@ -182,8 +206,116 @@ function keywordOf(node: Node, nameNode: Node): string | undefined {
   return keyword;
 }
 
+/**
+ * A value made by constructing something: `new WeakSet()`, `new Buffer(4)`.
+ *
+ * Read off the `constructor` field, which is what the grammars that have this
+ * shape put the constructed name on. What comes back is an instance, and an
+ * instance is not a type and is not something a call can reach -- a class with
+ * a call signature is a declaration-merging trick and would need one anyway.
+ */
+function isConstruction(value: Node): boolean {
+  return has(value, "constructor");
+}
+
+/**
+ * A value whose own shape is written out: a lambda, a comprehension, anything
+ * the grammar gives parameters or a body of its own.
+ *
+ * Whatever else it is, it is a value -- nothing in these languages lets a
+ * lambda or a list comprehension stand where a type name does -- so this
+ * settles `type` and leaves `callable` exactly as unsure as it found it.
+ */
+function isWrittenValue(value: Node): boolean {
+  return has(value, "parameters") || has(value, "body");
+}
+
+/**
+ * The names each language writes for a type that cannot hold a function.
+ *
+ * A list, and the third in this file after `LITERAL_WORDS` and the keywords
+ * `nounOf` reads -- for the reason `docs/reading-a-grammar.md` allows one: the
+ * fact is not in the tree. `x: Handler` is callable or not depending on what
+ * `Handler` turns out to be, and nothing in this file resolves a name.
+ *
+ * So the question is turned round. Rather than ask which types are functions,
+ * which needs the whole program, ask which are written out plainly enough that
+ * no resolution could change the answer. A `bool` is a bool in every file.
+ *
+ * TypeScript's are keywords, which no `type` statement can rebind. Python's
+ * are builtins, which one could shadow and none of the fifteen corpus
+ * repositories does. Rust is not in here and does not need to be: see below.
+ */
+const NOT_A_FUNCTION: Record<string, RegExp> = {
+  ts: /^(string|number|boolean|void|null|undefined|symbol|bigint|never|object|true|false|readonly|unique)$/,
+  python: /^(int|str|bool|float|complex|bytes|bytearray|list|dict|set|frozenset|tuple|None)$/,
+};
+
+/**
+ * Whether a written type could be something a call reaches.
+ *
+ * Doubt goes to `true`, so a type this does not recognise keeps the name
+ * `unsure` and nobody is accused over it.
+ *
+ * **Rust is read in full**, because there the answer is in the type as
+ * written: a value is callable only where it is a function pointer, a closure
+ * or a generic whose bound is elsewhere -- `fn`, `Fn`, `dyn`, `impl`, or a
+ * bare parameter like `F`. A `Vec<Spec>` is not callable and neither is an
+ * `Option<fn()>`, which has to be unwrapped before anything can call it.
+ *
+ * **TypeScript and Python are read conservatively**, because there a name can
+ * be a function type -- `type NodeTransform = (node, ctx) => void` -- and this
+ * file cannot follow a name. Only a type spelled out of the words above is
+ * judged, and every named type keeps its doubt. That costs most of what this
+ * rule could catch in those two languages and it is the difference between a
+ * red that is always right and one that is right about the corpus.
+ */
+function couldBeCalled(annotation: string, language: Language): boolean {
+  /*
+   * The colon belongs to the annotation in the curly-brace grammars and not in
+   * Rust's or Python's, so it is taken off here rather than in three places:
+   * `: F` and `F` are the same written type.
+   */
+  const text = annotation.replace(/^\s*:\s*/, "").trim();
+  if (text === "") return true;
+  if (language === "rust") {
+    return /^[A-Z]\w?$/.test(text) || /\b(fn|Fn|FnMut|FnOnce|dyn|impl)\b/.test(text);
+  }
+  const plain = NOT_A_FUNCTION[language === "tsx" || language === "js" ? "ts" : language];
+  if (!plain) return true;
+  /*
+   * A function type written out has punctuation and may have no words at all:
+   * `() => void` is one, and so is `{ (): void }`, and reading only the words
+   * in them finds `void` and calls the field a plain value. Found by the
+   * corpus -- TanStack's `destroy: () => void` -- and it is the whole reason
+   * this rule is measured before it may accuse.
+   */
+  if (/=>|\(/.test(text)) return true;
+  /*
+   * A written-out value stands for itself: `type: 'failed'` is a string and
+   * nothing resolves it into a function. Taken out first, or the word inside
+   * the quotes reads as a name.
+   */
+  const spelled = text.replace(/(["'`])(?:\\.|(?!\1)[\s\S])*\1/g, "");
+  // Every word left has to be one of them; the punctuation between them --
+  // `|`, `[]`, `?`, `<>` -- builds nothing a call could reach.
+  const words = spelled.match(/[A-Za-z_]\w*/g) ?? [];
+  return !words.every((word) => plain.test(word));
+}
+
+/**
+ * Whether this name is a type alias written with an annotation rather than a
+ * keyword: `Handler: TypeAlias = Callable[[], None]`.
+ *
+ * Python's spelling, and the one shape where a written type does not mean the
+ * name is a value.
+ */
+function aliasesByAnnotation(text: string): boolean {
+  return /\bTypeAlias\b/.test(text);
+}
+
 /** How one declaration reads, by the shapes above. */
-function readDeclaration(node: Node): Record<Part, PartReading> {
+function readDeclaration(node: Node, language: Language): Record<Part, PartReading> {
   if (has(node, "parameters")) {
     return {
       body: has(node, "body") ? "has" : "lacks",
@@ -226,16 +358,60 @@ function readDeclaration(node: Node): Record<Part, PartReading> {
    * opens it with. Both TypeScript and Rust spell it `type`.
    */
   const aliasesAType = name !== null && keywordOf(node, name) === "type";
-  if (value && !aliasesAType && isLiteral(value)) {
+  if (aliasesAType) return { ...UNSURE };
+  if (value && isLiteral(value)) {
     return {
       body: "lacks", signature: "lacks", result: "unsure", fields: "unsure", bases: "unsure",
       type: "lacks", callable: "lacks",
     };
   }
-  return {
-    body: "unsure", signature: "unsure", result: "unsure", fields: "unsure", bases: "unsure",
-    type: "unsure", callable: "unsure",
-  };
+  /*
+   * A name with a type written beside it (#337): a struct field, an annotated
+   * assignment, a property in an interface. The `type` field is what every
+   * grammar here puts that on, and two facts follow from it however the type
+   * is spelled.
+   *
+   * **It is a value, and a value is not a type.** `status: QueryStatus` names
+   * one thing of that type; it is not the type, and `@builds` or `@holds`
+   * pointed at it can never be true. The one exception is Python's annotated
+   * alias, `Handler: TypeAlias = ...`, which is what `aliasesByAnnotation`
+   * keeps out. Rust and TypeScript write theirs with the keyword, above.
+   *
+   * **And whether anything can call it is what its type says**, which is the
+   * one question that needs to know how each language spells a function type.
+   * Where the type could be one, the name keeps every doubt it had: a field
+   * holding `fn(Own<ErrorImpl>)` is called all day long.
+   *
+   * A value assigned something this file can see keeps the last word. A lambda
+   * under a type alias -- `transformElement: NodeTransform = (node, ctx) => {}`
+   * -- is callable whatever the alias resolves to, and reading the annotation
+   * alone would put a red on an arrow that is right.
+   */
+  const written = node.childForFieldName("type");
+  if (written && !aliasesByAnnotation(written.text)) {
+    const callable = value && isWrittenValue(value) ? "unsure"
+      : couldBeCalled(written.text, language) ? "unsure" : "lacks";
+    return {
+      body: callable, signature: callable, result: "unsure", fields: "unsure", bases: "unsure",
+      type: "lacks", callable,
+    };
+  }
+  /*
+   * No type written, and a value this file can read the shape of: a thing
+   * constructed, or a function written out. Neither is a type -- `x = new
+   * Set()` names a set and `run = (dep) => {}` names a function, and nothing
+   * in these languages lets either stand where a type name does.
+   */
+  if (value && isConstruction(value)) {
+    return {
+      body: "unsure", signature: "unsure", result: "unsure", fields: "unsure", bases: "unsure",
+      type: "lacks", callable: "lacks",
+    };
+  }
+  if (value && isWrittenValue(value)) {
+    return { ...UNSURE, type: "lacks" };
+  }
+  return { ...UNSURE };
 }
 
 const UNSURE: Record<Part, PartReading> = {
@@ -256,7 +432,7 @@ export function partsOf(
 ): Record<Part, PartReading> | undefined {
   const declarations = declaredShapes(source, language)?.get(name);
   if (!declarations || declarations.length === 0) return undefined;
-  const readings = declarations.map(({ node, soup }) => (soup ? UNSURE : readDeclaration(node)));
+  const readings = declarations.map(({ node, soup }) => (soup ? UNSURE : readDeclaration(node, language)));
   const combined = { ...UNSURE };
   for (const part of PARTS) {
     const all = readings.map((reading) => reading[part]);
@@ -278,10 +454,9 @@ export function declaredNames(source: string, language: Language): string[] {
  * Every square measured by `npm run measure:parts -- .corpus/*` against
  * rust-analyzer, pyright and the TypeScript compiler, over all fifteen pinned
  * repositories: 17,955 Rust names, 100,346 Python, 49,146 TS, 10,258 TSX,
- * 2,733 JS. **Zero wrong lacks and zero unjudged lacks in every square but
- * one** -- 42,222 agreed field-lacks in Python, 10,264 agreed "not a type" in
- * Rust, and so on through docs/claim-vocabulary.md's table. The one is Rust's
- * `body`, below.
+ * 2,733 JS. **Zero wrong lacks in every square but one** -- 42,222 agreed
+ * field-lacks in Python, 14,414 agreed "not a type" in Rust, and so on through
+ * docs/claim-vocabulary.md's table. The one is Rust's `body`, below.
  *
  * That is not the usual outcome in this codebase and is worth being suspicious
  * of, so the measurement was broken on purpose twice to check it can fail:
@@ -289,13 +464,23 @@ export function declaredNames(source: string, language: Language): string[] {
  * to say a function lacks a signature, it reports 926 wrong lacks in Python
  * and 208 in Rust.
  *
- * `callable` and `type` for a value written out in full (#307) were measured
- * the same way and are 0 wrong across every language. Their referee is a text
- * reading of the declaration, and it cannot parse everything: **160 Python and
- * 20 TypeScript** lacks went unjudged, 2.9% and 0.8% of what the reader
- * claimed there. Those were sampled and read -- a value spread over lines, a
- * chained `first = second = None`, a name the server lists at another line --
- * and not one was a reader mistake. Rust, TSX and JavaScript are fully judged.
+ * `callable` and `type` are the two squares this widened, and both were
+ * measured the same way after each widening. A value written out in full
+ * (#307) and a value with its type written beside it (#337) are 0 wrong lacks
+ * across every language, and the second is most of what is now said: `type`
+ * went from 5,276 agreed lacks in Python to 52,012, and `callable` from 874 in
+ * Rust to 3,430. The referee cannot parse everything it is handed -- **190
+ * Python, 12 TypeScript, 2 Rust and 1 TSX** lacks went unjudged, 0.2% of what
+ * the reader claimed. Those were sampled and read: a value spread over lines,
+ * a comprehension's own binding, a name a server lists at another line. Not
+ * one was a reader mistake, and the squares are licensed on that basis rather
+ * than on a clean sweep.
+ *
+ * The corpus found the one shape a rule about written types gets wrong, and it
+ * found it rather than review doing so: a function type can be spelled with no
+ * word in it that is not a keyword -- `destroy: () => void` -- and a reading
+ * that counts words alone calls that field a plain value. `couldBeCalled`
+ * refuses any type with an arrow or a bracket in it for that reason.
  *
  * A square goes `false` the moment a run finds one wrong lack in that
  * language. The claim's reader is unaffected either way: losing this costs the

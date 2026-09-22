@@ -551,6 +551,35 @@ parameters or a body** is a literal, and a literal is not a function and not a
 type (#307). `4`, `"utf-8"` and `[1, 2]` qualify; `OTHER`, `makeIt()` and `() =>
 {}` do not.
 
+**And a value with its type written beside it is still a value** (#337). That
+was the other nine tenths of the same population: `status: QueryStatus`,
+`settings: ArgFlags`, `values_dict: dict[str, str] = {}` are fields, and on the
+93 wrong-kind mistakes the bench was still missing the part reader said "not
+sure" 91 times. Two answers follow from an annotation and they stand on
+different footings:
+
+- **It is not a type.** `status: QueryStatus` names one thing of that type and
+  is not the type, so `@builds` and `@holds` pointed at it can never be true.
+  Nothing has to be resolved to know that, and it is the same in all five
+  languages. Python's `Handler: TypeAlias = ...` is the one exception, and it
+  says so on the line.
+- **Whether anything can call it is what the type says**, and that is only
+  readable where no resolution could change the answer. Rust is read in full:
+  a value there is callable only where its type says `fn`, `Fn`, `dyn`, `impl`,
+  or is a bare parameter whose bound is elsewhere -- an `Option<fn()>` has to be
+  unwrapped before anything can call it. TypeScript and Python are read only
+  where the type is spelled out of words no `type` statement can rebind,
+  because `type NodeTransform = (node, ctx) => void` is a name and this reader
+  follows no names. That costs most of what the rule could catch in those two
+  and it is the difference between a red that is always right and one that is
+  right about this corpus.
+
+The corpus found the shape that breaks a rule about written types, as it found
+the two above: a function type can be spelled with no word in it that is not a
+keyword. TanStack's `destroy: () => void` read as a plain value, because the
+arrow is punctuation. Any type with an arrow or a bracket in it is refused now,
+in the reader and in the referee both.
+
 That is why "can this be called" is a separate question from "has a signature".
 A class has no signature and is called all the time -- that is how Python and a
 Rust tuple struct construct one -- so `@calls` into a type stays quiet while
@@ -592,26 +621,39 @@ referee only.
 
 | language | part | wrong lacks | unjudged | agreed lacks | missed | may accuse |
 |---|---|---:|---:|---:|---:|---|
-| rust | body | **1,068** | 283 | 51 | 1 | **no** |
-| rust | signature / result | 0 | 0 | 1,817 | 797 | yes |
-| rust | fields / bases / type | 0 | 0 | 10,264 | 308 | yes |
-| python | body | 0 | 0 | 3,471 | 8,959 | yes |
-| python | signature / result | 0 | 0 | 12,430 | 0 | yes |
-| python | fields / bases / type | 0 | 0 | 42,222 | 0 | yes |
-| ts | body | 0 | 0 | 1,966 | 1,621 | yes |
-| ts | signature / result | 0 | 0 | 3,090 | 0 | yes |
-| ts | fields / bases / type | 0 | 0 | 8,615 | 2 | yes |
-| tsx | body | 0 | 0 | 71 | 59 | yes |
-| tsx | signature / result | 0 | 0 | 120 | 0 | yes |
-| tsx | fields / bases / type | 0 | 0 | 733 | 0 | yes |
-| js | body | 0 | 0 | 3 | 12 | yes |
-| js | signature / result | 0 | 0 | 15 | 0 | yes |
-| js | fields / bases / type | 0 | 0 | 542 | 0 | yes |
+| rust | body | **1,068** | 3,715 | 51 | 1 | **no** |
+| rust | signature | 0 | 2 | 5,248 | 869 | yes |
+| rust | result | 0 | 0 | 1,817 | 797 | yes |
+| rust | fields / bases | 0 | 0 | 10,264 | 308 | yes |
+| rust | type | 0 | 0 | 14,414 | 369 | yes |
+| rust | callable | 0 | 2 | 3,430 | 68 | yes |
+| python | body | 0 | 190 | 11,084 | 11,259 | yes |
+| python | signature | 0 | 190 | 20,044 | 2,299 | yes |
+| python | result | 0 | 0 | 12,430 | 0 | yes |
+| python | fields / bases | 0 | 0 | 42,222 | 0 | yes |
+| python | type | 0 | 172 | 52,012 | 25,518 | yes |
+| python | callable | 0 | 190 | 7,613 | 2,295 | yes |
+| ts | body | 0 | 7 | 8,649 | 4,641 | yes |
+| ts | signature | 0 | 7 | 9,766 | 3,020 | yes |
+| ts | result | 0 | 0 | 3,090 | 0 | yes |
+| ts | fields / bases | 0 | 0 | 8,615 | 2,587 | yes |
+| ts | type | 0 | 12 | 25,744 | 1,149 | yes |
+| ts | callable | 0 | 7 | 8,014 | 1,682 | yes |
+| tsx | body / signature | 0 | 1 | 1,435 / 1,484 | 607 / 548 | yes |
+| tsx | fields / bases | 0 | 0 | 733 | 1,171 | yes |
+| tsx | type / callable | 0 | 1 | 4,991 / 1,709 | 101 / 199 | yes |
+| js | every part | 0 | 0 | 315 to 1,200 | 0 to 267 | yes |
 
 17,955 Rust names, 100,346 Python, 49,146 TS, 10,258 TSX, 2,733 JS, over all
-fifteen pinned repositories, in 2m53s. `missed` is the cheap direction -- the
+fifteen pinned repositories, in 3m22s. `missed` is the cheap direction -- the
 tooling says "lacks" and the reader will not commit -- and it costs a red that
 never fires.
+
+`unjudged` is the expensive one and it is what the licences rest on being
+small: 384 lacks in 180,438 names, 0.2%, and every group of them read. They are
+values spread over lines, a comprehension's own binding, and names a server
+files at a line other than the one they are written on. None was a reader
+mistake.
 
 The measurement was broken on purpose twice to check that it can fail. Made to
 say a struct lacks fields, it refuses all five languages. Made to say a
@@ -624,12 +666,17 @@ above.
 
 `npm run bench:planted`, 855 planted and drawn mistakes and 428 true claims:
 
-| | before #297 | first cut | both ends, Rust body closed | at #309 | after #306 |
-|---|---:|---:|---:|---:|---:|
-| mistakes called wrong | 229 (27%) | 303 (35%) | 386 (45%) | 385 (45%) | **386 (45%)** |
-| of which planted wrong-kind | 7 of 146 | 11 | 52 | 51 | **52** |
-| greens on a false claim | -- | -- | 43 | 27 | **26** |
-| true claims called wrong | 8 | 10 | 8 | 1 | **1** |
+| | before #297 | first cut | both ends, Rust body closed | at #309 | after #306 | after #337 |
+|---|---:|---:|---:|---:|---:|---:|
+| mistakes called wrong | 229 (27%) | 303 (35%) | 386 (45%) | 385 (45%) | 386 (45%) | **479 (56%)** |
+| of which planted wrong-kind | 7 of 146 | 11 | 52 | 51 | 52 | **81** |
+| greens on a false claim | -- | -- | 43 | 27 | 26 | **26** |
+| true claims called wrong | 8 | 10 | 8 | 1 | 1 | **0** |
+
+The last column is every word, not only this one: reading a value's written
+type moved `@calls` by 12, `@builds` by 12, `@holds` by 5, `@takes` by 2 and
+`@returns` by 1, and 28 of the 93 wrong-kind mistakes the bench was still
+missing. Both arms were run on the same day's main, `4480f9f`.
 
 #306's column moves one claim and it is the kind worth moving: `@takes
 src/error.rs#fmt -> src/fmt.rs#display` was **confirmed** on anyhow's board and
@@ -643,9 +690,10 @@ by one without anything else changing.
 The 8 that remain are the same 8 as before any of this -- seven are the field
 reader missing a TypeScript parameter property or a Python attribute set in
 `__init__`, one is a clap import cycle -- and none is an end of the wrong kind.
-The wrong-kind row does not reach 146 for two reasons on the record: `@calls`
-into a constant is left alone by design (a constant may hold a function), and
-Rust structs are never said to have no code.
+The wrong-kind row does not reach 146 for reasons that are all on the record:
+`@calls` into a constant whose value is a name or a call's result is left alone
+by design (it may be a function), a named type in TypeScript or Python is never
+read as uncallable, and Rust structs are never said to have no code.
 
 What the licence costs when a square closes is one accusation and nothing else,
 exactly as in `licence.ts`: the claim's own reader is untouched, and the arrow

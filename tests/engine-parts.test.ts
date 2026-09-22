@@ -74,9 +74,14 @@ describe("Rust", () => {
     expect(read(source, "receive", "rust")?.type).toBe("lacks");
     expect(read(source, "Client", "rust")?.type).toBe("has");
     // A constant whose value is written out in full is not a type either
-    // (#307); one holding a name still is not judged.
+    // (#307). Nor is one holding a function: the constant names a value of
+    // that type and never the type itself, which the annotation settles
+    // whatever the value turns out to be (#337) -- while `callable` stays
+    // exactly as unsure as it was, because `fn() -> u32` is called all day.
     expect(read(source, "LIMIT", "rust")?.type).toBe("lacks");
-    expect(read("pub const MAKER: fn() -> u32 = build;\n", "MAKER", "rust")?.type).toBe("unsure");
+    const maker = read("pub const MAKER: fn() -> u32 = build;\n", "MAKER", "rust");
+    expect(maker?.type).toBe("lacks");
+    expect(maker?.callable).toBe("unsure");
   });
 
   it("reads a trait method with no default as a function with no body", () => {
@@ -281,6 +286,100 @@ describe("a value written out in full (#307)", () => {
   it("does not judge a type, which Python and Rust construct by calling it", () => {
     const source = "class Config:\n    width: int\n";
     expect(read(source, "Config", "python")?.callable).toBe("unsure");
+  });
+});
+
+describe("a value with its type written beside it (#337)", () => {
+  /*
+   * One shape per way a value gets written down, in each grammar that has it.
+   * The point of every case is the same: the name is a value, so nothing
+   * `@builds` or `@holds` can be true of it -- and whether anything can *call*
+   * it is a separate question its type answers, or refuses to.
+   */
+  it.each([
+    ["rust", "pub struct Arg { pub(crate) settings: ArgFlags, }", "settings"],
+    ["rust", "pub struct Parser { trailing_idx: Option<usize>, }", "trailing_idx"],
+    ["ts", "export interface Job { readonly id: number }", "id"],
+    ["ts", "export class Mutation { type: 'failed' }", "type"],
+    ["python", "class Model:\n    retries: int\n", "retries"],
+  ])("in %s, a field with a type written on it is not a type and cannot be called", (language, source, name) => {
+    expect(read(source, name, language as Language)).toMatchObject({ type: "lacks", callable: "lacks" });
+  });
+
+  it.each([
+    ["ts", "export class Query { status: QueryStatus }", "status"],
+    ["python", "class Model:\n    complete: ClassVar[bool]\n", "complete"],
+  ])("in %s, a field named by another type is a value, and may still be callable", (language, source, name) => {
+    /*
+     * `type QueryStatus = () => void` is a thing somebody can write, and this
+     * file resolves no names, so the call half keeps its doubt. Rust needs no
+     * such caution: there a value is callable only where its type says `fn`,
+     * `Fn`, `dyn` or a bare parameter, whatever the name resolves to.
+     */
+    expect(read(source, name, language as Language)).toMatchObject({ type: "lacks", callable: "unsure" });
+  });
+
+  it.each([
+    ["rust", "pub struct Vtable { object_drop: unsafe fn(Own<ErrorImpl>), }", "object_drop"],
+    ["ts", "export interface Hooks { onDone: (value: number) => void }", "onDone"],
+    ["python", "class Hooks:\n    on_done: Callable[[int], None]\n", "on_done"],
+    ["ts", "export interface Hooks { onFail: FailureHandler }", "onFail"],
+    // TanStack's `destroy: () => void`, found by the corpus: a function type
+    // can be written with no word in it that is not a keyword.
+    ["ts", "export interface Panel { destroy: () => void }", "destroy"],
+    ["ts", "export interface Panel { at: { (): void } }", "at"],
+  ])("in %s, a field whose type is a function keeps every doubt about calling it", (language, source, name) => {
+    expect(read(source, name, language as Language)).toMatchObject({ type: "lacks", callable: "unsure" });
+  });
+
+  it.each([
+    ["rust", "pub struct Held<F> { pub run: F, }", "run"],
+    ["ts", "export class Held<F> { run: F }", "run"],
+    ["python", "class Held:\n    run: F\n", "run"],
+  ])("in %s, a bare type parameter says nothing either way", (language, source, name) => {
+    // The bound that would settle it -- `F: Fn()`, `extends () => void` -- is
+    // written somewhere else, so this end is not one to accuse anybody over.
+    expect(read(source, name, language as Language)?.callable).toBe("unsure");
+  });
+
+  it.each([
+    ["ts", "export const result: Record<string, string[]> = {};", "result"],
+    ["ts", "export const rows = [];", "rows"],
+    ["python", "values_dict: dict[str, str] = {}\n", "values_dict"],
+    ["python", "operations: list[Operation] = []\n", "operations"],
+  ])("in %s, an empty collection is a value written out in full", (language, source, name) => {
+    expect(read(source, name, language as Language)).toMatchObject({ type: "lacks", callable: "lacks" });
+  });
+
+  it("a thing constructed is an instance, not a type and not callable", () => {
+    const seen = read("export const seen = new WeakSet<Node>();", "seen", "ts");
+    expect(seen).toMatchObject({ type: "lacks", callable: "lacks" });
+  });
+
+  it.each([
+    ["ts", "export const run = (dep: Dep) => { dep.trigger(); };", "run"],
+    ["python", "run = lambda dep: dep.trigger()\n", "run"],
+  ])("in %s, a function written out is not a type, and is still callable", (language, source, name) => {
+    expect(read(source, name, language as Language)).toMatchObject({ type: "lacks", callable: "unsure" });
+  });
+
+  it("a lambda under a type alias is never accused, whatever the alias says", () => {
+    // vue's `transformElement: NodeTransform = (node, context) => {}`. Reading
+    // the annotation alone and stopping there would put a red on an arrow that
+    // is right, which is the one mistake this file may not make.
+    const source = "export const transformElement: NodeTransform = (node, context) => { walk(node) };";
+    expect(read(source, "transformElement", "ts")).toMatchObject({ type: "lacks", callable: "unsure" });
+  });
+
+  it("a Python alias written as an annotation is still a type", () => {
+    const source = "Handler: TypeAlias = Callable[[], None]\n";
+    expect(read(source, "Handler", "python")?.type).toBe("unsure");
+  });
+
+  it("a name declared twice is judged only where every declaration agrees", () => {
+    // httpx's `unsatisfied = None` beside `unsatisfied = incompatibility`.
+    const source = "unsatisfied = None\nunsatisfied = incompatibility\n";
+    expect(read(source, "unsatisfied", "python")?.callable).toBe("unsure");
   });
 });
 

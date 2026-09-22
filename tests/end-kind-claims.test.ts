@@ -551,4 +551,49 @@ describe("an arrow into a constant (#307)", () => {
 
     expect(report.edges.filter((edge) => edge.kind === "end-lacks-part")).toEqual([]);
   });
+
+  it("is red for @calls into a field whose type is written on it", async () => {
+    // clap's `settings: ArgFlags`, the shape #337 found on 40 of the missed
+    // arrows: nothing is assigned, so the value rule above never sees it, and
+    // the type beside the name is the whole of what settles it.
+    const board = await boardOf("src/lib.rs#build", "src/lib.rs#settings", "calls");
+    const report = checkDrift(board, fakeWorkspace({
+      "src/lib.rs": [
+        "pub struct Command {",
+        "    pub(crate) settings: ArgFlags,",
+        "}",
+        "",
+        "pub fn build(command: &Command) -> usize { command.settings.bits() }",
+        "",
+      ].join("\n"),
+    }), { edges: true });
+    const finding = report.edges.find((edge) => edge.kind === "end-lacks-part");
+
+    expect(finding?.detail).toContain("is a plain value, and cannot be called");
+  });
+
+  it("is red for @builds into a field, and quiet when the field could hold a function", async () => {
+    /*
+     * The two halves stand on different footings, and the same declaration
+     * shows both: a TypeScript field named by another type is certainly not a
+     * type itself, and might still be callable, because `type Runner = () =>
+     * void` is a thing somebody can write and nothing here follows a name.
+     */
+    const files = {
+      "src/query.ts": [
+        "export class Query {",
+        "  status: QueryStatus",
+        "}",
+        "export function build(query: Query) { return query.status; }",
+        "",
+      ].join("\n"),
+    };
+    const builds = checkDrift(await boardOf("src/query.ts#build", "src/query.ts#status", "builds"),
+      fakeWorkspace(files), { edges: true });
+    expect(builds.edges.find((edge) => edge.kind === "end-lacks-part")?.detail).toContain("is not a type");
+
+    const calls = checkDrift(await boardOf("src/query.ts#build", "src/query.ts#status", "calls"),
+      fakeWorkspace(files), { edges: true });
+    expect(calls.edges.filter((edge) => edge.kind === "end-lacks-part")).toEqual([]);
+  });
 });
