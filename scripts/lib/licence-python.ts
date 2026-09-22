@@ -36,6 +36,7 @@ import path from "node:path";
 import { readDependencies } from "../../src/engine/deps";
 import { createWorkspace } from "../../src/engine/drift";
 import { initEngine } from "../../src/engine/parse";
+import { PYRIGHT_VERSION } from "../../src/engine/referee-python-lsp";
 import type { LicenceMeasurement } from "./licence";
 
 const SKIP_DIRECTORIES = new Set([
@@ -48,13 +49,12 @@ const SKIP_DIRECTORIES = new Set([
 const TOO_LARGE = 1_000_000;
 
 /**
- * The pyright to measure against, pinned.
- *
- * A referee that floats is a number that cannot be reproduced: pyright's
- * resolution improves, and a licence measured against "whatever npx fetched
- * today" is a claim about a day rather than about a reader.
+ * The pyright to measure against, pinned. Declared in
+ * `src/engine/referee-python-lsp.ts` since #337 moved the referee into the
+ * shipped tree; re-exported here so the measurement scripts that already ask
+ * this file for it keep working.
  */
-export const PYRIGHT_VERSION = "1.1.406";
+export { PYRIGHT_VERSION };
 
 function sourceFiles(root: string): { files: string[]; oversized: string[] } {
   const files: string[] = [];

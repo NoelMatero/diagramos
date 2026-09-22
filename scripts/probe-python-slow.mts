@@ -9,7 +9,7 @@
  * pipe is not the explanation: Rust answers 756 questions over the same kind of
  * pipe in 31ms.
  *
- * The suspect is the retry ladder in `resolution-python-lsp.ts`. A query pyright
+ * The suspect is the retry ladder in `referee-python-lsp.ts`. A query pyright
  * has no answer for is asked three times, sleeping 300ms and then 800ms in
  * between -- 1.1 seconds spent per *unanswerable* query, which is the opposite
  * of the case worth paying for.
@@ -84,7 +84,7 @@ console.log(`  warmUp at queries[0] (${first.file}): ${Math.round(performance.no
 console.log();
 
 /*
- * The same 97 queries at several widths. `resolution-python-live.ts` uses 32,
+ * The same 97 queries at several widths. `referee-python.ts` uses 32,
  * copied from the Rust resolver, and 32 is where the sixteen seconds came from:
  * pyright is single-threaded, so asking it 32 things at once does not make it
  * answer faster, it makes it answer all of them late.

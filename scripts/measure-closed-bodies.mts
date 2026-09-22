@@ -565,7 +565,7 @@ for (const tree of trees) {
    *
    * Python's and Rust's resolvers answer over LSP, and `CallSide.resolveReceiver`
    * is synchronous, so the reading above cannot ask them mid-walk.
-   * `resolution-python-live.ts` already solved this for the live checker and the
+   * `referee-python.ts` already solved this for the live checker and the
    * shape is reused rather than reinvented: read once with a resolver that
    * records every question and answers none, resolve the whole batch, then read
    * again with a synchronous lookup into what came back. Two readings of

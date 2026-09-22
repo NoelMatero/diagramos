@@ -579,7 +579,7 @@ if (!merging) {
      *
      * Python's and Rust's resolvers answer over LSP and both readers here are
      * synchronous, so the reading above cannot ask them mid-walk. The shape
-     * `resolution-python-live.ts` already solved for the live checker is
+     * `referee-python.ts` already solved for the live checker is
      * reused: read once with a resolver that records every question and
      * answers none, resolve the whole batch -- read receivers and call
      * receivers together, one server round -- then read again through a
