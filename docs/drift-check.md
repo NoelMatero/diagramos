@@ -751,7 +751,7 @@ alone:
 | its state is `built` | sketching a dependency that currently runs the other way is a thing people do on purpose |
 | the language is licensed | `licence.ts` — TypeScript against the compiler over 12,824 edges, Rust against rust-analyzer over 2,539 |
 | both ends are files of this repository | something other than our own reader has to agree the file is source at all — see the ledger below |
-| neither end is dynamic or half-read | a file that reaches out at runtime, or that we could not parse to the end, cannot support *absence* |
+| neither end is dynamic or half-read | a file that can load another at runtime, or that we could not parse to the end, cannot support *absence* |
 
 **Confirming asks less than accusing, and #308 is why that matters.** The bottom
 two rows are about proving something *is not there*, which is a sentence about a
@@ -863,10 +863,12 @@ asymmetry is the whole design, because `needs` is about one pair of files and
 Getting that backwards is the failure worth naming: a walk that quietly skipped
 what it could not read would paint a green box over a subsystem it never opened.
 
-**Three of the five escape flags count here.** `needs` withholds on all of them,
-because any of them makes the text an incomplete account of what a file does.
-`closed` asks something narrower — *could there be an import in here we did not
-see?* — and the answer splits them:
+**Three of the five escape flags count here.** Both `closed` and the `needs`
+accusation ask one question of them — *could there be an import in here we did
+not see?* — and the answer splits them. `needs` used to withhold on all five,
+and until #344 a `table[name]()` anywhere in either file kept a wrong arrow from
+going red: 19 of the planted mistakes on `bench:planted`. Both now read the one
+table in `deps.ts`:
 
 | flag | hides an import? |
 | --- | --- |

@@ -123,6 +123,46 @@ export type DynamicReason =
    */
   | "macro-expansion";
 
+/**
+ * The escapes that can hide an import, which is not all of them.
+ *
+ * The question is: **could there be an import in this file that we did not
+ * see?** `needs` asks it before saying a file does not import another, and
+ * `closed` asks it before saying nothing outside a box reaches in.
+ *
+ * - `dynamic-import` and `eval` can bring a module in at runtime, so yes.
+ * - `macro-expansion` is a macro at item position, whose expansion is exactly
+ *   where a `use` can be written and not read. The reader does better than the
+ *   flag suggests -- it reassembles `::`-joined runs out of token trees, and it
+ *   reads `macro_rules!` bodies where they are defined -- but a macro from
+ *   another crate can still expand to a path no file here spells. The flag's own
+ *   words are that the file "could be declaring anything and the reader would
+ *   not know", and a claim that everything was read cannot be built on a file
+ *   that says that about itself.
+ * - `computed-call` and `mutable-function` are about *calling* something, and no
+ *   call creates a module dependency that is not already declared somewhere in
+ *   the text -- you cannot import through `table[key]()`. A file whose only
+ *   escape is one of those is completely readable for this question.
+ *
+ * So the split is by what an escape can hide, not by how alarming it sounds.
+ * Until #344 `needs` kept its own answer -- every escape blinds -- and a wrong
+ * arrow went unaccused whenever either file held one `table[name]()`. One
+ * table, and a record rather than a set, so a new reason cannot be added
+ * without answering this for it.
+ */
+const HIDES_AN_IMPORT: Record<DynamicReason, boolean> = {
+  "dynamic-import": true,
+  eval: true,
+  "macro-expansion": true,
+  "computed-call": false,
+  "mutable-function": false,
+};
+
+/** Whether a file's escapes leave room for an import no reader saw. */
+export function mayHideAnImport(dynamic: readonly DynamicReason[]): boolean {
+  return dynamic.some((reason) => HIDES_AN_IMPORT[reason]);
+}
+
 export interface FileDependency {
   /** The specifier as written, so a report can quote the line. */
   specifier: string;

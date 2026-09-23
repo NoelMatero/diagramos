@@ -293,11 +293,13 @@ describe("an import written in plain sight", () => {
     /*
      * The gate that must not move. The dependency runs head-to-tail only, which
      * is the accusation -- and it rests on "the tail declares nothing on the
-     * head", which a file reaching out at runtime cannot support. Withheld
-     * before #308 and withheld after it, for both ways a file can be unreadable.
+     * head", which a file that could load anything at runtime cannot support.
+     * Withheld before #308 and withheld after it, for both ways a file can be
+     * unreadable. `eval` rather than `table[n]()` since #344: a computed call
+     * cannot bring in a file, and no longer withholds.
      */
     const dynamicTail = {
-      "reader.ts": 'const table: Record<string, () => void> = {};\nexport const go = (n: string) => table[n]();\n',
+      "reader.ts": 'export const go = (source: string) => eval(source);\n',
       "writer.ts": 'import { go } from "./reader";\nexport const w = go;\n',
     };
     expect(checkNeeds("reader.ts", "writer.ts", fakeWorkspace(dynamicTail)))
@@ -321,6 +323,109 @@ describe("an import written in plain sight", () => {
     const ledger = { files: new Set(["src/app.ts"]) };
     expect(checkNeeds("src/app.ts", "vendor/bundle.mjs", fakeWorkspace(files), new Map(), ledger))
       .toEqual({ verdict: "withheld", why: "unvouched" });
+  });
+});
+
+/**
+ * #344: a call the text cannot follow does not hide an import.
+ *
+ * `table[name]()` and a function kept in a `let` can only call something the
+ * file already has, and everything it has was imported where the reader can
+ * see it. So neither is a reason to doubt that a file imports nothing on
+ * another -- and before this, either one in either file kept 19 planted
+ * mistakes on `bench:planted` from going red. Loading a module at runtime and `eval` can bring
+ * in a file the text never names, and still refuse.
+ */
+describe("a call the text cannot follow (#344)", () => {
+  it("calls a TypeScript arrow backwards although the tail looks a function up by name", () => {
+    const files = {
+      "reader.ts": 'const table: Record<string, () => void> = {};\nexport const go = (n: string) => table[n]();\n',
+      "writer.ts": 'import { go } from "./reader";\nexport const w = go;\n',
+    };
+    expect(checkNeeds("reader.ts", "writer.ts", fakeWorkspace(files)))
+      .toMatchObject({ verdict: "backwards", evidence: { file: "writer.ts", on: "reader.ts", line: 1 } });
+  });
+
+  it("calls a TypeScript arrow wrong although the head calls a function kept in a variable", () => {
+    // Setter injection -- `layout.ts`' `measurerOverride` shape. Whatever gets
+    // stored in `hook` came from somewhere this file already imports.
+    const files = {
+      "app.ts": 'import { db } from "./db";\nexport const app = db;\n',
+      "db.ts": "export const db = 1;\n",
+      "hooks.ts": "let hook = () => {};\nexport const setHook = (f: () => void) => { hook = f; };\nexport const run = () => hook();\n",
+    };
+    expect(checkNeeds("app.ts", "hooks.ts", fakeWorkspace(files))).toEqual({ verdict: "refuted" });
+  });
+
+  it("still confirms a TypeScript arrow drawn the right way when both ends call that way", () => {
+    const files = {
+      "app.ts": 'import { run } from "./hooks";\nconst table: Record<string, () => void> = { run };\n'
+        + 'export const go = (n: string) => table[n]();\n',
+      "hooks.ts": "let hook = () => {};\nexport const run = () => hook();\n",
+    };
+    expect(checkNeeds("app.ts", "hooks.ts", fakeWorkspace(files)))
+      .toMatchObject({ verdict: "confirmed", evidence: { file: "app.ts", on: "hooks.ts", line: 1 } });
+  });
+
+  it("still says nothing about an absence when an end could load any file at runtime", () => {
+    const files = {
+      "app.ts": 'export const app = 1;\n',
+      "loader.ts": "export const load = (name: string) => import(`./plugins/${name}`);\n",
+    };
+    expect(checkNeeds("app.ts", "loader.ts", fakeWorkspace(files)))
+      .toEqual({ verdict: "withheld", why: "dynamic" });
+  });
+
+  it("calls a Python arrow backwards although the tail looks a function up by name", () => {
+    const files = {
+      "reader.py": "handlers = {}\n\ndef go(name):\n    return handlers[name]()\n",
+      "writer.py": "from .reader import go\n\nw = go\n",
+    };
+    expect(checkNeeds("reader.py", "writer.py", fakeWorkspace(files)))
+      .toMatchObject({ verdict: "backwards", evidence: { file: "writer.py", on: "reader.py", line: 1 } });
+  });
+
+  it("calls a Python arrow wrong although the head calls a function kept in a variable", () => {
+    const files = {
+      "app.py": "from .db import db\n\napp = db\n",
+      "db.py": "db = 1\n",
+      "hooks.py": "hook = print\n\ndef run():\n    return hook()\n",
+    };
+    expect(checkNeeds("app.py", "hooks.py", fakeWorkspace(files))).toEqual({ verdict: "refuted" });
+  });
+
+  it("still confirms a Python arrow drawn the right way when both ends call that way", () => {
+    const files = {
+      "app.py": "from .hooks import run\n\nhandlers = {'run': run}\n\ndef go(name):\n    return handlers[name]()\n",
+      "hooks.py": "hook = print\n\ndef run():\n    return hook()\n",
+    };
+    expect(checkNeeds("app.py", "hooks.py", fakeWorkspace(files)))
+      .toMatchObject({ verdict: "confirmed", evidence: { file: "app.py", on: "hooks.py", line: 1 } });
+  });
+
+  it("still says nothing about a Python absence when an end runs code it builds", () => {
+    const files = {
+      "app.py": "app = 1\n",
+      "loader.py": "def load(source):\n    exec(source)\n",
+    };
+    expect(checkNeeds("app.py", "loader.py", fakeWorkspace(files)))
+      .toEqual({ verdict: "withheld", why: "dynamic" });
+  });
+
+  it("puts the backwards arrow on the board as red, and the right one stays clean", async () => {
+    const files = {
+      "reader.ts": 'const table: Record<string, () => void> = {};\nexport const go = (n: string) => table[n]();\n',
+      "writer.ts": 'import { go } from "./reader";\nexport const w = go;\n',
+    };
+    const wrong = await verdicts(await boardOf("reader.ts", "writer.ts", { claim: "needs" }), files);
+    expect(wrong.edges.map((finding) => finding.kind)).toEqual(["backwards-edge"]);
+    expect(wrong.edges[0]!.detail).toContain("writer.ts line 1");
+    expect(wrong.clean).toBe(false);
+
+    const right = await verdicts(await boardOf("writer.ts", "reader.ts", { claim: "needs" }), files);
+    expect(right.edges).toEqual([]);
+    expect(right.claims.needsChecked).toBe(1);
+    expect(right.clean).toBe(true);
   });
 });
 

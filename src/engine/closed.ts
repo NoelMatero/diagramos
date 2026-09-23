@@ -28,38 +28,10 @@
  * skipped what it could not read would report a green box for a subsystem it
  * never opened, which is the exact thing this tool exists not to do.
  */
-import { readDependencies, type DynamicReason } from "./deps";
+import { mayHideAnImport, readDependencies } from "./deps";
 import { licenceFor } from "./licence";
 import type { ConfigCache } from "./resolve";
 import type { Workspace } from "./workspace";
-
-/**
- * The escapes that can hide an import, which is not all of them.
- *
- * The question here is narrower than the one `needs` asks. `needs` withholds on
- * every escape, because any of them can make the text an incomplete account of
- * what the file does. This claim only cares about one thing: **could there be an
- * import in here that we did not see?**
- *
- * - `dynamic-import` and `eval` can bring a module in at runtime, so yes.
- * - `macro-expansion` is a macro at item position, whose expansion is exactly
- *   where a `use` can be written and not read. The reader does better than the
- *   flag suggests -- it reassembles `::`-joined runs out of token trees, and it
- *   reads `macro_rules!` bodies where they are defined -- but a macro from
- *   another crate can still expand to a path no file here spells. The flag's own
- *   words are that the file "could be declaring anything and the reader would
- *   not know", and a claim that everything was read cannot be built on a file
- *   that says that about itself.
- * - `computed-call` and `mutable-function` are about *calling* something, and no
- *   call creates a module dependency that is not already declared somewhere in
- *   the text -- you cannot import through `table[key]()`. A file whose only
- *   escape is one of those is completely readable for this question, even though
- *   `needs` withholds on it.
- *
- * So the split is by what an escape can hide, not by how alarming it sounds, and
- * it costs a confirmation only where a confirmation would have been a guess.
- */
-const REACHES_IN = new Set<DynamicReason>(["dynamic-import", "eval", "macro-expansion"]);
 
 /** One import from outside the box that no door allows. */
 export interface ClosedBreach {
@@ -162,7 +134,7 @@ export function checkClosed(
       unread.push(file);
       continue;
     }
-    if (!read.complete || read.dynamic.some((reason) => REACHES_IN.has(reason))) {
+    if (!read.complete || mayHideAnImport(read.dynamic)) {
       unread.push(file);
       // Its dependencies are still worth reading: what it declares in the text
       // is true whatever else it does at runtime. Only absence is lost.
