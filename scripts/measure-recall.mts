@@ -136,7 +136,7 @@ const REASONS: Record<string, Label> = {
 
   "needs/incomplete": { kind: "cannot-see", why: "EITHER file had a parse error somewhere, so nothing can be proved absent in it. Since #308 this refuses the accusation only: an import the grammar did read still confirms" },
   "needs/unvouched": { kind: "cannot-see", why: "no source index has read the file" },
-  "needs/dynamic": { kind: "cannot-see", why: "EITHER file reaches out at run time (`table[name]()`, a Rust item macro), so neither can be said to declare nothing. Since #308 this refuses the accusation only: an import written in the tail confirms regardless (the rest here is the tail declaring nothing on the head)" },
+  "needs/dynamic": { kind: "cannot-see", why: "EITHER file can load a file at run time (`import()`, `eval`, a Rust item macro -- not `table[name]()` since #344), so neither can be said to declare nothing. Since #308 this refuses the accusation only: an import written in the tail confirms regardless (the rest here is the tail declaring nothing on the head)" },
   "needs/same-file": { kind: "not-an-arrow", why: "a file depending on itself" },
   "needs/said:backwards": { kind: "cannot-see", why: "the compiler sees the forward import and the reader does not" },
   "needs/said:indirect": { kind: "cannot-see", why: "the compiler sees a direct import and the reader reaches the far end only through another file -- mostly a Python `__init__.py` re-export. Amber, not red (#323)" },

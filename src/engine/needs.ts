@@ -29,8 +29,10 @@
  *
  * - both files **parsed to the end**, because a recovered parse read less than
  *   one, and nothing can be proved absent in what we did not read;
- * - neither file **reaching out at runtime**, where no reader can follow, so
- *   "it declares nothing on it" is not a fact about the file.
+ * - neither file **able to load a file at runtime** -- `import()`, `eval`, a
+ *   Rust item macro -- where no reader can follow, so "it declares nothing on
+ *   it" is not a fact about the file. A `table[name]()` is not one of those:
+ *   it calls what the file already imported (#344).
  *
  * Running those four together refused 19.8% of true imports in #302's corpus --
  * `flask/__init__.py` imports `app.py` in plain sight, and the answer was
@@ -44,7 +46,7 @@
  * have shown anyway. Silence is always available and always safe; the accusation
  * is not.
  */
-import { readDependencies, readerCanPlace } from "./deps";
+import { mayHideAnImport, readDependencies, readerCanPlace } from "./deps";
 import { vouchedFor, type Ledger } from "./ledger";
 import { licenceFor, mayAccuse } from "./licence";
 import { languageOf } from "./parse";
@@ -192,7 +194,12 @@ function declares(
    */
   if (!readerCanPlace(file, workspace, cache)) return { on, blind: "unreadable" };
   if (!read.complete) return { on, blind: "incomplete" };
-  if (read.dynamic.length > 0) return { on, blind: "dynamic" };
+  /*
+   * Only the escapes that can bring in a file the text never names (#344). A
+   * `table[name]()` calls something already imported, so "and it imports
+   * nothing else" is as true with one as without.
+   */
+  if (mayHideAnImport(read.dynamic)) return { on, blind: "dynamic" };
   return { on };
 }
 
@@ -497,8 +504,8 @@ const WALK_LIMIT = 5000;
  * way if so.
  *
  * Breadth first, so the chain named is the shortest one. A file the walk
- * could not read to the end -- unlicensed, unvouched, a torn parse, a
- * `table[name]()` -- is still walked through for what it does declare, and
+ * could not read to the end -- unlicensed, unvouched, a torn parse, an
+ * `eval` -- is still walked through for what it does declare, and
  * marks the walk `blind`: finding the head is still a finding, and failing to
  * is no longer evidence, since that file may reach it in a way nobody can read.
  */
