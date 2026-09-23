@@ -539,6 +539,23 @@ export async function createRustAnalyzerReferee(root: string): Promise<RustLspRe
     throw new Error(`rust-analyzer could not be started: ${(error as Error).message}`);
   }
 
+  /*
+   * Listened for before anything is awaited. The race below is only a race if
+   * the exit can still be heard, and rustup's proxy is gone within
+   * milliseconds: on a first check the `await`s between here and the
+   * handshake include loading the JSON-RPC library, which is long enough for
+   * the process to exit unheard -- and then the handshake waits forever.
+   * CI, where every earlier live test is skipped and so nothing has loaded
+   * that library yet, hit exactly that.
+   */
+  const exited = new Promise<never>((_, reject) => {
+    child.once("exit", (code, signal) => reject(new Error(
+      `rust-analyzer exited before answering (${signal ?? `exit code ${code}`})`,
+    )));
+  });
+  // Rejects on every ordinary shutdown too, long after nobody is racing it.
+  exited.catch(() => {});
+
   // `spawn` reports a missing binary asynchronously, so the `try` above catches
   // almost nothing on its own -- ENOENT arrives as an `error` event instead.
   const spawned = new Promise<void>((resolve, reject) => {
@@ -607,13 +624,6 @@ export async function createRustAnalyzerReferee(root: string): Promise<RustLspRe
    * on a tool they did not install. So the handshake races the exit, and
    * losing is a refusal the pool turns into "no server here".
    */
-  const exited = new Promise<never>((_, reject) => {
-    child.once("exit", (code, signal) => reject(new Error(
-      `rust-analyzer exited before answering (${signal ?? `exit code ${code}`})`,
-    )));
-  });
-  // Rejects on every ordinary shutdown too, long after nobody is racing it.
-  exited.catch(() => {});
   let serverVersion = "unknown";
   try {
     const initializing = connection.sendRequest("initialize", {
