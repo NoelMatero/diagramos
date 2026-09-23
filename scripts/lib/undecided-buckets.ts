@@ -123,6 +123,8 @@ export const UNDECIDED_BUCKETS: Record<Labelled, BucketLabel> & Record<string, B
   // ---- not decidable -------------------------------------------------------
   "declined: computed": { bucket: "never", cost: 1,
     why: "the callee is picked at run time; the text does not say what it is" },
+  "declined: not-closed local-callee": { bucket: "never", cost: 1,
+    why: "the call is on a parameter or a local, so what runs is whatever the caller handed in -- named apart from `unbound` because that bucket is work and this one is not (#337)" },
   "unread: endpoint-external": { bucket: "never", cost: 1,
     why: "the board put that end outside the repository, so there is no source to read" },
   "declined: macro": { bucket: "never", cost: 1,

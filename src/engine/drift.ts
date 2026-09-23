@@ -839,6 +839,7 @@ export const NOT_CLOSED_WORDS: Record<CallsNotClosed, string> = {
   dynamic: "the caller can reach a name that is nowhere in its text",
   receiver: "one call is on a value whose type the text does not give",
   unbound: "one call is on a name the file never says the origin of",
+  "local-callee": "one call is on a value the routine was handed, so what it runs is the caller's choice",
   ambiguous: "one call is on a name bound in two places at once",
   unplaced: "one call could not be traced to any file",
   elsewhere: "one call leads through a re-export that runs out",

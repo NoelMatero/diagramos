@@ -18,7 +18,7 @@
  */
 import { beforeAll, describe, expect, it } from "vitest";
 
-import { callSitesIn, type CallSide } from "../src/engine/calls";
+import { callSitesIn, EXTERNAL_RECEIVER, type CallSide } from "../src/engine/calls";
 import { initEngine, type Language } from "../src/engine/parse";
 
 beforeAll(async () => { await initEngine(); }, 120_000);
@@ -544,5 +544,139 @@ describe("the name a call is declared under where it comes to rest", () => {
         open: () => ({ source: "export function render() {}\n", language: "ts", imports: [] }),
       },
     )).toEqual(["render"]);
+  });
+});
+
+/**
+ * A call on a name the language itself provides (#337 part C).
+ *
+ * `isinstance(x, int)` is not a name the file forgot to import. It is Python,
+ * and there is no file in any repository it could reach. Reported as `unbound`
+ * it read as a gap in the text and left the body open, which is how one
+ * built-in stood between a whole body and a verdict: `is_stdlib_dataclass`
+ * makes exactly one call, `hasattr`, and nothing else was ever in doubt.
+ *
+ * Placed outside the repository rather than at any file, so it can close a
+ * body and can never be what an arrow reaches.
+ *
+ * The refusal that keeps it honest: a file carrying a wildcard import may have
+ * had the name shadowed by something it brought in, and the text does not say.
+ */
+describe("a call on a name the language itself provides", () => {
+  const placedOutside = (source: string, language: Language) => {
+    const body = sitesIn(source, language).find((one) => one.routine === "f")!;
+    return body.sites.map((one) => one.file ?? `?${one.why}`);
+  };
+
+  it("places a JavaScript global, and leaves an ordinary unbound name open", () => {
+    expect(placedOutside("function f(v) {\n  return Number(v);\n}\n", "ts"))
+      .toEqual([EXTERNAL_RECEIVER]);
+    expect(why("function f() {\n  mystery();\n}\n", "f")).toEqual(["unbound"]);
+  });
+
+  it("places a Python built-in, and leaves an ordinary unbound name open", () => {
+    expect(placedOutside("def f(v):\n    return isinstance(v, int)\n", "python"))
+      .toEqual([EXTERNAL_RECEIVER]);
+    expect(why("def f():\n    mystery()\n", "f", "python")).toEqual(["unbound"]);
+  });
+
+  it("places a Rust prelude name, and leaves an ordinary unbound name open", () => {
+    expect(placedOutside("fn f() -> Result<u8, E> {\n    Ok(1)\n}\n", "rust"))
+      .toEqual([EXTERNAL_RECEIVER]);
+    expect(why("fn f() {\n    mystery();\n}\n", "f", "rust")).toEqual(["unbound"]);
+  });
+
+  it("places a std macro's name, and still leaves the body open on its tokens", () => {
+    /*
+     * `calleeOf` reads a `macro_invocation` through its `macro` field, so
+     * `vec![1]` arrives as the bare name `vec` and is placed like any other
+     * prelude name. The body stays open all the same: what is *inside* a
+     * macro is loose tokens rather than a tree, and a call written in there
+     * is invisible. Both facts, because the first one alone would read as a
+     * Rust body that closes and no Rust body with a macro in it does.
+     */
+    const body = sitesIn("fn f() {\n    let v = vec![1];\n}\n", "rust")
+      .find((one) => one.routine === "f")!;
+    expect(body.sites.map((one) => one.file ?? `?${one.why}`))
+      .toEqual([EXTERNAL_RECEIVER, "?macro"]);
+  });
+
+  it("places a global in TSX too, and leaves an ordinary unbound name open", () => {
+    expect(placedOutside("function f(v) {\n  return Number(v);\n}\n", "tsx"))
+      .toEqual([EXTERNAL_RECEIVER]);
+    expect(why("function f() {\n  mystery();\n}\n", "f", "tsx")).toEqual(["unbound"]);
+  });
+
+  it("refuses when a wildcard import could have shadowed the name", () => {
+    /*
+     * `from .shims import *` may well declare a `list` of its own, and which
+     * one `list()` means is not in this file. The same doubt `throughWildcards`
+     * applies to a name it cannot follow to a unique answer.
+     */
+    expect(why("from .shims import *\n\n\ndef f(v):\n    return list(v)\n", "f", "python"))
+      .toEqual(["unbound"]);
+  });
+});
+
+/**
+ * A call on a name the routine itself holds (#337 part C).
+ *
+ * `next()` inside vite's `transformMiddleware` is that function's own third
+ * parameter. Reported as `unbound` -- "the file never says where this name
+ * came from" -- it described a gap in the text that is not there: the file
+ * says where it came from, on the line above. Nine of those sites were in one
+ * body, and the ranking that #337 was written from counted every one of them
+ * as a wildcard import waiting to be followed.
+ *
+ * The body stays open either way, and that is why this is safe to get wrong
+ * in the generous direction: a value handed in is genuinely not in the text,
+ * so no verdict moves. What moves is whether the next person reading the
+ * ranking is told the truth about what stopped the reader.
+ */
+describe("a call on a name the routine holds rather than the file", () => {
+  it("names a parameter as one, in each grammar", () => {
+    expect(why("function f(next) {\n  next();\n}\n", "f")).toEqual(["local-callee"]);
+    expect(why("def f(hook):\n    hook()\n", "f", "python")).toEqual(["local-callee"]);
+    expect(why("fn f(go: fn()) {\n    go();\n}\n", "f", "rust")).toEqual(["local-callee"]);
+    expect(why("function f(Render) {\n  return Render();\n}\n", "f", "tsx")).toEqual(["local-callee"]);
+  });
+
+  it("names a value the body binds, where the file reader has not already", () => {
+    /*
+     * Python and Rust, where a body-local is not something `bindingsIn`
+     * collects.
+     */
+    expect(why("def f():\n    step = pick()\n    step()\n", "f", "python"))
+      .toEqual(["unbound", "local-callee"]);
+    expect(why("fn f() {\n    let step = pick();\n    step();\n}\n", "f", "rust"))
+      .toEqual(["unbound", "local-callee"]);
+  });
+
+  it("leaves TypeScript's function-local const where the file reader put it", () => {
+    /*
+     * Asserted so it is on the record rather than found again later. A `const`
+     * inside a function body has a `name` field, so `bindingsIn` counts it
+     * among the *file's* declarations and the call is placed at this file --
+     * before this reader is ever asked. Python and Rust, whose locals carry no
+     * `name` field, get the more careful answer above.
+     *
+     * Not changed here. Placing it differently would move `@calls` verdicts on
+     * every TypeScript board, and nothing in this change has measured that.
+     */
+    const body = sitesIn("function f() {\n  const step = pick();\n  step();\n}\n")
+      .find((one) => one.routine === "f")!;
+    expect(body.sites.map((one) => one.file ?? `?${one.why}`)).toEqual(["?unbound", "a.ts"]);
+  });
+
+  it("still says unbound for a name nothing in the routine binds", () => {
+    // The distinction the whole thing is for: this one really is a name the
+    // file never says the origin of, and the ranking should keep saying so.
+    expect(why("function f() {\n  mystery();\n}\n", "f")).toEqual(["unbound"]);
+  });
+
+  it("does not mistake a parameter's type for a name it binds", () => {
+    // Rust writes the type on the same field-shaped node as the binding, and
+    // reading the two as one would bind `Mystery` and then place a call on it.
+    expect(why("fn f(x: Mystery) {\n    Mystery();\n}\n", "f", "rust")).toEqual(["unbound"]);
   });
 });

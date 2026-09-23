@@ -48,6 +48,7 @@
     "measure:accesses-closed": "NODE_OPTIONS=--max-old-space-size=8192 tsx scripts/measure-accesses-closed.mts",
     "measure:accesses-absence": "NODE_OPTIONS=--max-old-space-size=8192 tsx scripts/measure-accesses-absence.mts",
     "measure:calls": "NODE_OPTIONS=--max-old-space-size=8192 tsx scripts/measure-calls.mts",
+    "measure:builtins": "NODE_OPTIONS=--max-old-space-size=8192 tsx scripts/measure-builtins.mts",
     "measure:closed-bodies": "NODE_OPTIONS=--max-old-space-size=8192 tsx scripts/measure-closed-bodies.mts",
     "measure:wrong-routine": "NODE_OPTIONS=--max-old-space-size=8192 tsx scripts/measure-wrong-routine.mts",
     "measure:conforms": "tsx scripts/measure-conforms.mts",
