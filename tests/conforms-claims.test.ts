@@ -224,9 +224,10 @@ describe("a claim nothing can ever read", () => {
     // Red since #297's second end, where this was an unreadable claim: a
     // function is not a type, so nothing is ever one of it, and the person
     // whose board it is should be the one told. Still not `conforms-absent`:
-    // the base list was never the problem.
+    // the base list was never the problem. Worded since #345 as what
+    // `@conforms` asks of its head: something a type can implement or extend.
     const wrongKind = report.edges.find((one) => one.kind === "end-lacks-part");
-    expect(wrongKind?.detail).toContain("a function is not a type");
+    expect(wrongKind?.detail).toContain("a function cannot be implemented");
     expect(report.garbledClaims ?? []).toEqual([]);
     expect(report.edges.some((one) => one.kind === "conforms-absent")).toBe(false);
   });

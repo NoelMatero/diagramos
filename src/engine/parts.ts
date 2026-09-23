@@ -51,7 +51,9 @@ import type { ArrowClaim } from "./claim";
 import { declaredShapes } from "./body";
 import { each, type Language, type Node } from "./parse";
 
-export const PARTS = ["body", "signature", "result", "fields", "bases", "type", "callable"] as const;
+export const PARTS = [
+  "body", "signature", "result", "fields", "bases", "type", "callable", "implementable",
+] as const;
 export type Part = (typeof PARTS)[number];
 
 export type PartReading = "has" | "lacks" | "unsure";
@@ -65,7 +67,10 @@ export type PartReading = "has" | "lacks" | "unsure";
  *
  * The second end of `takes`, `returns`, `holds`, `conforms` and `builds` --
  * "this end is a type" -- was added when #301's test set planted its
- * wrong-kind mistakes there and #297's first cut never looked. `calls` has no
+ * wrong-kind mistakes there and #297's first cut never looked. `conforms` asks
+ * one step more of its head than "a type" (#345): something a type can
+ * implement or extend, which is every type in TypeScript and Python and only
+ * a trait in Rust. `calls` has no
  * second line: calling a class is how Python and a Rust tuple struct construct
  * one, so a type at its head is not a wrong kind, and a constant there may hold
  * a function.
@@ -80,7 +85,7 @@ export const NEEDS: Record<ArrowClaim, { from?: Part; to?: Part }> = {
   takes: { from: "type", to: "signature" },
   returns: { from: "type", to: "signature" },
   holds: { from: "fields", to: "type" },
-  conforms: { from: "bases", to: "type" },
+  conforms: { from: "bases", to: "implementable" },
   accesses: { from: "body", to: "fields" },
 };
 
@@ -93,6 +98,7 @@ export const PART_WORDS: Record<Part, string> = {
   bases: "has no base types",
   type: "is not a type",
   callable: "is a plain value, and cannot be called",
+  implementable: "cannot be implemented",
 };
 
 /** And the other way round: what the claim wanted to find there. */
@@ -104,6 +110,7 @@ export const PART_NEEDED: Record<Part, string> = {
   bases: "a base list",
   type: "a type",
   callable: "something that can be called",
+  implementable: "a type another can implement or extend (in Rust, only a trait)",
 };
 
 const has = (node: Node, field: string) => node.childForFieldName(field) !== null;
@@ -314,8 +321,56 @@ function aliasesByAnnotation(text: string): boolean {
   return /\bTypeAlias\b/.test(text);
 }
 
+/**
+ * `type Handler = "a" | "b"` writes a value where a type belongs, and the one
+ * thing that tells it apart from a constant is the word the language opens it
+ * with. Both TypeScript and Rust spell it `type`.
+ */
+function aliasesAType(node: Node): boolean {
+  const name = node.childForFieldName("name");
+  return name !== null && keywordOf(node, name) === "type";
+}
+
+/**
+ * Whether a type could implement or extend this one, for `@conforms`' head
+ * (#345).
+ *
+ * In TypeScript and Python this is the same question as "is it a type": a
+ * class can be extended and implemented, an interface or a `Protocol` too, so
+ * no type there is the wrong kind of thing to conform to.
+ *
+ * **In Rust only a trait can be implemented**, and whether a declaration is one
+ * is written on the declaration itself -- but not in a field. A trait, a
+ * struct, an enum and a module all carry the same two, `name` and `body`, and
+ * a unit struct carries only `name`. What differs is the word before the name,
+ * and a keyword is an anonymous token, so its type is its own text: the reading
+ * `nounOf` makes to say "a struct" in the sentence. `trait` is the one word
+ * that makes a thing implementable, which is a rule of the language and not a
+ * list of its declarations -- `struct`, `enum`, `union`, `mod`, `fn`, `const`
+ * all fall out of it without being named. `unsafe trait` and `auto trait` end
+ * on the same word.
+ *
+ * Where the declaration opens with no word -- an enum variant, a field -- the
+ * answer is whatever `type` said, and an alias keeps its doubt: `type Handler =
+ * ...` may name a trait object, and nothing here follows it.
+ */
+function implementable(node: Node, language: Language, type: PartReading): PartReading {
+  if (language !== "rust" || aliasesAType(node)) return type;
+  const name = node.childForFieldName("name");
+  const keyword = name ? keywordOf(node, name) : undefined;
+  if (!keyword) return type;
+  return keyword === "trait" ? "has" : "lacks";
+}
+
 /** How one declaration reads, by the shapes above. */
 function readDeclaration(node: Node, language: Language): Record<Part, PartReading> {
+  const shape = readShape(node, language);
+  return { ...shape, implementable: implementable(node, language, shape.type) };
+}
+
+type Shape = Record<Exclude<Part, "implementable">, PartReading>;
+
+function readShape(node: Node, language: Language): Shape {
   if (has(node, "parameters")) {
     return {
       body: has(node, "body") ? "has" : "lacks",
@@ -351,14 +406,7 @@ function readDeclaration(node: Node, language: Language): Record<Part, PartReadi
     };
   }
   const value = node.childForFieldName("value") ?? node.childForFieldName("right");
-  const name = node.childForFieldName("name");
-  /*
-   * `type Handler = "a" | "b"` writes a value where a type belongs, and the
-   * one thing that tells it apart from a constant is the word the language
-   * opens it with. Both TypeScript and Rust spell it `type`.
-   */
-  const aliasesAType = name !== null && keywordOf(node, name) === "type";
-  if (aliasesAType) return { ...UNSURE };
+  if (aliasesAType(node)) return { ...UNSURE };
   if (value && isLiteral(value)) {
     return {
       body: "lacks", signature: "lacks", result: "unsure", fields: "unsure", bases: "unsure",
@@ -416,7 +464,7 @@ function readDeclaration(node: Node, language: Language): Record<Part, PartReadi
 
 const UNSURE: Record<Part, PartReading> = {
   body: "unsure", signature: "unsure", result: "unsure", fields: "unsure", bases: "unsure",
-  type: "unsure", callable: "unsure",
+  type: "unsure", callable: "unsure", implementable: "unsure",
 };
 
 /**
@@ -482,14 +530,27 @@ export function declaredNames(source: string, language: Language): string[] {
  * that counts words alone calls that field a plain value. `couldBeCalled`
  * refuses any type with an arrow or a bracket in it for that reason.
  *
+ * `implementable` (#345) is `type` in every language but Rust, number for
+ * number. In Rust it reads the keyword, and rust-analyzer agreed on all 16,941
+ * lacks with 0 wrong and 0 unjudged.
+ *
  * A square goes `false` the moment a run finds one wrong lack in that
  * language. The claim's reader is unaffected either way: losing this costs the
  * accusation and nothing else, exactly as `licence.ts` has it.
  */
 export const PART_LICENCE: Record<Language, Record<Part, boolean>> = {
-  ts: { body: true, signature: true, result: true, fields: true, bases: true, type: true, callable: true },
-  tsx: { body: true, signature: true, result: true, fields: true, bases: true, type: true, callable: true },
-  js: { body: true, signature: true, result: true, fields: true, bases: true, type: true, callable: true },
+  ts: {
+    body: true, signature: true, result: true, fields: true, bases: true, type: true, callable: true,
+    implementable: true,
+  },
+  tsx: {
+    body: true, signature: true, result: true, fields: true, bases: true, type: true, callable: true,
+    implementable: true,
+  },
+  js: {
+    body: true, signature: true, result: true, fields: true, bases: true, type: true, callable: true,
+    implementable: true,
+  },
   /*
    * Closed on `body`, and it was open for a day. A Rust type's code is its
    * `impl` blocks, which live outside the declaration and may be in any file of
@@ -500,8 +561,14 @@ export const PART_LICENCE: Record<Language, Record<Part, boolean>> = {
    * blocks the square reads 1,068 wrong lacks. The same footing as `@conforms`
    * in Rust: the fact is somewhere in the crate.
    */
-  rust: { body: false, signature: true, result: true, fields: true, bases: true, type: true, callable: true },
-  python: { body: true, signature: true, result: true, fields: true, bases: true, type: true, callable: true },
+  rust: {
+    body: false, signature: true, result: true, fields: true, bases: true, type: true, callable: true,
+    implementable: true,
+  },
+  python: {
+    body: true, signature: true, result: true, fields: true, bases: true, type: true, callable: true,
+    implementable: true,
+  },
 };
 
 /** One end of an arrow, as the check has it. */

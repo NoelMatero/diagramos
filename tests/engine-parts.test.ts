@@ -383,6 +383,65 @@ describe("a value with its type written beside it (#337)", () => {
   });
 });
 
+describe("what a type can implement or extend (#345)", () => {
+  it("in Rust is a trait, and nothing else", () => {
+    const source = [
+      "pub trait Formatter { fn begin(&mut self) {} }",
+      "pub unsafe trait Sealed: Formatter {}",
+      "pub struct Command { name: String }",
+      "pub struct CompactFormatter;",
+      "pub struct Pair(u8, u8);",
+      "pub enum Category { Io, Syntax }",
+      "pub union Bits { word: u32 }",
+      "pub mod plumbing {}",
+      "pub fn helper() {}",
+      "",
+    ].join("\n");
+    for (const name of ["Formatter", "Sealed"]) {
+      expect(read(source, name, "rust")?.implementable).toBe("has");
+    }
+    for (const name of ["Command", "CompactFormatter", "Pair", "Category", "Bits", "plumbing", "helper"]) {
+      expect(read(source, name, "rust")?.implementable).toBe("lacks");
+    }
+  });
+
+  it("in Rust keeps its doubt about an alias and a name out of a macro", () => {
+    // `type Handler = dyn Fn()` names something nobody here follows, and a
+    // macro's output is never read at all.
+    expect(read("pub type Handler = Box<dyn Formatter>;\n", "Handler", "rust")?.implementable).toBe("unsure");
+    const macro = "lazy_static! { static ref LOGGER: Logger = Logger::new(); }\n";
+    expect(read(macro, "LOGGER", "rust")?.implementable).toBe("unsure");
+  });
+
+  it("in TypeScript is any class or interface, and never a function", () => {
+    const source = [
+      "export interface Sized { size(): number }",
+      "export class Panel {}",
+      "export abstract class Base {}",
+      "export function render(): string { return \"\"; }",
+      "",
+    ].join("\n");
+    for (const name of ["Sized", "Panel", "Base"]) expect(read(source, name, "ts")?.implementable).toBe("has");
+    expect(read(source, "render", "ts")?.implementable).toBe("lacks");
+  });
+
+  it("in Python is any class, and never a function", () => {
+    const source = [
+      "class Base:",
+      "    pass",
+      "",
+      "class Sized(Protocol):",
+      "    def size(self) -> int: ...",
+      "",
+      "def render() -> str:",
+      "    return \"\"",
+      "",
+    ].join("\n");
+    for (const name of ["Base", "Sized"]) expect(read(source, name, "python")?.implementable).toBe("has");
+    expect(read(source, "render", "python")?.implementable).toBe("lacks");
+  });
+});
+
 describe("the two halves that must not drift apart", () => {
   it("has a need for every claim, and words for every part", () => {
     // The typed records make this a compile error too; the test is here
