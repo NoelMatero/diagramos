@@ -203,7 +203,8 @@ function declaringLine(
     : new RegExp(`\\bfn\\s+${escaped}\\s*[<(]`);
   const container = language === "python"
     ? new RegExp(`^\\s*class\\s+${escaped}\\s*[(:]`)
-    : new RegExp(`\\b(struct|enum|trait|union|mod)\\s+${escaped}\\b`);
+    // `extern crate alloc;` names a crate, which rust-analyzer lists as nothing.
+    : new RegExp(`\\b(struct|enum|trait|union|mod|crate)\\s+${escaped}\\b`);
   /*
    * An assignment on the reader's own line, which the servers often file
    * elsewhere: pyright lists one symbol per name per scope, so the `brotli =
@@ -236,7 +237,7 @@ function declaringLine(
   }
   /*
    * A trait is what rust-analyzer files as an interface, and the one thing a
-   * Rust type can implement (#345); the other four keywords are its class.
+   * Rust type can implement (#345); the other five keywords are its class.
    */
   const opened = container.exec(text);
   if (opened) return refereeParts(opened[1] === "trait" ? 11 : 5, "", language === "python", language === "rust");

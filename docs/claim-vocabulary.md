@@ -485,7 +485,7 @@ only hand-written part.** Nine lines, in `NEEDS` in `parts.ts`:
 | `@takes` | a type | parameters or a return type |
 | `@returns` | a type | parameters or a return type |
 | `@holds` | a field list | a type |
-| `@conforms` | a base list | a type |
+| `@conforms` | a base list | a type another can implement or extend -- in Rust, only a trait (#345) |
 | `@accesses` | a body of code that runs | a field list |
 
 The first cut had one column. #297 listed one end per word and that is what was
@@ -603,6 +603,40 @@ which the first cut read as a name.
 
 **A plan is never accused**, as with every other red here.
 
+**In Rust, only a trait can be implemented** (#345). `CompactFormatter
+@conforms Formatter` drawn the wrong way round points "implements" at a unit
+struct, and `Command @conforms MKeyMap` at a struct with fields. Both are wrong
+whatever the crate says, and both were silent: `@conforms` withholds on Rust
+because an `impl` may be in any file, and "a type" was all this section asked of
+the head -- which a struct is. The planted bench had 15 of them, every one a
+struct or an enum at the head.
+
+So `@conforms`' head asks for something narrower than a type: something a type
+can implement or extend. In TypeScript and Python that is the same question --
+any class or interface can be implemented or extended, a `Protocol` too -- and
+there is no equivalent mistake to catch. In Rust it is a trait and nothing else.
+
+**There is no field for it.** A trait, a struct, an enum and a module all carry
+`name` and `body`, and a unit struct only `name`; a trait's `bounds` field is
+there only when it has supertraits. What differs is the word before the name,
+and a keyword is an anonymous token whose type is its own text -- the reading
+that already puts "a struct" in the sentence. `trait` is the one word that makes
+a thing implementable. `struct`, `enum`, `union`, `mod`, `fn`, `const` and
+`extern crate` are not listed anywhere; they fall out of not being it. A
+declaration that opens with no word (an enum variant, a field) keeps whatever
+`type` said, and `type Handler = ...` keeps its doubt, because an alias is
+followed nowhere here.
+
+Measured before it could accuse, over the same fifteen repositories: **0 wrong
+out of 16,941** Rust names the reader says cannot be implemented, with
+rust-analyzer as the referee -- it files a trait as an interface and a struct
+or an enum as something else, which is its own name resolution and not the
+keyword. The first run left 25 unjudged, every one an `extern crate alloc;`,
+which rust-analyzer does not list; the referee's text reading learned `crate`
+and judged all 25. In the other four languages the row is the `type` row,
+number for number, because it is the same question there.
+
+
 ### The measurement
 
 ```
@@ -627,6 +661,7 @@ referee only.
 | rust | fields / bases | 0 | 0 | 10,264 | 308 | yes |
 | rust | type | 0 | 0 | 14,414 | 369 | yes |
 | rust | callable | 0 | 2 | 3,430 | 68 | yes |
+| rust | implementable (#345) | 0 | 0 | 16,941 | 379 | yes |
 | python | body | 0 | 190 | 11,084 | 11,259 | yes |
 | python | signature | 0 | 190 | 20,044 | 2,299 | yes |
 | python | result | 0 | 0 | 12,430 | 0 | yes |

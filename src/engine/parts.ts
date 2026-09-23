@@ -530,6 +530,10 @@ export function declaredNames(source: string, language: Language): string[] {
  * that counts words alone calls that field a plain value. `couldBeCalled`
  * refuses any type with an arrow or a bracket in it for that reason.
  *
+ * `implementable` (#345) is `type` in every language but Rust, number for
+ * number. In Rust it reads the keyword, and rust-analyzer agreed on all 16,941
+ * lacks with 0 wrong and 0 unjudged.
+ *
  * A square goes `false` the moment a run finds one wrong lack in that
  * language. The claim's reader is unaffected either way: losing this costs the
  * accusation and nothing else, exactly as `licence.ts` has it.
