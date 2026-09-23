@@ -701,14 +701,21 @@ above.
 
 `npm run bench:planted`, 855 planted and drawn mistakes and 428 true claims:
 
-| | before #297 | first cut | both ends, Rust body closed | at #309 | after #306 | after #337 |
-|---|---:|---:|---:|---:|---:|---:|
-| mistakes called wrong | 229 (27%) | 303 (35%) | 386 (45%) | 385 (45%) | 386 (45%) | **479 (56%)** |
-| of which planted wrong-kind | 7 of 146 | 11 | 52 | 51 | 52 | **81** |
-| greens on a false claim | -- | -- | 43 | 27 | 26 | **26** |
-| true claims called wrong | 8 | 10 | 8 | 1 | 1 | **0** |
+| | before #297 | first cut | both ends, Rust body closed | at #309 | after #306 | after #337 | after #345 |
+|---|---:|---:|---:|---:|---:|---:|---:|
+| mistakes called wrong | 229 (27%) | 303 (35%) | 386 (45%) | 385 (45%) | 386 (45%) | 479 (56%) | **508 (59%)** |
+| of which planted wrong-kind | 7 of 146 | 11 | 52 | 51 | 52 | 81 | **83** |
+| greens on a false claim | -- | -- | 43 | 27 | 26 | 26 | **26** |
+| true claims called wrong | 8 | 10 | 8 | 1 | 1 | 0 | **0** |
 
-The last column is every word, not only this one: reading a value's written
+**#345's column** is one change measured against the same day's main,
+`5101697`, which caught 493: +15, and every one is a Rust `@conforms` with a
+struct or an enum at the head. None of them is a planted *wrong-kind* mistake
+-- they were planted as a swap, a reverse, or drawn that way -- which is why
+that row does not move. All 77 wrong `@conforms` claims on the bench are now
+red, and the 15 true ones are still green.
+
+The `after #337` column is every word, not only this one: reading a value's written
 type moved `@calls` by 12, `@builds` by 12, `@holds` by 5, `@takes` by 2 and
 `@returns` by 1, and 28 of the 93 wrong-kind mistakes the bench was still
 missing. Both arms were run on the same day's main, `4480f9f`.
