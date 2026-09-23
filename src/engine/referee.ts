@@ -154,7 +154,7 @@ export function refereedCheck(
  * scores the same with the referee as without it. If that changes, this is
  * the function to widen.
  */
-function wouldHelp(report: DriftReport): boolean {
+export function wouldHelp(report: DriftReport): boolean {
   const { callsWithheld, callsNotClosed } = report.claims;
   return (callsNotClosed.receiver ?? 0) > 0
     || (callsNotClosed["abstract-receiver"] ?? 0) > 0

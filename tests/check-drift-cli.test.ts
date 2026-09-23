@@ -1797,6 +1797,21 @@ describe("check-drift saying what it did not look at", () => {
     expect(asked.stderr).not.toContain("boxes skipped");
   });
 
+  it("says which check the board got, not only that it was checked (#334)", async () => {
+    /*
+     * "Everything on this board was checked" was true of a board the compiler
+     * answered for and of one where no compiler was ever asked, and the two
+     * printed identically. A Python board checked here got pyright's answer
+     * and the same board checked through the MCP tools did not, and nothing
+     * anywhere said so -- which is the whole of #334.
+     */
+    await put("real", [{ id: "a", label: "A", ref: "src/a.ts" }]);
+    const asked = await check("--details");
+    expect(asked.stderr).toContain("checked with the TypeScript compiler");
+    // And it never stands in for the line above it.
+    expect(asked.stderr).toContain("everything on this board was checked");
+  });
+
   it("names the reason an arrow went unread, per reason", async () => {
     await put("mixed", [
       { id: "a", label: "A", ref: "src/a.ts" },

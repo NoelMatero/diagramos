@@ -45,7 +45,7 @@
 import path from "node:path";
 
 import { ACCUSING_EDGE_KINDS, checkDrift, createWorkspace, newCheckCache, type CheckCache } from "../src/engine/drift";
-import { refereedCheck } from "../src/engine/referee";
+import { liveRefereePool, refereedCheckLive, type LiveRefereePool } from "../src/engine/referee-live";
 import { initEngine } from "../src/engine/parse";
 import { plantedBoard, plantedKeys, type Key, type KeyClaim } from "./lib/planted-keys";
 import { UNDECIDED_BUCKETS, type Bucket } from "./lib/undecided-buckets";
@@ -84,6 +84,35 @@ function cacheFor(project: string): CheckCache {
 }
 
 /**
+ * One language-server pool per project, and never two at once (#337).
+ *
+ * Every arrow is asked on a board of its own, so without a pool held across
+ * them a Python project would start pyright once per arrow -- the start is
+ * almost the whole cost, 1.0s to 4.1s per tree, and the questions are tens of
+ * milliseconds. Held per project, the run pays each start once.
+ *
+ * The previous project's servers are closed the moment a new project asks,
+ * for the reason `refereeFor` holds one root rather than a map of them: these
+ * are live child processes, fifteen pinned clones' worth of rust-analyzer at
+ * once is not something to find out about at the eleventh, and a run that
+ * walks projects in turn never wants the one it has left.
+ *
+ * The deadline is generous and per check rather than per pool. This is a
+ * measurement, so a board that would have degraded to the text reading under
+ * the product's own budget should not degrade here: what this run is for is
+ * the ceiling, and the product's cost is measured separately.
+ */
+const BENCH_BUDGET_MS = 120_000;
+let pools: { project: string; pool: LiveRefereePool } | undefined;
+function poolFor(project: string): LiveRefereePool {
+  if (pools?.project !== project) {
+    pools?.pool.close();
+    pools = { project, pool: liveRefereePool(() => Date.now() + BENCH_BUDGET_MS) };
+  }
+  return pools.pool;
+}
+
+/**
  * Why an undecided arrow was left undecided, in one slug (#320).
  *
  * Read off a board carrying that one arrow, so every count in the tally
@@ -110,15 +139,21 @@ async function ask(key: Key, claim: KeyClaim): Promise<{ outcome: Outcome; detai
   const { workspace } = cache;
   const board = await plantedBoard(key, claim);
   /*
-   * The same referee a real check gets (#328). This used to be left out, and
-   * the score every change was judged by was therefore the weaker check --
-   * the one where a call on a value whose type is not written down is never
-   * followed at all, which #324 measured as the largest single reason a
-   * `@calls` arrow goes unanswered.
+   * The same referee a real check gets (#328, widened to Python and Rust at
+   * #337). This used to be left out entirely, and the score every change was
+   * judged by was therefore the weaker check -- the one where a call on a
+   * value whose type is not written down is never followed at all, which #324
+   * measured as the largest single reason a `@calls` arrow goes unanswered.
+   * Until #337 it was still the weaker check for Python and Rust, which is
+   * two thirds of the corpus.
    */
-  const report = refereedCheck(path.join(CORPUS, key.project), (referee) => checkDrift(board, workspace, {
-    edges: true, cache, ...(referee ? { closedBodyReferee: referee } : {}),
-  }));
+  const { report } = await refereedCheckLive(
+    path.join(CORPUS, key.project),
+    (referee) => checkDrift(board, workspace, {
+      edges: true, cache, ...(referee ? { closedBodyReferee: referee } : {}),
+    }),
+    { budgetMs: BENCH_BUDGET_MS, pool: poolFor(key.project) },
+  );
   // The engine quotes the declaration it read, and a Python class runs to
   // thousands of characters. What a reader of this table needs is which
   // verdict it was and the first line of why.
@@ -441,3 +476,11 @@ for (const { reason, label, claims } of work) {
     + `${(claims / label!.cost).toFixed(1).padStart(7)}  ${reason}`);
 }
 console.log();
+
+/*
+ * The last project's servers, which nothing else will close. A live language
+ * server is an open child-process handle and Node will not reach its own
+ * natural exit while one is alive -- `check-drift.mjs` found that live, as the
+ * script hanging after printing its whole report.
+ */
+pools?.pool.close();

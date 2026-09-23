@@ -71,9 +71,9 @@ import { createCodeGraphOption, TESTED_VERSION_PREFIX } from "../src/engine/code
 import { createLedger } from "../src/engine/ledger.ts";
 import { goodNewsIds, goodNewsLine, goodNewsSince, novelGoodNews } from "../src/engine/goodnews.ts";
 import { createTsReferee, isOutsideTree, receiverResolutionFrom } from "./lib/resolution-ts.ts";
-import { resolvePythonReceivers } from "./lib/resolution-python-live.ts";
-import { resolveRustReceivers } from "./lib/resolution-rust-receivers.ts";
-import { refereePool, resolvePythonDefinitions, resolveRustDefinitions } from "./lib/resolution-definitions.ts";
+import { resolvePythonReceivers } from "../src/engine/referee-python.ts";
+import { resolveRustReceivers } from "../src/engine/referee-rust.ts";
+import { refereePool, resolvePythonDefinitions, resolveRustDefinitions } from "../src/engine/referee-pool.ts";
 import { languageOf } from "../src/engine/parse.ts";
 
 const root = process.cwd();
@@ -1473,7 +1473,7 @@ for (const file of checking) {
  *
  * `CallSide.resolveReceiver` is synchronous -- called deep inside `calls.ts`'s
  * own synchronous walk -- and a language server is not: every answer is a
- * round trip to a spawned process. `scripts/lib/resolution-python-live.ts`'s
+ * round trip to a spawned process. `src/engine/referee-python.ts`'s
  * header has the full reasoning; the shape of it is a silent run of every
  * board with a resolver that answers `undefined` and remembers what it was
  * asked, then one batch of real async work, then the real run reading a
@@ -1551,7 +1551,7 @@ function boardsName(language) {
  *
  * `receivers` and `definitions` each take `(root, queries, pool)` and wrap
  * that language's own batch resolver -- `resolvePythonReceivers` /
- * `resolveRustReceivers` and the pair in `resolution-definitions.ts`, which
+ * `resolveRustReceivers` and the pair in `referee-pool.ts`, which
  * share a shape without sharing a line. Wrapped rather than passed directly
  * because Rust's two take a `skip` set that Python's have no use for, and a
  * caller threading `undefined` through a positional slot to reach the pool is
@@ -2333,6 +2333,24 @@ function renderUnreadArrows(entries, colour) {
 }
 
 /**
+ * Which second opinion this run got, in words (#334).
+ *
+ * The CLI is the one path that has always asked pyright and rust-analyzer, so
+ * this is rarely bad news here -- but it can be: the harvest has a budget, and
+ * a tree whose servers do not come up inside it degrades to the text reading.
+ * A run that degraded and a run that did not are not the same claim.
+ */
+function checkedWithLine() {
+  const got = [];
+  if (tsReferee) got.push("the TypeScript compiler");
+  if (pythonCache) got.push("pyright");
+  if (rustCache) got.push("rust-analyzer");
+  if (got.length === 0) return "checked against the text only — no compiler was asked";
+  const spelled = got.length === 1 ? got[0] : `${got.slice(0, -1).join(", ")} and ${got[got.length - 1]}`;
+  return `checked with ${spelled}`;
+}
+
+/**
  * What was looked at, and what was not.
  *
  * Printed only for --details, and printed even when everything is clean. That is
@@ -2539,6 +2557,15 @@ function renderCoverageAudit(entries, colour) {
         if (plannedLine) rows.push(paint(plannedLine, "dim", colour));
       }
       if (rows.length === 0) rows.push(paint("everything on this board was checked", "dim", colour));
+      /*
+       * Which check this run got (#334). Silence had a third meaning here as
+       * well: a board whose compiler answered and a board whose compiler never
+       * started look identical in every row above, and the difference is
+       * whether "nothing disagreed" was a reading of the code or a reading of
+       * the text. Last, and after the empty-rows line rather than before it,
+       * so it never stands in for having nothing to admit.
+       */
+      rows.push(paint(checkedWithLine(), "dim", colour));
       return {
         // The same words the live board's chip uses, from the same function --
         // "refs" here and "boxes" there was one number with two names. The

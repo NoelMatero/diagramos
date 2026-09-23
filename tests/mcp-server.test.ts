@@ -1466,3 +1466,39 @@ describe("survey_scope", () => {
     await expect(call("survey_scope", { scope: "../.." })).rejects.toThrow();
   }, 120_000);
 });
+
+describe("saying which check a board got (#334)", () => {
+  /*
+   * A Python board checked through these tools got the text reading -- no
+   * compiler was ever asked what a value was -- while the same board checked
+   * from the terminal got pyright's answer. The two results printed
+   * identically, so nobody could tell a quiet board that had been read from a
+   * quiet board that had not. #337 wired the language servers in here; this is
+   * the part that makes the difference visible.
+   */
+  it("names the compiler that answered, on a Python board that needed one", async () => {
+    await mkdir(path.join(workspace, "told"), { recursive: true });
+    await writeFile(path.join(workspace, "told", "thing.py"), "class Thing:\n    def greet(self):\n        return \"hi\"\n");
+    await writeFile(path.join(workspace, "told", "make.py"), "from told.thing import Thing\n\n\ndef make():\n    return Thing()\n");
+    await writeFile(
+      path.join(workspace, "told", "a.py"),
+      "from told.make import make\n\n\ndef run():\n    thing = make()\n    return thing.greet()\n",
+    );
+    await writeFile(path.join(workspace, "told", "b.py"), "def render(n):\n    return n\n");
+
+    const board = "docs/diagrams/told.excalidraw";
+    await call("create_diagram", {
+      path: board,
+      name: "told",
+      nodes: [
+        { id: "caller", label: "run", ref: "told/a.py#run" },
+        { id: "callee", label: "render", ref: "told/b.py#render" },
+      ],
+      edges: [{ from: "caller", to: "callee", claim: "calls" }],
+    });
+
+    const checked = jsonOf(await call("check_drift", { path: board }));
+    const said = ((checked.checkedWith as string[] | undefined) ?? []).join(" | ");
+    expect(said, `checkedWith was ${JSON.stringify(checked.checkedWith)}`).toContain("pyright");
+  }, 180_000);
+});

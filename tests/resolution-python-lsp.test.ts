@@ -19,7 +19,8 @@ import path from "node:path";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
 
 import {
-  createPyrightLspReferee, isOutsideTree, memberRangeAfter, typeAnchorFor, type PyrightLspReferee,
+  createPyrightLspReferee, isOutsideTree, memberRangeAfter, typeAnchorFor, warmUpAcross,
+  type PyrightLspReferee,
 } from "../scripts/lib/resolution-python-lsp";
 
 function write(root: string, relative: string, contents: string): void {
@@ -85,7 +86,7 @@ describe("createPyrightLspReferee", () => {
 
     referee = await createPyrightLspReferee(repo);
     const warm = rangeOf(useSource, "c.load");
-    await referee.warmUp(useFile, useSource, warm.start);
+    await referee.warmUp([{ file: useFile, source: useSource, start: warm.start }]);
   }, 30_000);
 
   afterAll(() => {
@@ -218,7 +219,7 @@ describe("createPyrightLspReferee, a fallback that declares no type (#259)", () 
 
     referee = await createPyrightLspReferee(repo);
     const warm = rangeOf(source, "local.run");
-    await referee.warmUp(file, source, warm.start);
+    await referee.warmUp([{ file, source, start: warm.start }]);
   }, 30_000);
 
   afterAll(() => {
@@ -320,5 +321,83 @@ describe("memberRangeAfter", () => {
     // Wrong method name -- the text after the receiver does not say `save`.
     const range = memberRangeAfter(source, receiverEnd, "save");
     expect(range).toBeUndefined();
+  });
+});
+
+/**
+ * Waiting for pyright's binder, which is the one place a long sleep is right
+ * and the one place it was aimed at a single position (#337).
+ *
+ * `warmUp` climbs a ladder of sleeps -- 250, 500, 1000, 2000, 4000, 8000 --
+ * because pyright answers `null` to everything until its binder has run, and
+ * nothing tells a client when that is. The cost of that ladder is 15.75
+ * seconds, and it is paid in full whenever the position being asked about is
+ * one pyright will *never* answer: unanswerable and not-yet-bound look
+ * identical from outside.
+ *
+ * `resolvePythonReceivers` warmed up at `queries[0]`, whichever receiver the
+ * board happened to put first. On `encode-httpx/client-send` that position had
+ * no answer, so the board spent 16.0 seconds waiting for one, and then
+ * answered all 97 of its real questions in 247ms.
+ *
+ * The fix is to stop asking one position: a rung of the ladder is only paid
+ * when *every* candidate came back empty, which distinguishes the two cases
+ * the single-position ladder could not.
+ */
+describe("warmUpAcross", () => {
+  /** A sleep that records rather than waits, so these tests take no time. */
+  function recorder() {
+    const slept: number[] = [];
+    return { slept, sleep: async (ms: number) => { slept.push(ms); } };
+  }
+
+  const LADDER = [250, 500, 1000, 2000, 4000, 8000];
+
+  it("does not sleep at all when a later candidate answers", async () => {
+    const { slept, sleep } = recorder();
+    const answered = await warmUpAcross(
+      ["no", "yes"], async (c) => c === "yes", LADDER, sleep,
+    );
+    expect(answered).toBe(true);
+    expect(slept).toEqual([]);
+  });
+
+  it("does not sleep when the only candidate answers first time", async () => {
+    const { slept, sleep } = recorder();
+    expect(await warmUpAcross(["yes"], async () => true, LADDER, sleep)).toBe(true);
+    expect(slept).toEqual([]);
+  });
+
+  it("sleeps only as far as the rung where the binder comes up", async () => {
+    const { slept, sleep } = recorder();
+    let sweeps = 0;
+    const answered = await warmUpAcross(
+      ["a", "b"],
+      // Nothing answers until the third sweep -- the binder finishing its run.
+      async () => { sweeps += 1; return sweeps > 4; },
+      LADDER, sleep,
+    );
+    expect(answered).toBe(true);
+    expect(slept).toEqual([250, 500]);
+  });
+
+  it("still pays the whole ladder when nothing will ever answer", async () => {
+    const { slept, sleep } = recorder();
+    expect(await warmUpAcross(["a"], async () => false, LADDER, sleep)).toBe(false);
+    expect(slept).toEqual(LADDER);
+  });
+
+  it("asks every candidate before paying for a rung", async () => {
+    const { sleep } = recorder();
+    const asked: string[] = [];
+    await warmUpAcross(["a", "b", "c"], async (c) => { asked.push(c); return false; }, [250], sleep);
+    // Two sweeps: one before the single rung, one after.
+    expect(asked).toEqual(["a", "b", "c", "a", "b", "c"]);
+  });
+
+  it("answers false without sleeping when there is nothing to ask", async () => {
+    const { slept, sleep } = recorder();
+    expect(await warmUpAcross([], async () => true, LADDER, sleep)).toBe(false);
+    expect(slept).toEqual([]);
   });
 });

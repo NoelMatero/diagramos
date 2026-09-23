@@ -189,7 +189,8 @@ export async function checkerFor(
       let warmed: Promise<void> | undefined;
       return {
         definitionAt: async (file, source, at) => {
-          warmed ??= referee.warmUp(file, source, at.start);
+          // One position is all this streaming caller has when it warms up.
+          warmed ??= referee.warmUp([{ file, source, start: at.start }]);
           await warmed;
           return referee.methodDeclarationLocationAt(file, source, at.start, at.end);
         },

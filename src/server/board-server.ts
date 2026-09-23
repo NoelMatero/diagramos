@@ -24,8 +24,13 @@ import { diagramDir } from "../engine/config";
 import { createCodeGraphOption } from "../engine/codegraph";
 import { createLedger, gitKnown } from "../engine/ledger";
 import { generatedRef } from "../engine/generated";
-import { checkDrift, createGitBaseline, createWorkspace, findBoards } from "../engine/drift";
+import {
+  checkDrift, createGitBaseline, createWorkspace, findBoards, type ClosedBodyReferee,
+} from "../engine/drift";
 import { refereedCheck } from "../engine/referee";
+import {
+  liveRefereePool, refereeSentence, refereedCheckLive, SERVER_BUDGET_MS,
+} from "../engine/referee-live";
 import { initEngine } from "../engine/parse";
 import { buildIdentity } from "./build-identity";
 import { processAlive, registerServer, updateServer } from "./server-registry";
@@ -373,6 +378,17 @@ export async function startBoardServer(options: BoardServerOptions): Promise<Run
   const watchers = new Map<string, FSWatcher>();
   /** Tree-sitter grammars for /api/drift, loaded on the first request only. */
   let engineReady: Promise<void> | undefined;
+  /**
+   * One language-server pool for the life of this service (#337).
+   *
+   * This service checks the same board over and over -- a focus, a board
+   * write, the slow timer -- so a pyright started per check would pay the
+   * whole cost each time. Held, the first check that needs one pays it for
+   * every check after it. The deadline is per check, not per pool: a number
+   * fixed here would mean a service refusing to start a server ever again
+   * twelve seconds after it booted.
+   */
+  const SERVERS = liveRefereePool(() => Date.now() + SERVER_BUDGET_MS);
   /** The recent timeline of every board this service has seen (#68). */
   const history = new BoardHistory();
 
@@ -534,14 +550,28 @@ export async function startBoardServer(options: BoardServerOptions): Promise<Run
     // has to stay fresh precisely because the tree is what is changing.
     const ledger = full ? createLedger(workspaceRoot) : undefined;
     const board = await readBoard(target);
-    const report = refereedCheck(workspaceRoot, (referee) =>
+    const run = (referee?: ClosedBodyReferee) =>
       checkDrift(board, createWorkspace(workspaceRoot), {
         ...(full ? { baseline: createGitBaseline(workspaceRoot, target) } : {}),
         ...(codeGraph ? { codeGraph } : {}),
         ...(ledger ? { ledger } : {}),
         ...(referee ? { closedBodyReferee: referee } : {}),
-      }));
-    return { board, report };
+      });
+    /*
+     * The language servers only on the full path (#337).
+     *
+     * The cheap path is the live one: it runs on every keystroke-scale change
+     * to the tree, and its one question is whether a planned box has been
+     * built. Waking pyright for that would put seconds into a loop that has to
+     * stay under a frame, and would answer a question nobody asked. The full
+     * path is a focus, a board write or the slow timer, which is the cadence
+     * this cost was measured against.
+     */
+    if (!full) {
+      return { board, report: refereedCheck(workspaceRoot, run), checkedWith: undefined };
+    }
+    const { report, checkedWith } = await refereedCheckLive(workspaceRoot, run, { pool: SERVERS });
+    return { board, report, checkedWith };
   };
 
   /**
@@ -891,8 +921,16 @@ export async function startBoardServer(options: BoardServerOptions): Promise<Run
         }
         // Grammars load once per process, lazily: a server nobody asks for
         // status keeps starting as fast as it always did.
-        const { report } = await reportFor(target.file);
-        return json(response, 200, { file: target.file, report, ...(FROM_CHECKOUT ? { fromCheckout: true } : {}) });
+        const { report, checkedWith } = await reportFor(target.file);
+        return json(response, 200, {
+          file: target.file,
+          report,
+          // Which check this was (#334): a board checked with a compiler and a
+          // board checked without one are not the same claim, and the page had
+          // no way to tell them apart.
+          ...(checkedWith ? { checkedWith: refereeSentence(checkedWith) } : {}),
+          ...(FROM_CHECKOUT ? { fromCheckout: true } : {}),
+        });
       }
 
       /**

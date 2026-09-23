@@ -1699,7 +1699,7 @@ be one: `<MenuContent />` is a routine making a MenuContent, which is `@builds`.
       that the issue never named. `symbolDeclarationAt`'s counterpart --
       where the method actually *called* is declared -- is answered by
       `textDocument/definition` after all, asked at the method's own
-      position rather than the receiver's. `scripts/lib/resolution-python-lsp.ts`
+      position rather than the receiver's. `src/engine/referee-python-lsp.ts`
       wires both, one LSP method per question, and
       `tests/resolution-python-lsp.test.ts` pins the distinction down with a
       server rather than a comment: asking `definition` at the receiver's own
@@ -1848,7 +1848,7 @@ be one: `<MenuContent />` is a routine making a MenuContent, which is `@builds`.
 18. **Rust's version of the same ladder, and the safety check items 14 and 17
     used turns out to measure nothing in Rust -- so a different one was built,
     and it found three reader bugs (#246, after #237's spike).** The client is
-    `scripts/lib/resolution-rust-lsp.ts`, rust-analyzer over `vscode-jsonrpc`
+    `src/engine/referee-rust-lsp.ts`, rust-analyzer over `vscode-jsonrpc`
     per #237's recommendation, scoped to "only when rust-analyzer is already on
     the machine" -- no binary fetcher, silent skip on absence, `parse.ts`'s own
     stance for a missing grammar. Corpus: `rust-test`, `.corpus/anyhow` and
@@ -2446,7 +2446,7 @@ be one: `<MenuContent />` is a routine making a MenuContent, which is `@builds`.
     `placeOf`, called only from `callSitesIn`, whose only caller is
     `closedBodyRefutes` -- and that returns `undefined` on `concrete === false`
     before it reads the file. `isConcreteClassLine` answers `undefined` for every
-    one of these lines, which `resolution-python-live.ts` turns into
+    one of these lines, which `referee-python.ts` turns into
     `concrete: false`; `resolution-python-live.test.ts` already pinned the
     unannotated-parameter shape. What was wrong was this document's number.
     Withholding them in the client is filed as #259 rather than done here,
@@ -2483,7 +2483,7 @@ be one: `<MenuContent />` is a routine making a MenuContent, which is `@builds`.
 22. **#259: the client no longer answers with a line that declares no type,
     and most of item 17's disagreements were that line. 84.9% → 55.5%
     answered, 1.76% → 0.35% disagreeing, and mypy's 460 wrong files → 0.**
-    `askTypeLocation` in `scripts/lib/resolution-python-lsp.ts` reads the line
+    `askTypeLocation` in `src/engine/referee-python-lsp.ts` reads the line
     `textDocument/typeDefinition` pointed at with `pythonDeclarationKind` and
     withholds `not a type`, in the repository or out of it; `type` and `module`
     are kept. `tests/resolution-python-lsp.test.ts` has one test per line the

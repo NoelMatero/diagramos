@@ -46,7 +46,7 @@
  * `reveal_type`. It has no opinion on where anything is *declared* -- the
  * question that took TypeScript from item 11's 9.5% (syntax alone) to item
  * 12's 97.8% (a real compiler, no reader gate) and, further, to item 13's
- * 50.3% of whole call bodies closed. `scripts/lib/resolution-python-lsp.ts`
+ * 50.3% of whole call bodies closed. `src/engine/referee-python-lsp.ts`
  * asks pyright the same question over LSP (`pyright-langserver --stdio`):
  * `textDocument/typeDefinition` on a receiver for where its *type* is
  * declared (section 8, `typeAt().declaringFile`'s counterpart), and
@@ -842,7 +842,7 @@ for (const tree of trees) {
     if (lspReferee) {
       const startedAt = Date.now();
       const first = collectedPyAll[0]!;
-      await lspReferee.warmUp(first.absolute, pySourcesAll.get(first.file)!, first.start);
+      await lspReferee.warmUp([{ file: first.absolute, source: pySourcesAll.get(first.file)!, start: first.start }]);
 
       /*
        * A progress line, not silence: every other referee in this file
