@@ -80,6 +80,7 @@
  */
 import { spawn, type ChildProcessWithoutNullStreams } from "node:child_process";
 import path from "node:path";
+import { PassThrough } from "node:stream";
 import { fileURLToPath, pathToFileURL } from "node:url";
 import type { MessageConnection } from "vscode-jsonrpc/node";
 
@@ -102,6 +103,31 @@ import type { LspDocumentSymbol } from "./lsp-symbols";
  */
 async function transport(): Promise<typeof import("vscode-jsonrpc/node")> {
   return import("vscode-jsonrpc/node");
+}
+
+/**
+ * A JSON-RPC connection to `child` that cannot fail in the background.
+ *
+ * The writer gets a buffer, never the child's own stdin. vscode-jsonrpc writes
+ * a request from inside `new Promise(async (...) => { ... throw error })`, and
+ * a failed write throws out of that executor where no caller can catch it.
+ * Against a process that has already died that is an unhandled
+ * ERR_STREAM_DESTROYED -- found on CI, where rustup's proxy for a missing
+ * rust-analyzer is gone before the handshake is written, and the run failed
+ * with every test green. A `PassThrough` always accepts the write; what it
+ * cannot deliver is dropped at the pipe, whose own error is heard here, and
+ * the caller's race against the exit is what reports it. The same holds for
+ * any later request to a server that died mid-run.
+ */
+export async function connectTo(child: ChildProcessWithoutNullStreams): Promise<MessageConnection> {
+  const { StreamMessageReader, StreamMessageWriter, createMessageConnection } = await transport();
+  const toServer = new PassThrough();
+  child.stdin.on("error", () => { /* the caller's exit race is the report */ });
+  toServer.pipe(child.stdin);
+  return createMessageConnection(
+    new StreamMessageReader(child.stdout),
+    new StreamMessageWriter(toServer),
+  );
 }
 
 /**
@@ -523,11 +549,7 @@ export async function createRustAnalyzerReferee(root: string): Promise<RustLspRe
   await spawned;
 
   let closed = false;
-  const { StreamMessageReader, StreamMessageWriter, createMessageConnection } = await transport();
-  const connection: MessageConnection = createMessageConnection(
-    new StreamMessageReader(child.stdout),
-    new StreamMessageWriter(child.stdin),
-  );
+  const connection = await connectTo(child);
   // rust-analyzer's own stderr is its log, not a failure channel; a referee
   // that printed it would bury the measurement's output in indexing chatter.
   child.stderr.resume();
@@ -592,10 +614,9 @@ export async function createRustAnalyzerReferee(root: string): Promise<RustLspRe
   });
   // Rejects on every ordinary shutdown too, long after nobody is racing it.
   exited.catch(() => {});
-
   let serverVersion = "unknown";
   try {
-    const init = await Promise.race([exited, connection.sendRequest("initialize", {
+    const initializing = connection.sendRequest("initialize", {
       processId: process.pid,
       rootUri: pathToFileURL(root).toString(),
       capabilities: {
@@ -609,7 +630,9 @@ export async function createRustAnalyzerReferee(root: string): Promise<RustLspRe
         window: { workDoneProgress: true },
       },
       workspaceFolders: [{ uri: pathToFileURL(root).toString(), name: path.basename(root) }],
-    })]) as { serverInfo?: { name?: string; version?: string } };
+    });
+    initializing.catch(() => { /* the loser of the race below, when `exited` wins */ });
+    const init = await Promise.race([exited, initializing]) as { serverInfo?: { name?: string; version?: string } };
     serverVersion = init?.serverInfo?.version ?? "unknown";
   } catch (error) {
     connection.dispose();

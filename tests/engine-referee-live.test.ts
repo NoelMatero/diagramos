@@ -227,6 +227,8 @@ describe("a machine with Rust but no rust-analyzer", () => {
    * install; it has to fall back to the text reading and say so.
    */
   let savedPath: string | undefined;
+  let unhandled: unknown[] = [];
+  const onUnhandled = (reason: unknown): void => { unhandled.push(reason); };
   beforeEach(() => {
     const bin = path.join(repo, ".fake-bin");
     mkdirSync(bin, { recursive: true });
@@ -236,10 +238,15 @@ describe("a machine with Rust but no rust-analyzer", () => {
       + "echo \"error: Unknown binary 'rust-analyzer' in official toolchain 'stable'.\" >&2\n"
       + "exit 1\n");
     chmodSync(stub, 0o755);
+    unhandled = [];
+    process.on("unhandledRejection", onUnhandled);
     savedPath = process.env.PATH;
     process.env.PATH = `${bin}${path.delimiter}${savedPath ?? ""}`;
   });
-  afterEach(() => { process.env.PATH = savedPath; });
+  afterEach(() => {
+    process.env.PATH = savedPath;
+    process.off("unhandledRejection", onUnhandled);
+  });
 
   it.skipIf(process.platform === "win32")("falls back to the text reading instead of waiting forever", async () => {
     write("Cargo.toml", "[package]\nname = \"fixture\"\nversion = \"0.1.0\"\nedition = \"2021\"\n[workspace]\n");
@@ -261,6 +268,11 @@ describe("a machine with Rust but no rust-analyzer", () => {
     expect(live.report.edges.filter((finding) => finding.kind === "calls-refuted")).toEqual([]);
     expect(live.checkedWith.answered).not.toContain("rust");
     expect(refereeSentence(live.checkedWith)).toContain("rust-analyzer did not answer");
+    // Nothing left failing in the background after the check has answered.
+    // Which way the handshake and the exit race depends on the machine; the
+    // ordering CI hit is pinned deterministically by `connectTo`'s own test.
+    await new Promise((resolve) => { setTimeout(resolve, 500); });
+    expect(unhandled.map(String)).toEqual([]);
   }, 30_000);
 });
 

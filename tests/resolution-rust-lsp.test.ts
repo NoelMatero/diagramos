@@ -18,7 +18,7 @@
  * no binary fetcher, silence when absent). The pure-scan half always runs -- it
  * is where the anchor rules are pinned, and it needs no server.
  */
-import { execFileSync } from "node:child_process";
+import { execFileSync, spawn } from "node:child_process";
 import { mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from "node:fs";
 import os from "node:os";
 import path from "node:path";
@@ -26,6 +26,7 @@ import path from "node:path";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
 
 import {
+  connectTo,
   aliasIndexOf, bareTypeName, createRustAnalyzerReferee, declaredTypeOnLine, isAliasFor,
   isOutsideRustTree, rustMemberRangeAfter, rustTypeAnchorFor,
   type RustLspReferee,
@@ -514,5 +515,41 @@ describe("bareTypeName", () => {
 
   it("leaves an unqualified name alone", () => {
     expect(bareTypeName("Config")).toBe("Config");
+  });
+});
+
+describe("connectTo", () => {
+  /*
+   * CI has rustup but not the rust-analyzer component, so `rust-analyzer`
+   * there is rustup's proxy: it starts, says "Unknown binary", and is gone
+   * before the handshake is written. vscode-jsonrpc writes a request from
+   * inside an async promise executor, so that failed write rejected where no
+   * caller could catch it -- an unhandled ERR_STREAM_DESTROYED that failed the
+   * whole run with every test green. A laptop almost never loses that race,
+   * which is why this does not wait for the race: the process is dead first,
+   * every time.
+   */
+  it("sends to a process that has already exited without failing in the background", async () => {
+    const unhandled: unknown[] = [];
+    const onUnhandled = (reason: unknown): void => { unhandled.push(reason); };
+    process.on("unhandledRejection", onUnhandled);
+    try {
+      const child = spawn(process.execPath, ["-e", ""], { stdio: ["pipe", "pipe", "pipe"] });
+      await new Promise((resolve) => { child.once("exit", resolve); });
+      await new Promise((resolve) => { setTimeout(resolve, 50); });
+
+      const connection = await connectTo(child);
+      connection.onError(() => {});
+      connection.listen();
+      // Nobody will ever answer this. What matters is that asking costs nothing
+      // beyond the caller's own race against the exit.
+      connection.sendRequest("initialize", {}).catch(() => {});
+
+      await new Promise((resolve) => { setTimeout(resolve, 300); });
+      connection.dispose();
+      expect(unhandled.map(String)).toEqual([]);
+    } finally {
+      process.off("unhandledRejection", onUnhandled);
+    }
   });
 });
