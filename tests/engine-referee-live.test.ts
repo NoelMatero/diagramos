@@ -12,7 +12,8 @@
  * it changes an answer, that a right arrow does not turn red on the way, and
  * that whichever check the board got, the board can say which one it was.
  */
-import { mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from "node:fs";
+import { execFileSync } from "node:child_process";
+import { chmodSync, mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import path from "node:path";
 
@@ -29,6 +30,12 @@ import { assertFreshCliBundle } from "./helpers/fresh-bundle";
 installExcalifontMeasurer();
 
 beforeAll(async () => { await initEngine(); }, 60_000);
+
+/** The same check every other rust-analyzer test here makes: the live half needs the real binary. */
+const hasRustAnalyzer = (() => {
+  try { execFileSync("rust-analyzer", ["--version"], { stdio: "ignore" }); return true; }
+  catch { return false; }
+})();
 
 let repo: string;
 
@@ -185,7 +192,7 @@ describe("a Rust call on a value whose type the text does not give", () => {
     write("src/b.rs", "pub fn render(n: u32) -> u32 { n }\n");
   }
 
-  it("calls the wrong arrow wrong, and leaves the right one alone", async () => {
+  it.skipIf(!hasRustAnalyzer)("calls the wrong arrow wrong, and leaves the right one alone", async () => {
     writeCrate();
     const workspace = createWorkspace(repo);
 
@@ -208,6 +215,53 @@ describe("a Rust call on a value whose type the text does not give", () => {
       checkDrift(right, workspace, { edges: true, ...(referee ? { closedBodyReferee: referee } : {}) }));
     expect(kept.report.edges.filter((finding) => finding.kind === "calls-refuted")).toEqual([]);
   }, 180_000);
+});
+
+describe("a machine with Rust but no rust-analyzer", () => {
+  /*
+   * Found by CI, which is this machine: rustup and cargo installed, the
+   * rust-analyzer component not. `rust-analyzer` is then rustup's proxy, which
+   * starts, prints "Unknown binary" and exits -- and the check waited for its
+   * opening handshake forever, because nothing noticed the process was gone.
+   * A board checked on every turn cannot hang on a tool somebody did not
+   * install; it has to fall back to the text reading and say so.
+   */
+  let savedPath: string | undefined;
+  beforeEach(() => {
+    const bin = path.join(repo, ".fake-bin");
+    mkdirSync(bin, { recursive: true });
+    const stub = path.join(bin, "rust-analyzer");
+    writeFileSync(stub,
+      "#!/bin/sh\n"
+      + "echo \"error: Unknown binary 'rust-analyzer' in official toolchain 'stable'.\" >&2\n"
+      + "exit 1\n");
+    chmodSync(stub, 0o755);
+    savedPath = process.env.PATH;
+    process.env.PATH = `${bin}${path.delimiter}${savedPath ?? ""}`;
+  });
+  afterEach(() => { process.env.PATH = savedPath; });
+
+  it.skipIf(process.platform === "win32")("falls back to the text reading instead of waiting forever", async () => {
+    write("Cargo.toml", "[package]\nname = \"fixture\"\nversion = \"0.1.0\"\nedition = \"2021\"\n[workspace]\n");
+    write("src/lib.rs", "pub mod decl;\npub mod a;\npub mod b;\n");
+    write("src/decl.rs",
+      "pub struct Config { pub name: String }\n"
+      + "impl Config {\n    pub fn load(&self) -> u32 { 7 }\n}\n"
+      + "pub fn make() -> Config { Config { name: String::new() } }\n");
+    write("src/a.rs", "use crate::decl::make;\n\npub fn run() -> u32 {\n    let c = make();\n    c.load()\n}\n");
+    write("src/b.rs", "pub fn render(n: u32) -> u32 { n }\n");
+    const workspace = createWorkspace(repo);
+    const board = await boardOf("src/a.rs#run", "src/b.rs#render");
+
+    const started = Date.now();
+    const live = await refereedCheckLive(repo, (referee) =>
+      checkDrift(board, workspace, { edges: true, ...(referee ? { closedBodyReferee: referee } : {}) }));
+
+    expect(Date.now() - started).toBeLessThan(10_000);
+    expect(live.report.edges.filter((finding) => finding.kind === "calls-refuted")).toEqual([]);
+    expect(live.checkedWith.answered).not.toContain("rust");
+    expect(refereeSentence(live.checkedWith)).toContain("rust-analyzer did not answer");
+  }, 30_000);
 });
 
 describe("saying which check the board got (#334)", () => {

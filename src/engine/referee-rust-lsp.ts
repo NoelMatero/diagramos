@@ -574,9 +574,28 @@ export async function createRustAnalyzerReferee(root: string): Promise<RustLspRe
     setTimeout(resolve, PRIME_TIMEOUT_MS).unref();
   });
 
+  /*
+   * A process that ends before it has answered never answers, and nothing in
+   * the connection says so: a request pending on a stream that closed is not
+   * rejected, it just waits. Found on CI, which has rustup but not the
+   * rust-analyzer component -- `rust-analyzer` there is rustup's proxy, which
+   * prints "Unknown binary" and exits 1 -- where the check waited on the
+   * handshake below until the test runner killed it. The same machine is a
+   * perfectly ordinary developer's, and a board checked every turn cannot hang
+   * on a tool they did not install. So the handshake races the exit, and
+   * losing is a refusal the pool turns into "no server here".
+   */
+  const exited = new Promise<never>((_, reject) => {
+    child.once("exit", (code, signal) => reject(new Error(
+      `rust-analyzer exited before answering (${signal ?? `exit code ${code}`})`,
+    )));
+  });
+  // Rejects on every ordinary shutdown too, long after nobody is racing it.
+  exited.catch(() => {});
+
   let serverVersion = "unknown";
   try {
-    const init = await connection.sendRequest("initialize", {
+    const init = await Promise.race([exited, connection.sendRequest("initialize", {
       processId: process.pid,
       rootUri: pathToFileURL(root).toString(),
       capabilities: {
@@ -590,7 +609,7 @@ export async function createRustAnalyzerReferee(root: string): Promise<RustLspRe
         window: { workDoneProgress: true },
       },
       workspaceFolders: [{ uri: pathToFileURL(root).toString(), name: path.basename(root) }],
-    }) as { serverInfo?: { name?: string; version?: string } };
+    })]) as { serverInfo?: { name?: string; version?: string } };
     serverVersion = init?.serverInfo?.version ?? "unknown";
   } catch (error) {
     connection.dispose();
