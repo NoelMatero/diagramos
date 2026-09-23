@@ -874,6 +874,7 @@ const LACKING_FIX: Record<LackingEnd["part"], string> = {
   bases: "Start the arrow at the type that declares the base",
   type: "Point that end at the type the claim is about",
   callable: "Point the arrow at the routine that is called, or drop the claim",
+  implementable: "Point that end at the trait or base type the claim is about",
 };
 
 /**

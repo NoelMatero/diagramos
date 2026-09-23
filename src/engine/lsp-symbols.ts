@@ -76,12 +76,20 @@ export function refereeParts(
       bases: "lacks",
       type: "lacks",
       callable: "has",
+      implementable: "lacks",
     };
   }
   if (CONTAINERS.has(kind)) {
     return {
       body: "lacks", signature: "lacks", result: "lacks", fields: "unknown", bases: "unknown",
       type: "has", callable: "unknown",
+      /*
+       * Every type can be implemented or extended in TypeScript and Python. In
+       * Rust only a trait can (#345), and a trait is the one kind rust-analyzer
+       * files as an interface -- its own name resolution, not the keyword the
+       * reader reads.
+       */
+      implementable: !rust || kind === KIND.Interface ? "has" : "lacks",
     };
   }
   /*
@@ -111,13 +119,13 @@ export function refereeParts(
   if (!VALUES.has(kind)) {
     return {
       body: literal, signature: literal, result: "unknown", fields: "unknown", bases: "unknown",
-      type: literal, callable: literal,
+      type: literal, callable: literal, implementable: literal,
     };
   }
   const callable = literal === "lacks" ? "lacks" : writtenTypeCallable(bodyText, python, rust);
   return {
     body: callable, signature: callable, result: "unknown", fields: "unknown", bases: "unknown",
-    type: "lacks", callable,
+    type: "lacks", callable, implementable: "lacks",
   };
 }
 

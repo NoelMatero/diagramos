@@ -227,14 +227,19 @@ function declaringLine(
     if (literal === "lacks") {
       return {
         body: "lacks", signature: "lacks", result: "unknown", fields: "unknown", bases: "unknown",
-        type: "lacks", callable: "lacks",
+        type: "lacks", callable: "lacks", implementable: "lacks",
       };
     }
   }
   if (routine.test(text)) {
     return refereeParts(12, language === "python" ? "" : text.trimEnd().endsWith(";") ? ";" : "}", language === "python");
   }
-  if (container.test(text)) return refereeParts(5, "", language === "python");
+  /*
+   * A trait is what rust-analyzer files as an interface, and the one thing a
+   * Rust type can implement (#345); the other four keywords are its class.
+   */
+  const opened = container.exec(text);
+  if (opened) return refereeParts(opened[1] === "trait" ? 11 : 5, "", language === "python", language === "rust");
   /*
    * A name with a type written on it and no value, which the servers miss for
    * the same reasons as above -- a `const _: () = {...}` inside a `cfg`, a
@@ -259,7 +264,7 @@ function declaringLine(
       body: callable, signature: callable, result: "unknown", fields: "unknown", bases: "unknown",
       // The line says this name is a value of that type; a type is not
       // introduced with a colon in any of the three.
-      type: "lacks", callable,
+      type: "lacks", callable, implementable: "lacks",
     };
   }
   return undefined;
@@ -305,7 +310,7 @@ function typescriptReferee(file: string, source: string): RefereeByLine {
       const at = node.getStart(tree) + node.getText(tree).indexOf("constructor");
       found.set(`${tree.getLineAndCharacterOfPosition(at).line}\tconstructor`, {
         body: node.body ? "has" : "lacks", signature: "has", result: "has", fields: "lacks", bases: "lacks",
-        type: "lacks", callable: "has",
+        type: "lacks", callable: "has", implementable: "lacks",
       });
     }
     /*
@@ -320,7 +325,7 @@ function typescriptReferee(file: string, source: string): RefereeByLine {
         const written = notCallableType(node.type) ? "lacks" : "unknown";
         found.set(`${tree.getLineAndCharacterOfPosition(parameter.getStart(tree)).line}\t${parameter.text}`, {
           body: written, signature: written, result: "unknown", fields: "unknown", bases: "unknown",
-          type: "lacks", callable: written,
+          type: "lacks", callable: written, implementable: "lacks",
         });
       }
     }
@@ -330,13 +335,13 @@ function typescriptReferee(file: string, source: string): RefereeByLine {
         reading = {
           body: (node as { body?: ts.Node }).body ? "has" : "lacks",
           signature: "has", result: "has", fields: "lacks", bases: "lacks", type: "lacks",
-          callable: "has",
+          callable: "has", implementable: "lacks",
         };
       } else if (ts.isClassLike(node) || ts.isInterfaceDeclaration(node)
         || ts.isEnumDeclaration(node) || ts.isModuleDeclaration(node)) {
         reading = {
           body: "lacks", signature: "lacks", result: "lacks", fields: "unknown", bases: "unknown",
-          type: "has", callable: "unknown",
+          type: "has", callable: "unknown", implementable: "has",
         };
       } else if ((ts.isVariableDeclaration(node) || ts.isPropertyDeclaration(node)) && node.initializer) {
         /*
@@ -379,7 +384,7 @@ function typescriptReferee(file: string, source: string): RefereeByLine {
         if (literal) {
           reading = {
             body: "lacks", signature: "lacks", result: "unknown", fields: "unknown",
-            bases: "unknown", type: "lacks", callable: "lacks",
+            bases: "unknown", type: "lacks", callable: "lacks", implementable: "lacks",
           };
         }
       }
@@ -397,7 +402,7 @@ function typescriptReferee(file: string, source: string): RefereeByLine {
           : notCallableType(node.type) ? "lacks" : "unknown";
         reading = {
           body: written, signature: written, result: "unknown", fields: "unknown", bases: "unknown",
-          type: "lacks", callable: written,
+          type: "lacks", callable: written, implementable: "lacks",
         };
       }
       /*
@@ -411,12 +416,12 @@ function typescriptReferee(file: string, source: string): RefereeByLine {
         if (ts.isNewExpression(assigned)) {
           reading = {
             body: "lacks", signature: "lacks", result: "unknown", fields: "unknown",
-            bases: "unknown", type: "lacks", callable: "lacks",
+            bases: "unknown", type: "lacks", callable: "lacks", implementable: "lacks",
           };
         } else if (ts.isArrowFunction(assigned) || ts.isFunctionExpression(assigned)) {
           reading = {
             body: "has", signature: "has", result: "has", fields: "lacks", bases: "lacks",
-            type: "lacks", callable: "has",
+            type: "lacks", callable: "has", implementable: "lacks",
           };
         }
       }
@@ -433,7 +438,7 @@ function typescriptReferee(file: string, source: string): RefereeByLine {
         if (literal) {
           reading = {
             body: "lacks", signature: "lacks", result: "unknown", fields: "unknown",
-            bases: "unknown", type: "lacks", callable: "lacks",
+            bases: "unknown", type: "lacks", callable: "lacks", implementable: "lacks",
           };
         }
       }

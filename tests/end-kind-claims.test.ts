@@ -16,7 +16,7 @@ import { beforeAll, describe, expect, it } from "vitest";
 
 import { emptyBoard, type BoardFile } from "../src/engine/board-file";
 import { createDiagram } from "../src/engine/diagram";
-import { checkDrift, type Workspace } from "../src/engine/drift";
+import { ACCUSING_EDGE_KINDS, checkDrift, type Workspace } from "../src/engine/drift";
 import { initEngine } from "../src/engine/parse";
 import type { ArrowClaim } from "../src/engine/claim";
 import { installExcalifontMeasurer } from "./helpers/excalifont";
@@ -256,7 +256,10 @@ describe("an end of the right kind is left alone", () => {
   ];
 
   for (const [claim, from, to, label] of rightWayRound) {
-    it.each(LANGUAGES)(`says nothing about @${claim} in %s`, async (language) => {
+    // `Buffer` is a struct, and in Rust only a trait can be implemented: the
+    // right-way-round Rust `@conforms` is in the #345 block below.
+    const languages = claim === "conforms" ? LANGUAGES.filter((one) => one !== "rust") : LANGUAGES;
+    it.each(languages)(`says nothing about @${claim} in %s`, async (language) => {
       const { file } = SOURCES[language]!;
       const board = await boardOf(`${file}#${from}`, `${file}#${to}`, claim, label ? { label } : {});
       const { finding } = wrongKind(board, language);
@@ -393,6 +396,10 @@ describe("the other end: a function where a type should be", () => {
         // `helper`. Either sentence is a true one; the arrow must not pass.
         expect(report.edges.some((edge) => edge.kind === "signature-absent" || edge.kind === "end-lacks-part"))
           .toBe(true);
+      } else if (claim === "conforms") {
+        // #345: what `@conforms` asks of its head is something a type can
+        // implement or extend, and a function is not that in any language.
+        expect(finding?.detail).toContain("a function cannot be implemented");
       } else {
         expect(finding?.detail).toContain("a function is not a type");
       }
@@ -595,5 +602,80 @@ describe("an arrow into a constant (#307)", () => {
     const calls = checkDrift(await boardOf("src/query.ts#build", "src/query.ts#status", "calls"),
       fakeWorkspace(files), { edges: true });
     expect(calls.edges.filter((edge) => edge.kind === "end-lacks-part")).toEqual([]);
+  });
+});
+
+describe("a Rust @conforms whose head is not a trait (#345)", () => {
+  /*
+   * In Rust only a trait can be implemented, so `CompactFormatter @conforms
+   * Formatter` drawn the wrong way round -- or `Command @conforms MKeyMap` --
+   * is wrong whatever the rest of the crate says. `@conforms` withholds on
+   * Rust because an `impl` may sit in any file, and "is a type" is all #297
+   * asked of the head, which a struct is. Shapes from serde_json and clap.
+   */
+  const file = "src/ser.rs";
+  const source = [
+    "pub trait Formatter {",
+    "    fn begin(&mut self) {}",
+    "}",
+    "",
+    "pub unsafe trait Sealed: Formatter {}",
+    "",
+    "pub struct CompactFormatter;",
+    "",
+    "pub struct MKeyMap {",
+    "    keys: Vec<String>,",
+    "}",
+    "",
+    "pub struct Pair(u8, u8);",
+    "",
+    "pub enum Category {",
+    "    Io,",
+    "    Syntax,",
+    "}",
+    "",
+    "pub struct Command {",
+    "    name: String,",
+    "}",
+    "",
+  ].join("\n");
+  const ACCUSING = new Set<string>(ACCUSING_EDGE_KINDS);
+  const check = async (from: string, to: string) => {
+    const report = checkDrift(await boardOf(`${file}#${from}`, `${file}#${to}`, "conforms"),
+      fakeWorkspace({ [file]: source }), { edges: true });
+    return { report, finding: report.edges.find((edge) => edge.kind === "end-lacks-part") };
+  };
+
+  it("is red when the head is a struct with fields", async () => {
+    const { report, finding } = await check("Command", "MKeyMap");
+
+    expect(finding?.detail).toContain("a struct cannot be implemented");
+    expect(report.clean).toBe(false);
+  });
+
+  it("is red when the head is a unit struct, which has no body field at all", async () => {
+    // `pub struct CompactFormatter;` -- the shape every other part leaves
+    // unsure, because there is no field list to read. The word is still there.
+    const { report, finding } = await check("Formatter", "CompactFormatter");
+
+    expect(finding?.detail).toContain("a struct cannot be implemented");
+    expect(finding?.detail).toContain("in Rust, only a trait");
+    expect(report.clean).toBe(false);
+  });
+
+  it("is red when the head is a tuple struct or an enum", async () => {
+    expect((await check("Command", "Pair")).finding?.detail).toContain("a struct cannot be implemented");
+    expect((await check("Command", "Category")).finding?.detail).toContain("an enum cannot be implemented");
+  });
+
+  it("says nothing when the head is a trait, however the trait opens", async () => {
+    // The right way round. `impl Formatter for CompactFormatter` may be in any
+    // file of the crate, so the arrow stays unread -- never red.
+    for (const head of ["Formatter", "Sealed"]) {
+      const { report, finding } = await check("CompactFormatter", head);
+
+      expect(finding).toBeUndefined();
+      expect(report.edges.filter((edge) => ACCUSING.has(edge.kind))).toEqual([]);
+    }
   });
 });
