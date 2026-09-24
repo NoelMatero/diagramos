@@ -4523,6 +4523,87 @@ duplicate from conflitcts, requires reading prs "An arrow can be three calls lon
     `self._search_for_cached.cache_clear()` is an `lru_cache` set in
     `__init__`, which the old rule placed as a method of its own class.
 
+50. **A wrong `@calls` arrow on a Rust board passed whenever the routine made
+    its calls inside a macro, and the compiler had the list all along
+    (#357).** clap writes `ok!(self.parse(..))` through its whole parser, so
+    the text saw a token tree and stopped; rust-analyzer's call hierarchy
+    drops every call inside a macro without saying so (#355). rustc does not:
+    `cargo rustc --lib -- --emit=mir` prints every body after expansion, and
+    a call it cannot pin down is printed as one rather than left out. Where
+    the text reading of a Rust tail stops, that list is now read instead
+    (`compiled-calls.ts`, built by `referee-rustc.ts`).
+
+    **It answers only when it is certainly the routine the board means.**
+    rustc 1.93 prints a unique name bare (`format_error`), so a module path is
+    not a location. A method is found by its `impl`'s own span, a trait's
+    default by `Trait::name`, anything else by module path or a name unique in
+    the crate -- and then the parameter count must agree, and every call the
+    text *did* see must be in the list by name. A function declared inside
+    another, a binary target, a file the build left out: no answer, and the
+    text reading stands. So does anything with `cfg` on it, on what holds it,
+    or inside it -- 34% of the corpus's routines, most of anyhow.
+
+    **And it says "never" only when nothing in the list could be the head.**
+    Each guard is a way a call happens without the head's name on it, and each
+    is a test:
+
+    | shape | why it is quiet |
+    |---|---|
+    | a call through `T: Trait`, `dyn Trait`, `impl Trait`, `Self` | the implementation that runs may call the head (item 14, one level down) |
+    | the head's name anywhere in the body -- `map(double)`, a local | it may be handed to something that calls it |
+    | `a + b`, `?`, `format!`, a scope's end | the head is a method of a trait the repository does not declare, on a type the body names |
+    | a function pointer, a closure passed in | the target is a value |
+
+    Four of those were **already red on main, with no macro anywhere**, once
+    rust-analyzer placed every other call: `a + b` against `add`, a drop
+    against `drop`, `?` against `from`, `map(double)` against `double`. The
+    text reading of a Rust tail now asks the same two questions before it
+    accuses (`unwrittenRustCall`): a method of a trait from outside the
+    repository withholds always, because the text cannot see the types of
+    temporaries or a `Result<T>` alias's error type; a head named in the body
+    and not called there withholds as `named`.
+
+    **The gate, `measure:compiled-calls`:** every call rust-analyzer lists
+    from every routine in the five pinned clones' library crates, put to this
+    reader. 6,057 calls from the 3,198 routines it answers for, **0 "never"**.
+    rust-analyzer shares its blind spot for macros, so that zero is over the
+    calls it can see; the shapes above are what neither tool helps with. It
+    found one reader bug before anything accused: `fn(A) -> B {name}`'s `->`
+    closed a generic bracket, and 318 calls to named functions read as calls
+    through a value.
+
+    | `bench:planted --word=calls`, fbe74ba | ts | tsx | python | rust | all |
+    |---|---:|---:|---:|---:|---:|
+    | mistakes called wrong, before | 53 | 1 | 33 | 26 | 113 |
+    | after | 53 | 1 | 33 | **35** | **122** |
+    | true claims called wrong | 0 | 0 | 0 | 0 | **0** |
+
+    #355's ceiling for this list was +26 with name matching alone (27 new, 1
+    lost). The 18 of those it does not reach: 10 have `cfg` in or around them
+    or share their name with a test function, 5 point at a type the body
+    handles (three of which call a method of that type, and were arguably
+    right), 1 is a serde trait method on the tail's own type, 1 goes through
+    `Arc<dyn Strategy>` -- #351's own example of what must stay quiet -- and
+    one is a chain, now an advisory rather than a red.
+
+    **What it costs.** A build of the tail's crate, into
+    `~/.diagramos/rustc`, never the repository's `target/`; `--offline`, so an
+    unfetched dependency is no answer rather than a download. Cold, 0.1-3.7s a
+    crate on the pinned clones and ~21s for all of regex's; warm, a stat of the
+    package's files and a cached parse. A build is started detached and waited
+    for only until the check's existing 12-second deadline -- one still running
+    finishes on its own and the next check reads it. Build scripts and proc
+    macros run, as they already do for rust-analyzer (#342). The planted bench
+    went from 189s to 202s. A crate that does not build is remembered against
+    its inputs and not rebuilt on every check: ripgrep's crates declare
+    `rust-version = "1.96"` and this machine has 1.93, so only 14 of its 87 files
+    are in a crate this machine can build.
+
+    **Not done.** Six correct Rust arrows the text could not settle -- four
+    of them calls inside a macro -- are now `same-name` rather than confirmed: the list names a function, not where it
+    lives, and a name is not enough to go green on. TypeScript and Python may
+    have the `map(double)` shape too; it was not measured here.
+
 ## Open, in the order worth doing
 
 1. ~~**The licence grid.**~~ Built at #207 and shipped at #209. `@accesses` is

@@ -66,6 +66,7 @@
  *   macros                 the call site is generated, not written   -> `macro`
  */
 import { providedByLanguage } from "./builtins";
+import { compiledBodiesOf, compiledRefutes, traitImplsOf, type CompiledBody, type CompiledCrate } from "./compiled-calls";
 import { mayAccuse } from "./licence";
 import { declaresMember, holdersIn } from "./overrides";
 import { each, parseSource, type Language, type Node, type Tree } from "./parse";
@@ -307,6 +308,28 @@ export type CallsNotClosed =
    * apart from the reasons above, all of which are the reading falling short.
    */
   | "reaches-the-file"
+  /**
+   * The Rust compiler's own list of the tail's calls (#357) has a call, or a
+   * mention, of something named what the head is named. The list names a
+   * function and not where it lives -- a call through a trait names no
+   * implementation at all -- so a shared name is as far as it can say.
+   */
+  | "same-name"
+  /**
+   * The head is a method of a trait the repository does not declare, and
+   * the language or a library calls those without the name being written:
+   * `a + b` runs `add`, `?` runs `from`, `format!` runs `fmt`, a scope's end
+   * runs `drop` (#357). Neither the text nor the compiler's list shows the
+   * method, only the machinery.
+   */
+  | "called-implicitly"
+  /**
+   * The tail's body names the head without calling it -- `map(double)`,
+   * `spawn(worker)` -- so it hands the routine to something that does
+   * (#357). Rust only: every call in the body can be placed and the head is
+   * still what runs.
+   */
+  | "named"
   | SiteUnresolved;
 
 /** One end of the question: a file, its text, and what its imports point at. */
@@ -413,6 +436,20 @@ export interface CallSide {
    * existed. `drift.ts` hands it to every side it builds.
    */
   overridden?: (holder: string, member: string) => boolean;
+  /**
+   * The crate the Rust compiler built this file into, when it has (#357) --
+   * every body after macro expansion, with every call it makes.
+   *
+   * Consulted only where the text reading of a Rust tail stopped short: a
+   * call inside a macro, a receiver nothing could type. There the compiler's
+   * list is read instead (`compiled-calls.ts`), and only after every call
+   * the text *did* see is found in it. Absent, or answering `undefined`,
+   * and the text reading stands exactly as before.
+   *
+   * `drift.ts` hands it to the tail of a `@calls` arrow; `referee-live.ts`
+   * builds what it answers from.
+   */
+  compiled?: () => CompiledCrate | undefined;
 }
 
 /** What `resolveReceiver` may answer with. See `CallSide.resolveReceiver`'s doc. */
@@ -1377,10 +1414,26 @@ export function callsBetween(
   const wanted = new Set(to.names);
   const forward = callsTo(from, from.routine, { file: to.file, names: wanted });
   if (forward.evidence) return { verdict: "confirmed", evidence: forward.evidence };
-  if (forward.why) return { verdict: "withheld", why: forward.why };
+  /*
+   * A doubt reading forwards was the end of it until #357: the text could not
+   * see a call, so it could not say the call was absent. The Rust compiler's
+   * list can -- a call inside a macro is in it -- so for a Rust tail it has,
+   * the question goes on to the closed reading, which asks the compiler.
+   */
+  const compiled = forward.why ? compiledBodiesFor(from) : undefined;
+  if (forward.why && !compiled) return { verdict: "withheld", why: forward.why };
 
   if (!mayAccuse("calls", from.language) || !mayAccuse("calls", to.language)) {
     return { verdict: "withheld", why: "unlicensed" };
+  }
+  /*
+   * The text doubted the forward direction, so only the compiler may settle
+   * it -- before `backwards` below, which main never reached past a doubt
+   * and must not reach now on anything weaker than the compiler's "never".
+   */
+  if (compiled) {
+    const settled = compiledVerdict(compiled, to);
+    if ("why" in settled) return { verdict: "absent", notClosed: settled.why };
   }
 
   /*
@@ -1410,7 +1463,7 @@ export function callsBetween(
   if (!mayAccuse("calls", from.language, "absence")) {
     return { verdict: "absent", notClosed: "unlicensed" };
   }
-  const closed = closedBodyRefutes(from, to);
+  const closed = closedBodyRefutes(from, to, compiled);
   if ("reached" in closed) return { verdict: "wrong-routine", evidence: closed.reached };
   if ("evidence" in closed) return { verdict: "refuted", evidence: closed.evidence };
   return { verdict: "absent", notClosed: closed.why };
@@ -1446,6 +1499,154 @@ export function callsBetween(
  * until none of its declarations does.
  */
 function closedBodyRefutes(
+  from: CallSide & { routine: string },
+  to: CallSide & { names: string[] },
+  /** Already read by `callsBetween`, when it had to be. */
+  known?: CompiledTail,
+): { evidence: CallsRefutedEvidence } | { reached: CallsWrongRoutineEvidence } | { why: CallsNotClosed } {
+  const text = textClosed(from, to);
+  /*
+   * Closed, and in Rust still not the end of it: every call the text wrote
+   * was placed, and the head can run without being written as one (#357).
+   * `a + b` runs `add`, `?` runs `from`, a scope's end runs `drop` -- and a
+   * body can hand the head to `map` by name. Each of those went red on a
+   * correct arrow once rust-analyzer could place everything else.
+   */
+  const closedByText = (): typeof text => {
+    const unwritten = from.language === "rust" ? unwrittenRustCall(from, to) : undefined;
+    return unwritten ? { why: unwritten } : text;
+  };
+  if (!("why" in text) && !known) return closedByText();
+  /*
+   * The text stopped, or the forward reading doubted before it got here
+   * (`known`). For a Rust tail the compiler built, its list is the second
+   * reading (#357) -- and only the second: where the text closes on its own
+   * it keeps its verdict and its evidence, because it placed every call at a
+   * file and the compiler's list names functions without saying whose they
+   * are. After a forward doubt the compiler's "never" is required first.
+   */
+  const compiled = known ?? compiledBodiesFor(from);
+  if (!compiled) return text;
+  const verdict = compiledVerdict(compiled, to);
+  if ("why" in verdict) return { why: verdict.why };
+  if (!("why" in text)) return closedByText();
+  const first = routinesNamed(from.source, from.routine, "rust").routines[0];
+  return {
+    evidence: {
+      routine: from.routine,
+      line: first ? lineOf(from.source, first.startIndex) : 1,
+      sites: verdict.sites,
+    },
+  };
+}
+
+/** What the compiler's bodies say about the head: never, with how many calls, or why they cannot. `measure:compiled-calls` asks this too. */
+export function compiledVerdict(
+  compiled: CompiledTail,
+  to: CallSide & { names: string[] },
+): ReturnType<typeof compiledRefutes> {
+  return compiledRefutes(compiled.bodies, {
+    names: to.names,
+    source: to.source,
+    ownTrait: (written) => traitDeclaredHere(to, written),
+  }, compiled.generics);
+}
+
+/** What `compiledBodiesFor` found: the bodies, and the type parameters in scope where they were declared. */
+export interface CompiledTail {
+  bodies: CompiledBody[];
+  generics: Set<string>;
+}
+
+/**
+ * How a Rust tail can reach the head without a call to it being written, on a
+ * body whose written calls were all placed elsewhere (#357).
+ *
+ * `called-implicitly`  the head is a method of a trait this repository does
+ *                      not declare -- `Add`, `From`, `Display`, `Drop`, a
+ *                      library's trait. The language or the library runs
+ *                      those on the caller's behalf, on values whose types
+ *                      the text does not always write down: a field, a
+ *                      `Result<T>` alias hiding the error type. A trait the
+ *                      repository declares is only ever called by name.
+ * `named`              the body names the head without calling it.
+ */
+function unwrittenRustCall(
+  from: CallSide & { routine: string },
+  to: CallSide & { names: string[] },
+): "called-implicitly" | "named" | undefined {
+  const names = new Set(to.names);
+  if (traitImplsOf(to.source, names).some((one) => !traitDeclaredHere(to, one.trait))) return "called-implicitly";
+
+  const reading = callSitesIn(from, from.routine);
+  const called = new Set<number>();
+  if (reading.read) {
+    for (const body of reading.bodies) {
+      if (body.routine !== from.routine) continue;
+      for (const site of body.sites) if (site.nameAt) called.add(site.nameAt.start);
+    }
+  }
+  let named = false;
+  for (const routine of routinesNamed(from.source, from.routine, "rust").routines) {
+    const body = routine.childForFieldName("body");
+    if (!body) continue;
+    each(body, (node) => {
+      if (named || (node.type !== "identifier" && node.type !== "field_identifier")) return;
+      if (names.has(node.text) && !called.has(node.startIndex)) named = true;
+    });
+  }
+  return named ? "named" : undefined;
+}
+
+/**
+ * Whether a trait an `impl` in `side` names is declared in this repository:
+ * written from `crate::`, `self::` or `super::`, declared in the same file, or
+ * imported from something `deps-rust.ts` resolved to a file here.
+ */
+function traitDeclaredHere(side: CallSide, written: string): boolean {
+  const segments = written.split("::").map((one) => one.trim()).filter(Boolean);
+  const first = segments[0];
+  if (!first) return false;
+  if (first === "crate" || first === "self" || first === "super") return true;
+  if (segments.length === 1 && new RegExp(`\\btrait\\s+${escapeName(first)}\\b`).test(side.source)) return true;
+  const binding = bindingsIn(side.source, side.language)?.imported.get(first);
+  if (!binding) return false;
+  return side.imports.some((one) => one.specifier === binding.specifier && one.file !== undefined);
+}
+
+/**
+ * The Rust compiler's bodies for the tail's routine, or `undefined` when it
+ * has none to offer or they cannot be trusted (#357).
+ *
+ * Trusted means one more thing than found: every call the text reading saw
+ * in the routine is in them by name. That is the check that the body matched
+ * is the routine the board means, and that the build compiled the code the
+ * text shows -- a call switched off by a setting `compiledBodiesOf` did not
+ * catch, or inlined away, fails it. Calls inside a macro are not in the text
+ * reading, so they cannot fail it; that is what the compiler is here to add.
+ */
+export function compiledBodiesFor(from: CallSide & { routine: string }): CompiledTail | undefined {
+  if (from.language !== "rust" || !from.compiled) return undefined;
+  const crate = from.compiled();
+  if (!crate) return undefined;
+  const reading = compiledBodiesOf(crate, from.file, from.source, from.routine);
+  if (!("bodies" in reading)) return undefined;
+  const seen = callSitesIn(from, from.routine);
+  if (!seen.read) return undefined;
+  for (const body of seen.bodies) {
+    if (body.routine !== from.routine) continue;
+    for (const site of body.sites) {
+      if (site.name === "" || site.why === "macro") continue;
+      // `ok!(..)` is read as a call to `ok`; what rustc lists is what it expands to.
+      if (site.nameAt && from.source[site.nameAt.end] === "!") continue;
+      if (!reading.bodies.some((compiled) => compiled.words.has(site.name))) return undefined;
+    }
+  }
+  return { bodies: reading.bodies, generics: reading.generics };
+}
+
+/** `closedBodyRefutes` as it was before #357: the text reading alone. */
+function textClosed(
   from: CallSide & { routine: string },
   to: CallSide & { names: string[] },
 ): { evidence: CallsRefutedEvidence } | { reached: CallsWrongRoutineEvidence } | { why: CallsNotClosed } {

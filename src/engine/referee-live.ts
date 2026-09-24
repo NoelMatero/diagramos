@@ -56,6 +56,7 @@ import type { PyrightLspReferee } from "./referee-python-lsp";
 import type { RustLspReferee } from "./referee-rust-lsp";
 import { resolvePythonReceivers } from "./referee-python";
 import { resolveRustReceivers } from "./referee-rust";
+import { compileCrates, type CompiledCrates } from "./referee-rustc";
 
 /** The languages this file can put a question to, in the order a note names them. */
 const LIVE_LANGUAGES = ["python", "rust"] as const;
@@ -121,6 +122,13 @@ export interface LiveOptions {
    * Node will not reach its own natural exit while one is alive.
    */
   pool?: LiveRefereePool;
+  /**
+   * Whether a Rust `@calls` arrow the text could not settle may be put to
+   * the Rust compiler's own call list (#357). Default on. `false` is for a
+   * test that wants the text reading alone, or a caller that must not start
+   * a build.
+   */
+  compiler?: boolean;
 }
 
 /**
@@ -203,7 +211,15 @@ export async function refereedCheckLive(
   options: LiveOptions = {},
 ): Promise<LiveCheck> {
   const first = run(undefined);
-  if (!wouldHelp(first)) {
+  /*
+   * Two second opinions, each asked only where it can change something. The
+   * language servers answer receivers and definitions; the Rust compiler
+   * answers a Rust arrow's whole call list (#357), and a board with nothing
+   * else open never starts a server for it.
+   */
+  const askServers = wouldHelp(first);
+  const askCompiler = options.compiler !== false && first.claims.callsCompilable > 0;
+  if (!askServers && !askCompiler) {
     return { report: first, checkedWith: { answered: [], silent: [], nothingToAsk: true } };
   }
 
@@ -222,6 +238,9 @@ export async function refereedCheckLive(
   const answered = new Set<string>();
   const silent = new Set<string>();
   const closers: (() => void)[] = [];
+  /** Rust tails whose arrows asked for the compiler's list, and the builds that answer them. */
+  const compilable = new Set<string>();
+  let crates: Promise<CompiledCrates> | undefined;
 
   try {
     for (let round = 0; round < ROUNDS; round += 1) {
@@ -246,7 +265,7 @@ export async function refereedCheckLive(
       ) => (file: string, at: { start: number; end: number }): never | undefined => {
         const language = languageOf(file);
         if (language !== "python" && language !== "rust") return real?.(file, at) as never;
-        if (!RESOLVERS[language][BATCHES[kind]]) return undefined;
+        if (!askServers || !RESOLVERS[language][BATCHES[kind]]) return undefined;
         const known = answers[language][kind](file, at);
         if (known !== undefined) return known as never;
         const key = `${language}:${file}:${at.start}:${at.end}`;
@@ -260,6 +279,9 @@ export async function refereedCheckLive(
         resolveReceiver: record("receiver", ts?.resolveReceiver.bind(ts)) as ClosedBodyReferee["resolveReceiver"],
         declarationAt: record("definition", ts?.declarationAt?.bind(ts)) as ClosedBodyReferee["declarationAt"],
         kindAt: record("kind", ts?.kindAt?.bind(ts)) as ClosedBodyReferee["kindAt"],
+        ...(askCompiler
+          ? { compiledCrateOf: (file: string) => { compilable.add(file); return undefined; } }
+          : {}),
       };
 
       try {
@@ -268,6 +290,15 @@ export async function refereedCheckLive(
         run(recording);
       } catch {
         // A board this pass cannot read is one whose real check will say so.
+      }
+
+      /*
+       * Started before the servers are waited on, so a build and a server's
+       * start run side by side inside the one budget rather than one after
+       * the other.
+       */
+      if (compilable.size > 0 && !crates) {
+        crates = compileCrates(root, [...compilable], { until });
       }
 
       let asking = false;
@@ -287,6 +318,10 @@ export async function refereedCheckLive(
       }
       if (!asking) break;
     }
+
+    const compiled = crates ? await crates : undefined;
+    if (compiled?.answered) answered.add("rustc");
+    else if (crates) silent.add("rustc");
 
     /*
      * The merged referee the real check reports through. No half knows the
@@ -314,6 +349,7 @@ export async function refereedCheckLive(
         }
         return ts?.kindAt?.(file, at);
       },
+      ...(compiled?.answered ? { compiledCrateOf: (file: string) => compiled.crateOf(file) } : {}),
     };
     if (ts) answered.add("typescript");
 
@@ -345,6 +381,7 @@ export function refereeSentence(note: RefereeNote): string {
     typescript: "the TypeScript compiler",
     python: "pyright",
     rust: "rust-analyzer",
+    rustc: "the Rust compiler",
   };
   const list = (names: readonly string[]): string => {
     const spelled = names.map((one) => NAMES[one] ?? one);

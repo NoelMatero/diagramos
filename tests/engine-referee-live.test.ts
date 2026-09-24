@@ -260,9 +260,16 @@ describe("a machine with Rust but no rust-analyzer", () => {
     const workspace = createWorkspace(repo);
     const board = await boardOf("src/a.rs#run", "src/b.rs#render");
 
+    /*
+     * The text reading alone, which is what this is about. `run` never calls
+     * `render`, and since #357 the Rust compiler's own call list says so
+     * whether or not rust-analyzer answers -- a correct red, and a different
+     * test (`calls-compiled-rust.test.ts`).
+     */
     const started = Date.now();
     const live = await refereedCheckLive(repo, (referee) =>
-      checkDrift(board, workspace, { edges: true, ...(referee ? { closedBodyReferee: referee } : {}) }));
+      checkDrift(board, workspace, { edges: true, ...(referee ? { closedBodyReferee: referee } : {}) }),
+    { compiler: false });
 
     expect(Date.now() - started).toBeLessThan(10_000);
     expect(live.report.edges.filter((finding) => finding.kind === "calls-refuted")).toEqual([]);
