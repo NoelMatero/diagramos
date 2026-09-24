@@ -79,8 +79,8 @@
       "language": "python",
       "source": "swap",
       "parent": "builds|httpx/_models.py#Request|httpx/_urls.py#URL|",
-      "truth": "false",
-      "why": "the from end is a type, and only something that runs can call"
+      "truth": "true",
+      "why": "its routine __init__ calls it"
     },
     {
       "id": "builds|httpx/_urls.py#URL|httpx/_models.py#Request|",
@@ -155,8 +155,8 @@
       "language": "python",
       "source": "swap",
       "parent": "builds|httpx/_models.py#Request|httpx/_models.py#Headers|",
-      "truth": "false",
-      "why": "the from end is a type, and only something that runs can call"
+      "truth": "true",
+      "why": "its routine __init__ calls it"
     },
     {
       "id": "builds|httpx/_models.py#Headers|httpx/_models.py#Request|",
@@ -341,8 +341,8 @@
       "language": "python",
       "source": "swap",
       "parent": "builds|httpx/_models.py#Response|httpx/_models.py#Headers|",
-      "truth": "false",
-      "why": "the from end is a type, and only something that runs can call"
+      "truth": "true",
+      "why": "its routine __init__ calls it"
     },
     {
       "id": "builds|httpx/_models.py#Headers|httpx/_models.py#Response|",
@@ -535,8 +535,8 @@
       "language": "python",
       "source": "swap",
       "parent": "builds|httpx/_urls.py#URL|httpx/_urls.py#QueryParams|",
-      "truth": "false",
-      "why": "the from end is a type, and only something that runs can call"
+      "truth": "true",
+      "why": "its routine __init__ calls it"
     },
     {
       "id": "builds|httpx/_urls.py#QueryParams|httpx/_urls.py#URL|",
@@ -586,8 +586,8 @@
       "toLabel": "Request",
       "language": "python",
       "source": "drawn",
-      "truth": "false",
-      "why": "the from end is a type, and only something that runs can call"
+      "truth": "undecidable",
+      "why": "its routine __iter__: the tool would not walk this routine's calls"
     },
     {
       "id": "calls|httpx/_models.py#Cookies|httpx/_models.py#Response|",
@@ -598,8 +598,8 @@
       "toLabel": "Response",
       "language": "python",
       "source": "drawn",
-      "truth": "false",
-      "why": "the from end is a type, and only something that runs can call"
+      "truth": "undecidable",
+      "why": "its routine __iter__: the tool would not walk this routine's calls"
     },
     {
       "id": "takes|httpx/_models.py#Headers|httpx/_types.py#HeaderTypes|",

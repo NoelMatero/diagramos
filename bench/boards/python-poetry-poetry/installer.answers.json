@@ -16,8 +16,8 @@
       "toLabel": "Transaction",
       "language": "python",
       "source": "drawn",
-      "truth": "false",
-      "why": "the from end is a type, and only something that runs can call"
+      "truth": "true",
+      "why": "its routine _do_install calls it"
     },
     {
       "id": "needs|src/poetry/installation/installer.py#Installer|src/poetry/puzzle/transaction.py#Transaction|",
@@ -144,8 +144,8 @@
       "toLabel": "Executor",
       "language": "python",
       "source": "drawn",
-      "truth": "false",
-      "why": "the from end is a type, and only something that runs can call"
+      "truth": "true",
+      "why": "its routine __init__ calls it"
     },
     {
       "id": "needs|src/poetry/installation/installer.py#Installer|src/poetry/installation/executor.py#Executor|",
@@ -335,8 +335,8 @@
       "toLabel": "Operation",
       "language": "python",
       "source": "drawn",
-      "truth": "false",
-      "why": "the from end is a type, and only something that runs can call"
+      "truth": "undecidable",
+      "why": "its routine execute: the name appears without being called (passed as a value, or a path)"
     },
     {
       "id": "needs|src/poetry/installation/executor.py#Executor|src/poetry/installation/operations/operation.py#Operation|",
@@ -398,8 +398,8 @@
       "toLabel": "WheelInstaller",
       "language": "python",
       "source": "drawn",
-      "truth": "false",
-      "why": "the from end is a type, and only something that runs can call"
+      "truth": "true",
+      "why": "its routine __init__ calls it"
     },
     {
       "id": "needs|src/poetry/installation/executor.py#Executor|src/poetry/installation/wheel_installer.py#WheelInstaller|",
@@ -512,8 +512,8 @@
       "toLabel": "Chef",
       "language": "python",
       "source": "drawn",
-      "truth": "false",
-      "why": "the from end is a type, and only something that runs can call"
+      "truth": "true",
+      "why": "its routine __init__ calls it"
     },
     {
       "id": "needs|src/poetry/installation/executor.py#Executor|src/poetry/installation/chef.py#Chef|",
@@ -640,8 +640,8 @@
       "toLabel": "Chooser",
       "language": "python",
       "source": "drawn",
-      "truth": "false",
-      "why": "the from end is a type, and only something that runs can call"
+      "truth": "true",
+      "why": "its routine __init__ calls it"
     },
     {
       "id": "needs|src/poetry/installation/executor.py#Executor|src/poetry/installation/chooser.py#Chooser|",

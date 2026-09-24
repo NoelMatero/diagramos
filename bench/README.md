@@ -112,3 +112,19 @@ npx tsx scripts/bench-planted-key.mts anyhow       # one project
 Needs `rust-analyzer` on the machine; pyright is fetched by `npx`. The result
 is deterministic given the same clones at the same pins: the plants are chosen
 by a hash of the claim, not at random.
+
+### Correcting how one word is judged, without moving the population
+
+A rebuild grows plants from every claim the tooling calls true, so changing how
+a word is judged and then rebuilding changes *which* claims are scored, not
+only their answers. To correct the answers alone, re-ask the stored claims in
+place:
+
+```
+npx tsx scripts/bench-planted-rejudge.mts --word=calls --why="the from end is a type"          # dry run
+npx tsx scripts/bench-planted-rejudge.mts --word=calls --why="the from end is a type" --write
+```
+
+`--why` narrows it to claims whose stored reason starts with that text. #346
+used exactly the line above: an `@calls` arrow out of a class had been called
+false outright, and is now read through the class's own routines.

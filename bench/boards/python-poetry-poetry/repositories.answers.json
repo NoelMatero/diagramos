@@ -550,8 +550,8 @@
       "language": "python",
       "source": "swap",
       "parent": "builds|src/poetry/repositories/repository_pool.py#RepositoryPool|src/poetry/repositories/repository.py#Repository|",
-      "truth": "false",
-      "why": "the from end is a type, and only something that runs can call"
+      "truth": "true",
+      "why": "its routine from_packages calls it"
     },
     {
       "id": "builds|src/poetry/repositories/repository.py#Repository|src/poetry/repositories/repository_pool.py#RepositoryPool|",

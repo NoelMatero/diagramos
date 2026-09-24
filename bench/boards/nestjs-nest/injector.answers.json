@@ -66,8 +66,8 @@
       "toLabel": "loadProvider",
       "language": "ts",
       "source": "drawn",
-      "truth": "false",
-      "why": "the from end is a type, and only something that runs can call"
+      "truth": "true",
+      "why": "its routine resolveComponentHost calls it"
     },
     {
       "id": "calls|packages/core/injector/injector.ts#loadProvider|packages/core/injector/injector.ts#loadInstance|",
@@ -740,8 +740,8 @@
       "language": "ts",
       "source": "swap",
       "parent": "builds|packages/core/injector/module.ts#Module|packages/core/injector/instance-wrapper.ts#InstanceWrapper|",
-      "truth": "false",
-      "why": "the from end is a type, and only something that runs can call"
+      "truth": "true",
+      "why": "its routine addModuleRef calls it"
     },
     {
       "id": "builds|packages/core/injector/instance-wrapper.ts#InstanceWrapper|packages/core/injector/module.ts#Module|",

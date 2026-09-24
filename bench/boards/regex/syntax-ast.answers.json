@@ -241,7 +241,7 @@
       "source": "swap",
       "parent": "needs|regex-syntax/src/ast/parse.rs#Primitive|regex-syntax/src/ast/mod.rs#Concat|",
       "truth": "false",
-      "why": "the from end is a type, and only something that runs can call"
+      "why": "the to end is a value or field, and only something that runs can be called"
     },
     {
       "id": "needs|regex-syntax/src/ast/mod.rs#Concat|regex-syntax/src/ast/parse.rs#Primitive|",

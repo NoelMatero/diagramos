@@ -16,8 +16,8 @@
       "toLabel": "should_skip_entry",
       "language": "rust",
       "source": "drawn",
-      "truth": "false",
-      "why": "the from end is a type, and only something that runs can call"
+      "truth": "true",
+      "why": "its routine skip_entry calls it"
     },
     {
       "id": "calls|crates/ignore/src/walk.rs#should_skip_entry|crates/ignore/src/dir.rs#matched_dir_entry|",

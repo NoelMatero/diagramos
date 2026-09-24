@@ -276,17 +276,38 @@ export function createOracle(tooling: Tooling): Oracle {
     const calls = await tooling.outgoingCalls(from);
     if (calls?.some((l) => denotes(l, to))) return { truth: "true", why: "the tool's call hierarchy lists it" };
     const body = signatureOf(language, from)?.bodyStart ?? from.start;
-    const text = sourceOf(from.file);
-    const blank = blankOf(language, text);
+    const scan = await scanForCall(from.file, { start: body, end: from.end }, [], to);
+    if (scan.called) return { truth: "true", why: "the name is called here and resolves to it" };
+    const doubt = calls === undefined ? "the tool would not walk this routine's calls" : scan.doubt;
+    if (doubt) return { truth: "undecidable", why: doubt };
+    return { truth: "false", why: "the routine's calls were read and none is it" };
+  }
+
+  /**
+   * Every place `to`'s name is written in a region, resolved: called there, or
+   * a doubt about whether it could be. `skip` is the parts of the region some
+   * other reading has already answered for.
+   *
+   * `decorators` counts a bare `@name` (or `@module.name`) opening a line as a
+   * call, which it is: the name is called with what it decorates. Only a
+   * type's own scan asks for it -- a routine at the tail keeps the reading its
+   * stored key was made with.
+   */
+  async function scanForCall(
+    file: string, region: Span, skip: Span[], to: Sym, decorators = false,
+  ): Promise<{ called: boolean; doubt?: string }> {
+    const blank = blankOf(language, sourceOf(file));
     let doubt: string | undefined;
-    if (calls === undefined) doubt = "the tool would not walk this routine's calls";
-    for (const m of blank.slice(body, from.end).matchAll(new RegExp(`\\b${escape(to.name)}\\b`, "g"))) {
-      const at = body + m.index!;
+    for (const m of blank.slice(region.start, region.end).matchAll(new RegExp(`\\b${escape(to.name)}\\b`, "g"))) {
+      const at = region.start + m.index!;
+      if (skip.some((s) => s.start <= at && at < s.end)) continue;
       const after = blank.slice(at + to.name.length, at + to.name.length + 40);
-      const calling = /^\s*(::<[^>]*>)?\s*\(/.test(after);
-      const found = await resolve(from.file, at);
+      const decorating = decorators && !/^\s*\./.test(after)
+        && /(^|\n)[ \t]*@\s*(?:[A-Za-z_$][\w$]*\s*\.\s*)*$/.test(blank.slice(Math.max(0, at - 200), at));
+      const calling = decorating || /^\s*(::<[^>]*>)?\s*\(/.test(after);
+      const found = await resolve(file, at);
       if (found.kind === "sym" && found.sym.file === to.file && found.sym.nameStart === to.nameStart) {
-        if (calling) return { truth: "true", why: "the name is called here and resolves to it" };
+        if (calling) return { called: true };
         doubt ??= "the name appears without being called (passed as a value, or a path)";
       } else if (found.kind === "failed" || found.kind === "none") {
         doubt ??= `the tool could not say what ${to.name} means at one call site`;
@@ -294,8 +315,131 @@ export function createOracle(tooling: Tooling): Oracle {
         doubt ??= `a call to another ${to.name} is here, and dispatch could reach this one`;
       }
     }
+    return { called: false, ...(doubt ? { doubt } : {}) };
+  }
+
+  /**
+   * `@calls` out of a type, read the way a board means it (#346): the type
+   * calls the far end when some routine of its own does, or any other code
+   * written inside it -- a field's initialiser, a Python class body.
+   *
+   * "Its own" is the whole question. A routine it inherits from a base in
+   * this repository, or a Rust trait's default method, runs as the type and
+   * is written somewhere else, so a type with one of those is never called
+   * `false` -- only `undecidable`, with the base named.
+   */
+  async function judgeCallsFromType(from: Sym, to: Sym): Promise<Answer> {
+    const own = await ownCode(from);
+    if (typeof own === "string") return { truth: "undecidable", why: own };
+    let doubt: string | undefined;
+    for (const routine of own.routines) {
+      const answer = await judgeCalls(routine, to).then((a) => (writesNoCall(routine, a) ? NO_CALL : a));
+      if (answer.truth === "true") return { truth: "true", why: `its routine ${routine.name} calls it` };
+      if (answer.truth === "undecidable") doubt ??= `its routine ${routine.name}: ${answer.why}`;
+    }
+    for (const region of own.regions) {
+      /*
+       * Each routine was read above from its name on -- a default argument's
+       * call is in the tool's own call list -- but a decorator sits before the
+       * name and runs when the type is made, so that part is left for this
+       * scan. Not the name or the signature: the routine's own name reads as
+       * a call to itself, and a parameter's type names the far end without
+       * running anything.
+       */
+      const skip = own.routines.filter((r) => r.file === region.file).map((r) => ({ start: r.nameStart, end: r.end }));
+      const scan = await scanForCall(region.file, region, skip, to, true);
+      if (scan.called) return { truth: "true", why: "code inside the type calls it" };
+      doubt ??= scan.doubt;
+    }
+    doubt ??= own.inherits;
     if (doubt) return { truth: "undecidable", why: doubt };
-    return { truth: "false", why: "the routine's calls were read and none is it" };
+    if (own.routines.length === 0) return { truth: "false", why: "the type has no routine, and nothing in it calls it" };
+    return { truth: "false", why: "every routine of the type was read and none calls it" };
+  }
+
+  const NO_CALL: Answer = { truth: "false", why: "the routine's calls were read and none is it" };
+
+  /**
+   * Whether a routine the tool would not walk plainly makes no call at all.
+   *
+   * pyright answers `null` for the outgoing calls of a routine that makes
+   * none, and `null` is also what a server says when it did not answer -- so
+   * `def tidy(self): return 1` read as a doubt, and one such method made a
+   * whole class undecidable. A body with no bracket to call through and no
+   * `new` has nothing for a call hierarchy to list, whichever the tool meant.
+   *
+   * Only asked on a type's routines. A routine at the tail keeps the answer
+   * its stored key already has, since those claims are not being re-read.
+   */
+  function writesNoCall(routine: Sym, answer: Answer): boolean {
+    if (answer.truth !== "undecidable" || answer.why !== "the tool would not walk this routine's calls") return false;
+    const body = signatureOf(language, routine)?.bodyStart;
+    if (body === undefined) return false;
+    const text = blankOf(language, sourceOf(routine.file)).slice(body, routine.end);
+    return !/[(]|\bnew\b/.test(text);
+  }
+
+  /**
+   * The code a type owns: the spans it is written in and the routines in
+   * them, plus the reason it may run code written elsewhere. A string is a
+   * reason the spans themselves could not be found.
+   */
+  async function ownCode(type: Sym): Promise<
+    string | { regions: Array<Span & { file: string }>; routines: Sym[]; inherits?: string }
+  > {
+    const routinesIn = async (file: string, span: Span) => ((await symbolsOf(rel(file))) ?? [])
+      .filter((s) => s.kind === "routine" && s.start >= span.start && s.end <= span.end && s !== type);
+    if (language !== "rust" || rustKeyword(type) === "trait") {
+      const region = { file: type.file, start: type.start, end: type.end };
+      const routines = await routinesIn(type.file, region);
+      if (language === "rust") return { regions: [region], routines };
+      const bases = basesOf(language, type);
+      if (!bases) return "the declaration's bases could not be read";
+      let inherits: string | undefined;
+      const text = sourceOf(type.file);
+      for (const base of bases) {
+        // The base's own name, not a type argument inside it: `Generic[T]`
+        // inherits from `Generic`, and `T` says nothing about code.
+        const chain = /^\s*((?:[A-Za-z_$][\w$]*\s*\.\s*)*)([A-Za-z_$][\w$]*)/.exec(text.slice(base.start, base.end));
+        if (!chain) { inherits ??= "one of its bases could not be read"; continue; }
+        const name = chain[2]!;
+        const found = await resolve(type.file, base.start + chain[0].length - name.length);
+        if (found.kind === "outside") continue;
+        inherits ??= found.kind === "sym"
+          ? `it inherits from ${found.sym.name}, whose routines run as it and are written elsewhere`
+          : `the tool could not say what its base ${name} is`;
+      }
+      return { regions: [region], routines, ...(inherits ? { inherits } : {}) };
+    }
+    /*
+     * A Rust type's routines are in `impl` blocks anywhere in the crate. Each
+     * is its own region, and only a block whose type resolves to this one
+     * counts: two modules may each declare a `Value`.
+     */
+    const regions: Array<Span & { file: string }> = [];
+    const routines: Sym[] = [];
+    let inherits: string | undefined;
+    for (const file of crateFiles(type.file)) {
+      if (!sourceOf(file).includes(type.name)) continue;
+      for (const block of rustImplBlocks(file)) {
+        if (block.selfName !== type.name || block.selfAt === undefined) continue;
+        const self = await resolve(file, block.selfAt);
+        if (self.kind !== "sym") return `an impl of ${type.name}'s own type could not be resolved`;
+        if (self.sym.file !== type.file || self.sym.nameStart !== type.nameStart) continue;
+        regions.push({ file, start: block.start, end: block.end });
+        routines.push(...await routinesIn(file, block));
+        if (block.traitAt === undefined) continue;
+        const trait = await resolve(file, block.traitAt);
+        if (trait.kind === "outside") continue;
+        if (trait.kind !== "sym") { inherits ??= `the tool could not say what trait ${block.traitName} is`; continue; }
+        // A trait whose methods all end in `;` gives the type nothing to run.
+        const declared = blankRust(sourceOf(trait.sym.file)).slice(trait.sym.start, trait.sym.end);
+        if (/\bfn\b[^;{]*\{/.test(declared)) {
+          inherits ??= `it implements ${trait.sym.name}, whose default routines run as it and are written elsewhere`;
+        }
+      }
+    }
+    return { regions, routines, ...(inherits ? { inherits } : {}) };
   }
 
   async function judgeSignature(word: "takes" | "returns", type: Sym, fn: Sym): Promise<Answer> {
@@ -642,6 +786,17 @@ export function createOracle(tooling: Tooling): Oracle {
   }
 
   async function judgeOne(claim: ClaimUnderTest, from: Sym, to: Sym): Promise<Answer> {
+    /*
+     * A type at the tail of `@calls` is read through its own routines (#346),
+     * so only the far end's kind is still a mistake. `kindProblemFor` keeps
+     * saying a type cannot call: plants are grown from it, and the planted
+     * population is not this change's to move.
+     */
+    if (claim.word === "calls" && from.kind === "type") {
+      const far = kindProblem("calls", { ...from, kind: "routine" }, to);
+      if (far) return { truth: "false", why: far };
+      return judgeCallsFromType(from, to);
+    }
     const problem = kindProblem(claim.word, from, to);
     if (problem) return { truth: "false", why: problem };
     switch (claim.word) {

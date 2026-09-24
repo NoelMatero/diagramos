@@ -53,7 +53,7 @@
       "language": "rust",
       "source": "drawn",
       "truth": "false",
-      "why": "the from end is a type, and only something that runs can call"
+      "why": "every routine of the type was read and none calls it"
     },
     {
       "id": "calls|clap_lex/src/lib.rs#is_long|clap_lex/src/lib.rs#to_long|",
@@ -77,7 +77,7 @@
       "language": "rust",
       "source": "drawn",
       "truth": "false",
-      "why": "the from end is a type, and only something that runs can call"
+      "why": "every routine of the type was read and none calls it"
     },
     {
       "id": "calls|clap_lex/src/lib.rs#is_short|clap_lex/src/lib.rs#to_short|",
@@ -164,7 +164,7 @@
       "language": "rust",
       "source": "drawn",
       "truth": "false",
-      "why": "the from end is a type, and only something that runs can call"
+      "why": "every routine of the type was read and none calls it"
     },
     {
       "id": "needs|clap_lex/src/lib.rs#ParsedArg|clap_lex/src/ext.rs#OsStrExt|",

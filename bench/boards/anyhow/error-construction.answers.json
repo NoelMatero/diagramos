@@ -247,7 +247,7 @@
       "source": "reverse",
       "parent": "calls|src/error.rs#construct_from_adhoc|src/wrapper.rs#MessageError|",
       "truth": "false",
-      "why": "the from end is a type, and only something that runs can call"
+      "why": "every routine of the type was read and none calls it"
     },
     {
       "id": "calls|src/error.rs#construct_from_adhoc|src/wrapper.rs#fmt|",

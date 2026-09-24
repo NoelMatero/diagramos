@@ -56,7 +56,7 @@
       "source": "retarget",
       "parent": "calls|packages/vite/src/node/ssr/ssrTransform.ts#ssrTransform|packages/vite/src/node/ssr/ssrTransform.ts#ssrTransformScript|",
       "truth": "false",
-      "why": "the from end is a type, and only something that runs can call"
+      "why": "the type has no routine, and nothing in it calls it"
     },
     {
       "id": "calls|packages/vite/src/node/ssr/ssrTransform.ts#ssrTransform|packages/vite/src/node/ssr/ssrTransform.ts#exportedAs|",
@@ -244,8 +244,8 @@
       "toLabel": "fetchModule",
       "language": "ts",
       "source": "drawn",
-      "truth": "false",
-      "why": "the from end is a type, and only something that runs can call"
+      "truth": "undecidable",
+      "why": "it inherits from ModuleRunner, whose routines run as it and are written elsewhere"
     },
     {
       "id": "returns|packages/vite/src/node/ssr/fetchModule.ts#fetchModule|packages/vite/src/node/ssr/ssrModuleLoader.ts#SSRCompatModuleRunner|",

@@ -769,6 +769,18 @@ answered.
 | greens on a false claim | -- | -- | 43 | 27 | 26 | 26 | **26** |
 | true claims called wrong | 8 | 10 | 8 | 1 | 1 | 0 | **0** |
 
+**From #346 the counts are out of 808 mistakes and 453 true claims, not 855
+and 428.** The answer key used to call every `@calls` arrow out of a class
+false; it now reads one the way the checker does, as some routine of the
+class calling the far end, and 62 stored claims were re-asked in place
+(`bench/README.md`). 25 turned out true -- mostly a constructor making the far
+end -- and 22 undecidable, so 47 leave the mistakes and 25 join the true
+claims. On `16cff9c`, one checker scored both keys: mistakes called wrong 554
+of 855 → 549 of 808 (65% → 68%), greens on a false claim 26 → 9, true claims
+called wrong 0 of 428 → 0 of 453. The five reds lost were on arrows the tools
+can no longer settle, not on arrows that became true. A column added after
+#346 is measured on the new key and does not compare with the ones above.
+
 **#345's column** is one change measured against the same day's main,
 `5101697`, which caught 493: +15, and every one is a Rust `@conforms` with a
 struct or an enum at the head. None of them is a planted *wrong-kind* mistake

@@ -27,14 +27,18 @@ export interface Key {
 
 /** Every stored key, by project then file, in the order the bench scores them. */
 export function plantedKeys(repo: string): Key[] {
+  return plantedKeyFiles(repo).map((file) => JSON.parse(readFileSync(file, "utf8")) as Key);
+}
+
+/** Where each stored key lives, in the same order. */
+export function plantedKeyFiles(repo: string): string[] {
   const root = path.join(repo, "bench/boards");
   if (!existsSync(root)) return [];
-  const out: Key[] = [];
+  const out: string[] = [];
   for (const project of readdirSync(root).sort()) {
     const dir = path.join(root, project);
     for (const file of readdirSync(dir).sort()) {
-      if (!file.endsWith(".answers.json")) continue;
-      out.push(JSON.parse(readFileSync(path.join(dir, file), "utf8")) as Key);
+      if (file.endsWith(".answers.json")) out.push(path.join(dir, file));
     }
   }
   return out;
