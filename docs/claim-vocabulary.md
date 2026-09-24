@@ -4470,6 +4470,59 @@ duplicate from conflitcts, requires reading prs "An arrow can be three calls lon
     152 distinct class methods the definitions landed on, 21 are overridden
     in the same repository; none is under one of this change's new reds.
 
+49. **A correct `@calls` arrow went red when the call runs a subclass's
+    method (#353).** The closed reading took the method a call lands on as
+    the place it runs. For a plain base class that holds only when nothing
+    overrides it: `send(t: Transport)` calling `t.handle(r)` runs
+    `HTTPTransport.handle` whenever `t` is one, and an arrow `send ->
+    HTTPTransport` was called wrong. Building one test per shape found the
+    same mistake in three more spellings, none of which the issue named:
+
+    | shape | before |
+    |---|---|
+    | through a typed parameter or a field, Python and TypeScript | red |
+    | a base class calling its own `self.handle()` / `this.handle()` | red |
+    | a subclass calling an inherited `self.send()` -- placed at the subclass's file | red |
+    | a Rust trait's default method calling `self.handle()` | red |
+
+    The issue expected Rust to be safe, and it is at the definition: a trait's
+    default method was already withheld there. `self.x()` was never asked
+    about, because the text reader placed every `own` call in its own file.
+
+    **The rule is now "runs where it is declared, and nothing overrides it."**
+    `overrides.ts` answers the second half from the text: a class naming the
+    holder as a base -- read by `conforms.ts`' own base reader, through a
+    qualified name, an import alias, or inside a base it cannot read as a
+    name -- that declares the member again, at any depth. Every doubt answers
+    yes: a name shared by an unrelated class, a walk past 20,000 files, a file
+    that would not read. The cost of each is one arrow withheld. An `own` call
+    the class does not declare goes to "go to definition", like a `through`
+    call; with no checker it is a `receiver` doubt. Inside a Rust `impl` the
+    old rule stands, because nothing can override it. Inside a trait it
+    withholds.
+
+    Found by building, not by the key: `bench:planted`'s answer key comes
+    from the compilers' call hierarchy, which says `send` calls
+    `Transport.handle`, so it cannot see this. On 830e434, both arms the same
+    day:
+
+    | `bench:planted` | before | after |
+    |---|---:|---:|
+    | mistakes called wrong | 557 of 808 | **556** |
+    | true claims called wrong | 0 of 453 | **0** |
+    | greens on a false claim | 9 | 9 |
+    | run time | 195s | 207s |
+
+    **The one lost red was the key's mistake, not a catch.** TanStack's
+    `Subscribable.subscribe -> QueryObserver` ("subscribe() calls
+    onSubscribe()"): `Subscribable.onSubscribe` does nothing, and
+    `QueryObserver` overrides it, so subscribing to a `QueryObserver` runs
+    `QueryObserver.onSubscribe`. The arrow is true, and it was red. Three
+    other arrows changed only the reason they are withheld under: httpx's
+    `Auth` and flask's `JSONProvider` now say `overridden`, and poetry's
+    `self._search_for_cached.cache_clear()` is an `lru_cache` set in
+    `__init__`, which the old rule placed as a method of its own class.
+
 ## Open, in the order worth doing
 
 1. ~~**The licence grid.**~~ Built at #207 and shipped at #209. `@accesses` is

@@ -67,6 +67,7 @@
  */
 import { providedByLanguage } from "./builtins";
 import { mayAccuse } from "./licence";
+import { declaresMember, holdersIn } from "./overrides";
 import { each, parseSource, type Language, type Node, type Tree } from "./parse";
 
 /**
@@ -291,6 +292,13 @@ export type CallsNotClosed =
    */
   | "abstract-receiver"
   /**
+   * A call was placed at a method of a plain class, and a class deriving from
+   * it declares that method again (#353). Whenever the value is one of those,
+   * the subclass's method is what runs -- so where the call was placed is one
+   * of the places it goes, not the only one.
+   */
+  | "overridden"
+  /**
    * A call in the tail's body does land in the head's file, at some routine
    * the arrow does not name.
    *
@@ -395,6 +403,16 @@ export interface CallSide {
    * options and are unchanged.
    */
   declarationAt?: (at: { start: number; end: number }) => { file: string; line: number; concrete?: boolean } | "outside" | undefined;
+  /**
+   * Whether a class deriving from the one named `holder` declares `member`
+   * again, anywhere in the repository (#353) -- `overrides.ts`. A call placed
+   * at such a method runs the subclass's whenever the value is one, so the
+   * closed-body check may not accuse on it.
+   *
+   * Absent, nobody asked, and a placement stands as it did before this
+   * existed. `drift.ts` hands it to every side it builds.
+   */
+  overridden?: (holder: string, member: string) => boolean;
 }
 
 /** What `resolveReceiver` may answer with. See `CallSide.resolveReceiver`'s doc. */
@@ -1442,7 +1460,14 @@ function closedBodyRefutes(
     for (const site of body.sites) {
       // Open: something unplaced, and the site says what stopped it.
       if (site.file === undefined) return { why: site.why ?? "unplaced" };
-      if (site.receiver && site.concrete === false) return { why: "abstract-receiver" };
+      /*
+       * `concrete` is only ever set by a checker's answer, and since #353 an
+       * `own` call the class does not declare is put to one too -- a
+       * `self.callback()` lands on an attribute, which runs whatever was put
+       * there. So the guard is on the answer, not on how the call was spelt.
+       */
+      if (site.concrete === false) return { why: "abstract-receiver" };
+      if (site.overridden) return { why: "overridden" };
       if (site.file === to.file) {
         /*
          * The near miss (#329). Three ways this can go, and only one of them
@@ -1602,6 +1627,13 @@ export interface CallSitePlaced {
    * (docs/claim-vocabulary.md item 14's own caveat).
    */
   concrete?: boolean;
+  /**
+   * The method this site was placed at is declared again by a class deriving
+   * from the one holding it (#353), so the placement names one place the call
+   * can run and not the only one. The same guard as `concrete: false`, for a
+   * plain base class rather than an interface.
+   */
+  overridden?: boolean;
 }
 
 /** Every call site in one routine, placed or refused. */
@@ -1773,7 +1805,7 @@ function throughWildcards(
 }
 
 /** Where one call site's callee lives, when it can be placed at all. */
-export type Placement = { file: string; concrete?: boolean; as?: string };
+export type Placement = { file: string; concrete?: boolean; as?: string; overridden?: boolean };
 
 /**
  * A name's resting place: the file it settles in, and what that file calls it.
@@ -1895,6 +1927,11 @@ function placeThroughChecker(
  * The name it rests under is the routine declared on that line, when one is;
  * the near-miss verdict names it (#329), and a line holding no routine names
  * nothing.
+ *
+ * And a method a subclass declares again is marked so (#353). A checker's
+ * "runs there" is about the declaration it landed on -- a body, not an
+ * interface's signature -- and says nothing about a class deriving from its
+ * holder, which is what runs whenever the value is one.
  */
 function placeThroughDefinition(
   memberAt: { start: number; end: number },
@@ -1909,7 +1946,21 @@ function placeThroughDefinition(
     file: found.file,
     concrete: found.concrete ?? false,
     ...(landed ? { as: landed.name } : {}),
+    ...(landed?.holder && overriddenBelow(landed.holder, landed.name, side) ? { overridden: true } : {}),
   };
+}
+
+/**
+ * Whether a class deriving from `holder` declares `member` again, by the
+ * side's `overridden` (#353). Only a holder that is a class by structure --
+ * named, and not itself a routine -- has anything deriving from it; a
+ * function nested in another is not one.
+ */
+function overriddenBelow(holder: Node, member: string, side: CallSide): boolean {
+  if (!side.overridden || holder.childForFieldName("parameters")) return false;
+  const name = holder.childForFieldName("name");
+  if (!name || name.childCount !== 0) return false;
+  return side.overridden(name.text, member);
 }
 
 /**
@@ -1957,6 +2008,45 @@ export function routineDeclaredOn(
 }
 
 /**
+ * Where `self.foo()` / `this.foo()` runs (#353).
+ *
+ * A member of `self` is a member of whatever the routine belongs to, and
+ * that used to be the whole rule: this file, under the name written on it.
+ * It is right only when the class declares `foo` itself and nothing deriving
+ * from it declares `foo` again, and each half had a correct arrow going red:
+ *
+ *   `foo` declared by a subclass too   a base class calling its own hook
+ *                                      runs the subclass's -- marked
+ *                                      `overridden`, which withholds
+ *   `foo` not declared here at all     inherited from a base, or a value
+ *                                      set on the instance: it runs in
+ *                                      some other file. Put to "go to
+ *                                      definition" where the caller offers
+ *                                      it, as a `through` call is, and a
+ *                                      `receiver` doubt where it does not
+ *
+ * Rust keeps the old rule inside an `impl`, which nothing can override. A
+ * trait's default method is the one place Rust has the hazard: `self.foo()`
+ * there runs whatever each implementation says `foo` is.
+ *
+ * With no holder -- a routine at the top of its file, a method of an object
+ * literal -- there is no class to judge by, and the old rule stands.
+ */
+function placeOwn(
+  callee: Extract<Callee, { kind: "own" }>,
+  side: CallSide,
+  holder: Node | undefined,
+): Placement | { why: SiteUnresolved } {
+  const here: Placement = { file: side.file, as: callee.name };
+  if (!holder) return here;
+  if (side.language === "rust") return holder.childForFieldName("type") ? here : { ...here, overridden: true };
+  if (!declaresMember(holder, callee.name)) {
+    return (side.declarationAt ? placeThroughDefinition(callee.nameAt, side) : undefined) ?? { why: "receiver" };
+  }
+  return overriddenBelow(holder, callee.name, side) ? { ...here, overridden: true } : here;
+}
+
+/**
  * Where one call site's callee lives, or why the reader cannot say.
  *
  * The target-free twin of `resolves`, and every branch below is the same branch
@@ -1977,13 +2067,17 @@ function placeOf(
    * the one asymmetry between the two readers and is why it is written down.
    */
   scope?: ReadonlySet<string>,
+  /**
+   * The class, `impl` or trait the enclosing routine is a member of --
+   * `holdersIn` -- for an `own` call to be judged against (#353). Absent
+   * where there is no routine to ask, as `scope` is.
+   */
+  holder?: Node,
 ): Placement | { why: SiteUnresolved } {
   if (callee.kind === "computed") return { why: "computed" };
   if (REACHES_ANYTHING.has(callee.name)) return { why: "dynamic" };
 
-  // A member of `self` is a member of whatever this routine belongs to, and
-  // that is in this file, under the name written on it.
-  if (callee.kind === "own") return { file: side.file, as: callee.name };
+  if (callee.kind === "own") return placeOwn(callee, side, holder);
 
   const bound = callee.kind === "through" ? callee.through : callee.name;
   const at = callee.kind === "through" ? callee.at : undefined;
@@ -2123,6 +2217,8 @@ export function callSitesIn(side: CallSide, only?: string): CallSitesReading {
   if (!tree) return { read: false, why: "unreadable" };
 
   const bodies: BodyCallSites[] = [];
+  /** Which class each routine is a member of (#353), read on the first body that is placed. */
+  let holders: Map<number, Node> | undefined;
   each(tree.rootNode, (node) => {
     const name = node.type === "impl_item"
       ? node.childForFieldName("type")
@@ -2175,6 +2271,8 @@ export function callSitesIn(side: CallSide, only?: string): CallSitesReading {
      */
     if (only !== undefined && name.text !== only) { bodies.push(body); return; }
     const scope = boundByRoutine(node);
+    holders ??= holdersIn(tree.rootNode);
+    const holder = holders.get(node.id);
     each(node, (inner) => {
       /*
        * A macro's arguments are loose tokens rather than a tree, so a call
@@ -2194,7 +2292,7 @@ export function callSitesIn(side: CallSide, only?: string): CallSitesReading {
       }
       const callee = calleeOf(inner) ?? constructedBy(inner);
       if (!callee) return;
-      const where = placeOf(callee, side, bindings, scope);
+      const where = placeOf(callee, side, bindings, scope, holder);
       body.sites.push({
         name: callee.kind === "computed" ? "" : callee.name,
         line: lineOf(side.source, inner.startIndex),
@@ -2206,6 +2304,7 @@ export function callSitesIn(side: CallSide, only?: string): CallSitesReading {
               file: where.file,
               ...(where.concrete !== undefined ? { concrete: where.concrete } : {}),
               ...(where.as !== undefined ? { declaredAs: where.as } : {}),
+              ...(where.overridden ? { overridden: true } : {}),
             }
           : { why: where.why }),
       });

@@ -242,6 +242,26 @@ export function parseSource(source: string, language: Language): Tree | undefine
   return tree;
 }
 
+/**
+ * Parse outside the cache, hand the tree to `use`, and free it.
+ *
+ * For a sweep over many files in the middle of a reading (#353). Every tree
+ * `parseSource` adds pushes the oldest out and frees it, and the oldest can
+ * be the one the caller is still walking: the override sweep reads every file
+ * that names a class, which can be far more than `CACHE_LIMIT`, from inside
+ * `callSitesIn`'s walk of one body. Nothing `use` returns may hold a node.
+ */
+export function withParsed<T>(source: string, language: Language, use: (tree: Tree) => T): T | undefined {
+  const parser = parsers.get(language);
+  if (!parser) return undefined;
+  const tree = parser.parse(source);
+  try {
+    return use(tree);
+  } finally {
+    tree.delete();
+  }
+}
+
 /** Free every cached tree. For tests and for the end of a long-lived run. */
 export function resetEngineCache(): void {
   for (const tree of trees.values()) tree.delete();

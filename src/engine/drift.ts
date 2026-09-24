@@ -61,6 +61,7 @@ import { constructions, routineNamesIn, type ConstructsNames, type ConstructsWit
 import { type AccessesWithheld, type NotReadEvidence, memberAccesses, memberNamed, membersReadAt, membersReadByName, readsMember } from "./accesses";
 import { heldTypes, type HoldsWithheld } from "./holds";
 import { conformedTypes, type ConformsWithheld } from "./conforms";
+import { overridesIn, type Overrides } from "./overrides";
 import { signatureNames, type SignatureWithheld } from "./signature";
 import { resolveDependency, type ConfigCache } from "./resolve";
 import { boardIsNewer, newerBuildClaimError } from "./version";
@@ -833,6 +834,7 @@ export const NOT_CLOSED_WORDS: Record<CallsNotClosed, string> = {
   unreadable: "the calling file could not be read",
   "routine-not-found": "nothing in the calling file declares that routine",
   "abstract-receiver": "one call goes through an interface, so what it reaches is not fixed",
+  overridden: "one call is to a method a subclass replaces, so it can run in the subclass instead",
   "reaches-the-file": "one call does reach that file, at a routine the arrow does not name "
     + "-- and the text does not say which one",
   computed: "one call picks its target at run time",
@@ -1699,7 +1701,7 @@ const WALK_FILE_CAP = 2000;
  *
  * `undefined` past the cap, meaning "do not report", never "nothing found".
  */
-function sourceFilesUnder(rootAbsolute: string, workspace: Workspace): string[] | undefined {
+function sourceFilesUnder(rootAbsolute: string, workspace: Workspace, cap = WALK_FILE_CAP): string[] | undefined {
   const found: string[] = [];
   const queue = [rootAbsolute];
   while (queue.length) {
@@ -1711,13 +1713,22 @@ function sourceFilesUnder(rootAbsolute: string, workspace: Workspace): string[] 
       const kind = workspace.stat(child);
       if (kind === "directory") queue.push(child);
       else if (kind === "file" && readableSource(entry)) {
-        if (found.length >= WALK_FILE_CAP) return undefined;
+        if (found.length >= cap) return undefined;
         found.push(child);
       }
     }
   }
   return found;
 }
+
+/**
+ * How far the override sweep (#353) walks before every class method counts
+ * as overridden. Higher than `WALK_FILE_CAP` because past it this answer
+ * withholds every closed body that calls a method, where the others merely
+ * go unreported; and it is text read once per check, parsed only where a
+ * file names the class asked about.
+ */
+const OVERRIDE_WALK_CAP = 20_000;
 
 /**
  * How many files are under a directory, and how many of them anything can read.
@@ -2195,6 +2206,11 @@ function callSide(
    * `CallSide.declarationAt`.
    */
   askDefinition = false,
+  /**
+   * Which methods a subclass declares again (#353), for the side whose calls
+   * a closed-body accusation rests on. See `CallSide.overridden`.
+   */
+  overrides?: Overrides,
 ): CallSide | undefined {
   const declarationAt = askDefinition ? closedBodyReferee?.declarationAt?.bind(closedBodyReferee) : undefined;
   const readSide = (target: string): CallSide | undefined => {
@@ -2221,6 +2237,7 @@ function callSide(
       },
       ...(closedBodyReferee ? { resolveReceiver: (at) => closedBodyReferee.resolveReceiver(target, at) } : {}),
       ...(declarationAt ? { declarationAt: (at) => declarationAt(target, at) } : {}),
+      ...(overrides ? { overridden: (holder, member) => overrides.below(holder, member) } : {}),
     };
   };
   return readSide(file);
@@ -2932,10 +2949,48 @@ export interface CheckCache {
   readonly workspace: Workspace;
   readonly read: ReadCache;
   readonly reach: ReachCache;
+  /**
+   * Which methods some subclass declares again (#353). Held across checks
+   * even with a referee, unlike `reach`: it is read from the text alone, and
+   * a run of one arrow per board would otherwise walk the tree once an arrow.
+   */
+  readonly overrides?: Overrides;
 }
 
-export const newCheckCache = (workspace: Workspace): CheckCache =>
-  ({ workspace, read: { imports: new Map(), configs: new Map() }, reach: newReachCache() });
+export const newCheckCache = (workspace: Workspace): CheckCache => ({
+  workspace,
+  read: { imports: new Map(), configs: new Map() },
+  reach: newReachCache(),
+  overrides: overridesOf(workspace),
+});
+
+/**
+ * Which methods some subclass declares again (#353), for `@calls`' closed
+ * reading.
+ *
+ * The second walk of the whole tree, and bounded like the first: driven by
+ * the tool, never by a ref. The names it looks for are the classes a call
+ * landed in, read out of the code, and each only picks which walked files get
+ * parsed. Walked on the first question, never on a board whose arrows never
+ * ask one, and per check unless a `CheckCache` holds it -- for `ReadCache`'s
+ * reason.
+ */
+function overridesOf(workspace: Workspace): Overrides {
+  return overridesIn(() => {
+    const rootAbsolute = workspace.resolve(".");
+    const walked = rootAbsolute ? sourceFilesUnder(rootAbsolute, workspace, OVERRIDE_WALK_CAP) : undefined;
+    if (!walked) return undefined;
+    const sources: Array<{ source: string; language: Language }> = [];
+    for (const absolute of walked) {
+      const language = languageOf(absolute);
+      if (!language || language === "rust") continue;
+      // A file that would not read could hold the subclass: that is "cannot
+      // tell", which answers yes, not a file skipped.
+      try { sources.push({ source: workspace.read(absolute), language }); } catch { return undefined; }
+    }
+    return sources;
+  });
+}
 
 export function checkDrift(
   board: BoardFile,
@@ -3079,6 +3134,9 @@ export function checkDrift(
   const declarationAsked = options?.closedBodyReferee?.declarationAt
     ? { declarationAt: options.closedBodyReferee.declarationAt.bind(options.closedBodyReferee) }
     : {};
+
+  /** Which methods some subclass declares again (#353). See `overridesOf`. */
+  const overrides = options?.cache?.overrides ?? overridesOf(workspace);
 
   /**
    * Files the wiring behind a `@feeds` arrow could be in.
@@ -4872,7 +4930,7 @@ export function checkDrift(
            * against the repo-relative file a dependency resolved to, so an
            * absolute one would never match even if it could be read.
            */
-          const tail = callSide(fromAnchor, workspace, importCache.configs, options?.closedBodyReferee, true);
+          const tail = callSide(fromAnchor, workspace, importCache.configs, options?.closedBodyReferee, true, overrides);
           const head = callSide(toAnchor, workspace, importCache.configs, options?.closedBodyReferee);
           if (!tail || !head) {
             noteCalled("unreadable");

@@ -55,7 +55,13 @@ describe("a body whose every call site the reader can place", () => {
   });
 
   it("places a call on `this`, because the member belongs to this file", () => {
-    expect(why("class K {\n  run() {\n    this.step();\n  }\n}\n", "run")).toEqual([]);
+    expect(why("class K {\n  run() {\n    this.step();\n  }\n\n  step() {}\n}\n", "run")).toEqual([]);
+  });
+
+  it("leaves a call on `this` open when the class does not declare it (#353)", () => {
+    // Inherited from a base, or set on the instance: either way it runs in
+    // some other file, and with no checker to ask the text cannot say which.
+    expect(why("class K extends Base {\n  run() {\n    this.step();\n  }\n}\n", "run")).toEqual(["receiver"]);
   });
 
   it("closes an imported call once the name comes to rest on a file that declares it", () => {

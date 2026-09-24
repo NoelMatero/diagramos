@@ -139,6 +139,8 @@ export const UNDECIDED_BUCKETS: Record<Labelled, BucketLabel> & Record<string, B
     why: "the import resolves to no file in the repository -- usually a package" },
   "declined: not-closed abstract-receiver": { bucket: "never", cost: 1,
     why: "the call goes through an interface, so what it reaches is not fixed" },
+  "declined: not-closed overridden": { bucket: "never", cost: 1,
+    why: "the call is to a method a subclass replaces, so the subclass's can be what runs" },
   "unconfirmed: feeds-runs-the-other-way": { bucket: "never", cost: 1,
     why: "@feeds never refutes: a value can reach the far end through a callback, a field or a queue no reader follows" },
   "declined: not-closed computed": { bucket: "never", cost: 1,

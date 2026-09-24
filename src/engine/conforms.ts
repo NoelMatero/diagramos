@@ -361,6 +361,37 @@ function basesIn(clause: Node): { names: Array<{ name: string; at: number }>; co
   return { names, computed };
 }
 
+/** The clauses one declaration writes its bases in: Python's `superclasses`, or a heritage clause. */
+function heritageOf(declaration: Node): Node[] {
+  const clauses: Node[] = [];
+  const superclasses = declaration.childForFieldName("superclasses");
+  if (superclasses) clauses.push(superclasses);
+  for (let index = 0; index < declaration.childCount; index += 1) {
+    const child = declaration.child(index);
+    if (child && HERITAGE.has(child.type)) clauses.push(child);
+  }
+  return clauses;
+}
+
+/**
+ * Every base one declaration names, by this reader's rules, and whether one
+ * of them is an expression it will not read a name out of (#353).
+ *
+ * `overrides.ts` asks this of every class that might derive from a method's
+ * holder. It is this file's reading rather than a second one, so a base
+ * `@conforms` would confirm is a base an override is looked for under.
+ */
+export function basesOfDeclaration(declaration: Node): { names: string[]; computed: boolean } {
+  const names: string[] = [];
+  let computed = false;
+  for (const clause of heritageOf(declaration)) {
+    const read = basesIn(clause);
+    names.push(...read.names.map((base) => base.name));
+    computed = computed || read.computed;
+  }
+  return { names, computed };
+}
+
 /**
  * Whether a name is declared as a routine in this source.
  *
@@ -597,13 +628,7 @@ export function declaredBases(
       continue;
     }
 
-    const clauses: Node[] = [];
-    const superclasses = declaration.childForFieldName("superclasses");
-    if (superclasses) clauses.push(superclasses);
-    for (let index = 0; index < declaration.childCount; index += 1) {
-      const child = declaration.child(index);
-      if (child && HERITAGE.has(child.type)) clauses.push(child);
-    }
+    const clauses = heritageOf(declaration);
 
     /*
      * A Rust type carries no base list of its own, so an empty one is not an
