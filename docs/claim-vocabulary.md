@@ -781,6 +781,18 @@ called wrong 0 of 428 → 0 of 453. The five reds lost were on arrows the tools
 can no longer settle, not on arrows that became true. A column added after
 #346 is measured on the new key and does not compare with the ones above.
 
+On the new key, 808 mistakes and 453 true claims:
+
+| | at #346 (`4efa334`) | after #351 |
+|---|---:|---:|
+| mistakes called wrong | 549 (68%) | **557 (69%)** |
+| of which planted wrong-kind | 108 of 146 | **108** |
+| greens on a false claim | 9 | **9** |
+| true claims called wrong | 0 | **0** |
+
+**#351's column** is `@calls` asking "go to definition" at a call's own name
+instead of the receiver's type, item 48. Both arms ran on `4efa334`.
+
 **#345's column** is one change measured against the same day's main,
 `5101697`, which caught 493: +15, and every one is a Rust `@conforms` with a
 struct or an enum at the head. None of them is a planted *wrong-kind* mistake
@@ -4391,6 +4403,72 @@ duplicate from conflitcts, requires reading prs "An arrow can be three calls lon
     process per tree and keeps each answer, so a second run costs only what
     is missing -- fifteen repositories in one process ran out of both the
     JavaScript heap and tree-sitter's WebAssembly one, in that order.
+
+48. **A wrong `@calls` arrow stayed quiet whenever the routine called
+    something through a value, because the compiler was asked the wrong
+    question (#351).** The closed reading placed `x.foo()` by asking what
+    `x` is and mapping that type back to a file. Each step dropped answers:
+    `Box::new(n)` and `Error::construct(..)` have a type's name where a
+    value would be, so there was nothing to ask; `os.path.join(p)` is a
+    module reached through a module; `ctx.signal?.fire()` prints as
+    `Signal | undefined`, a name no file binds. It now asks "go to
+    definition" at `foo` itself -- the question `@accesses` has asked since
+    #255 -- through the same `declarationAt` for all three languages.
+
+    **Where the answer lands decides whether anything may rest on it**, and
+    each language says so with the rule its receivers already had, now
+    applied at the definition: TypeScript's compiler refuses a member of an
+    interface or an abstract class and anything without a body; pyright's
+    answer inside a `Protocol` or an ABC withholds (`isConcreteClassLine`);
+    in Rust a method counts only when its block has a `type` field -- an
+    `impl`, never a trait's default. A line with no routine on it is data
+    being made in Rust (an enum variant, a `#[derive]`) and a construction
+    in Python (a class header); anything else withholds.
+
+    Measured before building, the receiver wall lifted outright was worth
+    +26 on the new key, all 26 confirmed false by the key. 10 point at a
+    class and 4 go through an interface (vue's `context.helper`, vite's
+    `logger.warn`), which the guard exists to keep quiet, so the reachable
+    ceiling was 12. It caught 8 of those 12 and one arrow at a class the
+    routine never reaches at all -- **+9, and lost 1**. The four left are a
+    reach walk's advisory (clap) and three flask routines whose calls into
+    werkzeug and blinker pyright has no definition for. The lost red is regex's
+    `search_with`, whose only way to close was the receiver answer placing
+    `strat.search()` on an `Arc<dyn Strategy>` *outside the repository*,
+    because `Arc` is. The definition lands on the trait's signature, and the
+    arrow goes back to withheld, which is what it always should have been.
+
+    | `bench:planted`, new key | ts | python | rust | all |
+    |---|---:|---:|---:|---:|
+    | mistakes called wrong, before | 223 | 149 | 147 | 549 |
+    | after | **224** | **151** | **152** | **557** |
+    | true claims called wrong | 0 | 0 | 0 | **0** |
+
+    **What it costs.** The bench ran 131s before and 192s after: Rust's
+    `Type::f()` calls were never asked about at all, and now each is a
+    question. Two things were tried and dropped. Asking the receiver as a
+    fallback when the definition had no answer changed no verdict and doubled
+    what the first pass asks. Placing only the tail routine's sites brought
+    the time back to 133s but starved the chain check: the first pass
+    harvests Python and Rust answers only for what it places, the chain walk
+    rides on the rest of the file's, and clap's `_build_recursive` went from
+    "one level up" to red. That +1 is a harvesting accident, not a catch.
+
+    **One cost that showed up as a wrong answer rather than a slow one.**
+    pyright's warm-up asks at the batch's own positions and waits out a
+    15.75-second ladder when none answers. `@calls`' positions are the
+    likeliest to have no answer -- `sink.send()` on an untyped parameter --
+    and asked before the wrong-kind question they spent the 12-second
+    budget, so `end-lacks-part` never got pyright's word on `ctx`
+    (`engine-parts-compiler.test.ts` caught it). The server now remembers
+    that it is bound, and the definition batch is asked last.
+
+    **What it does not close (#353).** A plain base class's method counts as
+    where the call runs, as it did for a receiver's type. When a subclass
+    overrides it, an arrow drawn at the subclass goes red although the
+    subclass is what runs -- on main already, in Python and TypeScript. Of
+    152 distinct class methods the definitions landed on, 21 are overridden
+    in the same repository; none is under one of this change's new reds.
 
 ## Open, in the order worth doing
 
