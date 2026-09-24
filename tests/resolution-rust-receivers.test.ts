@@ -257,12 +257,14 @@ describe.skipIf(!hasRustAnalyzer)("resolveRustDefinitions", () => {
 
   it("places a path call at the impl, which is what a receiver's type cannot do", () => {
     expect(answers.cache.get("src/use_site.rs", at.pathCall!))
-      .toEqual({ file: path.join("src", "decl.rs"), line: 3 });
+      // An inherent `impl`'s method runs where it is declared (#351).
+      .toEqual({ file: path.join("src", "decl.rs"), line: 3, concrete: true });
   });
 
   it("places a method called on a value the same way", () => {
     expect(answers.cache.get("src/use_site.rs", at.method!))
-      .toEqual({ file: path.join("src", "decl.rs"), line: 4 });
+      // An inherent `impl`'s method runs where it is declared (#351).
+      .toEqual({ file: path.join("src", "decl.rs"), line: 4, concrete: true });
   });
 
   it("says outside for a call into the standard library", () => {

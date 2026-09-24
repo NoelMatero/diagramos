@@ -23,6 +23,7 @@
 import { readFileSync } from "node:fs";
 import path from "node:path";
 
+import { routineDeclaredOn } from "./calls";
 import { refereePool, type RefereePool } from "./referee-pool";
 import {
   createPyrightLspReferee, isOutsideTree, WARM_UP_CANDIDATES,
@@ -68,6 +69,24 @@ export function isConcreteClassLine(lineText: string): boolean | undefined {
   }
   if (/\bclass\s+\w+\s*:/.test(lineText)) return true; // no base list at all -- plainly concrete.
   return undefined;
+}
+
+/**
+ * Whether the call "go to definition" landed on at `line` runs there (#351).
+ *
+ * A function at the top of its module does; a method does when the class
+ * holding it passes `isConcreteClassLine`, the rule a receiver's type already
+ * gets. A class header is a construction -- `mod.Thing(...)` -- placed at the
+ * class, where the text reading already places a bare `Thing(...)`. Anything
+ * else -- an attribute that holds a class or a function, a header that rule
+ * cannot read, a function nested in another -- runs whatever was put there,
+ * and withholds.
+ */
+export function pythonDefinitionRunsThere(source: string, line: number): boolean {
+  const landed = routineDeclaredOn(source, "python", line);
+  if (!landed) return isConcreteClassLine(source.split("\n")[line - 1] ?? "") !== undefined;
+  if (!landed.holder) return true;
+  return isConcreteClassLine(landed.holder.text.split("\n")[0]!) ?? false;
 }
 
 /*

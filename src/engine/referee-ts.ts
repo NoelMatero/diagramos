@@ -119,6 +119,32 @@ function isConcreteDeclaration(ts: typeof TS, declaration: TS.Declaration): bool
   return true;
 }
 
+/**
+ * Whether a call "go to definition" landed on runs there, rather than on
+ * whatever a runtime puts in its place (#351).
+ *
+ * Only a function with a body can say so, written as one or given as the
+ * value a `const` or a class's own field is declared with -- ShapeCache's
+ * `static delete = (element) => {...}` is excalidraw's spelling of a method. A
+ * signature -- an interface's, an overload's, an `abstract` method's -- has
+ * nothing to run, and a `let` or a field declared only by its type runs
+ * whatever was last put in it. And a member held by a class
+ * `isConcreteDeclaration` refuses is the receiver rule's own hazard, at the
+ * member.
+ */
+function runsWhereDeclared(ts: typeof TS, declaration: TS.Declaration): boolean {
+  const bound = (ts.isVariableDeclaration(declaration)
+      && ts.isVariableDeclarationList(declaration.parent)
+      && (declaration.parent.flags & ts.NodeFlags.Const))
+    || ts.isPropertyDeclaration(declaration);
+  const routine = bound ? (declaration as TS.VariableDeclaration | TS.PropertyDeclaration).initializer : declaration;
+  if (!routine || !ts.isFunctionLike(routine) || !(routine as TS.FunctionLikeDeclaration).body) return false;
+  if (ts.getCombinedModifierFlags(declaration) & ts.ModifierFlags.Abstract) return false;
+  const holder = declaration.parent;
+  if (ts.isClassDeclaration(holder) || ts.isClassExpression(holder)) return isConcreteDeclaration(ts, holder);
+  return true;
+}
+
 export interface TsReferee {
   /** `undefined` when no node in the program spans exactly this range: the file was not part of the program, or the range does not land on an expression the checker has an opinion about (whitespace, a comment, a syntax error). */
   typeAt(file: string, start: number, end: number): TsTypeAnswer | undefined;
@@ -141,8 +167,13 @@ export interface TsReferee {
    * taken from the declaration's own name where it has one. `measure:calls`
    * needs the line (#254): a file can declare two routines, and only the line
    * says which one "go to definition" landed on.
+   *
+   * `concrete` is `false` when the declaration is a member something else
+   * stands in for at runtime -- declared in an interface or a type literal,
+   * marked `abstract`, or held by an abstract class -- the same line
+   * `isConcreteDeclaration` draws for a receiver's type (#351).
    */
-  symbolDeclarationLocationAt(file: string, start: number, end: number): { file: string; line: number } | undefined;
+  symbolDeclarationLocationAt(file: string, start: number, end: number): { file: string; line: number; concrete: boolean } | undefined;
   /**
    * What the name declared at exactly this range is (#343): whether a value of
    * its type can be called, and whether the name is a type. `undefined` for a
@@ -460,7 +491,7 @@ function buildReferee(ts: typeof TS, root: string): TsReferee {
     return { text, head: headOfTs(text), declaringFile, concrete };
   }
 
-  function symbolDeclarationLocationAt(file: string, start: number, end: number): { file: string; line: number } | undefined {
+  function symbolDeclarationLocationAt(file: string, start: number, end: number): { file: string; line: number; concrete: boolean } | undefined {
     const configPath = configOf.get(file);
     if (configPath === undefined) return undefined;
     const { program, checker } = programFor(configPath);
@@ -482,7 +513,7 @@ function buildReferee(ts: typeof TS, root: string): TsReferee {
        */
       const named = (declaration as TS.NamedDeclaration).name ?? declaration;
       const { line } = declaredIn.getLineAndCharacterOfPosition(named.getStart(declaredIn));
-      return { file: declaredIn.fileName, line };
+      return { file: declaredIn.fileName, line, concrete: runsWhereDeclared(ts, declaration) };
     } catch {
       return undefined;
     }
