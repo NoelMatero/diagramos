@@ -5,6 +5,15 @@
  *
  *   npm run measure:parts -- /Users/noelmatero/board-ai/.corpus/*
  *   npm run measure:parts -- <tree>... [--only=rust|python|ts] [--show=20]
+ *   npm run measure:parts -- /Users/noelmatero/board-ai/.corpus/* --compiler
+ *
+ * `--compiler` reads the way a check that holds a compiler does (#343): each
+ * value the text cannot judge is put to the TypeScript checker or pyright,
+ * as `drift.ts` puts it. Every "cannot be called" or "is not a type" that adds
+ * is refereed by writing the call and asking a checker whether it compiles
+ * (`lib/call-probe.ts`) -- the compiler's call resolution for TypeScript,
+ * mypy for Python -- and is also tallied on its own, so the cost of the
+ * compiler's answers can be read apart from the text's.
  *
  * `parts.ts` reads each declaration's shape from tree-sitter fields. The
  * referees read the same names another way entirely:
@@ -39,7 +48,10 @@ import { createPyrightLspReferee } from "./lib/resolution-python-lsp";
 
 import { initEngine, languageOf, type Language } from "../src/engine/parse";
 import { declaredShapes } from "../src/engine/body";
-import { PARTS, partsOf, type Part } from "../src/engine/parts";
+import { PARTS, partsOf, type AskKind, type Part, type ValueKind } from "../src/engine/parts";
+import { createTsReferee } from "../src/engine/referee-ts";
+import { resolvePythonKinds } from "../src/engine/referee-pool";
+import { probeCallsPython, probeCallsTs, probeKey, type ProbeAnswer, type ProbeSite } from "./lib/call-probe";
 
 await initEngine();
 
@@ -47,6 +59,7 @@ const args = process.argv.slice(2);
 const roots = args.filter((argument) => !argument.startsWith("--")).map((root) => path.resolve(root));
 const only = args.find((argument) => argument.startsWith("--only="))?.slice(7);
 const show = Number(args.find((argument) => argument.startsWith("--show="))?.slice(7) ?? 15);
+const withCompiler = args.includes("--compiler");
 if (roots.length === 0) {
   console.error("usage: measure-parts <tree>... [--only=rust|python|ts]");
   process.exit(1);
@@ -58,6 +71,9 @@ const familyOf = (language: Language): Family =>
 
 type Outcome = "wrong" | "unrefereed" | "agreed" | "missed" | "agreedHas" | "wrongHas";
 const tally = new Map<string, Record<Outcome, number>>();
+/** The lacks only the compiler's answer produced (#343), by the same outcomes. */
+const added = new Map<string, Record<Outcome, number>>();
+const addedExamples = new Map<string, string[]>();
 const names = new Map<Language, { read: number; refereed: number }>();
 const examples = new Map<string, string[]>();
 const bump = (language: Language, part: Part, outcome: Outcome, example?: string) => {
@@ -109,20 +125,49 @@ type RefereeByLine = Map<string, Record<Part, RefereeReading>>;
 /** How many declarations the second, text referee had to answer for. */
 let byText = 0;
 
+/**
+ * The names in a file whose reading a compiler turned into a lack the text did
+ * not have, with every line each is declared on: what the call probe is asked.
+ */
+function compilerLacks(file: string, source: string, language: Language, ask: AskKind): ProbeSite[] {
+  const sites: ProbeSite[] = [];
+  const shapes = declaredShapes(source, language);
+  if (!shapes) return sites;
+  for (const [name, declarations] of shapes) {
+    const text = partsOf(source, name, language);
+    const ours = partsOf(source, name, language, ask);
+    if (!text || !ours || !PARTS.some((part) => ours[part] === "lacks" && text[part] !== "lacks")) continue;
+    for (const { nameNode } of declarations) sites.push({ file, line: lineAt(source, nameNode.startIndex), name });
+  }
+  return sites;
+}
+
+/** A call probe's answer as the referee's reading of every part it settles. */
+function probeReading(answer: ProbeAnswer): Partial<Record<Part, RefereeReading>> {
+  const typed: RefereeReading = answer.value ? "lacks" : "unknown";
+  return {
+    body: answer.callable, signature: answer.callable, callable: answer.callable,
+    type: typed, implementable: typed,
+  };
+}
+
 /** Score one file, given what the referee says about each (line, name). */
 function score(
   file: string, source: string, language: Language,
   referee: RefereeByLine | undefined,
   refereeRan = true,
   implemented?: ReadonlySet<string>,
+  ask?: AskKind,
+  probes?: ReadonlyMap<string, ProbeAnswer>,
 ) {
   const shapes = declaredShapes(source, language);
   if (!shapes) return;
   const counts = names.get(language) ?? { read: 0, refereed: 0 };
   names.set(language, counts);
   for (const [name, declarations] of shapes) {
-    const ours = partsOf(source, name, language);
+    const ours = partsOf(source, name, language, ask);
     if (!ours) continue;
+    const textOnly = (ask ? partsOf(source, name, language) : undefined) ?? ours;
     counts.read += 1;
     const theirs = declarations.map(({ nameNode }) => {
       const line = lineAt(source, nameNode.startIndex);
@@ -158,6 +203,22 @@ function score(
         }
       }
     }
+    if (probes) {
+      /*
+       * The call probe fills what the first two referees left open, part by
+       * part, the way the text referee does (#343). It never overrides one of
+       * them: a server that answered is not second-guessed by a rewrite.
+       */
+      for (let index = 0; index < declarations.length; index += 1) {
+        const answer = probes.get(probeKey(file, lineAt(source, declarations[index]!.nameNode.startIndex), name));
+        if (!answer) continue;
+        const merged = { ...(theirs[index] ?? Object.fromEntries(PARTS.map((part) => [part, "unknown"]))) } as Record<Part, RefereeReading>;
+        for (const [part, reading] of Object.entries(probeReading(answer)) as [Part, RefereeReading][]) {
+          if (merged[part] === "unknown") merged[part] = reading;
+        }
+        theirs[index] = merged;
+      }
+    }
     if (theirs.some((one) => one !== undefined)) counts.refereed += 1;
     const where = `${file}:${lineAt(source, declarations[0]!.nameNode.startIndex) + 1} ${name}`;
     for (const part of PARTS) {
@@ -168,6 +229,16 @@ function score(
       if (ours[part] === "lacks") {
         bump(language, part, verdict === "has" ? "wrong" : verdict === "lacks" ? "agreed" : "unrefereed",
           verdict === "lacks" ? undefined : where);
+        if (textOnly[part] !== "lacks") {
+          const outcome: Outcome = verdict === "has" ? "wrong" : verdict === "lacks" ? "agreed" : "unrefereed";
+          const key = `${language}\t${part}`;
+          const row = added.get(key) ?? { wrong: 0, unrefereed: 0, agreed: 0, missed: 0, agreedHas: 0, wrongHas: 0 };
+          row[outcome] += 1;
+          added.set(key, row);
+          if (outcome !== "agreed") {
+            addedExamples.set(`${key}\t${outcome}`, [...(addedExamples.get(`${key}\t${outcome}`) ?? []), where]);
+          }
+        }
       } else if (verdict === "lacks") {
         bump(language, part, ours[part] === "has" ? "wrongHas" : "missed", where);
       } else if (ours[part] === "has" && verdict === "has") {
@@ -476,9 +547,20 @@ for (const tree of roots) {
     byFamily.set(family, [...(byFamily.get(family) ?? []), file]);
   }
 
-  for (const file of byFamily.get("ts") ?? []) {
+  const tsFiles = byFamily.get("ts") ?? [];
+  const tsKinds = withCompiler && tsFiles.length > 0 ? createTsReferee(tree) : undefined;
+  const tsAsk = (file: string): AskKind | undefined =>
+    tsKinds ? (at) => tsKinds.kindAt(file, at.start, at.end) : undefined;
+  let tsProbes: Map<string, ProbeAnswer> | undefined;
+  if (tsKinds) {
+    const began = Date.now();
+    const sites = tsFiles.flatMap((file) => compilerLacks(file, readFileSync(file, "utf8"), languageOf(file)!, tsAsk(file)!));
+    tsProbes = probeCallsTs(sites);
+    console.error(`ts ${path.basename(tree)}: ${sites.length} declarations probed in ${((Date.now() - began) / 1000).toFixed(0)}s`);
+  }
+  for (const file of tsFiles) {
     const source = readFileSync(file, "utf8");
-    score(file, source, languageOf(file)!, typescriptReferee(file, source));
+    score(file, source, languageOf(file)!, typescriptReferee(file, source), true, undefined, tsAsk(file), tsProbes);
   }
 
   const rustFiles = byFamily.get("rust") ?? [];
@@ -507,6 +589,38 @@ for (const tree of roots) {
   }
 
   const pythonFiles = byFamily.get("python") ?? [];
+  /*
+   * pyright answers over a pipe, so the compiler's half is harvested first:
+   * every question the reader would ask, asked once, and read back from a
+   * lookup -- the recording pass `referee-live.ts` makes for a board.
+   */
+  let pyAsk: ((file: string) => AskKind) | undefined;
+  let pyProbes: Map<string, ProbeAnswer> | undefined;
+  if (withCompiler && pythonFiles.length > 0) {
+    const began = Date.now();
+    const queries: { file: string; at: { start: number; end: number } }[] = [];
+    for (const file of pythonFiles) {
+      const source = readFileSync(file, "utf8");
+      for (const name of declaredShapes(source, "python")?.keys() ?? []) {
+        partsOf(source, name, "python", (at) => { queries.push({ file, at }); return undefined; });
+      }
+    }
+    const kinds = await resolvePythonKinds(tree, queries);
+    kinds.close();
+    pyAsk = (file) => (at) => kinds.cache.get(file, at) as ValueKind | undefined;
+    const sites = pythonFiles.flatMap((file) => compilerLacks(file, readFileSync(file, "utf8"), "python", pyAsk!(file)));
+    const probed = probeCallsPython(tree, sites);
+    pyProbes = probed.answers;
+    const settled = new Map<string, number>();
+    for (const answer of pyProbes.values()) {
+      const key = `${answer.by ?? "nobody"} says ${answer.callable}`;
+      settled.set(key, (settled.get(key) ?? 0) + 1);
+    }
+    console.error(`python ${path.basename(tree)} probes: ${[...settled].sort().map(([key, count]) => `${count} ${key}`).join(", ")}`);
+    console.error(`python ${path.basename(tree)}: ${queries.length} values asked, ${sites.length} declarations probed`
+      + ` (mypy ${probed.seconds.toFixed(0)}s${probed.failure ? `, FAILED: ${probed.failure}` : ""})`
+      + ` in ${((Date.now() - began) / 1000).toFixed(0)}s`);
+  }
   if (pythonFiles.length > 0) {
     const referee = await createPyrightLspReferee(tree).catch((error: Error) => {
       console.error(`pyright unavailable at ${tree}: ${error.message}`);
@@ -523,7 +637,8 @@ for (const tree of roots) {
         const source = readFileSync(file, "utf8");
         const symbols = referee ? await referee.documentSymbols(file) : undefined;
         if (!symbols) silent += 1;
-        score(file, source, "python", symbols ? byLine(symbols, source, true) : undefined, true);
+        score(file, source, "python", symbols ? byLine(symbols, source, true) : undefined, true,
+          undefined, pyAsk?.(file), pyProbes);
       }));
     }
     referee?.close();
@@ -638,6 +753,18 @@ for (const [key, list] of [...examples].sort()) {
   if (outcome === "missed") continue;
   console.log(`\n${language} ${part} ${outcome} (${list.length}):`);
   for (const example of list.slice(0, show)) console.log(`  ${example}`);
+}
+if (withCompiler) {
+  console.log("\nlacks only the compiler's answer produced (#343), refereed by writing the call");
+  console.log(["language", "part", "wrong lacks", "unrefereed", "agreed lacks"].join("\t"));
+  for (const [key, row] of [...added].sort()) {
+    console.log([...key.split("\t"), row.wrong, row.unrefereed, row.agreed].join("\t"));
+  }
+  for (const [key, list] of [...addedExamples].sort()) {
+    const [language, part, outcome] = key.split("\t");
+    console.log(`\n${language} ${part} ${outcome}, compiler-only (${list.length}):`);
+    for (const example of list.slice(0, show)) console.log(`  ${example}`);
+  }
 }
 const missed = [...examples].filter(([key]) => key.endsWith("\tmissed"));
 if (missed.length > 0) {

@@ -73,7 +73,7 @@ import { goodNewsIds, goodNewsLine, goodNewsSince, novelGoodNews } from "../src/
 import { createTsReferee, isOutsideTree, receiverResolutionFrom } from "./lib/resolution-ts.ts";
 import { resolvePythonReceivers } from "../src/engine/referee-python.ts";
 import { resolveRustReceivers } from "../src/engine/referee-rust.ts";
-import { refereePool, resolvePythonDefinitions, resolveRustDefinitions } from "../src/engine/referee-pool.ts";
+import { refereePool, resolvePythonDefinitions, resolvePythonKinds, resolveRustDefinitions } from "../src/engine/referee-pool.ts";
 import { languageOf } from "../src/engine/parse.ts";
 
 const root = process.cwd();
@@ -1563,7 +1563,7 @@ function boardsName(language) {
  * Returns a synchronous `get` for each, and the closers to run before this
  * process tries to exit.
  */
-async function harvestFor(language, { receivers, definitions }) {
+async function harvestFor(language, { receivers, definitions, kinds }) {
   /*
    * One server per key for the whole harvest, shared by both questions and
    * every round. Without it, `rust-test` started rust-analyzer six times --
@@ -1577,8 +1577,10 @@ async function harvestFor(language, { receivers, definitions }) {
   /** Every key ever put to a server, so a question with no answer is asked once. */
   const askedReceiver = new Set();
   const askedDefinition = new Set();
+  const askedKind = new Set();
   const receiverRounds = [];
   const definitionRounds = [];
+  const kindRounds = [];
   const closers = [];
   const lookIn = (rounds) => (file, at) => {
     for (const round of rounds) {
@@ -1589,10 +1591,12 @@ async function harvestFor(language, { receivers, definitions }) {
   };
   const receiverAnswer = lookIn(receiverRounds);
   const definitionAnswer = lookIn(definitionRounds);
+  const kindAnswer = lookIn(kindRounds);
 
   for (let round = 0; round < ROUNDS; round += 1) {
     const freshReceivers = [];
     const freshDefinitions = [];
+    const freshKinds = [];
     const harvest = (known, asked, fresh) => (file, at) => {
       if (languageOf(file) !== language) return undefined;
       const hit = known(file, at);
@@ -1604,6 +1608,8 @@ async function harvestFor(language, { receivers, definitions }) {
     const recording = {
       resolveReceiver: harvest(receiverAnswer, askedReceiver, freshReceivers),
       declarationAt: harvest(definitionAnswer, askedDefinition, freshDefinitions),
+      // What a value at an arrow's end is (#343); only asked where `kinds` answers.
+      ...(kinds ? { kindAt: harvest(kindAnswer, askedKind, freshKinds) } : {}),
     };
     for (const { boardFile } of loaded) {
       try {
@@ -1618,7 +1624,7 @@ async function harvestFor(language, { receivers, definitions }) {
         // it runs again from the same unmodified board and workspace.
       }
     }
-    if (freshReceivers.length === 0 && freshDefinitions.length === 0) break;
+    if (freshReceivers.length === 0 && freshDefinitions.length === 0 && freshKinds.length === 0) break;
     if (freshReceivers.length > 0 && affordable()) {
       const resolved = await receivers(root, freshReceivers, pool);
       receiverRounds.push(resolved.cache);
@@ -1629,11 +1635,17 @@ async function harvestFor(language, { receivers, definitions }) {
       definitionRounds.push(resolved.cache);
       closers.push(resolved.close);
     }
+    if (freshKinds.length > 0 && affordable()) {
+      const resolved = await kinds(root, freshKinds, pool);
+      kindRounds.push(resolved.cache);
+      closers.push(resolved.close);
+    }
     if (!affordable()) break;
   }
   return {
     receiver: receiverAnswer,
     definition: definitionAnswer,
+    kind: kindAnswer,
     close: () => { for (const close of closers) close(); pool.close(); },
   };
 }
@@ -1687,13 +1699,16 @@ function anythingUnsettled() {
 
 let pythonCache;
 let pythonDefinitions;
+let pythonKinds;
 if (boardsName("python") && anythingUnsettled()) {
   const harvested = await harvestFor("python", {
     receivers: (tree, queries, pool) => resolvePythonReceivers(tree, queries, pool),
     definitions: (tree, queries, pool) => resolvePythonDefinitions(tree, queries, pool),
+    kinds: (tree, queries, pool) => resolvePythonKinds(tree, queries, pool),
   });
   pythonCache = { get: harvested.receiver };
   pythonDefinitions = { get: harvested.definition };
+  pythonKinds = { get: harvested.kind };
   harvested.close();
 }
 
@@ -1748,6 +1763,16 @@ const closedBodyReferee = (tsReferee || pythonCache || rustCache) ? {
     if (!found) return undefined;
     if (isOutsideTree(found.file, root)) return "outside";
     return { file: path.relative(root, found.file), line: found.line + 1 };
+  },
+  /*
+   * What a value at an arrow's end is (#343), for the wrong-kind check:
+   * pyright for Python, the compiler in process for TypeScript, and nothing
+   * for Rust, whose written types already say.
+   */
+  kindAt: (file, at) => {
+    if (languageOf(file) === "python") return pythonKinds?.get(file, at);
+    if (languageOf(file) === "rust" || !tsReferee) return undefined;
+    return tsReferee.kindAt(path.resolve(root, file), at.start, at.end);
   },
 } : undefined;
 

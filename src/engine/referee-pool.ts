@@ -43,6 +43,7 @@ import { createPyrightLspReferee, WARM_UP_CANDIDATES } from "./referee-python-ls
 import { cargoRootsIn } from "./referee-rust";
 import { createRustAnalyzerReferee, isOutsideRustTree, type RustLspReferee } from "./referee-rust-lsp";
 import { isOutsideTree } from "./referee-ts";
+import type { ValueKind } from "./parts";
 
 /** Structurally `ClosedBodyReferee.declarationAt`'s answer, not imported -- the engine holds no dependency on anything under `scripts/lib`. */
 export type DefinitionAnswer = { file: string; line: number } | "outside";
@@ -94,10 +95,10 @@ function readerOf(root: string): (file: string) => string {
  * back with nothing stays a real cached answer of "asked, nothing said",
  * which is why the cache is a `Map` rather than a lookup with a default.
  */
-async function run(
+async function run<Answer>(
   queries: readonly DefinitionQuery[],
-  cache: Map<string, DefinitionAnswer | undefined>,
-  ask: (query: DefinitionQuery) => Promise<DefinitionAnswer | undefined>,
+  cache: Map<string, Answer | undefined>,
+  ask: (query: DefinitionQuery) => Promise<Answer | undefined>,
 ): Promise<void> {
   let cursor = 0;
   const worker = async (): Promise<void> => {
@@ -211,6 +212,49 @@ export async function resolvePythonDefinitions(
     return { file: path.relative(root, found.file), line: found.line + 1 };
   });
 
+  return {
+    cache: { get: (file, at) => cache.get(queryKey(file, at)) },
+    close: () => { if (!pool) mine.close(); },
+    started: true,
+  };
+}
+
+/** `DefinitionAnswers`' shape, for the kind of a value rather than a definition. */
+export interface KindAnswers {
+  cache: { get(file: string, at: { start: number; end: number }): ValueKind | undefined };
+  close: () => void;
+  started: boolean;
+}
+
+const NO_KINDS: KindAnswers = { cache: { get: () => undefined }, close: () => {}, started: false };
+
+/**
+ * Python: what each value at an arrow's end is, from the same one pyright
+ * (#343). Asked at a declaration's own name, which is where the wrong-kind
+ * check (`parts.ts`) wants its answer; `valueKindAt` says what is asked.
+ */
+export async function resolvePythonKinds(
+  root: string,
+  queries: readonly DefinitionQuery[],
+  pool?: RefereePool<Awaited<ReturnType<typeof createPyrightLspReferee>>>,
+): Promise<KindAnswers> {
+  if (queries.length === 0) return NO_KINDS;
+  const sourceOf = readerOf(root);
+  const mine = pool ?? refereePool<Awaited<ReturnType<typeof createPyrightLspReferee>>>();
+  const referee = await mine.get(root, () => createPyrightLspReferee(root));
+  if (!referee) return NO_KINDS;
+  try {
+    await referee.warmUp(queries.slice(0, WARM_UP_CANDIDATES).map((query) => ({
+      file: path.resolve(root, query.file),
+      source: sourceOf(query.file),
+      start: query.at.start,
+    })));
+  } catch {
+    // Warming up only buys speed; every query below still gets its own answer.
+  }
+  const cache = new Map<string, ValueKind | undefined>();
+  await run(queries, cache, (query) =>
+    referee.valueKindAt(path.resolve(root, query.file), sourceOf(query.file), query.at.start));
   return {
     cache: { get: (file, at) => cache.get(queryKey(file, at)) },
     close: () => { if (!pool) mine.close(); },

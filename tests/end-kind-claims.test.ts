@@ -541,8 +541,8 @@ describe("an arrow into a constant (#307)", () => {
     }), { edges: true });
     const finding = report.edges.find((edge) => edge.kind === "end-lacks-part");
 
-    expect(finding?.detail).toContain("is a plain value, and cannot be called");
-    expect(finding?.detail).toContain("Point the arrow at the routine that is called");
+    expect(finding?.detail).toContain("holds data, and cannot be called");
+    expect(finding?.detail).toContain("Point the arrow at the routine that is called, or drop the claim.");
   });
 
   it.each(Object.keys(files))("is red in %s for @builds into a number", async (language) => {
@@ -576,7 +576,10 @@ describe("an arrow into a constant (#307)", () => {
     }), { edges: true });
     const finding = report.edges.find((edge) => edge.kind === "end-lacks-part");
 
-    expect(finding?.detail).toContain("is a plain value, and cannot be called");
+    expect(finding?.detail).toContain("holds data, and cannot be called");
+    // A field writes no keyword before its name. It used to be named "a type"
+    // for want of one, which made the sentence contradict itself (#343).
+    expect(finding?.detail).toContain("anchored at `settings`, a value,");
   });
 
   it("is red for @builds into a field, and quiet when the field could hold a function", async () => {

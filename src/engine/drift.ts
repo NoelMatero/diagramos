@@ -49,7 +49,7 @@ import { readGraph, type Provenance, type RecoveredGraph, type RecoveredNode } f
 import { licenceFor, mayAccuse } from "./licence";
 import { outsideCallsIn } from "./outside";
 import { lackingPhrase } from "./summary";
-import { lackingEnd, PART_NEEDED, PART_WORDS, type LackingEnd } from "./parts";
+import { lackingEnd, PART_NEEDED, PART_WORDS, type LackingEnd, type ValueKind } from "./parts";
 import { languageOf, type Language } from "./parse";
 import { ledgerAdditions, type Ledger } from "./ledger";
 import { checkNeeds, type NeedsWithheld } from "./needs";
@@ -873,7 +873,7 @@ const LACKING_FIX: Record<LackingEnd["part"], string> = {
   fields: "Anchor that end at the type that has the field",
   bases: "Start the arrow at the type that declares the base",
   type: "Point that end at the type the claim is about",
-  callable: "Point the arrow at the routine that is called, or drop the claim",
+  callable: "Point the arrow at the routine that is called",
   implementable: "Point that end at the trait or base type the claim is about",
 };
 
@@ -1334,6 +1334,17 @@ export interface ClaimTally {
    * never wrong about today, and nothing here changes that.
    */
   plannedWithheld: SkipBreakdown<EdgeSkipReason>;
+  /**
+   * Arrows every reader withheld on whose end is a value nobody here could say
+   * is callable or a type, because no compiler answered (#343).
+   *
+   * `ctx = makeContext()` at the head of an `@calls` is the shape: the text
+   * cannot tell whether a context can be called, and the compiler can. On a
+   * check with no referee this is what `wouldHelp` reads to decide one is
+   * worth starting; on a check with one, it is what the compiler could not
+   * settle either -- an `any`, an unresolved import.
+   */
+  endsUnsettled: number;
 }
 
 /**
@@ -2237,6 +2248,13 @@ export interface ClosedBodyReferee {
    * could not see into.
    */
   declarationAt?(file: string, at: { start: number; end: number }): { file: string; line: number } | "outside" | undefined;
+  /**
+   * What the name declared at this range is (#343): whether a value of its
+   * type can be called, and whether it is a type. Asked by the wrong-kind-of-end
+   * check (`parts.ts`) about a value the text cannot judge, and `undefined`
+   * wherever the compiler cannot say -- which reads as no answer at all.
+   */
+  kindAt?(file: string, at: { start: number; end: number }): ValueKind | undefined;
 }
 
 /**
@@ -2981,6 +2999,7 @@ export function checkDrift(
     calls: 0, callsConfirmed: 0, callsWithheld: {}, callsNotClosed: {},
     feeds: 0, feedsConfirmed: 0, feedsWithheld: {},
     plannedWithheld: {},
+    endsUnsettled: 0,
   };
   const closedBreaches: ClosedBreachFinding[] = [];
   const closedUnproven: ClosedUnprovenFinding[] = [];
@@ -5324,13 +5343,36 @@ export function checkDrift(
        * (`parts.ts`) and licensed per language and part by `measure:parts`. A
        * plan is never accused, as everywhere else here.
        */
+      /*
+       * A value at an end is put to the compiler where the text left a doubt
+       * (#343), and a question nobody answered is counted: that count is what
+       * tells `wouldHelp` a compiler is worth starting for this board. Rust is
+       * not asked -- its written type already says whether a value is a
+       * function (`couldBeCalled`), and a Rust value with none written is a
+       * macro's or a pattern's, which no server here answers for.
+       */
+      let unsettled = false;
+      // Repo-relative, as every question to a referee is (`ClosedBodyReferee`).
+      const askAbout = (file: string) => (languageOf(file) === "rust" ? undefined
+        : (at: { start: number; end: number }) => {
+          const answer = options?.closedBodyReferee?.kindAt?.(file, at);
+          if (answer?.callable === undefined) unsettled = true;
+          return answer;
+        });
       const lacking = claimed && edge.claim && bothNamed
         ? lackingEnd(
           edge.claim,
-          { source: workspace.read(fromFile), language: languageOf(fromFile), symbols: fromEnd.symbols },
-          { source: workspace.read(toFile), language: languageOf(toFile), symbols: toEnd.symbols },
+          {
+            source: workspace.read(fromFile), language: languageOf(fromFile), symbols: fromEnd.symbols,
+            ask: askAbout(fromAnchor),
+          },
+          {
+            source: workspace.read(toFile), language: languageOf(toFile), symbols: toEnd.symbols,
+            ask: askAbout(toAnchor),
+          },
         )
         : undefined;
+      if (!lacking && unsettled) claims.endsUnsettled += 1;
       if (lacking && edge.claim) {
         if (tallyOf && tallyBefore) {
           for (const key of Object.keys(tallyOf)) delete tallyOf[key];
