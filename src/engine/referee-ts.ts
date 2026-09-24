@@ -143,6 +143,13 @@ export interface TsReferee {
    * says which one "go to definition" landed on.
    */
   symbolDeclarationLocationAt(file: string, start: number, end: number): { file: string; line: number } | undefined;
+  /**
+   * What the name declared at exactly this range is (#343): whether a value of
+   * its type can be called, and whether the name is a type. `undefined` for a
+   * range the program does not cover; either half `undefined` where the
+   * checker itself cannot say.
+   */
+  kindAt(file: string, start: number, end: number): { callable?: boolean; type?: boolean } | undefined;
 }
 
 const SKIP_DIRECTORIES = new Set([
@@ -486,7 +493,71 @@ function buildReferee(ts: typeof TS, root: string): TsReferee {
     return symbolDeclarationLocationAt(file, start, end)?.file;
   }
 
-  return { typeAt, symbolDeclarationAt, symbolDeclarationLocationAt };
+  function kindAt(file: string, start: number, end: number): { callable?: boolean; type?: boolean } | undefined {
+    const configPath = configOf.get(file);
+    if (configPath === undefined) return undefined;
+    const { program, checker } = programFor(configPath);
+    const sourceFile = program.getSourceFile(file);
+    if (!sourceFile) return undefined;
+    const node = findNodeAt(ts, sourceFile, start, end);
+    if (!node) return undefined;
+    try {
+      const found = checker.getSymbolAtLocation(node);
+      if (!found) return undefined;
+      const symbol = found.flags & ts.SymbolFlags.Alias ? checker.getAliasedSymbol(found) : found;
+      return {
+        callable: callableType(ts, checker, checker.getTypeAtLocation(node)),
+        type: (symbol.flags & ts.SymbolFlags.Type) !== 0,
+      };
+    } catch {
+      return undefined;
+    }
+  }
+
+  return { typeAt, symbolDeclarationAt, symbolDeclarationLocationAt, kindAt };
+}
+
+/**
+ * Whether a value of this type can be called (#343): `false` only when the
+ * checker can see every type it may hold and none of them can be.
+ *
+ * Each member of a union is its own question, because the checker answers a
+ * union's call signatures only when every member has one: `(() => void) |
+ * undefined` has none, and is plainly something a caller calls. Any member
+ * callable makes the value callable.
+ *
+ * A call signature and a construct signature both count -- a class held in a
+ * variable is called with `new`, and `@calls` into one is a board to read.
+ * So does anything assignable to the global `Function`, which declares no
+ * signature of its own and is callable all the same: `name?: Function |
+ * string` is a field somebody calls.
+ *
+ * What the checker cannot see through is not guessed at. `any` and `unknown`
+ * (and an unresolved import, which the checker reads as `any`) are
+ * `undefined`; so is a type parameter or any other deferred type whose
+ * constraint says nothing, because `TError` may be instantiated with a
+ * function. A constraint that does say -- `T extends string` -- is read.
+ */
+function callableType(ts: typeof TS, checker: TS.TypeChecker, type: TS.Type, depth = 0): boolean | undefined {
+  if (depth > 8) return undefined;
+  const functionSymbol = checker.resolveName("Function", undefined, ts.SymbolFlags.Type, false);
+  const functionType = functionSymbol ? checker.getDeclaredTypeOfSymbol(functionSymbol) : undefined;
+  let answer: boolean | undefined = false;
+  for (const member of type.isUnion() ? type.types : [type]) {
+    let one: boolean | undefined;
+    if (member.flags & (ts.TypeFlags.Any | ts.TypeFlags.Unknown)) {
+      one = undefined;
+    } else if (member.flags & ts.TypeFlags.Instantiable) {
+      const constraint = checker.getBaseConstraintOfType(member);
+      one = constraint && constraint !== member ? callableType(ts, checker, constraint, depth + 1) : undefined;
+    } else {
+      one = member.getCallSignatures().length > 0 || member.getConstructSignatures().length > 0
+        || (functionType !== undefined && checker.isTypeAssignableTo(member, functionType));
+    }
+    if (one === true) return true;
+    if (one === undefined) answer = undefined;
+  }
+  return answer;
 }
 
 /**

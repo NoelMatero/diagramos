@@ -64,6 +64,8 @@ import path from "node:path";
 import { fileURLToPath, pathToFileURL } from "node:url";
 
 import type { LspDocumentSymbol } from "./lsp-symbols";
+import { each, parseSource, type Node } from "./parse";
+import type { ValueKind } from "./parts";
 import { isOutsideTree } from "./referee-ts";
 
 export { isOutsideTree };
@@ -319,6 +321,12 @@ export interface PyrightLspReferee {
    * *is* (#297). `undefined` when it would not answer.
    */
   documentSymbols(file: string): Promise<LspDocumentSymbol[] | undefined>;
+  /**
+   * What the name declared at `start` is (#343): whether a value of its type
+   * can be called, and whether the name is a type. `undefined`, or a half of
+   * it `undefined`, wherever pyright cannot say. See `valueKindFrom`.
+   */
+  valueKindAt(file: string, source: string, start: number): Promise<ValueKind | undefined>;
   close(): void;
 }
 
@@ -448,7 +456,7 @@ export async function createPyrightLspReferee(root: string): Promise<PyrightLspR
     processId: process.pid,
     rootUri: pathToFileURL(root).toString(),
     capabilities: { textDocument: {
-      definition: {}, typeDefinition: {},
+      definition: {}, typeDefinition: {}, hover: { contentFormat: ["plaintext"] },
       documentSymbol: { hierarchicalDocumentSymbolSupport: true },
     } },
     workspaceFolders: [{ uri: pathToFileURL(root).toString(), name: path.basename(root) }],
@@ -546,7 +554,138 @@ export async function createPyrightLspReferee(root: string): Promise<PyrightLspR
     return undefined;
   }
 
+  /** Every location an answer names, as `firstLocation` reads the first. */
+  async function askLocations(
+    method: "typeDefinition" | "definition", file: string, source: string, start: number,
+  ): Promise<{ file: string; line: number }[] | undefined> {
+    if (closed) return undefined;
+    const params = { textDocument: { uri: pathToFileURL(file).toString() }, position: positionAt(source, start) };
+    for (const wait of [0, ...STEADY_RETRY_MS]) {
+      if (wait) await new Promise((resolve) => setTimeout(resolve, wait));
+      if (closed) return undefined;
+      let result: DefinitionResult;
+      try {
+        result = (await send(`textDocument/${method}`, params)) as DefinitionResult;
+      } catch {
+        return undefined;
+      }
+      const all = (Array.isArray(result) ? result : result ? [result] : []).flatMap((one) => {
+        const found = firstLocation(one);
+        return found ? [found] : [];
+      });
+      if (all.length > 0) return all;
+    }
+    return undefined;
+  }
+
+  const sourceOf = (file: string): string | undefined => {
+    try { return readFileSync(file, "utf8"); } catch { return undefined; }
+  };
+
+  /** Every class `locations` names, or `undefined` if one of them is not a class. */
+  function classesAt(locations: { file: string; line: number }[] | undefined) {
+    if (!locations || locations.length === 0) return undefined;
+    /*
+     * pyright names a bundled stub and the module it describes side by side
+     * -- `types.pyi`'s `class NoneType:` and `types.py`'s `NoneType =
+     * type(None)`. The stub is the declaration a checker reads; the module
+     * line is how the runtime spells it, and it declares no class.
+     */
+    const stubbed = locations.some((one) => one.file.endsWith(".pyi"));
+    const read = stubbed
+      ? locations.filter((one) => one.file.endsWith(".pyi") || !isOutsideTree(one.file, root))
+      : locations;
+    const classes = read.filter((one) => pythonTypeDeclaredOnLine(lineOf(one.file, one.line))?.kind === "class");
+    return classes.length === read.length ? classes : undefined;
+  }
+
+  const calling = new Map<string, Promise<boolean | undefined>>();
+
+  /**
+   * Whether instances of the class declared at this line can be called: its
+   * body or a base's defines `__call__`. `undefined` for a base pyright cannot
+   * place, which leaves the whole answer open.
+   */
+  function definesCall(file: string, line: number, depth: number): Promise<boolean | undefined> {
+    const key = `${file}:${line}`;
+    let answer = calling.get(key);
+    if (!answer) {
+      answer = readCall(file, line, depth);
+      calling.set(key, answer);
+    }
+    return answer;
+  }
+
+  async function readCall(file: string, line: number, depth: number): Promise<boolean | undefined> {
+    if (depth > 12) return undefined;
+    const source = sourceOf(file);
+    const klass = source === undefined ? undefined : classOnLine(source, line);
+    if (!source || !klass) return undefined;
+    if (ownsCall(klass)) return true;
+    const bases = basesOf(klass);
+    if (!bases) return undefined;
+    let answer: boolean | undefined = false;
+    for (const base of bases) {
+      const classes = classesAt(await askLocations("definition", file, source, base.startIndex));
+      if (!classes) return undefined;
+      for (const one of classes) {
+        const inherited = await definesCall(one.file, one.line, depth + 1);
+        if (inherited === true) return true;
+        if (inherited === undefined) answer = undefined;
+      }
+    }
+    return answer;
+  }
+
+  async function valueKindAt(file: string, source: string, start: number): Promise<ValueKind | undefined> {
+    if (closed) return undefined;
+    const position = positionAt(source, start);
+    let hover: { contents?: string | { value?: string } } | null | undefined;
+    for (const wait of [0, ...STEADY_RETRY_MS]) {
+      if (wait) await new Promise((resolve) => setTimeout(resolve, wait));
+      if (closed) return undefined;
+      try {
+        hover = (await send("textDocument/hover", {
+          textDocument: { uri: pathToFileURL(file).toString() }, position,
+        })) as typeof hover;
+      } catch {
+        return undefined;
+      }
+      if (hover) break;
+    }
+    const text = typeof hover?.contents === "string" ? hover.contents : hover?.contents?.value;
+    if (!text) return undefined;
+    const seesEverything = hoverSeesEverything(source, start);
+    return valueKindFrom(text, async (written) => {
+      if (!seesEverything) return undefined;
+      const classes = classesAt(await askLocations("typeDefinition", file, source, start));
+      if (!classes) return undefined;
+      /*
+       * Every class the type points at has to be written in the type as
+       * shown. An alias hides the rest: pydantic's `cls_: ModelOrDc` is a
+       * `Type[Union[BaseModel, Dataclass]]` -- the classes themselves, which
+       * are called to make one -- and `typeDefinition` names the two classes
+       * with nothing to say it is them rather than one of them. Found by
+       * `measure:parts`, as a red it would have put on a right arrow.
+       */
+      const words = new Set(written.match(/[A-Za-z_]\w*/g) ?? []);
+      const named = classes.every((one) => {
+        const name = pythonTypeDeclaredOnLine(lineOf(one.file, one.line))?.name ?? "";
+        return words.has(name) || (name === "NoneType" && words.has("None"));
+      });
+      if (!named) return undefined;
+      let answer: boolean | undefined = false;
+      for (const one of classes) {
+        const callable = await definesCall(one.file, one.line, 0);
+        if (callable === true) return true;
+        if (callable === undefined) answer = undefined;
+      }
+      return answer;
+    });
+  }
+
   return {
+    valueKindAt,
     // `typeAnchorFor` is the reason `end` matters here: `[start, end)` can
     // span an entire expression (a chain, `self.cache`), and only its last
     // token says what the whole thing evaluates to. `methodDeclarationAt`
@@ -593,4 +732,158 @@ export async function createPyrightLspReferee(root: string): Promise<PyrightLspR
       child.kill();
     },
   };
+}
+
+/**
+ * What pyright's hover says a name is, and so what may be asked next (#343).
+ *
+ * The hover opens with the kind of thing in brackets -- `(variable) ctx:
+ * AppContext`, `(class) Plain`, `(function) def work(n)` -- which is pyright
+ * saying whether the name is a value. A value is not a type; whether it can
+ * be called is `instancesCall`'s question, about the class or classes its
+ * type names.
+ *
+ * Two spellings of a type are not asked about, because the class
+ * `typeDefinition` names for them is not the class of the value: `type[Foo]`
+ * is the class object itself, which is called to make one, and a callable's
+ * `(x) -> y` is a function. Both keep their doubt -- and so does a type that
+ * hides either behind an alias, which `valueKindAt` catches by asking that
+ * every class named be written in the type.
+ */
+export async function valueKindFrom(
+  hover: string,
+  instancesCall: (written: string) => Promise<boolean | undefined>,
+): Promise<ValueKind | undefined> {
+  const kind = /^\(([a-z ]+)\)/.exec(hover.trim())?.[1];
+  if (kind === "class" || kind === "type alias" || kind === "type") return { type: true };
+  if (kind === "function" || kind === "method") return { callable: true, type: false };
+  if (kind !== "variable" && kind !== "constant" && kind !== "parameter") return undefined;
+  // `Type[Foo]` is `typing`'s spelling of the same thing.
+  if (/\b[Tt]ype\[|->/.test(hover)) return { type: false };
+  /*
+   * `typeDefinition` names a class for each member of a union it knows, and
+   * nothing for one it does not -- so `Term | Unknown` would read as a `Term`
+   * and nothing else. A member nobody knows keeps the whole value open.
+   */
+  const written = /^\([a-z ]+\)\s+[A-Za-z_]\w*\s*:\s*([^\n]*)/.exec(hover.trim())?.[1] ?? "";
+  if (topLevelMembers(written).some((member) => member === "Unknown" || member === "Any")) return { type: false };
+  return { callable: await instancesCall(written), type: false };
+}
+
+/** A written type's top-level union members: `A | B[C | D]` is `A` and `B[C | D]`. */
+function topLevelMembers(text: string): string[] {
+  const members: string[] = [];
+  let depth = 0;
+  let current = "";
+  for (const character of text) {
+    if ("([{".includes(character)) depth += 1;
+    if (")]}".includes(character)) depth -= 1;
+    if (character === "|" && depth === 0) { members.push(current.trim()); current = ""; continue; }
+    current += character;
+  }
+  members.push(current.trim());
+  return members;
+}
+
+/**
+ * Whether the type pyright shows at a declaration is every value the name
+ * may hold, which is what "cannot be called" has to be true of (#343).
+ *
+ * pyright's hover is the value written *there*. Most of the time that is the
+ * whole story -- every other assignment to a local is another declaration in
+ * the same file, and `parts.ts` asks each. Two shapes it is not:
+ *
+ * - **An unannotated parameter.** pyright reads `hook=None` as a `None`; a
+ *   caller passes the function. The default is not the type.
+ * - **An unannotated class attribute.** `callback = None` in a class body is
+ *   replaced by `self.callback = fn` in a method, which is no declaration of
+ *   the name anybody here reads.
+ *
+ * A written annotation settles both, since it binds every assignment to it.
+ */
+function hoverSeesEverything(source: string, start: number): boolean {
+  const name = /^[A-Za-z_]\w*/.exec(source.slice(start))?.[0];
+  if (!name) return false;
+  const after = source.slice(start + name.length).trimStart();
+  if (after.startsWith(":") && !after.startsWith(":=")) return true;
+  const tree = parseSource(source, "python");
+  if (!tree) return false;
+  /*
+   * The innermost scope the name sits in: a routine is a declaration with
+   * parameters, a class one with a body and none (`parts.ts`). A name *among*
+   * a routine's parameters is a parameter; one in its body is a local.
+   */
+  let inner: { at: number; scope: "routine" | "class" | "parameter" } | undefined;
+  each(tree.rootNode, (node) => {
+    const body = node.childForFieldName("body");
+    if (!body || !node.childForFieldName("name")) return;
+    const parameters = node.childForFieldName("parameters");
+    const inside = (part: Node) => start >= part.startIndex && start < part.startIndex + part.text.length;
+    if (parameters && inside(parameters) && (!inner || parameters.startIndex > inner.at)) {
+      inner = { at: parameters.startIndex, scope: "parameter" };
+    } else if (inside(body) && (!inner || body.startIndex > inner.at)) {
+      inner = { at: body.startIndex, scope: parameters ? "routine" : "class" };
+    }
+  });
+  return inner?.scope !== "parameter" && inner?.scope !== "class";
+}
+
+/** The class whose name is on this 0-based line, as `typeDefinition` and `definition` name one. */
+function classOnLine(source: string, line: number): Node | undefined {
+  const tree = parseSource(source, "python");
+  if (!tree) return undefined;
+  const starts = lineStartsOf(source);
+  const from = starts[line];
+  const to = starts[line + 1] ?? source.length;
+  if (from === undefined) return undefined;
+  let found: Node | undefined;
+  each(tree.rootNode, (node) => {
+    if (found) return;
+    const name = node.childForFieldName("name");
+    // A class is a declaration with a body and no parameters (`parts.ts`).
+    if (!name || !node.childForFieldName("body") || node.childForFieldName("parameters")) return;
+    if (name.startIndex >= from && name.startIndex < to) found = node;
+  });
+  return found;
+}
+
+/** Whether a class body defines `__call__` itself: a method, or a name assigned one. */
+function ownsCall(klass: Node): boolean {
+  let owns = false;
+  each(klass.childForFieldName("body")!, (node) => {
+    if (owns) return;
+    const named = node.childForFieldName("name") ?? node.childForFieldName("left");
+    if (named?.text === "__call__") owns = true;
+  });
+  return owns;
+}
+
+/**
+ * The name each base of a class is spelled by: `Base`, `abc.Base`'s `Base`,
+ * `Mapping[str, int]`'s `Mapping`. A keyword argument (`metaclass=...`) is not
+ * a base, and a metaclass's `__call__` is what calling the *class* runs, not an
+ * instance. `undefined` when a base is spelled any other way -- a call, a
+ * splat -- because a base nobody can place may define `__call__`.
+ *
+ * `Generic` and `Protocol` are left out by name, the one list here: typing
+ * declares both as special forms rather than classes, so pyright names no
+ * class for either, and neither gives an instance anything to call.
+ */
+function basesOf(klass: Node): Node[] | undefined {
+  const list = klass.childForFieldName("superclasses");
+  if (!list) return [];
+  const bases: Node[] = [];
+  for (let index = 0; index < list.childCount; index += 1) {
+    const base = list.child(index);
+    if (!base?.isNamed || base.text.startsWith("#")) continue;
+    if (base.childForFieldName("name") && base.childForFieldName("value")) continue;
+    let head: Node | null = base;
+    while (head && head.childCount > 0) {
+      head = head.childForFieldName("attribute") ?? head.childForFieldName("value");
+    }
+    if (!head) return undefined;
+    if (head.text === "Generic" || head.text === "Protocol") continue;
+    bases.push(head);
+  }
+  return bases;
 }

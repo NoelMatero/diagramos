@@ -36,9 +36,16 @@
  * that is in `couldBeCalled`, and it is the one rule in this file that has to
  * know how each language spells a function.
  *
- * Everything else is "not sure": a type alias, a name assigned a call's result,
- * a name out of a macro. Those may be a function or a type in disguise, so they
- * never lack anything here.
+ * Everything else is "not sure" on the text alone: a type alias, a name
+ * assigned a call's result, a name out of a macro. Those may be a function or a
+ * type in disguise.
+ *
+ * **Where a compiler answers, it settles that doubt (#343).** `ctx =
+ * makeContext()` is a value the text cannot judge and the TypeScript checker or
+ * pyright can: asked at the name, it says whether a value of that type can be
+ * called and whether the name is a type. `partsOf` takes that answer as `ask`,
+ * only for a value and only where the text was unsure, and without one reads
+ * exactly as before -- so no answer is never an accusation.
  *
  * A name declared more than once lacks a part only when **every** declaration
  * lacks it. `interface Foo` beside `function Foo` has a signature.
@@ -97,7 +104,7 @@ export const PART_WORDS: Record<Part, string> = {
   fields: "has no fields",
   bases: "has no base types",
   type: "is not a type",
-  callable: "is a plain value, and cannot be called",
+  callable: "holds data, and cannot be called",
   implementable: "cannot be implemented",
 };
 
@@ -362,10 +369,77 @@ function implementable(node: Node, language: Language, type: PartReading): PartR
   return keyword === "trait" ? "has" : "lacks";
 }
 
-/** How one declaration reads, by the shapes above. */
-function readDeclaration(node: Node, language: Language): Record<Part, PartReading> {
-  const shape = readShape(node, language);
+/**
+ * What a compiler says about one declared name (#343): whether a value of its
+ * type can be called, and whether the name is a type. `undefined` for either
+ * is the compiler not knowing -- an `any`, an unresolved import, a type
+ * parameter -- and is read exactly as no answer at all.
+ */
+export interface ValueKind {
+  callable?: boolean;
+  type?: boolean;
+}
+
+/** Asks a compiler about the name at this range, or answers `undefined`. */
+export type AskKind = (at: { start: number; end: number }) => ValueKind | undefined;
+
+/**
+ * Whether a declaration is a value, which is the one kind a compiler is asked
+ * about. A routine and a container read their parts off the grammar and need
+ * nothing more; a type alias is a type whatever it aliases.
+ */
+function isValue(node: Node, language: Language): boolean {
+  if (has(node, "parameters") || isContainer(node) || aliasesAType(node)) return false;
+  const written = node.childForFieldName("type");
+  return !(language === "python" && written && aliasesByAnnotation(written.text));
+}
+
+/**
+ * The compiler's answer, laid over the text's reading of a value (#343).
+ *
+ * It only ever settles a doubt. What the text already knows it keeps: a
+ * `lacks` it reads was licensed by `measure:parts` on its own, and a compiler
+ * saying "callable" about a name the text calls unsure changes nothing.
+ *
+ * **Not callable** settles `body`, `signature` and `callable` together, the
+ * same three `readShape` settles from a written type: a value nothing can call
+ * has no code of its own that runs.
+ *
+ * **Not a type** is only believed of a value that is also not callable. A
+ * variable holding a class (`const Model = class {}`, Python's `type[Foo]`) or
+ * a component (`const Row = memo(...)`) is a value to the compiler and is
+ * exactly what `@builds` means to point at; its type has a call or a construct
+ * signature, and that is the answer that keeps it out.
+ */
+function settle(shape: Shape, kind: ValueKind | undefined): Shape {
+  if (kind?.callable !== false) return shape;
+  const lacks = (part: PartReading): PartReading => (part === "unsure" ? "lacks" : part);
+  return {
+    ...shape,
+    body: lacks(shape.body),
+    signature: lacks(shape.signature),
+    callable: lacks(shape.callable),
+    type: kind.type === false ? lacks(shape.type) : shape.type,
+  };
+}
+
+/** How one declaration reads, by the shapes above and, for a value, a compiler's answer. */
+function readDeclaration(node: Node, nameNode: Node, language: Language, ask?: AskKind): Record<Part, PartReading> {
+  const read = readShape(node, language);
+  const shape = ask && (read.callable === "unsure" || read.type === "unsure") && isValue(node, language)
+    ? settle(read, ask({ start: nameNode.startIndex, end: nameNode.startIndex + nameNode.text.length }))
+    : read;
   return { ...shape, implementable: implementable(node, language, shape.type) };
+}
+
+/**
+ * A container is a declaration with a `body` field and none of `parameters`,
+ * `value`, `right` or `type`: a struct, a class, an interface, an enum, a
+ * trait, a module.
+ */
+function isContainer(node: Node): boolean {
+  return has(node, "name") && has(node, "body")
+    && !has(node, "parameters") && !has(node, "value") && !has(node, "right") && !has(node, "type");
 }
 
 type Shape = Record<Exclude<Part, "implementable">, PartReading>;
@@ -382,9 +456,7 @@ function readShape(node: Node, language: Language): Shape {
       callable: "has",
     };
   }
-  const container = has(node, "name") && has(node, "body")
-    && !has(node, "value") && !has(node, "right") && !has(node, "type");
-  if (container) {
+  if (isContainer(node)) {
     /*
      * A field list holds no code. A class body does: Python runs one at
      * import, TypeScript runs a field initialiser at construction, and a
@@ -472,15 +544,22 @@ const UNSURE: Record<Part, PartReading> = {
  *
  * `undefined` when the file declares no such name or has no grammar: a missing
  * name is the node check's business, not a part this name lacks.
+ *
+ * `ask` is a compiler, where the caller holds one (#343). It is asked about a
+ * value only, only where the text left a doubt, and one question per
+ * declaration; without it, or where it cannot say, this reads exactly as the
+ * text does.
  */
 export function partsOf(
   source: string,
   name: string,
   language: Language,
+  ask?: AskKind,
 ): Record<Part, PartReading> | undefined {
   const declarations = declaredShapes(source, language)?.get(name);
   if (!declarations || declarations.length === 0) return undefined;
-  const readings = declarations.map(({ node, soup }) => (soup ? UNSURE : readDeclaration(node, language)));
+  const readings = declarations.map(({ node, nameNode, soup }) =>
+    (soup ? UNSURE : readDeclaration(node, nameNode, language, ask)));
   const combined = { ...UNSURE };
   for (const part of PARTS) {
     const all = readings.map((reading) => reading[part]);
@@ -534,6 +613,16 @@ export function declaredNames(source: string, language: Language): string[] {
  * number. In Rust it reads the keyword, and rust-analyzer agreed on all 16,941
  * lacks with 0 wrong and 0 unjudged.
  *
+ * **The compiler's answers (#343)** were measured with `measure:parts
+ * --compiler` over the ten TypeScript and Python repositories, refereed by
+ * writing the call and asking a checker whether it compiles -- the TypeScript
+ * compiler's own call resolution, mypy, and pyright's command line where mypy
+ * reads `Any`. 0 wrong lacks in every square. `callable` went from 7,613
+ * agreed to 18,502 in Python, 8,014 to 25,071 in TS and 1,709 to 4,878 in TSX;
+ * 173 of the compiler's lacks went unjudged -- index-signature keys, members
+ * of declaration files, bindings in `@no_type_check` code -- and every one was
+ * read: all plain values. Rust asks no compiler and its squares did not move.
+ *
  * A square goes `false` the moment a run finds one wrong lack in that
  * language. The claim's reader is unaffected either way: losing this costs the
  * accusation and nothing else, exactly as `licence.ts` has it.
@@ -576,7 +665,12 @@ export interface PartEnd {
   source: string;
   language: Language | undefined;
   symbols: string[];
+  /** A compiler for this end's file, where the check holds one (#343). */
+  ask?: AskKind;
 }
+
+/** The parts a compiler's answer can settle; `settle` names the same five. */
+const SETTLED_BY_A_COMPILER: ReadonlySet<Part> = new Set(["body", "signature", "callable", "type", "implementable"]);
 
 /** An end that is the wrong kind of thing for its claim. */
 export interface LackingEnd {
@@ -601,8 +695,9 @@ export function lackingEnd(claim: ArrowClaim, from: PartEnd, to: PartEnd): Lacki
     const side = end === "from" ? from : to;
     if (!part || !side.language || side.symbols.length === 0) continue;
     if (!PART_LICENCE[side.language][part]) continue;
+    const ask = SETTLED_BY_A_COMPILER.has(part) ? side.ask : undefined;
     const lacks = side.symbols.every(
-      (name) => partsOf(side.source, name, side.language!)?.[part] === "lacks",
+      (name) => partsOf(side.source, name, side.language!, ask)?.[part] === "lacks",
     );
     if (!lacks) continue;
     const name = side.symbols[0]!;
@@ -617,8 +712,9 @@ export function lackingEnd(claim: ArrowClaim, from: PartEnd, to: PartEnd): Lacki
  * The word the source writes just before the name -- `struct`, `class`,
  * `trait`, `interface`. A keyword is an anonymous token, so its type is its own
  * text and no list of them is needed. A routine is "a function" whatever its
- * keyword (`fn`, `def`, `function` are not nouns), and a container that writes
- * none, like an enum variant, is "a type".
+ * keyword (`fn`, `def`, `function` are not nouns), a container that writes
+ * none, like an enum variant, is "a type", and a value that writes none is "a
+ * value".
  */
 function nounOf(source: string, name: string, language: Language): string {
   const declaration = declaredShapes(source, language)?.get(name)?.find((one) => !one.soup);
@@ -631,6 +727,11 @@ function nounOf(source: string, name: string, language: Language): string {
     if (!child || child.startIndex >= nameNode.startIndex) break;
     if (!child.isNamed && /^[a-z]+$/.test(child.type)) keyword = child.type;
   }
-  if (!keyword) return "a type";
+  /*
+   * No word before the name: an enum variant, which is a type, or a value --
+   * a field, a Python local, `ctx = make_context()` -- which is not, and a
+   * sentence saying "a type is a plain value" helps nobody fix the arrow.
+   */
+  if (!keyword) return isValue(node, language) ? "a value" : "a type";
   return `${/^[aeiou]/.test(keyword) ? "an" : "a"} ${keyword}`;
 }

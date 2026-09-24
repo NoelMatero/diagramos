@@ -74,6 +74,10 @@ export function createClosedBodyReferee(root: string): ClosedBodyReferee | undef
       if (isOutsideTree(found.file, root)) return "outside";
       return { file: path.relative(root, found.file), line: found.line + 1 };
     },
+    kindAt: (file, at) => {
+      if (languageOf(file) === "python" || languageOf(file) === "rust") return undefined;
+      return ts.kindAt(path.resolve(root, file), at.start, at.end);
+    },
   };
 }
 
@@ -147,6 +151,12 @@ export function refereedCheck(
  * question the report can answer -- but "did a receiver stop the reading" is,
  * and it is the sharper question anyway.
  *
+ * The second reason is the other end of the same question (#343): an arrow
+ * every reader withheld on, whose end is a value the text cannot say is
+ * callable or a type -- `ctx = makeContext()` at the head of an `@calls`.
+ * `endsUnsettled` counts those on the pass with no compiler, and a compiler's
+ * answer is what turns one into a red or leaves it alone.
+ *
  * `@accesses` is not on this list although it takes `declarationAt` too. Its
  * own refusals name what the member list could not say (`no-members`,
  * `aliased`, `incomplete`), never a receiver -- there is no reason in its
@@ -155,8 +165,9 @@ export function refereedCheck(
  * the function to widen.
  */
 export function wouldHelp(report: DriftReport): boolean {
-  const { callsWithheld, callsNotClosed } = report.claims;
+  const { callsWithheld, callsNotClosed, endsUnsettled } = report.claims;
   return (callsNotClosed.receiver ?? 0) > 0
     || (callsNotClosed["abstract-receiver"] ?? 0) > 0
-    || (callsWithheld.receiver ?? 0) > 0;
+    || (callsWithheld.receiver ?? 0) > 0
+    || endsUnsettled > 0;
 }

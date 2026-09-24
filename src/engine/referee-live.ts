@@ -50,7 +50,7 @@ import type { ClosedBodyReferee, DriftReport } from "./drift";
 import { languageOf } from "./parse";
 import { refereeFor, wouldHelp } from "./referee";
 import {
-  refereePool, resolvePythonDefinitions, resolveRustDefinitions, type RefereePool,
+  refereePool, resolvePythonDefinitions, resolvePythonKinds, resolveRustDefinitions, type RefereePool,
 } from "./referee-pool";
 import type { PyrightLspReferee } from "./referee-python-lsp";
 import type { RustLspReferee } from "./referee-rust-lsp";
@@ -135,11 +135,20 @@ export interface LiveOptions {
  */
 export type LiveRefereePool = RefereePool<PyrightLspReferee & RustLspReferee>;
 
-/** What each language's two batch resolvers are called, behind one shape. */
+/**
+ * What each language's batch resolvers are called, behind one shape.
+ *
+ * `kinds` is the wrong-kind check's question (#343): what the value declared
+ * at a name is. Python's is pyright; Rust has none and is never asked, since
+ * `drift.ts` puts no Rust value to a compiler.
+ */
 type Resolvers = {
   receivers: (root: string, queries: Query[], pool: LiveRefereePool) => Promise<Resolved>;
   definitions: (root: string, queries: Query[], pool: LiveRefereePool) => Promise<Resolved>;
+  kinds?: (root: string, queries: Query[], pool: LiveRefereePool) => Promise<Resolved>;
 };
+type Kind = "receiver" | "definition" | "kind";
+const BATCHES = { receiver: "receivers", definition: "definitions", kind: "kinds" } as const;
 interface Query { file: string; at: { start: number; end: number } }
 interface Resolved {
   cache: { get(file: string, at: { start: number; end: number }): unknown };
@@ -157,6 +166,7 @@ const RESOLVERS: Record<LiveLanguage, Resolvers> = {
   python: {
     receivers: (root, queries, pool) => resolvePythonReceivers(root, queries, pool) as Promise<Resolved>,
     definitions: (root, queries, pool) => resolvePythonDefinitions(root, queries, pool) as Promise<Resolved>,
+    kinds: (root, queries, pool) => resolvePythonKinds(root, queries, pool) as Promise<Resolved>,
   },
   rust: {
     receivers: (root, queries, pool) => resolveRustReceivers(root, queries, undefined, pool) as Promise<Resolved>,
@@ -195,9 +205,10 @@ export async function refereedCheckLive(
   /** The in-process half. Unchanged, and free relative to anything below. */
   const ts = refereeFor(root);
 
-  const answers: Record<LiveLanguage, { receiver: Answer; definition: Answer }> = {
-    python: { receiver: () => undefined, definition: () => undefined },
-    rust: { receiver: () => undefined, definition: () => undefined },
+  const none: Answer = () => undefined;
+  const answers: Record<LiveLanguage, Record<Kind, Answer>> = {
+    python: { receiver: none, definition: none, kind: none },
+    rust: { receiver: none, definition: none, kind: none },
   };
   const answered = new Set<string>();
   const silent = new Set<string>();
@@ -205,11 +216,13 @@ export async function refereedCheckLive(
 
   try {
     for (let round = 0; round < ROUNDS; round += 1) {
-      const fresh: Record<LiveLanguage, { receivers: Query[]; definitions: Query[] }> = {
-        python: { receivers: [], definitions: [] },
-        rust: { receivers: [], definitions: [] },
+      const fresh: Record<LiveLanguage, Record<(typeof BATCHES)[Kind], Query[]>> = {
+        python: { receivers: [], definitions: [], kinds: [] },
+        rust: { receivers: [], definitions: [], kinds: [] },
       };
-      const asked = { receiver: new Set<string>(), definition: new Set<string>() };
+      const asked: Record<Kind, Set<string>> = {
+        receiver: new Set(), definition: new Set(), kind: new Set(),
+      };
 
       /*
        * The recording referee. TypeScript is answered for real even on this
@@ -219,23 +232,25 @@ export async function refereedCheckLive(
        * pass then asks.
        */
       const record = (
-        kind: "receiver" | "definition",
+        kind: Kind,
         real: ((file: string, at: { start: number; end: number }) => unknown) | undefined,
       ) => (file: string, at: { start: number; end: number }): never | undefined => {
         const language = languageOf(file);
         if (language !== "python" && language !== "rust") return real?.(file, at) as never;
+        if (!RESOLVERS[language][BATCHES[kind]]) return undefined;
         const known = answers[language][kind](file, at);
         if (known !== undefined) return known as never;
         const key = `${language}:${file}:${at.start}:${at.end}`;
         if (!asked[kind].has(key)) {
           asked[kind].add(key);
-          fresh[language][kind === "receiver" ? "receivers" : "definitions"].push({ file, at });
+          fresh[language][BATCHES[kind]].push({ file, at });
         }
         return undefined;
       };
       const recording: ClosedBodyReferee = {
         resolveReceiver: record("receiver", ts?.resolveReceiver.bind(ts)) as ClosedBodyReferee["resolveReceiver"],
         declarationAt: record("definition", ts?.declarationAt?.bind(ts)) as ClosedBodyReferee["declarationAt"],
+        kindAt: record("kind", ts?.kindAt?.bind(ts)) as ClosedBodyReferee["kindAt"],
       };
 
       try {
@@ -248,17 +263,17 @@ export async function refereedCheckLive(
 
       let asking = false;
       for (const language of LIVE_LANGUAGES) {
-        for (const kind of ["receivers", "definitions"] as const) {
-          const queries = fresh[language][kind];
-          if (queries.length === 0) continue;
+        for (const kind of Object.keys(BATCHES) as Kind[]) {
+          const queries = fresh[language][BATCHES[kind]];
+          const resolve = RESOLVERS[language][BATCHES[kind]];
+          if (queries.length === 0 || !resolve) continue;
           asking = true;
           if (Date.now() >= until) { silent.add(language); continue; }
-          const resolved = await RESOLVERS[language][kind](root, queries, pool);
+          const resolved = await resolve(root, queries, pool);
           closers.push(resolved.close);
           if (resolved.started) answered.add(language); else silent.add(language);
-          const previous = answers[language][kind === "receivers" ? "receiver" : "definition"];
-          answers[language][kind === "receivers" ? "receiver" : "definition"] =
-            (file, at) => previous(file, at) ?? resolved.cache.get(file, at);
+          const previous = answers[language][kind];
+          answers[language][kind] = (file, at) => previous(file, at) ?? resolved.cache.get(file, at);
         }
       }
       if (!asking) break;
@@ -282,6 +297,13 @@ export async function refereedCheckLive(
           return answers[language].definition(file, at) as never;
         }
         return ts?.declarationAt?.(file, at);
+      },
+      kindAt: (file, at) => {
+        const language = languageOf(file);
+        if (language === "python" || language === "rust") {
+          return answers[language].kind(file, at) as never;
+        }
+        return ts?.kindAt?.(file, at);
       },
     };
     if (ts) answered.add("typescript");

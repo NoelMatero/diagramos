@@ -697,6 +697,67 @@ Rust. Neither control would have caught the Rust `body` square, because both
 broke the reader and left the shared definition alone -- which is the case
 above.
 
+### When a compiler answers (#343)
+
+A value whose type the text cannot judge -- `ctx = make_context()`, `failure:
+TError | null` -- is put to the compiler a check already holds: the TypeScript
+checker in process, pyright over its pipe. It answers whether a value of that
+type can be called and whether the name is a type, and `parts.ts` takes that
+only where the text was unsure. No answer reads exactly as before.
+
+The referee could not be the same compilers asked the same way, so it
+**writes the call** -- `name()` after the declaration, in a copy of the file --
+and asks whether the program still type-checks: the TypeScript compiler's own
+diagnostics, mypy, and pyright's command line only where mypy reads `Any`
+(mypy does not infer an unannotated function's result). Every probe line also
+carries `0 + ''`, an error any checker reports wherever it reports anything; a
+line without it was not checked, and is not an answer.
+
+```
+npm run measure:parts -- /Users/noelmatero/board-ai/.corpus/<tree> --compiler
+```
+
+Run per tree over the ten TypeScript and Python repositories; Rust asks no
+compiler and was not re-run.
+
+| language | part | wrong lacks | unjudged | agreed lacks, before → after |
+|---|---|---:|---:|---|
+| python | callable | 0 | 249 | 7,613 → 18,502 |
+| python | type | 0 | 107 | 52,012 → 62,354 |
+| ts | callable | 0 | 101 | 8,014 → 25,071 |
+| ts | type | 0 | 19 | 25,744 → 38,774 |
+| tsx | callable | 0 | 21 | 1,709 → 4,878 |
+| js | callable | 0 | 0 | 560 |
+
+The compiler alone produced 10,890 Python, 17,057 TS, 3,169 TSX and 146 JS
+lacks of `callable`; 173 of them went unjudged and all 173 were read. They are
+index-signature keys, members of `.d.ts` files, a second binding in one
+comprehension, and names inside pydantic's `@no_type_check` metaclass -- every
+one a string, a number, a collection or an instance of a class with no
+`__call__`.
+
+The measurement was broken on purpose: made to believe every "cannot be
+called" the compilers said, callable or not, it reports wrong lacks in both
+languages on a four-file tree.
+
+**Five referee mistakes came out of the corpus before the number could be
+believed, and one reader mistake.** The referee heard nothing in a
+`// @ts-nocheck` file (56 false wrongs in excalidraw), missed every refusal
+under Flask's `pretty = true` (145), read `Unbound` in a TypedDict body and a
+`@no_type_check` routine as a call accepted (78), and could not place a call
+after a comprehension's binding or a member of an anonymous type (1,694
+unjudged in excalidraw alone). The reader mistake was pydantic's `cls_:
+ModelOrDc`: an alias for `Type[Union[...]]`, which pyright's hover prints by
+its name and `typeDefinition` resolves to the two classes -- so a class object,
+which is called to make one, read as an instance. A "cannot be called" now
+needs every class the type points at written in the type as shown.
+
+Two shapes are not judged at all, by design: an unannotated parameter
+(pyright reads `hook=None` as `None`; a caller passes the function) and an
+unannotated class attribute (`callback = None` is replaced by
+`self.callback = fn`). Both have to be written with an annotation to be
+answered.
+
 ### What #301's test set says
 
 `npm run bench:planted`, 855 planted and drawn mistakes and 428 true claims:
