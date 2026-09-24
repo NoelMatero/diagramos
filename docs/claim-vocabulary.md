@@ -4558,7 +4558,7 @@ duplicate from conflitcts, requires reading prs "An arrow can be three calls lon
     rust-analyzer placed every other call: `a + b` against `add`, a drop
     against `drop`, `?` against `from`, `map(double)` against `double`. The
     text reading of a Rust tail now asks the same two questions before it
-    accuses (`unwrittenRustCall`): a method of a trait from outside the
+    accuses (`calledImplicitly`, `handsOnHead`): a method of a trait from outside the
     repository withholds always, because the text cannot see the types of
     temporaries or a `Result<T>` alias's error type; a head named in the body
     and not called there withholds as `named`.
@@ -4601,8 +4601,26 @@ duplicate from conflitcts, requires reading prs "An arrow can be three calls lon
 
     **Not done.** Six correct Rust arrows the text could not settle -- four
     of them calls inside a macro -- are now `same-name` rather than confirmed: the list names a function, not where it
-    lives, and a name is not enough to go green on. TypeScript and Python may
-    have the `map(double)` shape too; it was not measured here.
+    lives, and a name is not enough to go green on. TypeScript and Python
+    had the `map(double)` shape too; #359 below.
+
+    **#359: the same shape in TypeScript and Python.** `xs.map(double)`,
+    `map(double, xs)`, `sorted(xs, key=double)`, `onClick={double}`, a
+    function put in an object or a field, or returned: every call the tail
+    wrote was placed, none reached the head's file, and a correct arrow went
+    red. `handsOnHead` now runs for every language before a closed body
+    accuses: any named leaf in the body spelt as one of the head's names that
+    its file declares as a routine -- or as an import alias of one -- at a
+    position no call site claims, withholds as `named`. One rule on the
+    tree's shape, no list of higher-order functions.
+
+    Its first version counted every head name, and the planted bench found
+    what that costs on the first run: `pointFrom -> GlobalPoint` (excalidraw)
+    lost its red because the body writes `as Point`, a type. Only a routine
+    can be handed on to run, and only a body is read -- an overload signature
+    has none. With both, `bench:planted` on 77858fa is unchanged in every
+    row: 565 of 808 mistakes called wrong, 0 of 453 true claims.
+    `tests/calls-passed-as-value.test.ts` has each shape per language.
 
 ## Open, in the order worth doing
 

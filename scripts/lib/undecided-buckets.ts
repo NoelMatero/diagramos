@@ -144,7 +144,7 @@ export const UNDECIDED_BUCKETS: Record<Labelled, BucketLabel> & Record<string, B
   "declined: not-closed same-name": { bucket: "never", cost: 1,
     why: "the Rust compiler's list has a call named what the head is named, and a name does not say whose function it is (#357)" },
   "declined: not-closed named": { bucket: "never", cost: 1,
-    why: "the tail hands the head on by name -- `map(double)` -- rather than calling it (#357)" },
+    why: "the tail hands the head on by name -- `map(double)`, `key=double`, `onClick={double}` -- rather than calling it (#357, #359)" },
   "declined: not-closed called-implicitly": { bucket: "never", cost: 1,
     why: "the head is a trait method on a type the tail handles, which an operator, `?`, formatting or a drop can run unwritten (#357)" },
   "unconfirmed: feeds-runs-the-other-way": { bucket: "never", cost: 1,
