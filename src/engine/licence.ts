@@ -1225,7 +1225,19 @@ export const LICENCES: readonly Licence[] = [
             "rustc types `Vec` and declares it nowhere, and every such answer " +
             "falls to the unchecked column -- the run records whether it was " +
             "(`hasStdSource`), so a thinner figure from a bare toolchain " +
-            "cannot read as a finding.",
+            "cannot read as a finding. **#357 adds a second reading under the " +
+            "same licence**: where the text cannot close a body -- a call " +
+            "inside a macro, above all -- rustc's own MIR (`--emit=mir`) is " +
+            "read instead (`compiled-calls.ts`). Its gate is " +
+            "`npm run measure:compiled-calls`: over every routine in the five " +
+            "pinned clones' library crates, every call rust-analyzer's call " +
+            "hierarchy lists into the repository is put to that reader, and " +
+            "the answer must never be 'never'. 2026-09-24: 6,057 calls from " +
+            "3,198 routines it could answer for, 0 'never'. rust-analyzer " +
+            "drops every call inside a macro, so that zero covers the calls it " +
+            "can see; the shapes neither tool helps with -- a trait call, an " +
+            "operator, `?`, a drop, a function handed on by name -- are " +
+            "`tests/calls-compiled-rust.test.ts`, one per shape.",
           known: [
             "rustc names the line inside a `macro_rules!` body where " +
               "rust-analyzer names the expansion site, so a type declared by a " +

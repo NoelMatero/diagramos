@@ -56,6 +56,7 @@ import { checkNeeds, type NeedsWithheld } from "./needs";
 import {
   type CallSide, type CallsNotClosed, type CallsWithheld, EXTERNAL_RECEIVER, type ReceiverResolution, callSitesIn, callsBetween,
 } from "./calls";
+import type { CompiledCrate } from "./compiled-calls";
 import { newReachCache, reachBetween, type ReachCache } from "./reach";
 import { constructions, routineNamesIn, type ConstructsNames, type ConstructsWithheld } from "./constructs";
 import { type AccessesWithheld, type NotReadEvidence, memberAccesses, memberNamed, membersReadAt, membersReadByName, readsMember } from "./accesses";
@@ -846,6 +847,10 @@ export const NOT_CLOSED_WORDS: Record<CallsNotClosed, string> = {
   unplaced: "one call could not be traced to any file",
   elsewhere: "one call leads through a re-export that runs out",
   macro: "one call comes out of a macro",
+  "same-name": "the compiler lists a call to something with that name, and does not say whose it is",
+  "called-implicitly": "the arrow's end is a trait method the language can run without it being written "
+    + "-- an operator, `?`, formatting, the end of a scope",
+  named: "the caller names that routine without calling it, so it may hand it to something that does",
 };
 
 export { lackingPhrase };
@@ -1215,6 +1220,15 @@ export interface ClaimTally {
    * measurement to run rather than a reader to fix.
    */
   callsNotClosed: SkipBreakdown<CallsNotClosed>;
+  /**
+   * `@calls` arrows with a Rust tail that ended without an answer -- withheld,
+   * or absent and not closed -- while no compiled crate was on hand (#357).
+   *
+   * Not a reason, a question for the caller: these are the arrows the Rust
+   * compiler's own call list could settle, and `referee-live.ts` builds a
+   * crate only when this is above zero.
+   */
+  callsCompilable: number;
   /**
    * Arrows asserting that the tail reads a named member off the head's type.
    *
@@ -2238,6 +2252,9 @@ function callSide(
       ...(closedBodyReferee ? { resolveReceiver: (at) => closedBodyReferee.resolveReceiver(target, at) } : {}),
       ...(declarationAt ? { declarationAt: (at) => declarationAt(target, at) } : {}),
       ...(overrides ? { overridden: (holder, member) => overrides.below(holder, member) } : {}),
+      ...(askDefinition && closedBodyReferee?.compiledCrateOf
+        ? { compiled: () => closedBodyReferee.compiledCrateOf!(target) }
+        : {}),
     };
   };
   return readSide(file);
@@ -2286,6 +2303,13 @@ export interface ClosedBodyReferee {
    * wherever the compiler cannot say -- which reads as no answer at all.
    */
   kindAt?(file: string, at: { start: number; end: number }): ValueKind | undefined;
+  /**
+   * The crate the Rust compiler built a file into (#357), for the tail of a
+   * `@calls` arrow whose text reading stopped short. `referee-live.ts`
+   * answers it from `referee-rustc.ts`'s builds; everything else leaves it
+   * out, and the text reading stands.
+   */
+  compiledCrateOf?(file: string): CompiledCrate | undefined;
 }
 
 /**
@@ -3065,7 +3089,7 @@ export function checkDrift(
     accesses: 0, accessesConfirmed: 0, accessesWithheld: {},
     conforms: 0, conformsConfirmed: 0, conformsWithheld: {},
     builds: 0, buildsConfirmed: 0, buildsWithheld: {},
-    calls: 0, callsConfirmed: 0, callsWithheld: {}, callsNotClosed: {},
+    calls: 0, callsConfirmed: 0, callsWithheld: {}, callsNotClosed: {}, callsCompilable: 0,
     feeds: 0, feedsConfirmed: 0, feedsWithheld: {},
     plannedWithheld: {},
     endsUnsettled: 0,
@@ -4939,6 +4963,12 @@ export function checkDrift(
               { ...tail, routine: fromEnd.symbols[0]! },
               { ...head, names: toEnd.symbols },
             );
+            if (
+              claimed && tail.language === "rust" && !tail.compiled?.()
+              && (verdict.verdict === "withheld" || (verdict.verdict === "absent" && verdict.notClosed))
+            ) {
+              claims.callsCompilable += 1;
+            }
 
             /*
              * The chain an accusation has to rule out before it may be made.
