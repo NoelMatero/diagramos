@@ -67,8 +67,8 @@
       "toLabel": "set_model_fields (assigns to class)",
       "language": "python",
       "source": "drawn",
-      "truth": "false",
-      "why": "the from end is a type, and only something that runs can call"
+      "truth": "true",
+      "why": "its routine __new__ calls it"
     },
     {
       "id": "calls|pydantic/_internal/_model_construction.py#set_model_fields|pydantic/_internal/_fields.py#collect_model_fields|",
@@ -182,7 +182,7 @@
       "language": "python",
       "source": "drawn",
       "truth": "false",
-      "why": "the from end is a type, and only something that runs can call"
+      "why": "every routine of the type was read and none calls it"
     },
     {
       "id": "needs|pydantic/_internal/_model_construction.py#ModelMetaclass|pydantic/_internal/_generate_schema.py#GenerateSchema|",

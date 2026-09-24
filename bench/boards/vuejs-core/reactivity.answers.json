@@ -79,8 +79,8 @@
       "toLabel": "track()",
       "language": "ts",
       "source": "drawn",
-      "truth": "false",
-      "why": "the from end is a type, and only something that runs can call"
+      "truth": "undecidable",
+      "why": "the ref could mean more than one declaration, and they differ"
     },
     {
       "id": "needs|packages/reactivity/src/baseHandlers.ts#BaseReactiveHandler|packages/reactivity/src/dep.ts#track|",
@@ -219,8 +219,8 @@
       "language": "ts",
       "source": "swap",
       "parent": "builds|packages/reactivity/src/dep.ts#Dep|packages/reactivity/src/dep.ts#Link|",
-      "truth": "false",
-      "why": "the from end is a type, and only something that runs can call"
+      "truth": "true",
+      "why": "its routine track calls it"
     },
     {
       "id": "builds|packages/reactivity/src/dep.ts#Link|packages/reactivity/src/dep.ts#Dep|",
@@ -334,8 +334,8 @@
       "toLabel": "trigger()",
       "language": "ts",
       "source": "drawn",
-      "truth": "false",
-      "why": "the from end is a type, and only something that runs can call"
+      "truth": "undecidable",
+      "why": "the ref could mean more than one declaration, and they differ"
     },
     {
       "id": "needs|packages/reactivity/src/baseHandlers.ts#MutableReactiveHandler|packages/reactivity/src/dep.ts#trigger|",
@@ -612,8 +612,8 @@
       "language": "ts",
       "source": "swap",
       "parent": "builds|packages/reactivity/src/computed.ts#ComputedRefImpl|packages/reactivity/src/dep.ts#Dep|",
-      "truth": "false",
-      "why": "the from end is a type, and only something that runs can call"
+      "truth": "true",
+      "why": "its routine constructor calls it"
     },
     {
       "id": "builds|packages/reactivity/src/dep.ts#Dep|packages/reactivity/src/computed.ts#ComputedRefImpl|",

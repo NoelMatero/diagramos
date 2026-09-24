@@ -105,8 +105,8 @@
       "toLabel": "subscribe()",
       "language": "ts",
       "source": "drawn",
-      "truth": "false",
-      "why": "the from end is a type, and only something that runs can call"
+      "truth": "true",
+      "why": "its routine fetchOptimistic calls it"
     },
     {
       "id": "needs|packages/query-core/src/queryObserver.ts#QueryObserver|packages/query-core/src/subscribable.ts#subscribe|",
@@ -180,8 +180,8 @@
       "toLabel": "addObserver()",
       "language": "ts",
       "source": "drawn",
-      "truth": "false",
-      "why": "the from end is a type, and only something that runs can call"
+      "truth": "undecidable",
+      "why": "its routine get: the tool would not walk this routine's calls"
     },
     {
       "id": "needs|packages/query-core/src/queryObserver.ts#QueryObserver|packages/query-core/src/query.ts#Query|",
@@ -294,8 +294,8 @@
       "toLabel": "executeFetch()",
       "language": "ts",
       "source": "drawn",
-      "truth": "false",
-      "why": "the from end is a type, and only something that runs can call"
+      "truth": "undecidable",
+      "why": "its routine get: the tool would not walk this routine's calls"
     },
     {
       "id": "calls|packages/query-core/src/queryObserver.ts#QueryObserver|packages/query-core/src/queryCache.ts#QueryCache|",
@@ -306,8 +306,8 @@
       "toLabel": "build()",
       "language": "ts",
       "source": "drawn",
-      "truth": "false",
-      "why": "the from end is a type, and only something that runs can call"
+      "truth": "undecidable",
+      "why": "its routine get: the tool would not walk this routine's calls"
     },
     {
       "id": "builds|packages/query-core/src/queryCache.ts#QueryCache|packages/query-core/src/query.ts#Query|",
@@ -343,8 +343,8 @@
       "language": "ts",
       "source": "swap",
       "parent": "builds|packages/query-core/src/queryCache.ts#QueryCache|packages/query-core/src/query.ts#Query|",
-      "truth": "false",
-      "why": "the from end is a type, and only something that runs can call"
+      "truth": "true",
+      "why": "its routine build calls it"
     },
     {
       "id": "builds|packages/query-core/src/query.ts#Query|packages/query-core/src/queryCache.ts#QueryCache|",

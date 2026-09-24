@@ -280,8 +280,8 @@
       "language": "python",
       "source": "reverse",
       "parent": "calls|django/urls/resolvers.py#resolve|django/urls/resolvers.py#ResolverMatch|",
-      "truth": "false",
-      "why": "the from end is a type, and only something that runs can call"
+      "truth": "undecidable",
+      "why": "its routine __getitem__: the tool would not walk this routine's calls"
     },
     {
       "id": "calls|django/urls/resolvers.py#_reverse_with_prefix|django/urls/resolvers.py#ResolverMatch|",

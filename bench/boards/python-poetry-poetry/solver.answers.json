@@ -658,8 +658,8 @@
       "language": "python",
       "source": "reverse",
       "parent": "calls|src/poetry/mixology/version_solver.py#_resolve_conflict|src/poetry/mixology/incompatibility.py#Incompatibility|",
-      "truth": "false",
-      "why": "the from end is a type, and only something that runs can call"
+      "truth": "undecidable",
+      "why": "its routine _single_term_where: the tool would not walk this routine's calls"
     },
     {
       "id": "calls|src/poetry/mixology/version_solver.py#_resolve_conflict|src/poetry/mixology/incompatibility.py#terms|",

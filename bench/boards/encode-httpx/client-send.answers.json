@@ -246,7 +246,7 @@
       "source": "reverse",
       "parent": "calls|httpx/_client.py#_build_request_auth|httpx/_auth.py#Auth|",
       "truth": "false",
-      "why": "the from end is a type, and only something that runs can call"
+      "why": "every routine of the type was read and none calls it"
     },
     {
       "id": "calls|httpx/_client.py#_enforce_trailing_slash|httpx/_auth.py#Auth|",
@@ -658,7 +658,7 @@
       "source": "reverse",
       "parent": "calls|httpx/_client.py#_build_redirect_request|httpx/_models.py#Request|",
       "truth": "false",
-      "why": "the from end is a type, and only something that runs can call"
+      "why": "every routine of the type was read and none calls it"
     },
     {
       "id": "calls|httpx/_client.py#_build_redirect_request|httpx/_models.py#iter_text|",

@@ -16,8 +16,8 @@
       "toLabel": "RouterExplorer",
       "language": "ts",
       "source": "drawn",
-      "truth": "false",
-      "why": "the from end is a type, and only something that runs can call"
+      "truth": "true",
+      "why": "its routine constructor calls it"
     },
     {
       "id": "needs|packages/core/router/routes-resolver.ts#RoutesResolver|packages/core/router/router-explorer.ts#RouterExplorer|",
@@ -181,8 +181,8 @@
       "toLabel": "PathsExplorer",
       "language": "ts",
       "source": "drawn",
-      "truth": "false",
-      "why": "the from end is a type, and only something that runs can call"
+      "truth": "true",
+      "why": "its routine constructor calls it"
     },
     {
       "id": "needs|packages/core/router/router-explorer.ts#RouterExplorer|packages/core/router/paths-explorer.ts#PathsExplorer|",
@@ -358,8 +358,8 @@
       "toLabel": "RoutePathFactory",
       "language": "ts",
       "source": "drawn",
-      "truth": "false",
-      "why": "the from end is a type, and only something that runs can call"
+      "truth": "undecidable",
+      "why": "its routine hostRegExps: the tool would not walk this routine's calls"
     },
     {
       "id": "needs|packages/core/router/router-explorer.ts#RouterExplorer|packages/core/router/route-path-factory.ts#RoutePathFactory|",
@@ -459,8 +459,8 @@
       "toLabel": "RouterProxy",
       "language": "ts",
       "source": "drawn",
-      "truth": "false",
-      "why": "the from end is a type, and only something that runs can call"
+      "truth": "undecidable",
+      "why": "its routine hostRegExps: the tool would not walk this routine's calls"
     },
     {
       "id": "needs|packages/core/router/router-explorer.ts#RouterExplorer|packages/core/router/router-proxy.ts#RouterProxy|",
@@ -573,8 +573,8 @@
       "toLabel": "RouterExecutionContext",
       "language": "ts",
       "source": "drawn",
-      "truth": "false",
-      "why": "the from end is a type, and only something that runs can call"
+      "truth": "true",
+      "why": "its routine constructor calls it"
     },
     {
       "id": "needs|packages/core/router/router-explorer.ts#RouterExplorer|packages/core/router/router-execution-context.ts#RouterExecutionContext|",

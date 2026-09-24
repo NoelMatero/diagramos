@@ -181,8 +181,8 @@
       "toLabel": "parse_number()",
       "language": "rust",
       "source": "drawn",
-      "truth": "false",
-      "why": "the from end is a type, and only something that runs can call"
+      "truth": "true",
+      "why": "its routine parse_integer calls it"
     },
     {
       "id": "calls|src/de.rs#parse_number|src/de.rs#parse_decimal|",

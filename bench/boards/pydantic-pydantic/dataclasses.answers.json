@@ -347,8 +347,8 @@
       "language": "python",
       "source": "reverse",
       "parent": "calls|pydantic/_internal/_dataclasses.py#complete_dataclass|pydantic/_internal/_generate_schema.py#GenerateSchema|",
-      "truth": "false",
-      "why": "the from end is a type, and only something that runs can call"
+      "truth": "undecidable",
+      "why": "its routine _add_js_function: the tool would not walk this routine's calls"
     },
     {
       "id": "calls|pydantic/_internal/_dataclasses.py#PydanticDataclass|pydantic/_internal/_generate_schema.py#GenerateSchema|",
@@ -361,7 +361,7 @@
       "source": "retarget",
       "parent": "calls|pydantic/_internal/_dataclasses.py#complete_dataclass|pydantic/_internal/_generate_schema.py#GenerateSchema|",
       "truth": "false",
-      "why": "the from end is a type, and only something that runs can call"
+      "why": "every routine of the type was read and none calls it"
     },
     {
       "id": "calls|pydantic/_internal/_dataclasses.py#complete_dataclass|pydantic/_internal/_generate_schema.py#choices_with_tags|",

@@ -142,8 +142,8 @@
       "language": "ts",
       "source": "reverse",
       "parent": "calls|packages/query-core/src/mutationCache.ts#build|packages/query-core/src/mutation.ts#Mutation|",
-      "truth": "false",
-      "why": "the from end is a type, and only something that runs can call"
+      "truth": "undecidable",
+      "why": "its routine fn: the tool would not walk this routine's calls"
     },
     {
       "id": "calls|packages/query-core/src/mutationCache.ts#NotifyEventMutationObserverAdded|packages/query-core/src/mutation.ts#Mutation|",
@@ -155,8 +155,8 @@
       "language": "ts",
       "source": "retarget",
       "parent": "calls|packages/query-core/src/mutationCache.ts#build|packages/query-core/src/mutation.ts#Mutation|",
-      "truth": "false",
-      "why": "the from end is a type, and only something that runs can call"
+      "truth": "undecidable",
+      "why": "the name appears without being called (passed as a value, or a path)"
     },
     {
       "id": "calls|packages/query-core/src/mutationCache.ts#build|packages/query-core/src/mutation.ts#type|",
@@ -270,7 +270,7 @@
       "source": "retarget",
       "parent": "calls|packages/query-core/src/mutation.ts#execute|packages/query-core/src/mutation.ts#dispatch|",
       "truth": "false",
-      "why": "the from end is a type, and only something that runs can call"
+      "why": "the type has no routine, and nothing in it calls it"
     },
     {
       "id": "calls|packages/query-core/src/mutation.ts#execute|packages/query-core/src/mutation.ts#failureReason|",

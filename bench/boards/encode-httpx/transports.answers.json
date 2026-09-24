@@ -157,8 +157,8 @@
       "toLabel": "map_httpcore_exceptions",
       "language": "python",
       "source": "drawn",
-      "truth": "false",
-      "why": "the from end is a type, and only something that runs can call"
+      "truth": "true",
+      "why": "its routine __exit__ calls it"
     },
     {
       "id": "returns|httpx/_models.py#Response|httpx/_transports/base.py#BaseTransport|",

@@ -207,8 +207,8 @@
       "toLabel": "register",
       "language": "python",
       "source": "drawn",
-      "truth": "false",
-      "why": "the from end is a type, and only something that runs can call"
+      "truth": "undecidable",
+      "why": "its routine __init__: the name appears without being called (passed as a value, or a path)"
     },
     {
       "id": "needs|src/flask/sansio/app.py#App|src/flask/sansio/blueprints.py#Blueprint|",
@@ -321,8 +321,8 @@
       "language": "python",
       "source": "swap",
       "parent": "builds|src/flask/sansio/blueprints.py#Blueprint|src/flask/sansio/blueprints.py#BlueprintSetupState|",
-      "truth": "false",
-      "why": "the from end is a type, and only something that runs can call"
+      "truth": "true",
+      "why": "its routine make_setup_state calls it"
     },
     {
       "id": "builds|src/flask/sansio/blueprints.py#BlueprintSetupState|src/flask/sansio/blueprints.py#Blueprint|",
@@ -525,7 +525,7 @@
       "language": "python",
       "source": "drawn",
       "truth": "false",
-      "why": "the from end is a type, and only something that runs can call"
+      "why": "every routine of the type was read and none calls it"
     },
     {
       "id": "accesses|src/flask/sansio/app.py#App|src/flask/sansio/app.py#App|adds",
