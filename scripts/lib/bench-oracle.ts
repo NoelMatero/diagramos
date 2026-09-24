@@ -287,9 +287,14 @@ export function createOracle(tooling: Tooling): Oracle {
    * Every place `to`'s name is written in a region, resolved: called there, or
    * a doubt about whether it could be. `skip` is the parts of the region some
    * other reading has already answered for.
+   *
+   * `decorators` counts a bare `@name` (or `@module.name`) opening a line as a
+   * call, which it is: the name is called with what it decorates. Only a
+   * type's own scan asks for it -- a routine at the tail keeps the reading its
+   * stored key was made with.
    */
   async function scanForCall(
-    file: string, region: Span, skip: Span[], to: Sym,
+    file: string, region: Span, skip: Span[], to: Sym, decorators = false,
   ): Promise<{ called: boolean; doubt?: string }> {
     const blank = blankOf(language, sourceOf(file));
     let doubt: string | undefined;
@@ -297,7 +302,9 @@ export function createOracle(tooling: Tooling): Oracle {
       const at = region.start + m.index!;
       if (skip.some((s) => s.start <= at && at < s.end)) continue;
       const after = blank.slice(at + to.name.length, at + to.name.length + 40);
-      const calling = /^\s*(::<[^>]*>)?\s*\(/.test(after);
+      const decorating = decorators && !/^\s*\./.test(after)
+        && /(^|\n)[ \t]*@\s*(?:[A-Za-z_$][\w$]*\s*\.\s*)*$/.test(blank.slice(Math.max(0, at - 200), at));
+      const calling = decorating || /^\s*(::<[^>]*>)?\s*\(/.test(after);
       const found = await resolve(file, at);
       if (found.kind === "sym" && found.sym.file === to.file && found.sym.nameStart === to.nameStart) {
         if (calling) return { called: true };
@@ -331,8 +338,16 @@ export function createOracle(tooling: Tooling): Oracle {
       if (answer.truth === "undecidable") doubt ??= `its routine ${routine.name}: ${answer.why}`;
     }
     for (const region of own.regions) {
-      const skip = own.routines.filter((r) => r.file === region.file).map((r) => ({ start: r.start, end: r.end }));
-      const scan = await scanForCall(region.file, region, skip, to);
+      /*
+       * Each routine was read above from its name on -- a default argument's
+       * call is in the tool's own call list -- but a decorator sits before the
+       * name and runs when the type is made, so that part is left for this
+       * scan. Not the name or the signature: the routine's own name reads as
+       * a call to itself, and a parameter's type names the far end without
+       * running anything.
+       */
+      const skip = own.routines.filter((r) => r.file === region.file).map((r) => ({ start: r.nameStart, end: r.end }));
+      const scan = await scanForCall(region.file, region, skip, to, true);
       if (scan.called) return { truth: "true", why: "code inside the type calls it" };
       doubt ??= scan.doubt;
     }

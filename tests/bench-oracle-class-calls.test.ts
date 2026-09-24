@@ -57,9 +57,11 @@ describe("TypeScript: a class calls what one of its routines calls", () => {
   const judge = oracleOver("ts", {
     "tsconfig.json": JSON.stringify({ compilerOptions: { strict: true, target: "ES2022", module: "ESNext" } }),
     "report.ts": "export function report(message: string): void { console.log(message); }\n"
-      + "export function build(): number { return 1; }\n",
+      + "export function build(): number { return 1; }\n"
+      + "export function mark(value: unknown, context: unknown): void {}\n"
+      + "export function fallback(): number { return 0; }\n",
     "installer.ts": [
-      'import { report, build } from "./report";',
+      'import { report, build, mark, fallback } from "./report";',
       "export class Installer {",
       "  install(): void { report(\"installing\"); }",
       "}",
@@ -75,6 +77,16 @@ describe("TypeScript: a class calls what one of its routines calls", () => {
       "export class Child extends Base {",
       "  tidy(): number { return 2; }",
       "}",
+      "export class Decorated {",
+      "  @mark",
+      "  tidy(): number { return 1; }",
+      "}",
+      "export class Defaulted {",
+      "  tidy(x = fallback()): number { return x; }",
+      "}",
+      "export class Lonely {",
+      "  solo(): number { return 1; }",
+      "}",
       "",
     ].join("\n"),
   });
@@ -87,6 +99,22 @@ describe("TypeScript: a class calls what one of its routines calls", () => {
   it("is true when a field's initialiser calls it", async () => {
     expect(await judge("installer.ts#Holder", "report.ts#build"))
       .toEqual({ truth: "true", why: "code inside the type calls it" });
+  }, LIVE_TIMEOUT_MS);
+
+  /*
+   * A decorator and a default argument run code, and neither is inside the
+   * method's body -- the part a routine's own reading starts at.
+   */
+  it("is true when a decorator on a method calls it", async () => {
+    expect((await judge("installer.ts#Decorated", "report.ts#mark")).truth).toBe("true");
+  }, LIVE_TIMEOUT_MS);
+
+  it("is true when a default argument calls it", async () => {
+    expect((await judge("installer.ts#Defaulted", "report.ts#fallback")).truth).toBe("true");
+  }, LIVE_TIMEOUT_MS);
+
+  it("does not read a method's own declaration as a call to it", async () => {
+    expect((await judge("installer.ts#Lonely", "installer.ts#solo")).truth).toBe("false");
   }, LIVE_TIMEOUT_MS);
 
   it("stays false when every method was read and none calls it", async () => {
@@ -103,9 +131,10 @@ describe("TypeScript: a class calls what one of its routines calls", () => {
 
 describe("Python: a class calls what one of its routines calls", () => {
   const judge = oracleOver("python", {
-    "report.py": "def report(message: str) -> None:\n    print(message)\n\n\ndef build() -> int:\n    return 1\n",
+    "report.py": "def report(message: str) -> None:\n    print(message)\n\n\ndef build() -> int:\n    return 1\n"
+      + "\n\ndef mark(fn):\n    return fn\n\n\ndef fallback() -> int:\n    return 0\n",
     "installer.py": [
-      "from report import report, build",
+      "from report import report, build, mark, fallback",
       "",
       "",
       "class Installer:",
@@ -131,6 +160,22 @@ describe("Python: a class calls what one of its routines calls", () => {
       "    def tidy(self) -> int:",
       "        return 2",
       "",
+      "",
+      "class Decorated:",
+      "    @mark",
+      "    def tidy(self) -> int:",
+      "        return 1",
+      "",
+      "",
+      "class Defaulted:",
+      "    def tidy(self, x: int = fallback()) -> int:",
+      "        return x",
+      "",
+      "",
+      "class Lonely:",
+      "    def solo(self) -> int:",
+      "        return 1",
+      "",
     ].join("\n"),
   });
 
@@ -142,6 +187,18 @@ describe("Python: a class calls what one of its routines calls", () => {
   it("is true when the class body calls it", async () => {
     expect(await judge("installer.py#Holder", "report.py#build"))
       .toEqual({ truth: "true", why: "code inside the type calls it" });
+  }, LIVE_TIMEOUT_MS);
+
+  it("is true when a decorator on a method calls it", async () => {
+    expect((await judge("installer.py#Decorated", "report.py#mark")).truth).toBe("true");
+  }, LIVE_TIMEOUT_MS);
+
+  it("is true when a default argument calls it", async () => {
+    expect((await judge("installer.py#Defaulted", "report.py#fallback")).truth).toBe("true");
+  }, LIVE_TIMEOUT_MS);
+
+  it("does not read a method's own declaration as a call to it", async () => {
+    expect((await judge("installer.py#Lonely", "installer.py#solo")).truth).toBe("false");
   }, LIVE_TIMEOUT_MS);
 
   it("stays false when every method was read and none calls it", async () => {
