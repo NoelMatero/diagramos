@@ -33,6 +33,8 @@
 import { existsSync, readdirSync, readFileSync, statSync } from "node:fs";
 import path from "node:path";
 
+import { routineDeclaredOn } from "./calls";
+import { each, parseSource } from "./parse";
 import { refereePool, type RefereePool } from "./referee-pool";
 import {
   createRustAnalyzerReferee, declaredTypeOnLine, isOutsideRustTree, rustTypeAnchorFor,
@@ -59,6 +61,44 @@ export function isConcreteRustDeclaration(
   kind: NonNullable<ReturnType<typeof declaredTypeOnLine>>["kind"],
 ): boolean {
   return kind === "struct" || kind === "enum" || kind === "union";
+}
+
+/**
+ * Whether the call "go to definition" landed on at `line` runs there (#351).
+ *
+ * A free function does. A method does when the block holding it is an `impl`
+ * -- inherent or `impl Trait for X`, either way the body of one type -- which
+ * the grammar says by giving the block a `type` field. A trait's block has a
+ * name and no `type`: its default method is what runs only for an
+ * implementation that does not override it, `isConcreteRustDeclaration`'s
+ * hazard at the method rather than at the receiver. Anything else holding a
+ * function withholds.
+ *
+ * A line with no function on it at all is data being made: an enum variant
+ * or a tuple struct written as a call, or a `#[derive]` whose generated
+ * `impl` rust-analyzer points back at. Nothing of this repository's own runs
+ * there but that one type's code, so it stands. A line declaring a function
+ * with no body -- a trait's required method -- is the one thing that does not.
+ */
+export function rustDefinitionRunsThere(source: string, line: number): boolean {
+  const landed = routineDeclaredOn(source, "rust", line);
+  if (!landed) return !signatureOn(source, line);
+  if (!landed.holder) return true;
+  return landed.holder.childForFieldName("type") !== null;
+}
+
+/** Whether a function is declared on `line` with parameters and no body. */
+function signatureOn(source: string, line: number): boolean {
+  const tree = parseSource(source, "rust");
+  if (!tree) return true;
+  let found = false;
+  each(tree.rootNode, (node) => {
+    if (found) return;
+    const name = node.childForFieldName("name");
+    if (!name || !node.childForFieldName("parameters")) return;
+    if (source.slice(0, name.startIndex).split("\n").length === line) found = true;
+  });
+  return found;
 }
 
 /**

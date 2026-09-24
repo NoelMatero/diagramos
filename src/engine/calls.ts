@@ -378,6 +378,23 @@ export interface CallSide {
    * check (#233) is the first live caller that does, through `callSitesIn`.
    */
   resolveReceiver?: (at: { start: number; end: number }) => ReceiverResolution | undefined;
+  /**
+   * "Go to definition" at a call's own name (#351): where the function called
+   * there is declared, `"outside"` when that is not in the repository.
+   *
+   * When a caller hands this in, it replaces `resolveReceiver` as the question
+   * a `receiver` dead end is put to. `resolveReceiver` asks what the value on
+   * the left of the dot is and then maps that type back to a file itself, and
+   * each of those two steps can drop the answer -- a chain, a closure's
+   * parameter, `self.field.method()` -- while `Type::make()` has no value on
+   * the left to ask about at all. This asks the question the placement is
+   * actually for, at the one position every language server answers it.
+   *
+   * Only `drift.ts`'s `@calls` closed-body check passes it. The walk across
+   * files (`reach.ts`) and `@accesses` ask the same question through their own
+   * options and are unchanged.
+   */
+  declarationAt?: (at: { start: number; end: number }) => { file: string; line: number; concrete?: boolean } | "outside" | undefined;
 }
 
 /** What `resolveReceiver` may answer with. See `CallSide.resolveReceiver`'s doc. */
@@ -1865,6 +1882,81 @@ function placeThroughChecker(
 }
 
 /**
+ * Where a checker's "go to definition" at the call's own name puts it (#351),
+ * or `undefined` when that says nothing a verdict may rest on.
+ *
+ * Outside the repository settles the site. Inside it, the answer is a file
+ * and a line, placed there with the checker's own word on whether the call
+ * runs there (`concrete`) -- each language's rule, applied where the
+ * definition is read (`referee-ts.ts`, `referee-python.ts`,
+ * `referee-rust.ts`). Nobody saying counts as `false`, so the closed-body
+ * check withholds rather than accuses on it.
+ *
+ * The name it rests under is the routine declared on that line, when one is;
+ * the near-miss verdict names it (#329), and a line holding no routine names
+ * nothing.
+ */
+function placeThroughDefinition(
+  memberAt: { start: number; end: number },
+  side: CallSide,
+): Placement | undefined {
+  const found = side.declarationAt?.(memberAt);
+  if (!found) return undefined;
+  if (found === "outside") return { file: EXTERNAL_RECEIVER };
+  const there = found.file === side.file ? side : side.open?.(found.file);
+  const landed = there ? routineDeclaredOn(there.source, there.language, found.line) : undefined;
+  return {
+    file: found.file,
+    concrete: found.concrete ?? false,
+    ...(landed ? { as: landed.name } : {}),
+  };
+}
+
+/**
+ * The routine with a body whose name is written on `line` (1-based), by the
+ * same test `callSitesIn` finds bodies with -- a name, parameters, a body --
+ * and the declaration holding it, if any (#351).
+ *
+ * The name's line, because that is the line every checker here reports a
+ * definition at; the line a declaration *opens* on can be a decorator's.
+ *
+ * `holder` is the nearest enclosing node that is itself a declaration -- one
+ * with a `name` or a `type` field, the class, `impl` or trait around a method
+ * -- and `undefined` for a routine at the top of its file. What a holder
+ * means for where a call runs is each language's own rule, which is why this
+ * returns the node rather than a verdict.
+ */
+export function routineDeclaredOn(
+  source: string,
+  language: Language,
+  line: number,
+): { name: string; node: Node; holder?: Node } | undefined {
+  const tree = parseSource(source, language);
+  if (!tree) return undefined;
+  const isDeclaration = (node: Node) => Boolean(node.childForFieldName("name") ?? node.childForFieldName("type"));
+  const visit = (node: Node, holder: Node | undefined): { name: string; node: Node; holder?: Node } | undefined => {
+    const name = node.childForFieldName("name") ?? node.childForFieldName("left");
+    const value = node.childForFieldName("value");
+    if (
+      name && name.childCount === 0
+      && (node.childForFieldName("parameters") ?? value?.childForFieldName("parameters"))
+      && (node.childForFieldName("body") ?? value?.childForFieldName("body"))
+      && lineOf(source, name.startIndex) === line
+    ) {
+      return { name: name.text, node, ...(holder ? { holder } : {}) };
+    }
+    const inside = isDeclaration(node) ? node : holder;
+    for (let index = 0; index < node.childCount; index += 1) {
+      const child = node.child(index);
+      const found = child ? visit(child, inside) : undefined;
+      if (found) return found;
+    }
+    return undefined;
+  };
+  return visit(tree.rootNode, undefined);
+}
+
+/**
  * Where one call site's callee lives, or why the reader cannot say.
  *
  * The target-free twin of `resolves`, and every branch below is the same branch
@@ -1906,6 +1998,17 @@ function placeOf(
    * different question, so it is replaced rather than passed on (#329).
    */
   const throughChecker = (): { why: SiteUnresolved } | Placement => {
+    /*
+     * "Go to definition" instead of the receiver's type where the caller
+     * offers it (#351), and no second question when it has no answer. The
+     * receiver's answer is the one that placed `strat.search()` on an
+     * `Arc<dyn Strategy>` outside the repository, because `Arc` is; asked as
+     * a fallback on the bench it placed nothing the definition had not, and
+     * doubled what the first pass asks a language server.
+     */
+    if (side.declarationAt && callee.kind === "through") {
+      return placeThroughDefinition(callee.memberAt, side) ?? { why: "receiver" };
+    }
     const placed = placeThroughChecker(at, side, bindings);
     if (!placed) return { why: "receiver" };
     return "file" in placed ? { ...placed, as: callee.name } : placed;

@@ -307,6 +307,12 @@ export interface PyrightLspReferee {
    * A caller that skips this still gets correct answers, just at
    * `WARMUP_RETRY_MS` cost on however many of its first queries land before
    * the binder catches up on its own.
+   *
+   * Once a sweep has had a real answer the binder has run, and every later
+   * call returns at once (#351). A server held in a pool is warmed by each
+   * batch of questions put to it, and a batch whose own positions all happen
+   * to be unanswerable -- `sink.send()` on an untyped parameter -- used to pay
+   * the whole ladder again on a server that was already bound.
    */
   warmUp(candidates: readonly WarmUpCandidate[]): Promise<void>;
   /**
@@ -397,6 +403,8 @@ export async function createPyrightLspReferee(root: string): Promise<PyrightLspR
   const pending = new Map<number, PendingRequest>();
   let nextId = 1;
   let closed = false;
+  /** Whether a warm-up sweep has had a real answer, so the binder has run. */
+  let bound = false;
 
   child.on("error", (error) => {
     for (const { reject } of pending.values()) reject(error);
@@ -702,11 +710,14 @@ export async function createPyrightLspReferee(root: string): Promise<PyrightLspR
      * The ladder lives in `warmUpAcross`, between sweeps, where a sleep buys
      * the binder time rather than re-asking a position that has no answer.
      */
-    warmUp: (candidates) => warmUpAcross(
-      candidates.slice(0, WARM_UP_CANDIDATES),
-      async (one) => (await askLocation("typeDefinition", one.file, one.source, one.start, [])) !== undefined,
-      WARMUP_RETRY_MS,
-    ).then(() => {}),
+    warmUp: async (candidates) => {
+      if (bound) return;
+      bound = await warmUpAcross(
+        candidates.slice(0, WARM_UP_CANDIDATES),
+        async (one) => (await askLocation("typeDefinition", one.file, one.source, one.start, [])) !== undefined,
+        WARMUP_RETRY_MS,
+      );
+    },
     withheldNoType: () => withheldNoType,
     documentSymbols: async (file) => {
       for (const wait of [0, ...STEADY_RETRY_MS]) {

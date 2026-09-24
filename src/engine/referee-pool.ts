@@ -40,13 +40,14 @@ import { readFileSync } from "node:fs";
 import path from "node:path";
 
 import { createPyrightLspReferee, WARM_UP_CANDIDATES } from "./referee-python-lsp";
-import { cargoRootsIn } from "./referee-rust";
+import { pythonDefinitionRunsThere } from "./referee-python";
+import { cargoRootsIn, rustDefinitionRunsThere } from "./referee-rust";
 import { createRustAnalyzerReferee, isOutsideRustTree, type RustLspReferee } from "./referee-rust-lsp";
 import { isOutsideTree } from "./referee-ts";
 import type { ValueKind } from "./parts";
 
 /** Structurally `ClosedBodyReferee.declarationAt`'s answer, not imported -- the engine holds no dependency on anything under `scripts/lib`. */
-export type DefinitionAnswer = { file: string; line: number } | "outside";
+export type DefinitionAnswer = { file: string; line: number; concrete?: boolean } | "outside";
 
 export interface DefinitionQuery {
   /** Repo-relative, matching `CallSide.file`. */
@@ -69,6 +70,23 @@ const queryKey = (file: string, at: { start: number; end: number }): string =>
   `${file}:${at.start}:${at.end}`;
 
 const EMPTY: DefinitionAnswers = { cache: { get: () => undefined }, close: () => {}, started: false };
+
+/**
+ * Whether a definition's own language says a call landing there runs there
+ * (#351). A file that cannot be read is not one a verdict may rest on.
+ */
+function landsWhereItRuns(
+  rule: (source: string, line: number) => boolean,
+  sourceOf: (file: string) => string,
+  file: string,
+  line: number,
+): boolean {
+  try {
+    return rule(sourceOf(file), line);
+  } catch {
+    return false;
+  }
+}
 
 /** How many questions are in flight at once. The same number the receiver resolvers use. */
 const CONCURRENCY = 32;
@@ -164,7 +182,8 @@ export async function resolveRustDefinitions(
       );
       if (!found) return undefined;
       if (isOutsideRustTree(found.file, root)) return "outside";
-      return { file: path.relative(root, found.file), line: found.line + 1 };
+      const file = path.relative(root, found.file);
+      return { file, line: found.line + 1, concrete: landsWhereItRuns(rustDefinitionRunsThere, sourceOf, file, found.line + 1) };
     });
   }
 
@@ -209,7 +228,8 @@ export async function resolvePythonDefinitions(
     );
     if (!found) return undefined;
     if (isOutsideTree(found.file, root)) return "outside";
-    return { file: path.relative(root, found.file), line: found.line + 1 };
+    const file = path.relative(root, found.file);
+    return { file, line: found.line + 1, concrete: landsWhereItRuns(pythonDefinitionRunsThere, sourceOf, file, found.line + 1) };
   });
 
   return {

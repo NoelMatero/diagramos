@@ -72,7 +72,7 @@ export function createClosedBodyReferee(root: string): ClosedBodyReferee | undef
       const found = ts.symbolDeclarationLocationAt(path.resolve(root, file), at.start, at.end);
       if (!found) return undefined;
       if (isOutsideTree(found.file, root)) return "outside";
-      return { file: path.relative(root, found.file), line: found.line + 1 };
+      return { file: path.relative(root, found.file), line: found.line + 1, concrete: found.concrete };
     },
     kindAt: (file, at) => {
       if (languageOf(file) === "python" || languageOf(file) === "rust") return undefined;

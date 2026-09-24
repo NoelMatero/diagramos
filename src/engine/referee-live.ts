@@ -148,7 +148,16 @@ type Resolvers = {
   kinds?: (root: string, queries: Query[], pool: LiveRefereePool) => Promise<Resolved>;
 };
 type Kind = "receiver" | "definition" | "kind";
-const BATCHES = { receiver: "receivers", definition: "definitions", kind: "kinds" } as const;
+/*
+ * Asked in this order, and the order is the key order here. "Go to
+ * definition" goes last (#351): `@calls` puts every call it cannot place to
+ * it, and on a Python board those are often positions nothing can answer --
+ * `sink.send()` on an untyped parameter -- whose warm-up then waits out
+ * pyright's whole ladder. Asked first, that spent the budget and left the
+ * wrong-kind check's question unasked; asked after a batch that did get an
+ * answer, the server is known to be bound and it waits for nothing.
+ */
+const BATCHES = { receiver: "receivers", kind: "kinds", definition: "definitions" } as const;
 interface Query { file: string; at: { start: number; end: number } }
 interface Resolved {
   cache: { get(file: string, at: { start: number; end: number }): unknown };

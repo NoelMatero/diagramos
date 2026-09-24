@@ -1630,14 +1630,16 @@ async function harvestFor(language, { receivers, definitions, kinds }) {
       receiverRounds.push(resolved.cache);
       closers.push(resolved.close);
     }
-    if (freshDefinitions.length > 0 && affordable()) {
-      const resolved = await definitions(root, freshDefinitions, pool);
-      definitionRounds.push(resolved.cache);
-      closers.push(resolved.close);
-    }
     if (freshKinds.length > 0 && affordable()) {
       const resolved = await kinds(root, freshKinds, pool);
       kindRounds.push(resolved.cache);
+      closers.push(resolved.close);
+    }
+    // Last, for `referee-live.ts`'s reason (#351): its positions are the ones
+    // most often unanswerable, and a warm-up there waits out the whole ladder.
+    if (freshDefinitions.length > 0 && affordable()) {
+      const resolved = await definitions(root, freshDefinitions, pool);
+      definitionRounds.push(resolved.cache);
       closers.push(resolved.close);
     }
     if (!affordable()) break;
@@ -1762,7 +1764,7 @@ const closedBodyReferee = (tsReferee || pythonCache || rustCache) ? {
     const found = tsReferee.symbolDeclarationLocationAt(path.resolve(root, file), at.start, at.end);
     if (!found) return undefined;
     if (isOutsideTree(found.file, root)) return "outside";
-    return { file: path.relative(root, found.file), line: found.line + 1 };
+    return { file: path.relative(root, found.file), line: found.line + 1, concrete: found.concrete };
   },
   /*
    * What a value at an arrow's end is (#343), for the wrong-kind check:

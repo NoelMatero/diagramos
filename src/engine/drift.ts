@@ -2189,7 +2189,14 @@ function callSide(
   workspace: Workspace,
   configs: ConfigCache,
   closedBodyReferee?: ClosedBodyReferee,
+  /**
+   * Put a call the text cannot place to "go to definition" rather than to the
+   * receiver's type (#351). Only `@calls`' own tail asks for it; see
+   * `CallSide.declarationAt`.
+   */
+  askDefinition = false,
 ): CallSide | undefined {
+  const declarationAt = askDefinition ? closedBodyReferee?.declarationAt?.bind(closedBodyReferee) : undefined;
   const readSide = (target: string): CallSide | undefined => {
     const language = languageOf(target);
     if (!language) return undefined;
@@ -2213,6 +2220,7 @@ function callSide(
           : undefined;
       },
       ...(closedBodyReferee ? { resolveReceiver: (at) => closedBodyReferee.resolveReceiver(target, at) } : {}),
+      ...(declarationAt ? { declarationAt: (at) => declarationAt(target, at) } : {}),
     };
   };
   return readSide(file);
@@ -2246,8 +2254,14 @@ export interface ClosedBodyReferee {
    * wider one for Python and Rust as well. Without it `@accesses` still finds
    * a helper the call reader placed by itself, and counts the rest as calls it
    * could not see into.
+   *
+   * `concrete` (#351) is `false` when the declaration is one a runtime puts
+   * something else in place of -- an interface's or a trait's member, an
+   * abstract one, a Protocol's -- by the same rule each language already
+   * applies to a receiver's type. Absent means nobody said, and `@calls`
+   * reads that as `false`: its closed-body check may not accuse on it.
    */
-  declarationAt?(file: string, at: { start: number; end: number }): { file: string; line: number } | "outside" | undefined;
+  declarationAt?(file: string, at: { start: number; end: number }): { file: string; line: number; concrete?: boolean } | "outside" | undefined;
   /**
    * What the name declared at this range is (#343): whether a value of its
    * type can be called, and whether it is a type. Asked by the wrong-kind-of-end
@@ -4858,7 +4872,7 @@ export function checkDrift(
            * against the repo-relative file a dependency resolved to, so an
            * absolute one would never match even if it could be read.
            */
-          const tail = callSide(fromAnchor, workspace, importCache.configs, options?.closedBodyReferee);
+          const tail = callSide(fromAnchor, workspace, importCache.configs, options?.closedBodyReferee, true);
           const head = callSide(toAnchor, workspace, importCache.configs, options?.closedBodyReferee);
           if (!tail || !head) {
             noteCalled("unreadable");
