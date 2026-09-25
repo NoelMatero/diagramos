@@ -759,7 +759,42 @@ export const LICENCES: readonly Licence[] = [
             "the empty square is the only thing standing between a barely measured " +
             "reader and a red.",
         },
-        absence: NOT_DESIGNED_YET,
+        /*
+         * The absence (#362): the routine's own body creates none of the
+         * head's type. #360 settled that a B handed back by another function
+         * is not one the routine built, which is what makes the absence
+         * readable from the body at all.
+         */
+        absence: {
+          reproduce: "npm run measure:builds-absent -- --language=ts",
+          measured: "2026-09-25",
+          referee:
+            "the TypeScript compiler's own type checker: the type of every " +
+            "`new` expression, the symbol behind every JSX tag, and the " +
+            "contextual type of every object literal, in five pinned " +
+            "TypeScript clones. It shares nothing with the reader, which reads " +
+            "tree-sitter nodes and follows imports with `calls.ts`' resolver.",
+          unit: "(routine, type) pairs the compiler says the routine creates, drawn as @builds arrows",
+          counts: { asked: 1053, missed: 0 },
+          covers: ["ts", "tsx"],
+          note:
+            "0 of 1,053 called wrong: 191 confirmed, the rest quiet -- 847 of " +
+            "them object literals the compiler types as an interface, an alias " +
+            "or a class, which the reader refuses because a literal names " +
+            "nothing. Over the 1,635 pairs the compiler says the routine only " +
+            "*gets* from a call, 112 went red and 1,521 stayed quiet: the new " +
+            "red on real code, and the guards' price, in one row. JavaScript " +
+            "stays out of `covers`, as it is for the presence row.",
+          known: [
+            "A workspace import the compiler cannot resolve without " +
+              "`node_modules` gives no pair, so a construction through one is " +
+              "not counted either way.",
+            "An alias, a subclass, `this.constructor`, a default import: the " +
+              "compiler names the class, the reader has only the text, so " +
+              "each of those is a test in tests/builds-absent.test.ts rather " +
+              "than a row here.",
+          ],
+        },
         indirect: NO_INDIRECT_READER,
       },
       calls: {

@@ -31,7 +31,7 @@ that took longest to see and it is not in #190:
 | `@takes` | accepts | a function's parameters | yes | **absence** |
 | `@returns` | produces | a function's return type | yes | **absence** |
 | `@holds` | contains | a type's field list | yes | **absence** |
-| `@builds` | constructs | a routine's body | yes | **presence** |
+| `@builds` | constructs | a routine's body | yes | **presence**, and **absence**: A's own body creates no B; a B from another function is not one A built (#360, #362) |
 | `@calls` | invokes | a routine's body, and what its names are bound to | yes | **presence** |
 | `@accesses` | accesses | a type's member list — **and** a routine's body | yes | **absence**, at both ends — the routine end by name |
 | `@conforms` | conforms | a type's base list, where the language writes one | yes | **absence** |

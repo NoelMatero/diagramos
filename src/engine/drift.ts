@@ -209,13 +209,27 @@ export type EdgeFindingKind =
    * A `builds` arrow whose construction runs the other way (#199).
    *
    * The fourth member that means **wrong**, and the only one of the four that
-   * rests on a presence rather than an absence -- which is why there is no
-   * `builds-absent` beside it and never will be. A routine that never writes
-   * `new T` can still get a `T` from a factory, so not finding the construction
-   * proves nothing; finding it at the far end, and only there, is proof the
-   * arrow is drawn backwards. Same footing as `backwards-edge`.
+   * rests on a presence rather than an absence. Finding the construction at
+   * the far end, and only there, is proof the arrow is drawn backwards. Same
+   * footing as `backwards-edge`. `builds-refuted` below is the absence beside
+   * it, and it exists because #360 settled what the word means.
    */
   | "builds-backwards"
+  /**
+   * A `builds` arrow whose routine creates none of the head's type (#362).
+   *
+   * Once "never, and never will be", on the grounds that a routine can get a
+   * `T` from a factory. #360 settled that this is not what the word means: "A
+   * builds B" is A's own body creating the B, by writing it or by calling B's
+   * own constructor, and a B handed back by something else is not building it.
+   * Under that reading an absence is readable from the body, like `holds`.
+   *
+   * What is left is every way a body creates a B without writing its name --
+   * an alias, `this.constructor`, a subclass, an object literal passing for an
+   * interface -- and `constructs.ts` withholds on each of them. The detail says
+   * what the routine creates instead, because that is where the arrow belonged.
+   */
+  | "builds-refuted"
   /**
    * A `calls` arrow whose call runs the other way (#189).
    *
@@ -432,6 +446,7 @@ export const EDGE_FINDING_KINDS = [
   "signature-absent",
   "holds-absent",
   "builds-backwards",
+  "builds-refuted",
   "calls-backwards",
   "calls-refuted",
   "calls-wrong-routine",
@@ -462,7 +477,7 @@ export const EDGE_FINDING_KINDS = [
  * from `relations`, and the only kind that survives somebody in a hurry.
  *
  * They are not all the same shape. `signature-absent`, `holds-absent`,
- * `accesses-absent`, `accesses-not-read`, `conforms-absent` and `calls-refuted` refute from an
+ * `accesses-absent`, `accesses-not-read`, `conforms-absent`, `builds-refuted` and `calls-refuted` refute from an
  * absence; `backwards-edge`, `builds-backwards` and `calls-backwards` from a
  * presence. What the list is about is neither: it is whether somebody is
  * being told their diagram is wrong.
@@ -472,6 +487,7 @@ export const ACCUSING_EDGE_KINDS = [
   "signature-absent",
   "holds-absent",
   "builds-backwards",
+  "builds-refuted",
   "calls-backwards",
   "calls-refuted",
   "calls-wrong-routine",
@@ -4837,12 +4853,14 @@ export function checkDrift(
            * the workspace refuses an absolute path, and a `CallSide.file` is
            * compared against the repo-relative file a dependency resolved to.
            *
-           * Built only for Python, because it costs a dependency read per file
-           * and no other language needs it -- everywhere else the grammar has a
-           * node that means construction and nothing else.
+           * Built for Python and, since #362, TypeScript: it costs a
+           * dependency read per file. TypeScript's grammar has a node that
+           * means construction, so it needs the imports for something else --
+           * saying "creates none" only once every `new C()` has been followed
+           * to a C that is not the head under another name.
            */
           let names: ConstructsNames | undefined;
-          if (language === "python") {
+          if (language === "python" || language === "ts" || language === "tsx") {
             const tail = callSide(fromAnchor, workspace, importCache.configs);
             if (tail) names = { side: tail, target: toAnchor };
           }
@@ -4889,12 +4907,39 @@ export function checkDrift(
                 + `\`${verdict.evidence.wrote}\`. Turn the arrow round.`,
             } });
             continue;
+          } else if (verdict.verdict === "refuted") {
+            edgesChecked += 1;
+            const wasClaimed = baselineGraph?.edges.some(
+              (was) => was.from === edge.from && was.to === edge.to && was.claim === "builds",
+            );
+            const fresh = baselineGraph !== undefined && !wasClaimed;
+            const maker = oneLine(fromNode.label) || fromPath;
+            const made = oneLine(toNode.label) || toPath;
+            const instead = verdict.evidence.made;
+            recordEdge(edge, fromNode, toNode, { kind: "finding", finding: {
+              from: fromPath,
+              to: toPath,
+              fromLabel: fromNode.label,
+              toLabel: toNode.label,
+              fromRef,
+              toRef,
+              kind: "builds-refuted",
+              detail:
+                (fresh ? "a claim written this turn is already wrong: " : "")
+                + `this arrow says ${maker} makes ${made}, and ${maker} never creates one -- `
+                + (instead.length > 0
+                  ? `it creates ${instead.slice(0, 3).map((one) => one.name).join(", ")} instead `
+                    + `(${fromPath} line ${instead[0]!.line}: \`${instead[0]!.wrote}\`). `
+                  : `its code creates no object of any kind. `)
+                + `Getting one back from another function is not making it. `
+                + `Point the arrow at what does create it, or remove it.`,
+            } });
+            continue;
           }
           /*
-           * `absent` and `cycle` are both silent here. That is the point of
-           * the word: not finding a construction is not evidence there is
-           * none. A claimed arrow then reaches the gate below and is not
-           * verified; a plan takes the ordinary channels as it always did.
+           * `absent` and `cycle` are both silent here. Absent is now only what
+           * a language without the absence licence gets, or a planned arrow;
+           * a claimed arrow then reaches the gate below and is not verified.
            */
         }
       }

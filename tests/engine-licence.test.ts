@@ -670,9 +670,10 @@ describe("the licence's second axis (#231)", () => {
   it("leaves every other word's absence axis unmeasured, everywhere", () => {
     // @calls closes a body's call set with a real compiler, @accesses closes a
     // body's reads by name (#255), and @needs a file's imports and everything
-    // they lead to (#323). Every other square on this axis is a stated absence
-    // of a measurement, not a silent yes.
-    const closed = new Set(["calls", "accesses", "needs", "depends"]);
+    // they lead to (#323), and @builds a body's constructions once #360 settled
+    // that a factory's B is not one it built (#362). Every other square on this
+    // axis is a stated absence of a measurement, not a silent yes.
+    const closed = new Set(["calls", "accesses", "needs", "depends", "builds"]);
     for (const relation of ACCUSING_RELATIONS.filter((one) => !closed.has(one))) {
       for (const language of LANGUAGES) {
         expect(mayAccuse(relation, language, "absence"), `${relation} in ${language}`)

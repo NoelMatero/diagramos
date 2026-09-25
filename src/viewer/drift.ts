@@ -72,6 +72,7 @@ const KNOWN_EDGE_KINDS = new Set([
   "signature-absent",
   "holds-absent",
   "builds-backwards",
+  "builds-refuted",
   "calls-backwards",
   "calls-refuted",
   "calls-wrong-routine",
@@ -95,7 +96,7 @@ const KNOWN_EDGE_KINDS = new Set([
  */
 const WRONG_EDGE_KINDS = new Set([
   "backwards-edge", "signature-absent", "holds-absent", "builds-backwards",
-  "calls-backwards", "calls-refuted", "calls-wrong-routine",
+  "builds-refuted", "calls-backwards", "calls-refuted", "calls-wrong-routine",
   "accesses-absent", "accesses-not-read", "conforms-absent",
   "end-lacks-part",
 ]);
