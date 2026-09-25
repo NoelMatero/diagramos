@@ -67,6 +67,8 @@ import { existsSync, readdirSync, statSync } from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 
+import type { ClosedBodyReferee } from "../src/engine/drift";
+
 const args = process.argv.slice(2);
 const flag = (name: string) => args.find((one) => one.startsWith(`--${name}=`))?.split("=")[1];
 const language = flag("language") ?? "ts";
@@ -216,7 +218,7 @@ async function measureOne(project: string): Promise<ProjectResult> {
  * its own line patterns. The crates are built (or read from the cache) the
  * way the product builds them, and handed to the checker the same way.
  */
-async function rustPairs(root: string): Promise<{ pairs: Pair[]; referee: import("../src/engine/drift").ClosedBodyReferee }> {
+async function rustPairs(root: string): Promise<{ pairs: Pair[]; referee: ClosedBodyReferee }> {
   const { readFileSync } = await import("node:fs");
   const { createHash } = await import("node:crypto");
   const { compileCrates, rustcCacheDir } = await import("../src/engine/referee-rustc");
@@ -544,7 +546,7 @@ async function askChecker(
   project: string,
   root: string,
   pairs: Pair[],
-  referee?: import("../src/engine/drift").ClosedBodyReferee,
+  referee?: ClosedBodyReferee,
   /** Ask pyright, the way the bench and the board do, through `refereedCheckLive`. */
   live = false,
 ): Promise<ProjectResult> {
@@ -569,15 +571,14 @@ async function askChecker(
     });
     let answer: string;
     try {
-      const run = (second?: import("../src/engine/drift").ClosedBodyReferee) => {
-        const using = second ?? referee;
-        return checkDrift(JSON.parse(JSON.stringify(board)), cache.workspace, {
-          edges: true, cache, ...(using ? { closedBodyReferee: using } : {}),
-        });
-      };
+      function run(second: ClosedBodyReferee | undefined) {
+        const chosen = second ?? referee;
+        const options = chosen ? { edges: true, cache, closedBodyReferee: chosen } : { edges: true, cache };
+        return checkDrift(JSON.parse(JSON.stringify(board)), cache.workspace, options);
+      }
       const report = pool
         ? (await refereedCheckLive(root, run, { budgetMs: 120_000, pool })).report
-        : run();
+        : run(undefined);
       const red = report.edges.find((finding) => accusing.has(finding.kind));
       if (red) answer = `red ${red.kind}`;
       else if (report.claims.buildsConfirmed > 0) answer = "green";

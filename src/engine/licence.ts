@@ -784,16 +784,11 @@ export const LICENCES: readonly Licence[] = [
             "nothing. Over the 1,635 pairs the compiler says the routine only " +
             "*gets* from a call, 112 went red and 1,521 stayed quiet: the new " +
             "red on real code, and the guards' price, in one row. JavaScript " +
-            "stays out of `covers`, as it is for the presence row.",
-          known: [
-            "A workspace import the compiler cannot resolve without " +
-              "`node_modules` gives no pair, so a construction through one is " +
-              "not counted either way.",
-            "An alias, a subclass, `this.constructor`, a default import: the " +
-              "compiler names the class, the reader has only the text, so " +
-              "each of those is a test in tests/builds-absent.test.ts rather " +
-              "than a row here.",
-          ],
+            "stays out of `covers`, as it is for the presence row. What the " +
+            "referee cannot see: a workspace import the compiler cannot resolve " +
+            "without `node_modules` gives no pair; an alias, a subclass, " +
+            "`this.constructor` or a default import is a test in " +
+            "tests/builds-absent.test.ts rather than a pair here.",
         },
         indirect: NO_INDIRECT_READER,
       },
@@ -1191,15 +1186,12 @@ export const LICENCES: readonly Licence[] = [
             "closure's local as its function's, because MIR numbers locals " +
             "per body. Over the 615 pairs where a call hands back an owned B " +
             "and nothing creates one, 0 went red, by construction: a B in a " +
-            "call's result is a B the gate sees.",
-          known: [
-            "Two referees, and neither is fully apart from the reader: the MIR " +
-              "one reads the same dump the gate does, through different code, " +
-              "and the text one shares tree-sitter's parse of which routines " +
-              "exist. The shapes neither can see -- `Self`, an alias, a " +
-              "`cfg`, a binary target, a macro -- are the tests in " +
-              "tests/builds-absent-rust.test.ts.",
-          ],
+            "call's result is a B the gate sees. Neither referee is fully apart " +
+            "from the reader: the MIR one reads the same dump the gate does, " +
+            "through different code, and the text one shares tree-sitter's " +
+            "parse of which routines exist. The shapes neither can see -- " +
+            "`Self`, an alias, a `cfg`, a binary target, a macro -- are the " +
+            "tests in tests/builds-absent-rust.test.ts.",
         },
         indirect: NO_INDIRECT_READER,
       },
@@ -1696,11 +1688,9 @@ export const LICENCES: readonly Licence[] = [
             "1,345, because jedi is slow and #360 read these three trees. The " +
             "shapes jedi cannot tell the reader about -- `cls()`, " +
             "`type(self)()`, a class kept in an attribute, a subclass, a " +
-            "`TypedDict` -- are the tests in tests/builds-absent.test.ts.",
-          known: [
+            "`TypedDict` -- are the tests in tests/builds-absent.test.ts. " +
             "Poetry's split package and attributes set at runtime leave jedi " +
-              "without an answer, so a construction through one is not a pair.",
-          ],
+            "without an answer, so a construction through one is not a pair.",
         },
         indirect: NO_INDIRECT_READER,
       },
