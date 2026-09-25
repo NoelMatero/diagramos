@@ -4942,11 +4942,11 @@ export function checkDrift(
               kind: "builds-refuted",
               detail:
                 (fresh ? "a claim written this turn is already wrong: " : "")
-                + `this arrow says ${maker} makes ${made}, and ${maker} never creates one -- `
+                + `this arrow says ${maker} makes ${made}, and ${maker}'s own code never creates one`
                 + (instead.length > 0
-                  ? `it creates ${instead.slice(0, 3).map((one) => one.name).join(", ")} instead `
+                  ? ` -- it creates ${instead.slice(0, 3).map((one) => one.name).join(", ")} instead `
                     + `(${fromPath} line ${instead[0]!.line}: \`${instead[0]!.wrote}\`). `
-                  : `its code creates no object of any kind. `)
+                  : ". ")
                 + `Getting one back from another function is not making it. `
                 + `Point the arrow at what does create it, or remove it.`,
             } });

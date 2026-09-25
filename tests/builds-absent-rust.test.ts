@@ -146,7 +146,7 @@ describe.skipIf(!HAS_CARGO)("Rust: a routine that creates something else", () =>
   it("is red on a routine that creates a different struct, and on one that creates nothing", async () => {
     const red = await accused([[`${M}gear`, `${W}Widget`], [`${M}nothing`, `${W}Widget`]]);
     expect(red.get(`${M}gear -> ${W}Widget`)).toMatch(/^builds-refuted: .*it creates Gear instead/);
-    expect(red.get(`${M}nothing -> ${W}Widget`)).toMatch(/^builds-refuted: .*creates no object/);
+    expect(red.get(`${M}nothing -> ${W}Widget`)).toMatch(/^builds-refuted: .*own code never creates one\. Getting/);
   }, 240_000);
 });
 

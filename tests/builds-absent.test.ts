@@ -133,7 +133,7 @@ describe("TypeScript: a head something other than `new` can create", () => {
       "export function build() { return 1; }\n",
       "export class Widget { constructor(public x: number) {} }\n"));
     expect(accusations(report).map((finding) => finding.kind)).toEqual(["builds-refuted"]);
-    expect(accusations(report)[0]!.detail).toContain("creates no object");
+    expect(accusations(report)[0]!.detail).toMatch(/own code never creates one\. Getting/);
   });
 });
 
