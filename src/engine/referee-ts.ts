@@ -181,6 +181,12 @@ export interface TsReferee {
    * checker itself cannot say.
    */
   kindAt(file: string, start: number, end: number): { callable?: boolean; type?: boolean } | undefined;
+  /**
+   * Whether the name declared at exactly this range could be rendered as a
+   * JSX component (#363): `true` or `false` on the compiler's word, and
+   * `undefined` wherever it cannot say. See `renderableAt`.
+   */
+  renderableAt(file: string, start: number, end: number): boolean | undefined;
 }
 
 const SKIP_DIRECTORIES = new Set([
@@ -545,7 +551,179 @@ function buildReferee(ts: typeof TS, root: string): TsReferee {
     }
   }
 
-  return { typeAt, symbolDeclarationAt, symbolDeclarationLocationAt, kindAt };
+  /*
+   * What the compiler wrote when asked `renderableAt`, per program: a program
+   * is rebuilt whenever a file it read changes, so the program itself is the
+   * key that goes stale at the right moment.
+   */
+  const rendered = new WeakMap<TS.Program, Map<string, boolean | undefined>>();
+
+  /**
+   * Whether the name declared here is a component (#363): something `@builds`
+   * may point at though it is a function and not a type.
+   *
+   * A component is a fact about the function, not about how any one caller
+   * renders it -- `<Widget />`, `createElement(Widget)`, `memo(Widget)`, an
+   * alias, a prop a child renders are all the same component. So nothing
+   * about the caller is read, and no wrapper is named. The compiler is asked
+   * the question itself: the file is checked again with a few lines written
+   * at its end, and what those lines compile to is the answer.
+   *
+   * ```
+   * const BoardControl__: any = null;
+   * <BoardControl__ {...({} as any)} />;           the control: can JSX be written here at all?
+   * const BoardProbe__ = Widget;                  the name, capitalised: <widget/> would be an HTML tag
+   * const boardProps__: object | null | undefined  a component takes an object of props, or none
+   *   = null as any as <Widget's first parameter>;
+   * const BoardOne__ = (props: any) =>             and what it returns can be rendered:
+   *   Widget(props);                               a one-argument wrapper, typed as returning
+   * <BoardOne__ {...({} as any)} />;               what Widget returns, stands as a JSX element
+   * ```
+   *
+   * **Both halves, because either alone is too generous.** React's own types
+   * let a component return a number or a promise, so `parse(s: string):
+   * number` and an `async` loader compile as elements; what rules them out is
+   * a string where the props go. And a function taking an object is not a
+   * component if what it returns cannot be rendered.
+   *
+   * **The wrapper, rather than `<Widget />` itself**, because a render function
+   * handed to `forwardRef` takes `(props, ref)`, and JSX will not call a
+   * function that needs two arguments. People draw that function as the
+   * component, and it is one in every sense but its arity, so the arity is
+   * what the wrapper takes away: the question is only what it returns.
+   *
+   * `false` is only said on an error the name itself caused. The alias line
+   * failing (the name is not in scope at the end of the file), any syntax the
+   * rewritten file does not parse (a `.ts` file's `<T>x` cast read as JSX), or
+   * the control failing (classic JSX with no `React` in scope, which fails
+   * every element alike) are the compiler unable to say, and read as no
+   * answer. So is a control that type-checks as `any`: no JSX types in the
+   * program, where every function would pass.
+   */
+  function renderableAt(file: string, start: number, end: number): boolean | undefined {
+    const configPath = configOf.get(file);
+    if (configPath === undefined) return undefined;
+    const { program } = programFor(configPath);
+    const sourceFile = program.getSourceFile(file);
+    if (!sourceFile) return undefined;
+    const name = findNodeAt(ts, sourceFile, start, end);
+    if (!name || !ts.isIdentifier(name)) return undefined;
+    const key = `${file}:${start}`;
+    const known = rendered.get(program) ?? new Map<string, boolean | undefined>();
+    rendered.set(program, known);
+    if (known.has(key)) return known.get(key);
+    const reach = reachOf(name);
+    let answer: boolean | undefined;
+    try {
+      answer = reach === undefined ? undefined : probeRenderable(program, sourceFile, reach);
+    } catch {
+      answer = undefined;
+    }
+    known.set(key, answer);
+    return answer;
+  }
+
+  /**
+   * How the end of the file reaches the declaration this name opens: the name
+   * itself, or through the class that holds it -- `Router.prototype["explore"]`
+   * for a method, `Router["create"]` for a static one. A bracket, because it
+   * reaches a `private` member where a dot is refused. Anything else is
+   * reached by its name or not at all, and the compiler says which.
+   */
+  function reachOf(name: TS.Identifier): string | undefined {
+    const member = name.parent;
+    if (!member || !(ts.isMethodDeclaration(member) || ts.isPropertyDeclaration(member)) || member.name !== name) {
+      return name.text;
+    }
+    const holder = member.parent;
+    if (!ts.isClassDeclaration(holder) || !holder.name) return undefined;
+    const outer = reachOf(holder.name);
+    if (outer === undefined) return undefined;
+    const isStatic = ts.getCombinedModifierFlags(member) & ts.ModifierFlags.Static;
+    return `${outer}${isStatic ? "" : ".prototype"}[${JSON.stringify(name.text)}]`;
+  }
+
+  function probeRenderable(program: TS.Program, sourceFile: TS.SourceFile, reach: string): boolean | undefined {
+    /*
+     * The control first: the compiler reports some things about JSX once per
+     * file, on the first element it meets -- a `jsx-runtime` it cannot find --
+     * and that has to land on the element that tells us so.
+     */
+    const lines = [
+      "const BoardControl__: any = null;",
+      "const boardControl__ = <BoardControl__ {...({} as any)} />;",
+      `const BoardProbe__ = ${reach};`,
+      "const boardProps__: object | null | undefined = null as any as "
+        + "(Parameters<typeof BoardProbe__> extends [infer P, ...any[]] ? P : {});",
+      "const BoardOne__ = (props: any) => "
+        + "(BoardProbe__ as unknown as (...args: any[]) => ReturnType<typeof BoardProbe__>)(props);",
+      "<BoardOne__ {...({} as any)} />;",
+      // Read, so a project that makes an unused name an error has none here.
+      "void [boardControl__, boardProps__];",
+    ];
+    // Each line opens with `;` so nothing above it can run on into it.
+    const starts: number[] = [];
+    let text = `${sourceFile.text}\n`;
+    for (const line of lines) {
+      starts.push(text.length);
+      text += `;${line}\n`;
+    }
+    const lineOf = (at: number) => starts.filter((one) => one <= at).length - 1;
+
+    const options = { ...program.getCompilerOptions() };
+    if (options.jsx === undefined) options.jsx = ts.JsxEmit.Preserve;
+    const host = ts.createCompilerHost(options, true);
+    const readSource = host.getSourceFile.bind(host);
+    host.getSourceFile = (fileName, languageVersion, onError, shouldCreate) => {
+      if (path.resolve(fileName) === path.resolve(sourceFile.fileName)) {
+        return ts.createSourceFile(fileName, text, languageVersion, true, ts.ScriptKind.TSX);
+      }
+      /*
+       * The files already read are handed back rather than parsed again, all
+       * but one kind: where a workspace installs one package twice, the
+       * compiler keeps the second copy as a redirect to the first, and refuses
+       * one handed back (vuejs-core threw on every question). The field is the
+       * one its own assertion reads.
+       */
+      const known = program.getSourceFile(fileName);
+      if (known && !(known as { redirectInfo?: unknown }).redirectInfo) return known;
+      return readSource(fileName, languageVersion, onError, shouldCreate);
+    };
+    const probe = ts.createProgram({ rootNames: program.getRootFileNames(), options, host, oldProgram: program });
+    const probed = probe.getSourceFile(sourceFile.fileName);
+    if (!probed || probe.getSyntacticDiagnostics(probed).length > 0) return undefined;
+
+    const failed = new Set<number>();
+    for (const diagnostic of probe.getSemanticDiagnostics(probed)) {
+      if (diagnostic.category !== ts.DiagnosticCategory.Error) continue;
+      if (diagnostic.start === undefined || diagnostic.start < starts[0]!) continue;
+      failed.add(lineOf(diagnostic.start));
+    }
+    if (failed.has(0) || failed.has(1) || failed.has(2) || failed.has(4) || failed.has(6)) return undefined;
+    if (failed.has(3)) return false;
+    const checker = probe.getTypeChecker();
+    const typeOfLine = (index: number): TS.Type | undefined => {
+      const statement = probed.statements.find((one) => one.getStart(probed) === starts[index]! + 1);
+      const declared = statement && ts.isVariableStatement(statement)
+        ? statement.declarationList.declarations[0] : undefined;
+      return declared ? checker.getTypeAtLocation(declared.name) : undefined;
+    };
+    const vague = (type: TS.Type | undefined) => !type || (type.flags & (ts.TypeFlags.Any | ts.TypeFlags.Unknown)) !== 0;
+    if (!vague(typeOfLine(1))) return !failed.has(5);
+    /*
+     * No JSX types in this program: the control is an `any`, and so is every
+     * element, so the element line passes whatever stands in it. What is left
+     * to go on is what the function returns. Where the compiler knows it --
+     * `createVNodeCall` returns a `VNodeCall` -- nothing this program can see
+     * renders it, since nothing it can see renders anything. Where it does
+     * not -- an untyped `.jsx` file, whose `<div />` is itself an `any` --
+     * that is no answer.
+     */
+    const signatures = typeOfLine(2)?.getCallSignatures() ?? [];
+    return signatures.length > 0 && signatures.every((one) => !vague(one.getReturnType())) ? false : undefined;
+  }
+
+  return { typeAt, symbolDeclarationAt, symbolDeclarationLocationAt, kindAt, renderableAt };
 }
 
 /**

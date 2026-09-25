@@ -2304,6 +2304,13 @@ export interface ClosedBodyReferee {
    */
   kindAt?(file: string, at: { start: number; end: number }): ValueKind | undefined;
   /**
+   * Whether the name declared at this range could be rendered as a JSX
+   * component (#363), which is what lets a function stand at the far end of
+   * `@builds`. TypeScript's compiler answers it (`referee-ts.ts`); `undefined`
+   * is no answer, and a function nobody answered for is not accused.
+   */
+  renderableAt?(file: string, at: { start: number; end: number }): boolean | undefined;
+  /**
    * The crate the Rust compiler built a file into (#357), for the tail of a
    * `@calls` arrow whose text reading stopped short. `referee-live.ts`
    * answers it from `referee-rustc.ts`'s builds; everything else leaves it
@@ -5461,16 +5468,31 @@ export function checkDrift(
           if (answer?.callable === undefined) unsettled = true;
           return answer;
         });
+      /*
+       * Whether a function could be rendered as a component (#363), for the
+       * languages that have JSX. Unanswered counts the same way: with no
+       * compiler, a `@builds` arrow into a function is left alone and the
+       * compiler is worth starting.
+       */
+      const renderableAbout = (file: string) => {
+        const language = languageOf(file);
+        return language === "rust" || language === "python" ? undefined
+          : (at: { start: number; end: number }) => {
+            const answer = options?.closedBodyReferee?.renderableAt?.(file, at);
+            if (answer === undefined) unsettled = true;
+            return answer;
+          };
+      };
       const lacking = claimed && edge.claim && bothNamed
         ? lackingEnd(
           edge.claim,
           {
             source: workspace.read(fromFile), language: languageOf(fromFile), symbols: fromEnd.symbols,
-            ask: askAbout(fromAnchor),
+            ask: askAbout(fromAnchor), askRenderable: renderableAbout(fromAnchor),
           },
           {
             source: workspace.read(toFile), language: languageOf(toFile), symbols: toEnd.symbols,
-            ask: askAbout(toAnchor),
+            ask: askAbout(toAnchor), askRenderable: renderableAbout(toAnchor),
           },
         )
         : undefined;

@@ -279,6 +279,8 @@ export async function refereedCheckLive(
         resolveReceiver: record("receiver", ts?.resolveReceiver.bind(ts)) as ClosedBodyReferee["resolveReceiver"],
         declarationAt: record("definition", ts?.declarationAt?.bind(ts)) as ClosedBodyReferee["declarationAt"],
         kindAt: record("kind", ts?.kindAt?.bind(ts)) as ClosedBodyReferee["kindAt"],
+        // TypeScript's alone, and answered on the spot: no language server is asked.
+        renderableAt: ts?.renderableAt?.bind(ts),
         ...(askCompiler
           ? { compiledCrateOf: (file: string) => { compilable.add(file); return undefined; } }
           : {}),
@@ -349,6 +351,7 @@ export async function refereedCheckLive(
         }
         return ts?.kindAt?.(file, at);
       },
+      renderableAt: (file, at) => ts?.renderableAt?.(file, at),
       ...(compiled?.answered ? { compiledCrateOf: (file: string) => compiled.crateOf(file) } : {}),
     };
     if (ts) answered.add("typescript");
