@@ -667,6 +667,12 @@ export interface PartEnd {
   symbols: string[];
   /** A compiler for this end's file, where the check holds one (#343). */
   ask?: AskKind;
+  /**
+   * Whether a name declared here could be rendered as a JSX component (#363),
+   * given for a file in a language that has JSX. Answers `undefined` where no
+   * compiler is running or it cannot say.
+   */
+  askRenderable?: (at: { start: number; end: number }) => boolean | undefined;
 }
 
 /** The parts a compiler's answer can settle; `settle` names the same five. */
@@ -696,14 +702,55 @@ export function lackingEnd(claim: ArrowClaim, from: PartEnd, to: PartEnd): Lacki
     if (!part || !side.language || side.symbols.length === 0) continue;
     if (!PART_LICENCE[side.language][part]) continue;
     const ask = SETTLED_BY_A_COMPILER.has(part) ? side.ask : undefined;
-    const lacks = side.symbols.every(
-      (name) => partsOf(side.source, name, side.language!, ask)?.[part] === "lacks",
-    );
+    const lacks = side.symbols.every((name) => {
+      const parts = partsOf(side.source, name, side.language!, ask);
+      if (parts?.[part] !== "lacks") return false;
+      /*
+       * A component is not a type and is exactly what `@builds` means to point
+       * at (#363): `App` makes a `Widget` whether it writes `<Widget />`,
+       * `createElement(Widget)` or `memo(Widget)`. Whether a function is one is
+       * a fact about the function, and only a compiler knows it, so where the
+       * language has JSX, a function is accused only on the compiler's word
+       * that it cannot be rendered -- never on the text's.
+       *
+       * A function as the text writes one: a declaration with parameters, or
+       * a name given a function written out. A field or a variable keeps the
+       * reading it had, because what it holds is not what gets made.
+       */
+      if (claim === "builds" && end === "to" && side.askRenderable) {
+        const functions = writtenAsFunctions(side.source, name, side.language!);
+        if (functions) return cannotRender(functions, side.askRenderable);
+      }
+      return true;
+    });
     if (!lacks) continue;
     const name = side.symbols[0]!;
     return { end, part, name, noun: nounOf(side.source, name, side.language) };
   }
   return undefined;
+}
+
+/**
+ * The names of `name`'s declarations here when every one is a function as
+ * written -- `function Widget()`, `const Widget = () => ...` -- and otherwise
+ * `undefined`.
+ */
+function writtenAsFunctions(source: string, name: string, language: Language): Node[] | undefined {
+  const declarations = declaredShapes(source, language)?.get(name) ?? [];
+  const functions = declarations.filter(({ node, soup }) => {
+    if (soup) return false;
+    const value = node.childForFieldName("value") ?? node.childForFieldName("right");
+    return has(node, "parameters") || (value !== null && isWrittenValue(value));
+  });
+  return functions.length > 0 && functions.length === declarations.length
+    ? functions.map(({ nameNode }) => nameNode)
+    : undefined;
+}
+
+/** Whether the compiler said, of every one of these declared names, that it cannot be rendered. */
+function cannotRender(names: Node[], askRenderable: NonNullable<PartEnd["askRenderable"]>): boolean {
+  return names.every((nameNode) =>
+    askRenderable({ start: nameNode.startIndex, end: nameNode.startIndex + nameNode.text.length }) === false);
 }
 
 /**
