@@ -31,7 +31,7 @@ that took longest to see and it is not in #190:
 | `@takes` | accepts | a function's parameters | yes | **absence** |
 | `@returns` | produces | a function's return type | yes | **absence** |
 | `@holds` | contains | a type's field list | yes | **absence** |
-| `@builds` | constructs | a routine's body | yes | **presence** |
+| `@builds` | constructs | a routine's body | yes | **presence**, and **absence**: A's own body creates no B; a B from another function is not one A built (#360, #362) |
 | `@calls` | invokes | a routine's body, and what its names are bound to | yes | **presence** |
 | `@accesses` | accesses | a type's member list — **and** a routine's body | yes | **absence**, at both ends — the routine end by name |
 | `@conforms` | conforms | a type's base list, where the language writes one | yes | **absence** |
@@ -266,7 +266,7 @@ grants a licence nobody measured.
 | `@takes` | yes | yes | **no** | yes | yes | a text scan of the same signatures |
 | `@returns` | yes | yes | **no** | yes | yes | the same run |
 | `@holds` | yes | yes | **no** | yes | yes | a text scan of the same field lists |
-| `@builds` | yes | yes | **no** | yes | **no** | a text scan of the same routine bodies |
+| `@builds` | yes | yes | **no** | yes | yes | a text scan of the same routine bodies; Python by jedi (#362) |
 | `@calls` | yes | yes | **no** | yes | yes | a text scan that bounds each routine and reads its calls |
 | `@accesses` | yes | yes | **no** | yes | yes | a text scan of the same member lists |
 | `@conforms` | yes | yes | **no** | **no** | yes | a text scan of the same declaration headers |
@@ -4621,6 +4621,64 @@ duplicate from conflitcts, requires reading prs "An arrow can be three calls lon
     has none. With both, `bench:planted` on 77858fa is unchanged in every
     row: 565 of 808 mistakes called wrong, 0 of 453 true claims.
     `tests/calls-passed-as-value.test.ts` has each shape per language.
+
+51. **A wrong `@builds` arrow could only ever be confirmed or called
+    backwards, so 40 on the planted bench got no verdict at all (#360,
+    #362).** `computed -> Dep` says vue's `computed` makes a `Dep`; it makes
+    a `ComputedRefImpl`. `constructs.ts` refused absence on purpose -- "a
+    routine that never writes `new T` can still hand you a `T` by calling a
+    factory" -- and #360 settled that this was a question about meaning, not
+    about reading: **"A builds B" is A's own body creating the B**, by writing
+    it or by calling B's own constructor. A B handed back by some other
+    function is not one A built. Under that reading the absence is readable
+    from the body, like `holds`, and `builds-refuted` says it, naming what the
+    routine creates instead.
+
+    What is left is every way a body creates a B without writing its name,
+    and each is a reason to stay quiet and a test:
+
+    | language | quiet when |
+    |---|---|
+    | all | the routine names B or an import alias of it anywhere, types and return type included; a planned arrow |
+    | TypeScript | B is an interface, a type alias, a fields-only or an abstract class (an object literal or a subclass makes one); a `new C()` whose C is not a class or routine followed to where it is declared, or is B's subclass |
+    | Rust | B is not a struct or an enum; `Self` in B's `impl` or in a trait; a macro in the file writes a routine of that name; **and rustc's MIR for the routine must show no B aggregate and no call handing back a B**, else quiet -- the text cannot say what `x.clone()` makes |
+    | Python | B is a `TypedDict` or a `Protocol`; the body calls a computed callee (`type(self)()`); any call `@calls`' pyright-backed reading cannot place, or places in B's file, at a subclass of B, or at a value rather than a `def` or a class (flask's `self.json_provider_class()`) |
+
+    Python may also say **backwards** now, for the first time: the tail is a
+    class and the head's code calls it.
+
+    `measure:builds-absent` draws every pair a compiler says really creates B
+    and requires 0 accusations: 0 of 1,053 (TypeScript compiler), 0 of 1,345
+    (Rust text scan and rustc MIR, read by the script's own patterns), 0 of
+    248 (jedi). `bench:planted` on f4f6df7, both arms the same day, every
+    changed arrow read: 565 -> 586 of 808 caught, 0 of 453 true claims red;
+    `--word=builds` 71 -> 92. TypeScript +4, Rust +4, Python +13, against
+    #360's projection of about 22.
+
+    Building it one language at a time found four things the plan had not:
+
+    - **A use carries a `name` field too.** `<Widget />` and `Widget { x }`
+      put the type on `name`, so a check for "B is declared only as a class"
+      read B's own file using B as a second declaration and went quiet. Only
+      the quiet side, and only because the check was written to doubt.
+    - **So does `Widget | None`, on `left`.** The Python check for
+      `Widget = something` read the `left` field, and a union hint has one:
+      every class used in a union annotation was doubted. httpx's `Request`,
+      `URL` and `Headers` lost three backwards reds to it. An assignment is
+      now the node with an `=` token -- anonymous, so its type is its text --
+      which is `docs/reading-a-grammar.md`'s rule, broken and then kept.
+    - **A macro can declare the routine the text cannot see.** regex's
+      `primitives.rs` has a plain `fn new` and a `macro_rules!` that generates
+      the `fn new` creating `SmallIndexIter`. The first Rust measurement
+      accused it; the reader now withholds when a macro in the file writes a
+      routine of that name.
+    - **The first Rust referee was wrong three times, and read each time.**
+      Two counted a borrowed `&B` handed back as a B created, one read a
+      closure's local as its function's -- MIR numbers locals per body. Fixed
+      in the referee, not the reader, and said so in the licence row.
+
+    `tests/builds-absent.test.ts` and `tests/builds-absent-rust.test.ts` hold
+    each shape, every guarded one watched go red with its guard switched off.
 
 ## Open, in the order worth doing
 

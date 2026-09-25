@@ -61,10 +61,11 @@ field has that type.
 
 ## `claim: "builds"`
 
-`from` makes a value of type `to`: `new X`, `X { .. }`, `<X />`. `from` may be a
-routine, or a type whose routines do the making. Red only when the construction
-is found at the far end and only there, meaning the arrow is backwards. Never
-red for not finding it. No verdict in Python. `<div />` does not count.
+`from`'s own code creates the `to`: `new X`, `X { .. }`, `<X />`, or `X`'s own
+constructor (`X::new()`, `X.from_dict()`). A `to` handed back by another function
+does not count. `from` may be a routine, or a type whose routines do the making.
+Red when the arrow is backwards, or when `from` creates none. `<div />` does
+not count.
 
 ## `claim: "calls"`
 

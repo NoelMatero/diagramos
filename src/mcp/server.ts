@@ -163,7 +163,8 @@ const CLAIM_DESCRIPTION =
   + "takes / returns: from is a TYPE, to is a FUNCTION whose parameter / return type it is; red if "
   + "absent from the signature. "
   + "holds: from is a type with a field of type to; red if no field has it. "
-  + "builds: from makes a value of type to; red only if the arrow is backwards. "
+  + "builds: from's own code creates a to (one got from another function does not count); red "
+  + "if backwards or if from creates none. "
   + "calls: from calls to; red only if the arrow is backwards. "
   + "accesses: from reads member of type to, and the member name goes in label; red if the type "
   + "lacks it. "
@@ -438,11 +439,10 @@ const CLAIM_CONSEQUENCE: Record<string, string> = {
     + " reported either way when the type could be written there under another name.",
   builds:
     " Each one is now read out of the tail's own routines: `new X`, `X { .. }` and `<X />` all"
-    + " count. Finding the construction confirms the arrow. NOT finding it is never held against"
-    + " it -- a factory one call away is invisible to this, so there is no red for an absence."
-    + " What does get reported is finding the construction at the FAR end and only there, which"
-    + " means the arrow is drawn backwards. Python gets no verdict either way: it spells making"
-    + " one of something as an ordinary call.",
+    + " count. Finding the construction confirms the arrow. A to handed back by another function"
+    + " is not one the tail built, so a tail whose code creates none is reported in red, saying"
+    + " what it creates instead. Finding the construction at the FAR end and only there means"
+    + " the arrow is drawn backwards.",
   holds:
     " Each one is now read off the field list of the FROM end -- the opposite end from takes,"
     + " because containment points whole to part: if no field of the from end's type is of the to"

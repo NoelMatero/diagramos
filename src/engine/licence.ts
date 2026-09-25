@@ -759,7 +759,37 @@ export const LICENCES: readonly Licence[] = [
             "the empty square is the only thing standing between a barely measured " +
             "reader and a red.",
         },
-        absence: NOT_DESIGNED_YET,
+        /*
+         * The absence (#362): the routine's own body creates none of the
+         * head's type. #360 settled that a B handed back by another function
+         * is not one the routine built, which is what makes the absence
+         * readable from the body at all.
+         */
+        absence: {
+          reproduce: "npm run measure:builds-absent -- --language=ts",
+          measured: "2026-09-25",
+          referee:
+            "the TypeScript compiler's own type checker: the type of every " +
+            "`new` expression, the symbol behind every JSX tag, and the " +
+            "contextual type of every object literal, in five pinned " +
+            "TypeScript clones. It shares nothing with the reader, which reads " +
+            "tree-sitter nodes and follows imports with `calls.ts`' resolver.",
+          unit: "(routine, type) pairs the compiler says the routine creates, drawn as @builds arrows",
+          counts: { asked: 1053, missed: 0 },
+          covers: ["ts", "tsx"],
+          note:
+            "0 of 1,053 called wrong: 191 confirmed, the rest quiet -- 847 of " +
+            "them object literals the compiler types as an interface, an alias " +
+            "or a class, which the reader refuses because a literal names " +
+            "nothing. Over the 1,635 pairs the compiler says the routine only " +
+            "*gets* from a call, 112 went red and 1,521 stayed quiet: the new " +
+            "red on real code, and the guards' price, in one row. JavaScript " +
+            "stays out of `covers`, as it is for the presence row. What the " +
+            "referee cannot see: a workspace import the compiler cannot resolve " +
+            "without `node_modules` gives no pair; an alias, a subclass, " +
+            "`this.constructor` or a default import is a test in " +
+            "tests/builds-absent.test.ts rather than a pair here.",
+        },
         indirect: NO_INDIRECT_READER,
       },
       calls: {
@@ -1125,7 +1155,44 @@ export const LICENCES: readonly Licence[] = [
             "construction at all; a false `backwards` needs a miss paired with a " +
             "hit the other way.",
         },
-        absence: NOT_DESIGNED_YET,
+        /*
+         * The absence (#362), and the reader rests on rustc: the text rules
+         * pass, *and* rustc's MIR for the routine shows no B written and no
+         * call handing one back. A routine rustc did not compile is never
+         * accused.
+         */
+        absence: {
+          reproduce: "npm run measure:builds-absent -- --language=rust",
+          measured: "2026-09-25",
+          referee:
+            "two, because the reader itself asks rustc. The text scan " +
+            "`measure:constructs` uses -- every `B { .. }` written in a " +
+            "routine, no syntax tree, no compiler -- and rustc's MIR read by " +
+            "the script's own line patterns rather than by `compiled-calls.ts`: " +
+            "every aggregate of B, and every call whose result is a B, by B's " +
+            "own function or a conversion. Five pinned Rust clones.",
+          unit: "(routine, struct) pairs a referee says the routine creates, drawn as @builds arrows",
+          counts: { asked: 1345, missed: 0 },
+          covers: ["rust"],
+          note:
+            "0 of 1,345 called wrong: 479 confirmed, the rest quiet, 323 of " +
+            "them on a routine that reaches a macro. The first run said 4, and " +
+            "all four were read. One was the reader: regex's `primitives.rs` " +
+            "has a `fn new` a macro generates, which creates the " +
+            "`SmallIndexIter`, and the reader answered about the plain `fn new` " +
+            "beside it -- now quiet whenever a macro in the file writes a " +
+            "routine of that name. Three were the referee: two counted a " +
+            "borrowed `&B` handed back as a B created, and one read a " +
+            "closure's local as its function's, because MIR numbers locals " +
+            "per body. Over the 615 pairs where a call hands back an owned B " +
+            "and nothing creates one, 0 went red, by construction: a B in a " +
+            "call's result is a B the gate sees. Neither referee is fully apart " +
+            "from the reader: the MIR one reads the same dump the gate does, " +
+            "through different code, and the text one shares tree-sitter's " +
+            "parse of which routines exist. The shapes neither can see -- " +
+            "`Self`, an alias, a `cfg`, a binary target, a macro -- are the " +
+            "tests in tests/builds-absent-rust.test.ts.",
+        },
         indirect: NO_INDIRECT_READER,
       },
       calls: {
@@ -1576,23 +1643,55 @@ export const LICENCES: readonly Licence[] = [
         indirect: NO_INDIRECT_READER,
       },
       builds: {
+        /*
+         * Unmeasured until #362, and the note it carried said why: Python
+         * spells making one as an ordinary call, and the backwards verdict
+         * rests on finding that call at the far end. #309 made the call
+         * findable through imports; #362 measured what reading it that way
+         * accuses, against jedi.
+         */
         presence: {
-          unmeasured:
-            "Python spells making one of something as an ordinary call, so the " +
-            "referee has no pattern to count and the reader has no verdict to " +
-            "give: `measure:constructs` asks it 0 times over the 4,077 files " +
-            "of the pinned clones. Until #207 this square read `yes`, on the " +
-            "strength of three measurements of other words. " +
-            "#309 changed what the reader can *confirm* and deliberately not " +
-            "this: resolving the called name through the file's imports tells " +
-            "`Response(body)` from `render(body)` where the import places the " +
-            "name, and `constructs.ts` answers only `confirmed` or a refusal on " +
-            "that path -- Python never reaches `absent`, which is the door " +
-            "`backwards` stands behind. So the accusation is still unmeasured " +
-            "and still refused, and giving it a licence would need its own run " +
-            "against pyright first.",
+          reproduce: "JEDI_PYTHON=<python with jedi> npm run measure:builds-absent -- --language=python",
+          measured: "2026-09-25",
+          referee:
+            "jedi -- parso and its own inference, nothing shared with pyright or " +
+            "tree-sitter -- listing every project class each routine calls, over " +
+            "httpx, flask and poetry (`scripts/lib/builds_jedi.py`). The reader is " +
+            "`@calls`' call reading with pyright behind it, as the bench runs it.",
+          unit: "(routine, class) pairs jedi says the routine creates, drawn as @builds arrows",
+          counts: { asked: 248, missed: 0 },
+          covers: ["python"],
+          note:
+            "The backwards verdict: the tail is a class and the head's own code " +
+            "calls it. 0 of the 248 were called wrong either way -- backwards or " +
+            "creates-none -- 206 confirmed, 42 quiet. The same run licenses the " +
+            "absence row below.",
         },
-        absence: NOT_DESIGNED_YET,
+        /*
+         * The absence (#362): every call the routine makes was placed by
+         * `@calls`' reading, none lands in the head's file, none on a class
+         * deriving from the head, none on a value that could hold a class.
+         */
+        absence: {
+          reproduce: "JEDI_PYTHON=<python with jedi> npm run measure:builds-absent -- --language=python",
+          measured: "2026-09-25",
+          referee:
+            "jedi -- parso and its own inference, nothing shared with pyright or " +
+            "tree-sitter -- listing every project class each routine calls, over " +
+            "httpx, flask and poetry (`scripts/lib/builds_jedi.py`). The reader is " +
+            "`@calls`' call reading with pyright behind it, as the bench runs it.",
+          unit: "(routine, class) pairs jedi says the routine creates, drawn as @builds arrows",
+          counts: { asked: 248, missed: 0 },
+          covers: ["python"],
+          note:
+            "0 of 248 called wrong. Thin next to TypeScript's 1,053 and Rust's " +
+            "1,345, because jedi is slow and #360 read these three trees. The " +
+            "shapes jedi cannot tell the reader about -- `cls()`, " +
+            "`type(self)()`, a class kept in an attribute, a subclass, a " +
+            "`TypedDict` -- are the tests in tests/builds-absent.test.ts. " +
+            "Poetry's split package and attributes set at runtime leave jedi " +
+            "without an answer, so a construction through one is not a pair.",
+        },
         indirect: NO_INDIRECT_READER,
       },
       calls: {
