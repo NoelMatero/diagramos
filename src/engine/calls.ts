@@ -326,8 +326,8 @@ export type CallsNotClosed =
   /**
    * The tail's body names the head without calling it -- `map(double)`,
    * `spawn(worker)` -- so it hands the routine to something that does
-   * (#357). Rust only: every call in the body can be placed and the head is
-   * still what runs.
+   * (#357, and for every language since #359). Every call in the body can
+   * be placed and the head is still what runs.
    */
   | "named"
   | SiteUnresolved;
@@ -1506,14 +1506,16 @@ function closedBodyRefutes(
 ): { evidence: CallsRefutedEvidence } | { reached: CallsWrongRoutineEvidence } | { why: CallsNotClosed } {
   const text = textClosed(from, to);
   /*
-   * Closed, and in Rust still not the end of it: every call the text wrote
-   * was placed, and the head can run without being written as one (#357).
-   * `a + b` runs `add`, `?` runs `from`, a scope's end runs `drop` -- and a
-   * body can hand the head to `map` by name. Each of those went red on a
-   * correct arrow once rust-analyzer could place everything else.
+   * Closed, and still not the end of it: every call the text wrote was
+   * placed, and the head can run without being written as one. A body can
+   * hand the head on by name -- `xs.map(double)`, `sorted(xs, key=double)`,
+   * `onClick={double}` -- to something that runs it (#359; Rust's
+   * `map(double)` was #357). And in Rust `a + b` runs `add`, `?` runs `from`,
+   * a scope's end runs `drop`. Each of those went red on a correct arrow.
    */
   const closedByText = (): typeof text => {
-    const unwritten = from.language === "rust" ? unwrittenRustCall(from, to) : undefined;
+    const unwritten = (from.language === "rust" ? calledImplicitly(to) : undefined)
+      ?? (handsOnHead(from, to) ? "named" : undefined);
     return unwritten ? { why: unwritten } : text;
   };
   if (!("why" in text) && !known) return closedByText();
@@ -1559,24 +1561,54 @@ export interface CompiledTail {
 }
 
 /**
- * How a Rust tail can reach the head without a call to it being written, on a
- * body whose written calls were all placed elsewhere (#357).
- *
- * `called-implicitly`  the head is a method of a trait this repository does
- *                      not declare -- `Add`, `From`, `Display`, `Drop`, a
- *                      library's trait. The language or the library runs
- *                      those on the caller's behalf, on values whose types
- *                      the text does not always write down: a field, a
- *                      `Result<T>` alias hiding the error type. A trait the
- *                      repository declares is only ever called by name.
- * `named`              the body names the head without calling it.
+ * Whether the head is a method of a trait this repository does not declare
+ * -- `Add`, `From`, `Display`, `Drop`, a library's trait (#357). The
+ * language or the library runs those on the caller's behalf, on values
+ * whose types the text does not always write down: a field, a `Result<T>`
+ * alias hiding the error type. A trait the repository declares is only ever
+ * called by name.
  */
-function unwrittenRustCall(
+function calledImplicitly(to: CallSide & { names: string[] }): "called-implicitly" | undefined {
+  const names = new Set(to.names);
+  return traitImplsOf(to.source, names).some((one) => !traitDeclaredHere(to, one.trait)) ? "called-implicitly" : undefined;
+}
+
+/**
+ * Whether the tail's body names the head anywhere it does not call it (#359).
+ *
+ * A name that is not a call's callee is the routine handed on as a value --
+ * an argument, a property, a field, a return -- and whatever receives it may
+ * run it. So this asks the grammar nothing about *where* the name sits: any
+ * named leaf spelt as the head, at a position no call site claims, is
+ * enough. That is one rule in every grammar, and no list of `map`, `sorted`
+ * and `setTimeout` to go stale (docs/reading-a-grammar.md).
+ *
+ * "Spelt as the head" is those of the head's names its file declares as a
+ * routine, and any name this file imports *as* one of them -- `import {
+ * double as twice }`, `use crate::b::double as twice` -- or imports from the
+ * head's file without saying under which name, as a default import does.
+ * `B.double` needs nothing extra: `double` is a leaf of its own. Only what
+ * runs can be handed on to run: an arrow at a type whose name the body
+ * writes as a type (`as Point`) is still a wrong arrow.
+ *
+ * Only a body is read. An overload's signature has none, and its type
+ * parameters are not a value being handed anywhere.
+ *
+ * It can withhold on a body that only shares a word with the head -- a local
+ * called `double` -- and that is the side to be wrong on.
+ */
+function handsOnHead(
   from: CallSide & { routine: string },
   to: CallSide & { names: string[] },
-): "called-implicitly" | "named" | undefined {
-  const names = new Set(to.names);
-  if (traitImplsOf(to.source, names).some((one) => !traitDeclaredHere(to, one.trait))) return "called-implicitly";
+): boolean {
+  const names = new Set(to.names.filter((name) => isRoutine(to.source, name, to.language)));
+  if (names.size === 0) return false;
+  for (const [local, binding] of bindingsIn(from.source, from.language)?.imported ?? []) {
+    if (binding.name !== undefined ? names.has(binding.name) : !binding.namespace
+      && from.imports.some((one) => one.specifier === binding.specifier && one.file === to.file)) {
+      names.add(local);
+    }
+  }
 
   const reading = callSitesIn(from, from.routine);
   const called = new Set<number>();
@@ -1587,15 +1619,16 @@ function unwrittenRustCall(
     }
   }
   let named = false;
-  for (const routine of routinesNamed(from.source, from.routine, "rust").routines) {
-    const body = routine.childForFieldName("body");
+  for (const routine of routinesNamed(from.source, from.routine, from.language).routines) {
+    const body = routine.childForFieldName("body")
+      ?? routine.childForFieldName("value")?.childForFieldName("body");
     if (!body) continue;
     each(body, (node) => {
-      if (named || (node.type !== "identifier" && node.type !== "field_identifier")) return;
+      if (named || node.childCount !== 0 || !node.isNamed) return;
       if (names.has(node.text) && !called.has(node.startIndex)) named = true;
     });
   }
-  return named ? "named" : undefined;
+  return named;
 }
 
 /**
