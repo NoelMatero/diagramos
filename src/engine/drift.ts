@@ -1246,6 +1246,13 @@ export interface ClaimTally {
    */
   callsCompilable: number;
   /**
+   * `@builds` arrows with a Rust tail that every text rule would let say
+   * "creates none", waiting only on rustc's body for the routine (#362).
+   * The same question to the caller as `callsCompilable`, and
+   * `referee-live.ts` adds the two.
+   */
+  buildsCompilable: number;
+  /**
    * Arrows asserting that the tail reads a named member off the head's type.
    *
    * The one word here whose two ends stand on different footings, so its numbers
@@ -3105,7 +3112,7 @@ export function checkDrift(
     accesses: 0, accessesConfirmed: 0, accessesWithheld: {},
     conforms: 0, conformsConfirmed: 0, conformsWithheld: {},
     builds: 0, buildsConfirmed: 0, buildsWithheld: {},
-    calls: 0, callsConfirmed: 0, callsWithheld: {}, callsNotClosed: {}, callsCompilable: 0,
+    calls: 0, callsConfirmed: 0, callsWithheld: {}, callsNotClosed: {}, callsCompilable: 0, buildsCompilable: 0,
     feeds: 0, feedsConfirmed: 0, feedsWithheld: {},
     plannedWithheld: {},
     endsUnsettled: 0,
@@ -4853,7 +4860,7 @@ export function checkDrift(
            * the workspace refuses an absolute path, and a `CallSide.file` is
            * compared against the repo-relative file a dependency resolved to.
            *
-           * Built for Python and, since #362, TypeScript: it costs a
+           * Built for Python and, since #362, TypeScript and Rust: it costs a
            * dependency read per file. TypeScript's grammar has a node that
            * means construction, so it needs the imports for something else --
            * saying "creates none" only once every `new C()` has been followed
@@ -4862,6 +4869,15 @@ export function checkDrift(
           let names: ConstructsNames | undefined;
           if (language === "python" || language === "ts" || language === "tsx") {
             const tail = callSide(fromAnchor, workspace, importCache.configs);
+            if (tail) names = { side: tail, target: toAnchor };
+          } else if (language === "rust" && edge.state !== "planned") {
+            /*
+             * Rust needs rustc's own body for the routine before it may say
+             * "creates none" (#362) -- the text cannot say what `x.clone()`
+             * makes. `callSide` offers the compiled crate only to a side that
+             * asks for it, the way `@calls`' tail does.
+             */
+            const tail = callSide(fromAnchor, workspace, importCache.configs, options?.closedBodyReferee, true);
             if (tail) names = { side: tail, target: toAnchor };
           }
           const verdict = constructions(
@@ -4936,6 +4952,7 @@ export function checkDrift(
             } });
             continue;
           }
+          if (claimed && verdict.verdict === "absent" && verdict.awaitsCompiler) claims.buildsCompilable += 1;
           /*
            * `absent` and `cycle` are both silent here. Absent is now only what
            * a language without the absence licence gets, or a planned arrow;

@@ -4,6 +4,7 @@
  *
  *   npm run measure:builds-absent -- --language=ts           -- the TypeScript clones
  *   npm run measure:builds-absent -- --language=ts --cases   -- print every accusation
+ *   npm run measure:builds-absent -- --language=rust         -- the Rust clones, rustc on PATH
  *
  * **The gate for #362's absence licence. A measurement: it prints and never fails.**
  *
@@ -28,6 +29,19 @@
  * `new` expression, the symbol behind each JSX tag, and the contextual type of
  * each object literal. It shares nothing with the reader judged, which reads
  * tree-sitter nodes and follows imports with `calls.ts`' resolver.
+ *
+ * Rust: two, because the reader itself now asks rustc. The accusation needs
+ * rustc's MIR for the routine to show no B, so a referee reading the same
+ * MIR is not independent of it. So Rust gets both:
+ *
+ *   - the text scan `measure:constructs` uses (`scripts/lib/construct-scan.ts`):
+ *     every `B { .. }` written in a routine, read with no syntax tree and no
+ *     compiler. Independent of the MIR half of the reader.
+ *   - rustc's MIR, read here by its own line patterns rather than by
+ *     `compiled-calls.ts`: every aggregate of B, and every call whose result
+ *     is a B -- B's own function (`B::new`), a conversion (`into`, `clone`,
+ *     `default`, `collect`), or any other call ("gets"). Independent of the
+ *     text half, and of the code that parses the same dump for the reader.
  *
  * ## What it cannot see, stated before anybody reads the zero
  *
@@ -75,8 +89,13 @@ const TS_TREES: Record<string, string[]> = {
 interface Pair {
   from: string;
   to: string;
-  /** How the referee says the routine comes by it: writes it, types a literal as it, or gets it from a call. */
-  how: "new" | "literal" | "gets";
+  /**
+   * How the referee says the routine comes by it. Everything but `gets` is
+   * the routine creating it, and must never be accused: `new` / `literal` from
+   * the TypeScript compiler, `written` from the Rust text scan, `aggregate`,
+   * `own` (B's own function) and `conversion` from rustc's MIR.
+   */
+  how: "new" | "literal" | "written" | "aggregate" | "own" | "conversion" | "gets";
   /** What the head is declared as. */
   target: string;
 }
@@ -97,15 +116,17 @@ if (only) {
   process.exit(0);
 }
 
-if (language !== "ts") {
-  process.stderr.write(`--language=${language}: not measured yet. Only ts is wired.\n`);
+const RUST_TREES = ["anyhow", "clap", "json", "regex", "ripgrep"];
+const TREES: Record<string, string[]> = { ts: Object.keys(TS_TREES), rust: RUST_TREES };
+if (!TREES[language]) {
+  process.stderr.write(`--language=${language}: not measured yet. ts and rust are wired.\n`);
   process.exit(1);
 }
 
 const results: ProjectResult[] = [];
 const failed: string[] = [];
 const self = fileURLToPath(import.meta.url);
-for (const project of Object.keys(TS_TREES)) {
+for (const project of TREES[language]!) {
   process.stderr.write(`${project}...\n`);
   const run = spawnSync(process.execPath, [
     ...process.execArgv, self, `--language=${language}`, `--one=${project}`,
@@ -123,7 +144,7 @@ report(results, failed);
 function report(results: ProjectResult[], failed: string[]): void {
   const tally: Record<string, number> = {};
   for (const one of results) for (const [key, count] of Object.entries(one.tally)) tally[key] = (tally[key] ?? 0) + count;
-  const created = (key: string) => key.startsWith("new ") || key.startsWith("literal ");
+  const created = (key: string) => !key.startsWith("gets ");
   const sum = (keep: (key: string) => boolean) =>
     Object.entries(tally).filter(([key]) => keep(key)).reduce((total, [, count]) => total + count, 0);
 
@@ -135,7 +156,7 @@ function report(results: ProjectResult[], failed: string[]): void {
   console.log(`\n@builds absence, ${language}: ${results.length} project(s)`);
   console.log(`  pairs the compiler says the routine creates: ${createdPairs}`);
   console.log(`    called wrong by the checker: ${wrong.length}   <- must be 0`);
-  for (const how of ["new", "literal"]) {
+  for (const how of ["new", "literal", "written", "aggregate", "own", "conversion"]) {
     const rows = Object.entries(tally).filter(([key]) => key.startsWith(`${how} `)).sort();
     for (const [key, count] of rows) console.log(`      ${String(count).padStart(5)}  ${key}`);
   }
@@ -160,11 +181,222 @@ function report(results: ProjectResult[], failed: string[]): void {
 
 async function measureOne(project: string): Promise<ProjectResult> {
   const root = path.join(CORPUS, project);
+  if (language === "rust") {
+    const { pairs, referee } = await rustPairs(root);
+    process.stderr.write(`${project}: ${pairs.length} pairs\n`);
+    return askChecker(project, root, pairs, referee);
+  }
   // Loaded here so the parent process never pays for the compiler.
   const ts = (await import("typescript")).default;
   const pairs = typescriptPairs(ts, root, TS_TREES[project] ?? []);
   process.stderr.write(`${project}: ${pairs.length} pairs\n`);
   return askChecker(project, root, pairs);
+}
+
+/**
+ * The Rust referees: the text scan's constructions, and rustc's MIR read by
+ * its own line patterns. The crates are built (or read from the cache) the
+ * way the product builds them, and handed to the checker the same way.
+ */
+async function rustPairs(root: string): Promise<{ pairs: Pair[]; referee: import("../src/engine/drift").ClosedBodyReferee }> {
+  const { readFileSync } = await import("node:fs");
+  const { createHash } = await import("node:crypto");
+  const { compileCrates, rustcCacheDir } = await import("../src/engine/referee-rustc");
+  const { compiledBodiesOf } = await import("../src/engine/compiled-calls");
+  const { initEngine, parseSource, each } = await import("../src/engine/parse");
+  const { refereeRoutines } = await import("./lib/construct-scan");
+  await initEngine();
+
+  const skip = new Set(["target", ".git", "node_modules", "tests", "benches", "examples", "fuzz"]);
+  const walk = (dir: string, out: string[] = []): string[] => {
+    for (const name of readdirSync(dir)) {
+      if (skip.has(name)) continue;
+      const full = path.join(dir, name);
+      if (statSync(full).isDirectory()) walk(full, out);
+      else if (name.endsWith(".rs")) out.push(full);
+    }
+    return out;
+  };
+  const absolute = walk(root);
+  const files = absolute.map((one) => path.relative(root, one));
+  const crates = await compileCrates(root, files, { until: Date.now() + 900_000 });
+  const referee = {
+    resolveReceiver: () => undefined,
+    compiledCrateOf: (file: string) => crates.crateOf(file),
+  };
+
+  // Types declared once in the repository, and where.
+  const sources = new Map<string, string>();
+  const declared = new Map<string, string[]>();
+  for (const file of files) {
+    const source = readFileSync(path.join(root, file), "utf8");
+    sources.set(file, source);
+    const tree = parseSource(source, "rust");
+    if (!tree) continue;
+    each(tree.rootNode, (node) => {
+      if (!/^(struct|enum)_item$/.test(node.type)) return;
+      const name = node.childForFieldName("name")?.text;
+      if (name) declared.set(name, [...(declared.get(name) ?? []), file]);
+    });
+  }
+  const home = (name: string) => {
+    const at = declared.get(name);
+    return at && at.length === 1 ? at[0] : undefined;
+  };
+
+  // rustc's raw bodies, by printed path, closures folded into their function.
+  const raw = new Map<string, string[][]>();  // printed path -> its bodies, closures apart
+  const manifests = new Set<string>();
+  for (const file of absolute) {
+    for (let dir = path.dirname(file); dir.startsWith(root); dir = path.dirname(dir)) {
+      if (existsSync(path.join(dir, "Cargo.toml"))) { manifests.add(path.join(dir, "Cargo.toml")); break; }
+    }
+  }
+  for (const manifest of manifests) {
+    const key = createHash("sha1").update(manifest).digest("hex").slice(0, 16);
+    const dump = path.join(rustcCacheDir(), key, "calls.mir");
+    if (!existsSync(dump)) continue;
+    for (const [printed, lists] of rawBodies(readFileSync(dump, "utf8"))) {
+      raw.set(printed, [...(raw.get(printed) ?? []), ...lists]);
+    }
+  }
+
+  const rank: Pair["how"][] = ["gets", "conversion", "own", "written", "aggregate"];
+  const found = new Map<string, Pair>();
+  const note = (pair: Pair) => {
+    const key = `${pair.from} -> ${pair.to}`;
+    const was = found.get(key);
+    if (!was || rank.indexOf(pair.how) > rank.indexOf(was.how)) found.set(key, pair);
+  };
+
+  for (const file of files) {
+    const source = sources.get(file)!;
+    // The text scan: every construction written in each routine.
+    for (const routine of refereeRoutines(source, "rust")) {
+      for (const made of routine.makes) {
+        const at = home(made);
+        if (at) note({ from: `${file}#${routine.name}`, to: `${at}#${made}`, how: "written", target: "struct" });
+      }
+    }
+    // rustc's MIR for each routine the product can match to its body.
+    const crate = crates.crateOf(file);
+    if (!crate) continue;
+    const tree = parseSource(source, "rust");
+    if (!tree) continue;
+    const routines = new Set<string>();
+    each(tree.rootNode, (node) => {
+      if (node.type === "function_item") {
+        const name = node.childForFieldName("name")?.text;
+        if (name) routines.add(name);
+      }
+    });
+    for (const routine of routines) {
+      const reading = compiledBodiesOf(crate, file, source, routine);
+      if ("why" in reading) continue;
+      const lists: string[][] = [];
+      let unique = true;
+      for (const body of reading.bodies) {
+        const got = raw.get(body.path) ?? [];
+        if (got.filter((one) => one[0] === "@@OWN").length !== 1) unique = false;
+        else lists.push(...got);
+      }
+      if (!unique) continue;
+      const makes = new Map<string, Pair["how"]>();
+      for (const list of lists) {
+        for (const [made, how] of mirMakes(list)) {
+          const was = makes.get(made);
+          if (!was || rank.indexOf(how) > rank.indexOf(was)) makes.set(made, how);
+        }
+      }
+      for (const [made, how] of makes) {
+        const at = home(made);
+        if (at) note({ from: `${file}#${routine}`, to: `${at}#${made}`, how, target: "struct" });
+      }
+    }
+  }
+  return { pairs: [...found.values()], referee };
+}
+
+/**
+ * Raw MIR per printed path: the function's own body first, then each closure
+ * of it as a list of its own. The #360 probe's reading, with one fix: #360
+ * folded a closure's lines into its function's, and MIR numbers locals per
+ * body, so a closure's `_3` overwrote the function's `_3` and its type was
+ * read off the wrong declaration (#362's `next -> Searcher`).
+ */
+function rawBodies(mir: string): Map<string, string[][]> {
+  const out = new Map<string, string[][]>();
+  let open: string[] | undefined;
+  let skipping = false;
+  let ctfe = false;
+  for (const line of mir.split("\n")) {
+    if (open || skipping) {
+      if (line === "}") { open = undefined; skipping = false; } else open?.push(line);
+      continue;
+    }
+    if (line.startsWith("// MIR FOR CTFE")) { ctfe = true; continue; }
+    if (line.startsWith(" ") || line.startsWith("//") || !line.endsWith("{")) continue;
+    const header = line.match(/^(?:const )?fn (.*)$/);
+    if (!header || ctfe) { skipping = true; ctfe = false; continue; }
+    const rest = header[1]!;
+    let depth = 0;
+    let cut = -1;
+    for (let index = 0; index < rest.length; index += 1) {
+      const char = rest[index]!;
+      if ("<{[".includes(char)) depth += 1;
+      else if (">}]".includes(char)) depth -= 1;
+      else if (char === "(" && depth === 0) { cut = index; break; }
+    }
+    let printed = cut < 0 ? rest : rest.slice(0, cut);
+    const nested = printed.search(/::\{[\w -]+#\d+\}/);
+    if (nested >= 0) printed = printed.slice(0, nested);
+    const lists = out.get(printed) ?? [];
+    out.set(printed, lists);
+    open = [];
+    // The function's own body is marked, so a printed path rustc gave two
+    // functions -- the ambiguity the caller refuses -- can be told apart from
+    // one function with closures.
+    if (nested < 0) open.push("@@OWN");
+    lists.push(open);
+  }
+  return out;
+}
+
+/** What a routine's raw MIR creates, by type name, and how. */
+function mirMakes(texts: string[]): Map<string, Pair["how"]> {
+  const base = (type: string) =>
+    type.replace(/^(&(mut )?|\*(const|mut) )+/, "").replace(/'\w+ /g, "").split("<")[0]!.split("::").pop()!.trim();
+  const locals = new Map<string, string>();
+  for (const line of texts) {
+    const local = line.match(/^\s+let (?:mut )?_(\d+): (.+);$/);
+    if (local) locals.set(local[1]!, local[2]!);
+  }
+  const rank: Pair["how"][] = ["gets", "conversion", "own", "aggregate"];
+  const made = new Map<string, Pair["how"]>();
+  const note = (name: string, how: Pair["how"]) => {
+    const was = made.get(name);
+    if (!was || rank.indexOf(how) > rank.indexOf(was)) made.set(name, how);
+  };
+  for (const line of texts) {
+    if (!/ -> \[/.test(line)) {
+      const aggregate = line.match(/^\s+(?:\(?\*?)?_\d+[^=]*= ((?:\w+::)*)(\w+)(?:::<[^;]*?>)?(?:::(\w+))?\s*[{(;]/);
+      if (aggregate && !/^(move|copy|const)$/.test(aggregate[2]!)) note(aggregate[2]!, "aggregate");
+      continue;
+    }
+    const call = line.match(/^\s+_(\d+) = (.+?) -> \[/);
+    if (!call) continue;
+    const type = locals.get(call[1]!);
+    // A reference or a pointer handed back is somebody else's B, borrowed --
+    // not one this routine created (#362: `build_ignore -> WalkBuilder`).
+    if (!type || /^[&*]/.test(type)) continue;
+    const name = base(type);
+    const callee = call[2]!;
+    const escaped = name.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+    const own = new RegExp(`^(?:\\w+::)*${escaped}(?:::<.*?>)?::\\w+|^<(?:\\w+::)*${escaped}(?:<.*?>)? as `).test(callee);
+    const conversion = /::(into|from|try_into|try_from|default|clone|collect|parse|to_owned|from_str|from_iter)(::<.*>)?\(/.test(callee);
+    note(name, own ? "own" : conversion ? "conversion" : "gets");
+  }
+  return made;
 }
 
 /**
@@ -237,7 +469,7 @@ function typescriptPairs(ts: typeof import("typescript"), root: string, dirs: st
     return undefined;
   };
 
-  const rank = ["gets", "literal", "new"] as const;
+  const rank: Pair["how"][] = ["gets", "literal", "new"];
   const pairs: Pair[] = [];
   for (const source of program.getSourceFiles()) {
     if (!reading.has(source.fileName)) continue;
@@ -277,7 +509,12 @@ function typescriptPairs(ts: typeof import("typescript"), root: string, dirs: st
 }
 
 /** Every pair drawn as a `@builds` arrow and checked by the product. */
-async function askChecker(project: string, root: string, pairs: Pair[]): Promise<ProjectResult> {
+async function askChecker(
+  project: string,
+  root: string,
+  pairs: Pair[],
+  referee?: import("../src/engine/drift").ClosedBodyReferee,
+): Promise<ProjectResult> {
   const { checkDrift, createWorkspace, newCheckCache, ACCUSING_EDGE_KINDS } = await import("../src/engine/drift");
   const { emptyBoard } = await import("../src/engine/board-file");
   const { createDiagram } = await import("../src/engine/diagram");
@@ -297,7 +534,9 @@ async function askChecker(project: string, root: string, pairs: Pair[]): Promise
     });
     let answer: string;
     try {
-      const report = checkDrift(board, cache.workspace, { edges: true, cache });
+      const report = checkDrift(board, cache.workspace, {
+        edges: true, cache, ...(referee ? { closedBodyReferee: referee } : {}),
+      });
       const red = report.edges.find((finding) => accusing.has(finding.kind));
       if (red) answer = `red ${red.kind}`;
       else if (report.claims.buildsConfirmed > 0) answer = "green";

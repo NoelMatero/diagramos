@@ -1160,7 +1160,47 @@ export const LICENCES: readonly Licence[] = [
             "construction at all; a false `backwards` needs a miss paired with a " +
             "hit the other way.",
         },
-        absence: NOT_DESIGNED_YET,
+        /*
+         * The absence (#362), and the reader rests on rustc: the text rules
+         * pass, *and* rustc's MIR for the routine shows no B written and no
+         * call handing one back. A routine rustc did not compile is never
+         * accused.
+         */
+        absence: {
+          reproduce: "npm run measure:builds-absent -- --language=rust",
+          measured: "2026-09-25",
+          referee:
+            "two, because the reader itself asks rustc. The text scan " +
+            "`measure:constructs` uses -- every `B { .. }` written in a " +
+            "routine, no syntax tree, no compiler -- and rustc's MIR read by " +
+            "the script's own line patterns rather than by `compiled-calls.ts`: " +
+            "every aggregate of B, and every call whose result is a B, by B's " +
+            "own function or a conversion. Five pinned Rust clones.",
+          unit: "(routine, struct) pairs a referee says the routine creates, drawn as @builds arrows",
+          counts: { asked: 1345, missed: 0 },
+          covers: ["rust"],
+          note:
+            "0 of 1,345 called wrong: 479 confirmed, the rest quiet, 323 of " +
+            "them on a routine that reaches a macro. The first run said 4, and " +
+            "all four were read. One was the reader: regex's `primitives.rs` " +
+            "has a `fn new` a macro generates, which creates the " +
+            "`SmallIndexIter`, and the reader answered about the plain `fn new` " +
+            "beside it -- now quiet whenever a macro in the file writes a " +
+            "routine of that name. Three were the referee: two counted a " +
+            "borrowed `&B` handed back as a B created, and one read a " +
+            "closure's local as its function's, because MIR numbers locals " +
+            "per body. Over the 615 pairs where a call hands back an owned B " +
+            "and nothing creates one, 0 went red, by construction: a B in a " +
+            "call's result is a B the gate sees.",
+          known: [
+            "Two referees, and neither is fully apart from the reader: the MIR " +
+              "one reads the same dump the gate does, through different code, " +
+              "and the text one shares tree-sitter's parse of which routines " +
+              "exist. The shapes neither can see -- `Self`, an alias, a " +
+              "`cfg`, a binary target, a macro -- are the tests in " +
+              "tests/builds-absent-rust.test.ts.",
+          ],
+        },
         indirect: NO_INDIRECT_READER,
       },
       calls: {

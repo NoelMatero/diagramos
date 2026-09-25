@@ -218,7 +218,7 @@ export async function refereedCheckLive(
    * else open never starts a server for it.
    */
   const askServers = wouldHelp(first);
-  const askCompiler = options.compiler !== false && first.claims.callsCompilable > 0;
+  const askCompiler = options.compiler !== false && first.claims.callsCompilable + first.claims.buildsCompilable > 0;
   if (!askServers && !askCompiler) {
     return { report: first, checkedWith: { answered: [], silent: [], nothingToAsk: true } };
   }

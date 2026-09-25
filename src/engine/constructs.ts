@@ -67,7 +67,7 @@
  * Python remains the whole of why this word cannot be trusted with an absence
  * even in the languages where the syntax is clear.
  */
-import { bindingsIn, placeName, type Bindings, type CallSide } from "./calls";
+import { bindingsIn, compiledBodiesFor, placeName, type Bindings, type CallSide } from "./calls";
 import { mayAccuse } from "./licence";
 import { each, parseSource, type Language, type Node } from "./parse";
 
@@ -177,7 +177,11 @@ export type ConstructsVerdict =
    * this is "no construction found", never "no construction happens". Reported
    * exactly as an unclaimed arrow is.
    */
-  | { verdict: "absent" }
+  /**
+   * `awaitsCompiler`: a Rust routine every text rule would let say "creates
+   * none", held back only because rustc's body for it was not on hand (#362).
+   */
+  | { verdict: "absent"; awaitsCompiler?: true }
   /**
    * The routine's own body creates none of the head's type, and every reason
    * it might have without writing the name was ruled out (#362).
@@ -382,14 +386,16 @@ function madeIn(
  * reader was not asked.
  */
 function onlyNewCreates(source: string, tailLanguage: Language, language: Language, names: string[]): boolean {
-  const typescript = (one: Language) => one === "ts" || one === "tsx";
-  if (!typescript(tailLanguage) || !typescript(language) || names.length === 0) return false;
+  if (tailLanguage === "rust" && language === "rust") return onlyStructs(source, names);
+  if (!isTypeScript(tailLanguage) || !isTypeScript(language) || names.length === 0) return false;
   const tree = parseSource(source, language);
   if (!tree) return false;
   const wanted = new Set(names);
   const buildable = new Set<string>();
   let doubt = false;
   each(tree.rootNode, (node) => {
+    // `<Widget />` carries the component on a `name` field too: a use, not a declaration.
+    if (node.type.startsWith("jsx_")) return;
     const name = node.childForFieldName("name");
     if (!name || name.childCount !== 0 || !wanted.has(name.text)) return;
     // A method or a parameter that happens to share the name is not a
@@ -411,6 +417,74 @@ function onlyNewCreates(source: string, tailLanguage: Language, language: Langua
 }
 
 /**
+ * Rust's `onlyNewCreates`: every one of these names is declared as a struct,
+ * an enum or a union, and nothing else of that name is declared -- a `type`
+ * alias or a trait is quiet, because what it stands for is written elsewhere.
+ * An `impl` names its type on a `type` field, not `name`, so it is not a
+ * second declaration.
+ */
+function onlyStructs(source: string, names: string[]): boolean {
+  if (names.length === 0) return false;
+  const tree = parseSource(source, "rust");
+  if (!tree) return false;
+  const wanted = new Set(names);
+  const buildable = new Set<string>();
+  let doubt = false;
+  each(tree.rootNode, (node) => {
+    // `Widget { x }` carries the type on a `name` field too: a use, not a declaration.
+    if (MAKES.test(node.type)) return;
+    const name = node.childForFieldName("name");
+    if (!name || name.childCount !== 0 || !wanted.has(name.text)) return;
+    if (node.childForFieldName("parameters")) return;
+    if (/^(struct|enum|union)_item$/.test(node.type)) buildable.add(name.text);
+    else doubt = true;
+  });
+  return !doubt && names.every((name) => buildable.has(name));
+}
+
+/**
+ * Whether a macro in this file writes a routine of this name (#362).
+ *
+ * regex's `primitives.rs` has a plain `fn new` and a `macro_rules!` that
+ * generates more of them, one of which creates a `SmallIndexIter`. The text
+ * sees only the plain one, and so does the body matching in
+ * `compiled-calls.ts` -- so an arrow meant for the generated `new` would be
+ * answered about the other. A macro body is an unparsed token tree, so this
+ * reads its text: `fn` followed by the name, anywhere inside one.
+ */
+function macroDeclares(source: string, routine: string): boolean {
+  const tree = parseSource(source, "rust");
+  if (!tree) return true;
+  const written = new RegExp(`\\bfn\\s+${routine.replace(/[^\w]/g, "")}\\b`);
+  let found = false;
+  each(tree.rootNode, (node) => {
+    if (!found && node.type === "token_tree" && written.test(node.text)) found = true;
+  });
+  return found;
+}
+
+/**
+ * Whether rustc's own body for the routine creates none of these types (#362).
+ *
+ * The text cannot say what `h.first.clone()` or `x.into()` creates, and #360
+ * found about 17 real functions in the Rust corpus that create a B exactly
+ * that way. rustc's MIR can: every value a call hands back sits in a local
+ * whose type is written, and every aggregate names its type -- through an
+ * alias, a `use .. as`, or `Self`. So Rust may only say "creates none" when
+ * that list agrees.
+ *
+ * No body is no answer: a binary target, a `cfg` on or in the routine, a body
+ * that cannot be matched to exactly one declaration (`compiledBodiesFor`,
+ * #357's rules).
+ */
+function compiledCreatesNone(routine: string, wanted: Set<string>, names: ConstructsNames | undefined): boolean {
+  if (!names?.side.compiled) return false;
+  const compiled = compiledBodiesFor({ ...names.side, routine });
+  if (!compiled || compiled.bodies.length === 0) return false;
+  return compiled.bodies.every((body) => ![...wanted].some((name) => body.made.has(name)));
+}
+
+/**
  * Whether any of these routines writes the head's name, or a name the file
  * imports it under, anywhere at all -- types included (#362).
  *
@@ -427,15 +501,34 @@ function namesTheHead(routines: Node[], source: string, language: Language, want
   for (const [local, binding] of bindingsIn(source, language)?.imported ?? []) {
     if (binding.name !== undefined && wanted.has(binding.name)) spelt.add(local);
   }
+  const selfIsHead = language === "rust" ? selfMeansHead(source, wanted) : [];
   let named = false;
   for (const routine of routines) {
+    // In Rust, `Self` inside the head's own `impl` -- or a trait's, where it is
+    // whoever implements it -- is the head under another name.
+    const inside = selfIsHead.some((span) => routine.startIndex >= span.start && routine.startIndex < span.end);
     each(routine, (node) => {
       if (named || node.childCount !== 0 || !node.isNamed) return;
-      if (spelt.has(node.text)) named = true;
+      if (spelt.has(node.text) || (inside && node.text === "Self")) named = true;
     });
     if (named) return true;
   }
   return false;
+}
+
+/** Where `Self` could be the head in a Rust file: an `impl` of one of its names, and every trait. */
+function selfMeansHead(source: string, wanted: Set<string>): Array<{ start: number; end: number }> {
+  const tree = parseSource(source, "rust");
+  if (!tree) return [];
+  const spans: Array<{ start: number; end: number }> = [];
+  each(tree.rootNode, (node) => {
+    const implemented = node.type === "impl_item" ? node.childForFieldName("type") : undefined;
+    const bare = implemented?.text.replace(/<[\s\S]*$/, "").split("::").pop();
+    if (node.type === "trait_item" || (bare !== undefined && wanted.has(bare))) {
+      spans.push({ start: node.startIndex, end: node.startIndex + node.text.length });
+    }
+  });
+  return spans;
 }
 
 /**
@@ -852,10 +945,16 @@ export function constructions(
    * it. No `reverse` means a planned arrow or a head nothing could read, and
    * both stay quiet.
    */
-  if (reverse && mayAccuse("builds", language, "absence")
+  const byText = reverse !== undefined && mayAccuse("builds", language, "absence")
     && onlyNewCreates(reverse.source, language, reverse.language, targets)
     && !namesTheHead(routines, source, language, wanted)
-    && everyConstructionIsSomethingElse(routines, source, language, wanted, names)) {
+    && !(language === "rust" && macroDeclares(source, routine));
+  if (byText && language === "rust" && names && !names.side.compiled?.()) {
+    return { verdict: "absent", awaitsCompiler: true };
+  }
+  if (byText && (language === "rust"
+    ? compiledCreatesNone(routine, wanted, names)
+    : everyConstructionIsSomethingElse(routines, source, language, wanted, names))) {
     return { verdict: "refuted", evidence: {
       routine,
       line: lineOf(source, routines[0]!.startIndex),
