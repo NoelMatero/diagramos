@@ -267,6 +267,15 @@ describe("Python: a function that creates something else", () => {
     expect(red.map((finding) => finding.kind)).toEqual(["builds-backwards"]);
     expect(red[0]!.detail).toContain("Maker()");
   });
+
+  it("is still backwards when the head's file writes `Widget | None` in a hint (httpx's URL -> Request)", async () => {
+    // `Widget | None` gives the grammar a `left` field spelt Widget. Read as a
+    // second declaration, it silenced every class used in a union hint.
+    const report = await checked("src/factory.py#Maker", "src/widget.py#Widget", py(
+      "class Maker:\n    def run(self):\n        return 1\n",
+      "from .factory import Maker\n\nclass Widget:\n    def make(self, other: Widget | None = None):\n        return Maker()\n"));
+    expect(accusations(report).map((finding) => finding.kind)).toEqual(["builds-backwards"]);
+  });
 });
 
 describe("Python: a body that could create one without a call spelt as the class", () => {

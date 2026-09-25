@@ -938,7 +938,7 @@ function onlyCalledClasses(source: string, names: string[]): boolean {
   const classes = new Set<string>();
   let doubt = false;
   each(tree.rootNode, (node) => {
-    const name = node.childForFieldName("name") ?? node.childForFieldName("left");
+    const name = node.childForFieldName("name") ?? assigned(node);
     if (!name || name.childCount !== 0 || !wanted.has(name.text)) return;
     if (!node.childForFieldName("body") || node.childForFieldName("parameters")) { doubt = true; return; }
     const bases = node.childForFieldName("superclasses")?.text ?? "";
@@ -998,6 +998,25 @@ function aCallMayCreateTheHead(side: CallSide, routine: string, wanted: Set<stri
   return false;
 }
 
+/**
+ * The name an assignment binds, `Widget` in `Widget = make()`, or nothing.
+ *
+ * Not simply the `left` field: `Widget | None` in a hint has one too, and
+ * read as a declaration it silenced every class used in a union (#362,
+ * httpx's `Request`). What an assignment has and an operator does not is an
+ * `=` -- an anonymous token, so its type is its own text
+ * (docs/reading-a-grammar.md).
+ */
+function assigned(node: Node): Node | undefined {
+  const left = node.childForFieldName("left");
+  if (!left) return undefined;
+  for (let at = 0; at < node.childCount; at += 1) {
+    const part = node.child(at);
+    if (part && !part.isNamed && part.type === "=") return left;
+  }
+  return undefined;
+}
+
 /** Whether this Python source declares `name` as a `def` -- and only as that. */
 function declaresRoutine(source: string, name: string): boolean {
   const tree = parseSource(source, "python");
@@ -1005,10 +1024,10 @@ function declaresRoutine(source: string, name: string): boolean {
   let routine = false;
   let other = false;
   each(tree.rootNode, (node) => {
-    const declared = node.childForFieldName("name") ?? node.childForFieldName("left");
+    const declared = node.childForFieldName("name") ?? assigned(node);
     if (!declared || declared.childCount !== 0 || declared.text !== name) return;
     if (node.childForFieldName("parameters") && node.childForFieldName("body")) routine = true;
-    else if (node.childForFieldName("body") || node.childForFieldName("left")) other = true;
+    else if (node.childForFieldName("body") || assigned(node)) other = true;
   });
   return routine && !other;
 }
