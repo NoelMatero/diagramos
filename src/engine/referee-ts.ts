@@ -570,14 +570,14 @@ function buildReferee(ts: typeof TS, root: string): TsReferee {
    * at its end, and what those lines compile to is the answer.
    *
    * ```
+   * const BoardControl__: any = null;
+   * <BoardControl__ {...({} as any)} />;           the control: can JSX be written here at all?
    * const BoardProbe__ = Widget;                  the name, capitalised: <widget/> would be an HTML tag
    * const boardProps__: object | null | undefined  a component takes an object of props, or none
    *   = null as any as <Widget's first parameter>;
    * const BoardOne__ = (props: any) =>             and what it returns can be rendered:
    *   Widget(props);                               a one-argument wrapper, typed as returning
    * <BoardOne__ {...({} as any)} />;               what Widget returns, stands as a JSX element
-   * const BoardControl__: any = null;
-   * <BoardControl__ {...({} as any)} />;           the control: can JSX be written here at all?
    * ```
    *
    * **Both halves, because either alone is too generous.** React's own types
@@ -612,9 +612,10 @@ function buildReferee(ts: typeof TS, root: string): TsReferee {
     const known = rendered.get(program) ?? new Map<string, boolean | undefined>();
     rendered.set(program, known);
     if (known.has(key)) return known.get(key);
+    const reach = reachOf(name);
     let answer: boolean | undefined;
     try {
-      answer = probeRenderable(program, sourceFile, name.text);
+      answer = reach === undefined ? undefined : probeRenderable(program, sourceFile, reach);
     } catch {
       answer = undefined;
     }
@@ -622,16 +623,43 @@ function buildReferee(ts: typeof TS, root: string): TsReferee {
     return answer;
   }
 
-  function probeRenderable(program: TS.Program, sourceFile: TS.SourceFile, name: string): boolean | undefined {
+  /**
+   * How the end of the file reaches the declaration this name opens: the name
+   * itself, or through the class that holds it -- `Router.prototype["explore"]`
+   * for a method, `Router["create"]` for a static one. A bracket, because it
+   * reaches a `private` member where a dot is refused. Anything else is
+   * reached by its name or not at all, and the compiler says which.
+   */
+  function reachOf(name: TS.Identifier): string | undefined {
+    const member = name.parent;
+    if (!member || !(ts.isMethodDeclaration(member) || ts.isPropertyDeclaration(member)) || member.name !== name) {
+      return name.text;
+    }
+    const holder = member.parent;
+    if (!ts.isClassDeclaration(holder) || !holder.name) return undefined;
+    const outer = reachOf(holder.name);
+    if (outer === undefined) return undefined;
+    const isStatic = ts.getCombinedModifierFlags(member) & ts.ModifierFlags.Static;
+    return `${outer}${isStatic ? "" : ".prototype"}[${JSON.stringify(name.text)}]`;
+  }
+
+  function probeRenderable(program: TS.Program, sourceFile: TS.SourceFile, reach: string): boolean | undefined {
+    /*
+     * The control first: the compiler reports some things about JSX once per
+     * file, on the first element it meets -- a `jsx-runtime` it cannot find --
+     * and that has to land on the element that tells us so.
+     */
     const lines = [
-      `const BoardProbe__ = ${name};`,
+      "const BoardControl__: any = null;",
+      "const boardControl__ = <BoardControl__ {...({} as any)} />;",
+      `const BoardProbe__ = ${reach};`,
       "const boardProps__: object | null | undefined = null as any as "
         + "(Parameters<typeof BoardProbe__> extends [infer P, ...any[]] ? P : {});",
       "const BoardOne__ = (props: any) => "
         + "(BoardProbe__ as unknown as (...args: any[]) => ReturnType<typeof BoardProbe__>)(props);",
       "<BoardOne__ {...({} as any)} />;",
-      "const BoardControl__: any = null;",
-      "const boardControl__ = <BoardControl__ {...({} as any)} />;",
+      // Read, so a project that makes an unused name an error has none here.
+      "void [boardControl__, boardProps__];",
     ];
     // Each line opens with `;` so nothing above it can run on into it.
     const starts: number[] = [];
@@ -650,7 +678,16 @@ function buildReferee(ts: typeof TS, root: string): TsReferee {
       if (path.resolve(fileName) === path.resolve(sourceFile.fileName)) {
         return ts.createSourceFile(fileName, text, languageVersion, true, ts.ScriptKind.TSX);
       }
-      return program.getSourceFile(fileName) ?? readSource(fileName, languageVersion, onError, shouldCreate);
+      /*
+       * The files already read are handed back rather than parsed again, all
+       * but one kind: where a workspace installs one package twice, the
+       * compiler keeps the second copy as a redirect to the first, and refuses
+       * one handed back (vuejs-core threw on every question). The field is the
+       * one its own assertion reads.
+       */
+      const known = program.getSourceFile(fileName);
+      if (known && !(known as { redirectInfo?: unknown }).redirectInfo) return known;
+      return readSource(fileName, languageVersion, onError, shouldCreate);
     };
     const probe = ts.createProgram({ rootNames: program.getRootFileNames(), options, host, oldProgram: program });
     const probed = probe.getSourceFile(sourceFile.fileName);
@@ -662,16 +699,28 @@ function buildReferee(ts: typeof TS, root: string): TsReferee {
       if (diagnostic.start === undefined || diagnostic.start < starts[0]!) continue;
       failed.add(lineOf(diagnostic.start));
     }
-    if (failed.has(0) || failed.has(2)) return undefined;
-    if (failed.has(1)) return false;
-    if (failed.has(4) || failed.has(5)) return undefined;
-    const control = probed.statements[probed.statements.length - 1];
-    if (control && ts.isVariableStatement(control)) {
-      const declared = control.declarationList.declarations[0];
-      const type = declared ? probe.getTypeChecker().getTypeAtLocation(declared.name) : undefined;
-      if (!type || type.flags & (ts.TypeFlags.Any | ts.TypeFlags.Unknown)) return undefined;
-    }
-    return !failed.has(3);
+    if (failed.has(0) || failed.has(1) || failed.has(2) || failed.has(4) || failed.has(6)) return undefined;
+    if (failed.has(3)) return false;
+    const checker = probe.getTypeChecker();
+    const typeOfLine = (index: number): TS.Type | undefined => {
+      const statement = probed.statements.find((one) => one.getStart(probed) === starts[index]! + 1);
+      const declared = statement && ts.isVariableStatement(statement)
+        ? statement.declarationList.declarations[0] : undefined;
+      return declared ? checker.getTypeAtLocation(declared.name) : undefined;
+    };
+    const vague = (type: TS.Type | undefined) => !type || (type.flags & (ts.TypeFlags.Any | ts.TypeFlags.Unknown)) !== 0;
+    if (!vague(typeOfLine(1))) return !failed.has(5);
+    /*
+     * No JSX types in this program: the control is an `any`, and so is every
+     * element, so the element line passes whatever stands in it. What is left
+     * to go on is what the function returns. Where the compiler knows it --
+     * `createVNodeCall` returns a `VNodeCall` -- nothing this program can see
+     * renders it, since nothing it can see renders anything. Where it does
+     * not -- an untyped `.jsx` file, whose `<div />` is itself an `any` --
+     * that is no answer.
+     */
+    const signatures = typeOfLine(2)?.getCallSignatures() ?? [];
+    return signatures.length > 0 && signatures.every((one) => !vague(one.getReturnType())) ? false : undefined;
   }
 
   return { typeAt, symbolDeclarationAt, symbolDeclarationLocationAt, kindAt, renderableAt };

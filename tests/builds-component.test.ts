@@ -176,3 +176,78 @@ describe("App makes a plain function", () => {
     expect(wrongKind(checkDrift(board, createWorkspace(repo)))).toBeUndefined();
   });
 });
+
+describe("App makes a method", () => {
+  /*
+   * A method is not in scope at the end of its file, so the compiler is asked
+   * about it through its class. nestjs-nest's `RoutesResolver makes explore`
+   * lost its red to this before it was.
+   */
+  it.each([["public", ""], ["private", "private "], ["static", "static "]])(
+    "is still called wrong for a %s one",
+    async (_kind, modifier) => {
+      write("src/router.ts", "export class Router {\n"
+        + `  ${modifier}explore(prefix: string): string[] {\n    return [prefix];\n  }\n}\n`);
+      write("src/App.tsx", "import { Router } from \"./router\";\n"
+        + "export function App() {\n  return <div>{String(new Router())}</div>;\n}\n");
+      const board = await boardOf("src/App.tsx#App", "src/router.ts#explore");
+
+      expect(wrongKind(refereed(board))?.detail).toContain("is not a type");
+    },
+  );
+});
+
+describe("a program with no JSX types", () => {
+  beforeEach(() => {
+    rmSync(path.join(repo, "node_modules/@types/react"));
+    // As vuejs-core writes it: JSX kept as written, for a runtime to handle.
+    write("tsconfig.json", JSON.stringify({
+      compilerOptions: { target: "ES2022", module: "ESNext", moduleResolution: "bundler", strict: true, jsx: "preserve" },
+    }));
+  });
+
+  it("still calls a function that returns data wrong", async () => {
+    /*
+     * vuejs-core's shape: every element is an `any` here, so whether a thing
+     * renders cannot be asked -- and `createVNodeCall` returns a `VNodeCall`,
+     * which nothing in a program with no JSX types renders.
+     */
+    write("src/ast.ts", "export interface VNodeCall { tag: string }\n"
+      + "export function createVNodeCall(context: { id: number } | null, tag: string): VNodeCall {\n"
+      + "  return { tag };\n}\n");
+    write("src/transform.ts", "import { createVNodeCall } from \"./ast\";\n"
+      + "export function transformElement() {\n  return createVNodeCall(null, \"div\");\n}\n");
+    const board = await boardOf("src/transform.ts#transformElement", "src/ast.ts#createVNodeCall");
+
+    expect(wrongKind(refereed(board))?.detail).toContain("is not a type");
+  });
+
+  it("leaves an untyped JavaScript component alone", async () => {
+    write("src/Widget.jsx", "export function Widget(props) {\n  return <div>{props.n}</div>;\n}\n");
+    write("src/App.jsx", "import { createElement } from \"react\";\nimport { Widget } from \"./Widget\";\n"
+      + "export function App() {\n  return createElement(Widget, { n: 1 });\n}\n");
+    const board = await boardOf("src/App.jsx#App", "src/Widget.jsx#Widget");
+
+    expect(wrongKind(refereed(board))?.detail).toBeUndefined();
+  });
+});
+
+describe("a project that makes an unused name an error", () => {
+  it("still leaves a component alone", async () => {
+    /*
+     * vuejs-core sets `noUnusedLocals`, and the compiler's check writes names
+     * of its own into the file; one left unread was an error, and read as
+     * "cannot be rendered".
+     */
+    write("tsconfig.json", JSON.stringify({
+      compilerOptions: {
+        target: "ES2022", module: "ESNext", moduleResolution: "bundler", strict: true, jsx: "react-jsx",
+        noUnusedLocals: true, noUnusedParameters: true,
+      },
+    }));
+    for (const [file, contents] of Object.entries(SHAPES[0]![1])) write(file, contents);
+    const board = await boardOf("src/App.tsx#App", "src/Widget.tsx#Widget");
+
+    expect(wrongKind(refereed(board))?.detail).toBeUndefined();
+  });
+});
