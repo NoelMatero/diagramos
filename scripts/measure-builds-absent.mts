@@ -5,6 +5,7 @@
  *   npm run measure:builds-absent -- --language=ts           -- the TypeScript clones
  *   npm run measure:builds-absent -- --language=ts --cases   -- print every accusation
  *   npm run measure:builds-absent -- --language=rust         -- the Rust clones, rustc on PATH
+ *   JEDI_PYTHON=<python with jedi> npm run measure:builds-absent -- --language=python
  *
  * **The gate for #362's absence licence. A measurement: it prints and never fails.**
  *
@@ -42,6 +43,11 @@
  *     is a B -- B's own function (`B::new`), a conversion (`into`, `clone`,
  *     `default`, `collect`), or any other call ("gets"). Independent of the
  *     text half, and of the code that parses the same dump for the reader.
+ *
+ * Python: jedi (`scripts/lib/builds_jedi.py`) -- parso and jedi's own
+ * inference -- says which project classes each routine calls. The reader it
+ * judges is `@calls`' call reading with pyright behind it, as the bench runs
+ * it, so the two share no parser and no type checker.
  *
  * ## What it cannot see, stated before anybody reads the zero
  *
@@ -85,6 +91,13 @@ const TS_TREES: Record<string, string[]> = {
   "vitejs-vite": ["packages/vite/src"],
 };
 
+/** The Python trees and the package read in each: #360's three. */
+const PY_TREES: Record<string, string[]> = {
+  "encode-httpx": ["httpx"],
+  "pallets-flask": ["src/flask"],
+  "python-poetry-poetry": ["src/poetry"],
+};
+
 /** One pair, as the referee sees it. */
 interface Pair {
   from: string;
@@ -95,7 +108,7 @@ interface Pair {
    * the TypeScript compiler, `written` from the Rust text scan, `aggregate`,
    * `own` (B's own function) and `conversion` from rustc's MIR.
    */
-  how: "new" | "literal" | "written" | "aggregate" | "own" | "conversion" | "gets";
+  how: "new" | "literal" | "written" | "aggregate" | "own" | "conversion" | "called" | "gets";
   /** What the head is declared as. */
   target: string;
 }
@@ -117,7 +130,7 @@ if (only) {
 }
 
 const RUST_TREES = ["anyhow", "clap", "json", "regex", "ripgrep"];
-const TREES: Record<string, string[]> = { ts: Object.keys(TS_TREES), rust: RUST_TREES };
+const TREES: Record<string, string[]> = { ts: Object.keys(TS_TREES), rust: RUST_TREES, python: Object.keys(PY_TREES) };
 if (!TREES[language]) {
   process.stderr.write(`--language=${language}: not measured yet. ts and rust are wired.\n`);
   process.exit(1);
@@ -156,7 +169,7 @@ function report(results: ProjectResult[], failed: string[]): void {
   console.log(`\n@builds absence, ${language}: ${results.length} project(s)`);
   console.log(`  pairs the compiler says the routine creates: ${createdPairs}`);
   console.log(`    called wrong by the checker: ${wrong.length}   <- must be 0`);
-  for (const how of ["new", "literal", "written", "aggregate", "own", "conversion"]) {
+  for (const how of ["new", "literal", "written", "aggregate", "own", "conversion", "called"]) {
     const rows = Object.entries(tally).filter(([key]) => key.startsWith(`${how} `)).sort();
     for (const [key, count] of rows) console.log(`      ${String(count).padStart(5)}  ${key}`);
   }
@@ -185,6 +198,11 @@ async function measureOne(project: string): Promise<ProjectResult> {
     const { pairs, referee } = await rustPairs(root);
     process.stderr.write(`${project}: ${pairs.length} pairs\n`);
     return askChecker(project, root, pairs, referee);
+  }
+  if (language === "python") {
+    const pairs = pythonPairs(project, PY_TREES[project] ?? []);
+    process.stderr.write(`${project}: ${pairs.length} pairs\n`);
+    return askChecker(project, root, pairs, undefined, true);
   }
   // Loaded here so the parent process never pays for the compiler.
   const ts = (await import("typescript")).default;
@@ -315,6 +333,19 @@ async function rustPairs(root: string): Promise<{ pairs: Pair[]; referee: import
     }
   }
   return { pairs: [...found.values()], referee };
+}
+
+/** The Python referee: jedi, in a Python that has it. */
+function pythonPairs(project: string, dirs: string[]): Pair[] {
+  const python = process.env.JEDI_PYTHON ?? "python3";
+  const script = path.join(import.meta.dirname, "lib", "builds_jedi.py");
+  const run = spawnSync(python, [script, CORPUS, project, ...dirs], { encoding: "utf8", maxBuffer: 1 << 28 });
+  if (run.status !== 0) {
+    throw new Error(`jedi referee failed (${python}): ${run.stderr.trim().split("\n").pop()}. `
+      + "Set JEDI_PYTHON to a Python with jedi installed.");
+  }
+  return (JSON.parse(run.stdout) as Array<{ from: string; to: string }>)
+    .map((one) => ({ from: one.from, to: one.to, how: "called" as const, target: "class" }));
 }
 
 /**
@@ -514,7 +545,11 @@ async function askChecker(
   root: string,
   pairs: Pair[],
   referee?: import("../src/engine/drift").ClosedBodyReferee,
+  /** Ask pyright, the way the bench and the board do, through `refereedCheckLive`. */
+  live = false,
 ): Promise<ProjectResult> {
+  const { liveRefereePool, refereedCheckLive } = await import("../src/engine/referee-live");
+  const pool = live ? liveRefereePool(() => Date.now() + 120_000) : undefined;
   const { checkDrift, createWorkspace, newCheckCache, ACCUSING_EDGE_KINDS } = await import("../src/engine/drift");
   const { emptyBoard } = await import("../src/engine/board-file");
   const { createDiagram } = await import("../src/engine/diagram");
@@ -534,9 +569,15 @@ async function askChecker(
     });
     let answer: string;
     try {
-      const report = checkDrift(board, cache.workspace, {
-        edges: true, cache, ...(referee ? { closedBodyReferee: referee } : {}),
-      });
+      const run = (second?: import("../src/engine/drift").ClosedBodyReferee) => {
+        const using = second ?? referee;
+        return checkDrift(JSON.parse(JSON.stringify(board)), cache.workspace, {
+          edges: true, cache, ...(using ? { closedBodyReferee: using } : {}),
+        });
+      };
+      const report = pool
+        ? (await refereedCheckLive(root, run, { budgetMs: 120_000, pool })).report
+        : run();
       const red = report.edges.find((finding) => accusing.has(finding.kind));
       if (red) answer = `red ${red.kind}`;
       else if (report.claims.buildsConfirmed > 0) answer = "green";
@@ -546,9 +587,10 @@ async function askChecker(
     }
     const key = `${pair.how} ${pair.target} ${answer}`;
     result.tally[key] = (result.tally[key] ?? 0) + 1;
-    if (answer === "red builds-refuted") {
-      (pair.how === "gets" ? result.caught : result.wrong).push(`${pair.from} -> ${pair.to} (${pair.target})`);
+    if (answer.startsWith("red ")) {
+      (pair.how === "gets" ? result.caught : result.wrong).push(`${pair.from} -> ${pair.to} (${pair.target}) ${answer}`);
     }
   }
+  pool?.close();
   return result;
 }

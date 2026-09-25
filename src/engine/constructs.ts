@@ -67,7 +67,10 @@
  * Python remains the whole of why this word cannot be trusted with an absence
  * even in the languages where the syntax is clear.
  */
-import { bindingsIn, compiledBodiesFor, placeName, type Bindings, type CallSide } from "./calls";
+import {
+  bindingsIn, callsBetween, callSitesIn, compiledBodiesFor, EXTERNAL_RECEIVER, placeName,
+  type Bindings, type CallSide, type CallsNotClosed,
+} from "./calls";
 import { mayAccuse } from "./licence";
 import { each, parseSource, type Language, type Node } from "./parse";
 
@@ -181,7 +184,12 @@ export type ConstructsVerdict =
    * `awaitsCompiler`: a Rust routine every text rule would let say "creates
    * none", held back only because rustc's body for it was not on hand (#362).
    */
-  | { verdict: "absent"; awaitsCompiler?: true }
+  | {
+    verdict: "absent";
+    awaitsCompiler?: true;
+    /** Python (#362): where `@calls`' call reading stopped short of a closed body. */
+    notClosed?: CallsNotClosed;
+  }
   /**
    * The routine's own body creates none of the head's type, and every reason
    * it might have without writing the name was ruled out (#362).
@@ -704,6 +712,14 @@ export function routineNamesIn(source: string, language: Language): string[] {
 export interface ConstructsNames {
   side: CallSide;
   target: string;
+  /**
+   * The head's own file as a side, with the same second opinion the tail
+   * has (#362). Python asks `@calls`' call reading whether the tail's whole
+   * call set lands anywhere near the head, and whether the head's code
+   * creates the tail -- both questions need the head readable the way
+   * `callsBetween` reads it.
+   */
+  head?: CallSide;
 }
 
 /**
@@ -860,6 +876,165 @@ function pythonConstructions(
 }
 
 /**
+ * Python's "creates none" and "backwards", read through `@calls`' call
+ * reading rather than the text (#362).
+ *
+ * The text cannot tell `self.do_thing()` from `self.widget_class()`, which
+ * creates one, so it can never close a Python body on its own. `callsBetween`
+ * can: with pyright behind it, every call the routine makes is placed at a
+ * file, or the body is not closed and nothing is said. So:
+ *
+ *   refuted     every call placed, none in the head's file -- and none at a
+ *               class that derives from the head, which is a head too
+ *   backwards   the tail is a class and the head's own code calls it, which
+ *               in Python is creating one
+ *
+ * Only after the import-resolved text path found no call spelt as the head,
+ * with no doubt on the way (`not-constructed`). Quiet when the head is a
+ * `TypedDict` or a `Protocol` (a dict literal or any class makes one), when
+ * the routine names the head anywhere, and on a planned arrow.
+ */
+function pythonAbsence(
+  source: string,
+  routine: string,
+  targets: string[],
+  reverse: { source: string; routines: string[]; language: Language; names: string[] } | undefined,
+  names: ConstructsNames | undefined,
+): ConstructsVerdict | undefined {
+  if (!reverse || reverse.language !== "python" || !names?.head) return undefined;
+  if (!mayAccuse("builds", "python", "absence") || !onlyCalledClasses(reverse.source, targets)) return undefined;
+  const { routines } = routinesNamed(source, routine, "python");
+  if (routines.length === 0 || namesTheHead(routines, source, "python", new Set(targets))) return undefined;
+
+  const verdict = callsBetween({ ...names.side, routine }, { ...names.head, names: targets });
+  if (verdict.verdict === "backwards") {
+    // A call to the tail is a construction only when the tail is a class.
+    if (!declaresClass(source, routine) || !mayAccuse("builds", "python")) return undefined;
+    const { name, line, wrote } = verdict.evidence;
+    return { verdict: "backwards", evidence: { name, line, wrote } };
+  }
+  if (verdict.verdict === "absent" && verdict.notClosed) return { verdict: "absent", notClosed: verdict.notClosed };
+  if (verdict.verdict !== "refuted") return undefined;
+  if (callsAComputedCallee(routines)) return undefined;
+  if (aCallMayCreateTheHead(names.side, routine, new Set(targets))) return undefined;
+  return { verdict: "refuted", evidence: {
+    routine,
+    line: lineOf(source, routines[0]!.startIndex),
+    made: [],
+  } };
+}
+
+/**
+ * Python's `onlyNewCreates`: every name is a class, and none is a `TypedDict`
+ * or a `Protocol` -- a dict literal makes the first, and any class with the
+ * right methods is the second. A name declared any second way in the file (a
+ * function, a module-level assignment) is doubt.
+ */
+function onlyCalledClasses(source: string, names: string[]): boolean {
+  if (names.length === 0) return false;
+  const tree = parseSource(source, "python");
+  if (!tree) return false;
+  const wanted = new Set(names);
+  const classes = new Set<string>();
+  let doubt = false;
+  each(tree.rootNode, (node) => {
+    const name = node.childForFieldName("name") ?? node.childForFieldName("left");
+    if (!name || name.childCount !== 0 || !wanted.has(name.text)) return;
+    if (!node.childForFieldName("body") || node.childForFieldName("parameters")) { doubt = true; return; }
+    const bases = node.childForFieldName("superclasses")?.text ?? "";
+    if (/\b(TypedDict|Protocol)\b/.test(bases)) doubt = true;
+    else classes.add(name.text);
+  });
+  return !doubt && names.every((name) => classes.has(name));
+}
+
+/**
+ * Whether the routine calls something that is not a name: `type(self)(..)`,
+ * `KINDS[k]()`. The call reading names the first by the call inside it --
+ * `type`, a builtin, placed outside the repository -- so the body looks
+ * closed while the thing actually called is the routine's own class.
+ */
+function callsAComputedCallee(routines: Node[]): boolean {
+  let computed = false;
+  for (const routine of routines) {
+    each(routine, (node) => {
+      const callee = node.childForFieldName("function");
+      if (!computed && callee && !/^(identifier|attribute)$/.test(callee.type)) computed = true;
+    });
+  }
+  return computed;
+}
+
+/**
+ * Whether a call in the routine may create the head after all, though the
+ * call reading placed every one of them away from its file:
+ *
+ *   - a call landing on a class that derives from the head -- `SubWidget()`
+ *     creates a Widget -- one level, under any name the subclass's file
+ *     gives the head;
+ *   - a call landing on something that is neither a routine nor a class:
+ *     flask's `self.json_provider_class(self)` is placed at the attribute
+ *     `json_provider_class = DefaultJSONProvider`, a value that holds a class;
+ *   - a call placed without the far name read, which is not knowing.
+ */
+function aCallMayCreateTheHead(side: CallSide, routine: string, wanted: Set<string>): boolean {
+  const reading = callSitesIn(side, routine);
+  if (!reading.read) return true;
+  for (const body of reading.bodies) {
+    if (body.routine !== routine) continue;
+    for (const site of body.sites) {
+      if (site.file === undefined || site.file === EXTERNAL_RECEIVER) continue;
+      if (site.declaredAs === undefined) return true;
+      const far = site.file === side.file ? { source: side.source, language: side.language } : side.open?.(site.file);
+      if (!far) return true;
+      if (far.language !== "python") return true;
+      if (declaresClass(far.source, site.declaredAs)) {
+        if (!declaredApartPython(far.source, site.declaredAs, wanted)) return true;
+      } else if (!declaresRoutine(far.source, site.declaredAs)) {
+        return true;
+      }
+    }
+  }
+  return false;
+}
+
+/** Whether this Python source declares `name` as a `def` -- and only as that. */
+function declaresRoutine(source: string, name: string): boolean {
+  const tree = parseSource(source, "python");
+  if (!tree) return false;
+  let routine = false;
+  let other = false;
+  each(tree.rootNode, (node) => {
+    const declared = node.childForFieldName("name") ?? node.childForFieldName("left");
+    if (!declared || declared.childCount !== 0 || declared.text !== name) return;
+    if (node.childForFieldName("parameters") && node.childForFieldName("body")) routine = true;
+    else if (node.childForFieldName("body") || node.childForFieldName("left")) other = true;
+  });
+  return routine && !other;
+}
+
+/** `declaredApart`'s header check for a Python class: its bases name none of the head's spellings. */
+function declaredApartPython(source: string, name: string, wanted: Set<string>): boolean {
+  const tree = parseSource(source, "python");
+  if (!tree) return false;
+  const spelt = new Set(wanted);
+  for (const [local, binding] of bindingsIn(source, "python")?.imported ?? []) {
+    if (binding.name !== undefined && wanted.has(binding.name)) spelt.add(local);
+  }
+  let apart = true;
+  each(tree.rootNode, (node) => {
+    const declared = node.childForFieldName("name");
+    if (!declared || declared.text !== name) return;
+    const bases = node.childForFieldName("superclasses");
+    if (!bases) return;
+    each(bases, (leaf) => {
+      if (leaf.childCount === 0 && leaf.isNamed && spelt.has(leaf.text)) apart = false;
+    });
+  });
+  return apart;
+}
+
+/**
  * Whether this routine makes one of these types, and whether the reverse holds.
  *
  * `targets` is every name the far box stands for, and any one of them is enough
@@ -884,7 +1059,11 @@ export function constructions(
    * Its own path, and confirm-only: `reverse` is not consulted, because the
    * accusation that rests on it has no measured licence in this language.
    */
-  if (language === "python") return pythonConstructions(source, routine, targets, names);
+  if (language === "python") {
+    const verdict = pythonConstructions(source, routine, targets, names);
+    if (verdict.verdict !== "withheld" || verdict.why !== "not-constructed") return verdict;
+    return pythonAbsence(source, routine, targets, reverse, names) ?? verdict;
+  }
 
   const { routines, declared, unreadable } = routinesNamed(source, routine, language);
   if (unreadable) return { verdict: "withheld", why: "unreadable" };

@@ -1651,23 +1651,57 @@ export const LICENCES: readonly Licence[] = [
         indirect: NO_INDIRECT_READER,
       },
       builds: {
+        /*
+         * Unmeasured until #362, and the note it carried said why: Python
+         * spells making one as an ordinary call, and the backwards verdict
+         * rests on finding that call at the far end. #309 made the call
+         * findable through imports; #362 measured what reading it that way
+         * accuses, against jedi.
+         */
         presence: {
-          unmeasured:
-            "Python spells making one of something as an ordinary call, so the " +
-            "referee has no pattern to count and the reader has no verdict to " +
-            "give: `measure:constructs` asks it 0 times over the 4,077 files " +
-            "of the pinned clones. Until #207 this square read `yes`, on the " +
-            "strength of three measurements of other words. " +
-            "#309 changed what the reader can *confirm* and deliberately not " +
-            "this: resolving the called name through the file's imports tells " +
-            "`Response(body)` from `render(body)` where the import places the " +
-            "name, and `constructs.ts` answers only `confirmed` or a refusal on " +
-            "that path -- Python never reaches `absent`, which is the door " +
-            "`backwards` stands behind. So the accusation is still unmeasured " +
-            "and still refused, and giving it a licence would need its own run " +
-            "against pyright first.",
+          reproduce: "JEDI_PYTHON=<python with jedi> npm run measure:builds-absent -- --language=python",
+          measured: "2026-09-25",
+          referee:
+            "jedi -- parso and its own inference, nothing shared with pyright or " +
+            "tree-sitter -- listing every project class each routine calls, over " +
+            "httpx, flask and poetry (`scripts/lib/builds_jedi.py`). The reader is " +
+            "`@calls`' call reading with pyright behind it, as the bench runs it.",
+          unit: "(routine, class) pairs jedi says the routine creates, drawn as @builds arrows",
+          counts: { asked: 248, missed: 0 },
+          covers: ["python"],
+          note:
+            "The backwards verdict: the tail is a class and the head's own code " +
+            "calls it. 0 of the 248 were called wrong either way -- backwards or " +
+            "creates-none -- 206 confirmed, 42 quiet. The same run licenses the " +
+            "absence row below.",
         },
-        absence: NOT_DESIGNED_YET,
+        /*
+         * The absence (#362): every call the routine makes was placed by
+         * `@calls`' reading, none lands in the head's file, none on a class
+         * deriving from the head, none on a value that could hold a class.
+         */
+        absence: {
+          reproduce: "JEDI_PYTHON=<python with jedi> npm run measure:builds-absent -- --language=python",
+          measured: "2026-09-25",
+          referee:
+            "jedi -- parso and its own inference, nothing shared with pyright or " +
+            "tree-sitter -- listing every project class each routine calls, over " +
+            "httpx, flask and poetry (`scripts/lib/builds_jedi.py`). The reader is " +
+            "`@calls`' call reading with pyright behind it, as the bench runs it.",
+          unit: "(routine, class) pairs jedi says the routine creates, drawn as @builds arrows",
+          counts: { asked: 248, missed: 0 },
+          covers: ["python"],
+          note:
+            "0 of 248 called wrong. Thin next to TypeScript's 1,053 and Rust's " +
+            "1,345, because jedi is slow and #360 read these three trees. The " +
+            "shapes jedi cannot tell the reader about -- `cls()`, " +
+            "`type(self)()`, a class kept in an attribute, a subclass, a " +
+            "`TypedDict` -- are the tests in tests/builds-absent.test.ts.",
+          known: [
+            "Poetry's split package and attributes set at runtime leave jedi " +
+              "without an answer, so a construction through one is not a pair.",
+          ],
+        },
         indirect: NO_INDIRECT_READER,
       },
       calls: {

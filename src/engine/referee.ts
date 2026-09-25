@@ -165,9 +165,11 @@ export function refereedCheck(
  * the function to widen.
  */
 export function wouldHelp(report: DriftReport): boolean {
-  const { callsWithheld, callsNotClosed, endsUnsettled } = report.claims;
+  const { callsWithheld, callsNotClosed, buildsNotClosed, endsUnsettled } = report.claims;
   return (callsNotClosed.receiver ?? 0) > 0
     || (callsNotClosed["abstract-receiver"] ?? 0) > 0
+    || (buildsNotClosed.receiver ?? 0) > 0
+    || (buildsNotClosed["abstract-receiver"] ?? 0) > 0
     || (callsWithheld.receiver ?? 0) > 0
     || endsUnsettled > 0;
 }

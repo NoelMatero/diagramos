@@ -1253,6 +1253,12 @@ export interface ClaimTally {
    */
   buildsCompilable: number;
   /**
+   * Python `@builds` arrows whose tail's call set `@calls`' reading could
+   * not close (#362), by where it stopped. `wouldHelp` reads it the way it
+   * reads `callsNotClosed`: a receiver is a question pyright can answer.
+   */
+  buildsNotClosed: SkipBreakdown<CallsNotClosed>;
+  /**
    * Arrows asserting that the tail reads a named member off the head's type.
    *
    * The one word here whose two ends stand on different footings, so its numbers
@@ -3112,7 +3118,7 @@ export function checkDrift(
     accesses: 0, accessesConfirmed: 0, accessesWithheld: {},
     conforms: 0, conformsConfirmed: 0, conformsWithheld: {},
     builds: 0, buildsConfirmed: 0, buildsWithheld: {},
-    calls: 0, callsConfirmed: 0, callsWithheld: {}, callsNotClosed: {}, callsCompilable: 0, buildsCompilable: 0,
+    calls: 0, callsConfirmed: 0, callsWithheld: {}, callsNotClosed: {}, callsCompilable: 0, buildsCompilable: 0, buildsNotClosed: {},
     feeds: 0, feedsConfirmed: 0, feedsWithheld: {},
     plannedWithheld: {},
     endsUnsettled: 0,
@@ -4867,7 +4873,17 @@ export function checkDrift(
            * to a C that is not the head under another name.
            */
           let names: ConstructsNames | undefined;
-          if (language === "python" || language === "ts" || language === "tsx") {
+          if (language === "python" && edge.state !== "planned") {
+            /*
+             * Python's absence and backwards go through `@calls`' own call
+             * reading (#362), so both sides are built exactly as that block
+             * builds them: the second opinion, "go to definition" on the
+             * tail, and the overridden methods.
+             */
+            const tail = callSide(fromAnchor, workspace, importCache.configs, options?.closedBodyReferee, true, overrides);
+            const head = callSide(toAnchor, workspace, importCache.configs, options?.closedBodyReferee);
+            if (tail) names = { side: tail, target: toAnchor, ...(head ? { head } : {}) };
+          } else if (language === "python" || language === "ts" || language === "tsx") {
             const tail = callSide(fromAnchor, workspace, importCache.configs);
             if (tail) names = { side: tail, target: toAnchor };
           } else if (language === "rust" && edge.state !== "planned") {
@@ -4953,6 +4969,9 @@ export function checkDrift(
             continue;
           }
           if (claimed && verdict.verdict === "absent" && verdict.awaitsCompiler) claims.buildsCompilable += 1;
+          if (claimed && verdict.verdict === "absent" && verdict.notClosed) {
+            claims.buildsNotClosed[verdict.notClosed] = (claims.buildsNotClosed[verdict.notClosed] ?? 0) + 1;
+          }
           /*
            * `absent` and `cycle` are both silent here. Absent is now only what
            * a language without the absence licence gets, or a planned arrow;

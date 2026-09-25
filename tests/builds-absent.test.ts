@@ -241,3 +241,97 @@ describe("TypeScript: the rest of #360's table", () => {
     expect(accusations(report)).toEqual([]);
   });
 });
+
+/** A Python class with behaviour, and the package it lives in. */
+const PY_WIDGET = "class Widget:\n    def __init__(self, x=0):\n        self.x = x\n";
+const py = (factory: string, widget = PY_WIDGET, extra: Record<string, string> = {}) => ({
+  "src/__init__.py": "",
+  "src/factory.py": factory,
+  "src/widget.py": widget,
+  "src/helpers.py": "def helper():\n    return 1\n",
+  ...extra,
+});
+
+describe("Python: a function that creates something else", () => {
+  it("goes red when every call is read and none of them creates one (httpx's http_version -> Headers)", async () => {
+    const report = await checked("src/factory.py#build", "src/widget.py#Widget",
+      py("from .helpers import helper\n\ndef build():\n    return helper()\n"));
+    expect(accusations(report).map((finding) => finding.kind)).toEqual(["builds-refuted"]);
+  });
+
+  it("goes red as backwards when the head's code creates the tail (httpx's Headers -> Request)", async () => {
+    const report = await checked("src/factory.py#Maker", "src/widget.py#Widget", py(
+      "class Maker:\n    def run(self):\n        return 1\n",
+      "from .factory import Maker\n\nclass Widget:\n    def make(self):\n        return Maker()\n"));
+    const red = accusations(report);
+    expect(red.map((finding) => finding.kind)).toEqual(["builds-backwards"]);
+    expect(red[0]!.detail).toContain("Maker()");
+  });
+});
+
+describe("Python: a body that could create one without a call spelt as the class", () => {
+  const quiet = async (factory: string, widget = PY_WIDGET, extra: Record<string, string> = {},
+    maker = "src/factory.py#build", made = "src/widget.py#Widget") => {
+    const report = await checked(maker, made, py(factory, widget, extra));
+    expect(accusations(report)).toEqual([]);
+  };
+  const method = (body: string) => PY_WIDGET + "\n" + body;
+
+  it("stays quiet on cls() in a classmethod", () => quiet("",
+    method("    @classmethod\n    def from_dict(cls, d):\n        return cls(**d)\n"), {}, "src/widget.py#from_dict"));
+
+  it("stays quiet on cls() in a classmethod that returns nothing", () => quiet("",
+    method("    @classmethod\n    def register(cls, d):\n        REG.append(cls(**d))\n"), {}, "src/widget.py#register"));
+
+  it("stays quiet on type(self)(..)", () => quiet("",
+    method("    def copy(self):\n        return type(self)(self.x)\n"), {}, "src/widget.py#copy"));
+
+  it("stays quiet on self.__class__(..)", () => quiet("",
+    method("    def copy(self):\n        return self.__class__(self.x)\n"), {}, "src/widget.py#copy"));
+
+  it("stays quiet on a module-level alias, Maker = Widget", () => quiet(
+    "from .widget import Widget\nMaker = Widget\n\ndef build():\n    return Maker()\n"));
+
+  it("stays quiet on a local alias", () => quiet(
+    "from .widget import Widget\n\ndef build():\n    Maker = Widget\n    return Maker()\n"));
+
+  it("stays quiet on Widget.from_dict(..)", () => quiet(
+    "from .widget import Widget\n\ndef build(d):\n    return Widget.from_dict(d)\n"));
+
+  it("stays quiet on a class kept in a dict", () => quiet(
+    "from .widget import Widget\nKINDS = {'w': Widget}\n\ndef build(k):\n    return KINDS[k]()\n"));
+
+  it("stays quiet on a class as a default argument", () => quiet(
+    "from .widget import Widget\n\ndef build(factory=Widget):\n    return factory()\n"));
+
+  it("stays quiet on a class passed in", () => quiet("def build(factory):\n    return factory()\n"));
+
+  it("stays quiet on the module's attribute, widget.Widget()", () => quiet(
+    "from . import widget\n\ndef build():\n    return widget.Widget()\n"));
+
+  it("stays quiet on a class kept in an attribute, self.widget_class() (flask)", () => quiet(
+    "from .helpers import helper\n\nclass Maker:\n    widget_class = None\n\n    def build(self):\n        helper()\n        return self.widget_class()\n",
+    PY_WIDGET, {}, "src/factory.py#build"));
+
+  it("stays quiet on an imported subclass, SubWidget()", () => quiet(
+    "from .sub import SubWidget\n\ndef build():\n    return SubWidget()\n",
+    PY_WIDGET, { "src/sub.py": "from .widget import Widget\n\nclass SubWidget(Widget):\n    pass\n" }));
+
+  it("stays quiet on a subclass's __init__ calling super().__init__()", () => quiet("", PY_WIDGET, {
+    "src/sub.py": "from .widget import Widget\n\nclass SubWidget(Widget):\n    def __init__(self):\n        super().__init__()\n",
+  }, "src/sub.py#__init__"));
+
+  it("stays quiet on a TypedDict, which a dict literal creates", () => quiet(
+    "def build():\n    return {'x': 1}\n",
+    "from typing import TypedDict\n\nclass Widget(TypedDict):\n    x: int\n"));
+
+  it("stays quiet on a Protocol, which any class with the method satisfies", () => quiet(
+    "from .helpers import helper\n\ndef build():\n    return helper()\n",
+    "from typing import Protocol\n\nclass Widget(Protocol):\n    def go(self) -> None: ...\n"));
+
+  it("stays quiet on a planned arrow", async () => {
+    const report = await checked("src/factory.py#build", "src/widget.py#Widget",
+      py("from .helpers import helper\n\ndef build():\n    return helper()\n"), "planned");
+    expect(accusations(report)).toEqual([]);
+  });
+});
