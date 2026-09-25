@@ -64,8 +64,8 @@ field has that type.
 `from`'s own code creates the `to`: `new X`, `X { .. }`, `<X />`, or `X`'s own
 constructor (`X::new()`, `X.from_dict()`). A `to` handed back by another function
 does not count. `from` may be a routine, or a type whose routines do the making.
-Red when the arrow is backwards, and in TypeScript when `from` creates none.
-No verdict in Python. `<div />` does not count.
+Red when the arrow is backwards, or when `from` creates none. `<div />` does
+not count.
 
 ## `claim: "calls"`
 

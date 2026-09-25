@@ -164,7 +164,7 @@ const CLAIM_DESCRIPTION =
   + "absent from the signature. "
   + "holds: from is a type with a field of type to; red if no field has it. "
   + "builds: from's own code creates a to (one got from another function does not count); red "
-  + "if backwards, or in TypeScript if from creates none. "
+  + "if backwards or if from creates none. "
   + "calls: from calls to; red only if the arrow is backwards. "
   + "accesses: from reads member of type to, and the member name goes in label; red if the type "
   + "lacks it. "
@@ -440,9 +440,9 @@ const CLAIM_CONSEQUENCE: Record<string, string> = {
   builds:
     " Each one is now read out of the tail's own routines: `new X`, `X { .. }` and `<X />` all"
     + " count. Finding the construction confirms the arrow. A to handed back by another function"
-    + " is not one the tail built: in TypeScript, a tail whose code creates none is reported in"
-    + " red, saying what it creates instead. Finding the construction at the FAR end and only"
-    + " there means the arrow is drawn backwards. Python gets no verdict either way.",
+    + " is not one the tail built, so a tail whose code creates none is reported in red, saying"
+    + " what it creates instead. Finding the construction at the FAR end and only there means"
+    + " the arrow is drawn backwards.",
   holds:
     " Each one is now read off the field list of the FROM end -- the opposite end from takes,"
     + " because containment points whole to part: if no field of the from end's type is of the to"
