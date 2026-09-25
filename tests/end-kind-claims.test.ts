@@ -400,6 +400,15 @@ describe("the other end: a function where a type should be", () => {
         // #345: what `@conforms` asks of its head is something a type can
         // implement or extend, and a function is not that in any language.
         expect(finding?.detail).toContain("a function cannot be implemented");
+      } else if (claim === "builds" && language === "ts") {
+        /*
+         * #363: in a language with JSX a function may be a component, which is
+         * exactly what `@builds` points at, and only a compiler can tell. With
+         * none running the arrow is left alone; builds-component.test.ts has
+         * the red with one.
+         */
+        expect(finding).toBeUndefined();
+        return;
       } else {
         expect(finding?.detail).toContain("a function is not a type");
       }

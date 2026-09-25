@@ -181,6 +181,12 @@ export interface TsReferee {
    * checker itself cannot say.
    */
   kindAt(file: string, start: number, end: number): { callable?: boolean; type?: boolean } | undefined;
+  /**
+   * Whether the name declared at exactly this range could be rendered as a
+   * JSX component (#363): `true` or `false` on the compiler's word, and
+   * `undefined` wherever it cannot say. See `renderableAt`.
+   */
+  renderableAt(file: string, start: number, end: number): boolean | undefined;
 }
 
 const SKIP_DIRECTORIES = new Set([
@@ -545,7 +551,130 @@ function buildReferee(ts: typeof TS, root: string): TsReferee {
     }
   }
 
-  return { typeAt, symbolDeclarationAt, symbolDeclarationLocationAt, kindAt };
+  /*
+   * What the compiler wrote when asked `renderableAt`, per program: a program
+   * is rebuilt whenever a file it read changes, so the program itself is the
+   * key that goes stale at the right moment.
+   */
+  const rendered = new WeakMap<TS.Program, Map<string, boolean | undefined>>();
+
+  /**
+   * Whether the name declared here is a component (#363): something `@builds`
+   * may point at though it is a function and not a type.
+   *
+   * A component is a fact about the function, not about how any one caller
+   * renders it -- `<Widget />`, `createElement(Widget)`, `memo(Widget)`, an
+   * alias, a prop a child renders are all the same component. So nothing
+   * about the caller is read, and no wrapper is named. The compiler is asked
+   * the question itself: the file is checked again with a few lines written
+   * at its end, and what those lines compile to is the answer.
+   *
+   * ```
+   * const BoardProbe__ = Widget;                  the name, capitalised: <widget/> would be an HTML tag
+   * const boardProps__: object | null | undefined  a component takes an object of props, or none
+   *   = null as any as <Widget's first parameter>;
+   * const BoardOne__ = (props: any) =>             and what it returns can be rendered:
+   *   Widget(props);                               a one-argument wrapper, typed as returning
+   * <BoardOne__ {...({} as any)} />;               what Widget returns, stands as a JSX element
+   * const BoardControl__: any = null;
+   * <BoardControl__ {...({} as any)} />;           the control: can JSX be written here at all?
+   * ```
+   *
+   * **Both halves, because either alone is too generous.** React's own types
+   * let a component return a number or a promise, so `parse(s: string):
+   * number` and an `async` loader compile as elements; what rules them out is
+   * a string where the props go. And a function taking an object is not a
+   * component if what it returns cannot be rendered.
+   *
+   * **The wrapper, rather than `<Widget />` itself**, because a render function
+   * handed to `forwardRef` takes `(props, ref)`, and JSX will not call a
+   * function that needs two arguments. People draw that function as the
+   * component, and it is one in every sense but its arity, so the arity is
+   * what the wrapper takes away: the question is only what it returns.
+   *
+   * `false` is only said on an error the name itself caused. The alias line
+   * failing (the name is not in scope at the end of the file), any syntax the
+   * rewritten file does not parse (a `.ts` file's `<T>x` cast read as JSX), or
+   * the control failing (classic JSX with no `React` in scope, which fails
+   * every element alike) are the compiler unable to say, and read as no
+   * answer. So is a control that type-checks as `any`: no JSX types in the
+   * program, where every function would pass.
+   */
+  function renderableAt(file: string, start: number, end: number): boolean | undefined {
+    const configPath = configOf.get(file);
+    if (configPath === undefined) return undefined;
+    const { program } = programFor(configPath);
+    const sourceFile = program.getSourceFile(file);
+    if (!sourceFile) return undefined;
+    const name = findNodeAt(ts, sourceFile, start, end);
+    if (!name || !ts.isIdentifier(name)) return undefined;
+    const key = `${file}:${start}`;
+    const known = rendered.get(program) ?? new Map<string, boolean | undefined>();
+    rendered.set(program, known);
+    if (known.has(key)) return known.get(key);
+    let answer: boolean | undefined;
+    try {
+      answer = probeRenderable(program, sourceFile, name.text);
+    } catch {
+      answer = undefined;
+    }
+    known.set(key, answer);
+    return answer;
+  }
+
+  function probeRenderable(program: TS.Program, sourceFile: TS.SourceFile, name: string): boolean | undefined {
+    const lines = [
+      `const BoardProbe__ = ${name};`,
+      "const boardProps__: object | null | undefined = null as any as "
+        + "(Parameters<typeof BoardProbe__> extends [infer P, ...any[]] ? P : {});",
+      "const BoardOne__ = (props: any) => "
+        + "(BoardProbe__ as unknown as (...args: any[]) => ReturnType<typeof BoardProbe__>)(props);",
+      "<BoardOne__ {...({} as any)} />;",
+      "const BoardControl__: any = null;",
+      "const boardControl__ = <BoardControl__ {...({} as any)} />;",
+    ];
+    // Each line opens with `;` so nothing above it can run on into it.
+    const starts: number[] = [];
+    let text = `${sourceFile.text}\n`;
+    for (const line of lines) {
+      starts.push(text.length);
+      text += `;${line}\n`;
+    }
+    const lineOf = (at: number) => starts.filter((one) => one <= at).length - 1;
+
+    const options = { ...program.getCompilerOptions() };
+    if (options.jsx === undefined) options.jsx = ts.JsxEmit.Preserve;
+    const host = ts.createCompilerHost(options, true);
+    const readSource = host.getSourceFile.bind(host);
+    host.getSourceFile = (fileName, languageVersion, onError, shouldCreate) => {
+      if (path.resolve(fileName) === path.resolve(sourceFile.fileName)) {
+        return ts.createSourceFile(fileName, text, languageVersion, true, ts.ScriptKind.TSX);
+      }
+      return program.getSourceFile(fileName) ?? readSource(fileName, languageVersion, onError, shouldCreate);
+    };
+    const probe = ts.createProgram({ rootNames: program.getRootFileNames(), options, host, oldProgram: program });
+    const probed = probe.getSourceFile(sourceFile.fileName);
+    if (!probed || probe.getSyntacticDiagnostics(probed).length > 0) return undefined;
+
+    const failed = new Set<number>();
+    for (const diagnostic of probe.getSemanticDiagnostics(probed)) {
+      if (diagnostic.category !== ts.DiagnosticCategory.Error) continue;
+      if (diagnostic.start === undefined || diagnostic.start < starts[0]!) continue;
+      failed.add(lineOf(diagnostic.start));
+    }
+    if (failed.has(0) || failed.has(2)) return undefined;
+    if (failed.has(1)) return false;
+    if (failed.has(4) || failed.has(5)) return undefined;
+    const control = probed.statements[probed.statements.length - 1];
+    if (control && ts.isVariableStatement(control)) {
+      const declared = control.declarationList.declarations[0];
+      const type = declared ? probe.getTypeChecker().getTypeAtLocation(declared.name) : undefined;
+      if (!type || type.flags & (ts.TypeFlags.Any | ts.TypeFlags.Unknown)) return undefined;
+    }
+    return !failed.has(3);
+  }
+
+  return { typeAt, symbolDeclarationAt, symbolDeclarationLocationAt, kindAt, renderableAt };
 }
 
 /**

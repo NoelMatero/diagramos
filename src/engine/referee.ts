@@ -78,6 +78,10 @@ export function createClosedBodyReferee(root: string): ClosedBodyReferee | undef
       if (languageOf(file) === "python" || languageOf(file) === "rust") return undefined;
       return ts.kindAt(path.resolve(root, file), at.start, at.end);
     },
+    renderableAt: (file, at) => {
+      if (languageOf(file) === "python" || languageOf(file) === "rust") return undefined;
+      return ts.renderableAt(path.resolve(root, file), at.start, at.end);
+    },
   };
 }
 
