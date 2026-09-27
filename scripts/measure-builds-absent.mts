@@ -173,7 +173,7 @@ function report(results: ProjectResult[], failed: string[]): void {
   console.log(`\n@builds absence, ${language}: ${results.length} project(s)`);
   console.log(`  pairs the compiler says the routine creates: ${createdPairs}`);
   console.log(`    called wrong by the checker: ${wrong.length}   <- must be 0`);
-  for (const how of ["new", "literal", "written", "aggregate", "own", "conversion", "called"]) {
+  for (const how of ["new", "literal", "written", "aggregate", "own", "conversion", "called", "ancestor"]) {
     const rows = Object.entries(tally).filter(([key]) => key.startsWith(`${how} `)).sort();
     for (const [key, count] of rows) console.log(`      ${String(count).padStart(5)}  ${key}`);
   }
