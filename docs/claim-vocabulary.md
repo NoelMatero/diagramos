@@ -4640,9 +4640,9 @@ duplicate from conflitcts, requires reading prs "An arrow can be three calls lon
     | language | quiet when |
     |---|---|
     | all | the routine names B or an import alias of it anywhere, types and return type included; a planned arrow |
-    | TypeScript | B is an interface, a type alias, a fields-only or an abstract class (an object literal or a subclass makes one); a `new C()` whose C is not a class or routine followed to where it is declared, or is B's subclass |
+    | TypeScript | B is an interface, a type alias, a fields-only or an abstract class (an object literal or a subclass makes one); a `new C()` whose C is not a class or routine followed to where it is declared, or is a kind of B -- a header spelling B, or any parent the compiler does not place entirely apart from B, at any depth |
     | Rust | B is not a struct or an enum; `Self` in B's `impl` or in a trait; a macro in the file writes a routine of that name; **and rustc's MIR for the routine must show no B aggregate and no call handing back a B**, else quiet -- the text cannot say what `x.clone()` makes |
-    | Python | B is a `TypedDict` or a `Protocol`; the body calls a computed callee (`type(self)()`); any call `@calls`' pyright-backed reading cannot place, or places in B's file, at a subclass of B, or at a value rather than a `def` or a class (flask's `self.json_provider_class()`) |
+    | Python | B is a `TypedDict` or a `Protocol`; the body calls a computed callee (`type(self)()`); any call `@calls`' pyright-backed reading cannot place, or places in B's file, at a class pyright does not place entirely apart from B (its bases walked to the top), or at a value rather than a `def` or a class (flask's `self.json_provider_class()`) |
 
     Python may also say **backwards** now, for the first time: the tail is a
     class and the head's code calls it.
@@ -4679,6 +4679,20 @@ duplicate from conflitcts, requires reading prs "An arrow can be three calls lon
 
     `tests/builds-absent.test.ts` and `tests/builds-absent-rust.test.ts` hold
     each shape, every guarded one watched go red with its guard switched off.
+
+    **The review found a fifth: a subclass two levels down.** `new Leaf()`
+    creates a Widget when `Leaf extends Mid extends Widget`, and the first
+    cut read Leaf's one header, saw `Mid`, and called that correct arrow
+    wrong -- in TypeScript and in Python. The measurement could not see it
+    either: both referees named only the class written. "Is this a kind of
+    B" is now the compiler's question (`ClosedBodyReferee.ancestorsAt`):
+    TypeScript's checker walks the heritage clauses, pyright places each base
+    and reads that class's bases in turn, all inside one answer so the live
+    check's single round learns about a grandparent. A class with no parent
+    written needs no compiler; one whose parents nobody placed is quiet. The
+    measurement now draws every parent as a pair too: 0 of 1,120 in
+    TypeScript (67 of them parents) and 0 of 295 in Python (50).
+    `tests/builds-absent-ancestry.test.ts` holds the shape both ways.
 
 ## Open, in the order worth doing
 
