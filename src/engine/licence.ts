@@ -767,7 +767,7 @@ export const LICENCES: readonly Licence[] = [
          */
         absence: {
           reproduce: "npm run measure:builds-absent -- --language=ts",
-          measured: "2026-09-25",
+          measured: "2026-09-27",
           referee:
             "the TypeScript compiler's own type checker: the type of every " +
             "`new` expression, the symbol behind every JSX tag, and the " +
@@ -775,10 +775,14 @@ export const LICENCES: readonly Licence[] = [
             "TypeScript clones. It shares nothing with the reader, which reads " +
             "tree-sitter nodes and follows imports with `calls.ts`' resolver.",
           unit: "(routine, type) pairs the compiler says the routine creates, drawn as @builds arrows",
-          counts: { asked: 1053, missed: 0 },
+          counts: { asked: 1120, missed: 0 },
           covers: ["ts", "tsx"],
           note:
-            "0 of 1,053 called wrong: 191 confirmed, the rest quiet -- 847 of " +
+            "0 of 1,120 called wrong. 67 are a parent class, at any depth, of " +
+            "one the routine creates -- `new Leaf()` makes a Widget when Leaf " +
+            "derives from it, the shape #362's review found red -- and the " +
+            "compiler's base types list them. Of the other 1,053: 191 " +
+            "confirmed, the rest quiet -- 847 of " +
             "them object literals the compiler types as an interface, an alias " +
             "or a class, which the reader refuses because a literal names " +
             "nothing. Over the 1,635 pairs the compiler says the routine only " +
@@ -786,7 +790,7 @@ export const LICENCES: readonly Licence[] = [
             "red on real code, and the guards' price, in one row. JavaScript " +
             "stays out of `covers`, as it is for the presence row. What the " +
             "referee cannot see: a workspace import the compiler cannot resolve " +
-            "without `node_modules` gives no pair; an alias, a subclass, " +
+            "without `node_modules` gives no pair; an alias, " +
             "`this.constructor` or a default import is a test in " +
             "tests/builds-absent.test.ts rather than a pair here.",
         },
@@ -1652,20 +1656,22 @@ export const LICENCES: readonly Licence[] = [
          */
         presence: {
           reproduce: "JEDI_PYTHON=<python with jedi> npm run measure:builds-absent -- --language=python",
-          measured: "2026-09-25",
+          measured: "2026-09-27",
           referee:
             "jedi -- parso and its own inference, nothing shared with pyright or " +
             "tree-sitter -- listing every project class each routine calls, over " +
             "httpx, flask and poetry (`scripts/lib/builds_jedi.py`). The reader is " +
             "`@calls`' call reading with pyright behind it, as the bench runs it.",
           unit: "(routine, class) pairs jedi says the routine creates, drawn as @builds arrows",
-          counts: { asked: 248, missed: 0 },
+          counts: { asked: 295, missed: 0 },
           covers: ["python"],
           note:
             "The backwards verdict: the tail is a class and the head's own code " +
-            "calls it. 0 of the 248 were called wrong either way -- backwards or " +
-            "creates-none -- 206 confirmed, 42 quiet. The same run licenses the " +
-            "absence row below.",
+            "calls it. 0 of the 295 were called wrong either way -- backwards or " +
+            "creates-none. 50 are a parent class, at any depth, of one the " +
+            "routine calls (#362's review); of the 245 classes called directly, " +
+            "203 confirmed and 42 quiet. The same run licenses the absence row " +
+            "below.",
         },
         /*
          * The absence (#362): every call the routine makes was placed by
@@ -1674,20 +1680,21 @@ export const LICENCES: readonly Licence[] = [
          */
         absence: {
           reproduce: "JEDI_PYTHON=<python with jedi> npm run measure:builds-absent -- --language=python",
-          measured: "2026-09-25",
+          measured: "2026-09-27",
           referee:
             "jedi -- parso and its own inference, nothing shared with pyright or " +
             "tree-sitter -- listing every project class each routine calls, over " +
             "httpx, flask and poetry (`scripts/lib/builds_jedi.py`). The reader is " +
             "`@calls`' call reading with pyright behind it, as the bench runs it.",
           unit: "(routine, class) pairs jedi says the routine creates, drawn as @builds arrows",
-          counts: { asked: 248, missed: 0 },
+          counts: { asked: 295, missed: 0 },
           covers: ["python"],
           note:
-            "0 of 248 called wrong. Thin next to TypeScript's 1,053 and Rust's " +
+            "0 of 295 called wrong, 50 of them a parent class of one called. " +
+            "Thin next to TypeScript's 1,120 and Rust's " +
             "1,345, because jedi is slow and #360 read these three trees. The " +
             "shapes jedi cannot tell the reader about -- `cls()`, " +
-            "`type(self)()`, a class kept in an attribute, a subclass, a " +
+            "`type(self)()`, a class kept in an attribute, a " +
             "`TypedDict` -- are the tests in tests/builds-absent.test.ts. " +
             "Poetry's split package and attributes set at runtime leave jedi " +
             "without an answer, so a construction through one is not a pair.",
