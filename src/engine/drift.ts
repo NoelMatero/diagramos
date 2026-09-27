@@ -1259,6 +1259,12 @@ export interface ClaimTally {
    */
   buildsNotClosed: SkipBreakdown<CallsNotClosed>;
   /**
+   * `@builds` arrows left quiet because a class the tail creates has parents
+   * nobody has yet asked the compiler about (#362's review): whether it is a
+   * kind of the head is `ancestorsAt`'s question. `wouldHelp` reads it.
+   */
+  buildsUnsettled: number;
+  /**
    * Arrows asserting that the tail reads a named member off the head's type.
    *
    * The one word here whose two ends stand on different footings, so its numbers
@@ -2340,6 +2346,18 @@ export interface ClosedBodyReferee {
    */
   renderableAt?(file: string, at: { start: number; end: number }): boolean | undefined;
   /**
+   * Every class the class declared at this range derives from, at any depth
+   * (#362's review) -- `extends` and `implements` in TypeScript, the bases in
+   * Python -- as repo-relative files and 1-based lines of each one's name. A
+   * parent outside the repository is left out, and the walk stops there: it
+   * cannot derive from anything in here. `undefined` when the compiler could
+   * not place every parent, which is no answer.
+   *
+   * Asked by `@builds` before it calls `new Leaf()` evidence of "creates
+   * something else": a Leaf two levels below the head is a head.
+   */
+  ancestorsAt?(file: string, at: { start: number; end: number }): Array<{ file: string; line: number }> | undefined;
+  /**
    * The crate the Rust compiler built a file into (#357), for the tail of a
    * `@calls` arrow whose text reading stopped short. `referee-live.ts`
    * answers it from `referee-rustc.ts`'s builds; everything else leaves it
@@ -3125,7 +3143,7 @@ export function checkDrift(
     accesses: 0, accessesConfirmed: 0, accessesWithheld: {},
     conforms: 0, conformsConfirmed: 0, conformsWithheld: {},
     builds: 0, buildsConfirmed: 0, buildsWithheld: {},
-    calls: 0, callsConfirmed: 0, callsWithheld: {}, callsNotClosed: {}, callsCompilable: 0, buildsCompilable: 0, buildsNotClosed: {},
+    calls: 0, callsConfirmed: 0, callsWithheld: {}, callsNotClosed: {}, callsCompilable: 0, buildsCompilable: 0, buildsNotClosed: {}, buildsUnsettled: 0,
     feeds: 0, feedsConfirmed: 0, feedsWithheld: {},
     plannedWithheld: {},
     endsUnsettled: 0,
@@ -4880,6 +4898,17 @@ export function checkDrift(
            * to a C that is not the head under another name.
            */
           let names: ConstructsNames | undefined;
+          /*
+           * Whether a class the tail creates is a kind of the head, when its
+           * header names some other parent (#362's review). A question nobody
+           * answered is counted, so `wouldHelp` starts the compiler for it.
+           */
+          let ancestryUnanswered = false;
+          const ancestors: ConstructsNames["ancestors"] = (file, at) => {
+            const answer = options?.closedBodyReferee?.ancestorsAt?.(file, at);
+            if (answer === undefined) ancestryUnanswered = true;
+            return answer;
+          };
           if (language === "python" && edge.state !== "planned") {
             /*
              * Python's absence and backwards go through `@calls`' own call
@@ -4889,10 +4918,10 @@ export function checkDrift(
              */
             const tail = callSide(fromAnchor, workspace, importCache.configs, options?.closedBodyReferee, true, overrides);
             const head = callSide(toAnchor, workspace, importCache.configs, options?.closedBodyReferee);
-            if (tail) names = { side: tail, target: toAnchor, ...(head ? { head } : {}) };
+            if (tail) names = { side: tail, target: toAnchor, ancestors, ...(head ? { head } : {}) };
           } else if (language === "python" || language === "ts" || language === "tsx") {
             const tail = callSide(fromAnchor, workspace, importCache.configs);
-            if (tail) names = { side: tail, target: toAnchor };
+            if (tail) names = { side: tail, target: toAnchor, ancestors };
           } else if (language === "rust" && edge.state !== "planned") {
             /*
              * Rust needs rustc's own body for the routine before it may say
@@ -4976,6 +5005,7 @@ export function checkDrift(
             continue;
           }
           if (claimed && verdict.verdict === "absent" && verdict.awaitsCompiler) claims.buildsCompilable += 1;
+          if (claimed && ancestryUnanswered) claims.buildsUnsettled += 1;
           if (claimed && verdict.verdict === "absent" && verdict.notClosed) {
             claims.buildsNotClosed[verdict.notClosed] = (claims.buildsNotClosed[verdict.notClosed] ?? 0) + 1;
           }

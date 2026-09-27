@@ -73,6 +73,7 @@ import { goodNewsIds, goodNewsLine, goodNewsSince, novelGoodNews } from "../src/
 import { createTsReferee, isOutsideTree, receiverResolutionFrom } from "./lib/resolution-ts.ts";
 import { resolvePythonReceivers } from "../src/engine/referee-python.ts";
 import { resolveRustReceivers } from "../src/engine/referee-rust.ts";
+import { ancestorsInTree } from "../src/engine/referee.ts";
 import { refereePool, resolvePythonDefinitions, resolvePythonKinds, resolveRustDefinitions } from "../src/engine/referee-pool.ts";
 import { languageOf } from "../src/engine/parse.ts";
 
@@ -1775,6 +1776,12 @@ const closedBodyReferee = (tsReferee || pythonCache || rustCache) ? {
     if (languageOf(file) === "python") return pythonKinds?.get(file, at);
     if (languageOf(file) === "rust" || !tsReferee) return undefined;
     return tsReferee.kindAt(path.resolve(root, file), at.start, at.end);
+  },
+  // Whether a class a `@builds` tail creates is a kind of the head (#362's
+  // review). TypeScript's compiler in process; Python's walk is `referee-live.ts`'s.
+  ancestorsAt: (file, at) => {
+    if (languageOf(file) === "python" || languageOf(file) === "rust" || !tsReferee) return undefined;
+    return ancestorsInTree(tsReferee.ancestorsAt(path.resolve(root, file), at.start, at.end), root);
   },
 } : undefined;
 

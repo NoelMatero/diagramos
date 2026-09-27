@@ -282,6 +282,54 @@ export async function resolvePythonKinds(
   };
 }
 
+/** `DefinitionAnswers`' shape, for every class a class derives from. */
+export interface AncestorAnswers {
+  cache: { get(file: string, at: { start: number; end: number }): Array<{ file: string; line: number }> | undefined };
+  close: () => void;
+  started: boolean;
+}
+
+/**
+ * Python: every class each class named at a query derives from, from the
+ * same one pyright (#362's review). The whole walk up is one answer, so a
+ * check that gets one round of questions still learns about a grandparent.
+ * Repo-relative, 1-based, and nothing from outside the tree -- the head a
+ * caller compares against is always in it.
+ */
+export async function resolvePythonAncestors(
+  root: string,
+  queries: readonly DefinitionQuery[],
+  pool?: RefereePool<Awaited<ReturnType<typeof createPyrightLspReferee>>>,
+): Promise<AncestorAnswers> {
+  const nothing: AncestorAnswers = { cache: { get: () => undefined }, close: () => {}, started: false };
+  if (queries.length === 0) return nothing;
+  const sourceOf = readerOf(root);
+  const mine = pool ?? refereePool<Awaited<ReturnType<typeof createPyrightLspReferee>>>();
+  const referee = await mine.get(root, () => createPyrightLspReferee(root));
+  if (!referee) return nothing;
+  try {
+    await referee.warmUp(queries.slice(0, WARM_UP_CANDIDATES).map((query) => ({
+      file: path.resolve(root, query.file),
+      source: sourceOf(query.file),
+      start: query.at.start,
+    })));
+  } catch {
+    // Warming up only buys speed; every query below still gets its own answer.
+  }
+  const cache = new Map<string, Array<{ file: string; line: number }> | undefined>();
+  await run(queries, cache, async (query) => {
+    const found = await referee.ancestorsAt(path.resolve(root, query.file), sourceOf(query.file), query.at.start);
+    return found
+      ?.filter((one) => !isOutsideTree(one.file, root))
+      .map((one) => ({ file: path.relative(root, one.file), line: one.line + 1 }));
+  });
+  return {
+    cache: { get: (file, at) => cache.get(queryKey(file, at)) },
+    close: () => { if (!pool) mine.close(); },
+    started: true,
+  };
+}
+
 /* ------------------------------------------------------- sharing a server */
 
 /**

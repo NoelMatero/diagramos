@@ -333,6 +333,14 @@ export interface PyrightLspReferee {
    * it `undefined`, wherever pyright cannot say. See `valueKindFrom`.
    */
   valueKindAt(file: string, source: string, start: number): Promise<ValueKind | undefined>;
+  /**
+   * Every class the class named at `start` derives from, at any depth
+   * (#362's review), each base placed by "go to definition" and its own bases
+   * read in turn: absolute files, 0-based lines. The walk stops at a class
+   * outside the tree. `undefined` when a base is one pyright cannot place as
+   * a class -- a call, a value -- which leaves the whole answer open.
+   */
+  ancestorsAt(file: string, source: string, start: number): Promise<Array<{ file: string; line: number }> | undefined>;
   close(): void;
 }
 
@@ -645,6 +653,36 @@ export async function createPyrightLspReferee(root: string): Promise<PyrightLspR
     return answer;
   }
 
+  async function ancestorsAt(
+    file: string, source: string, start: number,
+  ): Promise<Array<{ file: string; line: number }> | undefined> {
+    if (closed) return undefined;
+    const found: Array<{ file: string; line: number }> = [];
+    const seen = new Set<string>();
+    const walk = async (at: string, line: number, text: string | undefined, depth: number): Promise<boolean> => {
+      if (depth > 12) return false;
+      const klass = text === undefined ? undefined : classOnLine(text, line);
+      if (!text || !klass) return false;
+      const bases = basesOf(klass);
+      if (!bases) return false;
+      for (const base of bases) {
+        const classes = classesAt(await askLocations("definition", at, text, base.startIndex));
+        if (!classes) return false;
+        for (const one of classes) {
+          const key = `${one.file}:${one.line}`;
+          if (seen.has(key)) continue;
+          seen.add(key);
+          found.push(one);
+          // A class outside the tree derives from nothing in it.
+          if (isOutsideTree(one.file, root)) continue;
+          if (!(await walk(one.file, one.line, sourceOf(one.file), depth + 1))) return false;
+        }
+      }
+      return true;
+    };
+    return (await walk(file, positionAt(source, start).line, source, 0)) ? found : undefined;
+  }
+
   async function valueKindAt(file: string, source: string, start: number): Promise<ValueKind | undefined> {
     if (closed) return undefined;
     const position = positionAt(source, start);
@@ -694,6 +732,7 @@ export async function createPyrightLspReferee(root: string): Promise<PyrightLspR
 
   return {
     valueKindAt,
+    ancestorsAt,
     // `typeAnchorFor` is the reason `end` matters here: `[start, end)` can
     // span an entire expression (a chain, `self.cache`), and only its last
     // token says what the whole thing evaluates to. `methodDeclarationAt`

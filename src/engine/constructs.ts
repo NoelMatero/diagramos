@@ -590,7 +590,7 @@ function isSomethingElse(
   names: ConstructsNames | undefined,
 ): boolean {
   if (!bindings.imported.has(name)) {
-    return bindings.local.has(name) && declaredApart(source, language, name, wanted);
+    return bindings.local.has(name) && declaredApart(source, language, name, wanted, names?.side.file, names);
   }
   if (!names) return false;
   const placed = placeName(name, names.side, bindings);
@@ -600,17 +600,28 @@ function isSomethingElse(
     ? { source, language }
     : names.side.open?.(placed.file);
   if (!far || far.language !== language && !(isTypeScript(far.language) && isTypeScript(language))) return false;
-  return declaredApart(far.source, far.language, placed.as, wanted);
+  return declaredApart(far.source, far.language, placed.as, wanted, placed.file, names);
 }
 
 const isTypeScript = (language: Language) => language === "ts" || language === "tsx";
 
 /**
  * Whether `source` declares `name` exactly as a class or a routine, and a
- * class that names none of the head's spellings in its header -- `extends`,
- * `implements`, under the head's name or any name this file imports it as.
+ * class that is no kind of the head.
+ *
+ * A header that spells the head -- `extends`, `implements`, under the head's
+ * name or any name this file imports it as -- is a kind of it on sight. A
+ * header that spells anything else is the compiler's question, because
+ * `Leaf extends Mid` says nothing about what Mid extends (#362's review).
  */
-function declaredApart(source: string, language: Language, name: string, wanted: Set<string>): boolean {
+function declaredApart(
+  source: string,
+  language: Language,
+  name: string,
+  wanted: Set<string>,
+  file: string | undefined,
+  names: ConstructsNames | undefined,
+): boolean {
   const tree = parseSource(source, language);
   if (!tree) return false;
   const spelt = new Set(wanted);
@@ -632,19 +643,53 @@ function declaredApart(source: string, language: Language, name: string, wanted:
     declared += 1;
     // The header: every child between the name and the body -- `extends`,
     // `implements`, type parameters.
+    const typeParameters = node.childForFieldName("type_parameters");
     let header = false;
+    let parents = false;
     for (let at = 0; at < node.childCount; at += 1) {
       const part = node.child(at);
       if (!part) continue;
       if (part.id === declaredName.id) { header = true; continue; }
       if (part.id === body.id) break;
       if (!header) continue;
+      if (part.isNamed && part.id !== typeParameters?.id) parents = true;
       each(part, (leaf) => {
         if (leaf.childCount === 0 && leaf.isNamed && spelt.has(leaf.text)) apart = false;
       });
     }
+    if (apart && parents && !noKindOfTheHead(file, declaredName, names, wanted, language)) apart = false;
   });
   return apart && declared > 0;
+}
+
+/**
+ * Whether the compiler says the class named at `declared` in `file` derives
+ * from nothing that is the head: it placed every parent, and none of them is
+ * a class of the head's names declared in the head's own file.
+ */
+function noKindOfTheHead(
+  file: string | undefined,
+  declared: Node,
+  names: ConstructsNames | undefined,
+  wanted: Set<string>,
+  language: Language,
+): boolean {
+  if (file === undefined || !names?.ancestors) return false;
+  const ancestors = names.ancestors(file, { start: declared.startIndex, end: declared.startIndex + declared.text.length });
+  if (!ancestors) return false;
+  const inHead = ancestors.filter((one) => one.file === names.target);
+  if (inHead.length === 0) return true;
+  const head = names.target === names.side.file ? names.side.source : names.side.open?.(names.target)?.source;
+  const tree = head === undefined ? undefined : parseSource(head, language);
+  if (!tree) return false;
+  const lines = new Set<number>();
+  each(tree.rootNode, (node) => {
+    const name = node.childForFieldName("name");
+    if (name && name.childCount === 0 && wanted.has(name.text) && node.childForFieldName("body")) {
+      lines.add(lineOf(head!, name.startIndex));
+    }
+  });
+  return inHead.every((one) => !lines.has(one.line));
 }
 
 /** Whether this declaration has a routine anywhere inside it. */
@@ -720,6 +765,13 @@ export interface ConstructsNames {
    * `callsBetween` reads it.
    */
   head?: CallSide;
+  /**
+   * Every class the class declared at this range of `file` derives from, at
+   * any depth, from the compiler (#362's review; `ClosedBodyReferee`'s
+   * `ancestorsAt`). Absent, or `undefined` from it, is no answer -- and a
+   * class with a parent nobody placed may be a kind of the head.
+   */
+  ancestors?: (file: string, at: { start: number; end: number }) => Array<{ file: string; line: number }> | undefined;
 }
 
 /**
@@ -916,7 +968,7 @@ function pythonAbsence(
   if (verdict.verdict === "absent" && verdict.notClosed) return { verdict: "absent", notClosed: verdict.notClosed };
   if (verdict.verdict !== "refuted") return undefined;
   if (callsAComputedCallee(routines)) return undefined;
-  if (aCallMayCreateTheHead(names.side, routine, new Set(targets))) return undefined;
+  if (aCallMayCreateTheHead(names, routine, new Set(targets))) return undefined;
   return { verdict: "refuted", evidence: {
     routine,
     line: lineOf(source, routines[0]!.startIndex),
@@ -977,7 +1029,8 @@ function callsAComputedCallee(routines: Node[]): boolean {
  *     `json_provider_class = DefaultJSONProvider`, a value that holds a class;
  *   - a call placed without the far name read, which is not knowing.
  */
-function aCallMayCreateTheHead(side: CallSide, routine: string, wanted: Set<string>): boolean {
+function aCallMayCreateTheHead(names: ConstructsNames, routine: string, wanted: Set<string>): boolean {
+  const { side } = names;
   const reading = callSitesIn(side, routine);
   if (!reading.read) return true;
   for (const body of reading.bodies) {
@@ -989,7 +1042,7 @@ function aCallMayCreateTheHead(side: CallSide, routine: string, wanted: Set<stri
       if (!far) return true;
       if (far.language !== "python") return true;
       if (declaresClass(far.source, site.declaredAs)) {
-        if (!declaredApartPython(far.source, site.declaredAs, wanted)) return true;
+        if (!declaredApartPython(far.source, site.declaredAs, wanted, site.file, names)) return true;
       } else if (!declaresRoutine(far.source, site.declaredAs)) {
         return true;
       }
@@ -1032,8 +1085,18 @@ function declaresRoutine(source: string, name: string): boolean {
   return routine && !other;
 }
 
-/** `declaredApart`'s header check for a Python class: its bases name none of the head's spellings. */
-function declaredApartPython(source: string, name: string, wanted: Set<string>): boolean {
+/**
+ * `declaredApart` for a Python class: its bases name none of the head's
+ * spellings, and a class with any base at all is the compiler's question --
+ * `Leaf(Mid)` says nothing about what Mid derives from (#362's review).
+ */
+function declaredApartPython(
+  source: string,
+  name: string,
+  wanted: Set<string>,
+  file: string,
+  names: ConstructsNames,
+): boolean {
   const tree = parseSource(source, "python");
   if (!tree) return false;
   const spelt = new Set(wanted);
@@ -1049,6 +1112,14 @@ function declaredApartPython(source: string, name: string, wanted: Set<string>):
     each(bases, (leaf) => {
       if (leaf.childCount === 0 && leaf.isNamed && spelt.has(leaf.text)) apart = false;
     });
+    // A keyword (`metaclass=M`) is not a parent; anything else named is.
+    let parents = false;
+    for (let at = 0; at < bases.childCount; at += 1) {
+      const base = bases.child(at);
+      if (!base?.isNamed || base.text.startsWith("#")) continue;
+      if (!(base.childForFieldName("name") && base.childForFieldName("value"))) parents = true;
+    }
+    if (apart && parents && !noKindOfTheHead(file, declared, names, wanted, "python")) apart = false;
   });
   return apart;
 }

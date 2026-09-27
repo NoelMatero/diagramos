@@ -187,6 +187,14 @@ export interface TsReferee {
    * `undefined` wherever it cannot say. See `renderableAt`.
    */
   renderableAt(file: string, start: number, end: number): boolean | undefined;
+  /**
+   * Every class and interface the class named at exactly this range derives
+   * from, at any depth -- `extends` and `implements` -- as absolute files and
+   * 0-based lines of each one's name (#362's review). The walk stops at a
+   * parent outside the tree. `undefined` when a parent is one the compiler
+   * gives no class for: `any`, an error, a mixin's anonymous part.
+   */
+  ancestorsAt(file: string, start: number, end: number): Array<{ file: string; line: number }> | undefined;
 }
 
 const SKIP_DIRECTORIES = new Set([
@@ -723,7 +731,64 @@ function buildReferee(ts: typeof TS, root: string): TsReferee {
     return signatures.length > 0 && signatures.every((one) => !vague(one.getReturnType())) ? false : undefined;
   }
 
-  return { typeAt, symbolDeclarationAt, symbolDeclarationLocationAt, kindAt, renderableAt };
+  function ancestorsAt(file: string, start: number, end: number): Array<{ file: string; line: number }> | undefined {
+    const configPath = configOf.get(file);
+    if (configPath === undefined) return undefined;
+    const { program, checker } = programFor(configPath);
+    const sourceFile = program.getSourceFile(file);
+    if (!sourceFile) return undefined;
+    const node = findNodeAt(ts, sourceFile, start, end);
+    if (!node) return undefined;
+    try {
+      const found = checker.getSymbolAtLocation(node);
+      const symbol = found && found.flags & ts.SymbolFlags.Alias ? checker.getAliasedSymbol(found) : found;
+      if (!symbol || !(symbol.flags & ts.SymbolFlags.Class)) return undefined;
+      const ancestors: Array<{ file: string; line: number }> = [];
+      const seen = new Set<TS.Symbol>([symbol]);
+      /** The classes a written parent is: one, or each part of a mixin's intersection. */
+      const classesOf = (type: TS.Type): TS.Symbol[] | undefined => {
+        if (type.flags & (ts.TypeFlags.Any | ts.TypeFlags.Unknown)) return undefined;
+        if (type.isIntersection()) {
+          const parts = type.types.map(classesOf);
+          return parts.some((part) => part === undefined) ? undefined : parts.flat() as TS.Symbol[];
+        }
+        const own = type.getSymbol();
+        return own && own.flags & (ts.SymbolFlags.Class | ts.SymbolFlags.Interface) ? [own] : undefined;
+      };
+      const walk = (klass: TS.Symbol): boolean => {
+        for (const declaration of klass.getDeclarations() ?? []) {
+          if (!ts.isClassLike(declaration) && !ts.isInterfaceDeclaration(declaration)) continue;
+          for (const clause of declaration.heritageClauses ?? []) {
+            for (const written of clause.types) {
+              const parents = classesOf(checker.getTypeAtLocation(written));
+              if (!parents) return false;
+              for (const parent of parents) {
+                if (seen.has(parent)) continue;
+                seen.add(parent);
+                for (const one of parent.getDeclarations() ?? []) {
+                  if (!ts.isClassLike(one) && !ts.isInterfaceDeclaration(one)) continue;
+                  const declaredIn = one.getSourceFile();
+                  const named = one.name ?? one;
+                  const { line } = declaredIn.getLineAndCharacterOfPosition(named.getStart(declaredIn));
+                  ancestors.push({ file: declaredIn.fileName, line });
+                }
+                // A parent outside the tree derives from nothing in it.
+                const home = parent.getDeclarations()?.[0]?.getSourceFile().fileName;
+                if (home !== undefined && isOutsideTree(home, root)) continue;
+                if (!walk(parent)) return false;
+              }
+            }
+          }
+        }
+        return true;
+      };
+      return walk(symbol) ? ancestors : undefined;
+    } catch {
+      return undefined;
+    }
+  }
+
+  return { typeAt, symbolDeclarationAt, symbolDeclarationLocationAt, kindAt, renderableAt, ancestorsAt };
 }
 
 /**
