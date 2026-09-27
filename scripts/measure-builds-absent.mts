@@ -108,9 +108,11 @@ interface Pair {
    * How the referee says the routine comes by it. Everything but `gets` is
    * the routine creating it, and must never be accused: `new` / `literal` from
    * the TypeScript compiler, `written` from the Rust text scan, `aggregate`,
-   * `own` (B's own function) and `conversion` from rustc's MIR.
+   * `own` (B's own function) and `conversion` from rustc's MIR. `ancestor`
+   * is a parent class of one the routine creates, at any depth: `new Leaf()`
+   * creates a Widget when Leaf derives from it (#362's review).
    */
-  how: "new" | "literal" | "written" | "aggregate" | "own" | "conversion" | "called" | "gets";
+  how: "new" | "literal" | "written" | "aggregate" | "own" | "conversion" | "called" | "ancestor" | "gets";
   /** What the head is declared as. */
   target: string;
 }
@@ -210,7 +212,9 @@ async function measureOne(project: string): Promise<ProjectResult> {
   const ts = (await import("typescript")).default;
   const pairs = typescriptPairs(ts, root, TS_TREES[project] ?? []);
   process.stderr.write(`${project}: ${pairs.length} pairs\n`);
-  return askChecker(project, root, pairs);
+  // Through the live check, so the compiler answers what the product asks it
+  // -- whether a class created is a kind of the head (#362's review).
+  return askChecker(project, root, pairs, undefined, true);
 }
 
 /**
@@ -346,8 +350,8 @@ function pythonPairs(project: string, dirs: string[]): Pair[] {
     throw new Error(`jedi referee failed (${python}): ${run.stderr.trim().split("\n").pop()}. `
       + "Set JEDI_PYTHON to a Python with jedi installed.");
   }
-  return (JSON.parse(run.stdout) as Array<{ from: string; to: string }>)
-    .map((one) => ({ from: one.from, to: one.to, how: "called" as const, target: "class" }));
+  return (JSON.parse(run.stdout) as Array<{ from: string; to: string; kind: string }>)
+    .map((one) => ({ from: one.from, to: one.to, how: one.kind === "ancestor" ? "ancestor" as const : "called" as const, target: "class" }));
 }
 
 /**
@@ -502,7 +506,25 @@ function typescriptPairs(ts: typeof import("typescript"), root: string, dirs: st
     return undefined;
   };
 
-  const rank: Pair["how"][] = ["gets", "literal", "new"];
+  const rank: Pair["how"][] = ["gets", "ancestor", "literal", "new"];
+  /** Every class a class type derives from, at any depth, by the compiler's own base types. */
+  const ancestorsOf = (type: import("typescript").Type, seen = new Set<import("typescript").Type>()): string[] => {
+    if (!(type.flags & ts.TypeFlags.Object) || !((type as import("typescript").ObjectType).objectFlags & ts.ObjectFlags.ClassOrInterface)) {
+      return [];
+    }
+    const names: string[] = [];
+    for (const base of checker.getBaseTypes(type as import("typescript").InterfaceType) ?? []) {
+      const parts = base.isIntersection() ? base.types : [base];
+      for (const part of parts) {
+        if (seen.has(part)) continue;
+        seen.add(part);
+        if (part.symbol?.name) names.push(part.symbol.name);
+        const target = (part as import("typescript").TypeReference).target ?? part;
+        names.push(...ancestorsOf(target, seen));
+      }
+    }
+    return names;
+  };
   const pairs: Pair[] = [];
   for (const source of program.getSourceFiles()) {
     if (!reading.has(source.fileName)) continue;
@@ -518,7 +540,9 @@ function typescriptPairs(ts: typeof import("typescript"), root: string, dirs: st
         };
         (function inner(child: import("typescript").Node) {
           if (ts.isNewExpression(child)) {
-            for (const name of namesOf(checker.getTypeAtLocation(child))) note(name, "new");
+            const type = checker.getTypeAtLocation(child);
+            for (const name of namesOf(type)) note(name, "new");
+            for (const name of ancestorsOf((type as import("typescript").TypeReference).target ?? type)) note(name, "ancestor");
             note(symbolName(checker.getSymbolAtLocation(child.expression)), "new");
           } else if (ts.isJsxOpeningElement(child) || ts.isJsxSelfClosingElement(child)) {
             note(symbolName(checker.getSymbolAtLocation(child.tagName)), "new");

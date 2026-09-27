@@ -32,6 +32,42 @@ for path in files:
             classes[n.name.value].append(os.path.relpath(path, root))
 unique = {k: v[0] for k, v in classes.items() if len(v) == 1}
 
+def class_at(path, line):
+    """The parso classdef whose name is on this 1-based line of a project file."""
+    if path not in modules: return None
+    for n in walk(modules[path][1]):
+        if n.type == "classdef" and n.name.start_pos[0] == line: return n
+    return None
+
+def ancestors(d, depth=0, seen=None):
+    """Every project class a jedi class Name derives from, at any depth (#362's review)."""
+    seen = set() if seen is None else seen
+    if depth > 12 or not d.module_path: return []
+    path = str(d.module_path)
+    klass = class_at(path, d.line)
+    if klass is None: return []
+    found = []
+    script = jedi.Script(code=modules[path][0], path=path, project=project)
+    ch = klass.children
+    if len(ch) < 4 or getattr(ch[2], "value", None) != "(": return []
+    for leaf in (n for n in walk(ch[3]) if n.type == "name"):
+        # A keyword argument's name (`metaclass=`) is not a base.
+        nxt = leaf.get_next_leaf()
+        if nxt is not None and nxt.value == "=": continue
+        try:
+            inferred = script.infer(*leaf.start_pos)
+        except Exception:
+            continue
+        for b in inferred:
+            if b.type != "class" or b.name not in unique: continue
+            if not b.module_path or not str(b.module_path).startswith(root): continue
+            key = (str(b.module_path), b.line)
+            if key in seen: continue
+            seen.add(key)
+            found.append(b)
+            found += ancestors(b, depth + 1, seen)
+    return found
+
 pairs, seen = [], set()
 for path, (code, m) in modules.items():
     rel = os.path.relpath(path, root)
@@ -63,5 +99,13 @@ for path, (code, m) in modules.items():
                     if key in seen: continue
                     seen.add(key)
                     pairs.append({"from": f"{rel}#{routine}", "to": f"{unique[d.name]}#{d.name}", "kind": how, "target": "class", "wrote": leaf.value})
+                for d in found:
+                    if d.type != "class" or d.name not in unique: continue
+                    if not d.module_path or not str(d.module_path).startswith(root): continue
+                    for b in ancestors(d):
+                        key = (rel, routine, b.name)
+                        if key in seen: continue
+                        seen.add(key)
+                        pairs.append({"from": f"{rel}#{routine}", "to": f"{unique[b.name]}#{b.name}", "kind": "ancestor", "target": "class", "wrote": leaf.value})
 print(json.dumps(pairs))
 print(f"{project_name}: {len(files)} files, {len(pairs)} pairs", file=sys.stderr)
