@@ -3847,6 +3847,21 @@ duplicate from conflitcts, requires reading prs "An arrow can be three calls lon
     `measure-survey.mts`, `probe-generative.mts` and the Rust example in
     `measure-conforms.mts`' header. They name `.corpus` now.
 
+
+    **#366: a Rust struct's fields are only ever where it is declared, and the
+    reader missed two shapes of them.** `pub struct Serializer;` has no field
+    list node, so it read as unread -- "no fields to read" -- and a wrong
+    `@holds` from it stayed quiet; it now holds nothing, which is true in Rust
+    and nowhere else here. And a tuple list carries one `type` per field on
+    itself, which `childForFieldName` hands back only the first of: every
+    tuple struct (`struct S(Value);`, where the list is the body itself) read
+    as holding nothing, and `A(u8, Value)` as holding `u8`. The row above could
+    not see it -- its referee lists no tuple fields -- so it was counted by a
+    census of every tuple list on the five Rust clones: 67 correct pairs, both
+    ends declared in the repo, answered `absent` on main, 0 after.
+    `bench:planted` 586 -> 588, serde_json's two unit structs, 0 true claims
+    red; no planted true claim was a tuple struct, which is why the bench never
+    saw the false red either.
 41. **"The right relationship at the wrong altitude" has one definition that
     survives, it covers the easy quarter, and the shape it covers was being
     passed on nothing.** #280, gap 2 of #217. Five candidates were tried against
