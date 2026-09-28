@@ -88,6 +88,17 @@ export interface CompiledBody {
    * shows is looked for here before the list is trusted at all.
    */
   words: Set<string>;
+  /**
+   * Every type the body creates a value of, by its last path segment (#362):
+   * the head of every aggregate rustc writes -- `Widget { .. }`, `Tagged(..)`,
+   * `Shape::Circle { .. }` gives both `Shape` and `Circle` -- and the type of
+   * every value a call hands back, read off the local the call writes into.
+   * `Widget::default()`, `x.clone()` and `x.into()` into a `Widget` all land
+   * here, which is the point: the text cannot say what `x.clone()` makes, and
+   * this can. A reference is looked through (`&mut Widget` counts), which is
+   * the quiet side for an accusation resting on this set being without B.
+   */
+  made: Set<string>;
 }
 
 /** One crate's bodies, indexed the two ways a declaration can be found. */
@@ -182,13 +193,14 @@ export function readCompiledCrate(mir: string, depInfo: string, places: Compiled
 function bodiesIn(mir: string): CompiledBody[] {
   const all: CompiledBody[] = [];
   let open: CompiledBody | undefined;
+  let locals = new Map<string, string>();
   let skipping = false;
   let ctfe = false;
   for (const line of mir.split("\n")) {
     if (open || skipping) {
       if (line === "}") { open = undefined; skipping = false; continue; }
       if (!open) continue;
-      readBodyLine(line, open);
+      readBodyLine(line, open, locals);
       continue;
     }
     if (line.startsWith("// MIR FOR CTFE")) { ctfe = true; continue; }
@@ -203,7 +215,9 @@ function bodiesIn(mir: string): CompiledBody[] {
       calls: [],
       drops: 0,
       words: new Set(),
+      made: new Set(),
     };
+    locals = new Map();
     all.push(open);
   }
 
@@ -223,6 +237,7 @@ function bodiesIn(mir: string): CompiledBody[] {
       owner.calls.push(...body.calls);
       owner.drops += body.drops;
       for (const word of body.words) owner.words.add(word);
+      for (const type of body.made) owner.made.add(type);
     }
   }
   return kept;
@@ -285,10 +300,34 @@ const TERMINATOR = /^\s+(.*) -> (?:\[[^\]]*\]|unwind [^;]*|bb\d+);$/;
 /** Terminators that are not calls. `drop` is counted apart; the rest move control and run nothing. */
 const NOT_A_CALL = /^(?:goto|switchInt|assert|falseEdge|falseUnwind|yield|drop)\b/;
 
-function readBodyLine(line: string, body: CompiledBody): void {
+/** `let mut _3: std::vec::Vec<Widget>;` -- a local and its type, which MIR declares before any statement. */
+const LOCAL = /^\s+let (?:mut )?(_\d+): (.+);$/;
+/** `_3 = Widget { .. }`, `(_1.0: T) = Tagged(..)` -- an assignment whose value is an aggregate, not a call. */
+const AGGREGATE = /^\s+\S.*? = (?:const )?((?:[A-Za-z_]\w*(?:::<.*?>)?::)*[A-Za-z_]\w*)(?:::<.*?>)?\s*[{(;]/;
+
+/** The last path segment of a type, looking through references and pointers: `&mut a::Widget<T>` -> `Widget`. */
+export function baseTypeOf(written: string): string {
+  const bare = written.replace(/^(?:&(?:'\w+ )?(?:mut )?|\*(?:const|mut) )+/, "").trim();
+  return segmentsOf(stripGenerics(bare)).pop()?.trim() ?? bare;
+}
+
+function readBodyLine(line: string, body: CompiledBody, locals: Map<string, string>): void {
   for (const word of line.match(/[A-Za-z_][A-Za-z0-9_]*/g) ?? []) body.words.add(word);
+  const local = line.match(LOCAL);
+  if (local) { locals.set(local[1]!, local[2]!); return; }
   const terminator = line.match(TERMINATOR);
-  if (!terminator) return;
+  if (!terminator) {
+    // Not a call, so a `Name {`, `Name(` or `Name;` on the right is a value built in place.
+    const aggregate = line.match(AGGREGATE);
+    if (aggregate && !/^(?:move|copy|const)$/.test(aggregate[1]!)) {
+      for (const segment of segmentsOf(stripGenerics(aggregate[1]!)).slice(-2)) body.made.add(segment);
+    }
+    return;
+  }
+  // Whatever a call writes into is a value it handed back.
+  const destination = terminator[1]!.match(/^(_\d+) = /);
+  const type = destination ? locals.get(destination[1]!) : undefined;
+  if (type) body.made.add(baseTypeOf(type));
   const written = terminator[1]!.replace(/^_\d+ = /, "");
   if (/^drop\(/.test(written)) { body.drops += 1; return; }
   if (NOT_A_CALL.test(written)) return;

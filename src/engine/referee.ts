@@ -82,7 +82,24 @@ export function createClosedBodyReferee(root: string): ClosedBodyReferee | undef
       if (languageOf(file) === "python" || languageOf(file) === "rust") return undefined;
       return ts.renderableAt(path.resolve(root, file), at.start, at.end);
     },
+    ancestorsAt: (file, at) => {
+      if (languageOf(file) === "python" || languageOf(file) === "rust") return undefined;
+      return ancestorsInTree(ts.ancestorsAt(path.resolve(root, file), at.start, at.end), root);
+    },
   };
+}
+
+/**
+ * The compiler's ancestors, as `ClosedBodyReferee.ancestorsAt` gives them:
+ * repo-relative with 1-based lines, and nothing from outside the repository.
+ */
+export function ancestorsInTree(
+  found: Array<{ file: string; line: number }> | undefined,
+  root: string,
+): Array<{ file: string; line: number }> | undefined {
+  return found
+    ?.filter((one) => !isOutsideTree(one.file, root))
+    .map((one) => ({ file: path.relative(root, one.file), line: one.line + 1 }));
 }
 
 /**
@@ -169,9 +186,12 @@ export function refereedCheck(
  * the function to widen.
  */
 export function wouldHelp(report: DriftReport): boolean {
-  const { callsWithheld, callsNotClosed, endsUnsettled } = report.claims;
+  const { callsWithheld, callsNotClosed, buildsNotClosed, buildsUnsettled, endsUnsettled } = report.claims;
   return (callsNotClosed.receiver ?? 0) > 0
     || (callsNotClosed["abstract-receiver"] ?? 0) > 0
+    || (buildsNotClosed.receiver ?? 0) > 0
+    || (buildsNotClosed["abstract-receiver"] ?? 0) > 0
     || (callsWithheld.receiver ?? 0) > 0
+    || buildsUnsettled > 0
     || endsUnsettled > 0;
 }

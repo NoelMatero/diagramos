@@ -50,7 +50,8 @@ import type { ClosedBodyReferee, DriftReport } from "./drift";
 import { languageOf } from "./parse";
 import { refereeFor, wouldHelp } from "./referee";
 import {
-  refereePool, resolvePythonDefinitions, resolvePythonKinds, resolveRustDefinitions, type RefereePool,
+  refereePool, resolvePythonAncestors, resolvePythonDefinitions, resolvePythonKinds, resolveRustDefinitions,
+  type RefereePool,
 } from "./referee-pool";
 import type { PyrightLspReferee } from "./referee-python-lsp";
 import type { RustLspReferee } from "./referee-rust-lsp";
@@ -154,8 +155,9 @@ type Resolvers = {
   receivers: (root: string, queries: Query[], pool: LiveRefereePool) => Promise<Resolved>;
   definitions: (root: string, queries: Query[], pool: LiveRefereePool) => Promise<Resolved>;
   kinds?: (root: string, queries: Query[], pool: LiveRefereePool) => Promise<Resolved>;
+  ancestors?: (root: string, queries: Query[], pool: LiveRefereePool) => Promise<Resolved>;
 };
-type Kind = "receiver" | "definition" | "kind";
+type Kind = "receiver" | "definition" | "kind" | "ancestor";
 /*
  * Asked in this order, and the order is the key order here. "Go to
  * definition" goes last (#351): `@calls` puts every call it cannot place to
@@ -165,7 +167,7 @@ type Kind = "receiver" | "definition" | "kind";
  * wrong-kind check's question unasked; asked after a batch that did get an
  * answer, the server is known to be bound and it waits for nothing.
  */
-const BATCHES = { receiver: "receivers", kind: "kinds", definition: "definitions" } as const;
+const BATCHES = { receiver: "receivers", kind: "kinds", ancestor: "ancestors", definition: "definitions" } as const;
 interface Query { file: string; at: { start: number; end: number } }
 interface Resolved {
   cache: { get(file: string, at: { start: number; end: number }): unknown };
@@ -184,6 +186,7 @@ const RESOLVERS: Record<LiveLanguage, Resolvers> = {
     receivers: (root, queries, pool) => resolvePythonReceivers(root, queries, pool) as Promise<Resolved>,
     definitions: (root, queries, pool) => resolvePythonDefinitions(root, queries, pool) as Promise<Resolved>,
     kinds: (root, queries, pool) => resolvePythonKinds(root, queries, pool) as Promise<Resolved>,
+    ancestors: (root, queries, pool) => resolvePythonAncestors(root, queries, pool) as Promise<Resolved>,
   },
   rust: {
     receivers: (root, queries, pool) => resolveRustReceivers(root, queries, undefined, pool) as Promise<Resolved>,
@@ -218,7 +221,7 @@ export async function refereedCheckLive(
    * else open never starts a server for it.
    */
   const askServers = wouldHelp(first);
-  const askCompiler = options.compiler !== false && first.claims.callsCompilable > 0;
+  const askCompiler = options.compiler !== false && first.claims.callsCompilable + first.claims.buildsCompilable > 0;
   if (!askServers && !askCompiler) {
     return { report: first, checkedWith: { answered: [], silent: [], nothingToAsk: true } };
   }
@@ -232,8 +235,8 @@ export async function refereedCheckLive(
 
   const none: Answer = () => undefined;
   const answers: Record<LiveLanguage, Record<Kind, Answer>> = {
-    python: { receiver: none, definition: none, kind: none },
-    rust: { receiver: none, definition: none, kind: none },
+    python: { receiver: none, definition: none, kind: none, ancestor: none },
+    rust: { receiver: none, definition: none, kind: none, ancestor: none },
   };
   const answered = new Set<string>();
   const silent = new Set<string>();
@@ -245,11 +248,11 @@ export async function refereedCheckLive(
   try {
     for (let round = 0; round < ROUNDS; round += 1) {
       const fresh: Record<LiveLanguage, Record<(typeof BATCHES)[Kind], Query[]>> = {
-        python: { receivers: [], definitions: [], kinds: [] },
-        rust: { receivers: [], definitions: [], kinds: [] },
+        python: { receivers: [], definitions: [], kinds: [], ancestors: [] },
+        rust: { receivers: [], definitions: [], kinds: [], ancestors: [] },
       };
       const asked: Record<Kind, Set<string>> = {
-        receiver: new Set(), definition: new Set(), kind: new Set(),
+        receiver: new Set(), definition: new Set(), kind: new Set(), ancestor: new Set(),
       };
 
       /*
@@ -279,6 +282,7 @@ export async function refereedCheckLive(
         resolveReceiver: record("receiver", ts?.resolveReceiver.bind(ts)) as ClosedBodyReferee["resolveReceiver"],
         declarationAt: record("definition", ts?.declarationAt?.bind(ts)) as ClosedBodyReferee["declarationAt"],
         kindAt: record("kind", ts?.kindAt?.bind(ts)) as ClosedBodyReferee["kindAt"],
+        ancestorsAt: record("ancestor", ts?.ancestorsAt?.bind(ts)) as ClosedBodyReferee["ancestorsAt"],
         // TypeScript's alone, and answered on the spot: no language server is asked.
         renderableAt: ts?.renderableAt?.bind(ts),
         ...(askCompiler
@@ -352,6 +356,13 @@ export async function refereedCheckLive(
         return ts?.kindAt?.(file, at);
       },
       renderableAt: (file, at) => ts?.renderableAt?.(file, at),
+      ancestorsAt: (file, at) => {
+        const language = languageOf(file);
+        if (language === "python" || language === "rust") {
+          return answers[language].ancestor(file, at) as never;
+        }
+        return ts?.ancestorsAt?.(file, at);
+      },
       ...(compiled?.answered ? { compiledCrateOf: (file: string) => compiled.crateOf(file) } : {}),
     };
     if (ts) answered.add("typescript");

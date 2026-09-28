@@ -6,11 +6,11 @@
  * becomes silence, and whether a claim nobody could check is distinguishable in
  * the report from a claim that passed.
  *
- * The one thing to keep true here is the thing the reader is written around:
- * **`absent` is not a finding.** A factory is invisible to this reader, so
- * "no construction found" is never "no construction happens", and the only
- * accusation the word is entitled to is the one that rests on finding the
- * construction running the other way.
+ * Until #362 the thing kept true here was that **`absent` is not a finding**,
+ * because a factory could be making the thing out of sight. #360 settled that
+ * a factory's product is not one the routine built, so an absence is now a
+ * finding where the language holds the licence for it -- and every way a body
+ * creates one without writing its name is in builds-absent.test.ts.
  */
 import { beforeAll, describe, expect, it } from "vitest";
 
@@ -78,18 +78,26 @@ describe("@builds on an arrow the code confirms", () => {
   });
 });
 
-describe("absent is not a finding, and this is the test that keeps it true", () => {
-  it("says nothing when a factory could be making it out of sight", async () => {
-    // `build` hands back a Widget and never writes `new Widget`: the
-    // construction is one call away and invisible from here. A reader that
-    // called this wrong would be accusing on the strength of not having
-    // followed a call.
+describe("a factory's Widget is not one this routine built (#360)", () => {
+  it("is red when the routine only gets one from another function", async () => {
+    /*
+     * This test once said the opposite, and it was the whole reason the word
+     * could not refute from absence: `build` hands back a Widget from
+     * `makeWidget` and never writes `new Widget`. #360 settled what "builds"
+     * means -- the routine's own body creates it -- and under that reading
+     * this arrow is wrong: `makeWidget` builds the Widget, `build` does not.
+     * A routine that *declares* it returns a Widget is still quiet; that is
+     * in builds-absent.test.ts.
+     */
     const factory = "export function build() { return makeWidget(); }\n";
     const board = await boardOf("src/factory.ts#build", "src/widget.ts#Widget", { claim: "builds" });
-    const report = checkDrift(board, fakeWorkspace(files(factory)), { edges: true });
+    const report = checkDrift(board, fakeWorkspace({
+      "src/factory.ts": factory,
+      "src/widget.ts": "export class Widget { id = 1; reset() {} }\n",
+    }), { edges: true });
 
-    expect(report.edges.filter((finding) => finding.kind === "builds-backwards")).toEqual([]);
-    expect(report.clean).toBe(true);
+    expect(report.edges.map((finding) => finding.kind)).toEqual(["builds-refuted"]);
+    expect(report.clean).toBe(false);
   });
 });
 

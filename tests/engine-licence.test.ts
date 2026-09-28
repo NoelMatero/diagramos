@@ -311,13 +311,11 @@ describe("which words may accuse, and in which languages", () => {
      * Both blocks of `false` are findings rather than design, and neither was
      * visible before the squares had to be filled in one at a time.
      *
-     * `builds` has never been measured in Python: `measure:constructs` asks it 0
+     * `builds` in Python was a `no` until #362: `measure:constructs` asks it 0
      * times over 442 files, because Python spells making one of something as an
-     * ordinary call. #309 gave that language a reader that *confirms* -- the
-     * import places the name, and the file it lands in says class or function --
-     * and left this square alone on purpose: that path answers `confirmed` or a
-     * refusal and never `absent`, so nothing there can accuse, and a licence
-     * would need its own run against pyright.
+     * ordinary call. #309 gave that language a reader that *confirms*, and #362
+     * the run against a referee it said a licence would need -- jedi, over the
+     * 248 constructions it finds in httpx, flask and poetry, 0 called wrong.
      *
      * JavaScript has never been measured for any of the four words the
      * dependency corpus does not cover. It sits inside the TypeScript licence,
@@ -353,7 +351,7 @@ describe("which words may accuse, and in which languages", () => {
       takes: { ts: true, tsx: true, js: false, rust: true, python: true },
       returns: { ts: true, tsx: true, js: false, rust: true, python: true },
       holds: { ts: true, tsx: true, js: false, rust: true, python: true },
-      builds: { ts: true, tsx: true, js: false, rust: true, python: false },
+      builds: { ts: true, tsx: true, js: false, rust: true, python: true },
       calls: { ts: true, tsx: true, js: false, rust: true, python: true },
       accesses: { ts: true, tsx: true, js: false, rust: true, python: true },
       conforms: { ts: true, tsx: true, js: false, rust: false, python: true },
@@ -437,10 +435,12 @@ describe("which words may accuse, and in which languages", () => {
   });
 
   it("gives a reason where it says no, rather than a shrug", () => {
-    const row = relationLicence("builds", "python");
+    // `builds` in Python stood here until #362 measured it; `conforms` in Rust
+    // is the square no measurement can move, and says why.
+    const row = relationLicence("conforms", "rust");
     expect(row).toBeDefined();
     expect(row && isMeasured(row)).toBe(false);
-    expect(row && !isMeasured(row) ? row.unmeasured : "").toMatch(/ordinary call/);
+    expect(row && !isMeasured(row) ? row.unmeasured : "").toMatch(/impl/);
   });
 
   it("leaves no square empty, whatever the type is doing", () => {
@@ -670,9 +670,10 @@ describe("the licence's second axis (#231)", () => {
   it("leaves every other word's absence axis unmeasured, everywhere", () => {
     // @calls closes a body's call set with a real compiler, @accesses closes a
     // body's reads by name (#255), and @needs a file's imports and everything
-    // they lead to (#323). Every other square on this axis is a stated absence
-    // of a measurement, not a silent yes.
-    const closed = new Set(["calls", "accesses", "needs", "depends"]);
+    // they lead to (#323), and @builds a body's constructions once #360 settled
+    // that a factory's B is not one it built (#362). Every other square on this
+    // axis is a stated absence of a measurement, not a silent yes.
+    const closed = new Set(["calls", "accesses", "needs", "depends", "builds"]);
     for (const relation of ACCUSING_RELATIONS.filter((one) => !closed.has(one))) {
       for (const language of LANGUAGES) {
         expect(mayAccuse(relation, language, "absence"), `${relation} in ${language}`)
