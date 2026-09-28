@@ -4646,6 +4646,14 @@ duplicate from conflitcts, requires reading prs "An arrow can be three calls lon
     `rust-version = "1.96"` and this machine has 1.93, so only 14 of its 87 files
     are in a crate this machine can build.
 
+    **#366: that was a flag, not a toolchain.** `cargo rustc
+    --ignore-rust-version` builds all seven of ripgrep's refused crates on 1.93
+    in 16 s; a crate that really needs a newer compiler still fails and stays
+    unread. The build command is now part of the inputs a result is
+    remembered against, or every machine that had already tried ripgrep would
+    have kept the old failure until somebody edited ripgrep -- and changing
+    the command rebuilds each crate once.
+
     **Not done.** Six correct Rust arrows the text could not settle -- four
     of them calls inside a macro -- are now `same-name` rather than confirmed: the list names a function, not where it
     lives, and a name is not enough to go green on. TypeScript and Python

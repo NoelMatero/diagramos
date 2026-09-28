@@ -193,6 +193,20 @@ async function crateFor(manifest: string, root: string, cache: string, until: nu
 }
 
 /**
+ * What the build is asked to do, beyond which files it reads. Part of the
+ * inputs a result is remembered against, so changing it builds each crate
+ * once more rather than trusting a failure the old command produced.
+ *
+ * `--ignore-rust-version` (#366): ripgrep's crates declare `rust-version =
+ * "1.96"` and cargo refused them on 1.93, though all seven build there in
+ * 16 s. A crate that really needs a newer compiler still fails to build, and
+ * a failed build is no answer -- the safe direction.
+ */
+const CARGO_FLAGS = ["--lib", "--offline", "--quiet", "--ignore-rust-version"];
+const RUSTC_FLAGS = ["-C", "opt-level=0"];
+const RECIPE = [...CARGO_FLAGS, "--", "--emit=mir,dep-info", ...RUSTC_FLAGS].join(" ");
+
+/**
  * Start the build, detached, so it outlives this check if it has to.
  *
  * The shell script moves the dump into place and writes the stamp only on
@@ -214,12 +228,12 @@ function start(manifest: string, workspace: string, directory: string, inputs: s
   writeFileSync(next, inputs);
   const nonce = `${Date.now()}`;
   const cargo = [
-    "cargo", "rustc", "--lib", "--offline", "--quiet",
+    "cargo", "rustc", ...CARGO_FLAGS,
     "--manifest-path", quote(manifest),
     "--target-dir", quote(target),
     "--",
     `--emit=mir=${quote(partialDump)},dep-info=${quote(partialDeps)}`,
-    "-C", "opt-level=0",
+    ...RUSTC_FLAGS,
     "--cfg", quote(`diagramos_calls="${nonce}"`),
   ].join(" ");
   const script = [
@@ -259,7 +273,9 @@ function building(lock: string): boolean {
 
 /**
  * The files a dump depends on, as one string: every `.rs` under the package,
- * its manifest, and the workspace's lockfile, each by size and mtime.
+ * its manifest, and the workspace's lockfile, each by size and mtime -- and
+ * the build command, `RECIPE`, so a result the old command produced is not
+ * read as this one's.
  */
 function inputsOf(packageDirectory: string, workspace: string): string {
   const rows: string[] = [];
@@ -279,6 +295,7 @@ function inputsOf(packageDirectory: string, workspace: string): string {
   rows.sort();
   rows.push(`${path.join(packageDirectory, "Cargo.toml")}:${statStamp(path.join(packageDirectory, "Cargo.toml"))}`);
   rows.push(`${path.join(workspace, "Cargo.lock")}:${statStamp(path.join(workspace, "Cargo.lock"))}`);
+  rows.push(`recipe:${RECIPE}`);
   return hash(rows.join("\n"));
 }
 
