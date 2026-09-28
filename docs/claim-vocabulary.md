@@ -3575,6 +3575,18 @@ duplicate from conflitcts, requires reading prs "An arrow can be three calls lon
     reader from item 37 is not wired in: this is the routine-level question,
     which is the one with the coverage.
 
+    **#366: a type is never a door, so an external box anchored at one is read
+    as code.** Haiku drew httpx's `BaseTransport` and `ByteStream` external
+    while anchoring them at their own classes, and 9 wrong arrows on the planted
+    bench were never read behind them. A door is a routine; a declaration with a
+    `body` and no `parameters` (a class, an interface, a struct, a trait) cannot
+    be one, so such a box is code in this repo marked wrongly. It is read like a
+    built box and the arrow's report says the mark is wrong. The old
+    non-door test still passes untouched, because its ref names a routine: a
+    routine keeps the door meaning above, checked or not. A file-only ref, a
+    name the file does not declare, a Rust unit struct and a type alias stay
+    skipped, which is the quiet direction.
+
 26. **#206's demand number came back at 7 arrows of 162 and did not decide the
     issue, because the corpus it counts was drawn to test the tool. Built
     anyway, on the code-side argument the issue itself made. Licensed in
@@ -4217,6 +4229,26 @@ duplicate from conflitcts, requires reading prs "An arrow can be three calls lon
 
     The four false `@needs` greens that remain are #319's `pub(crate)`, unmoved.
 
+    **#319, decided in #366: a visibility marker is not an import for an
+    arrow.** `pub(crate)`, `pub(super)` and `pub(in crate::a)` say who may see
+    an item. rust-analyzer resolves the path inside them like any other, and the
+    reader still records it -- the licence was measured that way -- but marks
+    it, and neither `@needs`' confirmation nor its walk rests on one. The four
+    greens above go red as backwards (`bench:planted` 586 -> 590, 0 true claims
+    red).
+
+    The price is on the referee's own list, and it is the definition, not a
+    miss. Of 2,539 Rust imports rust-analyzer reads on `.corpus/*`, confirmed
+    goes 99.8% -> 96.1% on `measure:recall`: 94 fewer, 28 of them red (22
+    backwards, 6 refuted) and 66 quiet. Counted without that script's
+    population rule, 118 file pairs are linked by nothing but a marker: 87 go
+    quiet, and 30 would be red if drawn -- `fnv.rs -> lib.rs` among them.
+    In all 30 the tail writes nothing that reaches the head except the marker,
+    none calls a macro the head defines, and the head declares the tail as a
+    module, so the red says what is true: the dependency runs the other way.
+    (`clap_complete_nushell`'s 12 files crash the reader on main and were not
+    in that count.)
+
 45. **The arrow now says which dependency it means, because the code cannot
     tell them apart (#323).**
 
@@ -4636,6 +4668,31 @@ duplicate from conflitcts, requires reading prs "An arrow can be three calls lon
     has none. With both, `bench:planted` on 77858fa is unchanged in every
     row: 565 of 808 mistakes called wrong, 0 of 453 true claims.
     `tests/calls-passed-as-value.test.ts` has each shape per language.
+
+    **#366: `cfg` blocks only what it could hide.** "Anything with `cfg` on it,
+    on what holds it, or inside it" above was 34% of the corpus's routines,
+    and two of its reasons were reading mistakes. A `cfg` on the routine or a
+    holder decides whether the routine exists, not what it does: one
+    declaration matched to one compiled body is the code rustc built, and
+    only a name declared twice -- a setting swapping one body for another --
+    still blocks. A `#[cfg(..)]` on one statement, field or expression inside
+    the body switches off that region alone, and blocks only if the region
+    names the head, writes `Self`, or holds a macro; `cfg!()`, `cfg_attr` and
+    a `cfg` inside a macro's tokens still block the whole list. And the text
+    reading counted `object_drop::<E>` -- a function named as a value in
+    anyhow's vtable, which rustc promotes out of the body -- as a call rustc's
+    list lacked, and threw the list away as untrusted. A call now needs
+    `arguments`: in the corpus only Rust's `generic_function` and TypeScript's
+    `f<T>` / `typeof f<T>` have a `function` and none.
+
+    `measure:compiled-calls`, which now asks each callee by its own name:
+    routines answered 3,198 -> 3,960 of 5,724, calls put to the list 6,057 ->
+    7,728, **0 "never"** before and after; 114 calls are withheld because the
+    switched-off region names them. `bench:planted` 586 -> 591, all five
+    anyhow, 0 true claims red. The two clap arrows #366 priced with the wall
+    lifted wholesale stay quiet by this rule: `get_matches_with` has a
+    `#[cfg]` region holding `ok!(..)` and another `#[cfg]` inside a macro's
+    tokens.
 
 51. **A wrong `@builds` arrow could only ever be confirmed or called
     backwards, so 40 on the planted bench got no verdict at all (#360,

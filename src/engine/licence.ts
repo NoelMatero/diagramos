@@ -1085,7 +1085,12 @@ export const LICENCES: readonly Licence[] = [
         absence: NEEDS_ABSENCE(2539, 0,
           "A `use` is walked to the file it lands on, not through every module " +
             "on its path: `lib.rs` declares every module in the crate, and a walk " +
-            "through it would reach everything and never accuse."),
+            "through it would reach everything and never accuse. A visibility " +
+            "marker (`pub(crate)`, `pub(super)`) is counted above, as rust-analyzer " +
+            "counts it, and is never an import for an arrow (#319). On " +
+            "`measure:recall` that is 94 of these 2,539 no longer confirmed: 28 red " +
+            "(22 backwards, 6 refuted) and 66 quiet. Each is a pair linked by the " +
+            "marker alone, where the head declares the tail as a module."),
         indirect: NEEDS_INDIRECT(2539, 0,
           "Not one true import in Rust is reached only through another file, " +
             "once a name is followed through the module that re-exports it: " +

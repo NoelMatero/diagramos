@@ -487,7 +487,7 @@ function macroDeclares(source: string, routine: string): boolean {
  */
 function compiledCreatesNone(routine: string, wanted: Set<string>, names: ConstructsNames | undefined): boolean {
   if (!names?.side.compiled) return false;
-  const compiled = compiledBodiesFor({ ...names.side, routine });
+  const compiled = compiledBodiesFor({ ...names.side, routine }, [...wanted]);
   if (!compiled || compiled.bodies.length === 0) return false;
   return compiled.bodies.every((body) => ![...wanted].some((name) => body.made.has(name)));
 }

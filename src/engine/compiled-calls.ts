@@ -48,10 +48,11 @@
  *                                method without the method's name anywhere;
  *                                a head in `impl Trait for X` whose `X` the
  *                                body mentions is left alone
- *   code the build left out      `#[cfg(..)]` on the routine, on what holds
- *                                it, or inside it -- rustc compiled one
- *                                setting, and a call in another is not in
- *                                the list
+ *   code the build left out      `#[cfg(..)]` on a routine declared twice,
+ *                                `cfg!()`, `cfg_attr`, or a `#[cfg]` region
+ *                                that names the head or holds a macro --
+ *                                rustc compiled one setting, and a call in
+ *                                another is not in the list (#366)
  */
 import path from "node:path";
 
@@ -421,7 +422,11 @@ function stripGenerics(written: string): string {
  *                 its own.
  * `switched-off`  `cfg` on the routine, on what holds it, or inside it. What
  *                 rustc read is one setting's body, and a call in another
- *                 setting's is not in it.
+ *                 setting's is not in it. Since #366 a `#[cfg(..)]` on one
+ *                 statement, field or expression inside the body switches
+ *                 off only that, and blocks only when the caller names no
+ *                 head, or the region names one or holds a macro: anyhow's
+ *                 vtable literal has a `#[cfg]` field that could call nothing.
  */
 export type CompiledReading =
   /**
@@ -429,7 +434,12 @@ export type CompiledReading =
    * in a trait's: the names a call through a trait can be made on without
    * saying which type it is.
    */
-  | { bodies: CompiledBody[]; generics: Set<string> }
+  | {
+    bodies: CompiledBody[];
+    generics: Set<string>;
+    /** Source ranges a `#[cfg(..)]` inside the body switched off, which rustc may not have read. */
+    unbuilt: Array<{ start: number; end: number }>;
+  }
   | { why: "not-compiled" | "not-matched" | "switched-off" };
 
 /**
@@ -452,6 +462,12 @@ export function compiledBodiesOf(
   file: string,
   source: string,
   routine: string,
+  /**
+   * The names the caller asks about. With them, a region switched off inside
+   * the body blocks only if it names one or holds a macro; without them, any
+   * `cfg` in the body blocks, as it always did.
+   */
+  heads?: readonly string[],
 ): CompiledReading {
   if (!crate.files.has(file)) return { why: "not-compiled" };
   const tree = parseSource(source, "rust");
@@ -462,8 +478,23 @@ export function compiledBodiesOf(
 
   const bodies: CompiledBody[] = [];
   const generics = new Set<string>();
+  const unbuilt: Array<{ start: number; end: number }> = [];
+  // `Self` too: `Self { .. }` builds the head without naming it, for `@builds`' use of this list.
+  const couldCall = (region: Node): boolean => heads === undefined || region.text.includes("!")
+    || /\bSelf\b/.test(region.text)
+    || heads.some((name) => new RegExp(`(?<![\\w$])${name.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}(?![\\w$])`).test(region.text));
   for (const declaration of declarations) {
     if (declaration.switchedOff) return { why: "switched-off" };
+    /*
+     * `cfg` on the routine or on what holds it decides whether it exists, not
+     * what it does. One declaration matched to one compiled body is the code
+     * rustc built -- anyhow's `#[cfg(..)] fn construct_from_std`. Two of the
+     * same name is a routine a setting swaps for another, and the list has
+     * only one of them (#366).
+     */
+    if (declaration.gated && (heads === undefined || declarations.length > 1)) return { why: "switched-off" };
+    if (declaration.regions.some(couldCall)) return { why: "switched-off" };
+    for (const region of declaration.regions) unbuilt.push({ start: region.startIndex, end: region.startIndex + region.text.length });
     const body = bodyOf(crate, file, source, declaration, routine);
     if (!body || body.params !== parameterCount(declaration.node)) return { why: "not-matched" };
     bodies.push(body);
@@ -473,17 +504,71 @@ export function compiledBodiesOf(
       for (const match of parameters.matchAll(/(?:^<|,)\s*(?:const\s+)?([A-Za-z_]\w*)/g)) generics.add(match[1]!);
     }
   }
-  return { bodies, generics };
+  return { bodies, generics, unbuilt };
 }
 
 /** A function declaration, what holds it (outermost first), and whether `cfg` reaches it. */
 interface Declaration {
   node: Node;
   ancestors: Node[];
+  /** `cfg` on it, on a holder, or as a holder's inner attribute: whether it exists at all. */
+  gated: boolean;
+  /** `cfg` in its body other than as below: `cfg!()`, `cfg_attr`, an attribute with nothing after it. */
   switchedOff: boolean;
+  /** Each statement, field or expression inside the body that one `#[cfg(..)]` switches on or off. */
+  regions: Node[];
 }
 
 const CFG = /\bcfg(?:_attr)?\b/;
+/** An attribute that is exactly one `cfg(..)`: it switches the next item off or on, and nothing else. */
+const CFG_ATTRIBUTE = /^#\[\s*cfg\s*\(/;
+
+/**
+ * The regions `#[cfg(..)]` attributes switch inside one function, or
+ * `undefined` when `cfg` reaches it some other way -- `cfg!()`, `cfg_attr`,
+ * an attribute with nothing after it. Each region is the next named sibling
+ * of its attribute, read from the structure rather than a list of node types
+ * (docs/reading-a-grammar.md), and what is left once every region and its
+ * attribute is cut out must say `cfg` nowhere.
+ */
+function cfgRegions(fn: Node): Node[] | undefined {
+  const regions: Node[] = [];
+  const cut: Array<[number, number]> = [];
+  let orphan = false;
+  const visit = (node: Node) => {
+    const named: Node[] = [];
+    for (let index = 0; index < node.childCount; index += 1) {
+      const child = node.child(index);
+      if (child?.isNamed) named.push(child);
+    }
+    for (let index = 0; index < named.length; index += 1) {
+      const child = named[index]!;
+      if (child.type === "attribute_item" && CFG_ATTRIBUTE.test(child.text)) {
+        let next = index + 1;
+        while (next < named.length && (named[next]!.type === "attribute_item"
+          || named[next]!.type === "line_comment" || named[next]!.type === "block_comment")) next += 1;
+        const region = named[next];
+        if (!region) { orphan = true; continue; }
+        regions.push(region);
+        cut.push([child.startIndex, child.startIndex + child.text.length], [region.startIndex, region.startIndex + region.text.length]);
+        continue;
+      }
+      visit(child);
+    }
+  };
+  visit(fn);
+  if (orphan) return undefined;
+  let rest = "";
+  let at = fn.startIndex;
+  const offset = fn.startIndex;
+  for (const [start, end] of cut.sort((a, b) => a[0] - b[0])) {
+    if (start < at) { at = Math.max(at, end); continue; }
+    rest += fn.text.slice(at - offset, start - offset);
+    at = end;
+  }
+  rest += fn.text.slice(at - offset);
+  return CFG.test(rest) ? undefined : regions;
+}
 
 /**
  * Every function with a body named `routine`, walked down from the root so
@@ -513,7 +598,8 @@ function declarationsNamed(root: Node, routine: string): Declaration[] {
       attributed = false;
       if (child.type === "function_item" && child.childForFieldName("name")?.text === routine
         && child.childForFieldName("body")) {
-        found.push({ node: child, ancestors: holding, switchedOff: childOff || CFG.test(child.text) });
+        const regions = cfgRegions(child);
+        found.push({ node: child, ancestors: holding, gated: childOff, switchedOff: regions === undefined, regions: regions ?? [] });
       }
       visit(child, holding, childOff);
     }

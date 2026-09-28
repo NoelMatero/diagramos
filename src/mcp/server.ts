@@ -235,7 +235,8 @@ const nodeSchema = z.object({
     .describe(
       "Omit for built. planned: meant to exist, drawn dashed; its ref is work to do, and it "
       + "turns built on its own when the code lands. external: real but not code in this repo (a "
-      + "browser, a database), drawn dotted; its ref, if any, is the routine here that talks to it.",
+      + "browser, a database), drawn dotted; its ref, if any, is the routine here that talks to it. "
+      + "A class declared here is never external, even a base class.",
     ),
 });
 
