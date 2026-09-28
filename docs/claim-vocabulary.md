@@ -3575,6 +3575,18 @@ duplicate from conflitcts, requires reading prs "An arrow can be three calls lon
     reader from item 37 is not wired in: this is the routine-level question,
     which is the one with the coverage.
 
+    **#366: a type is never a door, so an external box anchored at one is read
+    as code.** Haiku drew httpx's `BaseTransport` and `ByteStream` external
+    while anchoring them at their own classes, and 9 wrong arrows on the planted
+    bench were never read behind them. A door is a routine; a declaration with a
+    `body` and no `parameters` (a class, an interface, a struct, a trait) cannot
+    be one, so such a box is code in this repo marked wrongly. It is read like a
+    built box and the arrow's report says the mark is wrong. The old
+    non-door test still passes untouched, because its ref names a routine: a
+    routine keeps the door meaning above, checked or not. A file-only ref, a
+    name the file does not declare, a Rust unit struct and a type alias stay
+    skipped, which is the quiet direction.
+
 26. **#206's demand number came back at 7 arrows of 162 and did not decide the
     issue, because the corpus it counts was drawn to test the tool. Built
     anyway, on the code-side argument the issue itself made. Licensed in
