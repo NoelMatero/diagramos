@@ -4622,6 +4622,31 @@ duplicate from conflitcts, requires reading prs "An arrow can be three calls lon
     row: 565 of 808 mistakes called wrong, 0 of 453 true claims.
     `tests/calls-passed-as-value.test.ts` has each shape per language.
 
+    **#366: `cfg` blocks only what it could hide.** "Anything with `cfg` on it,
+    on what holds it, or inside it" above was 34% of the corpus's routines,
+    and two of its reasons were reading mistakes. A `cfg` on the routine or a
+    holder decides whether the routine exists, not what it does: one
+    declaration matched to one compiled body is the code rustc built, and
+    only a name declared twice -- a setting swapping one body for another --
+    still blocks. A `#[cfg(..)]` on one statement, field or expression inside
+    the body switches off that region alone, and blocks only if the region
+    names the head, writes `Self`, or holds a macro; `cfg!()`, `cfg_attr` and
+    a `cfg` inside a macro's tokens still block the whole list. And the text
+    reading counted `object_drop::<E>` -- a function named as a value in
+    anyhow's vtable, which rustc promotes out of the body -- as a call rustc's
+    list lacked, and threw the list away as untrusted. A call now needs
+    `arguments`: in the corpus only Rust's `generic_function` and TypeScript's
+    `f<T>` / `typeof f<T>` have a `function` and none.
+
+    `measure:compiled-calls`, which now asks each callee by its own name:
+    routines answered 3,198 -> 3,960 of 5,724, calls put to the list 6,057 ->
+    7,728, **0 "never"** before and after; 114 calls are withheld because the
+    switched-off region names them. `bench:planted` 586 -> 591, all five
+    anyhow, 0 true claims red. The two clap arrows #366 priced with the wall
+    lifted wholesale stay quiet by this rule: `get_matches_with` has a
+    `#[cfg]` region holding `ok!(..)` and another `#[cfg]` inside a macro's
+    tokens.
+
 51. **A wrong `@builds` arrow could only ever be confirmed or called
     backwards, so 40 on the planted bench got no verdict at all (#360,
     #362).** `computed -> Dep` says vue's `computed` makes a `Dep`; it makes
