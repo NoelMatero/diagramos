@@ -437,7 +437,20 @@ export function heldTypes(
       withheld = "aliased";
       continue;
     }
-    if (!body) continue;
+    if (!body) {
+      /*
+       * `pub struct Serializer;` -- a Rust unit struct has no field list node,
+       * so it looked unread rather than empty, and a wrong `@holds` from it was
+       * "no fields to read" (#366). Rust cannot give a struct a field anywhere
+       * but its declaration, so no list is an empty list. Python and TypeScript
+       * never reach here: their classes always have a body.
+       */
+      if (declaration.type === "struct_item") {
+        sawFields = true;
+        if (!quoted) quoted = declaration.text.replace(/\s+/g, " ").trim();
+      }
+      continue;
+    }
     sawFields = true;
     if (!quoted) quoted = body.text.replace(/\s+/g, " ").trim();
 
@@ -465,6 +478,21 @@ export function heldTypes(
       // A nested type is its own declaration and `each` reaches it on its own;
       // descending here as well would count its fields twice.
       if (depth > 0 && (member.type === "object_type" || TYPE_DECLARATION.test(member.type))) return;
+      /*
+       * A Rust tuple list -- `struct S(Value);`, `A(u8, Value)` -- carries one
+       * `type` per field on itself, and `childForFieldName` hands back only the
+       * first. Read every one. On a tuple struct the list *is* the body, at
+       * depth 0, so before this every Rust tuple struct read as holding nothing
+       * and a correct arrow from one went red (#366).
+       */
+      const typed: Node[] = [];
+      for (let index = 0; index < member.childCount; index += 1) {
+        if (member.fieldNameForChild(index) === "type") typed.push(member.child(index)!);
+      }
+      if (typed.length > 1 || (depth === 0 && typed.length > 0)) {
+        for (const one of typed) found.push(...typeNamesIn(one));
+        return;
+      }
       const type = member.childForFieldName("type");
       if (depth > 0 && type) {
         found.push(...typeNamesIn(type));

@@ -1123,6 +1123,13 @@ export const LICENCES: readonly Licence[] = [
             "A field typed by a type parameter's associated type -- `map: " +
               "S::SerializeMap` in pydantic-core, `caps: M::Captures` in ripgrep " +
               "-- where the referee reads the parameter `S` as a held type. Both.",
+            "Tuple fields, which the referee does not list, so this row could not " +
+              "see what the reader did with them: until #366 it read every Rust " +
+              "tuple struct as holding nothing, and a multi-field variant as " +
+              "holding its first field only. On the five Rust clones that was 67 " +
+              "correct (type, type it holds) pairs, both declared in the repo, " +
+              "answered `absent`; 0 after. Counted by a census over every tuple " +
+              "list, not by this row.",
           ],
           note:
             "Over 911 Rust files in the pinned clones, pydantic's own Rust core " +
