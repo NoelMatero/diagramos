@@ -127,9 +127,14 @@ for (const tree of trees.length > 0 ? trees : DEFAULT_TREES) {
         asked.add(symbol.name);
         totals.routines += 1;
 
-        const reading = compiledBodiesOf(crates.crateOf(file)!, file, side.source, symbol.name);
+        /*
+         * Asked with no head first, the widest the product ever reads a body
+         * (#366): a `#[cfg]` region blocks here only if it holds a macro. Each
+         * callee is then asked again with its own name, as `@calls` asks.
+         */
+        const reading = compiledBodiesOf(crates.crateOf(file)!, file, side.source, symbol.name, []);
         if (!("bodies" in reading)) { bump(totals.reading, reading.why); continue; }
-        const bodies = compiledBodiesFor({ ...side, routine: symbol.name });
+        const bodies = compiledBodiesFor({ ...side, routine: symbol.name }, []);
         if (!bodies) { bump(totals.reading, "a call the text shows is not in the list"); continue; }
         bump(totals.reading, "answered");
         if (!bodies.bodies.some((body) => body.calls.some((call) => call.kind === "opaque"))) totals.closable += 1;
@@ -148,7 +153,9 @@ for (const tree of trees.length > 0 ? trees : DEFAULT_TREES) {
         }
         for (const callee of callees.values()) {
           totals.calls += 1;
-          const verdict = compiledVerdict(bodies, { ...sideOf(path.relative(tree, callee.file).split(path.sep).join("/")), names: [callee.name] });
+          const perCallee = compiledBodiesFor({ ...side, routine: symbol.name }, [callee.name]);
+          if (!perCallee) { bump(totals.said, "switched-off: the region names it"); continue; }
+          const verdict = compiledVerdict(perCallee, { ...sideOf(path.relative(tree, callee.file).split(path.sep).join("/")), names: [callee.name] });
           if ("why" in verdict) { bump(totals.said, verdict.why); continue; }
           bump(totals.said, "NEVER -- rust-analyzer says it calls");
           violations.push(`${name}/${file}#${symbol.name} -> ${path.relative(tree, callee.file)}#${callee.name}`);
