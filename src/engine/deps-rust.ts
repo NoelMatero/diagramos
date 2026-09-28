@@ -52,6 +52,19 @@ import type { Workspace } from "./workspace";
  */
 const QUOTING = new Set(["quote", "quote_spanned", "parse_quote", "parse_quote_spanned", "stringify"]);
 
+/**
+ * std's macros that expand to an expression or to nothing, never to an item
+ * (#366). At item level only `compile_error!` and the `assert!` family appear;
+ * the rest are here because a `macro_rules!` body that calls them is judged by
+ * what it calls.
+ */
+const EXPANDS_TO_NO_ITEM = new Set([
+  "compile_error", "assert", "assert_eq", "assert_ne", "debug_assert", "debug_assert_eq",
+  "debug_assert_ne", "panic", "unreachable", "todo", "unimplemented", "format", "format_args",
+  "print", "println", "eprint", "eprintln", "write", "writeln", "vec", "matches", "concat",
+  "stringify", "cfg", "env", "option_env", "line", "column", "file", "module_path", "dbg",
+]);
+
 /** Token types a path can begin with, when it is being read out of a macro. */
 const PATH_START = new Set(["identifier", "crate", "self", "super", "type_identifier", "metavariable"]);
 const PATH_SEGMENT = new Set(["identifier", "type_identifier", "crate", "self", "super"]);
@@ -102,6 +115,39 @@ export function readRustDependencies(
   const own = moduleDirectory(filePath, layout);
   const scope = boundModules(filePath, tree.rootNode, layout, workspace, own);
   const fileDirectory = filePath.includes("/") ? filePath.slice(0, filePath.lastIndexOf("/")) : "";
+
+  /*
+   * Whether an item-level macro could expand to an import nobody read (#366).
+   *
+   * A `macro_rules!` defined in this file is read where it is defined -- its
+   * `crate::x` and `$crate::x` paths are dependencies already -- so expanding
+   * it names nothing new, unless its body writes an item that brings a module
+   * in by an argument's name (`use $p;`, `mod $m;`, `extern crate`), glues a
+   * path together out of an argument (`$m::run()`), or calls a macro that
+   * might. Anything defined elsewhere, or qualified, could expand to anything.
+   */
+  const defined = new Map<string, string>();
+  each(tree.rootNode, (node) => {
+    if (node.type !== "macro_definition") return;
+    const name = node.childForFieldName("name")?.text;
+    if (name && !defined.has(name)) defined.set(name, node.text.replace(/^macro_rules!\s*\w+/, ""));
+  });
+  const judged = new Map<string, boolean>();
+  const expandsToNoImport = (name: string): boolean => {
+    if (EXPANDS_TO_NO_ITEM.has(name)) return true;
+    const body = defined.get(name);
+    if (body === undefined) return false;
+    const known = judged.get(name);
+    if (known !== undefined) return known;
+    judged.set(name, true); // a macro calling itself is judged by the rest of its body
+    const writesAnItem = /\b(use|mod|extern|include)\b/.test(body);
+    const gluesAPath = /\$(?!crate\b)\w+\s*::|::\s*\$\w+/.test(body);
+    const calls = [...body.matchAll(/([\w$]+(?:\s*::\s*[\w$]+)*)\s*!/g)].map((match) => match[1]!);
+    const verdict = !writesAnItem && !gluesAPath
+      && calls.every((called) => /^\w+$/.test(called) && expandsToNoImport(called));
+    judged.set(name, verdict);
+    return verdict;
+  };
 
   const record = (node: Node, specifier: string, file?: string, star = false): void => {
     /*
@@ -319,9 +365,11 @@ export function readRustDependencies(
           /*
            * Everything inside a macro is a token tree, so a `use` in there is
            * not a `use`. At item level that can hide a whole dependency, which
-           * is the one thing a refutation may not be built on top of.
+           * is the one thing a refutation may not be built on top of -- unless
+           * the macro is one whose expansion is already read (#366).
            */
-          if (itemLevel) dynamic.add("macro-expansion");
+          const called = name?.type === "identifier" ? name.text : undefined;
+          if (itemLevel && !(called && expandsToNoImport(called))) dynamic.add("macro-expansion");
           for (const part of children(child)) {
             if (part.type === "token_tree") takeTokens(part, position);
           }
@@ -373,7 +421,13 @@ export function readRustDependencies(
         }
         default: {
           if (!PUNCTUATION.has(child.type)) pathAttribute = undefined;
-          const inside = child.type === "block" || child.type === "field_declaration_list";
+          /*
+           * An `impl` or `trait` body holds associated items, and none of those
+           * is a `use`, a `mod` or an `extern crate`: a macro there is on the
+           * footing of one in a function body, which never blinded (#366).
+           */
+          const inside = child.type === "block" || child.type === "field_declaration_list"
+            || child.type === "impl_item" || child.type === "trait_item";
           walk(child, position, itemLevel && !inside);
         }
       }

@@ -132,7 +132,8 @@ export type DynamicReason =
  *
  * - `dynamic-import` and `eval` can bring a module in at runtime, so yes.
  * - `macro-expansion` is a macro at item position, whose expansion is exactly
- *   where a `use` can be written and not read. The reader does better than the
+ *   where a `use` can be written and not read. Since #366 it is not raised for
+ *   a macro whose expansion is already read (`deps-rust.ts`). The reader does better than the
  *   flag suggests -- it reassembles `::`-joined runs out of token trees, and it
  *   reads `macro_rules!` bodies where they are defined -- but a macro from
  *   another crate can still expand to a path no file here spells. The flag's own
@@ -380,7 +381,7 @@ function readUncached(
     deferred: boolean,
     star = false,
     names: string[] = [],
-  ) => {
+  ): boolean => {
     const resolved = resolveDependency(specifier, filePath, workspace, configs);
     dependencies.push({
       specifier,
@@ -390,6 +391,7 @@ function readUncached(
       ...(star ? { star: true } : {}),
       ...(names.length > 0 ? { names } : {}),
     });
+    return resolved !== undefined;
   };
 
   /**
@@ -436,11 +438,25 @@ function readUncached(
         const callee = node.childForFieldName("function");
         if (!callee) return;
         if (callee.type === "import") {
-          dynamic.add("dynamic-import");
           const specifier = firstStringArgument(node);
-          // A specifier that is not a literal is unreadable by anyone, and the
-          // dynamic flag above already says so.
-          if (specifier) declare(specifier, unquote(specifier.text), true);
+          /*
+           * A specifier that is not a literal is unreadable by anyone. A literal
+           * naming a file in this repository is read, and still blinds: a lazy
+           * import is how code hands itself to the file it loads, which then
+           * calls back the other way -- `font.ts` loading `layout.ts`, the case
+           * this flag was built around (tests/engine-deps.test.ts).
+           *
+           * A literal naming a package outside the repository is the exception
+           * (#366). nest's `import('class-validator')` loads a library, which
+           * cannot be the file an arrow here points at, and flagging it kept
+           * every import arrow on the file from being called wrong. A package
+           * specifier the resolver places inside the repo (a workspace alias)
+           * is a file here, and blinds.
+           */
+          const written = specifier ? unquote(specifier.text) : undefined;
+          const placed = specifier && written !== undefined ? declare(specifier, written, true) : false;
+          const aPackage = written !== undefined && !placed && !/^[./]/.test(written);
+          if (!aPackage) dynamic.add("dynamic-import");
           return;
         }
         if (callee.type === "subscript_expression") {
