@@ -4202,6 +4202,26 @@ duplicate from conflitcts, requires reading prs "An arrow can be three calls lon
 
     The four false `@needs` greens that remain are #319's `pub(crate)`, unmoved.
 
+    **#319, decided in #366: a visibility marker is not an import for an
+    arrow.** `pub(crate)`, `pub(super)` and `pub(in crate::a)` say who may see
+    an item. rust-analyzer resolves the path inside them like any other, and the
+    reader still records it -- the licence was measured that way -- but marks
+    it, and neither `@needs`' confirmation nor its walk rests on one. The four
+    greens above go red as backwards (`bench:planted` 586 -> 590, 0 true claims
+    red).
+
+    The price is on the referee's own list, and it is the definition, not a
+    miss. Of 2,539 Rust imports rust-analyzer reads on `.corpus/*`, confirmed
+    goes 99.8% -> 96.1% on `measure:recall`: 94 fewer, 28 of them red (22
+    backwards, 6 refuted) and 66 quiet. Counted without that script's
+    population rule, 118 file pairs are linked by nothing but a marker: 87 go
+    quiet, and 30 would be red if drawn -- `fnv.rs -> lib.rs` among them.
+    In all 30 the tail writes nothing that reaches the head except the marker,
+    none calls a macro the head defines, and the head declares the tail as a
+    module, so the red says what is true: the dependency runs the other way.
+    (`clap_complete_nushell`'s 12 files crash the reader on main and were not
+    in that count.)
+
 45. **The arrow now says which dependency it means, because the code cannot
     tell them apart (#323).**
 

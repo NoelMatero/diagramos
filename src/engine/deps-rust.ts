@@ -103,7 +103,7 @@ export function readRustDependencies(
   const scope = boundModules(filePath, tree.rootNode, layout, workspace, own);
   const fileDirectory = filePath.includes("/") ? filePath.slice(0, filePath.lastIndexOf("/")) : "";
 
-  const record = (node: Node, specifier: string, file?: string, star = false): void => {
+  const record = (node: Node, specifier: string, file?: string, star = false, visibility = false): void => {
     /*
      * A Rust path carries the name at its end -- `crate::parser::ArgMatcher` --
      * so the names a `use` binds are read off the specifier rather than from a
@@ -121,6 +121,7 @@ export function readRustDependencies(
       deferred: false,
       ...(star ? { star: true } : {}),
       ...(names.length > 0 ? { names } : {}),
+      ...(visibility ? { visibility: true } : {}),
     });
   };
 
@@ -134,6 +135,11 @@ export function readRustDependencies(
    * referee on every file whose only mention of the root is a visibility marker.
    * Matching the language beats matching taste.
    *
+   * So they are recorded, and marked (#319): a visibility marker says who may
+   * see an item, not what the file uses, and an arrow's verdict does not rest
+   * on one. `fnv.rs`, whose only mention of the root is `pub(crate) type`, came
+   * back as using `lib.rs`, and a backwards arrow into the root went green.
+   *
    * Called on the `mod` and `use` items too, whose own handling consumes them
    * before the walk could reach the modifier on its own.
    */
@@ -145,7 +151,7 @@ export function readRustDependencies(
       // definite module somewhere else.
       if (entry.type === "self") continue;
       const segments = segmentsOf(entry);
-      if (segments) takePath(part, segments, false, position);
+      if (segments) takePath(part, segments, false, position, false, true);
     }
   };
 
@@ -161,14 +167,15 @@ export function readRustDependencies(
     declaration: boolean,
     position?: RustPosition,
     star = false,
+    visibility = false,
   ): void => {
     const targets = resolveRustPath(segments, filePath, layout, workspace, declaration, position);
     const written = segments.join("::");
     if (targets.length === 0) {
-      record(node, written, undefined, star);
+      record(node, written, undefined, star, visibility);
       return;
     }
-    for (const target of targets) record(node, written, target.file, star);
+    for (const target of targets) record(node, written, target.file, star, visibility);
   };
 
   /**
