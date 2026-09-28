@@ -163,6 +163,12 @@ function declares(
   const on = new Map<string, NeedsEvidence>();
   for (const dependency of read.dependencies) {
     if (!dependency.file) continue;
+    /*
+     * `pub(crate)` names the crate root and uses nothing in it (#319). Read as
+     * an import, globset's `fnv.rs` -- no `use` in it at all -- "needed"
+     * `lib.rs`, and the backwards arrow `fnv.rs -> lib.rs#GlobSet` went green.
+     */
+    if (dependency.visibility) continue;
     // First mention wins: a file importing the same module twice should quote the
     // line somebody would look at first.
     if (!on.has(dependency.file)) {
@@ -308,7 +314,9 @@ export function checkNeeds(
  * declares every module in the crate, so a walk through it reaches everything
  * and no Rust arrow could ever be unreached. The walk takes the last file each
  * written import landed on, and drops a bare `crate`/`self`/`super`, which is
- * a path's first segment or a `pub(crate)` read as one (#319), never an import.
+ * a path's first segment or a `pub(crate)` read as one (#319), never an import
+ * -- and so is `pub(in crate::a)`, which is why the marker is dropped by its
+ * flag rather than by its spelling.
  */
 function landings(read: NonNullable<ReturnType<typeof readDependencies>>): NeedsEvidence[] {
   const last = new Map<string, {
@@ -317,6 +325,7 @@ function landings(read: NonNullable<ReturnType<typeof readDependencies>>): Needs
   for (const dependency of read.dependencies) {
     if (!dependency.file) continue;
     if (dependency.specifier === "crate" || dependency.specifier === "self" || dependency.specifier === "super") continue;
+    if (dependency.visibility) continue;
     last.set(`${dependency.line} @ ${dependency.specifier}`, {
       specifier: dependency.specifier,
       line: dependency.line,
