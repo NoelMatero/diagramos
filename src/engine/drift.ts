@@ -27,6 +27,7 @@ import {
   chainBreak,
   declarationMentions,
   declarationsOf,
+  declaredShapes,
   numbersIn,
   numbersInSymbol,
   reaches,
@@ -3131,6 +3132,8 @@ export function checkDrift(
   const unannotated: UnannotatedFinding[] = [];
   const unreadEdges: UnreadEdgeFinding[] = [];
   const unconfirmedEdges: UnconfirmedEdge[] = [];
+  /** Arrows read through a box marked external that is code here, and the sentence saying so (#366). */
+  const markedWrongly = new Map<string, string>();
   const assertions: AssertionTally = { checked: 0, downgraded: 0, unsupportedLanguage: 0 };
   const claims: ClaimTally = {
     closed: 0, closedHeld: 0, closedTestReaches: 0,
@@ -3273,7 +3276,10 @@ export function checkDrift(
     toNode: { label: string },
     outcome: EdgeOutcome,
   ) => {
-    const finding = outcome.kind === "finding" ? outcome.finding : undefined;
+    const note = markedWrongly.get(`${edge.from} -> ${edge.to}`) ?? "";
+    const finding = outcome.kind === "finding"
+      ? { ...outcome.finding, detail: outcome.finding.detail + note }
+      : undefined;
     if (edge.state !== "planned") {
       // Stamped here rather than at each construction site: this is the one
       // place that still holds the edge itself, and the ids name the arrow on
@@ -3287,7 +3293,7 @@ export function checkDrift(
           toLabel: toNode.label || edge.to,
           ...(edge.label ? { label: edge.label } : {}),
           reason: outcome.reason,
-          detail: outcome.detail,
+          detail: outcome.detail + note,
         });
       }
       return;
@@ -4043,7 +4049,47 @@ export function checkDrift(
         return reading.calls.some((call) =>
           call.routine === symbol && call.reading.verdict === "outside");
       };
-      const externalEnd = fromNode.state === "external" || toNode.state === "external";
+      /*
+       * An external box anchored at a type declared here is not outside at all
+       * (#366). A door is a routine, so a class, an interface or a struct
+       * under an `external` box can only be code in this repo that was marked
+       * wrongly -- Haiku drew httpx's `BaseTransport` that way, and 9 wrong
+       * arrows on the planted bench went unread behind it. Such a box is read
+       * like a built one, and whatever the arrow is told carries a sentence
+       * saying the mark is wrong, so the author learns why it was read.
+       *
+       * "A type" is read from the structure, not from a list of node names
+       * (docs/reading-a-grammar.md): a declaration with a `body` and no
+       * `parameters`. A routine keeps its door meaning, checked or not; a
+       * file-only ref, a name the file does not declare, a unit struct and a
+       * type alias stay skipped, which is the quiet direction.
+       */
+      const typeHere = (node: RecoveredNode): boolean => {
+        if (node.state !== "external") return false;
+        const ref = node.ref?.trim();
+        if (!ref) return false;
+        const { path: typePath, symbol } = parseRef(ref);
+        if (!symbol) return false;
+        const language = languageOf(typePath);
+        if (!language) return false;
+        const absolute = workspace.resolve(typePath);
+        if (!absolute || workspace.stat(absolute) !== "file") return false;
+        const source = workspace.read(absolute);
+        if (source === undefined) return false;
+        const declared = declaredShapes(source, language)?.get(symbol) ?? [];
+        return declared.length > 0 && declared.every(({ node: declaration, soup }) =>
+          !soup
+          && declaration.childForFieldName("body") !== null
+          && declaration.childForFieldName("parameters") === null);
+      };
+      const misfiled = [fromNode, toNode].filter(typeHere);
+      if (misfiled.length > 0) {
+        markedWrongly.set(`${edge.from} -> ${edge.to}`, misfiled.map((node) =>
+          ` ${node.label || node.id} is marked external, but ${node.ref!.trim()} is declared in this `
+          + "repository, so the arrow was checked as code; drop the external state.").join(""));
+      }
+      const outsideEnd = (node: RecoveredNode) => node.state === "external" && !misfiled.includes(node);
+      const externalEnd = outsideEnd(fromNode) || outsideEnd(toNode);
       if (externalEnd && !(atADoor(fromNode) || atADoor(toNode))) {
         /*
          * An unanchored arrow to an external box is unread. But if both ends
@@ -4056,7 +4102,7 @@ export function checkDrift(
          * An arrow from code to an external thing is checkable; an arrow from a
          * person to an external thing is not, so the other end must be "built".
          */
-        const codeEnd = fromNode.state === "external" ? toNode : fromNode;
+        const codeEnd = outsideEnd(fromNode) ? toNode : fromNode;
         if (codeEnd.state === "built") {
           anchorableEdges += 1;
         }

@@ -884,6 +884,20 @@ says it does not know what it declares. The split is by what an escape can hide,
 not by how alarming it sounds, and it costs a confirmation only where a
 confirmation would have been a guess.
 
+**#366 narrowed which escapes raise the flag at all**, by the same question.
+Three macros stopped raising `macro-expansion`: one inside an `impl` or `trait`
+body (an associated item is never a `use`, a `mod` or an `extern crate`, so it is
+on the footing of a macro in a function body, which never raised it); a
+`macro_rules!` defined in the same file whose body writes no `use`/`mod`/`extern`,
+builds no path out of an argument, and calls only macros that pass the same test;
+and std's `compile_error!` and `assert!` family. One `import()` stopped raising
+`dynamic-import`: a literal naming a package outside the repository. A literal
+naming a file here still raises it — a lazy import is how `font.ts` hands itself
+to `layout.ts`, which then calls back — and so does a computed one. On ten corpus
+trees the flagged files went 81 → 58 in Rust and 129 → 83 in TypeScript, and
+`measure:recall --words=needs` did not move on any of 30,595 imports:
+rust-analyzer expands macros, and found no import behind the flags lifted.
+
 **Tests are exempt, and the exemption is loud.** Tests reach into everything and
 have to: testing a private function means importing it. Counting them would make
 `closed` unclaimable in every repository that has a suite, which is a check

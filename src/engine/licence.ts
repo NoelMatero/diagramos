@@ -1085,7 +1085,12 @@ export const LICENCES: readonly Licence[] = [
         absence: NEEDS_ABSENCE(2539, 0,
           "A `use` is walked to the file it lands on, not through every module " +
             "on its path: `lib.rs` declares every module in the crate, and a walk " +
-            "through it would reach everything and never accuse."),
+            "through it would reach everything and never accuse. A visibility " +
+            "marker (`pub(crate)`, `pub(super)`) is counted above, as rust-analyzer " +
+            "counts it, and is never an import for an arrow (#319). On " +
+            "`measure:recall` that is 94 of these 2,539 no longer confirmed: 28 red " +
+            "(22 backwards, 6 refuted) and 66 quiet. Each is a pair linked by the " +
+            "marker alone, where the head declares the tail as a module."),
         indirect: NEEDS_INDIRECT(2539, 0,
           "Not one true import in Rust is reached only through another file, " +
             "once a name is followed through the module that re-exports it: " +
@@ -1118,6 +1123,13 @@ export const LICENCES: readonly Licence[] = [
             "A field typed by a type parameter's associated type -- `map: " +
               "S::SerializeMap` in pydantic-core, `caps: M::Captures` in ripgrep " +
               "-- where the referee reads the parameter `S` as a held type. Both.",
+            "Tuple fields, which the referee does not list, so this row could not " +
+              "see what the reader did with them: until #366 it read every Rust " +
+              "tuple struct as holding nothing, and a multi-field variant as " +
+              "holding its first field only. On the five Rust clones that was 67 " +
+              "correct (type, type it holds) pairs, both declared in the repo, " +
+              "answered `absent`; 0 after. Counted by a census over every tuple " +
+              "list, not by this row.",
           ],
           note:
             "Over 911 Rust files in the pinned clones, pydantic's own Rust core " +

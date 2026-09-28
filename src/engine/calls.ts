@@ -929,8 +929,16 @@ const OWN = new Set(["self", "this"]);
 /** A name a reader would recognise, wherever a grammar puts one. */
 const NAME_LEAF = /identifier$|^field_identifier$|^property_identifier$/;
 
+/**
+ * What a call calls, read off the node that makes the call. A call carries
+ * `arguments`; Rust's `object_drop::<E>` has a `function` field too and no
+ * arguments, because it is a function named as a value -- stored in anyhow's
+ * vtable, not run. Read as a call it was a site rustc's list rightly lacks,
+ * and the list was thrown away as untrusted (#366).
+ */
 function calleeOf(node: Node): Callee | undefined {
-  const callee = node.childForFieldName("function") ?? node.childForFieldName("macro");
+  const called = node.childForFieldName("arguments") ? node.childForFieldName("function") : undefined;
+  const callee = called ?? node.childForFieldName("macro");
   return callee ? calleeOfNode(callee) : undefined;
 }
 
@@ -1420,7 +1428,7 @@ export function callsBetween(
    * list can -- a call inside a macro is in it -- so for a Rust tail it has,
    * the question goes on to the closed reading, which asks the compiler.
    */
-  const compiled = forward.why ? compiledBodiesFor(from) : undefined;
+  const compiled = forward.why ? compiledBodiesFor(from, to.names) : undefined;
   if (forward.why && !compiled) return { verdict: "withheld", why: forward.why };
 
   if (!mayAccuse("calls", from.language) || !mayAccuse("calls", to.language)) {
@@ -1527,7 +1535,7 @@ function closedBodyRefutes(
    * file and the compiler's list names functions without saying whose they
    * are. After a forward doubt the compiler's "never" is required first.
    */
-  const compiled = known ?? compiledBodiesFor(from);
+  const compiled = known ?? compiledBodiesFor(from, to.names);
   if (!compiled) return text;
   const verdict = compiledVerdict(compiled, to);
   if ("why" in verdict) return { why: verdict.why };
@@ -1658,18 +1666,25 @@ function traitDeclaredHere(side: CallSide, written: string): boolean {
  * catch, or inlined away, fails it. Calls inside a macro are not in the text
  * reading, so they cannot fail it; that is what the compiler is here to add.
  */
-export function compiledBodiesFor(from: CallSide & { routine: string }): CompiledTail | undefined {
+export function compiledBodiesFor(
+  from: CallSide & { routine: string },
+  /** The head's names: a `#[cfg]` region inside the body that names none of them and holds no macro does not block (#366). */
+  heads?: readonly string[],
+): CompiledTail | undefined {
   if (from.language !== "rust" || !from.compiled) return undefined;
   const crate = from.compiled();
   if (!crate) return undefined;
-  const reading = compiledBodiesOf(crate, from.file, from.source, from.routine);
+  const reading = compiledBodiesOf(crate, from.file, from.source, from.routine, heads);
   if (!("bodies" in reading)) return undefined;
   const seen = callSitesIn(from, from.routine);
   if (!seen.read) return undefined;
+  // A call written in a switched-off region is one rustc may never have read.
+  const unbuilt = (at: number) => reading.unbuilt.some((region) => at >= region.start && at < region.end);
   for (const body of seen.bodies) {
     if (body.routine !== from.routine) continue;
     for (const site of body.sites) {
       if (site.name === "" || site.why === "macro") continue;
+      if (site.nameAt && unbuilt(site.nameAt.start)) continue;
       // `ok!(..)` is read as a call to `ok`; what rustc lists is what it expands to.
       if (site.nameAt && from.source[site.nameAt.end] === "!") continue;
       if (!reading.bodies.some((compiled) => compiled.words.has(site.name))) return undefined;

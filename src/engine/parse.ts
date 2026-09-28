@@ -155,6 +155,12 @@ export interface Node {
   isNamed: boolean;
   child(index: number): Node | null;
   childForFieldName(field: string): Node | null;
+  /**
+   * The field the child at `index` fills, or null. `childForFieldName` gives
+   * only the first of a field written more than once -- a Rust tuple list
+   * carries one `type` per field (#366).
+   */
+  fieldNameForChild(index: number): string | null;
 }
 
 export interface Tree {
