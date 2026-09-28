@@ -195,6 +195,16 @@ export interface FileDependency {
    * there is no way to tell that from a file re-exporting five others.
    */
   names?: readonly string[];
+  /**
+   * True when the path is only a Rust visibility marker: the `crate` in
+   * `pub(crate)`, the `super` in `pub(super)`, the `crate::a` in
+   * `pub(in crate::a)`.
+   *
+   * Recorded, because rust-analyzer resolves it like any other path and the
+   * `@needs` licence was measured against that. Never an import for an arrow
+   * (#319): it says who may see an item, not what the file uses.
+   */
+  visibility?: boolean;
 }
 
 export interface FileDependencies {

@@ -15,7 +15,8 @@ Follow these every time.
 
 1. **Every box points at code, or says why not.** Give it a `ref`, or
    `state: "planned"` (not built yet), or `state: "external"` (not code in this
-   repo: a browser, a database, another project).
+   repo: a browser, a database, another project). A class declared in this repo
+   is never external, even a base class.
 2. **After `#` goes one plain name, as the code spells it.** Write
    `src/lib.rs#dispatch`. Never line numbers (`src/lib.rs#578-636`,
    `src/lib.rs:254`), which are refused, and never a qualified path

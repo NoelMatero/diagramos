@@ -3575,6 +3575,18 @@ duplicate from conflitcts, requires reading prs "An arrow can be three calls lon
     reader from item 37 is not wired in: this is the routine-level question,
     which is the one with the coverage.
 
+    **#366: a type is never a door, so an external box anchored at one is read
+    as code.** Haiku drew httpx's `BaseTransport` and `ByteStream` external
+    while anchoring them at their own classes, and 9 wrong arrows on the planted
+    bench were never read behind them. A door is a routine; a declaration with a
+    `body` and no `parameters` (a class, an interface, a struct, a trait) cannot
+    be one, so such a box is code in this repo marked wrongly. It is read like a
+    built box and the arrow's report says the mark is wrong. The old
+    non-door test still passes untouched, because its ref names a routine: a
+    routine keeps the door meaning above, checked or not. A file-only ref, a
+    name the file does not declare, a Rust unit struct and a type alias stay
+    skipped, which is the quiet direction.
+
 26. **#206's demand number came back at 7 arrows of 162 and did not decide the
     issue, because the corpus it counts was drawn to test the tool. Built
     anyway, on the code-side argument the issue itself made. Licensed in
@@ -4201,6 +4213,26 @@ duplicate from conflitcts, requires reading prs "An arrow can be three calls lon
     | false claims green, all words | 26 | 26 |
 
     The four false `@needs` greens that remain are #319's `pub(crate)`, unmoved.
+
+    **#319, decided in #366: a visibility marker is not an import for an
+    arrow.** `pub(crate)`, `pub(super)` and `pub(in crate::a)` say who may see
+    an item. rust-analyzer resolves the path inside them like any other, and the
+    reader still records it -- the licence was measured that way -- but marks
+    it, and neither `@needs`' confirmation nor its walk rests on one. The four
+    greens above go red as backwards (`bench:planted` 586 -> 590, 0 true claims
+    red).
+
+    The price is on the referee's own list, and it is the definition, not a
+    miss. Of 2,539 Rust imports rust-analyzer reads on `.corpus/*`, confirmed
+    goes 99.8% -> 96.1% on `measure:recall`: 94 fewer, 28 of them red (22
+    backwards, 6 refuted) and 66 quiet. Counted without that script's
+    population rule, 118 file pairs are linked by nothing but a marker: 87 go
+    quiet, and 30 would be red if drawn -- `fnv.rs -> lib.rs` among them.
+    In all 30 the tail writes nothing that reaches the head except the marker,
+    none calls a macro the head defines, and the head declares the tail as a
+    module, so the red says what is true: the dependency runs the other way.
+    (`clap_complete_nushell`'s 12 files crash the reader on main and were not
+    in that count.)
 
 45. **The arrow now says which dependency it means, because the code cannot
     tell them apart (#323).**
