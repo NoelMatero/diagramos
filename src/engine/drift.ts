@@ -55,14 +55,15 @@ import { languageOf, type Language } from "./parse";
 import { ledgerAdditions, type Ledger } from "./ledger";
 import { checkNeeds, type NeedsWithheld } from "./needs";
 import {
-  type CallSide, type CallsNotClosed, type CallsWithheld, EXTERNAL_RECEIVER, type ReceiverResolution, callSitesIn, callsBetween,
+  type CallSide, type CallsNotClosed, type CallsVerdict, type CallsWithheld, EXTERNAL_RECEIVER, type ReceiverResolution,
+  callSitesIn, callsBetween, callsIntoType, compiledBodiesFor, isTypeName,
 } from "./calls";
 import type { CompiledCrate } from "./compiled-calls";
 import { newReachCache, reachBetween, type ReachCache } from "./reach";
 import { constructions, routineNamesIn, type ConstructsNames, type ConstructsWithheld } from "./constructs";
 import { type AccessesWithheld, type NotReadEvidence, memberAccesses, memberNamed, membersReadAt, membersReadByName, readsMember } from "./accesses";
 import { heldTypes, type HoldsWithheld } from "./holds";
-import { conformedTypes, type ConformsWithheld } from "./conforms";
+import { conformedTypes, declaredBases, type ConformsWithheld } from "./conforms";
 import { overridesIn, type Overrides } from "./overrides";
 import { signatureNames, type SignatureWithheld } from "./signature";
 import { resolveDependency, type ConfigCache } from "./resolve";
@@ -868,6 +869,9 @@ export const NOT_CLOSED_WORDS: Record<CallsNotClosed, string> = {
   "called-implicitly": "the arrow's end is a trait method the language can run without it being written "
     + "-- an operator, `?`, formatting, the end of a scope",
   named: "the caller names that routine without calling it, so it may hand it to something that does",
+  inherits: "the class has a base, and one call is to another class's method -- which on one of these "
+    + "is its own, inherited",
+  "may-create": "no call is to the class, and the caller may still create one",
 };
 
 export { lackingPhrase };
@@ -4896,6 +4900,77 @@ export function checkDrift(
       }
 
       /*
+       * The tail's constructions, read the way `@builds` reads them: with
+       * Python's imports, TypeScript's followed `new C()`, and Rust's compiled
+       * body behind any "creates none" (#362). `@calls` asks it too when the
+       * head is a class (#374), since creating one is one way to call it.
+       */
+      const readConstructions = (language: Language, toLanguage: Language | undefined) => {
+        /*
+         * Python's imports, which are the only thing that separates
+         * `Response(body)` from `render(body)` (#309). The same `callSide`
+         * `@calls` is given, and the **anchors** rather than `fromFile` /
+         * `toFile`, for the reason spelled out at the `@calls` block below:
+         * the workspace refuses an absolute path, and a `CallSide.file` is
+         * compared against the repo-relative file a dependency resolved to.
+         *
+         * Built for Python and, since #362, TypeScript and Rust: it costs a
+         * dependency read per file. TypeScript's grammar has a node that
+         * means construction, so it needs the imports for something else --
+         * saying "creates none" only once every `new C()` has been followed
+         * to a C that is not the head under another name.
+         */
+        let names: ConstructsNames | undefined;
+        /*
+         * Whether a class the tail creates is a kind of the head, when its
+         * header names some other parent (#362's review). A question nobody
+         * answered is counted, so `wouldHelp` starts the compiler for it.
+         */
+        let ancestryUnanswered = false;
+        const ancestors: ConstructsNames["ancestors"] = (file, at) => {
+          const answer = options?.closedBodyReferee?.ancestorsAt?.(file, at);
+          if (answer === undefined) ancestryUnanswered = true;
+          return answer;
+        };
+        if (language === "python" && edge.state !== "planned") {
+          /*
+           * Python's absence and backwards go through `@calls`' own call
+           * reading (#362), so both sides are built exactly as that block
+           * builds them: the second opinion, "go to definition" on the
+           * tail, and the overridden methods.
+           */
+          const tail = callSide(fromAnchor, workspace, importCache.configs, options?.closedBodyReferee, true, overrides);
+          const head = callSide(toAnchor, workspace, importCache.configs, options?.closedBodyReferee);
+          if (tail) names = { side: tail, target: toAnchor, ancestors, ...(head ? { head } : {}) };
+        } else if (language === "python" || language === "ts" || language === "tsx") {
+          const tail = callSide(fromAnchor, workspace, importCache.configs);
+          if (tail) names = { side: tail, target: toAnchor, ancestors };
+        } else if (language === "rust" && edge.state !== "planned") {
+          /*
+           * Rust needs rustc's own body for the routine before it may say
+           * "creates none" (#362) -- the text cannot say what `x.clone()`
+           * makes. `callSide` offers the compiled crate only to a side that
+           * asks for it, the way `@calls`' tail does.
+           */
+          const tail = callSide(fromAnchor, workspace, importCache.configs, options?.closedBodyReferee, true);
+          if (tail) names = { side: tail, target: toAnchor };
+        }
+        const verdict = constructions(
+          workspace.read(fromFile), fromEnd.symbols[0]!, toEnd.symbols, language,
+          toLanguage && edge.state !== "planned"
+            ? {
+              source: workspace.read(toFile),
+              routines: routineNamesIn(workspace.read(toFile), toLanguage),
+              language: toLanguage,
+              names: fromEnd.symbols,
+            }
+            : undefined,
+          names,
+        );
+        return { verdict, ancestryUnanswered };
+      };
+
+      /*
        * `@builds`: does the tail make one of the head's type?
        *
        * Read at the **from** end, like `holds`, but for a different reason: the
@@ -4929,67 +5004,7 @@ export function checkDrift(
            * as a routine to read; the reader ignores the ones that are not.
            */
           const toLanguage = languageOf(toFile);
-          /*
-           * Python's imports, which are the only thing that separates
-           * `Response(body)` from `render(body)` (#309). The same `callSide`
-           * `@calls` is given, and the **anchors** rather than `fromFile` /
-           * `toFile`, for the reason spelled out at the `@calls` block below:
-           * the workspace refuses an absolute path, and a `CallSide.file` is
-           * compared against the repo-relative file a dependency resolved to.
-           *
-           * Built for Python and, since #362, TypeScript and Rust: it costs a
-           * dependency read per file. TypeScript's grammar has a node that
-           * means construction, so it needs the imports for something else --
-           * saying "creates none" only once every `new C()` has been followed
-           * to a C that is not the head under another name.
-           */
-          let names: ConstructsNames | undefined;
-          /*
-           * Whether a class the tail creates is a kind of the head, when its
-           * header names some other parent (#362's review). A question nobody
-           * answered is counted, so `wouldHelp` starts the compiler for it.
-           */
-          let ancestryUnanswered = false;
-          const ancestors: ConstructsNames["ancestors"] = (file, at) => {
-            const answer = options?.closedBodyReferee?.ancestorsAt?.(file, at);
-            if (answer === undefined) ancestryUnanswered = true;
-            return answer;
-          };
-          if (language === "python" && edge.state !== "planned") {
-            /*
-             * Python's absence and backwards go through `@calls`' own call
-             * reading (#362), so both sides are built exactly as that block
-             * builds them: the second opinion, "go to definition" on the
-             * tail, and the overridden methods.
-             */
-            const tail = callSide(fromAnchor, workspace, importCache.configs, options?.closedBodyReferee, true, overrides);
-            const head = callSide(toAnchor, workspace, importCache.configs, options?.closedBodyReferee);
-            if (tail) names = { side: tail, target: toAnchor, ancestors, ...(head ? { head } : {}) };
-          } else if (language === "python" || language === "ts" || language === "tsx") {
-            const tail = callSide(fromAnchor, workspace, importCache.configs);
-            if (tail) names = { side: tail, target: toAnchor, ancestors };
-          } else if (language === "rust" && edge.state !== "planned") {
-            /*
-             * Rust needs rustc's own body for the routine before it may say
-             * "creates none" (#362) -- the text cannot say what `x.clone()`
-             * makes. `callSide` offers the compiled crate only to a side that
-             * asks for it, the way `@calls`' tail does.
-             */
-            const tail = callSide(fromAnchor, workspace, importCache.configs, options?.closedBodyReferee, true);
-            if (tail) names = { side: tail, target: toAnchor };
-          }
-          const verdict = constructions(
-            workspace.read(fromFile), fromEnd.symbols[0]!, toEnd.symbols, language,
-            toLanguage && edge.state !== "planned"
-              ? {
-                source: workspace.read(toFile),
-                routines: routineNamesIn(workspace.read(toFile), toLanguage),
-                language: toLanguage,
-                names: fromEnd.symbols,
-              }
-              : undefined,
-            names,
-          );
+          const { verdict, ancestryUnanswered } = readConstructions(language, toLanguage);
 
           if (verdict.verdict === "confirmed") {
             if (claimed) claims.buildsConfirmed += 1;
@@ -5123,7 +5138,7 @@ export function checkDrift(
           if (!tail || !head) {
             noteCalled("unreadable");
           } else {
-            const verdict = callsBetween(
+            let verdict: CallsVerdict = callsBetween(
               { ...tail, routine: fromEnd.symbols[0]! },
               { ...head, names: toEnd.symbols },
             );
@@ -5132,6 +5147,84 @@ export function checkDrift(
               && (verdict.verdict === "withheld" || (verdict.verdict === "absent" && verdict.notClosed))
             ) {
               claims.callsCompilable += 1;
+            }
+
+            /*
+             * A class at the head (#374): "main calls Parser" is true when
+             * main creates a Parser or calls anything Parser declares.
+             *
+             * `callsBetween` asks only whether a call lands in the class's
+             * file, which is neither half. A call to `p.parse()` landed there
+             * and was never confirmed, and a struct literal, a subclass, an
+             * inherited method or an `impl` two files away landed nowhere
+             * near it -- so a correct arrow was called wrong. Now the two
+             * halves are asked of what already reads them: the call list, for
+             * a call that comes to rest on the class's own routine
+             * (`callsIntoType`), and `@builds`' reading of the same body,
+             * with every guard #362 gave it. Either one confirms. Wrong needs
+             * all three: the old reading's own "no call reaches its file",
+             * every call placed and none the class's, and `@builds` closing
+             * on "creates none". So this can take a red away and never add
+             * one: the bench's 4 reds it withdrew were wrong arrows whose
+             * body names the class or could build it as a literal.
+             */
+            if (
+              verdict.verdict !== "confirmed"
+              && toEnd.symbols.every((name) => isTypeName(head.source, name, head.language))
+            ) {
+              // Rust has no inheritance: a trait's default method is held by
+              // the trait, which `callsIntoType` treats as dispatch anyway.
+              const inherits = head.language !== "rust" && toEnd.symbols.some((name) => {
+                const read = declaredBases(head.source, name, head.language);
+                return "why" in read || read.bases.length > 0;
+              });
+              const routine = fromEnd.symbols[0]!;
+              const own = callsIntoType({ ...tail, routine }, { ...head, names: toEnd.symbols }, inherits);
+              const made = own.verdict === "confirmed" ? undefined
+                : readConstructions(tail.language, head.language).verdict;
+              if (own.verdict === "confirmed") {
+                verdict = { verdict: "confirmed", evidence: own.evidence };
+              } else if (made?.verdict === "confirmed") {
+                verdict = { verdict: "confirmed", evidence: {
+                  name: made.evidence.name, inside: routine, line: made.evidence.line, wrote: made.evidence.wrote,
+                } };
+              } else if (verdict.verdict === "backwards" && own.verdict === "closed") {
+                /*
+                 * The class's code calls the tail, and every call the tail
+                 * makes was placed and none is the class's: turn it round.
+                 * "Turn it round" says the forward call is absent, and before
+                 * this reading nothing could see the forward half of vite's
+                 * `ModuleGraph` pairs -- each side calling the other -- so 204
+                 * correct arrows said it (`measure:builds-absent
+                 * --word=calls`). A forward reading that is still open is
+                 * quiet below instead, with its reason, which is also what
+                 * lets a live check put the open call to a language server.
+                 */
+              } else if (own.verdict === "open") {
+                if (verdict.verdict !== "withheld") verdict = { verdict: "absent", notClosed: own.why };
+              } else if (made?.verdict !== "refuted") {
+                if (verdict.verdict !== "withheld") verdict = { verdict: "absent", notClosed: "may-create" };
+              } else if (verdict.verdict === "refuted") {
+                /*
+                 * Rust runs a type's trait methods without a call written:
+                 * `a >= b` runs a derived `PartialOrd`, a scope's end runs
+                 * `Drop`. The red already needs rustc's body for the routine
+                 * (`@builds`' "creates none"), and if that body so much as
+                 * names the type, the text's closed list is not the whole of
+                 * it -- regex's `special.rs#matches` compares `StateID`s and
+                 * writes none (#374, `measure:builds-absent --word=calls`).
+                 */
+                const compiled = tail.language === "rust" ? compiledBodiesFor({ ...tail, routine }, toEnd.symbols) : undefined;
+                const named = compiled?.bodies.some((body) => toEnd.symbols.some((name) => body.words.has(name)
+                  || body.calls.some((call) => call.kind === "named" && call.through === name)));
+                verdict = named
+                  ? { verdict: "absent", notClosed: "called-implicitly" }
+                  : { verdict: "refuted", evidence: { routine, line: own.line, sites: own.sites } };
+              }
+              // "Creates none" in Rust waits on the compiler, which a live check starts only when asked.
+              if (claimed && own.verdict === "closed" && made?.verdict === "absent" && made.awaitsCompiler) {
+                claims.callsCompilable += 1;
+              }
             }
 
             /*

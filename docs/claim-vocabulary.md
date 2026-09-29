@@ -4806,6 +4806,81 @@ duplicate from conflitcts, requires reading prs "An arrow can be three calls lon
     TypeScript (67 of them parents) and 0 of 295 in Python (50).
     `tests/builds-absent-ancestry.test.ts` holds the shape both ways.
 
+52. **A `@calls` arrow into a class was read as "some call lands in the
+    class's file", which is neither half of what it means (#374).** "main
+    calls Parser" is true when main **creates a Parser or calls anything
+    Parser declares** -- decided in #366, and "\<class A\> accesses M" is
+    true when one of A's routines reads it. The file rule got both halves
+    wrong. `p.parse()` landed in the file and was never confirmed. And a
+    Parser built without a call landing there -- a Rust struct literal, a
+    subclass in its own file, a method it inherits, an `impl Parser` in
+    another file, the class passed as a value -- was **called wrong on
+    correct code**: nine shapes in `tests/calls-into-a-class.test.ts`, red
+    on main, and anyhow's `construct -> ErrorImpl` twice on the bench once
+    the key read the meaning (#391).
+
+    Now a class head is asked both halves by what already reads them.
+    `callsIntoType` reads the call list for a call that comes to rest on a
+    routine the class holds -- its body, or an `impl` of it in a file that
+    imports it from the class's own. `@builds`' construction reading, lifted
+    out of its block so both words call the same code, reads the body for a
+    B created, with every #362 guard. Either confirms. Wrong needs all
+    three: the old "no call reaches its file", every call placed and none
+    the class's (`inherits` and trait dispatch keep it open), and `@builds`
+    closing on "creates none". **It can only withdraw a red**, never add one.
+
+    Found by building it:
+
+    - **A struct literal has a `name` and a `body`.** `Parser { depth: 1 }`
+      read as a declaration of Parser, so a ref at a file that only *builds*
+      one took it for the class. Declarations inside a routine are skipped.
+    - **So does an enum variant.** clap's `Flag::Command` beside the struct
+      `Command` confirmed an arrow at the variant through the struct's
+      methods, because holders were matched by name. A holder now counts
+      only in the class's own file or in one that imports the class from
+      there; a Rust file with `impl Parser` counts `Parser` as local *and*
+      imported, so its resolved `use` path is read instead.
+    - **A getter is not a call.** The answer key's call hierarchies list
+      `wrapper.id` and `@property` reads as calls; #391 filters them.
+    - **"Turn it round" on a pair that calls both ways.** The corpus
+      measurement below put 204 correct TypeScript arrows red as
+      *backwards*: vite's `getBackwardCompatibleModuleNode` calls
+      `ModuleGraph`'s methods and `ModuleGraph` calls it back, and the old
+      reading saw only the second. The class reading now runs first, and a
+      class-head "backwards" needs the forward reading closed.
+    - **A class declared inside a function.** nest builds
+      `InternalModuleClass` inside `build()`; skipping everything inside a
+      routine (for the struct literal) sent it down the old path. Inside a
+      routine a declaration counts when its body holds a routine.
+    - **Rust runs a type's methods with no call written.** regex's
+      `special.rs#matches` compares `StateID`s, which runs a derived
+      `PartialOrd`. When rustc's body for the routine names the type, the
+      red is withheld as `called-implicitly`.
+
+    `measure:builds-absent -- --word=calls` draws every pair a compiler
+    says is a correct `@calls` into a class -- the routine creates it, or
+    calls one of its own methods -- and asks the checker. Before, then
+    after:
+
+    | | correct arrows called wrong | confirmed |
+    |---|---|---|
+    | TypeScript, 1,497 (TS compiler) | 231 -> **0** | 0 -> 1,169 |
+    | Rust, 3,928 (text scan, rustc MIR) | 187 -> **0** | 75 -> 1,130 |
+    | Python, 295 (jedi, creation only) | 4 -> **0** | 210 -> 211 |
+
+    One TypeScript pair threw in tree-sitter's wasm heap and is not counted
+    either way.
+
+    `bench:planted -- --word=calls`, both arms the same hour on the #374
+    key: true claims called wrong 2 -> 0 of 129, confirmed 68 -> 96; wrong
+    claims caught 126 -> 122 of 228, and none shown as correct. The four
+    withdrawn reds are wrong arrows whose body names the class (nest's
+    `lookupComponent` twice, poetry's `_propagate_incompatibility`) or
+    could build it as a literal (vite's `ModuleRunnerContext`, an
+    interface). `@accesses` from a class needed nothing: #297 already reads
+    a class tail through its methods, and `tests/accesses-from-a-class.test.ts`
+    holds that as a guard.
+
 ## Open, in the order worth doing
 
 1. ~~**The licence grid.**~~ Built at #207 and shipped at #209. `@accesses` is

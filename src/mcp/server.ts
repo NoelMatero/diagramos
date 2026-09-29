@@ -165,9 +165,10 @@ const CLAIM_DESCRIPTION =
   + "holds: from is a type with a field of type to; red if no field has it. "
   + "builds: from's own code creates a to (one got from another function does not count); red "
   + "if backwards or if from creates none. "
-  + "calls: from calls to; red only if the arrow is backwards. "
+  + "calls: from calls to; red only if the arrow is backwards. A class at to means from creates "
+  + "one or calls its methods. "
   + "accesses: from reads member of type to, and the member name goes in label; red if the type "
-  + "lacks it. "
+  + "lacks it. A class at from means one of its methods reads it. "
   + "conforms: from extends or implements to (subtype first); red in Python and TypeScript if the "
   + "base is not listed, never in Rust. "
   + "On a planned arrow a claim is checked only once the code lands.";
