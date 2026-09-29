@@ -486,9 +486,79 @@ export interface RustLspReferee {
    * file *is* (#297). `undefined` when it would not answer.
    */
   documentSymbols(file: string): Promise<LspDocumentSymbol[] | undefined>;
+  /**
+   * What the type at `[start, end)` is made of (#393): every type
+   * rust-analyzer's hover offers to go to -- the type, its arguments, and a
+   * generic's bounds, `where` clauses included -- with the 0-based line of
+   * each one's name. See `rustTypeParts`.
+   */
+  typePartsAt(file: string, source: string, start: number, end: number): Promise<RustTypeParts | undefined>;
+  /**
+   * The file the path at `[start, end)` resolves to (#393): a `use` path, or
+   * a macro's -- `crate::cents!`, `core_lib::cents!` -- which is how a file
+   * depends on the one that defines the macro. Absolute.
+   */
+  importTargetAt(file: string, source: string, start: number, end: number): Promise<string | undefined>;
   /** The server's own version string, for the record in a measurement. */
   version(): string;
   close(): void;
+}
+
+/** `RustLspReferee.typePartsAt`'s answer, before paths are made relative. */
+export interface RustTypeParts {
+  parts: Array<{ name: string; file: string; line: number }>;
+  whole: boolean;
+}
+
+/** A hover as rust-analyzer sends it, with its `hoverActions` extension. */
+interface RustHover {
+  contents?: string | { value?: string };
+  actions?: Array<{
+    commands?: Array<{
+      title: string;
+      command: string;
+      arguments?: Array<{ uri?: string; targetUri?: string; range?: LspRange; targetSelectionRange?: LspRange }>;
+    }>;
+  }>;
+}
+
+/** Rust's own primitive types: a name in a printed type that no declaration stands behind. */
+const RUST_PRIMITIVES = new Set([
+  "bool", "char", "str", "i8", "i16", "i32", "i64", "i128", "isize",
+  "u8", "u16", "u32", "u64", "u128", "usize", "f32", "f64", "Self",
+]);
+
+/** Words a printed Rust type is spelled with that name no type. */
+const RUST_TYPE_WORDS = new Set(["dyn", "impl", "mut", "const", "fn", "for", "unsafe", "extern", "let", "ref"]);
+
+/**
+ * `typePartsAt` from what rust-analyzer's hover says (#393).
+ *
+ * The "go to" actions are the parts, placed. Whether they are all of it is
+ * read from the printed type: every name in it must be one of the actions, a
+ * primitive, or a type parameter whose bounds the actions stand in for --
+ * rust-analyzer offers `Named` for `n: N` where `N: Named`, and nothing for an
+ * unbounded `T`, which is a part nobody can name. So a type parameter with a
+ * bound still leaves the answer partial: its bounds are what it is known to
+ * be, and a "no" would need more than that. `{unknown}` is the compiler
+ * saying it could not tell.
+ */
+export function rustTypeParts(
+  hover: string,
+  targets: ReadonlyArray<{ title: string; file: string; line: number }>,
+): RustTypeParts | undefined {
+  const declaration = hover.split("\n").map((one) => one.trim())
+    .map((one) => /^(?:let\s+(?:mut\s+)?)?(?:[A-Za-z_]\w*|\d+)\s*:(?!:)\s*(.+)$/.exec(one)?.[1])
+    .find((one) => one !== undefined);
+  const parts = targets.map(({ title, file, line }) => ({ name: title.split("::").pop()!, file, line }));
+  if (declaration === undefined) return parts.length > 0 ? { parts, whole: false } : undefined;
+  const placed = new Set(parts.map((one) => one.name));
+  const named = declaration.replace(/'\w+/g, "").match(/[A-Za-z_][\w:]*/g) ?? [];
+  const whole = !declaration.includes("{unknown}") && named.every((one) => {
+    const last = one.split("::").pop()!;
+    return placed.has(last) || RUST_PRIMITIVES.has(last) || RUST_TYPE_WORDS.has(last);
+  });
+  return { parts, whole };
 }
 
 /** How long any one request may take before this referee gives up on it. */
@@ -634,10 +704,14 @@ export async function createRustAnalyzerReferee(root: string): Promise<RustLspRe
           definition: { linkSupport: true },
           typeDefinition: { linkSupport: true },
           documentSymbol: { hierarchicalDocumentSymbolSupport: true },
+          hover: { contentFormat: ["plaintext"] },
         },
         // Without this rust-analyzer sends no `$/progress` at all, and the
         // readiness gate above would wait out its whole timeout on every crate.
         window: { workDoneProgress: true },
+        // rust-analyzer's own extension: a hover lists every type in the
+        // hovered type as a "go to" -- arguments and bounds too (#393).
+        experimental: { hoverActions: true, commands: { commands: ["rust-analyzer.gotoLocation"] } },
       },
       workspaceFolders: [{ uri: pathToFileURL(root).toString(), name: path.basename(root) }],
     });
@@ -716,6 +790,55 @@ export async function createRustAnalyzerReferee(root: string): Promise<RustLspRe
     method: "typeDefinition" | "definition", file: string, source: string, at: number,
   ): Promise<string | undefined> => (await askLocation(method, file, source, at))?.file;
 
+  /** The hover at `at`: its text, and the places its "go to" actions name (#393). */
+  async function hoverAt(file: string, source: string, at: number): Promise<RustHover | undefined> {
+    await whenPrimed();
+    const params = {
+      textDocument: { uri: pathToFileURL(file).toString() },
+      position: positionAt(startsFor(file, source), at),
+    };
+    for (let attempt = 0; !closed; attempt++) {
+      try {
+        const request = connection.sendRequest("textDocument/hover", params);
+        const timeout = new Promise<never>((_, reject) => setTimeout(
+          () => reject(new Error("textDocument/hover timed out")), REQUEST_TIMEOUT_MS).unref());
+        const result = (await Promise.race([request, timeout])) as RustHover | null;
+        // After priming, no hover is a real "nothing here", as for `askLocation`'s empty array.
+        return result ?? undefined;
+      } catch (error) {
+        if (!isNotReadyError(error) || attempt >= RETRY_MS.length) return undefined;
+      }
+      await new Promise((resolve) => setTimeout(resolve, RETRY_MS[attempt]));
+    }
+    return undefined;
+  }
+
+  async function typePartsAt(file: string, source: string, start: number, end: number): Promise<RustTypeParts | undefined> {
+    const anchor = /^[A-Za-z_]\w*$/.test(source.slice(start, end)) ? { start, end } : rustTypeAnchorFor(source, start, end);
+    if (!anchor) return undefined;
+    const hover = await hoverAt(file, source, anchor.start);
+    if (!hover) return undefined;
+    const text = typeof hover.contents === "string" ? hover.contents : hover.contents?.value ?? "";
+    const targets = (hover.actions ?? []).flatMap((group) => group.commands ?? [])
+      .filter((one) => one.command === "rust-analyzer.gotoLocation")
+      .flatMap((one) => {
+        const where = one.arguments?.[0];
+        const uri = where?.uri ?? where?.targetUri;
+        const range = where?.targetSelectionRange ?? where?.range;
+        if (!uri || !range) return [];
+        try { return [{ title: one.title, file: fileURLToPath(uri), line: range.start.line }]; } catch { return []; }
+      });
+    return rustTypeParts(text, targets);
+  }
+
+  async function importTargetAt(file: string, source: string, start: number, end: number): Promise<string | undefined> {
+    const written = source.slice(start, end).replace(/!\s*$/, "");
+    const last = written.lastIndexOf("::");
+    const at = start + (last < 0 ? 0 : last + 2);
+    if (at >= start + written.length) return undefined;
+    return ask("definition", file, source, at);
+  }
+
   return {
     typeDeclarationAt: (file, source, start, end) => {
       const anchor = rustTypeAnchorFor(source, start, end);
@@ -729,6 +852,8 @@ export async function createRustAnalyzerReferee(root: string): Promise<RustLspRe
     },
     methodDeclarationAt: (file, source, start) => ask("definition", file, source, start),
     methodDeclarationLocationAt: (file, source, start) => askLocation("definition", file, source, start),
+    typePartsAt,
+    importTargetAt,
     documentSymbols: async (file) => {
       await whenPrimed();
       for (let attempt = 0; !closed; attempt++) {

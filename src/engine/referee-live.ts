@@ -50,8 +50,9 @@ import type { ClosedBodyReferee, DriftReport } from "./drift";
 import { languageOf } from "./parse";
 import { refereeFor, wouldHelp } from "./referee";
 import {
-  refereePool, resolvePythonAncestors, resolvePythonDefinitions, resolvePythonKinds, resolveRustDefinitions,
-  type RefereePool,
+  fitsKey, refereePool, resolvePythonAncestors, resolvePythonDefinitions, resolvePythonFits, resolvePythonImports,
+  resolvePythonKinds, resolvePythonMembers, resolvePythonTypeParts, resolveRustDefinitions, resolveRustImports,
+  resolveRustTypeParts, type RefereePool,
 } from "./referee-pool";
 import type { PyrightLspReferee } from "./referee-python-lsp";
 import type { RustLspReferee } from "./referee-rust-lsp";
@@ -156,8 +157,13 @@ type Resolvers = {
   definitions: (root: string, queries: Query[], pool: LiveRefereePool) => Promise<Resolved>;
   kinds?: (root: string, queries: Query[], pool: LiveRefereePool) => Promise<Resolved>;
   ancestors?: (root: string, queries: Query[], pool: LiveRefereePool) => Promise<Resolved>;
+  /* #393's four, which `compiler-questions.ts` describes. Rust has no `fits` or `members` to ask. */
+  typeParts?: (root: string, queries: Query[], pool: LiveRefereePool) => Promise<Resolved>;
+  fits?: (root: string, queries: Query[], pool: LiveRefereePool) => Promise<Resolved>;
+  imports?: (root: string, queries: Query[], pool: LiveRefereePool) => Promise<Resolved>;
+  members?: (root: string, queries: Query[], pool: LiveRefereePool) => Promise<Resolved>;
 };
-type Kind = "receiver" | "definition" | "kind" | "ancestor";
+type Kind = "receiver" | "definition" | "kind" | "ancestor" | "typeParts" | "fits" | "import" | "member";
 /*
  * Asked in this order, and the order is the key order here. "Go to
  * definition" goes last (#351): `@calls` puts every call it cannot place to
@@ -167,10 +173,15 @@ type Kind = "receiver" | "definition" | "kind" | "ancestor";
  * wrong-kind check's question unasked; asked after a batch that did get an
  * answer, the server is known to be bound and it waits for nothing.
  */
-const BATCHES = { receiver: "receivers", kind: "kinds", ancestor: "ancestors", definition: "definitions" } as const;
-interface Query { file: string; at: { start: number; end: number } }
+const BATCHES = {
+  receiver: "receivers", kind: "kinds", ancestor: "ancestors",
+  typeParts: "typeParts", fits: "fits", import: "imports", member: "members",
+  definition: "definitions",
+} as const;
+/** `extra` is what a question carries beside its position: `fitsAt`'s target, `memberAt`'s name. */
+interface Query { file: string; at: { start: number; end: number }; extra?: string }
 interface Resolved {
-  cache: { get(file: string, at: { start: number; end: number }): unknown };
+  cache: { get(file: string, at: { start: number; end: number }, extra?: string): unknown };
   close: () => void;
   started: boolean;
 }
@@ -187,10 +198,16 @@ const RESOLVERS: Record<LiveLanguage, Resolvers> = {
     definitions: (root, queries, pool) => resolvePythonDefinitions(root, queries, pool) as Promise<Resolved>,
     kinds: (root, queries, pool) => resolvePythonKinds(root, queries, pool) as Promise<Resolved>,
     ancestors: (root, queries, pool) => resolvePythonAncestors(root, queries, pool) as Promise<Resolved>,
+    typeParts: (root, queries, pool) => resolvePythonTypeParts(root, queries, pool) as Promise<Resolved>,
+    fits: (root, queries, pool) => resolvePythonFits(root, queries, pool) as Promise<Resolved>,
+    imports: (root, queries, pool) => resolvePythonImports(root, queries, pool) as Promise<Resolved>,
+    members: (root, queries, pool) => resolvePythonMembers(root, queries, pool) as Promise<Resolved>,
   },
   rust: {
     receivers: (root, queries, pool) => resolveRustReceivers(root, queries, undefined, pool) as Promise<Resolved>,
     definitions: (root, queries, pool) => resolveRustDefinitions(root, queries, undefined, pool) as Promise<Resolved>,
+    typeParts: (root, queries, pool) => resolveRustTypeParts(root, queries, pool) as Promise<Resolved>,
+    imports: (root, queries, pool) => resolveRustImports(root, queries, pool) as Promise<Resolved>,
   },
 };
 
@@ -234,10 +251,11 @@ export async function refereedCheckLive(
   const ts = refereeFor(root);
 
   const none: Answer = () => undefined;
-  const answers: Record<LiveLanguage, Record<Kind, Answer>> = {
-    python: { receiver: none, definition: none, kind: none, ancestor: none },
-    rust: { receiver: none, definition: none, kind: none, ancestor: none },
-  };
+  const nothingYet = (): Record<Kind, Answer> => ({
+    receiver: none, definition: none, kind: none, ancestor: none,
+    typeParts: none, fits: none, import: none, member: none,
+  });
+  const answers: Record<LiveLanguage, Record<Kind, Answer>> = { python: nothingYet(), rust: nothingYet() };
   const answered = new Set<string>();
   const silent = new Set<string>();
   const closers: (() => void)[] = [];
@@ -247,13 +265,12 @@ export async function refereedCheckLive(
 
   try {
     for (let round = 0; round < ROUNDS; round += 1) {
-      const fresh: Record<LiveLanguage, Record<(typeof BATCHES)[Kind], Query[]>> = {
-        python: { receivers: [], definitions: [], kinds: [], ancestors: [] },
-        rust: { receivers: [], definitions: [], kinds: [], ancestors: [] },
-      };
-      const asked: Record<Kind, Set<string>> = {
-        receiver: new Set(), definition: new Set(), kind: new Set(), ancestor: new Set(),
-      };
+      const noQueries = (): Record<(typeof BATCHES)[Kind], Query[]> => ({
+        receivers: [], definitions: [], kinds: [], ancestors: [], typeParts: [], fits: [], imports: [], members: [],
+      });
+      const fresh: Record<LiveLanguage, Record<(typeof BATCHES)[Kind], Query[]>> = { python: noQueries(), rust: noQueries() };
+      const asked = Object.fromEntries((Object.keys(BATCHES) as Kind[]).map((kind) => [kind, new Set<string>()])) as
+        Record<Kind, Set<string>>;
 
       /*
        * The recording referee. TypeScript is answered for real even on this
@@ -264,17 +281,20 @@ export async function refereedCheckLive(
        */
       const record = (
         kind: Kind,
-        real: ((file: string, at: { start: number; end: number }) => unknown) | undefined,
-      ) => (file: string, at: { start: number; end: number }): never | undefined => {
+        real: ((file: string, at: { start: number; end: number }, argument?: never) => unknown) | undefined,
+        /** How a question's argument beside its position is written into its key (#393). */
+        extraOf?: (argument: never) => string,
+      ) => (file: string, at: { start: number; end: number }, argument?: unknown): never | undefined => {
         const language = languageOf(file);
-        if (language !== "python" && language !== "rust") return real?.(file, at) as never;
+        if (language !== "python" && language !== "rust") return real?.(file, at, argument as never) as never;
         if (!askServers || !RESOLVERS[language][BATCHES[kind]]) return undefined;
-        const known = answers[language][kind](file, at);
+        const extra = extraOf && argument !== undefined ? extraOf(argument as never) : undefined;
+        const known = answers[language][kind](file, at, extra);
         if (known !== undefined) return known as never;
-        const key = `${language}:${file}:${at.start}:${at.end}`;
+        const key = `${language}:${file}:${at.start}:${at.end}:${extra ?? ""}`;
         if (!asked[kind].has(key)) {
           asked[kind].add(key);
-          fresh[language][BATCHES[kind]].push({ file, at });
+          fresh[language][BATCHES[kind]].push({ file, at, ...(extra === undefined ? {} : { extra }) });
         }
         return undefined;
       };
@@ -283,6 +303,11 @@ export async function refereedCheckLive(
         declarationAt: record("definition", ts?.declarationAt?.bind(ts)) as ClosedBodyReferee["declarationAt"],
         kindAt: record("kind", ts?.kindAt?.bind(ts)) as ClosedBodyReferee["kindAt"],
         ancestorsAt: record("ancestor", ts?.ancestorsAt?.bind(ts)) as ClosedBodyReferee["ancestorsAt"],
+        typePartsAt: record("typeParts", ts?.typePartsAt?.bind(ts)) as ClosedBodyReferee["typePartsAt"],
+        fitsAt: record("fits", ts?.fitsAt?.bind(ts) as never, fitsKey as never) as ClosedBodyReferee["fitsAt"],
+        importTargetAt: record("import", ts?.importTargetAt?.bind(ts)) as ClosedBodyReferee["importTargetAt"],
+        memberAt: record("member", ts?.memberAt?.bind(ts) as never, ((name: string) => name) as never) as
+          ClosedBodyReferee["memberAt"],
         // TypeScript's alone, and answered on the spot: no language server is asked.
         renderableAt: ts?.renderableAt?.bind(ts),
         ...(askCompiler
@@ -319,7 +344,7 @@ export async function refereedCheckLive(
           closers.push(resolved.close);
           if (resolved.started) answered.add(language); else silent.add(language);
           const previous = answers[language][kind];
-          answers[language][kind] = (file, at) => previous(file, at) ?? resolved.cache.get(file, at);
+          answers[language][kind] = (file, at, extra) => previous(file, at, extra) ?? resolved.cache.get(file, at, extra);
         }
       }
       if (!asking) break;
@@ -363,6 +388,26 @@ export async function refereedCheckLive(
         }
         return ts?.ancestorsAt?.(file, at);
       },
+      typePartsAt: (file, at) => {
+        const language = languageOf(file);
+        if (language === "python" || language === "rust") return answers[language].typeParts(file, at) as never;
+        return ts?.typePartsAt?.(file, at);
+      },
+      fitsAt: (file, at, target) => {
+        const language = languageOf(file);
+        if (language === "python" || language === "rust") return answers[language].fits(file, at, fitsKey(target)) as never;
+        return ts?.fitsAt?.(file, at, target);
+      },
+      importTargetAt: (file, at) => {
+        const language = languageOf(file);
+        if (language === "python" || language === "rust") return answers[language].import(file, at) as never;
+        return ts?.importTargetAt?.(file, at);
+      },
+      memberAt: (file, at, name) => {
+        const language = languageOf(file);
+        if (language === "python" || language === "rust") return answers[language].member(file, at, name) as never;
+        return ts?.memberAt?.(file, at, name);
+      },
       ...(compiled?.answered ? { compiledCrateOf: (file: string) => compiled.crateOf(file) } : {}),
     };
     if (ts) answered.add("typescript");
@@ -381,7 +426,7 @@ export async function refereedCheckLive(
   }
 }
 
-type Answer = (file: string, at: { start: number; end: number }) => unknown;
+type Answer = (file: string, at: { start: number; end: number }, extra?: string) => unknown;
 
 /**
  * Which check a board got, in words somebody who has not read this file can

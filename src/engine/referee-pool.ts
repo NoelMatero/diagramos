@@ -43,7 +43,8 @@ import { createPyrightLspReferee, WARM_UP_CANDIDATES } from "./referee-python-ls
 import { pythonDefinitionRunsThere } from "./referee-python";
 import { cargoRootsIn, rustDefinitionRunsThere } from "./referee-rust";
 import { createRustAnalyzerReferee, isOutsideRustTree, type RustLspReferee } from "./referee-rust-lsp";
-import { isOutsideTree } from "./referee-ts";
+import { isOutsideTree, relativeInTree } from "./referee-ts";
+import type { DeclaredAt, ImportTarget, MemberTarget, TypeParts } from "./compiler-questions";
 import type { ValueKind } from "./parts";
 
 /** Structurally `ClosedBodyReferee.declarationAt`'s answer, not imported -- the engine holds no dependency on anything under `scripts/lib`. */
@@ -68,6 +69,18 @@ export interface DefinitionAnswers {
 
 const queryKey = (file: string, at: { start: number; end: number }): string =>
   `${file}:${at.start}:${at.end}`;
+
+/**
+ * A question that carries more than a position (#393): the target a
+ * `fitsAt` is asked against, the member a `memberAt` is asked for. Part of
+ * the key, so the same position asked about two targets is two questions.
+ */
+export interface QuestionQuery extends DefinitionQuery {
+  extra?: string;
+}
+
+const questionKey = (file: string, at: { start: number; end: number }, extra?: string): string =>
+  extra === undefined ? queryKey(file, at) : `${queryKey(file, at)}:${extra}`;
 
 const EMPTY: DefinitionAnswers = { cache: { get: () => undefined }, close: () => {}, started: false };
 
@@ -123,12 +136,13 @@ async function run<Answer>(
     for (;;) {
       const query = queries[cursor++];
       if (query === undefined) return;
-      const key = queryKey(query.file, query.at);
+      const key = questionKey(query.file, query.at, (query as QuestionQuery).extra);
       if (cache.has(key)) continue;
       cache.set(key, undefined);
       try {
+        // `false` is an answer (#393's `fitsAt`), so only `undefined` is none.
         const answer = await ask(query);
-        if (answer) cache.set(key, answer);
+        if (answer !== undefined) cache.set(key, answer);
       } catch {
         // A question that failed in a way the client does not itself turn
         // into `undefined` -- its process died mid-batch, say. Unresolved,
@@ -328,6 +342,178 @@ export async function resolvePythonAncestors(
     close: () => { if (!pool) mine.close(); },
     started: true,
   };
+}
+
+/* ------------------------------------------- the questions a red rests on */
+
+/**
+ * The four questions of #393 (`compiler-questions.ts`), in batch, for the
+ * languages whose checker is a language server. One shape for all of them:
+ * answers read back by position and, where the question carries one, its
+ * `extra` -- the target a `fitsAt` asks about, the member a `memberAt` asks
+ * for.
+ */
+export interface QuestionAnswers<Answer> {
+  cache: { get(file: string, at: { start: number; end: number }, extra?: string): Answer | undefined };
+  close: () => void;
+  started: boolean;
+}
+
+type Pyright = Awaited<ReturnType<typeof createPyrightLspReferee>>;
+
+/** Python's questions, all put to the one pyright the tree has. */
+async function askPyright<Answer>(
+  root: string,
+  queries: readonly QuestionQuery[],
+  pool: RefereePool<Pyright> | undefined,
+  ask: (referee: Pyright, query: QuestionQuery, absolute: string, source: string) => Promise<Answer | undefined>,
+): Promise<QuestionAnswers<Answer>> {
+  const nothing: QuestionAnswers<Answer> = { cache: { get: () => undefined }, close: () => {}, started: false };
+  if (queries.length === 0) return nothing;
+  const sourceOf = readerOf(root);
+  const mine = pool ?? refereePool<Pyright>();
+  const referee = await mine.get(root, () => createPyrightLspReferee(root));
+  if (!referee) return nothing;
+  try {
+    await referee.warmUp(queries.slice(0, WARM_UP_CANDIDATES).map((query) => ({
+      file: path.resolve(root, query.file), source: sourceOf(query.file), start: query.at.start,
+    })));
+  } catch {
+    // Warming up only buys speed; every query below still gets its own answer.
+  }
+  const cache = new Map<string, Answer | undefined>();
+  await run(queries, cache, (query) => ask(referee, query, path.resolve(root, query.file), sourceOf(query.file)));
+  return {
+    cache: { get: (file, at, extra) => cache.get(questionKey(file, at, extra)) },
+    close: () => { if (!pool) mine.close(); },
+    started: true,
+  };
+}
+
+/** Rust's questions, each put to the rust-analyzer of the crate its file is in. */
+async function askRustAnalyzer<Answer>(
+  root: string,
+  queries: readonly QuestionQuery[],
+  pool: RefereePool<RustLspReferee> | undefined,
+  ask: (referee: RustLspReferee, query: QuestionQuery, absolute: string, source: string) => Promise<Answer | undefined>,
+): Promise<QuestionAnswers<Answer>> {
+  const nothing: QuestionAnswers<Answer> = { cache: { get: () => undefined }, close: () => {}, started: false };
+  if (queries.length === 0) return nothing;
+  const crateRoots = cargoRootsIn(root, new Set(["node_modules", ".git", "target", "vendor"]));
+  const byCrate = new Map<string, QuestionQuery[]>();
+  for (const query of queries) {
+    const absolute = path.resolve(root, query.file);
+    const owner = crateRoots
+      .filter((one) => absolute === one || absolute.startsWith(one + path.sep))
+      .sort((a, b) => b.length - a.length)[0];
+    if (!owner) continue;
+    byCrate.set(owner, [...(byCrate.get(owner) ?? []), query]);
+  }
+  if (byCrate.size === 0) return nothing;
+  const cache = new Map<string, Answer | undefined>();
+  const sourceOf = readerOf(root);
+  const mine = pool ?? refereePool<RustLspReferee>();
+  let started = false;
+  for (const [crate, crateQueries] of byCrate) {
+    const referee = await mine.get(crate, () => createRustAnalyzerReferee(crate));
+    if (!referee) continue;
+    started = true;
+    await referee.warmUp();
+    await run(crateQueries, cache, (query) => ask(referee, query, path.resolve(root, query.file), sourceOf(query.file)));
+  }
+  return {
+    cache: { get: (file, at, extra) => cache.get(questionKey(file, at, extra)) },
+    close: () => { if (!pool) mine.close(); },
+    started,
+  };
+}
+
+/** An absolute answer as a place in the repository, or `"outside"`. */
+function placedIn(
+  root: string, file: string, line: number, outside: (file: string, tree: string) => boolean = isOutsideTree,
+): DeclaredAt | "outside" {
+  const home = relativeInTree(file, root, outside);
+  return home === undefined ? "outside" : { file: home, line: line + 1 };
+}
+
+/** Python `typePartsAt`: named parts, from pyright's printed type. */
+export function resolvePythonTypeParts(
+  root: string, queries: readonly QuestionQuery[], pool?: RefereePool<Pyright>,
+): Promise<QuestionAnswers<TypeParts>> {
+  return askPyright(root, queries, pool, (referee, query, absolute, source) =>
+    referee.typePartsAt(absolute, source, query.at.start, query.at.end));
+}
+
+/** Python `fitsAt`. `extra` is the target, as `fitsKey` writes it. */
+export function resolvePythonFits(
+  root: string, queries: readonly QuestionQuery[], pool?: RefereePool<Pyright>,
+): Promise<QuestionAnswers<boolean>> {
+  return askPyright(root, queries, pool, (referee, query, absolute, source) => {
+    const target = fitsTarget(query.extra);
+    if (!target) return Promise.resolve(undefined);
+    return referee.fitsAt(absolute, source, query.at.start, query.at.end, {
+      file: path.resolve(root, target.file), line: target.line - 1,
+    });
+  });
+}
+
+/** Python `importTargetAt`. */
+export function resolvePythonImports(
+  root: string, queries: readonly QuestionQuery[], pool?: RefereePool<Pyright>,
+): Promise<QuestionAnswers<ImportTarget>> {
+  return askPyright(root, queries, pool, async (referee, query, absolute, source) => {
+    const found = await referee.importTargetAt(absolute, source, query.at.start, query.at.end);
+    if (found === undefined) return undefined;
+    const home = relativeInTree(found, root);
+    return home === undefined ? "outside" : { file: home };
+  });
+}
+
+/** Python `memberAt`. `extra` is the member's name. */
+export function resolvePythonMembers(
+  root: string, queries: readonly QuestionQuery[], pool?: RefereePool<Pyright>,
+): Promise<QuestionAnswers<MemberTarget[]>> {
+  return askPyright(root, queries, pool, async (referee, query, absolute, source) => {
+    if (!query.extra) return undefined;
+    const found = await referee.memberAt(absolute, source, query.at.start, query.at.end, query.extra);
+    return found?.map((one) => placedIn(root, one.file, one.line));
+  });
+}
+
+/** Rust `typePartsAt`: every part placed. */
+export function resolveRustTypeParts(
+  root: string, queries: readonly QuestionQuery[], pool?: RefereePool<RustLspReferee>,
+): Promise<QuestionAnswers<TypeParts>> {
+  return askRustAnalyzer(root, queries, pool, async (referee, query, absolute, source) => {
+    const found = await referee.typePartsAt(absolute, source, query.at.start, query.at.end);
+    if (!found) return undefined;
+    return {
+      whole: found.whole,
+      parts: found.parts.map((one) => ({ name: one.name, at: placedIn(root, one.file, one.line, isOutsideRustTree) })),
+    };
+  });
+}
+
+/** Rust `importTargetAt`, for a `use` path or a macro's. */
+export function resolveRustImports(
+  root: string, queries: readonly QuestionQuery[], pool?: RefereePool<RustLspReferee>,
+): Promise<QuestionAnswers<ImportTarget>> {
+  return askRustAnalyzer(root, queries, pool, async (referee, query, absolute, source) => {
+    const found = await referee.importTargetAt(absolute, source, query.at.start, query.at.end);
+    if (found === undefined) return undefined;
+    const home = relativeInTree(found, root, isOutsideRustTree);
+    return home === undefined ? "outside" : { file: home };
+  });
+}
+
+/** How a `fitsAt` target travels as a question's `extra`, and back. */
+export function fitsKey(target: DeclaredAt): string {
+  return `${target.file}#${target.line}`;
+}
+
+function fitsTarget(extra: string | undefined): DeclaredAt | undefined {
+  const match = extra === undefined ? null : /^(.*)#(\d+)$/.exec(extra);
+  return match ? { file: match[1]!, line: Number(match[2]) } : undefined;
 }
 
 /* ------------------------------------------------------- sharing a server */

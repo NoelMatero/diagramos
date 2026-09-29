@@ -36,7 +36,7 @@
  * for every file in it; one per tree asks the compiler once and queries it
  * many times, which is what makes measuring a real corpus affordable at all.
  */
-import { readdirSync, statSync } from "node:fs";
+import { readdirSync, realpathSync, statSync } from "node:fs";
 import { createRequire } from "node:module";
 import path from "node:path";
 
@@ -195,6 +195,42 @@ export interface TsReferee {
    * gives no class for: `any`, an error, a mixin's anonymous part.
    */
   ancestorsAt(file: string, start: number, end: number): Array<{ file: string; line: number }> | undefined;
+  /**
+   * What the type of the name or expression at exactly this range is made of
+   * (#393, `compiler-questions.ts`): each class, interface, enum and alias it
+   * names, through unions, type arguments, signatures, anonymous object
+   * members and a type parameter's bound. Absolute files, 0-based lines of
+   * each declaration's name; a part with no declaration is named only.
+   */
+  typePartsAt(file: string, start: number, end: number): TsTypeParts | undefined;
+  /**
+   * Whether the type declared at exactly this range can be used where the
+   * type declared on `target`'s line is expected (#393) -- the compiler's own
+   * assignability, which is what "conforms" means where nobody wrote
+   * `implements`. `undefined` for a generic on either side, whose answer
+   * depends on arguments nobody gave.
+   */
+  fitsAt(file: string, start: number, end: number, target: { file: string; line: number }): boolean | undefined;
+  /**
+   * The file the module specifier at exactly this range resolves to (#393),
+   * by the program's own resolution: `paths`, package `exports`, a
+   * workspace's links, `import x = require()`. Absolute and with symlinks
+   * resolved, so a workspace package linked into `node_modules` names its
+   * home in the tree.
+   */
+  importTargetAt(file: string, start: number, end: number): string | undefined;
+  /**
+   * Where the member `name` of the value at exactly this range is declared
+   * (#393): one entry per declaration, across a union's members. A
+   * well-known symbol is written `[Symbol.iterator]`.
+   */
+  memberAt(file: string, start: number, end: number, name: string): Array<{ file: string; line: number }> | undefined;
+}
+
+/** `TsReferee.typePartsAt`'s answer: `TypeParts` before `referee.ts` makes its paths relative. */
+export interface TsTypeParts {
+  parts: Array<{ name: string; file?: string; line?: number }>;
+  whole: boolean;
 }
 
 const SKIP_DIRECTORIES = new Set([
@@ -788,7 +824,208 @@ function buildReferee(ts: typeof TS, root: string): TsReferee {
     }
   }
 
-  return { typeAt, symbolDeclarationAt, symbolDeclarationLocationAt, kindAt, renderableAt, ancestorsAt };
+  /** The program, checker and node for an exact range, or `undefined` where there is none. */
+  function located(file: string, start: number, end: number) {
+    const configPath = configOf.get(file);
+    if (configPath === undefined) return undefined;
+    const { program, checker } = programFor(configPath);
+    const sourceFile = program.getSourceFile(file);
+    if (!sourceFile) return undefined;
+    const node = findNodeAt(ts, sourceFile, start, end);
+    return node ? { program, checker, sourceFile, node } : undefined;
+  }
+
+  function typePartsAt(file: string, start: number, end: number): TsTypeParts | undefined {
+    const found = located(file, start, end);
+    if (!found) return undefined;
+    try {
+      return typePartsOf(ts, found.checker, found.checker.getTypeAtLocation(found.node));
+    } catch {
+      return undefined;
+    }
+  }
+
+  function fitsAt(file: string, start: number, end: number, target: { file: string; line: number }): boolean | undefined {
+    const found = located(file, start, end);
+    if (!found) return undefined;
+    const { program, checker, node } = found;
+    try {
+      const source = declaredTypeOf(ts, checker, checker.getSymbolAtLocation(node));
+      const home = program.getSourceFile(target.file);
+      const declaration = home && typeDeclarationOnLine(ts, home, target.line);
+      const wanted = declaration && declaredTypeOf(ts, checker, checker.getSymbolAtLocation(declaration.name));
+      if (!source || !wanted) return undefined;
+      return checker.isTypeAssignableTo(source, wanted);
+    } catch {
+      return undefined;
+    }
+  }
+
+  function importTargetAt(file: string, start: number, end: number): string | undefined {
+    const found = located(file, start, end);
+    if (!found || !ts.isStringLiteralLike(found.node)) return undefined;
+    try {
+      const options = found.program.getCompilerOptions();
+      const mode = ts.getModeForUsageLocation(found.sourceFile, found.node, options);
+      const resolved = ts.resolveModuleName(found.node.text, file, options, ts.sys, undefined, undefined, mode)
+        .resolvedModule?.resolvedFileName;
+      if (!resolved) return undefined;
+      return ts.sys.realpath ? ts.sys.realpath(resolved) : resolved;
+    } catch {
+      return undefined;
+    }
+  }
+
+  function memberAt(file: string, start: number, end: number, name: string): Array<{ file: string; line: number }> | undefined {
+    const found = located(file, start, end);
+    if (!found) return undefined;
+    const { checker, node } = found;
+    try {
+      const declarations: Array<{ file: string; line: number }> = [];
+      const type = checker.getTypeAtLocation(node);
+      for (const member of type.isUnion() ? type.types : [type]) {
+        // `null` and `undefined` in a union run nothing: the operator throws or
+        // short-circuits, and neither is a routine somebody drew.
+        if (member.flags & (ts.TypeFlags.Null | ts.TypeFlags.Undefined | ts.TypeFlags.Void)) continue;
+        if (member.flags & (ts.TypeFlags.Any | ts.TypeFlags.Unknown)) return undefined;
+        const concrete = member.flags & ts.TypeFlags.TypeParameter ? checker.getBaseConstraintOfType(member) : member;
+        if (!concrete || concrete.flags & (ts.TypeFlags.Any | ts.TypeFlags.Unknown)) return undefined;
+        const property = propertyNamed(ts, checker, checker.getApparentType(concrete), name);
+        for (const declaration of property?.getDeclarations() ?? []) declarations.push(nameLocation(declaration));
+      }
+      return declarations;
+    } catch {
+      return undefined;
+    }
+  }
+
+  return {
+    typeAt, symbolDeclarationAt, symbolDeclarationLocationAt, kindAt, renderableAt, ancestorsAt,
+    typePartsAt, fitsAt, importTargetAt, memberAt,
+  };
+}
+
+/** A declaration's file and the 0-based line of its own name -- not of a doc comment above it. */
+function nameLocation(declaration: TS.Declaration): { file: string; line: number } {
+  const home = declaration.getSourceFile();
+  const named = (declaration as TS.NamedDeclaration).name ?? declaration;
+  return { file: home.fileName, line: home.getLineAndCharacterOfPosition(named.getStart(home)).line };
+}
+
+/** What a symbol declares as a type, or `undefined` for anything not a type, or generic. */
+function declaredTypeOf(ts: typeof TS, checker: TS.TypeChecker, found: TS.Symbol | undefined): TS.Type | undefined {
+  if (!found) return undefined;
+  const symbol = found.flags & ts.SymbolFlags.Alias ? checker.getAliasedSymbol(found) : found;
+  if (!(symbol.flags & (ts.SymbolFlags.Class | ts.SymbolFlags.Interface | ts.SymbolFlags.TypeAlias))) return undefined;
+  // A generic's answer depends on its arguments, and a bare declaration has none.
+  const generic = symbol.getDeclarations()?.some((one) =>
+    (ts.isClassLike(one) || ts.isInterfaceDeclaration(one) || ts.isTypeAliasDeclaration(one))
+    && (one.typeParameters?.length ?? 0) > 0);
+  return generic ? undefined : checker.getDeclaredTypeOfSymbol(symbol);
+}
+
+/** The class, interface or type alias whose name starts on this 0-based line, at any depth. */
+function typeDeclarationOnLine(
+  ts: typeof TS, sourceFile: TS.SourceFile, line: number,
+): { name: TS.Identifier } | undefined {
+  let found: { name: TS.Identifier } | undefined;
+  const visit = (node: TS.Node): void => {
+    if (found) return;
+    if ((ts.isClassDeclaration(node) || ts.isInterfaceDeclaration(node) || ts.isTypeAliasDeclaration(node)) && node.name
+      && sourceFile.getLineAndCharacterOfPosition(node.name.getStart(sourceFile)).line === line) {
+      found = { name: node.name };
+      return;
+    }
+    ts.forEachChild(node, visit);
+  };
+  visit(sourceFile);
+  return found;
+}
+
+/**
+ * The property `name` on a type, where `[Symbol.iterator]` names the
+ * well-known symbol: the compiler stores those as `__@iterator@<id>`, and the
+ * id differs between programs.
+ */
+function propertyNamed(ts: typeof TS, checker: TS.TypeChecker, type: TS.Type, name: string): TS.Symbol | undefined {
+  const wellKnown = /^\[Symbol\.(\w+)\]$/.exec(name);
+  if (!wellKnown) return checker.getPropertyOfType(type, name);
+  const prefix = `__@${wellKnown[1]}@`;
+  return checker.getPropertiesOfType(type).find((one) => String(one.escapedName).startsWith(prefix));
+}
+
+/**
+ * `typePartsAt`'s walk (#393): every declared type the compiler's type names,
+ * and whether it could see all of it.
+ *
+ * Into a union's members, a reference's type arguments, an alias's
+ * arguments, a signature's parameters and return, and an anonymous object
+ * type's members -- `make: () => Engine` and `{ engine: Engine }` are made of
+ * an `Engine`. Not into a *named* type's own members: a `Car` field is made
+ * of `Car`, not of what `Car` holds.
+ *
+ * A type parameter is its bound. One with no bound is a part nobody can name,
+ * as are `any`, `unknown` and an error: those make the answer partial, never
+ * a no.
+ */
+function typePartsOf(ts: typeof TS, checker: TS.TypeChecker, root: TS.Type): TsTypeParts {
+  const TYPE = ts.SymbolFlags.Class | ts.SymbolFlags.Interface | ts.SymbolFlags.Enum | ts.SymbolFlags.TypeAlias;
+  const parts: TsTypeParts["parts"] = [];
+  const named = new Set<string>();
+  let whole = true;
+  const seen = new Set<TS.Type>();
+
+  const add = (found: TS.Symbol): boolean => {
+    const symbol = found.flags & ts.SymbolFlags.Alias ? checker.getAliasedSymbol(found) : found;
+    if (!(symbol.flags & TYPE)) return false;
+    const declaration = symbol.getDeclarations()?.[0];
+    const place = declaration ? nameLocation(declaration) : undefined;
+    const key = place ? `${place.file}:${place.line}` : symbol.name;
+    if (!named.has(key)) {
+      named.add(key);
+      parts.push({ name: symbol.name, ...place });
+    }
+    return true;
+  };
+
+  const visit = (type: TS.Type, depth: number): void => {
+    if (seen.has(type)) return;
+    seen.add(type);
+    if (depth > 12) { whole = false; return; }
+    if (type.flags & (ts.TypeFlags.Any | ts.TypeFlags.Unknown)) { whole = false; return; }
+    if (type.flags & ts.TypeFlags.Instantiable) {
+      const bound = checker.getBaseConstraintOfType(type);
+      if (!bound || bound === type) { whole = false; return; }
+      visit(bound, depth + 1);
+      return;
+    }
+    if (type.aliasSymbol) add(type.aliasSymbol);
+    for (const argument of type.aliasTypeArguments ?? []) visit(argument, depth + 1);
+    if (type.flags & ts.TypeFlags.EnumLiteral && !type.isUnion()) {
+      const base = checker.getBaseTypeOfLiteralType(type);
+      if (base !== type) visit(base, depth + 1);
+      return;
+    }
+    const symbol = type.getSymbol();
+    const namesAType = symbol !== undefined && add(symbol);
+    if (type.isUnionOrIntersection()) {
+      for (const member of type.types) visit(member, depth + 1);
+      return;
+    }
+    if (!(type.flags & ts.TypeFlags.Object)) return;
+    if ((type as TS.ObjectType).objectFlags & ts.ObjectFlags.Reference) {
+      for (const argument of checker.getTypeArguments(type as TS.TypeReference)) visit(argument, depth + 1);
+    }
+    if (namesAType) return;
+    for (const signature of [...type.getCallSignatures(), ...type.getConstructSignatures()]) {
+      for (const parameter of signature.getParameters()) visit(checker.getTypeOfSymbol(parameter), depth + 1);
+      visit(signature.getReturnType(), depth + 1);
+    }
+    for (const property of type.getProperties().slice(0, 64)) visit(checker.getTypeOfSymbol(property), depth + 1);
+  };
+
+  visit(root, 0);
+  return { parts, whole };
 }
 
 /**
@@ -871,6 +1108,38 @@ export function isOutsideTree(declaringFile: string, tree: string): boolean {
   if (declaringFile.includes(`${path.sep}node_modules${path.sep}`)) return true;
   const rel = path.relative(tree, declaringFile);
   return rel.startsWith("..") || path.isAbsolute(rel);
+}
+
+/**
+ * A compiler's absolute path as a repo-relative one, or `undefined` when it is
+ * outside the repository (#393).
+ *
+ * Checked against the root as given and as the filesystem resolves it,
+ * because a compiler that follows symlinks names the real path: a workspace
+ * package linked into `node_modules` resolves to its home under the real
+ * root, and on macOS a root under `/var` or `/tmp` is really under
+ * `/private`. Read against the root as given, every one of those is outside,
+ * and an import into the tree would read as a library's. `outside` is the
+ * language's own test -- Rust's also puts `target/` outside.
+ */
+export function relativeInTree(
+  file: string,
+  root: string,
+  outside: (file: string, tree: string) => boolean = isOutsideTree,
+): string | undefined {
+  if (!outside(file, root)) return path.relative(root, file);
+  const real = realRoot(root);
+  return real !== undefined && real !== root && !outside(file, real) ? path.relative(real, file) : undefined;
+}
+
+const realRoots = new Map<string, string | undefined>();
+function realRoot(root: string): string | undefined {
+  if (!realRoots.has(root)) {
+    let real: string | undefined;
+    try { real = realpathSync(root); } catch { real = undefined; }
+    realRoots.set(root, real);
+  }
+  return realRoots.get(root);
 }
 
 /**
