@@ -34,9 +34,10 @@
  */
 import path from "node:path";
 
+import type { DeclaredAt } from "./compiler-questions";
 import type { ClosedBodyReferee, DriftReport } from "./drift";
 import { languageOf } from "./parse";
-import { createTsReferee, isOutsideTree, receiverResolutionFrom } from "./referee-ts";
+import { createTsReferee, isOutsideTree, receiverResolutionFrom, relativeInTree } from "./referee-ts";
 
 /** The languages `createClosedBodyReferee` can answer for. */
 export const REFEREE_LANGUAGES = ["typescript"] as const;
@@ -86,8 +87,44 @@ export function createClosedBodyReferee(root: string): ClosedBodyReferee | undef
       if (languageOf(file) === "python" || languageOf(file) === "rust") return undefined;
       return ancestorsInTree(ts.ancestorsAt(path.resolve(root, file), at.start, at.end), root);
     },
+    typePartsAt: (file, at) => {
+      if (languageOf(file) === "python" || languageOf(file) === "rust") return undefined;
+      const found = ts.typePartsAt(path.resolve(root, file), at.start, at.end);
+      if (!found) return undefined;
+      return {
+        whole: found.whole,
+        parts: found.parts.map(({ name, file: home, line }) => ({
+          name,
+          ...(home === undefined || line === undefined ? {} : { at: placed(home, line, root) }),
+        })),
+      };
+    },
+    fitsAt: (file, at, target) => {
+      if (languageOf(file) === "python" || languageOf(file) === "rust") return undefined;
+      return ts.fitsAt(path.resolve(root, file), at.start, at.end, {
+        file: path.resolve(root, target.file), line: target.line - 1,
+      });
+    },
+    importTargetAt: (file, at) => {
+      if (languageOf(file) === "python" || languageOf(file) === "rust") return undefined;
+      const found = ts.importTargetAt(path.resolve(root, file), at.start, at.end);
+      if (found === undefined) return undefined;
+      const home = relativeInTree(found, root);
+      return home === undefined ? "outside" : { file: home };
+    },
+    memberAt: (file, at, name) => {
+      if (languageOf(file) === "python" || languageOf(file) === "rust") return undefined;
+      return ts.memberAt(path.resolve(root, file), at.start, at.end, name)?.map((one) => placed(one.file, one.line, root));
+    },
   };
 }
+
+/** An absolute file and 0-based line from a compiler, as the engine holds a place -- or `"outside"`. */
+export function placed(file: string, line: number, root: string): DeclaredAt | "outside" {
+  const home = relativeInTree(file, root);
+  return home === undefined ? "outside" : { file: home, line: line + 1 };
+}
+
 
 /**
  * The compiler's ancestors, as `ClosedBodyReferee.ancestorsAt` gives them:

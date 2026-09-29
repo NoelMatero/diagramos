@@ -45,6 +45,7 @@ import { checkHandles, type HandlesWithheld } from "./handles";
 import { connects, refIsStale, type CodeGraphOption } from "./codegraph";
 import { readDependencies, readerCanPlace } from "./deps";
 import type { BindingFault } from "./damage";
+import type { DeclaredAt, ImportTarget, MemberTarget, TypeParts } from "./compiler-questions";
 import { generatedRef, NEVER_WALK } from "./generated";
 import { readGraph, type Provenance, type RecoveredGraph, type RecoveredNode } from "./graph";
 import { licenceFor, mayAccuse } from "./licence";
@@ -2369,6 +2370,19 @@ export interface ClosedBodyReferee {
    * out, and the text reading stands.
    */
   compiledCrateOf?(file: string): CompiledCrate | undefined;
+  /*
+   * The four questions a red is put to before it is shown (#393). What each
+   * asks, which languages answer it, and how an answer is read are in
+   * `compiler-questions.ts`; nothing in this file asks them yet.
+   */
+  /** What the type of the name or expression at this range is made of. */
+  typePartsAt?(file: string, at: { start: number; end: number }): TypeParts | undefined;
+  /** Whether the type declared at this range can be used where `target`'s type is expected. */
+  fitsAt?(file: string, at: { start: number; end: number }, target: DeclaredAt): boolean | undefined;
+  /** Which file the module path (or Rust macro path) at this range resolves to. */
+  importTargetAt?(file: string, at: { start: number; end: number }): ImportTarget | undefined;
+  /** Every routine the member `name` of the value at this range lands on. */
+  memberAt?(file: string, at: { start: number; end: number }, name: string): MemberTarget[] | undefined;
 }
 
 /**

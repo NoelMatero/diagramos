@@ -341,7 +341,132 @@ export interface PyrightLspReferee {
    * a class -- a call, a value -- which leaves the whole answer open.
    */
   ancestorsAt(file: string, source: string, start: number): Promise<Array<{ file: string; line: number }> | undefined>;
+  /**
+   * What the type at `[start, end)` is made of (#393), as pyright prints it:
+   * names, not places. A `self.x` is asked as the attribute's declared type,
+   * never as what one assignment narrowed it to -- `self.x = None` in
+   * `__init__` does not make a field that is later set to an `Engine` hold
+   * nothing. A type variable is its bound. See `pythonTypeNames`.
+   */
+  typePartsAt(file: string, source: string, start: number, end: number): Promise<PythonTypeParts | undefined>;
+  /**
+   * Whether the class named at `[start, end)` can be returned where the type
+   * declared on `target`'s line (absolute file, 0-based line) is expected
+   * (#393): pyright's own assignability, so a Protocol satisfied with no base
+   * says yes. `undefined` when the probe could not import either, or the
+   * project's settings switch type errors off.
+   */
+  fitsAt(file: string, source: string, start: number, end: number, target: { file: string; line: number }): Promise<boolean | undefined>;
+  /** The file the module path at `[start, end)` of an import names (#393), absolute. */
+  importTargetAt(file: string, source: string, start: number, end: number): Promise<string | undefined>;
+  /**
+   * Where the member `name` lands on the value at `[start, end)` (#393): per
+   * class its type may be, the declaration pyright resolves the member to on
+   * an instance, inherited ones included. Absolute files, 0-based lines.
+   */
+  memberAt(file: string, source: string, start: number, end: number, name: string): Promise<Array<{ file: string; line: number }> | undefined>;
   close(): void;
+}
+
+/** `PyrightLspReferee.typePartsAt`'s answer: named parts only (see `TypePart.at`). */
+export interface PythonTypeParts {
+  parts: Array<{ name: string }>;
+  whole: boolean;
+}
+
+/**
+ * The type a pyright hover shows, or `undefined` for one that shows none
+ * (#393). The hover opens with what the name is in brackets; what follows is
+ * `name: type` for a value, a signature for a routine, and for a property the
+ * signature of its getter, whose return is the value's type.
+ */
+export function hoverType(hover: string): string | undefined {
+  const head = hover.split(/\n\s*\n/)[0]!.trim();
+  const match = /^\(([a-z][a-z ]*)\)\s+([\s\S]*)$/.exec(head);
+  if (!match) return undefined;
+  const [, kind, rest] = match as unknown as [string, string, string];
+  if (kind === "class") return rest.split("(")[0]!.trim();
+  if (kind === "property" && rest.includes("->")) return rest.slice(rest.lastIndexOf("->") + 2).trim();
+  if (kind === "function" || kind === "method") return rest.replace(/^(?:async\s+)?def\s+\w+/, "").trim();
+  const colon = rest.indexOf(":");
+  return colon < 0 ? undefined : rest.slice(colon + 1).trim();
+}
+
+/**
+ * The names a type pyright printed is made of (#393), the type variables in it
+ * still to be read, and whether pyright saw all of it.
+ *
+ * pyright prints a type variable with its scope, `S@Holder`, and `Self` the
+ * same way with the class as the scope, which is the class. `Unknown` and
+ * `Any` are parts nobody can name. A string literal is dropped (its content is
+ * not a type), and so is a parameter's name in a signature (`(self: X) ->`).
+ * Every segment of a dotted name is kept -- `Literal[Color.Red]` is a
+ * `Color` -- which can only add a name, and an extra name only ever withdraws
+ * a red.
+ */
+export function pythonTypeNames(type: string): { names: string[]; typeVars: string[]; whole: boolean } {
+  const text = type
+    .replace(/(["'])(?:\\.|(?!\1).)*\1/g, "")
+    .replace(/\b[A-Za-z_]\w*\s*:(?!:)/g, "");
+  const names: string[] = [];
+  const typeVars: string[] = [];
+  let whole = true;
+  for (const token of text.match(/[A-Za-z_][\w.]*(?:@[A-Za-z_]\w*)?/g) ?? []) {
+    const [name, scope] = token.split("@") as [string, string | undefined];
+    if (name === "Unknown" || name === "Any") { whole = false; continue; }
+    if (scope !== undefined) {
+      if (name === "Self") names.push(scope); else typeVars.push(name);
+      continue;
+    }
+    if (name === "def" || name === "async") continue;
+    for (const segment of name.split(".")) if (segment) names.push(segment);
+  }
+  return { names: [...new Set(names)], typeVars: [...new Set(typeVars)], whole };
+}
+
+/**
+ * What a type variable declared here is bounded by, as written: the `bound=`
+ * of a `TypeVar(...)`, its constraints, or the bound in a PEP 695 parameter
+ * list (`class Holder[S: Seat]`). `undefined` when it has none -- a bare
+ * `TypeVar("T")` can be anything -- or this is not its declaration.
+ *
+ * A bound is always written; the compiler is what says *which* declaration
+ * `S` is, by "go to definition", and this reads the one it pointed at.
+ */
+export function typeVarBound(declaration: string, name: string): string | undefined {
+  const pep695 = new RegExp(String.raw`[\[,]\s*${name}\s*:\s*(\([^)]*\)|[^\],=]+)`).exec(declaration);
+  if (pep695) return pep695[1]!.replace(/^\(|\)$/g, "").trim();
+  const call = new RegExp(
+    String.raw`\b${name}\s*=\s*(?:typing(?:_extensions)?\.)?TypeVar\s*\(\s*["']${name}["']`,
+  ).exec(declaration);
+  if (!call) return undefined;
+  // The rest of the call's arguments, up to its own closing bracket.
+  let depth = 1;
+  let end = call.index + call[0].length;
+  for (; end < declaration.length && depth > 0; end += 1) {
+    if ("([".includes(declaration[end]!)) depth += 1;
+    else if (")]".includes(declaration[end]!)) depth -= 1;
+  }
+  if (depth > 0) return undefined;
+  const rest = declaration.slice(call.index + call[0].length, end - 1);
+  const bound = /\bbound\s*=\s*(["']?)([^,"')]+(?:\[[^\]]*\])?)\1/.exec(rest);
+  if (bound) return bound[2]!.trim();
+  const constraints = rest.split(",").map((one) => one.trim()).filter((one) => one && !one.includes("="));
+  return constraints.length > 0 ? constraints.join(" | ") : undefined;
+}
+
+/**
+ * The relative import that reaches `file` from a module in `directory`
+ * (#393's probes): `.car` beside it, `..b.parts` one level up, `.` for the
+ * package's own `__init__.py`.
+ */
+export function relativeModule(directory: string, file: string): string {
+  const segments = path.relative(directory, file).split(path.sep);
+  let up = 0;
+  while (segments[0] === "..") { segments.shift(); up += 1; }
+  const last = segments.pop()!.replace(/\.pyi?$/, "");
+  const names = last === "__init__" ? segments : [...segments, last];
+  return ".".repeat(up + 1) + names.join(".");
 }
 
 interface PendingRequest {
@@ -351,6 +476,20 @@ interface PendingRequest {
 
 /** How long any one request may take before this referee gives up on it. */
 const REQUEST_TIMEOUT_MS = 20_000;
+
+/**
+ * How long a probe document waits to be checked (#393). Measured at about
+ * 300ms on a warm server; the rest is a bound on one that never checks it.
+ */
+const PROBE_TIMEOUT_MS = 10_000;
+
+/** One diagnostic pyright published for a probe document. */
+interface ProbeDiagnostic {
+  range: { start: { line: number; character: number } };
+  /** 1 is an error. */
+  severity?: number;
+  message: string;
+}
 
 /**
  * Wait for pyright's binder by asking several positions, not one (#337).
@@ -413,6 +552,8 @@ export async function createPyrightLspReferee(root: string): Promise<PyrightLspR
   let closed = false;
   /** Whether a warm-up sweep has had a real answer, so the binder has run. */
   let bound = false;
+  /** Who is waiting on a probe document's diagnostics, by its URI (#393). */
+  const diagnosticWaiters = new Map<string, (diagnostics: ProbeDiagnostic[]) => void>();
 
   child.on("error", (error) => {
     for (const { reject } of pending.values()) reject(error);
@@ -437,8 +578,13 @@ export async function createPyrightLspReferee(root: string): Promise<PyrightLspR
       if (buffer.length < bodyStart + length) return;
       const body = buffer.subarray(bodyStart, bodyStart + length).toString("utf8");
       buffer = buffer.subarray(bodyStart + length);
-      let message: { id?: number; method?: string; result?: unknown; error?: unknown };
+      let message: { id?: number; method?: string; result?: unknown; error?: unknown; params?: unknown };
       try { message = JSON.parse(body); } catch { continue; }
+      if (message.method === "textDocument/publishDiagnostics") {
+        const published = message.params as { uri: string; diagnostics: ProbeDiagnostic[] };
+        diagnosticWaiters.get(published.uri)?.(published.diagnostics);
+        continue;
+      }
       if (message.id !== undefined && pending.has(message.id)) {
         const { resolve, reject } = pending.get(message.id)!;
         pending.delete(message.id);
@@ -683,7 +829,8 @@ export async function createPyrightLspReferee(root: string): Promise<PyrightLspR
     return (await walk(file, positionAt(source, start).line, source, 0)) ? found : undefined;
   }
 
-  async function valueKindAt(file: string, source: string, start: number): Promise<ValueKind | undefined> {
+  /** What pyright's hover says at `start`, in plain text. */
+  async function hoverTextAt(file: string, source: string, start: number): Promise<string | undefined> {
     if (closed) return undefined;
     const position = positionAt(source, start);
     let hover: { contents?: string | { value?: string } } | null | undefined;
@@ -699,7 +846,166 @@ export async function createPyrightLspReferee(root: string): Promise<PyrightLspR
       }
       if (hover) break;
     }
-    const text = typeof hover?.contents === "string" ? hover.contents : hover?.contents?.value;
+    return (typeof hover?.contents === "string" ? hover.contents : hover?.contents?.value) || undefined;
+  }
+
+  let probes = 0;
+
+  /**
+   * A few lines of Python pyright checks as if they sat beside `directory`'s
+   * modules, never written to disk (#393).
+   *
+   * Opened as a document, so its relative imports reach the real modules and
+   * its questions are answered by the same analysis as the rest of the tree.
+   * The last line is a type error on purpose: pyright can publish a
+   * document's diagnostics before it has checked it (an empty list, then the
+   * real one), and the control's error arriving is what says it has. A
+   * project whose settings switch type errors off never reports it, and
+   * `diagnostics` is `undefined` -- no answer, rather than a silence read as
+   * "no errors".
+   */
+  async function withProbe<T>(
+    directory: string,
+    lines: readonly string[],
+    work: (probe: { file: string; source: string; diagnostics: ProbeDiagnostic[] | undefined }) => Promise<T | undefined>,
+  ): Promise<T | undefined> {
+    if (closed) return undefined;
+    probes += 1;
+    const file = path.join(directory, `__board_probe_${process.pid}_${probes}__.py`);
+    const uri = pathToFileURL(file).toString();
+    const control = lines.length;
+    const source = `${[...lines, "__board_control: int = ''"].join("\n")}\n`;
+    const checked = new Promise<ProbeDiagnostic[] | undefined>((resolve) => {
+      diagnosticWaiters.set(uri, (diagnostics) => {
+        if (diagnostics.some((one) => one.range.start.line === control)) resolve(diagnostics);
+      });
+      setTimeout(() => resolve(undefined), PROBE_TIMEOUT_MS).unref();
+    });
+    send("textDocument/didOpen", { textDocument: { uri, languageId: "python", version: 1, text: source } }, true);
+    try {
+      return await work({ file, source, diagnostics: await checked });
+    } finally {
+      diagnosticWaiters.delete(uri);
+      send("textDocument/didClose", { textDocument: { uri } }, true);
+    }
+  }
+
+  /** Where a printed type variable is bounded, read from the declaration "go to definition" names. */
+  async function boundOf(file: string, source: string, name: string): Promise<string | undefined> {
+    const uses = [...source.matchAll(new RegExp(String.raw`\b${name}\b`, "g"))].slice(0, 6);
+    for (const use of uses) {
+      const found = await askLocation("definition", file, source, use.index!, []);
+      if (!found) continue;
+      const text = sourceOf(found.file)?.split("\n").slice(found.line, found.line + 6).join("\n");
+      const bound = text === undefined ? undefined : typeVarBound(text, name);
+      if (bound !== undefined) return bound;
+    }
+    return undefined;
+  }
+
+  async function typePartsAt(file: string, source: string, start: number, end: number): Promise<PythonTypeParts | undefined> {
+    const anchor = /^[A-Za-z_]\w*$/.test(source.slice(start, end)) ? { start, end } : typeAnchorFor(source, start, end);
+    if (!anchor) return undefined;
+    const name = source.slice(anchor.start, anchor.end);
+    const before = source.slice(Math.max(0, anchor.start - 64), anchor.start);
+    const owner = /\b(self|cls)\s*\.\s*$/.exec(before);
+    const here = hoverType((await hoverTextAt(file, source, anchor.start)) ?? "");
+    if (!owner) return here === undefined ? undefined : partsOfPrinted(file, source, here);
+    /*
+     * An attribute is asked through a parameter typed as its class, where
+     * nothing has narrowed it: the declared type, the union of everything the
+     * class ever assigns it. What pyright says *here* is what this one
+     * assignment gives it, which is part of that union -- so its parts are
+     * parts of the field too, and add a yes. Only the declared type can make a
+     * no: `self.engine = None` in `__init__` is not a field that holds no
+     * Engine. A generic class asked without its arguments declares `Unknown`,
+     * and then what this assignment gives is all there is to go on.
+     */
+    const holder = hoverType((await hoverTextAt(file, source, anchor.start - before.length + owner.index)) ?? "");
+    const klass = /Self@([A-Za-z_]\w*)/.exec(holder ?? "")?.[1] ?? (/^[A-Za-z_]\w*$/.test(holder ?? "") ? holder : undefined);
+    const directory = path.dirname(file);
+    const declared = klass === undefined ? undefined : await withProbe(directory, [
+      `from ${relativeModule(directory, file)} import ${klass} as __board_c`,
+      "def __board_probe(__board_x: __board_c) -> None:",
+      `    __board_x.${name}`,
+    ], async (probe) => hoverType(
+      (await hoverTextAt(probe.file, probe.source, probe.source.lastIndexOf(`.${name}`) + 1)) ?? "",
+    ));
+    const whole = declared === undefined ? undefined : await partsOfPrinted(file, source, declared);
+    const narrowed = here === undefined ? undefined : await partsOfPrinted(file, source, here);
+    if (!whole && !narrowed) return undefined;
+    const names = new Set([...(whole?.parts ?? []), ...(narrowed?.parts ?? [])].map((one) => one.name));
+    return { parts: [...names].map((one) => ({ name: one })), whole: whole?.whole ?? false };
+  }
+
+  /** A printed type's parts, with each type variable read as its bound. */
+  async function partsOfPrinted(file: string, source: string, printed: string): Promise<PythonTypeParts> {
+    const read = pythonTypeNames(printed);
+    const names = [...read.names];
+    let whole = read.whole;
+    for (const typeVar of read.typeVars) {
+      const bound = await boundOf(file, source, typeVar);
+      if (bound === undefined) { whole = false; continue; }
+      const within = pythonTypeNames(bound);
+      names.push(...within.names);
+      if (!within.whole || within.typeVars.length > 0) whole = false;
+    }
+    return { parts: [...new Set(names)].map((one) => ({ name: one })), whole };
+  }
+
+  async function fitsAt(
+    file: string, source: string, start: number, end: number, target: { file: string; line: number },
+  ): Promise<boolean | undefined> {
+    const name = source.slice(start, end);
+    const wanted = pythonTypeDeclaredOnLine(lineOf(target.file, target.line));
+    if (!/^[A-Za-z_]\w*$/.test(name) || (wanted?.kind !== "class" && wanted?.kind !== "alias")) return undefined;
+    const directory = path.dirname(file);
+    return withProbe(directory, [
+      `from ${relativeModule(directory, file)} import ${name} as __board_s`,
+      `from ${relativeModule(directory, target.file)} import ${wanted.name} as __board_t`,
+      "def __board_fits(__board_x: __board_s) -> __board_t:",
+      "    return __board_x",
+    ], async ({ diagnostics }) => {
+      if (!diagnostics) return undefined;
+      const errors = diagnostics.filter((one) => one.severity === 1);
+      // An import the probe could not make is no answer about either class.
+      if (errors.some((one) => one.range.start.line < 3)) return undefined;
+      return !errors.some((one) => one.range.start.line === 3);
+    });
+  }
+
+  async function importTargetAt(file: string, source: string, start: number, end: number): Promise<string | undefined> {
+    const written = source.slice(start, end);
+    const last = written.lastIndexOf(".") + 1;
+    if (last >= written.length) return undefined;
+    return (await askLocation("definition", file, source, start + last, STEADY_RETRY_MS))?.file;
+  }
+
+  async function memberAt(
+    file: string, source: string, start: number, end: number, name: string,
+  ): Promise<Array<{ file: string; line: number }> | undefined> {
+    const anchor = typeAnchorFor(source, start, end) ?? { start, end };
+    const classes = classesAt(await askLocations("typeDefinition", file, source, anchor.start));
+    if (!classes) return undefined;
+    const found: Array<{ file: string; line: number }> = [];
+    for (const klass of classes) {
+      // A library's class runs a library's member, whatever it is called.
+      if (isOutsideTree(klass.file, root)) { found.push(klass); continue; }
+      const className = pythonTypeDeclaredOnLine(lineOf(klass.file, klass.line))?.name;
+      if (!className) return undefined;
+      const directory = path.dirname(klass.file);
+      const landed = await withProbe(directory, [
+        `from ${relativeModule(directory, klass.file)} import ${className} as __board_c`,
+        "def __board_probe(__board_x: __board_c) -> None:",
+        `    __board_x.${name}`,
+      ], async (probe) => askLocations("definition", probe.file, probe.source, probe.source.lastIndexOf(`.${name}`) + 1));
+      if (landed) found.push(...landed);
+    }
+    return found;
+  }
+
+  async function valueKindAt(file: string, source: string, start: number): Promise<ValueKind | undefined> {
+    const text = await hoverTextAt(file, source, start);
     if (!text) return undefined;
     const seesEverything = hoverSeesEverything(source, start);
     return valueKindFrom(text, async (written) => {
@@ -733,6 +1039,10 @@ export async function createPyrightLspReferee(root: string): Promise<PyrightLspR
   return {
     valueKindAt,
     ancestorsAt,
+    typePartsAt,
+    fitsAt,
+    importTargetAt,
+    memberAt,
     // `typeAnchorFor` is the reason `end` matters here: `[start, end)` can
     // span an entire expression (a chain, `self.cache`), and only its last
     // token says what the whole thing evaluates to. `methodDeclarationAt`
