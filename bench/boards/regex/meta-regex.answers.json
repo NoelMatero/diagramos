@@ -240,7 +240,7 @@
       "source": "swap",
       "parent": "needs|regex-automata/src/meta/strategy.rs#search_nofail|regex-automata/src/util/search.rs#Match|",
       "truth": "false",
-      "why": "the routine's calls were read and none is it"
+      "why": "it neither creates one nor calls any of its 9 members"
     },
     {
       "id": "needs|regex-automata/src/util/search.rs#Match|regex-automata/src/meta/strategy.rs#search_nofail|",

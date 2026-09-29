@@ -29,8 +29,8 @@
       "language": "python",
       "source": "swap",
       "parent": "needs|src/flask/json/__init__.py#dumps|src/flask/json/provider.py#JSONProvider|",
-      "truth": "false",
-      "why": "the routine's calls were read and none is it"
+      "truth": "true",
+      "why": "it calls its routine dumps"
     },
     {
       "id": "needs|src/flask/json/provider.py#JSONProvider|src/flask/json/__init__.py#dumps|",

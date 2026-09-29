@@ -17,7 +17,7 @@
       "language": "ts",
       "source": "drawn",
       "truth": "false",
-      "why": "the routine's calls were read and none is it"
+      "why": "it neither creates one nor calls any of its 58 members"
     },
     {
       "id": "needs|packages/core/injector/instance-loader.ts#createInstancesOfDependencies|packages/core/injector/injector.ts#Injector|",
@@ -118,7 +118,7 @@
       "source": "retarget",
       "parent": "calls|packages/core/injector/injector.ts#loadProvider|packages/core/injector/injector.ts#loadInstance|",
       "truth": "false",
-      "why": "the routine's calls were read and none is it"
+      "why": "it neither creates one nor calls any of its 4 members"
     },
     {
       "id": "calls|packages/core/injector/injector.ts#loadProvider|packages/core/injector/injector.ts#isTopLevelStaticTransientOrRequestProvider|",
@@ -373,7 +373,7 @@
       "source": "swap",
       "parent": "needs|packages/core/injector/injector.ts#lookupComponent|packages/core/injector/module.ts#Module|",
       "truth": "false",
-      "why": "the routine's calls were read and none is it"
+      "why": "it neither creates one nor calls any of its 70 members"
     },
     {
       "id": "needs|packages/core/injector/module.ts#Module|packages/core/injector/injector.ts#lookupComponent|",
@@ -436,7 +436,7 @@
       "source": "swap",
       "parent": "needs|packages/core/injector/injector.ts#lookupComponent|packages/core/injector/instance-wrapper.ts#InstanceWrapper|",
       "truth": "false",
-      "why": "the routine's calls were read and none is it"
+      "why": "it neither creates one nor calls any of its 62 members"
     },
     {
       "id": "needs|packages/core/injector/instance-wrapper.ts#InstanceWrapper|packages/core/injector/injector.ts#lookupComponent|",
@@ -639,8 +639,8 @@
       "language": "ts",
       "source": "swap",
       "parent": "needs|packages/core/injector/injector.ts#instantiateClass|packages/core/injector/instance-wrapper.ts#InstanceWrapper|",
-      "truth": "false",
-      "why": "the routine's calls were read and none is it"
+      "truth": "true",
+      "why": "it calls its routine getInstanceByContextId"
     },
     {
       "id": "needs|packages/core/injector/instance-wrapper.ts#InstanceWrapper|packages/core/injector/injector.ts#instantiateClass|",

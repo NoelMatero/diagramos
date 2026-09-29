@@ -294,7 +294,7 @@
       "source": "retarget",
       "parent": "calls|django/urls/resolvers.py#resolve|django/urls/resolvers.py#ResolverMatch|",
       "truth": "false",
-      "why": "the routine's calls were read and none is it"
+      "why": "it neither creates one nor calls any of its 4 members"
     },
     {
       "id": "calls|django/urls/resolvers.py#resolve|django/urls/resolvers.py#regex|",

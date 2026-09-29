@@ -319,8 +319,8 @@
       "language": "ts",
       "source": "swap",
       "parent": "needs|packages/query-core/src/mutation.ts#execute|packages/query-core/src/retryer.ts#Retryer|",
-      "truth": "false",
-      "why": "the routine's calls were read and none is it"
+      "truth": "true",
+      "why": "it calls its routine canStart"
     },
     {
       "id": "needs|packages/query-core/src/retryer.ts#Retryer|packages/query-core/src/mutation.ts#execute|",

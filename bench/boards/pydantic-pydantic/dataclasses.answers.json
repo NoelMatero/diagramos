@@ -207,8 +207,8 @@
       "language": "python",
       "source": "swap",
       "parent": "needs|pydantic/_internal/_dataclasses.py#complete_dataclass|pydantic/_internal/_config.py#ConfigWrapper|",
-      "truth": "false",
-      "why": "the routine's calls were read and none is it"
+      "truth": "true",
+      "why": "it calls its routine core_config"
     },
     {
       "id": "needs|pydantic/_internal/_config.py#ConfigWrapper|pydantic/_internal/_dataclasses.py#complete_dataclass|",

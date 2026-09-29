@@ -346,8 +346,8 @@
       "language": "rust",
       "source": "swap",
       "parent": "builds|src/de.rs#parse_number|src/de.rs#ParserNumber|",
-      "truth": "undecidable",
-      "why": "the name appears without being called (passed as a value, or a path)"
+      "truth": "true",
+      "why": "it creates one here"
     },
     {
       "id": "builds|src/de.rs#ParserNumber|src/de.rs#parse_number|",

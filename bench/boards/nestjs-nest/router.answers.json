@@ -321,8 +321,8 @@
       "language": "ts",
       "source": "retarget",
       "parent": "builds|packages/core/router/router-explorer.ts#RouterExplorer|packages/core/router/paths-explorer.ts#PathsExplorer|",
-      "truth": "false",
-      "why": "nothing in it makes one"
+      "truth": "undecidable",
+      "why": "a literal here is written against a type that could be it"
     },
     {
       "id": "builds|packages/core/router/router-explorer.ts#RouterExplorer|packages/core/router/paths-explorer.ts#requestMethod|",
@@ -358,8 +358,8 @@
       "toLabel": "RoutePathFactory",
       "language": "ts",
       "source": "drawn",
-      "truth": "undecidable",
-      "why": "its routine hostRegExps: the tool would not walk this routine's calls"
+      "truth": "true",
+      "why": "its routine applyCallbackToRouter calls it"
     },
     {
       "id": "needs|packages/core/router/router-explorer.ts#RouterExplorer|packages/core/router/route-path-factory.ts#RoutePathFactory|",
@@ -459,8 +459,8 @@
       "toLabel": "RouterProxy",
       "language": "ts",
       "source": "drawn",
-      "truth": "undecidable",
-      "why": "its routine hostRegExps: the tool would not walk this routine's calls"
+      "truth": "true",
+      "why": "its routine createCallbackProxy calls it"
     },
     {
       "id": "needs|packages/core/router/router-explorer.ts#RouterExplorer|packages/core/router/router-proxy.ts#RouterProxy|",

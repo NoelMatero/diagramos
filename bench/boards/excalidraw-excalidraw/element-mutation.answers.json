@@ -16,8 +16,8 @@
       "toLabel": "ExcalidrawElement",
       "language": "ts",
       "source": "drawn",
-      "truth": "false",
-      "why": "nothing in it makes one"
+      "truth": "undecidable",
+      "why": "a literal here is written against a type that could be it"
     },
     {
       "id": "needs|packages/element/src/newElement.ts#_newElementBase|packages/element/src/types.ts#ExcalidrawElement|",

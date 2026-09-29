@@ -258,8 +258,8 @@
       "language": "rust",
       "source": "swap",
       "parent": "needs|clap_builder/src/parser/parser.rs#parse_long_arg|clap_builder/src/parser/arg_matcher.rs#ArgMatcher|",
-      "truth": "false",
-      "why": "the routine's calls were read and none is it"
+      "truth": "true",
+      "why": "it calls its routine arg_ids"
     },
     {
       "id": "needs|clap_builder/src/parser/arg_matcher.rs#ArgMatcher|clap_builder/src/parser/parser.rs#parse_long_arg|",
@@ -321,8 +321,8 @@
       "language": "rust",
       "source": "swap",
       "parent": "needs|clap_builder/src/parser/parser.rs#parse_short_arg|clap_builder/src/parser/arg_matcher.rs#ArgMatcher|",
-      "truth": "false",
-      "why": "the routine's calls were read and none is it"
+      "truth": "undecidable",
+      "why": "the tool could not say which get is called at one site"
     },
     {
       "id": "needs|clap_builder/src/parser/arg_matcher.rs#ArgMatcher|clap_builder/src/parser/parser.rs#parse_short_arg|",
@@ -460,8 +460,8 @@
       "toLabel": "Validator",
       "language": "rust",
       "source": "drawn",
-      "truth": "undecidable",
-      "why": "the name appears without being called (passed as a value, or a path)"
+      "truth": "true",
+      "why": "it calls its routine new"
     },
     {
       "id": "needs|clap_builder/src/parser/parser.rs#get_matches_with|clap_builder/src/parser/validator.rs#Validator|",

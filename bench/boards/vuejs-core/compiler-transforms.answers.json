@@ -193,8 +193,8 @@
       "language": "ts",
       "source": "retarget",
       "parent": "calls|packages/compiler-core/src/transforms/transformElement.ts#transformElement|packages/compiler-core/src/ast.ts#createVNodeCall|",
-      "truth": "false",
-      "why": "the routine's calls were read and none is it"
+      "truth": "undecidable",
+      "why": "it inherits from ObjectExpression, whose routines run as it and are written elsewhere"
     },
     {
       "id": "calls|packages/compiler-core/src/transforms/transformElement.ts#transformElement|packages/compiler-core/src/ast.ts#VNODE_CALL|",

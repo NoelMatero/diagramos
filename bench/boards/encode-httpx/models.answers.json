@@ -276,8 +276,8 @@
       "language": "python",
       "source": "swap",
       "parent": "builds|httpx/_models.py#Request|httpx/_content.py#ByteStream|",
-      "truth": "false",
-      "why": "the from end is a type, and only something that runs reads a member"
+      "truth": "undecidable",
+      "why": "the type's members are open"
     },
     {
       "id": "builds|httpx/_content.py#ByteStream|httpx/_models.py#Request|",

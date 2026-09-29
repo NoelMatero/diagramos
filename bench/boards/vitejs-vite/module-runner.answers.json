@@ -407,7 +407,7 @@
       "source": "swap",
       "parent": "needs|packages/vite/src/module-runner/esmEvaluator.ts#runInlinedModule|packages/vite/src/module-runner/types.ts#ModuleRunnerContext|",
       "truth": "false",
-      "why": "the routine's calls were read and none is it"
+      "why": "it neither creates one nor calls any of its 0 members"
     },
     {
       "id": "needs|packages/vite/src/module-runner/types.ts#ModuleRunnerContext|packages/vite/src/module-runner/esmEvaluator.ts#runInlinedModule|",

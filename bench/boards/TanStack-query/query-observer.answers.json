@@ -168,8 +168,8 @@
       "toLabel": "onSubscribe()",
       "language": "ts",
       "source": "drawn",
-      "truth": "false",
-      "why": "the routine's calls were read and none is it"
+      "truth": "undecidable",
+      "why": "a call to another onSubscribe is here, and dispatch could reach its own"
     },
     {
       "id": "calls|packages/query-core/src/queryObserver.ts#QueryObserver|packages/query-core/src/query.ts#Query|",
@@ -180,8 +180,8 @@
       "toLabel": "addObserver()",
       "language": "ts",
       "source": "drawn",
-      "truth": "undecidable",
-      "why": "its routine get: the tool would not walk this routine's calls"
+      "truth": "true",
+      "why": "its routine onSubscribe calls it"
     },
     {
       "id": "needs|packages/query-core/src/queryObserver.ts#QueryObserver|packages/query-core/src/query.ts#Query|",
@@ -294,8 +294,8 @@
       "toLabel": "executeFetch()",
       "language": "ts",
       "source": "drawn",
-      "truth": "undecidable",
-      "why": "its routine get: the tool would not walk this routine's calls"
+      "truth": "true",
+      "why": "its routine constructor calls it"
     },
     {
       "id": "calls|packages/query-core/src/queryObserver.ts#QueryObserver|packages/query-core/src/queryCache.ts#QueryCache|",
@@ -306,8 +306,8 @@
       "toLabel": "build()",
       "language": "ts",
       "source": "drawn",
-      "truth": "undecidable",
-      "why": "its routine get: the tool would not walk this routine's calls"
+      "truth": "true",
+      "why": "its routine setOptions calls it"
     },
     {
       "id": "builds|packages/query-core/src/queryCache.ts#QueryCache|packages/query-core/src/query.ts#Query|",
@@ -369,8 +369,8 @@
       "language": "ts",
       "source": "retarget",
       "parent": "builds|packages/query-core/src/queryCache.ts#QueryCache|packages/query-core/src/query.ts#Query|",
-      "truth": "false",
-      "why": "nothing in it makes one"
+      "truth": "undecidable",
+      "why": "a literal here is written against a type that could be it"
     },
     {
       "id": "builds|packages/query-core/src/queryCache.ts#QueryCache|packages/query-core/src/query.ts#status|",
@@ -446,8 +446,8 @@
       "toLabel": "Query",
       "language": "ts",
       "source": "drawn",
-      "truth": "false",
-      "why": "the from end is a type, and only something that runs reads a member"
+      "truth": "true",
+      "why": "its routine constructor reads it"
     }
   ]
 }

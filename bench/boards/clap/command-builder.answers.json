@@ -376,7 +376,7 @@
       "source": "reverse",
       "parent": "accesses|clap_builder/src/mkeymap.rs#_build|clap_builder/src/mkeymap.rs#MKeyMap|keys",
       "truth": "false",
-      "why": "the from end is a type, and only something that runs reads a member"
+      "why": "the to end is a routine, and only a type declares members"
     },
     {
       "id": "accesses|clap_builder/src/mkeymap.rs#_build|clap_builder/src/mkeymap.rs#KeyType|keys",

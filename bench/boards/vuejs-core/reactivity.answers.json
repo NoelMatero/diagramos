@@ -42,7 +42,7 @@
       "source": "swap",
       "parent": "needs|packages/reactivity/src/reactive.ts#reactive|packages/reactivity/src/baseHandlers.ts#BaseReactiveHandler|",
       "truth": "false",
-      "why": "the routine's calls were read and none is it"
+      "why": "it neither creates one nor calls any of its 2 members"
     },
     {
       "id": "needs|packages/reactivity/src/baseHandlers.ts#BaseReactiveHandler|packages/reactivity/src/reactive.ts#reactive|",
@@ -272,7 +272,7 @@
       "language": "ts",
       "source": "drawn",
       "truth": "false",
-      "why": "the from end is a type, and only something that runs reads a member"
+      "why": "the type declares no sub"
     },
     {
       "id": "needs|packages/reactivity/src/dep.ts#Link|packages/reactivity/src/effect.ts#ReactiveEffect|",
@@ -384,8 +384,8 @@
       "toLabel": "ReactiveEffect",
       "language": "ts",
       "source": "drawn",
-      "truth": "false",
-      "why": "the routine's calls were read and none is it"
+      "truth": "undecidable",
+      "why": "it inherits from Subscriber, whose routines run as it and are written elsewhere"
     },
     {
       "id": "needs|packages/reactivity/src/dep.ts#trigger|packages/reactivity/src/effect.ts#ReactiveEffect|",

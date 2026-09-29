@@ -5,6 +5,7 @@
  *
  *   npx tsx scripts/bench-planted-rejudge.mts --word=calls --why="the from end is a type"
  *   npx tsx scripts/bench-planted-rejudge.mts --word=calls --why="the from end is a type" --write
+ *   npx tsx scripts/bench-planted-rejudge.mts --word=builds --project=TanStack-query
  *
  * `bench-planted-key.mts` rebuilds a key from its board, and a rebuild grows
  * plants from every claim the tooling calls true -- so changing how one word
@@ -30,6 +31,7 @@ const argv = process.argv.slice(2);
 const flag = (name: string) => argv.find((a) => a.startsWith(`--${name}=`))?.slice(name.length + 3);
 const word = flag("word") as Word | undefined;
 const why = flag("why");
+const project = flag("project");
 const write = argv.includes("--write");
 if (!word) {
   console.log("Name the word to re-judge: --word=calls, and narrow it with --why=<start of the stored reason>.");
@@ -43,6 +45,7 @@ for (const file of plantedKeyFiles(REPO)) {
     project: string; language: string;
     claims: Array<{ word: string; from: string; to: string; member?: string; truth: string; why: string; source: string }>;
   };
+  if (project && key.project !== project) continue;
   const wanted = key.claims.filter((c) => c.word === word && (!why || c.why.startsWith(why)));
   if (wanted.length === 0) continue;
   const language = (key.language === "tsx" ? "ts" : key.language) as Language;

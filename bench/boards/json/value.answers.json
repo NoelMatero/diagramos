@@ -79,8 +79,8 @@
       "toLabel": "Value enum",
       "language": "rust",
       "source": "drawn",
-      "truth": "false",
-      "why": "every routine of the type was read and none calls it"
+      "truth": "undecidable",
+      "why": "its routine index_into: an impl of Value's own type could not be resolved"
     },
     {
       "id": "needs|src/value/index.rs#Index|src/value/mod.rs#Value|",
@@ -230,8 +230,8 @@
       "language": "rust",
       "source": "swap",
       "parent": "builds|src/value/ser.rs#Serializer|src/value/mod.rs#Value|",
-      "truth": "undecidable",
-      "why": "its routine serialize_bool: the name appears without being called (passed as a value, or a path)"
+      "truth": "true",
+      "why": "its routine serialize_bool calls it"
     },
     {
       "id": "builds|src/value/mod.rs#Value|src/value/ser.rs#Serializer|",
@@ -344,8 +344,8 @@
       "language": "rust",
       "source": "swap",
       "parent": "builds|src/value/de.rs#ValueVisitor|src/value/mod.rs#Value|",
-      "truth": "undecidable",
-      "why": "its routine visit_bool: the name appears without being called (passed as a value, or a path)"
+      "truth": "true",
+      "why": "its routine visit_bool calls it"
     },
     {
       "id": "builds|src/value/mod.rs#Value|src/value/de.rs#ValueVisitor|",

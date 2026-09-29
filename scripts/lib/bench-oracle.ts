@@ -22,8 +22,10 @@
  *   returns   the function (to) returns the type (from)
  *   holds     the container (from) has a field of the type (to)
  *   builds    from makes a value of the type (to)
- *   calls     from calls to
- *   accesses  from (a routine) reads the member named on the label off to (a type)
+ *   calls     from calls to; a class at the far end is called when from
+ *             creates one or calls any of its routines (#374)
+ *   accesses  from (a routine, or a class through its routines) reads the
+ *             member named on the label off to (a type)
  *   conforms  from extends or implements to
  *   feeds     from's result goes into to
  *
@@ -36,7 +38,7 @@ import { existsSync, readdirSync, statSync } from "node:fs";
 import path from "node:path";
 
 import {
-  isTsx, rustImplBlocks, rustKeyword,
+  isAccessor, isTsx, rustImplBlocks, rustKeyword, tsIsOverload, tsIsShape, tsWritesLiteralOf,
   basesOf, fieldsOf, membersOf, signatureOf, type Span,
 } from "./bench-shapes";
 import {
@@ -272,8 +274,19 @@ export function createOracle(tooling: Tooling): Oracle {
 
   /* --------------------------------------------------------------- words */
 
+  /** A routine's outgoing calls, asked of the tool once: a class at the far end asks for them again per routine. */
+  const outgoingCache = new Map<string, Promise<Loc[] | undefined>>();
+  function outgoing(sym: Sym): Promise<Loc[] | undefined> {
+    const key = `${sym.file}:${sym.nameStart}`;
+    let found = outgoingCache.get(key);
+    if (!found) { found = tooling.outgoingCalls(sym); outgoingCache.set(key, found); }
+    return found;
+  }
+
+  const same = (a: Sym, b: Sym) => a.file === b.file && a.nameStart === b.nameStart;
+
   async function judgeCalls(from: Sym, to: Sym): Promise<Answer> {
-    const calls = await tooling.outgoingCalls(from);
+    const calls = await outgoing(from);
     if (calls?.some((l) => denotes(l, to))) return { truth: "true", why: "the tool's call hierarchy lists it" };
     const body = signatureOf(language, from)?.bodyStart ?? from.start;
     const scan = await scanForCall(from.file, { start: body, end: from.end }, [], to);
@@ -319,6 +332,173 @@ export function createOracle(tooling: Tooling): Oracle {
   }
 
   /**
+   * `@calls` into a type, read the way #374 settled it: A calls the class B
+   * when A creates a B -- `new B()`, `B()`, `B::new()`, `B { .. }`, or a
+   * subclass of B -- or calls anything B declares: a method, a static one, a
+   * field holding a function (`retryer.start()` on an interface).
+   *
+   * False needs all of it read: the tool's call list, B's name in the body,
+   * and every call written through a value or a path. A call that could be
+   * B's by dispatch -- through a base, an interface, a trait, a value the
+   * tool cannot type -- is a doubt, and so is a routine B inherits from a
+   * base here, since a call to it lands on the base.
+   */
+  async function judgeCallsToType(from: Sym, to: Sym): Promise<Answer> {
+    const direct = await judgeCalls(from, to).then((a) => (writesNoCall(from, a) ? NO_CALL : a));
+    if (direct.truth === "true") return direct;
+    if ((await judgeBuilds(from, to)).truth === "true") return { truth: "true", why: "it creates one here" };
+    const own = await ownCode(to);
+    if (typeof own === "string") return { truth: "undecidable", why: own };
+    const calls = await outgoing(from);
+    const hit = own.routines.find((m) => !isAccessor(language, m) && calls?.some((l) => denotes(l, m)));
+    if (hit) return { truth: "true", why: `it calls its routine ${hit.name}` };
+    const sub = await subclassMade(calls ?? [], to);
+    if (sub) return { truth: "true", why: `it creates ${sub.name}, which is one` };
+    const body = { start: signatureOf(language, from)?.bodyStart ?? from.start, end: from.end };
+    const scan = await scanForMembers(from.file, body, [], to, own);
+    if (scan.called) return { truth: "true", why: `it calls its routine ${scan.called}` };
+    const doubt = (direct.truth === "undecidable" ? direct.why : undefined) ?? scan.doubt ?? own.inherits;
+    if (doubt) return { truth: "undecidable", why: doubt };
+    const members = (await membersOwned(to, own)).size;
+    return { truth: "false", why: `it neither creates one nor calls any of its ${members} members` };
+  }
+
+  const CONSTRUCTORS = new Set(["constructor", "__init__", "__new__"]);
+  /** Words a call-shaped match finds that are syntax, not a name anything declares. */
+  const NOT_CALLS = new Set(["if", "for", "while", "switch", "catch", "return", "function", "elif", "match",
+    "with", "assert", "print", "lambda", "yield", "super", "typeof", "delete", "void", "loop", "unsafe"]);
+
+  /** Whether a position is inside the type's own code: its declaration, or a Rust `impl` of it. */
+  function insideOwn(to: Sym, own: OwnCode, file: string, at: number): boolean {
+    if (file === to.file && to.start <= at && at < to.end) return true;
+    return own.regions.some((r) => r.file === file && r.start <= at && at < r.end);
+  }
+
+  /**
+   * What a type declares that a call can name: its routines, and its fields
+   * and properties -- not a routine's own locals. By name, since a doubt is
+   * about a call spelt the same.
+   */
+  async function membersOwned(to: Sym, own: OwnCode): Promise<Map<string, Sym[]>> {
+    const out = new Map<string, Sym[]>();
+    const add = (s: Sym) => out.set(s.name, [...(out.get(s.name) ?? []), s]);
+    own.routines.forEach(add);
+    const spans = [{ file: to.file, start: to.start, end: to.end }, ...own.regions];
+    for (const file of new Set(spans.map((r) => r.file))) {
+      for (const s of (await symbolsOf(rel(file))) ?? []) {
+        if (s.kind !== "data" || !spans.some((r) => r.file === file && r.start <= s.start && s.end <= r.end)) continue;
+        if (own.routines.some((r) => r.file === file && r.start <= s.start && s.end <= r.end)) continue;
+        add(s);
+      }
+    }
+    return out;
+  }
+
+  /**
+   * Every call in a region written through a value or a path, and every one
+   * spelt as something the type declares: the first the tool places inside
+   * the type's own code, or the first doubt.
+   *
+   * A call placed elsewhere under a name the type declares is a doubt only
+   * when the type could still be what it runs on (`dispatchCouldReach`) or
+   * the tool could not place it. A bare `name(` is some function of that
+   * name, and a constructor is never reached by dispatch --
+   * `super().__init__()` resolves to the one it runs.
+   */
+  async function scanForMembers(
+    file: string, region: Span, skip: Span[], to: Sym, own: OwnCode,
+  ): Promise<{ called?: string; doubt?: string }> {
+    const blank = blankOf(language, sourceOf(file));
+    const members = await membersOwned(to, own);
+    let doubt: string | undefined;
+    for (const m of blank.slice(region.start, region.end).matchAll(/\b([A-Za-z_$][\w$]*)\s*(?:::<[^>]*>)?\s*\(/g)) {
+      const name = m[1]!;
+      const at = region.start + m.index!;
+      if (skip.some((s) => s.start <= at && at < s.end)) continue;
+      if (KEYWORDS[language].has(name) || NOT_CALLS.has(name)) continue;
+      const before = blank.slice(Math.max(0, at - 10), at);
+      const throughValue = /\.\s*$/.test(before);
+      const throughPath = /::\s*$/.test(before);
+      const declared = members.get(name);
+      if (!declared && !throughValue && !throughPath) continue;
+      const found = await resolve(file, at);
+      const landed = found.kind === "sym" ? { file: found.sym.file, at: found.sym.start }
+        : found.kind === "unlisted" ? { file: found.loc.file, at: found.loc.start } : undefined;
+      if (landed && !(found.kind === "sym" && same(found.sym, to)) && insideOwn(to, own, landed.file, landed.at)) {
+        return { called: name };
+      }
+      if (!declared || CONSTRUCTORS.has(name) || !(throughValue || throughPath)) continue;
+      if (found.kind === "failed" || found.kind === "none") {
+        doubt ??= `the tool could not say which ${name} is called at one site`;
+      } else if (!throughValue) {
+        continue;
+      } else if (found.kind === "sym") {
+        if (await dispatchCouldReach(found.sym, declared[0]!)) {
+          doubt ??= `a call to another ${name} is here, and dispatch could reach its own`;
+        }
+      } else if (found.kind === "unlisted") {
+        doubt ??= `a call to ${name} resolves to something undeclared here, which could be its own`;
+      } else if (found.kind === "outside" && declared.some((s) => own.outside.includes(s))) {
+        doubt ??= `a call to ${name} outside the repository could reach its own through what it implements`;
+      }
+    }
+    // A routine of the type handed on as a value, `map(p.parse)`: whatever receives it may run it.
+    for (const routine of own.routines) {
+      if (CONSTRUCTORS.has(routine.name) || isAccessor(language, routine)) continue;
+      for (const m of blank.slice(region.start, region.end).matchAll(new RegExp(`\\.\\s*${escape(routine.name)}\\b(?!\\s*(::<[^>]*>)?\\s*\\()`, "g"))) {
+        const at = region.start + m.index! + m[0].length - routine.name.length;
+        if (skip.some((s) => s.start <= at && at < s.end)) continue;
+        const found = await resolve(file, at);
+        if (found.kind === "sym" && same(found.sym, routine)) {
+          doubt ??= `its routine ${routine.name} is named here without being called`;
+        }
+      }
+    }
+    return doubt ? { doubt } : {};
+  }
+
+  /**
+   * Whether a call the tool placed on `other` could run `method` instead.
+   *
+   * Only when the far type could be what the call runs on: `other` is on an
+   * interface or a Protocol the type may satisfy without saying so, on a Rust
+   * trait's declaration, or on a class the type inherits from. A call placed
+   * on another class's method, or in a Rust `impl` of another type, runs that
+   * one -- the tool read the receiver's type to place it there.
+   */
+  async function dispatchCouldReach(other: Sym, method: Sym): Promise<boolean> {
+    if (language === "rust") return other.containerKind !== "impl";
+    const owner = ((await symbolsOf(rel(other.file))) ?? [])
+      .filter((t) => t.kind === "type" && t.start <= other.start && other.end <= t.end)
+      .sort((a, b) => (a.end - a.start) - (b.end - b.start))[0];
+    const type = ((await symbolsOf(rel(method.file))) ?? [])
+      .filter((t) => t.kind === "type" && t.start <= method.start && method.end <= t.end)
+      .sort((a, b) => (a.end - a.start) - (b.end - b.start))[0];
+    if (!owner || !type) return true;
+    if (language === "ts" && tsIsShape(owner)) return true;
+    if (language === "python" && (basesOf(language, owner) ?? []).some((b) => /Protocol/.test(sourceOf(owner.file).slice(b.start, b.end)))) {
+      return true;
+    }
+    return reachesBase(type, owner, 0);
+  }
+
+  /** A subclass of `to` that one of these calls creates, read off the tool's call list. */
+  async function subclassMade(calls: Loc[], to: Sym): Promise<Sym | undefined> {
+    if (language === "rust") return undefined;
+    for (const loc of calls) {
+      if (isOutside(loc.file, root)) continue;
+      const syms = (await symbolsOf(rel(loc.file))) ?? [];
+      let made = syms.find((s) => s.kind === "type" && denotes(loc, s));
+      if (!made) {
+        const ctor = syms.find((s) => s.kind === "routine" && CONSTRUCTORS.has(s.name) && denotes(loc, s));
+        made = ctor && syms.find((t) => t.kind === "type" && t.start <= ctor.start && ctor.end <= t.end);
+      }
+      if (made && !same(made, to) && (await reachesBase(made, to, 0))) return made;
+    }
+    return undefined;
+  }
+
+  /**
    * `@calls` out of a type, read the way a board means it (#346): the type
    * calls the far end when some routine of its own does, or any other code
    * written inside it -- a field's initialiser, a Python class body.
@@ -333,7 +513,9 @@ export function createOracle(tooling: Tooling): Oracle {
     if (typeof own === "string") return { truth: "undecidable", why: own };
     let doubt: string | undefined;
     for (const routine of own.routines) {
-      const answer = await judgeCalls(routine, to).then((a) => (writesNoCall(routine, a) ? NO_CALL : a));
+      const answer = to.kind === "type"
+        ? await judgeCallsToType(routine, to)
+        : await judgeCalls(routine, to).then((a) => (writesNoCall(routine, a) ? NO_CALL : a));
       if (answer.truth === "true") return { truth: "true", why: `its routine ${routine.name} calls it` };
       if (answer.truth === "undecidable") doubt ??= `its routine ${routine.name}: ${answer.why}`;
     }
@@ -350,6 +532,12 @@ export function createOracle(tooling: Tooling): Oracle {
       const scan = await scanForCall(region.file, region, skip, to, true);
       if (scan.called) return { truth: "true", why: "code inside the type calls it" };
       doubt ??= scan.doubt;
+      if (to.kind !== "type") continue;
+      const far = await ownCode(to);
+      if (typeof far === "string") { doubt ??= far; continue; }
+      const methods = await scanForMembers(region.file, region, skip, to, far);
+      if (methods.called) return { truth: "true", why: "code inside the type calls it" };
+      doubt ??= methods.doubt;
     }
     doubt ??= own.inherits;
     if (doubt) return { truth: "undecidable", why: doubt };
@@ -384,18 +572,33 @@ export function createOracle(tooling: Tooling): Oracle {
    * them, plus the reason it may run code written elsewhere. A string is a
    * reason the spans themselves could not be found.
    */
-  async function ownCode(type: Sym): Promise<
-    string | { regions: Array<Span & { file: string }>; routines: Sym[]; inherits?: string }
-  > {
+  async function ownCode(type: Sym): Promise<string | OwnCode> {
+    const key = `${type.file}:${type.nameStart}`;
+    let found = ownCache.get(key);
+    if (!found) { found = readOwnCode(type); ownCache.set(key, found); }
+    return found;
+  }
+
+  /*
+   * `outside` is the routines a call resolving outside the repository could
+   * still land on: every one, for a class with a base out there (it may
+   * override the base's), and a Rust type's routines in an `impl` of a trait
+   * out there.
+   */
+  interface OwnCode { regions: Array<Span & { file: string }>; routines: Sym[]; outside: Sym[]; inherits?: string }
+  const ownCache = new Map<string, Promise<string | OwnCode>>();
+
+  async function readOwnCode(type: Sym): Promise<string | OwnCode> {
     const routinesIn = async (file: string, span: Span) => ((await symbolsOf(rel(file))) ?? [])
       .filter((s) => s.kind === "routine" && s.start >= span.start && s.end <= span.end && s !== type);
     if (language !== "rust" || rustKeyword(type) === "trait") {
       const region = { file: type.file, start: type.start, end: type.end };
       const routines = await routinesIn(type.file, region);
-      if (language === "rust") return { regions: [region], routines };
+      if (language === "rust") return { regions: [region], routines, outside: [] };
       const bases = basesOf(language, type);
       if (!bases) return "the declaration's bases could not be read";
       let inherits: string | undefined;
+      let outsideBase = false;
       const text = sourceOf(type.file);
       for (const base of bases) {
         // The base's own name, not a type argument inside it: `Generic[T]`
@@ -404,12 +607,12 @@ export function createOracle(tooling: Tooling): Oracle {
         if (!chain) { inherits ??= "one of its bases could not be read"; continue; }
         const name = chain[2]!;
         const found = await resolve(type.file, base.start + chain[0].length - name.length);
-        if (found.kind === "outside") continue;
+        if (found.kind === "outside") { outsideBase = true; continue; }
         inherits ??= found.kind === "sym"
           ? `it inherits from ${found.sym.name}, whose routines run as it and are written elsewhere`
           : `the tool could not say what its base ${name} is`;
       }
-      return { regions: [region], routines, ...(inherits ? { inherits } : {}) };
+      return { regions: [region], routines, outside: outsideBase ? routines : [], ...(inherits ? { inherits } : {}) };
     }
     /*
      * A Rust type's routines are in `impl` blocks anywhere in the crate. Each
@@ -418,6 +621,7 @@ export function createOracle(tooling: Tooling): Oracle {
      */
     const regions: Array<Span & { file: string }> = [];
     const routines: Sym[] = [];
+    const outside: Sym[] = [];
     let inherits: string | undefined;
     for (const file of crateFiles(type.file)) {
       if (!sourceOf(file).includes(type.name)) continue;
@@ -427,10 +631,11 @@ export function createOracle(tooling: Tooling): Oracle {
         if (self.kind !== "sym") return `an impl of ${type.name}'s own type could not be resolved`;
         if (self.sym.file !== type.file || self.sym.nameStart !== type.nameStart) continue;
         regions.push({ file, start: block.start, end: block.end });
-        routines.push(...await routinesIn(file, block));
+        const inBlock = await routinesIn(file, block);
+        routines.push(...inBlock);
         if (block.traitAt === undefined) continue;
         const trait = await resolve(file, block.traitAt);
-        if (trait.kind === "outside") continue;
+        if (trait.kind === "outside") { outside.push(...inBlock); continue; }
         if (trait.kind !== "sym") { inherits ??= `the tool could not say what trait ${block.traitName} is`; continue; }
         // A trait whose methods all end in `;` gives the type nothing to run.
         const declared = blankRust(sourceOf(trait.sym.file)).slice(trait.sym.start, trait.sym.end);
@@ -439,7 +644,7 @@ export function createOracle(tooling: Tooling): Oracle {
         }
       }
     }
-    return { regions, routines, ...(inherits ? { inherits } : {}) };
+    return { regions, routines, outside, ...(inherits ? { inherits } : {}) };
   }
 
   async function judgeSignature(word: "takes" | "returns", type: Sym, fn: Sym): Promise<Answer> {
@@ -525,10 +730,27 @@ export function createOracle(tooling: Tooling): Oracle {
     }
     if (open) return { truth: "undecidable", why: doubt ?? "a type's impls may be in another file" };
     if (doubt) return { truth: "undecidable", why: doubt };
+    /*
+     * An interface or a type alias is made by writing a literal, and nothing
+     * names it there: excalidraw's `_newElementBase` builds its element as
+     * `{ id, type, x, ... }` (#366), and `pointFrom` its point as `[x, y] as
+     * Point`. Which type a literal is, is a question for the type checker
+     * (`literalMayBe`), not for its text: an options bag handed to
+     * `createRetryer` is written against its config, which is no Retryer.
+     */
+    if (language === "ts" && tsIsShape(made) && tsWritesLiteralOf(maker, made)) {
+      const may = tooling.literalMayBe?.(maker, made);
+      if (may !== false) {
+        return { truth: "undecidable", why: may ? "a literal here is written against a type that could be it" : "a literal here could be one, and the checker could not say" };
+      }
+    }
     return { truth: "false", why: "nothing in it makes one" };
   }
 
-  async function judgeAccesses(reader: Sym, type: Sym, member: string | undefined): Promise<Answer> {
+  type Declared = { locations: Array<{ file: string; at: number }>; open: boolean };
+
+  /** The member's declarations on the far type, or the answer when there is nothing to look for. */
+  async function declaredMember(type: Sym, member: string | undefined): Promise<Answer | Declared> {
     if (!member || !/^[A-Za-z_]\w*$/.test(member)) {
       return { truth: "undecidable", why: "the arrow names no member" };
     }
@@ -538,18 +760,34 @@ export function createOracle(tooling: Tooling): Oracle {
       if (declared.open) return { truth: "undecidable", why: "the type's members are open" };
       return { truth: "false", why: `the type declares no ${member}` };
     }
+    return declared;
+  }
+
+  async function judgeAccesses(reader: Sym, type: Sym, member: string | undefined): Promise<Answer> {
+    const declared = await declaredMember(type, member);
+    if ("truth" in declared) return declared;
     const body: Span = { start: signatureOf(language, reader)?.bodyStart ?? reader.start, end: reader.end };
-    const text = sourceOf(reader.file);
-    const blank = blankOf(language, text);
+    const read = await readsMember(reader.file, body, [], declared, member!);
+    if (read.reads) return { truth: "true", why: "the body reads it off that type" };
+    if (read.doubt) return { truth: "undecidable", why: read.doubt };
+    return { truth: "false", why: `nothing in the routine reads that type's ${member}` };
+  }
+
+  /** Whether a region reads the member off the declarations given, or a doubt about whether it could. */
+  async function readsMember(
+    file: string, region: Span, skip: Span[], declared: Declared, member: string,
+  ): Promise<{ reads: boolean; doubt?: string }> {
+    const blank = blankOf(language, sourceOf(file));
     let doubt: string | undefined;
-    for (const m of blank.slice(body.start, body.end).matchAll(new RegExp(`\\b${escape(member)}\\b`, "g"))) {
-      const at = body.start + m.index!;
+    for (const m of blank.slice(region.start, region.end).matchAll(new RegExp(`\\b${escape(member)}\\b`, "g"))) {
+      const at = region.start + m.index!;
+      if (skip.some((s) => s.start <= at && at < s.end)) continue;
       const before = blank.slice(Math.max(0, at - 2), at);
       if (!/[.]$/.test(before) && !(language === "rust" && /::$/.test(blank.slice(Math.max(0, at - 2), at)))) continue;
-      const found = await resolve(reader.file, at);
+      const found = await resolve(file, at);
       if (found.kind === "sym") {
         if (declared.locations.some((l) => l.file === found.sym.file && l.at === found.sym.nameStart)) {
-          return { truth: "true", why: "the body reads it off that type" };
+          return { reads: true };
         }
       } else if (found.kind === "failed" || found.kind === "none") {
         doubt ??= `the tool could not say whose ${member} is read here`;
@@ -557,11 +795,41 @@ export function createOracle(tooling: Tooling): Oracle {
         doubt ??= `a ${member} is read here and the tool placed it somewhere undeclared`;
       }
     }
-    if (/\{[^{}]*\b(\w+\s*,\s*)*\w+\s*\}\s*=|\.\.\.|getattr\(|\[["'`]/.test(blank.slice(body.start, body.end))) {
+    const rest = skip.reduce((text, s) => (s.start >= region.start && s.end <= region.end
+      ? text.slice(0, s.start - region.start) + " ".repeat(s.end - s.start) + text.slice(s.end - region.start)
+      : text), blank.slice(region.start, region.end));
+    if (/\{[^{}]*\b(\w+\s*,\s*)*\w+\s*\}\s*=|\.\.\.|getattr\(|\[["'`]/.test(rest)) {
       doubt ??= "the body reads members without naming them (destructuring, spread or a computed key)";
     }
+    return { reads: false, ...(doubt ? { doubt } : {}) };
+  }
+
+  /**
+   * `@accesses` out of a type (#374): the type reads the member when one of
+   * its own routines does, or other code written inside it -- #346's rule for
+   * `@calls`, and never false while it inherits code from a base here.
+   */
+  async function judgeAccessesFromType(from: Sym, type: Sym, member: string | undefined): Promise<Answer> {
+    const declared = await declaredMember(type, member);
+    if ("truth" in declared) return declared;
+    const own = await ownCode(from);
+    if (typeof own === "string") return { truth: "undecidable", why: own };
+    let doubt: string | undefined;
+    for (const routine of own.routines) {
+      const answer = await judgeAccesses(routine, type, member);
+      if (answer.truth === "true") return { truth: "true", why: `its routine ${routine.name} reads it` };
+      if (answer.truth === "undecidable") doubt ??= `its routine ${routine.name}: ${answer.why}`;
+    }
+    for (const region of own.regions) {
+      const skip = own.routines.filter((r) => r.file === region.file).map((r) => ({ start: r.start, end: r.end }));
+      const read = await readsMember(region.file, region, skip, declared, member!);
+      if (read.reads) return { truth: "true", why: "code inside the type reads it" };
+      doubt ??= read.doubt;
+    }
+    doubt ??= own.inherits;
     if (doubt) return { truth: "undecidable", why: doubt };
-    return { truth: "false", why: `nothing in the routine reads that type's ${member}` };
+    if (own.routines.length === 0) return { truth: "false", why: `the type has no routine, and nothing in it reads that type's ${member}` };
+    return { truth: "false", why: `every routine of the type was read and none reads that type's ${member}` };
   }
 
   /** Where a type declares a member, following Rust's impls and giving up on inheritance. */
@@ -774,8 +1042,9 @@ export function createOracle(tooling: Tooling): Oracle {
       return { truth: "undecidable", why: "an end names nothing the tool declares" };
     }
     const answers: Answer[] = [];
-    for (const from of fromSyms.slice(0, 3)) {
-      for (const to of toSyms.slice(0, 3)) {
+    const readsBody = claim.word === "calls" || claim.word === "builds" || claim.word === "accesses";
+    for (const from of (readsBody ? bodied(fromSyms) : fromSyms).slice(0, 3)) {
+      for (const to of (readsBody ? bodied(toSyms) : toSyms).slice(0, 3)) {
         answers.push(await judgeOne(claim, from, to));
       }
     }
@@ -783,6 +1052,19 @@ export function createOracle(tooling: Tooling): Oracle {
     if (answers.every((a) => a.truth === first.truth)) return first;
     // Two declarations of one name that disagree: the ref does not say which.
     return { truth: "undecidable", why: "the ref could mean more than one declaration, and they differ" };
+  }
+
+  /**
+   * A TypeScript overload is a signature for the declaration after it, which
+   * holds the code. Reading the first three of `useQuery`'s four declarations
+   * read three signatures and no body, and called a real call false (#366).
+   * Only for a word that reads a body: to `takes` and `returns` the overloads
+   * are the signatures a caller sees.
+   */
+  function bodied(syms: Sym[]): Sym[] {
+    if (language !== "ts") return syms;
+    const kept = syms.filter((s) => !(s.kind === "routine" && tsIsOverload(s)));
+    return kept.length > 0 ? kept : syms;
   }
 
   async function judgeOne(claim: ClaimUnderTest, from: Sym, to: Sym): Promise<Answer> {
@@ -797,10 +1079,19 @@ export function createOracle(tooling: Tooling): Oracle {
       if (far) return { truth: "false", why: far };
       return judgeCallsFromType(from, to);
     }
+    /*
+     * A type at the tail of `@accesses` is read the same way (#374): it reads
+     * the member when one of its routines does.
+     */
+    if (claim.word === "accesses" && from.kind === "type") {
+      const far = kindProblem("accesses", { ...from, kind: "routine" }, to);
+      if (far) return { truth: "false", why: far };
+      return judgeAccessesFromType(from, to, claim.member);
+    }
     const problem = kindProblem(claim.word, from, to);
     if (problem) return { truth: "false", why: problem };
     switch (claim.word) {
-      case "calls": return judgeCalls(from, to);
+      case "calls": return to.kind === "type" ? judgeCallsToType(from, to) : judgeCalls(from, to);
       case "takes": return judgeSignature("takes", from, to);
       case "returns": return judgeSignature("returns", from, to);
       case "holds": return judgeHolds(from, to);
