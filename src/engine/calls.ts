@@ -330,6 +330,19 @@ export type CallsNotClosed =
    * be placed and the head is still what runs.
    */
   | "named"
+  /**
+   * The head is a class with a base, and a call in the tail lands on a
+   * routine of some other class (#374). On a value of the head's type that
+   * is the head's own inherited method, so the call may be the head's.
+   */
+  | "inherits"
+  /**
+   * The head is a class, every call was placed and none is its own, and the
+   * tail may still create one (#374): `@builds`' reading of the same body did
+   * not close on "creates none" -- the head's name is written in it, a `new
+   * C()` could not be followed, or the Rust compiler has no body for it.
+   */
+  | "may-create"
   | SiteUnresolved;
 
 /** One end of the question: a file, its text, and what its imports point at. */
@@ -1770,6 +1783,194 @@ function textClosed(
     return { why: "reaches-the-file" };
   }
   return { reached: { routine: from.routine, line: bodies[0]!.line, sites, reached } };
+}
+
+/**
+ * What a class at the head of `@calls` is asked (#374): does the tail call
+ * anything the class declares, and was every call it makes accounted for?
+ *
+ * "main calls Parser" is true when main creates a Parser or calls one of its
+ * methods. Creating one is `@builds`' reading, and `drift.ts` asks it; this
+ * is the other half. A call is the class's own when it comes to rest at a
+ * routine whose holder is the class -- its body in TypeScript and Python, an
+ * `impl` of it in Rust, in whatever file that `impl` is in. Before this, a
+ * class was only ever reached by a call landing in its own *file*, so
+ * `Parser::new()` from an `impl` two files away read as "never calls it".
+ *
+ * `closed` means every call was placed and none can be the class's: that is
+ * one half of an accusation, and never the whole. A call that could still
+ * run one of the class's routines keeps it `open` -- through a trait's
+ * declaration, onto another class's method when the class has a base
+ * (`inherits`), or onto a routine two holders in that file share.
+ */
+export type TypeCallsReading =
+  | { verdict: "confirmed"; evidence: CallsEvidence }
+  | { verdict: "closed"; sites: number; line: number }
+  | { verdict: "open"; why: CallsNotClosed };
+
+export function callsIntoType(
+  from: CallSide & { routine: string },
+  to: CallSide & { names: string[] },
+  /** The class names a base, so another class's method may be one it inherits. */
+  inherits: boolean,
+): TypeCallsReading {
+  const reading = callSitesIn(from);
+  if (!reading.read) return { verdict: "open", why: "unreadable" };
+  let bodies = reading.bodies.filter((body) => body.routine === from.routine);
+  /*
+   * A class at the tail too: read through the routines written inside it, or
+   * inside a Rust `impl` of it in this file -- #346's reading. Confirm-only:
+   * an accusation would need every one of its routines closed, and an
+   * inherited one is written somewhere else.
+   */
+  const typeTail = bodies.length === 0;
+  if (typeTail) {
+    const spans = typeSpans(from.source, from.language, from.routine);
+    bodies = reading.bodies.filter((body) => spans.some(([first, last]) => first <= body.line && body.line <= last));
+  }
+  if (bodies.length === 0) return { verdict: "open", why: "routine-not-found" };
+  const names = new Set(to.names);
+  let why: CallsNotClosed | undefined;
+  let sites = 0;
+  for (const body of bodies) {
+    for (const site of body.sites) {
+      sites += 1;
+      if (site.file === undefined) { why ??= site.why ?? "unplaced"; continue; }
+      if (site.concrete === false) { why ??= "abstract-receiver"; continue; }
+      if (site.overridden) { why ??= "overridden"; continue; }
+      const landed = site.file === to.file ? to
+        : site.file === from.file ? from
+          : from.open?.(site.file);
+      if (site.declaredAs === undefined || !landed) {
+        if (site.file === to.file) why ??= "reaches-the-file";
+        continue;
+      }
+      const holders = holdersOfRoutine(landed.source, landed.language, site.declaredAs);
+      /*
+       * The class's own, by name *and* by where the name comes from: its own
+       * file, or a file that imports it from there -- `impl Parser` two files
+       * away does, with `use crate::parser::Parser`. A holder that only
+       * shares the name, like clap's `Flag::Command` beside the struct
+       * `Command`, or one reached through a re-export this cannot follow, is
+       * a doubt and never a confirmation.
+       */
+      const spelt = holders.filter((one) => one.name !== undefined && names.has(one.name));
+      const sure = site.file === to.file || spelt.every((one) => importsFrom(landed, one.name!, to.file));
+      if (spelt.length > 0 && spelt.length === holders.length && sure) {
+        return { verdict: "confirmed", evidence: {
+          name: site.declaredAs, inside: from.routine, line: site.line, wrote: site.name,
+        } };
+      }
+      if (spelt.length > 0) { why ??= "reaches-the-file"; continue; }
+      if (!site.receiver) continue;
+      if (holders.some((one) => one.dispatched)) { why ??= "abstract-receiver"; continue; }
+      if (inherits && holders.some((one) => one.name !== undefined)) why ??= "inherits";
+    }
+  }
+  if (why || typeTail) return { verdict: "open", why: why ?? "routine-not-found" };
+  return { verdict: "closed", sites, line: bodies[0]!.line };
+}
+
+/** The 1-based lines a type's own code spans: its declaration, and each Rust `impl` of it in this file. */
+function typeSpans(source: string, language: Language, type: string): Array<[number, number]> {
+  const tree = parseSource(source, language);
+  if (!tree) return [];
+  const spans: Array<[number, number]> = [];
+  each(tree.rootNode, (node) => {
+    const own = node.childForFieldName("name");
+    const typed = node.childForFieldName("type");
+    const isType = own?.childCount === 0 && own.text === type
+      && !node.childForFieldName("parameters") && !node.childForFieldName("value");
+    let impl = false;
+    if (!own && typed && node.childForFieldName("body")) {
+      let inner = typed;
+      for (let next = inner.childForFieldName("type"); next; next = next.childForFieldName("type")) inner = next;
+      impl = (inner.childForFieldName("name") ?? inner).text === type;
+    }
+    if (isType || impl) spans.push([lineOf(source, node.startIndex), lineOf(source, node.startIndex + node.text.length)]);
+  });
+  return spans;
+}
+
+/**
+ * Whether a file imports `name` from `file`, as its own bindings and its
+ * resolved imports say. A Rust file holding `impl Parser` counts `Parser` as
+ * declared there as well as imported, so its binding is dropped as ambiguous;
+ * its `use crate::parser::Parser` still resolved to a file, and that is read
+ * instead.
+ */
+function importsFrom(side: { source: string; language: Language; imports: CallSide["imports"] }, name: string, file: string): boolean {
+  const binding = bindingsIn(side.source, side.language)?.imported.get(name);
+  if (binding !== undefined) return filesFor(binding.specifier, side.imports).files.has(file);
+  return side.language === "rust"
+    && side.imports.some((one) => one.file === file && one.specifier.split("::").pop()?.trim() === name);
+}
+
+/**
+ * Who holds each routine of this name in a file: the class it is declared
+ * in, or the type a Rust `impl` is for, and whether a call to it can run
+ * some other type's instead -- a Rust trait's declaration, which is what a
+ * call through `dyn Trait` or a default method comes to rest at. A routine at
+ * the top of its file has no holder.
+ */
+function holdersOfRoutine(
+  source: string,
+  language: Language,
+  routine: string,
+): Array<{ name?: string; dispatched: boolean }> {
+  const tree = parseSource(source, language);
+  if (!tree) return [];
+  const holders = holdersIn(tree.rootNode);
+  return routinesNamed(source, routine, language).routines
+    .filter((node) => node.childForFieldName("parameters") ?? node.childForFieldName("value")?.childForFieldName("parameters"))
+    .map((node) => {
+      const holder = holders.get(node.id);
+      if (!holder) return { dispatched: false };
+      let type = holder.childForFieldName("type");
+      if (type) {
+        // `impl<T> Parser<T>`, `impl crate::a::Parser`: the type's own name.
+        for (let inner = type.childForFieldName("type"); inner; inner = inner.childForFieldName("type")) type = inner;
+        const name = type.childForFieldName("name") ?? type;
+        return { name: name.text, dispatched: false };
+      }
+      const name = holder.childForFieldName("name")?.text;
+      return { ...(name !== undefined ? { name } : {}), dispatched: language === "rust" };
+    });
+}
+
+/**
+ * Whether a name is declared here as a type -- a class, a struct, an enum,
+ * an interface, a trait -- and as nothing else (#374). By structure, as
+ * `parse.ts` reads a grammar: a declaration with a `body` and no
+ * `parameters`. A function has parameters; a field, a constant, a type alias
+ * and the last segment of a `use` path have no body. A Rust unit struct
+ * (`struct S;`) has none either, and stays on the routine reading.
+ *
+ * Inside a routine, only one whose body holds a routine counts:
+ * `Parser { depth: 1 }` is a struct literal with a `name` and a `body` of its
+ * own, and a board's ref at a file that only builds one read it as the class
+ * (#362 met the same shape), while nest builds a whole class inside a
+ * function and it is still a class.
+ */
+export function isTypeName(source: string, name: string, language: Language): boolean {
+  const tree = parseSource(source, language);
+  if (!tree) return false;
+  let types = 0;
+  let other = 0;
+  const visit = (node: Node, inRoutine: boolean): void => {
+    const named = node.childForFieldName("name");
+    const routine = node.childForFieldName("parameters") !== null;
+    if (named && named.childCount === 0 && named.text === name) {
+      if (node.childForFieldName("body") && !routine && (!inRoutine || holdsRoutines(node))) types += 1;
+      else if (routine || node.childForFieldName("value")) other += 1;
+    }
+    for (let index = 0; index < node.childCount; index += 1) {
+      const child = node.child(index);
+      if (child) visit(child, inRoutine || routine);
+    }
+  };
+  visit(tree.rootNode, false);
+  return types > 0 && other === 0;
 }
 
 /**

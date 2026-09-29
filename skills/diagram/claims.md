@@ -69,15 +69,16 @@ not count.
 
 ## `claim: "calls"`
 
-`from` calls `to`. Both ends are symbols. Red only when the call is found at the
+`from` calls `to`. Both ends are symbols. A class at `to` means `from` creates
+one or calls its methods. Red only when the call is found at the
 far end and only there. Silent for method calls on untyped values, wildcard
 imports, package names and calls inside Rust macros. If what moves is a value,
 use `feeds`.
 
 ## `claim: "accesses"`
 
-`from` (a routine) reads a member of `to` (a type). Put the member name in the
-arrow's `label`:
+`from` (a routine) reads a member of `to` (a type). A class at `from` means one
+of its methods reads it. Put the member name in the arrow's `label`:
 
 ```
 { from: "renderer", to: "config", label: "width", claim: "accesses" }

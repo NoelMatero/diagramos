@@ -6,6 +6,7 @@
  *   npm run measure:builds-absent -- --language=ts --cases   -- print every accusation
  *   npm run measure:builds-absent -- --language=rust         -- the Rust clones, rustc on PATH
  *   JEDI_PYTHON=<python with jedi> npm run measure:builds-absent -- --language=python
+ *   npm run measure:builds-absent -- --language=ts --word=calls  -- the same pairs, as "calls" (#374)
  *
  * **The gate for #362's absence licence. A measurement: it prints and never fails.**
  *
@@ -59,6 +60,18 @@
  *   subclass, `this.constructor` -- are the tests in
  *   `tests/builds-absent.test.ts`, one per shape.
  *
+ * ## `--word=calls` (#374)
+ *
+ * "A calls \<class B\>" is true when A creates a B or calls one of B's
+ * methods, so every pair above where the routine creates the type is a
+ * correct `@calls` arrow into it too, and so is every pair where the compiler
+ * resolves a call to one of the type's own methods -- `method`: the
+ * TypeScript checker's resolved signature, and rustc's MIR calling
+ * `B::name` or `<B as Trait>::name`. Python's jedi half lists the classes a
+ * routine calls, not their methods, so Python is measured on creation only.
+ * Only classes and Rust structs and enums are asked: the meaning is about a
+ * class. `gets` pairs say nothing either way and are left out.
+ *
  * Each project runs in a process of its own (docs: a corpus sweep needs a
  * process per tree), and a project that fails is named, never dropped.
  */
@@ -74,6 +87,8 @@ const flag = (name: string) => args.find((one) => one.startsWith(`--${name}=`))?
 const language = flag("language") ?? "ts";
 const only = flag("one");
 const showCases = args.includes("--cases");
+/** `builds` by default; `calls` asks the same pairs as "A calls <class B>" (#374). */
+const word = flag("word") === "calls" ? "calls" : "builds";
 
 /** The pinned clones live in the main checkout; a worktree has none. */
 const CORPUS = existsSync(path.resolve(import.meta.dirname, "..", ".corpus"))
@@ -112,7 +127,7 @@ interface Pair {
    * is a parent class of one the routine creates, at any depth: `new Leaf()`
    * creates a Widget when Leaf derives from it (#362's review).
    */
-  how: "new" | "literal" | "written" | "aggregate" | "own" | "conversion" | "called" | "ancestor" | "gets";
+  how: "new" | "literal" | "written" | "aggregate" | "own" | "conversion" | "called" | "ancestor" | "method" | "gets";
   /** What the head is declared as. */
   target: string;
 }
@@ -146,7 +161,7 @@ const self = fileURLToPath(import.meta.url);
 for (const project of TREES[language]!) {
   process.stderr.write(`${project}...\n`);
   const run = spawnSync(process.execPath, [
-    ...process.execArgv, self, `--language=${language}`, `--one=${project}`,
+    ...process.execArgv, self, `--language=${language}`, `--one=${project}`, `--word=${word}`,
   ], { encoding: "utf8", maxBuffer: 1 << 28, env: { ...process.env } });
   const line = run.stdout.split("\n").find((one) => one.startsWith("@@RESULT "));
   if (run.status !== 0 || !line) {
@@ -170,10 +185,10 @@ function report(results: ProjectResult[], failed: string[]): void {
   const gets = sum((key) => key.startsWith("gets "));
   const caught = results.flatMap((one) => one.caught.map((pair) => `${one.project}: ${pair}`));
 
-  console.log(`\n@builds absence, ${language}: ${results.length} project(s)`);
-  console.log(`  pairs the compiler says the routine creates: ${createdPairs}`);
+  console.log(`\n@${word} ${word === "calls" ? "into a class" : "absence"}, ${language}: ${results.length} project(s)`);
+  console.log(`  pairs the compiler says the routine creates${word === "calls" ? ", or calls a method of" : ""}: ${createdPairs}`);
   console.log(`    called wrong by the checker: ${wrong.length}   <- must be 0`);
-  for (const how of ["new", "literal", "written", "aggregate", "own", "conversion", "called", "ancestor"]) {
+  for (const how of ["new", "literal", "written", "aggregate", "own", "conversion", "called", "ancestor", "method"]) {
     const rows = Object.entries(tally).filter(([key]) => key.startsWith(`${how} `)).sort();
     for (const [key, count] of rows) console.log(`      ${String(count).padStart(5)}  ${key}`);
   }
@@ -196,21 +211,40 @@ function report(results: ProjectResult[], failed: string[]): void {
   }
 }
 
+/**
+ * The pairs a word is asked about. `@builds` never sees `method`: calling a
+ * B's method is not making one. `@calls` sees only classes and structs, and
+ * nothing the routine only gets.
+ */
+function forWord(pairs: Pair[]): Pair[] {
+  if (word === "builds") return pairs.filter((pair) => pair.how !== "method");
+  return pairs.filter((pair) => pair.how !== "gets" && (pair.target === "class" || pair.target === "struct"));
+}
+
+/**
+ * The two weakest ways to come by a type, in order. Calling one of its methods
+ * says nothing about making one, and to `@calls` it is the whole of the claim.
+ */
+function lowest(): Pair["how"][] {
+  return word === "calls" ? ["gets", "method"] : ["method", "gets"];
+}
+
 async function measureOne(project: string): Promise<ProjectResult> {
   const root = path.join(CORPUS, project);
   if (language === "rust") {
-    const { pairs, referee } = await rustPairs(root);
+    const { pairs: all, referee } = await rustPairs(root);
+    const pairs = forWord(all);
     process.stderr.write(`${project}: ${pairs.length} pairs\n`);
     return askChecker(project, root, pairs, referee);
   }
   if (language === "python") {
-    const pairs = pythonPairs(project, PY_TREES[project] ?? []);
+    const pairs = forWord(pythonPairs(project, PY_TREES[project] ?? []));
     process.stderr.write(`${project}: ${pairs.length} pairs\n`);
     return askChecker(project, root, pairs, undefined, true);
   }
   // Loaded here so the parent process never pays for the compiler.
   const ts = (await import("typescript")).default;
-  const pairs = typescriptPairs(ts, root, TS_TREES[project] ?? []);
+  const pairs = forWord(typescriptPairs(ts, root, TS_TREES[project] ?? []));
   process.stderr.write(`${project}: ${pairs.length} pairs\n`);
   // Through the live check, so the compiler answers what the product asks it
   // -- whether a class created is a kind of the head (#362's review).
@@ -285,7 +319,7 @@ async function rustPairs(root: string): Promise<{ pairs: Pair[]; referee: Closed
     }
   }
 
-  const rank: Pair["how"][] = ["gets", "conversion", "own", "written", "aggregate"];
+  const rank: Pair["how"][] = [...lowest(), "conversion", "own", "written", "aggregate"];
   const found = new Map<string, Pair>();
   const note = (pair: Pair) => {
     const key = `${pair.from} -> ${pair.to}`;
@@ -408,7 +442,7 @@ function mirMakes(texts: string[]): Map<string, Pair["how"]> {
     const local = line.match(/^\s+let (?:mut )?_(\d+): (.+);$/);
     if (local) locals.set(local[1]!, local[2]!);
   }
-  const rank: Pair["how"][] = ["gets", "conversion", "own", "aggregate"];
+  const rank: Pair["how"][] = [...lowest(), "conversion", "own", "aggregate"];
   const made = new Map<string, Pair["how"]>();
   const note = (name: string, how: Pair["how"]) => {
     const was = made.get(name);
@@ -422,6 +456,11 @@ function mirMakes(texts: string[]): Map<string, Pair["how"]> {
     }
     const call = line.match(/^\s+_(\d+) = (.+?) -> \[/);
     if (!call) continue;
+    // A call to one of a type's own functions, whatever it hands back (#374):
+    // `Parser::parse(...)`, `<Parser as Display>::fmt(...)`. `@builds` never
+    // meets one: `forWord` drops them, and `lowest` ranks them under `gets`.
+    const method = call[2]!.match(/^<(?:\w+::)*(\w+)(?:<.*?>)? as .*?>::\w+(?:::<.*?>)?\(|^(?:\w+::)*(\w+)(?:::<.*?>)?::\w+(?:::<.*?>)?\(/);
+    if (method) note((method[1] ?? method[2])!, "method");
     const type = locals.get(call[1]!);
     // A reference or a pointer handed back is somebody else's B, borrowed --
     // not one this routine created (#362: `build_ignore -> WalkBuilder`).
@@ -506,7 +545,7 @@ function typescriptPairs(ts: typeof import("typescript"), root: string, dirs: st
     return undefined;
   };
 
-  const rank: Pair["how"][] = ["gets", "ancestor", "literal", "new"];
+  const rank: Pair["how"][] = [...lowest(), "ancestor", "literal", "new"];
   /** Every class a class type derives from, at any depth, by the compiler's own base types. */
   const ancestorsOf = (type: import("typescript").Type, seen = new Set<import("typescript").Type>()): string[] => {
     if (!(type.flags & ts.TypeFlags.Object) || !((type as import("typescript").ObjectType).objectFlags & ts.ObjectFlags.ClassOrInterface)) {
@@ -550,6 +589,12 @@ function typescriptPairs(ts: typeof import("typescript"), root: string, dirs: st
             for (const name of namesOf(checker.getContextualType(child))) note(name, "literal");
           } else if (ts.isCallExpression(child)) {
             for (const name of namesOf(checker.getTypeAtLocation(child))) note(name, "gets");
+            // The class whose own method the call resolves to (#374), static or not.
+            const declaration = checker.getResolvedSignature(child)?.declaration;
+            if (declaration && ts.isMethodDeclaration(declaration) && ts.isClassDeclaration(declaration.parent)
+              && declaration.parent.name) {
+              note(declaration.parent.name.text, "method");
+            }
           }
           ts.forEachChild(child, inner);
         })(node);
@@ -565,7 +610,7 @@ function typescriptPairs(ts: typeof import("typescript"), root: string, dirs: st
   return pairs;
 }
 
-/** Every pair drawn as a `@builds` arrow and checked by the product. */
+/** Every pair drawn as a `@builds` (or, with `--word=calls`, `@calls`) arrow and checked by the product. */
 async function askChecker(
   project: string,
   root: string,
@@ -591,7 +636,7 @@ async function askChecker(
     const { board } = await createDiagram(emptyBoard(), {
       name: "b",
       nodes: [{ id: "a", label: "a", ref: pair.from }, { id: "b", label: "b", ref: pair.to }],
-      edges: [{ from: "a", to: "b", claim: "builds" }],
+      edges: [{ from: "a", to: "b", claim: word }],
     });
     let answer: string;
     try {
@@ -605,8 +650,10 @@ async function askChecker(
         : run(undefined);
       const red = report.edges.find((finding) => accusing.has(finding.kind));
       if (red) answer = `red ${red.kind}`;
-      else if (report.claims.buildsConfirmed > 0) answer = "green";
-      else answer = `quiet ${Object.keys(report.claims.buildsWithheld).join("+") || "-"}`;
+      else if ((word === "calls" ? report.claims.callsConfirmed : report.claims.buildsConfirmed) > 0) answer = "green";
+      else if (word === "calls") {
+        answer = `quiet ${[...Object.keys(report.claims.callsWithheld), ...Object.keys(report.claims.callsNotClosed)].join("+") || "-"}`;
+      } else answer = `quiet ${Object.keys(report.claims.buildsWithheld).join("+") || "-"}`;
     } catch (error) {
       answer = `throw ${(error as Error).message.slice(0, 40)}`;
     }
