@@ -128,3 +128,16 @@ npx tsx scripts/bench-planted-rejudge.mts --word=calls --why="the from end is a 
 `--why` narrows it to claims whose stored reason starts with that text. #346
 used exactly the line above: an `@calls` arrow out of a class had been called
 false outright, and is now read through the class's own routines.
+
+`--project` runs one project at a time. #374 re-asked every `@calls` and
+`@accesses` claim that way, project by project, because one language server
+dying (regex's, on `@builds`, on unchanged main too) ends the whole run:
+
+```
+npx tsx scripts/bench-planted-rejudge.mts --word=calls --project=anyhow --write
+```
+
+A class at the far end of `@calls` is now called when the tail creates one
+(`new B()`, `B()`, `B::new()`, `B { .. }`, a subclass) or calls anything it
+declares; a class at the tail of `@accesses` reads the member when one of its
+routines does. A getter or a `@property` read is not a call.

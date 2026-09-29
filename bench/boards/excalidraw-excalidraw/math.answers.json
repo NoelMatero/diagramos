@@ -17,7 +17,7 @@
       "language": "ts",
       "source": "drawn",
       "truth": "undecidable",
-      "why": "the ref could mean more than one declaration, and they differ"
+      "why": "a literal here is written against a type that could be it"
     },
     {
       "id": "needs|packages/math/src/point.ts#pointFrom|packages/math/src/types.ts#GlobalPoint|",

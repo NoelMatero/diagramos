@@ -462,8 +462,8 @@
       "language": "rust",
       "source": "swap",
       "parent": "builds|src/error.rs#construct_from_context|src/error.rs#ContextError|",
-      "truth": "undecidable",
-      "why": "the name appears without being called (passed as a value, or a path)"
+      "truth": "true",
+      "why": "it creates one here"
     },
     {
       "id": "builds|src/error.rs#ContextError|src/error.rs#construct_from_context|",
@@ -590,8 +590,8 @@
       "language": "rust",
       "source": "swap",
       "parent": "builds|src/error.rs#construct|src/error.rs#ErrorImpl|",
-      "truth": "undecidable",
-      "why": "the name appears without being called (passed as a value, or a path)"
+      "truth": "true",
+      "why": "it creates one here"
     },
     {
       "id": "builds|src/error.rs#ErrorImpl|src/error.rs#construct|",

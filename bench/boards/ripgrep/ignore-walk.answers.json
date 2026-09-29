@@ -283,8 +283,8 @@
       "toLabel": "Override matcher",
       "language": "rust",
       "source": "drawn",
-      "truth": "false",
-      "why": "the routine's calls were read and none is it"
+      "truth": "true",
+      "why": "it calls its routine is_empty"
     },
     {
       "id": "needs|crates/ignore/src/dir.rs#matched|crates/ignore/src/overrides.rs#Override|",
@@ -397,8 +397,8 @@
       "toLabel": "Types matcher",
       "language": "rust",
       "source": "drawn",
-      "truth": "false",
-      "why": "the routine's calls were read and none is it"
+      "truth": "true",
+      "why": "it calls its routine is_empty"
     },
     {
       "id": "needs|crates/ignore/src/dir.rs#matched|crates/ignore/src/types.rs#Types|",
@@ -447,8 +447,8 @@
       "toLabel": "Gitignore matcher",
       "language": "rust",
       "source": "drawn",
-      "truth": "false",
-      "why": "the routine's calls were read and none is it"
+      "truth": "true",
+      "why": "it calls its routine matched"
     },
     {
       "id": "needs|crates/ignore/src/dir.rs#matched_ignore|crates/ignore/src/gitignore.rs#Gitignore|",
@@ -523,7 +523,7 @@
       "source": "swap",
       "parent": "needs|crates/ignore/src/walk.rs#should_skip_entry|crates/ignore/src/dir.rs#IgnoreMatch|",
       "truth": "false",
-      "why": "the routine's calls were read and none is it"
+      "why": "it neither creates one nor calls any of its 4 members"
     },
     {
       "id": "needs|crates/ignore/src/dir.rs#IgnoreMatch|crates/ignore/src/walk.rs#should_skip_entry|",

@@ -130,8 +130,8 @@
       "toLabel": "DevEnvironment",
       "language": "ts",
       "source": "drawn",
-      "truth": "false",
-      "why": "the routine's calls were read and none is it"
+      "truth": "true",
+      "why": "it calls its routine transformRequest"
     },
     {
       "id": "accesses|packages/vite/src/node/server/middlewares/transform.ts#transformMiddleware|packages/vite/src/node/server/environment.ts#DevEnvironment|transformRequest",
@@ -171,7 +171,7 @@
       "source": "reverse",
       "parent": "accesses|packages/vite/src/node/server/middlewares/transform.ts#transformMiddleware|packages/vite/src/node/server/environment.ts#DevEnvironment|transformRequest",
       "truth": "false",
-      "why": "the from end is a type, and only something that runs reads a member"
+      "why": "the to end is a routine, and only a type declares members"
     },
     {
       "id": "accesses|packages/vite/src/node/server/middlewares/transform.ts#isServerAccessDeniedForTransform|packages/vite/src/node/server/environment.ts#DevEnvironment|transformRequest",
@@ -376,7 +376,7 @@
       "source": "retarget",
       "parent": "calls|packages/vite/src/node/server/transformRequest.ts#transformRequest|packages/vite/src/node/server/transformRequest.ts#doTransform|",
       "truth": "false",
-      "why": "the routine's calls were read and none is it"
+      "why": "it neither creates one nor calls any of its 1 members"
     },
     {
       "id": "calls|packages/vite/src/node/server/transformRequest.ts#transformRequest|packages/vite/src/node/server/transformRequest.ts#importedMod|",
@@ -401,7 +401,7 @@
       "language": "ts",
       "source": "drawn",
       "truth": "false",
-      "why": "the routine's calls were read and none is it"
+      "why": "it neither creates one nor calls any of its 12 members"
     },
     {
       "id": "needs|packages/vite/src/node/server/transformRequest.ts#doTransform|packages/vite/src/node/server/pluginContainer.ts#PluginContainer|",
@@ -577,8 +577,8 @@
       "language": "ts",
       "source": "retarget",
       "parent": "calls|packages/vite/src/node/server/middlewares/transform.ts#transformMiddleware|packages/vite/src/node/server/send.ts#send|",
-      "truth": "false",
-      "why": "the routine's calls were read and none is it"
+      "truth": "undecidable",
+      "why": "the tool could not say which map is called at one site"
     },
     {
       "id": "calls|packages/vite/src/node/server/middlewares/transform.ts#transformMiddleware|packages/vite/src/node/server/send.ts#hires|",

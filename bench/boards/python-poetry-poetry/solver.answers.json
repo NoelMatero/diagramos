@@ -272,8 +272,8 @@
       "toLabel": "PartialSolution",
       "language": "python",
       "source": "drawn",
-      "truth": "false",
-      "why": "the routine's calls were read and none is it"
+      "truth": "true",
+      "why": "it calls its routine derive"
     },
     {
       "id": "needs|src/poetry/mixology/version_solver.py#_propagate_incompatibility|src/poetry/mixology/partial_solution.py#PartialSolution|",
@@ -361,7 +361,7 @@
       "source": "swap",
       "parent": "needs|src/poetry/mixology/version_solver.py#_propagate_incompatibility|src/poetry/mixology/incompatibility.py#Incompatibility|",
       "truth": "false",
-      "why": "the routine's calls were read and none is it"
+      "why": "it neither creates one nor calls any of its 13 members"
     },
     {
       "id": "needs|src/poetry/mixology/incompatibility.py#Incompatibility|src/poetry/mixology/version_solver.py#_propagate_incompatibility|",
@@ -414,7 +414,7 @@
       "source": "reverse",
       "parent": "accesses|src/poetry/mixology/version_solver.py#_propagate_incompatibility|src/poetry/mixology/incompatibility.py#Incompatibility|terms",
       "truth": "false",
-      "why": "the from end is a type, and only something that runs reads a member"
+      "why": "the to end is a routine, and only a type declares members"
     },
     {
       "id": "accesses|src/poetry/mixology/version_solver.py#_propagate_incompatibility|src/poetry/mixology/incompatibility.py#__str__|terms",
@@ -439,8 +439,8 @@
       "toLabel": "DependencyCache",
       "language": "python",
       "source": "drawn",
-      "truth": "false",
-      "why": "the routine's calls were read and none is it"
+      "truth": "true",
+      "why": "it calls its routine search_for"
     },
     {
       "id": "calls|src/poetry/mixology/version_solver.py#_choose_package_version|src/poetry/mixology/partial_solution.py#PartialSolution|",
@@ -451,8 +451,8 @@
       "toLabel": "PartialSolution",
       "language": "python",
       "source": "drawn",
-      "truth": "false",
-      "why": "the routine's calls were read and none is it"
+      "truth": "true",
+      "why": "it calls its routine decide"
     },
     {
       "id": "needs|src/poetry/mixology/version_solver.py#_choose_package_version|src/poetry/mixology/partial_solution.py#PartialSolution|",
@@ -517,7 +517,7 @@
       "source": "reverse",
       "parent": "accesses|src/poetry/mixology/version_solver.py#_choose_package_version|src/poetry/mixology/partial_solution.py#PartialSolution|decide",
       "truth": "false",
-      "why": "the from end is a type, and only something that runs reads a member"
+      "why": "the to end is a routine, and only a type declares members"
     },
     {
       "id": "accesses|src/poetry/mixology/version_solver.py#_choose_package_version|src/poetry/mixology/partial_solution.py#unsatisfied|decide",

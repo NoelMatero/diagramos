@@ -169,8 +169,8 @@
       "language": "python",
       "source": "swap",
       "parent": "needs|src/flask/app.py#request_context|src/flask/ctx.py#AppContext|",
-      "truth": "undecidable",
-      "why": "the name appears without being called (passed as a value, or a path)"
+      "truth": "true",
+      "why": "it calls its routine from_environ"
     },
     {
       "id": "needs|src/flask/ctx.py#AppContext|src/flask/app.py#request_context|",

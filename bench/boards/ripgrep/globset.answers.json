@@ -131,7 +131,7 @@
       "source": "swap",
       "parent": "builds|crates/globset/src/glob.rs#Glob|crates/globset/src/glob.rs#GlobMatcher|",
       "truth": "false",
-      "why": "the from end is a type, and only something that runs reads a member"
+      "why": "the type declares no compile"
     },
     {
       "id": "builds|crates/globset/src/glob.rs#GlobMatcher|crates/globset/src/glob.rs#Glob|",
@@ -386,7 +386,7 @@
       "source": "swap",
       "parent": "builds|crates/globset/src/lib.rs#GlobSet|crates/globset/src/lib.rs#GlobSetMatchStrategy|",
       "truth": "false",
-      "why": "the from end is a type, and only something that runs reads a member"
+      "why": "the type declares no strats"
     },
     {
       "id": "builds|crates/globset/src/lib.rs#GlobSetMatchStrategy|crates/globset/src/lib.rs#GlobSet|",
@@ -438,7 +438,7 @@
       "language": "rust",
       "source": "drawn",
       "truth": "false",
-      "why": "the from end is a type, and only something that runs reads a member"
+      "why": "the type declares no Regex"
     },
     {
       "id": "holds|crates/globset/src/lib.rs#GlobSetMatchStrategy|crates/globset/src/lib.rs#RegexSetStrategy|",
@@ -515,7 +515,7 @@
       "language": "rust",
       "source": "drawn",
       "truth": "false",
-      "why": "the from end is a type, and only something that runs reads a member"
+      "why": "the type declares no Ext"
     },
     {
       "id": "holds|crates/globset/src/lib.rs#GlobSetMatchStrategy|crates/globset/src/lib.rs#ExtensionStrategy|",
@@ -592,7 +592,7 @@
       "language": "rust",
       "source": "drawn",
       "truth": "false",
-      "why": "the from end is a type, and only something that runs reads a member"
+      "why": "the type declares no Prefix"
     },
     {
       "id": "holds|crates/globset/src/lib.rs#GlobSetMatchStrategy|crates/globset/src/lib.rs#PrefixStrategy|",

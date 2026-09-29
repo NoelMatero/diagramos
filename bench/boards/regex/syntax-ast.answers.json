@@ -101,8 +101,8 @@
       "language": "rust",
       "source": "swap",
       "parent": "builds|regex-syntax/src/ast/parse.rs#parse_primitive|regex-syntax/src/ast/parse.rs#Primitive|",
-      "truth": "undecidable",
-      "why": "the name appears without being called (passed as a value, or a path)"
+      "truth": "true",
+      "why": "it creates one here"
     },
     {
       "id": "builds|regex-syntax/src/ast/parse.rs#Primitive|regex-syntax/src/ast/parse.rs#parse_primitive|",

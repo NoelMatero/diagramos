@@ -28,8 +28,8 @@
       "toLabel": "Strategy Selector",
       "language": "rust",
       "source": "drawn",
-      "truth": "undecidable",
-      "why": "the name appears without being called (passed as a value, or a path)"
+      "truth": "true",
+      "why": "its routine search_path calls it"
     },
     {
       "id": "builds|crates/searcher/src/searcher/mod.rs#Searcher|crates/searcher/src/searcher/glue.rs#ReadByLine|",
@@ -343,8 +343,8 @@
       "language": "rust",
       "source": "swap",
       "parent": "builds|crates/searcher/src/searcher/core.rs#Core|crates/searcher/src/sink.rs#SinkMatch|",
-      "truth": "undecidable",
-      "why": "its routine sink_matched: the name appears without being called (passed as a value, or a path)"
+      "truth": "true",
+      "why": "its routine sink_matched calls it"
     },
     {
       "id": "builds|crates/searcher/src/sink.rs#SinkMatch|crates/searcher/src/searcher/core.rs#Core|",

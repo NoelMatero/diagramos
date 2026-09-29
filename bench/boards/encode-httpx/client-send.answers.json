@@ -42,7 +42,7 @@
       "source": "swap",
       "parent": "needs|httpx/_client.py#send|httpx/_models.py#Request|",
       "truth": "false",
-      "why": "the routine's calls were read and none is it"
+      "why": "it neither creates one nor calls any of its 8 members"
     },
     {
       "id": "needs|httpx/_models.py#Request|httpx/_client.py#send|",
@@ -259,7 +259,7 @@
       "source": "retarget",
       "parent": "calls|httpx/_client.py#_build_request_auth|httpx/_auth.py#Auth|",
       "truth": "false",
-      "why": "the routine's calls were read and none is it"
+      "why": "it neither creates one nor calls any of its 5 members"
     },
     {
       "id": "calls|httpx/_client.py#_build_request_auth|httpx/_auth.py#password|",
@@ -295,8 +295,8 @@
       "toLabel": "Auth",
       "language": "python",
       "source": "drawn",
-      "truth": "false",
-      "why": "the routine's calls were read and none is it"
+      "truth": "true",
+      "why": "it calls its routine sync_auth_flow"
     },
     {
       "id": "needs|httpx/_client.py#_send_handling_auth|httpx/_auth.py#Auth|",
@@ -370,8 +370,8 @@
       "toState": "external",
       "language": "python",
       "source": "drawn",
-      "truth": "false",
-      "why": "the routine's calls were read and none is it"
+      "truth": "undecidable",
+      "why": "the ref could mean more than one declaration, and they differ"
     },
     {
       "id": "needs|httpx/_client.py#_send_single_request|httpx/_transports/base.py#BaseTransport|",
@@ -720,8 +720,8 @@
       "language": "python",
       "source": "swap",
       "parent": "needs|httpx/_client.py#_send_handling_redirects|httpx/_models.py#Response|",
-      "truth": "false",
-      "why": "the routine's calls were read and none is it"
+      "truth": "true",
+      "why": "it calls its routine read"
     },
     {
       "id": "needs|httpx/_models.py#Response|httpx/_client.py#_send_handling_redirects|",

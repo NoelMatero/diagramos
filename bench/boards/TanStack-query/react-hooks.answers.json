@@ -28,8 +28,8 @@
       "toLabel": "useBaseQuery",
       "language": "ts",
       "source": "drawn",
-      "truth": "false",
-      "why": "the routine's calls were read and none is it"
+      "truth": "true",
+      "why": "the tool's call hierarchy lists it"
     },
     {
       "id": "needs|packages/react-query/src/useQuery.ts#useQuery|packages/react-query/src/useBaseQuery.ts#useBaseQuery|",

@@ -257,8 +257,8 @@
       "language": "rust",
       "source": "swap",
       "parent": "builds|src/fmt.rs#debug|src/fmt.rs#Indented|",
-      "truth": "undecidable",
-      "why": "the name appears without being called (passed as a value, or a path)"
+      "truth": "true",
+      "why": "it creates one here"
     },
     {
       "id": "builds|src/fmt.rs#Indented|src/fmt.rs#debug|",

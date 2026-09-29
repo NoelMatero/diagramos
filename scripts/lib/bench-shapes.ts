@@ -367,6 +367,68 @@ function tsFunctionOf(node: ts.Node): ts.SignatureDeclaration | undefined {
   return undefined;
 }
 
+/**
+ * A TypeScript overload signature: a function or method written with no body,
+ * which only the declaration after it implements. `abstract` and `declare`
+ * have no body either and are not overloads -- nothing else carries their code.
+ */
+export function tsIsOverload(sym: Sym): boolean {
+  const node = tsNodeAt(sym);
+  if (!node || !(ts.isFunctionDeclaration(node) || ts.isMethodDeclaration(node)) || node.body) return false;
+  return !(ts.getCombinedModifierFlags(node) & (ts.ModifierFlags.Abstract | ts.ModifierFlags.Ambient));
+}
+
+/**
+ * Whether a routine runs when its member is *read*: a TypeScript `get` or
+ * `set`, a Python `@property` or one of its setters, a `cached_property`.
+ * A call hierarchy lists `wrapper.id` as a call to the getter, and nobody
+ * drawing "calls" means a read.
+ */
+export function isAccessor(language: Language, sym: Sym): boolean {
+  if (language === "ts") {
+    const node = tsNodeAt(sym);
+    return !!node && (ts.isGetAccessorDeclaration(node) || ts.isSetAccessorDeclaration(node));
+  }
+  if (language !== "python") return false;
+  const text = sourceOf(sym.file);
+  const def = text.lastIndexOf("def", sym.nameStart);
+  if (def < 0) return false;
+  const lines = text.slice(0, text.lastIndexOf("\n", def) + 1).split("\n").reverse().slice(1);
+  for (const line of lines) {
+    const trimmed = line.trim();
+    if (!trimmed.startsWith("@")) break;
+    if (/^@(?:[\w.]+\.)?(?:property|cached_property|setter|getter|deleter)\b/.test(trimmed)) return true;
+  }
+  return false;
+}
+
+/** Whether a TypeScript type is an interface or a type alias: a shape an object literal can be. */
+export function tsIsShape(sym: Sym): boolean {
+  const node = tsNodeAt(sym);
+  return !!node && (ts.isInterfaceDeclaration(node) || ts.isTypeAliasDeclaration(node));
+}
+
+/**
+ * Whether a literal that could be a value of `made` is written anywhere inside
+ * a declaration: an object literal (`{ id, x: 0 }`) for an interface or a type
+ * alias, and an array literal (`[x, y] as Point`) for an alias, which may be a
+ * tuple.
+ */
+export function tsWritesLiteralOf(sym: Sym, made: Sym): boolean {
+  const node = tsNodeAt(sym);
+  const target = tsNodeAt(made);
+  if (!node || !target) return false;
+  const tuple = ts.isTypeAliasDeclaration(target);
+  let found = false;
+  const visit = (at: ts.Node) => {
+    if (found) return;
+    if (ts.isObjectLiteralExpression(at) || (tuple && ts.isArrayLiteralExpression(at))) { found = true; return; }
+    ts.forEachChild(at, visit);
+  };
+  ts.forEachChild(node, visit);
+  return found;
+}
+
 function tsSignature(sym: Sym): Signature | undefined {
   const node = tsNodeAt(sym);
   const fn = node && tsFunctionOf(node);

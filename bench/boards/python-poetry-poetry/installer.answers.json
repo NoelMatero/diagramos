@@ -17,7 +17,7 @@
       "language": "python",
       "source": "drawn",
       "truth": "true",
-      "why": "its routine _do_install calls it"
+      "why": "its routine _do_refresh calls it"
     },
     {
       "id": "needs|src/poetry/installation/installer.py#Installer|src/poetry/puzzle/transaction.py#Transaction|",
@@ -93,8 +93,8 @@
       "language": "python",
       "source": "swap",
       "parent": "builds|src/poetry/installation/installer.py#Installer|src/poetry/puzzle/transaction.py#Transaction|",
-      "truth": "false",
-      "why": "the from end is a type, and only something that runs reads a member"
+      "truth": "true",
+      "why": "its routine _do_install reads it"
     },
     {
       "id": "builds|src/poetry/puzzle/transaction.py#Transaction|src/poetry/installation/installer.py#Installer|",
@@ -221,8 +221,8 @@
       "language": "python",
       "source": "swap",
       "parent": "builds|src/poetry/installation/installer.py#Installer|src/poetry/installation/executor.py#Executor|",
-      "truth": "false",
-      "why": "the from end is a type, and only something that runs reads a member"
+      "truth": "true",
+      "why": "its routine _execute reads it"
     },
     {
       "id": "builds|src/poetry/installation/executor.py#Executor|src/poetry/installation/installer.py#Installer|",
@@ -589,8 +589,8 @@
       "language": "python",
       "source": "swap",
       "parent": "builds|src/poetry/installation/executor.py#Executor|src/poetry/installation/chef.py#Chef|",
-      "truth": "false",
-      "why": "the from end is a type, and only something that runs reads a member"
+      "truth": "true",
+      "why": "its routine _prepare_archive reads it"
     },
     {
       "id": "builds|src/poetry/installation/chef.py#Chef|src/poetry/installation/executor.py#Executor|",
@@ -717,8 +717,8 @@
       "language": "python",
       "source": "swap",
       "parent": "builds|src/poetry/installation/executor.py#Executor|src/poetry/installation/chooser.py#Chooser|",
-      "truth": "false",
-      "why": "the from end is a type, and only something that runs reads a member"
+      "truth": "true",
+      "why": "its routine _download reads it"
     },
     {
       "id": "builds|src/poetry/installation/chooser.py#Chooser|src/poetry/installation/executor.py#Executor|",
@@ -795,7 +795,7 @@
       "source": "swap",
       "parent": "builds|src/poetry/installation/executor.py#Executor|src/poetry/utils/download.py#Downloader|",
       "truth": "false",
-      "why": "the from end is a type, and only something that runs reads a member"
+      "why": "the type declares no downloads"
     },
     {
       "id": "builds|src/poetry/utils/download.py#Downloader|src/poetry/installation/executor.py#Executor|",

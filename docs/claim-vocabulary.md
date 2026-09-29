@@ -793,6 +793,38 @@ On the new key, 808 mistakes and 453 true claims:
 **#351's column** is `@calls` asking "go to definition" at a call's own name
 instead of the receiver's type, item 48. Both arms ran on `4efa334`.
 
+**From #374 the counts are out of 772 mistakes and 492 true claims.** The key
+now reads a class at either end the way #374 decided. "A calls \<class B\>"
+is true when A creates a B (`new B()`, `B()`, `B::new()`, `B { .. }`, a
+subclass of B) or calls anything B declares, and false when it does neither;
+a getter or `@property` read is not a call. "\<class A\> accesses B.m" is
+true when one of A's routines reads it. Both stay undecidable where a base,
+an interface, a trait or an unplaced call could hide the answer. Two of the
+four key errors #366 listed went with it: `useQuery`'s overload signatures
+were read instead of its body, and a TypeScript interface or alias built as a
+literal (excalidraw's `_newElementBase`) was called never built -- the
+TypeScript checker now says whether a literal is written against a type that
+could be it. The other two were not errors: `#dispatch -> Action` and
+`Headers -> HeaderTypes` are `@takes` arrows drawn function-first, and
+`@takes` runs from the type to the function.
+
+54 stored claims moved, and nothing else: 39 became true (21 of them were
+false), and 15 went from false to undecidable (9 `@calls`, 3 `@builds`, 3
+`@accesses`). On main `b1301c4`, with the checker unchanged and those 54
+re-asked:
+
+| | old key | #374 key |
+|---|---:|---:|
+| mistakes called wrong | 610 of 808 (75%) | 609 of 772 (79%) |
+| greens on a false claim | 5 | **0** |
+| true claims called wrong | 0 of 453 | **2 of 492** |
+
+All five greens were the checker right and the key wrong. The two reds are
+the other way round: anyhow's `construct` writes `ErrorImpl { .. }`, so
+"construct calls ErrorImpl" is true, and the checker says every call it makes
+misses ErrorImpl -- because a struct literal is not a call. That is the
+checker half of #374, not a key error.
+
 **#345's column** is one change measured against the same day's main,
 `5101697`, which caught 493: +15, and every one is a Rust `@conforms` with a
 struct or an enum at the head. None of them is a planted *wrong-kind* mistake

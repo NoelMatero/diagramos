@@ -232,8 +232,8 @@
       "toLabel": "SSRCompatModuleRunner",
       "language": "ts",
       "source": "drawn",
-      "truth": "false",
-      "why": "the routine's calls were read and none is it"
+      "truth": "undecidable",
+      "why": "it inherits from ModuleRunner, whose routines run as it and are written elsewhere"
     },
     {
       "id": "calls|packages/vite/src/node/ssr/ssrModuleLoader.ts#SSRCompatModuleRunner|packages/vite/src/node/ssr/fetchModule.ts#fetchModule|",
@@ -280,8 +280,8 @@
       "toLabel": "SSRCompatModuleRunner",
       "language": "ts",
       "source": "drawn",
-      "truth": "false",
-      "why": "the routine's calls were read and none is it"
+      "truth": "undecidable",
+      "why": "it inherits from ModuleRunner, whose routines run as it and are written elsewhere"
     }
   ]
 }

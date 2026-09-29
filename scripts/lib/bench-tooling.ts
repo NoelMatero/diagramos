@@ -54,6 +54,11 @@ export interface Tooling {
   implementations(sym: Sym): Promise<Loc[] | undefined>;
   /** Resolved files for each import statement; `undefined` entries did not resolve. */
   importsOf(file: string): Promise<Array<{ text: string; file: string | undefined; mod?: boolean }> | undefined>;
+  /**
+   * TypeScript only: whether a literal written inside `maker` could be a value
+   * of the type `made` -- `undefined` when the checker could not be asked.
+   */
+  literalMayBe?(maker: Sym, made: Sym): boolean | undefined;
   /** The tool's name and version, for the answer key's header. */
   version(): string;
   close(): void;
@@ -595,12 +600,86 @@ function tsTooling(root: string): Tooling {
     return out;
   }
 
+  /** The declaration a symbol names, found by where its name starts. */
+  function declarationAt(source: ts.SourceFile, sym: Sym): ts.Node | undefined {
+    let found: ts.Node | undefined;
+    const visit = (node: ts.Node) => {
+      if (found) return;
+      const name = (node as ts.NamedDeclaration).name;
+      if ((name && name.getStart(source) === sym.nameStart)
+        || (ts.isConstructorDeclaration(node) && node.getStart(source) <= sym.nameStart && sym.nameStart < node.getEnd())) {
+        found = node;
+        return;
+      }
+      ts.forEachChild(node, visit);
+    };
+    visit(source);
+    return found;
+  }
+
+  /*
+   * An interface or a type alias is made by writing a literal, and nothing
+   * names it there (#366): excalidraw's `_newElementBase` writes its element
+   * as `{ id, type, x, ... }` against `Merge<ExcalidrawGenericElement, ...>`.
+   * So each object or array literal is asked what type it is written against
+   * -- an `as` or `satisfies` around it, else its contextual type, else its
+   * own -- and that type could be one when either is assignable to the other,
+   * union member by union member, or when it is built from the type or one
+   * of its members (`Merge<ExcalidrawGenericElement, ...>`). A type parameter
+   * could be anything its constraint allows, and `any` could be anything.
+   */
+  function literalMayBe(maker: Sym, made: Sym): boolean | undefined {
+    const prog = program(maker.file);
+    const checker = prog?.getTypeChecker();
+    const source = prog?.getSourceFile(maker.file);
+    const madeSource = prog?.getSourceFile(made.file);
+    if (!checker || !source || !madeSource) return undefined;
+    const body = declarationAt(source, maker);
+    const madeNode = declarationAt(madeSource, made) as ts.NamedDeclaration | undefined;
+    const madeSymbol = madeNode?.name && checker.getSymbolAtLocation(madeNode.name);
+    if (!body || !madeSymbol) return undefined;
+    const madeType = checker.getDeclaredTypeOfSymbol(madeSymbol);
+    const members = (t: ts.Type): ts.Type[] => (t.isUnion() ? t.types : [t]);
+    const madeNames = new Set<ts.Symbol | undefined>([madeSymbol,
+      ...members(madeType).map((m) => m.aliasSymbol ?? m.symbol)]);
+    madeNames.delete(undefined);
+    const names = (t: ts.Type) => madeNames.has(t.aliasSymbol) || madeNames.has(t.symbol);
+    const related = (t: ts.Type, depth: number): boolean => {
+      if (depth > 3) return false;
+      if (t.flags & (ts.TypeFlags.Any | ts.TypeFlags.Unknown)) return true;
+      if (t.flags & (ts.TypeFlags.TypeParameter | ts.TypeFlags.IndexedAccess | ts.TypeFlags.Conditional)) {
+        const constraint = checker.getBaseConstraintOfType(t);
+        return !constraint || constraint === t || related(constraint, depth + 1);
+      }
+      if (t.isUnionOrIntersection()) return t.types.some((one) => related(one, depth + 1));
+      if (names(t) || (t.aliasTypeArguments ?? []).some(names)) return true;
+      return members(madeType).some((m) => checker.isTypeAssignableTo(t, m) || checker.isTypeAssignableTo(m, t));
+    };
+    let may = false;
+    const visit = (node: ts.Node) => {
+      if (may) return;
+      if (ts.isObjectLiteralExpression(node) || ts.isArrayLiteralExpression(node)) {
+        let outer: ts.Node = node;
+        while (ts.isParenthesizedExpression(outer.parent) || ts.isAsExpression(outer.parent)
+          || ts.isSatisfiesExpression(outer.parent) || ts.isTypeAssertionExpression(outer.parent)) outer = outer.parent;
+        const against = outer !== node
+          ? checker.getTypeAtLocation(outer)
+          : checker.getContextualType(node as ts.Expression) ?? checker.getTypeAtLocation(node);
+        if (related(against, 0)) { may = true; return; }
+      }
+      ts.forEachChild(node, visit);
+    };
+    ts.forEachChild(body, visit);
+    return may;
+  }
+
   return {
     language: "ts",
     root,
     symbols,
     definition,
     outgoingCalls,
+    literalMayBe,
     implementations: async () => undefined,
     importsOf,
     version: () => `typescript ${ts.version}`,
