@@ -196,3 +196,26 @@ export function declaredIn(
     at: [...new Set(shapes.map((shape) => source.slice(0, shape.nameNode.startIndex).split("\n").length))].map((line) => ({ file, line })),
   };
 }
+
+/**
+ * "Can this be used where the head is wanted?" -- `fitsAt` at each place,
+ * against every declaration of the head. Yes anywhere is a yes; no needs a
+ * no for every pair.
+ */
+export function askFits(
+  referee: ClosedBodyReferee,
+  places: AskedAt[],
+  head: { name: string; at: DeclaredAt[] },
+): CompilerSaid {
+  if (!referee.fitsAt || places.length === 0 || head.at.length === 0) return { does: undefined };
+  let unsure = false;
+  for (const place of places) {
+    for (const at of head.at) {
+      const fits = referee.fitsAt(place.file, place.at, at);
+      if (fits === true) return { does: true, said: `\`${place.name}\` can be used wherever a \`${head.name}\` is wanted` };
+      if (fits === undefined) unsure = true;
+    }
+  }
+  if (unsure) return { does: undefined, said: `the compiler could not say whether \`${places[0]!.name}\` fits` };
+  return { does: false, said: `\`${places[0]!.name}\` cannot be used where a \`${head.name}\` is wanted` };
+}

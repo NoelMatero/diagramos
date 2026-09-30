@@ -46,7 +46,7 @@ import { connects, refIsStale, type CodeGraphOption } from "./codegraph";
 import { readDependencies, readerCanPlace } from "./deps";
 import type { BindingFault } from "./damage";
 import type { DeclaredAt, ImportTarget, MemberTarget, TypeParts } from "./compiler-questions";
-import { askTypeParts, declaredIn, gateRed, WRITTEN, type GateWithdrawn, type RedRests } from "./gate";
+import { askFits, askTypeParts, declaredIn, gateRed, WRITTEN, type GateWithdrawn, type RedRests } from "./gate";
 import { generatedRef, NEVER_WALK } from "./generated";
 import { readGraph, type Provenance, type RecoveredGraph, type RecoveredNode } from "./graph";
 import { licenceFor, mayAccuse } from "./licence";
@@ -5001,7 +5001,15 @@ export function checkDrift(
                     + `${oneLine(fromNode.label) || fromPath} instead — the arrow is the right `
                     + "fact drawn backwards, so turn it round."
                   : "Either the arrow points at the wrong type, or the declaration changed."),
-            }, rests: WRITTEN /* GATE-TODO */ });
+            }, rests: {
+              written: verdict.written,
+              unwritten: `a class that writes no base list, which may still fit \`${oneLine(toNode.label) || toPath}\` without saying so`,
+              ask: (referee) => askFits(
+                referee,
+                verdict.sites.map((one) => ({ file: fromPath, name: one.name, at: one })),
+                declaredIn(workspace.read(toFile), toLanguage ?? language, toPath, toEnd.symbols[0]!),
+              ),
+            } });
             continue;
           }
         }
