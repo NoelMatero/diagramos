@@ -1,0 +1,25 @@
+export const fixture = {
+  name: "mono",
+  files: {
+    "package.json": '{ "name": "root", "private": true, "workspaces": ["packages/*"] }\n',
+    "tsconfig.json": '{ "compilerOptions": { "strict": true, "target": "es2022", "module": "nodenext", "moduleResolution": "nodenext", "baseUrl": ".", "paths": { "@acme/util": ["packages/util/src/index.ts"] } } }\n',
+    "packages/core/package.json": '{ "name": "@acme/core", "type": "module", "exports": { ".": "./src/index.ts", "./money": "./src/money.ts" } }\n',
+    "packages/core/src/index.ts": 'export { double } from "./math.js";\n',
+    "packages/core/src/math.ts": "export function double(x: number): number {\n  return x * 2;\n}\n",
+    "packages/core/src/money.ts": "export class Money {}\n",
+    "packages/util/package.json": '{ "name": "@acme/util", "type": "module" }\n',
+    "packages/util/src/index.ts": "export function triple(x: number): number {\n  return x * 3;\n}\n",
+    "packages/app/package.json": '{ "name": "@acme/app", "type": "module", "dependencies": { "@acme/core": "*" } }\n',
+    "packages/app/src/main.ts": 'import { double } from "@acme/core";\nimport { Money } from "@acme/core/money";\nimport { triple } from "@acme/util";\n\nexport function run(): number {\n  return double(1) + triple(1);\n}\n\nexport function make(): Money {\n  return new Money();\n}\n',
+    "node_modules/.keep": "",
+  },
+  arrows: [
+    ["workspace pkg by name -> its index (@needs)", "packages/app/src/main.ts", "packages/core/src/index.ts", "needs"],
+    ["workspace pkg by name -> defining file (@depends)", "packages/app/src/main.ts", "packages/core/src/math.ts", "depends"],
+    ["workspace subpath export (@needs)", "packages/app/src/main.ts", "packages/core/src/money.ts", "needs"],
+    ["tsconfig paths to another package (@needs)", "packages/app/src/main.ts", "packages/util/src/index.ts", "needs"],
+    ["workspace pkg call (@calls)", "packages/app/src/main.ts#run", "packages/core/src/math.ts#double", "calls"],
+    ["tsconfig-paths pkg call (@calls)", "packages/app/src/main.ts#run", "packages/util/src/index.ts#triple", "calls"],
+    ["workspace subpath builds (@builds)", "packages/app/src/main.ts#make", "packages/core/src/money.ts#Money", "builds"],
+  ],
+};

@@ -1,0 +1,27 @@
+export const fixture = {
+  name: "accesses-all",
+  files: {
+    "tsconfig.json": '{ "compilerOptions": { "strict": true, "target": "es2022" } }\n',
+    "c.ts": "export interface Config {\n  width: number;\n  height: number;\n}\n",
+    "r.ts": 'import type { Config } from "./c";\n\nexport function json(c: Config): string {\n  return JSON.stringify(c);\n}\n\nexport function keys(c: Config): number {\n  let n = 0;\n  for (const k in c) n += (c as any)[k];\n  return n;\n}\n\nexport function entries(c: Config): number {\n  return Object.values(c).reduce((a, b) => a + b, 0);\n}\n\nexport function copy(c: Config): Config {\n  return Object.assign({}, c);\n}\n',
+    "c.py": "from dataclasses import dataclass\n\n\n@dataclass\nclass Config:\n    width: int\n    height: int\n",
+    "r.py": "from dataclasses import asdict, astuple\nfrom c import Config\n\n\ndef as_dict(c: Config):\n    return asdict(c)\n\n\ndef as_tuple(c: Config):\n    w, h = astuple(c)\n    return w\n\n\ndef compare(a: Config, b: Config):\n    return a == b\n",
+    "Cargo.toml": '[package]\nname = "probe"\nversion = "0.1.0"\nedition = "2021"\n',
+    "src/lib.rs": "pub mod c;\npub mod r;\n",
+    "src/c.rs": "#[derive(Debug, Clone, PartialEq, Hash)]\npub struct Config {\n    pub width: u32,\n    pub height: u32,\n}\n",
+    "src/r.rs": "use crate::c::Config;\n\npub fn debug(c: &Config) -> String {\n    format!(\"{:?}\", c)\n}\n\npub fn cloned(c: &Config) -> Config {\n    c.clone()\n}\n\npub fn equal(a: &Config, b: &Config) -> bool {\n    a == b\n}\n\npub fn moved(c: Config) -> (u32, u32) {\n    let Config { width, height } = c;\n    (width, height)\n}\n",
+  },
+  arrows: [
+    ["TS JSON.stringify reads every field", "r.ts#json", "c.ts#Config", "accesses", "width"],
+    ["TS for..in over fields", "r.ts#keys", "c.ts#Config", "accesses", "width"],
+    ["TS Object.values", "r.ts#entries", "c.ts#Config", "accesses", "height"],
+    ["TS Object.assign copy", "r.ts#copy", "c.ts#Config", "accesses", "width"],
+    ["Py asdict", "r.py#as_dict", "c.py#Config", "accesses", "width"],
+    ["Py astuple", "r.py#as_tuple", "c.py#Config", "accesses", "width"],
+    ["Py dataclass __eq__ reads fields", "r.py#compare", "c.py#Config", "accesses", "width"],
+    ["Rs derived Debug {:?}", "src/r.rs#debug", "src/c.rs#Config", "accesses", "width"],
+    ["Rs derived Clone", "src/r.rs#cloned", "src/c.rs#Config", "accesses", "width"],
+    ["Rs derived PartialEq ==", "src/r.rs#equal", "src/c.rs#Config", "accesses", "height"],
+    ["Rs full destructure", "src/r.rs#moved", "src/c.rs#Config", "accesses", "height"],
+  ],
+};
