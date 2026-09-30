@@ -87,6 +87,20 @@ export function createClosedBodyReferee(root: string): ClosedBodyReferee | undef
       if (languageOf(file) === "python" || languageOf(file) === "rust") return undefined;
       return ancestorsInTree(ts.ancestorsAt(path.resolve(root, file), at.start, at.end), root);
     },
+    ...tsQuestions(ts, root),
+  };
+}
+
+/**
+ * #393's four questions, asked of an in-process TypeScript compiler. Shared by
+ * `createClosedBodyReferee` and `scripts/check-drift.mjs`, which holds its own
+ * compiler; each answers `undefined` for a Python or Rust file.
+ */
+export function tsQuestions(
+  ts: NonNullable<ReturnType<typeof createTsReferee>>,
+  root: string,
+): Pick<ClosedBodyReferee, "typePartsAt" | "fitsAt" | "importTargetAt" | "memberAt"> {
+  return {
     typePartsAt: (file, at) => {
       if (languageOf(file) === "python" || languageOf(file) === "rust") return undefined;
       const found = ts.typePartsAt(path.resolve(root, file), at.start, at.end);

@@ -133,6 +133,14 @@ function withheldReasons(report: ReturnType<typeof checkDrift>): string[] {
     .sort();
 }
 
+/**
+ * How long the last arrow's check took, and what the gate did with its red
+ * (#393): printed on `--details` lines so a run can be read for the cost of
+ * a check and for every catch the gate gave up, with the answer that gave it
+ * up.
+ */
+let lastAsked: { ms: number; gate: string } = { ms: 0, gate: "" };
+
 /** What the checker said about one arrow, run on a board of its own. */
 async function ask(key: Key, claim: KeyClaim): Promise<{ outcome: Outcome; detail: string; reason: string }> {
   const cache = cacheFor(key.project);
@@ -147,6 +155,7 @@ async function ask(key: Key, claim: KeyClaim): Promise<{ outcome: Outcome; detai
    * Until #337 it was still the weaker check for Python and Rust, which is
    * two thirds of the corpus.
    */
+  const began = performance.now();
   const { report } = await refereedCheckLive(
     path.join(CORPUS, key.project),
     (referee) => checkDrift(board, workspace, {
@@ -154,6 +163,11 @@ async function ask(key: Key, claim: KeyClaim): Promise<{ outcome: Outcome; detai
     }),
     { budgetMs: BENCH_BUDGET_MS, pool: poolFor(key.project) },
   );
+  const gated = (report as { gated?: Array<{ kind: string; outcome: string; said?: string }> }).gated ?? [];
+  lastAsked = {
+    ms: performance.now() - began,
+    gate: gated.map((one) => `${one.kind} ${one.outcome}${one.said ? `: ${one.said.replace(/\s+/g, " ")}` : ""}`).join("; "),
+  };
   // The engine quotes the declaration it read, and a Python class runs to
   // thousands of characters. What a reader of this table needs is which
   // verdict it was and the first line of why.
@@ -311,7 +325,8 @@ for (const key of loaded) {
       }
     }
     if (details) console.log(`    ${outcome.padEnd(9)} ${claim.truth.padEnd(6)} ${claim.source.padEnd(10)} `
-      + `${claim.language.padEnd(6)} [${reason}] @${claim.word} ${claim.from} -> ${claim.to} | ${detail}`);
+      + `${claim.language.padEnd(6)} [${reason}] @${claim.word} ${claim.from} -> ${claim.to} | ${detail}`
+      + ` | ${lastAsked.ms.toFixed(0)}ms | gate: ${lastAsked.gate || "-"}`);
   }
 }
 

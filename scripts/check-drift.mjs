@@ -73,7 +73,7 @@ import { goodNewsIds, goodNewsLine, goodNewsSince, novelGoodNews } from "../src/
 import { createTsReferee, isOutsideTree, receiverResolutionFrom } from "./lib/resolution-ts.ts";
 import { resolvePythonReceivers } from "../src/engine/referee-python.ts";
 import { resolveRustReceivers } from "../src/engine/referee-rust.ts";
-import { ancestorsInTree } from "../src/engine/referee.ts";
+import { ancestorsInTree, tsQuestions } from "../src/engine/referee.ts";
 import { refereePool, resolvePythonDefinitions, resolvePythonKinds, resolveRustDefinitions } from "../src/engine/referee-pool.ts";
 import { languageOf } from "../src/engine/parse.ts";
 
@@ -1783,6 +1783,13 @@ const closedBodyReferee = (tsReferee || pythonCache || rustCache) ? {
     if (languageOf(file) === "python" || languageOf(file) === "rust" || !tsReferee) return undefined;
     return ancestorsInTree(tsReferee.ancestorsAt(path.resolve(root, file), at.start, at.end), root);
   },
+  /*
+   * The questions a red is put to before it is shown (#393), TypeScript's in
+   * process. Python's and Rust's are not harvested here: a red of theirs
+   * resting on what the code does not write is withheld rather than asked,
+   * which `refereedCheckLive` -- the MCP server's check -- does ask.
+   */
+  ...(tsReferee ? tsQuestions(tsReferee, root) : {}),
 } : undefined;
 
 /*
