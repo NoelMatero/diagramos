@@ -86,6 +86,25 @@ describe("Rust, a field whose type is a type parameter (#380)", () => {
   }, 180_000);
 });
 
+describe("a repository with Python and Rust at the same root", () => {
+  it.skipIf(!hasRustAnalyzer)("asks rust-analyzer the Rust question, not pyright", async () => {
+    repo = scratchRepo({
+      ...RUST,
+      "src/car.rs": "use crate::parts::{Engine, Seat};\n\npub struct Gen<S: Seat> {\n    seat: S,\n    engine: Engine,\n}\n",
+      "engine.py": "class Engine:\n    pass\n",
+      "car.py": "from engine import Engine\n\n\nclass Car:\n    def __init__(self):\n        self.engine = Engine()\n",
+    });
+    const { each } = await verdicts(repo, [
+      ["car.py#Car", "engine.py#Engine", "holds"],
+      ["src/car.rs#Gen", "src/parts.rs#Seat", "holds"],
+    ]);
+    expect(each).toEqual([
+      { reds: [], unconfirmed: "compiler-says-it-does" },
+      { reds: [], unconfirmed: "compiler-says-it-does" },
+    ]);
+  }, 240_000);
+});
+
 const PY_ENGINE = "class Engine:\n    pass\n\n\nclass Motor:\n    pass\n";
 
 describe("Python, a field with no written type", () => {

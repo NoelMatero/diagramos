@@ -253,7 +253,7 @@ export async function resolveRustReceivers(
     // #237's settled distribution decision: silence, not a fetcher. Every
     // query here stays unresolved, costing nothing beyond what
     // `measure:closed-bodies` already withheld for Rust.
-    const referee = await mine.get(crate, () => createRustAnalyzerReferee(crate));
+    const referee = await mine.get(`rust:${crate}`, () => createRustAnalyzerReferee(crate));
     if (!referee) continue;
     started = true;
     // Asking before rust-analyzer says it has finished indexing is what made

@@ -184,7 +184,7 @@ export async function resolveRustDefinitions(
   for (const [crate, crateQueries] of byCrate) {
     // #237's settled distribution decision: a server that will not start is
     // silence, not a fetcher and not a retry.
-    const referee = await mine.get(crate, () => createRustAnalyzerReferee(crate));
+    const referee = await mine.get(`rust:${crate}`, () => createRustAnalyzerReferee(crate));
     if (!referee) continue;
     started = true;
     // Asking before rust-analyzer says it has finished indexing is what made
@@ -221,7 +221,7 @@ export async function resolvePythonDefinitions(
   // Nothing reachable -- no network the first time `npx` needs pyright, no
   // node. Every query stays unresolved, which costs nothing beyond the
   // silence there was before this file existed.
-  const referee = await mine.get(root, () => createPyrightLspReferee(root));
+  const referee = await mine.get(`python:${root}`, () => createPyrightLspReferee(root));
   if (!referee) return EMPTY;
 
   try {
@@ -275,7 +275,7 @@ export async function resolvePythonKinds(
   if (queries.length === 0) return NO_KINDS;
   const sourceOf = readerOf(root);
   const mine = pool ?? refereePool<Awaited<ReturnType<typeof createPyrightLspReferee>>>();
-  const referee = await mine.get(root, () => createPyrightLspReferee(root));
+  const referee = await mine.get(`python:${root}`, () => createPyrightLspReferee(root));
   if (!referee) return NO_KINDS;
   try {
     await referee.warmUp(queries.slice(0, WARM_UP_CANDIDATES).map((query) => ({
@@ -319,7 +319,7 @@ export async function resolvePythonAncestors(
   if (queries.length === 0) return nothing;
   const sourceOf = readerOf(root);
   const mine = pool ?? refereePool<Awaited<ReturnType<typeof createPyrightLspReferee>>>();
-  const referee = await mine.get(root, () => createPyrightLspReferee(root));
+  const referee = await mine.get(`python:${root}`, () => createPyrightLspReferee(root));
   if (!referee) return nothing;
   try {
     await referee.warmUp(queries.slice(0, WARM_UP_CANDIDATES).map((query) => ({
@@ -372,7 +372,7 @@ async function askPyright<Answer>(
   if (queries.length === 0) return nothing;
   const sourceOf = readerOf(root);
   const mine = pool ?? refereePool<Pyright>();
-  const referee = await mine.get(root, () => createPyrightLspReferee(root));
+  const referee = await mine.get(`python:${root}`, () => createPyrightLspReferee(root));
   if (!referee) return nothing;
   try {
     await referee.warmUp(queries.slice(0, WARM_UP_CANDIDATES).map((query) => ({
@@ -415,7 +415,7 @@ async function askRustAnalyzer<Answer>(
   const mine = pool ?? refereePool<RustLspReferee>();
   let started = false;
   for (const [crate, crateQueries] of byCrate) {
-    const referee = await mine.get(crate, () => createRustAnalyzerReferee(crate));
+    const referee = await mine.get(`rust:${crate}`, () => createRustAnalyzerReferee(crate));
     if (!referee) continue;
     started = true;
     await referee.warmUp();
@@ -534,6 +534,11 @@ function fitsTarget(extra: string | undefined): DeclaredAt | undefined {
  * startup failed is remembered as `undefined` and not retried: rust-analyzer
  * missing is not a transient condition, and #237's settled answer to it is
  * silence rather than a retry loop.
+ *
+ * A key names the language as well as the folder (`python:<root>`,
+ * `rust:<crate>`). A tree with its `Cargo.toml` at the root has one folder
+ * for both, and a bare path handed the Rust questions to pyright, which
+ * answered none of them (#393).
  */
 export interface RefereePool<T> {
   get(key: string, start: () => Promise<T>): Promise<T | undefined>;

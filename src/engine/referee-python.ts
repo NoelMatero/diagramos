@@ -176,7 +176,7 @@ export async function resolvePythonReceivers(
   // `started: false` says so, for a caller that would otherwise read every
   // query unanswered as pyright having nothing to say.
   const mine = pool ?? refereePool<PyrightLspReferee>();
-  const referee = await mine.get(root, () => createPyrightLspReferee(root));
+  const referee = await mine.get(`python:${root}`, () => createPyrightLspReferee(root));
   if (!referee) {
     return { cache: { get: () => undefined }, close: () => {}, started: false, withheldNoType: 0 };
   }
