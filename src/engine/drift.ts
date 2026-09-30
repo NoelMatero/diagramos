@@ -4776,7 +4776,7 @@ export function checkDrift(
                 + `(${verdict.unwritten.map((name) => `\`${name}\``).join(", ")})`,
               ask: (referee) => askTypeParts(
                 referee,
-                verdict.sites.map((one) => ({ file: toPath, name: one.name, at: one })),
+                verdict.sites.map((one) => ({ file: toPath, name: one.name, at: one, written: one.written })),
                 declaredIn(workspace.read(fromFile), fromLanguage ?? language, fromPath, fromEnd.symbols[0]!),
               ),
             } });
@@ -4898,7 +4898,7 @@ export function checkDrift(
               unwritten: `fields whose type is not written (${verdict.unwritten.map((name) => `\`${name}\``).join(", ")})`,
               ask: (referee) => askTypeParts(
                 referee,
-                verdict.sites.map((one) => ({ file: fromPath, name: one.name, at: one })),
+                verdict.sites.map((one) => ({ file: fromPath, name: one.name, at: one, written: one.written })),
                 declaredIn(workspace.read(toFile), toLanguage ?? language, toPath, toEnd.symbols[0]!),
               ),
             } });
@@ -5033,11 +5033,17 @@ export function checkDrift(
             }, rests: {
               written: verdict.written,
               unwritten: `a class that writes no base list, which may still fit \`${oneLine(toNode.label) || toPath}\` without saying so`,
-              ask: (referee) => askFits(
-                referee,
-                verdict.sites.map((one) => ({ file: fromPath, name: one.name, at: one })),
-                declaredIn(workspace.read(toFile), toLanguage ?? language, toPath, toEnd.symbols[0]!),
-              ),
+              ask: (referee) => {
+                const head = declaredIn(workspace.read(toFile), toLanguage ?? language, toPath, toEnd.symbols[0]!);
+                const tail = declaredIn(workspace.read(fromFile), language, fromPath, fromEnd.symbols[0]!);
+                // A class fits wherever it is itself wanted, and "is one of
+                // itself" is not what the arrow asks: that red rests on its
+                // base list alone.
+                const itself = head.at.some((one) => tail.at.some((other) => one.file === other.file && one.line === other.line));
+                return itself
+                  ? { does: undefined }
+                  : askFits(referee, verdict.sites.map((one) => ({ file: fromPath, name: one.name, at: one })), head);
+              },
             } });
             continue;
           }

@@ -4,7 +4,7 @@
  */
 import { beforeAll, describe, expect, it } from "vitest";
 
-import { gateRed, typeParametersIn, type RedRests } from "../src/engine/gate";
+import { askTypeParts, gateRed, typeParametersIn, type RedRests } from "../src/engine/gate";
 import type { ClosedBodyReferee } from "../src/engine/drift";
 import { initEngine, parseSource, type Language } from "../src/engine/parse";
 
@@ -32,6 +32,25 @@ describe("the rule", () => {
     expect(gateRed({ written: false, ask: says(undefined) }, referee)).toMatchObject({ stands: false, why: "rests-on-unwritten" });
     expect(gateRed({ written: false, ask: says(true) }, undefined)).toMatchObject({ stands: false, why: "rests-on-unwritten" });
     expect(gateRed({ written: false }, referee)).toMatchObject({ stands: false, why: "rests-on-unwritten" });
+  });
+});
+
+describe("asking what a type is made of, place by place", () => {
+  const head = { name: "Engine", at: [{ file: "engine.ts", line: 1 }] };
+  const place = (name: string, written: boolean) => ({ file: "car.ts", name, at: { start: 0, end: 1 }, written });
+  const answering = (answers: Record<string, ReturnType<NonNullable<ClosedBodyReferee["typePartsAt"]>>>) =>
+    ({ typePartsAt: (_file: string, at: { start: number }) => answers[String(at.start)] }) as unknown as ClosedBodyReferee;
+
+  it("lets a place whose type is written stand on it when the compiler cannot say", () => {
+    const referee = answering({ 0: undefined, 1: { parts: [{ name: "Motor", at: { file: "engine.ts", line: 2 } }], whole: true } });
+    const places = [place("typed", true), { ...place("untyped", false), at: { start: 1, end: 2 } }];
+    expect(askTypeParts(referee, places, head).does).toBe(false);
+  });
+
+  it("does not let a place whose type is not written stand on anything", () => {
+    const referee = answering({ 0: undefined, 1: { parts: [{ name: "Motor", at: { file: "engine.ts", line: 2 } }], whole: true } });
+    const places = [place("untyped", false), { ...place("typed", true), at: { start: 1, end: 2 } }];
+    expect(askTypeParts(referee, places, head).does).toBeUndefined();
   });
 });
 

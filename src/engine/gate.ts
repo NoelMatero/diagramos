@@ -141,6 +141,14 @@ export interface AskedAt {
   file: string;
   name: string;
   at: { start: number; end: number };
+  /**
+   * Whether the reader read this place's answer off something written. Where
+   * the compiler cannot say about such a place, the written answer stands for
+   * it -- the rule the gate applies to a whole red, applied per place -- so one
+   * field the compiler cannot place does not unsettle a list written out in
+   * full.
+   */
+  written?: boolean;
 }
 
 /**
@@ -165,7 +173,7 @@ export function askTypeParts(
     if (found.includes(true)) {
       return { does: true, said: `\`${place.name}\` ${what} ${printed(answer)}, which is ${head.name}` };
     }
-    if (found.includes(undefined)) unsure ??= place.name;
+    if (found.includes(undefined) && !place.written) unsure ??= place.name;
     else nos.push(`\`${place.name}\` ${what} ${printed(answer)}`);
   }
   if (unsure !== undefined) return { does: undefined, said: `the compiler could not say what \`${unsure}\` ${what}` };

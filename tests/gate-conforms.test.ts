@@ -115,6 +115,11 @@ describe("Python, a class that fits a Protocol with no base", () => {
     expect(await redsOf(repo, ["py/impl.py#Registered", "py/base.py#Node", "conforms"])).toEqual([]);
   }, 120_000);
 
+  it("still calls wrong a class drawn as one of itself, which it always fits", async () => {
+    repo = scratchRepo(PY);
+    expect(await redsOf(repo, ["py/impl.py#Plain", "py/impl.py#Plain", "conforms"])).toEqual(["conforms-absent"]);
+  }, 120_000);
+
   it("still calls it wrong when pyright says it does not fit", async () => {
     repo = scratchRepo(PY);
     expect(await redsOf(repo, ["py/impl.py#Plain", "py/base.py#Node", "conforms"])).toEqual(["conforms-absent"]);
