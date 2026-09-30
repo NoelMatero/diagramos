@@ -219,3 +219,26 @@ export function askFits(
   if (unsure) return { does: undefined, said: `the compiler could not say whether \`${places[0]!.name}\` fits` };
   return { does: false, said: `\`${places[0]!.name}\` cannot be used where a \`${head.name}\` is wanted` };
 }
+
+/**
+ * "Does the member `name` of any of these values land on the head?" --
+ * `memberAt` at each place (#384). Yes at any place is a yes; a no needs
+ * every place answered and none landing there.
+ */
+export function askMember(
+  referee: ClosedBodyReferee,
+  places: AskedAt[],
+  name: string,
+  head: { name: string; at: DeclaredAt[] },
+): CompilerSaid {
+  if (!referee.memberAt || places.length === 0 || head.at.length === 0) return { does: undefined };
+  let unsure: string | undefined;
+  for (const place of places) {
+    const landed = referee.memberAt(place.file, place.at, name);
+    if (landed === undefined) { unsure ??= place.name; continue; }
+    const hit = landed.some((one) => one !== "outside" && head.at.some((at) => at.file === one.file && at.line === one.line));
+    if (hit) return { does: true, said: `\`${name}\` on \`${place.name}\` is this ${head.name}` };
+  }
+  if (unsure !== undefined) return { does: undefined, said: `the compiler could not say what \`${name}\` on \`${unsure}\` is` };
+  return { does: false, said: `no value the routine uses has this \`${name}\`` };
+}

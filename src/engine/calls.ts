@@ -191,6 +191,14 @@ export interface CallsRefutedEvidence {
   line: number;
   /** Every call the routine makes, checked and placed somewhere else. */
   sites: number;
+  /**
+   * The head is a method the language runs without it being written (#384):
+   * a Python `__dunder__` an operator or builtin calls, or TypeScript's
+   * `toString`, `valueOf`, `toJSON`, `then`. No written call is then no
+   * evidence, so the red rests on the compiler saying which method `name`
+   * lands on for each value the routine uses (`values`).
+   */
+  implicit?: { name: string; values: Array<{ name: string; start: number; end: number }> };
 }
 
 /**
@@ -1537,7 +1545,9 @@ function closedBodyRefutes(
   const closedByText = (): typeof text => {
     const unwritten = (from.language === "rust" ? calledImplicitly(to) : undefined)
       ?? (handsOnHead(from, to) ? "named" : undefined);
-    return unwritten ? { why: unwritten } : text;
+    if (unwritten) return { why: unwritten };
+    const implicit = "evidence" in text ? runByTheLanguage(from, to) : undefined;
+    return implicit && "evidence" in text ? { evidence: { ...text.evidence, implicit } } : text;
   };
   if (!("why" in text) && !known) return closedByText();
   /*
@@ -1592,6 +1602,55 @@ export interface CompiledTail {
 function calledImplicitly(to: CallSide & { names: string[] }): "called-implicitly" | undefined {
   const names = new Set(to.names);
   return traitImplsOf(to.source, names).some((one) => !traitDeclaredHere(to, one.trait)) ? "called-implicitly" : undefined;
+}
+
+/**
+ * Methods TypeScript and JavaScript run on a value without the call being
+ * written: coercion (`+m`, `` `${m}` ``, `'x' + m`), `JSON.stringify`,
+ * `await`. The language's own list, from the spec -- the same footing as a
+ * Python dunder's name.
+ */
+const RUN_BY_JAVASCRIPT = new Set(["toString", "valueOf", "toLocaleString", "toJSON", "then"]);
+
+/**
+ * Whether the head is a method the language runs on the caller's behalf, and
+ * if so the values the tail's body uses, where the compiler is asked which
+ * method that name lands on (#384). Python's dunders and JavaScript's
+ * coercion and protocol methods; Rust has `calledImplicitly`.
+ *
+ * A value is a name used as one: anything but the object of a member access
+ * (`m.cents` reads a field; it runs no protocol method on `m`). An operand, an
+ * argument, a loop's iterable, a dict key, a callee (`m()` is `__call__`), a
+ * returned name -- each is a value the language may run one on.
+ */
+function runByTheLanguage(
+  from: CallSide & { routine: string },
+  to: CallSide & { names: string[] },
+): CallsRefutedEvidence["implicit"] {
+  const name = to.names.find((one) => from.language === "python"
+    ? /^__\w+__$/.test(one)
+    : (from.language === "ts" || from.language === "tsx" || from.language === "js") && (RUN_BY_JAVASCRIPT.has(one) || one.startsWith("[Symbol.")));
+  if (!name) return undefined;
+  const values: Array<{ name: string; start: number; end: number }> = [];
+  const seen = new Set<number>();
+  for (const routine of routinesNamed(from.source, from.routine, from.language).routines) {
+    const body = routine.childForFieldName("body")
+      ?? routine.childForFieldName("value")?.childForFieldName("body");
+    if (!body) continue;
+    const notValues = new Set<number>();
+    each(body, (node) => {
+      const member = node.childForFieldName("attribute") ?? node.childForFieldName("property");
+      const object = member ? node.childForFieldName("object") : null;
+      if (object) notValues.add(object.startIndex);
+    });
+    each(body, (node) => {
+      if (node.childCount !== 0 || (node.type !== "identifier" && node.type !== "this")) return;
+      if (notValues.has(node.startIndex) || seen.has(node.startIndex)) return;
+      seen.add(node.startIndex);
+      values.push({ name: node.text, start: node.startIndex, end: node.startIndex + node.text.length });
+    });
+  }
+  return { name, values };
 }
 
 /**

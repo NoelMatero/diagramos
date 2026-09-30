@@ -46,7 +46,7 @@ import { connects, refIsStale, type CodeGraphOption } from "./codegraph";
 import { readDependencies, readerCanPlace } from "./deps";
 import type { BindingFault } from "./damage";
 import type { DeclaredAt, ImportTarget, MemberTarget, TypeParts } from "./compiler-questions";
-import { askFits, askTypeParts, declaredIn, gateRed, WRITTEN, type GateWithdrawn, type RedRests } from "./gate";
+import { askFits, askMember, askTypeParts, declaredIn, gateRed, WRITTEN, type GateWithdrawn, type RedRests } from "./gate";
 import { generatedRef, NEVER_WALK } from "./generated";
 import { readGraph, type Provenance, type RecoveredGraph, type RecoveredNode } from "./graph";
 import { licenceFor, mayAccuse } from "./licence";
@@ -5548,7 +5548,18 @@ export function checkDrift(
                   + `${verdict.evidence.routine} makes was checked -- ${verdict.evidence.sites} of `
                   + `them, none reaching ${toPath}. ${fromPath} line ${verdict.evidence.line} is `
                   + `where ${verdict.evidence.routine} is declared.`,
-              }, rests: WRITTEN /* GATE-TODO */ });
+              }, rests: {
+                written: !verdict.evidence.implicit,
+                unwritten: `a call the language makes without it being written (\`${verdict.evidence.implicit?.name}\`)`,
+                ...(verdict.evidence.implicit ? {
+                  ask: (referee: ClosedBodyReferee) => askMember(
+                    referee,
+                    verdict.evidence.implicit!.values.map((one) => ({ file: fromPath, name: one.name, at: one })),
+                    verdict.evidence.implicit!.name,
+                    declaredIn(workspace.read(toFile), languageOf(toFile) ?? "python", toPath, verdict.evidence.implicit!.name),
+                  ),
+                } : {}),
+              } });
               continue;
             }
             /*
