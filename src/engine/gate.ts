@@ -242,3 +242,19 @@ export function askMember(
   if (unsure !== undefined) return { does: undefined, said: `the compiler could not say what \`${name}\` on \`${unsure}\` is` };
   return { does: false, said: `no value the routine uses has this \`${name}\`` };
 }
+
+/**
+ * "Does the type named here have a member called `name` at all?" --
+ * `memberAt` at the type's own name (#393). Anything it lands on, in the
+ * repository or a library's, is a yes; nothing is a no.
+ */
+export function askHasMember(referee: ClosedBodyReferee, places: AskedAt[], name: string): CompilerSaid {
+  if (!referee.memberAt || places.length === 0 || !name) return { does: undefined };
+  let unsure = false;
+  for (const place of places) {
+    const landed = referee.memberAt(place.file, place.at, name);
+    if (landed === undefined) { unsure = true; continue; }
+    if (landed.length > 0) return { does: true, said: `\`${place.name}\` has a \`${name}\`` };
+  }
+  return unsure ? { does: undefined } : { does: false, said: `\`${places[0]!.name}\` has no \`${name}\`` };
+}

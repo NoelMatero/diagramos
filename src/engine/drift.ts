@@ -46,7 +46,7 @@ import { connects, refIsStale, type CodeGraphOption } from "./codegraph";
 import { readDependencies, readerCanPlace } from "./deps";
 import type { BindingFault } from "./damage";
 import type { DeclaredAt, ImportTarget, MemberTarget, TypeParts } from "./compiler-questions";
-import { askFits, askMember, askTypeParts, declaredIn, gateRed, WRITTEN, type GateWithdrawn, type RedRests } from "./gate";
+import { askFits, askHasMember, askMember, askTypeParts, declaredIn, gateRed, WRITTEN, type GateWithdrawn, type RedRests } from "./gate";
 import { generatedRef, NEVER_WALK } from "./generated";
 import { readGraph, type Provenance, type RecoveredGraph, type RecoveredNode } from "./graph";
 import { licenceFor, mayAccuse } from "./licence";
@@ -4470,7 +4470,7 @@ export function checkDrift(
                 + `or the code is. If the code is right, `
                 + `\`drift --accept "${edge.from} -> ${edge.to}"\` turns the arrow round `
                 + `and the next check marks it built.`,
-            }, rests: WRITTEN /* GATE-TODO */ });
+            }, rests: WRITTEN /* advisory: never a red */ });
             continue;
           }
         } else if (needs.verdict === "withheld") {
@@ -5179,7 +5179,7 @@ export function checkDrift(
                 + `${oneLine(toNode.label) || toPath}, and it is the other way round -- `
                 + `${toPath} line ${verdict.evidence.line} writes `
                 + `\`${verdict.evidence.wrote}\`. Turn the arrow round.`,
-            }, rests: WRITTEN /* GATE-TODO */ });
+            }, rests: WRITTEN /* a construction found running the other way */ });
             continue;
           } else if (verdict.verdict === "refuted") {
             edgesChecked += 1;
@@ -5207,7 +5207,7 @@ export function checkDrift(
                   : ". ")
                 + `Getting one back from another function is not making it. `
                 + `Point the arrow at what does create it, or remove it.`,
-            }, rests: WRITTEN /* GATE-TODO */ });
+            }, rests: WRITTEN /* every construction in the body was read; one the text cannot name (`type(self)(..)`, `self.__class__(..)`) already withholds (#387) */ });
             continue;
           }
           if (claimed && verdict.verdict === "absent" && verdict.awaitsCompiler) claims.buildsCompilable += 1;
@@ -5459,7 +5459,7 @@ export function checkDrift(
                   + `${oneLine(toNode.label) || toPath}, and it is the other way round -- `
                   + `${toPath} line ${verdict.evidence.line} writes `
                   + `\`${verdict.evidence.wrote}\`. Turn the arrow round.`,
-              }, rests: WRITTEN /* GATE-TODO */ });
+              }, rests: WRITTEN /* a call found running the other way */ });
               continue;
             }
             if (verdict.verdict === "wrong-routine" && edge.state !== "planned") {
@@ -5507,7 +5507,7 @@ export function checkDrift(
                   + `${toEnd.symbols.join(" or ")} -- ${where}. Point the arrow at `
                   + `${near[0]!.name}, or call ${toEnd.symbols[0]!} from `
                   + `${verdict.evidence.routine}.`,
-              }, rests: WRITTEN /* GATE-TODO */ });
+              }, rests: WRITTEN /* a call found landing on another routine */ });
               continue;
             }
             if (verdict.verdict === "refuted" && edge.state !== "planned") {
@@ -5709,7 +5709,20 @@ export function checkDrift(
                 + `${toPath} declares ${verdict.members ? `\`${verdict.members}\`` : "nothing"}, `
                 + "which does not include it. Either the member was renamed, or the arrow points "
                 + "at the wrong type.",
-            }, rests: WRITTEN /* GATE-TODO */ });
+            }, rests: {
+              // The member list is read off the declaration (#393): written.
+              // The compiler is still asked, and a member it finds withdraws.
+              written: true,
+              ask: (referee) => askHasMember(
+                referee,
+                (declaredShapes(workspace.read(toFile), languageOf(toFile) ?? "ts")?.get(toEnd.symbols[0]!.split(/::|\./).pop()!) ?? [])
+                  .map(({ nameNode }) => ({
+                    file: toPath, name: toEnd.symbols[0]!,
+                    at: { start: nameNode.startIndex, end: nameNode.startIndex + nameNode.text.length },
+                  })),
+                memberNamed(edge.label) ?? "",
+              ),
+            } });
             continue;
           } else if (verdict.verdict === "not-read") {
             const member = memberNamed(edge.label) ?? "";
@@ -5743,7 +5756,7 @@ export function checkDrift(
                       + `could not see into. If one of those reads \`${member}\`, the board wants `
                       + `${routine} --calls--> that function --accesses--> ${target}.`
                     : ""),
-              }, rests: WRITTEN /* GATE-TODO */ });
+              }, rests: WRITTEN /* every member the routine reads was read and placed */ });
               continue;
             }
             /*
@@ -5931,7 +5944,7 @@ export function checkDrift(
               { label: oneLine(fromNode.label) || fromPath },
               { label: oneLine(toNode.label) || toPath },
             ),
-        }, rests: WRITTEN /* GATE-TODO */ });
+        }, rests: WRITTEN /* the compiler is asked inside `lackingEnd` (#343), which holds back where it cannot say */ });
         continue;
       }
 
