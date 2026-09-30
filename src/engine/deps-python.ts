@@ -307,6 +307,7 @@ export function readPythonDependencies(
     deferred: boolean,
     star = false,
     names: string[] = [],
+    unplaced = false,
   ) => {
     const key = `${specifier}\0${file ?? ""}\0${deferred}`;
     if (seen.has(key)) return;
@@ -318,6 +319,7 @@ export function readPythonDependencies(
       deferred,
       ...(star ? { star: true } : {}),
       ...(names.length > 0 ? { names } : {}),
+      ...(unplaced && !file ? { unplaced: { start: node.startIndex, end: node.startIndex + node.text.length } } : {}),
     });
   };
 
@@ -333,6 +335,13 @@ export function readPythonDependencies(
   ) => {
     if (parts.length === 0) return;
     const from = withPrefixes ? 1 : parts.length;
+    /*
+     * A module path that resolves to nothing while the package it starts in
+     * is here, or a relative one, may still be a file here that the roots do
+     * not reach (#393). Marked, for the compiler to be asked; a third-party
+     * name is not this repository's.
+     */
+    const here = specifier.startsWith(".") || resolveAbsolute(parts.slice(0, 1), roots, workspace) !== undefined;
     for (let length = from; length <= parts.length; length += 1) {
       const prefix = parts.slice(0, length);
       const file = resolveAbsolute(prefix, roots, workspace);
@@ -342,7 +351,8 @@ export function readPythonDependencies(
       if (file || length === parts.length) {
         declare(node, length === parts.length ? specifier : prefix.join("."), file, deferred,
           star && length === parts.length,
-          length === parts.length ? names : []);
+          length === parts.length ? names : [],
+          length === parts.length && here);
       }
     }
   };

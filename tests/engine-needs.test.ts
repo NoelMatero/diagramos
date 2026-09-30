@@ -143,7 +143,7 @@ describe("which way the dependency runs", () => {
   });
 
   it("calls an arrow wrong when nothing the tail imports leads to the head (#323)", () => {
-    expect(checkNeeds("a.ts", "loose.ts", workspace)).toEqual({ verdict: "refuted" });
+    expect(checkNeeds("a.ts", "loose.ts", workspace)).toEqual({ verdict: "refuted", unplaced: false });
   });
 
   it("names the line of the first mention, not of the last", () => {
@@ -354,7 +354,7 @@ describe("a call the text cannot follow (#344)", () => {
       "db.ts": "export const db = 1;\n",
       "hooks.ts": "let hook = () => {};\nexport const setHook = (f: () => void) => { hook = f; };\nexport const run = () => hook();\n",
     };
-    expect(checkNeeds("app.ts", "hooks.ts", fakeWorkspace(files))).toEqual({ verdict: "refuted" });
+    expect(checkNeeds("app.ts", "hooks.ts", fakeWorkspace(files))).toEqual({ verdict: "refuted", unplaced: false });
   });
 
   it("still confirms a TypeScript arrow drawn the right way when both ends call that way", () => {
@@ -391,7 +391,7 @@ describe("a call the text cannot follow (#344)", () => {
       "db.py": "db = 1\n",
       "hooks.py": "hook = print\n\ndef run():\n    return hook()\n",
     };
-    expect(checkNeeds("app.py", "hooks.py", fakeWorkspace(files))).toEqual({ verdict: "refuted" });
+    expect(checkNeeds("app.py", "hooks.py", fakeWorkspace(files))).toEqual({ verdict: "refuted", unplaced: false });
   });
 
   it("still confirms a Python arrow drawn the right way when both ends call that way", () => {
@@ -478,6 +478,7 @@ describe("an import that is not there (#323)", () => {
       via: ["service.ts", "repo.ts"],
       evidence: { file: "app.ts", on: "service.ts", specifier: "./service", line: 1, names: ["service"] },
       mayAccuse: true,
+      unplaced: false,
     });
   });
 

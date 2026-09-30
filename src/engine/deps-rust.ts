@@ -189,6 +189,16 @@ export function readRustDependencies(
    * Called on the `mod` and `use` items too, whose own handling consumes them
    * before the walk could reach the modifier on its own.
    */
+  /** A path whose landing the text does not give, and where it is written (#393). */
+  const unplaced = (node: Node, specifier: string, bang: number): void => {
+    dependencies.push({
+      specifier,
+      line: lineOf(source, node),
+      deferred: false,
+      unplaced: { start: node.startIndex, end: node.startIndex + node.text.length + bang },
+    });
+  };
+
   const takeModifier = (part: Node, position: RustPosition): void => {
     for (const entry of children(part)) {
       if (PUNCTUATION.has(entry.type) || entry.type === "pub" || entry.type === "in") continue;
@@ -377,6 +387,20 @@ export function readRustDependencies(
            */
           const called = name?.type === "identifier" ? name.text : undefined;
           if (itemLevel && !(called && expandsToNoImport(called))) dynamic.add("macro-expansion");
+          /*
+           * `crate::cents!(1)`, `core_lib::cents!(3)`: a macro reached by a path
+           * (#383). The macro lives wherever its `macro_rules!` is -- a
+           * `#[macro_export]` one at the crate root's path, in whatever file
+           * declares it -- and the path does not say which file that is. When
+           * the path starts in this workspace the landing is marked, for the
+           * compiler to be asked; a macro from outside is a library's.
+           */
+          const path = name && (name.type === "scoped_identifier") ? segmentsOf(name) : undefined;
+          if (name && path && path.length > 1) {
+            const inTree = ["crate", "self", "super", "$crate"].includes(path[0]!)
+              || resolveRustPath(path.slice(0, -1), filePath, layout, workspace, false, position).length > 0;
+            if (inTree) unplaced(name, `${path.join("::")}!`, 1);
+          }
           for (const part of children(child)) {
             if (part.type === "token_tree") takeTokens(part, position);
           }
@@ -423,6 +447,14 @@ export function readRustDependencies(
           // `macro_rules!` bodies are token trees too, and `$crate::x` in one is
           // a path into this very crate.
           for (const part of children(child)) takeTokens(part, position);
+          /*
+           * Which file a `$crate::util::double` in a body lands on is decided
+           * where the macro is expanded, not here: the text of the body is a
+           * template (#383). Marked, never placed.
+           */
+          each(child, (token) => {
+            if (token.type === "metavariable" && token.text === "$crate") unplaced(token, token.text, 0);
+          });
           pathAttribute = undefined;
           continue;
         }
@@ -442,6 +474,30 @@ export function readRustDependencies(
   };
 
   walk(tree.rootNode, { directory: own, inline: 0, scope }, true);
+
+  /*
+   * `use core_lib::cents;` and then `cents!(3)` (#383). The `use` resolves to
+   * the crate root, and a `#[macro_export]` macro is only *named* there: it
+   * lives in whatever file declares it. A `use` of a name this file calls as
+   * a macro is marked, for the compiler to say where it goes.
+   */
+  const macros = new Set<string>();
+  each(tree.rootNode, (node) => {
+    if (node.type !== "macro_invocation") return;
+    const called = children(node)[0];
+    if (called?.type === "identifier") macros.add(called.text);
+  });
+  if (macros.size > 0) {
+    each(tree.rootNode, (node) => {
+      if (node.type !== "use_declaration") return;
+      each(node, (part) => {
+        const tail = part.type === "scoped_identifier" ? part.childForFieldName("name") : part.type === "identifier" ? part : null;
+        if (!tail || !macros.has(tail.text)) return;
+        if (part.type === "identifier" && part.text !== tail.text) return;
+        unplaced(part, part.text, 0);
+      });
+    });
+  }
 
   return {
     dependencies,

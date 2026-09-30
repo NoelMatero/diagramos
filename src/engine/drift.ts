@@ -4382,6 +4382,35 @@ export function checkDrift(
         const word = edge.claim;
         const needs = checkNeeds(fromPath, toPath, workspace, importCache.configs, options?.ledger);
         /*
+         * What an import red rests on (#393): an absence the text read off
+         * every import it could place, and none it could not. The question is
+         * the same walk again with the compiler placing those -- a sibling
+         * package by name (#390), a Rust macro path (#383).
+         */
+        const needsRests = (unplaced: boolean): RedRests => ({
+          written: !unplaced,
+          unwritten: "an import the text cannot place (a package imported by its name, or a macro reached by a path)",
+          ask: (referee) => {
+            const where = referee.importTargetAt?.bind(referee);
+            if (!where) return { does: undefined };
+            const again = checkNeeds(fromPath, toPath, workspace, importCache.configs, options?.ledger, (file, at) => {
+              const answer = where(file, at);
+              return answer === undefined || answer === "outside" ? answer : answer.file;
+            });
+            if (again.verdict === "confirmed") {
+              return { does: true, said: `${fromPath} imports ${toPath}: \`${again.evidence.specifier}\` lands there` };
+            }
+            if (again.verdict === "indirect") {
+              const said = `${fromPath} reaches ${toPath} through ${again.via.join(" -> ") || again.evidence.on}`;
+              return { does: strict ? (again.unplaced ? undefined : false) : true, said };
+            }
+            if (again.verdict === "refuted" || again.verdict === "backwards") {
+              return { does: again.unplaced ? undefined : false, said: `none of ${fromPath}'s imports lands on ${toPath}` };
+            }
+            return { does: undefined };
+          },
+        });
+        /*
          * A `planned` arrow asks this one question and ignores every other
          * answer it could get (#124).
          *
@@ -4503,7 +4532,7 @@ export function checkDrift(
                  */
                 + ` — or, if the code is right and the arrow was wrong, `
                 + `\`drift --accept "${edge.from} -> ${edge.to}"\` turns it round for you.`,
-            }, rests: WRITTEN /* GATE-TODO */ });
+            }, rests: needsRests(needs.unplaced) });
             continue;
           }
           if (needs.verdict === "confirmed") {
@@ -4556,7 +4585,7 @@ export function checkDrift(
                   ? `@needs means the import written in ${fromPath}. Draw the hop, or say `
                     + `\`claim: "depends"\`, which is this chain and is true.`
                   : `Draw the hop, or leave the arrow where it is and read it as "depends on".`),
-            }, rests: WRITTEN /* GATE-TODO */ });
+            }, rests: needsRests(needs.unplaced) });
             continue;
           }
           if (needs.verdict === "refuted") {
@@ -4585,7 +4614,7 @@ export function checkDrift(
                 + `${oneLine(toNode.label) || toPath}, and ${fromPath} does not import `
                 + `${toPath}, directly or through anything it imports. Point the arrow `
                 + `at what ${fromPath} does import, or drop it.`,
-            }, rests: WRITTEN /* GATE-TODO */ });
+            }, rests: needsRests(needs.unplaced) });
             continue;
           }
           /*

@@ -34,6 +34,9 @@
  * module tree no single file contains, and a Python one is a position in a
  * module tree that depends on a `sys.path` no file states.
  */
+import { realpathSync } from "node:fs";
+import path from "node:path";
+
 import { licenceFor } from "./licence";
 import { each, languageOf, parseSource, type Node } from "./parse";
 import { resolveDependency, type ConfigCache } from "./resolve";
@@ -205,6 +208,15 @@ export interface FileDependency {
    * (#319): it says who may see an item, not what the file uses.
    */
   visibility?: boolean;
+  /**
+   * Where the path is written, when the reader could not say which file it
+   * lands on and it may land in this repository (#393): a sibling package
+   * imported by its name (#390), a relative path that resolves to nothing
+   * here, a Rust macro reached by a path into this workspace (#383). An
+   * absence over a file with one of these is not evidence on its own, and
+   * the range is where the compiler is asked instead.
+   */
+  unplaced?: { start: number; end: number };
 }
 
 export interface FileDependencies {
@@ -393,6 +405,7 @@ function readUncached(
     names: string[] = [],
   ): boolean => {
     const resolved = resolveDependency(specifier, filePath, workspace, configs);
+    const unplaced = !resolved && mayLandHere(specifier, filePath, workspace);
     dependencies.push({
       specifier,
       ...(resolved ? { file: resolved.rel } : {}),
@@ -400,6 +413,7 @@ function readUncached(
       deferred,
       ...(star ? { star: true } : {}),
       ...(names.length > 0 ? { names } : {}),
+      ...(unplaced ? { unplaced: { start: node.startIndex, end: node.startIndex + node.text.length } } : {}),
     });
     return resolved !== undefined;
   };
@@ -427,6 +441,18 @@ function readUncached(
     switch (node.type) {
       case "import_statement":
       case "export_statement": {
+        /*
+         * `import legacy = require("./legacy")`: TypeScript's CommonJS import
+         * (#386). The path sits on the clause, not the statement, and before
+         * this was read at all a correct arrow along it went red.
+         */
+        const required = children(node).find((child) => child.type === "import_require_clause");
+        const requiredFrom = required?.childForFieldName("source")
+          ?? (required ? children(required).find((child) => child.type === "string") : undefined);
+        if (requiredFrom) {
+          declare(requiredFrom, unquote(requiredFrom.text), false);
+          return;
+        }
         // An `export` carries a source only when it re-exports; a plain
         // `export const x = 1` has nothing to depend on.
         const source_ = node.childForFieldName("source");
@@ -495,6 +521,87 @@ function readUncached(
     complete: !tree.rootNode.hasError,
     dynamic: [...dynamic],
   };
+}
+
+/**
+ * Whether an import the resolver could not place may still land in this
+ * repository (#390): a relative path, which can only mean a file here, or a
+ * package name that one of this repository's own packages goes by -- a
+ * workspace sibling -- or that `node_modules` links back into the tree.
+ * Everything else is a library, and a library is not a file an arrow here
+ * points at.
+ */
+function mayLandHere(specifier: string, fromFile: string, workspace: Workspace): boolean {
+  if (specifier.startsWith(".") || specifier.startsWith("/")) return true;
+  const parts = specifier.split("/");
+  const name = specifier.startsWith("@") ? parts.slice(0, 2).join("/") : parts[0]!;
+  if (!name || specifier.startsWith("node:")) return false;
+  if (packageNamesIn(workspace).has(name)) return true;
+  /*
+   * `node_modules/@acme/core` linked to `packages/core`, looked for from the
+   * importing file up to the root, the way Node looks. A link, and to a place
+   * in the tree outside any `node_modules`: an installed library is a real
+   * directory there, and is a library.
+   */
+  const root = workspace.resolve(".");
+  if (!root) return false;
+  let home: string;
+  try { home = realpathSync(root); } catch { return false; }
+  let directory = fromFile.includes("/") ? fromFile.slice(0, fromFile.lastIndexOf("/")) : "";
+  for (;;) {
+    const candidate = path.join(root, directory, "node_modules", name);
+    try {
+      const real = realpathSync(candidate);
+      if (real !== candidate && real.startsWith(`${home}${path.sep}`) && !real.includes(`${path.sep}node_modules${path.sep}`)) return true;
+    } catch {
+      // not there
+    }
+    if (!directory) return false;
+    directory = directory.includes("/") ? directory.slice(0, directory.lastIndexOf("/")) : "";
+  }
+}
+
+/**
+ * The names this repository's own packages go by, from the workspace lists a
+ * root `package.json` (`workspaces`) or `pnpm-workspace.yaml` writes: each
+ * listed directory's `package.json` `name`. Simple patterns only -- a
+ * directory, or a directory followed by `/*` -- which is how they are written.
+ */
+const packageNames = new WeakMap<Workspace, Set<string>>();
+function packageNamesIn(workspace: Workspace): Set<string> {
+  const known = packageNames.get(workspace);
+  if (known) return known;
+  const names = new Set<string>();
+  const readJson = (relative: string): Record<string, unknown> | undefined => {
+    const absolute = workspace.resolve(relative);
+    if (!absolute || workspace.stat(absolute) !== "file") return undefined;
+    try { return JSON.parse(workspace.read(absolute)) as Record<string, unknown>; } catch { return undefined; }
+  };
+  const root = readJson("package.json");
+  const listed = root?.workspaces;
+  const patterns: string[] = Array.isArray(listed)
+    ? listed.filter((one): one is string => typeof one === "string")
+    : Array.isArray((listed as { packages?: unknown })?.packages)
+      ? ((listed as { packages: unknown[] }).packages.filter((one): one is string => typeof one === "string"))
+      : [];
+  const pnpm = workspace.resolve("pnpm-workspace.yaml");
+  if (pnpm && workspace.stat(pnpm) === "file") {
+    for (const match of workspace.read(pnpm).matchAll(/^\s*-\s*['"]?([^'"#\n]+?)['"]?\s*$/gm)) patterns.push(match[1]!);
+  }
+  for (const pattern of patterns) {
+    const clean = pattern.replace(/^\.\//, "").replace(/\/$/, "");
+    const parent = clean.endsWith("/*") ? workspace.resolve(clean.slice(0, -2)) : undefined;
+    const directories = clean.endsWith("/*")
+      ? (parent && workspace.stat(parent) === "directory" ? workspace.list(parent) : [])
+        .map((entry) => `${clean.slice(0, -2)}/${path.basename(entry)}`)
+      : clean.includes("*") ? [] : [clean];
+    for (const directory of directories) {
+      const name = readJson(`${directory}/package.json`)?.name;
+      if (typeof name === "string") names.add(name);
+    }
+  }
+  packageNames.set(workspace, names);
+  return names;
 }
 
 /** Just the repo-relative files, which is what a dependency question usually wants. */
