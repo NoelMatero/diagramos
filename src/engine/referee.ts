@@ -230,5 +230,8 @@ export function wouldHelp(report: DriftReport): boolean {
     || (buildsNotClosed["abstract-receiver"] ?? 0) > 0
     || (callsWithheld.receiver ?? 0) > 0
     || buildsUnsettled > 0
-    || endsUnsettled > 0;
+    || endsUnsettled > 0
+    // A red with a question for the compiler, on a pass that had none to ask
+    // (#393): shown or withheld, its answer can change it.
+    || report.gated.some((red) => red.asked && !red.referee);
 }

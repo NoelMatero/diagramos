@@ -375,6 +375,36 @@ export interface PythonTypeParts {
 }
 
 /**
+ * How to reach the class named `klass` that encloses `offset` from outside
+ * its module: `["Cookies", "_CookieCompatResponse"]` for a class nested in
+ * another, `["Request"]` for one at the top (#394). Read off indentation, the
+ * way Python itself scopes a class body. `undefined` when the class sits
+ * inside a function, which nothing outside can name.
+ */
+export function classPathAt(source: string, offset: number, klass: string): string[] | undefined {
+  const lines = source.slice(0, offset).split("\n");
+  const indentOf = (line: string) => line.length - line.trimStart().length;
+  let limit = indentOf(lines[lines.length - 1]!);
+  const chain: string[] = [];
+  for (let index = lines.length - 2; index >= 0; index -= 1) {
+    const line = lines[index]!;
+    if (!line.trim() || line.trimStart().startsWith("#")) continue;
+    const indent = indentOf(line);
+    if (indent >= limit) continue;
+    limit = indent;
+    const declared = /^\s*class\s+([A-Za-z_]\w*)/.exec(line)?.[1];
+    if (declared) {
+      if (chain.length === 0 && declared !== klass) return undefined;
+      chain.unshift(declared);
+    } else if (chain.length > 0 && /^\s*(?:async\s+)?def\s/.test(line)) {
+      return undefined;
+    }
+    if (indent === 0) break;
+  }
+  return chain.length > 0 && chain[chain.length - 1] === klass ? chain : undefined;
+}
+
+/**
  * The type a pyright hover shows, or `undefined` for one that shows none
  * (#393). The hover opens with what the name is in brackets; what follows is
  * `name: type` for a value, a signature for a routine, and for a property the
@@ -924,9 +954,11 @@ export async function createPyrightLspReferee(root: string): Promise<PyrightLspR
     const holder = hoverType((await hoverTextAt(file, source, anchor.start - before.length + owner.index)) ?? "");
     const klass = /Self@([A-Za-z_]\w*)/.exec(holder ?? "")?.[1] ?? (/^[A-Za-z_]\w*$/.test(holder ?? "") ? holder : undefined);
     const directory = path.dirname(file);
-    const declared = klass === undefined ? undefined : await withProbe(directory, [
-      `from ${relativeModule(directory, file)} import ${klass} as __board_c`,
-      "def __board_probe(__board_x: __board_c) -> None:",
+    // A class nested in another cannot be imported by its own name (#394).
+    const reach = klass === undefined ? undefined : classPathAt(source, anchor.start, klass);
+    const declared = reach === undefined ? undefined : await withProbe(directory, [
+      `from ${relativeModule(directory, file)} import ${reach[0]} as __board_c`,
+      `def __board_probe(__board_x: ${["__board_c", ...reach.slice(1)].join(".")}) -> None:`,
       `    __board_x.${name}`,
     ], async (probe) => hoverType(
       (await hoverTextAt(probe.file, probe.source, probe.source.lastIndexOf(`.${name}`) + 1)) ?? "",
