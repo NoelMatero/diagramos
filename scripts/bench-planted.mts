@@ -47,6 +47,7 @@ import path from "node:path";
 import { ACCUSING_EDGE_KINDS, checkDrift, createWorkspace, newCheckCache, type CheckCache } from "../src/engine/drift";
 import { liveRefereePool, refereedCheckLive, type LiveRefereePool } from "../src/engine/referee-live";
 import { initEngine } from "../src/engine/parse";
+import { waitForQuiet } from "./lib/bench-busy";
 import { plantedBoard, plantedKeys, type Key, type KeyClaim } from "./lib/planted-keys";
 import { UNDECIDED_BUCKETS, type Bucket } from "./lib/undecided-buckets";
 
@@ -64,6 +65,8 @@ const wantProject = flag("project");
 /** One kind of planted mistake: `wrong-kind`, `retarget`, `reverse`, `swap`, `drawn`. */
 const wantSource = flag("source");
 const details = argv.includes("--details");
+/** Start at once even while another bench, measure script or vitest is running (#403). */
+const noWait = argv.includes("--no-wait");
 
 /**
  * One workspace and one cache per project, for the whole run (#311).
@@ -241,6 +244,14 @@ function table(title: string, note: string, rows: Map<string, Row>, caught: (row
   console.log();
 }
 
+/*
+ * One of these at a time on a machine (#403). Two benches, or a bench beside
+ * a test run, starve the language servers: the score still comes out, slower
+ * and with reds that have nothing to do with the code. On stderr, so a saved
+ * `--details` run holds only the run.
+ */
+if (!noWait) await waitForQuiet((line) => console.error(`  ${line}`));
+
 await initEngine();
 
 const loaded = plantedKeys(REPO).filter((k) => !wantProject || k.project === wantProject);
@@ -289,6 +300,8 @@ let claimsScored = 0;
 let undecidableCount = 0;
 const started = Date.now();
 
+/** The project whose `--details` lines are being printed; each gets a header (#403). */
+let printedProject: string | undefined;
 for (const key of loaded) {
   boards++;
   for (const claim of key.claims) {
@@ -323,6 +336,11 @@ for (const key of loaded) {
         falseReds.push(`  ${where} · @${claim.word} ${claim.from} -> ${claim.to}`
           + `\n      checker: ${detail}\n      tooling: ${claim.why}`);
       }
+    }
+    if (details && key.project !== printedProject) {
+      // Where each project starts, so a saved run can be compared arrow for arrow.
+      console.log(`  == ${key.project}`);
+      printedProject = key.project;
     }
     if (details) console.log(`    ${outcome.padEnd(9)} ${claim.truth.padEnd(6)} ${claim.source.padEnd(10)} `
       + `${claim.language.padEnd(6)} [${reason}] @${claim.word} ${claim.from} -> ${claim.to} | ${detail}`

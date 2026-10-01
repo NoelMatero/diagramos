@@ -58,7 +58,7 @@
  * timeout, in case a tree is large enough that "done" never quite arrives),
  * and answers every query after that over the same connection.
  */
-import { spawn, type ChildProcessWithoutNullStreams } from "node:child_process";
+import type { ChildProcessWithoutNullStreams } from "node:child_process";
 import { readFileSync } from "node:fs";
 import path from "node:path";
 import { fileURLToPath, pathToFileURL } from "node:url";
@@ -67,6 +67,7 @@ import type { LspDocumentSymbol } from "./lsp-symbols";
 import { each, parseSource, type Node } from "./parse";
 import type { ValueKind } from "./parts";
 import { isOutsideTree } from "./referee-ts";
+import { spawnServer, stopServer } from "./server-process";
 
 export { isOutsideTree };
 
@@ -570,10 +571,15 @@ export async function warmUpAcross<T>(
 }
 
 export async function createPyrightLspReferee(root: string): Promise<PyrightLspReferee> {
-  const child: ChildProcessWithoutNullStreams = spawn(
+  /*
+   * `npx` is a wrapper and pyright its grandchild, so stopping the child alone
+   * could leave the server running. A group of its own, watched, goes whole
+   * and goes with this process however this process ends (#403).
+   */
+  const child: ChildProcessWithoutNullStreams = spawnServer(
     "npx",
     ["--yes", "-p", `pyright@${PYRIGHT_VERSION}`, "pyright-langserver", "--stdio"],
-    { cwd: root, stdio: ["pipe", "pipe", "pipe"] },
+    root,
   );
 
   let buffer = Buffer.alloc(0);
@@ -1118,10 +1124,10 @@ export async function createPyrightLspReferee(root: string): Promise<PyrightLspR
     close: () => {
       if (closed) return;
       closed = true;
-      // No LSP shutdown handshake: `child.kill()` reaps the process
+      // No LSP shutdown handshake: `stopServer` reaps the process
       // immediately after, so waiting on one more round trip buys nothing.
       child.stdin.end();
-      child.kill();
+      stopServer(child);
     },
   };
 }
