@@ -882,7 +882,8 @@ export const NOT_CLOSED_WORDS: Record<CallsNotClosed, string> = {
   dynamic: "the caller can reach a name that is nowhere in its text",
   receiver: "one call is on a value whose type the text does not give",
   unbound: "one call is on a name the file never says the origin of",
-  "local-callee": "one call is on a value the routine was handed, so what it runs is the caller's choice",
+  "local-callee": "one call is on a value -- handed in, or built by other code -- so what it runs "
+    + "is not in the text",
   ambiguous: "one call is on a name bound in two places at once",
   unplaced: "one call could not be traced to any file",
   elsewhere: "one call leads through a re-export that runs out",
@@ -5556,7 +5557,9 @@ export function checkDrift(
                   + `where ${verdict.evidence.routine} is declared.`,
               }, rests: {
                 written: !verdict.evidence.implicit,
-                unwritten: `a call the language makes without it being written (\`${verdict.evidence.implicit?.name}\`)`,
+                unwritten: verdict.evidence.implicit?.outside
+                  ? `a call code outside the repository may make on a value handed to it (\`${verdict.evidence.implicit.name}\`)`
+                  : `a call the language makes without it being written (\`${verdict.evidence.implicit?.name}\`)`,
                 ...(verdict.evidence.implicit ? {
                   ask: (referee: ClosedBodyReferee) => askMember(
                     referee,
