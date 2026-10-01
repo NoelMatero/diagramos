@@ -194,6 +194,40 @@ export interface RelationMeasured {
    * behind four explanations.
    */
   known?: readonly string[];
+  /**
+   * The same word measured against a compiler rather than a text scan (#393).
+   *
+   * Every row above was earned against a referee that reads what is written,
+   * which is the readers' own blind spot: #373 drew 448 correct arrows and 58
+   * went red behind zeros, every one resting on something not written -- a
+   * field with no type, a parameter typed by its variable, a class fitting an
+   * interface without `implements`. This is what the word does on the pairs a
+   * compiler says are true, drawn as arrows and checked by the product.
+   */
+  compilerTrue?: CompilerTrueMeasured;
+}
+
+/** One word, one language, on the pairs a compiler says are true (#393). */
+export interface CompilerTrueMeasured {
+  reproduce: string;
+  /** ISO date. */
+  measured: string;
+  /** The compiler, and what it shares with the reader and the gate. */
+  referee: string;
+  /** Pairs the compiler says are true, each drawn as an arrow and checked. */
+  pairs: number;
+  /** Of those, the ones true by what only the compiler knows: nothing at the site names the head. */
+  compilerOnly: number;
+  /** Called wrong with the language servers running, as the MCP server checks. The licence needs 0. */
+  redLive: number;
+  /**
+   * Called wrong with no compiler at all, as CI checks. Each rests on
+   * something the reader found written, and each is read in `note`.
+   */
+  redOff: number;
+  /** What this referee still cannot see, so nobody reads the zero as covering it. */
+  blind: string;
+  note?: string;
 }
 
 /**

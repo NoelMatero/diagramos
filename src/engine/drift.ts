@@ -58,7 +58,7 @@ import { ledgerAdditions, type Ledger } from "./ledger";
 import { checkNeeds, type NeedsWithheld } from "./needs";
 import {
   type CallSide, type CallsNotClosed, type CallsVerdict, type CallsWithheld, EXTERNAL_RECEIVER, type ReceiverResolution,
-  callSitesIn, callsBetween, callsIntoType, compiledBodiesFor, isTypeName,
+  bindingsIn, callSitesIn, callsBetween, callsIntoType, compiledBodiesFor, isTypeName, placeName,
 } from "./calls";
 import type { CompiledCrate } from "./compiled-calls";
 import { newReachCache, reachBetween, type ReachCache } from "./reach";
@@ -2348,6 +2348,68 @@ function callSide(
     };
   };
   return readSide(file);
+}
+
+/**
+ * Whether a type is one of the head through its bases' own base lists (#393).
+ *
+ * `conformedTypes` reads one declaration. `A extends B` with B extending the
+ * head reads there as "names other things", and that was a red resting on
+ * half of what is written: `measure:compiler-true` found 14 in TanStack's
+ * interfaces alone. So each base is followed to its own declaration, a file
+ * at a time, through the same import reading `@calls` places names with.
+ *
+ *   "reaches"     a written chain gets to the head
+ *   "closed"      every base was followed to its declaration, or left the
+ *                 repository -- a global (`Error`, `Exception`) or a
+ *                 package, neither of which can derive from a type here --
+ *                 and none got there
+ *   "unfollowed"  some base could not be followed, so "not one of it" is not
+ *                 read off writing any more
+ */
+function baseChain(
+  file: string,
+  subject: string,
+  targets: readonly string[],
+  workspace: Workspace,
+  configs: ConfigCache,
+): "reaches" | "closed" | "unfollowed" {
+  const wanted = new Set(targets);
+  const seen = new Set<string>();
+  let unfollowed = false;
+  let frontier = [{ file, name: subject }];
+  for (let depth = 0; frontier.length > 0; depth += 1) {
+    if (depth > 12) return "unfollowed";
+    const next: typeof frontier = [];
+    for (const { file: at, name } of frontier) {
+      if (seen.has(`${at}#${name}`)) continue;
+      seen.add(`${at}#${name}`);
+      const side = callSide(at, workspace, configs);
+      const read = side ? declaredBases(side.source, name, side.language) : undefined;
+      if (!side || !read || "why" in read || read.doubt || !read.closed) {
+        unfollowed = true;
+        continue;
+      }
+      const bindings = bindingsIn(side.source, side.language);
+      const mayLandHere = new Set((readDependencies(at, side.source, workspace, configs)?.dependencies ?? [])
+        .filter((one) => one.unplaced).map((one) => one.specifier));
+      for (const base of read.bases) {
+        if (wanted.has(base.name)) return "reaches";
+        if (!/^[\w$]+$/.test(base.name) || !bindings) { unfollowed = true; continue; }
+        const placed = placeName(base.name, side, bindings);
+        if (!("why" in placed)) {
+          next.push({ file: placed.file, name: placed.as ?? base.name });
+          continue;
+        }
+        const specifier = bindings.imported.get(base.name)?.specifier;
+        const leftTheRepository = placed.why === "unbound"
+          || (placed.why === "unplaced" && specifier !== undefined && !mayLandHere.has(specifier));
+        if (!leftTheRepository) unfollowed = true;
+      }
+    }
+    frontier = next;
+  }
+  return unfollowed ? "unfollowed" : "closed";
 }
 
 /**
@@ -4957,7 +5019,17 @@ export function checkDrift(
             recordEdge(edge, fromNode, toNode, { kind: "confirmed" });
             continue;
           }
-          if (verdict.verdict === "withheld") {
+          /*
+           * Not a base of its own: is it one through its bases' base lists?
+           * Reached, no red. Not followed all the way, and "names other
+           * things" is no longer read off writing (#393).
+           */
+          const chain = verdict.verdict === "absent" && verdict.bases && !verdict.reversed
+            ? baseChain(fromAnchor, fromEnd.symbols[0]!, toEnd.symbols, workspace, importCache.configs)
+            : "closed";
+          if (chain === "reaches") {
+            noteConforms("through-a-base");
+          } else if (verdict.verdict === "withheld") {
             noteConforms(verdict.why);
             /*
              * The two refusals that can never come good, and so the two that are
@@ -5031,8 +5103,10 @@ export function checkDrift(
                     + "fact drawn backwards, so turn it round."
                   : "Either the arrow points at the wrong type, or the declaration changed."),
             }, rests: {
-              written: verdict.written,
-              unwritten: `a class that writes no base list, which may still fit \`${oneLine(toNode.label) || toPath}\` without saying so`,
+              written: verdict.written && chain === "closed",
+              unwritten: chain === "unfollowed"
+                ? "a base whose own declaration could not be followed, which may itself be one of it"
+                : `a class that writes no base list, which may still fit \`${oneLine(toNode.label) || toPath}\` without saying so`,
               ask: (referee) => {
                 const head = declaredIn(workspace.read(toFile), toLanguage ?? language, toPath, toEnd.symbols[0]!);
                 const tail = declaredIn(workspace.read(fromFile), language, fromPath, fromEnd.symbols[0]!);

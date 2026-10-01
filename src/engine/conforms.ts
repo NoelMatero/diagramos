@@ -160,7 +160,14 @@ export type ConformsWithheld =
    * type checker reads -- pyright says `Registered` is not a `Node` -- so the
    * only honest answer is none.
    */
-  | "registered";
+  | "registered"
+  /**
+   * Not a base of its own, and a base of one of its bases (#393): `A extends
+   * B`, and B's declaration names the head. The chain is written, a file at a
+   * time, so it is never a red. Not a confirmation either, yet: the word may
+   * mean the direct base, and nobody has decided that.
+   */
+  | "through-a-base";
 
 /** Where the base was named, so a report can quote a file and a line. */
 export interface ConformsEvidence {
