@@ -120,6 +120,15 @@ def annotation_classes(script, node):
     return out
 
 
+def built(stmt):
+    """Whether an assignment's value is made by a call -- `Engine()` -- rather
+    than copied from a name or chosen by a condition, where jedi follows any
+    caller and no `isinstance`."""
+    value = stmt.children[2] if len(stmt.children) >= 3 and getattr(stmt.children[1], "value", None) == "=" else None
+    return value is not None and value.type in ("power", "atom_expr") \
+        and value.children[-1].type == "trailer" and value.children[-1].children[0].value == "("
+
+
 def value_classes(found):
     return {c for c in (project_class(d) for d in found) if c}
 
@@ -205,7 +214,7 @@ for path, (code, m) in modules.items():
             if target.type != "name" or target.value.startswith("__"):
                 continue
             annotation = stmt.children[1].children[1] if len(stmt.children) > 1 and stmt.children[1].type == "annassign" else None
-            sites.append((target, annotation))
+            sites.append((target, annotation, built(stmt)))
         for f in methods(klass):
             params = f.get_params()
             if not params or params[0].name.value != "self":
@@ -223,17 +232,17 @@ for path, (code, m) in modules.items():
                 if name.value.startswith("__"):
                     continue
                 annotation = n.children[1].children[1] if len(n.children) > 1 and n.children[1].type == "annassign" else None
-                sites.append((name, annotation))
+                sites.append((name, annotation, built(n)))
         # Where a type is written, it is the field's type: jedi's guesses at
         # what flows in follow no `isinstance` and no annotation, and a subclass
         # passed in is not what the field is declared to hold.
-        annotated = {leaf.value for leaf, annotation in sites if annotation is not None}
-        for leaf, annotation in sites:
+        annotated = {leaf.value for leaf, annotation, _ in sites if annotation is not None}
+        for leaf, annotation, made in sites:
             written = annotation_classes(script, annotation)
             for c in written:
                 if c != holder:
                     add("holds", f"{rel}#{holder}", f"{unique[c]}#{c}", "written")
-            if leaf.value in annotated:
+            if leaf.value in annotated or not made:
                 continue
             for c in value_classes(safe(script.infer, *leaf.start_pos)):
                 if c != holder:
