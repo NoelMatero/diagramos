@@ -155,8 +155,13 @@ export async function rustTruePairs(root: string): Promise<TruePair[]> {
     }
     return [...out].map(([name, self]) => ({ name, self }));
   };
-  const howOf = (written: string, name: string, self: boolean) =>
-    !self && new RegExp(`\\b${name}\\b`).test(written) ? "written" : self ? "alias" : "inferred";
+  /**
+   * `written` where the text names it; `alias` where it writes `Self` and
+   * means the impl's own type, which rustc prints by its name.
+   */
+  const howOf = (written: string, name: string, self: boolean, owner?: string) =>
+    !self && new RegExp(`\\b${name}\\b`).test(written) ? "written"
+      : self || (name === owner && /\bSelf\b/.test(written)) ? "alias" : "inferred";
 
   /**
    * A field's value type, as rustc has it, against the type the field writes.
@@ -208,7 +213,7 @@ export async function rustTruePairs(root: string): Promise<TruePair[]> {
     header.args.forEach((arg, index) => {
       if (hasSelf && index === 0) return;
       for (const { name, self } of partsOf(arg, routine.owner)) {
-        const how = howOf(routine.params, name, self);
+        const how = howOf(routine.params, name, self, routine.owner);
         // Rust writes every parameter's type: a part the text does not name is
         // what rustc built behind an `impl Trait` or another crate's alias.
         if (how !== "inferred") add({ word: "takes", from: `${home(name)}#${name}`, to: routine.ref, how });
@@ -217,7 +222,7 @@ export async function rustTruePairs(root: string): Promise<TruePair[]> {
     const signature = routine.text.slice(0, routine.text.indexOf("{") >= 0 ? routine.text.indexOf("{") : undefined);
     const written = signature.includes("->") ? signature.slice(signature.indexOf("->")) : "";
     for (const { name, self } of partsOf(header.ret, routine.owner)) {
-      const how = howOf(written, name, self);
+      const how = howOf(written, name, self, routine.owner);
       if (how !== "inferred") add({ word: "returns", from: `${home(name)}#${name}`, to: routine.ref, how });
     }
 
@@ -241,7 +246,7 @@ export async function rustTruePairs(root: string): Promise<TruePair[]> {
         if (!member) continue;
         heldBy(struct, member, read.type);
         // A read rustc copied in from a method it inlined is the method's, not this routine's.
-        if (!new RegExp(`\\b${member}\\b`).test(routine.text)) continue;
+        if (!new RegExp(`\\.\\s*${member}\\b`).test(routine.text)) continue;
         add({ word: "accesses", from: routine.ref, to: `${home(struct)}#${struct}`, label: member, how: "written" });
       }
       // Struct literals: `_4 = Position { offset: move _5, .. }`.
