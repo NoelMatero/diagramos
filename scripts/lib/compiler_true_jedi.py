@@ -37,6 +37,13 @@ def walk(n):
         yield from walk(c)
 
 
+def unwrap(n):
+    """A definition, with decorators and `async` looked through."""
+    while n.type in ("decorated", "async_funcdef", "async_stmt"):
+        n = n.children[-1]
+    return n
+
+
 modules, classes = {}, collections.defaultdict(list)
 for path in files:
     code = open(path, encoding="utf8").read()
@@ -47,13 +54,6 @@ for path in files:
         if n.type == "classdef":
             classes[n.name.value].append(os.path.relpath(path, root))
 unique = {k: v[0] for k, v in classes.items() if len(v) == 1}
-
-
-def unwrap(n):
-    """A definition, with decorators and `async` looked through."""
-    while n.type in ("decorated", "async_funcdef", "async_stmt"):
-        n = n.children[-1]
-    return n
 
 
 def top(module):
