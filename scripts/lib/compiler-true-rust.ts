@@ -67,7 +67,9 @@ export async function rustTruePairs(root: string): Promise<TruePair[]> {
   // What the files declare: types once, their named fields in order, and
   // every routine with the ref a board gives it.
   const typeHomes = new Map<string, string[]>();
+  /** Named fields in order, with each one's written type; none for a struct with a `cfg` inside, whose numbering rustc shifts. */
   const fields = new Map<string, string[]>();
+  const fieldTypes = new Map<string, Map<string, string>>();
   const typeText = new Map<string, string>();
   interface Routine { ref: string; file: string; name: string; owner?: string; implLine?: number; text: string; params: string }
   const routines: Routine[] = [];
@@ -94,9 +96,10 @@ export async function rustTruePairs(root: string): Promise<TruePair[]> {
           typeHomes.set(name, [...(typeHomes.get(name) ?? []), file]);
           typeText.set(name, node.text);
           const body = node.childForFieldName("body");
-          if (node.type === "struct_item" && body?.type === "field_declaration_list") {
-            fields.set(name, children(body).filter((one) => one.type === "field_declaration")
-              .map((one) => one.childForFieldName("name")?.text ?? ""));
+          if (node.type === "struct_item" && body?.type === "field_declaration_list" && !body.text.includes("#[cfg")) {
+            const declared = children(body).filter((one) => one.type === "field_declaration");
+            fields.set(name, declared.map((one) => one.childForFieldName("name")?.text ?? ""));
+            fieldTypes.set(name, new Map(declared.map((one) => [one.childForFieldName("name")?.text ?? "", one.childForFieldName("type")?.text ?? ""])));
           }
         }
       }
@@ -107,7 +110,9 @@ export async function rustTruePairs(root: string): Promise<TruePair[]> {
         if (name && (inImpl || atTop)) {
           const owner = inImpl ? holder!.childForFieldName("type")?.text.split("<")[0]!.split("::").pop() : undefined;
           routines.push({
-            ref: owner ? `${file}#${owner}.${name}` : `${file}#${name}`, file, name,
+            // The plain name, as the checker asks a Rust ref to be written:
+            // `file#Type.method` does not resolve, and #382 still judges it.
+            ref: `${file}#${name}`, file, name,
             ...(owner ? { owner, implLine: lineOf(holder!) } : {}),
             text: node.text, params: node.childForFieldName("parameters")?.text ?? "",
           });
@@ -138,15 +143,33 @@ export async function rustTruePairs(root: string): Promise<TruePair[]> {
   /** Every project type a printed type names, by last segment. `Self` is the owner. */
   const partsOf = (type: string, owner?: string): Array<{ name: string; self: boolean }> => {
     const out = new Map<string, boolean>();
-    for (const match of type.matchAll(/(?:\w+::)*([A-Z]\w*)/g)) {
-      const self = match[1] === "Self";
-      const name = self ? owner : match[1];
+    for (const match of type.matchAll(/((?:\w+::)*)([A-Z]\w*)/g)) {
+      // The standard library's own types are not this repository's, whatever they are called.
+      if (/^(std|core|alloc)::/.test(match[1]!)) continue;
+      const self = match[2] === "Self";
+      const name = self ? owner : match[2];
       if (name && home(name) && !out.has(name)) out.set(name, self);
     }
     return [...out].map(([name, self]) => ({ name, self }));
   };
   const howOf = (written: string, name: string, self: boolean) =>
     !self && new RegExp(`\\b${name}\\b`).test(written) ? "written" : self ? "alias" : "inferred";
+
+  /**
+   * A field's value type, as rustc has it, against the type the field writes.
+   * Rust writes every field's type, so a part the declaration does not name is
+   * the reading gone wrong -- except `Self`, the one name that stands for
+   * another there.
+   */
+  const heldBy = (struct: string, member: string, type: string) => {
+    const written = fieldTypes.get(struct)?.get(member);
+    if (written === undefined) return;
+    for (const { name } of partsOf(type)) {
+      if (name === struct) continue;
+      const how = new RegExp(`\\b${name}\\b`).test(written) ? "written" : /\bSelf\b/.test(written) ? "alias" : undefined;
+      if (how) add({ word: "holds", from: `${home(struct)}#${struct}`, to: `${home(name)}#${name}`, how });
+    }
+  };
 
   const pairs: TruePair[] = [];
   const seen = new Set<string>();
@@ -199,21 +222,16 @@ export async function rustTruePairs(root: string): Promise<TruePair[]> {
         const struct = baseOf(locals.get(read.local));
         if (!struct || !home(struct)) continue;
         const member = fields.get(struct)?.[read.index];
-        if (member) add({ word: "accesses", from: routine.ref, to: `${home(struct)}#${struct}`, label: member, how: "written" });
-        for (const { name } of partsOf(read.type)) {
-          if (name === struct) continue;
-          add({ word: "holds", from: `${home(struct)}#${struct}`, to: `${home(name)}#${name}`, how: howOf(typeText.get(struct) ?? "", name, false) });
-        }
+        if (!member) continue;
+        add({ word: "accesses", from: routine.ref, to: `${home(struct)}#${struct}`, label: member, how: "written" });
+        heldBy(struct, member, read.type);
       }
       // Struct literals: `_4 = Position { offset: move _5, .. }`.
       const literal = line.match(/^\s+_\d+ = (?:\w+::)*([A-Z]\w*)(?:::<.*?>)? \{ (.*) \};$/);
       if (literal && home(literal[1]!) && fields.has(literal[1]!)) {
         const struct = literal[1]!;
         for (const value of literal[2]!.matchAll(/(\w+): (?:move|copy) _(\d+)/g)) {
-          for (const { name } of partsOf(locals.get(value[2]!) ?? "")) {
-            if (name === struct) continue;
-            add({ word: "holds", from: `${home(struct)}#${struct}`, to: `${home(name)}#${name}`, how: howOf(typeText.get(struct) ?? "", name, false) });
-          }
+          heldBy(struct, value[1]!, locals.get(value[2]!) ?? "");
         }
       }
       // Calls: the function each lands on.

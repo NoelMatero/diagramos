@@ -43,30 +43,32 @@ for path in files:
     m = parso.parse(code)
     modules[path] = (code, m)
     for n in m.children:
+        n = unwrap(n)
         if n.type == "classdef":
             classes[n.name.value].append(os.path.relpath(path, root))
-        if n.type == "decorated" and n.children[-1].type == "classdef":
-            classes[n.children[-1].name.value].append(os.path.relpath(path, root))
 unique = {k: v[0] for k, v in classes.items() if len(v) == 1}
 
 
+def unwrap(n):
+    """A definition, with decorators and `async` looked through."""
+    while n.type in ("decorated", "async_funcdef", "async_stmt"):
+        n = n.children[-1]
+    return n
+
+
 def top(module):
-    """Top-level classdefs and funcdefs, decorators looked through."""
+    """Top-level classdefs and funcdefs."""
     for n in module.children:
-        if n.type == "decorated":
-            n = n.children[-1]
+        n = unwrap(n)
         if n.type in ("classdef", "funcdef"):
             yield n
 
 
 def methods(klass):
     for n in klass.children[-1].children if klass.children[-1].type == "suite" else []:
-        if n.type == "decorated":
-            n = n.children[-1]
-        if n.type in ("funcdef", "async_funcdef"):
+        n = unwrap(n)
+        if n.type == "funcdef":
             yield n
-        if n.type == "async_stmt" and n.children[-1].type == "funcdef":
-            yield n.children[-1]
 
 
 def project_class(name):
@@ -179,8 +181,8 @@ for path, (code, m) in modules.items():
                     continue
                 kscript = script if k is klass else jedi.Script(code=modules[kpath][0], path=kpath, project=project)
                 for leaf in names_in(ch[3]):
-                    following = leaf.get_next_leaf()
-                    if following is not None and following.value == "=":
+                    # A keyword argument -- `metaclass=Meta` -- is not a base, name or value.
+                    if any(p.type == "argument" for p in (leaf.parent, leaf.parent.parent if leaf.parent else None) if p is not None):
                         continue
                     for b in safe(kscript.infer, *leaf.start_pos):
                         c = project_class(b)
@@ -240,11 +242,16 @@ for path, ref, f, klass in routines:
     params = f.get_params()
     if klass is not None and params and params[0].name.value in ("self", "cls"):
         params = params[1:]
+    body = f.children[-1]
     for p in params:
         written = annotation_classes(script, p.annotation)
         for c in written:
             add("takes", f"{unique[c]}#{c}", ref, "written")
-        for c in value_classes(safe(script.infer, *p.name.start_pos)):
+        # Asked where the parameter is used, not where it is declared: only
+        # there does jedi look at the calls that pass it (dynamic params).
+        use = next((n for n in walk(body) if n.type == "name" and n.value == p.name.value), None)
+        found = safe(script.infer, *p.name.start_pos) + (safe(script.infer, *use.start_pos) if use else [])
+        for c in value_classes(found):
             add("takes", f"{unique[c]}#{c}", ref, "written" if c in written else "inferred")
 
     # returns: what calling it gives.
