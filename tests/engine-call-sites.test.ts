@@ -658,20 +658,23 @@ describe("a call on a name the routine holds rather than the file", () => {
       .toEqual(["unbound", "local-callee"]);
   });
 
-  it("leaves TypeScript's function-local const where the file reader put it", () => {
+  it("names TypeScript's function-local const a value too (#402)", () => {
     /*
-     * Asserted so it is on the record rather than found again later. A `const`
-     * inside a function body has a `name` field, so `bindingsIn` counts it
-     * among the *file's* declarations and the call is placed at this file --
-     * before this reader is ever asked. Python and Rust, whose locals carry no
-     * `name` field, get the more careful answer above.
+     * A `const` inside a function body has a `name` field, so `bindingsIn`
+     * counts it among the *file's* declarations, and until #402 the call was
+     * placed at this file -- before this reader was ever asked. Left that way
+     * then because placing it differently would move `@calls` verdicts on
+     * every TypeScript board, unmeasured.
      *
-     * Not changed here. Placing it differently would move `@calls` verdicts on
-     * every TypeScript board, and nothing in this change has measured that.
+     * #402 asks what such a name is declared as, wherever it is declared: a
+     * value (`const step = pick()`) is not a routine, so the call is on a
+     * value, as Python's and Rust's already were. Measured there:
+     * `bench:planted --word=calls` on a2dee38 moved no correct arrow to red
+     * and lost no catch to it.
      */
     const body = sitesIn("function f() {\n  const step = pick();\n  step();\n}\n")
       .find((one) => one.routine === "f")!;
-    expect(body.sites.map((one) => one.file ?? `?${one.why}`)).toEqual(["?unbound", "a.ts"]);
+    expect(body.sites.map((one) => one.file ?? `?${one.why}`)).toEqual(["?unbound", "?local-callee"]);
   });
 
   it("still says unbound for a name nothing in the routine binds", () => {
