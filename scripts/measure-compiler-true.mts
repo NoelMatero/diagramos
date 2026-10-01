@@ -111,7 +111,8 @@ interface ProjectResult {
 
 if (only) {
   const result = await measureOne(only);
-  process.stdout.write(`\n@@RESULT ${JSON.stringify(result)}\n`);
+  // Waited for: a pipe takes a long line in pieces, and exiting first cuts it.
+  await new Promise<void>((done) => process.stdout.write(`\n@@RESULT ${JSON.stringify(result)}\n`, () => done()));
   process.exit(0);
 }
 
@@ -134,7 +135,11 @@ for (const project of projects) {
     failed.push(`${project} (exit ${run.status}): ${(run.stderr || "").trim().split("\n").slice(-3).join(" | ")}`);
     continue;
   }
-  results.push(JSON.parse(line.slice("@@RESULT ".length)) as ProjectResult);
+  try {
+    results.push(JSON.parse(line.slice("@@RESULT ".length)) as ProjectResult);
+  } catch {
+    failed.push(`${project}: its result line did not parse (${line.length} characters)`);
+  }
 }
 report(results, failed);
 

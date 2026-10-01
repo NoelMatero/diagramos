@@ -53,9 +53,14 @@ function walk(dir: string, out: string[] = []): string[] {
 export function typescriptTruePairs(ts: typeof TS, root: string, dirs: string[]): TruePair[] {
   const files = dirs.flatMap((dir) => walk(path.join(root, dir)));
   const reading = new Set(files);
+  // The project's own settings: whether one type fits another depends on
+  // `strict`, and a looser program said 80 classes fit what the project's
+  // compiler says they do not.
+  const configPath = ts.findConfigFile(path.join(root, dirs[0] ?? "."), ts.sys.fileExists);
+  const parsed = configPath ? ts.getParsedCommandLineOfConfigFile(configPath, {}, { ...ts.sys, onUnRecoverableConfigFileDiagnostic: () => undefined }) : undefined;
   const program = ts.createProgram(files, {
-    target: ts.ScriptTarget.ES2022, jsx: ts.JsxEmit.Preserve, skipLibCheck: true, noEmit: true,
-    strict: false, experimentalDecorators: true, allowJs: false,
+    ...(parsed?.options ?? { target: ts.ScriptTarget.ES2022, strict: true }),
+    jsx: ts.JsxEmit.Preserve, skipLibCheck: true, noEmit: true, experimentalDecorators: true, allowJs: false,
   });
   const checker = program.getTypeChecker();
   const sources = program.getSourceFiles().filter((source) => reading.has(source.fileName));
@@ -98,7 +103,7 @@ export function typescriptTruePairs(ts: typeof TS, root: string, dirs: string[])
       if (name && !out.has(name)) out.set(name, bound ? "bound" : "plain");
     };
     note(type.aliasSymbol);
-    for (const argument of type.aliasTypeArguments ?? []) partsOf(argument, out, depth + 1, bound);
+    for (const argument of written(type.aliasSymbol, type.aliasTypeArguments)) partsOf(argument, out, depth + 1, bound);
     if (type.isUnionOrIntersection()) {
       for (const member of type.types) partsOf(member, out, depth + 1, bound);
       return out;
@@ -110,10 +115,27 @@ export function typescriptTruePairs(ts: typeof TS, root: string, dirs: string[])
     }
     note(type.getSymbol());
     if (type.flags & ts.TypeFlags.Object && (type as TS.ObjectType).objectFlags & ts.ObjectFlags.Reference) {
-      for (const argument of checker.getTypeArguments(type as TS.TypeReference)) partsOf(argument, out, depth + 1, bound);
+      const reference = type as TS.TypeReference;
+      for (const argument of written(reference.target?.getSymbol(), checker.getTypeArguments(reference))) {
+        partsOf(argument, out, depth + 1, bound);
+      }
     }
     return out;
   };
+  /**
+   * Type arguments, less the ones the declaration's defaults filled in:
+   * `ComponentObjectPropsOptions` is not "returns Data" because its parameter
+   * defaults to `Data` (#393's first run: 30 vue pairs nobody would draw).
+   */
+  function written(symbol: TS.Symbol | undefined, args: readonly TS.Type[] | undefined): readonly TS.Type[] {
+    if (!args) return [];
+    const declared = symbol?.declarations?.find((one) => (one as { typeParameters?: unknown }).typeParameters) as
+      { typeParameters?: TS.NodeArray<TS.TypeParameterDeclaration> } | undefined;
+    return args.filter((argument, index) => {
+      const fallback = declared?.typeParameters?.[index]?.default;
+      return !fallback || checker.getTypeAtLocation(fallback) !== argument;
+    });
+  }
   /** `written` when the name is spelled in the annotation, else what the compiler alone knows. */
   const howWritten = (annotation: TS.Node | undefined, name: string, part: "plain" | "bound") => {
     if (part === "bound") return "bound";
@@ -292,7 +314,10 @@ export function typescriptTruePairs(ts: typeof TS, root: string, dirs: string[])
   // or interface with at least one member that it is assignable to. An empty
   // type fits everything, which says nothing.
   const plain = (shape: (typeof shapes)[number]) => !shape.node.typeParameters?.length;
-  const targets = shapes.filter((shape) => plain(shape) && checker.getPropertiesOfType(shape.type).length > 0);
+  // At least one member that must be there: a type whose members are all
+  // optional is fitted by nearly anything, which says nothing.
+  const targets = shapes.filter((shape) => plain(shape)
+    && checker.getPropertiesOfType(shape.type).some((member) => !(member.flags & ts.SymbolFlags.Optional)));
   for (const shape of shapes) {
     if (!ts.isClassDeclaration(shape.node) || !plain(shape)) continue;
     for (const target of targets) {

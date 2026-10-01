@@ -371,11 +371,17 @@ function hasParent(declaration: Node): boolean {
  * A TypeScript index signature answers to every string, and a Python class with
  * `__getattr__` answers to every attribute. Either way the declaration in front
  * of us has stopped being a closed region.
+ *
+ * So does a member whose name is computed: vue declares
+ * `[LifecycleHooks.ERROR_CAPTURED]: LifecycleHook`, which the compiler knows
+ * as `ec` and the text writes as an expression (#393: 7 correct arrows red).
+ * A string literal in the brackets is still a name written down.
  */
 function openMembership(body: Node): boolean {
   let open = false;
   each(body, (node) => {
     if (node.type === "index_signature") open = true;
+    if (node.type === "computed_property_name" && !/^\[\s*(["'`])[^"'`$]*\1\s*\]$/.test(node.text)) open = true;
     if (nameOf(node) === "__getattr__" || nameOf(node) === "__getattribute__") open = true;
   });
   return open;

@@ -136,6 +136,29 @@ export function usesTypeParameter(type: Node, parameters: Set<string>): boolean 
   return found;
 }
 
+/**
+ * Node types of a TypeScript type the text computes rather than names:
+ * `typeof f`, `keyof T`, `T["k"]`, `A extends B ? C : D`, `infer U`, a
+ * mapped type, a template literal type. `...args: Parameters<typeof f>`
+ * names no type at all, so "it names other things" is not read off writing
+ * there (#393: 13 correct vue arrows red).
+ */
+const COMPUTED_TYPE = new Set([
+  "type_query", "index_type_query", "lookup_type", "conditional_type", "infer_type",
+  "mapped_type_clause", "template_literal_type",
+]);
+
+/**
+ * Whether what a type annotation says is not written out: it uses a type
+ * parameter (`seat: S`), or computes its type rather than naming one.
+ */
+export function unwrittenType(type: Node, parameters: Set<string>): boolean {
+  if (usesTypeParameter(type, parameters)) return true;
+  let computed = false;
+  each(type, (node) => { if (COMPUTED_TYPE.has(node.type)) computed = true; });
+  return computed;
+}
+
 /** A place to ask about: a name in a file and its range, as the questions take it. */
 export interface AskedAt {
   file: string;

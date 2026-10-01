@@ -24,8 +24,8 @@ export const hasRustAnalyzer = (() => {
 
 const ACCUSES = new Set<string>(ACCUSING_EDGE_KINDS);
 
-/** One arrow: `[from ref, to ref, claim]`. */
-export type Arrow = [from: string, to: string, claim: string];
+/** One arrow: `[from ref, to ref, claim]`, and the label an `accesses` arrow names its member with. */
+export type Arrow = [from: string, to: string, claim: string, label?: string];
 
 /** What one arrow came back as: its accusing kinds (empty when none) and why it went unconfirmed, if it did. */
 export interface ArrowVerdict {
@@ -69,7 +69,9 @@ export async function verdicts(
   const { board } = await createDiagram(emptyBoard(), {
     name: "probe",
     nodes: [...ids].map(([ref, id]) => ({ id, label: ref.split("#").pop()!, ref })),
-    edges: arrows.map(([from, to, claim]) => ({ from: idOf(from), to: idOf(to), claim: claim as never })),
+    edges: arrows.map(([from, to, claim, label]) => ({
+      from: idOf(from), to: idOf(to), claim: claim as never, ...(label ? { label } : {}),
+    })),
   });
   const workspace = createWorkspace(repo);
   const run = (referee?: ClosedBodyReferee) =>

@@ -140,7 +140,7 @@
  * in `docs/claim-vocabulary.md` and is the licence grid.
  */
 import { aliasesFor, aliasNames } from "./alias";
-import { typeParametersIn, unwrittenNames, usesTypeParameter, type Site } from "./gate";
+import { typeParametersIn, unwrittenNames, unwrittenType, type Site } from "./gate";
 import { mayAccuse } from "./licence";
 import { INSTANCE_NAMES, parseSource, qualifiedTail, type Language, type Node } from "./parse";
 
@@ -485,7 +485,7 @@ function parameterSites(parameters: Node, generics: Set<string>): Site[] {
       ? parameter
       : parameter.childForFieldName("pattern") ?? parameter.childForFieldName("name") ?? firstNamed(parameter);
     if (!name || INSTANCE_NAMES.has(name.text)) continue;
-    sites.push({ name: name.text, ...typeRange(name), written: type !== null && !usesTypeParameter(type, generics) });
+    sites.push({ name: name.text, ...typeRange(name), written: type !== null && !unwrittenType(type, generics) });
   }
   return sites;
 }
@@ -724,7 +724,7 @@ export function signatureNames(
     }
     sites.push(...(position === "parameter"
       ? (parameters ? parameterSites(parameters, generics) : [])
-      : [{ name: returned!.text.replace(/^[:\s]+|^->\s*/, ""), ...typeRange(returned!), written: !usesTypeParameter(returned!, generics) }]));
+      : [{ name: returned!.text.replace(/^[:\s]+|^->\s*/, ""), ...typeRange(returned!), written: !unwrittenType(returned!, generics) }]));
     absent ??= { verdict: "absent", signature: text, line, sites: [], unwritten: [] };
   }
 

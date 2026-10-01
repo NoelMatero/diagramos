@@ -61,7 +61,7 @@
  * return type, and counting it would make every method a field.
  */
 import { aliasesFor, aliasNames } from "./alias";
-import { typeParametersIn, usesTypeParameter, type Site } from "./gate";
+import { typeParametersIn, unwrittenType, type Site } from "./gate";
 import { mayAccuse } from "./licence";
 import {
   declaresField, each, INSTANCE_NAMES, parseSource, qualifiedTail,
@@ -468,7 +468,7 @@ export function heldTypes(
   const sites: FieldSite[] = [];
 
   const parameters = typeParametersIn(tree.rootNode, source);
-  const generic = (type: Node): boolean => usesTypeParameter(type, parameters);
+  const generic = (type: Node): boolean => unwrittenType(type, parameters);
 
   for (const declaration of declarations) {
     let body = declaration.type === "object_type"

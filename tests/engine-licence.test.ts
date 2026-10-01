@@ -736,3 +736,32 @@ describe("the compiler over this repository", () => {
     expect(measured.skipped).toEqual([]);
   });
 });
+
+/**
+ * #393: every licence earned against a text scan is measured again against a
+ * compiler, on the pairs the compiler says are true, and calls none wrong.
+ *
+ * The words not listed rest on a compiler already -- `needs` and `depends` on
+ * the compilers' own import edges, `builds` on `measure:builds-absent` -- or,
+ * for `handles`, on arms that are always written (see its row's note).
+ */
+describe("the licences measured against a compiler", () => {
+  const WORDS = ["holds", "takes", "returns", "conforms", "calls", "accesses"] as const;
+  const LANGUAGES = ["ts", "python", "rust"] as const;
+
+  it("has a compiler-true row on every square that may accuse, with no correct arrow called wrong", () => {
+    const missing: string[] = [];
+    for (const word of WORDS) {
+      for (const language of LANGUAGES) {
+        if (!mayAccuse(word, language as Language, "presence")) continue;
+        const row = relationLicence(word, language as Language, "presence");
+        const measured = row && isMeasured(row) ? row.compilerTrue : undefined;
+        if (!measured) { missing.push(`${word}/${language}`); continue; }
+        expect(measured.redLive, `${word}/${language}`).toBe(0);
+        expect(measured.pairs, `${word}/${language}`).toBeGreaterThan(0);
+        expect(measured.blind.length, `${word}/${language}`).toBeGreaterThan(20);
+      }
+    }
+    expect(missing).toEqual([]);
+  });
+});
