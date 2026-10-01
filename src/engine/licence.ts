@@ -687,8 +687,14 @@ const COMPILER_TRUE_COUNTS: Record<CompilerTrueLanguage, Partial<Record<Compiler
     holds: [1024, 390, 0, 0], takes: [7273, 4799, 0, 0], returns: [1872, 1251, 0, 0],
     conforms: [1013, 812, 0, 0], calls: [5575, 39, 0, 0], accesses: [4390, 0, 0, 0],
   },
-  python: {},
-  rust: {},
+  python: {
+    holds: [104, 37, 0, 0], takes: [431, 1, 0, 0], returns: [305, 0, 0, 0],
+    conforms: [262, 60, 0, 0], calls: [2551, 0, 0, 0], accesses: [3544, 0, 0, 0],
+  },
+  rust: {
+    holds: [244, 0, 0, 0], takes: [935, 14, 0, 0], returns: [1107, 155, 0, 0],
+    calls: [4290, 65, 0, 0], accesses: [1715, 0, 0, 0],
+  },
 };
 
 function compilerTrue(language: CompilerTrueLanguage, word: CompilerTrueWord): CompilerTrueMeasured | undefined {
