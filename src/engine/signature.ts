@@ -572,11 +572,18 @@ export function signatureNames(
    * and this file has not declared one of its own. A file with `class Self` in
    * it means that class, and substituting the enclosing type there would invent
    * exactly the false red this treatment exists to remove.
+   *
+   * A declaration, not anything with a `name`: Rust's `Self { header }`
+   * builds a value and names `Self` in that field, and counting it switched
+   * the reading off for every `-> Self` in the file -- 44 correct clap and
+   * regex arrows red (#393's `measure:compiler-true`).
    */
   let declaresSelf = false;
   each(tree.rootNode, (node) => {
     const name = node.childForFieldName("name");
-    if (name && name.childCount === 0 && name.text === SELF) declaresSelf = true;
+    if (name && name.childCount === 0 && name.text === SELF && /(_item|_definition|_declaration)$/.test(node.type)) {
+      declaresSelf = true;
+    }
   });
   const selfMeansEnclosing = SELF_MEANS_ENCLOSING.has(language) && !declaresSelf;
   const quoting = QUOTED_TYPES.has(language);

@@ -2430,9 +2430,29 @@ function baseChain(
  */
 function throughAliases(file: string, sites: Site[], workspace: Workspace, configs: ConfigCache): Site[] {
   if (!sites.some((one) => one.written && one.annotation)) return sites;
+  const hidesSomething = aliasesIn(file, workspace, configs);
+  const source = workspace.read(workspace.resolve(file) ?? file);
+  return sites.map((one) => {
+    if (!one.written || !one.annotation) return one;
+    const text = source.slice(one.annotation.start, one.annotation.end);
+    // Names in type position only: not a member after a dot, not a string's insides.
+    const names = [...text.replace(/(["'`]).*?\1/g, "").matchAll(/(?<![\w$.])[A-Za-z_$][\w$]*/g)].map((match) => match[0]);
+    return names.some(hidesSomething) ? { ...one, written: false } : one;
+  });
+}
+
+/**
+ * Whether a name, as this file would mean it, stands for another type: an
+ * alias declared here or where an import of it leads, or a name in this
+ * repository that cannot be followed to its declaration. A global or a
+ * package's name does not. `throughAliases` asks it of what a file writes;
+ * the gate asks it of what pyright answers, which prints an alias by its name
+ * and stops there (#393: httpx's `timeout: TimeoutTypes` read as "no Timeout").
+ */
+function aliasesIn(file: string, workspace: Workspace, configs: ConfigCache): (name: string) => boolean {
   const side = callSide(file, workspace, configs);
   const bindings = side ? bindingsIn(side.source, side.language) : undefined;
-  if (!side || !bindings) return sites.map((one) => (one.annotation ? { ...one, written: false } : one));
+  if (!side || !bindings) return () => true;
   const mayLandHere = new Set((readDependencies(file, side.source, workspace, configs)?.dependencies ?? [])
     .filter((one) => one.unplaced).map((one) => one.specifier));
   const hides = new Map<string, boolean>();
@@ -2461,13 +2481,7 @@ function throughAliases(file: string, sites: Site[], workspace: Workspace, confi
     }
     return hides.get(name)!;
   };
-  return sites.map((one) => {
-    if (!one.written || !one.annotation) return one;
-    const text = side.source.slice(one.annotation.start, one.annotation.end);
-    // Names in type position only: not a member after a dot, not a string's insides.
-    const names = [...text.replace(/(["'`]).*?\1/g, "").matchAll(/(?<![\w$.])[A-Za-z_$][\w$]*/g)].map((match) => match[0]);
-    return names.some(hidesSomething) ? { ...one, written: false } : one;
-  });
+  return hidesSomething;
 }
 
 /**
@@ -4899,6 +4913,8 @@ export function checkDrift(
                 referee,
                 signatureSites.map((one) => ({ file: toPath, name: one.name, at: one, written: one.written })),
                 declaredIn(workspace.read(fromFile), fromLanguage ?? language, fromPath, fromEnd.symbols[0]!),
+                "is",
+                language === "python" ? aliasesIn(toAnchor, workspace, importCache.configs) : undefined,
               ),
             } });
             continue;
@@ -5026,6 +5042,8 @@ export function checkDrift(
                 referee,
                 holdsSites.map((one) => ({ file: fromPath, name: one.name, at: one, written: one.written })),
                 declaredIn(workspace.read(toFile), toLanguage ?? language, toPath, toEnd.symbols[0]!),
+                "is",
+                language === "python" ? aliasesIn(fromAnchor, workspace, importCache.configs) : undefined,
               ),
             } });
             continue;

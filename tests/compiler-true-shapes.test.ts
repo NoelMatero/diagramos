@@ -169,3 +169,85 @@ describe("a type written through an alias is not written evidence", () => {
     expect(each.map((one) => one.reds)).toEqual([[], ["holds-absent"]]);
   }, 120_000);
 });
+
+/*
+ * httpx: `timeout: TimeoutTypes`, where `TimeoutTypes` is a module-level
+ * Union naming "Timeout". pyright answers with the alias's name and stops,
+ * which was read as "not a Timeout" -- 10 correct arrows red with it running.
+ */
+const PY_ALIAS = {
+  "pkg/__init__.py": "",
+  "pkg/config.py": "class Timeout:\n    pass\n",
+  // In a module of its own, as httpx's `_types.py`: an alias beside the head is read already.
+  "pkg/types.py": [
+    "from typing import TYPE_CHECKING, Optional, Union",
+    "",
+    "if TYPE_CHECKING:",
+    "    from .config import Timeout",
+    "",
+    "TimeoutTypes = Union[Optional[float], \"Timeout\"]",
+    "",
+  ].join("\n"),
+  "pkg/api.py": [
+    "from .types import TimeoutTypes",
+    "",
+    "",
+    "def request(timeout: TimeoutTypes = None) -> None:",
+    "    print(timeout)",
+    "",
+    "",
+    "def plain(seconds: float) -> None:",
+    "    print(seconds)",
+    "",
+  ].join("\n"),
+};
+
+describe("pyright answering with an alias's name", () => {
+  it("does not call a parameter typed through the alias wrong", async () => {
+    repo = scratchRepo(PY_ALIAS);
+    const { each: [arrow] } = await verdicts(repo, [["pkg/config.py#Timeout", "pkg/api.py#request", "takes"]]);
+    expect(arrow!.reds).toEqual([]);
+  }, 120_000);
+
+  it("still calls a parameter pyright says is a float wrong", async () => {
+    repo = scratchRepo(PY_ALIAS);
+    const { each: [arrow] } = await verdicts(repo, [["pkg/config.py#Timeout", "pkg/api.py#plain", "takes"]]);
+    expect(arrow!.reds).toEqual(["signature-absent"]);
+  }, 120_000);
+});
+
+/*
+ * clap's `Styles::plain() -> Self`, in a file that builds `Self { .. }`: the
+ * value counted as a declaration of a type called `Self`, which switched off
+ * reading `Self` as the impl's type for the whole file. 44 correct arrows red.
+ */
+const RS_SELF = {
+  "Cargo.toml": "[package]\nname = \"probe\"\nversion = \"0.1.0\"\nedition = \"2021\"\n",
+  "src/lib.rs": "pub mod styling;\n",
+  "src/styling.rs": [
+    "pub struct Style;",
+    "pub struct Styles {",
+    "    header: Style,",
+    "}",
+    "impl Styles {",
+    "    pub const fn plain() -> Self {",
+    "        Self { header: Style }",
+    "    }",
+    "}",
+    "",
+  ].join("\n"),
+};
+
+describe("Rust `-> Self` in a file that builds `Self { .. }`", () => {
+  it("reads `Self` as the impl's type", async () => {
+    repo = scratchRepo(RS_SELF);
+    const { each: [arrow] } = await verdicts(repo, [["src/styling.rs#Styles", "src/styling.rs#plain", "returns"]], { compiler: false });
+    expect(arrow).toEqual({ reds: [] });
+  }, 60_000);
+
+  it("still calls a return of another type wrong", async () => {
+    repo = scratchRepo(RS_SELF);
+    const { each: [arrow] } = await verdicts(repo, [["src/styling.rs#Style", "src/styling.rs#plain", "returns"]], { compiler: false });
+    expect(arrow!.reds).toEqual(["signature-absent"]);
+  }, 60_000);
+});

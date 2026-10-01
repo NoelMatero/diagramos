@@ -50,8 +50,9 @@ export async function rustTruePairs(root: string): Promise<TruePair[]> {
   const files = absolute.map((one) => path.relative(root, one));
   const crates = await compileCrates(root, files, { until: Date.now() + 900_000 });
 
-  // Raw MIR by printed path: header and body, closures folded into their function.
-  const mir = new Map<string, Header>();
+  // Raw MIR by printed path, one map per Cargo.toml: two crates in one
+  // workspace may each print a function as `subcommands`.
+  const mirOf = new Map<string, Map<string, Header>>();
   const manifests = new Set<string>();
   for (const file of absolute) {
     for (let dir = path.dirname(file); dir.startsWith(root); dir = path.dirname(dir)) {
@@ -61,7 +62,9 @@ export async function rustTruePairs(root: string): Promise<TruePair[]> {
   for (const manifest of manifests) {
     const key = createHash("sha1").update(manifest).digest("hex").slice(0, 16);
     const dump = path.join(rustcCacheDir(), key, "calls.mir");
+    const mir = new Map<string, Header>();
     if (existsSync(dump)) readMir(readFileSync(dump, "utf8"), mir);
+    mirOf.set(manifest, mir);
   }
 
   // What the files declare: types once, their named fields in order, and
@@ -189,7 +192,11 @@ export async function rustTruePairs(root: string): Promise<TruePair[]> {
       : !body.path.includes("<impl at "));
     const body = one(bodies);
     if (!body) continue;
-    const header = mir.get(body.path);
+    let manifest: string | undefined;
+    for (let dir = path.dirname(path.join(root, routine.file)); !manifest && dir.startsWith(root); dir = path.dirname(dir)) {
+      if (existsSync(path.join(dir, "Cargo.toml"))) manifest = path.join(dir, "Cargo.toml");
+    }
+    const header = manifest ? mirOf.get(manifest)?.get(body.path) : undefined;
     if (!header) continue;
 
     // takes and returns, off the header. A method's receiver is not a parameter.
@@ -217,8 +224,9 @@ export async function rustTruePairs(root: string): Promise<TruePair[]> {
       type?.replace(/^(&(mut )?|\*(const|mut) )+/, "").replace(/'\w+ /g, "").split("<")[0]!.split("::").pop()!.trim();
 
     for (const line of header.lines) {
-      // Field reads: `(_3.1: T)` and `((*_3).1: T)`.
-      for (const read of fieldReads(line)) {
+      // Field reads: `(_3.1: T)` and `((*_3).1: T)`. Not in a `drop`: rustc
+      // cleaning up the fields a body moved out of nothing reads them.
+      for (const read of /^\s+drop\(/.test(line) ? [] : fieldReads(line)) {
         const struct = baseOf(locals.get(read.local));
         if (!struct || !home(struct)) continue;
         const member = fields.get(struct)?.[read.index];

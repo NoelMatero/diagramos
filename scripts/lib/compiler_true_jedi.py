@@ -224,11 +224,17 @@ for path, (code, m) in modules.items():
                     continue
                 annotation = n.children[1].children[1] if len(n.children) > 1 and n.children[1].type == "annassign" else None
                 sites.append((name, annotation))
+        # Where a type is written, it is the field's type: jedi's guesses at
+        # what flows in follow no `isinstance` and no annotation, and a subclass
+        # passed in is not what the field is declared to hold.
+        annotated = {leaf.value for leaf, annotation in sites if annotation is not None}
         for leaf, annotation in sites:
             written = annotation_classes(script, annotation)
             for c in written:
                 if c != holder:
                     add("holds", f"{rel}#{holder}", f"{unique[c]}#{c}", "written")
+            if leaf.value in annotated:
+                continue
             for c in value_classes(safe(script.infer, *leaf.start_pos)):
                 if c != holder:
                     add("holds", f"{rel}#{holder}", f"{unique[c]}#{c}", "written" if c in written else "inferred")
@@ -247,6 +253,8 @@ for path, ref, f, klass in routines:
         written = annotation_classes(script, p.annotation)
         for c in written:
             add("takes", f"{unique[c]}#{c}", ref, "written")
+        if p.annotation is not None:
+            continue
         # Asked where the parameter is used, not where it is declared: only
         # there does jedi look at the calls that pass it (dynamic params).
         use = next((n for n in walk(body) if n.type == "name" and n.value == p.name.value), None)
@@ -258,7 +266,7 @@ for path, ref, f, klass in routines:
     written = annotation_classes(script, f.annotation)
     for c in written:
         add("returns", f"{unique[c]}#{c}", ref, "written")
-    for d in safe(script.infer, *f.name.start_pos):
+    for d in ([] if f.annotation is not None else safe(script.infer, *f.name.start_pos)):
         if d.type != "function":
             continue
         for c in value_classes(safe(d.execute)):

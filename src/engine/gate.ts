@@ -224,6 +224,12 @@ export function askTypeParts(
   places: AskedAt[],
   head: { name: string; at: DeclaredAt[] },
   what = "is",
+  /**
+   * Whether a name the answer gives stands for another type. Pyright prints
+   * an alias by its name -- `timeout: TimeoutTypes` -- and stops there, so an
+   * answer naming one has not said what the place holds (#393).
+   */
+  alias?: (name: string) => boolean,
 ): CompilerSaid {
   if (!referee.typePartsAt || places.length === 0 || head.at.length === 0) return { does: undefined };
   let unsure: string | undefined;
@@ -234,7 +240,8 @@ export function askTypeParts(
     if (found.includes(true)) {
       return { does: true, said: `\`${place.name}\` ${what} ${printed(answer)}, which is ${head.name}` };
     }
-    if (found.includes(undefined) && !place.written) unsure ??= place.name;
+    const unexpanded = alias !== undefined && (answer?.parts ?? []).some((part) => alias(part.name));
+    if ((found.includes(undefined) || unexpanded) && !place.written) unsure ??= place.name;
     else nos.push(`\`${place.name}\` ${what} ${printed(answer)}`);
   }
   if (unsure !== undefined) return { does: undefined, said: `the compiler could not say what \`${unsure}\` ${what}` };
