@@ -174,6 +174,13 @@ export async function rustTruePairs(root: string): Promise<TruePair[]> {
     }
   };
 
+  const manifestOf = (file: string): string | undefined => {
+    for (let dir = path.dirname(path.join(root, file)); dir.startsWith(root); dir = path.dirname(dir)) {
+      if (existsSync(path.join(dir, "Cargo.toml"))) return path.join(dir, "Cargo.toml");
+    }
+    return undefined;
+  };
+
   const pairs: TruePair[] = [];
   const seen = new Set<string>();
   const add = (pair: TruePair) => {
@@ -192,10 +199,7 @@ export async function rustTruePairs(root: string): Promise<TruePair[]> {
       : !body.path.includes("<impl at "));
     const body = one(bodies);
     if (!body) continue;
-    let manifest: string | undefined;
-    for (let dir = path.dirname(path.join(root, routine.file)); !manifest && dir.startsWith(root); dir = path.dirname(dir)) {
-      if (existsSync(path.join(dir, "Cargo.toml"))) manifest = path.join(dir, "Cargo.toml");
-    }
+    const manifest = manifestOf(routine.file);
     const header = manifest ? mirOf.get(manifest)?.get(body.path) : undefined;
     if (!header) continue;
 
@@ -204,13 +208,17 @@ export async function rustTruePairs(root: string): Promise<TruePair[]> {
     header.args.forEach((arg, index) => {
       if (hasSelf && index === 0) return;
       for (const { name, self } of partsOf(arg, routine.owner)) {
-        add({ word: "takes", from: `${home(name)}#${name}`, to: routine.ref, how: howOf(routine.params, name, self) });
+        const how = howOf(routine.params, name, self);
+        // Rust writes every parameter's type: a part the text does not name is
+        // what rustc built behind an `impl Trait` or another crate's alias.
+        if (how !== "inferred") add({ word: "takes", from: `${home(name)}#${name}`, to: routine.ref, how });
       }
     });
     const signature = routine.text.slice(0, routine.text.indexOf("{") >= 0 ? routine.text.indexOf("{") : undefined);
     const written = signature.includes("->") ? signature.slice(signature.indexOf("->")) : "";
     for (const { name, self } of partsOf(header.ret, routine.owner)) {
-      add({ word: "returns", from: `${home(name)}#${name}`, to: routine.ref, how: howOf(written, name, self) });
+      const how = howOf(written, name, self);
+      if (how !== "inferred") add({ word: "returns", from: `${home(name)}#${name}`, to: routine.ref, how });
     }
 
     // Locals' types, for the base of each field read and each literal's values.
@@ -231,8 +239,10 @@ export async function rustTruePairs(root: string): Promise<TruePair[]> {
         if (!struct || !home(struct)) continue;
         const member = fields.get(struct)?.[read.index];
         if (!member) continue;
-        add({ word: "accesses", from: routine.ref, to: `${home(struct)}#${struct}`, label: member, how: "written" });
         heldBy(struct, member, read.type);
+        // A read rustc copied in from a method it inlined is the method's, not this routine's.
+        if (!new RegExp(`\\b${member}\\b`).test(routine.text)) continue;
+        add({ word: "accesses", from: routine.ref, to: `${home(struct)}#${struct}`, label: member, how: "written" });
       }
       // Struct literals: `_4 = Position { offset: move _5, .. }`.
       const literal = line.match(/^\s+_\d+ = (?:\w+::)*([A-Z]\w*)(?:::<.*?>)? \{ (.*) \};$/);
@@ -252,7 +262,10 @@ export async function rustTruePairs(root: string): Promise<TruePair[]> {
           : callee.includes("<impl at ")
             ? unique.find((other) => other.owner && callee.endsWith(`::${other.name}`)
               && callee.includes(`${other.file}:${other.implLine}:`))
-            : one(byFree.get(callee.split("::").pop()!));
+            // A free function only within the routine's own crate: another
+            // crate's `next` is not this workspace's `next`.
+            : callee.startsWith("<") ? undefined
+            : one((byFree.get(callee.split("::").pop()!) ?? []).filter((other) => manifestOf(other.file) === manifest));
         if (target && target.ref !== routine.ref) {
           const spelled = routine.text.includes(`${target.name}(`) || routine.text.includes(`${target.name}::<`);
           add({ word: "calls", from: routine.ref, to: target.ref, how: spelled ? "written" : "other-name" });
