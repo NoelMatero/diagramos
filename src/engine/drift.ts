@@ -5353,7 +5353,16 @@ export function checkDrift(
                  * lets a live check put the open call to a language server.
                  */
               } else if (own.verdict === "open") {
-                if (verdict.verdict !== "withheld") verdict = { verdict: "absent", notClosed: own.why };
+                /*
+                 * A forward doubt no compiler can settle -- `x()(n)`, a call
+                 * nothing names (#400) -- is not the one to report when the
+                 * class's reading stopped on a value whose type a compiler
+                 * can give: that answer is what can still confirm it, and a
+                 * live check asks only for the reasons it is shown. nest's
+                 * `RouterExplorer -> RoutePathFactory` went unconfirmed so.
+                 */
+                const answerable = own.why === "receiver" || own.why === "abstract-receiver";
+                if (verdict.verdict !== "withheld" || answerable) verdict = { verdict: "absent", notClosed: own.why };
               } else if (made?.verdict !== "refuted") {
                 if (verdict.verdict !== "withheld") verdict = { verdict: "absent", notClosed: "may-create" };
               } else if (verdict.verdict === "refuted") {

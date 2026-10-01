@@ -25,6 +25,7 @@ import path from "node:path";
 import { afterEach, beforeAll, beforeEach, describe, expect, it } from "vitest";
 
 import { emptyBoard, type BoardFile } from "../src/engine/board-file";
+import { callSitesIn } from "../src/engine/calls";
 import { createDiagram } from "../src/engine/diagram";
 import { ACCUSING_EDGE_KINDS, checkDrift, createWorkspace, type DriftReport } from "../src/engine/drift";
 import { initEngine } from "../src/engine/parse";
@@ -215,5 +216,76 @@ describe("an object handed to library code (#401)", () => {
       ["the object handed on has no such method", "writer.py#show_quiet", "writer.py#write"],
       ["the head is a function, not a method of what is handed on", "writer.py#dump", "writer.py#helper"],
     ],
+  }, 120_000);
+});
+
+describe("a call of a call does not hide a class the tail does call (#400, found by bench:planted)", () => {
+  /*
+   * nest's `RouterExplorer` calls `this.routePathFactory.create(...)`, and
+   * elsewhere `this.createCallbackProxy(...)(req, res, next)`. The second is
+   * now a call nothing can name, and it was the reason recorded for the
+   * arrow -- one no compiler can settle, so the live check never started one
+   * to place the first, and a confirmed arrow went unconfirmed.
+   */
+  it("still confirms an arrow between two classes", async () => {
+    write({
+      "tsconfig.json": "{ \"compilerOptions\": { \"strict\": true } }\n",
+      "factory.ts": "export class Factory {\n  create(n: number): number {\n    return n + 1;\n  }\n}\n",
+      "explorer.ts": [
+        "import { Factory } from \"./factory\";",
+        "export class Explorer {\n  constructor(private readonly factory: Factory) {}\n\n"
+          + "  paths(n: number): number {\n    return this.factory.create(n);\n  }\n\n"
+          + "  proxy(): (n: number) => number {\n    return (n) => n;\n  }\n\n"
+          + "  handle(n: number): number {\n    return this.proxy()(n);\n  }\n}",
+        "",
+      ].join("\n\n"),
+    });
+    const report = await checked("explorer.ts#Explorer", "factory.ts#Factory");
+    expect(accusations(report)).toEqual([]);
+    expect(report.claims.callsConfirmed).toBe(1);
+  }, 120_000);
+});
+
+describe("a type named Ok is not a value somebody built (#402, found by bench:planted)", () => {
+  /*
+   * serde's `Serializer` impls declare `type Ok = Value;`, and the first
+   * version of #402's rule took that `Ok` -- declared in the file, and
+   * neither a routine nor a class -- for a value, so every `Ok(...)` read as
+   * a call on one. That was the first reason serde_json's `Serializer ->
+   * Value` stopped on, and no compiler settles it, so none was asked to place
+   * the call that confirmed it. Only a declaration that assigns a value is one.
+   */
+  it("places Ok(...) as the language's own", () => {
+    const source = [
+      "pub trait Sink {\n    type Ok;\n    fn put(&self) -> Result<Self::Ok, ()>;\n}",
+      "pub struct S;",
+      "impl Sink for S {\n    type Ok = i32;\n\n    fn put(&self) -> Result<i32, ()> {\n        Ok(2)\n    }\n}",
+      "",
+    ].join("\n\n");
+    const reading = callSitesIn({ file: "src/a.rs", source, language: "rust", imports: [] });
+    if (!reading.read) throw new Error(`unread: ${reading.why}`);
+    const sites = reading.bodies.flatMap((body) => body.sites).filter((site) => site.name === "Ok");
+    expect(sites).toHaveLength(1);
+    expect(sites[0]!.why).toBeUndefined();
+  });
+});
+
+describe("an unnameable call written first does not hide the one a compiler can place", () => {
+  it("still confirms an arrow between two classes", async () => {
+    write({
+      "tsconfig.json": "{ \"compilerOptions\": { \"strict\": true } }\n",
+      "factory.ts": "export class Factory {\n  create(n: number): number {\n    return n + 1;\n  }\n}\n",
+      "explorer.ts": [
+        "import { Factory } from \"./factory\";",
+        "export class Explorer {\n  constructor(private readonly factory: Factory) {}\n\n"
+          + "  proxy(): (n: number) => number {\n    return (n) => n;\n  }\n\n"
+          + "  handle(n: number): number {\n    return this.proxy()(n);\n  }\n\n"
+          + "  paths(n: number): number {\n    return this.factory.create(n);\n  }\n}",
+        "",
+      ].join("\n\n"),
+    });
+    const report = await checked("explorer.ts#Explorer", "factory.ts#Factory");
+    expect(accusations(report)).toEqual([]);
+    expect(report.claims.callsConfirmed).toBe(1);
   }, 120_000);
 });

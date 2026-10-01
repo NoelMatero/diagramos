@@ -1748,11 +1748,16 @@ function handedOutside(
       if (!handed || !outside.has(at.start)) return;
       /*
        * A value is a name used as one, as in `runByTheLanguage`: not the
-       * object of a member access, and not a keyword's own name (`file` in
-       * `file=w` names a parameter, not a value).
+       * object of a member access, not a keyword's own name (`file` in
+       * `file=w` names a parameter, not a value), and not what a call inside
+       * the arguments calls -- `get` in `list(hooks.get("request"))` is run
+       * here, and what is handed on is its result (httpx's `event_hooks`, on
+       * the bench).
        */
       const notValues = new Set<number>();
       each(handed, (node) => {
+        const inner = calleeOf(node) ?? constructedBy(node);
+        if (inner && inner.kind !== "computed") notValues.add((inner.kind === "through" ? inner.memberAt : inner.nameAt).start);
         const member = node.childForFieldName("attribute") ?? node.childForFieldName("property");
         const object = member ? node.childForFieldName("object") : null;
         if (object) notValues.add(object.startIndex);
@@ -2007,18 +2012,28 @@ export function callsIntoType(
   if (bodies.length === 0) return { verdict: "open", why: "routine-not-found" };
   const names = new Set(to.names);
   let why: CallsNotClosed | undefined;
+  /*
+   * The first wall wins, except that one a compiler can take down outranks
+   * one it cannot. This reading confirms from a single call, so a value whose
+   * type a compiler can give is still a way to green while `x()(n)` (#400) is
+   * not -- and a live check starts a compiler only for the reason it is
+   * shown. A call nothing names, written before the one that confirms, left
+   * a correct class arrow unconfirmed.
+   */
+  const answerable = (one: CallsNotClosed | undefined) => one === "receiver" || one === "abstract-receiver";
+  const stopped = (one: CallsNotClosed): void => { if (!why || (!answerable(why) && answerable(one))) why = one; };
   let sites = 0;
   for (const body of bodies) {
     for (const site of body.sites) {
       sites += 1;
-      if (site.file === undefined) { why ??= site.why ?? "unplaced"; continue; }
-      if (site.concrete === false) { why ??= "abstract-receiver"; continue; }
-      if (site.overridden) { why ??= "overridden"; continue; }
+      if (site.file === undefined) { stopped(site.why ?? "unplaced"); continue; }
+      if (site.concrete === false) { stopped("abstract-receiver"); continue; }
+      if (site.overridden) { stopped("overridden"); continue; }
       const landed = site.file === to.file ? to
         : site.file === from.file ? from
           : from.open?.(site.file);
       if (site.declaredAs === undefined || !landed) {
-        if (site.file === to.file) why ??= "reaches-the-file";
+        if (site.file === to.file) stopped("reaches-the-file");
         continue;
       }
       const holders = holdersOfRoutine(landed.source, landed.language, site.declaredAs);
@@ -2037,10 +2052,10 @@ export function callsIntoType(
           name: site.declaredAs, inside: from.routine, line: site.line, wrote: site.name,
         } };
       }
-      if (spelt.length > 0) { why ??= "reaches-the-file"; continue; }
+      if (spelt.length > 0) { stopped("reaches-the-file"); continue; }
       if (!site.receiver) continue;
-      if (holders.some((one) => one.dispatched)) { why ??= "abstract-receiver"; continue; }
-      if (inherits && holders.some((one) => one.name !== undefined)) why ??= "inherits";
+      if (holders.some((one) => one.dispatched)) { stopped("abstract-receiver"); continue; }
+      if (inherits && holders.some((one) => one.name !== undefined)) stopped("inherits");
     }
   }
   if (why || typeTail) return { verdict: "open", why: why ?? "routine-not-found" };
@@ -2171,15 +2186,21 @@ function isRoutine(source: string, name: string, language: Language): boolean {
 const runs_ = new WeakMap<Tree, Map<string, boolean>>();
 
 /**
- * Whether calling `name` runs a declaration the text can point at: a routine,
- * or a class (#402).
+ * Whether calling `name` may run a declaration the text can point at -- `false`
+ * only where the text declares it as a value, and not as a routine or a class
+ * (#402).
  *
- * A name declared as a value is not one. `const M = memo(Widget)` holds
- * whatever `memo` handed back, and `M()` or `<M />` runs that -- `Widget`,
- * through code nobody here can read. Placed at the file that declares `M`, the
- * call read as reaching nothing but that file, and a correct arrow at
- * `Widget` was refuted. No list of wrappers: what the name is declared as is
- * the whole of the question, by `isRoutine`'s and `isTypeName`'s structure.
+ * `const M = memo(Widget)` holds whatever `memo` handed back, and `M()` or
+ * `<M />` runs that -- `Widget`, through code nobody here can read. Placed at
+ * the file that declares `M`, the call read as reaching nothing but that
+ * file, and a correct arrow at `Widget` was refuted. No list of wrappers: what
+ * the name is declared as is the whole of the question, by structure -- a
+ * declaration whose `value` (Python: `right`) is not itself a routine.
+ *
+ * Declared, and not merely bound. `bindingsIn` is generous on purpose and
+ * counts a name a pattern binds -- Rust's `Ok(v) =>` -- as this file's, and
+ * "not a routine nor a class" took `Ok(...)` for a value the first time, on
+ * the bench (serde_json's `Serializer`).
  */
 function runsWhenCalled(source: string, name: string, language: Language): boolean {
   const tree = parseSource(source, language);
@@ -2188,7 +2209,15 @@ function runsWhenCalled(source: string, name: string, language: Language): boole
   runs_.set(tree, known);
   let runs = known.get(name);
   if (runs === undefined) {
-    runs = isRoutine(source, name, language) || isTypeName(source, name, language);
+    let value = false;
+    each(tree.rootNode, (node) => {
+      if (value) return;
+      const named = node.childForFieldName("name") ?? node.childForFieldName("left");
+      if (!named || named.childCount !== 0 || named.text !== name) return;
+      const held = node.childForFieldName("value") ?? node.childForFieldName("right");
+      if (held && !held.childForFieldName("parameters")) value = true;
+    });
+    runs = !value || isRoutine(source, name, language) || isTypeName(source, name, language);
     known.set(name, runs);
   }
   return runs;
