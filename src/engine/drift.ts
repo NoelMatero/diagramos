@@ -46,6 +46,7 @@ import { connects, refIsStale, type CodeGraphOption } from "./codegraph";
 import { readDependencies, readerCanPlace } from "./deps";
 import type { BindingFault } from "./damage";
 import type { DeclaredAt, ImportTarget, MemberTarget, TypeParts } from "./compiler-questions";
+import { askFits, askHasMember, askMember, askTypeParts, declaredIn, gateRed, WRITTEN, type GateWithdrawn, type RedRests } from "./gate";
 import { generatedRef, NEVER_WALK } from "./generated";
 import { readGraph, type Provenance, type RecoveredGraph, type RecoveredNode } from "./graph";
 import { licenceFor, mayAccuse } from "./licence";
@@ -808,7 +809,25 @@ export type EdgeUnconfirmedReason =
    * word" is a thing a reader should look at and decide, not a thing that fails
    * a build.
    */
-  | "signature-other-half";
+  | "signature-other-half"
+  /**
+   * A red the compiler withdrew (#393): the reader found nothing written, and
+   * the compiler says the code does what the arrow says.
+   *
+   * Not a confirmation, although it very nearly is one. The words that could
+   * turn this green on the compiler's word are their own changes (#397,
+   * #398), each measured for what it would confirm wrongly; until then the
+   * gate's job is only that the arrow is not called wrong.
+   */
+  | "compiler-says-it-does"
+  /**
+   * A red withheld (#393): "doesn't" rested on something the code does not
+   * write down -- a field with no type, a parameter typed by its variable, a
+   * generic, a base list nobody wrote, an import the reader could not place --
+   * and no compiler answered. #373 found 58 correct arrows called wrong on
+   * exactly that footing.
+   */
+  | "rests-on-unwritten";
 
 /**
  * Why an arrow came back unconfirmed, in words -- the one place they are written.
@@ -835,6 +854,8 @@ export const UNCONFIRMED_WORDS: Record<EdgeUnconfirmedReason, string> = {
   "claim-not-checked": "the claim's own check could not answer, and nothing looser may answer for it",
   "feeds-runs-the-other-way": "the only flow found runs the other way",
   "signature-other-half": "the type is in the other half of the signature — the arrow may be the wrong way round",
+  "compiler-says-it-does": "the code does not write it down, and the compiler says the code does what the arrow says",
+  "rests-on-unwritten": "the code does not write down the one thing this depends on, and no compiler answered",
 };
 
 /**
@@ -941,6 +962,21 @@ export function lackingSentence(
  * per-turn notice does not, `clean` does not include them, and no exit code
  * ever turns on one.
  */
+/** One red put through the gate (#393). */
+export interface GatedRed {
+  /** The arrow, by node ids. */
+  node: string;
+  kind: EdgeFindingKind;
+  /** Whether it was shown, and if not, why not. */
+  outcome: "stands" | GateWithdrawn;
+  /** Whether the red had a question for the compiler at all. */
+  asked: boolean;
+  /** Whether a compiler was there to ask. */
+  referee: boolean;
+  /** The compiler's answer in a sentence, when it gave one. */
+  said?: string;
+}
+
 export interface UnconfirmedEdge {
   /** Node ids, as `edit_diagram` refers to them. */
   from: string;
@@ -965,7 +1001,13 @@ export interface UnconfirmedEdge {
  */
 type EdgeOutcome =
   | { kind: "confirmed" }
-  | { kind: "finding"; finding: Omit<EdgeDriftFinding, "node"> }
+  /*
+   * `rests` is required, and that is the gate's guarantee (#393): a verdict
+   * that accuses cannot be filed without saying what it rests on, so a new
+   * word cannot skip the compiler by forgetting to ask it. An advisory
+   * finding carries one too and the gate never reads it.
+   */
+  | { kind: "finding"; finding: Omit<EdgeDriftFinding, "node">; rests: RedRests }
   | { kind: "unconfirmed"; reason: EdgeUnconfirmedReason; detail: string };
 
 /**
@@ -1597,6 +1639,13 @@ export interface DriftReport {
    * `edgesChecked` minus these is what came back confirmed.
    */
   unconfirmedEdges: UnconfirmedEdge[];
+  /**
+   * Every red the gate was asked about (#393), and what became of it: shown,
+   * withdrawn on the compiler's word, or withheld for resting on what the code
+   * does not write. The list a benchmark reads to name every catch the gate
+   * gave up and the answer that gave it up.
+   */
+  gated: GatedRed[];
   /**
    * Count of arrows with fewer than two bound endpoints (dangling arrows).
    * These are incomplete strokes, not checked specifications.
@@ -3150,6 +3199,7 @@ export function checkDrift(
   const unannotated: UnannotatedFinding[] = [];
   const unreadEdges: UnreadEdgeFinding[] = [];
   const unconfirmedEdges: UnconfirmedEdge[] = [];
+  const gated: GatedRed[] = [];
   /** Arrows read through a box marked external that is code here, and the sentence saying so (#366). */
   const markedWrongly = new Map<string, string>();
   const assertions: AssertionTally = { checked: 0, downgraded: 0, unsupportedLanguage: 0 };
@@ -3294,6 +3344,33 @@ export function checkDrift(
     toNode: { label: string },
     outcome: EdgeOutcome,
   ) => {
+    /*
+     * The gate (#393). A red on a built arrow is put to the compiler here and
+     * nowhere else, so every word goes through the same rule: see `gate.ts`.
+     * A planned arrow's finding is a work item, not a red, and is left alone.
+     */
+    if (outcome.kind === "finding" && edge.state !== "planned" && accuses(outcome.finding.kind)) {
+      const referee = options?.closedBodyReferee;
+      const verdict = gateRed(outcome.rests, referee);
+      gated.push({
+        node: `${edge.from} -> ${edge.to}`,
+        kind: outcome.finding.kind,
+        outcome: verdict.stands ? "stands" : verdict.why,
+        asked: verdict.asked,
+        referee: referee !== undefined,
+        ...(verdict.said ? { said: verdict.said } : {}),
+      });
+      if (!verdict.stands) {
+        const answer = verdict.why === "compiler-says-it-does"
+          ? `the compiler says it does${verdict.said ? `: ${verdict.said}` : ""}.`
+          : `that rests on ${verdict.unwritten ?? "something the code does not write down"}, and no compiler could say either way.`;
+        outcome = {
+          kind: "unconfirmed",
+          reason: verdict.why,
+          detail: `${outcome.finding.detail.replace(/\s*$/, "")} But ${answer}`,
+        };
+      }
+    }
     const note = markedWrongly.get(`${edge.from} -> ${edge.to}`) ?? "";
     const finding = outcome.kind === "finding"
       ? { ...outcome.finding, detail: outcome.finding.detail + note }
@@ -4305,6 +4382,35 @@ export function checkDrift(
         const word = edge.claim;
         const needs = checkNeeds(fromPath, toPath, workspace, importCache.configs, options?.ledger);
         /*
+         * What an import red rests on (#393): an absence the text read off
+         * every import it could place, and none it could not. The question is
+         * the same walk again with the compiler placing those -- a sibling
+         * package by name (#390), a Rust macro path (#383).
+         */
+        const needsRests = (unplaced: boolean): RedRests => ({
+          written: !unplaced,
+          unwritten: "an import the text cannot place (a package imported by its name, or a macro reached by a path)",
+          ask: (referee) => {
+            const where = referee.importTargetAt?.bind(referee);
+            if (!where) return { does: undefined };
+            const again = checkNeeds(fromPath, toPath, workspace, importCache.configs, options?.ledger, (file, at) => {
+              const answer = where(file, at);
+              return answer === undefined || answer === "outside" ? answer : answer.file;
+            });
+            if (again.verdict === "confirmed") {
+              return { does: true, said: `${fromPath} imports ${toPath}: \`${again.evidence.specifier}\` lands there` };
+            }
+            if (again.verdict === "indirect") {
+              const said = `${fromPath} reaches ${toPath} through ${again.via.join(" -> ") || again.evidence.on}`;
+              return { does: strict ? (again.unplaced ? undefined : false) : true, said };
+            }
+            if (again.verdict === "refuted" || again.verdict === "backwards") {
+              return { does: again.unplaced ? undefined : false, said: `none of ${fromPath}'s imports lands on ${toPath}` };
+            }
+            return { does: undefined };
+          },
+        });
+        /*
          * A `planned` arrow asks this one question and ignores every other
          * answer it could get (#124).
          *
@@ -4364,7 +4470,7 @@ export function checkDrift(
                 + `or the code is. If the code is right, `
                 + `\`drift --accept "${edge.from} -> ${edge.to}"\` turns the arrow round `
                 + `and the next check marks it built.`,
-            } });
+            }, rests: WRITTEN /* advisory: never a red */ });
             continue;
           }
         } else if (needs.verdict === "withheld") {
@@ -4426,7 +4532,7 @@ export function checkDrift(
                  */
                 + ` — or, if the code is right and the arrow was wrong, `
                 + `\`drift --accept "${edge.from} -> ${edge.to}"\` turns it round for you.`,
-            } });
+            }, rests: needsRests(needs.unplaced) });
             continue;
           }
           if (needs.verdict === "confirmed") {
@@ -4479,7 +4585,7 @@ export function checkDrift(
                   ? `@needs means the import written in ${fromPath}. Draw the hop, or say `
                     + `\`claim: "depends"\`, which is this chain and is true.`
                   : `Draw the hop, or leave the arrow where it is and read it as "depends on".`),
-            } });
+            }, rests: needsRests(needs.unplaced) });
             continue;
           }
           if (needs.verdict === "refuted") {
@@ -4508,7 +4614,7 @@ export function checkDrift(
                 + `${oneLine(toNode.label) || toPath}, and ${fromPath} does not import `
                 + `${toPath}, directly or through anything it imports. Point the arrow `
                 + `at what ${fromPath} does import, or drop it.`,
-            } });
+            }, rests: needsRests(needs.unplaced) });
             continue;
           }
           /*
@@ -4664,6 +4770,15 @@ export function checkDrift(
                 + `${oneLine(fromNode.label) || fromPath}, and ${toPath} line ${verdict.line} declares `
                 + `\`${verdict.signature}\`, which does not name it. `
                 + `Either the arrow points at the wrong function, or the signature changed.`,
+            }, rests: {
+              written: verdict.unwritten.length === 0,
+              unwritten: `${position === "parameter" ? "parameters" : "a return type"} not written out `
+                + `(${verdict.unwritten.map((name) => `\`${name}\``).join(", ")})`,
+              ask: (referee) => askTypeParts(
+                referee,
+                verdict.sites.map((one) => ({ file: toPath, name: one.name, at: one, written: one.written })),
+                declaredIn(workspace.read(fromFile), fromLanguage ?? language, fromPath, fromEnd.symbols[0]!),
+              ),
             } });
             continue;
           }
@@ -4778,6 +4893,14 @@ export function checkDrift(
                 + `${oneLine(toNode.label) || toPath}, and ${fromPath} declares `
                 + `\`${verdict.fields}\`, which does not name it. `
                 + `Either the arrow points at the wrong type, or the fields changed.`,
+            }, rests: {
+              written: verdict.unwritten.length === 0,
+              unwritten: `fields whose type is not written (${verdict.unwritten.map((name) => `\`${name}\``).join(", ")})`,
+              ask: (referee) => askTypeParts(
+                referee,
+                verdict.sites.map((one) => ({ file: fromPath, name: one.name, at: one, written: one.written })),
+                declaredIn(workspace.read(toFile), toLanguage ?? language, toPath, toEnd.symbols[0]!),
+              ),
             } });
             continue;
           }
@@ -4907,6 +5030,20 @@ export function checkDrift(
                     + `${oneLine(fromNode.label) || fromPath} instead — the arrow is the right `
                     + "fact drawn backwards, so turn it round."
                   : "Either the arrow points at the wrong type, or the declaration changed."),
+            }, rests: {
+              written: verdict.written,
+              unwritten: `a class that writes no base list, which may still fit \`${oneLine(toNode.label) || toPath}\` without saying so`,
+              ask: (referee) => {
+                const head = declaredIn(workspace.read(toFile), toLanguage ?? language, toPath, toEnd.symbols[0]!);
+                const tail = declaredIn(workspace.read(fromFile), language, fromPath, fromEnd.symbols[0]!);
+                // A class fits wherever it is itself wanted, and "is one of
+                // itself" is not what the arrow asks: that red rests on its
+                // base list alone.
+                const itself = head.at.some((one) => tail.at.some((other) => one.file === other.file && one.line === other.line));
+                return itself
+                  ? { does: undefined }
+                  : askFits(referee, verdict.sites.map((one) => ({ file: fromPath, name: one.name, at: one })), head);
+              },
             } });
             continue;
           }
@@ -5048,7 +5185,7 @@ export function checkDrift(
                 + `${oneLine(toNode.label) || toPath}, and it is the other way round -- `
                 + `${toPath} line ${verdict.evidence.line} writes `
                 + `\`${verdict.evidence.wrote}\`. Turn the arrow round.`,
-            } });
+            }, rests: WRITTEN /* a construction found running the other way */ });
             continue;
           } else if (verdict.verdict === "refuted") {
             edgesChecked += 1;
@@ -5076,7 +5213,7 @@ export function checkDrift(
                   : ". ")
                 + `Getting one back from another function is not making it. `
                 + `Point the arrow at what does create it, or remove it.`,
-            } });
+            }, rests: WRITTEN /* every construction in the body was read; one the text cannot name (`type(self)(..)`, `self.__class__(..)`) already withholds (#387) */ });
             continue;
           }
           if (claimed && verdict.verdict === "absent" && verdict.awaitsCompiler) claims.buildsCompilable += 1;
@@ -5279,6 +5416,8 @@ export function checkDrift(
                   + `${via.join(" -> ")}. Draw the hop, or leave the arrow where it is and `
                   + `read it as the whole path.`,
               },
+              // Advisory: never a red, so the gate does not read it.
+              rests: WRITTEN,
             });
 
             if (verdict.verdict === "confirmed") {
@@ -5326,7 +5465,7 @@ export function checkDrift(
                   + `${oneLine(toNode.label) || toPath}, and it is the other way round -- `
                   + `${toPath} line ${verdict.evidence.line} writes `
                   + `\`${verdict.evidence.wrote}\`. Turn the arrow round.`,
-              } });
+              }, rests: WRITTEN /* a call found running the other way */ });
               continue;
             }
             if (verdict.verdict === "wrong-routine" && edge.state !== "planned") {
@@ -5374,7 +5513,7 @@ export function checkDrift(
                   + `${toEnd.symbols.join(" or ")} -- ${where}. Point the arrow at `
                   + `${near[0]!.name}, or call ${toEnd.symbols[0]!} from `
                   + `${verdict.evidence.routine}.`,
-              } });
+              }, rests: WRITTEN /* a call found landing on another routine */ });
               continue;
             }
             if (verdict.verdict === "refuted" && edge.state !== "planned") {
@@ -5415,6 +5554,17 @@ export function checkDrift(
                   + `${verdict.evidence.routine} makes was checked -- ${verdict.evidence.sites} of `
                   + `them, none reaching ${toPath}. ${fromPath} line ${verdict.evidence.line} is `
                   + `where ${verdict.evidence.routine} is declared.`,
+              }, rests: {
+                written: !verdict.evidence.implicit,
+                unwritten: `a call the language makes without it being written (\`${verdict.evidence.implicit?.name}\`)`,
+                ...(verdict.evidence.implicit ? {
+                  ask: (referee: ClosedBodyReferee) => askMember(
+                    referee,
+                    verdict.evidence.implicit!.values.map((one) => ({ file: fromPath, name: one.name, at: one })),
+                    verdict.evidence.implicit!.name,
+                    declaredIn(workspace.read(toFile), languageOf(toFile) ?? "python", toPath, verdict.evidence.implicit!.name),
+                  ),
+                } : {}),
               } });
               continue;
             }
@@ -5565,6 +5715,19 @@ export function checkDrift(
                 + `${toPath} declares ${verdict.members ? `\`${verdict.members}\`` : "nothing"}, `
                 + "which does not include it. Either the member was renamed, or the arrow points "
                 + "at the wrong type.",
+            }, rests: {
+              // The member list is read off the declaration (#393): written.
+              // The compiler is still asked, and a member it finds withdraws.
+              written: true,
+              ask: (referee) => askHasMember(
+                referee,
+                (declaredShapes(workspace.read(toFile), languageOf(toFile) ?? "ts")?.get(toEnd.symbols[0]!.split(/::|\./).pop()!) ?? [])
+                  .map(({ nameNode }) => ({
+                    file: toPath, name: toEnd.symbols[0]!,
+                    at: { start: nameNode.startIndex, end: nameNode.startIndex + nameNode.text.length },
+                  })),
+                memberNamed(edge.label) ?? "",
+              ),
             } });
             continue;
           } else if (verdict.verdict === "not-read") {
@@ -5599,7 +5762,7 @@ export function checkDrift(
                       + `could not see into. If one of those reads \`${member}\`, the board wants `
                       + `${routine} --calls--> that function --accesses--> ${target}.`
                     : ""),
-              } });
+              }, rests: WRITTEN /* every member the routine reads was read and placed */ });
               continue;
             }
             /*
@@ -5787,7 +5950,7 @@ export function checkDrift(
               { label: oneLine(fromNode.label) || fromPath },
               { label: oneLine(toNode.label) || toPath },
             ),
-        } });
+        }, rests: WRITTEN /* the compiler is asked inside `lackingEnd` (#343), which holds back where it cannot say */ });
         continue;
       }
 
@@ -5837,7 +6000,7 @@ export function checkDrift(
                     + `${broken.at} names ${broken.next}. Correct the route or drop it.`
                   : `the route breaks at ${broken.at}: nothing in it names ${broken.next} `
                     + `— worth a look, not necessarily wrong.`,
-              } }
+              }, rests: WRITTEN }
             : { kind: "confirmed" },
         );
         continue;
@@ -6457,6 +6620,7 @@ export function checkDrift(
     unreadEdges,
     ...(anchorableEdges > 0 ? { anchorableEdges } : {}),
     unconfirmedEdges,
+    gated,
     ...(graph.strayArrows > 0 ? { strayArrows: graph.strayArrows } : {}),
     // Read off the graph rather than recomputed: one answer, so no two channels
     // can ever disagree about whether a board is damaged.

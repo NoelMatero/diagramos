@@ -61,6 +61,7 @@
  * return type, and counting it would make every method a field.
  */
 import { aliasesFor, aliasNames } from "./alias";
+import { typeParametersIn, usesTypeParameter, type Site } from "./gate";
 import { mayAccuse } from "./licence";
 import {
   declaresField, each, INSTANCE_NAMES, parseSource, qualifiedTail,
@@ -146,8 +147,22 @@ export interface HoldsEvidence {
 
 export type HoldsVerdict =
   | { verdict: "confirmed"; evidence: HoldsEvidence }
-  | { verdict: "absent"; fields: string }
+  | {
+    verdict: "absent";
+    fields: string;
+    /** Every field the reader found, where its name is, so the compiler can be asked its type (#393). */
+    sites: FieldSite[];
+    /**
+     * The fields whose type the code does not write down: no annotation, or a
+     * type parameter (`seat: S`, `S: Seat`). An absence with any of these is
+     * not evidence on its own (#378, #380).
+     */
+    unwritten: string[];
+  }
   | { verdict: "withheld"; why: HoldsWithheld };
+
+/** One field, by the range of its name. */
+export type FieldSite = Site;
 
 /** Node types that declare a type with a member list, in any grammar we load. */
 const TYPE_DECLARATION =
@@ -290,7 +305,11 @@ function quotedTypeIn(body: Node): boolean {
  * It only ever adds names, so it can turn an absence into a confirmation and
  * never the other way about: no accusation here is new.
  */
-function declaredInRoutine(routine: Node): Array<{ name: string; line: number }> {
+function declaredInRoutine(
+  routine: Node,
+  sites: FieldSite[],
+  generic: (type: Node) => boolean,
+): Array<{ name: string; line: number }> {
   const found: Array<{ name: string; line: number }> = [];
 
   const parameters = routine.childForFieldName("parameters");
@@ -300,6 +319,8 @@ function declaredInRoutine(routine: Node): Array<{ name: string; line: number }>
       if (!parameter || !declaresField(parameter)) continue;
       const type = parameter.childForFieldName("type");
       if (type) found.push(...typeNamesIn(type));
+      const name = parameter.childForFieldName("pattern") ?? parameter.childForFieldName("name");
+      if (name) sites.push(site(name, type !== null && !generic(type)));
     }
   }
 
@@ -319,16 +340,38 @@ function declaredInRoutine(routine: Node): Array<{ name: string; line: number }>
   if (body) {
     each(body, (node) => {
       const left = node.childForFieldName("left");
-      const type = node.childForFieldName("type");
-      if (!left || !type) return;
+      if (!left) return;
       const object = left.childForFieldName("object");
       if (!object || !INSTANCE_NAMES.has(object.text)) return;
-      found.push(...typeNamesIn(type));
+      const type = node.childForFieldName("type");
+      const attribute = left.childForFieldName("attribute") ?? left.childForFieldName("property");
+      /*
+       * The unannotated one is the field #378 is about: `self.engine =
+       * Engine()` writes no type, so it cannot confirm anything here and it
+       * must not let an absence count as evidence either. Only on the
+       * instance itself -- `cls.x = ...` in a metaclass sets something on
+       * another class -- and never a dunder, which is the language's, not the
+       * class's (#394).
+       */
+      if (attribute && (type || object.text !== "cls") && !isDunder(attribute.text)) {
+        sites.push(site(attribute, type !== null && !generic(type)));
+      }
+      if (type) found.push(...typeNamesIn(type));
     });
   }
 
   return found;
 }
+
+/** `__slots__`, `__instancecheck__`: a name the language gives meaning to, not a field somebody declared. */
+function isDunder(name: string): boolean {
+  return name.startsWith("__") && name.endsWith("__");
+}
+
+function site(name: Node, written: boolean): FieldSite {
+  return { name: name.text, start: name.startIndex, end: name.startIndex + name.text.length, written };
+}
+
 
 /**
  * Whether a name is declared as a routine in this source.
@@ -422,6 +465,10 @@ export function heldTypes(
    * forbids an accusation.
    */
   let withheld: HoldsWithheld | undefined;
+  const sites: FieldSite[] = [];
+
+  const parameters = typeParametersIn(tree.rootNode, source);
+  const generic = (type: Node): boolean => usesTypeParameter(type, parameters);
 
   for (const declaration of declarations) {
     let body = declaration.type === "object_type"
@@ -472,7 +519,7 @@ export function heldTypes(
       if (depth > 0 && member.childForFieldName("parameters")) {
         // ... unless it declares one on the way. A constructor is where
         // TypeScript and Python put most of a real class's fields (#303).
-        found.push(...declaredInRoutine(member));
+        found.push(...declaredInRoutine(member, sites, generic));
         return;
       }
       // A nested type is its own declaration and `each` reaches it on its own;
@@ -496,7 +543,27 @@ export function heldTypes(
       const type = member.childForFieldName("type");
       if (depth > 0 && type) {
         found.push(...typeNamesIn(type));
+        const name = member.childForFieldName("name") ?? member.childForFieldName("left");
+        if (name) sites.push(site(name, !generic(type)));
         return;
+      }
+      /*
+       * A field declared with no type: `engine = new Engine();` in a
+       * TypeScript class body, `mode = Mode.A` in a Python one (#378). It
+       * names nothing here, and it is a field whose type the code leaves to
+       * the compiler.
+       */
+      if (depth > 0) {
+        const untyped = untypedField(member);
+        if (untyped) sites.push(site(untyped, false));
+        /*
+         * A Python property reads like a field and is declared as a method,
+         * so its type is the getter's -- which the walk above skips as a
+         * routine. Whether a property counts as holding is #378's open
+         * question; asking the compiler can only withdraw a red.
+         */
+        const property = propertyName(member);
+        if (property) sites.push(site(property, false));
       }
       for (let index = 0; index < member.childCount; index += 1) {
         const child = member.child(index);
@@ -555,5 +622,39 @@ export function heldTypes(
   if (!sawFields) return { verdict: "withheld", why: "no-fields" };
   // The last gate, and the only one that is about us rather than about the code.
   if (!mayAccuse("holds", language)) return { verdict: "withheld", why: "unlicensed" };
-  return { verdict: "absent", fields: quoted };
+  /*
+   * A name annotated anywhere is written: `engine: Motor` in the class body
+   * and `self.engine = Motor()` in `__init__` are one field, and its type is
+   * on the page.
+   */
+  const typed = new Set(sites.filter((one) => one.written).map((one) => one.name));
+  const unwritten = [...new Set(sites.filter((one) => !one.written && !typed.has(one.name)).map((one) => one.name))];
+  return { verdict: "absent", fields: quoted, sites, unwritten };
+}
+
+/**
+ * The name of a field declared with no type: a TypeScript class field with
+ * none, or a Python class-level assignment. Read off the grammar's fields --
+ * a `name` with a `value` beside it and no `type` -- and, for Python, a bare
+ * `left` identifier. A dunder is the language's.
+ */
+function untypedField(member: Node): Node | undefined {
+  if (member.childForFieldName("type") || member.childForFieldName("parameters")) return undefined;
+  const name = member.childForFieldName("name") ?? member.childForFieldName("property");
+  if (name && name.childCount === 0 && member.type.endsWith("field_definition")) return name;
+  const left = member.childForFieldName("left");
+  if (left && left.type === "identifier" && member.childForFieldName("right") && !isDunder(left.text)) return left;
+  return undefined;
+}
+
+/** The name of a method declared under `@property` (or a cached one). */
+function propertyName(member: Node): Node | undefined {
+  const definition = member.childForFieldName("definition");
+  if (!definition) return undefined;
+  let decorated = false;
+  for (let index = 0; index < member.childCount; index += 1) {
+    const child = member.child(index);
+    if (child?.type === "decorator" && /^@\s*(?:\w+\.)*(?:property|cached_property)\s*$/.test(child.text)) decorated = true;
+  }
+  return decorated ? definition.childForFieldName("name") ?? undefined : undefined;
 }

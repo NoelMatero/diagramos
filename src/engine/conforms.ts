@@ -82,6 +82,8 @@
  * because the census had been counting all three TypeScript spellings in one
  * bucket and #216 made it split them.
  */
+import { declaredShapes } from "./body";
+import type { Site } from "./gate";
 import { mayAccuse } from "./licence";
 import { each, parseSource, type Language, type Node } from "./parse";
 
@@ -151,7 +153,14 @@ export type ConformsWithheld =
    * because an absence is a claim about the whole of a declaration and it is
    * what turns a reader's blindness into somebody's wrong diagram.
    */
-  | "unlicensed";
+  | "unlicensed"
+  /**
+   * Python's `Node.register(Registered)`: an ABC told at run time that a
+   * class is one of it (#379). Written, and in a form no base list and no
+   * type checker reads -- pyright says `Registered` is not a `Node` -- so the
+   * only honest answer is none.
+   */
+  | "registered";
 
 /** Where the base was named, so a report can quote a file and a line. */
 export interface ConformsEvidence {
@@ -178,6 +187,14 @@ export type ConformsVerdict =
      * work out which end was wrong.
      */
     reversed?: boolean;
+    /** Where the tail's name is, so the compiler can be asked whether it fits (#393). */
+    sites: Site[];
+    /**
+     * Whether "is not one of" was read off a base list the declaration writes.
+     * A class that writes none may still fit an interface or a Protocol
+     * structurally, which is written nowhere (#379).
+     */
+    written: boolean;
   }
   | { verdict: "withheld"; why: ConformsWithheld };
 
@@ -731,5 +748,51 @@ export function conformedTypes(
     ? targets.some((name) =>
       conformedTypes(target.source, name, [subject], target.language).verdict === "confirmed")
     : false;
-  return { verdict: "absent", bases: read.written, ...(reversed ? { reversed: true } : {}) };
+  if (language === "python" && [source, target?.source ?? ""].some((text) => registers(text, targets, subject))) {
+    return { verdict: "withheld", why: "registered" };
+  }
+  /*
+   * Whether the absence is read off something written (#393). A base list
+   * naming other things is. So is the arrow drawn backwards, which rests on a
+   * base the far end writes. A class that writes no base list at all is not,
+   * where the language lets a class be one of another without saying so:
+   * always in TypeScript, and in Python when the far end is a Protocol or
+   * answers `isinstance` itself (#379). A Python class that fits a plain
+   * class names it, or it does not fit.
+   */
+  const written = read.bases.length > 0 || reversed
+    || (language === "python" && target !== undefined && targets.every((name) => nominal(target.source, name)));
+  const sites: Site[] = (declaredShapes(source, language)?.get(subject) ?? []).map(({ nameNode }) => ({
+    name: subject, start: nameNode.startIndex, end: nameNode.startIndex + nameNode.text.length, written,
+  }));
+  return {
+    verdict: "absent", bases: read.written, ...(reversed ? { reversed: true } : {}),
+    sites, written,
+  };
+}
+
+/**
+ * Whether this source registers `subject` as a virtual subclass of any of
+ * `targets`: `Node.register(Registered)`, or `@Node.register` above the class.
+ */
+function registers(source: string, targets: string[], subject: string): boolean {
+  return targets.some((target) => {
+    const name = target.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+    const plain = subject.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+    return new RegExp(`\\b${name}\\.register\\(\\s*${plain}\\s*\\)`).test(source)
+      || new RegExp(`@\\s*${name}\\.register\\s*\\n(?:\\s*@.*\\n)*\\s*class\\s+${plain}\\b`).test(source);
+  });
+}
+
+/**
+ * Whether a Python class is only ever one of by being named: its bases are
+ * read, none is a `Protocol`, and it does not answer `isinstance` itself with
+ * `__subclasshook__`. Anything unread is not.
+ */
+function nominal(source: string, name: string): boolean {
+  const read = declaredBases(source, name, "python");
+  if ("why" in read || read.doubt) return false;
+  if (read.bases.some((base) => base.name === "Protocol" || base.name.endsWith(".Protocol"))) return false;
+  const declared = declaredShapes(source, "python")?.get(name) ?? [];
+  return declared.length > 0 && declared.every(({ node }) => !node.text.includes("__subclasshook__"));
 }

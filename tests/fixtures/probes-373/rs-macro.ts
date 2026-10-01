@@ -1,0 +1,25 @@
+export const fixture = {
+  name: "rs-macro",
+  files: {
+    "Cargo.toml": '[workspace]\nmembers = ["core", "app"]\nresolver = "2"\n',
+    "core/Cargo.toml": '[package]\nname = "core_lib"\nversion = "0.1.0"\nedition = "2021"\n',
+    "core/src/lib.rs": "pub mod util;\npub mod macros;\npub mod user;\n",
+    "core/src/util.rs": "pub fn double(x: i64) -> i64 {\n    x * 2\n}\n",
+    "core/src/macros.rs": "#[macro_export]\nmacro_rules! cents {\n    ($x:expr) => {\n        $crate::util::double($x)\n    };\n}\n",
+    "core/src/user.rs": "pub fn u() -> i64 {\n    crate::cents!(1)\n}\n",
+    "app/Cargo.toml": '[package]\nname = "app"\nversion = "0.1.0"\nedition = "2021"\n\n[dependencies]\ncore_lib = { path = "../core" }\n',
+    "app/src/main.rs": "mod only_macro;\nmod use_macro;\nfn main() {\n    only_macro::run();\n    use_macro::run();\n}\n",
+    "app/src/only_macro.rs": "pub fn run() {\n    let _ = core_lib::cents!(3);\n}\n",
+    "app/src/use_macro.rs": "use core_lib::cents;\n\npub fn run() {\n    let _ = cents!(3);\n}\n",
+  },
+  arrows: [
+    ["same crate: crate::cents! -> macros.rs (@needs)", "core/src/user.rs", "core/src/macros.rs", "needs"],
+    ["same crate: crate::cents! -> util.rs (@depends)", "core/src/user.rs", "core/src/util.rs", "depends"],
+    ["other crate: core_lib::cents! -> macros.rs (@needs)", "app/src/only_macro.rs", "core/src/macros.rs", "needs"],
+    ["other crate: core_lib::cents! -> lib.rs (@needs)", "app/src/only_macro.rs", "core/src/lib.rs", "needs"],
+    ["other crate: core_lib::cents! -> util.rs (@depends)", "app/src/only_macro.rs", "core/src/util.rs", "depends"],
+    ["other crate: use core_lib::cents -> macros.rs (@needs)", "app/src/use_macro.rs", "core/src/macros.rs", "needs"],
+    ["other crate: use core_lib::cents -> util.rs (@depends)", "app/src/use_macro.rs", "core/src/util.rs", "depends"],
+    ["macros.rs -> util.rs (@needs, $crate path)", "core/src/macros.rs", "core/src/util.rs", "needs"],
+  ],
+};

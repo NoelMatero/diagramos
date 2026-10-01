@@ -46,7 +46,7 @@
  * have shown anyway. Silence is always available and always safe; the accusation
  * is not.
  */
-import { mayHideAnImport, readDependencies, readerCanPlace } from "./deps";
+import { mayHideAnImport, readDependencies, readerCanPlace, type FileDependency } from "./deps";
 import { vouchedFor, type Ledger } from "./ledger";
 import { licenceFor, mayAccuse } from "./licence";
 import { languageOf } from "./parse";
@@ -89,24 +89,34 @@ export interface NeedsEvidence {
   names?: readonly string[];
 }
 
+/**
+ * Where the compiler says an import the text could not place lands (#393):
+ * a repo-relative file, `"outside"`, or `undefined` for no answer.
+ */
+export type PlaceImport = (file: string, at: { start: number; end: number }) => string | "outside" | undefined;
+
 export type NeedsVerdict =
   /** The dependency runs the way the arrow does. */
   | { verdict: "confirmed"; evidence: NeedsEvidence }
-  /** It runs the other way, and only the other way. The arrow is backwards. */
-  | { verdict: "backwards"; evidence: NeedsEvidence }
+  /**
+   * It runs the other way, and only the other way. The arrow is backwards.
+   * `unplaced`: the tail has an import the text could not place and nothing
+   * answered for, so "and not this way" is not read off anything written.
+   */
+  | { verdict: "backwards"; evidence: NeedsEvidence; unplaced: boolean }
   /**
    * The tail does not import the head, and does reach it through other files
    * (#323). Not wrong: `app -> database` drawn over three files in between is
    * a reading of the architecture, and 26 of the 243 file pairs Haiku drew on
    * `bench:planted` are that shape. `via` is the files between, in order.
    */
-  | { verdict: "indirect"; via: string[]; evidence: NeedsEvidence; mayAccuse: boolean }
+  | { verdict: "indirect"; via: string[]; evidence: NeedsEvidence; mayAccuse: boolean; unplaced: boolean }
   /**
    * The tail does not import the head and nothing it imports leads there,
    * followed to the end through files that could all be read (#323). The
    * accusation on an absence, and licensed per language on that axis.
    */
-  | { verdict: "refuted" }
+  | { verdict: "refuted"; unplaced: boolean }
   /** Neither file declares the other, and no accusation was available. Amber. */
   | { verdict: "absent" }
   | { verdict: "withheld"; why: NeedsWithheld };
@@ -130,6 +140,12 @@ export type NeedsVerdict =
 interface Declared {
   /** Every repo file this one declares a dependency on. Empty when `refused`. */
   on: Map<string, NeedsEvidence>;
+  /**
+   * Imports the text could not place and nothing answered for (#393): a
+   * sibling package by name, a Rust macro path. Absence in `on` is not
+   * written evidence while there are any.
+   */
+  unplaced: number;
   /** No list was read at all: neither verdict is available. */
   refused?: NeedsWithheld;
   /** A list was read and may be short, so absence in it proves nothing. */
@@ -142,12 +158,13 @@ function declares(
   workspace: Workspace,
   cache: ConfigCache,
   ledger?: Ledger,
+  place?: PlaceImport,
 ): Declared {
-  if (!licenceFor(file)) return { on: new Map(), refused: "unlicensed" };
+  if (!licenceFor(file)) return { on: new Map(), unplaced: 0, refused: "unlicensed" };
 
   const absolute = workspace.resolve(file);
   if (!absolute || workspace.stat(absolute) !== "file") {
-    return { on: new Map(), refused: "unreadable" };
+    return { on: new Map(), unplaced: 0, refused: "unreadable" };
   }
 
   /*
@@ -155,13 +172,14 @@ function declares(
    * is told that rather than this. The order costs one directory lookup and buys
    * the more useful sentence.
    */
-  if (!vouchedFor(ledger, file)) return { on: new Map(), refused: "unvouched" };
+  if (!vouchedFor(ledger, file)) return { on: new Map(), unplaced: 0, refused: "unvouched" };
 
   const read = readDependencies(file, workspace.read(absolute), workspace, cache);
-  if (!read) return { on: new Map(), refused: "unreadable" };
+  if (!read) return { on: new Map(), unplaced: 0, refused: "unreadable" };
 
   const on = new Map<string, NeedsEvidence>();
-  for (const dependency of read.dependencies) {
+  const placed = placedByCompiler(file, read, place);
+  for (const dependency of [...read.dependencies, ...placed.dependencies]) {
     if (!dependency.file) continue;
     /*
      * `pub(crate)` names the crate root and uses nothing in it (#319). Read as
@@ -198,15 +216,43 @@ function declares(
    * `mod` and `crate::` have no root to resolve against. That is the reader's
    * blindness, not an absence, and since #323 an absence is an accusation.
    */
-  if (!readerCanPlace(file, workspace, cache)) return { on, blind: "unreadable" };
-  if (!read.complete) return { on, blind: "incomplete" };
+  const unplaced = placed.unanswered;
+  if (!readerCanPlace(file, workspace, cache)) return { on, unplaced, blind: "unreadable" };
+  if (!read.complete) return { on, unplaced, blind: "incomplete" };
   /*
    * Only the escapes that can bring in a file the text never names (#344). A
    * `table[name]()` calls something already imported, so "and it imports
    * nothing else" is as true with one as without.
    */
-  if (mayHideAnImport(read.dynamic)) return { on, blind: "dynamic" };
-  return { on };
+  if (mayHideAnImport(read.dynamic)) return { on, unplaced, blind: "dynamic" };
+  return { on, unplaced };
+}
+
+/**
+ * The imports the text could not place, as the compiler places them (#393):
+ * each one it answered with a file here becomes a dependency like any written
+ * one, with the specifier as written; the rest are counted.
+ */
+function placedByCompiler(
+  file: string,
+  read: NonNullable<ReturnType<typeof readDependencies>>,
+  place: PlaceImport | undefined,
+): { dependencies: FileDependency[]; unanswered: number } {
+  const dependencies: FileDependency[] = [];
+  let unanswered = 0;
+  const asked = new Set<string>();
+  for (const dependency of read.dependencies) {
+    if (!dependency.unplaced) continue;
+    const key = `${dependency.unplaced.start}:${dependency.unplaced.end}`;
+    if (asked.has(key)) continue;
+    asked.add(key);
+    const answer = place?.(file, dependency.unplaced);
+    if (answer === undefined) unanswered += 1;
+    else if (answer !== "outside" && answer !== file) {
+      dependencies.push({ specifier: dependency.specifier, file: answer, line: dependency.line, deferred: dependency.deferred });
+    }
+  }
+  return { dependencies, unanswered };
 }
 
 /**
@@ -221,12 +267,18 @@ export function checkNeeds(
   workspace: Workspace,
   cache: ConfigCache = new Map(),
   ledger?: Ledger,
+  /**
+   * Where the compiler says each import the text could not place lands
+   * (#393). Absent is no compiler: those imports are counted, and a verdict
+   * resting on the absence of them says so in `unplaced`.
+   */
+  place?: PlaceImport,
 ): NeedsVerdict {
   if (from === to) return { verdict: "withheld", why: "same-file" };
 
-  const tail = declares(from, workspace, cache, ledger);
+  const tail = declares(from, workspace, cache, ledger, place);
   if (tail.refused) return { verdict: "withheld", why: tail.refused };
-  const head = declares(to, workspace, cache, ledger);
+  const head = declares(to, workspace, cache, ledger, place);
   if (head.refused) return { verdict: "withheld", why: head.refused };
 
   /*
@@ -266,7 +318,7 @@ export function checkNeeds(
     const language = languageOf(file);
     return language !== undefined && mayAccuse("needs", language);
   });
-  if (backward && bothMeasured) return { verdict: "backwards", evidence: backward };
+  if (backward && bothMeasured) return { verdict: "backwards", evidence: backward, unplaced: tail.unplaced > 0 };
   if (backward) return { verdict: "absent" };
 
   /*
@@ -282,7 +334,7 @@ export function checkNeeds(
     const language = languageOf(file);
     return language !== undefined && mayAccuse("needs", language, axis);
   });
-  const walk = walkImports(from, to, workspace, cache, ledger);
+  const walk = walkImports(from, to, workspace, cache, ledger, place);
   if (walk.reached) {
     /*
      * Whether an `@needs` arrow over this chain may be called wrong, which is
@@ -296,11 +348,12 @@ export function checkNeeds(
       via: walk.reached.via,
       evidence: walk.reached.first,
       mayAccuse: licensed("indirect"),
+      unplaced: tail.unplaced > 0,
     };
   }
   const bothLicensed = licensed("absence");
   if (walk.blind || !bothLicensed) return { verdict: "absent" };
-  return { verdict: "refuted" };
+  return { verdict: "refuted", unplaced: walk.unplaced };
 }
 
 /**
@@ -350,14 +403,17 @@ function hopsOf(
   workspace: Workspace,
   cache: ConfigCache,
   ledger?: Ledger,
-): { hops: NeedsEvidence[]; blind?: NeedsWithheld } {
-  const declared = declares(file, workspace, cache, ledger);
-  if (declared.refused) return { hops: [], blind: declared.refused };
+  place?: PlaceImport,
+): { hops: NeedsEvidence[]; blind?: NeedsWithheld; unplaced: number } {
+  const declared = declares(file, workspace, cache, ledger, place);
+  if (declared.refused) return { hops: [], blind: declared.refused, unplaced: 0 };
   const absolute = workspace.resolve(file)!;
   const read = readDependencies(file, workspace.read(absolute), workspace, cache);
-  if (!read) return { hops: [], blind: "unreadable" };
-  const hops = landings(read).map((hop) => ({ ...hop, file }));
-  return declared.blind ? { hops, blind: declared.blind } : { hops };
+  if (!read) return { hops: [], blind: "unreadable", unplaced: 0 };
+  const placed = placedByCompiler(file, read, place).dependencies;
+  const hops = landings({ ...read, dependencies: [...read.dependencies, ...placed] }).map((hop) => ({ ...hop, file }));
+  const unplaced = declared.unplaced;
+  return declared.blind ? { hops, blind: declared.blind, unplaced } : { hops, unplaced };
 }
 
 /**
@@ -524,14 +580,18 @@ export function walkImports(
   workspace: Workspace,
   cache: ConfigCache,
   ledger?: Ledger,
-): { reached?: { via: string[]; first: NeedsEvidence }; blind?: NeedsWithheld } {
+  place?: PlaceImport,
+): { reached?: { via: string[]; first: NeedsEvidence }; blind?: NeedsWithheld; unplaced: boolean } {
   const cameFrom = new Map<string, { parent: string; hop: NeedsEvidence }>();
   const queue = [from];
   const seen = new Set([from]);
   let blind: NeedsWithheld | undefined;
+  /** Whether any file walked has an import nothing placed (#393). */
+  let unplaced = false;
   for (let next = 0; next < queue.length; next += 1) {
     const file = queue[next]!;
-    const { hops, blind: here } = hopsOf(file, workspace, cache, ledger);
+    const { hops, blind: here, unplaced: lost } = hopsOf(file, workspace, cache, ledger, place);
+    if (lost > 0) unplaced = true;
     if (here && file !== from) blind ??= here;
     for (const hop of hops) {
       if (seen.has(hop.on)) continue;
@@ -544,11 +604,11 @@ export function walkImports(
           via.unshift(step.parent);
           step = cameFrom.get(step.parent)!;
         }
-        return { reached: { via, first: step.hop } };
+        return { reached: { via, first: step.hop }, unplaced };
       }
-      if (seen.size > WALK_LIMIT) return { blind: blind ?? "incomplete" };
+      if (seen.size > WALK_LIMIT) return { blind: blind ?? "incomplete", unplaced };
       queue.push(hop.on);
     }
   }
-  return blind ? { blind } : {};
+  return blind ? { blind, unplaced } : { unplaced };
 }

@@ -1005,13 +1005,21 @@ function onlyCalledClasses(source: string, names: string[]): boolean {
  * `KINDS[k]()`. The call reading names the first by the call inside it --
  * `type`, a builtin, placed outside the repository -- so the body looks
  * closed while the thing actually called is the routine's own class.
+ *
+ * `self.__class__(..)` is the same call spelt as an attribute (#387): a
+ * dunder is the language's attribute, not a routine anybody declared, and
+ * what it holds is not written. It was read as a call placed outside the
+ * repository and the correct arrow went red.
  */
 function callsAComputedCallee(routines: Node[]): boolean {
   let computed = false;
   for (const routine of routines) {
     each(routine, (node) => {
       const callee = node.childForFieldName("function");
-      if (!computed && callee && !/^(identifier|attribute)$/.test(callee.type)) computed = true;
+      if (computed || !callee) return;
+      if (!/^(identifier|attribute)$/.test(callee.type)) computed = true;
+      const attribute = callee.type === "attribute" ? callee.childForFieldName("attribute")?.text ?? "" : "";
+      if (/^__\w+__$/.test(attribute)) computed = true;
     });
   }
   return computed;

@@ -140,8 +140,9 @@
  * in `docs/claim-vocabulary.md` and is the licence grid.
  */
 import { aliasesFor, aliasNames } from "./alias";
+import { typeParametersIn, unwrittenNames, usesTypeParameter, type Site } from "./gate";
 import { mayAccuse } from "./licence";
-import { parseSource, qualifiedTail, type Language, type Node } from "./parse";
+import { INSTANCE_NAMES, parseSource, qualifiedTail, type Language, type Node } from "./parse";
 
 /** Which half of a signature a claim is about. */
 export type SignaturePosition = "parameter" | "return";
@@ -225,8 +226,15 @@ export type SignatureVerdict =
    * something found rather than on something missing.
    */
   | { verdict: "misplaced"; evidence: SignatureEvidence }
-  /** The signature was read to the end and does not name the type anywhere. */
-  | { verdict: "absent"; signature: string; line: number }
+  /**
+   * The signature was read to the end and does not name the type anywhere.
+   * `sites` is every name the claimed half was read at -- each parameter, or
+   * the return type -- so the compiler can be asked what it is (#393);
+   * `unwritten` names those whose type the code leaves out or writes as a
+   * type parameter, which make the absence no evidence on its own (#381,
+   * #380).
+   */
+  | { verdict: "absent"; signature: string; line: number; sites: Site[]; unwritten: string[] }
   | { verdict: "withheld"; why: SignatureWithheld };
 
 /** A leaf that is a name rather than punctuation or a keyword. */
@@ -461,6 +469,45 @@ function typeNames(
   return quoted;
 }
 
+/**
+ * Each parameter of a signature, by the range of its name, and whether its
+ * type is written: `(props)` and `(u = new User())` write none, and `(n: N)`
+ * with `N` a type parameter writes a stand-in. A receiver -- `self`, `this`,
+ * Rust's `&self` -- is not a parameter an arrow is about.
+ */
+function parameterSites(parameters: Node, generics: Set<string>): Site[] {
+  const sites: Site[] = [];
+  for (let index = 0; index < parameters.childCount; index += 1) {
+    const parameter = parameters.child(index);
+    if (!parameter?.isNamed || parameter.type === "self_parameter" || parameter.type.endsWith("comment")) continue;
+    const type = parameter.childForFieldName("type");
+    const name = parameter.childCount === 0
+      ? parameter
+      : parameter.childForFieldName("pattern") ?? parameter.childForFieldName("name") ?? firstNamed(parameter);
+    if (!name || INSTANCE_NAMES.has(name.text)) continue;
+    sites.push({ name: name.text, ...typeRange(name), written: type !== null && !usesTypeParameter(type, generics) });
+  }
+  return sites;
+}
+
+function firstNamed(node: Node): Node | undefined {
+  for (let index = 0; index < node.childCount; index += 1) {
+    const child = node.child(index);
+    if (child?.isNamed) return child;
+  }
+  return undefined;
+}
+
+/**
+ * Where a node is, as the compiler questions take a range. A type annotation
+ * is asked at the type in it, not at its `:` or `->`.
+ */
+function typeRange(node: Node): { start: number; end: number } {
+  let target = node;
+  if (/annotation$/.test(node.type)) target = firstNamed(node) ?? node;
+  return { start: target.startIndex, end: target.startIndex + target.text.length };
+}
+
 function parameterTypes(
   parameters: Node,
   into: Set<string>,
@@ -562,6 +609,9 @@ export function signatureNames(
   let misplaced: SignatureVerdict | undefined;
   let withheld: SignatureVerdict | undefined;
   let absent: SignatureVerdict | undefined;
+  /** Where the claimed half was read, over every declaration that read absent. */
+  const sites: Site[] = [];
+  const generics = typeParametersIn(tree.rootNode, source);
 
   for (const { node: declaration, self } of declarations) {
     sawName = true;
@@ -672,7 +722,10 @@ export function signatureNames(
       withheld ??= { verdict: "withheld", why: "untyped-return" };
       continue;
     }
-    absent ??= { verdict: "absent", signature: text, line };
+    sites.push(...(position === "parameter"
+      ? (parameters ? parameterSites(parameters, generics) : [])
+      : [{ name: returned!.text.replace(/^[:\s]+|^->\s*/, ""), ...typeRange(returned!), written: !usesTypeParameter(returned!, generics) }]));
+    absent ??= { verdict: "absent", signature: text, line, sites: [], unwritten: [] };
   }
 
   if (misplaced) return misplaced;
@@ -689,7 +742,11 @@ export function signatureNames(
    * thing from one row that both of them read (#207).
    */
   const word = position === "return" ? "returns" : "takes";
-  if (absent) return mayAccuse(word, language) ? absent : { verdict: "withheld", why: "unlicensed" };
+  if (absent) {
+    return mayAccuse(word, language)
+      ? { ...absent, sites, unwritten: unwrittenNames(sites) } as SignatureVerdict
+      : { verdict: "withheld", why: "unlicensed" };
+  }
 
   if (!sawName) return { verdict: "withheld", why: "not-declared" };
   return { verdict: "withheld", why: sawSignature ? "unreadable" : "no-signature" };

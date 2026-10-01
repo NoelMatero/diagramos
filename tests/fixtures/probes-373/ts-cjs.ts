@@ -1,0 +1,28 @@
+export const fixture = {
+  name: "ts-cjs",
+  files: {
+    "package.json": '{ "name": "probe" }\n',
+    "tsconfig.json": '{ "compilerOptions": { "strict": true, "module": "nodenext", "moduleResolution": "nodenext", "target": "es2022", "noEmit": true, "allowJs": true, "checkJs": false } }\n',
+    "lib/legacy.cts": "function legacy(): number {\n  return 1;\n}\nexport = legacy;\n",
+    "lib/modern.mts": "export function modern(): number {\n  return 1;\n}\n",
+    "lib/plain.ts": "export function plain(): number {\n  return 1;\n}\n",
+    "lib/old.js": "function old() {\n  return 1;\n}\nmodule.exports = { old };\n",
+    "h1.cts": 'import legacy = require("./lib/legacy.cjs");\nexport function r(): number {\n  return legacy();\n}\n',
+    "h2.mts": 'import { modern } from "./lib/modern.mjs";\nexport function r(): number {\n  return modern();\n}\n',
+    "h3.cts": 'import { modern } from "./lib/legacy.cjs";\nexport const x = modern;\n',
+    "h4.ts": 'import plainMod = require("./lib/plain");\nexport function r(): number {\n  return plainMod.plain();\n}\n',
+    "h5.js": 'const { old } = require("./lib/old");\nfunction r() {\n  return old();\n}\nmodule.exports = { r };\n',
+    "h6.js": 'const { old } = require("./lib/old.js");\nmodule.exports = { r: () => old() };\n',
+    "h7.mts": 'import legacy from "./lib/legacy.cjs";\nexport const y = legacy();\n',
+  },
+  arrows: [
+    ["import = require('./x.cjs') -> x.cts", "h1.cts", "lib/legacy.cts", "needs"],
+    ["import from './x.mjs' -> x.mts", "h2.mts", "lib/modern.mts", "needs"],
+    ["import {..} from './x.cjs' in .cts -> x.cts", "h3.cts", "lib/legacy.cts", "needs"],
+    ["import = require('./x') no extension", "h4.ts", "lib/plain.ts", "needs"],
+    ["JS require('./x') no extension", "h5.js", "lib/old.js", "needs"],
+    ["JS require('./x.js')", "h6.js", "lib/old.js", "needs"],
+    ["ESM default import of ./x.cjs from .mts", "h7.mts", "lib/legacy.cts", "needs"],
+    ["JS require -> calls", "h5.js#r", "lib/old.js#old", "calls"],
+  ],
+};

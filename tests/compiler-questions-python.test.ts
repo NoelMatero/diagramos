@@ -22,8 +22,44 @@ import {
 } from "../src/engine/referee-pool";
 import { liveRefereePool, refereedCheckLive } from "../src/engine/referee-live";
 import {
-  createPyrightLspReferee, hoverType, pythonTypeNames, relativeModule, typeVarBound,
+  classPathAt, createPyrightLspReferee, hoverType, pythonTypeNames, relativeModule, typeVarBound,
 } from "../src/engine/referee-python-lsp";
+
+describe("reaching the class around an attribute (#394)", () => {
+  const source = [
+    "class Cookies:",
+    "    def extract(self):",
+    "        self.last = 1",
+    "",
+    "    @dataclass",
+    "    class _Compat:",
+    "        def __init__(self, response):",
+    "            self.response = response",
+    "",
+    "def make():",
+    "    class Local:",
+    "        def m(self):",
+    "            self.x = 1",
+    "",
+  ].join("\n");
+  const at = (needle: string) => source.indexOf(needle);
+
+  it("names a top-level class by itself", () => {
+    expect(classPathAt(source, at("self.last"), "Cookies")).toEqual(["Cookies"]);
+  });
+
+  it("names a nested class through the class around it", () => {
+    expect(classPathAt(source, at("self.response"), "_Compat")).toEqual(["Cookies", "_Compat"]);
+  });
+
+  it("gives up on a class declared inside a function, which nothing outside can name", () => {
+    expect(classPathAt(source, at("self.x"), "Local")).toBeUndefined();
+  });
+
+  it("gives up when the class around it is not the one pyright named", () => {
+    expect(classPathAt(source, at("self.response"), "Other")).toBeUndefined();
+  });
+});
 
 describe("reading what pyright prints", () => {
   it.each([
