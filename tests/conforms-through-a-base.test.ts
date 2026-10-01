@@ -72,15 +72,18 @@ describe("TypeScript, a base of a base", () => {
     expect(await redsOf(repo, ["observer.ts#ObserverOptions", "param.ts#InitialPageParam", "conforms"])).toEqual([]);
   }, 60_000);
 
-  it("is still red with no compiler when the chain ends without reaching it", async () => {
+  // TypeScript decides fit by shape, so with no compiler a base list is not
+  // evidence (see gate-conforms); the compiler is what keeps these red.
+  it("is still red when the chain ends without reaching it and the compiler says it does not fit", async () => {
     repo = scratchRepo(TS);
     const { each } = await verdicts(repo, [
-      ["observer.ts#ObserverOptions", "param.ts#Unrelated", "conforms"],
       ["observer.ts#Leaf", "param.ts#Unrelated", "conforms"],
       // A global base leaves the repository, which nothing here can be a base of.
       ["observer.ts#Failure", "param.ts#Unrelated", "conforms"],
-    ], { compiler: false });
-    expect(each.map((one) => one.reds)).toEqual([["conforms-absent"], ["conforms-absent"], ["conforms-absent"]]);
+      // A generic's fit depends on its arguments, so the compiler does not say (#395).
+      ["observer.ts#ObserverOptions", "param.ts#Unrelated", "conforms"],
+    ]);
+    expect(each.map((one) => one.reds)).toEqual([["conforms-absent"], ["conforms-absent"], []]);
   }, 60_000);
 });
 

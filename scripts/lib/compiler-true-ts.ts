@@ -322,6 +322,9 @@ export function typescriptTruePairs(ts: typeof TS, root: string, dirs: string[])
     if (!ts.isClassDeclaration(shape.node) || !plain(shape)) continue;
     for (const target of targets) {
       if (target.name === shape.name || nominal.get(shape.name)!.has(target.name)) continue;
+      // A base fits a subclass that adds nothing it must have; that is the
+      // hierarchy drawn backwards, which the word rightly calls wrong.
+      if (nominal.get(target.name)?.has(shape.name)) continue;
       if (!checker.isTypeAssignableTo(shape.type, target.type)) continue;
       add({ word: "conforms", from: `${rel(shape.node)}#${shape.name}`, to: `${rel(target.node)}#${target.name}`, how: "structural" });
     }

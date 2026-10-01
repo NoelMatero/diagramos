@@ -485,7 +485,12 @@ function parameterSites(parameters: Node, generics: Set<string>): Site[] {
       ? parameter
       : parameter.childForFieldName("pattern") ?? parameter.childForFieldName("name") ?? firstNamed(parameter);
     if (!name || INSTANCE_NAMES.has(name.text)) continue;
-    sites.push({ name: name.text, ...typeRange(name), written: type !== null && !unwrittenType(type, generics) });
+    // `...rest` is asked at the name in it: the compiler has no type for the spread.
+    const asked = name.type === "rest_pattern" ? firstNamed(name) ?? name : name;
+    sites.push({
+      name: name.text, ...typeRange(asked), written: type !== null && !unwrittenType(type, generics),
+      ...(type ? { annotation: { start: type.startIndex, end: type.startIndex + type.text.length } } : {}),
+    });
   }
   return sites;
 }
@@ -724,7 +729,8 @@ export function signatureNames(
     }
     sites.push(...(position === "parameter"
       ? (parameters ? parameterSites(parameters, generics) : [])
-      : [{ name: returned!.text.replace(/^[:\s]+|^->\s*/, ""), ...typeRange(returned!), written: !unwrittenType(returned!, generics) }]));
+      : [{ name: returned!.text.replace(/^[:\s]+|^->\s*/, ""), ...typeRange(returned!), written: !unwrittenType(returned!, generics),
+        annotation: { start: returned!.startIndex, end: returned!.startIndex + returned!.text.length } }]));
     absent ??= { verdict: "absent", signature: text, line, sites: [], unwritten: [] };
   }
 

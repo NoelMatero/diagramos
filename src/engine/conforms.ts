@@ -759,16 +759,21 @@ export function conformedTypes(
     return { verdict: "withheld", why: "registered" };
   }
   /*
-   * Whether the absence is read off something written (#393). A base list
-   * naming other things is. So is the arrow drawn backwards, which rests on a
-   * base the far end writes. A class that writes no base list at all is not,
-   * where the language lets a class be one of another without saying so:
-   * always in TypeScript, and in Python when the far end is a Protocol or
-   * answers `isinstance` itself (#379). A Python class that fits a plain
-   * class names it, or it does not fit.
+   * Whether the absence is read off something written (#393). The arrow
+   * drawn backwards is: it rests on a base the far end writes. In Python, a
+   * base list is too, and so is none, against a plain class: a Python class
+   * is one of a class only by naming it, unless the far end is a Protocol or
+   * answers `isinstance` itself (#379).
+   *
+   * In TypeScript nothing else is. A class is one of whatever it fits, and
+   * `implements LoggerService` says nothing about whether it also fits
+   * `ReplLogger`: `measure:compiler-true` found 756 correct nest arrows red
+   * on exactly that with no compiler, and 21 where the compiler could not
+   * say. So the compiler decides, and without it the red is held back.
    */
-  const written = read.bases.length > 0 || reversed
-    || (language === "python" && target !== undefined && targets.every((name) => nominal(target.source, name)));
+  const written = reversed
+    || (language === "python" && (read.bases.length > 0
+      || (target !== undefined && targets.every((name) => nominal(target.source, name)))));
   const sites: Site[] = (declaredShapes(source, language)?.get(subject) ?? []).map(({ nameNode }) => ({
     name: subject, start: nameNode.startIndex, end: nameNode.startIndex + nameNode.text.length, written,
   }));

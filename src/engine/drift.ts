@@ -46,7 +46,10 @@ import { connects, refIsStale, type CodeGraphOption } from "./codegraph";
 import { readDependencies, readerCanPlace } from "./deps";
 import type { BindingFault } from "./damage";
 import type { DeclaredAt, ImportTarget, MemberTarget, TypeParts } from "./compiler-questions";
-import { askFits, askHasMember, askMember, askTypeParts, declaredIn, gateRed, WRITTEN, type GateWithdrawn, type RedRests } from "./gate";
+import {
+  askFits, askHasMember, askMember, askTypeParts, declaredIn, declaresAlias, gateRed, unwrittenNames, WRITTEN,
+  type GateWithdrawn, type RedRests, type Site,
+} from "./gate";
 import { generatedRef, NEVER_WALK } from "./generated";
 import { readGraph, type Provenance, type RecoveredGraph, type RecoveredNode } from "./graph";
 import { licenceFor, mayAccuse } from "./licence";
@@ -2410,6 +2413,61 @@ function baseChain(
     frontier = next;
   }
   return unfollowed ? "unfollowed" : "closed";
+}
+
+/**
+ * The same sites, with a written type no longer counted as written where a
+ * name in it is an alias, or a name in this repository that cannot be
+ * followed to its declaration (#393).
+ *
+ * `element: ExcalidrawElement` names a union of eleven element types, one of
+ * them the head, in another file. Read as written it was "names something
+ * else", and `measure:compiler-true` found 934 correct excalidraw arrows red
+ * with no compiler on it. An alias says what it stands for only where it is
+ * declared, so each name is followed there, the way `@calls` places names.
+ * A name that leaves the repository -- a global, a package -- cannot stand
+ * for a type here except through a type argument, which is written.
+ */
+function throughAliases(file: string, sites: Site[], workspace: Workspace, configs: ConfigCache): Site[] {
+  if (!sites.some((one) => one.written && one.annotation)) return sites;
+  const side = callSide(file, workspace, configs);
+  const bindings = side ? bindingsIn(side.source, side.language) : undefined;
+  if (!side || !bindings) return sites.map((one) => (one.annotation ? { ...one, written: false } : one));
+  const mayLandHere = new Set((readDependencies(file, side.source, workspace, configs)?.dependencies ?? [])
+    .filter((one) => one.unplaced).map((one) => one.specifier));
+  const hides = new Map<string, boolean>();
+  const hidesSomething = (name: string): boolean => {
+    if (!hides.has(name)) {
+      let hidden: boolean;
+      const here = declaresAlias(side.source, side.language, name);
+      if (here !== undefined) hidden = here;
+      else {
+        const placed = placeName(name, side, bindings);
+        if (!("why" in placed)) {
+          const target = workspace.resolve(placed.file);
+          const language = languageOf(placed.file);
+          const there = target && language && workspace.stat(target) === "file"
+            ? declaresAlias(workspace.read(target), language, placed.as ?? name)
+            : undefined;
+          hidden = there !== false;
+        } else {
+          const specifier = bindings.imported.get(name)?.specifier;
+          const left = placed.why === "unbound"
+            || (placed.why === "unplaced" && specifier !== undefined && !mayLandHere.has(specifier));
+          hidden = !left;
+        }
+      }
+      hides.set(name, hidden);
+    }
+    return hides.get(name)!;
+  };
+  return sites.map((one) => {
+    if (!one.written || !one.annotation) return one;
+    const text = side.source.slice(one.annotation.start, one.annotation.end);
+    // Names in type position only: not a member after a dot, not a string's insides.
+    const names = [...text.replace(/(["'`]).*?\1/g, "").matchAll(/(?<![\w$.])[A-Za-z_$][\w$]*/g)].map((match) => match[0]);
+    return names.some(hidesSomething) ? { ...one, written: false } : one;
+  });
 }
 
 /**
@@ -4817,6 +4875,7 @@ export function checkDrift(
                 && was.claim === signatureClaim,
             );
             const fresh = baselineGraph !== undefined && !wasClaimed;
+            const signatureSites = throughAliases(toAnchor, verdict.sites, workspace, importCache.configs);
             recordEdge(edge, fromNode, toNode, { kind: "finding", finding: {
               from: fromPath,
               to: toPath,
@@ -4833,12 +4892,12 @@ export function checkDrift(
                 + `\`${verdict.signature}\`, which does not name it. `
                 + `Either the arrow points at the wrong function, or the signature changed.`,
             }, rests: {
-              written: verdict.unwritten.length === 0,
-              unwritten: `${position === "parameter" ? "parameters" : "a return type"} not written out `
-                + `(${verdict.unwritten.map((name) => `\`${name}\``).join(", ")})`,
+              written: unwrittenNames(signatureSites).length === 0,
+              unwritten: `${position === "parameter" ? "parameters" : "a return type"} not written out, or written `
+                + `through an alias (${unwrittenNames(signatureSites).map((name) => `\`${name}\``).join(", ")})`,
               ask: (referee) => askTypeParts(
                 referee,
-                verdict.sites.map((one) => ({ file: toPath, name: one.name, at: one, written: one.written })),
+                signatureSites.map((one) => ({ file: toPath, name: one.name, at: one, written: one.written })),
                 declaredIn(workspace.read(fromFile), fromLanguage ?? language, fromPath, fromEnd.symbols[0]!),
               ),
             } });
@@ -4941,6 +5000,10 @@ export function checkDrift(
               (was) => was.from === edge.from && was.to === edge.to && was.claim === "holds",
             );
             const fresh = baselineGraph !== undefined && !wasClaimed;
+            const holdsSites = throughAliases(fromAnchor, verdict.sites, workspace, importCache.configs);
+            // A name typed elsewhere in the class with no alias in it is still written.
+            const typedPlainly = new Set(holdsSites.filter((one) => one.written).map((one) => one.name));
+            const aliased = unwrittenNames(holdsSites.filter((one) => !typedPlainly.has(one.name) && !verdict.unwritten.includes(one.name)));
             recordEdge(edge, fromNode, toNode, { kind: "finding", finding: {
               from: fromPath,
               to: toPath,
@@ -4956,11 +5019,12 @@ export function checkDrift(
                 + `\`${verdict.fields}\`, which does not name it. `
                 + `Either the arrow points at the wrong type, or the fields changed.`,
             }, rests: {
-              written: verdict.unwritten.length === 0,
-              unwritten: `fields whose type is not written (${verdict.unwritten.map((name) => `\`${name}\``).join(", ")})`,
+              written: verdict.unwritten.length === 0 && aliased.length === 0,
+              unwritten: `fields whose type is not written, or written through an alias `
+                + `(${[...verdict.unwritten, ...aliased].map((name) => `\`${name}\``).join(", ")})`,
               ask: (referee) => askTypeParts(
                 referee,
-                verdict.sites.map((one) => ({ file: fromPath, name: one.name, at: one, written: one.written })),
+                holdsSites.map((one) => ({ file: fromPath, name: one.name, at: one, written: one.written })),
                 declaredIn(workspace.read(toFile), toLanguage ?? language, toPath, toEnd.symbols[0]!),
               ),
             } });

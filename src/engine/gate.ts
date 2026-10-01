@@ -22,7 +22,7 @@
 import { declaredShapes } from "./body";
 import { partsInclude, type DeclaredAt, type TypeParts } from "./compiler-questions";
 import type { ClosedBodyReferee } from "./drift";
-import { each, type Language, type Node } from "./parse";
+import { each, parseSource, type Language, type Node } from "./parse";
 
 /** What the compiler said about the one thing a red rests on. */
 export interface CompilerSaid {
@@ -86,6 +86,12 @@ export interface Site {
   start: number;
   end: number;
   written: boolean;
+  /**
+   * Where the written type is, when one is. A name in it may be an alias,
+   * which says nothing about what it stands for (#393), and only a reader
+   * with the workspace can look: `drift.ts`'s `throughAliases`.
+   */
+  annotation?: { start: number; end: number };
 }
 
 /** The names of the sites whose type is not written, once each. */
@@ -157,6 +163,38 @@ export function unwrittenType(type: Node, parameters: Set<string>): boolean {
   let computed = false;
   each(type, (node) => { if (COMPUTED_TYPE.has(node.type)) computed = true; });
   return computed;
+}
+
+/** Declarations that name a type for good: `class`, `interface`, `enum`, `struct`, `trait`. */
+const NOMINAL_DECLARATION = /^(class_declaration|abstract_class_declaration|interface_declaration|enum_declaration|class_definition|struct_item|enum_item|trait_item|union_item)$/;
+/** Declarations that name another type: `type X = ...` in TypeScript, Rust and Python 3.12. */
+const ALIAS_DECLARATION = /^(type_alias_declaration|type_item|type_alias_statement)$/;
+
+/**
+ * Whether this file declares `name` as an alias of another type (true), as
+ * a type of its own (false), or not at all (undefined).
+ *
+ * A Python module-level `Name = ...` is an alias too: `Engines = list[Engine]`
+ * and `Handler = Union[A, B]` are how Python wrote one before 3.12.
+ */
+export function declaresAlias(source: string, language: Language, name: string): boolean | undefined {
+  const tree = parseSource(source, language);
+  if (!tree) return undefined;
+  let found: boolean | undefined;
+  each(tree.rootNode, (node) => {
+    if (found !== undefined) return;
+    const declared = node.childForFieldName("name")?.text ?? (node.type === "type_alias_statement" ? node.child(1)?.text : undefined);
+    if (declared === name && NOMINAL_DECLARATION.test(node.type)) found = false;
+    else if (declared === name && ALIAS_DECLARATION.test(node.type)) found = true;
+    else if (language === "python" && node.type === "module") {
+      for (let index = 0; index < node.childCount; index += 1) {
+        const statement = node.child(index);
+        const assignment = statement?.type === "expression_statement" ? statement.child(0) : undefined;
+        if (assignment?.type === "assignment" && assignment.childForFieldName("left")?.text === name) found = true;
+      }
+    }
+  });
+  return found;
 }
 
 /** A place to ask about: a name in a file and its range, as the questions take it. */
