@@ -140,6 +140,12 @@ interface ProjectResult {
   wrong: string[];
   /** Pairs the compiler says are only got elsewhere, and the checker called wrong. The new red, on real code. */
   caught: string[];
+  /**
+   * Pairs the compiler says are only got elsewhere, and the checker confirmed
+   * (#396). Not wrong by itself -- the referee may have missed a construction
+   * -- but every one is printed, to be read.
+   */
+  greenOnGets: string[];
 }
 
 if (only) {
@@ -197,9 +203,15 @@ function report(results: ProjectResult[], failed: string[]): void {
   const quietGets = Object.entries(tally).filter(([key]) => key.startsWith("gets ") && key.includes(" quiet"));
   console.log(`    quiet: ${quietGets.reduce((total, [, count]) => total + count, 0)}`);
   for (const [key, count] of quietGets.sort()) console.log(`      ${String(count).padStart(5)}  ${key}`);
+  const greenOnGets = results.flatMap((one) => (one.greenOnGets ?? []).map((pair) => `${one.project}: ${pair}`));
+  console.log(`    confirmed by the checker: ${greenOnGets.length}   <- read every one`);
   if (wrong.length > 0) {
     console.log("\n  WRONG (the compiler says it creates one):");
     for (const one of wrong) console.log(`    ${one}`);
+  }
+  if (greenOnGets.length > 0) {
+    console.log("\n  CONFIRMED, where the compiler says it only gets one:");
+    for (const one of greenOnGets) console.log(`    ${one}`);
   }
   if (showCases && caught.length > 0) {
     console.log("\n  caught (the compiler says it only gets one):");
@@ -286,6 +298,7 @@ async function rustPairs(root: string): Promise<{ pairs: Pair[]; referee: Closed
   // Types declared once in the repository, and where.
   const sources = new Map<string, string>();
   const declared = new Map<string, string[]>();
+  const enums = new Set<string>();
   for (const file of files) {
     const source = readFileSync(path.join(root, file), "utf8");
     sources.set(file, source);
@@ -295,6 +308,7 @@ async function rustPairs(root: string): Promise<{ pairs: Pair[]; referee: Closed
       if (!/^(struct|enum)_item$/.test(node.type)) return;
       const name = node.childForFieldName("name")?.text;
       if (name) declared.set(name, [...(declared.get(name) ?? []), file]);
+      if (name && node.type === "enum_item") enums.add(name);
     });
   }
   const home = (name: string) => {
@@ -361,7 +375,7 @@ async function rustPairs(root: string): Promise<{ pairs: Pair[]; referee: Closed
       if (!unique) continue;
       const makes = new Map<string, Pair["how"]>();
       for (const list of lists) {
-        for (const [made, how] of mirMakes(list)) {
+        for (const [made, how] of mirMakes(list, enums)) {
           const was = makes.get(made);
           if (!was || rank.indexOf(how) > rank.indexOf(was)) makes.set(made, how);
         }
@@ -433,8 +447,15 @@ function rawBodies(mir: string): Map<string, string[][]> {
   return out;
 }
 
-/** What a routine's raw MIR creates, by type name, and how. */
-function mirMakes(texts: string[]): Map<string, Pair["how"]> {
+/**
+ * What a routine's raw MIR creates, by type name, and how.
+ *
+ * An enum value is named by its enum (#396): rustc prints `Value::Null`,
+ * `HirFrame::ClassUnicode(..)`, and the type built is `Value`, not `Null`.
+ * Before this, those were filed as "only got it from a call" whenever the
+ * body also got a `Value` back from one.
+ */
+function mirMakes(texts: string[], enums: ReadonlySet<string>): Map<string, Pair["how"]> {
   const base = (type: string) =>
     type.replace(/^(&(mut )?|\*(const|mut) )+/, "").replace(/'\w+ /g, "").split("<")[0]!.split("::").pop()!.trim();
   const locals = new Map<string, string>();
@@ -451,7 +472,10 @@ function mirMakes(texts: string[]): Map<string, Pair["how"]> {
   for (const line of texts) {
     if (!/ -> \[/.test(line)) {
       const aggregate = line.match(/^\s+(?:\(?\*?)?_\d+[^=]*= ((?:\w+::)*)(\w+)(?:::<[^;]*?>)?(?:::(\w+))?\s*[{(;]/);
-      if (aggregate && !/^(move|copy|const)$/.test(aggregate[2]!)) note(aggregate[2]!, "aggregate");
+      if (aggregate && !/^(move|copy|const)$/.test(aggregate[2]!)) {
+        const owner = aggregate[1]!.split("::").filter(Boolean).pop();
+        note(owner && enums.has(owner) && !aggregate[3] ? owner : aggregate[2]!, "aggregate");
+      }
       continue;
     }
     const call = line.match(/^\s+_(\d+) = (.+?) -> \[/);
@@ -631,7 +655,7 @@ async function askChecker(
 
   const cache = newCheckCache(createWorkspace(root));
   const accusing = new Set<string>(ACCUSING_EDGE_KINDS);
-  const result: ProjectResult = { project, tally: {}, wrong: [], caught: [] };
+  const result: ProjectResult = { project, tally: {}, wrong: [], caught: [], greenOnGets: [] };
   for (const pair of pairs) {
     const { board } = await createDiagram(emptyBoard(), {
       name: "b",
@@ -662,6 +686,7 @@ async function askChecker(
     if (answer.startsWith("red ")) {
       (pair.how === "gets" ? result.caught : result.wrong).push(`${pair.from} -> ${pair.to} (${pair.target}) ${answer}`);
     }
+    if (pair.how === "gets" && answer === "green") result.greenOnGets.push(`${pair.from} -> ${pair.to} (${pair.target})`);
   }
   pool?.close();
   return result;

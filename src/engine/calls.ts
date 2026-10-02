@@ -1631,6 +1631,8 @@ export function compiledVerdict(
 export interface CompiledTail {
   bodies: CompiledBody[];
   generics: Set<string>;
+  /** Source ranges a `#[cfg(..)]` inside the routine switched off: code rustc may never have read. */
+  unbuilt: Array<{ start: number; end: number }>;
 }
 
 /**
@@ -1884,7 +1886,7 @@ export function compiledBodiesFor(
       if (!reading.bodies.some((compiled) => compiled.words.has(site.name))) return undefined;
     }
   }
-  return { bodies: reading.bodies, generics: reading.generics };
+  return { bodies: reading.bodies, generics: reading.generics, unbuilt: reading.unbuilt };
 }
 
 /** `closedBodyRefutes` as it was before #357: the text reading alone. */
