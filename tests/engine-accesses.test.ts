@@ -350,7 +350,7 @@ describe("the routine end says wrong when nothing in the body is called the memb
     );
     expect(verdictOf(verdict)).toBe("not-read");
     if (verdict.verdict !== "not-read") return;
-    expect(verdict.evidence).toEqual({ routine: "render", line: 1, reads: 1 });
+    expect(verdict.evidence).toEqual({ routine: "render", line: 1, reads: 1, handed: [] });
   });
 
   it("refutes the same shape in Python", () => {

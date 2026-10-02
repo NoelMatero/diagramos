@@ -2694,8 +2694,9 @@ const isReceiver = (one: HandedWhole) => typeof one.slot === "object" && "receiv
  * `Debug` were already quiet on, and the same as a class reading through its
  * methods. So the value is followed to whatever receives it:
  *
- * - **outside the repository**, or placed nowhere: a library's or the
- *   language's own code, which cannot name your fields. It may read all.
+ * - **outside the repository**: a library's or the language's own code,
+ *   which cannot name your fields. It may read all. Usually only the
+ *   compiler can say a call lands there, so the red carries the question.
  * - **a method the type itself does not declare**, `c.clone()`: derived,
  *   inherited or the language's own. It may read all.
  * - **a routine in the repository**: read it. It may read all when it walks
@@ -2703,6 +2704,10 @@ const isReceiver = (one: HandedWhole) => typeof one.slot === "object" && "receiv
  *   hands that parameter on to one of these in turn -- `serialize(c)` whose
  *   body is `JSON.stringify(v)`. A routine typed to take a Config and reading
  *   only `.height` does not.
+ *
+ * A call nobody can place keeps the red, as a helper nobody can see into
+ * does (#255): silence needs somewhere to stand. So does a value that lands in
+ * a splat, or a chain longer than `WHOLE_DEPTH`.
  *
  * Only a value the code says is the arrow's type is followed: written so
  * (`c: Config`), or the compiler says so. A routine handing on a `string`, or
@@ -2786,19 +2791,20 @@ function handsWhole(
 
   /** Whether `routine` may read every member of the value its parameter `name` holds. */
   const walks = (target: string, routine: RoutineReads, name: string | undefined, depth: number): boolean => {
-    // A value that lands in a splat or a pattern, or a chain this long, is not followed further.
-    if (!name || depth >= WHOLE_DEPTH) return true;
+    if (!name || depth >= WHOLE_DEPTH) return false;
     if (routine.hazards.length > 0) return true;
     if (readsMember(routine.sites.map((site) => site.member), member)) return true;
     const own = name === "self" || name === "this" || name === "cls";
     const onward = routine.handed.filter((one) => one.name === name || (own && (one.name === "self" || one.name === "this")));
     if (onward.length === 0) return false;
     const sites = sitesOf(target, routine.line);
-    return onward.some((one) => receives(target, sites, one, depth + 1) !== undefined);
+    return onward.some((one) => receives(target, routine.line, sites, one, depth + 1) !== undefined);
   };
 
   /** Whether whatever receives `one` may read every member of it: the call, as written, when so. */
-  const receives = (target: string, sites: CallSitePlaced[], one: HandedWhole, depth: number): string | undefined => {
+  const receives = (
+    target: string, line: number, sites: CallSitePlaced[], one: HandedWhole, depth: number,
+  ): string | undefined => {
     const written = `${one.callee}(..)`;
     if (isReceiver(one) && depth === 0) {
       // The type's own method is a routine like any other; anything else on it is not written there.
@@ -2806,8 +2812,16 @@ function handsWhole(
       if (!("declares" in declared && declared.declares)) return written;
     }
     const landed = landing(target, sites, one);
-    if (landed === "outside" || landed === "unknown") return written;
-    return landed.routines.some((routine) => walks(landed.file, routine, receiving(routine, one), depth))
+    if (landed === "outside") return written;
+    if (landed === "unknown") return undefined;
+    /*
+     * Landing on the routine itself is a call to a parameter or a local --
+     * `measure(config)` -- whose value is not in the text: a call nobody can
+     * see into, as `helperReading` reads it.
+     */
+    return landed.routines
+      .filter((routine) => !(landed.file === target && routine.line === line))
+      .some((routine) => walks(landed.file, routine, receiving(routine, one), depth))
       ? written
       : undefined;
   };
@@ -2816,7 +2830,7 @@ function handsWhole(
   if (handed.length === 0) return undefined;
   const sites = sitesOf(file, evidence.line);
   for (const one of handed) {
-    const found = receives(file, sites, one, 0);
+    const found = receives(file, evidence.line, sites, one, 0);
     if (found) return found;
   }
   return undefined;
@@ -6151,7 +6165,27 @@ export function checkDrift(
                       + `could not see into. If one of those reads \`${member}\`, the board wants `
                       + `${routine} --calls--> that function --accesses--> ${target}.`
                     : ""),
-              }, rests: WRITTEN /* every member the routine reads was read and placed */ });
+              }, rests: verdict.evidence.handed.length === 0
+                ? WRITTEN /* every member the routine reads was read and placed */
+                : {
+                  /*
+                   * It hands a value on whole (#388). Where the call that
+                   * receives it lands -- `JSON.stringify`, `asdict` -- and
+                   * whether the value is the Config are the compiler's to say;
+                   * on the pass that had one, `handsWhole` above already asked.
+                   */
+                  written: true,
+                  ask: (referee) => {
+                    const found = handsWhole(
+                      fromPath, verdict.evidence, member,
+                      { file: toPath, source: workspace.read(toFile), language: toLanguage, names: toEnd.symbols },
+                      workspace, importCache.configs, referee,
+                    );
+                    return found
+                      ? { does: true, said: `${routine} hands the ${target} whole to \`${found}\`, which may read every field` }
+                      : { does: undefined };
+                  },
+                } });
               continue;
             }
             /*

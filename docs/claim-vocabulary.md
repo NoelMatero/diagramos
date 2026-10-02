@@ -146,7 +146,10 @@ that sentence have different evidence behind them:
   own may when it walks the parameter that received it or hands it on to one
   of those (`serialize(c)` whose body is `JSON.stringify(v)`). Only a value
   written or compiled as the Config is followed, so a body handing on a string
-  keeps its red. It never confirms: a serializer may skip a field.
+  keeps its red. It never confirms: a serializer may skip a field. A call
+  nobody can place still keeps the red, so where the call lands is the
+  compiler's to say: `JSON.stringify` and `asdict` are only known to be the
+  language's own while one is running, and with none they stay red.
 
 So the two ends refute on two different footings: the type end from a
 declaration, the routine end from a body read whole by name. Neither accuses

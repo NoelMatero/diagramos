@@ -25,7 +25,14 @@ import { installExcalifontMeasurer } from "./helpers/excalifont";
 installExcalifontMeasurer();
 beforeAll(async () => { await initEngine(); }, 60_000);
 
-type Shape = [shape: string, from: string, to: string, member: string];
+/**
+ * `COMPILER` marks a shape whose silence needs a compiler: only one can say
+ * `JSON.stringify` or `asdict` is the language's own rather than a function
+ * nobody can see into, and a call nobody can see into keeps the red (#255).
+ * With none running those stay red, and the test says so.
+ */
+const COMPILER = true;
+type Shape = [shape: string, from: string, to: string, member: string, needsCompiler?: boolean];
 
 /** One language's repository: the right arrows that must stay quiet, the wrong ones that must stay red. */
 interface Shapes {
@@ -67,18 +74,18 @@ const TYPESCRIPT: Shapes = {
     ].join("\n\n"),
   },
   right: [
-    ["JSON.stringify", "r.ts#json", "c.ts#Config", "width"],
-    ["Object.values", "r.ts#values", "c.ts#Config", "height"],
-    ["Object.assign", "r.ts#assign", "c.ts#Config", "width"],
+    ["JSON.stringify", "r.ts#json", "c.ts#Config", "width", COMPILER],
+    ["Object.values", "r.ts#values", "c.ts#Config", "height", COMPILER],
+    ["Object.assign", "r.ts#assign", "c.ts#Config", "width", COMPILER],
     ["for..in", "r.ts#forIn", "c.ts#Config", "width"],
     ["spread", "r.ts#spread", "c.ts#Config", "width"],
     ["c['width']", "r.ts#indexed", "c.ts#Config", "width"],
     ["destructuring", "r.ts#destructured", "c.ts#Config", "width"],
-    ["JSON.stringify beside other reads", "r.ts#jsonMixed", "c.ts#Config", "width"],
+    ["JSON.stringify beside other reads", "r.ts#jsonMixed", "c.ts#Config", "width", COMPILER],
     ["structuredClone", "r.ts#clone", "c.ts#Config", "width"],
-    ["console.log(c)", "r.ts#logged", "c.ts#Config", "width"],
+    ["console.log(c)", "r.ts#logged", "c.ts#Config", "width", COMPILER],
     ["own walker (unknown param)", "r.ts#ownWalker", "c.ts#Config", "width"],
-    ["own walker beside other reads", "r.ts#ownMethodLike", "c.ts#Config", "width"],
+    ["own walker beside other reads", "r.ts#ownMethodLike", "c.ts#Config", "width", COMPILER],
   ],
   wrong: [
     ["never touches Config", "r.ts#other", "c.ts#Config", "width"],
@@ -110,10 +117,10 @@ const PYTHON: Shapes = {
     ["asdict", "r.py#as_dict", "c.py#Config", "width"],
     ["astuple", "r.py#as_tuple", "c.py#Config", "width"],
     ["dataclass ==", "r.py#compare", "c.py#Config", "width"],
-    ["asdict beside other reads", "r.py#as_dict_mixed", "c.py#Config", "width"],
-    ["json.dumps(asdict(c))", "r.py#dumped", "c.py#Config", "width"],
+    ["asdict beside other reads", "r.py#as_dict_mixed", "c.py#Config", "width", COMPILER],
+    ["json.dumps(asdict(c))", "r.py#dumped", "c.py#Config", "width", COMPILER],
     ["print(c)", "r.py#printed", "c.py#Config", "width"],
-    ["own walker (object param)", "r.py#own_walker", "c.py#Config", "width"],
+    ["own walker (object param)", "r.py#own_walker", "c.py#Config", "width", COMPILER],
   ],
   wrong: [
     ["never touches Config", "r.py#other", "c.py#Config", "width"],
@@ -170,7 +177,10 @@ function shapes(language: string, fixture: Shapes): void {
         expect({
           right: fixture.right.filter((_, index) => red(index)).map(([shape]) => shape),
           wrong: fixture.wrong.filter((_, index) => !red(fixture.right.length + index)).map(([shape]) => shape),
-        }).toEqual({ right: [], wrong: [] });
+        }).toEqual({
+          right: compiler ? [] : fixture.right.filter(([, , , , needs]) => needs).map(([shape]) => shape),
+          wrong: [],
+        });
       } finally {
         dropRepo(repo);
       }
