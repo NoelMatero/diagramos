@@ -404,14 +404,25 @@ export function reachBetween(
   let unreadableHop = false;
   let overBudget = false;
 
+  /*
+   * Back-links form a tree rooted at the head, with one exception: the far
+   * end gets its link when it is reached, and a self arrow's far end *is* the
+   * head. `a -> b -> a` then gives the head a link to `b`, and a rebuild that
+   * stops only at a missing link goes round for ever (#407). So the head ends
+   * the route the second time it is met, and no key is ever followed twice.
+   */
   const routeTo = (key: string): { via: string[]; hops: ReachHop[] } => {
     const via: string[] = [];
     const hops: ReachHop[] = [];
+    const walked = new Set<string>();
     let current: string | undefined = key;
     while (current) {
       const here = at.get(current);
       if (!here) break;
       via.unshift(here.routine);
+      if (current === start && walked.size > 0) break;
+      if (walked.has(current)) break;
+      walked.add(current);
       const step = came.get(current);
       if (step) hops.unshift({ file: here.file, routine: here.routine, line: step.line });
       current = step?.previous;

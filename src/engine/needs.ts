@@ -598,9 +598,17 @@ export function walkImports(
       seen.add(hop.on);
       cameFrom.set(hop.on, { parent: file, hop });
       if (hop.on === to) {
+        /*
+         * Each file gets its link once, from a file already seen, so the links
+         * form a tree back to `from`. Guarded all the same: a rebuild that
+         * only stops at its start goes round for ever the day that stops
+         * being true (#407).
+         */
         const via: string[] = [];
+        const walked = new Set<string>();
         let step = cameFrom.get(to)!;
-        while (step.parent !== from) {
+        while (step.parent !== from && !walked.has(step.parent)) {
+          walked.add(step.parent);
           via.unshift(step.parent);
           step = cameFrom.get(step.parent)!;
         }

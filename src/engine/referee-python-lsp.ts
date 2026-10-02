@@ -797,25 +797,34 @@ export async function createPyrightLspReferee(root: string): Promise<PyrightLspR
     return classes.length === read.length ? classes : undefined;
   }
 
-  const calling = new Map<string, Promise<boolean | undefined>>();
+  /*
+   * Settled answers only. Sharing a pending one let a walk wait on itself: two
+   * files whose classes derive from each other (`class CA(CB)` beside `class
+   * CB(CA)`, each importing the other) handed CB the unfinished answer for CA,
+   * CA was waiting on CB, and the question never settled (#407). `run` asks
+   * several at once, so the same wait could also form across two walks.
+   */
+  const calling = new Map<string, boolean | undefined>();
 
   /**
    * Whether instances of the class declared at this line can be called: its
    * body or a base's defines `__call__`. `undefined` for a base pyright cannot
-   * place, which leaves the whole answer open.
+   * place, which leaves the whole answer open -- and for a base that leads back
+   * to a class already on this walk, which is no more placed than that.
    */
-  function definesCall(file: string, line: number, depth: number): Promise<boolean | undefined> {
+  async function definesCall(
+    file: string, line: number, through: ReadonlySet<string> = new Set(),
+  ): Promise<boolean | undefined> {
     const key = `${file}:${line}`;
-    let answer = calling.get(key);
-    if (!answer) {
-      answer = readCall(file, line, depth);
-      calling.set(key, answer);
-    }
+    if (calling.has(key)) return calling.get(key);
+    if (through.has(key)) return undefined;
+    const answer = await readCall(file, line, new Set(through).add(key));
+    calling.set(key, answer);
     return answer;
   }
 
-  async function readCall(file: string, line: number, depth: number): Promise<boolean | undefined> {
-    if (depth > 12) return undefined;
+  async function readCall(file: string, line: number, through: ReadonlySet<string>): Promise<boolean | undefined> {
+    if (through.size > 13) return undefined;
     const source = sourceOf(file);
     const klass = source === undefined ? undefined : classOnLine(source, line);
     if (!source || !klass) return undefined;
@@ -827,7 +836,7 @@ export async function createPyrightLspReferee(root: string): Promise<PyrightLspR
       const classes = classesAt(await askLocations("definition", file, source, base.startIndex));
       if (!classes) return undefined;
       for (const one of classes) {
-        const inherited = await definesCall(one.file, one.line, depth + 1);
+        const inherited = await definesCall(one.file, one.line, through);
         if (inherited === true) return true;
         if (inherited === undefined) answer = undefined;
       }
@@ -1066,7 +1075,7 @@ export async function createPyrightLspReferee(root: string): Promise<PyrightLspR
       if (!named) return undefined;
       let answer: boolean | undefined = false;
       for (const one of classes) {
-        const callable = await definesCall(one.file, one.line, 0);
+        const callable = await definesCall(one.file, one.line);
         if (callable === true) return true;
         if (callable === undefined) answer = undefined;
       }
