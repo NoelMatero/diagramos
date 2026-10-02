@@ -102,6 +102,12 @@ describe("TypeScript, a class that fits an interface without `implements`", () =
     expect(await redsOf(repo, ["impl.ts#Square", "base.ts#Named", "conforms"])).toEqual(["conforms-absent"]);
   }, 60_000);
 
+  // vue's `SchedulerJob` drawn as one of `SchedulerJobFlags`, an enum (#393's bench).
+  it("is red when the compiler says an interface is not one of an enum", async () => {
+    repo = scratchRepo({ ...TS, "flags.ts": "export enum Flags {\n  A = 1,\n  B = 2,\n}\n\nexport interface Job extends Function {\n  flags?: Flags\n}\n" });
+    expect(await redsOf(repo, ["flags.ts#Job", "flags.ts#Flags", "conforms"])).toEqual(["conforms-absent"]);
+  }, 60_000);
+
   it("is still red with no compiler when the arrow is drawn backwards", async () => {
     repo = scratchRepo(TS);
     expect(await redsOf(repo, ["base.ts#Other", "impl.ts#Square", "conforms"], { compiler: false })).toEqual(["conforms-absent"]);
