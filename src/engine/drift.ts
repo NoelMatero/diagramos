@@ -74,7 +74,7 @@ import { signatureNames, type SignatureWithheld } from "./signature";
 import { resolveDependency, type ConfigCache } from "./resolve";
 import { boardIsNewer, newerBuildClaimError } from "./version";
 import type { Workspace } from "./workspace";
-import { COLON_LINE, LINE_NUMBERS, LONE_LINE, plainNameOf } from "./lines";
+import { COLON_LINE, LINE_NUMBERS, LONE_LINE, ownerIsHere, writtenName } from "./lines";
 export { pointsAtLines, pointsAtQualified } from "./lines";
 
 export type DriftKind =
@@ -1051,6 +1051,14 @@ export type EdgeSkipReason =
    */
   | "endpoint-generated"
   | "endpoint-file-missing"
+  /**
+   * An end's box names something its file does not have (#382): a symbol it
+   * never mentions, an owner it never mentions, a malformed ref. The box check
+   * reports which; the arrow is not judged, because a reader looking for a
+   * name that is not there finds nothing and says so as though it looked.
+   * Its own reason, not `endpoint-file-missing`: the file is there.
+   */
+  | "endpoint-not-found"
   | "directory-ref"
   /**
    * An end refs a glob, so it stands for a set of files rather than one.
@@ -1735,11 +1743,22 @@ function licensedLanguage(name: string): string | undefined {
   return licenceFor(name)?.language;
 }
 
-/** Splits `path#symbol`. Either half may be empty; the caller decides. */
-export function parseRef(ref: string): { path: string; symbol?: string } {
+/**
+ * Splits `path#symbol`. Either half may be empty; the caller decides.
+ *
+ * `symbol` is the name as the code declares it: `money.rs#Money::new` is
+ * `new`, the same as `money.rs#new` (#382, `writtenName`). Every reader in
+ * this file gets its names from here, so none of them sees the owner and all
+ * of them understand it. `owner` is what was written in front, for the box
+ * check to make sure the file has it.
+ */
+export function parseRef(ref: string): { path: string; symbol?: string; owner?: string } {
   const hash = ref.indexOf("#");
   if (hash < 0) return { path: ref.trim() };
-  return { path: ref.slice(0, hash).trim(), symbol: ref.slice(hash + 1).trim() || undefined };
+  const written = ref.slice(hash + 1).trim();
+  if (!written) return { path: ref.slice(0, hash).trim() };
+  const { name, owner } = writtenName(written);
+  return { path: ref.slice(0, hash).trim(), symbol: name, ...(owner ? { owner } : {}) };
 }
 
 export function refFromLabel(label: string): string | undefined {
@@ -1766,6 +1785,13 @@ function lineNumbers(base: Omit<DriftFinding, "kind" | "detail">, file: string, 
 }
 
 type Inspection = DriftFinding | "ok" | { skip: NodeSkipReason };
+
+/**
+ * Box findings that mean a name was not found, so no arrow at that box can be
+ * judged (#382). `missing-file` has its own arrow reason; `unused-symbol` and
+ * the rest found the name and said something else about it.
+ */
+const UNFOUND_KINDS: ReadonlySet<string> = new Set(["missing-symbol", "unresolvable-ref", "missing-declaration"]);
 
 /**
  * How many entries a directory or glob anchor will look at.
@@ -1982,7 +2008,7 @@ function inspect(
   tally: AssertionTally,
   importCache: ReadCache,
 ): Inspection {
-  const { path: rawTarget, symbol: rawSymbol } = parseRef(ref);
+  const { path: rawTarget, symbol: rawSymbol, owner } = parseRef(ref);
   const base = { node: node.id, label: node.label, ref, provenance };
   if (!rawTarget) {
     return { ...base, kind: "unresolvable-ref", detail: `"${ref}" names a symbol but no file.` };
@@ -1996,23 +2022,23 @@ function inspect(
   if (lineShaped && !LONE_LINE.test(rawSymbol!.split("@")[0].trim())) {
     return lineNumbers(base, rawTarget, rawSymbol!);
   }
-  /**
-   * What a symbol the target does not mention is reported as. A qualified name
-   * whose plain part *is* there was never going to be found as written, so it
-   * is a pointer to rewrite, not code that went (#288).
-   */
-  const notMentioned = (detail: string, has: (name: string) => boolean): DriftFinding => {
+  /** What a symbol the target does not mention is reported as. */
+  const notMentioned = (detail: string): DriftFinding => {
     if (lineShaped) return lineNumbers(base, rawTarget, rawSymbol!);
-    const plain = symbol === undefined ? undefined : plainNameOf(symbol);
-    if (plain && has(plain)) {
-      return {
-        ...base,
-        kind: "unresolvable-ref",
-        detail: `${ref} qualifies the name, and ${rawTarget} never spells it that way: a method sits `
-          + `inside its impl or class. Write the plain name: ${rawTarget}#${plain}.`,
-      };
-    }
     return { ...base, kind: "missing-symbol", detail };
+  };
+  /**
+   * A name written with its owner is that name (#382), so long as the files
+   * have the owner. One they never mention is a typo or the wrong file, and
+   * reading the name alone would hold `Wallet::new` up on `Money::new`.
+   */
+  const strangeOwner = (files: string[], where: string): DriftFinding | undefined => {
+    if (!owner || files.some((file) => ownerIsHere(owner, file, workspace.read(file)))) return undefined;
+    return {
+      ...base,
+      kind: "unresolvable-ref",
+      detail: `${ref} names ${owner} as the owner of ${symbol}, and ${where} never mentions ${owner}.`,
+    };
   };
 
   // A garbled assertion is loud immediately rather than becoming a claim that
@@ -2117,8 +2143,10 @@ function inspect(
     if (!symbol) return "ok";
     const code = matched.filter((name) => TS_JS.test(name)).map((name) => `${absolute}/${name}`);
     if (!mentionedIn(code, symbol, workspace)) {
-      return notMentioned(`no file matching ${target} mentions ${symbol}.`, (name) => mentionedIn(code, name, workspace));
+      return notMentioned(`no file matching ${target} mentions ${symbol}.`);
     }
+    const unowned = strangeOwner(code, `no file matching ${target}`);
+    if (unowned) return unowned;
     if (!assertion) return "ok";
     const verdict = assertedIn(code, symbol, assertion, workspace, tally);
     return typeof verdict === "object" ? failed(verdict, `no file matching ${target}`) : "ok";
@@ -2143,8 +2171,10 @@ function inspect(
       };
     }
     if (!mentionedIn(code, symbol, workspace)) {
-      return notMentioned(`nothing directly in ${target} mentions ${symbol}.`, (name) => mentionedIn(code, name, workspace));
+      return notMentioned(`nothing directly in ${target} mentions ${symbol}.`);
     }
+    const unowned = strangeOwner(code, `nothing directly in ${target}`);
+    if (unowned) return unowned;
     if (!assertion) return "ok";
     const verdict = assertedIn(code, symbol, assertion, workspace, tally);
     return typeof verdict === "object" ? failed(verdict, `nothing directly in ${target}`) : "ok";
@@ -2169,8 +2199,10 @@ function inspect(
   if (!symbol) return "ok";
   const source = workspace.read(absolute);
   if (!mentions(source, symbol)) {
-    return notMentioned(`${target} no longer mentions ${symbol}.`, (name) => mentions(source, name));
+    return notMentioned(`${target} no longer mentions ${symbol}.`);
   }
+  const unowned = strangeOwner([absolute], target);
+  if (unowned) return unowned;
   if (!assertion) return "ok";
   const verdict = judgeAssertion(target, source, symbol, assertion, tally);
   return typeof verdict === "object" ? failed(verdict, target) : "ok";
@@ -3576,6 +3608,14 @@ export function checkDrift(
   // A board describing a protocol or another project makes no claims about this
   // tree, so every box on it is excused rather than reported as unannotated.
   const concept = graph.describes === "concept";
+  /**
+   * Boxes with a name their file does not have, by id (#382). An arrow needs
+   * both ends found before it may be called wrong: one whose end the box
+   * check could not find is asking about a name no reader will find either,
+   * and "every call in_vec makes was checked, none reaching money.rs" was
+   * said about `Money::new`, which is in money.rs.
+   */
+  const unfoundEnds = new Set<string>();
 
   for (const node of graph.nodes) {
     if (node.provenance !== "recorded") {
@@ -3653,7 +3693,10 @@ export function checkDrift(
         continue;
       }
 
-      if (result !== "ok") findings.push(result);
+      if (result !== "ok") {
+        findings.push(result);
+        if (isDeclared && UNFOUND_KINDS.has(result.kind)) unfoundEnds.add(node.id);
+      }
     }
     // Every anchor was unreadable. One box, one count, and the reason is the
     // one the last anchor gave rather than a stand-in: a directory too large to
@@ -4464,6 +4507,25 @@ export function checkDrift(
           continue;
         }
         skipClaimedEdge(missing ? "endpoint-file-missing" : shape);
+        continue;
+      }
+
+      /*
+       * A red needs both ends found (#382). Both files are here, and an end's
+       * box names something its file does not have -- the box check already
+       * says which. Asked after the file-level gates so a gone file, a
+       * directory or a glob keeps the reason it always had.
+       */
+      if (unfoundEnds.has(fromNode.id) || unfoundEnds.has(toNode.id)) {
+        // Counted under the arrow's own word, so a `holds` that could not be
+        // asked reads as a withheld `holds`, not as nothing.
+        if (claimed && edge.claim) {
+          const tally = withheldTallyOf(claims, edge.claim);
+          tally["endpoint-not-found"] = (tally["endpoint-not-found"] ?? 0) + 1;
+          skipEdge("endpoint-not-found", edge, fromNode, toNode);
+        } else {
+          skipClaimedEdge("endpoint-not-found");
+        }
         continue;
       }
 

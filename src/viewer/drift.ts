@@ -260,6 +260,7 @@ const WITHHELD_WORDS: Record<string, string> = {
   "endpoint-outside-repo": "with an end pointing outside the repo",
   "endpoint-generated": "with an end pointing into build output",
   "endpoint-file-missing": "with an end whose file is missing",
+  "endpoint-not-found": "with an end whose name its file does not have",
   "directory-ref": "with an end that refs a directory, not a file",
   "glob-ref": "with an end that refs a glob, not a file",
   "ends-in-one-file": "with one end the whole file the other end is in — anchor it at the thing it stands for",

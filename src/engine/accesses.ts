@@ -79,6 +79,7 @@
  *    numbers were counting, and the measurement would not notice.
  */
 import { mayAccuse } from "./licence";
+import { writtenName } from "./lines";
 import {
   declaresField, each, INSTANCE_NAMES, MEMBER_ACCESS, parseSource, qualifiedTail,
   type Language, type Node,
@@ -313,7 +314,11 @@ const lineOf = (source: string, offset: number) =>
  * member.
  */
 export function memberNamed(label: string | undefined): string | undefined {
-  const written = label?.trim().replace(/^\./, "").replace(/\(\s*\)$/, "").trim();
+  const bare = label?.trim().replace(/^\./, "").replace(/\(\s*\)$/, "").trim();
+  // `Config.width`, `Config::width`: the member, written with the type it is
+  // read off (#382). The type is the arrow's other end, so the owner says
+  // nothing the arrow does not.
+  const written = bare && !bare.startsWith("#") ? writtenName(bare).name : bare;
   // A leading `#` is a TypeScript private member, which somebody copying a
   // declaration off the screen will write exactly as the code has it.
   return written && /^#?[A-Za-z_$][\w$]*$/.test(written) ? written : undefined;

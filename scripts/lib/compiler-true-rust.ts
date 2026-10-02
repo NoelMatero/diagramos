@@ -30,7 +30,7 @@ import type { TruePair } from "./compiler-true-ts";
 
 interface Header { args: string[]; ret: string; lines: string[] }
 
-export async function rustTruePairs(root: string): Promise<TruePair[]> {
+export async function rustTruePairs(root: string, plainNames = false): Promise<TruePair[]> {
   const { compileCrates, rustcCacheDir } = await import("../../src/engine/referee-rustc");
   const { compiledBodiesOf } = await import("../../src/engine/compiled-calls");
   const { initEngine, parseSource } = await import("../../src/engine/parse");
@@ -113,8 +113,8 @@ export async function rustTruePairs(root: string): Promise<TruePair[]> {
         if (name && (inImpl || atTop)) {
           const owner = inImpl ? holder!.childForFieldName("type")?.text.split("<")[0]!.split("::").pop() : undefined;
           routines.push({
-            // The plain name, as the checker asks a Rust ref to be written:
-            // `file#Type.method` does not resolve, and #382 still judges it.
+            // Plain here, so a name two impls in one file share is left out
+            // below, and drawn as `Type::method` once it is (#382).
             ref: `${file}#${name}`, file, name,
             ...(owner ? { owner, implLine: lineOf(holder!) } : {}),
             text: node.text, params: node.childForFieldName("parameters")?.text ?? "",
@@ -133,6 +133,11 @@ export async function rustTruePairs(root: string): Promise<TruePair[]> {
   const refCount = new Map<string, number>();
   for (const routine of routines) refCount.set(routine.ref, (refCount.get(routine.ref) ?? 0) + 1);
   const unique = routines.filter((routine) => refCount.get(routine.ref) === 1);
+  // A method is drawn the way Rust writes it, `money.rs#Money::new` (#382);
+  // `--names=plain` draws `money.rs#new`, which the checker read before that.
+  if (!plainNames) {
+    for (const routine of unique) if (routine.owner) routine.ref = `${routine.file}#${routine.owner}::${routine.name}`;
+  }
   // A call's target, by `Type::method` and by a free function's name.
   const byMethod = new Map<string, Routine[]>();
   const byFree = new Map<string, Routine[]>();

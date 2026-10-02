@@ -10,6 +10,8 @@
  *   ... --words=holds,takes  only these words
  *   ... --projects=a,b     only these projects
  *   ... --one=<project>    one project, in this process (prints raw JSON)
+ *   ... --names=plain      Rust: draw a method as `file#new`, not `file#Money::new`
+ *                          (#382). TypeScript and Python always draw `Class.method`.
  *
  * **A measurement: it prints and never fails.**
  *
@@ -73,6 +75,8 @@ const flag = (name: string) => args.find((one) => one.startsWith(`--${name}=`))?
 const language = flag("language") ?? "ts";
 const only = flag("one");
 const showCases = args.includes("--cases");
+/** How a method's box is drawn: `Type::method` / `Class.method`, or `--names=plain`. */
+const plainNames = flag("names") === "plain";
 const words = flag("words")?.split(",") as TrueWord[] | undefined;
 const WORDS: TrueWord[] = ["holds", "takes", "returns", "conforms", "calls", "accesses"];
 
@@ -188,7 +192,7 @@ async function measureOne(project: string): Promise<ProjectResult> {
     pairs = pythonTruePairs(project, dirs);
   } else {
     const { rustTruePairs } = await import("./lib/compiler-true-rust");
-    pairs = await rustTruePairs(root);
+    pairs = await rustTruePairs(root, plainNames);
   }
   if (words) pairs = pairs.filter((pair) => words.includes(pair.word));
   process.stderr.write(`${project}: ${pairs.length} pairs\n`);
