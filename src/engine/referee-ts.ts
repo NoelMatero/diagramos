@@ -916,7 +916,8 @@ function nameLocation(declaration: TS.Declaration): { file: string; line: number
 function declaredTypeOf(ts: typeof TS, checker: TS.TypeChecker, found: TS.Symbol | undefined): TS.Type | undefined {
   if (!found) return undefined;
   const symbol = found.flags & ts.SymbolFlags.Alias ? checker.getAliasedSymbol(found) : found;
-  if (!(symbol.flags & (ts.SymbolFlags.Class | ts.SymbolFlags.Interface | ts.SymbolFlags.TypeAlias))) return undefined;
+  // An enum too: nothing but its own members is one of it, and the compiler can say so (#393).
+  if (!(symbol.flags & (ts.SymbolFlags.Class | ts.SymbolFlags.Interface | ts.SymbolFlags.TypeAlias | ts.SymbolFlags.Enum))) return undefined;
   // A generic's answer depends on its arguments, and a bare declaration has none.
   const generic = symbol.getDeclarations()?.some((one) =>
     (ts.isClassLike(one) || ts.isInterfaceDeclaration(one) || ts.isTypeAliasDeclaration(one))
@@ -924,14 +925,15 @@ function declaredTypeOf(ts: typeof TS, checker: TS.TypeChecker, found: TS.Symbol
   return generic ? undefined : checker.getDeclaredTypeOfSymbol(symbol);
 }
 
-/** The class, interface or type alias whose name starts on this 0-based line, at any depth. */
+/** The class, interface, type alias or enum whose name starts on this 0-based line, at any depth. */
 function typeDeclarationOnLine(
   ts: typeof TS, sourceFile: TS.SourceFile, line: number,
 ): { name: TS.Identifier } | undefined {
   let found: { name: TS.Identifier } | undefined;
   const visit = (node: TS.Node): void => {
     if (found) return;
-    if ((ts.isClassDeclaration(node) || ts.isInterfaceDeclaration(node) || ts.isTypeAliasDeclaration(node)) && node.name
+    if ((ts.isClassDeclaration(node) || ts.isInterfaceDeclaration(node) || ts.isTypeAliasDeclaration(node)
+      || ts.isEnumDeclaration(node)) && node.name
       && sourceFile.getLineAndCharacterOfPosition(node.name.getStart(sourceFile)).line === line) {
       found = { name: node.name };
       return;

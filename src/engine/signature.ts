@@ -140,7 +140,7 @@
  * in `docs/claim-vocabulary.md` and is the licence grid.
  */
 import { aliasesFor, aliasNames } from "./alias";
-import { typeParametersIn, unwrittenNames, usesTypeParameter, type Site } from "./gate";
+import { typeParametersIn, unwrittenNames, unwrittenType, type Site } from "./gate";
 import { mayAccuse } from "./licence";
 import { INSTANCE_NAMES, parseSource, qualifiedTail, type Language, type Node } from "./parse";
 
@@ -485,7 +485,12 @@ function parameterSites(parameters: Node, generics: Set<string>): Site[] {
       ? parameter
       : parameter.childForFieldName("pattern") ?? parameter.childForFieldName("name") ?? firstNamed(parameter);
     if (!name || INSTANCE_NAMES.has(name.text)) continue;
-    sites.push({ name: name.text, ...typeRange(name), written: type !== null && !usesTypeParameter(type, generics) });
+    // `...rest` is asked at the name in it: the compiler has no type for the spread.
+    const asked = name.type === "rest_pattern" ? firstNamed(name) ?? name : name;
+    sites.push({
+      name: name.text, ...typeRange(asked), written: type !== null && !unwrittenType(type, generics),
+      ...(type ? { annotation: { start: type.startIndex, end: type.startIndex + type.text.length } } : {}),
+    });
   }
   return sites;
 }
@@ -567,11 +572,18 @@ export function signatureNames(
    * and this file has not declared one of its own. A file with `class Self` in
    * it means that class, and substituting the enclosing type there would invent
    * exactly the false red this treatment exists to remove.
+   *
+   * A declaration, not anything with a `name`: Rust's `Self { header }`
+   * builds a value and names `Self` in that field, and counting it switched
+   * the reading off for every `-> Self` in the file -- 44 correct clap and
+   * regex arrows red (#393's `measure:compiler-true`).
    */
   let declaresSelf = false;
   each(tree.rootNode, (node) => {
     const name = node.childForFieldName("name");
-    if (name && name.childCount === 0 && name.text === SELF) declaresSelf = true;
+    if (name && name.childCount === 0 && name.text === SELF && /(_item|_definition|_declaration)$/.test(node.type)) {
+      declaresSelf = true;
+    }
   });
   const selfMeansEnclosing = SELF_MEANS_ENCLOSING.has(language) && !declaresSelf;
   const quoting = QUOTED_TYPES.has(language);
@@ -724,7 +736,8 @@ export function signatureNames(
     }
     sites.push(...(position === "parameter"
       ? (parameters ? parameterSites(parameters, generics) : [])
-      : [{ name: returned!.text.replace(/^[:\s]+|^->\s*/, ""), ...typeRange(returned!), written: !usesTypeParameter(returned!, generics) }]));
+      : [{ name: returned!.text.replace(/^[:\s]+|^->\s*/, ""), ...typeRange(returned!), written: !unwrittenType(returned!, generics),
+        annotation: { start: returned!.startIndex, end: returned!.startIndex + returned!.text.length } }]));
     absent ??= { verdict: "absent", signature: text, line, sites: [], unwritten: [] };
   }
 

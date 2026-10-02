@@ -194,6 +194,40 @@ export interface RelationMeasured {
    * behind four explanations.
    */
   known?: readonly string[];
+  /**
+   * The same word measured against a compiler rather than a text scan (#393).
+   *
+   * Every row above was earned against a referee that reads what is written,
+   * which is the readers' own blind spot: #373 drew 448 correct arrows and 58
+   * went red behind zeros, every one resting on something not written -- a
+   * field with no type, a parameter typed by its variable, a class fitting an
+   * interface without `implements`. This is what the word does on the pairs a
+   * compiler says are true, drawn as arrows and checked by the product.
+   */
+  compilerTrue?: CompilerTrueMeasured;
+}
+
+/** One word, one language, on the pairs a compiler says are true (#393). */
+export interface CompilerTrueMeasured {
+  reproduce: string;
+  /** ISO date. */
+  measured: string;
+  /** The compiler, and what it shares with the reader and the gate. */
+  referee: string;
+  /** Pairs the compiler says are true, each drawn as an arrow and checked. */
+  pairs: number;
+  /** Of those, the ones true by what only the compiler knows: nothing at the site names the head. */
+  compilerOnly: number;
+  /** Called wrong with the language servers running, as the MCP server checks. The licence needs 0. */
+  redLive: number;
+  /**
+   * Called wrong with no compiler at all, as CI checks. Each rests on
+   * something the reader found written, and each is read in `note`.
+   */
+  redOff: number;
+  /** What this referee still cannot see, so nobody reads the zero as covering it. */
+  blind: string;
+  note?: string;
 }
 
 /**
@@ -594,6 +628,95 @@ const PYTHON_SIGNATURE: RelationMeasured = {
 };
 
 /**
+ * `measure:compiler-true` (#393, part 3): every word whose licence above was
+ * earned against a text scan, measured again on the pairs a compiler says are
+ * true, drawn as arrows and checked by the product -- with the language
+ * servers running (`redLive`, the licence's number) and with none (`redOff`).
+ *
+ * One run per language, on one commit, over the clones `measure:builds-absent`
+ * reads. Every red the first runs found was read: the checker's were fixed
+ * (a base's base, a type written through an alias or computed, a member named
+ * by an expression, a TypeScript base list, `-> Self` beside `Self { .. }`,
+ * pyright naming an alias), and the rest were the harness's and are fixed
+ * there. `scripts/measure-compiler-true.mts` says how.
+ */
+const COMPILER_TRUE_MEASURED = "2026-10-01";
+
+const COMPILER_TRUE_REFEREE = {
+  ts:
+    "the TypeScript compiler's type checker, asked through its API with a program of " +
+    "its own under each package's tsconfig: the type of every field, parameter and " +
+    "return, every base and every type a class fits, the declaration each call " +
+    "resolves to, the property each `.name` reads (`scripts/lib/compiler-true-ts.ts`). " +
+    "The product asks the same compiler through a language service, and only where a " +
+    "red rests on something unwritten; the two share the compiler and nothing else.",
+  python:
+    "jedi -- parso and jedi's own inference, nothing shared with the pyright the " +
+    "product asks or the tree-sitter it reads (`scripts/lib/compiler_true_jedi.py`).",
+  rust:
+    "rustc's MIR, read by the script's own line patterns (`scripts/lib/compiler-true-rust.ts`): " +
+    "argument and return types, the type of each field a body reads or a struct literal " +
+    "fills, and the function each call lands on. rust-analyzer, which the product asks, " +
+    "is not involved.",
+} as const;
+
+const COMPILER_TRUE_BLIND = {
+  ts:
+    "a generic class or interface is never asked whether it fits, since its answer " +
+    "depends on its arguments; a workspace import the compiler cannot resolve without " +
+    "node_modules gives no pair; only top-level declarations are drawn, and a name " +
+    "declared twice in the files read is left out.",
+  python:
+    "a Protocol a class fits without naming it; a type written only as a string or " +
+    "behind `TYPE_CHECKING`; a generic's argument (`list[Request]` is a `list`); and " +
+    "most unwritten parameter and return types, which jedi rarely infers -- so `takes` " +
+    "and `returns` here are close to the written population the text scan already had.",
+  rust:
+    "a type parameter's bound (MIR writes `N`); a field no body reads and no literal " +
+    "fills; a struct with a `cfg` among its fields; a function declared under one name " +
+    "twice in its file; anything behind a `cfg` rustc did not build. Rust writes every " +
+    "field and parameter type, so `compilerOnly` there is `Self` and aliases.",
+} as const;
+
+type CompilerTrueLanguage = keyof typeof COMPILER_TRUE_REFEREE;
+type CompilerTrueWord = "holds" | "takes" | "returns" | "conforms" | "calls" | "accesses";
+
+/** [pairs, compiler-only, red live, red off], per language and word, from the one run. */
+const COMPILER_TRUE_COUNTS: Record<CompilerTrueLanguage, Partial<Record<CompilerTrueWord, [number, number, number, number]>>> = {
+  ts: {
+    holds: [1024, 390, 0, 0], takes: [7273, 4799, 0, 0], returns: [1872, 1251, 0, 0],
+    conforms: [1013, 812, 0, 0], calls: [5575, 39, 0, 0], accesses: [4390, 0, 0, 0],
+  },
+  python: {
+    holds: [104, 37, 0, 0], takes: [431, 1, 0, 0], returns: [305, 0, 0, 0],
+    conforms: [262, 60, 0, 0], calls: [2551, 0, 0, 0], accesses: [3544, 0, 0, 0],
+  },
+  rust: {
+    holds: [244, 0, 0, 0], takes: [935, 14, 0, 0], returns: [1107, 155, 0, 0],
+    calls: [4290, 65, 0, 0], accesses: [1715, 0, 0, 0],
+  },
+};
+
+function compilerTrue(language: CompilerTrueLanguage, word: CompilerTrueWord): CompilerTrueMeasured | undefined {
+  const counts = COMPILER_TRUE_COUNTS[language][word];
+  if (!counts) return undefined;
+  const [pairs, compilerOnly, redLive, redOff] = counts;
+  return {
+    reproduce: `npm run measure:compiler-true -- --language=${language} --words=${word}`,
+    measured: COMPILER_TRUE_MEASURED,
+    referee: COMPILER_TRUE_REFEREE[language],
+    pairs, compilerOnly, redLive, redOff,
+    blind: COMPILER_TRUE_BLIND[language],
+  };
+}
+
+/** A measured row, with its compiler-true measurement beside it when there is one. */
+function withCompilerTrue(row: RelationMeasured, language: CompilerTrueLanguage, word: CompilerTrueWord): RelationMeasured {
+  const measured = compilerTrue(language, word);
+  return measured ? { ...row, compilerTrue: measured } : row;
+}
+
+/**
  * The referee for `@accesses`' routine-end absence (#255).
  *
  * The same text scan as `MEMBER_SCAN`, asked a different question: for every
@@ -698,11 +821,12 @@ export const LICENCES: readonly Licence[] = [
           ]),
         indirect: DEPENDS_IS_THE_CHAIN,
       },
-      takes: { presence: TYPESCRIPT_SIGNATURE, absence: NOT_DESIGNED_YET, indirect: NO_INDIRECT_READER },
-      returns: { presence: TYPESCRIPT_SIGNATURE, absence: NOT_DESIGNED_YET, indirect: NO_INDIRECT_READER },
+      takes: { presence: withCompilerTrue(TYPESCRIPT_SIGNATURE, "ts", "takes"), absence: NOT_DESIGNED_YET, indirect: NO_INDIRECT_READER },
+      returns: { presence: withCompilerTrue(TYPESCRIPT_SIGNATURE, "ts", "returns"), absence: NOT_DESIGNED_YET, indirect: NO_INDIRECT_READER },
       holds: {
         presence: {
           reproduce: "npm run measure:holds -- .corpus/*",
+          compilerTrue: compilerTrue("ts", "holds"),
           measured: "2026-09-15",
           referee: TEXT_SCAN("field list"),
           unit: "field asks",
@@ -799,6 +923,7 @@ export const LICENCES: readonly Licence[] = [
       calls: {
         presence: {
           reproduce: "npm run measure:calls",
+          compilerTrue: compilerTrue("ts", "calls"),
           measured: "2026-09-03",
           referee: CALL_SCAN,
           unit: "calls between routines the corpus declares exactly once",
@@ -890,6 +1015,7 @@ export const LICENCES: readonly Licence[] = [
       accesses: {
         presence: {
           reproduce: "npm run measure:accesses",
+          compilerTrue: compilerTrue("ts", "accesses"),
           measured: "2026-09-11",
           referee: MEMBER_SCAN,
           unit: "member asks at the type end",
@@ -983,6 +1109,7 @@ export const LICENCES: readonly Licence[] = [
       conforms: {
         presence: {
           reproduce: "npm run measure:conforms -- .corpus/*",
+          compilerTrue: compilerTrue("ts", "conforms"),
           measured: "2026-09-15",
           referee: HEADER_SCAN,
           unit: "base asks",
@@ -1110,11 +1237,12 @@ export const LICENCES: readonly Licence[] = [
             "re-exports are followed, so nothing correct is called wrong here."),
         indirect: DEPENDS_IS_THE_CHAIN,
       },
-      takes: { presence: RUST_SIGNATURE, absence: NOT_DESIGNED_YET, indirect: NO_INDIRECT_READER },
-      returns: { presence: RUST_SIGNATURE, absence: NOT_DESIGNED_YET, indirect: NO_INDIRECT_READER },
+      takes: { presence: withCompilerTrue(RUST_SIGNATURE, "rust", "takes"), absence: NOT_DESIGNED_YET, indirect: NO_INDIRECT_READER },
+      returns: { presence: withCompilerTrue(RUST_SIGNATURE, "rust", "returns"), absence: NOT_DESIGNED_YET, indirect: NO_INDIRECT_READER },
       holds: {
         presence: {
           reproduce: "npm run measure:holds -- .corpus/*",
+          compilerTrue: compilerTrue("rust", "holds"),
           measured: "2026-09-15",
           referee: TEXT_SCAN("field list"),
           unit: "field asks",
@@ -1215,6 +1343,7 @@ export const LICENCES: readonly Licence[] = [
         presence: {
           reproduce:
             "npm run measure:calls -- .corpus/ripgrep .corpus/anyhow rust-test ~/orangutan",
+          compilerTrue: compilerTrue("rust", "calls"),
           measured: "2026-09-03",
           referee: CALL_SCAN,
           unit: "calls between routines the corpus declares exactly once",
@@ -1341,6 +1470,7 @@ export const LICENCES: readonly Licence[] = [
       accesses: {
         presence: {
           reproduce: "npm run measure:accesses",
+          compilerTrue: compilerTrue("rust", "accesses"),
           measured: "2026-09-11",
           referee: MEMBER_SCAN,
           unit: "member asks at the type end",
@@ -1399,6 +1529,11 @@ export const LICENCES: readonly Licence[] = [
           counts: { asked: 3000, missed: 182, invented: 7 },
           covers: ["rust"],
           note:
+            "No compiler-true row (#393), and not for want of one: the cases a " +
+            "routine handles are its arms, always written, and `syn` is a whole " +
+            "parse of them. What a compiler would add is how a box spells a case " +
+            "against the code (`Some(Method::Get)`), which is #385's question, " +
+            "not this licence's. " +
             "1,046 dispatches and 3,000 case labels over 291 Rust files -- " +
             "still the largest population of any language here, by three " +
             "times over -- against 3,175 from `syn`: 7 invented (0.23%) and " +
@@ -1619,11 +1754,12 @@ export const LICENCES: readonly Licence[] = [
             "reached, which is what `@depends` claims."),
         indirect: DEPENDS_IS_THE_CHAIN,
       },
-      takes: { presence: PYTHON_SIGNATURE, absence: NOT_DESIGNED_YET, indirect: NO_INDIRECT_READER },
-      returns: { presence: PYTHON_SIGNATURE, absence: NOT_DESIGNED_YET, indirect: NO_INDIRECT_READER },
+      takes: { presence: withCompilerTrue(PYTHON_SIGNATURE, "python", "takes"), absence: NOT_DESIGNED_YET, indirect: NO_INDIRECT_READER },
+      returns: { presence: withCompilerTrue(PYTHON_SIGNATURE, "python", "returns"), absence: NOT_DESIGNED_YET, indirect: NO_INDIRECT_READER },
       holds: {
         presence: {
           reproduce: "npm run measure:holds -- .corpus/*",
+          compilerTrue: compilerTrue("python", "holds"),
           measured: "2026-09-15",
           referee: TEXT_SCAN("field list"),
           unit: "field asks",
@@ -1716,6 +1852,7 @@ export const LICENCES: readonly Licence[] = [
       calls: {
         presence: {
           reproduce: "npm run measure:calls",
+          compilerTrue: compilerTrue("python", "calls"),
           measured: "2026-09-03",
           referee: CALL_SCAN,
           unit: "calls between routines the corpus declares exactly once",
@@ -1801,6 +1938,7 @@ export const LICENCES: readonly Licence[] = [
       accesses: {
         presence: {
           reproduce: "npm run measure:accesses",
+          compilerTrue: compilerTrue("python", "accesses"),
           measured: "2026-09-11",
           referee: MEMBER_SCAN,
           unit: "member asks at the type end",
@@ -1842,6 +1980,7 @@ export const LICENCES: readonly Licence[] = [
       conforms: {
         presence: {
           reproduce: "npm run measure:conforms -- .corpus/*",
+          compilerTrue: compilerTrue("python", "conforms"),
           measured: "2026-09-15",
           referee: HEADER_SCAN,
           unit: "base asks",

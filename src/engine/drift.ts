@@ -46,7 +46,10 @@ import { connects, refIsStale, type CodeGraphOption } from "./codegraph";
 import { readDependencies, readerCanPlace } from "./deps";
 import type { BindingFault } from "./damage";
 import type { DeclaredAt, ImportTarget, MemberTarget, TypeParts } from "./compiler-questions";
-import { askFits, askHasMember, askMember, askTypeParts, declaredIn, gateRed, WRITTEN, type GateWithdrawn, type RedRests } from "./gate";
+import {
+  askFits, askHasMember, askMember, askTypeParts, declaredIn, declaresAlias, gateRed, unwrittenNames, WRITTEN,
+  type GateWithdrawn, type RedRests, type Site,
+} from "./gate";
 import { generatedRef, NEVER_WALK } from "./generated";
 import { readGraph, type Provenance, type RecoveredGraph, type RecoveredNode } from "./graph";
 import { licenceFor, mayAccuse } from "./licence";
@@ -58,7 +61,7 @@ import { ledgerAdditions, type Ledger } from "./ledger";
 import { checkNeeds, type NeedsWithheld } from "./needs";
 import {
   type CallSide, type CallsNotClosed, type CallsVerdict, type CallsWithheld, EXTERNAL_RECEIVER, type ReceiverResolution,
-  callSitesIn, callsBetween, callsIntoType, compiledBodiesFor, isTypeName,
+  bindingsIn, callSitesIn, callsBetween, callsIntoType, compiledBodiesFor, isTypeName, placeName,
 } from "./calls";
 import type { CompiledCrate } from "./compiled-calls";
 import { newReachCache, reachBetween, type ReachCache } from "./reach";
@@ -2349,6 +2352,137 @@ function callSide(
     };
   };
   return readSide(file);
+}
+
+/**
+ * Whether a type is one of the head through its bases' own base lists (#393).
+ *
+ * `conformedTypes` reads one declaration. `A extends B` with B extending the
+ * head reads there as "names other things", and that was a red resting on
+ * half of what is written: `measure:compiler-true` found 14 in TanStack's
+ * interfaces alone. So each base is followed to its own declaration, a file
+ * at a time, through the same import reading `@calls` places names with.
+ *
+ *   "reaches"     a written chain gets to the head
+ *   "closed"      every base was followed to its declaration, or left the
+ *                 repository -- a global (`Error`, `Exception`) or a
+ *                 package, neither of which can derive from a type here --
+ *                 and none got there
+ *   "unfollowed"  some base could not be followed, so "not one of it" is not
+ *                 read off writing any more
+ */
+function baseChain(
+  file: string,
+  subject: string,
+  targets: readonly string[],
+  workspace: Workspace,
+  configs: ConfigCache,
+): "reaches" | "closed" | "unfollowed" {
+  const wanted = new Set(targets);
+  const seen = new Set<string>();
+  let unfollowed = false;
+  let frontier = [{ file, name: subject }];
+  for (let depth = 0; frontier.length > 0; depth += 1) {
+    if (depth > 12) return "unfollowed";
+    const next: typeof frontier = [];
+    for (const { file: at, name } of frontier) {
+      if (seen.has(`${at}#${name}`)) continue;
+      seen.add(`${at}#${name}`);
+      const side = callSide(at, workspace, configs);
+      const read = side ? declaredBases(side.source, name, side.language) : undefined;
+      if (!side || !read || "why" in read || read.doubt || !read.closed) {
+        unfollowed = true;
+        continue;
+      }
+      const bindings = bindingsIn(side.source, side.language);
+      const mayLandHere = new Set((readDependencies(at, side.source, workspace, configs)?.dependencies ?? [])
+        .filter((one) => one.unplaced).map((one) => one.specifier));
+      for (const base of read.bases) {
+        if (wanted.has(base.name)) return "reaches";
+        if (!/^[\w$]+$/.test(base.name) || !bindings) { unfollowed = true; continue; }
+        const placed = placeName(base.name, side, bindings);
+        if (!("why" in placed)) {
+          next.push({ file: placed.file, name: placed.as ?? base.name });
+          continue;
+        }
+        const specifier = bindings.imported.get(base.name)?.specifier;
+        const leftTheRepository = placed.why === "unbound"
+          || (placed.why === "unplaced" && specifier !== undefined && !mayLandHere.has(specifier));
+        if (!leftTheRepository) unfollowed = true;
+      }
+    }
+    frontier = next;
+  }
+  return unfollowed ? "unfollowed" : "closed";
+}
+
+/**
+ * The same sites, with a written type no longer counted as written where a
+ * name in it is an alias, or a name in this repository that cannot be
+ * followed to its declaration (#393).
+ *
+ * `element: ExcalidrawElement` names a union of eleven element types, one of
+ * them the head, in another file. Read as written it was "names something
+ * else", and `measure:compiler-true` found 934 correct excalidraw arrows red
+ * with no compiler on it. An alias says what it stands for only where it is
+ * declared, so each name is followed there, the way `@calls` places names.
+ * A name that leaves the repository -- a global, a package -- cannot stand
+ * for a type here except through a type argument, which is written.
+ */
+function throughAliases(file: string, sites: Site[], workspace: Workspace, configs: ConfigCache): Site[] {
+  if (!sites.some((one) => one.written && one.annotation)) return sites;
+  const hidesSomething = aliasesIn(file, workspace, configs);
+  const source = workspace.read(workspace.resolve(file) ?? file);
+  return sites.map((one) => {
+    if (!one.written || !one.annotation) return one;
+    const text = source.slice(one.annotation.start, one.annotation.end);
+    // Names in type position only: not a member after a dot, not a string's insides.
+    const names = [...text.replace(/(["'`]).*?\1/g, "").matchAll(/(?<![\w$.])[A-Za-z_$][\w$]*/g)].map((match) => match[0]);
+    return names.some(hidesSomething) ? { ...one, written: false } : one;
+  });
+}
+
+/**
+ * Whether a name, as this file would mean it, stands for another type: an
+ * alias declared here or where an import of it leads, or a name in this
+ * repository that cannot be followed to its declaration. A global or a
+ * package's name does not. `throughAliases` asks it of what a file writes;
+ * the gate asks it of what pyright answers, which prints an alias by its name
+ * and stops there (#393: httpx's `timeout: TimeoutTypes` read as "no Timeout").
+ */
+function aliasesIn(file: string, workspace: Workspace, configs: ConfigCache): (name: string) => boolean {
+  const side = callSide(file, workspace, configs);
+  const bindings = side ? bindingsIn(side.source, side.language) : undefined;
+  if (!side || !bindings) return () => true;
+  const mayLandHere = new Set((readDependencies(file, side.source, workspace, configs)?.dependencies ?? [])
+    .filter((one) => one.unplaced).map((one) => one.specifier));
+  const hides = new Map<string, boolean>();
+  const hidesSomething = (name: string): boolean => {
+    if (!hides.has(name)) {
+      let hidden: boolean;
+      const here = declaresAlias(side.source, side.language, name);
+      if (here !== undefined) hidden = here;
+      else {
+        const placed = placeName(name, side, bindings);
+        if (!("why" in placed)) {
+          const target = workspace.resolve(placed.file);
+          const language = languageOf(placed.file);
+          const there = target && language && workspace.stat(target) === "file"
+            ? declaresAlias(workspace.read(target), language, placed.as ?? name)
+            : undefined;
+          hidden = there !== false;
+        } else {
+          const specifier = bindings.imported.get(name)?.specifier;
+          const left = placed.why === "unbound"
+            || (placed.why === "unplaced" && specifier !== undefined && !mayLandHere.has(specifier));
+          hidden = !left;
+        }
+      }
+      hides.set(name, hidden);
+    }
+    return hides.get(name)!;
+  };
+  return hidesSomething;
 }
 
 /**
@@ -4756,6 +4890,7 @@ export function checkDrift(
                 && was.claim === signatureClaim,
             );
             const fresh = baselineGraph !== undefined && !wasClaimed;
+            const signatureSites = throughAliases(toAnchor, verdict.sites, workspace, importCache.configs);
             recordEdge(edge, fromNode, toNode, { kind: "finding", finding: {
               from: fromPath,
               to: toPath,
@@ -4772,13 +4907,15 @@ export function checkDrift(
                 + `\`${verdict.signature}\`, which does not name it. `
                 + `Either the arrow points at the wrong function, or the signature changed.`,
             }, rests: {
-              written: verdict.unwritten.length === 0,
-              unwritten: `${position === "parameter" ? "parameters" : "a return type"} not written out `
-                + `(${verdict.unwritten.map((name) => `\`${name}\``).join(", ")})`,
+              written: unwrittenNames(signatureSites).length === 0,
+              unwritten: `${position === "parameter" ? "parameters" : "a return type"} not written out, or written `
+                + `through an alias (${unwrittenNames(signatureSites).map((name) => `\`${name}\``).join(", ")})`,
               ask: (referee) => askTypeParts(
                 referee,
-                verdict.sites.map((one) => ({ file: toPath, name: one.name, at: one, written: one.written })),
+                signatureSites.map((one) => ({ file: toPath, name: one.name, at: one, written: one.written })),
                 declaredIn(workspace.read(fromFile), fromLanguage ?? language, fromPath, fromEnd.symbols[0]!),
+                "is",
+                language === "python" ? aliasesIn(toAnchor, workspace, importCache.configs) : undefined,
               ),
             } });
             continue;
@@ -4880,6 +5017,10 @@ export function checkDrift(
               (was) => was.from === edge.from && was.to === edge.to && was.claim === "holds",
             );
             const fresh = baselineGraph !== undefined && !wasClaimed;
+            const holdsSites = throughAliases(fromAnchor, verdict.sites, workspace, importCache.configs);
+            // A name typed elsewhere in the class with no alias in it is still written.
+            const typedPlainly = new Set(holdsSites.filter((one) => one.written).map((one) => one.name));
+            const aliased = unwrittenNames(holdsSites.filter((one) => !typedPlainly.has(one.name) && !verdict.unwritten.includes(one.name)));
             recordEdge(edge, fromNode, toNode, { kind: "finding", finding: {
               from: fromPath,
               to: toPath,
@@ -4895,12 +5036,15 @@ export function checkDrift(
                 + `\`${verdict.fields}\`, which does not name it. `
                 + `Either the arrow points at the wrong type, or the fields changed.`,
             }, rests: {
-              written: verdict.unwritten.length === 0,
-              unwritten: `fields whose type is not written (${verdict.unwritten.map((name) => `\`${name}\``).join(", ")})`,
+              written: verdict.unwritten.length === 0 && aliased.length === 0,
+              unwritten: `fields whose type is not written, or written through an alias `
+                + `(${[...verdict.unwritten, ...aliased].map((name) => `\`${name}\``).join(", ")})`,
               ask: (referee) => askTypeParts(
                 referee,
-                verdict.sites.map((one) => ({ file: fromPath, name: one.name, at: one, written: one.written })),
+                holdsSites.map((one) => ({ file: fromPath, name: one.name, at: one, written: one.written })),
                 declaredIn(workspace.read(toFile), toLanguage ?? language, toPath, toEnd.symbols[0]!),
+                "is",
+                language === "python" ? aliasesIn(fromAnchor, workspace, importCache.configs) : undefined,
               ),
             } });
             continue;
@@ -4958,7 +5102,17 @@ export function checkDrift(
             recordEdge(edge, fromNode, toNode, { kind: "confirmed" });
             continue;
           }
-          if (verdict.verdict === "withheld") {
+          /*
+           * Not a base of its own: is it one through its bases' base lists?
+           * Reached, no red. Not followed all the way, and "names other
+           * things" is no longer read off writing (#393).
+           */
+          const chain = verdict.verdict === "absent" && verdict.bases && !verdict.reversed
+            ? baseChain(fromAnchor, fromEnd.symbols[0]!, toEnd.symbols, workspace, importCache.configs)
+            : "closed";
+          if (chain === "reaches") {
+            noteConforms("through-a-base");
+          } else if (verdict.verdict === "withheld") {
             noteConforms(verdict.why);
             /*
              * The two refusals that can never come good, and so the two that are
@@ -5032,8 +5186,10 @@ export function checkDrift(
                     + "fact drawn backwards, so turn it round."
                   : "Either the arrow points at the wrong type, or the declaration changed."),
             }, rests: {
-              written: verdict.written,
-              unwritten: `a class that writes no base list, which may still fit \`${oneLine(toNode.label) || toPath}\` without saying so`,
+              written: verdict.written && chain === "closed",
+              unwritten: chain === "unfollowed"
+                ? "a base whose own declaration could not be followed, which may itself be one of it"
+                : `a class that writes no base list, which may still fit \`${oneLine(toNode.label) || toPath}\` without saying so`,
               ask: (referee) => {
                 const head = declaredIn(workspace.read(toFile), toLanguage ?? language, toPath, toEnd.symbols[0]!);
                 const tail = declaredIn(workspace.read(fromFile), language, fromPath, fromEnd.symbols[0]!);

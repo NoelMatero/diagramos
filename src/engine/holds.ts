@@ -61,7 +61,7 @@
  * return type, and counting it would make every method a field.
  */
 import { aliasesFor, aliasNames } from "./alias";
-import { typeParametersIn, usesTypeParameter, type Site } from "./gate";
+import { typeParametersIn, unwrittenType, type Site } from "./gate";
 import { mayAccuse } from "./licence";
 import {
   declaresField, each, INSTANCE_NAMES, parseSource, qualifiedTail,
@@ -320,7 +320,7 @@ function declaredInRoutine(
       const type = parameter.childForFieldName("type");
       if (type) found.push(...typeNamesIn(type));
       const name = parameter.childForFieldName("pattern") ?? parameter.childForFieldName("name");
-      if (name) sites.push(site(name, type !== null && !generic(type)));
+      if (name) sites.push(site(name, type !== null && !generic(type), type));
     }
   }
 
@@ -354,7 +354,7 @@ function declaredInRoutine(
        * class's (#394).
        */
       if (attribute && (type || object.text !== "cls") && !isDunder(attribute.text)) {
-        sites.push(site(attribute, type !== null && !generic(type)));
+        sites.push(site(attribute, type !== null && !generic(type), type));
       }
       if (type) found.push(...typeNamesIn(type));
     });
@@ -368,8 +368,11 @@ function isDunder(name: string): boolean {
   return name.startsWith("__") && name.endsWith("__");
 }
 
-function site(name: Node, written: boolean): FieldSite {
-  return { name: name.text, start: name.startIndex, end: name.startIndex + name.text.length, written };
+function site(name: Node, written: boolean, type?: Node | null): FieldSite {
+  return {
+    name: name.text, start: name.startIndex, end: name.startIndex + name.text.length, written,
+    ...(type ? { annotation: { start: type.startIndex, end: type.startIndex + type.text.length } } : {}),
+  };
 }
 
 
@@ -468,7 +471,7 @@ export function heldTypes(
   const sites: FieldSite[] = [];
 
   const parameters = typeParametersIn(tree.rootNode, source);
-  const generic = (type: Node): boolean => usesTypeParameter(type, parameters);
+  const generic = (type: Node): boolean => unwrittenType(type, parameters);
 
   for (const declaration of declarations) {
     let body = declaration.type === "object_type"
@@ -544,7 +547,7 @@ export function heldTypes(
       if (depth > 0 && type) {
         found.push(...typeNamesIn(type));
         const name = member.childForFieldName("name") ?? member.childForFieldName("left");
-        if (name) sites.push(site(name, !generic(type)));
+        if (name) sites.push(site(name, !generic(type), type));
         return;
       }
       /*

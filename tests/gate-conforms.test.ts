@@ -86,9 +86,31 @@ describe("TypeScript, a class that fits an interface without `implements`", () =
     expect(await redsOf(repo, ["impl.ts#Circle", "base.ts#Named", "conforms"])).toEqual(["conforms-absent"]);
   }, 60_000);
 
-  it("is still red with no compiler when the class writes a base list that is something else", async () => {
+  /*
+   * #393's measurement: a base list naming something else is not evidence in
+   * TypeScript, where a class is one of whatever it fits. So with no
+   * compiler this is held back, and with one it is red.
+   */
+  it("is held back with no compiler when the class writes a base list that is something else", async () => {
     repo = scratchRepo(TS);
-    expect(await redsOf(repo, ["impl.ts#Square", "base.ts#Named", "conforms"], { compiler: false })).toEqual(["conforms-absent"]);
+    const { each: [arrow] } = await verdicts(repo, [["impl.ts#Square", "base.ts#Named", "conforms"]], { compiler: false });
+    expect(arrow).toEqual({ reds: [], unconfirmed: "rests-on-unwritten" });
+  }, 60_000);
+
+  it("is red when the compiler says a class with a base list does not fit", async () => {
+    repo = scratchRepo(TS);
+    expect(await redsOf(repo, ["impl.ts#Square", "base.ts#Named", "conforms"])).toEqual(["conforms-absent"]);
+  }, 60_000);
+
+  // vue's `SchedulerJob` drawn as one of `SchedulerJobFlags`, an enum (#393's bench).
+  it("is red when the compiler says an interface is not one of an enum", async () => {
+    repo = scratchRepo({ ...TS, "flags.ts": "export enum Flags {\n  A = 1,\n  B = 2,\n}\n\nexport interface Job extends Function {\n  flags?: Flags\n}\n" });
+    expect(await redsOf(repo, ["flags.ts#Job", "flags.ts#Flags", "conforms"])).toEqual(["conforms-absent"]);
+  }, 60_000);
+
+  it("is still red with no compiler when the arrow is drawn backwards", async () => {
+    repo = scratchRepo(TS);
+    expect(await redsOf(repo, ["base.ts#Other", "impl.ts#Square", "conforms"], { compiler: false })).toEqual(["conforms-absent"]);
   }, 60_000);
 });
 
