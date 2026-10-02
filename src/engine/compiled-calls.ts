@@ -332,10 +332,16 @@ function readBodyLine(line: string, body: CompiledBody, locals: Map<string, stri
     const aggregate = line.match(AGGREGATE);
     if (aggregate && !/^(?:move|copy|const)$/.test(aggregate[1]!)) {
       const constant = /^\s+\S.*? = const /.test(line);
-      for (const segment of segmentsOf(stripGenerics(aggregate[1]!)).slice(-2)) {
-        body.made.add(segment);
-        if (!constant) body.built.add(segment);
-      }
+      const [owner, last] = segmentsOf(stripGenerics(aggregate[1]!)).slice(-2) as [string, string?];
+      for (const segment of last === undefined ? [owner] : [owner, last]) body.made.add(segment);
+      /*
+       * What was built is one type. `HirFrame::ClassBytes(cls)` builds a
+       * `HirFrame`, and its variant shares a name with the `ClassBytes`
+       * struct the routine only wrapped (regex's `translate.rs`). Two
+       * type-shaped segments are an enum and its variant; a lowercase one
+       * first is a module, `hir::ClassBytes { .. }`.
+       */
+      if (!constant) body.built.add(last === undefined ? owner : /^[A-Z]/.test(owner) && /^[A-Z]/.test(last) ? owner : last);
     }
     return;
   }

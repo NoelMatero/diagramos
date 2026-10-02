@@ -70,6 +70,10 @@ const FILES: Record<string, string> = {
     "pub struct Gear {\n    pub teeth: u8,\n}",
     "impl Gear {\n    pub fn new() -> Gear {\n        Gear { teeth: 3 }\n    }\n}",
     "pub fn teeth() -> u8 {\n    Gear::new().teeth\n}",
+    // regex's `translate.rs`: the variant shares its name with the struct it wraps.
+    "pub struct ClassBytes {\n    pub ranges: Vec<u8>,\n}",
+    "pub enum Frame {\n    ClassBytes(ClassBytes),\n    Empty,\n}",
+    "pub fn rewrap(frame: Frame) -> Frame {\n    match frame {\n        Frame::ClassBytes(cls) => Frame::ClassBytes(cls),\n        other => other,\n    }\n}",
     "",
   ].join("\n\n"),
 };
@@ -168,6 +172,11 @@ describe.skipIf(!HAS_CARGO)("Rust: a construction the text cannot see is confirm
 describe.skipIf(!HAS_CARGO)("Rust: what the build shows that is not a construction", () => {
   it("does not confirm a routine that only reads a constant (StateID::ZERO)", async () => {
     expect((await check(repo, "src/ids.rs#start", "src/ids.rs#StateID")).confirmed).toBe(0);
+  }, 240_000);
+
+  it("does not confirm a struct an enum variant of the same name only wraps (regex's HirFrame::ClassBytes)", async () => {
+    expect((await check(repo, "src/ids.rs#rewrap", "src/ids.rs#ClassBytes")).confirmed).toBe(0);
+    expect((await check(repo, "src/ids.rs#rewrap", "src/ids.rs#Frame")).confirmed).toBe(1);
   }, 240_000);
 
   it("does not confirm a routine that only gets one back from B::new()", async () => {
