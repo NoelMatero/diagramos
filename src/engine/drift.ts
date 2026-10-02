@@ -45,7 +45,7 @@ import { checkHandles, type HandlesWithheld } from "./handles";
 import { connects, refIsStale, type CodeGraphOption } from "./codegraph";
 import { readDependencies, readerCanPlace } from "./deps";
 import type { BindingFault } from "./damage";
-import type { DeclaredAt, ImportTarget, MemberTarget, TypeParts } from "./compiler-questions";
+import { partsInclude, type DeclaredAt, type ImportTarget, type MemberTarget, type TypeParts } from "./compiler-questions";
 import {
   askFits, askHasMember, askMember, askTypeParts, declaredIn, declaresAlias, gateRed, unwrittenNames, WRITTEN,
   type GateWithdrawn, type RedRests, type Site,
@@ -60,13 +60,17 @@ import { languageOf, type Language } from "./parse";
 import { ledgerAdditions, type Ledger } from "./ledger";
 import { checkNeeds, type NeedsWithheld } from "./needs";
 import {
-  type CallSide, type CallsNotClosed, type CallsVerdict, type CallsWithheld, EXTERNAL_RECEIVER, type ReceiverResolution,
-  bindingsIn, callSitesIn, callsBetween, callsIntoType, compiledBodiesFor, isTypeName, placeName,
+  type CallSide, type CallSitePlaced, type CallsNotClosed, type CallsVerdict, type CallsWithheld, EXTERNAL_RECEIVER,
+  type ReceiverResolution, bindingsIn, callSitesIn, callsBetween, callsIntoType, compiledBodiesFor, isTypeName, placeName,
 } from "./calls";
 import type { CompiledCrate } from "./compiled-calls";
 import { newReachCache, reachBetween, type ReachCache } from "./reach";
 import { constructions, routineNamesIn, type ConstructsNames, type ConstructsWithheld } from "./constructs";
-import { type AccessesWithheld, type NotReadEvidence, memberAccesses, memberNamed, membersReadAt, membersReadByName, readsMember } from "./accesses";
+import {
+  type AccessesWithheld, type NotReadEvidence, declaresMember, memberAccesses, memberNamed, membersReadAt,
+  membersReadByName, readsMember, routineReadAt, routinesReadByName,
+} from "./accesses";
+import type { HandedWhole, RoutineReads } from "./resolution";
 import { heldTypes, type HoldsWithheld } from "./holds";
 import { conformedTypes, declaredBases, type ConformsWithheld } from "./conforms";
 import { overridesIn, type Overrides } from "./overrides";
@@ -2672,6 +2676,150 @@ function helperReading(
     if (readsMember(members, member)) return { via: site.name };
   }
   return { unseen };
+}
+
+/** How far `handsWhole` follows a value into the functions it is handed to. */
+const WHOLE_DEPTH = 3;
+
+const isReceiver = (one: HandedWhole) => typeof one.slot === "object" && "receiver" in one.slot;
+
+/**
+ * Whether the routine hands a value of the arrow's type, whole, to code that
+ * may read every member it has (#388) -- the call that does, as written.
+ *
+ * `JSON.stringify(c)`, `asdict(c)` and a derived `c.clone()` read every field
+ * of `c` without writing one name, and that is the only way they can: code
+ * that does not know `c` is a Config cannot name `width`, so if it reaches the
+ * fields at all it walks them. The same rule `asdict` and Rust's derived
+ * `Debug` were already quiet on, and the same as a class reading through its
+ * methods. So the value is followed to whatever receives it:
+ *
+ * - **outside the repository**, or placed nowhere: a library's or the
+ *   language's own code, which cannot name your fields. It may read all.
+ * - **a method the type itself does not declare**, `c.clone()`: derived,
+ *   inherited or the language's own. It may read all.
+ * - **a routine in the repository**: read it. It may read all when it walks
+ *   the parameter that received the value (a spread, `c[k]`, a macro) or
+ *   hands that parameter on to one of these in turn -- `serialize(c)` whose
+ *   body is `JSON.stringify(v)`. A routine typed to take a Config and reading
+ *   only `.height` does not.
+ *
+ * Only a value the code says is the arrow's type is followed: written so
+ * (`c: Config`), or the compiler says so. A routine handing on a `string`, or
+ * a value nothing can place, keeps its red -- that is the population every
+ * wrong arrow in #255's measurement sat in.
+ *
+ * It never confirms. A serializer may skip a field (`toJSON`,
+ * `#[serde(skip)]`, `field(repr=False)`), so "may read every field" is grounds
+ * for silence and not for green.
+ */
+function handsWhole(
+  file: string,
+  evidence: NotReadEvidence,
+  member: string,
+  head: { file: string; source: string; language: Language; names: string[] },
+  workspace: Workspace,
+  configs: ConfigCache,
+  referee: ClosedBodyReferee | undefined,
+): string | undefined {
+  const names = new Set(head.names.map((name) => name.split(/::|\./).pop()!));
+  const declarations = [...names].map((name) => declaredIn(head.source, head.language, head.file, name));
+
+  /** Whether the value handed is the arrow's type: written so, or the compiler says. */
+  const isHead = (one: HandedWhole): boolean => {
+    if (one.verdict.verdict === "resolved" && names.has(one.verdict.evidence.type)) return true;
+    const answer = referee?.typePartsAt?.(file, one.at);
+    if (!answer) return false;
+    /*
+     * A method on a `Config[]` is the array's, not Config's: as a receiver
+     * the value has to be the type itself. As an argument, anything made of
+     * it -- `JSON.stringify(configs)` walks every element.
+     */
+    if (isReceiver(one) && answer.parts.length !== 1) return false;
+    return declarations.some(({ name, at }) => at.some((place) => partsInclude(answer, { name, at: place }) === true));
+  };
+
+  const sourceOf = (target: string) => {
+    const absolute = workspace.resolve(target);
+    return absolute && workspace.stat(absolute) === "file" ? workspace.read(absolute) : undefined;
+  };
+  const sitesOf = (target: string, line: number) => {
+    const side = callSide(target, workspace, configs, referee);
+    const reading = side ? callSitesIn(side) : undefined;
+    return reading?.read ? reading.bodies.find((one) => one.line === line)?.sites ?? [] : [];
+  };
+
+  /** Where a call lands: a library's, nobody knows, or these routines in the repository. */
+  const landing = (
+    target: string, sites: CallSitePlaced[], one: HandedWhole,
+  ): "outside" | "unknown" | { file: string; routines: RoutineReads[] } => {
+    const site = sites.find((each) => each.nameAt?.start === one.calleeAt.start);
+    if (site?.file === EXTERNAL_RECEIVER) return "outside";
+    if (site?.file !== undefined) {
+      const source = sourceOf(site.file);
+      const language = languageOf(site.file);
+      const routines = source !== undefined && language ? routinesReadByName(source, site.name, language) : [];
+      if (routines.length > 0) return { file: site.file, routines };
+    }
+    const declared = referee?.declarationAt?.(target, one.calleeAt);
+    if (declared === "outside") return "outside";
+    if (declared) {
+      const source = sourceOf(declared.file);
+      const language = languageOf(declared.file);
+      const routine = source !== undefined && language ? routineReadAt(source, declared.line, language) : undefined;
+      if (routine) return { file: declared.file, routines: [routine] };
+    }
+    return "unknown";
+  };
+
+  /** The parameter of `routine` that receives `one`, or `undefined` when no name does. */
+  const receiving = (routine: RoutineReads, one: HandedWhole): string | undefined => {
+    const takesSelf = routine.params[0] === "self" || routine.params[0] === "cls";
+    if (isReceiver(one)) return takesSelf ? routine.params[0] : "this";
+    if (typeof one.slot === "object" && "keyword" in one.slot) {
+      const keyword = one.slot.keyword;
+      return routine.params.includes(keyword) ? keyword : undefined;
+    }
+    const position = (one.slot as number) + (one.method && takesSelf ? 1 : 0);
+    return routine.params[position] || undefined;
+  };
+
+  /** Whether `routine` may read every member of the value its parameter `name` holds. */
+  const walks = (target: string, routine: RoutineReads, name: string | undefined, depth: number): boolean => {
+    // A value that lands in a splat or a pattern, or a chain this long, is not followed further.
+    if (!name || depth >= WHOLE_DEPTH) return true;
+    if (routine.hazards.length > 0) return true;
+    if (readsMember(routine.sites.map((site) => site.member), member)) return true;
+    const own = name === "self" || name === "this" || name === "cls";
+    const onward = routine.handed.filter((one) => one.name === name || (own && (one.name === "self" || one.name === "this")));
+    if (onward.length === 0) return false;
+    const sites = sitesOf(target, routine.line);
+    return onward.some((one) => receives(target, sites, one, depth + 1) !== undefined);
+  };
+
+  /** Whether whatever receives `one` may read every member of it: the call, as written, when so. */
+  const receives = (target: string, sites: CallSitePlaced[], one: HandedWhole, depth: number): string | undefined => {
+    const written = `${one.callee}(..)`;
+    if (isReceiver(one) && depth === 0) {
+      // The type's own method is a routine like any other; anything else on it is not written there.
+      const declared = declaresMember(head.source, [...names], one.callee, head.language);
+      if (!("declares" in declared && declared.declares)) return written;
+    }
+    const landed = landing(target, sites, one);
+    if (landed === "outside" || landed === "unknown") return written;
+    return landed.routines.some((routine) => walks(landed.file, routine, receiving(routine, one), depth))
+      ? written
+      : undefined;
+  };
+
+  const handed = evidence.handed.filter(isHead);
+  if (handed.length === 0) return undefined;
+  const sites = sitesOf(file, evidence.line);
+  for (const one of handed) {
+    const found = receives(file, sites, one, 0);
+    if (found) return found;
+  }
+  return undefined;
 }
 
 /**
@@ -5965,7 +6113,18 @@ export function checkDrift(
             const helper = helperReading(
               fromPath, verdict.evidence, member, workspace, importCache.configs, options?.closedBodyReferee,
             );
-            if ("unseen" in helper) {
+            /*
+             * It hands the Config whole to something that may read every
+             * field of it (#388): silent, like a helper that reads it.
+             */
+            const whole = "unseen" in helper
+              ? handsWhole(
+                fromPath, verdict.evidence, member,
+                { file: toPath, source: workspace.read(toFile), language: toLanguage, names: toEnd.symbols },
+                workspace, importCache.configs, options?.closedBodyReferee,
+              )
+              : undefined;
+            if ("unseen" in helper && whole === undefined) {
               edgesChecked += 1;
               const wasClaimed = baselineGraph?.edges.some(
                 (was) => was.from === edge.from && was.to === edge.to && was.claim === "accesses",

@@ -9,8 +9,8 @@
  *
  * The correct arrows still red are listed below with the issue that owns
  * them. None is a shape a compiler question answers: how a board's text is
- * matched to code (#382, #385), what a word means (#388, #389), and #360's
- * decision that getting a value back from a function is not making it.
+ * matched to code (#382, #385), and #360's decision that getting a value back
+ * from a function is not making it.
  */
 import { mkdirSync, mkdtempSync, readdirSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
@@ -34,14 +34,9 @@ interface Fixture { name: string; files: Record<string, string>; arrows: Arrow[]
 
 /** Correct arrows and boxes still red, by `fixture|shape`, and the issue that owns each. */
 const STILL_RED: Record<string, string> = {
-  "accesses-all|TS JSON.stringify reads every field": "#388",
-  "accesses-all|TS Object.values": "#388",
-  "accesses-all|TS Object.assign copy": "#388",
-  "accesses-all|Rs derived Clone": "#388",
   "builds|Py dataclasses.replace": "#360",
   "builds|Py copy.copy": "#360",
   "handles|Rs Some(Variant)/Some(_)/None": "#385",
-  "rs-needs|include!d body uses util": "#389",
 };
 
 /** Wrong-on-purpose arrows that were already quiet on main before #393: nothing here made them so. */

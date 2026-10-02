@@ -136,6 +136,18 @@ that sentence have different evidence behind them:
   wherever the body reads a member without a name, reads none at all, or calls
   a function that visibly reads the member ([item 25](#forty-two-times-a-measurement-contradicted-the-design)).
 
+  Or hands a Config whole to code that may read every field of it (#388):
+  `JSON.stringify(c)`, `asdict(c)`, a derived `c.clone()`. Code that does not
+  know `c` is a Config cannot name `width`, so where it reaches the fields it
+  walks all of them — the rule `asdict` and a derived `Debug` were already
+  quiet on, and the same as a class reading through its methods. The value is
+  followed to whatever receives it: outside the repository, or a method the
+  type does not declare, may read every field; a function of the repository's
+  own may when it walks the parameter that received it or hands it on to one
+  of those (`serialize(c)` whose body is `JSON.stringify(v)`). Only a value
+  written or compiled as the Config is followed, so a body handing on a string
+  keeps its red. It never confirms: a serializer may skip a field.
+
 So the two ends refute on two different footings: the type end from a
 declaration, the routine end from a body read whole by name. Neither accuses
 from a doubt about the other.

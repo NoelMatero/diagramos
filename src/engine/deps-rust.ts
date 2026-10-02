@@ -106,14 +106,22 @@ export function readRustDependencies(
   source: string,
   workspace: Workspace,
   layout: RustLayout,
+  /**
+   * Set when `source` is not `filePath`'s own text but a file it pastes in
+   * with `include!` (#389): the files already being pasted, so a pair that
+   * includes each other stops, and the names the including file's own `use`
+   * lines bound, which the pasted text sees as its own.
+   */
+  pasted?: { into: Set<string>; scope: Map<string, RustTarget> },
 ): FileDependencies | undefined {
   const tree = parseSource(source, "rust");
   if (!tree) return undefined;
 
   const dependencies: FileDependency[] = [];
   const dynamic = new Set<DynamicReason>();
+  let complete = !tree.rootNode.hasError;
   const own = moduleDirectory(filePath, layout);
-  const scope = boundModules(filePath, tree.rootNode, layout, workspace, own);
+  const scope = new Map([...(pasted?.scope ?? []), ...boundModules(filePath, tree.rootNode, layout, workspace, own)]);
   const fileDirectory = filePath.includes("/") ? filePath.slice(0, filePath.lastIndexOf("/")) : "";
 
   /*
@@ -278,6 +286,29 @@ export function readRustDependencies(
   };
 
   /**
+   * `include!("gen_body.rs")` pastes that file's text in here, and rustc
+   * compiles it as part of this module (#389): its `use` lines and paths are
+   * this file's own, resolved from here, and quoted at the `include!` line.
+   * A path in it that only the compiler could place is asked about a range
+   * in the other file, which no question here can carry, so it blinds the
+   * list instead of being dropped from it.
+   */
+  const paste = (at: Node, target: string, absolute: string): void => {
+    const into = pasted?.into ?? new Set([filePath]);
+    if (into.has(target)) return;
+    const read = readRustDependencies(
+      filePath, workspace.read(absolute), workspace, layout, { into: new Set([...into, target]), scope },
+    );
+    if (!read) { complete = false; return; }
+    if (!read.complete) complete = false;
+    for (const reason of read.dynamic) dynamic.add(reason);
+    for (const dependency of read.dependencies) {
+      if (dependency.unplaced) { dynamic.add("macro-expansion"); continue; }
+      dependencies.push({ ...dependency, line: lineOf(source, at) });
+    }
+  };
+
+  /**
    * `moduleDirectory` is where a `mod x;` seen right here would put its file. It
    * changes on the way into an inline `mod y { .. }` and nowhere else, which is
    * why the walk is written out rather than handed to `each`.
@@ -373,8 +404,9 @@ export function readRustDependencies(
             if (relative) {
               const target = `${fileDirectory}/${relative}`.replace(/^\//, "");
               const absolute = workspace.resolve(target);
-              record(child, `include!("${relative}")`,
-                absolute && workspace.stat(absolute) === "file" ? target : undefined);
+              const found = absolute !== undefined && workspace.stat(absolute) === "file";
+              record(child, `include!("${relative}")`, found ? target : undefined);
+              if (found) paste(child, target, absolute);
               pathAttribute = undefined;
               continue;
             }
@@ -501,7 +533,7 @@ export function readRustDependencies(
 
   return {
     dependencies,
-    complete: !tree.rootNode.hasError,
+    complete,
     dynamic: [...dynamic],
   };
 }

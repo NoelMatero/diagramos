@@ -268,6 +268,45 @@ export interface RoutineReads {
    * closed region however many of its `.name` reads resolved.
    */
   hazards: ReadHazard[];
+  /** Every value the routine hands on whole (#388). See `HandedWhole`. */
+  handed: HandedWhole[];
+  /**
+   * The parameters' names in order, `""` for one with no plain name, and
+   * `self` for a Rust `&self` or Python's first one -- so a value handed to
+   * the n-th argument can be followed to the name that receives it.
+   */
+  params: string[];
+}
+
+/**
+ * A value a routine hands on whole (#388): `JSON.stringify(c)`,
+ * `serialize(&c)`, or the receiver of a method, `c.clone()`.
+ *
+ * Not a read and not a hazard. Whatever receives the value may read every
+ * member it has -- a serializer, a derived `Clone`, a printer -- or none, and
+ * which of the two is a question about the receiving code, not about this
+ * body: `drift.ts` asks it, with the arrow's type in hand.
+ */
+export interface HandedWhole {
+  /** The name handed on, as written: `c`, `self`. */
+  name: string;
+  /** Its range, so a checker can be asked its type. */
+  at: { start: number; end: number };
+  /** The called name as written: `stringify`, `serialize`, `clone`. */
+  callee: string;
+  /**
+   * The called name's own range -- the same range the call reader records as
+   * `nameAt` -- so the two readings of one call can be matched.
+   */
+  calleeAt: { start: number; end: number };
+  /** Whether the callee was written as a member, `x.m(..)`: a method takes its receiver first. */
+  method: boolean;
+  /** Which argument, from 0; `receiver` for the value a method is called on; or a keyword's name. */
+  slot: number | { receiver: true } | { keyword: string };
+  /** 1-based. */
+  line: number;
+  /** What the text alone makes of the value's type. */
+  verdict: ResolutionVerdict;
 }
 
 /**
@@ -1074,6 +1113,94 @@ function hazardOf(node: Node, language: Language): ReadHazardKind | undefined {
   return undefined;
 }
 
+/**
+ * Wrappers that leave the value they hold whole: `&c`, `*c`, `(c)`, `c!`,
+ * `c as Shape`. A value read through one is still the value handed on.
+ */
+const LEAVES_WHOLE = new Set([
+  "reference_expression", "unary_expression", "parenthesized_expression",
+  "non_null_expression", "as_expression", "satisfies_expression", "type_assertion",
+]);
+
+function firstNamed(node: Node): Node | null {
+  for (let index = 0; index < node.childCount; index += 1) {
+    const child = node.child(index);
+    if (child?.isNamed) return child;
+  }
+  return null;
+}
+
+/** The plain name an argument hands on, through `LEAVES_WHOLE`, or `undefined`. */
+function wholeName(node: Node): Node | undefined {
+  let current: Node | null = node;
+  while (current && LEAVES_WHOLE.has(current.type)) {
+    if (current.type === "unary_expression" && current.child(0)?.text !== "*") return undefined;
+    current = current.childForFieldName("value") ?? current.childForFieldName("argument")
+      ?? firstNamed(current);
+  }
+  if (!current || current.childCount !== 0) return undefined;
+  return /identifier$/.test(current.type) || OWN.has(current.text) ? current : undefined;
+}
+
+/** The called name's own node: `g` in `g()`, `m` in `x.m()`, `walk` in `h::walk()`. */
+function calledName(callee: Node): Node | undefined {
+  if (callee.childCount === 0) return callee;
+  const name = callee.childForFieldName("property") ?? callee.childForFieldName("attribute")
+    ?? callee.childForFieldName("field") ?? callee.childForFieldName("name");
+  return name && name.childCount === 0 ? name : undefined;
+}
+
+/**
+ * Each value one call hands on whole, as `HandedWhole` wants it bar the
+ * verdict: every argument that is a plain name, and the receiver of a method.
+ * A spread argument, `f(...xs)`, hands on the elements, not `xs`.
+ */
+function handedBy(
+  node: Node, source: string,
+): Array<Omit<HandedWhole, "verdict"> & { node: Node }> {
+  const callee = node.type === "new_expression"
+    ? node.childForFieldName("constructor")
+    : node.childForFieldName("function");
+  const named = callee ? calledName(callee) : undefined;
+  const list = node.childForFieldName("arguments");
+  if (!callee || !named || !list) return [];
+  const method = callee.childCount > 0 && callee.type !== "scoped_identifier";
+  const calleeAt = { start: named.startIndex, end: named.startIndex + named.text.length };
+  const line = lineOf(source, node.startIndex);
+  const found: Array<Omit<HandedWhole, "verdict"> & { node: Node }> = [];
+  const take = (value: Node | null, slot: HandedWhole["slot"]) => {
+    const name = value ? wholeName(value) : undefined;
+    if (!name) return;
+    found.push({
+      name: name.text, at: { start: name.startIndex, end: name.startIndex + name.text.length },
+      callee: named.text, calleeAt, method, slot, line, node: name,
+    });
+  };
+  if (method) take(accessOf(callee)?.object ?? null, { receiver: true });
+  let position = 0;
+  for (let index = 0; index < list.childCount; index += 1) {
+    const argument = list.child(index);
+    if (!argument?.isNamed || argument.type === "comment") continue;
+    if (argument.type === "keyword_argument") {
+      const keyword = argument.childForFieldName("name");
+      if (keyword) take(argument.childForFieldName("value"), { keyword: keyword.text });
+      continue;
+    }
+    take(argument, position);
+    position += 1;
+  }
+  return found;
+}
+
+/** A parameter's own name, `self` for Rust's `&self`, `""` for a pattern or a splat. */
+function parameterName(parameter: Node): string {
+  if (parameter.type === "self_parameter") return "self";
+  if (parameter.childCount === 0) return /identifier$/.test(parameter.type) ? parameter.text : "";
+  const name = parameter.childForFieldName("pattern") ?? parameter.childForFieldName("name")
+    ?? (parameter.type === "typed_parameter" ? parameter.child(0) : null);
+  return name && name.childCount === 0 && /identifier$/.test(name.type) ? name.text : "";
+}
+
 /** Whether an object literal spreads something into itself: `{ ...c }`. */
 function spreadsInto(node: Node): boolean {
   if (node.type !== "object") return false;
@@ -1228,6 +1355,8 @@ interface RoutineBoth extends RoutineResolution {
   endLine: number;
   reads: MemberReadSite[];
   hazards: ReadHazard[];
+  handed: HandedWhole[];
+  params: string[];
 }
 
 function resolveRoutine(
@@ -1253,6 +1382,8 @@ function resolveRoutine(
   const sites: ReceiverSite[] = [];
   const reads: MemberReadSite[] = [];
   const hazards: ReadHazard[] = [];
+  const handed: HandedWhole[] = [];
+  const paramNames: string[] = [];
 
   /*
    * Read off the parameter list as well as the body. `function f({ width }: C)`
@@ -1271,6 +1402,10 @@ function resolveRoutine(
   };
   const parameterList = routine.childForFieldName("parameters");
   if (parameterList) noteHazards(parameterList);
+  for (let index = 0; index < (parameterList?.childCount ?? 0); index += 1) {
+    const parameter = parameterList!.child(index);
+    if (parameter?.isNamed && parameter.type !== "comment") paramNames.push(parameterName(parameter));
+  }
 
   /*
    * The read population. `x.width` and `x.width()` are both reads of `width`
@@ -1333,6 +1468,16 @@ function resolveRoutine(
 
       const scope: Scope = { params, bindings, fields, generics, imported };
       noteRead(node);
+      if (isCall(node) || node.type === "new_expression") {
+        for (const { node: name, ...one } of handedBy(node, source)) {
+          handed.push({
+            ...one,
+            verdict: OWN.has(name.text)
+              ? ownVerdict(own, source)
+              : resolveReceiver({ kind: "name", receiver: name.text }, scope, source),
+          });
+        }
+      }
 
       const callee = calleeOf(node);
       if (!callee) return;
@@ -1355,7 +1500,7 @@ function resolveRoutine(
     boundName,
     line: lineOf(source, routine.startIndex),
     endLine: lineOf(source, routine.startIndex + routine.text.length),
-    sites, reads, hazards,
+    sites, reads, hazards, handed, params: paramNames,
   };
 }
 
@@ -1484,8 +1629,8 @@ export function memberReadsIn(
   walk(tree.rootNode, new Map(), undefined, tree.rootNode, source, language, imported, routines, resolveRead);
   return {
     read: true,
-    routines: routines.map(({ routine, boundName, line, endLine, reads, hazards }) => ({
-      routine: routine || boundName || "", line, endLine, sites: reads, hazards,
+    routines: routines.map(({ routine, boundName, line, endLine, reads, hazards, handed, params }) => ({
+      routine: routine || boundName || "", line, endLine, sites: reads, hazards, handed, params,
     })),
   };
 }
