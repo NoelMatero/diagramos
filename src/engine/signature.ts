@@ -314,6 +314,18 @@ const SELF = "Self";
 const SELF_MEANS_ENCLOSING = new Set<Language>(["rust", "python"]);
 
 /**
+ * TypeScript's own word for it: `init(): Promise<this>`, `use(): this` (#382).
+ *
+ * A `this` type, which the grammar marks as one, so unlike `Self` there is no
+ * declared name to guard against. Inside a class it is the class; inside an
+ * interface it is whatever implements it, which may be the target, so it can
+ * confirm through the class and otherwise only forbid the refutation. Read as
+ * nothing, it made every builder method in nest's `NestApplication` a correct
+ * `returns` arrow called wrong once `NestApplication.init` could be found.
+ */
+const THIS = "this";
+
+/**
  * Languages where a type may be written inside a string, and #195, which is the
  * reason this exists.
  *
@@ -370,6 +382,12 @@ function selfTypeOf(node: Node, inherited: string | undefined): string | undefin
   if (node.type === "impl_item") return plainType(node.childForFieldName("type"));
   if (node.type === "trait_item") return undefined;
   if (node.type === "class_definition") return plainType(node.childForFieldName("name"));
+  // TypeScript, for `this` (#382). A class expression may have no name, and an
+  // interface's `this` is its implementer: neither names a type here.
+  if (node.type === "class_declaration" || node.type === "abstract_class_declaration" || node.type === "class") {
+    return plainType(node.childForFieldName("name"));
+  }
+  if (node.type === "interface_declaration") return undefined;
   return inherited;
 }
 
@@ -446,6 +464,10 @@ function typeNames(
         into.add(segments[segments.length - 1]!);
         for (const segment of segments.slice(0, -1)) qualifiers?.add(segment);
       }
+      return;
+    }
+    if (part.type === "this_type") {
+      into.add(THIS);
       return;
     }
     const tail = qualifiedTail(part);
@@ -671,6 +693,12 @@ export function signatureNames(
         if (!namesSelf) continue;
         if (self) half.add(self); else selfHeld = true;
       }
+    }
+
+    // TypeScript's `this` type, by the same rule (#382).
+    for (const half of [inParameters, inReturn]) {
+      if (!half.delete(THIS)) continue;
+      if (self) half.add(self); else selfHeld = true;
     }
 
     const here = position === "parameter" ? inParameters : inReturn;

@@ -408,3 +408,53 @@ describe("TypeScript @accesses, the member written with its type", () => {
     expect(accusations(await member("Config.height"))).not.toEqual([]);
   });
 });
+
+/*
+ * Found by measuring this change: once `NestApplication.init` could be found,
+ * 18 correct `returns` arrows went red with no compiler running, every one a
+ * method returning `this`. The plain spelling (`#init`) was red on main too.
+ */
+describe("TypeScript @returns on a method that returns this", () => {
+  const files = {
+    "tsconfig.json": "{ \"compilerOptions\": { \"strict\": true } }\n",
+    "app.ts": [
+      "export class Other {}",
+      "export class App {\n  async init(): Promise<this> {\n    return this;\n  }\n\n  use(x: number): this {\n    return this;\n  }\n}",
+      "export interface Builder {\n  add(): this;\n}",
+      "",
+    ].join("\n\n"),
+  };
+
+  async function returns(typeRef: string, routineRef: string): Promise<DriftReport> {
+    const { board } = await createDiagram(emptyBoard(), {
+      name: "arch",
+      nodes: [
+        { id: "type", label: "type", ref: typeRef },
+        { id: "routine", label: "routine", ref: routineRef },
+      ],
+      edges: [{ from: "type", to: "routine", claim: "returns" }],
+    });
+    return checkDrift(board as BoardFile, createWorkspace(repo), { edges: true });
+  }
+
+  it.each([
+    ["Promise<this>, written with the class", "app.ts#App", "app.ts#App.init"],
+    ["Promise<this>, the plain spelling", "app.ts#App", "app.ts#init"],
+    ["this", "app.ts#App", "app.ts#App.use"],
+  ])("confirms %s", async (_shape, type, routine) => {
+    write(files);
+    const report = await returns(type, routine);
+    expect(accusations(report)).toEqual([]);
+    expect(report.claims.signatureConfirmed).toBe(1);
+  });
+
+  it("does not call an interface's this wrong", async () => {
+    write(files);
+    expect(accusations(await returns("app.ts#Builder", "app.ts#Builder.add"))).toEqual([]);
+  });
+
+  it("still calls an arrow naming another class wrong", async () => {
+    write(files);
+    expect(accusations(await returns("app.ts#Other", "app.ts#App.init"))).toEqual(["signature-absent"]);
+  });
+});
