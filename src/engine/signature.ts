@@ -608,6 +608,13 @@ export function signatureNames(
     }
   });
   const selfMeansEnclosing = SELF_MEANS_ENCLOSING.has(language) && !declaresSelf;
+  /** TypeScript classes with type parameters, whose `this` names more than the class. */
+  const genericClasses = new Set<string>();
+  each(tree.rootNode, (node) => {
+    if (!/^(abstract_)?class(_declaration)?$/.test(node.type) || !node.childForFieldName("type_parameters")) return;
+    const name = plainType(node.childForFieldName("name"));
+    if (name) genericClasses.add(name);
+  });
   const quoting = QUOTED_TYPES.has(language);
 
   /* Every declaration of the name, with what `Self` meant where it was written. */
@@ -695,10 +702,15 @@ export function signatureNames(
       }
     }
 
-    // TypeScript's `this` type, by the same rule (#382).
+    // TypeScript's `this` type, by the same rule (#382). In a generic class it
+    // carries the type parameters too, and a parameter's bound is something
+    // this signature names without writing: nest's `init(): Promise<this>`
+    // returns a `NestApplicationContext<TOptions extends ...Options>`. So
+    // there it can confirm the class and refute nothing.
     for (const half of [inParameters, inReturn]) {
       if (!half.delete(THIS)) continue;
-      if (self) half.add(self); else selfHeld = true;
+      if (self) half.add(self);
+      if (!self || genericClasses.has(self)) selfHeld = true;
     }
 
     const here = position === "parameter" ? inParameters : inReturn;

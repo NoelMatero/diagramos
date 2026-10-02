@@ -421,6 +421,8 @@ describe("TypeScript @returns on a method that returns this", () => {
       "export class Other {}",
       "export class App {\n  async init(): Promise<this> {\n    return this;\n  }\n\n  use(x: number): this {\n    return this;\n  }\n}",
       "export interface Builder {\n  add(): this;\n}",
+      "export interface Options {\n  debug?: boolean;\n}",
+      "export class Context<T extends Options = Options> {\n  opts?: T;\n\n  start(): this {\n    return this;\n  }\n}",
       "",
     ].join("\n\n"),
   };
@@ -446,6 +448,18 @@ describe("TypeScript @returns on a method that returns this", () => {
     const report = await returns(type, routine);
     expect(accusations(report)).toEqual([]);
     expect(report.claims.signatureConfirmed).toBe(1);
+  });
+
+  it("confirms the class on a generic class's this", async () => {
+    write(files);
+    const report = await returns("app.ts#Context", "app.ts#Context.start");
+    expect(accusations(report)).toEqual([]);
+    expect(report.claims.signatureConfirmed).toBe(1);
+  });
+
+  it("does not call a generic class's this wrong about its type parameter's bound", async () => {
+    write(files);
+    expect(accusations(await returns("app.ts#Options", "app.ts#Context.start"))).toEqual([]);
   });
 
   it("does not call an interface's this wrong", async () => {
