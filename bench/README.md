@@ -11,14 +11,55 @@ npm run bench:planted                      # the score table
 npm run bench:planted -- --language=rust --details
 ```
 
-That command reads only what is stored here. It calls no model and no language
-server. It takes about a minute: since #311 one cache is held per project for
-the whole run, instead of every one of the 1,661 arrows re-reading the same
-files -- which is what made it an hour. What one arrow costs, asked twice:
+It calls no model. It does start language servers -- rust-analyzer and
+pyright, the checker's own second opinion since #328 and #337 -- and builds
+Rust crates for the compiler's call lists (#357), so the score is the check a
+person actually gets.
+
+**A full run takes 6-7 minutes and exits by itself** (2026-10-01, 1,264
+claims, 15 projects; the same with the Rust build cache empty). Each project's
+servers are closed when the run moves to the next. If a run takes much longer,
+look at the machine before the code: on 2026-09-29 the same commit took
+5 h 50 m, every arrow about fifty times slower than normal, while something
+else had the machine (#403).
+
+It waits before starting while another `bench:planted`, `measure-*` script or
+vitest is running, and says which; two at once starve the language servers and
+make reds that have nothing to do with the change. `--no-wait` skips that.
+
+What one arrow costs, asked twice:
 
 ```
 npm run probe:check-cost                   # cold, and through a held cache
 ```
+
+## Keeping a run, and comparing two (#403)
+
+A run worth keeping goes into a folder, one process per project:
+
+```
+npm run bench:planted:runs -- ~/runs/base                  # on main
+npm run bench:planted:runs -- ~/runs/arm                   # on the branch, from its own worktree
+npm run bench:planted:compare -- ~/runs/base ~/runs/arm
+```
+
+- **Resumable.** Each finished project is `<folder>/<project>.txt`. Run the same
+  command again and only the missing ones run. A folder remembers its commit
+  and flags and will not be finished by another.
+- **Capped.** `--cap=<seconds>` (default 900) per project; a project over it is
+  stopped, language servers included, and named at the end.
+- **Narrowed** with `--projects=regex,ripgrep`; any other flag
+  (`--word=calls`, `--language=rust`) is passed to every project.
+
+`bench:planted:compare` reads folders or the saved output of one
+`npm run bench:planted -- --details`, in any mix. It prints both sets of totals
+and every arrow whose answer flipped, with what each side said, and counts the
+arrows whose answer held but whose reason changed (`--all` lists those). It
+exits 1 when anything differs.
+
+Run both arms on the same day's main, one after the other: a baseline from the
+morning is not comparable with an afternoon arm, because main moves several
+times a day.
 
 ## The undecided half, and the ceiling (#320)
 

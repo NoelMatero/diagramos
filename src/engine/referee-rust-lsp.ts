@@ -78,13 +78,14 @@
  * every caller here treats that as silence, the same stance `src/engine/
  * parse.ts` already takes for a missing tree-sitter grammar.
  */
-import { spawn, type ChildProcessWithoutNullStreams } from "node:child_process";
+import type { ChildProcessWithoutNullStreams } from "node:child_process";
 import path from "node:path";
 import { PassThrough } from "node:stream";
 import { fileURLToPath, pathToFileURL } from "node:url";
 import type { MessageConnection } from "vscode-jsonrpc/node";
 
 import type { LspDocumentSymbol } from "./lsp-symbols";
+import { spawnServer, stopServer } from "./server-process";
 
 /**
  * The transport, fetched when a server is actually started.
@@ -604,7 +605,8 @@ function isNotReadyError(error: unknown): boolean {
 export async function createRustAnalyzerReferee(root: string): Promise<RustLspReferee> {
   let child: ChildProcessWithoutNullStreams;
   try {
-    child = spawn("rust-analyzer", [], { cwd: root, stdio: ["pipe", "pipe", "pipe"] });
+    // A group of its own, watched, so it dies with this process however this process ends (#403).
+    child = spawnServer("rust-analyzer", [], root);
   } catch (error) {
     throw new Error(`rust-analyzer could not be started: ${(error as Error).message}`);
   }
@@ -720,7 +722,7 @@ export async function createRustAnalyzerReferee(root: string): Promise<RustLspRe
     serverVersion = init?.serverInfo?.version ?? "unknown";
   } catch (error) {
     connection.dispose();
-    child.kill();
+    stopServer(child);
     throw new Error(`rust-analyzer refused the initialize handshake: ${(error as Error).message}`);
   }
   connection.sendNotification("initialized", {});
@@ -882,7 +884,7 @@ export async function createRustAnalyzerReferee(root: string): Promise<RustLspRe
       // No LSP shutdown handshake, the Python referee's own reasoning: the
       // process is killed immediately after, so one more round trip buys nothing.
       try { connection.dispose(); } catch { /* already gone */ }
-      child.kill();
+      stopServer(child);
     },
   };
 }
