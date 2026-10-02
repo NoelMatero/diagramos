@@ -14,12 +14,14 @@
  * process it spawned: pyright runs behind `npx`, and rust-analyzer starts a
  * proc-macro server of its own.
  */
-import { execFileSync, spawn } from "node:child_process";
+import { execFileSync, spawn, spawnSync } from "node:child_process";
 import { chmodSync, mkdirSync, mkdtempSync, rmSync, writeFileSync } from "node:fs";
 import os from "node:os";
 import path from "node:path";
 
 import { afterEach, describe, expect, it } from "vitest";
+
+import { WATCH } from "../src/engine/server-process";
 
 const REPO = path.resolve(__dirname, "..");
 
@@ -207,4 +209,32 @@ describe.skipIf(process.platform === "win32")("a language server dies with the p
     expect(before.some((one) => one.command.includes("pyright"))).toBe(true);
     expect(left).toEqual([]);
   }, 60_000);
+});
+
+/*
+ * The watcher is a shell loop, and `sh` is not one shell: macOS runs bash for
+ * it, Ubuntu -- and so CI -- runs dash. dash read `kill -0 -- -<group>` as
+ * asking about a process called `--`, so on Linux the watcher gave up at once
+ * and killed nothing; this file passed on a Mac and failed in CI (#404). Every
+ * shell that `sh` might be is run here, wherever it is installed.
+ */
+const SHELLS = ["sh", "dash", "bash", "zsh"]
+  .filter((shell) => spawnSync("sh", ["-c", `command -v ${shell}`], { stdio: "ignore" }).status === 0);
+
+describe.skipIf(process.platform === "win32")("the watcher, in whichever shell sh is", () => {
+  it.each(SHELLS)("%s stops the server once the checker is gone", async (shell) => {
+    const server = spawn("sleep", ["60"], { detached: true, stdio: "ignore" });
+    const checker = spawn("sleep", ["1"], { stdio: "ignore" });
+    started = [server.pid!, checker.pid!];
+    const ended = new Promise<string>((resolve) => { server.once("exit", () => resolve("stopped")); });
+    const watcher = spawn(shell, ["-c", WATCH, "watch", String(checker.pid), String(server.pid)], { stdio: "ignore" });
+    started.push(watcher.pid!);
+
+    const outcome = await Promise.race([
+      ended,
+      new Promise<string>((resolve) => { setTimeout(() => resolve("still running"), 8_000); }),
+    ]);
+
+    expect(outcome).toBe("stopped");
+  }, 15_000);
 });

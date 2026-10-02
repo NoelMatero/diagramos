@@ -49,10 +49,14 @@ const live = new Set<number>();
  * $1 is this process, $2 the server's group. `kill -0` sends nothing; it only
  * asks whether the target exists. TERM first so a server may tidy up, KILL
  * after for one that will not.
+ *
+ * No `--` before the group: dash, which is `sh` on Ubuntu, takes it for a
+ * process id and fails, and a watcher written with it killed nothing on Linux
+ * (#404). Once a signal is named, every shell reads `-<n>` as a group.
  */
-const WATCH = [
-  "while kill -0 \"$1\" 2>/dev/null && kill -0 -- \"-$2\" 2>/dev/null; do sleep 1; done",
-  "kill -TERM -- \"-$2\" 2>/dev/null; sleep 2; kill -KILL -- \"-$2\" 2>/dev/null; exit 0",
+export const WATCH = [
+  "while kill -0 \"$1\" 2>/dev/null && kill -0 \"-$2\" 2>/dev/null; do sleep 1; done",
+  "kill -TERM \"-$2\" 2>/dev/null; sleep 2; kill -KILL \"-$2\" 2>/dev/null; exit 0",
 ].join("\n");
 
 const guarded = process.platform !== "win32";
