@@ -40,19 +40,8 @@ const STILL_RED: Record<string, string> = {
   "accesses-all|Rs derived Clone": "#388",
   "builds|Py dataclasses.replace": "#360",
   "builds|Py copy.copy": "#360",
-  "handles|TS enum members (bare names)": "#385",
-  "handles|TS enum members (qualified)": "#385",
   "handles|Rs Some(Variant)/Some(_)/None": "#385",
-  "handles3|TS enum members written as in code (Kind.A)": "#385",
-  "handles3|Rs variants written as in code (Method::Get)": "#385",
-  "handles3|Rs Self::Get written as in code": "#385",
   "rs-needs|include!d body uses util": "#389",
-  "rs-qualified|Money::new via vec! (qualified ref)": "#382",
-  "rs-qualified|Money::from (qualified ref)": "#382",
-  "rs-qualified|Money::default (qualified ref)": "#382",
-  "rs-qualified|concrete FileStore::save (qualified ref)": "#382",
-  "rs-qualified|m.cents() in format! (qualified ref)": "#382",
-  "sanity-rs|receiver call, Type::method ref": "#382",
 };
 
 /** Wrong-on-purpose arrows that were already quiet on main before #393: nothing here made them so. */

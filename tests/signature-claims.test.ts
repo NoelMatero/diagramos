@@ -58,7 +58,7 @@ async function boardOf(
 }
 
 const HANDLER = "fn user_handler(request: &Request) -> Response { todo!() }\n";
-const REQUEST = "pub struct Request { pub uri: String }\n";
+const REQUEST = "pub struct Request { pub uri: String }\npub struct Response;\n";
 
 const files = (handler = HANDLER) => ({
   "src/main.rs": handler,

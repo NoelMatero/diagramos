@@ -688,7 +688,8 @@ function drawTimeNotes(drawn: {
           ),
         }
       : {}),
-    // Same reason: the code is there under its plain name (#288).
+    // A name written with an owner its file never mentions (#288, #382): a
+    // real owner is read as the plain name and says nothing here.
     ...(qualified.length
       ? {
           pointsAtQualifiedNames: qualified.map(

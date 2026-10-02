@@ -9,7 +9,7 @@ import { afterAll, beforeAll, describe, expect, it } from "vitest";
 
 import { emptyBoard, type BoardFile } from "../src/engine/board-file";
 import { createDiagram } from "../src/engine/diagram";
-import { checkDrift, createWorkspace, parseRef, refFromLabel, type Workspace } from "../src/engine/drift";
+import { checkDrift, createWorkspace, parseRef, pointsAtQualified, refFromLabel, type Workspace } from "../src/engine/drift";
 import { readGraph, type NodeState } from "../src/engine/graph";
 import { applyPromotions } from "../src/engine/promote";
 import type { ExcalidrawElement } from "../src/engine/normalize";
@@ -318,20 +318,33 @@ describe("checking a board against the code", () => {
     const python = { "app.py": "class App:\n    def run(self):\n        pass\n" };
     const ts = { "server.ts": "export class Server {\n  dispatch() {}\n}\n" };
 
-    it("says to write the plain name, for each way it is spelled", async () => {
-      for (const [ref, files, plain] of [
-        ["src/lib.rs#Orangutan::accept", rust, "src/lib.rs#accept"],
-        ["src/lib.rs#crate::net::accept", rust, "src/lib.rs#accept"],
-        ["src/lib.rs#Orangutan#accept", rust, "src/lib.rs#accept"],
-        ["app.py#App.run", python, "app.py#run"],
-        ["server.ts#Server.dispatch", ts, "server.ts#dispatch"],
-        ["server.ts#Server.dispatch@declared", ts, "server.ts#dispatch"],
+    it("reads the plain name, for each way it is spelled (#382)", async () => {
+      for (const [ref, files] of [
+        ["src/lib.rs#Orangutan::accept", rust],
+        ["src/lib.rs#Orangutan#accept", rust],
+        ["src/net.rs#crate::net::accept", { "src/net.rs": "pub fn accept() {}\n" }],
+        ["src/lib.rs#Self::accept", rust],
+        ["app.py#App.run", python],
+        ["server.ts#Server.dispatch", ts],
+        ["server.ts#Server.dispatch@declared", ts],
+      ] as const) {
+        const board = await boardWith([{ id: "a", label: "Box", ref }]);
+        expect(checkDrift(board, fakeWorkspace(files)).findings, ref).toEqual([]);
+      }
+    });
+
+    it("says so when the file never mentions the owner, rather than taking the name alone", async () => {
+      for (const [ref, files, owner] of [
+        ["src/lib.rs#Gorilla::accept", rust, "Gorilla"],
+        ["src/lib.rs#crate::net::accept", rust, "net"],
+        ["app.py#Web.run", python, "Web"],
+        ["server.ts#Client.dispatch", ts, "Client"],
       ] as const) {
         const board = await boardWith([{ id: "a", label: "Box", ref }]);
         const [finding] = checkDrift(board, fakeWorkspace(files)).findings;
         expect(finding, ref).toMatchObject({ kind: "unresolvable-ref" });
-        expect(finding.detail, ref).toContain(plain);
-        expect(finding.detail, ref).not.toContain("no longer");
+        expect(finding.detail, ref).toContain(`never mentions ${owner}`);
+        expect(pointsAtQualified(finding), ref).toBe(true);
       }
     });
 

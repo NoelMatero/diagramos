@@ -155,12 +155,13 @@ describe("an arrow whose end names data", () => {
 describe("an end naming something the file does not declare at all", () => {
   it("is not called data, because that is a second diagnosis for one mistake", async () => {
     // The missing symbol is the node check's finding and it makes it. The arrow
-    // gets the plain reason, so nobody is told to re-anchor an end whose real
-    // problem is that the name is gone.
+    // is not read at all (#382): a red needs both ends found, so nobody is told
+    // to re-anchor an end, or that a call is missing, when the name is gone.
     const found = report(await arrow("src/lib.rs#get_client", "src/lib.rs#Gone"));
 
     expect(found.findings.map((finding) => finding.kind)).toContain("missing-symbol");
-    expect(found.unconfirmedEdges.map((one) => one.reason)).toEqual(["no-call-either-way"]);
+    expect(found.unconfirmedEdges).toEqual([]);
+    expect(found.unreadEdges.map((one) => one.reason)).toEqual(["endpoint-not-found"]);
   });
 });
 

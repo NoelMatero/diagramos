@@ -49,6 +49,7 @@
  * about the code.
  */
 
+import { ownerIsHere, writtenName } from "./lines";
 import { each, parseSource, type Language, type Node, type Tree } from "./parse";
 
 /** One case a dispatch names. */
@@ -865,9 +866,26 @@ export function checkHandles(
 
   const found = dispatch.cases.map((one) => one.name);
   const inCode = new Set(found);
-  const onBox = new Set(claimed);
+  /*
+   * A case the box writes with its owner -- `Kind.A`, `Method::Get`,
+   * `Self::Get` -- is the case the code names (#385). This reader names a
+   * qualified label by its last part, so the box's list is read the same
+   * way, through the one function every written name goes through.
+   *
+   * Only when the written text is not itself a case: a string label is kept
+   * whole, so `"user.created"` is `user.created` in the code, and reading the
+   * box's `user.created` as `created` would make it a case the code lacks.
+   * And only when the routine's file has the owner, so `Other.C` is not
+   * taken for `Kind.C`.
+   */
+  const asCode = (written: string): string => {
+    if (inCode.has(written)) return written;
+    const { name, owner } = writtenName(written);
+    return owner && ownerIsHere(owner, "", source) ? name : written;
+  };
+  const onBox = new Set(claimed.map(asCode));
   const extra = found.filter((name) => !onBox.has(name));
-  const missing = claimed.filter((name) => !inCode.has(name));
+  const missing = claimed.filter((name) => !inCode.has(asCode(name)));
 
   // A catch-all handles every case nobody named, so a claimed case with no arm
   // of its own is still handled. That costs the `missing` half and keeps

@@ -43,7 +43,55 @@ export function plainNameOf(symbol: string): string | undefined {
   return QUALIFIED.exec(symbol.split("@")[0].trim())?.[1];
 }
 
-/** Whether a finding is the qualified-name refusal. */
+/**
+ * A name as a board writes it, read as the name the code declares (#382, #385).
+ *
+ * The one place a board's text becomes a name to look for: `parseRef` reads
+ * every ref's symbol through it, so every box and both ends of every word's
+ * arrow do; `handles` reads a box's case list through it; `@accesses` reads
+ * the member on its label through it. `Money::new`, `Self::Get`, `Kind.A`,
+ * `Store.save` are how each language spells the thing, and they mean `new`,
+ * `Get`, `A`, `save` -- the plain spelling, which is what every reader looks
+ * up.
+ *
+ * Before this, each reader matched the text as written. Nothing in a file is
+ * declared as `Money::new`, so the match failed and the arrow or the box was
+ * judged anyway.
+ *
+ * `owner` is the part just before the name, kept so a caller holding the file
+ * can tell a real owner from a typo (`ownerIsHere`). An assertion suffix stays
+ * on the name: `Money::new@declared` is `new@declared`.
+ */
+export function writtenName(written: string): { name: string; owner?: string } {
+  const at = written.indexOf("@");
+  const head = (at < 0 ? written : written.slice(0, at)).trim();
+  const match = QUALIFIED.exec(head);
+  if (!match) return { name: written };
+  const owner = head.slice(0, head.length - match[1].length).replace(/(?:::|\.|#)$/, "").split(/::|\.|#/).pop()!;
+  return { name: match[1] + (at < 0 ? "" : written.slice(at)), owner };
+}
+
+/**
+ * Whether the owner a name was written with is something this file has.
+ *
+ * `Self` and the path words always are. Otherwise the file mentions it, or is
+ * the module it names (`net.rs` for `crate::net::accept`). An owner the file
+ * never mentions is a typo or the wrong file, and taking the name alone would
+ * confirm `Wallet::new` off `Money::new`.
+ */
+export function ownerIsHere(owner: string, file: string, source: string): boolean {
+  if (OWNER_WORDS.has(owner)) return true;
+  const stem = file.replace(/\\/g, "/").split("/").pop()!.replace(/\.[^.]*$/, "");
+  if (owner === stem) return true;
+  return new RegExp(`(?<![\\w$])${owner.replace(/\$/g, "\\$")}(?![\\w$])`).test(source);
+}
+
+const OWNER_WORDS = new Set(["Self", "self", "crate", "super", "this", "cls"]);
+
+/**
+ * Whether a finding is the qualified-name refusal. Since #382 that is only an
+ * owner the file does not have: a qualified name whose owner is there resolves.
+ */
 export function pointsAtQualified(finding: { kind: string; ref: string }): boolean {
   if (finding.kind !== "unresolvable-ref") return false;
   const hash = finding.ref.indexOf("#");

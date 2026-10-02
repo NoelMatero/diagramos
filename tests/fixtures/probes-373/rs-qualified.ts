@@ -70,6 +70,8 @@ export const fixture = {
     ["concrete FileStore::save (qualified ref)", "src/a.rs#concrete", "src/file_store.rs#FileStore::save", "calls"],
     ["m.cents() in format! (qualified ref)", "src/a.rs#in_macro", "src/money.rs#Money::cents", "calls"],
     ["qualified HEAD: Store::save_twice -> FileStore save", "src/store.rs#Store::save_twice", "src/file_store.rs#save", "calls"],
-    ["qualified HEAD: Money::new -> nothing wrong (new builds Money)", "src/money.rs#Money::cents", "src/money.rs#double", "calls"],
+    // Labelled "nothing wrong" by #373, but `cents` is `self.0` and calls
+    // nothing: quiet only because `Money::cents` was never found (#382).
+    ["PLANTED wrong: qualified tail Money::cents calls nothing", "src/money.rs#Money::cents", "src/money.rs#double", "calls"],
   ],
 };

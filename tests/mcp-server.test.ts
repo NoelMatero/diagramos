@@ -671,18 +671,22 @@ describe("board MCP server", () => {
     expect((edited.pointsAtLineNumbers as string[]).join(" ")).toContain("Dispatch → src/lib.rs#L12");
   }, 120_000);
 
-  it("says at draw time when a box names a method with its type, and says to drop the type (#288)", async () => {
+  it("reads a method named with its type as the method, and says so only when the file lacks the type (#288, #382)", async () => {
     const board = "docs/diagrams/qualified.excalidraw";
     await mkdir(path.join(workspace, "src"), { recursive: true });
     await writeFile(path.join(workspace, "src/server.rs"), "impl Server {\n    fn accept(&self) {}\n}\n");
     const drawn = jsonOf(await call("create_diagram", {
       path: board,
-      nodes: [{ id: "accept", label: "Accept", ref: "src/server.rs#Server::accept" }],
+      nodes: [
+        { id: "accept", label: "Accept", ref: "src/server.rs#Server::accept" },
+        { id: "typo", label: "Typo", ref: "src/server.rs#Client::accept" },
+      ],
     }));
     expect(drawn.pointsAtNothing).toBeUndefined();
     const said = (drawn.pointsAtQualifiedNames as string[]).join(" ");
-    expect(said).toContain("Accept → src/server.rs#Server::accept");
-    expect(said).toContain("src/server.rs#accept");
+    expect(said).not.toContain("Accept →");
+    expect(said).toContain("Typo → src/server.rs#Client::accept");
+    expect(said).toContain("never mentions Client");
   }, 120_000);
 
   /**
