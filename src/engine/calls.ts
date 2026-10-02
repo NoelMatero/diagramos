@@ -198,7 +198,15 @@ export interface CallsRefutedEvidence {
    * evidence, so the red rests on the compiler saying which method `name`
    * lands on for each value the routine uses (`values`).
    */
-  implicit?: { name: string; values: Array<{ name: string; start: number; end: number }> };
+  implicit?: {
+    name: string;
+    values: Array<{ name: string; start: number; end: number }>;
+    /**
+     * Who may make the unwritten call: absent, the language (#384); `true`,
+     * code outside the repository that the routine handed `values` to (#401).
+     */
+    outside?: true;
+  };
 }
 
 /**
@@ -983,6 +991,25 @@ function constructedBy(node: Node): Callee | undefined {
   return made ? calleeOfNode(made) : { kind: "computed" };
 }
 
+/** The two grammar nodes a JSX tag that renders something is spelt with; a closing tag renders nothing. */
+export const JSX_TAG = /^(jsx_opening_element|jsx_self_closing_element)$/;
+
+/**
+ * The component a JSX tag renders, read as though it were a callee (#402).
+ *
+ * `<Widget />` runs `Widget` as surely as `Widget()` does, and the closed
+ * reading never counted it: a routine that only renders `<M />` read as one
+ * that makes no calls at all, so every arrow out of it was refuted. A
+ * lowercase name is a host element -- `<div>` compiles to the string
+ * `"div"`, which runs nothing -- and a fragment names nothing.
+ */
+function renderedBy(node: Node): Callee | undefined {
+  if (!JSX_TAG.test(node.type)) return undefined;
+  const name = node.childForFieldName("name");
+  if (!name || (name.childCount === 0 && !/^[A-Z_$]/.test(name.text))) return undefined;
+  return calleeOfNode(name);
+}
+
 function calleeOfNode(callee: Node): Callee {
   if (callee.childCount === 0) {
     return NAME_LEAF.test(callee.type)
@@ -990,6 +1017,21 @@ function calleeOfNode(callee: Node): Callee {
       : { kind: "computed" };
   }
 
+  /*
+   * A callee that is itself a call -- `pick()(1)` -- runs whatever that call
+   * handed back, which has no name in the text (#400). Read as the inner
+   * call's name, it was a second call of `pick`, and a body that runs
+   * `double` that way was told it calls `pick` and `pick`. The test is
+   * `calleeOf`'s own: a call is what carries `arguments`.
+   *
+   * Except where the inner call is one that reaches by any name --
+   * `getattr(handler, name)()` -- whose doubt is the more exact one, and is
+   * the reason the body gave before.
+   */
+  if (callee.childForFieldName("arguments")) {
+    const inner = calleeOf(callee);
+    return inner && inner.kind !== "computed" && REACHES_ANYTHING.has(inner.name) ? inner : { kind: "computed" };
+  }
   /*
    * `foo::<T>()` in Rust is a `generic_function` wrapping the real callee, and
    * reading it as a member access made 66 Rust calls come back `computed` -- a
@@ -1546,7 +1588,7 @@ function closedBodyRefutes(
     const unwritten = (from.language === "rust" ? calledImplicitly(to) : undefined)
       ?? (handsOnHead(from, to) ? "named" : undefined);
     if (unwritten) return { why: unwritten };
-    const implicit = "evidence" in text ? runByTheLanguage(from, to) : undefined;
+    const implicit = "evidence" in text ? runByTheLanguage(from, to) ?? handedOutside(from, to) : undefined;
     return implicit && "evidence" in text ? { evidence: { ...text.evidence, implicit } } : text;
   };
   if (!("why" in text) && !known) return closedByText();
@@ -1651,6 +1693,86 @@ function runByTheLanguage(
     });
   }
   return { name, values };
+}
+
+/**
+ * Whether the head is a method, and the tail hands values to code outside the
+ * repository that may run it (#401) -- and if so, those values, for the
+ * compiler to be asked whether the head is a method of any of them.
+ *
+ * `json.dump(d, w)` runs `w.write`, and `print(x, file=w)` does too. The
+ * closed reading placed both calls outside the repository and counted that as
+ * reaching nothing here, which is only true of what was handed over if the
+ * library calls nothing back on it. #361 answered that for a function handed
+ * on by name; this is the same doubt for an object, whose methods run without
+ * their names appearing at all. So: every value written among the arguments
+ * of a call placed outside, put to `memberAt` exactly as `runByTheLanguage`'s
+ * are. No list of the library routines that call back -- any of them may.
+ *
+ * Not Rust: code outside a crate can only run one of its methods through a
+ * trait, and a head that implements a trait from elsewhere is already
+ * `calledImplicitly`'s.
+ */
+function handedOutside(
+  from: CallSide & { routine: string },
+  to: CallSide & { names: string[] },
+): CallsRefutedEvidence["implicit"] {
+  if (from.language === "rust") return undefined;
+  const tree = parseSource(to.source, to.language);
+  if (!tree) return undefined;
+  const holders = holdersIn(tree.rootNode);
+  const name = to.names.find((one) => routinesNamed(to.source, one, to.language).routines
+    .some((routine) => routine.childForFieldName("parameters") && holders.has(routine.id)));
+  if (!name) return undefined;
+
+  const reading = callSitesIn(from, from.routine);
+  if (!reading.read) return undefined;
+  const outside = new Set<number>();
+  for (const body of reading.bodies) {
+    if (body.routine !== from.routine) continue;
+    for (const site of body.sites) if (site.file === EXTERNAL_RECEIVER && site.nameAt) outside.add(site.nameAt.start);
+  }
+  if (outside.size === 0) return undefined;
+
+  const values: Array<{ name: string; start: number; end: number }> = [];
+  const seen = new Set<number>();
+  for (const routine of routinesNamed(from.source, from.routine, from.language).routines) {
+    const body = routine.childForFieldName("body")
+      ?? routine.childForFieldName("value")?.childForFieldName("body");
+    if (!body) continue;
+    each(body, (call) => {
+      const callee = calleeOf(call) ?? constructedBy(call);
+      if (!callee || callee.kind === "computed") return;
+      const at = callee.kind === "through" ? callee.memberAt : callee.nameAt;
+      const handed = call.childForFieldName("arguments");
+      if (!handed || !outside.has(at.start)) return;
+      /*
+       * A value is a name used as one, as in `runByTheLanguage`: not the
+       * object of a member access, not a keyword's own name (`file` in
+       * `file=w` names a parameter, not a value), and not what a call inside
+       * the arguments calls -- `get` in `list(hooks.get("request"))` is run
+       * here, and what is handed on is its result (httpx's `event_hooks`, on
+       * the bench).
+       */
+      const notValues = new Set<number>();
+      each(handed, (node) => {
+        const inner = calleeOf(node) ?? constructedBy(node);
+        if (inner && inner.kind !== "computed") notValues.add((inner.kind === "through" ? inner.memberAt : inner.nameAt).start);
+        const member = node.childForFieldName("attribute") ?? node.childForFieldName("property");
+        const object = member ? node.childForFieldName("object") : null;
+        if (object) notValues.add(object.startIndex);
+        const keyword = node.childForFieldName("value") ? node.childForFieldName("name") : null;
+        if (keyword) notValues.add(keyword.startIndex);
+      });
+      each(handed, (node) => {
+        if (node.childCount !== 0 || (node.type !== "identifier" && node.type !== "this")) return;
+        if (notValues.has(node.startIndex) || seen.has(node.startIndex)) return;
+        seen.add(node.startIndex);
+        values.push({ name: node.text, start: node.startIndex, end: node.startIndex + node.text.length });
+      });
+    });
+  }
+  return values.length > 0 ? { name, values, outside: true } : undefined;
 }
 
 /**
@@ -1890,18 +2012,28 @@ export function callsIntoType(
   if (bodies.length === 0) return { verdict: "open", why: "routine-not-found" };
   const names = new Set(to.names);
   let why: CallsNotClosed | undefined;
+  /*
+   * The first wall wins, except that one a compiler can take down outranks
+   * one it cannot. This reading confirms from a single call, so a value whose
+   * type a compiler can give is still a way to green while `x()(n)` (#400) is
+   * not -- and a live check starts a compiler only for the reason it is
+   * shown. A call nothing names, written before the one that confirms, left
+   * a correct class arrow unconfirmed.
+   */
+  const answerable = (one: CallsNotClosed | undefined) => one === "receiver" || one === "abstract-receiver";
+  const stopped = (one: CallsNotClosed): void => { if (!why || (!answerable(why) && answerable(one))) why = one; };
   let sites = 0;
   for (const body of bodies) {
     for (const site of body.sites) {
       sites += 1;
-      if (site.file === undefined) { why ??= site.why ?? "unplaced"; continue; }
-      if (site.concrete === false) { why ??= "abstract-receiver"; continue; }
-      if (site.overridden) { why ??= "overridden"; continue; }
+      if (site.file === undefined) { stopped(site.why ?? "unplaced"); continue; }
+      if (site.concrete === false) { stopped("abstract-receiver"); continue; }
+      if (site.overridden) { stopped("overridden"); continue; }
       const landed = site.file === to.file ? to
         : site.file === from.file ? from
           : from.open?.(site.file);
       if (site.declaredAs === undefined || !landed) {
-        if (site.file === to.file) why ??= "reaches-the-file";
+        if (site.file === to.file) stopped("reaches-the-file");
         continue;
       }
       const holders = holdersOfRoutine(landed.source, landed.language, site.declaredAs);
@@ -1920,10 +2052,10 @@ export function callsIntoType(
           name: site.declaredAs, inside: from.routine, line: site.line, wrote: site.name,
         } };
       }
-      if (spelt.length > 0) { why ??= "reaches-the-file"; continue; }
+      if (spelt.length > 0) { stopped("reaches-the-file"); continue; }
       if (!site.receiver) continue;
-      if (holders.some((one) => one.dispatched)) { why ??= "abstract-receiver"; continue; }
-      if (inherits && holders.some((one) => one.name !== undefined)) why ??= "inherits";
+      if (holders.some((one) => one.dispatched)) { stopped("abstract-receiver"); continue; }
+      if (inherits && holders.some((one) => one.name !== undefined)) stopped("inherits");
     }
   }
   if (why || typeTail) return { verdict: "open", why: why ?? "routine-not-found" };
@@ -2049,6 +2181,67 @@ function isRoutine(source: string, name: string, language: Language): boolean {
     node.childForFieldName("parameters")
     ?? node.childForFieldName("value")?.childForFieldName("parameters"),
   ));
+}
+
+const runs_ = new WeakMap<Tree, Map<string, boolean>>();
+
+/**
+ * Whether calling `name` may run a declaration the text can point at -- `false`
+ * only where the text declares it as a value, and not as a routine or a class
+ * (#402).
+ *
+ * `const M = memo(Widget)` holds whatever `memo` handed back, and `M()` or
+ * `<M />` runs that -- `Widget`, through code nobody here can read. Placed at
+ * the file that declares `M`, the call read as reaching nothing but that
+ * file, and a correct arrow at `Widget` was refuted. No list of wrappers: what
+ * the name is declared as is the whole of the question, by structure -- a
+ * declaration whose `value` (Python: `right`) is not itself a routine.
+ *
+ * Declared, and not merely bound. `bindingsIn` is generous on purpose and
+ * counts a name a pattern binds -- Rust's `Ok(v) =>` -- as this file's, and
+ * "not a routine nor a class" took `Ok(...)` for a value the first time, on
+ * the bench (serde_json's `Serializer`).
+ */
+function runsWhenCalled(source: string, name: string, language: Language): boolean {
+  const tree = parseSource(source, language);
+  if (!tree) return true;
+  const known = runs_.get(tree) ?? new Map<string, boolean>();
+  runs_.set(tree, known);
+  let runs = known.get(name);
+  if (runs === undefined) {
+    let value = false;
+    each(tree.rootNode, (node) => {
+      if (value) return;
+      const named = node.childForFieldName("name") ?? node.childForFieldName("left");
+      if (!named || named.childCount !== 0 || named.text !== name) return;
+      const held = node.childForFieldName("value") ?? node.childForFieldName("right");
+      if (held && !held.childForFieldName("parameters")) value = true;
+    });
+    runs = !value || isRoutine(source, name, language) || isTypeName(source, name, language);
+    known.set(name, runs);
+  }
+  return runs;
+}
+
+/**
+ * Whether what a file exports as its default runs when called (#402): a
+ * routine or a class written there, or a name declared as one. `export
+ * default memo(Widget)` is a value somebody built. A file with no default
+ * written as an expression -- `export default function f() {}` is a
+ * declaration, and a language without default exports has none -- answers
+ * yes, as before.
+ */
+function defaultExportRuns(source: string, language: Language): boolean {
+  const tree = parseSource(source, language);
+  if (!tree) return true;
+  for (const node of children(tree.rootNode)) {
+    const value = node.type === "export_statement" ? node.childForFieldName("value") : null;
+    if (!value) continue;
+    if (value.childForFieldName("parameters") || value.childForFieldName("body")) return true;
+    if (value.childCount === 0) return runsWhenCalled(source, value.text, language);
+    return false;
+  }
+  return true;
 }
 
 /* ------------------------------------------- one body's call sites (#217) */
@@ -2560,7 +2753,9 @@ function placeOwn(
  *
  * The target-free twin of `resolves`, and every branch below is the same branch
  * in the same order -- the reasons have to match, or a body counted closed here
- * would be a body `@calls` still refuses on. `resolves`/`callsTo` never calls
+ * would be a body `@calls` still refuses on. One branch has no twin: a name
+ * declared as a value rather than a routine (#402) is never spelt as the
+ * head, so `resolves` is never asked about one. `resolves`/`callsTo` never calls
  * `placeThroughChecker`: a resolver only narrows what this function reports,
  * never what the live `@calls` word does.
  */
@@ -2680,7 +2875,10 @@ function placeOf(
      * the text even though the name it is bound to is -- unless a resolver
      * says what it is.
      */
-    if (callee.kind !== "through") return { file: side.file, as: callee.name };
+    if (callee.kind !== "through") {
+      if (!runsWhenCalled(side.source, callee.name, side.language)) return { why: "local-callee" };
+      return { file: side.file, as: callee.name };
+    }
     return throughChecker();
   }
 
@@ -2702,6 +2900,20 @@ function placeOf(
    */
   const under = callee.kind === "through" ? callee.name : imported.name ?? callee.name;
   const settled = settlesOn(under, files, side);
+  /*
+   * The far file declares a value there rather than something that runs:
+   * `export const Memoed = memo(Widget)`, or `export default memo(Widget)`
+   * under a default import, which names the far side nothing (#402). Only a
+   * name the walk read a declaration for is asked -- `as` is set exactly then.
+   */
+  if (settled && callee.kind !== "through") {
+    const far = side.open?.(settled.file);
+    const runs = !far ? true
+      : settled.as !== undefined ? runsWhenCalled(far.source, settled.as, far.language)
+      : imported.name === undefined ? defaultExportRuns(far.source, far.language)
+      : true;
+    if (!runs) return { why: "local-callee" };
+  }
   if (settled) return settled;
   return callee.kind === "through" ? throughChecker() : { why: "elsewhere" };
 }
@@ -2799,7 +3011,7 @@ export function callSitesIn(side: CallSide, only?: string): CallSitesReading {
         });
         return;
       }
-      const callee = calleeOf(inner) ?? constructedBy(inner);
+      const callee = calleeOf(inner) ?? constructedBy(inner) ?? renderedBy(inner);
       if (!callee) return;
       const where = placeOf(callee, side, bindings, scope, holder);
       body.sites.push({

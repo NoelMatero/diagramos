@@ -882,7 +882,8 @@ export const NOT_CLOSED_WORDS: Record<CallsNotClosed, string> = {
   dynamic: "the caller can reach a name that is nowhere in its text",
   receiver: "one call is on a value whose type the text does not give",
   unbound: "one call is on a name the file never says the origin of",
-  "local-callee": "one call is on a value the routine was handed, so what it runs is the caller's choice",
+  "local-callee": "one call is on a value -- handed in, or built by other code -- so what it runs "
+    + "is not in the text",
   ambiguous: "one call is on a name bound in two places at once",
   unplaced: "one call could not be traced to any file",
   elsewhere: "one call leads through a re-export that runs out",
@@ -5352,7 +5353,16 @@ export function checkDrift(
                  * lets a live check put the open call to a language server.
                  */
               } else if (own.verdict === "open") {
-                if (verdict.verdict !== "withheld") verdict = { verdict: "absent", notClosed: own.why };
+                /*
+                 * A forward doubt no compiler can settle -- `x()(n)`, a call
+                 * nothing names (#400) -- is not the one to report when the
+                 * class's reading stopped on a value whose type a compiler
+                 * can give: that answer is what can still confirm it, and a
+                 * live check asks only for the reasons it is shown. nest's
+                 * `RouterExplorer -> RoutePathFactory` went unconfirmed so.
+                 */
+                const answerable = own.why === "receiver" || own.why === "abstract-receiver";
+                if (verdict.verdict !== "withheld" || answerable) verdict = { verdict: "absent", notClosed: own.why };
               } else if (made?.verdict !== "refuted") {
                 if (verdict.verdict !== "withheld") verdict = { verdict: "absent", notClosed: "may-create" };
               } else if (verdict.verdict === "refuted") {
@@ -5556,7 +5566,9 @@ export function checkDrift(
                   + `where ${verdict.evidence.routine} is declared.`,
               }, rests: {
                 written: !verdict.evidence.implicit,
-                unwritten: `a call the language makes without it being written (\`${verdict.evidence.implicit?.name}\`)`,
+                unwritten: verdict.evidence.implicit?.outside
+                  ? `a call code outside the repository may make on a value handed to it (\`${verdict.evidence.implicit.name}\`)`
+                  : `a call the language makes without it being written (\`${verdict.evidence.implicit?.name}\`)`,
                 ...(verdict.evidence.implicit ? {
                   ask: (referee: ClosedBodyReferee) => askMember(
                     referee,

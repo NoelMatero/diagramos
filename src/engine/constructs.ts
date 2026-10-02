@@ -68,7 +68,7 @@
  * even in the languages where the syntax is clear.
  */
 import {
-  bindingsIn, callsBetween, callSitesIn, compiledBodiesFor, EXTERNAL_RECEIVER, placeName,
+  bindingsIn, callsBetween, callSitesIn, compiledBodiesFor, EXTERNAL_RECEIVER, JSX_TAG, placeName,
   type Bindings, type CallSide, type CallsNotClosed,
 } from "./calls";
 import { mayAccuse } from "./licence";
@@ -213,7 +213,7 @@ export interface ConstructsRefutedEvidence {
 }
 
 /** Grammar nodes that mean construction and nothing else. */
-const MAKES = /^(new_expression|struct_expression|jsx_opening_element|jsx_self_closing_element)$/;
+const MAKES = new RegExp(`^(new_expression|struct_expression)$|${JSX_TAG.source}`);
 
 /** Where each of those spells the name of the thing being made. */
 function madeBy(node: Node): Node | undefined {
