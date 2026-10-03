@@ -1455,6 +1455,9 @@ export interface ClaimTally {
    * check with no referee this is what `wouldHelp` reads to decide one is
    * worth starting; on a check with one, it is what the compiler could not
    * settle either -- an `any`, an unresolved import.
+   *
+   * Also an `@accesses` arrow into a TypeScript type with a parent (#398):
+   * whether it has the member is the compiler's question.
    */
   endsUnsettled: number;
 }
@@ -2600,6 +2603,12 @@ export interface ClosedBodyReferee {
   importTargetAt?(file: string, at: { start: number; end: number }): ImportTarget | undefined;
   /** Every routine the member `name` of the value at this range lands on. */
   memberAt?(file: string, at: { start: number; end: number }, name: string): MemberTarget[] | undefined;
+  /**
+   * Whether any class or interface the class declared at this range derives
+   * from is declared outside the repository: the parents `ancestorsAt` leaves
+   * out (#398). TypeScript only.
+   */
+  parentsOutsideAt?(file: string, at: { start: number; end: number }): boolean | undefined;
 }
 
 /**
@@ -5877,10 +5886,29 @@ export function checkDrift(
         } else if (!language || !toLanguage) {
           noteRead("unreadable");
         } else {
+          /*
+           * A TypeScript type with a parent: its members are partly the
+           * parents', and the compiler can list them (#398). A pass with no
+           * compiler counts the arrow, so a live check starts one.
+           */
+          const referee = options?.closedBodyReferee;
+          const typescriptEnd = toLanguage === "ts" || toLanguage === "tsx";
           const verdict = memberAccesses(
             workspace.read(fromFile), fromEnd.symbols[0]!, edge.label, language,
             { source: workspace.read(toFile), names: toEnd.symbols, language: toLanguage },
+            typescriptEnd && referee?.memberAt && referee.ancestorsAt && referee.parentsOutsideAt ? {
+              memberAt: (at, name) => referee.memberAt!(toAnchor, at, name),
+              ancestorsAt: (at) => referee.ancestorsAt!(toAnchor, at),
+              parentsOutsideAt: (at) => referee.parentsOutsideAt!(toAnchor, at),
+              read: (file) => {
+                const absolute = workspace.resolve(file);
+                return absolute !== undefined && workspace.stat(absolute) === "file" ? workspace.read(absolute) : undefined;
+              },
+            } : undefined,
           );
+          if (claimed && typescriptEnd && verdict.verdict === "withheld" && verdict.why === "inherited") {
+            claims.endsUnsettled += 1;
+          }
 
           if (verdict.verdict === "confirmed") {
             if (claimed) claims.accessesConfirmed += 1;

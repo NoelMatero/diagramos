@@ -310,6 +310,7 @@ export async function refereedCheckLive(
           ClosedBodyReferee["memberAt"],
         // TypeScript's alone, and answered on the spot: no language server is asked.
         renderableAt: ts?.renderableAt?.bind(ts),
+        parentsOutsideAt: ts?.parentsOutsideAt?.bind(ts),
         ...(askCompiler
           ? { compiledCrateOf: (file: string) => { compilable.add(file); return undefined; } }
           : {}),
@@ -381,6 +382,7 @@ export async function refereedCheckLive(
         return ts?.kindAt?.(file, at);
       },
       renderableAt: (file, at) => ts?.renderableAt?.(file, at),
+      parentsOutsideAt: (file, at) => ts?.parentsOutsideAt?.(file, at),
       ancestorsAt: (file, at) => {
         const language = languageOf(file);
         if (language === "python" || language === "rust") {
