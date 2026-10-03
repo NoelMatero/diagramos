@@ -34,8 +34,8 @@ Follow these every time.
 6. **Read every draw and edit response, and fix what it names in the same
    turn** with `edit_diagram`: `pointsAtNothing`, `pointsAtLineNumbers`,
    `pointsAtQualifiedNames`, `pointsAtBuildOutput`, `conceptPointsHere`,
-   `garbledClaims`, `notDirect`, `drawTheChoices`, an unviewable size. Correct the ref; never delete a ref to
-   make a finding go away.
+   `garbledClaims`, `notDirect`, `drawTheChoices`, an unviewable size. Correct
+   the ref; never delete a ref to make a finding go away.
 7. **Do not render to find out whether it worked.** The draw response already
    says whether the board is legible. Render once, at the end, to show a person.
 8. **Never redraw what the user drew.** Hand-drawn elements are the spec.
