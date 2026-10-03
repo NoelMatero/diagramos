@@ -33,6 +33,13 @@
  * - An interface's parents: the compiler answers `ancestorsAt` for classes.
  *
  * Each tree runs in a process of its own, and a tree that fails is named.
+ *
+ * ## A known scan miss
+ *
+ * The text scan reads a field initializer's call on a line of its own --
+ * vite's `startOffset = // ..\n getAsyncFunctionDeclarationPaddingLineCount() + 1`
+ * -- as a method of the class. The class has no such member, and "missing"
+ * is the right answer there; it is listed, not hidden.
  */
 import { spawnSync } from "node:child_process";
 import { existsSync, readFileSync } from "node:fs";
@@ -50,6 +57,12 @@ const CORPUS = existsSync(path.resolve(import.meta.dirname, "..", ".corpus"))
   ? path.resolve(import.meta.dirname, "..", ".corpus")
   : path.join(process.env.HOME ?? "", "board-ai", ".corpus");
 const TREES = ["TanStack-query", "vuejs-core", "excalidraw-excalidraw", "nestjs-nest", "vitejs-vite"];
+/**
+ * Where to read in a tree, when not the whole of it. nest's `sample/` and
+ * `integration/` are 900 more files of demo apps, and reading them ran out of
+ * 4 GB; the product's own code is under `packages/`.
+ */
+const SCOPES: Record<string, string[]> = { "nestjs-nest": ["packages"] };
 
 interface TreeResult {
   tree: string;
@@ -136,7 +149,9 @@ async function measureOne(root: string): Promise<TreeResult> {
     return refereeTypes(source, language, true).find((type) => type.line === line)?.members;
   };
 
-  for (const absolute of sourceFiles(root)) {
+  const scope = SCOPES[path.basename(root)];
+  const files = scope ? scope.flatMap((dir) => sourceFiles(path.join(root, dir))) : sourceFiles(root);
+  for (const absolute of files) {
     const file = path.relative(root, absolute);
     const language = languageOf(file);
     if ((language !== "ts" && language !== "tsx") || file.endsWith(".d.ts")) continue;
