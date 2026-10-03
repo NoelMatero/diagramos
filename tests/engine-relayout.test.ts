@@ -12,6 +12,7 @@
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
 
 import { emptyBoard, type BoardFile } from "../src/engine/board-file";
+import { ARROW_CLAIMS } from "../src/engine/claim";
 import { connectNodes, createDiagram } from "../src/engine/diagram";
 import { readGraph } from "../src/engine/graph";
 import { recoverDiagram, relayoutDiagram } from "../src/engine/relayout";
@@ -83,6 +84,26 @@ describe("re-laying a board out", () => {
     expect(now.complete).toEqual(was.complete);
     expect(now.direction).toBe("DOWN");
     expect(after.remembered).toBe(true);
+  }, 60_000);
+
+  it("keeps every arrow claim word, not only the two that existed when it was written", async () => {
+    // relayout knew `needs` and `feeds` and dropped the rest, so a board of
+    // `@calls` arrows came back from a flow change with no claims at all and
+    // nothing checked them again.
+    const words = ARROW_CLAIMS.filter((word) => word !== "accesses");
+    const { board } = await createDiagram(emptyBoard(), {
+      nodes: words.flatMap((word) => [
+        { id: `${word}-a`, label: `${word} a`, ref: `src/${word}.ts#a` },
+        { id: `${word}-b`, label: `${word} b`, ref: `src/${word}.ts#b` },
+      ]),
+      edges: [
+        ...words.map((word) => ({ from: `${word}-a`, to: `${word}-b`, claim: word })),
+        { from: "calls-b", to: "needs-a", label: "width", claim: "accesses" as const },
+      ],
+    });
+    const after = await relayoutDiagram(board, { direction: "DOWN" });
+    expect(readGraph(after.board).edges.map((edge) => edge.claim).sort())
+      .toEqual([...ARROW_CLAIMS].sort());
   }, 60_000);
 
   it("actually moves the boxes", async () => {
