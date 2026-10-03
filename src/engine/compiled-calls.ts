@@ -100,6 +100,14 @@ export interface CompiledBody {
    * the quiet side for an accusation resting on this set being without B.
    */
   made: Set<string>;
+  /**
+   * The aggregates alone: every type the body builds a value of in place,
+   * `Widget { .. }`, `Tagged(..)`, `Kind::Variant(..)` (#396). `made` also
+   * holds what a call hands back, which is right for refuting and wrong for
+   * confirming -- `B::new()` is B's own routine making one, not this body.
+   * A constant read, `= const StateID::ZERO;`, builds nothing and is left out.
+   */
+  built: Set<string>;
 }
 
 /** One crate's bodies, indexed the two ways a declaration can be found. */
@@ -217,6 +225,7 @@ function bodiesIn(mir: string): CompiledBody[] {
       drops: 0,
       words: new Set(),
       made: new Set(),
+      built: new Set(),
     };
     locals = new Map();
     all.push(open);
@@ -239,6 +248,7 @@ function bodiesIn(mir: string): CompiledBody[] {
       owner.drops += body.drops;
       for (const word of body.words) owner.words.add(word);
       for (const type of body.made) owner.made.add(type);
+      for (const type of body.built) owner.built.add(type);
     }
   }
   return kept;
@@ -321,7 +331,17 @@ function readBodyLine(line: string, body: CompiledBody, locals: Map<string, stri
     // Not a call, so a `Name {`, `Name(` or `Name;` on the right is a value built in place.
     const aggregate = line.match(AGGREGATE);
     if (aggregate && !/^(?:move|copy|const)$/.test(aggregate[1]!)) {
-      for (const segment of segmentsOf(stripGenerics(aggregate[1]!)).slice(-2)) body.made.add(segment);
+      const constant = /^\s+\S.*? = const /.test(line);
+      const [owner, last] = segmentsOf(stripGenerics(aggregate[1]!)).slice(-2) as [string, string?];
+      for (const segment of last === undefined ? [owner] : [owner, last]) body.made.add(segment);
+      /*
+       * What was built is one type. `HirFrame::ClassBytes(cls)` builds a
+       * `HirFrame`, and its variant shares a name with the `ClassBytes`
+       * struct the routine only wrapped (regex's `translate.rs`). Two
+       * type-shaped segments are an enum and its variant; a lowercase one
+       * first is a module, `hir::ClassBytes { .. }`.
+       */
+      if (!constant) body.built.add(last === undefined ? owner : /^[A-Z]/.test(owner) && /^[A-Z]/.test(last) ? owner : last);
     }
     return;
   }

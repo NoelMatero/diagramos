@@ -489,6 +489,14 @@ function compiledCreatesNone(routine: string, wanted: Set<string>, names: Constr
   if (!names?.side.compiled) return false;
   const compiled = compiledBodiesFor({ ...names.side, routine }, [...wanted]);
   if (!compiled || compiled.bodies.length === 0) return false;
+  /*
+   * A `#[cfg]` region the build switched off is code rustc never read, and
+   * one that makes a call could hand back a B without naming it --
+   * `#[cfg(feature = "extra")] { return h.first.clone().x; }`. Field
+   * initializers like anyhow's vtable (`object_boxed: object_boxed::<E>`)
+   * call nothing, so they don't block (#396).
+   */
+  if (compiled.unbuilt.some((region) => names.side.source.slice(region.start, region.end).includes("("))) return false;
   return compiled.bodies.every((body) => ![...wanted].some((name) => body.made.has(name)));
 }
 
@@ -1193,6 +1201,28 @@ export function constructions(
       if (evidence) return { verdict: "confirmed", evidence };
     }
     for (const [name, evidence] of made) if (!madeInstead.has(name)) madeInstead.set(name, evidence);
+  }
+
+  /*
+   * Rust: the text found no construction, and rustc's build may have (#396).
+   * `ParserNumber::F64(tri!(..))` is invisible to the text twice over -- the
+   * macro stops it, and an enum variant reads as a call -- and the compiled
+   * body writes it as an aggregate of `ParserNumber`. Only a value built in
+   * place confirms (`built`, not `made`): a B handed back by `B::new()` is
+   * B's routine making one. With a body to ask, a macro no longer blocks the
+   * guarded absence path below; with none, the answer is today's.
+   */
+  if (language === "rust" && names?.side.compiled) {
+    const compiled = compiledBodiesFor({ ...names.side, routine }, [...wanted]);
+    if (compiled && compiled.bodies.length > 0) {
+      const built = [...wanted].find((name) => compiled.bodies.some((body) => body.built.has(name)));
+      if (built) {
+        return { verdict: "confirmed", evidence: {
+          name: built, line: lineOf(source, routines[0]!.startIndex), wrote: "(built in place, by the compiler's build)",
+        } };
+      }
+      if (withheld === "macro") withheld = undefined;
+    }
   }
 
   if (withheld) return { verdict: "withheld", why: withheld };

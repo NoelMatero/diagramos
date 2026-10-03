@@ -1306,9 +1306,10 @@ export interface ClaimTally {
    */
   callsCompilable: number;
   /**
-   * `@builds` arrows with a Rust tail that every text rule would let say
-   * "creates none", waiting only on rustc's body for the routine (#362).
-   * The same question to the caller as `callsCompilable`, and
+   * `@builds` arrows with a Rust tail that rustc's body for the routine
+   * could answer: every text rule would let it say "creates none" (#362), or
+   * the text found no construction or stopped reading (#396). The same
+   * question to the caller as `callsCompilable`, and
    * `referee-live.ts` adds the two.
    */
   buildsCompilable: number;
@@ -5382,6 +5383,15 @@ export function checkDrift(
             recordEdge(edge, fromNode, toNode, { kind: "confirmed" });
             continue;
           }
+          /*
+           * A Rust body the text found nothing in, or stopped reading, is a
+           * question for rustc's build (#396): the live check starts it only
+           * when some arrow asks.
+           */
+          if (claimed && language === "rust" && (verdict.verdict === "absent"
+            || (verdict.verdict === "withheld" && /^(?:macro|computed|incomplete)$/.test(verdict.why)))) {
+            claims.buildsCompilable += 1;
+          }
           if (verdict.verdict === "withheld") {
             noteBuilt(verdict.why);
           } else if (verdict.verdict === "backwards") {
@@ -5435,7 +5445,6 @@ export function checkDrift(
             }, rests: WRITTEN /* every construction in the body was read; one the text cannot name (`type(self)(..)`, `self.__class__(..)`) already withholds (#387) */ });
             continue;
           }
-          if (claimed && verdict.verdict === "absent" && verdict.awaitsCompiler) claims.buildsCompilable += 1;
           if (claimed && ancestryUnanswered) claims.buildsUnsettled += 1;
           if (claimed && verdict.verdict === "absent" && verdict.notClosed) {
             claims.buildsNotClosed[verdict.notClosed] = (claims.buildsNotClosed[verdict.notClosed] ?? 0) + 1;
