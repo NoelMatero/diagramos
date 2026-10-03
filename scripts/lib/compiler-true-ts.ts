@@ -31,7 +31,8 @@ export interface TruePair {
    * What made it true. `written`: the name is in the text at the site.
    * Anything else is the compiler's alone -- `inferred` (no annotation),
    * `bound` (a type parameter's constraint), `alias` (written under another
-   * name), `ancestor` (a base of a base), `structural` (fits without naming
+   * name), `ancestor` (a base of a base), `inherited` (a member read on a
+   * class that has it from a parent), `structural` (fits without naming
    * it), `other-name` (a call or read spelled differently from what it lands on).
    */
   how: string;
@@ -261,6 +262,15 @@ export function typescriptTruePairs(ts: typeof TS, root: string, dirs: string[])
           const type = ts.isConstructorDeclaration(owner) ? owner.parent : owner;
           const name = headOf(checker.getSymbolAtLocation((type as TS.ClassDeclaration).name!) ?? undefined);
           if (name) add({ word: "accesses", from: routine.ref, to: `${home(name)}#${name}`, label: child.name.text, how: "written" });
+          /*
+           * And on the class the read goes through, when that class only has
+           * the member from a parent (#398): `c.base` on a `Child` is a read
+           * of Child's `base`, and a board draws it to Child.
+           */
+          const through = headOf(checker.getTypeAtLocation(child.expression).getSymbol());
+          if (name && through && through !== name) {
+            add({ word: "accesses", from: routine.ref, to: `${home(through)}#${through}`, label: child.name.text, how: "inherited" });
+          }
         }
       }
       ts.forEachChild(child, inner);

@@ -68,7 +68,7 @@
     "measure:door-reach": "NODE_OPTIONS=--max-old-space-size=8192 tsx scripts/measure-door-reach.mts",
     "measure:altitude": "tsx scripts/measure-altitude.mts",
     "measure:holds": "tsx scripts/measure-holds.mts",
-    "measure:inherited-members": "NODE_OPTIONS=--max-old-space-size=8192 tsx scripts/measure-inherited-members.mts",
+    "measure:inherited-members": "NODE_OPTIONS=--max-old-space-size=4096 tsx scripts/measure-inherited-members.mts",
     "measure:licence": "tsx scripts/measure-licence.mts",
     "measure:parts": "NODE_OPTIONS=--max-old-space-size=8192 tsx scripts/measure-parts.mts",
     "measure:rebind": "tsx scripts/measure-rebind.mts",
