@@ -133,7 +133,7 @@ async function measureOne(root: string): Promise<TreeResult> {
     const source = read(file);
     const language = languageOf(file);
     if (source === undefined || !language) return undefined;
-    return refereeTypes(source, language).find((type) => type.line === line)?.members;
+    return refereeTypes(source, language, true).find((type) => type.line === line)?.members;
   };
 
   for (const absolute of sourceFiles(root)) {
@@ -142,7 +142,7 @@ async function measureOne(root: string): Promise<TreeResult> {
     if ((language !== "ts" && language !== "tsx") || file.endsWith(".d.ts")) continue;
     const source = read(file)!;
     const lines = source.split("\n");
-    for (const type of refereeTypes(source, language as Language)) {
+    for (const type of refereeTypes(source, language as Language, true)) {
       const text = lines[type.line - 1] ?? "";
       const column = text.search(new RegExp(`\\b${type.name}\\b`));
       if (column < 0) continue;
