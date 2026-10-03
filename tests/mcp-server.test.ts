@@ -1540,7 +1540,7 @@ describe("the draw-time result names a longer route", () => {
     }));
     expect(result.notDirect).toEqual([
       'run() → render() is not a direct call: run → draw → render. Draw each step as a box, or mark '
-      + 'it a summary by giving arrow "run -> render" via: ["draw"].',
+      + 'it a summary: edit_diagram updates [{"id":"run -> render","via":["draw"]}].',
     ]);
   }, 120_000);
 
@@ -1555,7 +1555,7 @@ describe("the draw-time result names a longer route", () => {
     }));
     expect(result.notDirect).toEqual([
       'a.ts → b.ts is not a direct import: route/a.ts → route/helper.ts → route/b.ts. Draw each step '
-      + 'as a box, or mark it a summary by giving arrow "a -> b" via: ["route/helper.ts"].',
+      + 'as a box, or mark it a summary: edit_diagram updates [{"id":"a -> b","via":["route/helper.ts"]}].',
     ]);
   }, 120_000);
 
@@ -1576,6 +1576,15 @@ describe("the draw-time result names a longer route", () => {
       edges: [{ from: "run", to: "render", claim: "calls" }],
     }));
     expect(drawn.notDirect).toHaveLength(1);
+
+    // What Haiku sent in two of four runs: create_diagram's shape. It changed
+    // nothing and used to say so only as `updated: []`, which read as success.
+    const misaddressed = jsonOf(await call("edit_diagram", {
+      path: board,
+      edges: [{ from: "run", to: "render", via: ["draw"] }],
+    }));
+    expect(misaddressed.updated).toEqual([]);
+    expect(String(misaddressed.nothingChanged)).toContain('"id":"from -> to"');
 
     const marked = jsonOf(await call("edit_diagram", {
       path: board,

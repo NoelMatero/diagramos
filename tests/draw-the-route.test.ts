@@ -121,6 +121,14 @@ describe("an arrow that names its route is a summary on purpose", () => {
     expect(report.clean).toBe(true);
   });
 
+  it("reads a hop written with its call parentheses as the name", async () => {
+    // Haiku wrote `via: ["send()", ...]` in two of four runs (#375).
+    const report = checkDrift(
+      await boardOf("src/a.ts#run", "src/b.ts#render", { claim: "calls", via: ["draw()"] }),
+      fakeWorkspace(CHAIN), { edges: true });
+    expect(report.edges).toEqual([]);
+  });
+
   it("still says the route when via names a different one", async () => {
     const report = checkDrift(
       await boardOf("src/a.ts#run", "src/b.ts#render", { claim: "calls", via: ["paint"] }),

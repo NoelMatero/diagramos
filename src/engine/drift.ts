@@ -3040,13 +3040,15 @@ function oneLine(label: string): string {
  *
  * A hop is written the way the board would write it: a routine by its name,
  * a file by its path or the tail of one, with or without the extension --
- * `src/helper.ts`, `helper.ts` and `helper` all name `src/helper.ts`.
+ * `src/helper.ts`, `helper.ts` and `helper` all name `src/helper.ts`, and
+ * `load()` names `load`.
  */
 export function viaNamesRoute(via: readonly string[] | undefined, route: readonly string[]): boolean {
   const between = route.slice(1, -1);
   if (!via?.length || via.length !== between.length) return false;
   return between.every((found, index) => {
-    const written = via[index]!.trim().replace(/^\.\//, "");
+    // `send()` names `send`: Haiku wrote hops that way in two of four runs.
+    const written = via[index]!.trim().replace(/^\.\//, "").replace(/\(\s*\)$/, "");
     const bare = found.replace(/\.[A-Za-z0-9]+$/, "");
     return [found, bare].some((name) => name === written || name.endsWith(`/${written}`));
   });

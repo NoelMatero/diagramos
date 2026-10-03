@@ -616,9 +616,11 @@ function notDirectLines(
     const route = finding.route!;
     const word = finding.kind.split("-")[0]!;
     const ends = `${shortLabel(finding.fromLabel || route[0]!)} → ${shortLabel(finding.toLabel || route.at(-1)!)}`;
+    // The exact edit, because the agents measured for #375 who tried to act
+    // on a looser wording sent create_diagram's shape to edit_diagram.
     return `${ends} is not a direct ${STEP_NOUN[word] ?? word}: ${route.join(" → ")}. Draw each step as `
-      + `a box, or mark it a summary by giving arrow "${finding.node}" via: `
-      + `${JSON.stringify(route.slice(1, -1))}.`;
+      + `a box, or mark it a summary: edit_diagram updates `
+      + `${JSON.stringify([{ id: finding.node, via: route.slice(1, -1) }])}.`;
   });
   const held = routed.length - lines.length;
   return held > 0 ? [...lines, `+${held} more`] : lines;
@@ -1675,10 +1677,23 @@ server.registerTool(
           }));
         notes = drawTimeNotes(edited.report, edited.checkedWith);
       }
+      /*
+       * An edit that touched nothing says so (#375). Two of four Haiku runs
+       * sent `edges`, create_diagram's shape, got back `updated: []`, and
+       * took it for success: the arrow they meant to mark stayed unmarked.
+       */
+      const nothing = !result.updated.length && !result.deleted.length && !describes && !result.skipped.length;
       return text({
         wrote: relativeToWorkspace(file),
         updated: result.updated,
         deleted: result.deleted,
+        ...(nothing
+          ? {
+              nothingChanged:
+                'Nothing was changed: only updates, deletes and describes are read. A box is '
+                + '{"id":"<node id>", ...}; an arrow is {"id":"from -> to","via":[...]}.',
+            }
+          : {}),
         ...(describes ? { describes } : {}),
         ...(result.skipped.length ? { skipped: result.skipped, note: "No element has these ids." } : {}),
         ...notes,
