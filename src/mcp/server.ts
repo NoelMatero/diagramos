@@ -43,6 +43,7 @@ import {
   UNCONFIRMED_WORDS,
   type ClosedBodyReferee,
   type DriftReport,
+  type PickedAtRunTime,
   type UnconfirmedEdge,
 } from "../engine/drift";
 import {
@@ -165,13 +166,19 @@ const CLAIM_DESCRIPTION =
   + "holds: from is a type with a field of type to; red if no field has it. "
   + "builds: from's own code creates a to (one got from another function does not count); red "
   + "if backwards or if from creates none. "
-  + "calls: from calls to; red only if the arrow is backwards. A class at to means from creates "
-  + "one or calls its methods. "
+  + "calls: from calls to DIRECTLY; red only if the arrow is backwards. A class at to means from "
+  + "creates one or calls its methods. A longer route: draw the steps, or give via. A function "
+  + "picked from a table or match: one calls arrow to each choice. "
   + "accesses: from reads member of type to, and the member name goes in label; red if the type "
   + "lacks it. A class at from means one of its methods reads it. "
   + "conforms: from extends or implements to (subtype first); red in Python and TypeScript if the "
   + "base is not listed, never in Rust. "
   + "On a planned arrow a claim is checked only once the code lands.";
+
+/** What `via` says on an arrow, for every tool that writes one. */
+const VIA_DESCRIPTION =
+  "The steps between from and to, in order: routines for calls ['load', 'parse'], files for "
+  + "needs ['src/b.ts']. Marks an arrow drawn over several steps as a summary on purpose.";
 
 const nodeSchema = z.object({
   id: z.string().describe("Stable id, used by edges and later edits"),
@@ -244,13 +251,7 @@ const nodeSchema = z.object({
 const edgeSchema = z.object({
   from: z.string(),
   to: z.string(),
-  via: z
-    .array(z.string())
-    .optional()
-    .describe(
-      "Named hops between from and to, when the route matters: ['handle_logging', 'emit']. A "
-      + "break names the hop. Both ends must name symbols.",
-    ),
+  via: z.array(z.string()).optional().describe(VIA_DESCRIPTION),
   claim: z
     .enum(["needs", "depends", "feeds", "takes", "returns", "holds", "builds", "calls",
       "accesses", "conforms"])
@@ -589,6 +590,40 @@ function unconfirmedArrowNote(unconfirmed: ReadonlyArray<UnconfirmedEdge>): Reco
   };
 }
 
+/** What each word's steps are, for the line that names them (#375). */
+const STEP_NOUN: Record<string, string> = { calls: "call", needs: "import" };
+
+/**
+ * The arrows drawn as one step when the code takes several, one line each
+ * (#375).
+ *
+ * Every finding that knows the way the code really goes carries it as
+ * `route`, whichever word found it, so this reads that field and nothing
+ * else: a new word with the same reading gets its line without anybody
+ * coming back here. Said now because the author is an agent that can draw
+ * exactly what is true, and a board that keeps an arrow claiming a direct
+ * call that does not exist reads, later, the same as a mistake. The line
+ * offers both answers -- draw the steps, or say it is a summary -- and the
+ * second is `via`, the word arrows already had for naming their hops, which
+ * the check then compares against the route it found.
+ */
+function notDirectLines(
+  edges: ReadonlyArray<{ kind: string; node?: string; fromLabel?: string; toLabel?: string; route?: string[] }>,
+): string[] | undefined {
+  const routed = edges.filter((finding) => (finding.route?.length ?? 0) > 2);
+  if (routed.length === 0) return undefined;
+  const lines = routed.slice(0, ARROW_CAP).map((finding) => {
+    const route = finding.route!;
+    const word = finding.kind.split("-")[0]!;
+    const ends = `${shortLabel(finding.fromLabel || route[0]!)} → ${shortLabel(finding.toLabel || route.at(-1)!)}`;
+    return `${ends} is not a direct ${STEP_NOUN[word] ?? word}: ${route.join(" → ")}. Draw each step as `
+      + `a box, or mark it a summary by giving arrow "${finding.node}" via: `
+      + `${JSON.stringify(route.slice(1, -1))}.`;
+  });
+  const held = routed.length - lines.length;
+  return held > 0 ? [...lines, `+${held} more`] : lines;
+}
+
 /**
  * Everything the check has to say about a board the moment it is written.
  *
@@ -634,10 +669,13 @@ function checkedHere(
 
 function drawTimeNotes(drawn: {
   findings: ReadonlyArray<{ node: string; label?: string; ref: string; kind: string; detail: string }>;
-  edges: ReadonlyArray<{ kind: string; detail: string }>;
+  edges: ReadonlyArray<{
+    kind: string; detail: string; node?: string; fromLabel?: string; toLabel?: string; route?: string[];
+  }>;
   garbledClaims: ReadonlyArray<{ detail: string }>;
   workItems: ReadonlyArray<unknown>;
   unconfirmedEdges: ReadonlyArray<UnconfirmedEdge>;
+  pickedAtRunTime?: ReadonlyArray<PickedAtRunTime>;
   followed: ReadonlyArray<FollowedRef>;
   conceptAnchored?: number;
   conceptBoxes?: number;
@@ -654,6 +692,7 @@ function drawTimeNotes(drawn: {
    */
   const generated = drawn.findings.filter((finding) => finding.kind === "generated-ref");
   const wrongKindOfEnd = drawn.edges.filter((finding) => finding.kind === "end-lacks-part");
+  const notDirect = notDirectLines(drawn.edges);
   // Not a typo and not a plan: the code is there, the pointer can never reach
   // it. The finding's detail already says what to write instead (#286).
   const lines = drawn.findings.filter(pointsAtLines);
@@ -760,6 +799,20 @@ function drawTimeNotes(drawn: {
             + "result, no body, no fields at all. Move that end of the arrow to the declaration "
             + "the claim is about, or drop the claim -- left as is, the end-of-turn check reports "
             + "it to the user in red.",
+        }
+      : {}),
+    ...(notDirect ? { notDirect } : {}),
+    /*
+     * A routine that picks its callee from a list written in the code (#375),
+     * drawn as one arrow to one choice. The arrow can never be checked; the
+     * choices can, and the list is closed, so say which they are.
+     */
+    ...(drawn.pickedAtRunTime?.length
+      ? {
+          drawTheChoices: drawn.pickedAtRunTime.slice(0, ARROW_CAP).map((pick) =>
+            `${shortLabel(pick.label)} picks what to call at run time from ${pick.table}: one of `
+            + `${pick.names.join(", ")}. Draw a calls arrow to each choice, not one `
+            + `(not drawn yet: ${pick.missing.join(", ")}).`),
         }
       : {}),
     ...(drawn.workItems.length
@@ -1449,6 +1502,7 @@ server.registerTool(
               .describe(
       CLAIM_DESCRIPTION,
               ),
+            via: z.array(z.string()).optional().describe(VIA_DESCRIPTION),
           }),
         )
         .min(1),
@@ -1460,10 +1514,28 @@ server.registerTool(
       const { board, created } = await connectNodes(await readBoard(file), connections);
       await writeBoard(file, board);
       await followBoard(file);
+      /*
+       * An arrow that claims something gets the draw-time answer here too
+       * (#375), for the reason create_diagram does: the author is present
+       * now and gone by the time any check runs. An arrow claiming nothing
+       * asks nothing, so a plain connector costs no check, the guard
+       * edit_diagram keeps for a recolour.
+       */
+      let notes: Record<string, unknown> = {};
+      if (connections.some((connection) => connection.claim || connection.via?.length)) {
+        await initEngine();
+        const drawn = await checkedHere((referee) =>
+          checkDrift(board, createWorkspace(WORKSPACE_ROOT), {
+            trail: createGitTrail(WORKSPACE_ROOT),
+            ...(referee ? { closedBodyReferee: referee } : {}),
+          }));
+        notes = drawTimeNotes(drawn.report, drawn.checkedWith);
+      }
       return text({
         wrote: relativeToWorkspace(file),
         arrows: created,
         ...claimNote(connections),
+        ...notes,
       });
     }),
 );
@@ -1473,10 +1545,10 @@ server.registerTool(
   {
     title: "Edit diagram",
     description:
-      "Change part of a board without redrawing it. Patch a box or arrow by node id: ref, refs, "
-      + "state, closed, handles, a colour, a size. Delete by id (a shape takes its label). Set the whole "
+      "Change part of a board without redrawing it. Patch a box by node id (ref, refs, state, "
+      + "closed, handles) or an arrow by \"from -> to\" (via); a colour, a size. Delete by id (a shape takes its label). Set the whole "
       + "board's describes with the top-level field. Everything you do not name stays. Read the "
-      + "board first. The response re-checks anchors after a ref, state or describes change: fix "
+      + "board first. The response re-checks anchors after a ref, state, via or describes change: fix "
       + "what it names. Cannot add or remove boxes (create_diagram) or change the flow "
       + "(relayout_diagram).",
     inputSchema: {
@@ -1532,6 +1604,10 @@ server.registerTool(
                   "Set the case set on a routine box, or {of, cases} to say which dispatch. An "
                   + "empty array drops the claim.",
                 ),
+              via: z
+                .array(z.string())
+                .optional()
+                .describe(`On an arrow (id "from -> to"). ${VIA_DESCRIPTION} An empty array drops it.`),
             })
             .passthrough(),
         )
@@ -1584,7 +1660,8 @@ server.registerTool(
           || payload.ref !== undefined
           || payload.refs !== undefined
           || payload.state !== undefined
-          || payload.closed !== undefined;
+          || payload.closed !== undefined
+          || payload.via !== undefined;
       });
       let notes: Record<string, unknown> = {};
       // Switching describes changes what every box on the board is checked

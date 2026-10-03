@@ -531,6 +531,8 @@ export interface Connection {
   bidirectional?: boolean;
   /** What kind of relationship the arrow asserts. Written into customData and onto the label. */
   claim?: ArrowClaim;
+  /** The hops between the two ends, as create_diagram's edges take them (#375). */
+  via?: string[];
 }
 
 /**
@@ -670,11 +672,15 @@ export async function connectNodes(
         to: (to.customData as { node?: string } | undefined)?.node ?? String(to.id),
         ...(connection.claim ? { claim: connection.claim } : {}),
       },
+      via: trimmedList(connection.via),
     };
   });
 
   const customData = new Map(
-    skeletons.map(({ skeleton, semantic }) => [skeleton.id, { edge: semantic }]),
+    skeletons.map(({ skeleton, semantic, via }) => [
+      skeleton.id,
+      { edge: semantic, ...(via.length ? { via } : {}) },
+    ]),
   );
   const created = await convertSkeletons(
     skeletons.map(({ skeleton }) => skeleton),
@@ -730,7 +736,7 @@ export async function connectNodes(
  * lets the guidance point four changed refs at this tool instead of at a
  * forty-six box redraw.
  */
-const ANCHOR_FIELDS = ["ref", "refs", "state", "closed", "handles"] as const;
+const ANCHOR_FIELDS = ["ref", "refs", "state", "closed", "handles", "via"] as const;
 
 function trimmedList(value: unknown): string[] {
   return Array.isArray(value)
@@ -787,6 +793,13 @@ function anchorEdit(
     if (closed) existing.claim = { closed: true, through: trimmedList(closed.through) };
     else delete existing.claim;
   }
+  if (patch.via !== undefined) {
+    // An arrow's named route, as create_diagram writes it (#375). `via: []`
+    // drops it, the way `refs: []` drops a box's extra anchors.
+    const via = trimmedList(patch.via);
+    if (via.length) existing.via = via;
+    else delete existing.via;
+  }
   if (patch.handles !== undefined) {
     // `handles: []` is how a box drops the claim, the same way `refs: []` drops
     // its extra anchors: an empty case set states nothing, so it cannot be a
@@ -824,8 +837,16 @@ export function applyEdits(
   // A real element id always wins, so a node called the same thing as some
   // element cannot shadow it.
   const byNodeId = new Map<string, string>();
-  for (const node of readGraph(board).nodes) {
+  const graph = readGraph(board);
+  for (const node of graph.nodes) {
     if (!byId.has(node.id)) byNodeId.set(node.id, node.elementId);
+  }
+  // An arrow by its two ends, `from -> to`, which is how every report names
+  // one (#375): the draw-time result says which arrow to mark, and an id the
+  // caller was never shown is not one it can pass back.
+  for (const edge of graph.edges) {
+    const key = `${edge.from} -> ${edge.to}`;
+    if (!byId.has(key) && !byNodeId.has(key)) byNodeId.set(key, edge.elementId);
   }
   const resolve = (id: string) => (byId.has(id) ? id : byNodeId.get(id) ?? id);
 
@@ -863,7 +884,7 @@ export function applyEdits(
     // out here and folded in below.
     const {
       id: _ignoredId, type: _ignoredType, customData: _ignoredCustom,
-      ref: _ref, refs: _refs, state: _state, closed: _closed, ...safe
+      ref: _ref, refs: _refs, state: _state, closed: _closed, via: _via, ...safe
     } = patch;
     const custom = anchorEdit(element, patch);
     return {

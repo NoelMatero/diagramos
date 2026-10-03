@@ -42,6 +42,7 @@ import {
 } from "./claim";
 import { checkClosed, type ClosedBreach } from "./closed";
 import { checkHandles, type HandlesWithheld } from "./handles";
+import { runTimeChoices } from "./choices";
 import { connects, refIsStale, type CodeGraphOption } from "./codegraph";
 import { readDependencies, readerCanPlace } from "./deps";
 import type { BindingFault } from "./damage";
@@ -560,6 +561,14 @@ export interface EdgeDriftFinding {
   node: string;
   kind: EdgeFindingKind;
   detail: string;
+  /**
+   * The way the code really goes, ends included, on a finding that says an
+   * arrow drawn as one step takes several (#375): routines for `calls`, files
+   * for `needs`. One field for every word with that reading, so whoever tells
+   * the author -- the draw-time result above all -- names the route without
+   * knowing which word found it or parsing a sentence back apart.
+   */
+  route?: string[];
 }
 
 /**
@@ -1547,6 +1556,19 @@ export interface DeletedEdgeFinding {
   detail: string;
 }
 
+/** A routine that picks among written-down functions, and what the board leaves out. */
+export interface PickedAtRunTime {
+  /** The routine's node id. */
+  node: string;
+  label: string;
+  /** The table it picks from, as its code writes it. */
+  table: string;
+  /** Every function the table holds. */
+  names: string[];
+  /** The ones no `calls` arrow from this box points at yet. */
+  missing: string[];
+}
+
 export interface DriftReport {
   clean: boolean;
   findings: DriftFinding[];
@@ -1659,6 +1681,16 @@ export interface DriftReport {
    * `edgesChecked` minus these is what came back confirmed.
    */
   unconfirmedEdges: UnconfirmedEdge[];
+  /**
+   * Routines on this board that pick a function at run time from a closed
+   * list, drawn as one `calls` arrow to one of the choices (#375).
+   *
+   * Never a verdict: those arrows are reported exactly as before. This is the
+   * list the draw-time result turns into "draw the choices", and an entry
+   * goes away once the board has an arrow from the routine to each of them.
+   * Absent when there is nothing to say.
+   */
+  pickedAtRunTime?: PickedAtRunTime[];
   /**
    * Every red the gate was asked about (#393), and what became of it: shown,
    * withdrawn on the compiler's word, or withheld for resting on what the code
@@ -2996,6 +3028,30 @@ function oneLine(label: string): string {
   return label.replace(/\s+/g, " ").trim();
 }
 
+/**
+ * Whether an arrow's `via` names the hops the code was found taking (#375).
+ *
+ * The one marker for a summary drawn on purpose, whatever the word. An arrow
+ * drawn as one step when the code takes several is told the route at draw
+ * time; writing that route into `via` says "I know, this arrow is the whole
+ * path", and the check then has the route to compare rather than a promise.
+ * So it is compared, hop by hop, and a `via` naming some other route changes
+ * nothing.
+ *
+ * A hop is written the way the board would write it: a routine by its name,
+ * a file by its path or the tail of one, with or without the extension --
+ * `src/helper.ts`, `helper.ts` and `helper` all name `src/helper.ts`.
+ */
+export function viaNamesRoute(via: readonly string[] | undefined, route: readonly string[]): boolean {
+  const between = route.slice(1, -1);
+  if (!via?.length || via.length !== between.length) return false;
+  return between.every((found, index) => {
+    const written = via[index]!.trim().replace(/^\.\//, "");
+    const bare = found.replace(/\.[A-Za-z0-9]+$/, "");
+    return [found, bare].some((name) => name === written || name.endsWith(`/${written}`));
+  });
+}
+
 function symbolsOf(node: { ref?: string; refs?: string[] }, file: string): string[] {
   if (!languageOf(file)) return [];
   const anchors = [node.ref, ...(node.refs ?? [])];
@@ -3538,6 +3594,10 @@ export function checkDrift(
   const unannotated: UnannotatedFinding[] = [];
   const unreadEdges: UnreadEdgeFinding[] = [];
   const unconfirmedEdges: UnconfirmedEdge[] = [];
+  /** Closed run-time picks met on a `calls` arrow, by routine node and table (#375). */
+  const picks = new Map<string, Omit<PickedAtRunTime, "missing">>();
+  /** Every name a `calls` arrow from each node points at, to say which choices are drawn. */
+  const callsDrawn = new Map<string, Set<string>>();
   const gated: GatedRed[] = [];
   /** Arrows read through a box marked external that is code here, and the sentence saying so (#366). */
   const markedWrongly = new Map<string, string>();
@@ -4932,12 +4992,15 @@ export function checkDrift(
              * is left standing, the reading `calls-one-level-up` gives.
              */
             edgesChecked += 1;
-            if (!strict) {
+            const route = [fromPath, ...needs.via, toPath];
+            // A `via` naming these files is the summary on purpose (#375):
+            // the chain is what the arrow says, as it is for `@depends`.
+            if (!strict || viaNamesRoute(edge.via, route)) {
               recordEdge(edge, fromNode, toNode, { kind: "confirmed" });
               continue;
             }
             const hops = needs.via.length + 1;
-            const route = `it gets there in ${hops} steps, through ${needs.via.join(" -> ")}`;
+            const through = `it gets there in ${hops} steps, through ${needs.via.join(" -> ")}`;
             recordEdge(edge, fromNode, toNode, { kind: "finding", finding: {
               from: fromPath,
               to: toPath,
@@ -4949,11 +5012,12 @@ export function checkDrift(
               detail:
                 `this arrow says ${oneLine(fromNode.label) || fromPath} needs `
                 + `${oneLine(toNode.label) || toPath}, and ${fromPath} does not import it -- `
-                + `${route}. `
+                + `${through}. `
                 + (needs.mayAccuse
                   ? `@needs means the import written in ${fromPath}. Draw the hop, or say `
                     + `\`claim: "depends"\`, which is this chain and is true.`
                   : `Draw the hop, or leave the arrow where it is and read it as "depends on".`),
+              route,
             }, rests: needsRests(needs.unplaced) });
             continue;
           }
@@ -5660,6 +5724,11 @@ export function checkDrift(
        * as every other claim here is.
        */
       if (edge.claim === "calls" && (claimed || edge.state === "planned")) {
+        for (const name of toEnd.symbols) {
+          const drawn = callsDrawn.get(edge.from) ?? new Set<string>();
+          drawn.add(name);
+          callsDrawn.set(edge.from, drawn);
+        }
         const noteCalled = (why: CallsWithheld | EdgeSkipReason) => {
           if (claimed) claims.callsWithheld[why] = (claims.callsWithheld[why] ?? 0) + 1;
           unanswered(why);
@@ -5806,27 +5875,39 @@ export function checkDrift(
               { ...head, names: toEnd.symbols },
               { cache: reachCache, ...declarationAsked },
             );
-            /** The advisory a ruled-out accusation turns into. */
-            const oneLevelUp = (via: string[], hops: number): EdgeOutcome => ({
-              kind: "finding",
-              finding: {
-                from: fromPath,
-                to: toPath,
-                fromLabel: fromNode.label,
-                toLabel: toNode.label,
-                fromRef,
-                toRef,
-                kind: "calls-one-level-up",
-                detail:
-                  `this arrow says ${oneLine(fromNode.label) || fromPath} calls `
-                  + `${oneLine(toNode.label) || toPath}, and it does not call it directly -- `
-                  + `it gets there in ${hops} step${hops === 1 ? "" : "s"}, through `
-                  + `${via.join(" -> ")}. Draw the hop, or leave the arrow where it is and `
-                  + `read it as the whole path.`,
-              },
-              // Advisory: never a red, so the gate does not read it.
-              rests: WRITTEN,
-            });
+            /**
+             * The advisory a ruled-out accusation turns into -- unless the
+             * arrow already says it is this route (#375). `via` naming the
+             * routines the walk went through is a summary drawn on purpose,
+             * and the walk is that route checked, every hop a placed call.
+             */
+            const oneLevelUp = (via: string[], hops: number): EdgeOutcome => {
+              if (viaNamesRoute(edge.via, via)) {
+                if (claimed) claims.callsConfirmed += 1;
+                return { kind: "confirmed" };
+              }
+              return {
+                kind: "finding",
+                finding: {
+                  from: fromPath,
+                  to: toPath,
+                  fromLabel: fromNode.label,
+                  toLabel: toNode.label,
+                  fromRef,
+                  toRef,
+                  kind: "calls-one-level-up",
+                  detail:
+                    `this arrow says ${oneLine(fromNode.label) || fromPath} calls `
+                    + `${oneLine(toNode.label) || toPath}, and it does not call it directly -- `
+                    + `it gets there in ${hops} step${hops === 1 ? "" : "s"}, through `
+                    + `${via.join(" -> ")}. Draw the hop, or leave the arrow where it is and `
+                    + `read it as the whole path.`,
+                  route: via,
+                },
+                // Advisory: never a red, so the gate does not read it.
+                rests: WRITTEN,
+              };
+            };
 
             if (verdict.verdict === "confirmed") {
               if (claimed) claims.callsConfirmed += 1;
@@ -5834,8 +5915,27 @@ export function checkDrift(
               recordEdge(edge, fromNode, toNode, { kind: "confirmed" });
               continue;
             }
+            /*
+             * A routine that picks its callee out of a table can neither
+             * confirm nor refute "calls this one" (#375), and reaches here
+             * as a withheld verdict or an absence that could not close. When
+             * the table is written down and holds the far end, the true
+             * drawing is an arrow to each choice; `choices.ts` reads which,
+             * and the draw-time result says so. No verdict is touched.
+             */
+            const notePicks = () => {
+              if (edge.state === "planned") return;
+              for (const choice of runTimeChoices(tail.source, tail.language, fromEnd.symbols[0]!)) {
+                if (!toEnd.symbols.some((name) => choice.names.includes(name))) continue;
+                picks.set(`${edge.from} | ${choice.table}`, {
+                  node: edge.from, label: oneLine(fromNode.label) || edge.from, table: choice.table, names: choice.names,
+                });
+              }
+            };
+
             if (verdict.verdict === "withheld") {
               noteCalled(verdict.why);
+              notePicks();
             } else if (verdict.verdict === "backwards" && edge.state !== "planned") {
               /*
                * A `planned` arrow reaching here is a sketch whose code went in
@@ -6002,6 +6102,7 @@ export function checkDrift(
                   (claims.callsNotClosed[verdict.notClosed] ?? 0) + 1;
               }
               unanswered(NOT_CLOSED_WORDS[verdict.notClosed]);
+              notePicks();
             }
           }
         }
@@ -7080,6 +7181,7 @@ export function checkDrift(
     unreadEdges,
     ...(anchorableEdges > 0 ? { anchorableEdges } : {}),
     unconfirmedEdges,
+    ...pickedNote(picks, callsDrawn),
     gated,
     ...(graph.strayArrows > 0 ? { strayArrows: graph.strayArrows } : {}),
     // Read off the graph rather than recomputed: one answer, so no two channels
@@ -7090,6 +7192,17 @@ export function checkDrift(
     // nothing is wrong, which is where it matters most.
     vocabulary: [...DRIFT_KINDS, ...EDGE_FINDING_KINDS],
   };
+}
+
+/** The run-time picks whose choices the board has not drawn yet, as a report field. */
+function pickedNote(
+  picks: ReadonlyMap<string, Omit<PickedAtRunTime, "missing">>,
+  callsDrawn: ReadonlyMap<string, ReadonlySet<string>>,
+): { pickedAtRunTime?: PickedAtRunTime[] } {
+  const open = [...picks.values()]
+    .map((pick) => ({ ...pick, missing: pick.names.filter((name) => !callsDrawn.get(pick.node)?.has(name)) }))
+    .filter((pick) => pick.missing.length > 0);
+  return open.length ? { pickedAtRunTime: open } : {};
 }
 
 /**
