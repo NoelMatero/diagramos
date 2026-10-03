@@ -298,7 +298,6 @@ async function rustPairs(root: string): Promise<{ pairs: Pair[]; referee: Closed
   // Types declared once in the repository, and where.
   const sources = new Map<string, string>();
   const declared = new Map<string, string[]>();
-  const enums = new Set<string>();
   for (const file of files) {
     const source = readFileSync(path.join(root, file), "utf8");
     sources.set(file, source);
@@ -308,7 +307,6 @@ async function rustPairs(root: string): Promise<{ pairs: Pair[]; referee: Closed
       if (!/^(struct|enum)_item$/.test(node.type)) return;
       const name = node.childForFieldName("name")?.text;
       if (name) declared.set(name, [...(declared.get(name) ?? []), file]);
-      if (name && node.type === "enum_item") enums.add(name);
     });
   }
   const home = (name: string) => {
@@ -375,7 +373,7 @@ async function rustPairs(root: string): Promise<{ pairs: Pair[]; referee: Closed
       if (!unique) continue;
       const makes = new Map<string, Pair["how"]>();
       for (const list of lists) {
-        for (const [made, how] of mirMakes(list, enums)) {
+        for (const [made, how] of mirMakes(list)) {
           const was = makes.get(made);
           if (!was || rank.indexOf(how) > rank.indexOf(was)) makes.set(made, how);
         }
@@ -453,9 +451,11 @@ function rawBodies(mir: string): Map<string, string[][]> {
  * An enum value is named by its enum (#396): rustc prints `Value::Null`,
  * `HirFrame::ClassUnicode(..)`, and the type built is `Value`, not `Null`.
  * Before this, those were filed as "only got it from a call" whenever the
- * body also got a `Value` back from one.
+ * body also got a `Value` back from one -- and a variant of a library's enum
+ * that shares a name with a repository struct (serde's `Unexpected::Map`,
+ * json's `Map`) was counted as building that struct.
  */
-function mirMakes(texts: string[], enums: ReadonlySet<string>): Map<string, Pair["how"]> {
+function mirMakes(texts: string[]): Map<string, Pair["how"]> {
   const base = (type: string) =>
     type.replace(/^(&(mut )?|\*(const|mut) )+/, "").replace(/'\w+ /g, "").split("<")[0]!.split("::").pop()!.trim();
   const locals = new Map<string, string>();
@@ -473,8 +473,10 @@ function mirMakes(texts: string[], enums: ReadonlySet<string>): Map<string, Pair
     if (!/ -> \[/.test(line)) {
       const aggregate = line.match(/^\s+(?:\(?\*?)?_\d+[^=]*= ((?:\w+::)*)(\w+)(?:::<[^;]*?>)?(?:::(\w+))?\s*[{(;]/);
       if (aggregate && !/^(move|copy|const)$/.test(aggregate[2]!)) {
+        // `Value::Null`, `Unexpected::Map(..)`: a type-shaped segment before the last is the enum,
+        // whether or not the repository declares it; a lowercase one is a module.
         const owner = aggregate[1]!.split("::").filter(Boolean).pop();
-        note(owner && enums.has(owner) && !aggregate[3] ? owner : aggregate[2]!, "aggregate");
+        note(owner && /^[A-Z]/.test(owner) && !aggregate[3] ? owner : aggregate[2]!, "aggregate");
       }
       continue;
     }
