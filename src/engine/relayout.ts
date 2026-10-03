@@ -21,7 +21,7 @@
  * which is what makes a same-direction re-layout byte-identical to the board it
  * started from -- the property the whole file format rests on.
  */
-import { readLabelClaim, type ArrowClaim } from "./claim";
+import { ARROW_CLAIMS, readLabelClaim, type ArrowClaim } from "./claim";
 import type { BoardFile } from "./board-file";
 import {
   connectNodes,
@@ -78,7 +78,9 @@ function stateOf(value: unknown): NodeState | undefined {
 /** The claim recorded on an arrow, only when it is one the vocabulary knows. */
 function arrowClaimOf(value: unknown): ArrowClaim | undefined {
   const claim = (value as { claim?: unknown } | undefined)?.claim;
-  return claim === "needs" || claim === "feeds" ? claim : undefined;
+  // The whole vocabulary, from the list that defines it: a hand-written pair
+  // here dropped every word added after it, `calls` included.
+  return (ARROW_CLAIMS as readonly unknown[]).includes(claim) ? claim as ArrowClaim : undefined;
 }
 
 export interface RecoveredDiagram {
