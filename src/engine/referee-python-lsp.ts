@@ -59,7 +59,7 @@
  * and answers every query after that over the same connection.
  */
 import type { ChildProcessWithoutNullStreams } from "node:child_process";
-import { readFileSync } from "node:fs";
+import { readdirSync, readFileSync, type Dirent } from "node:fs";
 import path from "node:path";
 import { fileURLToPath, pathToFileURL } from "node:url";
 
@@ -371,7 +371,7 @@ export interface PyrightLspReferee {
 
 /** `PyrightLspReferee.typePartsAt`'s answer: named parts only (see `TypePart.at`). */
 export interface PythonTypeParts {
-  parts: Array<{ name: string }>;
+  parts: Array<{ name: string; expanded?: true }>;
   whole: boolean;
 }
 
@@ -424,6 +424,18 @@ export function hoverType(hover: string): string | undefined {
 }
 
 /**
+ * What an alias stands for, from pyright's hover on its name:
+ * `(type) QueryParamTypes = QueryParams | Mapping[str, ...] | str | bytes`,
+ * with every alias inside it printed out too. `undefined` for a hover that
+ * shows anything else.
+ */
+export function aliasExpansion(hover: string, name: string): string | undefined {
+  const head = hover.split(/\n\s*\n/)[0]!.trim();
+  const escaped = name.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+  return new RegExp(String.raw`^\(type(?: alias)?\)\s+${escaped}\s*=\s*([\s\S]+)$`).exec(head)?.[1]?.trim();
+}
+
+/**
  * The names a type pyright printed is made of (#393), the type variables in it
  * still to be read, and whether pyright saw all of it.
  *
@@ -435,7 +447,15 @@ export function hoverType(hover: string): string | undefined {
  * `Color` -- which can only add a name, and an extra name only ever withdraws
  * a red.
  */
-export function pythonTypeNames(type: string): { names: string[]; typeVars: string[]; whole: boolean } {
+export function pythonTypeNames(
+  type: string,
+  /**
+   * Read `Any` as written rather than unseen: what an alias's own declaration
+   * says, which pyright prints when the alias is hovered (#416). `Unknown` is
+   * never written.
+   */
+  anyIsWritten = false,
+): { names: string[]; typeVars: string[]; whole: boolean } {
   const text = type
     .replace(/(["'])(?:\\.|(?!\1).)*\1/g, "")
     .replace(/\b[A-Za-z_]\w*\s*:(?!:)/g, "");
@@ -444,7 +464,8 @@ export function pythonTypeNames(type: string): { names: string[]; typeVars: stri
   let whole = true;
   for (const token of text.match(/[A-Za-z_][\w.]*(?:@[A-Za-z_]\w*)?/g) ?? []) {
     const [name, scope] = token.split("@") as [string, string | undefined];
-    if (name === "Unknown" || name === "Any") { whole = false; continue; }
+    if (name === "Unknown" || (name === "Any" && !anyIsWritten)) { whole = false; continue; }
+    if (name === "Any") continue;
     if (scope !== undefined) {
       if (name === "Self") names.push(scope); else typeVars.push(name);
       continue;
@@ -569,6 +590,40 @@ export async function warmUpAcross<T>(
     await sleep(retryMs[attempt]!);
   }
 }
+
+/**
+ * Every `.py` and `.pyi` file under `root` and every directory holding one,
+ * repo-relative, skipping what is never the project's own source. `undefined`
+ * past a cap, which leaves every module possibly here.
+ */
+function pythonTree(root: string): { files: string[]; directories: Set<string> } | undefined {
+  const SKIP = new Set([".git", "node_modules", ".venv", "venv", "__pycache__", "site-packages", ".tox", ".mypy_cache"]);
+  const files: string[] = [];
+  const directories = new Set<string>();
+  const pending = [""];
+  let seen = 0;
+  while (pending.length > 0) {
+    const at = pending.pop()!;
+    let entries: Dirent[];
+    try { entries = readdirSync(path.join(root, at), { withFileTypes: true }); } catch { continue; }
+    for (const entry of entries) {
+      if ((seen += 1) > 400_000) return undefined;
+      const relative = at ? `${at}/${entry.name}` : entry.name;
+      if (entry.isDirectory() && !SKIP.has(entry.name)) pending.push(relative);
+      else if (entry.isFile() && /\.pyi?$/.test(entry.name)) {
+        files.push(relative);
+        if (at) directories.add(at);
+      }
+    }
+  }
+  return { files, directories };
+}
+
+/** Names pyright prints that are never an alias, so are not hovered to find out. */
+const PLAIN_TYPES = new Set([
+  "None", "str", "int", "float", "bool", "bytes", "complex", "object", "type", "list", "dict", "set", "frozenset",
+  "tuple", "Self", "Literal", "Callable", "Mapping", "Sequence", "Iterable", "Iterator", "Union", "Optional",
+]);
 
 export async function createPyrightLspReferee(root: string): Promise<PyrightLspReferee> {
   /*
@@ -981,15 +1036,47 @@ export async function createPyrightLspReferee(root: string): Promise<PyrightLspR
     const whole = declared === undefined ? undefined : await partsOfPrinted(file, source, declared);
     const narrowed = here === undefined ? undefined : await partsOfPrinted(file, source, here);
     if (!whole && !narrowed) return undefined;
-    const names = new Set([...(whole?.parts ?? []), ...(narrowed?.parts ?? [])].map((one) => one.name));
-    return { parts: [...names].map((one) => ({ name: one })), whole: whole?.whole ?? false };
+    const parts = new Map([...(whole?.parts ?? []), ...(narrowed?.parts ?? [])].map((one) => [one.name, one]));
+    return { parts: [...parts.values()], whole: whole?.whole ?? false };
   }
 
-  /** A printed type's parts, with each type variable read as its bound. */
+  /**
+   * What an alias pyright printed by its name stands for (#416), by hovering
+   * the name where this file writes it: pyright prints `params:
+   * QueryParamTypes | None` and stops, and on the alias's own name prints the
+   * whole of it. `undefined` when the name is not an alias, or not written here.
+   */
+  async function expansionOf(file: string, source: string, name: string): Promise<string | undefined> {
+    const escaped = name.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+    for (const use of [...source.matchAll(new RegExp(String.raw`(?<![\w.])${escaped}\b`, "g"))].slice(0, 6)) {
+      const hover = await hoverTextAt(file, source, use.index!);
+      if (!hover) continue;
+      return aliasExpansion(hover, name);
+    }
+    return undefined;
+  }
+
+  /**
+   * A printed type's parts, with each type variable read as its bound and
+   * each alias by what it stands for (#416). The alias's own name stays among
+   * them, marked `expanded`, so an arrow drawn to the alias itself still finds
+   * it. An `Any` an alias writes is written, as `json: Any` on a signature is:
+   * the alias is code somebody wrote, and pyright prints it as written.
+   */
   async function partsOfPrinted(file: string, source: string, printed: string): Promise<PythonTypeParts> {
     const read = pythonTypeNames(printed);
     const names = [...read.names];
     let whole = read.whole;
+    const expanded = new Set<string>();
+    for (const name of read.names) {
+      if (PLAIN_TYPES.has(name)) continue;
+      const expansion = await expansionOf(file, source, name);
+      if (expansion === undefined) continue;
+      expanded.add(name);
+      const within = pythonTypeNames(expansion, true);
+      names.push(...within.names);
+      if (!within.whole || within.typeVars.length > 0) whole = false;
+    }
     for (const typeVar of read.typeVars) {
       const bound = await boundOf(file, source, typeVar);
       if (bound === undefined) { whole = false; continue; }
@@ -997,7 +1084,7 @@ export async function createPyrightLspReferee(root: string): Promise<PyrightLspR
       names.push(...within.names);
       if (!within.whole || within.typeVars.length > 0) whole = false;
     }
-    return { parts: [...new Set(names)].map((one) => ({ name: one })), whole };
+    return { parts: [...new Set(names)].map((one) => (expanded.has(one) ? { name: one, expanded: true } : { name: one })), whole };
   }
 
   async function fitsAt(
@@ -1025,7 +1112,28 @@ export async function createPyrightLspReferee(root: string): Promise<PyrightLspR
     const written = source.slice(start, end);
     const last = written.lastIndexOf(".") + 1;
     if (last >= written.length) return undefined;
-    return (await askLocation("definition", file, source, start + last, STEADY_RETRY_MS))?.file;
+    const found = (await askLocation("definition", file, source, start + last, STEADY_RETRY_MS))?.file;
+    if (found !== undefined || written.startsWith(".")) return found;
+    /*
+     * A module pyright cannot find, and no file here could be (#416):
+     * poetry's `poetry.core.packages.package` is the separate `poetry-core`
+     * distribution, not installed in the clone, and the repository has no
+     * `poetry/core` of its own. A module is a file whose path ends in its
+     * dotted name, so with none of those here it is a library's. Said as a
+     * place outside the tree, which is how every library's answer comes back.
+     */
+    return couldBeHere(written.split(".")) ? undefined : path.join(path.dirname(root), "<not installed>", written);
+  }
+
+  /** Every Python file and directory under the root, repo-relative, read once; `undefined` past the cap. */
+  let tree: { files: string[]; directories: Set<string> } | undefined | null = null;
+  function couldBeHere(parts: string[]): boolean {
+    if (tree === null) tree = pythonTree(root);
+    if (tree === undefined) return true;
+    const module = parts.join("/");
+    const ends = (one: string, tail: string) => one === tail || one.endsWith(`/${tail}`);
+    return tree.files.some((one) => [".py", ".pyi", "/__init__.py", "/__init__.pyi"].some((suffix) => ends(one, module + suffix)))
+      || [...tree.directories].some((one) => ends(one, module));
   }
 
   async function memberAt(

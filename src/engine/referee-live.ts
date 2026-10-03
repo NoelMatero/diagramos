@@ -84,17 +84,25 @@ type LiveLanguage = (typeof LIVE_LANGUAGES)[number];
 export const SERVER_BUDGET_MS = 12_000;
 
 /**
- * How many times the recording pass runs before the answers are taken as
+ * How many times the recording pass may run before the answers are taken as
  * final.
  *
- * One, and the reasoning is `scripts/check-drift.mjs`'s, measured there: a
- * `@calls` closed-body check reads one file's bodies, so every question it
- * will ever ask is asked on the first pass. The cross-file walk is not like
- * that -- it reaches a second file only by placing a call in the first -- but
- * each further round buys one more hop and costs another twenty seconds, on a
- * check that runs every turn.
+ * Three, as `scripts/check-drift.mjs` has, and a round runs only when the one
+ * before it raised a question nobody had asked yet (#416). It was one, on the
+ * reasoning that a body's questions are all asked on the first pass. They are
+ * not: an answer can be what lets a reading finish, and a finished reading
+ * files a red that asks a question of its own. flask's
+ * `open_instance_resource -> request_context` closes only once "go to
+ * definition" has placed `os.path.join` and `open`; its red then asks what
+ * `request_context` is on each value handed to them -- seven questions the
+ * recording pass never saw, so pyright was never asked, and the red was
+ * withdrawn as though pyright had no answer. A second round asks them.
+ *
+ * Each question is asked once across the rounds, answered or not, so a
+ * question pyright cannot answer does not buy a round of its own. A board
+ * whose first round raises nothing new pays nothing more.
  */
-const ROUNDS = 1;
+const ROUNDS = 3;
 
 /** Which second opinion a check actually got, for the board to report (#334). */
 export interface RefereeNote {
@@ -263,14 +271,16 @@ export async function refereedCheckLive(
   const compilable = new Set<string>();
   let crates: Promise<CompiledCrates> | undefined;
 
+  /** Every question put to a server in any round, so none is asked twice. */
+  const asked = Object.fromEntries((Object.keys(BATCHES) as Kind[]).map((kind) => [kind, new Set<string>()])) as
+    Record<Kind, Set<string>>;
+
   try {
     for (let round = 0; round < ROUNDS; round += 1) {
       const noQueries = (): Record<(typeof BATCHES)[Kind], Query[]> => ({
         receivers: [], definitions: [], kinds: [], ancestors: [], typeParts: [], fits: [], imports: [], members: [],
       });
       const fresh: Record<LiveLanguage, Record<(typeof BATCHES)[Kind], Query[]>> = { python: noQueries(), rust: noQueries() };
-      const asked = Object.fromEntries((Object.keys(BATCHES) as Kind[]).map((kind) => [kind, new Set<string>()])) as
-        Record<Kind, Set<string>>;
 
       /*
        * The recording referee. TypeScript is answered for real even on this

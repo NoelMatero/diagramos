@@ -80,10 +80,11 @@ describe("TypeScript, a base of a base", () => {
       ["observer.ts#Leaf", "param.ts#Unrelated", "conforms"],
       // A global base leaves the repository, which nothing here can be a base of.
       ["observer.ts#Failure", "param.ts#Unrelated", "conforms"],
-      // A generic's fit depends on its arguments, so the compiler does not say (#395).
+      // A generic's fit depends on its arguments (#395) -- except that it has
+      // no `other`, which no argument gives it (#416).
       ["observer.ts#ObserverOptions", "param.ts#Unrelated", "conforms"],
     ]);
-    expect(each.map((one) => one.reds)).toEqual([["conforms-absent"], ["conforms-absent"], []]);
+    expect(each.map((one) => one.reds)).toEqual([["conforms-absent"], ["conforms-absent"], ["conforms-absent"]]);
   }, 60_000);
 });
 
