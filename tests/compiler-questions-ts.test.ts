@@ -100,6 +100,7 @@ beforeAll(() => {
     "export function fallback(e = new Engine()): Engine { return e; }",
     "export class Dog { name(): string { return 'd'; } }",
     "export class Rock { weight = 1; }",
+    "export class Held { value = 1; }",
     "export class Never {",
     "  spare;",
     "}",
@@ -201,8 +202,12 @@ describe("fitsAt: whether a class fits an interface nobody wrote `implements` fo
     expect(referee.fitsAt!(CAR, at(CAR, "class Rock", "Rock"), place("interface Named", "Named").at)).toBe(false);
   });
 
-  it("cannot say for a generic interface, whose answer depends on its arguments", () => {
-    expect(referee.fitsAt!(CAR, at(CAR, "class Dog", "Dog"), place("interface Box", "Box").at)).toBeUndefined();
+  it("cannot say for a generic interface a class has every member of, whose answer depends on its arguments", () => {
+    expect(referee.fitsAt!(CAR, at(CAR, "class Held", "Held"), place("interface Box", "Box").at)).toBeUndefined();
+  });
+
+  it("says no for a generic interface a class lacks a member of, whatever its arguments (#416)", () => {
+    expect(referee.fitsAt!(CAR, at(CAR, "class Dog", "Dog"), place("interface Box", "Box").at)).toBe(false);
   });
 });
 
