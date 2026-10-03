@@ -29,9 +29,16 @@ describe("the rule", () => {
   });
 
   it("withholds a red that rests on what is not written when the compiler cannot say or is not there", () => {
-    expect(gateRed({ written: false, ask: says(undefined) }, referee)).toMatchObject({ stands: false, why: "rests-on-unwritten" });
+    expect(gateRed({ written: false, ask: says(undefined) }, referee)).toMatchObject({ stands: false, why: "compiler-could-not-say" });
     expect(gateRed({ written: false, ask: says(true) }, undefined)).toMatchObject({ stands: false, why: "rests-on-unwritten" });
     expect(gateRed({ written: false }, referee)).toMatchObject({ stands: false, why: "rests-on-unwritten" });
+  });
+
+  it("says the compiler could not settle it only when the compiler was asked (#416)", () => {
+    expect(gateRed({ written: false, ask: () => ({ does: undefined, said: "the compiler gave no answer about `x`" }) }, referee))
+      .toMatchObject({ stands: false, why: "compiler-could-not-say", said: "the compiler gave no answer about `x`" });
+    expect(gateRed({ written: false, ask: () => ({ does: undefined, unasked: true }) }, referee))
+      .toMatchObject({ stands: false, why: "rests-on-unwritten" });
   });
 });
 

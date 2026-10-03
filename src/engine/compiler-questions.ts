@@ -70,6 +70,12 @@ export interface DeclaredAt {
 export interface TypePart {
   name: string;
   at?: DeclaredAt | "outside";
+  /**
+   * An alias the compiler also said the parts of, which are listed beside it
+   * (#416). pyright prints an alias by its name and stops; a part without
+   * this is one nobody looked inside.
+   */
+  expanded?: true;
 }
 
 /** `typePartsAt`'s answer. */
