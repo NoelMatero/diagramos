@@ -99,7 +99,7 @@ export function createClosedBodyReferee(root: string): ClosedBodyReferee | undef
 export function tsQuestions(
   ts: NonNullable<ReturnType<typeof createTsReferee>>,
   root: string,
-): Pick<ClosedBodyReferee, "typePartsAt" | "fitsAt" | "importTargetAt" | "memberAt"> {
+): Pick<ClosedBodyReferee, "typePartsAt" | "fitsAt" | "importTargetAt" | "memberAt" | "parentsOutsideAt"> {
   return {
     typePartsAt: (file, at) => {
       if (languageOf(file) === "python" || languageOf(file) === "rust") return undefined;
@@ -129,6 +129,10 @@ export function tsQuestions(
     memberAt: (file, at, name) => {
       if (languageOf(file) === "python" || languageOf(file) === "rust") return undefined;
       return ts.memberAt(path.resolve(root, file), at.start, at.end, name)?.map((one) => placed(one.file, one.line, root));
+    },
+    parentsOutsideAt: (file, at) => {
+      if (languageOf(file) === "python" || languageOf(file) === "rust") return undefined;
+      return ts.ancestorsAt(path.resolve(root, file), at.start, at.end)?.some((one) => isOutsideTree(one.file, root));
     },
   };
 }

@@ -80,11 +80,27 @@
  */
 import { mayAccuse } from "./licence";
 import { writtenName } from "./lines";
+import type { MemberTarget } from "./compiler-questions";
 import {
-  declaresField, each, INSTANCE_NAMES, MEMBER_ACCESS, parseSource, qualifiedTail,
+  declaresField, each, INSTANCE_NAMES, languageOf, MEMBER_ACCESS, parseSource, qualifiedTail,
   type Language, type Node,
 } from "./parse";
 import { memberReadsIn } from "./resolution";
+
+/**
+ * The compiler's view of a type with a parent (#398), each question asked at
+ * a range of the type's own file. `undefined` from any of them is no answer.
+ */
+export interface InheritedMembers {
+  /** Every declaration `name` lands on for a value of the type declared here. */
+  memberAt: (at: { start: number; end: number }, name: string) => MemberTarget[] | undefined;
+  /** Every class and interface it derives from, in the repository. */
+  ancestorsAt: (at: { start: number; end: number }) => Array<{ file: string; line: number }> | undefined;
+  /** Whether any of those is declared outside the repository. */
+  parentsOutsideAt: (at: { start: number; end: number }) => boolean | undefined;
+  /** A repo-relative file's text, or `undefined` when it cannot be read. */
+  read: (file: string) => string | undefined;
+}
 
 /**
  * Why no verdict was reached. Every one of these is a reason to stay quiet, and
@@ -535,6 +551,8 @@ export function declaresMember(
   names: string[],
   member: string,
   language: Language,
+  /** Asked only when a TypeScript type has a parent, which is where the text stops (#398). */
+  inherited?: InheritedMembers,
 ): TypeEnd {
   const tree = parseSource(source, language);
   if (!tree) return { why: "unreadable" };
@@ -575,7 +593,14 @@ export function declaresMember(
       const value = declaration.childForFieldName("value");
       if (value?.type !== "object_type") { withheld = "aliased"; continue; }
     }
-    if (hasParent(declaration)) { withheld = "inherited"; continue; }
+    if (hasParent(declaration)) {
+      const said = inherited && (language === "ts" || language === "tsx")
+        ? inheritedMember(declaration, member, inherited)
+        : undefined;
+      if (said === true) return { declares: true };
+      // A no lets the type's own list answer, below; no answer withholds.
+      if (said === undefined) { withheld = "inherited"; continue; }
+    }
 
     const body = declaration.type === "object_type"
       ? declaration
@@ -599,6 +624,49 @@ export function declaresMember(
 
   if (withheld) return { why: withheld };
   return { declares: false, members: listed };
+}
+
+/**
+ * Whether the TypeScript type declared here has `member` once its parents
+ * count (#398): `true`, `false`, or `undefined` when nobody can say.
+ *
+ * The compiler's member list is a yes whenever it lands anywhere. Its "none"
+ * is only half a no: it leaves out a parent's `#private` fields (TanStack's
+ * `InfiniteQueryObserver` inherits `#client`), an implemented interface's
+ * optional member the class never declares (nest's `Logger.setLogLevels`),
+ * and, asked at a class's name, every inherited `static`. So a no also needs
+ * every parent's own text to name it nowhere, in any spelling. A parent
+ * outside the repository, or one whose file can't be read, is no answer.
+ */
+function inheritedMember(declaration: Node, member: string, inherited: InheritedMembers): boolean | undefined {
+  const name = declaration.childForFieldName("name");
+  if (!name) return undefined;
+  const at = { start: name.startIndex, end: name.startIndex + name.text.length };
+  const lands = inherited.memberAt(at, member);
+  if (lands === undefined) return undefined;
+  if (lands.length > 0) return true;
+
+  if (inherited.parentsOutsideAt(at) !== false) return undefined;
+  const ancestors = inherited.ancestorsAt(at);
+  if (!ancestors || ancestors.length === 0) return undefined;
+  for (const ancestor of ancestors) {
+    const text = inherited.read(ancestor.file);
+    const language = languageOf(ancestor.file);
+    if (text === undefined || !language) return undefined;
+    const tree = parseSource(text, language);
+    if (!tree || tree.rootNode.hasError) return undefined;
+    let found: Node | undefined;
+    each(tree.rootNode, (node) => {
+      if (found || !TYPE_DECLARATION.test(node.type)) return;
+      const own = node.childForFieldName("name");
+      if (own && lineOf(text, own.startIndex) === ancestor.line) found = node;
+    });
+    const body = found?.childForFieldName("body");
+    if (!body) return undefined;
+    const members = membersIn(body);
+    if (spellings(member).some((one) => members.has(one))) return true;
+  }
+  return false;
 }
 
 /**
@@ -698,11 +766,12 @@ export function memberAccesses(
   member: string | undefined,
   language: Language,
   type: { source: string; names: string[]; language: Language },
+  inherited?: InheritedMembers,
 ): AccessesVerdict {
   const named = memberNamed(member);
   if (!named) return { verdict: "withheld", why: "no-member-named" };
 
-  const declared = declaresMember(type.source, type.names, named, type.language);
+  const declared = declaresMember(type.source, type.names, named, type.language, inherited);
   if ("why" in declared) return { verdict: "withheld", why: declared.why };
   /*
    * The last gate, and the only one here that is about us rather than about the

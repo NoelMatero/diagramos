@@ -402,7 +402,12 @@ function ownParts(body: string): string[] {
   return parts;
 }
 
-export function refereeTypes(source: string, language: Language): RefereeType[] {
+export function refereeTypes(
+  source: string,
+  language: Language,
+  /** Keep the declarations that name a parent, members as written (#398's question is about exactly those). */
+  withParents = false,
+): RefereeType[] {
   const header = HEADER.get(language);
   const member = MEMBER.get(language);
   if (!header || !member) return [];
@@ -433,7 +438,7 @@ export function refereeTypes(source: string, language: Language): RefereeType[] 
       // An inherited member list is not closed, and the reader says so. The
       // referee drops the declaration rather than offering members it knows the
       // reader will refuse: a refusal counted as a miss is a lie about recall.
-      if (headerHasParent(line, language)) { current = undefined; continue; }
+      if (!withParents && headerHasParent(line, language)) { current = undefined; continue; }
       current = { name: start[1]!, members: [], line: index + 1 };
       found.push(current);
       byName.set(current.name, current);
