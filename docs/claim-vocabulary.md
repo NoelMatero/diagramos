@@ -104,6 +104,26 @@ files is somebody reading the architecture, and 26 of the 243 file pairs Haiku
 drew on the planted set are that shape. [Item 44](#forty-two-times-a-measurement-contradicted-the-design)
 has the numbers.
 
+**Since #375 a summary can say it is one.** Every finding with that reading
+(`calls-one-level-up`, `needs-one-level-up`, `needs-indirect`) carries the
+route it found as `route`, and the draw-time result names it to the agent while
+it is still drawing. The marker for "this arrow is the whole path, on purpose"
+is `via`, which arrows already had for naming their hops: a `calls` or `needs`
+arrow whose `via` names exactly the hops the walk found is confirmed, so the
+route is checked rather than promised. A `via` naming any other route changes
+nothing, and `@depends` stays the import word for "through any number of
+files". No `bench:planted` arrow carries `via`, so the bench is unchanged
+(1,264 arrows, 0 flipped).
+
+The same issue counted the other shape an uncheckable `calls` arrow takes: a
+routine that picks its callee from a table at run time. On the corpus (tests
+excluded) that is 89 TypeScript and 67 Python call sites and no Rust ones, and
+about 15 of them pick among the project's own functions from a table written
+out in source; the rest take any string. `choices.ts` reads those few and the
+draw-time result says "draw an arrow to each choice". It never decides a
+verdict, and `@handles` was not stretched to carry it: `@handles` is a box's
+claim about the arms of a `match`, and "runs one of these" is a set of arrows.
+
 ### Never refuting
 
 `@feeds` asks where a *value travels*, and a value can reach the far end through

@@ -1506,3 +1506,148 @@ describe("saying which check a board got (#334)", () => {
     expect(said, `checkedWith was ${JSON.stringify(checked.checkedWith)}`).toContain("pyright");
   }, 180_000);
 });
+
+/**
+ * An arrow drawn as one step when the code takes several, said at draw time
+ * (#375): by every tool that writes an arrow, never for a direct one, and not
+ * again once the arrow says it is a summary.
+ */
+describe("the draw-time result names a longer route", () => {
+  const CHAIN = {
+    "route/a.ts": 'import { draw } from "./helper";\nexport function run() { return draw(1); }\n',
+    "route/helper.ts": 'import { render } from "./b";\nexport function draw(n: number) { return render(n); }\n',
+    "route/b.ts": 'export function render(n: number) { return n; }\nexport function direct() { return render(2); }\n',
+  };
+  const NODES = [
+    { id: "run", label: "run()", ref: "route/a.ts#run" },
+    { id: "render", label: "render()", ref: "route/b.ts#render" },
+    { id: "direct", label: "direct()", ref: "route/b.ts#direct" },
+  ];
+
+  beforeAll(async () => {
+    await mkdir(path.join(workspace, "route"), { recursive: true });
+    for (const [file, source] of Object.entries(CHAIN)) await writeFile(path.join(workspace, file), source);
+  });
+
+  it("names the steps for a chained calls arrow, and nothing for a direct one", async () => {
+    const result = jsonOf(await call("create_diagram", {
+      path: "docs/diagrams/route.excalidraw",
+      nodes: NODES,
+      edges: [
+        { from: "run", to: "render", claim: "calls" },
+        { from: "direct", to: "render", claim: "calls" },
+      ],
+    }));
+    expect(result.notDirect).toEqual([
+      'run() → render() is not a direct call: run → draw → render. Draw each step as a box, or mark '
+      + 'it a summary: edit_diagram updates [{"id":"run -> render","via":["draw"]}].',
+    ]);
+  }, 120_000);
+
+  it("names the files for a needs arrow that only gets there through another", async () => {
+    const result = jsonOf(await call("create_diagram", {
+      path: "docs/diagrams/route-needs.excalidraw",
+      nodes: [
+        { id: "a", label: "a.ts", ref: "route/a.ts" },
+        { id: "b", label: "b.ts", ref: "route/b.ts" },
+      ],
+      edges: [{ from: "a", to: "b", claim: "needs" }],
+    }));
+    expect(result.notDirect).toEqual([
+      'a.ts → b.ts is not a direct import: route/a.ts → route/helper.ts → route/b.ts. Draw each step '
+      + 'as a box, or mark it a summary: edit_diagram updates [{"id":"a -> b","via":["route/helper.ts"]}].',
+    ]);
+  }, 120_000);
+
+  it("says nothing for an arrow that already names its route", async () => {
+    const result = jsonOf(await call("create_diagram", {
+      path: "docs/diagrams/route-summary.excalidraw",
+      nodes: NODES,
+      edges: [{ from: "run", to: "render", claim: "calls", via: ["draw"] }],
+    }));
+    expect(result.notDirect).toBeUndefined();
+  }, 120_000);
+
+  it("goes quiet when edit_diagram marks the arrow a summary", async () => {
+    const board = "docs/diagrams/route-edit.excalidraw";
+    const drawn = jsonOf(await call("create_diagram", {
+      path: board,
+      nodes: NODES.slice(0, 2),
+      edges: [{ from: "run", to: "render", claim: "calls" }],
+    }));
+    expect(drawn.notDirect).toHaveLength(1);
+
+    // What Haiku sent in two of four runs: create_diagram's shape. It changed
+    // nothing and used to say so only as `updated: []`, which read as success.
+    const misaddressed = jsonOf(await call("edit_diagram", {
+      path: board,
+      edges: [{ from: "run", to: "render", via: ["draw"] }],
+    }));
+    expect(misaddressed.updated).toEqual([]);
+    expect(String(misaddressed.nothingChanged)).toContain('"id":"from -> to"');
+
+    const marked = jsonOf(await call("edit_diagram", {
+      path: board,
+      updates: [{ id: "run -> render", via: ["draw"] }],
+    }));
+    expect(marked.updated).toHaveLength(1);
+    expect(marked.notDirect).toBeUndefined();
+    const checked = jsonOf(await call("check_drift", { path: board }));
+    expect(JSON.stringify(checked)).not.toContain("one-level-up");
+  }, 120_000);
+
+  it("names the steps when connect_nodes draws the arrow", async () => {
+    const board = "docs/diagrams/route-connect.excalidraw";
+    await call("create_diagram", { path: board, nodes: NODES.slice(0, 2) });
+    const plain = jsonOf(await call("connect_nodes", {
+      path: board,
+      connections: [{ from: "render", to: "run" }],
+    }));
+    // A connector that claims nothing asks nothing, and costs no check.
+    expect(plain.notDirect).toBeUndefined();
+    expect(plain.checkedWith).toBeUndefined();
+
+    const claimed = jsonOf(await call("connect_nodes", {
+      path: board,
+      connections: [{ from: "run", to: "render", claim: "calls" }],
+    }));
+    expect(String((claimed.notDirect as string[] | undefined)?.[0])).toContain("run → draw → render");
+  }, 120_000);
+
+  it("names the choices when a routine picks its callee from a closed list", async () => {
+    await writeFile(path.join(workspace, "route", "cmd.ts"),
+      'import { render, direct } from "./b";\nconst handlers = { render, direct };\n'
+      + 'export function pick(k: keyof typeof handlers) { return handlers[k](1); }\n'
+      + 'const open: Record<string, (n: number) => number> = { render };\n'
+      + 'export function lookup(k: string) { return open[k](1); }\n');
+    const nodes = [
+      { id: "pick", label: "pick()", ref: "route/cmd.ts#pick" },
+      { id: "lookup", label: "lookup()", ref: "route/cmd.ts#lookup" },
+      { id: "render", label: "render()", ref: "route/b.ts#render" },
+      { id: "direct", label: "direct()", ref: "route/b.ts#direct" },
+    ];
+    const one = jsonOf(await call("create_diagram", {
+      path: "docs/diagrams/route-choices.excalidraw",
+      nodes,
+      edges: [
+        { from: "pick", to: "render", claim: "calls" },
+        // An open lookup: any string can come in, so nothing new is said.
+        { from: "lookup", to: "render", claim: "calls" },
+      ],
+    }));
+    expect(one.drawTheChoices).toEqual([
+      "pick() picks what to call at run time from handlers: one of render, direct. Draw a calls "
+      + "arrow to each choice, not one (not drawn yet: direct).",
+    ]);
+
+    const all = jsonOf(await call("create_diagram", {
+      path: "docs/diagrams/route-choices.excalidraw",
+      nodes,
+      edges: [
+        { from: "pick", to: "render", claim: "calls" },
+        { from: "pick", to: "direct", claim: "calls" },
+      ],
+    }));
+    expect(all.drawTheChoices).toBeUndefined();
+  }, 120_000);
+});

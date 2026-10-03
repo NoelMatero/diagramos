@@ -34,8 +34,8 @@ Follow these every time.
 6. **Read every draw and edit response, and fix what it names in the same
    turn** with `edit_diagram`: `pointsAtNothing`, `pointsAtLineNumbers`,
    `pointsAtQualifiedNames`, `pointsAtBuildOutput`, `conceptPointsHere`,
-   `garbledClaims`, an unviewable size. Correct the ref; never delete a ref to
-   make a finding go away.
+   `garbledClaims`, `notDirect`, `drawTheChoices`, an unviewable size. Correct
+   the ref; never delete a ref to make a finding go away.
 7. **Do not render to find out whether it worked.** The draw response already
    says whether the board is legible. Render once, at the end, to show a person.
 8. **Never redraw what the user drew.** Hand-drawn elements are the spec.
@@ -161,9 +161,14 @@ used before.
 | `returns` | the function returns this type | type → function | the type is not the return type |
 | `holds` | the type has a field of that type | container → field type | no field has that type |
 | `builds` | from makes a value of that type | maker → type made | the arrow is backwards |
-| `calls` | from calls to | caller → callee | the arrow is backwards |
+| `calls` | from calls to directly | caller → callee | the arrow is backwards |
 | `accesses` | from reads a member of to; the member name is the `label` | reader → type | the type has no such member |
 | `conforms` | from extends or implements to | subtype → base | the base is not listed (not in Rust) |
+
+- **`calls` means a direct call.** For a longer route, draw the steps, or mark
+  the arrow a summary with `via`: the steps in between, `via: ["load", "parse"]`.
+- **If code chooses a function from a table or a match, draw the choices**: one
+  `calls` arrow to each, not one arrow.
 
 ```
 edges: [
