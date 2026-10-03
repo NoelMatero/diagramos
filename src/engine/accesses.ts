@@ -85,7 +85,7 @@ import {
   declaresField, each, INSTANCE_NAMES, languageOf, MEMBER_ACCESS, parseSource, qualifiedTail,
   type Language, type Node,
 } from "./parse";
-import { memberReadsIn } from "./resolution";
+import { memberReadsIn, type HandedWhole, type RoutineReads } from "./resolution";
 
 /**
  * The compiler's view of a type with a parent (#398), each question asked at
@@ -207,6 +207,12 @@ export interface NotReadEvidence {
   line: number;
   /** How many distinct members it does read, none of them this one. */
   reads: number;
+  /**
+   * Every value it hands on whole (#388), from every routine of the name.
+   * Whatever receives one may read every member it has, and only the caller
+   * can ask what that is.
+   */
+  handed: HandedWhole[];
 }
 
 export type AccessesVerdict =
@@ -228,7 +234,9 @@ export type AccessesVerdict =
    *
    * Not yet a red. `drift.ts` stays quiet when a function the routine calls
    * visibly reads the member, because `draw --calls--> paint --accesses-->
-   * Config` is the right board and this arrow is only drawn a level too high.
+   * Config` is the right board and this arrow is only drawn a level too high;
+   * and when it hands the Config whole to something that may read every
+   * field of it, `JSON.stringify(c)` (#388).
    */
   | { verdict: "not-read"; evidence: NotReadEvidence }
   /**
@@ -838,7 +846,7 @@ function closedByName(
   if (matching.some((one) => one.sites.length === 0 || one.hazards.length > 0)) return undefined;
   const members = new Set(matching.flatMap((one) => one.sites.map((site) => site.member)));
   if (readsMember(members, member)) return undefined;
-  return { routine, line: matching[0]!.line, reads: members.size };
+  return { routine, line: matching[0]!.line, reads: members.size, handed: matching.flatMap((one) => one.handed) };
 }
 
 /**
@@ -851,6 +859,22 @@ export function membersReadByName(source: string, routine: string, language: Lan
   const matching = reading.routines.filter((one) => one.routine !== "" && one.routine === routine);
   if (matching.length === 0) return undefined;
   return new Set(matching.flatMap((one) => one.sites.map((site) => site.member)));
+}
+
+/** Every routine of this name, as the reader read it, for `drift.ts` to follow a value handed to one (#388). */
+export function routinesReadByName(source: string, routine: string, language: Language): RoutineReads[] {
+  const reading = memberReadsIn(source, language);
+  if (!reading.read) return [];
+  return reading.routines.filter((one) => one.routine !== "" && one.routine === routine);
+}
+
+/** The innermost named routine holding this 1-based line, as the reader read it (#388). */
+export function routineReadAt(source: string, line: number, language: Language): RoutineReads | undefined {
+  const reading = memberReadsIn(source, language);
+  if (!reading.read) return undefined;
+  return reading.routines
+    .filter((one) => one.routine !== "" && one.line <= line && line <= one.endLine)
+    .sort((a, b) => (a.endLine - a.line) - (b.endLine - b.line))[0];
 }
 
 /**

@@ -382,6 +382,33 @@ describe("paths written anywhere else", () => {
     };
     expect(depsOf(files, "src/lib.rs")).toEqual(["src/generated.rs"]);
   });
+
+  it("counts what an `include!`d file uses as the including file's own (#389)", () => {
+    /*
+     * rustc pastes the text in, so `gen_body.rs`'s paths are module `gen`'s
+     * paths, resolved from `gen.rs` -- including a short name `gen.rs` bound.
+     */
+    const files = {
+      "Cargo.toml": MANIFEST,
+      "src/lib.rs": "pub mod util;\npub mod money;\npub mod gen;\n",
+      "src/util.rs": "pub fn double(x: i64) -> i64 { x * 2 }\n",
+      "src/money.rs": "pub struct Money(pub i64);\n",
+      "src/gen.rs": "use crate::money;\ninclude!(\"gen_body.rs\");\n",
+      "src/gen_body.rs": "use crate::util::double;\npub fn go() -> money::Money { money::Money(double(1)) }\n",
+    };
+    expect(depsOf(files, "src/gen.rs")).toEqual(["src/lib.rs", "src/money.rs", "src/gen_body.rs", "src/util.rs"]);
+  });
+
+  it("stops when two files `include!` each other", () => {
+    const files = {
+      "Cargo.toml": MANIFEST,
+      "src/lib.rs": "mod a;\nmod util;\n",
+      "src/util.rs": "pub fn u() {}\n",
+      "src/a.rs": "include!(\"b.rs\");\n",
+      "src/b.rs": "include!(\"a.rs\");\nuse crate::util::u;\n",
+    };
+    expect(depsOf(files, "src/a.rs")).toEqual(["src/b.rs", "src/lib.rs", "src/util.rs"]);
+  });
 });
 
 describe("crates, which the manifest decides and the directory does not", () => {
