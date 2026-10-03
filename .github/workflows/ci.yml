@@ -15,6 +15,17 @@ on:
 
 jobs:
   build:
+    # Twice, once per kind of Rust user. With rust-analyzer the live Rust tests
+    # run — sixteen files skip themselves without it, so a break in the checker's
+    # Rust compiler path went unseen here. Without it the runner's rustup proxy
+    # exits at once, which is the only test of a user who never installed it:
+    # that path hung a test for 180 s on #342. Neither arm stands in for the
+    # other, and fail-fast is off so a red says which one broke.
+    strategy:
+      fail-fast: false
+      matrix:
+        rust-analyzer: [installed, missing]
+    name: build (rust-analyzer ${{ matrix.rust-analyzer }})
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v5
@@ -44,10 +55,19 @@ jobs:
       # cargo, not the rust-src component.
       - run: rustup component add rust-src
 
+      - if: matrix.rust-analyzer == 'installed'
+        run: rustup component add rust-analyzer && rust-analyzer --version
+      # Proves the arm is what it says: if the runner image ever ships
+      # rust-analyzer, this arm would silently become the other one.
+      - if: matrix.rust-analyzer == 'missing'
+        run: "! rust-analyzer --version"
+
       - run: npm run typecheck
       - run: npm test
 
       # The live board, in a real browser: file to canvas and back. The status
       # pill and the side-by-side board isolation are only covered here, so
-      # without this step both could break with the suite still green.
-      - run: npm run test:e2e:board
+      # without this step both could break with the suite still green. It never
+      # touches Rust, so one arm is enough.
+      - if: matrix.rust-analyzer == 'installed'
+        run: npm run test:e2e:board
