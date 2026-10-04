@@ -18,6 +18,7 @@
 import { spawn, type ChildProcessWithoutNullStreams } from "node:child_process";
 import { existsSync, readFileSync } from "node:fs";
 import path from "node:path";
+import { PassThrough } from "node:stream";
 import { fileURLToPath, pathToFileURL } from "node:url";
 import ts from "typescript";
 import type { MessageConnection } from "vscode-jsonrpc/node";
@@ -136,9 +137,18 @@ async function lspTooling(language: "rust" | "python", root: string): Promise<To
     child.once("error", reject);
   });
   child.stderr.resume();
+  /*
+   * Written through a buffer, never to the child's stdin, as the product's
+   * `connectTo` does (#342): a write vscode-jsonrpc makes after `close()` has
+   * killed the server throws ERR_STREAM_DESTROYED where nothing can catch it,
+   * and took down a whole re-judge on regex (#424).
+   */
   const { StreamMessageReader, StreamMessageWriter, createMessageConnection } = await import("vscode-jsonrpc/node");
+  const toServer = new PassThrough();
+  child.stdin.on("error", () => { /* a server that is gone; its exit is the report */ });
+  toServer.pipe(child.stdin);
   const connection: MessageConnection = createMessageConnection(
-    new StreamMessageReader(child.stdout), new StreamMessageWriter(child.stdin));
+    new StreamMessageReader(child.stdout), new StreamMessageWriter(toServer));
   let closed = false;
   connection.onError(() => {});
   connection.onClose(() => { closed = true; });
