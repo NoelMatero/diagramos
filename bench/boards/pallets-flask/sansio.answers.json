@@ -447,8 +447,8 @@
       "toLabel": "deferred_functions",
       "language": "python",
       "source": "labelled",
-      "truth": "true",
-      "why": "the body constructs one here"
+      "truth": "undecidable",
+      "why": "it is named here but not plainly constructed"
     },
     {
       "id": "conforms|src/flask/sansio/blueprints.py#Blueprint|src/flask/sansio/blueprints.py#Blueprint|",
@@ -549,8 +549,8 @@
       "toLabel": "url_map",
       "language": "python",
       "source": "labelled",
-      "truth": "true",
-      "why": "the body constructs one here"
+      "truth": "false",
+      "why": "nothing in it makes one"
     },
     {
       "id": "builds|src/flask/sansio/app.py#App|src/flask/sansio/app.py#template_filter|",

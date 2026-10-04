@@ -709,6 +709,14 @@ export function createOracle(tooling: Tooling): Oracle {
     for (const name of names) for (const region of regions) {
       for (const m of blank.slice(region.start, region.end).matchAll(new RegExp(`\\b${escape(name)}\\b`, "g"))) {
         const at = region.start + m.index!;
+        /*
+         * The maker's own name, where a class is its own region: `class
+         * Blueprint(Scaffold):` declares Blueprint, and read as a use it was a
+         * call -- every Python class keyed as making itself, and every
+         * TypeScript class header a doubt ("named here but not plainly
+         * constructed").
+         */
+        if (at === maker.nameStart) continue;
         const after = blank.slice(at + name.length, at + name.length + 200);
         const before = blank.slice(Math.max(0, at - 30), at);
         const found = name === "Self" ? undefined : await resolve(maker.file, at);
