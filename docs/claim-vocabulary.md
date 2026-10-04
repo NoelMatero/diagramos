@@ -793,6 +793,45 @@ unannotated class attribute (`callback = None` is replaced by
 `self.callback = fn`). Both have to be written with an annotation to be
 answered.
 
+### A name nothing declares (#417)
+
+A box anchored at a parameter -- httpx's `**kwargs`, poetry's `level: str` --
+or at a loop variable or a Rust `let` read as no declaration at all, so no
+word's end-kind check was ever asked and "only a type can be made" never
+fired. These are now read, **only where nothing in the file declares the
+name** (a declared `ctx` beside a `ctx` parameter is read as the declaration,
+as before), and never where the file imports it. A binding is a value, so it
+is not a type; whether it can be called is what its written type says, by the
+same `couldBeCalled`, and no compiler is asked -- one question per parameter
+started pyright for arrows that never needed it.
+
+```
+npm run measure:bound-parts -- /Users/noelmatero/board-ai/.corpus/*
+```
+
+The referee is the call probe above, on the bindings: every name read as
+lacking, every occurrence of it.
+
+| language | part | wrong lacks | unjudged | agreed lacks |
+|---|---|---:|---:|---:|
+| python | callable | 0 | 707 | 934 |
+| python | type | 0 | 14,311 | 3,031 |
+| ts | callable | 0 | 607 | 1,748 |
+| ts | type | 0 | 4,704 | 10,165 |
+| rust | both | -- | 11,714 | -- |
+
+Most of the unjudged are where the probe cannot write a line: mypy refuses
+pydantic's and django's trees outright (duplicate module names), an arrow
+function with an expression body has no statement to follow, and a name that
+is also a method or property is a function the probe does not call a value.
+Rust has no probe; its readings are `couldBeCalled` on the written type, the
+rule `measure:parts` measured on Rust's fields and values. The probe placed a
+line between a decorator and its `def` until this measurement found it.
+
+On `bench:planted` this read 7 more wrong arrows red (4 `@builds` into a
+parameter or loop variable, 3 `@calls` into a parameter) and turned none
+back.
+
 ### What #301's test set says
 
 `npm run bench:planted`, 855 planted and drawn mistakes and 428 true claims:

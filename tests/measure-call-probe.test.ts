@@ -120,6 +120,12 @@ describe.skipIf(!hasMypy || !hasPython)("Python", () => {
     "def unchecked() -> None:",
     "    skipped = {'a': 1}",
     "",
+    "",
+    "def register(app: Base, limit: int) -> None:",
+    "    @no_type_check",
+    "    def inner() -> None:",
+    "        pass",
+    "",
   ].join("\n");
 
   const answersFor = (sites: [string, string][]) => {
@@ -142,6 +148,12 @@ describe.skipIf(!hasMypy || !hasPython)("Python", () => {
 
   it("reaches a class attribute declared with no value, and a TypedDict key", () => {
     expect(answersFor([["size: int", "size"], ["tags: list", "tags"]])).toEqual(["lacks", "lacks"]);
+  });
+
+  it("reaches a parameter whose body opens with a decorated def (#417)", () => {
+    // The probe went between the decorator and its `def`, and mypy refused the
+    // whole tree: flask's tests, pydantic's, django's.
+    expect(answersFor([["def register(", "limit"]])).toEqual(["lacks"]);
   });
 
   it("gives no answer inside @no_type_check, where a checker reveals types and reports nothing", () => {

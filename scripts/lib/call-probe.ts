@@ -387,7 +387,11 @@ for path, sites in request.items():
         return lines[node.lineno - 1][:node.col_offset].strip() == ""
     def before_body(body):
         first = body[0]
-        return (first.lineno - 1, first.col_offset) if own_line(first) else None
+        # A decorated def or class starts at its first decorator, which ast
+        # does not count as its line: a probe there splits the decorator off.
+        # The indent is the def's own; a decorator's column is past its @.
+        line = min([first.lineno] + [one.lineno for one in getattr(first, "decorator_list", [])])
+        return (line - 1, first.col_offset) if own_line(first) else None
     placed = {}
     tail = []
     def place(line, name, where):
