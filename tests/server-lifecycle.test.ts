@@ -439,6 +439,12 @@ describe("diagramos stop", () => {
       env: { ...process.env, DIAGRAMOS_PORT: String(port), DIAGRAMOS_NO_OPEN: "1", DIAGRAMOS_STATE_DIR: stateDir },
     });
     expect(await until(async () => (await probeBoard(port)) !== undefined)).toBe(true);
+    /*
+     * A service registers only once it is listening, so it answers on its
+     * port a moment before `stop` can find it. On a slow CI runner `stop`
+     * landed in that moment and said "no board services running".
+     */
+    expect(await until(async () => (await listServers()).running.some((entry) => entry.port === port))).toBe(true);
 
     const { code, stdout } = await run(["stop"]);
     expect(code).toBe(0);
