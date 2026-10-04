@@ -33,6 +33,8 @@ export interface CompilerSaid {
   does: boolean | undefined;
   /** The answer in a sentence, for the report and for somebody reading why a red went. */
   said?: string;
+  /** The question did not apply to this red, so nothing was put to the compiler. */
+  unasked?: true;
 }
 
 /**
@@ -52,8 +54,19 @@ export interface RedRests {
 /** A red resting only on what the code writes, and on no question: presence reds (drawn backwards). */
 export const WRITTEN: RedRests = { written: true };
 
-/** Why a red did not stand. */
-export type GateWithdrawn = "compiler-says-it-does" | "rests-on-unwritten";
+/**
+ * Why a red did not stand.
+ *
+ * `compiler-could-not-say` and `rests-on-unwritten` were one reason until
+ * #416, and in 13 of the 14 bench arrows filed under it the thing it called
+ * unwritten was written: a compiler had been asked and had not settled it --
+ * an import it could not find, a class with type parameters, an alias it
+ * printed by name. Told "the code does not write this down", an agent writes
+ * a type that changes nothing (#410 tried it: 0 arrows moved). So a red the
+ * compiler was asked about says what it asked and what came back, and
+ * `rests-on-unwritten` is left for a red no compiler was there to ask.
+ */
+export type GateWithdrawn = "compiler-says-it-does" | "compiler-could-not-say" | "rests-on-unwritten";
 
 export type GateVerdict =
   | { stands: true; asked: boolean; said?: string }
@@ -69,6 +82,9 @@ export function gateRed(rests: RedRests, referee: ClosedBodyReferee | undefined)
   const said = answer?.said;
   if (answer?.does === true) return { stands: false, why: "compiler-says-it-does", asked, ...(said ? { said } : {}) };
   if (answer?.does === false || rests.written) return { stands: true, asked, ...(said ? { said } : {}) };
+  if (referee && asked && !answer?.unasked) {
+    return { stands: false, why: "compiler-could-not-say", asked, said: said ?? "the compiler gave no answer" };
+  }
   return {
     stands: false, why: "rests-on-unwritten", asked,
     ...(said ? { said } : {}),
@@ -106,7 +122,13 @@ export function unwrittenNames(sites: Site[]): string[] {
  *
  * The whole file rather than the one declaration's list, because a method's
  * `T` may be the class's or the `impl`'s, and a reader here cannot walk up.
- * Too many names only ever withholds.
+ *
+ * Too many names withholds, and withholding is not free (#416). Python's
+ * grammar uses one node for a declared list, `class A[T]`, and for a use,
+ * `dict[str, Any]`, so every type ever written in brackets in a file was
+ * taken for a type parameter: `method: str` in httpx's `Request` and
+ * pydantic's whole `config: ConfigDict | dict[str, Any] | ...` read as not
+ * written, and wrong arrows on both were withdrawn.
  */
 export function typeParametersIn(root: Node, source: string): Set<string> {
   const names = new Set<string>();
@@ -114,15 +136,14 @@ export function typeParametersIn(root: Node, source: string): Set<string> {
     /*
      * The list: `type_parameters` in TypeScript and Rust, and in Python a
      * `type_parameter` holding each parameter as a `type` -- which in the
-     * other two is the name of one parameter, told apart by its `name`.
+     * other two is the name of one parameter.
      */
-    const list = node.type === "type_parameters"
-      || (node.type === "type_parameter" && !node.childForFieldName("name"));
+    const list = node.type === "type_parameters" ? node : declaredPython(node);
     if (!list) return;
     // Each parameter's own name, never its bound: `<T extends User>` and
     // `[S: Seat]` declare `T` and `S`. The name comes first in every grammar.
-    for (let index = 0; index < node.childCount; index += 1) {
-      const parameter = node.child(index);
+    for (let index = 0; index < list.childCount; index += 1) {
+      const parameter = list.child(index);
       if (!parameter?.isNamed) continue;
       let name: Node | null = parameter.childForFieldName("name") ?? parameter.childForFieldName("left") ?? parameter;
       while (name && name.childCount > 0) name = name.child(0);
@@ -133,6 +154,26 @@ export function typeParametersIn(root: Node, source: string): Set<string> {
     names.add(match[1]!);
   }
   return names;
+}
+
+/**
+ * The list a Python declaration declares its type parameters in: on a
+ * `class` or a `def`, or on the left of a `type` statement. The grammar uses
+ * the same node for a subscript -- `list[User]` -- which names types already
+ * declared, so the list is found from the declaration down, never by its type.
+ */
+function declaredPython(node: Node): Node | undefined {
+  if (node.type === "class_definition" || node.type === "function_definition") {
+    const list = node.childForFieldName("type_parameters");
+    return list?.type === "type_parameter" ? list : undefined;
+  }
+  if (node.type !== "type_alias_statement") return undefined;
+  const generic = node.childForFieldName("left")?.child(0);
+  if (generic?.type !== "generic_type") return undefined;
+  for (let index = 0; index < generic.childCount; index += 1) {
+    if (generic.child(index)?.type === "type_parameter") return generic.child(index)!;
+  }
+  return undefined;
 }
 
 /** Whether a type expression uses any of these type parameters. */
@@ -240,12 +281,32 @@ export function askTypeParts(
     if (found.includes(true)) {
       return { does: true, said: `\`${place.name}\` ${what} ${printed(answer)}, which is ${head.name}` };
     }
-    const unexpanded = alias !== undefined && (answer?.parts ?? []).some((part) => alias(part.name));
-    if ((found.includes(undefined) || unexpanded) && !place.written) unsure ??= place.name;
-    else nos.push(`\`${place.name}\` ${what} ${printed(answer)}`);
+    const unexpanded = alias !== undefined
+      ? (answer?.parts ?? []).filter((part) => !part.expanded && alias(part.name)).map((part) => part.name)
+      : [];
+    if ((found.includes(undefined) || unexpanded.length > 0) && !place.written) {
+      unsure ??= unsettled(place.name, what, answer, unexpanded);
+    } else nos.push(`\`${place.name}\` ${what} ${printed(answer)}`);
   }
-  if (unsure !== undefined) return { does: undefined, said: `the compiler could not say what \`${unsure}\` ${what}` };
+  if (unsure !== undefined) return { does: undefined, said: unsure };
   return { does: false, said: nos.join("; ") };
+}
+
+/**
+ * What the compiler said about a place it did not settle (#416), so the
+ * reason names the question and the answer rather than a type to go and
+ * write: no answer at all, an alias it printed and did not open, or a type
+ * with a part that stands for anything.
+ */
+function unsettled(name: string, what: string, answer: TypeParts | undefined, aliases: string[]): string {
+  if (!answer) return `the compiler gave no answer about what \`${name}\` ${what}`;
+  if (aliases.length > 0) {
+    return `the compiler says \`${name}\` ${what} ${aliases.map((one) => `\`${one}\``).join(" or ")}, an alias it did not open`;
+  }
+  const open = "a type parameter, `any` or `unknown`, which could be anything";
+  return answer.parts.length === 0
+    ? `the compiler says \`${name}\` ${what} ${open}`
+    : `the compiler says \`${name}\` ${what} ${printed(answer)} with a part that is ${open}`;
 }
 
 /** A type's parts as a reader would say them: `Engine`, `Engine | None`. */
@@ -292,7 +353,9 @@ export function askFits(
       if (fits === undefined) unsure = true;
     }
   }
-  if (unsure) return { does: undefined, said: `the compiler could not say whether \`${places[0]!.name}\` fits` };
+  if (unsure) {
+    return { does: undefined, said: `the compiler gave no answer about whether \`${places[0]!.name}\` can be used where a \`${head.name}\` is wanted` };
+  }
   return { does: false, said: `\`${places[0]!.name}\` cannot be used where a \`${head.name}\` is wanted` };
 }
 
@@ -315,7 +378,7 @@ export function askMember(
     const hit = landed.some((one) => one !== "outside" && head.at.some((at) => at.file === one.file && at.line === one.line));
     if (hit) return { does: true, said: `\`${name}\` on \`${place.name}\` is this ${head.name}` };
   }
-  if (unsure !== undefined) return { does: undefined, said: `the compiler could not say what \`${name}\` on \`${unsure}\` is` };
+  if (unsure !== undefined) return { does: undefined, said: `the compiler gave no answer about what \`${name}\` on \`${unsure}\` is` };
   return { does: false, said: `no value the routine uses has this \`${name}\`` };
 }
 
@@ -332,5 +395,7 @@ export function askHasMember(referee: ClosedBodyReferee, places: AskedAt[], name
     if (landed === undefined) { unsure = true; continue; }
     if (landed.length > 0) return { does: true, said: `\`${place.name}\` has a \`${name}\`` };
   }
-  return unsure ? { does: undefined } : { does: false, said: `\`${places[0]!.name}\` has no \`${name}\`` };
+  return unsure
+    ? { does: undefined, said: `the compiler gave no answer about whether \`${places[0]!.name}\` has a \`${name}\`` }
+    : { does: false, said: `\`${places[0]!.name}\` has no \`${name}\`` };
 }

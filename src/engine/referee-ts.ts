@@ -36,11 +36,14 @@
  * for every file in it; one per tree asks the compiler once and queries it
  * many times, which is what makes measuring a real corpus affordable at all.
  */
-import { readdirSync, realpathSync, statSync } from "node:fs";
+import { readdirSync, readFileSync, realpathSync, statSync } from "node:fs";
 import { createRequire } from "node:module";
 import path from "node:path";
 
 import type * as TS from "typescript";
+
+import { workspacePackages } from "./deps";
+import type { Workspace } from "./workspace";
 
 const require_ = createRequire(import.meta.url);
 
@@ -850,12 +853,24 @@ function buildReferee(ts: typeof TS, root: string): TsReferee {
     if (!found) return undefined;
     const { program, checker, node } = found;
     try {
-      const source = declaredTypeOf(ts, checker, checker.getSymbolAtLocation(node));
+      const sourceSymbol = checker.getSymbolAtLocation(node);
       const home = program.getSourceFile(target.file);
       const declaration = home && typeDeclarationOnLine(ts, home, target.line);
-      const wanted = declaration && declaredTypeOf(ts, checker, checker.getSymbolAtLocation(declaration.name));
-      if (!source || !wanted) return undefined;
-      return checker.isTypeAssignableTo(source, wanted);
+      const wantedSymbol = declaration && checker.getSymbolAtLocation(declaration.name);
+      const source = declaredTypeOf(ts, checker, sourceSymbol);
+      const wanted = declaredTypeOf(ts, checker, wantedSymbol);
+      if (source && wanted) return checker.isTypeAssignableTo(source, wanted);
+      /*
+       * A generic at either end (#416): whether it fits depends on type
+       * arguments a bare declaration has none of. One answer does not -- a
+       * member the wanted type requires and this one has no member of that
+       * name for, whatever either is instantiated with. vue's
+       * `ReactiveEffect<T = any>` has no `dep`, so it is no
+       * `ComputedRefImpl`. Never a yes.
+       */
+      return lacksARequiredMember(ts, checker, declaredShapeOf(ts, checker, sourceSymbol), declaredShapeOf(ts, checker, wantedSymbol))
+        ? false
+        : undefined;
     } catch {
       return undefined;
     }
@@ -867,13 +882,34 @@ function buildReferee(ts: typeof TS, root: string): TsReferee {
     try {
       const options = found.program.getCompilerOptions();
       const mode = ts.getModeForUsageLocation(found.sourceFile, found.node, options);
-      const resolved = ts.resolveModuleName(found.node.text, file, options, ts.sys, undefined, undefined, mode)
-        .resolvedModule?.resolvedFileName;
+      const specifier = found.node.text;
+      const resolve = (host: TS.ModuleResolutionHost) => ts.resolveModuleName(
+        specifier, file, options, host, undefined, undefined, mode,
+      ).resolvedModule?.resolvedFileName;
+      const sibling = siblingPackage(specifier);
+      const resolved = resolve(ts.sys) ?? (sibling ? resolve(linkedTo(ts.sys, sibling.name, sibling.home)) : undefined);
       if (!resolved) return undefined;
       return ts.sys.realpath ? ts.sys.realpath(resolved) : resolved;
     } catch {
       return undefined;
     }
+  }
+
+  /**
+   * The workspace package an import names, when it is one of this
+   * repository's own (#416): `@tanstack/query-core` from `react-query`. A
+   * fresh clone has not linked it into `node_modules`, so the compiler finds
+   * nothing there -- and the import the text could not place stays unplaced
+   * with the compiler asked.
+   */
+  let siblings: Map<string, string> | undefined;
+  function siblingPackage(specifier: string): { name: string; home: string } | undefined {
+    if (specifier.startsWith(".") || specifier.startsWith("/")) return undefined;
+    const parts = specifier.split("/");
+    const name = specifier.startsWith("@") ? parts.slice(0, 2).join("/") : parts[0]!;
+    siblings ??= workspacePackages(diskWorkspace(root));
+    const home = siblings.get(name);
+    return home === undefined ? undefined : { name, home: path.join(root, home) };
   }
 
   function memberAt(file: string, start: number, end: number, name: string): Array<{ file: string; line: number }> | undefined {
@@ -905,6 +941,50 @@ function buildReferee(ts: typeof TS, root: string): TsReferee {
   };
 }
 
+/**
+ * The file system, with `node_modules/<name>` everywhere read as the
+ * workspace package's own directory: what `npm install` links there (#416).
+ * Only reads go through it, and only to resolve one import.
+ */
+function linkedTo(sys: TS.System, name: string, home: string): TS.ModuleResolutionHost {
+  const marker = `${path.sep}node_modules${path.sep}${name.split("/").join(path.sep)}`;
+  const mapped = (file: string): string => {
+    const at = file.indexOf(marker);
+    if (at < 0) return file;
+    const rest = file.slice(at + marker.length);
+    return rest === "" || rest.startsWith(path.sep) ? home + rest : file;
+  };
+  // The folders on the way in, which a fresh clone has none of either.
+  const scope = name.startsWith("@") ? `${path.sep}${name.split("/")[0]}` : "";
+  const onTheWay = (directory: string) => directory.endsWith(`${path.sep}node_modules`)
+    || (scope !== "" && directory.endsWith(`${path.sep}node_modules${scope}`));
+  return {
+    fileExists: (file) => sys.fileExists(mapped(file)),
+    readFile: (file) => sys.readFile(mapped(file)),
+    directoryExists: (directory) => onTheWay(directory) || sys.directoryExists(mapped(directory)),
+    realpath: (file) => (sys.realpath ? sys.realpath(mapped(file)) : mapped(file)),
+    getDirectories: (directory) => sys.getDirectories(mapped(directory)),
+    getCurrentDirectory: () => sys.getCurrentDirectory(),
+  };
+}
+
+/** A `Workspace` on the disk under `root`, for the readers that take one. */
+function diskWorkspace(root: string): Workspace {
+  return {
+    resolve: (relative) => {
+      const absolute = path.resolve(root, relative);
+      return absolute === root || absolute.startsWith(`${root}${path.sep}`) ? absolute : undefined;
+    },
+    stat: (absolute) => {
+      try { return statSync(absolute).isDirectory() ? "directory" : "file"; } catch { return "missing"; }
+    },
+    read: (absolute) => readFileSync(absolute, "utf8"),
+    list: (absolute) => {
+      try { return readdirSync(absolute); } catch { return []; }
+    },
+  };
+}
+
 /** A declaration's file and the 0-based line of its own name -- not of a doc comment above it. */
 function nameLocation(declaration: TS.Declaration): { file: string; line: number } {
   const home = declaration.getSourceFile();
@@ -923,6 +1003,37 @@ function declaredTypeOf(ts: typeof TS, checker: TS.TypeChecker, found: TS.Symbol
     (ts.isClassLike(one) || ts.isInterfaceDeclaration(one) || ts.isTypeAliasDeclaration(one))
     && (one.typeParameters?.length ?? 0) > 0);
   return generic ? undefined : checker.getDeclaredTypeOfSymbol(symbol);
+}
+
+/**
+ * What a class or interface declares, generic or not: its members, with any
+ * type parameter left as itself. For a question about member names only.
+ */
+function declaredShapeOf(ts: typeof TS, checker: TS.TypeChecker, found: TS.Symbol | undefined): TS.Type | undefined {
+  if (!found) return undefined;
+  const symbol = found.flags & ts.SymbolFlags.Alias ? checker.getAliasedSymbol(found) : found;
+  if (!(symbol.flags & (ts.SymbolFlags.Class | ts.SymbolFlags.Interface))) return undefined;
+  return checker.getDeclaredTypeOfSymbol(symbol);
+}
+
+/**
+ * Whether `wanted` requires a member `source` has nothing of that name for
+ * (#416): then no instantiation of either makes `source` fit. Asked only of
+ * two classes or interfaces whose every base the compiler could read, and
+ * never of a `source` that takes any name through an index signature.
+ */
+function lacksARequiredMember(
+  ts: typeof TS, checker: TS.TypeChecker, source: TS.Type | undefined, wanted: TS.Type | undefined,
+): boolean {
+  if (!source || !wanted) return false;
+  const opaque = (type: TS.Type): boolean => {
+    if (type.flags & (ts.TypeFlags.Any | ts.TypeFlags.Unknown)) return true;
+    if (!type.isClassOrInterface()) return false;
+    return (checker.getBaseTypes(type) ?? []).some(opaque);
+  };
+  if (opaque(source) || opaque(wanted) || checker.getIndexInfosOfType(source).length > 0) return false;
+  const has = new Set(checker.getPropertiesOfType(source).map((one) => one.escapedName));
+  return checker.getPropertiesOfType(wanted).some((one) => !(one.flags & ts.SymbolFlags.Optional) && !has.has(one.escapedName));
 }
 
 /** The class, interface, type alias or enum whose name starts on this 0-based line, at any depth. */

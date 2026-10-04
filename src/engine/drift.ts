@@ -837,11 +837,19 @@ export type EdgeUnconfirmedReason =
    */
   | "compiler-says-it-does"
   /**
+   * A red withheld (#416): the compiler was asked the one question it rests
+   * on and could not settle it -- no answer, an alias it did not open, a type
+   * with a part that could be anything. The detail names the question and
+   * what came back. Not "the code leaves it out": in 13 of the 14 bench
+   * arrows #410 read under the old reason, the code wrote it.
+   */
+  | "compiler-could-not-say"
+  /**
    * A red withheld (#393): "doesn't" rested on something the code does not
    * write down -- a field with no type, a parameter typed by its variable, a
    * generic, a base list nobody wrote, an import the reader could not place --
-   * and no compiler answered. #373 found 58 correct arrows called wrong on
-   * exactly that footing.
+   * and no compiler was there to ask. #373 found 58 correct arrows called
+   * wrong on exactly that footing.
    */
   | "rests-on-unwritten";
 
@@ -871,7 +879,8 @@ export const UNCONFIRMED_WORDS: Record<EdgeUnconfirmedReason, string> = {
   "feeds-runs-the-other-way": "the only flow found runs the other way",
   "signature-other-half": "the type is in the other half of the signature — the arrow may be the wrong way round",
   "compiler-says-it-does": "the code does not write it down, and the compiler says the code does what the arrow says",
-  "rests-on-unwritten": "the code does not write down the one thing this depends on, and no compiler answered",
+  "compiler-could-not-say": "the compiler was asked the one thing this depends on and could not settle it",
+  "rests-on-unwritten": "the code does not write down the one thing this depends on, and no compiler was running to ask",
 };
 
 /**
@@ -3764,7 +3773,10 @@ export function checkDrift(
       if (!verdict.stands) {
         const answer = verdict.why === "compiler-says-it-does"
           ? `the compiler says it does${verdict.said ? `: ${verdict.said}` : ""}.`
-          : `that rests on ${verdict.unwritten ?? "something the code does not write down"}, and no compiler could say either way.`;
+          : verdict.why === "compiler-could-not-say"
+            ? `${verdict.said ?? "the compiler gave no answer"}, so it is not called wrong.`
+            : `that rests on ${verdict.unwritten ?? "something the code does not write down"}, and `
+              + `${referee ? "no compiler can be asked about it" : "no compiler was running to check it"}.`;
         outcome = {
           kind: "unconfirmed",
           reason: verdict.why,
@@ -4824,21 +4836,37 @@ export function checkDrift(
           ask: (referee) => {
             const where = referee.importTargetAt?.bind(referee);
             if (!where) return { does: undefined };
+            /* The first import the compiler could not place, to name in the reason (#416). */
+            let unanswered: string | undefined;
             const again = checkNeeds(fromPath, toPath, workspace, importCache.configs, options?.ledger, (file, at) => {
               const answer = where(file, at);
+              if (answer === undefined && unanswered === undefined) {
+                const absolute = workspace.resolve(file);
+                const written = absolute ? workspace.read(absolute).slice(at.start, at.end).replace(/^['"`]|['"`]$/g, "") : "";
+                unanswered = `\`${written}\` in ${file}`;
+              }
               return answer === undefined || answer === "outside" ? answer : answer.file;
             });
+            const noAnswer = unanswered === undefined ? undefined : `the compiler gave no answer about where ${unanswered} leads`;
             if (again.verdict === "confirmed") {
               return { does: true, said: `${fromPath} imports ${toPath}: \`${again.evidence.specifier}\` lands there` };
             }
             if (again.verdict === "indirect") {
               const said = `${fromPath} reaches ${toPath} through ${again.via.join(" -> ") || again.evidence.on}`;
-              return { does: strict ? (again.unplaced ? undefined : false) : true, said };
+              return strict && again.unplaced ? { does: undefined, said: noAnswer ?? said } : { does: !strict, said };
             }
             if (again.verdict === "refuted" || again.verdict === "backwards") {
-              return { does: again.unplaced ? undefined : false, said: `none of ${fromPath}'s imports lands on ${toPath}` };
+              return again.unplaced
+                ? { does: undefined, ...(noAnswer ? { said: noAnswer } : {}) }
+                : { does: false, said: `none of ${fromPath}'s imports lands on ${toPath}` };
             }
-            return { does: undefined };
+            if (again.verdict === "withheld") return { does: undefined, said: `with the compiler's answers the imports could not be read: ${again.why}` };
+            return {
+              does: undefined,
+              said: noAnswer ?? `with every import placed, the walk through them passed a file that cannot be read to the end `
+                + `(code loaded at run time, or a parse that broke), so whether ${fromPath} gets to ${toPath} through other files `
+                + "cannot be said",
+            };
           },
         });
         /*
@@ -5498,7 +5526,7 @@ export function checkDrift(
                 // base list alone.
                 const itself = head.at.some((one) => tail.at.some((other) => one.file === other.file && one.line === other.line));
                 return itself
-                  ? { does: undefined }
+                  ? { does: undefined, unasked: true }
                   : askFits(referee, verdict.sites.map((one) => ({ file: fromPath, name: one.name, at: one })), head);
               },
             } });

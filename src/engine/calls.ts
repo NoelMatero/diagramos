@@ -434,7 +434,8 @@ export interface CallSide {
    * `resolves`/`callsTo`, the direction-and-backwards half of the live
    * per-claim path `drift.ts` uses, never reads this field: wiring a resolver
    * in was additive to the closed-bodies question (#226) and changed nothing
-   * about what `@calls` reported then. `callsBetween`'s closed-body absence
+   * about what `@calls` reported then. They read `declarationAt` instead,
+   * and only to confirm (#416). `callsBetween`'s closed-body absence
    * check (#233) is the first live caller that does, through `callSitesIn`.
    */
   resolveReceiver?: (at: { start: number; end: number }) => ReceiverResolution | undefined;
@@ -450,7 +451,8 @@ export interface CallSide {
    * the left to ask about at all. This asks the question the placement is
    * actually for, at the one position every language server answers it.
    *
-   * Only `drift.ts`'s `@calls` closed-body check passes it. The walk across
+   * Only `drift.ts`'s `@calls` tail passes it: the closed-body check reads it,
+   * and the forward reading reads it to confirm (#416). The walk across
    * files (`reach.ts`) and `@accesses` ask the same question through their own
    * options and are unchanged.
    */
@@ -1309,6 +1311,29 @@ function arrivesAt(
 }
 
 /**
+ * A `receiver` doubt put to "go to definition", where the side offers it
+ * (#416): `yes` when the compiler says the call lands on a routine of that
+ * name in the far file, and the doubt it was otherwise.
+ *
+ * Only ever a confirmation. `placeOf` asks the same question for the
+ * closed-body absence check, which has its own guards on what an answer
+ * elsewhere may settle; this reading only looks for the call, and a
+ * definition somewhere else leaves it looking. flask's `wsgi_app ->
+ * AppContext.push` writes `ctx = self.request_context(environ)` and then
+ * `ctx.push()`, and pyright knows `ctx` is an `AppContext` -- but this
+ * reading stopped at `receiver` without asking anybody.
+ */
+function landsOnTarget(
+  callee: Extract<Callee, { kind: "own" | "through" }>,
+  side: CallSide,
+  target: { file: string; names: Set<string> },
+): "yes" | "receiver" {
+  if (!side.declarationAt) return "receiver";
+  const placed = placeThroughDefinition(callee.kind === "own" ? callee.nameAt : callee.memberAt, side);
+  return placed?.file === target.file && placed.as !== undefined && target.names.has(placed.as) ? "yes" : "receiver";
+}
+
+/**
  * Whether one call site is a call to a name declared in the far file.
  *
  * `undefined` is "no", with certainty. A reason is "maybe, and the text does not
@@ -1344,10 +1369,10 @@ function resolves(
    * is in this file. Same file, so the name is placed; a different file, and the
    * text says nothing about whose method it is.
    */
-  if (callee.kind === "own") return side.file === target.file ? "yes" : "receiver";
+  if (callee.kind === "own") return side.file === target.file ? "yes" : landsOnTarget(callee, side, target);
 
   const bound = callee.kind === "through" ? callee.through : callee.name;
-  if (!bound) return "receiver";
+  if (!bound) return callee.kind === "through" ? landsOnTarget(callee, side, target) : "receiver";
   if (bindings.ambiguous.has(bound)) return "ambiguous";
 
   const imported = bindings.imported.get(bound);
@@ -1364,7 +1389,7 @@ function resolves(
      * whose type is not in the text. That is dynamic dispatch, and it is the
      * first hazard #189 lists.
      */
-    if (!bindings.local.has(bound)) return callee.kind === "through" ? "receiver" : "unbound";
+    if (!bindings.local.has(bound)) return callee.kind === "through" ? landsOnTarget(callee, side, target) : "unbound";
     /*
      * `through` before same-file, and the order is the whole of it (#254). A
      * bare `add()` in a file that declares `add` is this file's own.
@@ -1378,7 +1403,7 @@ function resolves(
      * `Read::read_to_end` in ripgrep. `placeOf` below already asks in this
      * order, and its own doc says the two must match.
      */
-    if (callee.kind === "through") return "receiver";
+    if (callee.kind === "through") return landsOnTarget(callee, side, target);
     return side.file === target.file ? "yes" : undefined;
   }
 

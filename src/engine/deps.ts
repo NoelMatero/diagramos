@@ -536,7 +536,7 @@ function mayLandHere(specifier: string, fromFile: string, workspace: Workspace):
   const parts = specifier.split("/");
   const name = specifier.startsWith("@") ? parts.slice(0, 2).join("/") : parts[0]!;
   if (!name || specifier.startsWith("node:")) return false;
-  if (packageNamesIn(workspace).has(name)) return true;
+  if (workspacePackages(workspace).has(name)) return true;
   /*
    * `node_modules/@acme/core` linked to `packages/core`, looked for from the
    * importing file up to the root, the way Node looks. A link, and to a place
@@ -562,16 +562,19 @@ function mayLandHere(specifier: string, fromFile: string, workspace: Workspace):
 }
 
 /**
- * The names this repository's own packages go by, from the workspace lists a
- * root `package.json` (`workspaces`) or `pnpm-workspace.yaml` writes: each
- * listed directory's `package.json` `name`. Simple patterns only -- a
- * directory, or a directory followed by `/*` -- which is how they are written.
+ * This repository's own packages, by the name each goes by, with the
+ * repo-relative directory it is in: from the workspace lists a root
+ * `package.json` (`workspaces`) or `pnpm-workspace.yaml` writes, each listed
+ * directory's `package.json` `name`. Simple patterns only -- a directory, or
+ * a directory followed by `/*` -- which is how they are written. The compiler
+ * asks for the directories (#416), to find a sibling a fresh clone has not
+ * linked into `node_modules`.
  */
-const packageNames = new WeakMap<Workspace, Set<string>>();
-function packageNamesIn(workspace: Workspace): Set<string> {
-  const known = packageNames.get(workspace);
+const packages = new WeakMap<Workspace, Map<string, string>>();
+export function workspacePackages(workspace: Workspace): Map<string, string> {
+  const known = packages.get(workspace);
   if (known) return known;
-  const names = new Set<string>();
+  const found = new Map<string, string>();
   const readJson = (relative: string): Record<string, unknown> | undefined => {
     const absolute = workspace.resolve(relative);
     if (!absolute || workspace.stat(absolute) !== "file") return undefined;
@@ -597,11 +600,11 @@ function packageNamesIn(workspace: Workspace): Set<string> {
       : clean.includes("*") ? [] : [clean];
     for (const directory of directories) {
       const name = readJson(`${directory}/package.json`)?.name;
-      if (typeof name === "string") names.add(name);
+      if (typeof name === "string" && !found.has(name)) found.set(name, directory);
     }
   }
-  packageNames.set(workspace, names);
-  return names;
+  packages.set(workspace, found);
+  return found;
 }
 
 /** Just the repo-relative files, which is what a dependency question usually wants. */
