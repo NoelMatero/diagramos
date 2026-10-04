@@ -5541,7 +5541,7 @@ export function checkDrift(
        * body behind any "creates none" (#362). `@calls` asks it too when the
        * head is a class (#374), since creating one is one way to call it.
        */
-      const readConstructions = (language: Language, toLanguage: Language | undefined) => {
+      const readConstructions = (language: Language, toLanguage: Language | undefined, forCalls = false) => {
         /*
          * Python's imports, which are the only thing that separates
          * `Response(body)` from `render(body)` (#309). The same `callSide`
@@ -5602,6 +5602,7 @@ export function checkDrift(
             }
             : undefined,
           names,
+          forCalls,
         );
         return { verdict, ancestryUnanswered };
       };
@@ -5830,7 +5831,7 @@ export function checkDrift(
               const routine = fromEnd.symbols[0]!;
               const own = callsIntoType({ ...tail, routine }, { ...head, names: toEnd.symbols }, inherits);
               const made = own.verdict === "confirmed" ? undefined
-                : readConstructions(tail.language, head.language).verdict;
+                : readConstructions(tail.language, head.language, true).verdict;
               if (own.verdict === "confirmed") {
                 verdict = { verdict: "confirmed", evidence: own.evidence };
               } else if (made?.verdict === "confirmed") {

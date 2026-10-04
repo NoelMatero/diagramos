@@ -1139,6 +1139,155 @@ function boundByRoutine(routine: Node): Set<string> {
 /** 1-based line of a byte offset, counted the way an editor counts. */
 const lineOf = (source: string, offset: number) => source.slice(0, offset).split("\n").length;
 
+/** A name a local can be found to hold: the function it stands for, and where that is written. */
+type Chosen = { name: string; at: { start: number; end: number } };
+
+/**
+ * Every function a routine's own local can hold when `call` calls it, or
+ * `undefined` when that is not all written down (#417).
+ *
+ * `const check = __DEV__ ? (job) => checkRecursiveUpdates(seen, job) : NOOP`,
+ * then `check(job)`: the call runs one of two things, and both are in the
+ * text. The lambda is part of the routine, so its calls are already read as
+ * the routine's; `NOOP` is a name, placed like any bare call. Following each
+ * closes the call, where reading it as a call on a value (`local-callee`)
+ * left the whole body open. The same shape is `f if fast else g` in Python,
+ * `if c { f } else { g }` or a `match` in Rust, `a ?? b`, and an `if`/`else`
+ * that assigns the local on each side. A function declared inside the
+ * routine is the same case with one branch.
+ *
+ * Read as fields, the way `boundByRoutine` reads bindings. Any one binding
+ * this cannot follow is the old doubt: a parameter (the caller chooses), a
+ * loop or `catch`, a destructuring, `+=`, a `global`, a value that is
+ * computed (`table[k]`, `make()`, `obj.fn`). Only the routine's own
+ * bindings, and in TypeScript and Rust only one declared in a block the call
+ * is inside: a name declared anywhere else can be set from anywhere else.
+ */
+function chosenCallees(routine: Node, name: string, call: Node, language: Language): Chosen[] | undefined {
+  const named = (node: Node) => children(node).filter((child) => child.isNamed);
+  const isName = (node: Node) => node.childCount === 0 && node.isNamed && node.text === name;
+  const mentions = (node: Node) => {
+    let hit = false;
+    each(node, (inner) => { if (!hit && isName(inner)) hit = true; });
+    return hit;
+  };
+  const token = (node: Node, test: (text: string) => boolean) =>
+    children(node).find((part) => !part.isNamed && test(part.type));
+
+  const chosen: Chosen[] = [];
+  /** Every function `value` can be, pushed onto `chosen`; false when one is not written down. */
+  const follow = (value: Node): boolean => {
+    if (value.childCount === 0) {
+      if (/^(null|undefined|None)$/.test(value.text)) return true; // calling it runs nothing
+      if (!NAME_LEAF.test(value.type)) return false;
+      chosen.push({ name: value.text, at: { start: value.startIndex, end: value.startIndex + value.text.length } });
+      return true;
+    }
+    // `c ? f : g`, Rust's `if c { f } else { g }`.
+    const consequence = value.childForFieldName("consequence");
+    if (consequence) {
+      const alternative = value.childForFieldName("alternative");
+      return follow(consequence) && (!alternative || follow(alternative));
+    }
+    // A function written out: its calls are the routine's own and already read.
+    if (value.childForFieldName("parameters") || token(value, (text) => text === "lambda")) return true;
+    // Python's `f if c else g`: no fields, and the condition between the two words.
+    const ifWord = token(value, (text) => text === "if");
+    const elseWord = token(value, (text) => text === "else");
+    if (ifWord && elseWord) {
+      return named(value).every((part) =>
+        (part.startIndex > ifWord.startIndex && part.startIndex < elseWord.startIndex) || follow(part));
+    }
+    // Rust's `match`: every arm's value.
+    const arms = value.childForFieldName("value") ? value.childForFieldName("body") : null;
+    if (arms) {
+      return named(arms).every((arm) => {
+        const result = arm.childForFieldName("value");
+        return result !== null && follow(result);
+      });
+    }
+    // `a || b`, `a ?? b`, `a or b`: either side.
+    const left = value.childForFieldName("left");
+    const right = value.childForFieldName("right");
+    if (left && right && token(value, (text) => /^(\|\||&&|\?\?|or|and)$/.test(text))) {
+      return follow(left) && follow(right);
+    }
+    /*
+     * `(f)`, and Rust's `else { g }` and `{ f }` -- the one thing inside, or
+     * the block's last expression. A brace is a block only in Rust: in
+     * TypeScript it opens an object, and calling one runs nothing written.
+     */
+    const inside = named(value);
+    const opens = value.child(0)?.type;
+    if (opens === "(" && inside.length === 1) return follow(inside[0]!);
+    if (language === "rust" && (opens === "{" || opens === "else") && inside.length > 0) {
+      return follow(inside[inside.length - 1]!);
+    }
+    return false;
+  };
+
+  let declared = false;
+  let doubt = false;
+  /**
+   * Down from the routine, carrying two facts about where each node sits: the
+   * block it is in, which in TypeScript and Rust has to hold the call for a
+   * declaration there to be the one the call sees; and whether it is
+   * somebody else's -- a member of a class written inside (`class X {
+   * check() {} }`), or in Python a nested function's own local. Python has no
+   * block scope, so there the routine is the block.
+   */
+  const visit = (node: Node, block: Node, foreign: boolean): void => {
+    if (doubt) return;
+    // A parameter anywhere in it: whoever calls passes what it holds.
+    for (const field of ["parameters", "parameter"]) {
+      const list = node.childForFieldName(field);
+      if (list && mentions(list)) doubt = true;
+    }
+    if (token(node, (text) => text === "global" || text === "nonlocal") && mentions(node)) doubt = true;
+    const seen = language === "python" || (call.startIndex >= block.startIndex
+      && call.startIndex < block.startIndex + block.text.length);
+    /*
+     * Only what binds: a declaration, by `body.ts`' own suffix rule, an
+     * assignment, or a loop or `catch`. A `name` field on anything else is a
+     * use -- `<M n={1} />` names `M` on its element, and read as a
+     * declaration it closed a body around a component nobody could see (#402).
+     */
+    const kind = /(_declaration|_definition|_item|_declarator|_signature)$/.test(node.type) ? "declaration"
+      : /assignment/.test(node.type) ? "assignment"
+      : /_(statement|clause)$/.test(node.type) ? "loop" : undefined;
+    for (const field of foreign || !kind ? [] : ["name", "pattern", "left", "alias"]) {
+      const target = node.childForFieldName(field);
+      if (!target || !mentions(target)) continue;
+      const assigns = token(node, (text) => text === "=");
+      // Python declares a local by assigning it; the other two by a declaration.
+      const declares = kind === "declaration" || (kind === "assignment" && language === "python");
+      if (!isName(target)) {
+        // A destructuring that binds it, or `obj.check = ...`.
+        if (assigns) doubt = true;
+        continue;
+      }
+      if (assigns) {
+        const value = node.childForFieldName("value") ?? node.childForFieldName("right");
+        if (!value || !follow(value)) doubt = true;
+        if (declares && seen) declared = true;
+      } else if (token(node, (text) => /^[^=!<>]+=$/.test(text)) || kind === "loop") {
+        // `check ||= f`, or a loop or a `catch` binding it.
+        doubt = true;
+      } else if (declares) {
+        // `let check;`, assigned further down -- or `function check() {}`, written out here.
+        if (seen) declared = true;
+      }
+    }
+    const container = node.childForFieldName("name") !== null && node.childForFieldName("body") !== null
+      && node.childForFieldName("parameters") === null;
+    const nested = language === "python" && node.id !== routine.id && node.childForFieldName("parameters") !== null;
+    const inner = language !== "python" && /^(statement_block|block)$/.test(node.type) ? node : block;
+    for (const child of children(node)) visit(child, inner, foreign || container || nested);
+  };
+  visit(routine, routine, false);
+  return declared && !doubt ? chosen : undefined;
+}
+
 /**
  * The names a body can reach without naming them.
  *
@@ -1506,6 +1655,13 @@ function escapeName(name: string): string {
 export function callsBetween(
   from: CallSide & { routine: string },
   to: CallSide & { names: string[] },
+  /**
+   * Whether a call the other way is an answer (#417). `@builds` reads Python
+   * through this function, and there a call from the head to the tail is a
+   * construction only when the tail is a class; otherwise it is no answer,
+   * and the question goes on to whether the tail's own calls close.
+   */
+  backwards = true,
 ): CallsVerdict {
   const wanted = new Set(to.names);
   const forward = callsTo(from, from.routine, { file: to.file, names: wanted });
@@ -1542,7 +1698,7 @@ export function callsBetween(
    * `absent` and is silence either way.
    */
   const back = { file: from.file, names: new Set([from.routine]) };
-  for (const name of to.names) {
+  for (const name of backwards ? to.names : []) {
     const reverse = callsTo(to, name, back);
     if (reverse.evidence) return { verdict: "backwards", evidence: reverse.evidence };
   }
@@ -2945,6 +3101,25 @@ function placeOf(
   return callee.kind === "through" ? throughChecker() : { why: "elsewhere" };
 }
 
+/** One call site as `callSitesIn` lists it, placed or refused. */
+function siteOf(callee: Callee, source: string, at: Node, where: Placement | { why: SiteUnresolved }): CallSitePlaced {
+  return {
+    name: callee.kind === "computed" ? "" : callee.name,
+    line: lineOf(source, at.startIndex),
+    receiver: callee.kind === "through",
+    ...(callee.kind === "through" ? { memberAt: callee.memberAt } : {}),
+    ...(callee.kind === "computed" ? {} : { nameAt: callee.kind === "through" ? callee.memberAt : callee.nameAt }),
+    ...("file" in where
+      ? {
+          file: where.file,
+          ...(where.concrete !== undefined ? { concrete: where.concrete } : {}),
+          ...(where.as !== undefined ? { declaredAs: where.as } : {}),
+          ...(where.overridden ? { overridden: true } : {}),
+        }
+      : { why: where.why }),
+  };
+}
+
 /**
  * Every call site in every routine of one file, each placed or refused.
  *
@@ -3041,21 +3216,22 @@ export function callSitesIn(side: CallSide, only?: string): CallSitesReading {
       const callee = calleeOf(inner) ?? constructedBy(inner) ?? renderedBy(inner);
       if (!callee) return;
       const where = placeOf(callee, side, bindings, scope, holder);
-      body.sites.push({
-        name: callee.kind === "computed" ? "" : callee.name,
-        line: lineOf(side.source, inner.startIndex),
-        receiver: callee.kind === "through",
-        ...(callee.kind === "through" ? { memberAt: callee.memberAt } : {}),
-        ...(callee.kind === "computed" ? {} : { nameAt: callee.kind === "through" ? callee.memberAt : callee.nameAt }),
-        ...("file" in where
-          ? {
-              file: where.file,
-              ...(where.concrete !== undefined ? { concrete: where.concrete } : {}),
-              ...(where.as !== undefined ? { declaredAs: where.as } : {}),
-              ...(where.overridden ? { overridden: true } : {}),
-            }
-          : { why: where.why }),
-      });
+      /*
+       * A local holding one of several functions, every one written down
+       * (#417): one site for each it can hold, and none for a function
+       * written out in the routine, whose calls are already listed.
+       */
+      const chosen = "why" in where && where.why === "local-callee" && callee.kind === "bare"
+        ? chosenCallees(node, callee.name, inner, side.language)
+        : undefined;
+      if (chosen) {
+        for (const choice of chosen) {
+          const held: Callee = { kind: "bare", name: choice.name, nameAt: choice.at };
+          body.sites.push(siteOf(held, side.source, inner, placeOf(held, side, bindings, scope, holder)));
+        }
+        return;
+      }
+      body.sites.push(siteOf(callee, side.source, inner, where));
     });
     bodies.push(body);
   });
