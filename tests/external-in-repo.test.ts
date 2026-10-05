@@ -12,8 +12,9 @@
  *
  * Such a box is now read like a built one, and the report says it is marked
  * wrongly. A ref that names a routine keeps its door meaning, and a ref to a
- * file alone, to a name the file does not declare, or to somewhere outside the
- * repository is skipped as before.
+ * name the file does not declare, or to somewhere outside the repository, is
+ * skipped as before. A ref to a whole file here is read and never accuses
+ * (#435, at the bottom).
  */
 import { beforeAll, describe, expect, it } from "vitest";
 
@@ -180,10 +181,6 @@ describe("an external box that still means something outside", () => {
     await skipped("src/plain.ts#plain");
   });
 
-  it("skips one anchored at a whole file", async () => {
-    await skipped("src/transport.ts");
-  });
-
   it("skips one whose name the file does not declare", async () => {
     await skipped("src/transport.ts#Elsewhere");
   });
@@ -199,5 +196,60 @@ describe("an external box that still means something outside", () => {
 
   it("skips one whose file is not in the repository", async () => {
     await skipped("pydantic_core#SchemaValidator");
+  });
+
+  it("skips one anchored at a whole file that is not there, a directory or a pattern", async () => {
+    await skipped("src/browser.ts");
+    await skipped("src");
+    await skipped("src/*.ts");
+  });
+});
+
+/**
+ * An external box anchored at a whole file in this repository (#435).
+ *
+ * httpx's `_urls.py` and `_transports/default.py` were drawn external, and
+ * every correct `@needs` arrow touching them went unread. A file is no more a
+ * door than a class is, so the box is read as code -- but it may also be an
+ * author pointing loosely at the code that talks to the outside thing, so the
+ * read may confirm and never accuses.
+ */
+describe("an external box anchored at a whole file in this repository", () => {
+  it("confirms a correct arrow onto it", async () => {
+    const board = await boardOf({ ref: "src/user.ts#user" }, { ref: "src/transport.ts", state: "external" });
+    const report = checkDrift(board, fakeWorkspace(ts));
+    expect(report.unreadEdges).toEqual([]);
+    expect(report.edgesChecked).toBe(1);
+    expect(report.edges).toEqual([]);
+    expect(report.unconfirmedEdges).toEqual([]);
+    expect(report.clean).toBe(true);
+  });
+
+  it("confirms one from it, when it is the tail", async () => {
+    const board = await boardOf({ ref: "src/user.ts", state: "external" }, { ref: "src/transport.ts#BaseTransport" });
+    const report = checkDrift(board, fakeWorkspace(ts));
+    expect(report.edgesChecked).toBe(1);
+    expect(report.edges).toEqual([]);
+    expect(report.unconfirmedEdges).toEqual([]);
+  });
+
+  it("never calls a wrong arrow onto it wrong, and says the mark is wrong", async () => {
+    const board = await boardOf({ ref: "src/client.ts#send" }, { ref: "src/transport.ts", state: "external" });
+    const report = checkDrift(board, fakeWorkspace(ts));
+    expect(report.unreadEdges).toEqual([]);
+    expect(report.edges).toEqual([]);
+    expect(report.clean).toBe(true);
+    expect(report.unconfirmedEdges.map((arrow) => arrow.reason)).toEqual(["end-marked-external"]);
+    expect(report.unconfirmedEdges[0]!.detail).toContain("is marked external, but src/transport.ts is a file in this repository");
+  });
+
+  it("does the same in Python and Rust", async () => {
+    const py = await boardOf({ ref: "pkg/client.py#send" }, { ref: "pkg/transport.py", state: "external" });
+    expect(checkDrift(py, fakeWorkspace(python)).unconfirmedEdges.map((arrow) => arrow.reason))
+      .toEqual(["end-marked-external"]);
+    const rs = await boardOf({ ref: "src/client.rs#send" }, { ref: "src/transport.rs", state: "external" });
+    const report = checkDrift(rs, treeWorkspace(rust));
+    expect(report.edges).toEqual([]);
+    expect(report.unconfirmedEdges.map((arrow) => arrow.reason)).toEqual(["end-marked-external"]);
   });
 });

@@ -851,7 +851,15 @@ export type EdgeUnconfirmedReason =
    * and no compiler was there to ask. #373 found 58 correct arrows called
    * wrong on exactly that footing.
    */
-  | "rests-on-unwritten";
+  | "rests-on-unwritten"
+  /**
+   * A red withheld (#435): one end is a box marked external but anchored at
+   * a whole file here. The file was read and did not answer, but the box may
+   * stand for something outside that this file only talks to, and an arrow
+   * to that thing can be true when the file does not show it -- a door with
+   * no route found, which goes quiet (#272).
+   */
+  | "end-marked-external";
 
 /**
  * Why an arrow came back unconfirmed, in words -- the one place they are written.
@@ -881,6 +889,7 @@ export const UNCONFIRMED_WORDS: Record<EdgeUnconfirmedReason, string> = {
   "compiler-says-it-does": "the code does not write it down, and the compiler says the code does what the arrow says",
   "compiler-could-not-say": "the compiler was asked the one thing this depends on and could not settle it",
   "rests-on-unwritten": "the code does not write down the one thing this depends on, and no compiler was running to ask",
+  "end-marked-external": "an end is marked external but anchored at a file here; that file does not show it, and the outside thing it stands for may",
 };
 
 /**
@@ -3658,6 +3667,8 @@ export function checkDrift(
   const gated: GatedRed[] = [];
   /** Arrows read through a box marked external that is code here, and the sentence saying so (#366). */
   const markedWrongly = new Map<string, string>();
+  /** Of those, the arrows read through a box marked external at a whole file, which may confirm and never accuse (#435). */
+  const confirmOnly = new Set<string>();
   const assertions: AssertionTally = { checked: 0, downgraded: 0, unsupportedLanguage: 0 };
   const claims: ClaimTally = {
     closed: 0, closedHeld: 0, closedTestReaches: 0,
@@ -3805,6 +3816,14 @@ export function checkDrift(
      * nowhere else, so every word goes through the same rule: see `gate.ts`.
      * A planned arrow's finding is a work item, not a red, and is left alone.
      */
+    if (outcome.kind === "finding" && edge.state !== "planned" && accuses(outcome.finding.kind)
+      && confirmOnly.has(`${edge.from} -> ${edge.to}`)) {
+      outcome = {
+        kind: "unconfirmed",
+        reason: "end-marked-external",
+        detail: outcome.finding.detail.replace(/\s*$/, ""),
+      };
+    }
     if (outcome.kind === "finding" && edge.state !== "planned" && accuses(outcome.finding.kind)) {
       const referee = options?.closedBodyReferee;
       const verdict = gateRed(outcome.rests, referee);
@@ -4587,7 +4606,9 @@ export function checkDrift(
        * corresponds to -- "Browser" against `src/b.ts` -- and two tests have
        * encoded since `state` shipped that such a box is still skipped. Reading
        * those refs as door anchors would repurpose data already on boards and
-       * could confirm an arrow off one. So the anchor is verified: the ref names
+       * could confirm an arrow off one. (#435 reads the file ref after all, as
+       * code here that may confirm and never accuse -- `fileHere` below -- not
+       * as a door.) So the anchor is verified: the ref names
        * a symbol, and that routine really does call the file system, the network
        * or another process.
        *
@@ -4626,8 +4647,9 @@ export function checkDrift(
        * "A type" is read from the structure, not from a list of node names
        * (docs/reading-a-grammar.md): a declaration with a `body` and no
        * `parameters`. A routine keeps its door meaning, checked or not; a
-       * file-only ref, a name the file does not declare, a unit struct and a
-       * type alias stay skipped, which is the quiet direction.
+       * name the file does not declare, a unit struct and a type alias stay
+       * skipped, which is the quiet direction. A file-only ref is `fileHere`'s,
+       * below.
        */
       const typeHere = (node: RecoveredNode): boolean => {
         if (node.state !== "external") return false;
@@ -4647,12 +4669,39 @@ export function checkDrift(
           && declaration.childForFieldName("body") !== null
           && declaration.childForFieldName("parameters") === null);
       };
-      const misfiled = [fromNode, toNode].filter(typeHere);
+      /*
+       * An external box anchored at a whole file in this repo (#435). A file
+       * is no more a door than a class is, so the box is read like a built
+       * one: Haiku drew httpx's `_urls.py` and `_transports/default.py` that
+       * way, and their correct `@needs` arrows went unread.
+       *
+       * Read, but never red. A class under an external box can only be a
+       * mistake; a file can also be an author pointing loosely at the code
+       * that talks to the outside thing -- "Browser" against `src/client.ts`
+       * -- and there an arrow the file does not answer may still be true of
+       * what the box stands for. That is a door with no route found, which
+       * goes quiet (#272). So a red on such an arrow is filed as unconfirmed
+       * in `recordEdge`, and only a confirmation is new.
+       */
+      const fileHere = (node: RecoveredNode): boolean => {
+        if (node.state !== "external") return false;
+        const ref = node.ref?.trim();
+        if (!ref) return false;
+        const { path: filePath, symbol } = parseRef(ref);
+        if (symbol || filePath.includes("*")) return false;
+        const absolute = workspace.resolve(filePath);
+        return !!absolute && workspace.stat(absolute) === "file";
+      };
+      const misfiledFiles = [fromNode, toNode].filter(fileHere);
+      const misfiled = [...[fromNode, toNode].filter(typeHere), ...misfiledFiles];
       if (misfiled.length > 0) {
         markedWrongly.set(`${edge.from} -> ${edge.to}`, misfiled.map((node) =>
-          ` ${node.label || node.id} is marked external, but ${node.ref!.trim()} is declared in this `
-          + "repository, so the arrow was checked as code; drop the external state.").join(""));
+          ` ${node.label || node.id} is marked external, but ${node.ref!.trim()} is `
+          + `${misfiledFiles.includes(node) ? "a file" : "declared"} in this repository, so the arrow was `
+          + "checked as code; drop the external state"
+          + `${misfiledFiles.includes(node) ? ", or anchor it at the routine that talks to the outside" : ""}.`).join(""));
       }
+      if (misfiledFiles.length > 0) confirmOnly.add(`${edge.from} -> ${edge.to}`);
       const outsideEnd = (node: RecoveredNode) => node.state === "external" && !misfiled.includes(node);
       const externalEnd = outsideEnd(fromNode) || outsideEnd(toNode);
       if (externalEnd && !(atADoor(fromNode) || atADoor(toNode))) {

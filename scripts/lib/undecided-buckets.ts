@@ -80,6 +80,8 @@ export const UNDECIDED_BUCKETS: Record<Labelled, BucketLabel> & Record<string, B
 
   "unconfirmed: an-end-is-data": { bucket: "now", cost: 1,
     why: "an end names data rather than something that runs, so the anchor is wrong and the author can be told which end" },
+  "unconfirmed: end-marked-external": { bucket: "now", cost: 1,
+    why: "an end is marked external but anchored at a file in this repo; the board should drop the mark or anchor the box at its door (#435)" },
   "declined: not-closed elsewhere": { bucket: "now", cost: 1,
     why: "the name leads through a re-export that runs out, and the next file is there to be read" },
 
