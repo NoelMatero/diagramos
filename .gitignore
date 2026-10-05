@@ -32,5 +32,3 @@ __pycache__/
 # Corpus clones for `npm run measure:licence`. A licence records the commit it
 # was measured at, not a copy of somebody else's repository.
 /.corpus/
-# The corpus projects' libraries, installed by `npm run bench:libraries` (#429).
-/.corpus-libs/

@@ -356,17 +356,9 @@ async function lspTooling(language: "rust" | "python", root: string): Promise<To
           const at = namesAt + n.index!;
           const found = await definition(file, at);
           const target = found?.find((l) => !isOutside(l.file, root));
-          /*
-           * Found, and only outside the repository: a library's, as `ask` reads
-           * a module. `poetry.core` shares its top package with poetry's own
-           * `src/poetry`, so once poetry-core is installed every name imported
-           * from it resolves there, and read as unresolved it made 30 `@needs`
-           * claims a doubt over an import of a library (#429).
-           */
-          if (found !== undefined && found.length > 0 && !target) continue;
           // A name imported from a module is a dependency on that module whether
           // it names a submodule or a symbol; only a submodule adds a file.
-          if (target &&(target.file.endsWith("__init__.py") || target.start === 0)) {
+          if (target && (target.file.endsWith("__init__.py") || target.start === 0)) {
             out.push({ text: `${moduleText}.${n[1]}`, file: target.file });
           } else if (!/\w/.test(moduleText) || (target === undefined && isLocalImport("python", moduleText, root, file))) {
             out.push({ text: `${moduleText}${n[1]}`, file: target?.file });

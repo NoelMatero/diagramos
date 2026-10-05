@@ -93,8 +93,8 @@
       "language": "python",
       "source": "reverse",
       "parent": "needs|src/poetry/repositories/repository.py#Repository|src/poetry/repositories/abstract_repository.py#AbstractRepository|",
-      "truth": "false",
-      "why": "nothing in it imports that file"
+      "truth": "undecidable",
+      "why": "an import (poetry.core.constraints.version) did not resolve"
     },
     {
       "id": "needs|src/poetry/repositories/cached_repository.py|src/poetry/repositories/abstract_repository.py#AbstractRepository|",
@@ -106,8 +106,8 @@
       "language": "python",
       "source": "retarget",
       "parent": "needs|src/poetry/repositories/repository.py#Repository|src/poetry/repositories/abstract_repository.py#AbstractRepository|",
-      "truth": "false",
-      "why": "nothing in it imports that file"
+      "truth": "undecidable",
+      "why": "an import (poetry.core.constraints.version) did not resolve"
     },
     {
       "id": "conforms|src/poetry/repositories/cached_repository.py#CachedRepository|src/poetry/repositories/repository.py#Repository|",
@@ -195,8 +195,8 @@
       "language": "python",
       "source": "reverse",
       "parent": "needs|src/poetry/repositories/cached_repository.py#CachedRepository|src/poetry/repositories/repository.py#Repository|",
-      "truth": "false",
-      "why": "nothing in it imports that file"
+      "truth": "undecidable",
+      "why": "an import (poetry.core.constraints.version) did not resolve"
     },
     {
       "id": "needs|src/poetry/repositories/http_repository.py|src/poetry/repositories/repository.py#Repository|",
@@ -208,8 +208,8 @@
       "language": "python",
       "source": "retarget",
       "parent": "needs|src/poetry/repositories/cached_repository.py#CachedRepository|src/poetry/repositories/repository.py#Repository|",
-      "truth": "false",
-      "why": "nothing in it imports that file"
+      "truth": "undecidable",
+      "why": "an import (poetry.core.constraints.version) did not resolve"
     },
     {
       "id": "conforms|src/poetry/repositories/http_repository.py#HTTPRepository|src/poetry/repositories/cached_repository.py#CachedRepository|",
@@ -284,8 +284,8 @@
       "language": "python",
       "source": "reverse",
       "parent": "needs|src/poetry/repositories/http_repository.py#HTTPRepository|src/poetry/repositories/cached_repository.py#CachedRepository|",
-      "truth": "false",
-      "why": "nothing in it imports that file"
+      "truth": "undecidable",
+      "why": "an import (poetry.core.constraints.version) did not resolve"
     },
     {
       "id": "needs|src/poetry/repositories/http_repository.py#HTTPRepository|src/poetry/repositories/http_repository.py|",
@@ -373,8 +373,8 @@
       "language": "python",
       "source": "reverse",
       "parent": "needs|src/poetry/repositories/pypi_repository.py#PyPiRepository|src/poetry/repositories/http_repository.py#HTTPRepository|",
-      "truth": "false",
-      "why": "nothing in it imports that file"
+      "truth": "undecidable",
+      "why": "an import (poetry.core.constraints.version) did not resolve"
     },
     {
       "id": "needs|src/poetry/repositories/pypi_repository.py#PyPiRepository|src/poetry/repositories/repository_pool.py|",
@@ -386,8 +386,8 @@
       "language": "python",
       "source": "retarget",
       "parent": "needs|src/poetry/repositories/pypi_repository.py#PyPiRepository|src/poetry/repositories/http_repository.py#HTTPRepository|",
-      "truth": "false",
-      "why": "nothing in it imports that file"
+      "truth": "undecidable",
+      "why": "an import (poetry.core.packages.dependency) did not resolve"
     },
     {
       "id": "conforms|src/poetry/repositories/repository_pool.py#RepositoryPool|src/poetry/repositories/abstract_repository.py#AbstractRepository|",
@@ -462,8 +462,8 @@
       "language": "python",
       "source": "reverse",
       "parent": "needs|src/poetry/repositories/repository_pool.py#RepositoryPool|src/poetry/repositories/abstract_repository.py#AbstractRepository|",
-      "truth": "false",
-      "why": "nothing in it imports that file"
+      "truth": "undecidable",
+      "why": "an import (poetry.core.constraints.version) did not resolve"
     },
     {
       "id": "needs|src/poetry/repositories/repository_pool.py#RepositoryPool|src/poetry/repositories/installed_repository.py|",
@@ -475,8 +475,8 @@
       "language": "python",
       "source": "retarget",
       "parent": "needs|src/poetry/repositories/repository_pool.py#RepositoryPool|src/poetry/repositories/abstract_repository.py#AbstractRepository|",
-      "truth": "false",
-      "why": "nothing in it imports that file"
+      "truth": "undecidable",
+      "why": "an import (poetry.core.constraints.version) did not resolve"
     },
     {
       "id": "holds|src/poetry/repositories/repository_pool.py#RepositoryPool|src/poetry/repositories/repository.py#Repository|",
@@ -524,8 +524,8 @@
       "language": "python",
       "source": "reverse",
       "parent": "needs|src/poetry/repositories/repository_pool.py#RepositoryPool|src/poetry/repositories/repository.py#Repository|",
-      "truth": "false",
-      "why": "nothing in it imports that file"
+      "truth": "undecidable",
+      "why": "an import (poetry.core.constraints.version) did not resolve"
     },
     {
       "id": "needs|src/poetry/repositories/installed_repository.py|src/poetry/repositories/repository.py#Repository|",
@@ -639,8 +639,8 @@
       "language": "python",
       "source": "reverse",
       "parent": "needs|src/poetry/repositories/http_repository.py#HTTPRepository|src/poetry/repositories/link_sources/base.py#LinkSource|",
-      "truth": "false",
-      "why": "nothing in it imports that file"
+      "truth": "undecidable",
+      "why": "an import (poetry.core.constraints.version) did not resolve"
     },
     {
       "id": "needs|src/poetry/repositories/repository_pool.py|src/poetry/repositories/link_sources/base.py#LinkSource|",
@@ -652,8 +652,8 @@
       "language": "python",
       "source": "retarget",
       "parent": "needs|src/poetry/repositories/http_repository.py#HTTPRepository|src/poetry/repositories/link_sources/base.py#LinkSource|",
-      "truth": "false",
-      "why": "nothing in it imports that file"
+      "truth": "undecidable",
+      "why": "an import (poetry.core.constraints.version) did not resolve"
     },
     {
       "id": "conforms|src/poetry/repositories/link_sources/html.py#HTMLPage|src/poetry/repositories/link_sources/base.py#LinkSource|",
@@ -741,8 +741,8 @@
       "language": "python",
       "source": "reverse",
       "parent": "needs|src/poetry/repositories/link_sources/html.py#HTMLPage|src/poetry/repositories/link_sources/base.py#LinkSource|",
-      "truth": "false",
-      "why": "nothing in it imports that file"
+      "truth": "undecidable",
+      "why": "an import (poetry.core.constraints.version) did not resolve"
     },
     {
       "id": "needs|src/poetry/repositories/link_sources/json.py|src/poetry/repositories/link_sources/base.py#LinkSource|",
@@ -843,8 +843,8 @@
       "language": "python",
       "source": "reverse",
       "parent": "needs|src/poetry/repositories/link_sources/json.py#SimpleJsonPage|src/poetry/repositories/link_sources/base.py#LinkSource|",
-      "truth": "false",
-      "why": "nothing in it imports that file"
+      "truth": "undecidable",
+      "why": "an import (poetry.core.constraints.version) did not resolve"
     },
     {
       "id": "needs|src/poetry/repositories/link_sources/html.py|src/poetry/repositories/link_sources/base.py#LinkSource|",
