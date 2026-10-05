@@ -403,7 +403,7 @@ function onlyNewCreates(source: string, tailLanguage: Language, language: Langua
   let doubt = false;
   each(tree.rootNode, (node) => {
     // `<Widget />` carries the component on a `name` field too: a use, not a declaration.
-    if (node.type.startsWith("jsx_")) return;
+    if (node.type.startsWith("jsx_") || writtenAsUse(node)) return;
     const name = node.childForFieldName("name");
     if (!name || name.childCount !== 0 || !wanted.has(name.text)) return;
     // A method or a parameter that happens to share the name is not a
@@ -425,6 +425,19 @@ function onlyNewCreates(source: string, tailLanguage: Language, language: Langua
 }
 
 /**
+ * Whether a node that carries a `name` is a use of that name rather than a
+ * declaration of it (#432): it is given type arguments (`Mutation<unknown>`
+ * in a cast) or reached through a path (`ser::Serializer` in `impl
+ * ser::Serializer for`, `ns.Widget`). Read by fields, which every grammar
+ * here shares, rather than by node names: no declaration has either. Read as
+ * a second declaration, each one made the name "declared some other way too",
+ * and the reader withheld on it.
+ */
+function writtenAsUse(node: Node): boolean {
+  return ["type_arguments", "path", "module", "scope", "object"].some((field) => node.childForFieldName(field) !== null);
+}
+
+/**
  * Rust's `onlyNewCreates`: every one of these names is declared as a struct,
  * an enum or a union, and nothing else of that name is declared -- a `type`
  * alias or a trait is quiet, because what it stands for is written elsewhere.
@@ -440,7 +453,7 @@ function onlyStructs(source: string, names: string[]): boolean {
   let doubt = false;
   each(tree.rootNode, (node) => {
     // `Widget { x }` carries the type on a `name` field too: a use, not a declaration.
-    if (MAKES.test(node.type)) return;
+    if (MAKES.test(node.type) || writtenAsUse(node)) return;
     const name = node.childForFieldName("name");
     if (!name || name.childCount !== 0 || !wanted.has(name.text)) return;
     if (node.childForFieldName("parameters")) return;
@@ -533,6 +546,8 @@ function compiledCreatesNone(routine: string, wanted: Set<string>, names: Constr
  */
 function namesTheHead(
   routines: Node[], source: string, language: Language, wanted: Set<string>, handedInCounts = false,
+  /** The head's own file, for what a value of it runs unwritten (#432). Absent, every handed-in value does. */
+  head?: { source: string; language: Language },
 ): boolean {
   const spelt = new Set(wanted);
   for (const [local, binding] of bindingsIn(source, language)?.imported ?? []) {
@@ -545,7 +560,15 @@ function namesTheHead(
     // whoever implements it -- is the head under another name.
     const inside = selfIsHead.some((span) => routine.startIndex >= span.start && routine.startIndex < span.end);
     const own = routine.childForFieldName("name");
-    const handedIn = handedInCounts ? [] : handedInTypes(routine, language);
+    /*
+     * For `@calls` into the class a handed-in value still names it when the
+     * body runs one of the class's methods through it with no call written
+     * (#432): `for x in r` runs `Range.__iter__`. Passed on, read from or kept,
+     * it runs nothing of the class's here, and `lookupComponent(moduleRef:
+     * Module)` was never asked whether it calls Module.
+     */
+    const handedIn = handedInTypes(routine, language)
+      .filter((span) => !handedInCounts || !runsUnwritten(routine, span.name, wanted, head));
     each(routine, (node) => {
       if (named || node.childCount !== 0 || !node.isNamed) return;
       if (own && node.id === own.id) return;
@@ -573,9 +596,9 @@ const MAKER_WORDS: Partial<Record<Language, RegExp>> = {
   rust: /^(fn|Fn|FnMut|FnOnce|impl|dyn)$/,
 };
 
-/** The spans of every parameter type under this routine that hands in a value, not a maker (#417). */
-function handedInTypes(routine: Node, language: Language): Array<{ start: number; end: number }> {
-  const spans: Array<{ start: number; end: number }> = [];
+/** The spans of every parameter type under this routine that hands in a value, not a maker (#417), with the parameter's name. */
+function handedInTypes(routine: Node, language: Language): Array<{ start: number; end: number; name?: string }> {
+  const spans: Array<{ start: number; end: number; name?: string }> = [];
   const maker = MAKER_WORDS[language];
   each(routine, (node) => {
     const parameters = node.childForFieldName("parameters");
@@ -589,10 +612,136 @@ function handedInTypes(routine: Node, language: Language): Array<{ start: number
         if (inner.childForFieldName("parameters")) makes = true;
         else if (inner.childCount === 0 && maker?.test(inner.text)) makes = true;
       });
-      if (!makes) spans.push({ start: written.startIndex, end: written.startIndex + written.text.length });
+      if (makes) continue;
+      const parameter = parameters.child(at)!;
+      const named = parameter.childForFieldName("name") ?? parameter.childForFieldName("pattern") ?? parameter.child(0);
+      spans.push({
+        start: written.startIndex,
+        end: written.startIndex + written.text.length,
+        ...(named?.childCount === 0 && /identifier$/.test(named.type) ? { name: named.text } : {}),
+      });
     }
   });
   return spans;
+}
+
+/**
+ * The methods a language runs on a value with no call written, by how the
+ * value is used (#432, #373). Python's are its dunders; TypeScript's are
+ * `toString`, `valueOf`, `toJSON`, `then` and the computed `[Symbol.*]` ones.
+ * `operator` is any of them: `a + b`, `a == b`, `a[k]` and `-a` each run one.
+ */
+const UNWRITTEN: Record<"iterate" | "format" | "hash" | "truth" | "with" | "await" | "operator", RegExp> = {
+  iterate: /^(__(iter|aiter|next|getitem|len|contains)__|\[Symbol\.(asyncI|i)terator\])$/,
+  format: /^(__(str|repr|format)__|toString|valueOf|toJSON|\[Symbol\.toPrimitive\])$/,
+  hash: /^__(hash|eq)__$/,
+  truth: /^__(bool|len)__$/,
+  with: /^__(a?enter|a?exit)__$/,
+  await: /^(__await__|then)$/,
+  operator: /^(__(?!(init|new|init_subclass|class_getitem|set_name|post_init)__)\w+__|toString|valueOf|\[Symbol\.toPrimitive\])$/,
+};
+const ITERATES = /^(list|tuple|set|frozenset|sorted|sum|min|max|any|all|enumerate|zip|iter|next|len|dict|map|filter|reversed|Array\.from|Promise\.all)$/;
+const FORMATS = /^(str|repr|format|print|String|JSON\.stringify|console\.\w+)$/;
+const HASHES = /(^hash|\.(add|discard))$/;
+
+/**
+ * Whether a body runs one of the head's methods through a value handed in
+ * under `name`, with no call to it written (#432): it iterates the value,
+ * spreads it, formats it, hashes it, uses it with an operator, tests its
+ * truth, enters it or awaits it -- and the head declares the method that
+ * use runs. A class with a base may inherit one, and a Rust type runs any
+ * trait it implements (`Drop` at the end of the routine alone), so both
+ * count whatever the use.
+ */
+function runsUnwritten(
+  routine: Node, name: string | undefined, wanted: Set<string>, head: { source: string; language: Language } | undefined,
+): boolean {
+  if (!name || !head) return true;
+  const declared = unwrittenMethods(head.source, head.language, wanted);
+  if (declared === "any") return true;
+  if (declared.length === 0) return false;
+  const runs = (use: Use) => declared.some((method) => UNWRITTEN[use].test(method));
+  let found = false;
+  const visit = (node: Node, use: Use | undefined, callee?: string): void => {
+    if (found) return;
+    if (node.childCount === 0) {
+      if (use && node.isNamed && node.text === name && runs(use)) found = true;
+      return;
+    }
+    const call = /^call(_expression)?$/.test(node.type) || node.type === "new_expression"
+      ? node.childForFieldName("function")?.text.replace(/\s+/g, "") ?? "" : undefined;
+    for (let at = 0; at < node.childCount; at += 1) {
+      const child = node.child(at)!;
+      visit(child, useOf(node, node.fieldNameForChild(at), use, callee), call ?? callee);
+    }
+  };
+  visit(routine.childForFieldName("body") ?? routine, undefined);
+  return found;
+}
+
+type Use = keyof typeof UNWRITTEN;
+
+/** What a node's child at `field` is used for, given what the node itself is used for. */
+function useOf(node: Node, field: string | null, use: Use | undefined, callee: string | undefined): Use | undefined {
+  switch (node.type) {
+    case "parenthesized_expression": case "expression_list": return use;
+    case "for_statement": case "for_in_clause": case "for_in_statement":
+      return field === "right" || field === "iterable" ? "iterate" : undefined;
+    case "list_splat": case "dictionary_splat": case "spread_element": case "yield": return "iterate";
+    case "interpolation": case "template_substitution": return "format";
+    case "not_operator": case "boolean_operator": return "truth";
+    case "binary_operator": case "binary_expression": case "comparison_operator": case "unary_operator":
+    case "unary_expression": case "augmented_assignment": case "subscript": case "subscript_expression":
+      return "operator";
+    case "if_statement": case "while_statement": case "elif_clause": case "conditional_expression": case "assert_statement":
+      return field === "condition" ? "truth" : undefined;
+    case "with_item": return "with";
+    case "await": case "await_expression": return "await";
+    case "set": return "hash";
+    // A container something walks: its items may be hashed, compared or formatted (`set([r])`, `sorted([r])`).
+    case "list": case "tuple": case "array": case "dictionary": case "object": case "list_comprehension":
+    case "generator_expression": case "set_comprehension": case "dictionary_comprehension":
+      return use ? "operator" : undefined;
+    case "pair": return field === "key" ? "hash" : undefined;
+    case "argument_list": case "arguments": {
+      const called = callee ?? "";
+      return ITERATES.test(called) ? "iterate" : FORMATS.test(called) ? "format" : HASHES.test(called) ? "hash" : undefined;
+    }
+    default: return undefined;
+  }
+}
+
+/**
+ * The methods of the head's class a value of it can run unwritten, by name;
+ * `"any"` when that cannot be listed: the class names a base, or it is a
+ * Rust type with a trait implemented in this file.
+ */
+function unwrittenMethods(source: string, language: Language, wanted: Set<string>): string[] | "any" {
+  const tree = parseSource(source, language);
+  if (!tree) return "any";
+  if (language === "rust") {
+    let traits = false;
+    each(tree.rootNode, (node) => {
+      if (node.type !== "impl_item" || !node.childForFieldName("trait")) return;
+      const type = node.childForFieldName("type")?.text.replace(/<[\s\S]*$/, "").split("::").pop();
+      if (type !== undefined && wanted.has(type)) traits = true;
+    });
+    return traits ? "any" : [];
+  }
+  const methods: string[] = [];
+  let based = false;
+  each(tree.rootNode, (node) => {
+    const own = node.childForFieldName("name");
+    const body = node.childForFieldName("body");
+    if (!own || !body || node.childForFieldName("parameters") || !wanted.has(own.text)) return;
+    if (node.childForFieldName("superclasses")) based = true;
+    for (let at = 0; at < node.childCount; at += 1) if (node.child(at)?.type === "class_heritage") based = true;
+    each(body, (member) => {
+      const named = member.childForFieldName("name");
+      if (named && member.childForFieldName("parameters")) methods.push(named.text.replace(/\s+/g, ""));
+    });
+  });
+  return based ? "any" : methods;
 }
 
 /** Where `Self` could be the head in a Rust file: an `impl` of one of its names, and every trait. */
@@ -1028,7 +1177,7 @@ function pythonAbsence(
   if (!reverse || reverse.language !== "python" || !names?.head) return undefined;
   if (!mayAccuse("builds", "python", "absence") || !onlyCalledClasses(reverse.source, targets)) return undefined;
   const { routines } = routinesNamed(source, routine, "python");
-  if (routines.length === 0 || namesTheHead(routines, source, "python", new Set(targets), handedInCounts)) return undefined;
+  if (routines.length === 0 || namesTheHead(routines, source, "python", new Set(targets), handedInCounts, reverse)) return undefined;
 
   /*
    * A call to the tail is a construction only when the tail is a class. When
@@ -1328,7 +1477,7 @@ export function constructions(
    */
   const byText = reverse !== undefined && mayAccuse("builds", language, "absence")
     && onlyNewCreates(reverse.source, language, reverse.language, targets)
-    && !namesTheHead(routines, source, language, wanted, forCalls)
+    && !namesTheHead(routines, source, language, wanted, forCalls, reverse)
     && !(language === "rust" && macroDeclares(source, routine));
   if (byText && language === "rust" && names && !names.side.compiled?.()) {
     return { verdict: "absent", awaitsCompiler: true };
