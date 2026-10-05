@@ -57,6 +57,8 @@ function ask(
     source: string; language: Language; imports?: Array<[string, string?]>;
     /** #233: a live per-receiver resolver, exactly as `drift.ts` would wire one in. */
     resolveReceiver?: (at: { start: number; end: number }) => ReceiverResolution | undefined;
+    /** #416: "go to definition", exactly as `drift.ts` would wire one in. */
+    declarationAt?: CallSide["declarationAt"];
   }>,
   from: { file: string; routine: string },
   to: { file: string; names: string[] },
@@ -84,6 +86,7 @@ function ask(
         };
       },
       ...(one.resolveReceiver ? { resolveReceiver: one.resolveReceiver } : {}),
+      ...(one.declarationAt ? { declarationAt: one.declarationAt } : {}),
     };
   };
   return callsBetween({ ...sideOf(from.file), routine: from.routine }, { ...sideOf(to.file), names: to.names });
@@ -574,6 +577,37 @@ describe("a doubt is about the name being asked after, and never about the body"
     }, { file: "src/a.ts", routine: "run" }, { file: "src/b.ts", names: ["render"] });
 
     expect(verdictOf(verdict)).toBe("withheld/ambiguous");
+  });
+
+  /**
+   * anyhow's `error.rs` imports `Error` and holds `impl Error` blocks, so the
+   * owner in `Error::construct(...)` is bound twice over and five correct
+   * arrows never confirmed (#433). The compiler, asked at the call, is not in
+   * doubt. Only its "yes, there" counts: no answer, or an answer somewhere
+   * else, leaves the doubt exactly as it was.
+   */
+  describe("an owner bound twice over, asked at the call (#433)", () => {
+    const source = "use crate::Error;\n"
+      + "impl Error {\n"
+      + "    pub fn msg() -> Self { Error::construct(1) }\n"
+      + "    fn construct(n: u8) -> Self { todo!() }\n"
+      + "}\n";
+    const askWith = (declarationAt?: CallSide["declarationAt"]): CallsVerdict => ask({
+      "src/error.rs": {
+        source, language: "rust", imports: [["crate::Error", "src/lib.rs"]], ...(declarationAt ? { declarationAt } : {}),
+      },
+    }, { file: "src/error.rs", routine: "msg" }, { file: "src/error.rs", names: ["construct"] });
+
+    it("confirms when the compiler lands on the far routine", () => {
+      expect(verdictOf(askWith(() => ({ file: "src/error.rs", line: 4, concrete: true })))).toBe("confirmed");
+    });
+
+    it("stays ambiguous with no compiler, or one that lands elsewhere", () => {
+      expect(verdictOf(askWith())).toBe("withheld/ambiguous");
+      expect(verdictOf(askWith(() => undefined))).toBe("withheld/ambiguous");
+      expect(verdictOf(askWith(() => ({ file: "src/error.rs", line: 3, concrete: true })))).toBe("withheld/ambiguous");
+      expect(verdictOf(askWith(() => "outside"))).toBe("withheld/ambiguous");
+    });
   });
 
   it("withholds when a macro's tokens mention the name", () => {

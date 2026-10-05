@@ -1522,7 +1522,16 @@ function resolves(
 
   const bound = callee.kind === "through" ? callee.through : callee.name;
   if (!bound) return callee.kind === "through" ? landsOnTarget(callee, side, target) : "receiver";
-  if (bindings.ambiguous.has(bound)) return "ambiguous";
+  /*
+   * Ambiguous as a name is not ambiguous at one position (#433), which is why
+   * `placeOf` already asks there. anyhow's `error.rs` imports `Error` and also
+   * holds `impl Error` blocks, so `Error::construct(...)`, written in plain
+   * sight, never confirmed. Only ever a confirmation: no answer, or one
+   * elsewhere, leaves the doubt as it was.
+   */
+  if (bindings.ambiguous.has(bound)) {
+    return callee.kind === "through" && landsOnTarget(callee, side, target) === "yes" ? "yes" : "ambiguous";
+  }
 
   const imported = bindings.imported.get(bound);
   if (!imported) {
