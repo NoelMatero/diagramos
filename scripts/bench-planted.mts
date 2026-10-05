@@ -48,11 +48,11 @@ import { ACCUSING_EDGE_KINDS, checkDrift, createWorkspace, newCheckCache, type C
 import { liveRefereePool, refereedCheckLive, type LiveRefereePool } from "../src/engine/referee-live";
 import { initEngine } from "../src/engine/parse";
 import { waitForQuiet } from "./lib/bench-busy";
+import { librariesLine, useLibraries } from "./lib/bench-libraries";
 import { plantedBoard, plantedKeys, type Key, type KeyClaim } from "./lib/planted-keys";
 import { UNDECIDED_BUCKETS, type Bucket } from "./lib/undecided-buckets";
 
 const REPO = path.resolve(path.dirname(new URL(import.meta.url).pathname), "..");
-const CORPUS = process.env.CORPUS ?? "/Users/noelmatero/board-ai/.corpus";
 const ACCUSES = new Set<string>(ACCUSING_EDGE_KINDS);
 
 type Outcome = "red" | "not sure" | "green" | "silent";
@@ -81,9 +81,21 @@ const held = new Map<string, CheckCache>();
 function cacheFor(project: string): CheckCache {
   const found = held.get(project);
   if (found) return found;
-  const cache = newCheckCache(createWorkspace(path.join(CORPUS, project)));
+  const cache = newCheckCache(createWorkspace(rootOf(project)));
   held.set(project, cache);
   return cache;
+}
+
+/**
+ * Where a project is read, with its own libraries in reach (#429): pyright
+ * started from here on finds that project's venv, and TanStack is read from a
+ * checkout with its packages installed. Projects are walked one at a time, so
+ * switching here switches what every server started for the next one sees.
+ */
+let current: { project: string; root: string } | undefined;
+function rootOf(project: string): string {
+  if (current?.project !== project) current = { project, root: useLibraries(project) };
+  return current.root;
 }
 
 /**
@@ -160,7 +172,7 @@ async function ask(key: Key, claim: KeyClaim): Promise<{ outcome: Outcome; detai
    */
   const began = performance.now();
   const { report } = await refereedCheckLive(
-    path.join(CORPUS, key.project),
+    rootOf(key.project),
     (referee) => checkDrift(board, workspace, {
       edges: true, cache, ...(referee ? { closedBodyReferee: referee } : {}),
     }),
@@ -350,6 +362,7 @@ for (const key of loaded) {
 
 console.log();
 console.log("#296 · PLANTED MISTAKES, AND WHAT THE CHECKER SAID");
+console.log(`  ${librariesLine()}`);
 console.log(`  ${boards} boards, ${claimsScored} claims scored, `
   + `${undecidableCount} left out as undecidable, in ${((Date.now() - started) / 1000).toFixed(0)}s`);
 console.log();
