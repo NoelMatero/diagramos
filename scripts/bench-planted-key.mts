@@ -34,7 +34,6 @@ import { existsSync, mkdirSync, readFileSync, readdirSync, writeFileSync } from 
 import path from "node:path";
 
 import { readGraph } from "../src/engine/graph";
-import { useLibraries } from "./lib/bench-libraries";
 import { createOracle, kindProblemFor, WORDS, type ClaimUnderTest, type Oracle, type Word } from "./lib/bench-oracle";
 import { createTooling, languageOfPath, type Language, type Sym } from "./lib/bench-tooling";
 
@@ -145,7 +144,7 @@ async function pickSwap(
 }
 
 async function buildKey(scope: Scope, boardPath: string): Promise<{ claims: KeyClaim[]; tool: string } | undefined> {
-  const root = useLibraries(scope.project);
+  const root = path.join(CORPUS, scope.project);
   const graph = readGraph(JSON.parse(readFileSync(boardPath, "utf8")));
   const label = new Map(graph.nodes.map((n) => [n.id, n.label.replace(/\s+/g, " ")]));
   const refOf = new Map(graph.nodes.flatMap((n) => (n.ref ? [[n.id, n.ref] as const] : [])));

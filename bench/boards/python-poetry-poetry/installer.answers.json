@@ -66,8 +66,8 @@
       "language": "python",
       "source": "reverse",
       "parent": "needs|src/poetry/installation/installer.py#Installer|src/poetry/puzzle/transaction.py#Transaction|",
-      "truth": "false",
-      "why": "nothing in it imports that file"
+      "truth": "undecidable",
+      "why": "an import (poetry.core.packages.package) did not resolve"
     },
     {
       "id": "needs|src/poetry/installation/installer.py#Installer|src/poetry/puzzle/solver.py|",
@@ -194,8 +194,8 @@
       "language": "python",
       "source": "reverse",
       "parent": "needs|src/poetry/installation/installer.py#Installer|src/poetry/installation/executor.py#Executor|",
-      "truth": "false",
-      "why": "nothing in it imports that file"
+      "truth": "undecidable",
+      "why": "an import (poetry.core.packages.utils.link) did not resolve"
     },
     {
       "id": "needs|src/poetry/installation/installer.py#Installer|src/poetry/installation/__init__.py|",
@@ -207,8 +207,8 @@
       "language": "python",
       "source": "retarget",
       "parent": "needs|src/poetry/installation/installer.py#Installer|src/poetry/installation/executor.py#Executor|",
-      "truth": "false",
-      "why": "nothing in it imports that file"
+      "truth": "undecidable",
+      "why": "an import (poetry.core.packages.dependency) did not resolve"
     },
     {
       "id": "accesses|src/poetry/installation/installer.py#Installer|src/poetry/installation/executor.py#Executor|execute",
@@ -310,8 +310,8 @@
       "language": "python",
       "source": "reverse",
       "parent": "needs|src/poetry/puzzle/transaction.py#Transaction|src/poetry/installation/operations/operation.py#Operation|",
-      "truth": "false",
-      "why": "nothing in it imports that file"
+      "truth": "undecidable",
+      "why": "an import (poetry.core.packages.package) did not resolve"
     },
     {
       "id": "needs|src/poetry/puzzle/solver.py|src/poetry/installation/operations/operation.py#Operation|",
@@ -323,8 +323,8 @@
       "language": "python",
       "source": "retarget",
       "parent": "needs|src/poetry/puzzle/transaction.py#Transaction|src/poetry/installation/operations/operation.py#Operation|",
-      "truth": "false",
-      "why": "nothing in it imports that file"
+      "truth": "undecidable",
+      "why": "an import (poetry.core.version.markers) did not resolve"
     },
     {
       "id": "calls|src/poetry/installation/executor.py#Executor|src/poetry/installation/operations/operation.py#Operation|",
@@ -373,8 +373,8 @@
       "language": "python",
       "source": "reverse",
       "parent": "needs|src/poetry/installation/executor.py#Executor|src/poetry/installation/operations/operation.py#Operation|",
-      "truth": "false",
-      "why": "nothing in it imports that file"
+      "truth": "undecidable",
+      "why": "an import (poetry.core.packages.package) did not resolve"
     },
     {
       "id": "needs|src/poetry/installation/__init__.py|src/poetry/installation/operations/operation.py#Operation|",
@@ -448,8 +448,8 @@
       "language": "python",
       "source": "reverse",
       "parent": "needs|src/poetry/installation/executor.py#Executor|src/poetry/installation/wheel_installer.py#WheelInstaller|",
-      "truth": "false",
-      "why": "nothing in it imports that file"
+      "truth": "undecidable",
+      "why": "an import (installerinstall) did not resolve"
     },
     {
       "id": "needs|src/poetry/installation/__init__.py|src/poetry/installation/wheel_installer.py#WheelInstaller|",
@@ -562,8 +562,8 @@
       "language": "python",
       "source": "reverse",
       "parent": "needs|src/poetry/installation/executor.py#Executor|src/poetry/installation/chef.py#Chef|",
-      "truth": "false",
-      "why": "nothing in it imports that file"
+      "truth": "undecidable",
+      "why": "an import (poetry.core.packages.utils.utils) did not resolve"
     },
     {
       "id": "needs|src/poetry/installation/executor.py#Executor|src/poetry/installation/__init__.py|",
@@ -575,8 +575,8 @@
       "language": "python",
       "source": "retarget",
       "parent": "needs|src/poetry/installation/executor.py#Executor|src/poetry/installation/chef.py#Chef|",
-      "truth": "false",
-      "why": "nothing in it imports that file"
+      "truth": "undecidable",
+      "why": "an import (poetry.core.packages.utils.link) did not resolve"
     },
     {
       "id": "accesses|src/poetry/installation/executor.py#Executor|src/poetry/installation/chef.py#Chef|prepare",
@@ -690,8 +690,8 @@
       "language": "python",
       "source": "reverse",
       "parent": "needs|src/poetry/installation/executor.py#Executor|src/poetry/installation/chooser.py#Chooser|",
-      "truth": "false",
-      "why": "nothing in it imports that file"
+      "truth": "undecidable",
+      "why": "an import (poetry.core.constraints.version) did not resolve"
     },
     {
       "id": "needs|src/poetry/installation/executor.py#Executor|src/poetry/installation/wheel_installer.py|",
