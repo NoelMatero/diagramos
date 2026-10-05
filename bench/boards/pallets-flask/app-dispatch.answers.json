@@ -335,8 +335,8 @@
       "language": "python",
       "source": "reverse",
       "parent": "calls|src/flask/ctx.py#push|src/flask/ctx.py#match_request|",
-      "truth": "undecidable",
-      "why": "the tool would not walk this routine's calls"
+      "truth": "false",
+      "why": "the routine's calls were read and none is it"
     },
     {
       "id": "calls|src/flask/ctx.py#__delattr__|src/flask/ctx.py#match_request|",

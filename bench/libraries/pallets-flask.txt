@@ -1,0 +1,12 @@
+# pallets-flask's runtime dependencies and extras, exported from its uv.lock at the pinned commit:
+#   uv export --frozen --no-default-groups --all-extras --no-emit-project --no-hashes
+asgiref==3.12.1
+blinker==1.9.0
+click==8.4.2
+colorama==0.4.6 ; sys_platform == 'win32'
+itsdangerous==2.2.0
+jinja2==3.1.6
+markupsafe==3.0.3
+python-dotenv==1.2.2
+typing-extensions==4.16.0 ; python_full_version < '3.11'
+werkzeug==3.1.8
