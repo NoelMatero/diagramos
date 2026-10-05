@@ -957,3 +957,85 @@ describe("a closed call set that lands in the head's file at another routine", (
     expect(verdictOf(verdict)).toBe("absent");
   });
 });
+
+/*
+ * Python's `getattr` and `setattr` read and set by name (#431). Neither runs
+ * an ordinary function, so one whose result goes nowhere it could be run no
+ * longer stops the question. What it can still run -- an attribute hook, a
+ * property -- and every way its result can be run are the quiet cases.
+ */
+describe("a Python read or write by name that runs nothing (#431)", () => {
+  const far = { "app/b.py": {
+    source: "class Box:\n    @property\n    def size(self):\n        return 1\n\n    def __getattr__(self, name):\n        return 2\n\n"
+      + "def render():\n    return 3\n",
+    language: "python" as const,
+  } };
+  const run = (body: string, head: string, header = "") => ask({
+    ...far,
+    "app/a.py": { source: `${header}def run(obj, name):\n${body}`, language: "python" },
+  }, { file: "app/a.py", routine: "run" }, { file: "app/b.py", names: [head] });
+
+  it("refutes when the body only tests and sets attributes by name", () => {
+    const verdict = run("    if getattr(obj, name, None) is None:\n        setattr(obj, name, 1)\n    return isinstance(getattr(obj, name), int)\n", "render");
+    expect(verdictOf(verdict)).toBe("refuted");
+  });
+
+  it("finds the call running the other way past a read by name", () => {
+    const verdict = ask({
+      "app/a.py": { source: "def run(obj, name):\n    return getattr(obj, name, None) is None\n", language: "python" },
+      "app/b.py": {
+        source: "from app.a import run\n\ndef render(obj):\n    return run(obj, 'x')\n",
+        language: "python",
+        imports: [["app.a", "app/a.py"], ["app.a.run", "app/a.py"]],
+      },
+    }, { file: "app/a.py", routine: "run" }, { file: "app/b.py", names: ["render"] });
+    expect(verdictOf(verdict)).toBe("backwards");
+  });
+
+  it("stays quiet when the result is called where it stands", () => {
+    expect(verdictOf(run("    return getattr(obj, name)()\n", "render"))).not.toBe("refuted");
+  });
+
+  it("stays quiet when the result is kept and then called", () => {
+    expect(verdictOf(run("    handler = getattr(obj, name)\n    handler()\n    return 1\n", "render"))).not.toBe("refuted");
+  });
+
+  it("stays quiet when the result is handed to a call that may run it", () => {
+    // `map` is a library call, placed; what it is handed, it runs.
+    expect(verdictOf(run("    return list(map(getattr(obj, name), [1]))\n", "render"))).not.toBe("refuted");
+  });
+
+  it("stays quiet when the result is returned", () => {
+    expect(verdictOf(run("    return getattr(obj, name)\n", "render"))).not.toBe("refuted");
+  });
+
+  it("stays quiet when the result is put into a field", () => {
+    expect(verdictOf(run("    obj.on_done = getattr(obj, name)\n    return 1\n", "render"))).not.toBe("refuted");
+  });
+
+  it("stays quiet when the read names the head", () => {
+    expect(verdictOf(run("    return getattr(obj, 'render', None) is None\n", "render"))).not.toBe("refuted");
+  });
+
+  it("stays quiet when the head is a property a read runs", () => {
+    expect(verdictOf(run("    return getattr(obj, name, None) is None\n", "size"))).not.toBe("refuted");
+  });
+
+  it("stays quiet when the head is the hook every read runs", () => {
+    expect(verdictOf(run("    return getattr(obj, name, None) is None\n", "__getattr__"))).not.toBe("refuted");
+  });
+
+  it("stays quiet when `getattr` is the file's own and not the builtin", () => {
+    // The repository's own `getattr` is a call to it, and a walk can follow it on.
+    const verdict = ask({
+      ...far,
+      "app/a.py": {
+        source: "from app.c import getattr\n\ndef run(obj, name):\n    return getattr(obj, name) is None\n",
+        language: "python",
+        imports: [["app.c", "app/c.py"], ["app.c.getattr", "app/c.py"]],
+      },
+      "app/c.py": { source: "def getattr(obj, name):\n    return name\n", language: "python" },
+    }, { file: "app/a.py", routine: "run" }, { file: "app/b.py", names: ["render"] });
+    expect(verdictOf(verdict)).toBe("withheld/dynamic");
+  });
+});

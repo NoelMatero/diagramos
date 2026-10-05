@@ -1300,6 +1300,131 @@ const REACHES_ANYTHING = new Set([
   "apply", "call", "Function",
 ]);
 
+/**
+ * The ones that only read or write by name (#431). Python's `getattr` hands
+ * back an attribute, `setattr` stores one, and `vars`, `globals` and `locals`
+ * hand back a namespace; none of them runs an ordinary function. What they can
+ * run is an attribute hook -- `__getattr__`, a descriptor's `__get__`, a
+ * property -- and `runsOnRead` keeps those a doubt. What comes back can still
+ * be called, which is the doubt `quietReads` keeps.
+ */
+const READS_BY_NAME = new Set(["getattr", "setattr", "vars", "globals", "locals"]);
+
+/** Builtins handed a value only to look at it: none of them calls it. */
+const INSPECTS = new Set(["isinstance", "issubclass", "id", "type", "len", "bool", "callable", "hasattr"]);
+
+/**
+ * The `getattr`-like calls in one Python routine whose result goes nowhere it
+ * could be run: compared, tested, read from, kept in a local -- never called
+ * where it stands, handed to a call, returned, put into a field or a
+ * container that is, used as a decorator or a context manager.
+ *
+ * Top-down, carrying whether the value at each node is handed on: a call's
+ * callee is called, its arguments are handed on unless the call only looks
+ * at them, and a container, a conditional or a walrus passes its context to
+ * what is in it. A local is any other value whose origin is unknown, and a
+ * call through one is a site of its own. A name bound by the file or the
+ * routine (`getattr = ...`, `from x import getattr`) is not the builtin.
+ */
+function quietReads(routine: Node, bindings: Bindings): Set<number> {
+  const quiet = new Set<number>();
+  if (bindings.wildcard) return quiet;
+  /*
+   * Bound here as something else. Not `boundByRoutine`, which takes every
+   * name on the left of an operator and so bound `getattr` in pydantic's
+   * `a and getattr(...)`: a parameter, an assignment, a loop or `as` target.
+   */
+  const parameters = routine.childForFieldName("parameters")?.text ?? "";
+  const own = (name: string) => bindings.local.has(name) || bindings.imported.has(name)
+    || new RegExp(`\\b${name}\\b`).test(parameters)
+    || new RegExp(`\\b${name}\\s*(:[^=\\n]*)?:?=(?!=)|\\b(as|for|def)\\s+${name}\\b`).test(routine.text);
+  const visit = (node: Node, handed: boolean): void => {
+    const each_ = (child: Node | null, onward: boolean) => { if (child) visit(child, onward); };
+    const rest = (onward: boolean, skip?: Node | null) => {
+      for (let index = 0; index < node.childCount; index += 1) {
+        const child = node.child(index);
+        if (child && child.id !== skip?.id) visit(child, onward);
+      }
+    };
+    switch (node.type) {
+      case "call": {
+        const callee = node.childForFieldName("function");
+        const name = callee?.type === "identifier" && !own(callee.text) ? callee.text : undefined;
+        if (name !== undefined && READS_BY_NAME.has(name) && !handed) quiet.add(node.id);
+        each_(callee, true);
+        // `getattr(x, n, default)` hands back `default` itself; what `isinstance` is given goes nowhere.
+        const onward = name !== undefined && INSPECTS.has(name) ? false : name === "getattr" ? handed : true;
+        each_(node.childForFieldName("arguments"), onward);
+        return;
+      }
+      case "argument_list": case "keyword_argument": case "list_splat": case "dictionary_splat":
+      case "parenthesized_expression": case "tuple": case "list": case "set": case "dictionary": case "pair":
+      case "conditional_expression": case "boolean_operator": case "await": case "expression_list":
+      case "list_comprehension": case "set_comprehension": case "dictionary_comprehension": case "generator_expression":
+        rest(handed);
+        return;
+      case "named_expression":
+        each_(node.childForFieldName("value"), handed);
+        return;
+      case "return_statement": case "yield": case "lambda": case "decorator": case "with_item":
+        rest(true);
+        return;
+      case "assignment": case "augmented_assignment": {
+        const left = node.childForFieldName("left");
+        const kept = left !== null && /^(identifier|pattern_list|tuple_pattern|list_pattern)$/.test(left.type);
+        each_(left, false);
+        each_(node.childForFieldName("right"), !kept);
+        return;
+      }
+      default:
+        rest(false);
+    }
+  };
+  visit(routine, false);
+  return quiet;
+}
+
+const DUNDER = /^__\w+__$/;
+const ATTRIBUTE_HOOK = /^__(getattr|getattribute|setattr|delattr|get|set|delete)__$/;
+const PLAIN_DECORATOR = /^@\s*(staticmethod|classmethod|(abc\.)?abstractmethod|(typing\.)?(overload|override))\s*$/;
+
+/**
+ * Whether reading or setting an attribute by name can run one of these
+ * without a call to it being written (#431): a dunder -- `__getattr__`, a
+ * descriptor's `__get__`, or any other the language runs on a value it was
+ * handed -- or a routine under a decorator that may make it a descriptor,
+ * `@property` and `@cached_property` among them. For a class: an attribute
+ * hook of its own, or a routine of its own under such a decorator.
+ */
+function runsOnRead(side: { source: string; language: Language }, names: readonly string[]): boolean {
+  if (side.language !== "python") return false;
+  if (names.some((name) => DUNDER.test(name))) return true;
+  const tree = parseSource(side.source, side.language);
+  if (!tree) return true;
+  const spans = names.flatMap((name) => typeSpans(side.source, side.language, name));
+  const inside = (at: Node) => {
+    const line = lineOf(side.source, at.startIndex);
+    return spans.some(([first, last]) => first <= line && line <= last);
+  };
+  let runs = false;
+  each(tree.rootNode, (node) => {
+    if (runs) return;
+    if (node.type === "function_definition") {
+      if (ATTRIBUTE_HOOK.test(node.childForFieldName("name")?.text ?? "") && inside(node)) runs = true;
+      return;
+    }
+    if (node.type !== "decorated_definition") return;
+    const routine = node.childForFieldName("definition");
+    if (routine?.type !== "function_definition") return;
+    if (!names.includes(routine.childForFieldName("name")?.text ?? "") && !inside(routine)) return;
+    for (let index = 0; index < node.childCount; index += 1) {
+      const decorator = node.child(index);
+      if (decorator?.type === "decorator" && !PLAIN_DECORATOR.test(decorator.text)) runs = true;
+    }
+  });
+  return runs;
+}
+
 type Named = { routines: Node[]; declared: boolean; unreadable: boolean };
 const named_ = new WeakMap<Tree, Map<string, Named>>();
 
@@ -1587,7 +1712,11 @@ function resolves(
 function callsTo(
   side: CallSide,
   routine: string,
-  target: { file: string; names: Set<string> },
+  target: {
+    file: string; names: Set<string>;
+    /** A head an attribute read by name can run (#431): `runsOnRead`. */
+    hooked?: boolean;
+  },
 ): { evidence?: CallsEvidence; why?: CallsWithheld } {
   const bindings = bindingsIn(side.source, side.language);
   if (!bindings) return { why: "unreadable" };
@@ -1600,6 +1729,7 @@ function callsTo(
   for (const body of routines) {
     if (body.hasError) { why ??= "incomplete"; continue; }
     let found: CallsEvidence | undefined;
+    const quiet = side.language === "python" && !target.hooked ? quietReads(body, bindings) : undefined;
     each(body, (node) => {
       if (found) return;
       /*
@@ -1618,6 +1748,8 @@ function callsTo(
       if (!callee) return;
       const answer = resolves(callee, side, bindings, target);
       if (answer === undefined) return;
+      // Read or set by name, and the result runs nowhere: no call to the head (#431).
+      if (answer === "dynamic" && quiet?.has(node.id)) return;
       if (answer === "yes") {
         found = {
           name: callee.kind === "computed" ? "" : callee.name,
@@ -1664,7 +1796,7 @@ export function callsBetween(
   backwards = true,
 ): CallsVerdict {
   const wanted = new Set(to.names);
-  const forward = callsTo(from, from.routine, { file: to.file, names: wanted });
+  const forward = callsTo(from, from.routine, { file: to.file, names: wanted, hooked: runsOnRead(to, to.names) });
   if (forward.evidence) return { verdict: "confirmed", evidence: forward.evidence };
   /*
    * A doubt reading forwards was the end of it until #357: the text could not
@@ -1697,7 +1829,7 @@ export function callsBetween(
    * read cleanly, so the honest answer is that no call was found, which is
    * `absent` and is silence either way.
    */
-  const back = { file: from.file, names: new Set([from.routine]) };
+  const back = { file: from.file, names: new Set([from.routine]), hooked: runsOnRead(from, [from.routine]) };
   for (const name of backwards ? to.names : []) {
     const reverse = callsTo(to, name, back);
     if (reverse.evidence) return { verdict: "backwards", evidence: reverse.evidence };
@@ -2082,10 +2214,12 @@ function textClosed(
 
   let sites = 0;
   const reached: Array<{ name: string; line: number }> = [];
+  let hooked: boolean | undefined;
   for (const body of bodies) {
     for (const site of body.sites) {
       // Open: something unplaced, and the site says what stopped it.
       if (site.file === undefined) return { why: site.why ?? "unplaced" };
+      if (site.byName && (hooked ??= runsOnRead(to, to.names))) return { why: "dynamic" };
       /*
        * `concrete` is only ever set by a checker's answer, and since #353 an
        * `own` call the class does not declare is put to one too -- a
@@ -2206,10 +2340,12 @@ export function callsIntoType(
   const answerable = (one: CallsNotClosed | undefined) => one === "receiver" || one === "abstract-receiver";
   const stopped = (one: CallsNotClosed): void => { if (!why || (!answerable(why) && answerable(one))) why = one; };
   let sites = 0;
+  let hooked: boolean | undefined;
   for (const body of bodies) {
     for (const site of body.sites) {
       sites += 1;
       if (site.file === undefined) { stopped(site.why ?? "unplaced"); continue; }
+      if (site.byName && (hooked ??= runsOnRead(to, to.names))) { stopped("dynamic"); continue; }
       if (site.concrete === false) { stopped("abstract-receiver"); continue; }
       if (site.overridden) { stopped("overridden"); continue; }
       const landed = site.file === to.file ? to
@@ -2519,6 +2655,13 @@ export interface CallSitePlaced {
    * plain base class rather than an interface.
    */
   overridden?: boolean;
+  /**
+   * A Python `getattr`, `setattr`, `vars`, `globals` or `locals` whose result
+   * goes nowhere it could be run (#431), placed outside the repository like
+   * any library call. It can still run an attribute hook, so a head that is
+   * one keeps it a doubt -- `runsOnRead`, asked where the head is known.
+   */
+  byName?: true;
 }
 
 /** Every call site in one routine, placed or refused. */
@@ -3196,6 +3339,7 @@ export function callSitesIn(side: CallSide, only?: string): CallSitesReading {
     const scope = boundByRoutine(node);
     holders ??= holdersIn(tree.rootNode);
     const holder = holders.get(node.id);
+    const quiet = side.language === "python" ? quietReads(node, bindings) : undefined;
     each(node, (inner) => {
       /*
        * A macro's arguments are loose tokens rather than a tree, so a call
@@ -3216,6 +3360,10 @@ export function callSitesIn(side: CallSide, only?: string): CallSitesReading {
       const callee = calleeOf(inner) ?? constructedBy(inner) ?? renderedBy(inner);
       if (!callee) return;
       const where = placeOf(callee, side, bindings, scope, holder);
+      if ("why" in where && where.why === "dynamic" && quiet?.has(inner.id)) {
+        body.sites.push({ ...siteOf(callee, side.source, inner, { file: EXTERNAL_RECEIVER }), byName: true });
+        return;
+      }
       /*
        * A local holding one of several functions, every one written down
        * (#417): one site for each it can hold, and none for a function
