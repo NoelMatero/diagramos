@@ -2013,8 +2013,9 @@ describe("saying what was not looked at", () => {
       ],
       [
         "an end marked external",
+        // No ref: one at a file here is read since #435.
         () => boardOf(
-          [{ id: "a", label: "A", ref: "src/a.ts" }, { id: "b", label: "B", ref: "src/b.ts", state: "external" }],
+          [{ id: "a", label: "A", ref: "src/a.ts" }, { id: "b", label: "B", state: "external" }],
           [{ from: "a", to: "b" }],
         ),
         { "src/a.ts": "x", "src/b.ts": "y" },
