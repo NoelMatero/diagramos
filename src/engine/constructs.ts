@@ -511,8 +511,29 @@ function compiledCreatesNone(routine: string, wanted: Set<string>, names: Constr
  * undecided. Every one of those is quiet, so the rule is the plainest one that
  * covers them: any named leaf spelt as the head. It is wrong only on the quiet
  * side, when a local merely shares the word.
+ *
+ * Two places are not a mention (#417), because neither can make anything:
+ *
+ *   - the routine's own name. `class Blueprint` names Blueprint by declaring
+ *     it, so an arrow from a class to itself could never be asked;
+ *   - a parameter's type, when it is the type of a thing handed in:
+ *     `incompatibility: Incompatibility` says what the routine is given.
+ *     Not when that type is a maker -- a function or constructor type, or
+ *     the language's word for a class or a callable (`MAKER_WORDS`) -- since
+ *     `factory: type[Widget]` is a parameter whose call makes one.
+ *
+ * Everything else still counts: a return type, a variable's type, a cast,
+ * `isinstance(x, Widget)`, `map(Widget, xs)`.
+ *
+ * `handedInCounts` keeps the parameter's type a mention, for `@calls` into a
+ * class (#374), which borrows this reading. A value handed in as a Widget
+ * makes no Widget, but it is how a routine runs Widget's methods with no call
+ * written -- `for (const x of r)`, `[...r]`, `+m` -- and #373's probe went red
+ * on both of the first two.
  */
-function namesTheHead(routines: Node[], source: string, language: Language, wanted: Set<string>): boolean {
+function namesTheHead(
+  routines: Node[], source: string, language: Language, wanted: Set<string>, handedInCounts = false,
+): boolean {
   const spelt = new Set(wanted);
   for (const [local, binding] of bindingsIn(source, language)?.imported ?? []) {
     if (binding.name !== undefined && wanted.has(binding.name)) spelt.add(local);
@@ -523,13 +544,55 @@ function namesTheHead(routines: Node[], source: string, language: Language, want
     // In Rust, `Self` inside the head's own `impl` -- or a trait's, where it is
     // whoever implements it -- is the head under another name.
     const inside = selfIsHead.some((span) => routine.startIndex >= span.start && routine.startIndex < span.end);
+    const own = routine.childForFieldName("name");
+    const handedIn = handedInCounts ? [] : handedInTypes(routine, language);
     each(routine, (node) => {
       if (named || node.childCount !== 0 || !node.isNamed) return;
+      if (own && node.id === own.id) return;
+      if (handedIn.some((span) => node.startIndex >= span.start && node.startIndex < span.end)) return;
       if (spelt.has(node.text) || (inside && node.text === "Self")) named = true;
     });
     if (named) return true;
   }
   return false;
+}
+
+/**
+ * The words each language writes for a class or a callable handed in as a
+ * value: `type[W]`, `Callable[..., W]`, `typeof W`, `impl Fn() -> W`. A list,
+ * for the reason `parts.ts`' `NOT_A_FUNCTION` is one: whether `F` in `f: F`
+ * makes anything is not in the tree, so only the spellings that say so are
+ * read. A function or constructor type needs none of it -- it has a
+ * `parameters` field of its own.
+ */
+const MAKER_WORDS: Partial<Record<Language, RegExp>> = {
+  python: /^(type|Type|Callable)$/,
+  ts: /^(typeof|new)$/,
+  tsx: /^(typeof|new)$/,
+  js: /^(typeof|new)$/,
+  rust: /^(fn|Fn|FnMut|FnOnce|impl|dyn)$/,
+};
+
+/** The spans of every parameter type under this routine that hands in a value, not a maker (#417). */
+function handedInTypes(routine: Node, language: Language): Array<{ start: number; end: number }> {
+  const spans: Array<{ start: number; end: number }> = [];
+  const maker = MAKER_WORDS[language];
+  each(routine, (node) => {
+    const parameters = node.childForFieldName("parameters");
+    if (!parameters) return;
+    for (let at = 0; at < parameters.childCount; at += 1) {
+      const written = parameters.child(at)?.childForFieldName("type");
+      if (!written) continue;
+      let makes = false;
+      each(written, (inner) => {
+        if (makes) return;
+        if (inner.childForFieldName("parameters")) makes = true;
+        else if (inner.childCount === 0 && maker?.test(inner.text)) makes = true;
+      });
+      if (!makes) spans.push({ start: written.startIndex, end: written.startIndex + written.text.length });
+    }
+  });
+  return spans;
 }
 
 /** Where `Self` could be the head in a Rust file: an `impl` of one of its names, and every trait. */
@@ -960,16 +1023,23 @@ function pythonAbsence(
   targets: string[],
   reverse: { source: string; routines: string[]; language: Language; names: string[] } | undefined,
   names: ConstructsNames | undefined,
+  handedInCounts = false,
 ): ConstructsVerdict | undefined {
   if (!reverse || reverse.language !== "python" || !names?.head) return undefined;
   if (!mayAccuse("builds", "python", "absence") || !onlyCalledClasses(reverse.source, targets)) return undefined;
   const { routines } = routinesNamed(source, routine, "python");
-  if (routines.length === 0 || namesTheHead(routines, source, "python", new Set(targets))) return undefined;
+  if (routines.length === 0 || namesTheHead(routines, source, "python", new Set(targets), handedInCounts)) return undefined;
 
-  const verdict = callsBetween({ ...names.side, routine }, { ...names.head, names: targets });
+  /*
+   * A call to the tail is a construction only when the tail is a class. When
+   * it is not, the head's code calling it says nothing about this arrow, and
+   * it used to end the question there (#417): httpx's `QueryParams` calls its
+   * own `multi_items`, and "does `multi_items` make one?" was never asked.
+   */
+  const tailIsAClass = declaresClass(source, routine);
+  const verdict = callsBetween({ ...names.side, routine }, { ...names.head, names: targets }, tailIsAClass);
   if (verdict.verdict === "backwards") {
-    // A call to the tail is a construction only when the tail is a class.
-    if (!declaresClass(source, routine) || !mayAccuse("builds", "python")) return undefined;
+    if (!mayAccuse("builds", "python")) return undefined;
     const { name, line, wrote } = verdict.evidence;
     return { verdict: "backwards", evidence: { name, line, wrote } };
   }
@@ -1150,6 +1220,9 @@ function declaredApartPython(
  * backwards verdict can rest on something found. Absent means the question is
  * not asked, and the answer degrades to `confirmed` or `absent` -- which is what
  * a caller with only one file can honestly get.
+ *
+ * `forCalls` is `@calls` into a class asking (#374): a parameter of the
+ * class's type then still names it (`namesTheHead`).
  */
 export function constructions(
   source: string,
@@ -1158,6 +1231,7 @@ export function constructions(
   language: Language,
   reverse?: { source: string; routines: string[]; language: Language; names: string[] },
   names?: ConstructsNames,
+  forCalls = false,
 ): ConstructsVerdict {
   /*
    * Python spells construction as a call, so nothing in this body separates one
@@ -1168,7 +1242,7 @@ export function constructions(
   if (language === "python") {
     const verdict = pythonConstructions(source, routine, targets, names);
     if (verdict.verdict !== "withheld" || verdict.why !== "not-constructed") return verdict;
-    return pythonAbsence(source, routine, targets, reverse, names) ?? verdict;
+    return pythonAbsence(source, routine, targets, reverse, names, forCalls) ?? verdict;
   }
 
   const { routines, declared, unreadable } = routinesNamed(source, routine, language);
@@ -1254,7 +1328,7 @@ export function constructions(
    */
   const byText = reverse !== undefined && mayAccuse("builds", language, "absence")
     && onlyNewCreates(reverse.source, language, reverse.language, targets)
-    && !namesTheHead(routines, source, language, wanted)
+    && !namesTheHead(routines, source, language, wanted, forCalls)
     && !(language === "rust" && macroDeclares(source, routine));
   if (byText && language === "rust" && names && !names.side.compiled?.()) {
     return { verdict: "absent", awaitsCompiler: true };

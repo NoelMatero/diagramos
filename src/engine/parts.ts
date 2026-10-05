@@ -56,7 +56,8 @@
  */
 import type { ArrowClaim } from "./claim";
 import { declaredShapes } from "./body";
-import { each, type Language, type Node } from "./parse";
+import { bindingsIn } from "./calls";
+import { each, parseSource, type Language, type Node, type Tree } from "./parse";
 
 export const PARTS = [
   "body", "signature", "result", "fields", "bases", "type", "callable", "implementable",
@@ -477,6 +478,17 @@ function readShape(node: Node, language: Language): Shape {
       callable: "unsure",
     };
   }
+  /*
+   * A loop's or a `catch`'s binding (#417): `for operation in group`, `for
+   * (const job of queue)`, `catch (error)`. It holds one element of something,
+   * or what was thrown, and is a value whatever that is -- nothing in these
+   * languages lets a loop variable stand where a type name does.
+   *
+   * Its `right` field is the thing looped over, not its value. Read as one,
+   * `for (const fn of new Set(fns))` was a construction and `fn` a value
+   * nothing can call.
+   */
+  if (bindsByLoop(node)) return { ...UNSURE, type: "lacks" };
   const value = node.childForFieldName("value") ?? node.childForFieldName("right");
   if (aliasesAType(node)) return { ...UNSURE };
   if (value && isLiteral(value)) {
@@ -540,10 +552,142 @@ const UNSURE: Record<Part, PartReading> = {
 };
 
 /**
- * What one name in one file has, by every declaration of it there.
+ * Whether this declaration binds by a loop or a `catch` rather than by `=`.
  *
- * `undefined` when the file declares no such name or has no grammar: a missing
- * name is the node check's business, not a part this name lacks.
+ * The same suffix rule `body.ts` uses to read one as a declaration at all
+ * (`BINDS`): a `left` or `parameter` field on a statement or a clause. An
+ * assignment is an `assignment`, which ends in neither.
+ */
+function bindsByLoop(node: Node): boolean {
+  return /_(statement|clause)$/.test(node.type);
+}
+
+/** A name a file binds without declaring it, and how (#417). */
+interface Bound {
+  node: Node;
+  nameNode: Node;
+  kind: "parameter" | "let" | "loop";
+}
+
+/** Held against the tree, as `body.ts` holds its declarations: a node wrapper is new on every read. */
+const boundCache = new WeakMap<Tree, Map<string, Bound[]>>();
+
+/** The named children of a node: no punctuation, no keywords. */
+function namedChildren(node: Node): Node[] {
+  const out: Node[] = [];
+  for (let index = 0; index < node.childCount; index += 1) {
+    const child = node.child(index);
+    if (child?.isNamed) out.push(child);
+  }
+  return out;
+}
+
+/**
+ * The one name a parameter binds: `x`, `x: int`, `x=1`, `*args`, `**kwargs`,
+ * `...rest`, `mut x: T`. Read off the `name` or `pattern` field, and where
+ * Python writes neither (`typed_parameter`, a splat), off the first named
+ * child. A destructuring pattern binds several and none is returned: what each
+ * holds is a piece of the argument, and nobody draws a box at one.
+ */
+function parameterName(parameter: Node): Node | undefined {
+  const leaf = (node: Node | null | undefined) =>
+    (node && node.childCount === 0 && /identifier$/.test(node.type) ? node : undefined);
+  if (parameter.childCount === 0) return leaf(parameter);
+  const written = parameter.childForFieldName("name") ?? parameter.childForFieldName("pattern")
+    ?? namedChildren(parameter)[0];
+  if (!written) return undefined;
+  if (written.childCount === 0) return leaf(written);
+  // `*args`, `**kwargs`, `...rest`: one name behind the punctuation.
+  const inside = namedChildren(written);
+  return inside.length === 1 ? leaf(inside[0]) : undefined;
+}
+
+/**
+ * The names a file binds without a declaration `body.ts` indexes (#417):
+ * every routine's, lambda's and closure's parameters, and Rust's `let` and
+ * `for` bindings.
+ *
+ * A box anchored at one -- `**kwargs`, a parameter `level` -- read as no
+ * declaration at all, so its arrow was asked nothing and stayed "not sure"
+ * however plainly it pointed at the wrong kind of thing. A parameter is a
+ * value in every grammar here; so is a `let`. Python's and TypeScript's
+ * locals and loop variables are already declarations (`assignment`,
+ * `variable_declarator`, `for_statement`), and Rust's are the ones that were
+ * not.
+ */
+function boundShapes(source: string, language: Language): Map<string, Bound[]> {
+  const tree = parseSource(source, language);
+  if (!tree) return new Map();
+  const hit = boundCache.get(tree);
+  if (hit) return hit;
+  const found = new Map<string, Bound[]>();
+  boundCache.set(tree, found);
+  const record = (node: Node, nameNode: Node | undefined, kind: Bound["kind"]) => {
+    if (!nameNode) return;
+    found.set(nameNode.text, [...(found.get(nameNode.text) ?? []), { node, nameNode, kind }]);
+  };
+  each(tree.rootNode, (node) => {
+    const parameters = node.childForFieldName("parameters");
+    if (parameters) {
+      for (const parameter of namedChildren(parameters)) record(parameter, parameterName(parameter), "parameter");
+    }
+    // An arrow function's lone parameter, `job => ...`. A `catch` writes the
+    // same field and is already a declaration.
+    const lone = bindsByLoop(node) ? null : node.childForFieldName("parameter");
+    if (lone && node.childForFieldName("body")) record(lone, parameterName(lone), "parameter");
+    /*
+     * Rust's `let x` and `for x in xs`, both a `pattern` field that is one
+     * name. A loop is told by having a body to run; a parameter, a match arm
+     * and an `if let` have the field and no body.
+     */
+    const pattern = language === "rust" ? node.childForFieldName("pattern") : null;
+    if (pattern && pattern.childCount === 0 && /identifier$/.test(pattern.type)) {
+      if (node.type === "let_declaration") record(node, pattern, "let");
+      else if (node.childForFieldName("body") && node.childForFieldName("value")) record(node, pattern, "loop");
+    }
+  });
+  return found;
+}
+
+/**
+ * How a bound name reads. A parameter is a value of its written type, the way
+ * an annotated name is in `readShape`, and a value with none is still not a
+ * type. A Rust `let` is read by `readShape` itself, then held to the same
+ * floor: whatever it holds, it is not a type.
+ *
+ * The text alone, and never a compiler. A file binds the same parameter name
+ * dozens of times (httpx's `files`), and one question each started pyright
+ * for arrows that never needed it: a 43 ms arrow took four passes, and on a
+ * loaded machine seventeen minutes. "Not a type" needs no compiler, and the
+ * written type says what it can about calling.
+ */
+function readBound({ node, kind }: Bound, language: Language): Record<Part, PartReading> {
+  let shape: Shape;
+  if (kind === "loop") {
+    // One element of what it loops over, as `readShape` reads a loop's binding.
+    shape = { ...UNSURE, type: "lacks" };
+  } else if (kind === "let") {
+    shape = { ...readShape(node, language), type: "lacks" };
+  } else {
+    const written = node.childForFieldName("type");
+    const value = node.childForFieldName("value");
+    const callable: PartReading = !written || (value && isWrittenValue(value))
+      || couldBeCalled(written.text, language) ? "unsure" : "lacks";
+    shape = {
+      body: callable, signature: callable, result: "unsure", fields: "unsure", bases: "unsure",
+      type: "lacks", callable,
+    };
+  }
+  // Nothing bound here is a declaration with a keyword before it, so `type` decides.
+  return { ...shape, implementable: shape.type };
+}
+
+/**
+ * What one name in one file has, by every declaration of it there -- or, when
+ * nothing declares it, by every parameter or `let` that binds it (#417).
+ *
+ * `undefined` when the file has no such name or no grammar: a missing name is
+ * the node check's business, not a part this name lacks.
  *
  * `ask` is a compiler, where the caller holds one (#343). It is asked about a
  * value only, only where the text left a doubt, and one question per
@@ -556,10 +700,27 @@ export function partsOf(
   language: Language,
   ask?: AskKind,
 ): Record<Part, PartReading> | undefined {
-  const declarations = declaredShapes(source, language)?.get(name);
-  if (!declarations || declarations.length === 0) return undefined;
-  const readings = declarations.map(({ node, nameNode, soup }) =>
-    (soup ? UNSURE : readDeclaration(node, nameNode, language, ask)));
+  const declarations = declaredShapes(source, language)?.get(name) ?? [];
+  /*
+   * A binding is read only where nothing in the file declares the name. A
+   * box at a declared name means the declaration, which is how every name was
+   * read before #417; a parameter by the same name elsewhere -- flask's `ctx`
+   * local beside a `ctx` parameter -- is somebody else's, and read alongside
+   * it turned seven measured reds back to "not sure".
+   */
+  const bound = declarations.length === 0 ? boundShapes(source, language).get(name) ?? [] : [];
+  if (declarations.length === 0 && bound.length === 0) return undefined;
+  /*
+   * A name the file also imports is, to a box anchored at it, most likely the
+   * import -- `from .types import level` beside `def log(level)` -- and an
+   * import is whatever it brings in, which nothing here reads. So a parameter
+   * or a `let` sharing its name says nothing either way.
+   */
+  const imported = bound.length > 0 && bindingsIn(source, language)?.imported.has(name) === true;
+  const readings = [
+    ...declarations.map(({ node, nameNode, soup }) => (soup ? UNSURE : readDeclaration(node, nameNode, language, ask))),
+    ...bound.map((one) => (imported ? UNSURE : readBound(one, language))),
+  ];
   const combined = { ...UNSURE };
   for (const part of PARTS) {
     const all = readings.map((reading) => reading[part]);
@@ -568,6 +729,24 @@ export function partsOf(
       : all.some((one) => one === "has") ? "has" : "unsure";
   }
   return combined;
+}
+
+/**
+ * Every name this file binds by a parameter, a loop, a `catch` or a Rust
+ * `let`, and where, for the measurement of #417's readings
+ * (`measure:bound-parts`).
+ */
+export function boundNames(source: string, language: Language): Array<{ name: string; start: number }> {
+  const out: Array<{ name: string; start: number }> = [];
+  for (const [name, list] of boundShapes(source, language)) {
+    for (const { nameNode } of list) out.push({ name, start: nameNode.startIndex });
+  }
+  for (const [name, list] of declaredShapes(source, language) ?? []) {
+    for (const { node, nameNode, soup } of list) {
+      if (!soup && bindsByLoop(node)) out.push({ name, start: nameNode.startIndex });
+    }
+  }
+  return out;
 }
 
 /** Every name a file declares, for the measurement. */
@@ -765,9 +944,15 @@ function cannotRender(names: Node[], askRenderable: NonNullable<PartEnd["askRend
  */
 function nounOf(source: string, name: string, language: Language): string {
   const declaration = declaredShapes(source, language)?.get(name)?.find((one) => !one.soup);
-  if (!declaration) return "a type";
+  if (!declaration) {
+    // Bound and not declared (#417): a parameter says so, and a `let` is a value.
+    const bound = boundShapes(source, language).get(name)?.[0];
+    return bound?.kind === "parameter" ? "a parameter" : bound ? "a value" : "a type";
+  }
   const { node, nameNode } = declaration;
   if (has(node, "parameters")) return "a function";
+  // `for`, `catch`: the word before a loop's binding is not what it is.
+  if (bindsByLoop(node)) return "a value";
   let keyword: string | undefined;
   for (let index = 0; index < node.childCount; index += 1) {
     const child = node.child(index);
