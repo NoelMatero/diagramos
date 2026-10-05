@@ -161,8 +161,12 @@ export type HoldsVerdict =
   }
   | { verdict: "withheld"; why: HoldsWithheld };
 
-/** One field, by the range of its name. */
-export type FieldSite = Site;
+/**
+ * One field, by the range of its name. `property` marks a Python property,
+ * whose type is its getter's: it may withdraw a red, and it never confirms
+ * that the class holds anything (#378's open question).
+ */
+export type FieldSite = Site & { property?: true };
 
 /** Node types that declare a type with a member list, in any grammar we load. */
 const TYPE_DECLARATION =
@@ -566,7 +570,7 @@ export function heldTypes(
          * question; asking the compiler can only withdraw a red.
          */
         const property = propertyName(member);
-        if (property) sites.push(site(property, false));
+        if (property) sites.push({ ...site(property, false), property: true });
       }
       for (let index = 0; index < member.childCount; index += 1) {
         const child = member.child(index);

@@ -2436,6 +2436,52 @@ function callSide(
 }
 
 /**
+ * Whether any of these fields, none with a type written, holds the head on
+ * the compiler's word (#397): `typePartsAt` at each field's name.
+ *
+ * A part the compiler placed matches on its place. Python's parts come back
+ * as names only, and a name alone could be some other class that shares it
+ * -- a library's `Headers` beside the repository's -- which here would add a
+ * green, not withdraw a red (#395). So a bare name confirms only when the
+ * holder's own file binds that name to the head's file: declared there, or
+ * imported from it. A field whose type nothing in the file names gives no
+ * answer, never a no.
+ */
+function untypedFieldHolds(
+  referee: ClosedBodyReferee | undefined,
+  file: string,
+  fields: Site[],
+  head: { file: string; names: string[]; name: string; at: DeclaredAt[] },
+  workspace: Workspace,
+  configs: ConfigCache,
+): boolean {
+  if (!referee?.typePartsAt || head.at.length === 0) return false;
+  let bound: { side: CallSide; bindings: NonNullable<ReturnType<typeof bindingsIn>> } | undefined | null;
+  const boundToHead = (name: string): boolean => {
+    if (!head.names.includes(name)) return false;
+    if (bound === undefined) {
+      const side = callSide(file, workspace, configs);
+      const bindings = side ? bindingsIn(side.source, side.language) : undefined;
+      bound = side && bindings ? { side, bindings } : null;
+    }
+    if (!bound) return false;
+    const placed = placeName(name, bound.side, bound.bindings);
+    return "file" in placed && placed.file === head.file && head.names.includes(placed.as ?? name);
+  };
+  for (const field of fields) {
+    const answer = referee.typePartsAt(file, field);
+    for (const part of answer?.parts ?? []) {
+      const placed = part.at;
+      if (placed === "outside") continue;
+      if (placed ? head.at.some((at) => at.file === placed.file && at.line === placed.line) : boundToHead(part.name)) {
+        return true;
+      }
+    }
+  }
+  return false;
+}
+
+/**
  * Whether a type is one of the head through its bases' own base lists (#393).
  *
  * `conformedTypes` reads one declaration. `A extends B` with B extending the
@@ -5291,6 +5337,28 @@ export function checkDrift(
             workspace.read(fromFile), fromEnd.symbols[0]!, toEnd.symbols, language,
             toLanguage ? { source: workspace.read(toFile), language: toLanguage } : undefined,
           );
+
+          /*
+           * A field nobody typed -- `self.url = URL(url)` -- holds whatever the
+           * compiler says it does (#397). Only a field with no annotation at
+           * all: `seat: S` is written, and what `S` stands for is #380's,
+           * which the gate asks without confirming. The compiler's yes
+           * confirms; anything else leaves the absence to the gate below,
+           * which never lets it stand on an unwritten field.
+           */
+          const untyped = verdict.verdict === "absent"
+            ? verdict.sites.filter((one) => !one.annotation && !one.property && verdict.unwritten.includes(one.name))
+            : [];
+          if (untyped.length > 0 && untypedFieldHolds(
+            options?.closedBodyReferee, fromPath, untyped,
+            { file: toPath, names: toEnd.symbols, ...declaredIn(workspace.read(toFile), toLanguage ?? language, toPath, toEnd.symbols[0]!) },
+            workspace, importCache.configs,
+          )) {
+            if (claimed) claims.holdsConfirmed += 1;
+            edgesChecked += 1;
+            recordEdge(edge, fromNode, toNode, { kind: "confirmed" });
+            continue;
+          }
 
           if (verdict.verdict === "confirmed") {
             if (claimed) claims.holdsConfirmed += 1;

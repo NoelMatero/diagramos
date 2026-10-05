@@ -23,10 +23,11 @@ afterEach(() => { if (repo) dropRepo(repo); repo = undefined; });
 const TS = { "tsconfig.json": "{ \"compilerOptions\": { \"strict\": true } }\n", "engine.ts": "export class Engine {}\nexport class Motor {}\n" };
 
 describe("TypeScript, a field with no written type", () => {
-  it("stays quiet on `engine = new Engine()`", async () => {
+  it("confirms `engine = new Engine()` on the compiler's word (#397)", async () => {
     repo = scratchRepo({ ...TS, "car.ts": "import { Engine } from \"./engine\";\n\nexport class Car {\n  engine = new Engine();\n}\n" });
-    const { each: [car] } = await verdicts(repo, [["car.ts#Car", "engine.ts#Engine", "holds"]]);
-    expect(car).toEqual({ reds: [], unconfirmed: "compiler-says-it-does" });
+    const { each: [car], report } = await verdicts(repo, [["car.ts#Car", "engine.ts#Engine", "holds"]]);
+    expect(car).toEqual({ reds: [] });
+    expect(report.claims.holdsConfirmed).toBe(1);
   }, 60_000);
 
   it("is withheld, not red, with no compiler", async () => {
@@ -98,8 +99,9 @@ describe("a repository with Python and Rust at the same root", () => {
       ["car.py#Car", "engine.py#Engine", "holds"],
       ["src/car.rs#Gen", "src/parts.rs#Seat", "holds"],
     ]);
+    // The Python field is confirmed (#397); the Rust one only withdrawn: `seat: S` is typed, and `S` is a bound (#380).
     expect(each).toEqual([
-      { reds: [], unconfirmed: "compiler-says-it-does" },
+      { reds: [] },
       { reds: [], unconfirmed: "compiler-says-it-does" },
     ]);
   }, 240_000);
@@ -108,10 +110,11 @@ describe("a repository with Python and Rust at the same root", () => {
 const PY_ENGINE = "class Engine:\n    pass\n\n\nclass Motor:\n    pass\n";
 
 describe("Python, a field with no written type", () => {
-  it("stays quiet on `self.engine = Engine()` in `__init__`", async () => {
+  it("confirms `self.engine = Engine()` in `__init__` on pyright's word (#397)", async () => {
     repo = scratchRepo({ "engine.py": PY_ENGINE, "car.py": "from engine import Engine\n\n\nclass Car:\n    def __init__(self):\n        self.engine = Engine()\n" });
-    const { each: [car] } = await verdicts(repo, [["car.py#Car", "engine.py#Engine", "holds"]]);
-    expect(car).toEqual({ reds: [], unconfirmed: "compiler-says-it-does" });
+    const { each: [car], report } = await verdicts(repo, [["car.py#Car", "engine.py#Engine", "holds"]]);
+    expect(car).toEqual({ reds: [] });
+    expect(report.claims.holdsConfirmed).toBe(1);
   }, 120_000);
 
   it.each([
@@ -296,10 +299,11 @@ describe("#394's ten correct Python field arrows (#397)", () => {
     ["pkg/executor.py#Executor", "pkg/executor.py#Chooser"],
   ];
 
-  it("keeps every one of them from being called wrong", async () => {
+  it("confirms every one of them, and calls none wrong", async () => {
     repo = scratchRepo(LIBRARY);
-    const { each } = await verdicts(repo, right.map(([from, to]) => [from, to, "holds"]));
-    expect(each.map((one, index) => [right[index]!.join(" -> "), one.reds])).toEqual(right.map((pair) => [pair.join(" -> "), []]));
+    const { each, report } = await verdicts(repo, right.map(([from, to]) => [from, to, "holds"]));
+    expect(each.map((one, index) => [right[index]!.join(" -> "), one])).toEqual(right.map((pair) => [pair.join(" -> "), { reds: [] }]));
+    expect(report.claims.holdsConfirmed).toBe(right.length);
   }, 180_000);
 });
 
@@ -314,4 +318,56 @@ describe("a class nested in another (#394's gap in #395)", () => {
     repo = scratchRepo(LIBRARY);
     expect(await redsOf(repo, ["pkg/models.py#_CookieCompatResponse", "pkg/models.py#Response", "holds"])).toEqual([]);
   }, 180_000);
+});
+
+/** One `@holds` arrow with pyright running: whether it came back confirmed. */
+async function confirmed(files: Record<string, string>, arrow: [string, string]): Promise<boolean> {
+  repo = scratchRepo(files);
+  const { report } = await verdicts(repo, [[...arrow, "holds"]]);
+  return report.claims.holdsConfirmed === 1;
+}
+
+describe("Python, a field nobody typed confirms on pyright's word (#397)", () => {
+  it("confirms `self.engine = None` in `__init__` and `Engine()` later: the field is `Engine | None`", async () => {
+    const car = "from engine import Engine\n\n\nclass Car:\n    def __init__(self):\n        self.engine = None\n\n    def start(self):\n        self.engine = Engine()\n";
+    expect(await confirmed({ "engine.py": PY_ENGINE, "car.py": car }, ["car.py#Car", "engine.py#Engine"])).toBe(true);
+  }, 120_000);
+
+  it("confirms a class-level `mode = Mode.A` for `Mode`", async () => {
+    const mode = "from enum import Enum\n\n\nclass Mode(Enum):\n    A = 1\n    B = 2\n";
+    const car = "from mode import Mode\n\n\nclass Car:\n    mode = Mode.A\n";
+    expect(await confirmed({ "mode.py": mode, "car.py": car }, ["car.py#Car", "mode.py#Mode"])).toBe(true);
+  }, 120_000);
+
+  it("does not read a dunder at class level as a field", async () => {
+    const car = "from engine import Engine\n\n\nclass Car:\n    __engine__ = Engine()\n";
+    expect(await confirmed({ "engine.py": PY_ENGINE, "car.py": car }, ["car.py#Car", "engine.py#Engine"])).toBe(false);
+  }, 120_000);
+
+  it("does not read `cls.x = ...` as a field: it sets something on another class", async () => {
+    const car = "from engine import Engine\n\n\nclass Car(type):\n    def __new__(mcs, name, bases, ns):\n        cls = super().__new__(mcs, name, bases, ns)\n        cls.engine = Engine()\n        return cls\n";
+    expect(await confirmed({ "engine.py": PY_ENGINE, "car.py": car }, ["car.py#Car", "engine.py#Engine"])).toBe(false);
+  }, 120_000);
+
+  it("does not confirm a property: what a getter returns is not what the class holds", async () => {
+    const car = "from engine import Engine\n\n\nclass Car:\n    @property\n    def engine(self) -> Engine:\n        return Engine()\n";
+    expect(await confirmed({ "engine.py": PY_ENGINE, "car.py": car }, ["car.py#Car", "engine.py#Engine"])).toBe(false);
+  }, 120_000);
+
+  it("does not confirm the other of two classes that share a name", async () => {
+    const files = {
+      "engine.py": PY_ENGINE,
+      "spare.py": "class Engine:\n    pass\n",
+      "car.py": "from engine import Engine\n\n\nclass Car:\n    def __init__(self):\n        self.engine = Engine()\n",
+    };
+    expect(await confirmed(files, ["car.py#Car", "spare.py#Engine"])).toBe(false);
+    expect(await confirmed(files, ["car.py#Car", "engine.py#Engine"])).toBe(true);
+  }, 240_000);
+
+  it("is withheld, never red and never green, with no compiler", async () => {
+    repo = scratchRepo({ "engine.py": PY_ENGINE, "car.py": "from engine import Engine\n\n\nclass Car:\n    def __init__(self):\n        self.engine = Engine()\n" });
+    const { each: [car], report } = await verdicts(repo, [["car.py#Car", "engine.py#Engine", "holds"]], { compiler: false });
+    expect(car).toEqual({ reds: [], unconfirmed: "rests-on-unwritten" });
+    expect(report.claims.holdsConfirmed).toBe(0);
+  }, 60_000);
 });
