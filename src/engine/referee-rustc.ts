@@ -173,6 +173,8 @@ async function crateFor(manifest: string, root: string, cache: string, until: nu
       workspace: found.workspace,
       repo: path.resolve(root),
       root: lib,
+    }, (file) => {
+      try { return readFileSync(path.join(root, file), "utf8"); } catch { return undefined; }
     });
     parsed.set(dump, { stamp, crate });
     return crate;

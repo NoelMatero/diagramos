@@ -168,7 +168,13 @@ export interface CompiledPlaces {
  * target's `main.rs`, a module switched off by a feature -- and the second kind
  * must be no answer, never a routine that calls nothing.
  */
-export function readCompiledCrate(mir: string, depInfo: string, places: CompiledPlaces): CompiledCrate {
+export function readCompiledCrate(
+  mir: string,
+  depInfo: string,
+  places: CompiledPlaces,
+  /** A repo-relative file's text, for the `impl` headers `markOnlyHere` reads; without it no bare `Type::m` is this crate's. */
+  read?: (file: string) => string | undefined,
+): CompiledCrate {
   const toRepo = (written: string): string | undefined => {
     const relative = path.relative(places.repo, path.resolve(places.workspace, written));
     if (relative.startsWith("..") || path.isAbsolute(relative)) return undefined;
@@ -211,42 +217,99 @@ export function readCompiledCrate(mir: string, depInfo: string, places: Compiled
     add(byName, segments[segments.length - 1]!, body);
   }
   const root = toRepo(places.root) ?? places.root;
-  markOnlyHere(bodies);
+  markOnlyHere(bodies, inherentOwners(byImpl, read));
   return { files, root, byImpl, byName };
 }
 
 /**
  * Sets `onlyHere` on every body (#434): no drop, and every call matched to a
- * function this dump holds a body for, by its module path and its name.
+ * function this dump holds a body for.
  *
- * A path is matched only under a module: `de::Deserializer::<R>::eat_char`
- * against `de::<impl at src/de.rs:142:1: 142:40>::eat_char`. rustc writes an
- * item of this crate without the crate's name and anybody else's with it --
- * `core::result::Result` -- but a name unique across every crate it read is
- * written bare whoever declared it (`Option::<T>::unwrap`, and anyhow's own
- * `ErrorImpl::error`), so a bare path is never taken as this crate's. Nor is
- * a call through a trait, which may run a library's blanket implementation.
- * Either way the body stays "not known", which is the quiet side.
+ * rustc writes an item of this crate without the crate's name and anybody
+ * else's with it -- `core::result::Result` -- except that a name unique
+ * among every crate it read is written bare, whoever declared it:
+ * `Option::<T>::unwrap`, `hold(..)`, `Counter::bump(..)`. So a call is this
+ * crate's when it is
+ *
+ *   under a module          `de::Deserializer::<R>::eat_char` against a body
+ *                           `de::<impl at src/de.rs:..>::eat_char`
+ *   a bare name             `hold(..)`, and the crate has a body printed
+ *                           `hold` -- unique, so it is that one
+ *   a bare type's method    `Counter::bump(..)`, and the crate has an inherent
+ *                           `impl Counter` holding `bump` -- unique, and only
+ *                           the crate declaring a type can write one
+ *
+ * Nothing else: a call through a trait may run a library's blanket
+ * implementation. Either way the body stays "not known", the quiet side.
  */
-function markOnlyHere(bodies: readonly CompiledBody[]): void {
+function markOnlyHere(bodies: readonly CompiledBody[], owners: ReadonlyMap<string, Set<string>>): void {
   const modulesOf = new Map<string, Set<string>>();
   for (const body of bodies) {
     const segments = segmentsOf(body.path);
     const at = segments.findIndex((segment) => segment.startsWith("<impl at "));
+    if (at >= 0 && segments.length !== at + 2) continue;
     const modules = at >= 0 ? segments.slice(0, at) : segments.slice(0, -1);
-    if (modules.length === 0 || (at >= 0 && segments.length !== at + 2)) continue;
+    // A bare free function is keyed under no module; a bare impl's methods come from `owners`.
+    if (modules.length === 0 && at >= 0) continue;
     const name = segments[segments.length - 1]!;
     modulesOf.set(name, (modulesOf.get(name) ?? new Set()).add(modules.join("::")));
   }
   const here = (call: CompiledCall): boolean => {
     if (call.kind !== "named" || call.through !== undefined || !call.path) return false;
+    const path = call.path;
+    if (path.length === 1) return modulesOf.get(call.name)?.has("") ?? false;
+    if (path.length === 2 && owners.get(path[0]!)?.has(call.name)) return true;
     const known = modulesOf.get(call.name);
     if (!known) return false;
     // A free function under its modules, or a method under its modules and its type.
-    return [1, 2].some((after) => call.path!.length > after
-      && known.has(call.path!.slice(0, call.path!.length - after).join("::")));
+    return [1, 2].some((after) => {
+      const modules = path.slice(0, path.length - after);
+      return modules.length > 0 && known.has(modules.join("::"));
+    });
   };
   for (const body of bodies) body.onlyHere = body.drops === 0 && body.calls.every(here);
+}
+
+/**
+ * The type each inherent `impl` of the crate is for, with the methods the
+ * dump holds for it: `Counter` -> `bump`, `push`. Read off the source at the
+ * span rustc gives the impl, `impl Counter` at `src/helpers.rs:30:1: 30:13`.
+ * A trait's `impl .. for ..` is left out.
+ */
+function inherentOwners(
+  byImpl: ReadonlyMap<string, CompiledBody[]>,
+  read: ((file: string) => string | undefined) | undefined,
+): Map<string, Set<string>> {
+  const owners = new Map<string, Set<string>>();
+  if (!read) return owners;
+  const texts = new Map<string, string[] | undefined>();
+  for (const [key, bodies] of byImpl) {
+    const span = bodies[0] && segmentsOf(bodies[0].path).find((segment) => segment.startsWith("<impl at "))
+      ?.match(/^<impl at .+:(\d+):(\d+): (\d+):(\d+)>$/);
+    if (!span) continue;
+    const file = key.slice(0, key.lastIndexOf(":"));
+    if (!texts.has(file)) texts.set(file, read(file)?.split("\n"));
+    const lines = texts.get(file);
+    const [startLine, startCol, endLine, endCol] = span.slice(1).map(Number) as [number, number, number, number];
+    if (!lines || startLine !== endLine) continue;
+    const header = lines[startLine - 1]?.slice(startCol - 1, endCol - 1) ?? "";
+    if (!/^impl\b/.test(header)) continue;
+    let rest = header.slice(4).trimStart();
+    if (rest.startsWith("<")) {
+      const close = matching(rest, 0);
+      if (close < 0) continue;
+      rest = rest.slice(close + 1).trim();
+    }
+    const written = rest;
+    if (!written || /\sfor\s/.test(` ${stripGenerics(written)} `)) continue;
+    const owner = baseTypeOf(written);
+    if (!/^[A-Za-z_]\w*$/.test(owner)) continue;
+    for (const body of bodies) {
+      const name = segmentsOf(body.path).pop()!;
+      owners.set(owner, (owners.get(owner) ?? new Set()).add(name));
+    }
+  }
+  return owners;
 }
 
 /** A callee's path as `CompiledCall.path` holds it: `<impl Error>` read as `Error`, generic arguments dropped. */
@@ -856,11 +919,12 @@ export function compiledRefutes(
  * the modules rustc gives the head's own body, then the type its `impl`
  * names, then the routine (a free function: its body's path as printed).
  *
+ * Or the bare `Type::m` rustc writes when the type's name is unique among
+ * every crate it read -- then it can only be the type the head's `impl` is
+ * for, since only the crate declaring a type writes an inherent `impl` of it.
+ *
  * Only an inherent `impl` or a free function. A trait method is called as
- * `<X as Trait>::m`, which may run a library's blanket implementation, and
- * the bare `Type::m` rustc writes for a name unique among every crate it read
- * is left alone: two of this crate's types may share a name in different
- * modules.
+ * `<X as Trait>::m`, which may run a library's blanket implementation.
  */
 export function ownCallIn(
   crate: CompiledCrate,
@@ -885,8 +949,10 @@ export function ownCallIn(
       if (holder.type !== "impl_item" || holder.childForFieldName("trait")) continue;
       const at = segments.findIndex((segment) => segment.startsWith("<impl at "));
       const owner = baseTypeOf(holder.childForFieldName("type")?.text ?? "");
-      if (at < 1 || !/^[A-Za-z_]\w*$/.test(owner)) continue;
-      paths.add([...segments.slice(0, at), owner, name].join("::"));
+      if (at < 0 || !/^[A-Za-z_]\w*$/.test(owner)) continue;
+      if (at > 0) paths.add([...segments.slice(0, at), owner, name].join("::"));
+      // rustc writes a type bare when its name is unique among every crate it read: only this one.
+      paths.add(`${owner}::${name}`);
     }
     if (paths.size === 0) continue;
     const called = bodies.some((body) => body.calls.some((call) => call.kind === "named"

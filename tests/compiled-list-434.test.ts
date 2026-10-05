@@ -90,6 +90,14 @@ const MIR = [
     "_0 = callers::keep_ref(const 1_u8) -> [return: bb1, unwind continue];",
     "drop(_2) -> [return: bb2, unwind continue];"),
   body("callers::keep_ref", "_1: u8", "let mut _0: u8;", "_0 = copy _1;"),
+  // Names unique among every crate rustc read are printed bare, ours or not.
+  body("hold", "_1: u8", "let mut _0: u8;", "_0 = copy _1;"),
+  body("callers::by_bare_function", "",
+    "let mut _0: u8;",
+    "_0 = hold(const 1_u8) -> [return: bb1, unwind continue];"),
+  body("callers::by_bare_library_type", "_1: Option<u8>",
+    "let mut _0: u8;",
+    "_0 = Option::<u8>::unwrap(move _1) -> [return: bb1, unwind continue];"),
 ].join("\n");
 
 let crate: CompiledCrate;
@@ -99,7 +107,7 @@ const of = (name: string): CompiledBody =>
 beforeAll(() => {
   crate = readCompiledCrate(MIR, "target/debug/deps/shapes.d: src/lib.rs src/helpers.rs src/callers.rs\n", {
     workspace: "/ws", repo: "/ws", root: "/ws/src/lib.rs",
-  });
+  }, (file) => (file === "src/helpers.rs" ? HELPERS : undefined));
 });
 
 describe("a body that runs nothing outside the crate", () => {
@@ -110,11 +118,23 @@ describe("a body that runs nothing outside the crate", () => {
     expect(of("builds_report").onlyHere).toBe(true);
   });
 
-  it("is not one that calls the standard library, through a trait, or by a bare type name", () => {
+  it("is one whose call is written bare, when the bare name is one of this crate's", () => {
+    // rustc writes a name unique among every crate bare, so a bare one this crate declares is this crate's.
+    expect(of("by_bare_owner").onlyHere).toBe(true);
+    expect(of("by_bare_function").onlyHere).toBe(true);
+  });
+
+  it("is not one that calls the standard library, bare or not, or calls through a trait", () => {
     expect(of("by_vec_push").onlyHere).toBe(false);
+    expect(of("by_bare_library_type").onlyHere).toBe(false);
     expect(of("shows_report").onlyHere).toBe(false);
-    // rustc writes a name unique among every crate bare, whoever declared it.
-    expect(of("by_bare_owner").onlyHere).toBe(false);
+  });
+
+  it("is not known without the source to read the crate's own types from", () => {
+    const blind = readCompiledCrate(MIR, "target/debug/deps/shapes.d: src/lib.rs src/helpers.rs src/callers.rs\n", {
+      workspace: "/ws", repo: "/ws", root: "/ws/src/lib.rs",
+    });
+    expect(blind.byName.get("by_bare_owner")?.[0]?.onlyHere).toBe(false);
   });
 
   it("is not one that drops a value, whose drop may run anything", () => {
@@ -166,8 +186,8 @@ describe("a call in rustc's list confirms only on the far function's own path", 
     expect(ownCallIn(crate, [of("by_vec_push")], head(["push"]))).toBeUndefined();
   });
 
-  it("does not confirm a call written with a bare type name, which may be another type's", () => {
-    expect(ownCallIn(crate, [of("by_bare_owner")], head(["bump"]))).toBeUndefined();
+  it("confirms a method written with its type bare, which rustc does only for a name no other crate has", () => {
+    expect(ownCallIn(crate, [of("by_bare_owner")], head(["bump"]))).toBe("bump");
   });
 
   it("does not confirm a trait method, which a library's blanket implementation may answer", () => {
