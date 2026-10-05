@@ -602,11 +602,12 @@ describe("a doubt is about the name being asked after, and never about the body"
       expect(verdictOf(askWith(() => ({ file: "src/error.rs", line: 4, concrete: true })))).toBe("confirmed");
     });
 
-    it("stays ambiguous with no compiler, or one that lands elsewhere", () => {
-      expect(verdictOf(askWith())).toBe("withheld/ambiguous");
-      expect(verdictOf(askWith(() => undefined))).toBe("withheld/ambiguous");
-      expect(verdictOf(askWith(() => ({ file: "src/error.rs", line: 3, concrete: true })))).toBe("withheld/ambiguous");
-      expect(verdictOf(askWith(() => "outside"))).toBe("withheld/ambiguous");
+    it("withholds with no compiler, or one that lands elsewhere, on the reason that asks one", () => {
+      // `receiver` is what makes a live check start a language server (`wouldHelp`).
+      expect(verdictOf(askWith())).toBe("withheld/receiver");
+      expect(verdictOf(askWith(() => undefined))).toBe("withheld/receiver");
+      expect(verdictOf(askWith(() => ({ file: "src/error.rs", line: 3, concrete: true })))).toBe("withheld/receiver");
+      expect(verdictOf(askWith(() => "outside"))).toBe("withheld/receiver");
     });
   });
 

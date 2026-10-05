@@ -1526,12 +1526,14 @@ function resolves(
    * Ambiguous as a name is not ambiguous at one position (#433), which is why
    * `placeOf` already asks there. anyhow's `error.rs` imports `Error` and also
    * holds `impl Error` blocks, so `Error::construct(...)`, written in plain
-   * sight, never confirmed. Only ever a confirmation: no answer, or one
-   * elsewhere, leaves the doubt as it was.
+   * sight, never confirmed. Only ever a confirmation.
+   *
+   * With no answer the doubt is `receiver`, as for any member call whose
+   * owner the text cannot place: a live check starts a language server only
+   * for that reason (`wouldHelp`), so leaving it `ambiguous` meant nothing
+   * was ever asked -- the first build of this moved no arrow on the bench.
    */
-  if (bindings.ambiguous.has(bound)) {
-    return callee.kind === "through" && landsOnTarget(callee, side, target) === "yes" ? "yes" : "ambiguous";
-  }
+  if (bindings.ambiguous.has(bound)) return callee.kind === "through" ? landsOnTarget(callee, side, target) : "ambiguous";
 
   const imported = bindings.imported.get(bound);
   if (!imported) {
