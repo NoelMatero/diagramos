@@ -297,8 +297,8 @@
       "language": "python",
       "source": "reverse",
       "parent": "needs|src/poetry/mixology/version_solver.py#_propagate_incompatibility|src/poetry/mixology/partial_solution.py#PartialSolution|",
-      "truth": "undecidable",
-      "why": "an import (poetry.core.packages.dependency) did not resolve"
+      "truth": "false",
+      "why": "nothing in it imports that file"
     },
     {
       "id": "needs|src/poetry/mixology/partial_solution.py|src/poetry/mixology/partial_solution.py#PartialSolution|",
@@ -489,8 +489,8 @@
       "language": "python",
       "source": "reverse",
       "parent": "needs|src/poetry/mixology/version_solver.py#_choose_package_version|src/poetry/mixology/partial_solution.py#PartialSolution|",
-      "truth": "undecidable",
-      "why": "an import (poetry.core.packages.dependency) did not resolve"
+      "truth": "false",
+      "why": "nothing in it imports that file"
     },
     {
       "id": "builds|src/poetry/mixology/version_solver.py#_choose_package_version|src/poetry/mixology/partial_solution.py#PartialSolution|",
@@ -760,8 +760,8 @@
       "language": "python",
       "source": "reverse",
       "parent": "needs|src/poetry/mixology/partial_solution.py#PartialSolution|src/poetry/mixology/assignment.py#Assignment|",
-      "truth": "undecidable",
-      "why": "an import (poetry.core.packages.dependency) did not resolve"
+      "truth": "false",
+      "why": "nothing in it imports that file"
     },
     {
       "id": "needs|src/poetry/mixology/failure.py|src/poetry/mixology/assignment.py#Assignment|",
@@ -773,8 +773,8 @@
       "language": "python",
       "source": "retarget",
       "parent": "needs|src/poetry/mixology/partial_solution.py#PartialSolution|src/poetry/mixology/assignment.py#Assignment|",
-      "truth": "undecidable",
-      "why": "an import (poetry.core.constraints.version) did not resolve"
+      "truth": "false",
+      "why": "nothing in it imports that file"
     },
     {
       "id": "conforms|src/poetry/mixology/assignment.py#Assignment|src/poetry/mixology/term.py#Term|",
@@ -849,8 +849,8 @@
       "language": "python",
       "source": "reverse",
       "parent": "needs|src/poetry/mixology/assignment.py#Assignment|src/poetry/mixology/term.py#Term|",
-      "truth": "undecidable",
-      "why": "an import (poetry.core.constraints.version) did not resolve"
+      "truth": "false",
+      "why": "nothing in it imports that file"
     },
     {
       "id": "needs|src/poetry/mixology/assignment.py#Assignment|src/poetry/mixology/result.py|",
@@ -862,8 +862,8 @@
       "language": "python",
       "source": "retarget",
       "parent": "needs|src/poetry/mixology/assignment.py#Assignment|src/poetry/mixology/term.py#Term|",
-      "truth": "undecidable",
-      "why": "an import (poetry.core.packages.dependency) did not resolve"
+      "truth": "false",
+      "why": "nothing in it imports that file"
     },
     {
       "id": "holds|src/poetry/mixology/incompatibility.py#Incompatibility|src/poetry/mixology/term.py#Term|",
@@ -899,8 +899,8 @@
       "language": "python",
       "source": "reverse",
       "parent": "needs|src/poetry/mixology/incompatibility.py#Incompatibility|src/poetry/mixology/term.py#Term|",
-      "truth": "undecidable",
-      "why": "an import (poetry.core.constraints.version) did not resolve"
+      "truth": "false",
+      "why": "nothing in it imports that file"
     },
     {
       "id": "needs|src/poetry/mixology/incompatibility.py#Incompatibility|src/poetry/mixology/result.py|",
