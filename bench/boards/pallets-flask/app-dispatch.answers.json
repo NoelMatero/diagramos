@@ -132,8 +132,8 @@
       "language": "python",
       "source": "wrong-kind",
       "parent": "calls|src/flask/app.py#wsgi_app|src/flask/app.py#request_context|",
-      "truth": "false",
-      "why": "the to end is a value or field, and only something that runs can be called"
+      "truth": "true",
+      "why": "the value is called here and resolves to it"
     },
     {
       "id": "builds|src/flask/app.py#request_context|src/flask/ctx.py#AppContext|",

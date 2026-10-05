@@ -291,9 +291,159 @@ export function createOracle(tooling: Tooling): Oracle {
     const body = signatureOf(language, from)?.bodyStart ?? from.start;
     const scan = await scanForCall(from.file, { start: body, end: from.end }, [], to);
     if (scan.called) return { truth: "true", why: "the name is called here and resolves to it" };
-    const doubt = calls === undefined ? "the tool would not walk this routine's calls" : scan.doubt;
+    /*
+     * A constructor is run by creating its class: `new SSRCompatModuleRunner(env)`
+     * never spells `constructor`, and the call hierarchy lists the class (#428).
+     */
+    const owner = CONSTRUCTORS.has(to.name) ? await typeAround(to) : undefined;
+    if (owner && (calls?.some((l) => denotes(l, owner))
+      || (await scanForCall(from.file, { start: body, end: from.end }, [], owner)).called)) {
+      return { truth: "true", why: `it creates ${owner.name}, which runs this constructor` };
+    }
+    const doubt = calls === undefined ? "the tool would not walk this routine's calls" : scan.doubt
+      ?? await valueCallCouldReach(from, body, to);
     if (doubt) return { truth: "undecidable", why: doubt };
     return { truth: "false", why: "the routine's calls were read and none is it" };
+  }
+
+  /** The innermost type declared around a symbol. */
+  async function typeAround(sym: Sym): Promise<Sym | undefined> {
+    return ((await symbolsOf(rel(sym.file))) ?? [])
+      .filter((t) => t.kind === "type" && t.start <= sym.start && sym.end <= t.end && !same(t, sym))
+      .sort((a, b) => (a.end - a.start) - (b.end - b.start))[0];
+  }
+
+  /**
+   * Whether a routine read out of a table in this body could be `to`.
+   *
+   * A call hierarchy lists what a name resolves to, so a routine fetched from
+   * a table and then called is not in it at all: vue's `buildProps` does
+   * `const directiveTransform = context.directiveTransforms[name]` and calls
+   * it, and `compile.ts` fills that table with `bind: transformBind` (#428).
+   *
+   * Only that shape: a call through `[...]`, or of a local read straight out
+   * of one. A callback parameter, or a local holding what a function returned,
+   * is not a table anybody stored `to` in -- read that loosely, the doubt moved
+   * 14 other answers on its first run. And only for a routine some non-test
+   * code stores under a key (`storedUnderKey`).
+   */
+  async function valueCallCouldReach(from: Sym, body: number, to: Sym): Promise<string | undefined> {
+    if (to.kind !== "routine" || CONSTRUCTORS.has(to.name)) return undefined;
+    const blank = blankOf(language, sourceOf(from.file));
+    const region = blank.slice(body, from.end);
+    let fetched: string | undefined;
+    if (/\]\s*(?:\?\.\s*)?\(/.test(region)) fetched = "a call through a table";
+    else {
+      for (const m of region.matchAll(/(?<![.\w$])([A-Za-z_$][\w$]*)\s*(?:\?\.\s*)?\(/g)) {
+        const name = m[1]!;
+        if (KEYWORDS[language].has(name) || NOT_CALLS.has(name)) continue;
+        // `const name = <something>[...]` in this body: a local read out of a table.
+        const declared = new RegExp(`\\b${escape(name)}\\s*(?::[^=\\n]*)?=\\s*[\\w$.?]+\\s*\\[[^\\]\\n]*\\]\\s*(?:[;\\n]|$)`);
+        if (declared.test(region)) { fetched = `a call of ${name}, read out of a table`; break; }
+      }
+    }
+    if (!fetched) return undefined;
+    const stored = await storedAsValue(to);
+    return stored ? `${fetched} is here, and ${to.name} is stored as a value at ${stored}` : undefined;
+  }
+
+  /** The first place in the project where a routine is written as a value rather than called or imported. */
+  const storedCache = new Map<string, Promise<string | undefined>>();
+  function storedAsValue(to: Sym): Promise<string | undefined> {
+    const key = `${to.file}:${to.nameStart}`;
+    let found = storedCache.get(key);
+    if (!found) { found = findStored(to); storedCache.set(key, found); }
+    return found;
+  }
+
+  async function findStored(to: Sym): Promise<string | undefined> {
+    const pattern = new RegExp(`\\b${escape(to.name)}\\b`, "g");
+    for (const file of sourceFiles()) {
+      if (!sourceOf(file).includes(to.name)) continue;
+      const blank = blankOf(language, sourceOf(file));
+      const uses = [...blank.matchAll(pattern)].map((m) => m.index!);
+      /*
+       * Outside its own file a routine is used by importing it, and only a
+       * file that does is asked about: asking the compiler about every file
+       * that merely spells the name loads a program per tsconfig, and ran a
+       * re-judge out of memory on nest in 25 seconds.
+       */
+      if (file !== to.file && !uses.some((at) => isImportOrExport(blank.slice(Math.max(0, at - 400), at)))) continue;
+      for (const at of uses) {
+        if (file === to.file && at === to.nameStart) continue;
+        const after = blank.slice(at + to.name.length, at + to.name.length + 40);
+        if (/^\s*(?:::<[^>]*>|<[^>()]*>)?\s*(?:\?\.\s*)?\(/.test(after)) continue;
+        const before = blank.slice(Math.max(0, at - 400), at);
+        if (isImportOrExport(before) || /@\s*$/.test(before) || !storedUnderKey(before, after)) continue;
+        const found = await resolve(file, at);
+        if (found.kind === "sym" && same(found.sym, to)) {
+          return `${rel(file)}:${sourceOf(file).slice(0, at).split("\n").length}`;
+        }
+      }
+    }
+    return undefined;
+  }
+
+  /**
+   * Whether a name is written as the value of a keyed entry: `bind: transformBind`,
+   * `{ transformBind }`, `"bind": transform_bind`, `table[key] = transformBind`.
+   * That is what a lookup like `directiveTransforms[name]` can hand back. A
+   * routine in a list (`nodeTransforms: [transformElement]`) or passed as an
+   * argument (`promise.then(flushJobs)`) is not -- read that loosely, the
+   * table rule moved four more answers, none of them reachable that way.
+   */
+  function storedUnderKey(before: string, after: string): boolean {
+    if (/\]\s*=\s*$/.test(before) || /[\w$'"\]]\s*:\s*$/.test(before)) return true;
+    if (!/[{,]\s*$/.test(before) || !/^\s*[,}]/.test(after)) return false;
+    // A shorthand entry: the innermost bracket still open is an object's.
+    let depth = 0;
+    for (let i = before.length - 1; i >= 0; i--) {
+      const c = before[i]!;
+      if (c === ")" || c === "]" || c === "}") depth++;
+      else if (c === "(" || c === "[" || c === "{") {
+        if (depth === 0) return c === "{";
+        depth--;
+      }
+    }
+    return false;
+  }
+
+  /** Whether the text just before a name puts it in an import or export list. */
+  function isImportOrExport(before: string): boolean {
+    const line = before.slice(before.lastIndexOf("\n") + 1);
+    if (/^\s*(import\b|from\s+\S+\s+import\b|export\s*(type\s*)?\{|export\s*\*|pub\s+use\b|use\b)/.test(line)) return true;
+    // A name on its own line inside a multi-line `import { ... }` or `from x import (...)`.
+    const open = Math.max(before.lastIndexOf("{"), before.lastIndexOf("("));
+    if (open < 0 || /[;})]/.test(before.slice(open + 1))) return false;
+    const head = before.slice(Math.max(0, open - 120), open);
+    return /(\bimport\s*(type\s*)?|\bexport\s*(type\s*)?|\bfrom\s+\S+\s+import\s*|\buse\s+[\w:]*::)$/.test(head.trimEnd());
+  }
+
+  let projectFiles: string[] | undefined;
+  function sourceFiles(): string[] {
+    if (projectFiles) return projectFiles;
+    const ext = language === "rust" ? /\.rs$/ : language === "python" ? /\.pyi?$/ : /\.(ts|tsx|mts|cts)$/;
+    const out: string[] = [];
+    const walk = (at: string, depth: number) => {
+      if (depth > 12) return;
+      let entries: string[];
+      try { entries = readdirSync(at); } catch { return; }
+      for (const entry of entries) {
+        if (entry.startsWith(".") || ["node_modules", "target", "dist"].includes(entry)) continue;
+        // A test hands routines to the code under test; that is not where the code stores them.
+        if (/^(__tests__|tests?|testing|benches)$/.test(entry)) continue;
+        const full = path.join(at, entry);
+        let stat;
+        try { stat = statSync(full); } catch { continue; }
+        if (stat.isDirectory()) walk(full, depth + 1);
+        else if (ext.test(entry) && !entry.endsWith(".d.ts") && !/(\.(spec|test)\.\w+$|^test_.*\.py$|_test\.py$)/.test(entry)) {
+          out.push(full);
+        }
+      }
+    };
+    walk(root, 0);
+    projectFiles = out;
+    return out;
   }
 
   /**
@@ -1052,7 +1202,13 @@ export function createOracle(tooling: Tooling): Oracle {
     const answers: Answer[] = [];
     const readsBody = claim.word === "calls" || claim.word === "builds" || claim.word === "accesses";
     for (const from of (readsBody ? bodied(fromSyms) : fromSyms).slice(0, 3)) {
-      for (const to of (readsBody ? bodied(toSyms) : toSyms).slice(0, 3)) {
+      /*
+       * A name declared inside the routine at the tail means the routine's
+       * own: `app.py#response` out of `wsgi_app` is its local, not the
+       * `response` locals of two other methods in the file (#428).
+       */
+      const own = claim.word === "calls" ? toSyms.filter((t) => from.start <= t.start && t.end <= from.end) : [];
+      for (const to of (readsBody ? bodied(own.length > 0 ? own : toSyms) : toSyms).slice(0, 3)) {
         answers.push(await judgeOne(claim, from, to));
       }
     }
@@ -1097,6 +1253,17 @@ export function createOracle(tooling: Tooling): Oracle {
       return judgeAccessesFromType(from, to, claim.member);
     }
     const problem = kindProblem(claim.word, from, to);
+    /*
+     * A value can hold something that runs. Flask's `wsgi_app` ends with
+     * `return response(environ, start_response)`, a call of its own local
+     * (#428); the kind is only a mistake when the body never calls it.
+     */
+    if (problem && claim.word === "calls" && to.kind === "data" && from.kind === "routine") {
+      const body = signatureOf(language, from)?.bodyStart ?? from.start;
+      if ((await scanForCall(from.file, { start: body, end: from.end }, [], to)).called) {
+        return { truth: "true", why: "the value is called here and resolves to it" };
+      }
+    }
     if (problem) return { truth: "false", why: problem };
     switch (claim.word) {
       case "calls": return to.kind === "type" ? judgeCallsToType(from, to) : judgeCalls(from, to);

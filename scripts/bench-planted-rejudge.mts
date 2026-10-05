@@ -7,6 +7,7 @@
  *   npx tsx scripts/bench-planted-rejudge.mts --word=calls --why="the from end is a type" --write
  *   npx tsx scripts/bench-planted-rejudge.mts --word=builds --project=TanStack-query
  *   npx tsx scripts/bench-planted-rejudge.mts --word=all --project=pallets-flask,TanStack-query
+ *   npx tsx scripts/bench-planted-rejudge.mts --word=calls --claim="calls|src/a.py#f|src/a.py#g|" --write
  *
  * `bench-planted-key.mts` rebuilds a key from its board, and a rebuild grows
  * plants from every claim the tooling calls true -- so changing how one word
@@ -34,6 +35,12 @@ const flag = (name: string) => argv.find((a) => a.startsWith(`--${name}=`))?.sli
 const word = flag("word") as Word | "all" | undefined;
 const why = flag("why");
 const projects = flag("project")?.split(",");
+/**
+ * Exact claim ids, as the key stores them; repeat the flag for more. For a
+ * correction meant for named claims only (#428), so a reading that would also
+ * move others moves nothing else in the key.
+ */
+const claims = argv.filter((a) => a.startsWith("--claim=")).map((a) => a.slice("--claim=".length));
 const write = argv.includes("--write");
 if (!word) {
   console.log("Name the word to re-judge: --word=calls, and narrow it with --why=<start of the stored reason>.");
@@ -45,10 +52,11 @@ const changed = new Map<string, number>();
 for (const file of plantedKeyFiles(REPO)) {
   const key = JSON.parse(readFileSync(file, "utf8")) as {
     project: string; language: string;
-    claims: Array<{ word: string; from: string; to: string; member?: string; truth: string; why: string; source: string }>;
+    claims: Array<{ id: string; word: string; from: string; to: string; member?: string; truth: string; why: string; source: string }>;
   };
   if (projects && !projects.includes(key.project)) continue;
-  const wanted = key.claims.filter((c) => (word === "all" || c.word === word) && (!why || c.why.startsWith(why)));
+  const wanted = key.claims.filter((c) => (word === "all" || c.word === word) && (!why || c.why.startsWith(why))
+    && (claims.length === 0 || claims.includes(c.id)));
   if (wanted.length === 0) continue;
   const language = (key.language === "tsx" ? "ts" : key.language) as Language;
   const oracle = createOracle(await createTooling(language, useLibraries(key.project)));
