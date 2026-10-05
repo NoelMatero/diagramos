@@ -189,6 +189,20 @@ describe("an arrow into a routine whose whole call set is checked (#233)", () =>
     expect(report.clean).toBe(false);
   });
 
+  it("says where the calls went when one lands in the far file on something else (#430)", async () => {
+    // `urlName` is a value nothing calls; `lookup` is beside it. "None reaching
+    // src/b.ts" would be false, so the sentence names what was reached.
+    const caller = 'import { lookup } from "./b";\nexport function run() { return lookup(); }\n';
+    const far = 'export const urlName = "home";\nexport function lookup() { return urlName; }\n';
+    const board = await boardOf("src/a.ts#run", "src/b.ts#urlName", { claim: "calls" });
+    const report = checkDrift(board, fakeWorkspace({ "src/a.ts": caller, "src/b.ts": far }), { edges: true });
+
+    const refuted = report.edges.filter((finding) => finding.kind === "calls-refuted");
+    expect(refuted).toHaveLength(1);
+    expect(refuted[0]!.detail).toContain("the one reaching src/b.ts lands on `lookup`, which is not urlName");
+    expect(refuted[0]!.detail).not.toContain("none reaching");
+  });
+
   it("keeps a planned arrow silent rather than refuting a sketch", async () => {
     // Same shape, drawn as a plan: the code has not caught up to it yet, and
     // a red about a plan is a lie about a plan -- same rule `backwards` is

@@ -3084,6 +3084,19 @@ function oneLine(label: string): string {
 }
 
 /**
+ * Where a refuted routine's calls went, said of the head's file: none of them
+ * there, or the ones that were landed on something the head cannot be (#430).
+ */
+function landedBeside(elsewhere: ReadonlyArray<{ name: string; line: number }> | undefined, toPath: string, head: readonly string[]): string {
+  if (!elsewhere || elsewhere.length === 0) return `none reaching ${toPath}`;
+  const names = [...new Set(elsewhere.map((one) => one.name))];
+  const lines = [...new Set(elsewhere.map((one) => one.line))].slice(0, 3);
+  return `and the ${elsewhere.length === 1 ? "one" : "ones"} reaching ${toPath} `
+    + `${elsewhere.length === 1 ? "lands" : "land"} on ${list(names)}, which ${names.length === 1 ? "is" : "are"} `
+    + `not ${head.join(" or ")} (line${lines.length === 1 ? "" : "s"} ${lines.join(", ")})`;
+}
+
+/**
  * Whether an arrow's `via` names the hops the code was found taking (#375).
  *
  * The one marker for a summary drawn on purpose, whatever the word. An arrow
@@ -6159,8 +6172,8 @@ export function checkDrift(
                   + `this arrow says ${oneLine(fromNode.label) || fromPath} calls `
                   + `${oneLine(toNode.label) || toPath}, and every call `
                   + `${verdict.evidence.routine} makes was checked -- ${verdict.evidence.sites} of `
-                  + `them, none reaching ${toPath}. ${fromPath} line ${verdict.evidence.line} is `
-                  + `where ${verdict.evidence.routine} is declared.`,
+                  + `them, ${landedBeside(verdict.evidence.elsewhere, toPath, toEnd.symbols)}. `
+                  + `${fromPath} line ${verdict.evidence.line} is where ${verdict.evidence.routine} is declared.`,
               }, rests: {
                 written: !verdict.evidence.implicit,
                 unwritten: verdict.evidence.implicit?.outside

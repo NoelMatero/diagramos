@@ -957,3 +957,166 @@ describe("a closed call set that lands in the head's file at another routine", (
     expect(verdictOf(verdict)).toBe("absent");
   });
 });
+
+/*
+ * A call that comes to rest in the head's file, on something the head cannot
+ * be (#430). Landing in that file used to stop the question whatever it landed
+ * on; django's `resolve` reaching `URLResolver.resolve` is not calling
+ * `url_name`, an attribute. The quiet cases are the ones the old rule was
+ * protecting: making a class runs its own code, and a name can be the head
+ * under another spelling.
+ */
+describe("a call that lands in the head's file on something the head cannot be (#430)", () => {
+  it("refutes when the head is data and the call lands on a routine beside it", () => {
+    const verdict = ask({
+      "src/a.ts": {
+        source: 'import { lookup } from "./b";\nexport function run() { return lookup(); }\n',
+        language: "ts",
+        imports: [["./b", "src/b.ts"]],
+      },
+      "src/b.ts": {
+        source: 'export const urlName = "home";\nexport function lookup() { return urlName; }\n',
+        language: "ts",
+      },
+    }, { file: "src/a.ts", routine: "run" }, { file: "src/b.ts", names: ["urlName"] });
+
+    expect(verdictOf(verdict)).toBe("refuted");
+    if (verdict.verdict !== "refuted") return;
+    expect(verdict.evidence.elsewhere).toEqual([{ name: "lookup", line: 2 }]);
+  });
+
+  it("refutes when the call makes a class and the head is another class's method", () => {
+    const verdict = ask({
+      "app/a.py": {
+        source: "from app.b import Request\n\ndef run():\n    return Request()\n",
+        language: "python",
+        imports: [["app.b", "app/b.py"], ["app.b.Request", "app/b.py"]],
+      },
+      "app/b.py": {
+        source: "class Request:\n    def __init__(self):\n        self.url = 1\n\n"
+          + "class Response:\n    def iter_text(self):\n        return ''\n",
+        language: "python",
+      },
+    }, { file: "app/a.py", routine: "run" }, { file: "app/b.py", names: ["iter_text"] });
+
+    expect(verdictOf(verdict)).toBe("refuted");
+  });
+
+  it("stays quiet when `new` runs the head: the class's own constructor", () => {
+    // vite's `new SSRCompatModuleRunner(...)` runs the constructor the arrow names.
+    const verdict = ask({
+      "src/a.ts": {
+        source: 'import { Runner } from "./b";\nexport function run() { return new Runner(); }\n',
+        language: "ts",
+        imports: [["./b", "src/b.ts"]],
+      },
+      "src/b.ts": {
+        source: "export class Runner {\n  constructor() { this.n = 1; }\n}\n",
+        language: "ts",
+      },
+    }, { file: "src/a.ts", routine: "run" }, { file: "src/b.ts", names: ["constructor"] });
+
+    expect(verdictOf(verdict)).not.toBe("refuted");
+  });
+
+  it("stays quiet when making the class runs the head without a call written to it", () => {
+    // A dataclass's generated `__init__` runs `__post_init__`; nothing spells it.
+    const verdict = ask({
+      "app/a.py": {
+        source: "from app.b import Point\n\ndef run():\n    return Point(1, 2)\n",
+        language: "python",
+        imports: [["app.b", "app/b.py"], ["app.b.Point", "app/b.py"]],
+      },
+      "app/b.py": {
+        source: "@dataclass\nclass Point:\n    x: int\n    y: int\n\n    def __post_init__(self):\n        self.x = abs(self.x)\n",
+        language: "python",
+      },
+    }, { file: "app/a.py", routine: "run" }, { file: "app/b.py", names: ["__post_init__"] });
+
+    expect(verdictOf(verdict)).not.toBe("refuted");
+  });
+
+  it("stays quiet when the head is held by a base the made class inherits here", () => {
+    // `Leaf()` runs `Base.__init__` through the class it derives from.
+    const verdict = ask({
+      "app/a.py": {
+        source: "from app.b import Leaf\n\ndef run():\n    return Leaf()\n",
+        language: "python",
+        imports: [["app.b", "app/b.py"], ["app.b.Leaf", "app/b.py"]],
+      },
+      "app/b.py": {
+        source: "class Base:\n    def setup(self):\n        return 1\n\nclass Mid(Base):\n    pass\n\nclass Leaf(Mid):\n    pass\n",
+        language: "python",
+      },
+    }, { file: "app/a.py", routine: "run" }, { file: "app/b.py", names: ["setup"] });
+
+    expect(verdictOf(verdict)).not.toBe("refuted");
+  });
+
+  it("stays quiet when the head is the routine it landed on, under another name", () => {
+    const verdict = ask({
+      "src/a.ts": {
+        source: 'import { get } from "./b";\nexport function run() { return get(); }\n',
+        language: "ts",
+        imports: [["./b", "src/b.ts"]],
+      },
+      "src/b.ts": {
+        source: "export function get() { return 1; }\nexport const fetch = get;\n",
+        language: "ts",
+      },
+    }, { file: "src/a.ts", routine: "run" }, { file: "src/b.ts", names: ["fetch"] });
+
+    expect(verdictOf(verdict)).not.toBe("refuted");
+  });
+
+  it("stays quiet when the head is a class and the call lands on its own method", () => {
+    // poetry's `self._solution.decide(...)`: a method of the head may make one.
+    const verdict = ask({
+      "src/a.ts": {
+        source: "export function run(m: unknown) { return m.decide(); }\n",
+        language: "ts",
+        resolveReceiver: () => ({ kind: "declared", file: "src/b.ts" }),
+      },
+      "src/b.ts": {
+        source: "export class Solution {\n  decide() { return new Solution(); }\n}\nexport function other() { return 1; }\n",
+        language: "ts",
+      },
+    }, { file: "src/a.ts", routine: "run" }, { file: "src/b.ts", names: ["Solution"] });
+
+    expect(verdictOf(verdict)).not.toBe("refuted");
+  });
+
+  it("stays quiet when the head is a class and the call makes one derived from it", () => {
+    const verdict = ask({
+      "src/a.ts": {
+        source: 'import { Special } from "./b";\nexport function run() { return new Special(); }\n',
+        language: "ts",
+        imports: [["./b", "src/b.ts"]],
+      },
+      "src/b.ts": {
+        source: "export class Match {\n  n = 1;\n}\nexport class Special extends Match {\n  m = 2;\n}\n",
+        language: "ts",
+      },
+    }, { file: "src/a.ts", routine: "run" }, { file: "src/b.ts", names: ["Match"] });
+
+    expect(verdictOf(verdict)).not.toBe("refuted");
+  });
+
+  it("stays quiet when a Rust struct is made and the head is its own `drop`", () => {
+    // Held twice: Rust's own rule for a trait method the language calls, and
+    // this one's "a routine the made type holds".
+    const verdict = ask({
+      "src/a.rs": {
+        source: "use crate::b::Guard;\n\nfn run() -> Guard { Guard { n: 1 } }\n",
+        language: "rust",
+        imports: [["crate::b::Guard", "src/b.rs"]],
+      },
+      "src/b.rs": {
+        source: "pub struct Guard { pub n: u32 }\n\nimpl Drop for Guard {\n    fn drop(&mut self) { self.n = 0; }\n}\n",
+        language: "rust",
+      },
+    }, { file: "src/a.rs", routine: "run" }, { file: "src/b.rs", names: ["drop"] });
+
+    expect(verdictOf(verdict)).not.toBe("refuted");
+  });
+});
