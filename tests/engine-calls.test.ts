@@ -1075,7 +1075,7 @@ describe("a call that lands in the head's file on something the head cannot be (
       "src/a.ts": {
         source: "export function run(m: unknown) { return m.decide(); }\n",
         language: "ts",
-        resolveReceiver: () => ({ kind: "declared", file: "src/b.ts" }),
+        resolveReceiver: () => ({ kind: "declared", file: "src/b.ts", concrete: true }),
       },
       "src/b.ts": {
         source: "export class Solution {\n  decide() { return new Solution(); }\n}\nexport function other() { return 1; }\n",

@@ -190,17 +190,27 @@ describe("an arrow into a routine whose whole call set is checked (#233)", () =>
   });
 
   it("says where the calls went when one lands in the far file on something else (#430)", async () => {
-    // `urlName` is a value nothing calls; `lookup` is beside it. "None reaching
-    // src/b.ts" would be false, so the sentence names what was reached.
+    // `new Request()` runs Request's code, never Response's `text`. "None
+    // reaching src/b.ts" would be false, so the sentence names what was reached.
+    const caller = 'import { Request } from "./b";\nexport function run() { return new Request(); }\n';
+    const far = "export class Request {\n  url = 1;\n}\nexport class Response {\n  text() { return 1; }\n}\n";
+    const board = await boardOf("src/a.ts#run", "src/b.ts#text", { claim: "calls" });
+    const report = checkDrift(board, fakeWorkspace({ "src/a.ts": caller, "src/b.ts": far }), { edges: true });
+
+    const refuted = report.edges.filter((finding) => finding.kind === "calls-refuted");
+    expect(refuted).toHaveLength(1);
+    expect(refuted[0]!.detail).toContain("the one reaching src/b.ts lands on `Request`, which is not text");
+    expect(refuted[0]!.detail).not.toContain("none reaching");
+  });
+
+  it("still says the far end is a value, which says what to fix, when it is one (#430)", async () => {
+    // The red #430 adds would also be true here; the one that names the fix wins.
     const caller = 'import { lookup } from "./b";\nexport function run() { return lookup(); }\n';
     const far = 'export const urlName = "home";\nexport function lookup() { return urlName; }\n';
     const board = await boardOf("src/a.ts#run", "src/b.ts#urlName", { claim: "calls" });
     const report = checkDrift(board, fakeWorkspace({ "src/a.ts": caller, "src/b.ts": far }), { edges: true });
 
-    const refuted = report.edges.filter((finding) => finding.kind === "calls-refuted");
-    expect(refuted).toHaveLength(1);
-    expect(refuted[0]!.detail).toContain("the one reaching src/b.ts lands on `lookup`, which is not urlName");
-    expect(refuted[0]!.detail).not.toContain("none reaching");
+    expect(report.edges.map((finding) => finding.kind)).toEqual(["end-lacks-part"]);
   });
 
   it("keeps a planned arrow silent rather than refuting a sketch", async () => {

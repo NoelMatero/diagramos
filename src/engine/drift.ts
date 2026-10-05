@@ -5175,6 +5175,13 @@ export function checkDrift(
       const tallyOf = edge.claim ? withheldTallyOf(claims, edge.claim) : undefined;
       const tallyBefore = tallyOf ? { ...tallyOf } : undefined;
       const garbledBefore = garbledClaims.length;
+      /*
+       * A `calls-refuted` resting on calls that landed in the far file beside
+       * the head (#430), held until the end's own kind is asked: "the far end
+       * is a value, point the arrow at the routine" says what to fix, where
+       * "never calls it" only says that something is wrong.
+       */
+      let besideTheHead: (() => void) | undefined;
 
       /*
        * `@takes` / `@returns`: does the head's signature name the tail's type?
@@ -6154,12 +6161,11 @@ export function checkDrift(
                   oneLevelUp(throughAChain.via, throughAChain.hops.length));
                 continue;
               }
-              edgesChecked += 1;
               const wasClaimed = baselineGraph?.edges.some(
                 (was) => was.from === edge.from && was.to === edge.to && was.claim === "calls",
               );
               const fresh = baselineGraph !== undefined && !wasClaimed;
-              recordEdge(edge, fromNode, toNode, { kind: "finding", finding: {
+              const refute = () => { edgesChecked += 1; recordEdge(edge, fromNode, toNode, { kind: "finding", finding: {
                 from: fromPath,
                 to: toPath,
                 fromLabel: fromNode.label,
@@ -6187,8 +6193,9 @@ export function checkDrift(
                     declaredIn(workspace.read(toFile), languageOf(toFile) ?? "python", toPath, verdict.evidence.implicit!.name),
                   ),
                 } : {}),
-              } });
-              continue;
+              } }); };
+              if (verdict.evidence.elsewhere) besideTheHead = refute;
+              else { refute(); continue; }
             }
             /*
              * `absent` is silent here. That is the point of the word: not
@@ -6597,6 +6604,7 @@ export function checkDrift(
         )
         : undefined;
       if (!lacking && unsettled) claims.endsUnsettled += 1;
+      if (!lacking && besideTheHead) { besideTheHead(); continue; }
       if (lacking && edge.claim) {
         if (tallyOf && tallyBefore) {
           for (const key of Object.keys(tallyOf)) delete tallyOf[key];
