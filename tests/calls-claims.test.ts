@@ -206,7 +206,7 @@ describe("an arrow into a routine whose whole call set is checked (#233)", () =>
   it("still says the far end is a value, which says what to fix, when it is one (#430)", async () => {
     // The red #430 adds would also be true here; the one that names the fix wins.
     const caller = 'import { lookup } from "./b";\nexport function run() { return lookup(); }\n';
-    const far = 'export const urlName = "home";\nexport function lookup() { return urlName; }\n';
+    const far = 'export const urlName: string = "home";\nexport function lookup() { return urlName; }\n';
     const board = await boardOf("src/a.ts#run", "src/b.ts#urlName", { claim: "calls" });
     const report = checkDrift(board, fakeWorkspace({ "src/a.ts": caller, "src/b.ts": far }), { edges: true });
 
