@@ -375,13 +375,27 @@ export function createOracle(tooling: Tooling): Oracle {
         if (/^\s*(?:::<[^>]*>|<[^>()]*>)?\s*(?:\?\.\s*)?\(/.test(after)) continue;
         const before = blank.slice(Math.max(0, at - 400), at);
         if (isImportOrExport(before) || /@\s*$/.test(before) || !storedUnderKey(before, after)) continue;
-        const found = await resolve(file, at);
-        if (found.kind === "sym" && same(found.sym, to)) {
+        if (await definedAs(file, at, to)) {
           return `${rel(file)}:${sourceOf(file).slice(0, at).split("\n").length}`;
         }
       }
     }
     return undefined;
+  }
+
+  /**
+   * Whether the name at `at` is `to`, following one import. TypeScript takes
+   * `model: model` through the import to the function, but stops a shorthand
+   * `{ bind }` at `import { bind }`; asked again there, it names the function.
+   */
+  async function definedAs(file: string, at: number, to: Sym): Promise<boolean> {
+    const found = (await tooling.definition(file, at)) ?? [];
+    if (found.some((loc) => denotes(loc, to))) return true;
+    for (const loc of found) {
+      if (isOutside(loc.file, root) || (loc.file === file && loc.start === at)) continue;
+      if ((await tooling.definition(loc.file, loc.start))?.some((next) => denotes(next, to))) return true;
+    }
+    return false;
   }
 
   /**
