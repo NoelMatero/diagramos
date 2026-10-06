@@ -207,8 +207,8 @@
       "language": "ts",
       "source": "retarget",
       "parent": "calls|packages/vite/src/node/ssr/ssrModuleLoader.ts#ssrLoadModule|packages/vite/src/node/ssr/ssrModuleLoader.ts#instantiateModule|",
-      "truth": "false",
-      "why": "the routine's calls were read and none is it"
+      "truth": "true",
+      "why": "it creates SSRCompatModuleRunner, which runs this constructor"
     },
     {
       "id": "calls|packages/vite/src/node/ssr/ssrModuleLoader.ts#ssrLoadModule|packages/vite/src/node/ssr/ssrModuleLoader.ts#error|",

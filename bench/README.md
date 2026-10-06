@@ -95,6 +95,54 @@ unit of work.
 Each answer file records the commit it describes (`pin`) and the tool that
 answered (`tool`). The clones live in `.corpus`, pinned by `src/engine/licence.ts`.
 
+## The projects' own libraries (#429)
+
+```
+npm run bench:libraries                    # once per machine; again when a pin changes
+```
+
+A user's checkout has its libraries installed; a bare clone does not. Without
+them pyright cannot say what Flask's `request_started.send(...)` is (blinker),
+and the TypeScript compiler cannot type anything React returns in TanStack, so
+the check, and the answer key, stop on calls a user's machine would answer.
+
+`bench:libraries` installs them beside `.corpus`, in `.corpus-libs/`, and never
+in it:
+
+- **The five Python projects** each get a venv at
+  `.corpus-libs/python/<project>/`, holding the project's dependencies and
+  extras (never its test or lint tools, never the project itself) at the
+  versions in `bench/libraries/<project>.txt`. Each file says where its pins
+  came from: the project's own `uv.lock` or `poetry.lock` at the pinned commit,
+  or, for the two with no lock (Django, httpx), the versions current on the
+  day of that commit. Python 3.14 for all five.
+- **TanStack** gets a checkout of its pin at `.corpus-libs/corpus/TanStack-query`,
+  with `pnpm install --frozen-lockfile` run in it at the pnpm version its
+  `package.json` names, for `@tanstack/react-query` and what it depends on
+  (every TanStack ref is in `query-core` or `react-query`).
+
+Needs `uv`, `git` and the network; about four minutes the first time, most of
+it pnpm. `.corpus-libs/installed.json` records what was installed from which
+pins, and the script does nothing when that still matches.
+
+Every bench script that reads a corpus project -- `bench:planted`, the key
+builder, the re-judge -- reads it with its libraries when they are installed:
+that project's venv goes first on `PATH`, where pyright looks for an
+interpreter, and TanStack is read from its own checkout. The score's header
+says which it was:
+
+```
+  libraries: installed from pins a0e7e56d41 (6 projects, /Users/noelmatero/board-ai/.corpus-libs)
+```
+
+A run without them says `not installed` there, and its Python and TanStack
+numbers are not comparable with one that had them. `BENCH_LIBRARIES=<folder>`
+points the scripts at another folder; a folder with nothing in it is a run
+without libraries.
+
+Excalidraw, the other TypeScript project with no `node_modules` in `.corpus`,
+is not covered yet.
+
 ## Where each part comes from
 
 **The boards come from Haiku**, one run per row of `scopes.json`, isolated from
@@ -170,12 +218,26 @@ npx tsx scripts/bench-planted-rejudge.mts --word=calls --why="the from end is a 
 used exactly the line above: an `@calls` arrow out of a class had been called
 false outright, and is now read through the class's own routines.
 
+`--claim=<id>` (repeat it for more) narrows it to exact claims, by the `id`
+the key stores. #428 corrected four answers that way: the corrected reading
+moves other claims too, and those were listed in the PR rather than written.
+
 `--project` runs one project at a time. #374 re-asked every `@calls` and
 `@accesses` claim that way, project by project, because one language server
 dying (regex's, on `@builds`, on unchanged main too) ends the whole run:
 
 ```
 npx tsx scripts/bench-planted-rejudge.mts --word=calls --project=anyhow --write
+```
+
+`--project` also takes a comma list, and `--word=all` re-asks every word: what
+a change to the machine rather than to one word needs. #429 installed the
+projects' libraries and re-asked the six projects they touch, after a control
+with the libraries switched off (`BENCH_LIBRARIES` set to an empty folder):
+
+```
+npx tsx scripts/bench-planted-rejudge.mts --word=all \
+  --project=django-django,encode-httpx,pallets-flask,pydantic-pydantic,python-poetry-poetry,TanStack-query --write
 ```
 
 A class at the far end of `@calls` is now called when the tail creates one

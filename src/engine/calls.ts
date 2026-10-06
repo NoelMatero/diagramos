@@ -67,6 +67,7 @@
  */
 import { providedByLanguage } from "./builtins";
 import { compiledBodiesOf, compiledRefutes, traitImplsOf, type CompiledBody, type CompiledCrate } from "./compiled-calls";
+import { declaredBases } from "./conforms";
 import { mayAccuse } from "./licence";
 import { declaresMember, holdersIn } from "./overrides";
 import { each, parseSource, type Language, type Node, type Tree } from "./parse";
@@ -191,6 +192,12 @@ export interface CallsRefutedEvidence {
   line: number;
   /** Every call the routine makes, checked and placed somewhere else. */
   sites: number;
+  /**
+   * The calls that came to rest in the head's own file, on something the
+   * head cannot be (#430). "None reaching that file" would be false, so the
+   * sentence names where they went.
+   */
+  elsewhere?: Array<{ name: string; line: number }>;
   /**
    * The head is a method the language runs without it being written (#384):
    * a Python `__dunder__` an operator or builtin calls, or TypeScript's
@@ -1647,7 +1654,18 @@ function resolves(
 
   const bound = callee.kind === "through" ? callee.through : callee.name;
   if (!bound) return callee.kind === "through" ? landsOnTarget(callee, side, target) : "receiver";
-  if (bindings.ambiguous.has(bound)) return "ambiguous";
+  /*
+   * Ambiguous as a name is not ambiguous at one position (#433), which is why
+   * `placeOf` already asks there. anyhow's `error.rs` imports `Error` and also
+   * holds `impl Error` blocks, so `Error::construct(...)`, written in plain
+   * sight, never confirmed. Only ever a confirmation.
+   *
+   * With no answer the doubt is `receiver`, as for any member call whose
+   * owner the text cannot place: a live check starts a language server only
+   * for that reason (`wouldHelp`), so leaving it `ambiguous` meant nothing
+   * was ever asked -- the first build of this moved no arrow on the bench.
+   */
+  if (bindings.ambiguous.has(bound)) return callee.kind === "through" ? landsOnTarget(callee, side, target) : "ambiguous";
 
   const imported = bindings.imported.get(bound);
   if (!imported) {
@@ -2215,6 +2233,7 @@ function textClosed(
   let sites = 0;
   const reached: Array<{ name: string; line: number }> = [];
   let hooked: boolean | undefined;
+  const elsewhere: Array<{ name: string; line: number }> = [];
   for (const body of bodies) {
     for (const site of body.sites) {
       // Open: something unplaced, and the site says what stopped it.
@@ -2244,6 +2263,11 @@ function textClosed(
          */
         if (site.declaredAs === undefined) return { why: "reaches-the-file" };
         if (to.names.includes(site.declaredAs)) return { why: "reaches-the-file" };
+        if (cannotBeTheHead(to, site.declaredAs)) {
+          elsewhere.push({ name: site.declaredAs, line: site.line });
+          sites += 1;
+          continue;
+        }
         /*
          * And the head's file has to actually declare a routine by that name
          * (#329's measurement). `measure:wrong-routine` put every placed name
@@ -2268,7 +2292,7 @@ function textClosed(
     }
   }
   if (reached.length === 0) {
-    return { evidence: { routine: from.routine, line: bodies[0]!.line, sites } };
+    return { evidence: { routine: from.routine, line: bodies[0]!.line, sites, ...(elsewhere.length > 0 ? { elsewhere } : {}) } };
   }
   /*
    * An arrow drawn at a **type** is a different mistake and not this one
@@ -2400,6 +2424,90 @@ function typeSpans(source: string, language: Language, type: string): Array<[num
     if (isType || impl) spans.push([lineOf(source, node.startIndex), lineOf(source, node.startIndex + node.text.length)]);
   });
   return spans;
+}
+
+/**
+ * Whether a call that came to rest in the head's file, on `landed`, cannot be
+ * the head -- one more call placed somewhere else, and no reason to stop
+ * (#430).
+ *
+ * Landing in the head's file used to end the question whatever it landed on.
+ * But django's `resolve` calling `URLResolver.resolve` is not calling
+ * `url_name`, an attribute nothing calls, and httpx's `Request(...)` is not
+ * calling `Response.iter_text`. Three shapes cannot be the head:
+ *
+ *   the head is data        neither a routine nor a type: nothing calls it
+ *   it landed on a class    making one runs that class's own code and what
+ *                           it inherits here, never another class's routine
+ *   the head is a type      and it landed on a routine written outside it,
+ *                           or on a class that does not derive from it
+ *
+ * A routine landing on another routine is none of these: that is the near
+ * miss (#329), and it keeps its own red. What landed has to be declared here
+ * as a routine or as a type and nothing else, and must not be the head under
+ * another name (`fetch = get`, `export { get as fetch }`, `{ error: log }`).
+ */
+function cannotBeTheHead(to: CallSide & { names: string[] }, landed: string): boolean {
+  const { source, language } = to;
+  const landedRoutine = isRoutine(source, landed, language);
+  const landedType = isTypeName(source, landed, language);
+  if (landedRoutine === landedType) return false;
+  return to.names.every((head) => {
+    if (aliases(source, head, landed)) return false;
+    const headRoutine = isRoutine(source, head, language);
+    const headType = isTypeName(source, head, language);
+    if (headRoutine) return landedType && !runWhenMade(to, landed, head);
+    if (headType) return !writtenInside(source, language, head, landed) && !(landedType && lineageOf(to, landed).has(head));
+    return true;
+  });
+}
+
+/**
+ * Whether making a `type` can run `routine` without a call to it being
+ * written: it is written inside the type's own code -- a constructor, a
+ * `__post_init__`, a validator, a Rust `Drop` -- or held by the type or by
+ * one of its bases declared in this file, or by a trait, whose method any
+ * implementor may be running. A base declared in another file cannot hold a
+ * routine of this one without importing it back.
+ */
+function runWhenMade(to: CallSide, type: string, routine: string): boolean {
+  if (writtenInside(to.source, to.language, type, routine)) return true;
+  const lineage = lineageOf(to, type);
+  return holdersOfRoutine(to.source, to.language, routine)
+    .some((one) => one.dispatched || (one.name !== undefined && lineage.has(one.name)));
+}
+
+/** Whether `name` is written anywhere in a type's own code in this file. */
+function writtenInside(source: string, language: Language, type: string, name: string): boolean {
+  const lines = source.split("\n");
+  const word = new RegExp(`\\b${escapeName(name)}\\b`);
+  return typeSpans(source, language, type)
+    .some(([first, last]) => word.test(lines.slice(first - 1, last).join("\n")));
+}
+
+/** A type and every base it names that this file declares, followed up the chain. */
+function lineageOf(side: CallSide, type: string): Set<string> {
+  const seen = new Set<string>();
+  const pending = [type];
+  while (pending.length > 0) {
+    const next = pending.pop()!;
+    if (seen.has(next)) continue;
+    seen.add(next);
+    const read = declaredBases(side.source, next, side.language);
+    if ("bases" in read) pending.push(...read.bases.map((base) => base.name));
+  }
+  return seen;
+}
+
+/** Whether this source binds `head` to `landed` under another name. */
+function aliases(source: string, head: string, landed: string): boolean {
+  const h = escapeName(head);
+  const l = escapeName(landed);
+  return new RegExp(
+    `\\b${h}\\s*(?::[^=;\\n]*)?=\\s*[\\w.:]*\\b${l}\\b`
+    + `|\\b${l}\\s+as\\s+${h}\\b`
+    + `|\\b${h}\\s*:\\s*[\\w.:]*\\b${l}\\b`,
+  ).test(source);
 }
 
 /**
