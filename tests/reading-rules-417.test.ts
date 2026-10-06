@@ -21,7 +21,7 @@ import { beforeAll, describe, expect, it } from "vitest";
 import { emptyBoard } from "../src/engine/board-file";
 import type { ArrowClaim } from "../src/engine/claim";
 import { createDiagram } from "../src/engine/diagram";
-import { ACCUSING_EDGE_KINDS, checkDrift, type DriftReport, type Workspace } from "../src/engine/drift";
+import { ACCUSING_EDGE_KINDS, checkDrift, type ClosedBodyReferee, type DriftReport, type Workspace } from "../src/engine/drift";
 import { initEngine } from "../src/engine/parse";
 import { partsOf } from "../src/engine/parts";
 import { installExcalifontMeasurer } from "./helpers/excalifont";
@@ -42,7 +42,10 @@ function fakeWorkspace(files: Record<string, string>): Workspace {
   };
 }
 
-async function checked(claim: ArrowClaim, fromRef: string, toRef: string, files: Record<string, string>): Promise<DriftReport> {
+async function checked(
+  claim: ArrowClaim, fromRef: string, toRef: string, files: Record<string, string>,
+  referee?: ClosedBodyReferee,
+): Promise<DriftReport> {
   const { board } = await createDiagram(emptyBoard(), {
     name: "arch",
     nodes: [
@@ -51,7 +54,7 @@ async function checked(claim: ArrowClaim, fromRef: string, toRef: string, files:
     ],
     edges: [{ from: "from", to: "to", claim }],
   });
-  return checkDrift(board, fakeWorkspace(files), { edges: true });
+  return checkDrift(board, fakeWorkspace(files), { edges: true, ...(referee ? { closedBodyReferee: referee } : {}) });
 }
 
 const ACCUSING = new Set<string>(ACCUSING_EDGE_KINDS);
@@ -372,6 +375,127 @@ describe("rule 4: a local chosen by a condition is followed down every branch", 
       "src/sched.py": "def next_tick():\n    return 1\n\n"
         + "def check_recursive(job):\n    return job\n\n"
         + "def flush_jobs(job):\n    def inner():\n        check = check_recursive\n        return check\n    check(job)\n",
+    }));
+    expect(kinds(report)).toEqual([]);
+  });
+});
+
+/*
+ * #432. A type written as a use -- given type arguments, or reached through a
+ * path -- is not a second declaration of it. And for `@calls` into a class, a
+ * parameter of the class's type names it only when the body runs one of the
+ * class's methods through it with no call written, and the class declares
+ * that method. The quiet cases are each way a value runs one.
+ */
+describe("#432: a type's use is not a declaration, and a parameter names the class only when it runs it", () => {
+  it("calls a \"makes\" arrow wrong when the head's file only casts to the type", async () => {
+    const report = await checked("builds", "src/cache.ts#remove", "src/mutation.ts#Mutation", ts({
+      "src/cache.ts": "import { Mutation } from \"./mutation\";\nexport function remove(m: Mutation<unknown>) { return m.id; }\n",
+      "src/mutation.ts": "export class Mutation<T> {\n  id = 1;\n  run(): T | undefined { return undefined; }\n}\n"
+        + "export function same(x: unknown) { return x as Mutation<unknown>; }\n",
+    }));
+    expect(kinds(report)).toEqual(["builds-refuted"]);
+  });
+
+  it("stays quiet when the name really is declared a second way", async () => {
+    const report = await checked("builds", "src/cache.ts#remove", "src/mutation.ts#Mutation", ts({
+      "src/cache.ts": "import { Mutation } from \"./mutation\";\nexport function remove(m: Mutation) { return m.id; }\n",
+      "src/mutation.ts": "export class Mutation {\n  id = 1;\n  run() { return 1; }\n}\nexport interface Mutation { extra?: number }\n",
+    }));
+    expect(kinds(report)).toEqual([]);
+  });
+
+  const loop = (klass: string, body: string) => checked("calls", "src/use.py#loop", "src/rng.py#Range", py({
+    "src/rng.py": klass,
+    "src/base.py": "class Base:\n    pass\n",
+    "src/helpers.py": "def note(x):\n    return x\n",
+    "src/use.py": `from .helpers import note\nfrom .rng import Range\n\ndef loop(r: Range):\n${body}`,
+  }));
+  const PLAIN = "class Range:\n    def entries(self):\n        return [1]\n";
+  const withMethod = (method: string) => `class Range:\n    def ${method}(self, *a):\n        return 1\n\n    def entries(self):\n        return [1]\n`;
+
+  it("calls a \"calls\" arrow wrong when the value is only handed on and read from", async () => {
+    expect(kinds(await loop(PLAIN, "    note(r)\n    return r.entries\n"))).toEqual(["calls-refuted"]);
+  });
+
+  it("calls it wrong when the value is hashed and the class has no __hash__ (poetry's shape)", async () => {
+    expect(kinds(await loop(withMethod("__str__"), "    return note({r})\n"))).toEqual(["calls-refuted"]);
+  });
+
+  it("stays quiet when the value is formatted and the class has __str__", async () => {
+    expect(kinds(await loop(withMethod("__str__"), "    return note(f\"{r}\")\n"))).toEqual([]);
+  });
+
+  it("stays quiet when the value is hashed and the class has __hash__", async () => {
+    expect(kinds(await loop(withMethod("__hash__"), "    return note({r})\n"))).toEqual([]);
+  });
+
+  it("stays quiet when the value is in a list a builtin walks, and the class compares", async () => {
+    expect(kinds(await loop(withMethod("__lt__"), "    return note(sorted([r, r]))\n"))).toEqual([]);
+  });
+
+  it("stays quiet when the value is used with an operator the class defines", async () => {
+    expect(kinds(await loop(withMethod("__add__"), "    return note(r + 1)\n"))).toEqual([]);
+  });
+
+  it("stays quiet when the value's truth is tested and the class has __bool__", async () => {
+    expect(kinds(await loop(withMethod("__bool__"), "    if r:\n        return note(1)\n    return 0\n"))).toEqual([]);
+  });
+
+  it("stays quiet when the value is entered and the class has __enter__", async () => {
+    expect(kinds(await loop(withMethod("__enter__"), "    with r:\n        return note(1)\n"))).toEqual([]);
+  });
+
+  it("stays quiet when the class names a base, which may hold the method", async () => {
+    const based = "from .base import Base\n\nclass Range(Base):\n    def entries(self):\n        return [1]\n";
+    expect(kinds(await loop(based, "    return note(f\"{r}\")\n"))).toEqual([]);
+  });
+
+  /*
+   * Handed to code outside the repository (#412's rule): a library may run
+   * any special method the class defines. The language's own routines whose
+   * use is known stay precise -- `hash` hashes, it does not format.
+   */
+  // Where "go to definition" puts `logging.info` and `copy.deepcopy`: the standard library.
+  const LIBRARY: ClosedBodyReferee = { resolveReceiver: () => undefined, declarationAt: () => "outside" };
+  const handed = (klass: string, body: string) => checked("calls", "src/use.py#loop", "src/rng.py#Range", py({
+    "src/rng.py": klass,
+    "src/use.py": `import copy\nimport logging\nfrom .rng import Range\n\ndef loop(r: Range):\n${body}`,
+  }), LIBRARY);
+
+  it("stays quiet when the value is handed to logging and the class has __str__", async () => {
+    expect(kinds(await handed(withMethod("__str__"), "    logging.info(\"%s\", r)\n    return r.entries\n"))).toEqual([]);
+  });
+
+  it("stays quiet when the value is deep-copied and the class has __deepcopy__", async () => {
+    expect(kinds(await handed(withMethod("__deepcopy__"), "    return copy.deepcopy(r)\n"))).toEqual([]);
+  });
+
+  it("stays quiet when the value is handed to a library by keyword", async () => {
+    expect(kinds(await handed(withMethod("__str__"), "    logging.info(\"%s\", extra=r)\n    return r.entries\n"))).toEqual([]);
+  });
+
+  it("calls it wrong when the value is handed to logging and the class defines no special method", async () => {
+    expect(kinds(await handed(PLAIN, "    logging.info(\"%s\", r)\n    return r.entries\n"))).toEqual(["calls-refuted"]);
+  });
+
+  it("calls it wrong when a builtin that only hashes is handed a class with only __str__", async () => {
+    expect(kinds(await handed(withMethod("__str__"), "    return hash(r)\n"))).toEqual(["calls-refuted"]);
+  });
+
+  it("stays quiet when a TypeScript value is handed to a library and the class has toString", async () => {
+    const report = await checked("calls", "src/use.ts#loop", "src/rng.ts#Range", ts({
+      "src/rng.ts": "export class Range {\n  toString() { return \"r\"; }\n  entries() { return [1]; }\n}\n",
+      "src/use.ts": "import { Range } from \"./rng\";\nexport function loop(r: Range) { return encodeURIComponent(r as unknown as string); }\n",
+    }));
+    expect(kinds(report)).toEqual([]);
+  });
+
+  it("stays quiet when a TypeScript value is spread and the class is iterable", async () => {
+    const report = await checked("calls", "src/use.ts#loop", "src/rng.ts#Range", ts({
+      "src/rng.ts": "export class Range {\n  *[Symbol.iterator]() { yield 1; }\n  entries() { return [1]; }\n}\n",
+      "src/helpers.ts": "export function note(x: unknown) { return x; }\n",
+      "src/use.ts": "import { note } from \"./helpers\";\nimport { Range } from \"./rng\";\nexport function loop(r: Range) { return note([...r]); }\n",
     }));
     expect(kinds(report)).toEqual([]);
   });

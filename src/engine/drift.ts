@@ -5678,7 +5678,11 @@ export function checkDrift(
        * body behind any "creates none" (#362). `@calls` asks it too when the
        * head is a class (#374), since creating one is one way to call it.
        */
-      const readConstructions = (language: Language, toLanguage: Language | undefined, forCalls = false) => {
+      const readConstructions = (
+        language: Language, toLanguage: Language | undefined, forCalls = false,
+        /** `@calls`' own tail, whose placements a handed-in value is judged by (#432). */
+        calls?: CallSide,
+      ) => {
         /*
          * Python's imports, which are the only thing that separates
          * `Response(body)` from `render(body)` (#309). The same `callSide`
@@ -5728,6 +5732,7 @@ export function checkDrift(
           const tail = callSide(fromAnchor, workspace, importCache.configs, options?.closedBodyReferee, true);
           if (tail) names = { side: tail, target: toAnchor };
         }
+        if (names && calls) names = { ...names, calls };
         const verdict = constructions(
           workspace.read(fromFile), fromEnd.symbols[0]!, toEnd.symbols, language,
           toLanguage && edge.state !== "planned"
@@ -5968,7 +5973,7 @@ export function checkDrift(
               const routine = fromEnd.symbols[0]!;
               const own = callsIntoType({ ...tail, routine }, { ...head, names: toEnd.symbols }, inherits);
               const made = own.verdict === "confirmed" ? undefined
-                : readConstructions(tail.language, head.language, true).verdict;
+                : readConstructions(tail.language, head.language, true, tail).verdict;
               if (own.verdict === "confirmed") {
                 verdict = { verdict: "confirmed", evidence: own.evidence };
               } else if (made?.verdict === "confirmed") {
