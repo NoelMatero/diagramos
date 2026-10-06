@@ -1,0 +1,1752 @@
+{
+  "type": "excalidraw",
+  "version": 2,
+  "source": "diagramos",
+  "elements": [
+    {
+      "id": "naivedate-and-naivedatetime-architecture-title",
+      "type": "text",
+      "x": 0,
+      "y": -115,
+      "width": 528,
+      "height": 30,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a0",
+      "roundness": null,
+      "seed": 1167109213,
+      "version": 1,
+      "versionNonce": 2076595911,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "naivedate-and-naivedatetime-architecture",
+        "role": "title"
+      },
+      "text": "NaiveDate and NaiveDateTime Architecture",
+      "fontSize": 24,
+      "fontFamily": 5,
+      "textAlign": "left",
+      "verticalAlign": "middle",
+      "containerId": null,
+      "originalText": "NaiveDate and NaiveDateTime Architecture",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "naivedate-and-naivedatetime-architecture-node-0",
+      "type": "rectangle",
+      "x": 640,
+      "y": 460,
+      "width": 160,
+      "height": 120,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a1",
+      "roundness": {
+        "type": 3
+      },
+      "seed": 980192324,
+      "version": 1,
+      "versionNonce": 2142190928,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "naivedate-and-naivedatetime-architecture-node-0-label"
+        },
+        {
+          "id": "naivedate-and-naivedatetime-architecture-edge-0",
+          "type": "arrow"
+        },
+        {
+          "id": "naivedate-and-naivedatetime-architecture-edge-2",
+          "type": "arrow"
+        },
+        {
+          "id": "naivedate-and-naivedatetime-architecture-edge-3",
+          "type": "arrow"
+        },
+        {
+          "id": "naivedate-and-naivedatetime-architecture-edge-4",
+          "type": "arrow"
+        },
+        {
+          "id": "naivedate-and-naivedatetime-architecture-edge-7",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "naivedate-and-naivedatetime-architecture",
+        "node": "nd",
+        "ref": "src/naive/date/mod.rs#NaiveDate"
+      }
+    },
+    {
+      "id": "naivedate-and-naivedatetime-architecture-node-1",
+      "type": "rectangle",
+      "x": 640,
+      "y": 180,
+      "width": 160,
+      "height": 80,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a2",
+      "roundness": {
+        "type": 3
+      },
+      "seed": 162848221,
+      "version": 1,
+      "versionNonce": 1086341959,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "naivedate-and-naivedatetime-architecture-node-1-label"
+        },
+        {
+          "id": "naivedate-and-naivedatetime-architecture-edge-1",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "naivedate-and-naivedatetime-architecture",
+        "node": "nt",
+        "ref": "src/naive/time/mod.rs#NaiveTime"
+      }
+    },
+    {
+      "id": "naivedate-and-naivedatetime-architecture-node-2",
+      "type": "rectangle",
+      "x": 20,
+      "y": 160,
+      "width": 200,
+      "height": 140,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a3",
+      "roundness": {
+        "type": 3
+      },
+      "seed": 739530434,
+      "version": 1,
+      "versionNonce": 1501796406,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "naivedate-and-naivedatetime-architecture-node-2-label"
+        },
+        {
+          "id": "naivedate-and-naivedatetime-architecture-edge-0",
+          "type": "arrow"
+        },
+        {
+          "id": "naivedate-and-naivedatetime-architecture-edge-1",
+          "type": "arrow"
+        },
+        {
+          "id": "naivedate-and-naivedatetime-architecture-edge-5",
+          "type": "arrow"
+        },
+        {
+          "id": "naivedate-and-naivedatetime-architecture-edge-6",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "naivedate-and-naivedatetime-architecture",
+        "node": "ndt",
+        "ref": "src/naive/datetime/mod.rs#NaiveDateTime"
+      }
+    },
+    {
+      "id": "naivedate-and-naivedatetime-architecture-node-3",
+      "type": "rectangle",
+      "x": 1260,
+      "y": 480,
+      "width": 160,
+      "height": 80,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a4",
+      "roundness": null,
+      "seed": 1835637875,
+      "version": 1,
+      "versionNonce": 940205645,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "naivedate-and-naivedatetime-architecture-node-3-label"
+        },
+        {
+          "id": "naivedate-and-naivedatetime-architecture-edge-2",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "naivedate-and-naivedatetime-architecture",
+        "node": "yf",
+        "ref": "src/naive/internals.rs#YearFlags"
+      }
+    },
+    {
+      "id": "naivedate-and-naivedatetime-architecture-node-4",
+      "type": "rectangle",
+      "x": 1260,
+      "y": 640,
+      "width": 160,
+      "height": 80,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a5",
+      "roundness": null,
+      "seed": 538774536,
+      "version": 1,
+      "versionNonce": 1277393764,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "naivedate-and-naivedatetime-architecture-node-4-label"
+        },
+        {
+          "id": "naivedate-and-naivedatetime-architecture-edge-3",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "naivedate-and-naivedatetime-architecture",
+        "node": "mdf",
+        "ref": "src/naive/internals.rs#Mdf"
+      }
+    },
+    {
+      "id": "naivedate-and-naivedatetime-architecture-node-5",
+      "type": "rectangle",
+      "x": 1260,
+      "y": 300,
+      "width": 160,
+      "height": 100,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "dotted",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a6",
+      "roundness": null,
+      "seed": 1960190257,
+      "version": 1,
+      "versionNonce": 168596411,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "naivedate-and-naivedatetime-architecture-node-5-label"
+        },
+        {
+          "id": "naivedate-and-naivedatetime-architecture-edge-5",
+          "type": "arrow"
+        },
+        {
+          "id": "naivedate-and-naivedatetime-architecture-edge-7",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "naivedate-and-naivedatetime-architecture",
+        "node": "td",
+        "ref": "src/time_delta.rs#TimeDelta",
+        "state": "external"
+      }
+    },
+    {
+      "id": "naivedate-and-naivedatetime-architecture-node-6",
+      "type": "rectangle",
+      "x": 640,
+      "y": 20,
+      "width": 160,
+      "height": 80,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a7",
+      "roundness": null,
+      "seed": 485398502,
+      "version": 1,
+      "versionNonce": 1027172810,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "naivedate-and-naivedatetime-architecture-node-6-label"
+        },
+        {
+          "id": "naivedate-and-naivedatetime-architecture-edge-6",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "naivedate-and-naivedatetime-architecture",
+        "node": "days",
+        "ref": "src/naive/mod.rs#Days"
+      }
+    },
+    {
+      "id": "naivedate-and-naivedatetime-architecture-node-7",
+      "type": "rectangle",
+      "x": 60,
+      "y": 520,
+      "width": 160,
+      "height": 80,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a8",
+      "roundness": {
+        "type": 3
+      },
+      "seed": 1089081143,
+      "version": 1,
+      "versionNonce": 340816529,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "naivedate-and-naivedatetime-architecture-node-7-label"
+        },
+        {
+          "id": "naivedate-and-naivedatetime-architecture-edge-4",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "naivedate-and-naivedatetime-architecture",
+        "node": "iw",
+        "ref": "src/naive/isoweek.rs#IsoWeek"
+      }
+    },
+    {
+      "id": "naivedate-and-naivedatetime-architecture-edge-0",
+      "type": "arrow",
+      "x": 212,
+      "y": 268,
+      "width": 429.6,
+      "height": 230.66666666666669,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a9",
+      "roundness": null,
+      "seed": 1639590811,
+      "version": 1,
+      "versionNonce": 12661653,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "naivedate-and-naivedatetime-architecture-edge-0-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "naivedate-and-naivedatetime-architecture",
+        "edge": {
+          "from": "ndt",
+          "to": "nd",
+          "claim": "holds"
+        }
+      },
+      "points": [
+        [
+          0.5,
+          0
+        ],
+        [
+          32,
+          0
+        ],
+        [
+          32,
+          230.66666666666669
+        ],
+        [
+          99.46666666666664,
+          230.66666666666669
+        ],
+        [
+          264.5333333333333,
+          230.66666666666669
+        ],
+        [
+          347.0666666666666,
+          230.66666666666669
+        ],
+        [
+          429.1,
+          230.66666666666669
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "naivedate-and-naivedatetime-architecture-node-2",
+        "focus": 0.5428571428571427,
+        "gap": 8
+      },
+      "endBinding": {
+        "elementId": "naivedate-and-naivedatetime-architecture-node-0",
+        "focus": 0.35555555555555557,
+        "gap": 1.6000000000000227
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "naivedate-and-naivedatetime-architecture-edge-1",
+      "type": "arrow",
+      "x": 212,
+      "y": 212,
+      "width": 429.6,
+      "height": 0,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aA",
+      "roundness": null,
+      "seed": 877771850,
+      "version": 1,
+      "versionNonce": 697692318,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "naivedate-and-naivedatetime-architecture-edge-1-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "naivedate-and-naivedatetime-architecture",
+        "edge": {
+          "from": "ndt",
+          "to": "nt",
+          "claim": "holds"
+        }
+      },
+      "points": [
+        [
+          0.5,
+          0
+        ],
+        [
+          214.8,
+          0
+        ],
+        [
+          429.1,
+          0
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "naivedate-and-naivedatetime-architecture-node-2",
+        "focus": -0.25714285714285706,
+        "gap": 8
+      },
+      "endBinding": {
+        "elementId": "naivedate-and-naivedatetime-architecture-node-1",
+        "focus": 0.2,
+        "gap": 1.6000000000000227
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "naivedate-and-naivedatetime-architecture-edge-2",
+      "type": "arrow",
+      "x": 801.6,
+      "y": 518.6666666666667,
+      "width": 455.9999999999999,
+      "height": 0,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aB",
+      "roundness": null,
+      "seed": 2031887653,
+      "version": 1,
+      "versionNonce": 1683582895,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "naivedate-and-naivedatetime-architecture-edge-2-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "naivedate-and-naivedatetime-architecture",
+        "edge": {
+          "from": "nd",
+          "to": "yf",
+          "claim": "holds"
+        }
+      },
+      "points": [
+        [
+          0.5,
+          0
+        ],
+        [
+          227.9999999999999,
+          0
+        ],
+        [
+          455.4999999999999,
+          0
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "naivedate-and-naivedatetime-architecture-node-0",
+        "focus": -0.02222222222222035,
+        "gap": 1.6000000000000227
+      },
+      "endBinding": {
+        "elementId": "naivedate-and-naivedatetime-architecture-node-3",
+        "focus": 0.03333333333333144,
+        "gap": 2.400000000000091
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "naivedate-and-naivedatetime-architecture-edge-3",
+      "type": "arrow",
+      "x": 801.6,
+      "y": 548.6666666666667,
+      "width": 455.9999999999999,
+      "height": 130,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aC",
+      "roundness": null,
+      "seed": 1891998476,
+      "version": 1,
+      "versionNonce": 1855127768,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "naivedate-and-naivedatetime-architecture-edge-3-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "naivedate-and-naivedatetime-architecture",
+        "edge": {
+          "from": "nd",
+          "to": "mdf",
+          "claim": "builds"
+        }
+      },
+      "points": [
+        [
+          0.5,
+          0
+        ],
+        [
+          32,
+          0
+        ],
+        [
+          32,
+          130
+        ],
+        [
+          162.9999999999999,
+          130
+        ],
+        [
+          236.2499999999999,
+          130
+        ],
+        [
+          309.4999999999999,
+          130
+        ],
+        [
+          455.4999999999999,
+          130
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "naivedate-and-naivedatetime-architecture-node-0",
+        "focus": 0.47777777777777963,
+        "gap": 1.6000000000000227
+      },
+      "endBinding": {
+        "elementId": "naivedate-and-naivedatetime-architecture-node-4",
+        "focus": 0.03333333333333144,
+        "gap": 2.400000000000091
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "naivedate-and-naivedatetime-architecture-edge-4",
+      "type": "arrow",
+      "x": 212,
+      "y": 555.4666666666667,
+      "width": 429.6,
+      "height": 16.799999999999955,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aD",
+      "roundness": null,
+      "seed": 1969653183,
+      "version": 1,
+      "versionNonce": 1521243097,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "naivedate-and-naivedatetime-architecture-edge-4-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "naivedate-and-naivedatetime-architecture",
+        "edge": {
+          "from": "iw",
+          "to": "nd",
+          "claim": "holds"
+        }
+      },
+      "points": [
+        [
+          0.5,
+          0
+        ],
+        [
+          55.80000000000001,
+          0
+        ],
+        [
+          111.60000000000002,
+          0
+        ],
+        [
+          223.2,
+          0
+        ],
+        [
+          321.6,
+          0
+        ],
+        [
+          321.6,
+          -16.799999999999955
+        ],
+        [
+          429.1,
+          -16.799999999999955
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "naivedate-and-naivedatetime-architecture-node-7",
+        "focus": -0.11333333333333313,
+        "gap": 8
+      },
+      "endBinding": {
+        "elementId": "naivedate-and-naivedatetime-architecture-node-0",
+        "focus": -0.31111111111111267,
+        "gap": 1.6000000000000227
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "naivedate-and-naivedatetime-architecture-edge-5",
+      "type": "arrow",
+      "x": 212,
+      "y": 240,
+      "width": 1045.6,
+      "height": 92,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aE",
+      "roundness": null,
+      "seed": 292254510,
+      "version": 1,
+      "versionNonce": 740109650,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "naivedate-and-naivedatetime-architecture-edge-5-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "naivedate-and-naivedatetime-architecture",
+        "edge": {
+          "from": "ndt",
+          "to": "td"
+        }
+      },
+      "points": [
+        [
+          0.5,
+          0
+        ],
+        [
+          56,
+          0
+        ],
+        [
+          56,
+          92
+        ],
+        [
+          476.79999999999995,
+          92
+        ],
+        [
+          619,
+          92
+        ],
+        [
+          761.1999999999999,
+          92
+        ],
+        [
+          1045.1,
+          92
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "naivedate-and-naivedatetime-architecture-node-2",
+        "focus": 0.14285714285714282,
+        "gap": 8
+      },
+      "endBinding": {
+        "elementId": "naivedate-and-naivedatetime-architecture-node-5",
+        "focus": 0.3599999999999996,
+        "gap": 2.400000000000091
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "naivedate-and-naivedatetime-architecture-edge-6",
+      "type": "arrow",
+      "x": 212,
+      "y": 184,
+      "width": 429.6,
+      "height": 132,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aF",
+      "roundness": null,
+      "seed": 690375577,
+      "version": 1,
+      "versionNonce": 977427427,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "naivedate-and-naivedatetime-architecture-edge-6-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "naivedate-and-naivedatetime-architecture",
+        "edge": {
+          "from": "ndt",
+          "to": "days"
+        }
+      },
+      "points": [
+        [
+          0.5,
+          0
+        ],
+        [
+          32,
+          0
+        ],
+        [
+          32,
+          -132
+        ],
+        [
+          148.8,
+          -132
+        ],
+        [
+          219,
+          -132
+        ],
+        [
+          289.20000000000005,
+          -132
+        ],
+        [
+          429.1,
+          -132
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "naivedate-and-naivedatetime-architecture-node-2",
+        "focus": -0.6571428571428573,
+        "gap": 7.3197842735625365
+      },
+      "endBinding": {
+        "elementId": "naivedate-and-naivedatetime-architecture-node-6",
+        "focus": 0.2,
+        "gap": 1.6000000000000227
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "naivedate-and-naivedatetime-architecture-edge-7",
+      "type": "arrow",
+      "x": 801.6,
+      "y": 488.6666666666667,
+      "width": 455.9999999999999,
+      "height": 123.33333333333331,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aG",
+      "roundness": null,
+      "seed": 1419346576,
+      "version": 1,
+      "versionNonce": 1380504172,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "naivedate-and-naivedatetime-architecture-edge-7-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "naivedate-and-naivedatetime-architecture",
+        "edge": {
+          "from": "nd",
+          "to": "td"
+        }
+      },
+      "points": [
+        [
+          0.5,
+          0
+        ],
+        [
+          32,
+          0
+        ],
+        [
+          32,
+          -115.66666666666669
+        ],
+        [
+          173.9999999999999,
+          -115.66666666666669
+        ],
+        [
+          347.9999999999999,
+          -115.66666666666669
+        ],
+        [
+          347.9999999999999,
+          -123.33333333333331
+        ],
+        [
+          455.4999999999999,
+          -123.33333333333331
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "naivedate-and-naivedatetime-architecture-node-0",
+        "focus": -0.5222222222222225,
+        "gap": 1.6150195051908687
+      },
+      "endBinding": {
+        "elementId": "naivedate-and-naivedatetime-architecture-node-5",
+        "focus": -0.30666666666666687,
+        "gap": 2.400000000000091
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "naivedate-and-naivedatetime-architecture-node-0-label",
+      "type": "text",
+      "x": 670.5,
+      "y": 507.5,
+      "width": 99.00000000000001,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aH",
+      "roundness": null,
+      "seed": 1665424977,
+      "version": 1,
+      "versionNonce": 1100376155,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "naivedate-and-naivedatetime-architecture"
+      },
+      "text": "NaiveDate",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "naivedate-and-naivedatetime-architecture-node-0",
+      "originalText": "NaiveDate",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "naivedate-and-naivedatetime-architecture-node-1-label",
+      "type": "text",
+      "x": 670.5,
+      "y": 207.5,
+      "width": 99.00000000000001,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aI",
+      "roundness": null,
+      "seed": 1832897556,
+      "version": 1,
+      "versionNonce": 970165600,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "naivedate-and-naivedatetime-architecture"
+      },
+      "text": "NaiveTime",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "naivedate-and-naivedatetime-architecture-node-1",
+      "originalText": "NaiveTime",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "naivedate-and-naivedatetime-architecture-node-2-label",
+      "type": "text",
+      "x": 48.5,
+      "y": 217.5,
+      "width": 143,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aJ",
+      "roundness": null,
+      "seed": 2073417891,
+      "version": 1,
+      "versionNonce": 1556844605,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "naivedate-and-naivedatetime-architecture"
+      },
+      "text": "NaiveDateTime",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "naivedate-and-naivedatetime-architecture-node-2",
+      "originalText": "NaiveDateTime",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "naivedate-and-naivedatetime-architecture-node-3-label",
+      "type": "text",
+      "x": 1290.5,
+      "y": 507.5,
+      "width": 99.00000000000001,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aK",
+      "roundness": null,
+      "seed": 2037053006,
+      "version": 1,
+      "versionNonce": 1171430642,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "naivedate-and-naivedatetime-architecture"
+      },
+      "text": "YearFlags",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "naivedate-and-naivedatetime-architecture-node-3",
+      "originalText": "YearFlags",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "naivedate-and-naivedatetime-architecture-node-4-label",
+      "type": "text",
+      "x": 1323.5,
+      "y": 667.5,
+      "width": 33,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aL",
+      "roundness": null,
+      "seed": 1029811925,
+      "version": 1,
+      "versionNonce": 437671391,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "naivedate-and-naivedatetime-architecture"
+      },
+      "text": "Mdf",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "naivedate-and-naivedatetime-architecture-node-4",
+      "originalText": "Mdf",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "naivedate-and-naivedatetime-architecture-node-5-label",
+      "type": "text",
+      "x": 1290.5,
+      "y": 337.5,
+      "width": 99.00000000000001,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aM",
+      "roundness": null,
+      "seed": 1786685960,
+      "version": 1,
+      "versionNonce": 1674524004,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "naivedate-and-naivedatetime-architecture"
+      },
+      "text": "TimeDelta",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "naivedate-and-naivedatetime-architecture-node-5",
+      "originalText": "TimeDelta",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "naivedate-and-naivedatetime-architecture-node-6-label",
+      "type": "text",
+      "x": 698,
+      "y": 47.5,
+      "width": 44,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aN",
+      "roundness": null,
+      "seed": 1719407959,
+      "version": 1,
+      "versionNonce": 2145582385,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "naivedate-and-naivedatetime-architecture"
+      },
+      "text": "Days",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "naivedate-and-naivedatetime-architecture-node-6",
+      "originalText": "Days",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "naivedate-and-naivedatetime-architecture-node-7-label",
+      "type": "text",
+      "x": 101.5,
+      "y": 547.5,
+      "width": 77,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aO",
+      "roundness": null,
+      "seed": 1182645298,
+      "version": 1,
+      "versionNonce": 1679471590,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "naivedate-and-naivedatetime-architecture"
+      },
+      "text": "IsoWeek",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "naivedate-and-naivedatetime-architecture-node-7",
+      "originalText": "IsoWeek",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "naivedate-and-naivedatetime-architecture-edge-0-label",
+      "type": "text",
+      "x": 236.66666666666663,
+      "y": 488.6666666666667,
+      "width": 149.60000000000002,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aP",
+      "roundness": null,
+      "seed": 185006022,
+      "version": 1,
+      "versionNonce": 764984362,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "naivedate-and-naivedatetime-architecture"
+      },
+      "text": "date field @holds",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "naivedate-and-naivedatetime-architecture-edge-0",
+      "originalText": "date field @holds",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "naivedate-and-naivedatetime-architecture-edge-1-label",
+      "type": "text",
+      "x": 352,
+      "y": 202,
+      "width": 149.60000000000002,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aQ",
+      "roundness": null,
+      "seed": 1943185275,
+      "version": 1,
+      "versionNonce": 67101941,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "naivedate-and-naivedatetime-architecture"
+      },
+      "text": "time field @holds",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "naivedate-and-naivedatetime-architecture-edge-1",
+      "originalText": "time field @holds",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "naivedate-and-naivedatetime-architecture-edge-2-label",
+      "type": "text",
+      "x": 954.8,
+      "y": 508.66666666666674,
+      "width": 149.60000000000002,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aR",
+      "roundness": null,
+      "seed": 697022988,
+      "version": 1,
+      "versionNonce": 1316343256,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "naivedate-and-naivedatetime-architecture"
+      },
+      "text": "year flags @holds",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "naivedate-and-naivedatetime-architecture-edge-2",
+      "originalText": "year flags @holds",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "naivedate-and-naivedatetime-architecture-edge-3-label",
+      "type": "text",
+      "x": 876.5999999999999,
+      "y": 668.6666666666667,
+      "width": 176,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aS",
+      "roundness": null,
+      "seed": 1328338089,
+      "version": 1,
+      "versionNonce": 342387635,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "naivedate-and-naivedatetime-architecture"
+      },
+      "text": "via from_mdf @builds",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "naivedate-and-naivedatetime-architecture-edge-3",
+      "originalText": "via from_mdf @builds",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "naivedate-and-naivedatetime-architecture-edge-4-label",
+      "type": "text",
+      "x": 360.4,
+      "y": 545.4666666666667,
+      "width": 149.60000000000002,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aT",
+      "roundness": null,
+      "seed": 802779978,
+      "version": 1,
+      "versionNonce": 540738974,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "naivedate-and-naivedatetime-architecture"
+      },
+      "text": "date field @holds",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "naivedate-and-naivedatetime-architecture-edge-4",
+      "originalText": "date field @holds",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "naivedate-and-naivedatetime-architecture-edge-5-label",
+      "type": "text",
+      "x": 636,
+      "y": 322,
+      "width": 105.60000000000001,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aU",
+      "roundness": null,
+      "seed": 931858767,
+      "version": 1,
+      "versionNonce": 1690605097,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "naivedate-and-naivedatetime-architecture"
+      },
+      "text": "Add/Sub with",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "naivedate-and-naivedatetime-architecture-edge-5",
+      "originalText": "Add/Sub with",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "naivedate-and-naivedatetime-architecture-edge-6-label",
+      "type": "text",
+      "x": 308,
+      "y": 42,
+      "width": 105.60000000000001,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aV",
+      "roundness": null,
+      "seed": 103145376,
+      "version": 1,
+      "versionNonce": 379908348,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "naivedate-and-naivedatetime-architecture"
+      },
+      "text": "Add/Sub with",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "naivedate-and-naivedatetime-architecture-edge-6",
+      "originalText": "Add/Sub with",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "naivedate-and-naivedatetime-architecture-edge-7-label",
+      "type": "text",
+      "x": 922.8,
+      "y": 363,
+      "width": 105.60000000000001,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aW",
+      "roundness": null,
+      "seed": 1982584685,
+      "version": 1,
+      "versionNonce": 1457976279,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "naivedate-and-naivedatetime-architecture"
+      },
+      "text": "via add_days",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "naivedate-and-naivedatetime-architecture-edge-7",
+      "originalText": "via add_days",
+      "autoResize": true,
+      "lineHeight": 1.25
+    }
+  ],
+  "appState": {
+    "gridSize": null,
+    "viewBackgroundColor": "#ffffff"
+  },
+  "files": {},
+  "diagramos": {
+    "version": "0.2.0-rc.6",
+    "schema": 1
+  }
+}

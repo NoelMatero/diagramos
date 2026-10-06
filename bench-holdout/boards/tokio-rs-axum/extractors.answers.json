@@ -1,0 +1,47 @@
+{
+  "board": "bench-holdout/boards/tokio-rs-axum/extractors.excalidraw",
+  "project": "tokio-rs-axum",
+  "topic": "extractors",
+  "language": "rust",
+  "scope": "axum/src/extract",
+  "pin": "9f1226db15",
+  "tool": "rust-analyzer 0.0.0 (7cb789d982 2026-02-01)",
+  "claims": [
+    {
+      "id": "returns|axum/src/extract/path/mod.rs#Path|axum/src/extract/rejection.rs|",
+      "word": "returns",
+      "from": "axum/src/extract/path/mod.rs#Path",
+      "to": "axum/src/extract/rejection.rs",
+      "fromLabel": "Path<T>",
+      "toLabel": "Rejection",
+      "language": "rust",
+      "source": "drawn",
+      "truth": "undecidable",
+      "why": "an end names a file rather than a declaration"
+    },
+    {
+      "id": "returns|axum/src/extract/query.rs#Query|axum/src/extract/rejection.rs|",
+      "word": "returns",
+      "from": "axum/src/extract/query.rs#Query",
+      "to": "axum/src/extract/rejection.rs",
+      "fromLabel": "Query<T>",
+      "toLabel": "Rejection",
+      "language": "rust",
+      "source": "drawn",
+      "truth": "undecidable",
+      "why": "an end names a file rather than a declaration"
+    },
+    {
+      "id": "returns|axum/src/json.rs#Json|axum/src/extract/rejection.rs|",
+      "word": "returns",
+      "from": "axum/src/json.rs#Json",
+      "to": "axum/src/extract/rejection.rs",
+      "fromLabel": "Json<T>",
+      "toLabel": "Rejection",
+      "language": "rust",
+      "source": "drawn",
+      "truth": "undecidable",
+      "why": "an end names a file rather than a declaration"
+    }
+  ]
+}

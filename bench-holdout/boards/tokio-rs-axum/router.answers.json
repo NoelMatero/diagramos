@@ -1,0 +1,112 @@
+{
+  "board": "bench-holdout/boards/tokio-rs-axum/router.excalidraw",
+  "project": "tokio-rs-axum",
+  "topic": "router",
+  "language": "rust",
+  "scope": "axum/src/routing",
+  "pin": "9f1226db15",
+  "tool": "rust-analyzer 0.0.0 (7cb789d982 2026-02-01)",
+  "claims": [
+    {
+      "id": "calls|axum/src/routing/mod.rs#call_with_state|axum/src/routing/path_router.rs#call_with_state|",
+      "word": "calls",
+      "from": "axum/src/routing/mod.rs#call_with_state",
+      "to": "axum/src/routing/path_router.rs#call_with_state",
+      "fromLabel": "Router::call_with_state",
+      "toLabel": "PathRouter::call_with_state",
+      "language": "rust",
+      "source": "drawn",
+      "truth": "undecidable",
+      "why": "the ref could mean more than one declaration, and they differ"
+    },
+    {
+      "id": "needs|axum/src/routing/mod.rs#call_with_state|axum/src/routing/path_router.rs#call_with_state|",
+      "word": "needs",
+      "from": "axum/src/routing/mod.rs#call_with_state",
+      "to": "axum/src/routing/path_router.rs#call_with_state",
+      "fromLabel": "Router::call_with_state",
+      "toLabel": "PathRouter::call_with_state",
+      "language": "rust",
+      "source": "labelled",
+      "truth": "true",
+      "why": "it imports it (self::..PathRouter)"
+    },
+    {
+      "id": "needs|axum/src/routing/path_router.rs#call_with_state|axum/src/routing/mod.rs#call_with_state|",
+      "word": "needs",
+      "from": "axum/src/routing/path_router.rs#call_with_state",
+      "to": "axum/src/routing/mod.rs#call_with_state",
+      "fromLabel": "PathRouter::call_with_state",
+      "toLabel": "Router::call_with_state",
+      "language": "rust",
+      "source": "reverse",
+      "parent": "needs|axum/src/routing/mod.rs#call_with_state|axum/src/routing/path_router.rs#call_with_state|",
+      "truth": "true",
+      "why": "it imports it (super::..Endpoint)"
+    },
+    {
+      "id": "needs|axum/src/routing/future.rs|axum/src/routing/path_router.rs#call_with_state|",
+      "word": "needs",
+      "from": "axum/src/routing/future.rs",
+      "to": "axum/src/routing/path_router.rs#call_with_state",
+      "fromLabel": "Router::call_with_state",
+      "toLabel": "PathRouter::call_with_state",
+      "language": "rust",
+      "source": "retarget",
+      "parent": "needs|axum/src/routing/mod.rs#call_with_state|axum/src/routing/path_router.rs#call_with_state|",
+      "truth": "false",
+      "why": "nothing in it imports that file"
+    },
+    {
+      "id": "needs|axum/src/routing/method_routing.rs#call_with_state|axum/src/routing/route.rs#call_owned|",
+      "word": "needs",
+      "from": "axum/src/routing/method_routing.rs#call_with_state",
+      "to": "axum/src/routing/route.rs#call_owned",
+      "fromLabel": "MethodRouter::call_with_state",
+      "toLabel": "Route::call_owned",
+      "language": "rust",
+      "source": "labelled",
+      "truth": "true",
+      "why": "it imports it (super::..InfallibleRouteFuture)"
+    },
+    {
+      "id": "calls|axum/src/routing/method_routing.rs#call_with_state|axum/src/routing/route.rs#call_owned|",
+      "word": "calls",
+      "from": "axum/src/routing/method_routing.rs#call_with_state",
+      "to": "axum/src/routing/route.rs#call_owned",
+      "fromLabel": "MethodRouter::call_with_state",
+      "toLabel": "Route::call_owned",
+      "language": "rust",
+      "source": "swap",
+      "parent": "needs|axum/src/routing/method_routing.rs#call_with_state|axum/src/routing/route.rs#call_owned|",
+      "truth": "false",
+      "why": "the routine's calls were read and none is it"
+    },
+    {
+      "id": "needs|axum/src/routing/route.rs#call_owned|axum/src/routing/method_routing.rs#call_with_state|",
+      "word": "needs",
+      "from": "axum/src/routing/route.rs#call_owned",
+      "to": "axum/src/routing/method_routing.rs#call_with_state",
+      "fromLabel": "Route::call_owned",
+      "toLabel": "MethodRouter::call_with_state",
+      "language": "rust",
+      "source": "reverse",
+      "parent": "needs|axum/src/routing/method_routing.rs#call_with_state|axum/src/routing/route.rs#call_owned|",
+      "truth": "true",
+      "why": "it imports it (crate::..get)"
+    },
+    {
+      "id": "needs|axum/src/routing/method_routing.rs#call_with_state|axum/src/routing/into_make_service.rs|",
+      "word": "needs",
+      "from": "axum/src/routing/method_routing.rs#call_with_state",
+      "to": "axum/src/routing/into_make_service.rs",
+      "fromLabel": "MethodRouter::call_with_state",
+      "toLabel": "Route::call_owned",
+      "language": "rust",
+      "source": "retarget",
+      "parent": "needs|axum/src/routing/method_routing.rs#call_with_state|axum/src/routing/route.rs#call_owned|",
+      "truth": "true",
+      "why": "it imports it (super::..IntoMakeService)"
+    }
+  ]
+}

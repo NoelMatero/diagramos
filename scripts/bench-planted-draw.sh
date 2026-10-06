@@ -10,12 +10,28 @@
 #   sh scripts/bench-planted-draw.sh 0
 #
 # Needs a built CLI (`npm run build:cli`) and the pinned clones in .corpus.
+# BENCH_SET=holdout (or holdout-b, ...) draws a row of bench-<set>/scopes.json
+# instead, from that set's clones (`npm run bench:libraries -- --set=<set>`
+# fetches them).
 set -eu
 REPO=$(cd "$(dirname "$0")/.." && pwd)
-CORPUS=${CORPUS:-/Users/noelmatero/board-ai/.corpus}
-WORK=${2:-${TMPDIR:-/tmp}/bench-planted}
+case "${BENCH_SET:-main}" in
+  main) ;;
+  holdout|holdout-[a-z]) ;;
+  *) echo "BENCH_SET=$BENCH_SET: the sets are main, holdout, and holdout-<letter>" >&2; exit 2 ;;
+esac
+if [ "${BENCH_SET:-main}" != main ]; then
+  BENCH=bench-$BENCH_SET
+  CORPUS=${CORPUS:-$HOME/.board-ai-$BENCH_SET/corpus}
+  WORK_NAME=bench-$BENCH_SET
+else
+  BENCH=bench
+  CORPUS=${CORPUS:-/Users/noelmatero/board-ai/.corpus}
+  WORK_NAME=bench-planted
+fi
+WORK=${2:-${TMPDIR:-/tmp}/$WORK_NAME}
 i=$1
-row=$(python3 -c "import json,sys;print(json.dumps(json.load(open('$REPO/bench/scopes.json'))[int(sys.argv[1])]))" "$i")
+row=$(python3 -c "import json,sys;print(json.dumps(json.load(open('$REPO/$BENCH/scopes.json'))[int(sys.argv[1])]))" "$i")
 get() { python3 -c "import json,sys;print(json.loads(sys.argv[1])[sys.argv[2]])" "$row" "$1"; }
 project=$(get project); topic=$(get topic); scope=$(get scope); ask=$(get ask)
 
@@ -66,8 +82,8 @@ for l in open(sys.argv[1]):
 print(c)" "$run/out.jsonl")
 board="docs/diagrams/$topic.excalidraw"
 if [ -f "$board" ]; then
-  mkdir -p "$REPO/bench/boards/$project"
-  cp "$board" "$REPO/bench/boards/$project/$topic.excalidraw"
+  mkdir -p "$REPO/$BENCH/boards/$project"
+  cp "$board" "$REPO/$BENCH/boards/$project/$topic.excalidraw"
   echo "$i $project/$topic drawn cost=$cost"
 else
   echo "$i $project/$topic NO BOARD cost=$cost"

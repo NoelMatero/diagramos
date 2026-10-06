@@ -34,12 +34,12 @@ import { existsSync, mkdirSync, readFileSync, readdirSync, writeFileSync } from 
 import path from "node:path";
 
 import { readGraph } from "../src/engine/graph";
-import { useLibraries } from "./lib/bench-libraries";
+import { CORPUS, useLibraries } from "./lib/bench-libraries";
+import { BENCH_DIR } from "./lib/bench-set";
 import { createOracle, kindProblemFor, WORDS, type ClaimUnderTest, type Oracle, type Word } from "./lib/bench-oracle";
 import { createTooling, languageOfPath, type Language, type Sym } from "./lib/bench-tooling";
 
 const REPO = path.resolve(path.dirname(new URL(import.meta.url).pathname), "..");
-const CORPUS = process.env.CORPUS ?? "/Users/noelmatero/board-ai/.corpus";
 
 interface Scope { project: string; language: string; topic: string; scope: string; ask: string }
 
@@ -250,7 +250,7 @@ async function buildKey(scope: Scope, boardPath: string): Promise<{ claims: KeyC
 }
 
 const only = process.argv.slice(2).filter((a) => !a.startsWith("-"));
-const scopes: Scope[] = JSON.parse(readFileSync(path.join(REPO, "bench/scopes.json"), "utf8"));
+const scopes: Scope[] = JSON.parse(readFileSync(path.join(REPO, BENCH_DIR, "scopes.json"), "utf8"));
 const pins = new Map<string, string>();
 for (const entry of readdirSync(CORPUS)) {
   try {
@@ -262,13 +262,13 @@ for (const entry of readdirSync(CORPUS)) {
 
 for (const scope of scopes) {
   if (only.length > 0 && !only.includes(scope.project) && !only.includes(`${scope.project}/${scope.topic}`)) continue;
-  const boardPath = path.join(REPO, "bench/boards", scope.project, `${scope.topic}.excalidraw`);
+  const boardPath = path.join(REPO, BENCH_DIR, "boards", scope.project, `${scope.topic}.excalidraw`);
   if (!existsSync(boardPath)) { console.log(`- ${scope.project}/${scope.topic}: no board`); continue; }
   const started = Date.now();
   const built = await buildKey(scope, boardPath);
   if (!built) { console.log(`- ${scope.project}/${scope.topic}: no key`); continue; }
   const out = {
-    board: `bench/boards/${scope.project}/${scope.topic}.excalidraw`,
+    board: `${BENCH_DIR}/boards/${scope.project}/${scope.topic}.excalidraw`,
     project: scope.project,
     topic: scope.topic,
     language: scope.language,

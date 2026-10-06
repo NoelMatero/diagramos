@@ -1,0 +1,2184 @@
+{
+  "type": "excalidraw",
+  "version": 2,
+  "source": "diagramos",
+  "elements": [
+    {
+      "id": "worker-job-processing-flow-title",
+      "type": "text",
+      "x": 0,
+      "y": -115,
+      "width": 343.20000000000005,
+      "height": 30,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a0",
+      "roundness": null,
+      "seed": 669897992,
+      "version": 1,
+      "versionNonce": 433055332,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "worker-job-processing-flow",
+        "role": "title"
+      },
+      "text": "Worker Job Processing Flow",
+      "fontSize": 24,
+      "fontFamily": 5,
+      "textAlign": "left",
+      "verticalAlign": "middle",
+      "containerId": null,
+      "originalText": "Worker Job Processing Flow",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "worker-job-processing-flow-node-0",
+      "type": "rectangle",
+      "x": 20,
+      "y": 40,
+      "width": 180,
+      "height": 80,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a1",
+      "roundness": null,
+      "seed": 1826835543,
+      "version": 1,
+      "versionNonce": 341742129,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "worker-job-processing-flow-node-0-label"
+        },
+        {
+          "id": "worker-job-processing-flow-edge-0",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "worker-job-processing-flow",
+        "node": "run",
+        "ref": "src/classes/worker.ts#run"
+      }
+    },
+    {
+      "id": "worker-job-processing-flow-node-1",
+      "type": "rectangle",
+      "x": 520,
+      "y": 40,
+      "width": 160,
+      "height": 100,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a2",
+      "roundness": null,
+      "seed": 520494982,
+      "version": 1,
+      "versionNonce": 67806186,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "worker-job-processing-flow-node-1-label"
+        },
+        {
+          "id": "worker-job-processing-flow-edge-0",
+          "type": "arrow"
+        },
+        {
+          "id": "worker-job-processing-flow-edge-1",
+          "type": "arrow"
+        },
+        {
+          "id": "worker-job-processing-flow-edge-4",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "worker-job-processing-flow",
+        "node": "mainLoop",
+        "ref": "src/classes/worker.ts#mainLoop"
+      }
+    },
+    {
+      "id": "worker-job-processing-flow-node-2",
+      "type": "rectangle",
+      "x": 1020,
+      "y": 20,
+      "width": 220,
+      "height": 100,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a3",
+      "roundness": null,
+      "seed": 1529252561,
+      "version": 1,
+      "versionNonce": 2057467355,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "worker-job-processing-flow-node-2-label"
+        },
+        {
+          "id": "worker-job-processing-flow-edge-1",
+          "type": "arrow"
+        },
+        {
+          "id": "worker-job-processing-flow-edge-2",
+          "type": "arrow"
+        },
+        {
+          "id": "worker-job-processing-flow-edge-3",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "worker-job-processing-flow",
+        "node": "getNextJob",
+        "ref": "src/classes/worker.ts#_getNextJob"
+      }
+    },
+    {
+      "id": "worker-job-processing-flow-node-3",
+      "type": "rectangle",
+      "x": 1580,
+      "y": 180,
+      "width": 180,
+      "height": 80,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a4",
+      "roundness": null,
+      "seed": 1276528936,
+      "version": 1,
+      "versionNonce": 339303684,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "worker-job-processing-flow-node-3-label"
+        },
+        {
+          "id": "worker-job-processing-flow-edge-2",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "worker-job-processing-flow",
+        "node": "waitForJob",
+        "ref": "src/classes/worker.ts#waitForJob"
+      }
+    },
+    {
+      "id": "worker-job-processing-flow-node-4",
+      "type": "rectangle",
+      "x": 1580,
+      "y": 20,
+      "width": 220,
+      "height": 80,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a5",
+      "roundness": null,
+      "seed": 1451155,
+      "version": 1,
+      "versionNonce": 2108022509,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "worker-job-processing-flow-node-4-label"
+        },
+        {
+          "id": "worker-job-processing-flow-edge-3",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "worker-job-processing-flow",
+        "node": "moveToActive",
+        "ref": "src/classes/worker.ts#moveToActive"
+      }
+    },
+    {
+      "id": "worker-job-processing-flow-node-5",
+      "type": "rectangle",
+      "x": 1040,
+      "y": 340,
+      "width": 180,
+      "height": 120,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a6",
+      "roundness": null,
+      "seed": 733050210,
+      "version": 1,
+      "versionNonce": 500853078,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "worker-job-processing-flow-node-5-label"
+        },
+        {
+          "id": "worker-job-processing-flow-edge-4",
+          "type": "arrow"
+        },
+        {
+          "id": "worker-job-processing-flow-edge-5",
+          "type": "arrow"
+        },
+        {
+          "id": "worker-job-processing-flow-edge-6",
+          "type": "arrow"
+        },
+        {
+          "id": "worker-job-processing-flow-edge-7",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "worker-job-processing-flow",
+        "node": "processJob",
+        "ref": "src/classes/worker.ts#processJob"
+      }
+    },
+    {
+      "id": "worker-job-processing-flow-node-6",
+      "type": "rectangle",
+      "x": 1580,
+      "y": 500,
+      "width": 220,
+      "height": 80,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a7",
+      "roundness": null,
+      "seed": 1684509949,
+      "version": 1,
+      "versionNonce": 807163111,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "worker-job-processing-flow-node-6-label"
+        },
+        {
+          "id": "worker-job-processing-flow-edge-5",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "worker-job-processing-flow",
+        "node": "callProcessor",
+        "ref": "src/classes/worker.ts#callProcessJob"
+      }
+    },
+    {
+      "id": "worker-job-processing-flow-node-7",
+      "type": "rectangle",
+      "x": 1580,
+      "y": 340,
+      "width": 240,
+      "height": 80,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a8",
+      "roundness": null,
+      "seed": 1759523428,
+      "version": 1,
+      "versionNonce": 420090352,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "worker-job-processing-flow-node-7-label"
+        },
+        {
+          "id": "worker-job-processing-flow-edge-6",
+          "type": "arrow"
+        },
+        {
+          "id": "worker-job-processing-flow-edge-8",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "worker-job-processing-flow",
+        "node": "handleCompleted",
+        "ref": "src/classes/worker.ts#handleCompleted"
+      }
+    },
+    {
+      "id": "worker-job-processing-flow-node-8",
+      "type": "rectangle",
+      "x": 2140,
+      "y": 340,
+      "width": 240,
+      "height": 80,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a9",
+      "roundness": null,
+      "seed": 1748781455,
+      "version": 1,
+      "versionNonce": 1313233513,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "worker-job-processing-flow-node-8-label"
+        },
+        {
+          "id": "worker-job-processing-flow-edge-8",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "worker-job-processing-flow",
+        "node": "moveToCompleted",
+        "ref": "src/classes/job.ts#moveToCompleted"
+      }
+    },
+    {
+      "id": "worker-job-processing-flow-node-9",
+      "type": "rectangle",
+      "x": 1600,
+      "y": 660,
+      "width": 200,
+      "height": 80,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aA",
+      "roundness": null,
+      "seed": 1572230206,
+      "version": 1,
+      "versionNonce": 108879842,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "worker-job-processing-flow-node-9-label"
+        },
+        {
+          "id": "worker-job-processing-flow-edge-7",
+          "type": "arrow"
+        },
+        {
+          "id": "worker-job-processing-flow-edge-9",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "worker-job-processing-flow",
+        "node": "handleFailed",
+        "ref": "src/classes/worker.ts#handleFailed"
+      }
+    },
+    {
+      "id": "worker-job-processing-flow-node-10",
+      "type": "rectangle",
+      "x": 2140,
+      "y": 660,
+      "width": 220,
+      "height": 80,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aB",
+      "roundness": null,
+      "seed": 1862596168,
+      "version": 1,
+      "versionNonce": 1169453220,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "worker-job-processing-flow-node-10-label"
+        },
+        {
+          "id": "worker-job-processing-flow-edge-9",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "worker-job-processing-flow",
+        "node": "moveToFailed",
+        "ref": "src/classes/job.ts#moveToFailed"
+      }
+    },
+    {
+      "id": "worker-job-processing-flow-edge-0",
+      "type": "arrow",
+      "x": 192,
+      "y": 85.33333333333334,
+      "width": 332.79999999999995,
+      "height": 0,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aC",
+      "roundness": null,
+      "seed": 366330248,
+      "version": 1,
+      "versionNonce": 501822436,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "worker-job-processing-flow-edge-0-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "worker-job-processing-flow",
+        "edge": {
+          "from": "run",
+          "to": "mainLoop",
+          "claim": "calls"
+        }
+      },
+      "points": [
+        [
+          0.5,
+          0
+        ],
+        [
+          166.39999999999998,
+          0
+        ],
+        [
+          332.29999999999995,
+          0
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "worker-job-processing-flow-node-0",
+        "focus": 0.13333333333333364,
+        "gap": 8
+      },
+      "endBinding": {
+        "elementId": "worker-job-processing-flow-node-1",
+        "focus": 0.09333333333333348,
+        "gap": 4.7999999999999545
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "worker-job-processing-flow-edge-1",
+      "type": "arrow",
+      "x": 684.8,
+      "y": 68.66666666666667,
+      "width": 332.79999999999995,
+      "height": 0,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aD",
+      "roundness": null,
+      "seed": 1787745969,
+      "version": 1,
+      "versionNonce": 1540508731,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "worker-job-processing-flow-edge-1-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "worker-job-processing-flow",
+        "edge": {
+          "from": "mainLoop",
+          "to": "getNextJob",
+          "claim": "calls"
+        }
+      },
+      "points": [
+        [
+          0.5,
+          0
+        ],
+        [
+          166.39999999999998,
+          0
+        ],
+        [
+          332.29999999999995,
+          0
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "worker-job-processing-flow-node-1",
+        "focus": -0.4266666666666665,
+        "gap": 4.7999999999999545
+      },
+      "endBinding": {
+        "elementId": "worker-job-processing-flow-node-2",
+        "focus": 0.02666666666666711,
+        "gap": 2.400000000000091
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "worker-job-processing-flow-edge-2",
+      "type": "arrow",
+      "x": 1237.6,
+      "y": 85.33333333333333,
+      "width": 332.79999999999995,
+      "height": 126.66666666666667,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aE",
+      "roundness": null,
+      "seed": 312954214,
+      "version": 1,
+      "versionNonce": 251601482,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "worker-job-processing-flow-edge-2-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "worker-job-processing-flow",
+        "edge": {
+          "from": "getNextJob",
+          "to": "waitForJob",
+          "claim": "calls"
+        }
+      },
+      "points": [
+        [
+          0.5,
+          0
+        ],
+        [
+          32,
+          0
+        ],
+        [
+          32,
+          126.66666666666667
+        ],
+        [
+          103.0666666666666,
+          126.66666666666667
+        ],
+        [
+          160.5,
+          126.66666666666667
+        ],
+        [
+          217.9333333333334,
+          126.66666666666667
+        ],
+        [
+          332.29999999999995,
+          126.66666666666667
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "worker-job-processing-flow-node-2",
+        "focus": 0.3066666666666668,
+        "gap": 2.400000000000091
+      },
+      "endBinding": {
+        "elementId": "worker-job-processing-flow-node-3",
+        "focus": 0.19999999999999998,
+        "gap": 9.600000000000136
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "worker-job-processing-flow-edge-3",
+      "type": "arrow",
+      "x": 1237.6,
+      "y": 52,
+      "width": 332.79999999999995,
+      "height": 0,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aF",
+      "roundness": null,
+      "seed": 916636855,
+      "version": 1,
+      "versionNonce": 1712728849,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "worker-job-processing-flow-edge-3-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "worker-job-processing-flow",
+        "edge": {
+          "from": "getNextJob",
+          "to": "moveToActive",
+          "claim": "calls"
+        }
+      },
+      "points": [
+        [
+          0.5,
+          0
+        ],
+        [
+          166.4000000000001,
+          0
+        ],
+        [
+          332.29999999999995,
+          0
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "worker-job-processing-flow-node-2",
+        "focus": -0.35999999999999927,
+        "gap": 2.400000000000091
+      },
+      "endBinding": {
+        "elementId": "worker-job-processing-flow-node-4",
+        "focus": 0.2,
+        "gap": 9.600000000000136
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "worker-job-processing-flow-edge-4",
+      "type": "arrow",
+      "x": 684.8,
+      "y": 102,
+      "width": 362.79999999999995,
+      "height": 300,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aG",
+      "roundness": null,
+      "seed": 807748036,
+      "version": 1,
+      "versionNonce": 1366619600,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "worker-job-processing-flow-edge-4-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "worker-job-processing-flow",
+        "edge": {
+          "from": "mainLoop",
+          "to": "processJob",
+          "claim": "calls"
+        }
+      },
+      "points": [
+        [
+          0.5,
+          0
+        ],
+        [
+          32,
+          0
+        ],
+        [
+          32,
+          299.4
+        ],
+        [
+          32,
+          300
+        ],
+        [
+          362.29999999999995,
+          300
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "worker-job-processing-flow-node-1",
+        "focus": 0.2400000000000004,
+        "gap": 4.7999999999999545
+      },
+      "endBinding": {
+        "elementId": "worker-job-processing-flow-node-5",
+        "focus": -0.03333333333333334,
+        "gap": 7.599999999999909
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "worker-job-processing-flow-edge-5",
+      "type": "arrow",
+      "x": 1227.6,
+      "y": 402,
+      "width": 342.79999999999995,
+      "height": 130,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aH",
+      "roundness": null,
+      "seed": 2137887581,
+      "version": 1,
+      "versionNonce": 310770631,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "worker-job-processing-flow-edge-5-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "worker-job-processing-flow",
+        "edge": {
+          "from": "processJob",
+          "to": "callProcessor",
+          "claim": "calls"
+        }
+      },
+      "points": [
+        [
+          0.5,
+          0
+        ],
+        [
+          66,
+          0
+        ],
+        [
+          66,
+          130
+        ],
+        [
+          106.40000000000009,
+          130
+        ],
+        [
+          224.5999999999999,
+          130
+        ],
+        [
+          283.6999999999998,
+          130
+        ],
+        [
+          342.29999999999995,
+          130
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "worker-job-processing-flow-node-5",
+        "focus": 0.03333333333333334,
+        "gap": 7.599999999999909
+      },
+      "endBinding": {
+        "elementId": "worker-job-processing-flow-node-6",
+        "focus": 0.2,
+        "gap": 9.600000000000136
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "worker-job-processing-flow-edge-6",
+      "type": "arrow",
+      "x": 1227.6,
+      "y": 372,
+      "width": 342.79999999999995,
+      "height": 0,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aI",
+      "roundness": null,
+      "seed": 567086146,
+      "version": 1,
+      "versionNonce": 726225078,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "worker-job-processing-flow-edge-6-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "worker-job-processing-flow",
+        "edge": {
+          "from": "processJob",
+          "to": "handleCompleted",
+          "claim": "calls"
+        }
+      },
+      "points": [
+        [
+          0.5,
+          0
+        ],
+        [
+          171.4000000000001,
+          0
+        ],
+        [
+          342.29999999999995,
+          0
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "worker-job-processing-flow-node-5",
+        "focus": -0.4666666666666667,
+        "gap": 7.599999999999909
+      },
+      "endBinding": {
+        "elementId": "worker-job-processing-flow-node-7",
+        "focus": 0.1999999999999983,
+        "gap": 9.600000000000136
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "worker-job-processing-flow-edge-7",
+      "type": "arrow",
+      "x": 1227.6,
+      "y": 432,
+      "width": 362.79999999999995,
+      "height": 260,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aJ",
+      "roundness": null,
+      "seed": 1663193587,
+      "version": 1,
+      "versionNonce": 164634317,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "worker-job-processing-flow-edge-7-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "worker-job-processing-flow",
+        "edge": {
+          "from": "processJob",
+          "to": "handleFailed",
+          "claim": "calls"
+        }
+      },
+      "points": [
+        [
+          0.5,
+          0
+        ],
+        [
+          42,
+          0
+        ],
+        [
+          42,
+          260
+        ],
+        [
+          51.40000000000009,
+          260
+        ],
+        [
+          207.0999999999999,
+          260
+        ],
+        [
+          284.9499999999998,
+          260
+        ],
+        [
+          362.29999999999995,
+          260
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "worker-job-processing-flow-node-5",
+        "focus": 0.5333333333333334,
+        "gap": 7.599999999999909
+      },
+      "endBinding": {
+        "elementId": "worker-job-processing-flow-node-9",
+        "focus": 0.20000000000000004,
+        "gap": 9.600000000000136
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "worker-job-processing-flow-edge-8",
+      "type": "arrow",
+      "x": 1810.3999999999999,
+      "y": 372,
+      "width": 332.79999999999995,
+      "height": 0,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aK",
+      "roundness": null,
+      "seed": 341623936,
+      "version": 1,
+      "versionNonce": 704773724,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "worker-job-processing-flow-edge-8-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "worker-job-processing-flow",
+        "edge": {
+          "from": "handleCompleted",
+          "to": "moveToCompleted",
+          "claim": "calls"
+        }
+      },
+      "points": [
+        [
+          0.5,
+          0
+        ],
+        [
+          166.39999999999986,
+          0
+        ],
+        [
+          332.29999999999995,
+          0
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "worker-job-processing-flow-node-7",
+        "focus": -0.2,
+        "gap": 9.600000000000136
+      },
+      "endBinding": {
+        "elementId": "worker-job-processing-flow-node-8",
+        "focus": 0.2,
+        "gap": 3.199999999999818
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "worker-job-processing-flow-edge-9",
+      "type": "arrow",
+      "x": 1790.3999999999999,
+      "y": 692,
+      "width": 352.79999999999995,
+      "height": 0,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aL",
+      "roundness": null,
+      "seed": 1347338953,
+      "version": 1,
+      "versionNonce": 595930707,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "worker-job-processing-flow-edge-9-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "worker-job-processing-flow",
+        "edge": {
+          "from": "handleFailed",
+          "to": "moveToFailed",
+          "claim": "calls"
+        }
+      },
+      "points": [
+        [
+          0.5,
+          0
+        ],
+        [
+          176.39999999999986,
+          0
+        ],
+        [
+          352.29999999999995,
+          0
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "worker-job-processing-flow-node-9",
+        "focus": -0.20000000000000004,
+        "gap": 9.600000000000136
+      },
+      "endBinding": {
+        "elementId": "worker-job-processing-flow-node-10",
+        "focus": 0.2,
+        "gap": 3.199999999999818
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "worker-job-processing-flow-node-0-label",
+      "type": "text",
+      "x": 44,
+      "y": 67.5,
+      "width": 132,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aM",
+      "roundness": null,
+      "seed": 1146484434,
+      "version": 1,
+      "versionNonce": 2068166406,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "worker-job-processing-flow"
+      },
+      "text": "Start Worker",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "worker-job-processing-flow-node-0",
+      "originalText": "Start Worker",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "worker-job-processing-flow-node-1-label",
+      "type": "text",
+      "x": 550.5,
+      "y": 77.5,
+      "width": 99.00000000000001,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aN",
+      "roundness": null,
+      "seed": 1810233207,
+      "version": 1,
+      "versionNonce": 961707985,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "worker-job-processing-flow"
+      },
+      "text": "Main Loop",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "worker-job-processing-flow-node-1",
+      "originalText": "Main Loop",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "worker-job-processing-flow-node-2-label",
+      "type": "text",
+      "x": 1053,
+      "y": 57.5,
+      "width": 154,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aO",
+      "roundness": null,
+      "seed": 156389032,
+      "version": 1,
+      "versionNonce": 2041972100,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "worker-job-processing-flow"
+      },
+      "text": "Fetch Next Job",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "worker-job-processing-flow-node-2",
+      "originalText": "Fetch Next Job",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "worker-job-processing-flow-node-3-label",
+      "type": "text",
+      "x": 1604,
+      "y": 207.5,
+      "width": 132,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aP",
+      "roundness": null,
+      "seed": 2055758837,
+      "version": 1,
+      "versionNonce": 298292351,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "worker-job-processing-flow"
+      },
+      "text": "Wait for Job",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "worker-job-processing-flow-node-3",
+      "originalText": "Wait for Job",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "worker-job-processing-flow-node-4-label",
+      "type": "text",
+      "x": 1613,
+      "y": 47.5,
+      "width": 154,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aQ",
+      "roundness": null,
+      "seed": 131608942,
+      "version": 1,
+      "versionNonce": 797494674,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "worker-job-processing-flow"
+      },
+      "text": "Move to Active",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "worker-job-processing-flow-node-4",
+      "originalText": "Move to Active",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "worker-job-processing-flow-node-5-label",
+      "type": "text",
+      "x": 1069.5,
+      "y": 387.5,
+      "width": 121.00000000000001,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aR",
+      "roundness": null,
+      "seed": 204164291,
+      "version": 1,
+      "versionNonce": 1519084253,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "worker-job-processing-flow"
+      },
+      "text": "Process Job",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "worker-job-processing-flow-node-5",
+      "originalText": "Process Job",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "worker-job-processing-flow-node-6-label",
+      "type": "text",
+      "x": 1613,
+      "y": 527.5,
+      "width": 154,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aS",
+      "roundness": null,
+      "seed": 1883730484,
+      "version": 1,
+      "versionNonce": 1550009344,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "worker-job-processing-flow"
+      },
+      "text": "Call Processor",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "worker-job-processing-flow-node-6",
+      "originalText": "Call Processor",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "worker-job-processing-flow-node-7-label",
+      "type": "text",
+      "x": 1612,
+      "y": 367.5,
+      "width": 176,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aT",
+      "roundness": null,
+      "seed": 113001585,
+      "version": 1,
+      "versionNonce": 1577723387,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "worker-job-processing-flow"
+      },
+      "text": "Handle Completed",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "worker-job-processing-flow-node-7",
+      "originalText": "Handle Completed",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "worker-job-processing-flow-node-8-label",
+      "type": "text",
+      "x": 2166.5,
+      "y": 367.5,
+      "width": 187.00000000000003,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aU",
+      "roundness": null,
+      "seed": 508855898,
+      "version": 1,
+      "versionNonce": 44503854,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "worker-job-processing-flow"
+      },
+      "text": "Move to Completed",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "worker-job-processing-flow-node-8",
+      "originalText": "Move to Completed",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "worker-job-processing-flow-node-9-label",
+      "type": "text",
+      "x": 1628.5,
+      "y": 687.5,
+      "width": 143,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aV",
+      "roundness": null,
+      "seed": 1219206431,
+      "version": 1,
+      "versionNonce": 275706297,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "worker-job-processing-flow"
+      },
+      "text": "Handle Failed",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "worker-job-processing-flow-node-9",
+      "originalText": "Handle Failed",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "worker-job-processing-flow-node-10-label",
+      "type": "text",
+      "x": 2173,
+      "y": 687.5,
+      "width": 154,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aW",
+      "roundness": null,
+      "seed": 1810329493,
+      "version": 1,
+      "versionNonce": 1826678175,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "worker-job-processing-flow"
+      },
+      "text": "Move to Failed",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "worker-job-processing-flow-node-10",
+      "originalText": "Move to Failed",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "worker-job-processing-flow-edge-0-label",
+      "type": "text",
+      "x": 332,
+      "y": 75.33333333333334,
+      "width": 52.800000000000004,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aX",
+      "roundness": null,
+      "seed": 950581333,
+      "version": 1,
+      "versionNonce": 719997535,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "worker-job-processing-flow"
+      },
+      "text": "@calls",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "worker-job-processing-flow-edge-0",
+      "originalText": "@calls",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "worker-job-processing-flow-edge-1-label",
+      "type": "text",
+      "x": 824.8,
+      "y": 58.66666666666667,
+      "width": 52.800000000000004,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aY",
+      "roundness": null,
+      "seed": 1707455368,
+      "version": 1,
+      "versionNonce": 1956850148,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "worker-job-processing-flow"
+      },
+      "text": "@calls",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "worker-job-processing-flow-edge-1",
+      "originalText": "@calls",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "worker-job-processing-flow-edge-2-label",
+      "type": "text",
+      "x": 1314.2666666666664,
+      "y": 202,
+      "width": 52.800000000000004,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aZ",
+      "roundness": null,
+      "seed": 1640177367,
+      "version": 1,
+      "versionNonce": 280424881,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "worker-job-processing-flow"
+      },
+      "text": "@calls",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "worker-job-processing-flow-edge-2",
+      "originalText": "@calls",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "worker-job-processing-flow-edge-3-label",
+      "type": "text",
+      "x": 1377.6,
+      "y": 42,
+      "width": 52.800000000000004,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aa",
+      "roundness": null,
+      "seed": 1103414706,
+      "version": 1,
+      "versionNonce": 1961797734,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "worker-job-processing-flow"
+      },
+      "text": "@calls",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "worker-job-processing-flow-edge-3",
+      "originalText": "@calls",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "worker-job-processing-flow-edge-4-label",
+      "type": "text",
+      "x": 690.4,
+      "y": 391.4,
+      "width": 52.800000000000004,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "ab",
+      "roundness": null,
+      "seed": 1586194385,
+      "version": 1,
+      "versionNonce": 1382702299,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "worker-job-processing-flow"
+      },
+      "text": "@calls",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "worker-job-processing-flow-edge-4",
+      "originalText": "@calls",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "worker-job-processing-flow-edge-5-label",
+      "type": "text",
+      "x": 1307.6,
+      "y": 522,
+      "width": 52.800000000000004,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "ac",
+      "roundness": null,
+      "seed": 1753666964,
+      "version": 1,
+      "versionNonce": 1252491744,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "worker-job-processing-flow"
+      },
+      "text": "@calls",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "worker-job-processing-flow-edge-5",
+      "originalText": "@calls",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "worker-job-processing-flow-edge-6-label",
+      "type": "text",
+      "x": 1372.6,
+      "y": 362,
+      "width": 52.800000000000004,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "ad",
+      "roundness": null,
+      "seed": 1994187299,
+      "version": 1,
+      "versionNonce": 1839170749,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "worker-job-processing-flow"
+      },
+      "text": "@calls",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "worker-job-processing-flow-edge-6",
+      "originalText": "@calls",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "worker-job-processing-flow-edge-7-label",
+      "type": "text",
+      "x": 1252.6,
+      "y": 682,
+      "width": 52.800000000000004,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "ae",
+      "roundness": null,
+      "seed": 1957822414,
+      "version": 1,
+      "versionNonce": 1453756786,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "worker-job-processing-flow"
+      },
+      "text": "@calls",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "worker-job-processing-flow-edge-7",
+      "originalText": "@calls",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "worker-job-processing-flow-edge-8-label",
+      "type": "text",
+      "x": 1950.3999999999996,
+      "y": 362,
+      "width": 52.800000000000004,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "af",
+      "roundness": null,
+      "seed": 249302109,
+      "version": 1,
+      "versionNonce": 1567520455,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "worker-job-processing-flow"
+      },
+      "text": "@calls",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "worker-job-processing-flow-edge-8",
+      "originalText": "@calls",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "worker-job-processing-flow-edge-9-label",
+      "type": "text",
+      "x": 1940.3999999999996,
+      "y": 682,
+      "width": 52.800000000000004,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "ag",
+      "roundness": null,
+      "seed": 1188282256,
+      "version": 1,
+      "versionNonce": 603380076,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "worker-job-processing-flow"
+      },
+      "text": "@calls",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "worker-job-processing-flow-edge-9",
+      "originalText": "@calls",
+      "autoResize": true,
+      "lineHeight": 1.25
+    }
+  ],
+  "appState": {
+    "gridSize": null,
+    "viewBackgroundColor": "#ffffff"
+  },
+  "files": {},
+  "diagramos": {
+    "version": "0.2.0-rc.6",
+    "schema": 1
+  }
+}

@@ -1,0 +1,1913 @@
+{
+  "type": "excalidraw",
+  "version": 2,
+  "source": "diagramos",
+  "elements": [
+    {
+      "id": "flowproducer-adding-a-tree-of-parent-and-title",
+      "type": "text",
+      "x": 0,
+      "y": -115,
+      "width": 686.4000000000001,
+      "height": 30,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a0",
+      "roundness": null,
+      "seed": 92151537,
+      "version": 1,
+      "versionNonce": 1765088635,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "flowproducer-adding-a-tree-of-parent-and",
+        "role": "title"
+      },
+      "text": "FlowProducer: Adding a Tree of Parent and Child Jobs",
+      "fontSize": 24,
+      "fontFamily": 5,
+      "textAlign": "left",
+      "verticalAlign": "middle",
+      "containerId": null,
+      "originalText": "FlowProducer: Adding a Tree of Parent and Child Jobs",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "flowproducer-adding-a-tree-of-parent-and-node-0",
+      "type": "rectangle",
+      "x": 60,
+      "y": 180,
+      "width": 160,
+      "height": 100,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a1",
+      "roundness": null,
+      "seed": 1049465816,
+      "version": 1,
+      "versionNonce": 1636736948,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "flowproducer-adding-a-tree-of-parent-and-node-0-label"
+        },
+        {
+          "id": "flowproducer-adding-a-tree-of-parent-and-edge-0",
+          "type": "arrow"
+        },
+        {
+          "id": "flowproducer-adding-a-tree-of-parent-and-edge-7",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "flowproducer-adding-a-tree-of-parent-and",
+        "node": "add",
+        "ref": "src/classes/flow-producer.ts#add"
+      }
+    },
+    {
+      "id": "flowproducer-adding-a-tree-of-parent-and-node-1",
+      "type": "rectangle",
+      "x": 700,
+      "y": 20,
+      "width": 160,
+      "height": 120,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a2",
+      "roundness": null,
+      "seed": 1853523841,
+      "version": 1,
+      "versionNonce": 1169602763,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "flowproducer-adding-a-tree-of-parent-and-node-1-label"
+        },
+        {
+          "id": "flowproducer-adding-a-tree-of-parent-and-edge-0",
+          "type": "arrow"
+        },
+        {
+          "id": "flowproducer-adding-a-tree-of-parent-and-edge-1",
+          "type": "arrow"
+        },
+        {
+          "id": "flowproducer-adding-a-tree-of-parent-and-edge-2",
+          "type": "arrow"
+        },
+        {
+          "id": "flowproducer-adding-a-tree-of-parent-and-edge-3",
+          "type": "arrow"
+        },
+        {
+          "id": "flowproducer-adding-a-tree-of-parent-and-edge-4",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "flowproducer-adding-a-tree-of-parent-and",
+        "node": "addNode",
+        "ref": "src/classes/flow-producer.ts#addNode"
+      }
+    },
+    {
+      "id": "flowproducer-adding-a-tree-of-parent-and-node-2",
+      "type": "rectangle",
+      "x": 20,
+      "y": 20,
+      "width": 200,
+      "height": 80,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a3",
+      "roundness": null,
+      "seed": 389177846,
+      "version": 1,
+      "versionNonce": 77598554,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "flowproducer-adding-a-tree-of-parent-and-node-2-label"
+        },
+        {
+          "id": "flowproducer-adding-a-tree-of-parent-and-edge-2",
+          "type": "arrow"
+        },
+        {
+          "id": "flowproducer-adding-a-tree-of-parent-and-edge-3",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "flowproducer-adding-a-tree-of-parent-and",
+        "node": "addChildren",
+        "ref": "src/classes/flow-producer.ts#addChildren"
+      }
+    },
+    {
+      "id": "flowproducer-adding-a-tree-of-parent-and-node-3",
+      "type": "rectangle",
+      "x": 1260,
+      "y": 180,
+      "width": 160,
+      "height": 80,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a4",
+      "roundness": null,
+      "seed": 1724745351,
+      "version": 1,
+      "versionNonce": 1768746401,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "flowproducer-adding-a-tree-of-parent-and-node-3-label"
+        },
+        {
+          "id": "flowproducer-adding-a-tree-of-parent-and-edge-1",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "flowproducer-adding-a-tree-of-parent-and",
+        "node": "Job",
+        "ref": "src/classes/job.ts#Job"
+      }
+    },
+    {
+      "id": "flowproducer-adding-a-tree-of-parent-and-node-4",
+      "type": "rectangle",
+      "x": 1260,
+      "y": 20,
+      "width": 260,
+      "height": 80,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a5",
+      "roundness": null,
+      "seed": 1861993300,
+      "version": 1,
+      "versionNonce": 1267522720,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "flowproducer-adding-a-tree-of-parent-and-node-4-label"
+        },
+        {
+          "id": "flowproducer-adding-a-tree-of-parent-and-edge-4",
+          "type": "arrow"
+        },
+        {
+          "id": "flowproducer-adding-a-tree-of-parent-and-edge-5",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "flowproducer-adding-a-tree-of-parent-and",
+        "node": "collectFlowEntry",
+        "ref": "src/classes/flow-producer.ts#collectFlowEntry"
+      }
+    },
+    {
+      "id": "flowproducer-adding-a-tree-of-parent-and-node-5",
+      "type": "rectangle",
+      "x": 1860,
+      "y": 20,
+      "width": 200,
+      "height": 80,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a6",
+      "roundness": null,
+      "seed": 776954157,
+      "version": 1,
+      "versionNonce": 2035548055,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "flowproducer-adding-a-tree-of-parent-and-node-5-label"
+        },
+        {
+          "id": "flowproducer-adding-a-tree-of-parent-and-edge-5",
+          "type": "arrow"
+        },
+        {
+          "id": "flowproducer-adding-a-tree-of-parent-and-edge-6",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "flowproducer-adding-a-tree-of-parent-and",
+        "node": "toFlowEntry",
+        "ref": "src/classes/job.ts#toFlowEntry"
+      }
+    },
+    {
+      "id": "flowproducer-adding-a-tree-of-parent-and-node-6",
+      "type": "rectangle",
+      "x": 2400,
+      "y": 20,
+      "width": 180,
+      "height": 80,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a7",
+      "roundness": null,
+      "seed": 1675449106,
+      "version": 1,
+      "versionNonce": 1100323654,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "flowproducer-adding-a-tree-of-parent-and-node-6-label"
+        },
+        {
+          "id": "flowproducer-adding-a-tree-of-parent-and-edge-6",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "flowproducer-adding-a-tree-of-parent-and",
+        "node": "FlowJobEntry",
+        "ref": "src/classes/flow-producer.ts#FlowJobEntry"
+      }
+    },
+    {
+      "id": "flowproducer-adding-a-tree-of-parent-and-node-7",
+      "type": "rectangle",
+      "x": 680,
+      "y": 340,
+      "width": 240,
+      "height": 80,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a8",
+      "roundness": null,
+      "seed": 292687491,
+      "version": 1,
+      "versionNonce": 313672349,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "flowproducer-adding-a-tree-of-parent-and-node-7-label"
+        },
+        {
+          "id": "flowproducer-adding-a-tree-of-parent-and-edge-7",
+          "type": "arrow"
+        },
+        {
+          "id": "flowproducer-adding-a-tree-of-parent-and-edge-8",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "flowproducer-adding-a-tree-of-parent-and",
+        "node": "addFlow",
+        "ref": "src/classes/redis-queue-backend.ts#addFlow"
+      }
+    },
+    {
+      "id": "flowproducer-adding-a-tree-of-parent-and-node-8",
+      "type": "rectangle",
+      "x": 1260,
+      "y": 340,
+      "width": 160,
+      "height": 80,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a9",
+      "roundness": null,
+      "seed": 417847568,
+      "version": 1,
+      "versionNonce": 1503329772,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "flowproducer-adding-a-tree-of-parent-and-node-8-label"
+        },
+        {
+          "id": "flowproducer-adding-a-tree-of-parent-and-edge-8",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "flowproducer-adding-a-tree-of-parent-and",
+        "node": "JobNode",
+        "ref": "src/classes/flow-producer.ts#JobNode"
+      }
+    },
+    {
+      "id": "flowproducer-adding-a-tree-of-parent-and-edge-0",
+      "type": "arrow",
+      "x": 212,
+      "y": 212,
+      "width": 496.79999999999995,
+      "height": 110,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aA",
+      "roundness": null,
+      "seed": 849341327,
+      "version": 1,
+      "versionNonce": 1763598441,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "flowproducer-adding-a-tree-of-parent-and-edge-0-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "flowproducer-adding-a-tree-of-parent-and",
+        "edge": {
+          "from": "add",
+          "to": "addNode",
+          "claim": "calls"
+        }
+      },
+      "points": [
+        [
+          0.5,
+          0
+        ],
+        [
+          75.85000000000002,
+          0
+        ],
+        [
+          151.7,
+          0
+        ],
+        [
+          303.4,
+          -2.842170943040401e-14
+        ],
+        [
+          356.79999999999995,
+          -2.842170943040401e-14
+        ],
+        [
+          356.79999999999995,
+          -110
+        ],
+        [
+          496.29999999999995,
+          -110
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "flowproducer-adding-a-tree-of-parent-and-node-0",
+        "focus": -0.36,
+        "gap": 8
+      },
+      "endBinding": {
+        "elementId": "flowproducer-adding-a-tree-of-parent-and-node-1",
+        "focus": -0.366666666666667,
+        "gap": 8.799999999999955
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "flowproducer-adding-a-tree-of-parent-and-edge-1",
+      "type": "arrow",
+      "x": 868.8,
+      "y": 92,
+      "width": 398.4000000000001,
+      "height": 120,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aB",
+      "roundness": null,
+      "seed": 672790078,
+      "version": 1,
+      "versionNonce": 559244770,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "flowproducer-adding-a-tree-of-parent-and-edge-1-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "flowproducer-adding-a-tree-of-parent-and",
+        "edge": {
+          "from": "addNode",
+          "to": "Job",
+          "claim": "builds"
+        }
+      },
+      "points": [
+        [
+          0.5,
+          0
+        ],
+        [
+          80,
+          0
+        ],
+        [
+          80,
+          120
+        ],
+        [
+          139.20000000000005,
+          120
+        ],
+        [
+          268.79999999999995,
+          120
+        ],
+        [
+          333.60000000000014,
+          120
+        ],
+        [
+          397.9000000000001,
+          120
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "flowproducer-adding-a-tree-of-parent-and-node-1",
+        "focus": 0.2,
+        "gap": 8.799999999999955
+      },
+      "endBinding": {
+        "elementId": "flowproducer-adding-a-tree-of-parent-and-node-3",
+        "focus": 0.2,
+        "gap": 7.2000000000000455
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "flowproducer-adding-a-tree-of-parent-and-edge-2",
+      "type": "arrow",
+      "x": 708.8,
+      "y": 72,
+      "width": 496.79999999999995,
+      "height": 0,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aC",
+      "roundness": null,
+      "seed": 933640041,
+      "version": 1,
+      "versionNonce": 99766387,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "flowproducer-adding-a-tree-of-parent-and-edge-2-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "flowproducer-adding-a-tree-of-parent-and",
+        "edge": {
+          "from": "addNode",
+          "to": "addChildren",
+          "claim": "calls"
+        }
+      },
+      "points": [
+        [
+          -0.5,
+          0
+        ],
+        [
+          -248.39999999999998,
+          0
+        ],
+        [
+          -496.29999999999995,
+          0
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "flowproducer-adding-a-tree-of-parent-and-node-1",
+        "focus": 0.13333333333333303,
+        "gap": 8.799999999999955
+      },
+      "endBinding": {
+        "elementId": "flowproducer-adding-a-tree-of-parent-and-node-2",
+        "focus": 0.30000000000000004,
+        "gap": 8
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "flowproducer-adding-a-tree-of-parent-and-edge-3",
+      "type": "arrow",
+      "x": 212,
+      "y": 45.33333333333333,
+      "width": 496.79999999999995,
+      "height": 3.3333333333333286,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aD",
+      "roundness": null,
+      "seed": 1372853920,
+      "version": 1,
+      "versionNonce": 971343356,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "flowproducer-adding-a-tree-of-parent-and-edge-3-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "flowproducer-adding-a-tree-of-parent-and",
+        "edge": {
+          "from": "addChildren",
+          "to": "addNode",
+          "claim": "calls"
+        }
+      },
+      "points": [
+        [
+          0.5,
+          0
+        ],
+        [
+          62.51666666666665,
+          0
+        ],
+        [
+          125.0333333333333,
+          0
+        ],
+        [
+          250.0666666666666,
+          0
+        ],
+        [
+          356.79999999999995,
+          0
+        ],
+        [
+          356.79999999999995,
+          -3.3333333333333286
+        ],
+        [
+          496.29999999999995,
+          -3.3333333333333286
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "flowproducer-adding-a-tree-of-parent-and-node-2",
+        "focus": -0.36666666666666664,
+        "gap": 8
+      },
+      "endBinding": {
+        "elementId": "flowproducer-adding-a-tree-of-parent-and-node-1",
+        "focus": 0.6333333333333331,
+        "gap": 8.799999999999955
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "flowproducer-adding-a-tree-of-parent-and-edge-4",
+      "type": "arrow",
+      "x": 868.8,
+      "y": 52,
+      "width": 398.4000000000001,
+      "height": 0,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aE",
+      "roundness": null,
+      "seed": 1561864043,
+      "version": 1,
+      "versionNonce": 1435902565,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "flowproducer-adding-a-tree-of-parent-and-edge-4-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "flowproducer-adding-a-tree-of-parent-and",
+        "edge": {
+          "from": "addNode",
+          "to": "collectFlowEntry",
+          "claim": "calls"
+        }
+      },
+      "points": [
+        [
+          0.5,
+          0
+        ],
+        [
+          199.20000000000005,
+          0
+        ],
+        [
+          397.9000000000001,
+          0
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "flowproducer-adding-a-tree-of-parent-and-node-1",
+        "focus": -0.466666666666667,
+        "gap": 8.799999999999955
+      },
+      "endBinding": {
+        "elementId": "flowproducer-adding-a-tree-of-parent-and-node-4",
+        "focus": 0.2,
+        "gap": 7.2000000000000455
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "flowproducer-adding-a-tree-of-parent-and-edge-5",
+      "type": "arrow",
+      "x": 1527.2,
+      "y": 52,
+      "width": 332.79999999999995,
+      "height": 0,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aF",
+      "roundness": null,
+      "seed": 150786522,
+      "version": 1,
+      "versionNonce": 1771433390,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "flowproducer-adding-a-tree-of-parent-and-edge-5-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "flowproducer-adding-a-tree-of-parent-and",
+        "edge": {
+          "from": "collectFlowEntry",
+          "to": "toFlowEntry",
+          "claim": "calls"
+        }
+      },
+      "points": [
+        [
+          0.5,
+          0
+        ],
+        [
+          166.39999999999986,
+          0
+        ],
+        [
+          332.29999999999995,
+          0
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "flowproducer-adding-a-tree-of-parent-and-node-4",
+        "focus": -0.2,
+        "gap": 7.2000000000000455
+      },
+      "endBinding": {
+        "elementId": "flowproducer-adding-a-tree-of-parent-and-node-5",
+        "focus": 0.20000000000000004,
+        "gap": 1
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "flowproducer-adding-a-tree-of-parent-and-edge-6",
+      "type": "arrow",
+      "x": 2060,
+      "y": 52,
+      "width": 341.5999999999999,
+      "height": 0,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aG",
+      "roundness": null,
+      "seed": 1091800501,
+      "version": 1,
+      "versionNonce": 1632890175,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "flowproducer-adding-a-tree-of-parent-and-edge-6-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "flowproducer-adding-a-tree-of-parent-and",
+        "edge": {
+          "from": "toFlowEntry",
+          "to": "FlowJobEntry",
+          "claim": "builds"
+        }
+      },
+      "points": [
+        [
+          0.5,
+          0
+        ],
+        [
+          170.80000000000018,
+          0
+        ],
+        [
+          341.0999999999999,
+          0
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "flowproducer-adding-a-tree-of-parent-and-node-5",
+        "focus": -0.20000000000000004,
+        "gap": 1
+      },
+      "endBinding": {
+        "elementId": "flowproducer-adding-a-tree-of-parent-and-node-6",
+        "focus": 0.19999999999999998,
+        "gap": 1.599999999999909
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "flowproducer-adding-a-tree-of-parent-and-edge-7",
+      "type": "arrow",
+      "x": 212,
+      "y": 245.33333333333331,
+      "width": 464.79999999999995,
+      "height": 126.66666666666669,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aH",
+      "roundness": null,
+      "seed": 740555676,
+      "version": 1,
+      "versionNonce": 1344809896,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "flowproducer-adding-a-tree-of-parent-and-edge-7-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "flowproducer-adding-a-tree-of-parent-and",
+        "edge": {
+          "from": "add",
+          "to": "addFlow",
+          "claim": "calls"
+        }
+      },
+      "points": [
+        [
+          0.5,
+          0
+        ],
+        [
+          32,
+          0
+        ],
+        [
+          32,
+          126.66666666666669
+        ],
+        [
+          169.06666666666666,
+          126.66666666666669
+        ],
+        [
+          316.9333333333333,
+          126.66666666666669
+        ],
+        [
+          390.86666666666656,
+          126.66666666666669
+        ],
+        [
+          464.29999999999995,
+          126.66666666666669
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "flowproducer-adding-a-tree-of-parent-and-node-0",
+        "focus": 0.3066666666666656,
+        "gap": 8
+      },
+      "endBinding": {
+        "elementId": "flowproducer-adding-a-tree-of-parent-and-node-7",
+        "focus": 0.2,
+        "gap": 3.2000000000000455
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "flowproducer-adding-a-tree-of-parent-and-edge-8",
+      "type": "arrow",
+      "x": 916.8,
+      "y": 372,
+      "width": 350.4000000000001,
+      "height": 0,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aI",
+      "roundness": null,
+      "seed": 927395415,
+      "version": 1,
+      "versionNonce": 792107057,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "flowproducer-adding-a-tree-of-parent-and-edge-8-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "flowproducer-adding-a-tree-of-parent-and",
+        "edge": {
+          "from": "addFlow",
+          "to": "JobNode",
+          "claim": "returns"
+        }
+      },
+      "points": [
+        [
+          0.5,
+          0
+        ],
+        [
+          175.20000000000005,
+          0
+        ],
+        [
+          349.9000000000001,
+          0
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "flowproducer-adding-a-tree-of-parent-and-node-7",
+        "focus": -0.2,
+        "gap": 3.2000000000000455
+      },
+      "endBinding": {
+        "elementId": "flowproducer-adding-a-tree-of-parent-and-node-8",
+        "focus": 0.2,
+        "gap": 7.2000000000000455
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "flowproducer-adding-a-tree-of-parent-and-node-0-label",
+      "type": "text",
+      "x": 90.5,
+      "y": 217.5,
+      "width": 99.00000000000001,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aJ",
+      "roundness": null,
+      "seed": 1646231205,
+      "version": 1,
+      "versionNonce": 882857007,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "flowproducer-adding-a-tree-of-parent-and"
+      },
+      "text": "add(flow)",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "flowproducer-adding-a-tree-of-parent-and-node-0",
+      "originalText": "add(flow)",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "flowproducer-adding-a-tree-of-parent-and-node-1-label",
+      "type": "text",
+      "x": 730.5,
+      "y": 67.5,
+      "width": 99.00000000000001,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aK",
+      "roundness": null,
+      "seed": 1765453784,
+      "version": 1,
+      "versionNonce": 269595572,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "flowproducer-adding-a-tree-of-parent-and"
+      },
+      "text": "addNode()",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "flowproducer-adding-a-tree-of-parent-and-node-1",
+      "originalText": "addNode()",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "flowproducer-adding-a-tree-of-parent-and-node-2-label",
+      "type": "text",
+      "x": 48.5,
+      "y": 47.5,
+      "width": 143,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aL",
+      "roundness": null,
+      "seed": 1779596967,
+      "version": 1,
+      "versionNonce": 1862214465,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "flowproducer-adding-a-tree-of-parent-and"
+      },
+      "text": "addChildren()",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "flowproducer-adding-a-tree-of-parent-and-node-2",
+      "originalText": "addChildren()",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "flowproducer-adding-a-tree-of-parent-and-node-3-label",
+      "type": "text",
+      "x": 1323.5,
+      "y": 207.5,
+      "width": 33,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aM",
+      "roundness": null,
+      "seed": 817687554,
+      "version": 1,
+      "versionNonce": 1477773686,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "flowproducer-adding-a-tree-of-parent-and"
+      },
+      "text": "Job",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "flowproducer-adding-a-tree-of-parent-and-node-3",
+      "originalText": "Job",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "flowproducer-adding-a-tree-of-parent-and-node-4-label",
+      "type": "text",
+      "x": 1291,
+      "y": 47.5,
+      "width": 198.00000000000003,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aN",
+      "roundness": null,
+      "seed": 1740495521,
+      "version": 1,
+      "versionNonce": 1118568555,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "flowproducer-adding-a-tree-of-parent-and"
+      },
+      "text": "collectFlowEntry()",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "flowproducer-adding-a-tree-of-parent-and-node-4",
+      "originalText": "collectFlowEntry()",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "flowproducer-adding-a-tree-of-parent-and-node-5-label",
+      "type": "text",
+      "x": 1888.5,
+      "y": 47.5,
+      "width": 143,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aO",
+      "roundness": null,
+      "seed": 1913246692,
+      "version": 1,
+      "versionNonce": 93539952,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "flowproducer-adding-a-tree-of-parent-and"
+      },
+      "text": "toFlowEntry()",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "flowproducer-adding-a-tree-of-parent-and-node-5",
+      "originalText": "toFlowEntry()",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "flowproducer-adding-a-tree-of-parent-and-node-6-label",
+      "type": "text",
+      "x": 2424,
+      "y": 47.5,
+      "width": 132,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aP",
+      "roundness": null,
+      "seed": 1472308531,
+      "version": 1,
+      "versionNonce": 1579584781,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "flowproducer-adding-a-tree-of-parent-and"
+      },
+      "text": "FlowJobEntry",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "flowproducer-adding-a-tree-of-parent-and-node-6",
+      "originalText": "FlowJobEntry",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "flowproducer-adding-a-tree-of-parent-and-node-7-label",
+      "type": "text",
+      "x": 706.5,
+      "y": 367.5,
+      "width": 187.00000000000003,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aQ",
+      "roundness": null,
+      "seed": 1425005598,
+      "version": 1,
+      "versionNonce": 2144555586,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "flowproducer-adding-a-tree-of-parent-and"
+      },
+      "text": "backend.addFlow()",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "flowproducer-adding-a-tree-of-parent-and-node-7",
+      "originalText": "backend.addFlow()",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "flowproducer-adding-a-tree-of-parent-and-node-8-label",
+      "type": "text",
+      "x": 1301.5,
+      "y": 367.5,
+      "width": 77,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aR",
+      "roundness": null,
+      "seed": 877885933,
+      "version": 1,
+      "versionNonce": 793494359,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "flowproducer-adding-a-tree-of-parent-and"
+      },
+      "text": "JobNode",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "flowproducer-adding-a-tree-of-parent-and-node-8",
+      "originalText": "JobNode",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "flowproducer-adding-a-tree-of-parent-and-edge-0-label",
+      "type": "text",
+      "x": 462.59999999999997,
+      "y": 201.99999999999997,
+      "width": 105.60000000000001,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aS",
+      "roundness": null,
+      "seed": 1686837338,
+      "version": 1,
+      "versionNonce": 177137966,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "flowproducer-adding-a-tree-of-parent-and"
+      },
+      "text": "start @calls",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "flowproducer-adding-a-tree-of-parent-and-edge-0",
+      "originalText": "start @calls",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "flowproducer-adding-a-tree-of-parent-and-edge-1-label",
+      "type": "text",
+      "x": 977.2,
+      "y": 202,
+      "width": 61.60000000000001,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aT",
+      "roundness": null,
+      "seed": 249704223,
+      "version": 1,
+      "versionNonce": 408340409,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "flowproducer-adding-a-tree-of-parent-and"
+      },
+      "text": "@builds",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "flowproducer-adding-a-tree-of-parent-and-edge-1",
+      "originalText": "@builds",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "flowproducer-adding-a-tree-of-parent-and-edge-2-label",
+      "type": "text",
+      "x": 368,
+      "y": 62,
+      "width": 184.8,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aU",
+      "roundness": null,
+      "seed": 338582832,
+      "version": 1,
+      "versionNonce": 534245260,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "flowproducer-adding-a-tree-of-parent-and"
+      },
+      "text": "children exist @calls",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "flowproducer-adding-a-tree-of-parent-and-edge-2",
+      "originalText": "children exist @calls",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "flowproducer-adding-a-tree-of-parent-and-edge-3-label",
+      "type": "text",
+      "x": 387.2666666666666,
+      "y": 35.33333333333333,
+      "width": 149.60000000000002,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aV",
+      "roundness": null,
+      "seed": 276192637,
+      "version": 1,
+      "versionNonce": 190969447,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "flowproducer-adding-a-tree-of-parent-and"
+      },
+      "text": "each child @calls",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "flowproducer-adding-a-tree-of-parent-and-edge-3",
+      "originalText": "each child @calls",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "flowproducer-adding-a-tree-of-parent-and-edge-4-label",
+      "type": "text",
+      "x": 1041.6,
+      "y": 42,
+      "width": 52.800000000000004,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aW",
+      "roundness": null,
+      "seed": 1957067286,
+      "version": 1,
+      "versionNonce": 1762979834,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "flowproducer-adding-a-tree-of-parent-and"
+      },
+      "text": "@calls",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "flowproducer-adding-a-tree-of-parent-and-edge-4",
+      "originalText": "@calls",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "flowproducer-adding-a-tree-of-parent-and-edge-5-label",
+      "type": "text",
+      "x": 1667.1999999999998,
+      "y": 42,
+      "width": 52.800000000000004,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aX",
+      "roundness": null,
+      "seed": 293537227,
+      "version": 1,
+      "versionNonce": 1896623941,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "flowproducer-adding-a-tree-of-parent-and"
+      },
+      "text": "@calls",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "flowproducer-adding-a-tree-of-parent-and-edge-5",
+      "originalText": "@calls",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "flowproducer-adding-a-tree-of-parent-and-edge-6-label",
+      "type": "text",
+      "x": 2200,
+      "y": 42,
+      "width": 61.60000000000001,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aY",
+      "roundness": null,
+      "seed": 566408156,
+      "version": 1,
+      "versionNonce": 956629480,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "flowproducer-adding-a-tree-of-parent-and"
+      },
+      "text": "@builds",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "flowproducer-adding-a-tree-of-parent-and-edge-6",
+      "originalText": "@builds",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "flowproducer-adding-a-tree-of-parent-and-edge-7-label",
+      "type": "text",
+      "x": 319.46666666666664,
+      "y": 362,
+      "width": 123.20000000000002,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aZ",
+      "roundness": null,
+      "seed": 994953145,
+      "version": 1,
+      "versionNonce": 77968771,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "flowproducer-adding-a-tree-of-parent-and"
+      },
+      "text": "persist @calls",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "flowproducer-adding-a-tree-of-parent-and-edge-7",
+      "originalText": "persist @calls",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "flowproducer-adding-a-tree-of-parent-and-edge-8-label",
+      "type": "text",
+      "x": 1056.8,
+      "y": 362,
+      "width": 70.4,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aa",
+      "roundness": null,
+      "seed": 176982226,
+      "version": 1,
+      "versionNonce": 53316870,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "flowproducer-adding-a-tree-of-parent-and"
+      },
+      "text": "@returns",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "flowproducer-adding-a-tree-of-parent-and-edge-8",
+      "originalText": "@returns",
+      "autoResize": true,
+      "lineHeight": 1.25
+    }
+  ],
+  "appState": {
+    "gridSize": null,
+    "viewBackgroundColor": "#ffffff"
+  },
+  "files": {},
+  "diagramos": {
+    "version": "0.2.0-rc.6",
+    "schema": 1
+  }
+}

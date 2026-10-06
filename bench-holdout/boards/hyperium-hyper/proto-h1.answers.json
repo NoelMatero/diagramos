@@ -1,0 +1,107 @@
+{
+  "board": "bench-holdout/boards/hyperium-hyper/proto-h1.excalidraw",
+  "project": "hyperium-hyper",
+  "topic": "proto-h1",
+  "language": "rust",
+  "scope": "src/proto/h1",
+  "pin": "69396fdd96",
+  "tool": "rust-analyzer 0.0.0 (7cb789d982 2026-02-01)",
+  "claims": [
+    {
+      "id": "calls|src/proto/h1/dispatch.rs#poll_loop|src/proto/h1/dispatch.rs#poll_read|",
+      "word": "calls",
+      "from": "src/proto/h1/dispatch.rs#poll_loop",
+      "to": "src/proto/h1/dispatch.rs#poll_read",
+      "fromLabel": "Dispatcher::poll_loop",
+      "toLabel": "Dispatcher::poll_read",
+      "language": "rust",
+      "source": "drawn",
+      "truth": "undecidable",
+      "why": "the tool would not walk this routine's calls"
+    },
+    {
+      "id": "calls|src/proto/h1/dispatch.rs#poll_loop|src/proto/h1/dispatch.rs#poll_write|",
+      "word": "calls",
+      "from": "src/proto/h1/dispatch.rs#poll_loop",
+      "to": "src/proto/h1/dispatch.rs#poll_write",
+      "fromLabel": "Dispatcher::poll_loop",
+      "toLabel": "Dispatcher::poll_write",
+      "language": "rust",
+      "source": "drawn",
+      "truth": "undecidable",
+      "why": "the tool would not walk this routine's calls"
+    },
+    {
+      "id": "calls|src/proto/h1/dispatch.rs#poll_read|src/proto/h1/dispatch.rs#poll_read_head|",
+      "word": "calls",
+      "from": "src/proto/h1/dispatch.rs#poll_read",
+      "to": "src/proto/h1/dispatch.rs#poll_read_head",
+      "fromLabel": "Dispatcher::poll_read",
+      "toLabel": "Dispatcher::poll_read_head",
+      "language": "rust",
+      "source": "drawn",
+      "truth": "undecidable",
+      "why": "the tool would not walk this routine's calls"
+    },
+    {
+      "id": "calls|src/proto/h1/dispatch.rs#poll_read_head|src/proto/h1/conn.rs#poll_read_head|",
+      "word": "calls",
+      "from": "src/proto/h1/dispatch.rs#poll_read_head",
+      "to": "src/proto/h1/conn.rs#poll_read_head",
+      "fromLabel": "Dispatcher::poll_read_head",
+      "toLabel": "Conn::poll_read_head",
+      "language": "rust",
+      "source": "drawn",
+      "truth": "undecidable",
+      "why": "the tool would not walk this routine's calls"
+    },
+    {
+      "id": "calls|src/proto/h1/dispatch.rs#poll_read|src/proto/h1/conn.rs#poll_read_body|",
+      "word": "calls",
+      "from": "src/proto/h1/dispatch.rs#poll_read",
+      "to": "src/proto/h1/conn.rs#poll_read_body",
+      "fromLabel": "Dispatcher::poll_read",
+      "toLabel": "Conn::poll_read_body",
+      "language": "rust",
+      "source": "drawn",
+      "truth": "undecidable",
+      "why": "the tool would not walk this routine's calls"
+    },
+    {
+      "id": "calls|src/proto/h1/conn.rs#poll_read_body|src/proto/h1/decode.rs#Decoder|",
+      "word": "calls",
+      "from": "src/proto/h1/conn.rs#poll_read_body",
+      "to": "src/proto/h1/decode.rs#Decoder",
+      "fromLabel": "Conn::poll_read_body",
+      "toLabel": "Decoder::decode",
+      "language": "rust",
+      "source": "drawn",
+      "truth": "undecidable",
+      "why": "an impl of Decoder's own type could not be resolved"
+    },
+    {
+      "id": "calls|src/proto/h1/dispatch.rs#poll_write|src/proto/h1/conn.rs#encode_head|",
+      "word": "calls",
+      "from": "src/proto/h1/dispatch.rs#poll_write",
+      "to": "src/proto/h1/conn.rs#encode_head",
+      "fromLabel": "Dispatcher::poll_write",
+      "toLabel": "Conn::encode_head",
+      "language": "rust",
+      "source": "drawn",
+      "truth": "undecidable",
+      "why": "the tool would not walk this routine's calls"
+    },
+    {
+      "id": "builds|src/proto/h1/conn.rs#encode_head|src/proto/h1/encode.rs#Encoder|",
+      "word": "builds",
+      "from": "src/proto/h1/conn.rs#encode_head",
+      "to": "src/proto/h1/encode.rs#Encoder",
+      "fromLabel": "Conn::encode_head",
+      "toLabel": "Encoder",
+      "language": "rust",
+      "source": "drawn",
+      "truth": "false",
+      "why": "nothing in it makes one"
+    }
+  ]
+}

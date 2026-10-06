@@ -1,0 +1,1936 @@
+{
+  "type": "excalidraw",
+  "version": 2,
+  "source": "diagramos",
+  "elements": [
+    {
+      "id": "fd-directory-walk-filter-and-output-flow-title",
+      "type": "text",
+      "x": 0,
+      "y": -115,
+      "width": 567.6,
+      "height": 30,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a0",
+      "roundness": null,
+      "seed": 688012551,
+      "version": 1,
+      "versionNonce": 577255713,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "fd-directory-walk-filter-and-output-flow",
+        "role": "title",
+        "direction": "DOWN"
+      },
+      "text": "fd: Directory Walk, Filter, and Output Flow",
+      "fontSize": 24,
+      "fontFamily": 5,
+      "textAlign": "left",
+      "verticalAlign": "middle",
+      "containerId": null,
+      "originalText": "fd: Directory Walk, Filter, and Output Flow",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "fd-directory-walk-filter-and-output-flow-node-0",
+      "type": "rectangle",
+      "x": 160,
+      "y": 20,
+      "width": 160,
+      "height": 80,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a1",
+      "roundness": null,
+      "seed": 1083338378,
+      "version": 1,
+      "versionNonce": 438476766,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "fd-directory-walk-filter-and-output-flow-node-0-label"
+        },
+        {
+          "id": "fd-directory-walk-filter-and-output-flow-edge-0",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "fd-directory-walk-filter-and-output-flow",
+        "node": "scan",
+        "ref": "src/walk.rs#scan"
+      }
+    },
+    {
+      "id": "fd-directory-walk-filter-and-output-flow-node-1",
+      "type": "rectangle",
+      "x": 140,
+      "y": 400,
+      "width": 180,
+      "height": 80,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a2",
+      "roundness": null,
+      "seed": 1102826715,
+      "version": 1,
+      "versionNonce": 965618901,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "fd-directory-walk-filter-and-output-flow-node-1-label"
+        },
+        {
+          "id": "fd-directory-walk-filter-and-output-flow-edge-0",
+          "type": "arrow"
+        },
+        {
+          "id": "fd-directory-walk-filter-and-output-flow-edge-1",
+          "type": "arrow"
+        },
+        {
+          "id": "fd-directory-walk-filter-and-output-flow-edge-3",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "fd-directory-walk-filter-and-output-flow",
+        "node": "state",
+        "ref": "src/walk.rs#WorkerState"
+      }
+    },
+    {
+      "id": "fd-directory-walk-filter-and-output-flow-node-2",
+      "type": "rectangle",
+      "x": 400,
+      "y": 780,
+      "width": 220,
+      "height": 80,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a3",
+      "roundness": null,
+      "seed": 1355234380,
+      "version": 1,
+      "versionNonce": 236040728,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "fd-directory-walk-filter-and-output-flow-node-2-label"
+        },
+        {
+          "id": "fd-directory-walk-filter-and-output-flow-edge-1",
+          "type": "arrow"
+        },
+        {
+          "id": "fd-directory-walk-filter-and-output-flow-edge-2",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "fd-directory-walk-filter-and-output-flow",
+        "node": "builder",
+        "ref": "src/walk.rs#WorkerState::build_walker"
+      }
+    },
+    {
+      "id": "fd-directory-walk-filter-and-output-flow-node-3",
+      "type": "ellipse",
+      "x": 380,
+      "y": 1160,
+      "width": 240,
+      "height": 80,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a4",
+      "roundness": null,
+      "seed": 514428005,
+      "version": 1,
+      "versionNonce": 1147967727,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "fd-directory-walk-filter-and-output-flow-node-3-label"
+        },
+        {
+          "id": "fd-directory-walk-filter-and-output-flow-edge-2",
+          "type": "arrow"
+        },
+        {
+          "id": "fd-directory-walk-filter-and-output-flow-edge-4",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "fd-directory-walk-filter-and-output-flow",
+        "node": "walk_parallel",
+        "ref": "src/walk.rs#WorkerState::build_walker"
+      }
+    },
+    {
+      "id": "fd-directory-walk-filter-and-output-flow-node-4",
+      "type": "rectangle",
+      "x": 100,
+      "y": 780,
+      "width": 220,
+      "height": 80,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a5",
+      "roundness": null,
+      "seed": 1944550766,
+      "version": 1,
+      "versionNonce": 1268609426,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "fd-directory-walk-filter-and-output-flow-node-4-label"
+        },
+        {
+          "id": "fd-directory-walk-filter-and-output-flow-edge-3",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "fd-directory-walk-filter-and-output-flow",
+        "node": "senders",
+        "ref": "src/walk.rs#WorkerState::spawn_senders"
+      }
+    },
+    {
+      "id": "fd-directory-walk-filter-and-output-flow-node-5",
+      "type": "rectangle",
+      "x": 340,
+      "y": 1540,
+      "width": 320,
+      "height": 140,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a6",
+      "roundness": {
+        "type": 3
+      },
+      "seed": 27839231,
+      "version": 1,
+      "versionNonce": 1727958553,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "fd-directory-walk-filter-and-output-flow-node-5-label"
+        },
+        {
+          "id": "fd-directory-walk-filter-and-output-flow-edge-4",
+          "type": "arrow"
+        },
+        {
+          "id": "fd-directory-walk-filter-and-output-flow-edge-5",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "fd-directory-walk-filter-and-output-flow",
+        "node": "filter_closure",
+        "ref": "src/walk.rs#WorkerState::spawn_senders@used"
+      }
+    },
+    {
+      "id": "fd-directory-walk-filter-and-output-flow-node-6",
+      "type": "rectangle",
+      "x": 420,
+      "y": 1980,
+      "width": 180,
+      "height": 80,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a7",
+      "roundness": null,
+      "seed": 882685648,
+      "version": 1,
+      "versionNonce": 1908900780,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "fd-directory-walk-filter-and-output-flow-node-6-label"
+        },
+        {
+          "id": "fd-directory-walk-filter-and-output-flow-edge-5",
+          "type": "arrow"
+        },
+        {
+          "id": "fd-directory-walk-filter-and-output-flow-edge-6",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "fd-directory-walk-filter-and-output-flow",
+        "node": "batch_sender",
+        "ref": "src/walk.rs#BatchSender"
+      }
+    },
+    {
+      "id": "fd-directory-walk-filter-and-output-flow-node-7",
+      "type": "rectangle",
+      "x": 400,
+      "y": 2360,
+      "width": 220,
+      "height": 80,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a8",
+      "roundness": null,
+      "seed": 153714649,
+      "version": 1,
+      "versionNonce": 525128483,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "fd-directory-walk-filter-and-output-flow-node-7-label"
+        },
+        {
+          "id": "fd-directory-walk-filter-and-output-flow-edge-6",
+          "type": "arrow"
+        },
+        {
+          "id": "fd-directory-walk-filter-and-output-flow-edge-7",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "fd-directory-walk-filter-and-output-flow",
+        "node": "receiver",
+        "ref": "src/walk.rs#ReceiverBuffer"
+      }
+    },
+    {
+      "id": "fd-directory-walk-filter-and-output-flow-node-8",
+      "type": "rectangle",
+      "x": 400,
+      "y": 2740,
+      "width": 200,
+      "height": 80,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a9",
+      "roundness": null,
+      "seed": 458734546,
+      "version": 1,
+      "versionNonce": 1930352134,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "fd-directory-walk-filter-and-output-flow-node-8-label"
+        },
+        {
+          "id": "fd-directory-walk-filter-and-output-flow-edge-7",
+          "type": "arrow"
+        },
+        {
+          "id": "fd-directory-walk-filter-and-output-flow-edge-8",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "fd-directory-walk-filter-and-output-flow",
+        "node": "print",
+        "ref": "src/output.rs#print_entry"
+      }
+    },
+    {
+      "id": "fd-directory-walk-filter-and-output-flow-node-9",
+      "type": "rectangle",
+      "x": 420,
+      "y": 3120,
+      "width": 160,
+      "height": 80,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aA",
+      "roundness": null,
+      "seed": 798999107,
+      "version": 1,
+      "versionNonce": 719346525,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "fd-directory-walk-filter-and-output-flow-node-9-label"
+        },
+        {
+          "id": "fd-directory-walk-filter-and-output-flow-edge-8",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "fd-directory-walk-filter-and-output-flow",
+        "node": "entry",
+        "ref": "src/dir_entry.rs#DirEntry"
+      }
+    },
+    {
+      "id": "fd-directory-walk-filter-and-output-flow-edge-0",
+      "type": "arrow",
+      "x": 236.8,
+      "y": 92,
+      "width": 0,
+      "height": 300.8,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aB",
+      "roundness": null,
+      "seed": 165629277,
+      "version": 1,
+      "versionNonce": 59623879,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "fd-directory-walk-filter-and-output-flow-edge-0-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "fd-directory-walk-filter-and-output-flow",
+        "edge": {
+          "from": "scan",
+          "to": "state",
+          "claim": "calls"
+        }
+      },
+      "points": [
+        [
+          0,
+          0.5
+        ],
+        [
+          0,
+          150.4
+        ],
+        [
+          0,
+          300.3
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "fd-directory-walk-filter-and-output-flow-node-0",
+        "focus": 0.03999999999999989,
+        "gap": 8
+      },
+      "endBinding": {
+        "elementId": "fd-directory-walk-filter-and-output-flow-node-1",
+        "focus": 0.07555555555555547,
+        "gap": 7.199999999999989
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "fd-directory-walk-filter-and-output-flow-edge-1",
+      "type": "arrow",
+      "x": 266.8,
+      "y": 472.8,
+      "width": 239.99999999999994,
+      "height": 300.7999999999999,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aC",
+      "roundness": null,
+      "seed": 982973380,
+      "version": 1,
+      "versionNonce": 1115472848,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "fd-directory-walk-filter-and-output-flow-edge-1-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "fd-directory-walk-filter-and-output-flow",
+        "edge": {
+          "from": "state",
+          "to": "builder",
+          "claim": "calls"
+        }
+      },
+      "points": [
+        [
+          0,
+          0.5
+        ],
+        [
+          0,
+          32
+        ],
+        [
+          238.39999999999992,
+          32
+        ],
+        [
+          239.99999999999994,
+          32
+        ],
+        [
+          239.99999999999994,
+          300.2999999999999
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "fd-directory-walk-filter-and-output-flow-node-1",
+        "focus": -0.40888888888888897,
+        "gap": 7.199999999999989
+      },
+      "endBinding": {
+        "elementId": "fd-directory-walk-filter-and-output-flow-node-2",
+        "focus": -0.029090909090909806,
+        "gap": 6.400000000000091
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "fd-directory-walk-filter-and-output-flow-edge-2",
+      "type": "arrow",
+      "x": 506.79999999999995,
+      "y": 853.5999999999999,
+      "width": 0,
+      "height": 300.79999999999995,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aD",
+      "roundness": null,
+      "seed": 1838418931,
+      "version": 1,
+      "versionNonce": 2060971213,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "fd-directory-walk-filter-and-output-flow-edge-2-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "fd-directory-walk-filter-and-output-flow",
+        "edge": {
+          "from": "builder",
+          "to": "walk_parallel"
+        }
+      },
+      "points": [
+        [
+          0,
+          0.5
+        ],
+        [
+          0,
+          150.39999999999998
+        ],
+        [
+          0,
+          300.29999999999995
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "fd-directory-walk-filter-and-output-flow-node-2",
+        "focus": 0.029090909090909806,
+        "gap": 6.400000000000091
+      },
+      "endBinding": {
+        "elementId": "fd-directory-walk-filter-and-output-flow-node-3",
+        "focus": 0.05666666666666587,
+        "gap": 5.663276162947269
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "fd-directory-walk-filter-and-output-flow-edge-3",
+      "type": "arrow",
+      "x": 206.8,
+      "y": 472.8,
+      "width": 0,
+      "height": 300.7999999999999,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aE",
+      "roundness": null,
+      "seed": 742311490,
+      "version": 1,
+      "versionNonce": 475078326,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "fd-directory-walk-filter-and-output-flow-edge-3-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "fd-directory-walk-filter-and-output-flow",
+        "edge": {
+          "from": "state",
+          "to": "senders",
+          "claim": "calls"
+        }
+      },
+      "points": [
+        [
+          0,
+          0.5
+        ],
+        [
+          0,
+          150.39999999999992
+        ],
+        [
+          0,
+          300.2999999999999
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "fd-directory-walk-filter-and-output-flow-node-1",
+        "focus": 0.2577777777777777,
+        "gap": 7.199999999999989
+      },
+      "endBinding": {
+        "elementId": "fd-directory-walk-filter-and-output-flow-node-4",
+        "focus": -0.029090909090908897,
+        "gap": 6.400000000000091
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "fd-directory-walk-filter-and-output-flow-edge-4",
+      "type": "arrow",
+      "x": 506.79999999999995,
+      "y": 1234.3999999999999,
+      "width": 0,
+      "height": 300.79999999999995,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aF",
+      "roundness": null,
+      "seed": 1962971313,
+      "version": 1,
+      "versionNonce": 1289361979,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "fd-directory-walk-filter-and-output-flow-edge-4-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "fd-directory-walk-filter-and-output-flow",
+        "edge": {
+          "from": "walk_parallel",
+          "to": "filter_closure"
+        }
+      },
+      "points": [
+        [
+          0,
+          0.5
+        ],
+        [
+          0,
+          150.39999999999986
+        ],
+        [
+          0,
+          300.29999999999995
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "fd-directory-walk-filter-and-output-flow-node-3",
+        "focus": -0.05666666666666587,
+        "gap": 5.534720142023668
+      },
+      "endBinding": {
+        "elementId": "fd-directory-walk-filter-and-output-flow-node-5",
+        "focus": 0.04249999999999985,
+        "gap": 4.800000000000182
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "fd-directory-walk-filter-and-output-flow-edge-5",
+      "type": "arrow",
+      "x": 506.79999999999995,
+      "y": 1675.1999999999998,
+      "width": 0,
+      "height": 300.79999999999995,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aG",
+      "roundness": null,
+      "seed": 541555592,
+      "version": 1,
+      "versionNonce": 250675684,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "fd-directory-walk-filter-and-output-flow-edge-5-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "fd-directory-walk-filter-and-output-flow",
+        "edge": {
+          "from": "filter_closure",
+          "to": "batch_sender"
+        }
+      },
+      "points": [
+        [
+          0,
+          0.5
+        ],
+        [
+          0,
+          150.4000000000001
+        ],
+        [
+          0,
+          300.29999999999995
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "fd-directory-walk-filter-and-output-flow-node-5",
+        "focus": -0.04249999999999985,
+        "gap": 4.800000000000182
+      },
+      "endBinding": {
+        "elementId": "fd-directory-walk-filter-and-output-flow-node-6",
+        "focus": -0.03555555555555595,
+        "gap": 4.000000000000227
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "fd-directory-walk-filter-and-output-flow-edge-6",
+      "type": "arrow",
+      "x": 506.79999999999995,
+      "y": 2056,
+      "width": 0,
+      "height": 300.8000000000002,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aH",
+      "roundness": null,
+      "seed": 1091862199,
+      "version": 1,
+      "versionNonce": 1461582097,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "fd-directory-walk-filter-and-output-flow-edge-6-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "fd-directory-walk-filter-and-output-flow",
+        "edge": {
+          "from": "batch_sender",
+          "to": "receiver"
+        }
+      },
+      "points": [
+        [
+          0,
+          0.5
+        ],
+        [
+          0,
+          150.4000000000001
+        ],
+        [
+          0,
+          300.3000000000002
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "fd-directory-walk-filter-and-output-flow-node-6",
+        "focus": 0.03555555555555648,
+        "gap": 4
+      },
+      "endBinding": {
+        "elementId": "fd-directory-walk-filter-and-output-flow-node-7",
+        "focus": -0.02909090909090948,
+        "gap": 3.199999999999818
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "fd-directory-walk-filter-and-output-flow-edge-7",
+      "type": "arrow",
+      "x": 506.79999999999995,
+      "y": 2436.8,
+      "width": 0,
+      "height": 300.8000000000002,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aI",
+      "roundness": null,
+      "seed": 488179558,
+      "version": 1,
+      "versionNonce": 454730,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "fd-directory-walk-filter-and-output-flow-edge-7-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "fd-directory-walk-filter-and-output-flow",
+        "edge": {
+          "from": "receiver",
+          "to": "print",
+          "claim": "calls"
+        }
+      },
+      "points": [
+        [
+          0,
+          0.5
+        ],
+        [
+          0,
+          150.4000000000001
+        ],
+        [
+          0,
+          300.3000000000002
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "fd-directory-walk-filter-and-output-flow-node-7",
+        "focus": 0.02909090909090948,
+        "gap": 3.199999999999818
+      },
+      "endBinding": {
+        "elementId": "fd-directory-walk-filter-and-output-flow-node-8",
+        "focus": 0.06799999999999892,
+        "gap": 2.399999999999636
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "fd-directory-walk-filter-and-output-flow-edge-8",
+      "type": "arrow",
+      "x": 506.79999999999995,
+      "y": 2817.6000000000004,
+      "width": 0,
+      "height": 300.8000000000002,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aJ",
+      "roundness": null,
+      "seed": 1256267285,
+      "version": 1,
+      "versionNonce": 1877907743,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "fd-directory-walk-filter-and-output-flow-edge-8-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "fd-directory-walk-filter-and-output-flow",
+        "edge": {
+          "from": "print",
+          "to": "entry",
+          "claim": "accesses"
+        }
+      },
+      "points": [
+        [
+          0,
+          0.5
+        ],
+        [
+          0,
+          150.4000000000001
+        ],
+        [
+          0,
+          300.3000000000002
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "fd-directory-walk-filter-and-output-flow-node-8",
+        "focus": -0.06799999999999892,
+        "gap": 2.399999999999636
+      },
+      "endBinding": {
+        "elementId": "fd-directory-walk-filter-and-output-flow-node-9",
+        "focus": 0.08500000000000056,
+        "gap": 1.5999999999994543
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "fd-directory-walk-filter-and-output-flow-node-0-label",
+      "type": "text",
+      "x": 207,
+      "y": 47.5,
+      "width": 66,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aK",
+      "roundness": null,
+      "seed": 460422203,
+      "version": 1,
+      "versionNonce": 269855157,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "fd-directory-walk-filter-and-output-flow"
+      },
+      "text": "scan()",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "fd-directory-walk-filter-and-output-flow-node-0",
+      "originalText": "scan()",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "fd-directory-walk-filter-and-output-flow-node-1-label",
+      "type": "text",
+      "x": 169.5,
+      "y": 427.5,
+      "width": 121.00000000000001,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aL",
+      "roundness": null,
+      "seed": 768398470,
+      "version": 1,
+      "versionNonce": 1188664042,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "fd-directory-walk-filter-and-output-flow"
+      },
+      "text": "WorkerState",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "fd-directory-walk-filter-and-output-flow-node-1",
+      "originalText": "WorkerState",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "fd-directory-walk-filter-and-output-flow-node-2-label",
+      "type": "text",
+      "x": 433,
+      "y": 807.5,
+      "width": 154,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aM",
+      "roundness": null,
+      "seed": 1548619881,
+      "version": 1,
+      "versionNonce": 976022387,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "fd-directory-walk-filter-and-output-flow"
+      },
+      "text": "build_walker()",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "fd-directory-walk-filter-and-output-flow-node-2",
+      "originalText": "build_walker()",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "fd-directory-walk-filter-and-output-flow-node-3-label",
+      "type": "text",
+      "x": 434.1471862576143,
+      "y": 1187.715728752538,
+      "width": 132,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aN",
+      "roundness": null,
+      "seed": 777219788,
+      "version": 1,
+      "versionNonce": 1371877784,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "fd-directory-walk-filter-and-output-flow"
+      },
+      "text": "WalkParallel",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "fd-directory-walk-filter-and-output-flow-node-3",
+      "originalText": "WalkParallel",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "fd-directory-walk-filter-and-output-flow-node-4-label",
+      "type": "text",
+      "x": 127.5,
+      "y": 807.5,
+      "width": 165,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aO",
+      "roundness": null,
+      "seed": 1090793743,
+      "version": 1,
+      "versionNonce": 284674281,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "fd-directory-walk-filter-and-output-flow"
+      },
+      "text": "spawn_senders()",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "fd-directory-walk-filter-and-output-flow-node-4",
+      "originalText": "spawn_senders()",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "fd-directory-walk-filter-and-output-flow-node-5-label",
+      "type": "text",
+      "x": 395.5,
+      "y": 1547.5,
+      "width": 209.00000000000003,
+      "height": 125,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aP",
+      "roundness": null,
+      "seed": 1826774794,
+      "version": 1,
+      "versionNonce": 1543125342,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "fd-directory-walk-filter-and-output-flow"
+      },
+      "text": "Filter closure:\n1. Pattern match\n2. Extension filter\n3. Type filter\n4. Size/Time",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "fd-directory-walk-filter-and-output-flow-node-5",
+      "originalText": "Filter closure:\n1. Pattern match\n2. Extension filter\n3. Type filter\n4. Size/Time",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "fd-directory-walk-filter-and-output-flow-node-6-label",
+      "type": "text",
+      "x": 449.5,
+      "y": 2007.5,
+      "width": 121.00000000000001,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aQ",
+      "roundness": null,
+      "seed": 506844205,
+      "version": 1,
+      "versionNonce": 555419799,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "fd-directory-walk-filter-and-output-flow"
+      },
+      "text": "BatchSender",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "fd-directory-walk-filter-and-output-flow-node-6",
+      "originalText": "BatchSender",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "fd-directory-walk-filter-and-output-flow-node-7-label",
+      "type": "text",
+      "x": 433,
+      "y": 2387.5,
+      "width": 154,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aR",
+      "roundness": null,
+      "seed": 1736146016,
+      "version": 1,
+      "versionNonce": 1017810364,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "fd-directory-walk-filter-and-output-flow"
+      },
+      "text": "ReceiverBuffer",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "fd-directory-walk-filter-and-output-flow-node-7",
+      "originalText": "ReceiverBuffer",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "fd-directory-walk-filter-and-output-flow-node-8-label",
+      "type": "text",
+      "x": 428.5,
+      "y": 2767.5,
+      "width": 143,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aS",
+      "roundness": null,
+      "seed": 1398931827,
+      "version": 1,
+      "versionNonce": 1041327437,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "fd-directory-walk-filter-and-output-flow"
+      },
+      "text": "print_entry()",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "fd-directory-walk-filter-and-output-flow-node-8",
+      "originalText": "print_entry()",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "fd-directory-walk-filter-and-output-flow-node-9-label",
+      "type": "text",
+      "x": 456,
+      "y": 3147.5,
+      "width": 88,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aT",
+      "roundness": null,
+      "seed": 862496094,
+      "version": 1,
+      "versionNonce": 1694825602,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "fd-directory-walk-filter-and-output-flow"
+      },
+      "text": "DirEntry",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "fd-directory-walk-filter-and-output-flow-node-9",
+      "originalText": "DirEntry",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "fd-directory-walk-filter-and-output-flow-edge-0-label",
+      "type": "text",
+      "x": 148.8,
+      "y": 232.4,
+      "width": 176,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aU",
+      "roundness": null,
+      "seed": 228245396,
+      "version": 1,
+      "versionNonce": 687923168,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "fd-directory-walk-filter-and-output-flow"
+      },
+      "text": "creates state @calls",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "fd-directory-walk-filter-and-output-flow-edge-0",
+      "originalText": "creates state @calls",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "fd-directory-walk-filter-and-output-flow-edge-1-label",
+      "type": "text",
+      "x": 417.19999999999993,
+      "y": 494.8,
+      "width": 176,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aV",
+      "roundness": null,
+      "seed": 60772817,
+      "version": 1,
+      "versionNonce": 818133723,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "fd-directory-walk-filter-and-output-flow"
+      },
+      "text": "builds walker @calls",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "fd-directory-walk-filter-and-output-flow-edge-1",
+      "originalText": "builds walker @calls",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "fd-directory-walk-filter-and-output-flow-edge-2-label",
+      "type": "text",
+      "x": 475.99999999999994,
+      "y": 993.9999999999999,
+      "width": 61.60000000000001,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aW",
+      "roundness": null,
+      "seed": 432400846,
+      "version": 1,
+      "versionNonce": 889188210,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "fd-directory-walk-filter-and-output-flow"
+      },
+      "text": "returns",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "fd-directory-walk-filter-and-output-flow-edge-2",
+      "originalText": "returns",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "fd-directory-walk-filter-and-output-flow-edge-3-label",
+      "type": "text",
+      "x": 145.2,
+      "y": 603.1999999999999,
+      "width": 123.20000000000002,
+      "height": 40,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aX",
+      "roundness": null,
+      "seed": 468765731,
+      "version": 1,
+      "versionNonce": 1274602173,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "fd-directory-walk-filter-and-output-flow"
+      },
+      "text": "spawns threads\n@calls",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "fd-directory-walk-filter-and-output-flow-edge-3",
+      "originalText": "spawns threads @calls",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "fd-directory-walk-filter-and-output-flow-edge-4-label",
+      "type": "text",
+      "x": 449.59999999999997,
+      "y": 1374.7999999999997,
+      "width": 114.4,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aY",
+      "roundness": null,
+      "seed": 182033800,
+      "version": 1,
+      "versionNonce": 1392281572,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "fd-directory-walk-filter-and-output-flow"
+      },
+      "text": "feeds entries",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "fd-directory-walk-filter-and-output-flow-edge-4",
+      "originalText": "feeds entries",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "fd-directory-walk-filter-and-output-flow-edge-5-label",
+      "type": "text",
+      "x": 449.59999999999997,
+      "y": 1815.6,
+      "width": 114.4,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aZ",
+      "roundness": null,
+      "seed": 1572643413,
+      "version": 1,
+      "versionNonce": 155428959,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "fd-directory-walk-filter-and-output-flow"
+      },
+      "text": "sends matched",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "fd-directory-walk-filter-and-output-flow-edge-5",
+      "originalText": "sends matched",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "fd-directory-walk-filter-and-output-flow-edge-6-label",
+      "type": "text",
+      "x": 440.79999999999995,
+      "y": 2196.4,
+      "width": 132,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aa",
+      "roundness": null,
+      "seed": 1725476786,
+      "version": 1,
+      "versionNonce": 1397229158,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "fd-directory-walk-filter-and-output-flow"
+      },
+      "text": "batches results",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "fd-directory-walk-filter-and-output-flow-edge-6",
+      "originalText": "batches results",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "fd-directory-walk-filter-and-output-flow-edge-7-label",
+      "type": "text",
+      "x": 436.4,
+      "y": 2567.2000000000003,
+      "width": 140.8,
+      "height": 40,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "ab",
+      "roundness": null,
+      "seed": 114755799,
+      "version": 1,
+      "versionNonce": 1863339953,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "fd-directory-walk-filter-and-output-flow"
+      },
+      "text": "calls for output\n@calls",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "fd-directory-walk-filter-and-output-flow-edge-7",
+      "originalText": "calls for output @calls",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "fd-directory-walk-filter-and-output-flow-edge-8-label",
+      "type": "text",
+      "x": 427.59999999999997,
+      "y": 2958.0000000000005,
+      "width": 158.4,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "ac",
+      "roundness": null,
+      "seed": 1601043388,
+      "version": 1,
+      "versionNonce": 1839593800,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "fd-directory-walk-filter-and-output-flow"
+      },
+      "text": "accesses @accesses",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "fd-directory-walk-filter-and-output-flow-edge-8",
+      "originalText": "accesses @accesses",
+      "autoResize": true,
+      "lineHeight": 1.25
+    }
+  ],
+  "appState": {
+    "gridSize": null,
+    "viewBackgroundColor": "#ffffff"
+  },
+  "files": {},
+  "diagramos": {
+    "version": "0.2.0-rc.6",
+    "schema": 1
+  }
+}

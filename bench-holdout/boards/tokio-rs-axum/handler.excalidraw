@@ -1,0 +1,1650 @@
+{
+  "type": "excalidraw",
+  "version": 2,
+  "source": "diagramos",
+  "elements": [
+    {
+      "id": "async-fn-handler-service-title",
+      "type": "text",
+      "x": 0,
+      "y": -115,
+      "width": 369.6,
+      "height": 30,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a0",
+      "roundness": null,
+      "seed": 1827381389,
+      "version": 1,
+      "versionNonce": 692753783,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "async-fn-handler-service",
+        "role": "title",
+        "direction": "DOWN"
+      },
+      "text": "async fn → Handler → Service",
+      "fontSize": 24,
+      "fontFamily": 5,
+      "textAlign": "left",
+      "verticalAlign": "middle",
+      "containerId": null,
+      "originalText": "async fn → Handler → Service",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "async-fn-handler-service-node-0",
+      "type": "rectangle",
+      "x": 420,
+      "y": 20,
+      "width": 220,
+      "height": 80,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "#e8f4f8",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "dotted",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a1",
+      "roundness": null,
+      "seed": 424012788,
+      "version": 1,
+      "versionNonce": 662183872,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "async-fn-handler-service-node-0-label"
+        },
+        {
+          "id": "async-fn-handler-service-edge-0",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "async-fn-handler-service",
+        "node": "user_fn",
+        "state": "external"
+      }
+    },
+    {
+      "id": "async-fn-handler-service-node-1",
+      "type": "rectangle",
+      "x": 400,
+      "y": 400,
+      "width": 260,
+      "height": 80,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "#f0e6ff",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a2",
+      "roundness": null,
+      "seed": 1764494925,
+      "version": 1,
+      "versionNonce": 1875232823,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "async-fn-handler-service-node-1-label"
+        },
+        {
+          "id": "async-fn-handler-service-edge-0",
+          "type": "arrow"
+        },
+        {
+          "id": "async-fn-handler-service-edge-1",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "async-fn-handler-service",
+        "node": "impl_handler_macro",
+        "ref": "axum/src/handler/mod.rs#impl_handler"
+      }
+    },
+    {
+      "id": "async-fn-handler-service-node-2",
+      "type": "rectangle",
+      "x": 380,
+      "y": 780,
+      "width": 200,
+      "height": 80,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "#fff4e6",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a3",
+      "roundness": null,
+      "seed": 1642621618,
+      "version": 1,
+      "versionNonce": 218851174,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "async-fn-handler-service-node-2-label"
+        },
+        {
+          "id": "async-fn-handler-service-edge-1",
+          "type": "arrow"
+        },
+        {
+          "id": "async-fn-handler-service-edge-2",
+          "type": "arrow"
+        },
+        {
+          "id": "async-fn-handler-service-edge-6",
+          "type": "arrow"
+        },
+        {
+          "id": "async-fn-handler-service-edge-7",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "async-fn-handler-service",
+        "node": "handler_trait",
+        "ref": "axum/src/handler/mod.rs#Handler"
+      }
+    },
+    {
+      "id": "async-fn-handler-service-node-3",
+      "type": "rectangle",
+      "x": 380,
+      "y": 1000,
+      "width": 280,
+      "height": 80,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "#fff4e6",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a4",
+      "roundness": null,
+      "seed": 2024462883,
+      "version": 1,
+      "versionNonce": 1155329213,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "async-fn-handler-service-node-3-label"
+        },
+        {
+          "id": "async-fn-handler-service-edge-2",
+          "type": "arrow"
+        },
+        {
+          "id": "async-fn-handler-service-edge-3",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "async-fn-handler-service",
+        "node": "with_state_method",
+        "ref": "axum/src/handler/mod.rs#with_state"
+      }
+    },
+    {
+      "id": "async-fn-handler-service-node-4",
+      "type": "rectangle",
+      "x": 380,
+      "y": 1440,
+      "width": 280,
+      "height": 80,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "#e6f9ff",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a5",
+      "roundness": null,
+      "seed": 1014734328,
+      "version": 1,
+      "versionNonce": 2135436116,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "async-fn-handler-service-node-4-label"
+        },
+        {
+          "id": "async-fn-handler-service-edge-3",
+          "type": "arrow"
+        },
+        {
+          "id": "async-fn-handler-service-edge-4",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "async-fn-handler-service",
+        "node": "handler_service",
+        "ref": "axum/src/handler/service.rs#HandlerService"
+      }
+    },
+    {
+      "id": "async-fn-handler-service-node-5",
+      "type": "rectangle",
+      "x": 400,
+      "y": 1660,
+      "width": 240,
+      "height": 100,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "#e6f9ff",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a6",
+      "roundness": null,
+      "seed": 652107425,
+      "version": 1,
+      "versionNonce": 584830059,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "async-fn-handler-service-node-5-label"
+        },
+        {
+          "id": "async-fn-handler-service-edge-4",
+          "type": "arrow"
+        },
+        {
+          "id": "async-fn-handler-service-edge-5",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "async-fn-handler-service",
+        "node": "service_impl",
+        "ref": "axum/src/handler/service.rs"
+      }
+    },
+    {
+      "id": "async-fn-handler-service-node-6",
+      "type": "rectangle",
+      "x": 420,
+      "y": 2060,
+      "width": 200,
+      "height": 80,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "#f5f5f5",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "dotted",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a7",
+      "roundness": null,
+      "seed": 356350358,
+      "version": 1,
+      "versionNonce": 919152250,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "async-fn-handler-service-node-6-label"
+        },
+        {
+          "id": "async-fn-handler-service-edge-5",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "async-fn-handler-service",
+        "node": "tower_service",
+        "state": "external"
+      }
+    },
+    {
+      "id": "async-fn-handler-service-node-7",
+      "type": "rectangle",
+      "x": 20,
+      "y": 400,
+      "width": 300,
+      "height": 80,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "#f5f5f5",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "dotted",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a8",
+      "roundness": null,
+      "seed": 1691917863,
+      "version": 1,
+      "versionNonce": 887273921,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "async-fn-handler-service-node-7-label"
+        },
+        {
+          "id": "async-fn-handler-service-edge-6",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "async-fn-handler-service",
+        "node": "from_request",
+        "state": "external"
+      }
+    },
+    {
+      "id": "async-fn-handler-service-node-8",
+      "type": "rectangle",
+      "x": 120,
+      "y": 1220,
+      "width": 320,
+      "height": 80,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "#f5f5f5",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "dotted",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a9",
+      "roundness": null,
+      "seed": 433214508,
+      "version": 1,
+      "versionNonce": 1096480888,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "async-fn-handler-service-node-8-label"
+        },
+        {
+          "id": "async-fn-handler-service-edge-7",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "async-fn-handler-service",
+        "node": "into_response",
+        "state": "external"
+      }
+    },
+    {
+      "id": "async-fn-handler-service-edge-0",
+      "type": "arrow",
+      "x": 522,
+      "y": 92,
+      "width": 0,
+      "height": 300.8,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aA",
+      "roundness": null,
+      "seed": 1009434699,
+      "version": 1,
+      "versionNonce": 493012677,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "async-fn-handler-service-edge-0-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "async-fn-handler-service",
+        "edge": {
+          "from": "user_fn",
+          "to": "impl_handler_macro"
+        }
+      },
+      "points": [
+        [
+          0,
+          0.5
+        ],
+        [
+          0,
+          150.4
+        ],
+        [
+          0,
+          300.3
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "async-fn-handler-service-node-0",
+        "focus": 0.07272727272727271,
+        "gap": 8
+      },
+      "endBinding": {
+        "elementId": "async-fn-handler-service-node-1",
+        "focus": -0.06153846153846152,
+        "gap": 7.199999999999989
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "async-fn-handler-service-edge-1",
+      "type": "arrow",
+      "x": 522,
+      "y": 472.8,
+      "width": 0,
+      "height": 300.7999999999999,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aB",
+      "roundness": null,
+      "seed": 577045562,
+      "version": 1,
+      "versionNonce": 610581902,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "async-fn-handler-service-edge-1-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "async-fn-handler-service",
+        "edge": {
+          "from": "impl_handler_macro",
+          "to": "handler_trait",
+          "claim": "builds"
+        }
+      },
+      "points": [
+        [
+          0,
+          0.5
+        ],
+        [
+          0,
+          150.39999999999992
+        ],
+        [
+          0,
+          300.2999999999999
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "async-fn-handler-service-node-1",
+        "focus": 0.06153846153846152,
+        "gap": 7.199999999999989
+      },
+      "endBinding": {
+        "elementId": "async-fn-handler-service-node-2",
+        "focus": 0.4199999999999999,
+        "gap": 6.400000000000091
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "async-fn-handler-service-edge-2",
+      "type": "arrow",
+      "x": 522,
+      "y": 853.5999999999999,
+      "width": 0,
+      "height": 140,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aC",
+      "roundness": null,
+      "seed": 1518162709,
+      "version": 1,
+      "versionNonce": 47581215,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "async-fn-handler-service",
+        "edge": {
+          "from": "handler_trait",
+          "to": "with_state_method"
+        }
+      },
+      "points": [
+        [
+          0,
+          0.5
+        ],
+        [
+          0,
+          139.5
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "async-fn-handler-service-node-2",
+        "focus": -0.4199999999999999,
+        "gap": 6.400000000000091
+      },
+      "endBinding": {
+        "elementId": "async-fn-handler-service-node-3",
+        "focus": 0.01428571428571447,
+        "gap": 6.400000000000091
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "async-fn-handler-service-edge-3",
+      "type": "arrow",
+      "x": 522,
+      "y": 1073.6,
+      "width": 0,
+      "height": 360,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aD",
+      "roundness": null,
+      "seed": 1593176188,
+      "version": 1,
+      "versionNonce": 526812936,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "async-fn-handler-service-edge-3-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "async-fn-handler-service",
+        "edge": {
+          "from": "with_state_method",
+          "to": "handler_service",
+          "claim": "builds"
+        }
+      },
+      "points": [
+        [
+          0,
+          0.5
+        ],
+        [
+          0,
+          180
+        ],
+        [
+          0,
+          359.5
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "async-fn-handler-service-node-3",
+        "focus": -0.01428571428571447,
+        "gap": 6.400000000000091
+      },
+      "endBinding": {
+        "elementId": "async-fn-handler-service-node-4",
+        "focus": 0.01428571428571447,
+        "gap": 6.400000000000091
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "async-fn-handler-service-edge-4",
+      "type": "arrow",
+      "x": 522,
+      "y": 1513.6,
+      "width": 0,
+      "height": 140,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aE",
+      "roundness": null,
+      "seed": 255335279,
+      "version": 1,
+      "versionNonce": 820708553,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "async-fn-handler-service",
+        "edge": {
+          "from": "handler_service",
+          "to": "service_impl"
+        }
+      },
+      "points": [
+        [
+          0,
+          0.5
+        ],
+        [
+          0,
+          139.5
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "async-fn-handler-service-node-4",
+        "focus": -0.01428571428571447,
+        "gap": 6.400000000000091
+      },
+      "endBinding": {
+        "elementId": "async-fn-handler-service-node-5",
+        "focus": 0.016666666666666444,
+        "gap": 6.400000000000091
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "async-fn-handler-service-edge-5",
+      "type": "arrow",
+      "x": 522,
+      "y": 1753.6,
+      "width": 0,
+      "height": 300.7999999999997,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aF",
+      "roundness": null,
+      "seed": 120360734,
+      "version": 1,
+      "versionNonce": 358685506,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "async-fn-handler-service-edge-5-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "async-fn-handler-service",
+        "edge": {
+          "from": "service_impl",
+          "to": "tower_service",
+          "claim": "conforms"
+        }
+      },
+      "points": [
+        [
+          0,
+          0.5
+        ],
+        [
+          0,
+          150.39999999999986
+        ],
+        [
+          0,
+          300.2999999999997
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "async-fn-handler-service-node-5",
+        "focus": -0.016666666666666444,
+        "gap": 6.400000000000091
+      },
+      "endBinding": {
+        "elementId": "async-fn-handler-service-node-6",
+        "focus": 0.020000000000000625,
+        "gap": 5.600000000000364
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "async-fn-handler-service-edge-6",
+      "type": "arrow",
+      "x": 162,
+      "y": 472.8,
+      "width": 293.33333333333337,
+      "height": 300.7999999999999,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aG",
+      "roundness": null,
+      "seed": 1784459721,
+      "version": 1,
+      "versionNonce": 661941075,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "async-fn-handler-service-edge-6-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "async-fn-handler-service",
+        "edge": {
+          "from": "from_request",
+          "to": "handler_trait"
+        }
+      },
+      "points": [
+        [
+          0,
+          0.5
+        ],
+        [
+          -2.842170943040401e-14,
+          192.7999999999999
+        ],
+        [
+          104.26666666666671,
+          192.7999999999999
+        ],
+        [
+          293.33333333333337,
+          192.7999999999999
+        ],
+        [
+          293.33333333333337,
+          300.2999999999999
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "async-fn-handler-service-node-7",
+        "focus": 0.053333333333333136,
+        "gap": 7.199999999999989
+      },
+      "endBinding": {
+        "elementId": "async-fn-handler-service-node-2",
+        "focus": -0.2466666666666669,
+        "gap": 6.400000000000091
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "async-fn-handler-service-edge-7",
+      "type": "arrow",
+      "x": 455.33333333333337,
+      "y": 853.5999999999999,
+      "width": 173.33333333333337,
+      "height": 360,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aH",
+      "roundness": null,
+      "seed": 778744704,
+      "version": 1,
+      "versionNonce": 770784092,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "async-fn-handler-service-edge-7-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "async-fn-handler-service",
+        "edge": {
+          "from": "handler_trait",
+          "to": "into_response"
+        }
+      },
+      "points": [
+        [
+          0,
+          0.5
+        ],
+        [
+          0,
+          32
+        ],
+        [
+          -173.33333333333337,
+          32
+        ],
+        [
+          -173.33333333333337,
+          93.33333333333326
+        ],
+        [
+          -173.33333333333337,
+          226.66666666666652
+        ],
+        [
+          -173.33333333333337,
+          293.33333333333326
+        ],
+        [
+          -173.33333333333337,
+          359.5
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "async-fn-handler-service-node-2",
+        "focus": 0.2466666666666669,
+        "gap": 6.400000000000091
+      },
+      "endBinding": {
+        "elementId": "async-fn-handler-service-node-8",
+        "focus": 0.012499999999999999,
+        "gap": 6.400000000000091
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "async-fn-handler-service-node-0-label",
+      "type": "text",
+      "x": 447.5,
+      "y": 47.5,
+      "width": 165,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aI",
+      "roundness": null,
+      "seed": 1432740417,
+      "version": 1,
+      "versionNonce": 1852747147,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "async-fn-handler-service"
+      },
+      "text": "User's async fn",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "async-fn-handler-service-node-0",
+      "originalText": "User's async fn",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "async-fn-handler-service-node-1-label",
+      "type": "text",
+      "x": 425.5,
+      "y": 427.5,
+      "width": 209.00000000000003,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aJ",
+      "roundness": null,
+      "seed": 765866372,
+      "version": 1,
+      "versionNonce": 276511632,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "async-fn-handler-service"
+      },
+      "text": "impl_handler! macro",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "async-fn-handler-service-node-1",
+      "originalText": "impl_handler! macro",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "async-fn-handler-service-node-2-label",
+      "type": "text",
+      "x": 408.5,
+      "y": 807.5,
+      "width": 143,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aK",
+      "roundness": null,
+      "seed": 977658835,
+      "version": 1,
+      "versionNonce": 1880874029,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "async-fn-handler-service"
+      },
+      "text": "Handler trait",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "async-fn-handler-service-node-2",
+      "originalText": "Handler trait",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "async-fn-handler-service-node-3-label",
+      "type": "text",
+      "x": 404.5,
+      "y": 1027.5,
+      "width": 231.00000000000003,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aL",
+      "roundness": null,
+      "seed": 1997498174,
+      "version": 1,
+      "versionNonce": 1840662754,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "async-fn-handler-service"
+      },
+      "text": "Handler::with_state()",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "async-fn-handler-service-node-3",
+      "originalText": "Handler::with_state()",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "async-fn-handler-service-node-4-label",
+      "type": "text",
+      "x": 404.5,
+      "y": 1467.5,
+      "width": 231.00000000000003,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aM",
+      "roundness": null,
+      "seed": 952113093,
+      "version": 1,
+      "versionNonce": 1936719055,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "async-fn-handler-service"
+      },
+      "text": "HandlerService struct",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "async-fn-handler-service-node-4",
+      "originalText": "HandlerService struct",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "async-fn-handler-service-node-5-label",
+      "type": "text",
+      "x": 432,
+      "y": 1685,
+      "width": 176,
+      "height": 50,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aN",
+      "roundness": null,
+      "seed": 564153720,
+      "version": 1,
+      "versionNonce": 940077524,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "async-fn-handler-service"
+      },
+      "text": "impl Service for\nHandlerService",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "async-fn-handler-service-node-5",
+      "originalText": "impl Service for\nHandlerService",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "async-fn-handler-service-node-6-label",
+      "type": "text",
+      "x": 448.5,
+      "y": 2087.5,
+      "width": 143,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aO",
+      "roundness": null,
+      "seed": 1506938567,
+      "version": 1,
+      "versionNonce": 1946344161,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "async-fn-handler-service"
+      },
+      "text": "Service trait",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "async-fn-handler-service-node-6",
+      "originalText": "Service trait",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "async-fn-handler-service-node-7-label",
+      "type": "text",
+      "x": 48.999999999999986,
+      "y": 427.5,
+      "width": 242.00000000000003,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aP",
+      "roundness": null,
+      "seed": 1260252706,
+      "version": 1,
+      "versionNonce": 1053490454,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "async-fn-handler-service"
+      },
+      "text": "FromRequest extractors",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "async-fn-handler-service-node-7",
+      "originalText": "FromRequest extractors",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "async-fn-handler-service-node-8-label",
+      "type": "text",
+      "x": 153.5,
+      "y": 1247.5,
+      "width": 253.00000000000003,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aQ",
+      "roundness": null,
+      "seed": 1606097481,
+      "version": 1,
+      "versionNonce": 1796402387,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "async-fn-handler-service"
+      },
+      "text": "IntoResponse conversion",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "async-fn-handler-service-node-8",
+      "originalText": "IntoResponse conversion",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "async-fn-handler-service-edge-0-label",
+      "type": "text",
+      "x": 469.2,
+      "y": 232.4,
+      "width": 105.60000000000001,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aR",
+      "roundness": null,
+      "seed": 789169142,
+      "version": 1,
+      "versionNonce": 212817242,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "async-fn-handler-service"
+      },
+      "text": "processed by",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "async-fn-handler-service-edge-0",
+      "originalText": "processed by",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "async-fn-handler-service-edge-1-label",
+      "type": "text",
+      "x": 460.4,
+      "y": 603.1999999999999,
+      "width": 123.20000000000002,
+      "height": 40,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aS",
+      "roundness": null,
+      "seed": 1086547755,
+      "version": 1,
+      "versionNonce": 2083276581,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "async-fn-handler-service"
+      },
+      "text": "generates impl\n@builds",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "async-fn-handler-service-edge-1",
+      "originalText": "generates impl @builds",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "async-fn-handler-service-edge-3-label",
+      "type": "text",
+      "x": 456,
+      "y": 1243.6,
+      "width": 132,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aT",
+      "roundness": null,
+      "seed": 1711073817,
+      "version": 1,
+      "versionNonce": 1957731,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "async-fn-handler-service"
+      },
+      "text": "creates @builds",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "async-fn-handler-service-edge-3",
+      "originalText": "creates @builds",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "async-fn-handler-service-edge-5-label",
+      "type": "text",
+      "x": 434,
+      "y": 1893.9999999999998,
+      "width": 176,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aU",
+      "roundness": null,
+      "seed": 844657151,
+      "version": 1,
+      "versionNonce": 193098521,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "async-fn-handler-service"
+      },
+      "text": "implements @conforms",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "async-fn-handler-service-edge-5",
+      "originalText": "implements @conforms",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "async-fn-handler-service-edge-6-label",
+      "type": "text",
+      "x": 204.66666666666669,
+      "y": 655.5999999999999,
+      "width": 123.20000000000002,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aV",
+      "roundness": null,
+      "seed": 1794782864,
+      "version": 1,
+      "versionNonce": 209989228,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "async-fn-handler-service"
+      },
+      "text": "extract params",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "async-fn-handler-service-edge-6",
+      "originalText": "extract params",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "async-fn-handler-service-edge-7-label",
+      "type": "text",
+      "x": 220.39999999999998,
+      "y": 936.9333333333332,
+      "width": 123.20000000000002,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aW",
+      "roundness": null,
+      "seed": 855802717,
+      "version": 1,
+      "versionNonce": 1174129607,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "async-fn-handler-service"
+      },
+      "text": "convert return",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "async-fn-handler-service-edge-7",
+      "originalText": "convert return",
+      "autoResize": true,
+      "lineHeight": 1.25
+    }
+  ],
+  "appState": {
+    "gridSize": null,
+    "viewBackgroundColor": "#ffffff"
+  },
+  "files": {},
+  "diagramos": {
+    "version": "0.2.0-rc.6",
+    "schema": 1
+  }
+}

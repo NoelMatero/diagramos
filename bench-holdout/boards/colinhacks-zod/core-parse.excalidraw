@@ -1,0 +1,1809 @@
+{
+  "type": "excalidraw",
+  "version": 2,
+  "source": "diagramos",
+  "elements": [
+    {
+      "id": "zod-core-parse-flow-title",
+      "type": "text",
+      "x": 0,
+      "y": -115,
+      "width": 250.8,
+      "height": 30,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a0",
+      "roundness": null,
+      "seed": 1518755991,
+      "version": 1,
+      "versionNonce": 1495654513,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "zod-core-parse-flow",
+        "role": "title",
+        "direction": "DOWN"
+      },
+      "text": "Zod Core Parse Flow",
+      "fontSize": 24,
+      "fontFamily": 5,
+      "textAlign": "left",
+      "verticalAlign": "middle",
+      "containerId": null,
+      "originalText": "Zod Core Parse Flow",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "zod-core-parse-flow-node-0",
+      "type": "rectangle",
+      "x": 100,
+      "y": 20,
+      "width": 160,
+      "height": 80,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a1",
+      "roundness": null,
+      "seed": 1899734874,
+      "version": 1,
+      "versionNonce": 75499054,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "zod-core-parse-flow-node-0-label"
+        },
+        {
+          "id": "zod-core-parse-flow-edge-0",
+          "type": "arrow"
+        },
+        {
+          "id": "zod-core-parse-flow-edge-1",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "zod-core-parse-flow",
+        "node": "parse_entry",
+        "ref": "packages/zod/src/v4/core/parse.ts#_parse"
+      }
+    },
+    {
+      "id": "zod-core-parse-flow-node-1",
+      "type": "rectangle",
+      "x": 100,
+      "y": 1160,
+      "width": 180,
+      "height": 80,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a2",
+      "roundness": null,
+      "seed": 1163328747,
+      "version": 1,
+      "versionNonce": 1887451877,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "zod-core-parse-flow-node-1-label"
+        },
+        {
+          "id": "zod-core-parse-flow-edge-0",
+          "type": "arrow"
+        },
+        {
+          "id": "zod-core-parse-flow-edge-4",
+          "type": "arrow"
+        },
+        {
+          "id": "zod-core-parse-flow-edge-5",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "zod-core-parse-flow",
+        "node": "payload_type",
+        "ref": "packages/zod/src/v4/core/schemas.ts#ParsePayload"
+      }
+    },
+    {
+      "id": "zod-core-parse-flow-node-2",
+      "type": "rectangle",
+      "x": 300,
+      "y": 400,
+      "width": 240,
+      "height": 80,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a3",
+      "roundness": null,
+      "seed": 342020380,
+      "version": 1,
+      "versionNonce": 1796359208,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "zod-core-parse-flow-node-2-label"
+        },
+        {
+          "id": "zod-core-parse-flow-edge-1",
+          "type": "arrow"
+        },
+        {
+          "id": "zod-core-parse-flow-edge-2",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "zod-core-parse-flow",
+        "node": "run_method",
+        "ref": "packages/zod/src/v4/core/schemas.ts#_$ZodTypeInternals"
+      }
+    },
+    {
+      "id": "zod-core-parse-flow-node-3",
+      "type": "rectangle",
+      "x": 320,
+      "y": 780,
+      "width": 200,
+      "height": 80,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a4",
+      "roundness": null,
+      "seed": 693265205,
+      "version": 1,
+      "versionNonce": 2084439487,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "zod-core-parse-flow-node-3-label"
+        },
+        {
+          "id": "zod-core-parse-flow-edge-2",
+          "type": "arrow"
+        },
+        {
+          "id": "zod-core-parse-flow-edge-3",
+          "type": "arrow"
+        },
+        {
+          "id": "zod-core-parse-flow-edge-4",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "zod-core-parse-flow",
+        "node": "check_exec",
+        "ref": "packages/zod/src/v4/core/checks.ts#$ZodCheckInternals"
+      }
+    },
+    {
+      "id": "zod-core-parse-flow-node-4",
+      "type": "rectangle",
+      "x": 120,
+      "y": 1540,
+      "width": 180,
+      "height": 80,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a5",
+      "roundness": null,
+      "seed": 274254782,
+      "version": 1,
+      "versionNonce": 1010794082,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "zod-core-parse-flow-node-4-label"
+        },
+        {
+          "id": "zod-core-parse-flow-edge-3",
+          "type": "arrow"
+        },
+        {
+          "id": "zod-core-parse-flow-edge-5",
+          "type": "arrow"
+        },
+        {
+          "id": "zod-core-parse-flow-edge-7",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "zod-core-parse-flow",
+        "node": "raw_issue_type",
+        "ref": "packages/zod/src/v4/core/errors.ts#$ZodRawIssue"
+      }
+    },
+    {
+      "id": "zod-core-parse-flow-node-5",
+      "type": "rectangle",
+      "x": 100,
+      "y": 1920,
+      "width": 220,
+      "height": 80,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a6",
+      "roundness": null,
+      "seed": 450806031,
+      "version": 1,
+      "versionNonce": 67664105,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "zod-core-parse-flow-node-5-label"
+        },
+        {
+          "id": "zod-core-parse-flow-edge-6",
+          "type": "arrow"
+        },
+        {
+          "id": "zod-core-parse-flow-edge-7",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "zod-core-parse-flow",
+        "node": "finalize_fn",
+        "ref": "packages/zod/src/v4/core/util.ts#finalizeIssue"
+      }
+    },
+    {
+      "id": "zod-core-parse-flow-node-6",
+      "type": "rectangle",
+      "x": 140,
+      "y": 2300,
+      "width": 160,
+      "height": 80,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a7",
+      "roundness": null,
+      "seed": 974318624,
+      "version": 1,
+      "versionNonce": 1422892668,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "zod-core-parse-flow-node-6-label"
+        },
+        {
+          "id": "zod-core-parse-flow-edge-6",
+          "type": "arrow"
+        },
+        {
+          "id": "zod-core-parse-flow-edge-8",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "zod-core-parse-flow",
+        "node": "issue_type",
+        "ref": "packages/zod/src/v4/core/errors.ts#$ZodIssue"
+      }
+    },
+    {
+      "id": "zod-core-parse-flow-node-7",
+      "type": "rectangle",
+      "x": 140,
+      "y": 2680,
+      "width": 160,
+      "height": 80,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a8",
+      "roundness": null,
+      "seed": 535104745,
+      "version": 1,
+      "versionNonce": 551315699,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "zod-core-parse-flow-node-7-label"
+        },
+        {
+          "id": "zod-core-parse-flow-edge-8",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "zod-core-parse-flow",
+        "node": "error_type",
+        "ref": "packages/zod/src/v4/core/errors.ts#$ZodError"
+      }
+    },
+    {
+      "id": "zod-core-parse-flow-edge-0",
+      "type": "arrow",
+      "x": 154,
+      "y": 92,
+      "width": 0,
+      "height": 1062.3999999999999,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a9",
+      "roundness": null,
+      "seed": 1843300333,
+      "version": 1,
+      "versionNonce": 1160957271,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "zod-core-parse-flow-edge-0-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "zod-core-parse-flow",
+        "edge": {
+          "from": "parse_entry",
+          "to": "payload_type",
+          "claim": "builds"
+        }
+      },
+      "points": [
+        [
+          0,
+          0.5
+        ],
+        [
+          0,
+          531.1999999999999
+        ],
+        [
+          0,
+          1061.8999999999999
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "zod-core-parse-flow-node-0",
+        "focus": 0.325,
+        "gap": 8
+      },
+      "endBinding": {
+        "elementId": "zod-core-parse-flow-node-1",
+        "focus": -0.39999999999999997,
+        "gap": 5.600000000000136
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "zod-core-parse-flow-edge-1",
+      "type": "arrow",
+      "x": 207.33333333333331,
+      "y": 92,
+      "width": 207.00000000000006,
+      "height": 300.8,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aA",
+      "roundness": null,
+      "seed": 1905964052,
+      "version": 1,
+      "versionNonce": 351192416,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "zod-core-parse-flow-edge-1-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "zod-core-parse-flow",
+        "edge": {
+          "from": "parse_entry",
+          "to": "run_method",
+          "claim": "calls"
+        }
+      },
+      "points": [
+        [
+          0,
+          0.5
+        ],
+        [
+          0,
+          32
+        ],
+        [
+          207.00000000000006,
+          32
+        ],
+        [
+          207.00000000000006,
+          46.89999999999998
+        ],
+        [
+          207.00000000000006,
+          110.375
+        ],
+        [
+          207.00000000000006,
+          173.85000000000002
+        ],
+        [
+          207.00000000000006,
+          300.3
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "zod-core-parse-flow-node-0",
+        "focus": -0.3416666666666664,
+        "gap": 8
+      },
+      "endBinding": {
+        "elementId": "zod-core-parse-flow-node-2",
+        "focus": -0.0472222222222213,
+        "gap": 7.199999999999989
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "zod-core-parse-flow-edge-2",
+      "type": "arrow",
+      "x": 414.33333333333337,
+      "y": 472.8,
+      "width": 0,
+      "height": 300.7999999999999,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aB",
+      "roundness": null,
+      "seed": 1358930499,
+      "version": 1,
+      "versionNonce": 885914461,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "zod-core-parse-flow-edge-2-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "zod-core-parse-flow",
+        "edge": {
+          "from": "run_method",
+          "to": "check_exec",
+          "claim": "calls"
+        }
+      },
+      "points": [
+        [
+          0,
+          0.5
+        ],
+        [
+          0,
+          150.39999999999992
+        ],
+        [
+          0,
+          300.2999999999999
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "zod-core-parse-flow-node-2",
+        "focus": 0.047222222222221576,
+        "gap": 7.199999999999989
+      },
+      "endBinding": {
+        "elementId": "zod-core-parse-flow-node-3",
+        "focus": -0.05666666666666678,
+        "gap": 6.400000000000091
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "zod-core-parse-flow-edge-3",
+      "type": "arrow",
+      "x": 447.6666666666667,
+      "y": 853.5999999999999,
+      "width": 203.66666666666669,
+      "height": 681.5999999999999,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aC",
+      "roundness": null,
+      "seed": 1018665938,
+      "version": 1,
+      "versionNonce": 2096920070,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "zod-core-parse-flow-edge-3-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "zod-core-parse-flow",
+        "edge": {
+          "from": "check_exec",
+          "to": "raw_issue_type",
+          "claim": "builds"
+        }
+      },
+      "points": [
+        [
+          0,
+          0.5
+        ],
+        [
+          0,
+          32
+        ],
+        [
+          -25.666666666666686,
+          32
+        ],
+        [
+          -25.666666666666686,
+          416.9666666666667
+        ],
+        [
+          -25.666666666666686,
+          573.5999999999999
+        ],
+        [
+          -203.66666666666669,
+          573.5999999999999
+        ],
+        [
+          -203.66666666666669,
+          681.0999999999999
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "zod-core-parse-flow-node-3",
+        "focus": -0.27666666666666745,
+        "gap": 6.400000000000091
+      },
+      "endBinding": {
+        "elementId": "zod-core-parse-flow-node-4",
+        "focus": 0.3777777777777777,
+        "gap": 4.800000000000182
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "zod-core-parse-flow-edge-4",
+      "type": "arrow",
+      "x": 381,
+      "y": 853.5999999999999,
+      "width": 167,
+      "height": 300.79999999999995,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aD",
+      "roundness": null,
+      "seed": 1473140289,
+      "version": 1,
+      "versionNonce": 954026379,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "zod-core-parse-flow-edge-4-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "zod-core-parse-flow",
+        "edge": {
+          "from": "check_exec",
+          "to": "payload_type",
+          "claim": "feeds"
+        }
+      },
+      "points": [
+        [
+          0,
+          0.5
+        ],
+        [
+          0,
+          192.79999999999995
+        ],
+        [
+          -41.10000000000002,
+          192.79999999999995
+        ],
+        [
+          -167,
+          192.79999999999995
+        ],
+        [
+          -167,
+          300.29999999999995
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "zod-core-parse-flow-node-3",
+        "focus": 0.39000000000000007,
+        "gap": 6.400000000000091
+      },
+      "endBinding": {
+        "elementId": "zod-core-parse-flow-node-1",
+        "focus": 0.266666666666667,
+        "gap": 5.600000000000136
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "zod-core-parse-flow-edge-5",
+      "type": "arrow",
+      "x": 184,
+      "y": 1234.3999999999999,
+      "width": 0,
+      "height": 300.79999999999995,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aE",
+      "roundness": null,
+      "seed": 1135013272,
+      "version": 1,
+      "versionNonce": 1144864116,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "zod-core-parse-flow-edge-5-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "zod-core-parse-flow",
+        "edge": {
+          "from": "payload_type",
+          "to": "raw_issue_type",
+          "claim": "holds"
+        }
+      },
+      "points": [
+        [
+          0,
+          0.5
+        ],
+        [
+          0,
+          150.39999999999986
+        ],
+        [
+          0,
+          300.29999999999995
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "zod-core-parse-flow-node-1",
+        "focus": 0.06666666666666697,
+        "gap": 5.600000000000136
+      },
+      "endBinding": {
+        "elementId": "zod-core-parse-flow-node-4",
+        "focus": -0.2888888888888893,
+        "gap": 4.800000000000182
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "zod-core-parse-flow-edge-6",
+      "type": "arrow",
+      "x": 214,
+      "y": 1995.9999999999998,
+      "width": 0,
+      "height": 300.8000000000004,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aF",
+      "roundness": null,
+      "seed": 602031175,
+      "version": 1,
+      "versionNonce": 193401697,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "zod-core-parse-flow-edge-6-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "zod-core-parse-flow",
+        "edge": {
+          "from": "finalize_fn",
+          "to": "issue_type",
+          "claim": "builds"
+        }
+      },
+      "points": [
+        [
+          0,
+          0.5
+        ],
+        [
+          0,
+          150.40000000000032
+        ],
+        [
+          0,
+          300.3000000000004
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "zod-core-parse-flow-node-5",
+        "focus": -0.03636363636363649,
+        "gap": 4.000000000000227
+      },
+      "endBinding": {
+        "elementId": "zod-core-parse-flow-node-6",
+        "focus": -0.075,
+        "gap": 3.199999999999818
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "zod-core-parse-flow-edge-7",
+      "type": "arrow",
+      "x": 214,
+      "y": 1615.1999999999998,
+      "width": 0,
+      "height": 300.79999999999995,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aG",
+      "roundness": null,
+      "seed": 433148598,
+      "version": 1,
+      "versionNonce": 1267175194,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "zod-core-parse-flow-edge-7-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "zod-core-parse-flow",
+        "edge": {
+          "from": "raw_issue_type",
+          "to": "finalize_fn"
+        }
+      },
+      "points": [
+        [
+          0,
+          0.5
+        ],
+        [
+          0,
+          150.4000000000001
+        ],
+        [
+          0,
+          300.29999999999995
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "zod-core-parse-flow-node-4",
+        "focus": -0.044444444444444654,
+        "gap": 4.800000000000182
+      },
+      "endBinding": {
+        "elementId": "zod-core-parse-flow-node-5",
+        "focus": 0.036363636363634926,
+        "gap": 4.000000000000227
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "zod-core-parse-flow-edge-8",
+      "type": "arrow",
+      "x": 214,
+      "y": 2376.8,
+      "width": 0,
+      "height": 300.8000000000002,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aH",
+      "roundness": null,
+      "seed": 1074359397,
+      "version": 1,
+      "versionNonce": 1314535663,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "zod-core-parse-flow-edge-8-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "zod-core-parse-flow",
+        "edge": {
+          "from": "issue_type",
+          "to": "error_type",
+          "claim": "holds"
+        }
+      },
+      "points": [
+        [
+          0,
+          0.5
+        ],
+        [
+          0,
+          150.4000000000001
+        ],
+        [
+          0,
+          300.3000000000002
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "zod-core-parse-flow-node-6",
+        "focus": 0.075,
+        "gap": 3.199999999999818
+      },
+      "endBinding": {
+        "elementId": "zod-core-parse-flow-node-7",
+        "focus": -0.075,
+        "gap": 2.399999999999636
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "zod-core-parse-flow-node-0-label",
+      "type": "text",
+      "x": 141.5,
+      "y": 47.5,
+      "width": 77,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aI",
+      "roundness": null,
+      "seed": 2048601931,
+      "version": 1,
+      "versionNonce": 518095813,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "zod-core-parse-flow"
+      },
+      "text": "parse()",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "zod-core-parse-flow-node-0",
+      "originalText": "parse()",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "zod-core-parse-flow-node-1-label",
+      "type": "text",
+      "x": 124,
+      "y": 1187.5,
+      "width": 132,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aJ",
+      "roundness": null,
+      "seed": 1564648342,
+      "version": 1,
+      "versionNonce": 384451706,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "zod-core-parse-flow"
+      },
+      "text": "ParsePayload",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "zod-core-parse-flow-node-1",
+      "originalText": "ParsePayload",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "zod-core-parse-flow-node-2-label",
+      "type": "text",
+      "x": 326.5,
+      "y": 427.5,
+      "width": 187.00000000000003,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aK",
+      "roundness": null,
+      "seed": 602534201,
+      "version": 1,
+      "versionNonce": 846924291,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "zod-core-parse-flow"
+      },
+      "text": "schema._zod.run()",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "zod-core-parse-flow-node-2",
+      "originalText": "schema._zod.run()",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "zod-core-parse-flow-node-3-label",
+      "type": "text",
+      "x": 348.5,
+      "y": 807.5,
+      "width": 143,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aL",
+      "roundness": null,
+      "seed": 173989212,
+      "version": 1,
+      "versionNonce": 1725585000,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "zod-core-parse-flow"
+      },
+      "text": "check.check()",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "zod-core-parse-flow-node-3",
+      "originalText": "check.check()",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "zod-core-parse-flow-node-4-label",
+      "type": "text",
+      "x": 144,
+      "y": 1567.5,
+      "width": 132,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aM",
+      "roundness": null,
+      "seed": 2004768927,
+      "version": 1,
+      "versionNonce": 1177295929,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "zod-core-parse-flow"
+      },
+      "text": "$ZodRawIssue",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "zod-core-parse-flow-node-4",
+      "originalText": "$ZodRawIssue",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "zod-core-parse-flow-node-5-label",
+      "type": "text",
+      "x": 127.5,
+      "y": 1947.5,
+      "width": 165,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aN",
+      "roundness": null,
+      "seed": 1294418394,
+      "version": 1,
+      "versionNonce": 946093486,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "zod-core-parse-flow"
+      },
+      "text": "finalizeIssue()",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "zod-core-parse-flow-node-5",
+      "originalText": "finalizeIssue()",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "zod-core-parse-flow-node-6-label",
+      "type": "text",
+      "x": 170.5,
+      "y": 2327.5,
+      "width": 99.00000000000001,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aO",
+      "roundness": null,
+      "seed": 2031257341,
+      "version": 1,
+      "versionNonce": 959924967,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "zod-core-parse-flow"
+      },
+      "text": "$ZodIssue",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "zod-core-parse-flow-node-6",
+      "originalText": "$ZodIssue",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "zod-core-parse-flow-node-7-label",
+      "type": "text",
+      "x": 170.5,
+      "y": 2707.5,
+      "width": 99.00000000000001,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aP",
+      "roundness": null,
+      "seed": 2093647536,
+      "version": 1,
+      "versionNonce": 1303200780,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "zod-core-parse-flow"
+      },
+      "text": "$ZodError",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "zod-core-parse-flow-node-7",
+      "originalText": "$ZodError",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "zod-core-parse-flow-edge-0-label",
+      "type": "text",
+      "x": 88,
+      "y": 613.1999999999999,
+      "width": 132,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aQ",
+      "roundness": null,
+      "seed": 627643428,
+      "version": 1,
+      "versionNonce": 188216496,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "zod-core-parse-flow"
+      },
+      "text": "creates @builds",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "zod-core-parse-flow-edge-0",
+      "originalText": "creates @builds",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "zod-core-parse-flow-edge-1-label",
+      "type": "text",
+      "x": 348.33333333333337,
+      "y": 128.89999999999998,
+      "width": 132,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aR",
+      "roundness": null,
+      "seed": 971028961,
+      "version": 1,
+      "versionNonce": 2118787755,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "zod-core-parse-flow"
+      },
+      "text": "executes @calls",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "zod-core-parse-flow-edge-1",
+      "originalText": "executes @calls",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "zod-core-parse-flow-edge-2-label",
+      "type": "text",
+      "x": 335.1333333333334,
+      "y": 613.1999999999999,
+      "width": 158.4,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aS",
+      "roundness": null,
+      "seed": 180979038,
+      "version": 1,
+      "versionNonce": 1921358978,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "zod-core-parse-flow"
+      },
+      "text": "runs checks @calls",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "zod-core-parse-flow-edge-2",
+      "originalText": "runs checks @calls",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "zod-core-parse-flow-edge-3-label",
+      "type": "text",
+      "x": 356,
+      "y": 1260.5666666666666,
+      "width": 132,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aT",
+      "roundness": null,
+      "seed": 717414771,
+      "version": 1,
+      "versionNonce": 1267860813,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "zod-core-parse-flow"
+      },
+      "text": "creates @builds",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "zod-core-parse-flow-edge-3",
+      "originalText": "creates @builds",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "zod-core-parse-flow-edge-4-label",
+      "type": "text",
+      "x": 251.89999999999998,
+      "y": 1036.3999999999999,
+      "width": 176,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aU",
+      "roundness": null,
+      "seed": 1531180824,
+      "version": 1,
+      "versionNonce": 1886597620,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "zod-core-parse-flow"
+      },
+      "text": "pushes issues @feeds",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "zod-core-parse-flow-edge-4",
+      "originalText": "pushes issues @feeds",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "zod-core-parse-flow-edge-5-label",
+      "type": "text",
+      "x": 118,
+      "y": 1374.7999999999997,
+      "width": 132,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aV",
+      "roundness": null,
+      "seed": 655054821,
+      "version": 1,
+      "versionNonce": 1985999727,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "zod-core-parse-flow"
+      },
+      "text": "collects @holds",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "zod-core-parse-flow-edge-5",
+      "originalText": "collects @holds",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "zod-core-parse-flow-edge-6-label",
+      "type": "text",
+      "x": 139.2,
+      "y": 2136.4,
+      "width": 149.60000000000002,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aW",
+      "roundness": null,
+      "seed": 380770114,
+      "version": 1,
+      "versionNonce": 802791862,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "zod-core-parse-flow"
+      },
+      "text": "finalizes @builds",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "zod-core-parse-flow-edge-6",
+      "originalText": "finalizes @builds",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "zod-core-parse-flow-edge-7-label",
+      "type": "text",
+      "x": 170,
+      "y": 1755.6,
+      "width": 88,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aX",
+      "roundness": null,
+      "seed": 2120856551,
+      "version": 1,
+      "versionNonce": 452622465,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "zod-core-parse-flow"
+      },
+      "text": "raw issues",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "zod-core-parse-flow-edge-7",
+      "originalText": "raw issues",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "zod-core-parse-flow-edge-8-label",
+      "type": "text",
+      "x": 152.39999999999998,
+      "y": 2517.2000000000003,
+      "width": 123.20000000000002,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aY",
+      "roundness": null,
+      "seed": 95702732,
+      "version": 1,
+      "versionNonce": 1598411160,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "zod-core-parse-flow"
+      },
+      "text": "held by @holds",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "zod-core-parse-flow-edge-8",
+      "originalText": "held by @holds",
+      "autoResize": true,
+      "lineHeight": 1.25
+    }
+  ],
+  "appState": {
+    "gridSize": null,
+    "viewBackgroundColor": "#ffffff"
+  },
+  "files": {},
+  "diagramos": {
+    "version": "0.2.0-rc.6",
+    "schema": 1
+  }
+}

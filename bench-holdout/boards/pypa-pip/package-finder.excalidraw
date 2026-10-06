@@ -1,0 +1,1821 @@
+{
+  "type": "excalidraw",
+  "version": 2,
+  "source": "diagramos",
+  "elements": [
+    {
+      "id": "pip-package-finder-flow-title",
+      "type": "text",
+      "x": 0,
+      "y": -115,
+      "width": 303.6,
+      "height": 30,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a0",
+      "roundness": null,
+      "seed": 86642713,
+      "version": 1,
+      "versionNonce": 338735459,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "pip-package-finder-flow",
+        "role": "title",
+        "direction": "DOWN"
+      },
+      "text": "Pip Package Finder Flow",
+      "fontSize": 24,
+      "fontFamily": 5,
+      "textAlign": "left",
+      "verticalAlign": "middle",
+      "containerId": null,
+      "originalText": "Pip Package Finder Flow",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "pip-package-finder-flow-node-0",
+      "type": "rectangle",
+      "x": 480,
+      "y": 20,
+      "width": 260,
+      "height": 80,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "#e7f5ff",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a1",
+      "roundness": null,
+      "seed": 2133717440,
+      "version": 1,
+      "versionNonce": 2119870364,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "pip-package-finder-flow-node-0-label"
+        },
+        {
+          "id": "pip-package-finder-flow-edge-0",
+          "type": "arrow"
+        },
+        {
+          "id": "pip-package-finder-flow-edge-5",
+          "type": "arrow"
+        },
+        {
+          "id": "pip-package-finder-flow-edge-8",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "pip-package-finder-flow",
+        "node": "find_best",
+        "ref": "src/pip/_internal/index/package_finder.py#find_best_candidate"
+      }
+    },
+    {
+      "id": "pip-package-finder-flow-node-1",
+      "type": "rectangle",
+      "x": 540,
+      "y": 400,
+      "width": 260,
+      "height": 80,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "#e7f5ff",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a2",
+      "roundness": null,
+      "seed": 1734279433,
+      "version": 1,
+      "versionNonce": 480878227,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "pip-package-finder-flow-node-1-label"
+        },
+        {
+          "id": "pip-package-finder-flow-edge-0",
+          "type": "arrow"
+        },
+        {
+          "id": "pip-package-finder-flow-edge-1",
+          "type": "arrow"
+        },
+        {
+          "id": "pip-package-finder-flow-edge-6",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "pip-package-finder-flow",
+        "node": "find_all",
+        "ref": "src/pip/_internal/index/package_finder.py#find_all_candidates"
+      }
+    },
+    {
+      "id": "pip-package-finder-flow-node-2",
+      "type": "rectangle",
+      "x": 600,
+      "y": 780,
+      "width": 220,
+      "height": 80,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "#d3f9d8",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a3",
+      "roundness": null,
+      "seed": 70180446,
+      "version": 1,
+      "versionNonce": 219199362,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "pip-package-finder-flow-node-2-label"
+        },
+        {
+          "id": "pip-package-finder-flow-edge-1",
+          "type": "arrow"
+        },
+        {
+          "id": "pip-package-finder-flow-edge-2",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "pip-package-finder-flow",
+        "node": "collect_sources",
+        "ref": "src/pip/_internal/index/collector.py#collect_sources"
+      }
+    },
+    {
+      "id": "pip-package-finder-flow-node-3",
+      "type": "rectangle",
+      "x": 620,
+      "y": 1160,
+      "width": 180,
+      "height": 80,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "#d3f9d8",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a4",
+      "roundness": null,
+      "seed": 1610308015,
+      "version": 1,
+      "versionNonce": 764641801,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "pip-package-finder-flow-node-3-label"
+        },
+        {
+          "id": "pip-package-finder-flow-edge-2",
+          "type": "arrow"
+        },
+        {
+          "id": "pip-package-finder-flow-edge-3",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "pip-package-finder-flow",
+        "node": "parse_links",
+        "ref": "src/pip/_internal/index/collector.py#parse_links"
+      }
+    },
+    {
+      "id": "pip-package-finder-flow-node-4",
+      "type": "rectangle",
+      "x": 620,
+      "y": 1540,
+      "width": 200,
+      "height": 80,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "#fff3bf",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a5",
+      "roundness": null,
+      "seed": 1501419196,
+      "version": 1,
+      "versionNonce": 345750088,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "pip-package-finder-flow-node-4-label"
+        },
+        {
+          "id": "pip-package-finder-flow-edge-3",
+          "type": "arrow"
+        },
+        {
+          "id": "pip-package-finder-flow-edge-4",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "pip-package-finder-flow",
+        "node": "evaluate_link",
+        "ref": "src/pip/_internal/index/package_finder.py#LinkEvaluator"
+      }
+    },
+    {
+      "id": "pip-package-finder-flow-node-5",
+      "type": "rectangle",
+      "x": 580,
+      "y": 1920,
+      "width": 280,
+      "height": 80,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "#f0f9ff",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a6",
+      "roundness": null,
+      "seed": 1108532565,
+      "version": 1,
+      "versionNonce": 2097318239,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "pip-package-finder-flow-node-5-label"
+        },
+        {
+          "id": "pip-package-finder-flow-edge-4",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "pip-package-finder-flow",
+        "node": "install_candidate",
+        "ref": "src/pip/_internal/models/candidate.py#InstallationCandidate"
+      }
+    },
+    {
+      "id": "pip-package-finder-flow-node-6",
+      "type": "rectangle",
+      "x": 180,
+      "y": 780,
+      "width": 340,
+      "height": 80,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "#fce7f3",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a7",
+      "roundness": null,
+      "seed": 485288570,
+      "version": 1,
+      "versionNonce": 5061582,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "pip-package-finder-flow-node-6-label"
+        },
+        {
+          "id": "pip-package-finder-flow-edge-5",
+          "type": "arrow"
+        },
+        {
+          "id": "pip-package-finder-flow-edge-6",
+          "type": "arrow"
+        },
+        {
+          "id": "pip-package-finder-flow-edge-7",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "pip-package-finder-flow",
+        "node": "applicable_candidates",
+        "ref": "src/pip/_internal/index/package_finder.py#get_applicable_candidates"
+      }
+    },
+    {
+      "id": "pip-package-finder-flow-node-7",
+      "type": "rectangle",
+      "x": 160,
+      "y": 1160,
+      "width": 300,
+      "height": 80,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "#fce7f3",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a8",
+      "roundness": null,
+      "seed": 175243915,
+      "version": 1,
+      "versionNonce": 436842757,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "pip-package-finder-flow-node-7-label"
+        },
+        {
+          "id": "pip-package-finder-flow-edge-7",
+          "type": "arrow"
+        },
+        {
+          "id": "pip-package-finder-flow-edge-8",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "pip-package-finder-flow",
+        "node": "compute_best",
+        "ref": "src/pip/_internal/index/package_finder.py#compute_best_candidate"
+      }
+    },
+    {
+      "id": "pip-package-finder-flow-edge-0",
+      "type": "arrow",
+      "x": 671.2666666666667,
+      "y": 92,
+      "width": 0,
+      "height": 300.8,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a9",
+      "roundness": null,
+      "seed": 942224695,
+      "version": 1,
+      "versionNonce": 1287210129,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "pip-package-finder-flow-edge-0-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "pip-package-finder-flow",
+        "edge": {
+          "from": "find_best",
+          "to": "find_all",
+          "claim": "calls"
+        }
+      },
+      "points": [
+        [
+          0,
+          0.5
+        ],
+        [
+          0,
+          150.4
+        ],
+        [
+          0,
+          300.3
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "pip-package-finder-flow-node-0",
+        "focus": -0.4712820512820512,
+        "gap": 8
+      },
+      "endBinding": {
+        "elementId": "pip-package-finder-flow-node-1",
+        "focus": 0.009743589743589666,
+        "gap": 7.199999999999989
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "pip-package-finder-flow-edge-1",
+      "type": "arrow",
+      "x": 714.6,
+      "y": 472.8,
+      "width": 0,
+      "height": 300.7999999999999,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aA",
+      "roundness": null,
+      "seed": 338542054,
+      "version": 1,
+      "versionNonce": 1973566410,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "pip-package-finder-flow-edge-1-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "pip-package-finder-flow",
+        "edge": {
+          "from": "find_all",
+          "to": "collect_sources",
+          "claim": "calls"
+        }
+      },
+      "points": [
+        [
+          0,
+          0.5
+        ],
+        [
+          0,
+          150.39999999999992
+        ],
+        [
+          0,
+          300.2999999999999
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "pip-package-finder-flow-node-1",
+        "focus": -0.3430769230769232,
+        "gap": 7.199999999999989
+      },
+      "endBinding": {
+        "elementId": "pip-package-finder-flow-node-2",
+        "focus": 0.04181818181818187,
+        "gap": 6.400000000000091
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "pip-package-finder-flow-edge-2",
+      "type": "arrow",
+      "x": 714.6,
+      "y": 853.5999999999999,
+      "width": 0,
+      "height": 300.79999999999995,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aB",
+      "roundness": null,
+      "seed": 1813333809,
+      "version": 1,
+      "versionNonce": 1114990011,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "pip-package-finder-flow-edge-2-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "pip-package-finder-flow",
+        "edge": {
+          "from": "collect_sources",
+          "to": "parse_links",
+          "claim": "calls"
+        }
+      },
+      "points": [
+        [
+          0,
+          0.5
+        ],
+        [
+          0,
+          150.39999999999998
+        ],
+        [
+          0,
+          300.29999999999995
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "pip-package-finder-flow-node-2",
+        "focus": -0.04181818181818187,
+        "gap": 6.400000000000091
+      },
+      "endBinding": {
+        "elementId": "pip-package-finder-flow-node-3",
+        "focus": 0.05111111111111147,
+        "gap": 5.600000000000136
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "pip-package-finder-flow-edge-3",
+      "type": "arrow",
+      "x": 714.6,
+      "y": 1234.3999999999999,
+      "width": 0,
+      "height": 300.79999999999995,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aC",
+      "roundness": null,
+      "seed": 391918088,
+      "version": 1,
+      "versionNonce": 76303716,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "pip-package-finder-flow-edge-3-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "pip-package-finder-flow",
+        "edge": {
+          "from": "parse_links",
+          "to": "evaluate_link",
+          "claim": "feeds"
+        }
+      },
+      "points": [
+        [
+          0,
+          0.5
+        ],
+        [
+          0,
+          150.39999999999986
+        ],
+        [
+          0,
+          300.29999999999995
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "pip-package-finder-flow-node-3",
+        "focus": -0.05111111111111147,
+        "gap": 5.600000000000136
+      },
+      "endBinding": {
+        "elementId": "pip-package-finder-flow-node-4",
+        "focus": -0.054000000000000076,
+        "gap": 4.800000000000182
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "pip-package-finder-flow-edge-4",
+      "type": "arrow",
+      "x": 714.6,
+      "y": 1615.1999999999998,
+      "width": 0,
+      "height": 300.79999999999995,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aD",
+      "roundness": null,
+      "seed": 1688781427,
+      "version": 1,
+      "versionNonce": 1886599245,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "pip-package-finder-flow-edge-4-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "pip-package-finder-flow",
+        "edge": {
+          "from": "evaluate_link",
+          "to": "install_candidate",
+          "claim": "builds"
+        }
+      },
+      "points": [
+        [
+          0,
+          0.5
+        ],
+        [
+          0,
+          150.4000000000001
+        ],
+        [
+          0,
+          300.29999999999995
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "pip-package-finder-flow-node-4",
+        "focus": 0.054000000000000076,
+        "gap": 4.800000000000182
+      },
+      "endBinding": {
+        "elementId": "pip-package-finder-flow-node-5",
+        "focus": -0.038571428571428534,
+        "gap": 4.000000000000227
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "pip-package-finder-flow-edge-5",
+      "type": "arrow",
+      "x": 606.2666666666667,
+      "y": 92,
+      "width": 395.6,
+      "height": 681.5999999999999,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aE",
+      "roundness": null,
+      "seed": 592673986,
+      "version": 2,
+      "versionNonce": 300706358,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "pip-package-finder-flow-edge-5-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "pip-package-finder-flow",
+        "edge": {
+          "from": "find_best",
+          "to": "applicable_candidates",
+          "claim": "calls"
+        },
+        "via": [
+          "compute_best_candidate"
+        ]
+      },
+      "points": [
+        [
+          0,
+          0.5
+        ],
+        [
+          0,
+          56
+        ],
+        [
+          -395.6,
+          56
+        ],
+        [
+          -395.6,
+          186.63333333333333
+        ],
+        [
+          -395.6,
+          573.5999999999999
+        ],
+        [
+          -308.3333333333333,
+          573.5999999999999
+        ],
+        [
+          -308.3333333333333,
+          681.0999999999999
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "pip-package-finder-flow-node-0",
+        "focus": 0.028717948717948038,
+        "gap": 8
+      },
+      "endBinding": {
+        "elementId": "pip-package-finder-flow-node-6",
+        "focus": -0.3062745098039215,
+        "gap": 6.400000000000091
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "pip-package-finder-flow-edge-6",
+      "type": "arrow",
+      "x": 627.9333333333333,
+      "y": 472.8,
+      "width": 216.66666666666674,
+      "height": 300.7999999999999,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aF",
+      "roundness": null,
+      "seed": 15991773,
+      "version": 1,
+      "versionNonce": 2032735559,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "pip-package-finder-flow-edge-6-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "pip-package-finder-flow",
+        "edge": {
+          "from": "find_all",
+          "to": "applicable_candidates",
+          "claim": "feeds"
+        }
+      },
+      "points": [
+        [
+          0,
+          0.5
+        ],
+        [
+          1.1368683772161603e-13,
+          32
+        ],
+        [
+          -216.66666666666663,
+          32
+        ],
+        [
+          -216.66666666666663,
+          42.06666666666655
+        ],
+        [
+          -216.66666666666663,
+          106.74999999999994
+        ],
+        [
+          -216.66666666666663,
+          171.43333333333322
+        ],
+        [
+          -216.66666666666663,
+          300.2999999999999
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "pip-package-finder-flow-node-1",
+        "focus": 0.3235897435897447,
+        "gap": 7.199999999999989
+      },
+      "endBinding": {
+        "elementId": "pip-package-finder-flow-node-6",
+        "focus": 0.36039215686274495,
+        "gap": 6.400000000000091
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "pip-package-finder-flow-edge-7",
+      "type": "arrow",
+      "x": 354.6,
+      "y": 853.5999999999999,
+      "width": 0,
+      "height": 300.79999999999995,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aG",
+      "roundness": null,
+      "seed": 833335876,
+      "version": 1,
+      "versionNonce": 941100880,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "pip-package-finder-flow-edge-7-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "pip-package-finder-flow",
+        "edge": {
+          "from": "applicable_candidates",
+          "to": "compute_best",
+          "claim": "feeds"
+        }
+      },
+      "points": [
+        [
+          0,
+          0.5
+        ],
+        [
+          0,
+          150.39999999999998
+        ],
+        [
+          0,
+          300.29999999999995
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "pip-package-finder-flow-node-6",
+        "focus": -0.02705882352941194,
+        "gap": 6.400000000000091
+      },
+      "endBinding": {
+        "elementId": "pip-package-finder-flow-node-7",
+        "focus": 0.29733333333333356,
+        "gap": 5.600000000000136
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "pip-package-finder-flow-edge-8",
+      "type": "arrow",
+      "x": 541.2666666666667,
+      "y": 92,
+      "width": 466.46666666666664,
+      "height": 1062.3999999999999,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aH",
+      "roundness": null,
+      "seed": 1991285999,
+      "version": 1,
+      "versionNonce": 329179465,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "pip-package-finder-flow-edge-8-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "pip-package-finder-flow",
+        "edge": {
+          "from": "find_best",
+          "to": "compute_best",
+          "claim": "calls"
+        }
+      },
+      "points": [
+        [
+          0,
+          0.5
+        ],
+        [
+          0,
+          32
+        ],
+        [
+          -466.46666666666664,
+          32
+        ],
+        [
+          -466.46666666666664,
+          387.8666666666666
+        ],
+        [
+          -466.46666666666664,
+          954.3999999999999
+        ],
+        [
+          -286.66666666666663,
+          954.3999999999999
+        ],
+        [
+          -286.66666666666663,
+          1061.8999999999999
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "pip-package-finder-flow-node-0",
+        "focus": 0.528717948717948,
+        "gap": 8
+      },
+      "endBinding": {
+        "elementId": "pip-package-finder-flow-node-7",
+        "focus": -0.36933333333333335,
+        "gap": 5.600000000000136
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "pip-package-finder-flow-node-0-label",
+      "type": "text",
+      "x": 505.5,
+      "y": 47.5,
+      "width": 209.00000000000003,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aI",
+      "roundness": null,
+      "seed": 87930653,
+      "version": 1,
+      "versionNonce": 1093904519,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "pip-package-finder-flow"
+      },
+      "text": "find_best_candidate",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "pip-package-finder-flow-node-0",
+      "originalText": "find_best_candidate",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "pip-package-finder-flow-node-1-label",
+      "type": "text",
+      "x": 565.5,
+      "y": 427.5,
+      "width": 209.00000000000003,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aJ",
+      "roundness": null,
+      "seed": 1836205392,
+      "version": 1,
+      "versionNonce": 1777784620,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "pip-package-finder-flow"
+      },
+      "text": "find_all_candidates",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "pip-package-finder-flow-node-1",
+      "originalText": "find_all_candidates",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "pip-package-finder-flow-node-2-label",
+      "type": "text",
+      "x": 627.5,
+      "y": 807.5,
+      "width": 165,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aK",
+      "roundness": null,
+      "seed": 776768959,
+      "version": 1,
+      "versionNonce": 1825237977,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "pip-package-finder-flow"
+      },
+      "text": "collect_sources",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "pip-package-finder-flow-node-2",
+      "originalText": "collect_sources",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "pip-package-finder-flow-node-3-label",
+      "type": "text",
+      "x": 649.5,
+      "y": 1187.5,
+      "width": 121.00000000000001,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aL",
+      "roundness": null,
+      "seed": 384291578,
+      "version": 1,
+      "versionNonce": 105463118,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "pip-package-finder-flow"
+      },
+      "text": "parse_links",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "pip-package-finder-flow-node-3",
+      "originalText": "parse_links",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "pip-package-finder-flow-node-4-label",
+      "type": "text",
+      "x": 648.5,
+      "y": 1567.5,
+      "width": 143,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aM",
+      "roundness": null,
+      "seed": 1469404121,
+      "version": 1,
+      "versionNonce": 319524643,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "pip-package-finder-flow"
+      },
+      "text": "evaluate_link",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "pip-package-finder-flow-node-4",
+      "originalText": "evaluate_link",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "pip-package-finder-flow-node-5-label",
+      "type": "text",
+      "x": 604.5,
+      "y": 1947.5,
+      "width": 231.00000000000003,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aN",
+      "roundness": null,
+      "seed": 599296124,
+      "version": 1,
+      "versionNonce": 1572589320,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "pip-package-finder-flow"
+      },
+      "text": "InstallationCandidate",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "pip-package-finder-flow-node-5",
+      "originalText": "InstallationCandidate",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "pip-package-finder-flow-node-6-label",
+      "type": "text",
+      "x": 212.5,
+      "y": 807.5,
+      "width": 275,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aO",
+      "roundness": null,
+      "seed": 2010385899,
+      "version": 1,
+      "versionNonce": 1801584101,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "pip-package-finder-flow"
+      },
+      "text": "get_applicable_candidates",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "pip-package-finder-flow-node-6",
+      "originalText": "get_applicable_candidates",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "pip-package-finder-flow-node-7-label",
+      "type": "text",
+      "x": 189,
+      "y": 1187.5,
+      "width": 242.00000000000003,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aP",
+      "roundness": null,
+      "seed": 493579702,
+      "version": 1,
+      "versionNonce": 1998589978,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "pip-package-finder-flow"
+      },
+      "text": "compute_best_candidate",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "pip-package-finder-flow-node-7",
+      "originalText": "compute_best_candidate",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "pip-package-finder-flow-edge-0-label",
+      "type": "text",
+      "x": 644.8666666666667,
+      "y": 232.4,
+      "width": 52.800000000000004,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aQ",
+      "roundness": null,
+      "seed": 1318302258,
+      "version": 1,
+      "versionNonce": 514651622,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "pip-package-finder-flow"
+      },
+      "text": "@calls",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "pip-package-finder-flow-edge-0",
+      "originalText": "@calls",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "pip-package-finder-flow-edge-1-label",
+      "type": "text",
+      "x": 688.2,
+      "y": 613.1999999999999,
+      "width": 52.800000000000004,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aR",
+      "roundness": null,
+      "seed": 1855064919,
+      "version": 1,
+      "versionNonce": 980762417,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "pip-package-finder-flow"
+      },
+      "text": "@calls",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "pip-package-finder-flow-edge-1",
+      "originalText": "@calls",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "pip-package-finder-flow-edge-2-label",
+      "type": "text",
+      "x": 688.2,
+      "y": 993.9999999999999,
+      "width": 52.800000000000004,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aS",
+      "roundness": null,
+      "seed": 1922342920,
+      "version": 1,
+      "versionNonce": 509704036,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "pip-package-finder-flow"
+      },
+      "text": "@calls",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "pip-package-finder-flow-edge-2",
+      "originalText": "@calls",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "pip-package-finder-flow-edge-3-label",
+      "type": "text",
+      "x": 631,
+      "y": 1374.7999999999997,
+      "width": 167.20000000000002,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aT",
+      "roundness": null,
+      "seed": 1165468885,
+      "version": 1,
+      "versionNonce": 1420335071,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "pip-package-finder-flow"
+      },
+      "text": "Link objects @feeds",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "pip-package-finder-flow-edge-3",
+      "originalText": "Link objects @feeds",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "pip-package-finder-flow-edge-4-label",
+      "type": "text",
+      "x": 683.8000000000001,
+      "y": 1755.6,
+      "width": 61.60000000000001,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aU",
+      "roundness": null,
+      "seed": 25226318,
+      "version": 1,
+      "versionNonce": 6610674,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "pip-package-finder-flow"
+      },
+      "text": "@builds",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "pip-package-finder-flow-edge-4",
+      "originalText": "@builds",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "pip-package-finder-flow-edge-5-label",
+      "type": "text",
+      "x": 184.26666666666662,
+      "y": 268.6333333333333,
+      "width": 52.800000000000004,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aV",
+      "roundness": null,
+      "seed": 61591203,
+      "version": 1,
+      "versionNonce": 392024637,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "pip-package-finder-flow"
+      },
+      "text": "@calls",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "pip-package-finder-flow-edge-5",
+      "originalText": "@calls",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "pip-package-finder-flow-edge-6-label",
+      "type": "text",
+      "x": 336.46666666666664,
+      "y": 504.86666666666656,
+      "width": 149.60000000000002,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aW",
+      "roundness": null,
+      "seed": 1968554516,
+      "version": 1,
+      "versionNonce": 1952829280,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "pip-package-finder-flow"
+      },
+      "text": "candidates @feeds",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "pip-package-finder-flow-edge-6",
+      "originalText": "candidates @feeds",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "pip-package-finder-flow-edge-7-label",
+      "type": "text",
+      "x": 271,
+      "y": 983.9999999999999,
+      "width": 167.20000000000002,
+      "height": 40,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aX",
+      "roundness": null,
+      "seed": 1801081937,
+      "version": 1,
+      "versionNonce": 2083039835,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "pip-package-finder-flow"
+      },
+      "text": "filtered candidates\n@feeds",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "pip-package-finder-flow-edge-7",
+      "originalText": "filtered candidates @feeds",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "pip-package-finder-flow-edge-8-label",
+      "type": "text",
+      "x": 48.400000000000006,
+      "y": 469.8666666666666,
+      "width": 52.800000000000004,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aY",
+      "roundness": null,
+      "seed": 127222970,
+      "version": 1,
+      "versionNonce": 1868187406,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "pip-package-finder-flow"
+      },
+      "text": "@calls",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "pip-package-finder-flow-edge-8",
+      "originalText": "@calls",
+      "autoResize": true,
+      "lineHeight": 1.25
+    }
+  ],
+  "appState": {
+    "gridSize": null,
+    "viewBackgroundColor": "#ffffff"
+  },
+  "files": {},
+  "diagramos": {
+    "version": "0.2.0-rc.6",
+    "schema": 1
+  }
+}

@@ -1,0 +1,107 @@
+{
+  "board": "bench-holdout/boards/hyperium-hyper/client-conn.excalidraw",
+  "project": "hyperium-hyper",
+  "topic": "client-conn",
+  "language": "rust",
+  "scope": "src/client",
+  "pin": "69396fdd96",
+  "tool": "rust-analyzer 0.0.0 (7cb789d982 2026-02-01)",
+  "claims": [
+    {
+      "id": "calls|src/client/conn/http1.rs#handshake|src/client/dispatch.rs#channel|",
+      "word": "calls",
+      "from": "src/client/conn/http1.rs#handshake",
+      "to": "src/client/dispatch.rs#channel",
+      "fromLabel": "handshake(io)",
+      "toLabel": "dispatch::channel()",
+      "language": "rust",
+      "source": "drawn",
+      "truth": "undecidable",
+      "why": "the tool would not walk this routine's calls"
+    },
+    {
+      "id": "calls|src/client/conn/http1.rs#handshake|src/proto/h1/dispatch.rs#Dispatcher|",
+      "word": "calls",
+      "from": "src/client/conn/http1.rs#handshake",
+      "to": "src/proto/h1/dispatch.rs#Dispatcher",
+      "fromLabel": "handshake(io)",
+      "toLabel": "Dispatcher::new",
+      "language": "rust",
+      "source": "drawn",
+      "truth": "undecidable",
+      "why": "an impl of Dispatcher's own type could not be resolved"
+    },
+    {
+      "id": "builds|src/client/dispatch.rs#channel|src/client/conn/http1.rs#SendRequest|",
+      "word": "builds",
+      "from": "src/client/dispatch.rs#channel",
+      "to": "src/client/conn/http1.rs#SendRequest",
+      "fromLabel": "dispatch::channel()",
+      "toLabel": "SendRequest",
+      "language": "rust",
+      "source": "drawn",
+      "truth": "false",
+      "why": "nothing in it makes one"
+    },
+    {
+      "id": "builds|src/proto/h1/dispatch.rs#Dispatcher|src/client/conn/http1.rs#Connection|",
+      "word": "builds",
+      "from": "src/proto/h1/dispatch.rs#Dispatcher",
+      "to": "src/client/conn/http1.rs#Connection",
+      "fromLabel": "Dispatcher::new",
+      "toLabel": "Connection",
+      "language": "rust",
+      "source": "drawn",
+      "truth": "undecidable",
+      "why": "a type's impls may be in another file"
+    },
+    {
+      "id": "returns|src/client/conn/http1.rs#handshake|src/client/conn/http1.rs#SendRequest|",
+      "word": "returns",
+      "from": "src/client/conn/http1.rs#handshake",
+      "to": "src/client/conn/http1.rs#SendRequest",
+      "fromLabel": "handshake(io)",
+      "toLabel": "SendRequest",
+      "language": "rust",
+      "source": "drawn",
+      "truth": "false",
+      "why": "the from end is a routine, and only a type can be a parameter or a return type"
+    },
+    {
+      "id": "returns|src/client/conn/http1.rs#handshake|src/client/conn/http1.rs#Connection|",
+      "word": "returns",
+      "from": "src/client/conn/http1.rs#handshake",
+      "to": "src/client/conn/http1.rs#Connection",
+      "fromLabel": "handshake(io)",
+      "toLabel": "Connection",
+      "language": "rust",
+      "source": "drawn",
+      "truth": "false",
+      "why": "the from end is a routine, and only a type can be a parameter or a return type"
+    },
+    {
+      "id": "calls|src/client/conn/http1.rs#SendRequest|src/client/conn/http1.rs#SendRequest|",
+      "word": "calls",
+      "from": "src/client/conn/http1.rs#SendRequest",
+      "to": "src/client/conn/http1.rs#SendRequest",
+      "fromLabel": "send_request(req)",
+      "toLabel": "SendRequest",
+      "language": "rust",
+      "source": "drawn",
+      "truth": "undecidable",
+      "why": "an impl of SendRequest's own type could not be resolved"
+    },
+    {
+      "id": "calls|src/proto/h1/dispatch.rs#Dispatcher|src/proto/h1/conn.rs#Conn|",
+      "word": "calls",
+      "from": "src/proto/h1/dispatch.rs#Dispatcher",
+      "to": "src/proto/h1/conn.rs#Conn",
+      "fromLabel": "Dispatcher::poll_loop",
+      "toLabel": "Conn (socket I/O)",
+      "language": "rust",
+      "source": "drawn",
+      "truth": "undecidable",
+      "why": "an impl of Dispatcher's own type could not be resolved"
+    }
+  ]
+}

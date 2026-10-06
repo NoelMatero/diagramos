@@ -1,0 +1,1839 @@
+{
+  "type": "excalidraw",
+  "version": 2,
+  "source": "diagramos",
+  "elements": [
+    {
+      "id": "trpc-client-operation-flow-through-link--title",
+      "type": "text",
+      "x": 0,
+      "y": -115,
+      "width": 607.2,
+      "height": 30,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a0",
+      "roundness": null,
+      "seed": 1151253039,
+      "version": 1,
+      "versionNonce": 449080201,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "trpc-client-operation-flow-through-link-",
+        "role": "title",
+        "direction": "DOWN"
+      },
+      "text": "TRPC Client: Operation Flow Through Link Chain",
+      "fontSize": 24,
+      "fontFamily": 5,
+      "textAlign": "left",
+      "verticalAlign": "middle",
+      "containerId": null,
+      "originalText": "TRPC Client: Operation Flow Through Link Chain",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "trpc-client-operation-flow-through-link--node-0",
+      "type": "rectangle",
+      "x": 200,
+      "y": 20,
+      "width": 240,
+      "height": 80,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "dotted",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a1",
+      "roundness": null,
+      "seed": 83756338,
+      "version": 1,
+      "versionNonce": 1208852198,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "trpc-client-operation-flow-through-link--node-0-label"
+        },
+        {
+          "id": "trpc-client-operation-flow-through-link--edge-0",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "trpc-client-operation-flow-through-link-",
+        "node": "app",
+        "state": "external"
+      }
+    },
+    {
+      "id": "trpc-client-operation-flow-through-link--node-1",
+      "type": "rectangle",
+      "x": 200,
+      "y": 400,
+      "width": 240,
+      "height": 80,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a2",
+      "roundness": null,
+      "seed": 465597603,
+      "version": 1,
+      "versionNonce": 2145330237,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "trpc-client-operation-flow-through-link--node-1-label"
+        },
+        {
+          "id": "trpc-client-operation-flow-through-link--edge-0",
+          "type": "arrow"
+        },
+        {
+          "id": "trpc-client-operation-flow-through-link--edge-1",
+          "type": "arrow"
+        },
+        {
+          "id": "trpc-client-operation-flow-through-link--edge-2",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "trpc-client-operation-flow-through-link-",
+        "node": "client",
+        "ref": "packages/client/src/internals/TRPCUntypedClient.ts#TRPCUntypedClient"
+      }
+    },
+    {
+      "id": "trpc-client-operation-flow-through-link--node-2",
+      "type": "rectangle",
+      "x": 20,
+      "y": 780,
+      "width": 160,
+      "height": 80,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a3",
+      "roundness": null,
+      "seed": 1012631156,
+      "version": 1,
+      "versionNonce": 1652184896,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "trpc-client-operation-flow-through-link--node-2-label"
+        },
+        {
+          "id": "trpc-client-operation-flow-through-link--edge-1",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "trpc-client-operation-flow-through-link-",
+        "node": "operation",
+        "ref": "packages/client/src/links/types.ts#Operation"
+      }
+    },
+    {
+      "id": "trpc-client-operation-flow-through-link--node-3",
+      "type": "rectangle",
+      "x": 260,
+      "y": 780,
+      "width": 200,
+      "height": 80,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a4",
+      "roundness": null,
+      "seed": 205629645,
+      "version": 1,
+      "versionNonce": 717750199,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "trpc-client-operation-flow-through-link--node-3-label"
+        },
+        {
+          "id": "trpc-client-operation-flow-through-link--edge-2",
+          "type": "arrow"
+        },
+        {
+          "id": "trpc-client-operation-flow-through-link--edge-3",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "trpc-client-operation-flow-through-link-",
+        "node": "createchain",
+        "ref": "packages/client/src/links/internals/createChain.ts#createChain"
+      }
+    },
+    {
+      "id": "trpc-client-operation-flow-through-link--node-4",
+      "type": "rectangle",
+      "x": 280,
+      "y": 1160,
+      "width": 160,
+      "height": 80,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a5",
+      "roundness": null,
+      "seed": 944968726,
+      "version": 1,
+      "versionNonce": 1909153274,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "trpc-client-operation-flow-through-link--node-4-label"
+        },
+        {
+          "id": "trpc-client-operation-flow-through-link--edge-3",
+          "type": "arrow"
+        },
+        {
+          "id": "trpc-client-operation-flow-through-link--edge-4",
+          "type": "arrow"
+        },
+        {
+          "id": "trpc-client-operation-flow-through-link--edge-5",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "trpc-client-operation-flow-through-link-",
+        "node": "linkfactory",
+        "ref": "packages/client/src/links/types.ts#TRPCLink"
+      }
+    },
+    {
+      "id": "trpc-client-operation-flow-through-link--node-5",
+      "type": "rectangle",
+      "x": 140,
+      "y": 1540,
+      "width": 160,
+      "height": 80,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a6",
+      "roundness": null,
+      "seed": 133052583,
+      "version": 1,
+      "versionNonce": 1877274945,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "trpc-client-operation-flow-through-link--node-5-label"
+        },
+        {
+          "id": "trpc-client-operation-flow-through-link--edge-4",
+          "type": "arrow"
+        },
+        {
+          "id": "trpc-client-operation-flow-through-link--edge-6",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "trpc-client-operation-flow-through-link-",
+        "node": "retry",
+        "ref": "packages/client/src/links/retryLink.ts#retryLink@declared"
+      }
+    },
+    {
+      "id": "trpc-client-operation-flow-through-link--node-6",
+      "type": "rectangle",
+      "x": 280,
+      "y": 1920,
+      "width": 160,
+      "height": 80,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a7",
+      "roundness": null,
+      "seed": 1603352696,
+      "version": 1,
+      "versionNonce": 977953492,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "trpc-client-operation-flow-through-link--node-6-label"
+        },
+        {
+          "id": "trpc-client-operation-flow-through-link--edge-5",
+          "type": "arrow"
+        },
+        {
+          "id": "trpc-client-operation-flow-through-link--edge-6",
+          "type": "arrow"
+        },
+        {
+          "id": "trpc-client-operation-flow-through-link--edge-7",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "trpc-client-operation-flow-through-link-",
+        "node": "http",
+        "ref": "packages/client/src/links/httpLink.ts#httpLink@declared"
+      }
+    },
+    {
+      "id": "trpc-client-operation-flow-through-link--node-7",
+      "type": "rectangle",
+      "x": 260,
+      "y": 2300,
+      "width": 180,
+      "height": 80,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "dotted",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a8",
+      "roundness": null,
+      "seed": 1240725793,
+      "version": 1,
+      "versionNonce": 1574831083,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "trpc-client-operation-flow-through-link--node-7-label"
+        },
+        {
+          "id": "trpc-client-operation-flow-through-link--edge-7",
+          "type": "arrow"
+        },
+        {
+          "id": "trpc-client-operation-flow-through-link--edge-8",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "trpc-client-operation-flow-through-link-",
+        "node": "transport",
+        "state": "external"
+      }
+    },
+    {
+      "id": "trpc-client-operation-flow-through-link--node-8",
+      "type": "rectangle",
+      "x": 280,
+      "y": 2520,
+      "width": 160,
+      "height": 80,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "dotted",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a9",
+      "roundness": null,
+      "seed": 430159722,
+      "version": 1,
+      "versionNonce": 161734462,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "trpc-client-operation-flow-through-link--node-8-label"
+        },
+        {
+          "id": "trpc-client-operation-flow-through-link--edge-8",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "trpc-client-operation-flow-through-link-",
+        "node": "server",
+        "state": "external"
+      }
+    },
+    {
+      "id": "trpc-client-operation-flow-through-link--edge-0",
+      "type": "arrow",
+      "x": 312,
+      "y": 92,
+      "width": 0,
+      "height": 300.8,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aA",
+      "roundness": null,
+      "seed": 343084997,
+      "version": 1,
+      "versionNonce": 1311532239,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "trpc-client-operation-flow-through-link--edge-0-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "trpc-client-operation-flow-through-link-",
+        "edge": {
+          "from": "app",
+          "to": "client",
+          "claim": "calls"
+        }
+      },
+      "points": [
+        [
+          0,
+          0.5
+        ],
+        [
+          0,
+          150.4
+        ],
+        [
+          0,
+          300.3
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "trpc-client-operation-flow-through-link--node-0",
+        "focus": 0.06666666666666665,
+        "gap": 8
+      },
+      "endBinding": {
+        "elementId": "trpc-client-operation-flow-through-link--node-1",
+        "focus": -0.06666666666666657,
+        "gap": 7.199999999999989
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "trpc-client-operation-flow-through-link--edge-1",
+      "type": "arrow",
+      "x": 272,
+      "y": 472.8,
+      "width": 180,
+      "height": 300.7999999999999,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aB",
+      "roundness": null,
+      "seed": 1926221996,
+      "version": 1,
+      "versionNonce": 1483077112,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "trpc-client-operation-flow-through-link--edge-1-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "trpc-client-operation-flow-through-link-",
+        "edge": {
+          "from": "client",
+          "to": "operation",
+          "claim": "builds"
+        }
+      },
+      "points": [
+        [
+          0,
+          0.5
+        ],
+        [
+          0,
+          32
+        ],
+        [
+          -180,
+          32
+        ],
+        [
+          -180,
+          60.39999999999992
+        ],
+        [
+          -180,
+          180.59999999999985
+        ],
+        [
+          -180,
+          240.69999999999987
+        ],
+        [
+          -180,
+          300.2999999999999
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "trpc-client-operation-flow-through-link--node-1",
+        "focus": 0.4,
+        "gap": 7.199999999999989
+      },
+      "endBinding": {
+        "elementId": "trpc-client-operation-flow-through-link--node-2",
+        "focus": -0.1,
+        "gap": 6.400000000000091
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "trpc-client-operation-flow-through-link--edge-2",
+      "type": "arrow",
+      "x": 352,
+      "y": 472.8,
+      "width": 0,
+      "height": 300.7999999999999,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aC",
+      "roundness": null,
+      "seed": 929579707,
+      "version": 1,
+      "versionNonce": 361768245,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "trpc-client-operation-flow-through-link--edge-2-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "trpc-client-operation-flow-through-link-",
+        "edge": {
+          "from": "client",
+          "to": "createchain",
+          "claim": "calls"
+        }
+      },
+      "points": [
+        [
+          0,
+          0.5
+        ],
+        [
+          0,
+          150.39999999999992
+        ],
+        [
+          0,
+          300.2999999999999
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "trpc-client-operation-flow-through-link--node-1",
+        "focus": -0.2666666666666667,
+        "gap": 7.199999999999989
+      },
+      "endBinding": {
+        "elementId": "trpc-client-operation-flow-through-link--node-3",
+        "focus": -0.08000000000000017,
+        "gap": 6.400000000000091
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "trpc-client-operation-flow-through-link--edge-3",
+      "type": "arrow",
+      "x": 352,
+      "y": 853.5999999999999,
+      "width": 0,
+      "height": 300.79999999999995,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aD",
+      "roundness": null,
+      "seed": 1334548842,
+      "version": 1,
+      "versionNonce": 1705813310,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "trpc-client-operation-flow-through-link--edge-3-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "trpc-client-operation-flow-through-link-",
+        "edge": {
+          "from": "createchain",
+          "to": "linkfactory",
+          "claim": "needs"
+        }
+      },
+      "points": [
+        [
+          0,
+          0.5
+        ],
+        [
+          0,
+          150.39999999999998
+        ],
+        [
+          0,
+          300.29999999999995
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "trpc-client-operation-flow-through-link--node-3",
+        "focus": 0.08000000000000017,
+        "gap": 6.400000000000091
+      },
+      "endBinding": {
+        "elementId": "trpc-client-operation-flow-through-link--node-4",
+        "focus": -0.1,
+        "gap": 5.600000000000136
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "trpc-client-operation-flow-through-link--edge-4",
+      "type": "arrow",
+      "x": 325.3333333333333,
+      "y": 1234.3999999999999,
+      "width": 106.66666666666669,
+      "height": 300.79999999999995,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aE",
+      "roundness": null,
+      "seed": 2127848121,
+      "version": 2,
+      "versionNonce": 1368110723,
+      "isDeleted": true,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "trpc-client-operation-flow-through-link--edge-4-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "trpc-client-operation-flow-through-link-",
+        "edge": {
+          "from": "linkfactory",
+          "to": "retry"
+        }
+      },
+      "points": [
+        [
+          0,
+          0.5
+        ],
+        [
+          5.684341886080802e-14,
+          32
+        ],
+        [
+          -106.66666666666663,
+          32
+        ],
+        [
+          -106.66666666666663,
+          97.0666666666666
+        ],
+        [
+          -106.66666666666663,
+          198.93333333333317
+        ],
+        [
+          -106.66666666666663,
+          249.86666666666656
+        ],
+        [
+          -106.66666666666663,
+          300.29999999999995
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "trpc-client-operation-flow-through-link--node-4",
+        "focus": 0.4333333333333337,
+        "gap": 5.600000000000136
+      },
+      "endBinding": {
+        "elementId": "trpc-client-operation-flow-through-link--node-5",
+        "focus": -0.016666666666666573,
+        "gap": 4.800000000000182
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "trpc-client-operation-flow-through-link--edge-5",
+      "type": "arrow",
+      "x": 378.6666666666667,
+      "y": 1234.3999999999999,
+      "width": 0,
+      "height": 681.5999999999999,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aF",
+      "roundness": null,
+      "seed": 1453570096,
+      "version": 2,
+      "versionNonce": 1050030220,
+      "isDeleted": true,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "trpc-client-operation-flow-through-link--edge-5-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "trpc-client-operation-flow-through-link-",
+        "edge": {
+          "from": "linkfactory",
+          "to": "http"
+        }
+      },
+      "points": [
+        [
+          0,
+          0.5
+        ],
+        [
+          0,
+          340.79999999999995
+        ],
+        [
+          0,
+          681.0999999999999
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "trpc-client-operation-flow-through-link--node-4",
+        "focus": -0.23333333333333367,
+        "gap": 5.600000000000136
+      },
+      "endBinding": {
+        "elementId": "trpc-client-operation-flow-through-link--node-6",
+        "focus": 0.233333333333332,
+        "gap": 4.000000000000227
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "trpc-client-operation-flow-through-link--edge-6",
+      "type": "arrow",
+      "x": 218.66666666666669,
+      "y": 1615.1999999999998,
+      "width": 106.66666666666669,
+      "height": 300.79999999999995,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aG",
+      "roundness": null,
+      "seed": 2003876703,
+      "version": 2,
+      "versionNonce": 1891523065,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "trpc-client-operation-flow-through-link--edge-6-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "trpc-client-operation-flow-through-link-",
+        "edge": {
+          "from": "retry",
+          "to": "http"
+        },
+        "via": [
+          "next"
+        ]
+      },
+      "points": [
+        [
+          -0.5,
+          0.5
+        ],
+        [
+          0,
+          192.79999999999995
+        ],
+        [
+          10.933333333333366,
+          192.79999999999995
+        ],
+        [
+          106.66666666666669,
+          192.79999999999995
+        ],
+        [
+          107.16666666666663,
+          300.29999999999995
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "trpc-client-operation-flow-through-link--node-5",
+        "focus": 0.016666666666666573,
+        "gap": 4.800000000000182
+      },
+      "endBinding": {
+        "elementId": "trpc-client-operation-flow-through-link--node-6",
+        "focus": -0.43333333333333307,
+        "gap": 4.000000000000227
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "trpc-client-operation-flow-through-link--edge-7",
+      "type": "arrow",
+      "x": 352,
+      "y": 1995.9999999999998,
+      "width": 0,
+      "height": 300.8000000000004,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aH",
+      "roundness": null,
+      "seed": 48277582,
+      "version": 1,
+      "versionNonce": 706335474,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "trpc-client-operation-flow-through-link--edge-7-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "trpc-client-operation-flow-through-link-",
+        "edge": {
+          "from": "http",
+          "to": "transport",
+          "claim": "feeds"
+        }
+      },
+      "points": [
+        [
+          0,
+          0.5
+        ],
+        [
+          0,
+          150.40000000000032
+        ],
+        [
+          0,
+          300.3000000000004
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "trpc-client-operation-flow-through-link--node-6",
+        "focus": 0.1,
+        "gap": 4.000000000000227
+      },
+      "endBinding": {
+        "elementId": "trpc-client-operation-flow-through-link--node-7",
+        "focus": 0.022222222222221387,
+        "gap": 3.199999999999818
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "trpc-client-operation-flow-through-link--edge-8",
+      "type": "arrow",
+      "x": 352,
+      "y": 2376.8,
+      "width": 0,
+      "height": 140,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aI",
+      "roundness": null,
+      "seed": 1110018765,
+      "version": 1,
+      "versionNonce": 114345399,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "trpc-client-operation-flow-through-link-",
+        "edge": {
+          "from": "transport",
+          "to": "server"
+        }
+      },
+      "points": [
+        [
+          0,
+          0.5
+        ],
+        [
+          0,
+          139.5
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "trpc-client-operation-flow-through-link--node-7",
+        "focus": -0.022222222222221387,
+        "gap": 3.199999999999818
+      },
+      "endBinding": {
+        "elementId": "trpc-client-operation-flow-through-link--node-8",
+        "focus": -0.1,
+        "gap": 3.199999999999818
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "trpc-client-operation-flow-through-link--node-0-label",
+      "type": "text",
+      "x": 232,
+      "y": 47.5,
+      "width": 176,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aJ",
+      "roundness": null,
+      "seed": 2128259667,
+      "version": 1,
+      "versionNonce": 1716541357,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "trpc-client-operation-flow-through-link-"
+      },
+      "text": "Application Code",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "trpc-client-operation-flow-through-link--node-0",
+      "originalText": "Application Code",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "trpc-client-operation-flow-through-link--node-1-label",
+      "type": "text",
+      "x": 226.5,
+      "y": 427.5,
+      "width": 187.00000000000003,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aK",
+      "roundness": null,
+      "seed": 1000615358,
+      "version": 1,
+      "versionNonce": 1676330082,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "trpc-client-operation-flow-through-link-"
+      },
+      "text": "TRPCUntypedClient",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "trpc-client-operation-flow-through-link--node-1",
+      "originalText": "TRPCUntypedClient",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "trpc-client-operation-flow-through-link--node-2-label",
+      "type": "text",
+      "x": 50.49999999999999,
+      "y": 807.5,
+      "width": 99.00000000000001,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aL",
+      "roundness": null,
+      "seed": 435857601,
+      "version": 1,
+      "versionNonce": 1688414475,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "trpc-client-operation-flow-through-link-"
+      },
+      "text": "Operation",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "trpc-client-operation-flow-through-link--node-2",
+      "originalText": "Operation",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "trpc-client-operation-flow-through-link--node-3-label",
+      "type": "text",
+      "x": 288.5,
+      "y": 807.5,
+      "width": 143,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aM",
+      "roundness": null,
+      "seed": 1916467204,
+      "version": 1,
+      "versionNonce": 112178960,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "trpc-client-operation-flow-through-link-"
+      },
+      "text": "createChain()",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "trpc-client-operation-flow-through-link--node-3",
+      "originalText": "createChain()",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "trpc-client-operation-flow-through-link--node-4-label",
+      "type": "text",
+      "x": 316,
+      "y": 1187.5,
+      "width": 88,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aN",
+      "roundness": null,
+      "seed": 510055751,
+      "version": 1,
+      "versionNonce": 1782011489,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "trpc-client-operation-flow-through-link-"
+      },
+      "text": "TRPCLink",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "trpc-client-operation-flow-through-link--node-4",
+      "originalText": "TRPCLink",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "trpc-client-operation-flow-through-link--node-5-label",
+      "type": "text",
+      "x": 170.5,
+      "y": 1567.5,
+      "width": 99.00000000000001,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aO",
+      "roundness": null,
+      "seed": 263369890,
+      "version": 1,
+      "versionNonce": 889157782,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "trpc-client-operation-flow-through-link-"
+      },
+      "text": "retryLink",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "trpc-client-operation-flow-through-link--node-5",
+      "originalText": "retryLink",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "trpc-client-operation-flow-through-link--node-6-label",
+      "type": "text",
+      "x": 316,
+      "y": 1947.5,
+      "width": 88,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aP",
+      "roundness": null,
+      "seed": 2102713925,
+      "version": 1,
+      "versionNonce": 1772386383,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "trpc-client-operation-flow-through-link-"
+      },
+      "text": "httpLink",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "trpc-client-operation-flow-through-link--node-6",
+      "originalText": "httpLink",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "trpc-client-operation-flow-through-link--node-7-label",
+      "type": "text",
+      "x": 284,
+      "y": 2327.5,
+      "width": 132,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aQ",
+      "roundness": null,
+      "seed": 1714754552,
+      "version": 1,
+      "versionNonce": 775744852,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "trpc-client-operation-flow-through-link-"
+      },
+      "text": "HTTP Request",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "trpc-client-operation-flow-through-link--node-7",
+      "originalText": "HTTP Request",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "trpc-client-operation-flow-through-link--node-8-label",
+      "type": "text",
+      "x": 327,
+      "y": 2547.5,
+      "width": 66,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aR",
+      "roundness": null,
+      "seed": 245868699,
+      "version": 1,
+      "versionNonce": 983366293,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "trpc-client-operation-flow-through-link-"
+      },
+      "text": "Server",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "trpc-client-operation-flow-through-link--node-8",
+      "originalText": "Server",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "trpc-client-operation-flow-through-link--edge-0-label",
+      "type": "text",
+      "x": 285.6,
+      "y": 232.4,
+      "width": 52.800000000000004,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aS",
+      "roundness": null,
+      "seed": 1868499116,
+      "version": 1,
+      "versionNonce": 1843076600,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "trpc-client-operation-flow-through-link-"
+      },
+      "text": "@calls",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "trpc-client-operation-flow-through-link--edge-0",
+      "originalText": "@calls",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "trpc-client-operation-flow-through-link--edge-1-label",
+      "type": "text",
+      "x": 61.199999999999996,
+      "y": 523.1999999999999,
+      "width": 61.60000000000001,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aT",
+      "roundness": null,
+      "seed": 1474867913,
+      "version": 1,
+      "versionNonce": 450494035,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "trpc-client-operation-flow-through-link-"
+      },
+      "text": "@builds",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "trpc-client-operation-flow-through-link--edge-1",
+      "originalText": "@builds",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "trpc-client-operation-flow-through-link--edge-2-label",
+      "type": "text",
+      "x": 325.6,
+      "y": 613.1999999999999,
+      "width": 52.800000000000004,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aU",
+      "roundness": null,
+      "seed": 2081810406,
+      "version": 1,
+      "versionNonce": 136075722,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "trpc-client-operation-flow-through-link-"
+      },
+      "text": "@calls",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "trpc-client-operation-flow-through-link--edge-2",
+      "originalText": "@calls",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "trpc-client-operation-flow-through-link--edge-3-label",
+      "type": "text",
+      "x": 325.6,
+      "y": 993.9999999999999,
+      "width": 52.800000000000004,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aV",
+      "roundness": null,
+      "seed": 1111521947,
+      "version": 1,
+      "versionNonce": 1949274261,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "trpc-client-operation-flow-through-link-"
+      },
+      "text": "@needs",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "trpc-client-operation-flow-through-link--edge-3",
+      "originalText": "@needs",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "trpc-client-operation-flow-through-link--edge-4-label",
+      "type": "text",
+      "x": 157.06666666666666,
+      "y": 1321.4666666666665,
+      "width": 123.20000000000002,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aW",
+      "roundness": null,
+      "seed": 1962788288,
+      "version": 2,
+      "versionNonce": 1954898844,
+      "isDeleted": true,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "trpc-client-operation-flow-through-link-"
+      },
+      "text": "first in chain",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "trpc-client-operation-flow-through-link--edge-4",
+      "originalText": "first in chain",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "trpc-client-operation-flow-through-link--edge-5-label",
+      "type": "text",
+      "x": 317.06666666666666,
+      "y": 1565.1999999999998,
+      "width": 123.20000000000002,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aX",
+      "roundness": null,
+      "seed": 1038437261,
+      "version": 2,
+      "versionNonce": 575850103,
+      "isDeleted": true,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "trpc-client-operation-flow-through-link-"
+      },
+      "text": "later in chain",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "trpc-client-operation-flow-through-link--edge-5",
+      "originalText": "later in chain",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "trpc-client-operation-flow-through-link--edge-6-label",
+      "type": "text",
+      "x": 185.60000000000005,
+      "y": 1797.9999999999998,
+      "width": 88,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aY",
+      "roundness": null,
+      "seed": 249325930,
+      "version": 1,
+      "versionNonce": 300160318,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "trpc-client-operation-flow-through-link-"
+      },
+      "text": "calls next",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "trpc-client-operation-flow-through-link--edge-6",
+      "originalText": "calls next",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "trpc-client-operation-flow-through-link--edge-7-label",
+      "type": "text",
+      "x": 325.6,
+      "y": 2136.4,
+      "width": 52.800000000000004,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aZ",
+      "roundness": null,
+      "seed": 1901784175,
+      "version": 1,
+      "versionNonce": 767166409,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "trpc-client-operation-flow-through-link-"
+      },
+      "text": "@feeds",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "trpc-client-operation-flow-through-link--edge-7",
+      "originalText": "@feeds",
+      "autoResize": true,
+      "lineHeight": 1.25
+    }
+  ],
+  "appState": {
+    "gridSize": null,
+    "viewBackgroundColor": "#ffffff"
+  },
+  "files": {},
+  "diagramos": {
+    "version": "0.2.0-rc.6",
+    "schema": 1
+  }
+}

@@ -12,6 +12,7 @@ import path from "node:path";
 
 import { emptyBoard, type BoardFile } from "../../src/engine/board-file";
 import { createDiagram } from "../../src/engine/diagram";
+import { BENCH_DIR } from "./bench-set";
 
 export interface KeyClaim {
   id: string; word: string; from: string; to: string; member?: string;
@@ -32,7 +33,7 @@ export function plantedKeys(repo: string): Key[] {
 
 /** Where each stored key lives, in the same order. */
 export function plantedKeyFiles(repo: string): string[] {
-  const root = path.join(repo, "bench/boards");
+  const root = path.join(repo, BENCH_DIR, "boards");
   if (!existsSync(root)) return [];
   const out: string[] = [];
   for (const project of readdirSync(root).sort()) {

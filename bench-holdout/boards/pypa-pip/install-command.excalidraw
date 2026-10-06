@@ -1,0 +1,1857 @@
+{
+  "type": "excalidraw",
+  "version": 2,
+  "source": "diagramos",
+  "elements": [
+    {
+      "id": "pip-install-command-flow-title",
+      "type": "text",
+      "x": 0,
+      "y": -115,
+      "width": 316.8,
+      "height": 30,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a0",
+      "roundness": null,
+      "seed": 1565071931,
+      "version": 1,
+      "versionNonce": 914580405,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "pip-install-command-flow",
+        "role": "title"
+      },
+      "text": "pip install command flow",
+      "fontSize": 24,
+      "fontFamily": 5,
+      "textAlign": "left",
+      "verticalAlign": "middle",
+      "containerId": null,
+      "originalText": "pip install command flow",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "pip-install-command-flow-node-0",
+      "type": "rectangle",
+      "x": 20,
+      "y": 40,
+      "width": 280,
+      "height": 200,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a1",
+      "roundness": null,
+      "seed": 234349086,
+      "version": 1,
+      "versionNonce": 1198834754,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "pip-install-command-flow-node-0-label"
+        },
+        {
+          "id": "pip-install-command-flow-edge-0",
+          "type": "arrow"
+        },
+        {
+          "id": "pip-install-command-flow-edge-1",
+          "type": "arrow"
+        },
+        {
+          "id": "pip-install-command-flow-edge-2",
+          "type": "arrow"
+        },
+        {
+          "id": "pip-install-command-flow-edge-3",
+          "type": "arrow"
+        },
+        {
+          "id": "pip-install-command-flow-edge-6",
+          "type": "arrow"
+        },
+        {
+          "id": "pip-install-command-flow-edge-7",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "pip-install-command-flow",
+        "node": "install_run",
+        "ref": "src/pip/_internal/commands/install.py#run"
+      }
+    },
+    {
+      "id": "pip-install-command-flow-node-1",
+      "type": "rectangle",
+      "x": 660,
+      "y": 360,
+      "width": 240,
+      "height": 100,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a2",
+      "roundness": null,
+      "seed": 369323631,
+      "version": 1,
+      "versionNonce": 1660857801,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "pip-install-command-flow-node-1-label"
+        },
+        {
+          "id": "pip-install-command-flow-edge-0",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "pip-install-command-flow",
+        "node": "get_reqs",
+        "ref": "src/pip/_internal/cli/req_command.py#get_requirements"
+      }
+    },
+    {
+      "id": "pip-install-command-flow-node-2",
+      "type": "rectangle",
+      "x": 1320,
+      "y": 500,
+      "width": 320,
+      "height": 100,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a3",
+      "roundness": null,
+      "seed": 892733056,
+      "version": 1,
+      "versionNonce": 1610933340,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "pip-install-command-flow-node-2-label"
+        },
+        {
+          "id": "pip-install-command-flow-edge-1",
+          "type": "arrow"
+        },
+        {
+          "id": "pip-install-command-flow-edge-4",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "pip-install-command-flow",
+        "node": "finder",
+        "ref": "src/pip/_internal/index/package_finder.py#PackageFinder"
+      }
+    },
+    {
+      "id": "pip-install-command-flow-node-3",
+      "type": "rectangle",
+      "x": 1320,
+      "y": 720,
+      "width": 260,
+      "height": 100,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a4",
+      "roundness": null,
+      "seed": 1898448073,
+      "version": 1,
+      "versionNonce": 1502090323,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "pip-install-command-flow-node-3-label"
+        },
+        {
+          "id": "pip-install-command-flow-edge-2",
+          "type": "arrow"
+        },
+        {
+          "id": "pip-install-command-flow-edge-5",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "pip-install-command-flow",
+        "node": "preparer",
+        "ref": "src/pip/_internal/operations/prepare.py#RequirementPreparer"
+      }
+    },
+    {
+      "id": "pip-install-command-flow-node-4",
+      "type": "rectangle",
+      "x": 700,
+      "y": 660,
+      "width": 280,
+      "height": 100,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a5",
+      "roundness": null,
+      "seed": 691033914,
+      "version": 1,
+      "versionNonce": 1450731150,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "pip-install-command-flow-node-4-label"
+        },
+        {
+          "id": "pip-install-command-flow-edge-3",
+          "type": "arrow"
+        },
+        {
+          "id": "pip-install-command-flow-edge-4",
+          "type": "arrow"
+        },
+        {
+          "id": "pip-install-command-flow-edge-5",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "pip-install-command-flow",
+        "node": "resolver",
+        "ref": "src/pip/_internal/resolution/resolvelib/resolver.py#Resolver"
+      }
+    },
+    {
+      "id": "pip-install-command-flow-node-5",
+      "type": "rectangle",
+      "x": 660,
+      "y": 180,
+      "width": 280,
+      "height": 100,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a6",
+      "roundness": null,
+      "seed": 1123423051,
+      "version": 1,
+      "versionNonce": 1333161925,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "pip-install-command-flow-node-5-label"
+        },
+        {
+          "id": "pip-install-command-flow-edge-6",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "pip-install-command-flow",
+        "node": "build_wheels",
+        "ref": "src/pip/_internal/wheel_builder.py#build"
+      }
+    },
+    {
+      "id": "pip-install-command-flow-node-6",
+      "type": "rectangle",
+      "x": 660,
+      "y": 20,
+      "width": 340,
+      "height": 80,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a7",
+      "roundness": null,
+      "seed": 1707164540,
+      "version": 1,
+      "versionNonce": 1366962184,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "pip-install-command-flow-node-6-label"
+        },
+        {
+          "id": "pip-install-command-flow-edge-7",
+          "type": "arrow"
+        },
+        {
+          "id": "pip-install-command-flow-edge-8",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "pip-install-command-flow",
+        "node": "install_reqs",
+        "ref": "src/pip/_internal/req/__init__.py#install_given_reqs"
+      }
+    },
+    {
+      "id": "pip-install-command-flow-node-7",
+      "type": "rectangle",
+      "x": 1320,
+      "y": 20,
+      "width": 280,
+      "height": 100,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a8",
+      "roundness": null,
+      "seed": 1632151061,
+      "version": 1,
+      "versionNonce": 887730463,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "pip-install-command-flow-node-7-label"
+        },
+        {
+          "id": "pip-install-command-flow-edge-8",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "pip-install-command-flow",
+        "node": "install_wheel",
+        "ref": "src/pip/_internal/operations/install/wheel.py#install_wheel"
+      }
+    },
+    {
+      "id": "pip-install-command-flow-edge-0",
+      "type": "arrow",
+      "x": 292,
+      "y": 119.14285714285715,
+      "width": 361.6,
+      "height": 292.85714285714283,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a9",
+      "roundness": null,
+      "seed": 1956984145,
+      "version": 1,
+      "versionNonce": 487120219,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "pip-install-command-flow-edge-0-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "pip-install-command-flow",
+        "edge": {
+          "from": "install_run",
+          "to": "get_reqs",
+          "claim": "calls"
+        }
+      },
+      "points": [
+        [
+          0.5,
+          0
+        ],
+        [
+          104,
+          0
+        ],
+        [
+          104,
+          223.2285714285714
+        ],
+        [
+          104,
+          292.85714285714283
+        ],
+        [
+          361.1,
+          292.85714285714283
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "pip-install-command-flow-node-0",
+        "focus": -0.20857142857142832,
+        "gap": 8
+      },
+      "endBinding": {
+        "elementId": "pip-install-command-flow-node-1",
+        "focus": -0.039999999999999675,
+        "gap": 6.399999999999977
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "pip-install-command-flow-edge-1",
+      "type": "arrow",
+      "x": 292,
+      "y": 147.71428571428572,
+      "width": 1034.3999999999999,
+      "height": 394.2857142857143,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aA",
+      "roundness": null,
+      "seed": 1704260520,
+      "version": 1,
+      "versionNonce": 916440196,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "pip-install-command-flow-edge-1-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "pip-install-command-flow",
+        "edge": {
+          "from": "install_run",
+          "to": "finder",
+          "claim": "builds"
+        }
+      },
+      "points": [
+        [
+          0.5,
+          0
+        ],
+        [
+          80,
+          0
+        ],
+        [
+          80,
+          394.2857142857143
+        ],
+        [
+          320.0571428571427,
+          394.2857142857143
+        ],
+        [
+          498.642857142857,
+          394.2857142857143
+        ],
+        [
+          677.2285714285713,
+          394.2857142857143
+        ],
+        [
+          1033.8999999999999,
+          394.2857142857143
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "pip-install-command-flow-node-0",
+        "focus": 0.07714285714285722,
+        "gap": 8
+      },
+      "endBinding": {
+        "elementId": "pip-install-command-flow-node-2",
+        "focus": 0.15999999999999948,
+        "gap": 6.399999999999864
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "pip-install-command-flow-edge-2",
+      "type": "arrow",
+      "x": 292,
+      "y": 204.85714285714286,
+      "width": 1034.3999999999999,
+      "height": 629.9428571428571,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aB",
+      "roundness": null,
+      "seed": 107083479,
+      "version": 1,
+      "versionNonce": 918878641,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "pip-install-command-flow-edge-2-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "pip-install-command-flow",
+        "edge": {
+          "from": "install_run",
+          "to": "preparer",
+          "claim": "builds"
+        }
+      },
+      "points": [
+        [
+          0.5,
+          0
+        ],
+        [
+          32,
+          0
+        ],
+        [
+          32,
+          629.9428571428571
+        ],
+        [
+          230.49523809523816,
+          629.9428571428571
+        ],
+        [
+          926.3999999999999,
+          629.9428571428571
+        ],
+        [
+          926.3999999999999,
+          573.4095238095236
+        ],
+        [
+          1033.8999999999999,
+          573.4095238095236
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "pip-install-command-flow-node-0",
+        "focus": 0.6485714285714288,
+        "gap": 8
+      },
+      "endBinding": {
+        "elementId": "pip-install-command-flow-node-3",
+        "focus": -0.16533333333332997,
+        "gap": 6.399999999999864
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "pip-install-command-flow-edge-3",
+      "type": "arrow",
+      "x": 292,
+      "y": 176.28571428571428,
+      "width": 401.6,
+      "height": 528.5142857142857,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aC",
+      "roundness": null,
+      "seed": 948226566,
+      "version": 1,
+      "versionNonce": 644942698,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "pip-install-command-flow-edge-3-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "pip-install-command-flow",
+        "edge": {
+          "from": "install_run",
+          "to": "resolver",
+          "claim": "builds"
+        }
+      },
+      "points": [
+        [
+          0.5,
+          0
+        ],
+        [
+          56,
+          0
+        ],
+        [
+          56,
+          409.0571428571429
+        ],
+        [
+          56,
+          528.5142857142857
+        ],
+        [
+          401.1,
+          528.5142857142857
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "pip-install-command-flow-node-0",
+        "focus": 0.3628571428571428,
+        "gap": 8
+      },
+      "endBinding": {
+        "elementId": "pip-install-command-flow-node-4",
+        "focus": 0.10400000000000119,
+        "gap": 6.399999999999977
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "pip-install-command-flow-edge-4",
+      "type": "arrow",
+      "x": 973.6,
+      "y": 688.1333333333333,
+      "width": 352.79999999999984,
+      "height": 112.79999999999995,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aD",
+      "roundness": null,
+      "seed": 2112241533,
+      "version": 1,
+      "versionNonce": 1384299623,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "pip-install-command-flow-edge-4-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "pip-install-command-flow",
+        "edge": {
+          "from": "resolver",
+          "to": "finder",
+          "claim": "calls"
+        }
+      },
+      "points": [
+        [
+          0.5,
+          0
+        ],
+        [
+          58.19999999999993,
+          0
+        ],
+        [
+          116.39999999999998,
+          0
+        ],
+        [
+          232.79999999999984,
+          0
+        ],
+        [
+          244.79999999999984,
+          0
+        ],
+        [
+          244.79999999999984,
+          -112.79999999999995
+        ],
+        [
+          352.29999999999984,
+          -112.79999999999995
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "pip-install-command-flow-node-4",
+        "focus": -0.43733333333333346,
+        "gap": 6.399999999999977
+      },
+      "endBinding": {
+        "elementId": "pip-install-command-flow-node-2",
+        "focus": -0.506666666666669,
+        "gap": 6.399999999999864
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "pip-install-command-flow-edge-5",
+      "type": "arrow",
+      "x": 973.6,
+      "y": 721.4666666666666,
+      "width": 352.79999999999984,
+      "height": 23.466666666666697,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aE",
+      "roundness": null,
+      "seed": 39771364,
+      "version": 1,
+      "versionNonce": 997226864,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "pip-install-command-flow-edge-5-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "pip-install-command-flow",
+        "edge": {
+          "from": "resolver",
+          "to": "preparer",
+          "claim": "calls"
+        }
+      },
+      "points": [
+        [
+          0.5,
+          0
+        ],
+        [
+          51.999999999999886,
+          0
+        ],
+        [
+          51.999999999999886,
+          23.466666666666697
+        ],
+        [
+          164.66666666666663,
+          23.466666666666697
+        ],
+        [
+          211.69999999999993,
+          23.466666666666697
+        ],
+        [
+          258.73333333333323,
+          23.466666666666697
+        ],
+        [
+          352.29999999999984,
+          23.466666666666697
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "pip-install-command-flow-node-4",
+        "focus": 0.2293333333333335,
+        "gap": 6.399999999999977
+      },
+      "endBinding": {
+        "elementId": "pip-install-command-flow-node-3",
+        "focus": 0.5013333333333339,
+        "gap": 6.399999999999864
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "pip-install-command-flow-edge-6",
+      "type": "arrow",
+      "x": 292,
+      "y": 90.57142857142857,
+      "width": 361.6,
+      "height": 141.42857142857144,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aF",
+      "roundness": null,
+      "seed": 429182739,
+      "version": 1,
+      "versionNonce": 537675373,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "pip-install-command-flow-edge-6-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "pip-install-command-flow",
+        "edge": {
+          "from": "install_run",
+          "to": "build_wheels",
+          "claim": "calls"
+        }
+      },
+      "points": [
+        [
+          0.5,
+          0
+        ],
+        [
+          128,
+          0
+        ],
+        [
+          128,
+          123.51428571428572
+        ],
+        [
+          128,
+          141.42857142857144
+        ],
+        [
+          361.1,
+          141.42857142857144
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "pip-install-command-flow-node-0",
+        "focus": -0.4942857142857143,
+        "gap": 8
+      },
+      "endBinding": {
+        "elementId": "pip-install-command-flow-node-5",
+        "focus": -0.03999999999999943,
+        "gap": 6.399999999999977
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "pip-install-command-flow-edge-7",
+      "type": "arrow",
+      "x": 292,
+      "y": 62,
+      "width": 361.6,
+      "height": 0,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aG",
+      "roundness": null,
+      "seed": 1160781794,
+      "version": 1,
+      "versionNonce": 1077989590,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "pip-install-command-flow-edge-7-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "pip-install-command-flow",
+        "edge": {
+          "from": "install_run",
+          "to": "install_reqs",
+          "claim": "calls"
+        }
+      },
+      "points": [
+        [
+          0.5,
+          0
+        ],
+        [
+          180.8,
+          0
+        ],
+        [
+          361.1,
+          0
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "pip-install-command-flow-node-0",
+        "focus": -0.78,
+        "gap": 8
+      },
+      "endBinding": {
+        "elementId": "pip-install-command-flow-node-6",
+        "focus": -0.04999999999999999,
+        "gap": 6.399999999999977
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "pip-install-command-flow-edge-8",
+      "type": "arrow",
+      "x": 993.6,
+      "y": 62,
+      "width": 332.79999999999984,
+      "height": 0,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aH",
+      "roundness": null,
+      "seed": 113328105,
+      "version": 1,
+      "versionNonce": 226537971,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "pip-install-command-flow-edge-8-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "pip-install-command-flow",
+        "edge": {
+          "from": "install_reqs",
+          "to": "install_wheel",
+          "claim": "calls"
+        }
+      },
+      "points": [
+        [
+          0.5,
+          0
+        ],
+        [
+          166.39999999999998,
+          0
+        ],
+        [
+          332.29999999999984,
+          0
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "pip-install-command-flow-node-6",
+        "focus": 0.04999999999999999,
+        "gap": 6.399999999999977
+      },
+      "endBinding": {
+        "elementId": "pip-install-command-flow-node-7",
+        "focus": 0.1600000000000006,
+        "gap": 6.399999999999864
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "pip-install-command-flow-node-0-label",
+      "type": "text",
+      "x": 77.5,
+      "y": 115,
+      "width": 165,
+      "height": 50,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aI",
+      "roundness": null,
+      "seed": 170994943,
+      "version": 1,
+      "versionNonce": 1437651993,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "pip-install-command-flow"
+      },
+      "text": "install command\nentry point",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "pip-install-command-flow-node-0",
+      "originalText": "install command\nentry point",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "pip-install-command-flow-node-1-label",
+      "type": "text",
+      "x": 686.5,
+      "y": 385,
+      "width": 187.00000000000003,
+      "height": 50,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aJ",
+      "roundness": null,
+      "seed": 1992657466,
+      "version": 1,
+      "versionNonce": 2019012494,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "pip-install-command-flow"
+      },
+      "text": "parse requirement\nspecifications",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "pip-install-command-flow-node-1",
+      "originalText": "parse requirement\nspecifications",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "pip-install-command-flow-node-2-label",
+      "type": "text",
+      "x": 1403,
+      "y": 525,
+      "width": 154,
+      "height": 50,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aK",
+      "roundness": null,
+      "seed": 182140509,
+      "version": 1,
+      "versionNonce": 271199431,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "pip-install-command-flow"
+      },
+      "text": "find available\npackages",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "pip-install-command-flow-node-2",
+      "originalText": "find available\npackages",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "pip-install-command-flow-node-3-label",
+      "type": "text",
+      "x": 1362,
+      "y": 745,
+      "width": 176,
+      "height": 50,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aL",
+      "roundness": null,
+      "seed": 1121120656,
+      "version": 1,
+      "versionNonce": 1454542700,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "pip-install-command-flow"
+      },
+      "text": "download &\nprepare packages",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "pip-install-command-flow-node-3",
+      "originalText": "download &\nprepare packages",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "pip-install-command-flow-node-4-label",
+      "type": "text",
+      "x": 774,
+      "y": 685,
+      "width": 132,
+      "height": 50,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aM",
+      "roundness": null,
+      "seed": 412885547,
+      "version": 1,
+      "versionNonce": 1180346405,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "pip-install-command-flow"
+      },
+      "text": "resolve\ndependencies",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "pip-install-command-flow-node-4",
+      "originalText": "resolve\ndependencies",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "pip-install-command-flow-node-5-label",
+      "type": "text",
+      "x": 717.5,
+      "y": 205,
+      "width": 165,
+      "height": 50,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aN",
+      "roundness": null,
+      "seed": 115506934,
+      "version": 1,
+      "versionNonce": 1457370714,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "pip-install-command-flow"
+      },
+      "text": "build source\ndists to wheels",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "pip-install-command-flow-node-5",
+      "originalText": "build source\ndists to wheels",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "pip-install-command-flow-node-6-label",
+      "type": "text",
+      "x": 742,
+      "y": 35,
+      "width": 176,
+      "height": 50,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aO",
+      "roundness": null,
+      "seed": 1037411609,
+      "version": 1,
+      "versionNonce": 1246511203,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "pip-install-command-flow"
+      },
+      "text": "install packages\nin order",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "pip-install-command-flow-node-6",
+      "originalText": "install packages\nin order",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "pip-install-command-flow-node-7-label",
+      "type": "text",
+      "x": 1366.5,
+      "y": 45,
+      "width": 187.00000000000003,
+      "height": 50,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aP",
+      "roundness": null,
+      "seed": 911819708,
+      "version": 1,
+      "versionNonce": 1107841352,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "pip-install-command-flow"
+      },
+      "text": "write wheel files\nto site-packages",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "pip-install-command-flow-node-7",
+      "originalText": "write wheel files\nto site-packages",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "pip-install-command-flow-edge-0-label",
+      "type": "text",
+      "x": 369.6,
+      "y": 332.37142857142857,
+      "width": 52.800000000000004,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aQ",
+      "roundness": null,
+      "seed": 679978280,
+      "version": 1,
+      "versionNonce": 447557892,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "pip-install-command-flow"
+      },
+      "text": "@calls",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "pip-install-command-flow-edge-0",
+      "originalText": "@calls",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "pip-install-command-flow-edge-1-label",
+      "type": "text",
+      "x": 581.2571428571428,
+      "y": 532,
+      "width": 61.60000000000001,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aR",
+      "roundness": null,
+      "seed": 431864437,
+      "version": 1,
+      "versionNonce": 851361791,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "pip-install-command-flow"
+      },
+      "text": "@builds",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "pip-install-command-flow-edge-1",
+      "originalText": "@builds",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "pip-install-command-flow-edge-2-label",
+      "type": "text",
+      "x": 491.69523809523815,
+      "y": 824.8,
+      "width": 61.60000000000001,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aS",
+      "roundness": null,
+      "seed": 1670073682,
+      "version": 1,
+      "versionNonce": 473752198,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "pip-install-command-flow"
+      },
+      "text": "@builds",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "pip-install-command-flow-edge-2",
+      "originalText": "@builds",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "pip-install-command-flow-edge-3-label",
+      "type": "text",
+      "x": 317.2,
+      "y": 575.3428571428572,
+      "width": 61.60000000000001,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aT",
+      "roundness": null,
+      "seed": 186338807,
+      "version": 1,
+      "versionNonce": 1514777425,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "pip-install-command-flow"
+      },
+      "text": "@builds",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "pip-install-command-flow-edge-3",
+      "originalText": "@builds",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "pip-install-command-flow-edge-4-label",
+      "type": "text",
+      "x": 1179.9999999999998,
+      "y": 678.1333333333333,
+      "width": 52.800000000000004,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aU",
+      "roundness": null,
+      "seed": 259836084,
+      "version": 1,
+      "versionNonce": 2103078784,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "pip-install-command-flow"
+      },
+      "text": "@calls",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "pip-install-command-flow-edge-4",
+      "originalText": "@calls",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "pip-install-command-flow-edge-5-label",
+      "type": "text",
+      "x": 1111.8666666666666,
+      "y": 734.9333333333333,
+      "width": 52.800000000000004,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aV",
+      "roundness": null,
+      "seed": 636590833,
+      "version": 1,
+      "versionNonce": 2130792827,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "pip-install-command-flow"
+      },
+      "text": "@calls",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "pip-install-command-flow-edge-5",
+      "originalText": "@calls",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "pip-install-command-flow-edge-6-label",
+      "type": "text",
+      "x": 393.6,
+      "y": 204.0857142857143,
+      "width": 52.800000000000004,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aW",
+      "roundness": null,
+      "seed": 655198190,
+      "version": 1,
+      "versionNonce": 1350564114,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "pip-install-command-flow"
+      },
+      "text": "@calls",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "pip-install-command-flow-edge-6",
+      "originalText": "@calls",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "pip-install-command-flow-edge-7-label",
+      "type": "text",
+      "x": 446.40000000000003,
+      "y": 52,
+      "width": 52.800000000000004,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aX",
+      "roundness": null,
+      "seed": 727753539,
+      "version": 1,
+      "versionNonce": 2072153693,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "pip-install-command-flow"
+      },
+      "text": "@calls",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "pip-install-command-flow-edge-7",
+      "originalText": "@calls",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "pip-install-command-flow-edge-8-label",
+      "type": "text",
+      "x": 1133.6,
+      "y": 52,
+      "width": 52.800000000000004,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aY",
+      "roundness": null,
+      "seed": 1831674288,
+      "version": 1,
+      "versionNonce": 954680588,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "pip-install-command-flow"
+      },
+      "text": "@calls",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "pip-install-command-flow-edge-8",
+      "originalText": "@calls",
+      "autoResize": true,
+      "lineHeight": 1.25
+    }
+  ],
+  "appState": {
+    "gridSize": null,
+    "viewBackgroundColor": "#ffffff"
+  },
+  "files": {},
+  "diagramos": {
+    "version": "0.2.0-rc.6",
+    "schema": 1
+  }
+}
