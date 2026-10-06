@@ -66,7 +66,10 @@
  *   macros                 the call site is generated, not written   -> `macro`
  */
 import { providedByLanguage } from "./builtins";
-import { compiledBodiesOf, compiledRefutes, traitImplsOf, type CompiledBody, type CompiledCrate } from "./compiled-calls";
+import {
+  compiledBodiesOf, compiledRefutes, ownCallIn, traitImplsOf, type CompiledBody, type CompiledCrate,
+} from "./compiled-calls";
+import { declaredBases } from "./conforms";
 import { mayAccuse } from "./licence";
 import { declaresMember, holdersIn } from "./overrides";
 import { each, parseSource, type Language, type Node, type Tree } from "./parse";
@@ -191,6 +194,12 @@ export interface CallsRefutedEvidence {
   line: number;
   /** Every call the routine makes, checked and placed somewhere else. */
   sites: number;
+  /**
+   * The calls that came to rest in the head's own file, on something the
+   * head cannot be (#430). "None reaching that file" would be false, so the
+   * sentence names where they went.
+   */
+  elsewhere?: Array<{ name: string; line: number }>;
   /**
    * The head is a method the language runs without it being written (#384):
    * a Python `__dunder__` an operator or builtin calls, or TypeScript's
@@ -1300,6 +1309,131 @@ const REACHES_ANYTHING = new Set([
   "apply", "call", "Function",
 ]);
 
+/**
+ * The ones that only read or write by name (#431). Python's `getattr` hands
+ * back an attribute, `setattr` stores one, and `vars`, `globals` and `locals`
+ * hand back a namespace; none of them runs an ordinary function. What they can
+ * run is an attribute hook -- `__getattr__`, a descriptor's `__get__`, a
+ * property -- and `runsOnRead` keeps those a doubt. What comes back can still
+ * be called, which is the doubt `quietReads` keeps.
+ */
+const READS_BY_NAME = new Set(["getattr", "setattr", "vars", "globals", "locals"]);
+
+/** Builtins handed a value only to look at it: none of them calls it. */
+const INSPECTS = new Set(["isinstance", "issubclass", "id", "type", "len", "bool", "callable", "hasattr"]);
+
+/**
+ * The `getattr`-like calls in one Python routine whose result goes nowhere it
+ * could be run: compared, tested, read from, kept in a local -- never called
+ * where it stands, handed to a call, returned, put into a field or a
+ * container that is, used as a decorator or a context manager.
+ *
+ * Top-down, carrying whether the value at each node is handed on: a call's
+ * callee is called, its arguments are handed on unless the call only looks
+ * at them, and a container, a conditional or a walrus passes its context to
+ * what is in it. A local is any other value whose origin is unknown, and a
+ * call through one is a site of its own. A name bound by the file or the
+ * routine (`getattr = ...`, `from x import getattr`) is not the builtin.
+ */
+function quietReads(routine: Node, bindings: Bindings): Set<number> {
+  const quiet = new Set<number>();
+  if (bindings.wildcard) return quiet;
+  /*
+   * Bound here as something else. Not `boundByRoutine`, which takes every
+   * name on the left of an operator and so bound `getattr` in pydantic's
+   * `a and getattr(...)`: a parameter, an assignment, a loop or `as` target.
+   */
+  const parameters = routine.childForFieldName("parameters")?.text ?? "";
+  const own = (name: string) => bindings.local.has(name) || bindings.imported.has(name)
+    || new RegExp(`\\b${name}\\b`).test(parameters)
+    || new RegExp(`\\b${name}\\s*(:[^=\\n]*)?:?=(?!=)|\\b(as|for|def)\\s+${name}\\b`).test(routine.text);
+  const visit = (node: Node, handed: boolean): void => {
+    const each_ = (child: Node | null, onward: boolean) => { if (child) visit(child, onward); };
+    const rest = (onward: boolean, skip?: Node | null) => {
+      for (let index = 0; index < node.childCount; index += 1) {
+        const child = node.child(index);
+        if (child && child.id !== skip?.id) visit(child, onward);
+      }
+    };
+    switch (node.type) {
+      case "call": {
+        const callee = node.childForFieldName("function");
+        const name = callee?.type === "identifier" && !own(callee.text) ? callee.text : undefined;
+        if (name !== undefined && READS_BY_NAME.has(name) && !handed) quiet.add(node.id);
+        each_(callee, true);
+        // `getattr(x, n, default)` hands back `default` itself; what `isinstance` is given goes nowhere.
+        const onward = name !== undefined && INSPECTS.has(name) ? false : name === "getattr" ? handed : true;
+        each_(node.childForFieldName("arguments"), onward);
+        return;
+      }
+      case "argument_list": case "keyword_argument": case "list_splat": case "dictionary_splat":
+      case "parenthesized_expression": case "tuple": case "list": case "set": case "dictionary": case "pair":
+      case "conditional_expression": case "boolean_operator": case "await": case "expression_list":
+      case "list_comprehension": case "set_comprehension": case "dictionary_comprehension": case "generator_expression":
+        rest(handed);
+        return;
+      case "named_expression":
+        each_(node.childForFieldName("value"), handed);
+        return;
+      case "return_statement": case "yield": case "lambda": case "decorator": case "with_item":
+        rest(true);
+        return;
+      case "assignment": case "augmented_assignment": {
+        const left = node.childForFieldName("left");
+        const kept = left !== null && /^(identifier|pattern_list|tuple_pattern|list_pattern)$/.test(left.type);
+        each_(left, false);
+        each_(node.childForFieldName("right"), !kept);
+        return;
+      }
+      default:
+        rest(false);
+    }
+  };
+  visit(routine, false);
+  return quiet;
+}
+
+const DUNDER = /^__\w+__$/;
+const ATTRIBUTE_HOOK = /^__(getattr|getattribute|setattr|delattr|get|set|delete)__$/;
+const PLAIN_DECORATOR = /^@\s*(staticmethod|classmethod|(abc\.)?abstractmethod|(typing\.)?(overload|override))\s*$/;
+
+/**
+ * Whether reading or setting an attribute by name can run one of these
+ * without a call to it being written (#431): a dunder -- `__getattr__`, a
+ * descriptor's `__get__`, or any other the language runs on a value it was
+ * handed -- or a routine under a decorator that may make it a descriptor,
+ * `@property` and `@cached_property` among them. For a class: an attribute
+ * hook of its own, or a routine of its own under such a decorator.
+ */
+function runsOnRead(side: { source: string; language: Language }, names: readonly string[]): boolean {
+  if (side.language !== "python") return false;
+  if (names.some((name) => DUNDER.test(name))) return true;
+  const tree = parseSource(side.source, side.language);
+  if (!tree) return true;
+  const spans = names.flatMap((name) => typeSpans(side.source, side.language, name));
+  const inside = (at: Node) => {
+    const line = lineOf(side.source, at.startIndex);
+    return spans.some(([first, last]) => first <= line && line <= last);
+  };
+  let runs = false;
+  each(tree.rootNode, (node) => {
+    if (runs) return;
+    if (node.type === "function_definition") {
+      if (ATTRIBUTE_HOOK.test(node.childForFieldName("name")?.text ?? "") && inside(node)) runs = true;
+      return;
+    }
+    if (node.type !== "decorated_definition") return;
+    const routine = node.childForFieldName("definition");
+    if (routine?.type !== "function_definition") return;
+    if (!names.includes(routine.childForFieldName("name")?.text ?? "") && !inside(routine)) return;
+    for (let index = 0; index < node.childCount; index += 1) {
+      const decorator = node.child(index);
+      if (decorator?.type === "decorator" && !PLAIN_DECORATOR.test(decorator.text)) runs = true;
+    }
+  });
+  return runs;
+}
+
 type Named = { routines: Node[]; declared: boolean; unreadable: boolean };
 const named_ = new WeakMap<Tree, Map<string, Named>>();
 
@@ -1522,7 +1656,18 @@ function resolves(
 
   const bound = callee.kind === "through" ? callee.through : callee.name;
   if (!bound) return callee.kind === "through" ? landsOnTarget(callee, side, target) : "receiver";
-  if (bindings.ambiguous.has(bound)) return "ambiguous";
+  /*
+   * Ambiguous as a name is not ambiguous at one position (#433), which is why
+   * `placeOf` already asks there. anyhow's `error.rs` imports `Error` and also
+   * holds `impl Error` blocks, so `Error::construct(...)`, written in plain
+   * sight, never confirmed. Only ever a confirmation.
+   *
+   * With no answer the doubt is `receiver`, as for any member call whose
+   * owner the text cannot place: a live check starts a language server only
+   * for that reason (`wouldHelp`), so leaving it `ambiguous` meant nothing
+   * was ever asked -- the first build of this moved no arrow on the bench.
+   */
+  if (bindings.ambiguous.has(bound)) return callee.kind === "through" ? landsOnTarget(callee, side, target) : "ambiguous";
 
   const imported = bindings.imported.get(bound);
   if (!imported) {
@@ -1587,7 +1732,11 @@ function resolves(
 function callsTo(
   side: CallSide,
   routine: string,
-  target: { file: string; names: Set<string> },
+  target: {
+    file: string; names: Set<string>;
+    /** A head an attribute read by name can run (#431): `runsOnRead`. */
+    hooked?: boolean;
+  },
 ): { evidence?: CallsEvidence; why?: CallsWithheld } {
   const bindings = bindingsIn(side.source, side.language);
   if (!bindings) return { why: "unreadable" };
@@ -1600,6 +1749,7 @@ function callsTo(
   for (const body of routines) {
     if (body.hasError) { why ??= "incomplete"; continue; }
     let found: CallsEvidence | undefined;
+    const quiet = side.language === "python" && !target.hooked ? quietReads(body, bindings) : undefined;
     each(body, (node) => {
       if (found) return;
       /*
@@ -1618,6 +1768,8 @@ function callsTo(
       if (!callee) return;
       const answer = resolves(callee, side, bindings, target);
       if (answer === undefined) return;
+      // Read or set by name, and the result runs nowhere: no call to the head (#431).
+      if (answer === "dynamic" && quiet?.has(node.id)) return;
       if (answer === "yes") {
         found = {
           name: callee.kind === "computed" ? "" : callee.name,
@@ -1664,7 +1816,7 @@ export function callsBetween(
   backwards = true,
 ): CallsVerdict {
   const wanted = new Set(to.names);
-  const forward = callsTo(from, from.routine, { file: to.file, names: wanted });
+  const forward = callsTo(from, from.routine, { file: to.file, names: wanted, hooked: runsOnRead(to, to.names) });
   if (forward.evidence) return { verdict: "confirmed", evidence: forward.evidence };
   /*
    * A doubt reading forwards was the end of it until #357: the text could not
@@ -1674,6 +1826,13 @@ export function callsBetween(
    */
   const compiled = forward.why ? compiledBodiesFor(from, to.names) : undefined;
   if (forward.why && !compiled) return { verdict: "withheld", why: forward.why };
+  /*
+   * And the compiler's list may show the call the text could only doubt
+   * (#434): `ok!(self.parse_long_arg(..))`. Its path has to be the head's
+   * own, not just its name -- see `ownCallIn`.
+   */
+  const listed = compiled ? listedCall(from, to, compiled) : undefined;
+  if (listed) return { verdict: "confirmed", evidence: listed };
 
   if (!mayAccuse("calls", from.language) || !mayAccuse("calls", to.language)) {
     return { verdict: "withheld", why: "unlicensed" };
@@ -1697,7 +1856,7 @@ export function callsBetween(
    * read cleanly, so the honest answer is that no call was found, which is
    * `absent` and is silence either way.
    */
-  const back = { file: from.file, names: new Set([from.routine]) };
+  const back = { file: from.file, names: new Set([from.routine]), hooked: runsOnRead(from, [from.routine]) };
   for (const name of backwards ? to.names : []) {
     const reverse = callsTo(to, name, back);
     if (reverse.evidence) return { verdict: "backwards", evidence: reverse.evidence };
@@ -1766,7 +1925,7 @@ function closedBodyRefutes(
    * a scope's end runs `drop`. Each of those went red on a correct arrow.
    */
   const closedByText = (): typeof text => {
-    const unwritten = (from.language === "rust" ? calledImplicitly(to) : undefined)
+    const unwritten = (from.language === "rust" ? calledImplicitly(from, to, known) : undefined)
       ?? (handsOnHead(from, to) ? "named" : undefined);
     if (unwritten) return { why: unwritten };
     const implicit = "evidence" in text ? runByTheLanguage(from, to) ?? handedOutside(from, to) : undefined;
@@ -1824,9 +1983,21 @@ export interface CompiledTail {
  * alias hiding the error type. A trait the repository declares is only ever
  * called by name.
  */
-function calledImplicitly(to: CallSide & { names: string[] }): "called-implicitly" | undefined {
+function calledImplicitly(
+  from: CallSide & { routine: string },
+  to: CallSide & { names: string[] },
+  known?: CompiledTail,
+): "called-implicitly" | undefined {
   const names = new Set(to.names);
-  return traitImplsOf(to.source, names).some((one) => !traitDeclaredHere(to, one.trait)) ? "called-implicitly" : undefined;
+  if (!traitImplsOf(to.source, names).some((one) => !traitDeclaredHere(to, one.trait))) return undefined;
+  /*
+   * Unless the compiler's list says it never happens (#434): every call the
+   * body makes is to this crate, it drops nothing, and none is the head --
+   * so no library runs anything for it. `compiledRefutes` holds that rule;
+   * this is the text-closed reading asking it too.
+   */
+  const compiled = known ?? compiledBodiesFor(from, to.names);
+  return compiled && !("why" in compiledVerdict(compiled, to)) ? undefined : "called-implicitly";
 }
 
 /**
@@ -2070,6 +2241,30 @@ export function compiledBodiesFor(
   return { bodies: reading.bodies, generics: reading.generics, unbuilt: reading.unbuilt };
 }
 
+/**
+ * The head's call in the compiler's list, as evidence: the first line of the
+ * tail's routine that writes the name, which for a call inside a macro is
+ * the macro's line (#434).
+ */
+function listedCall(
+  from: CallSide & { routine: string },
+  to: CallSide & { names: string[] },
+  compiled: CompiledTail,
+): CallsEvidence | undefined {
+  const crate = from.compiled?.();
+  const name = crate ? ownCallIn(crate, compiled.bodies, to) : undefined;
+  if (!name) return undefined;
+  const pattern = new RegExp(`(?<![\\w$])${escapeName(name)}(?![\\w$])`);
+  for (const routine of routinesNamed(from.source, from.routine, "rust").routines) {
+    const at = routine.text.search(pattern);
+    if (at < 0) continue;
+    const line = lineOf(from.source, routine.startIndex + at);
+    return { name, inside: from.routine, line, wrote: from.source.split("\n")[line - 1]!.trim() };
+  }
+  const first = routinesNamed(from.source, from.routine, "rust").routines[0];
+  return { name, inside: from.routine, line: first ? lineOf(from.source, first.startIndex) : 1, wrote: `${name}(..), in rustc's call list` };
+}
+
 /** `closedBodyRefutes` as it was before #357: the text reading alone. */
 function textClosed(
   from: CallSide & { routine: string },
@@ -2082,10 +2277,13 @@ function textClosed(
 
   let sites = 0;
   const reached: Array<{ name: string; line: number }> = [];
+  let hooked: boolean | undefined;
+  const elsewhere: Array<{ name: string; line: number }> = [];
   for (const body of bodies) {
     for (const site of body.sites) {
       // Open: something unplaced, and the site says what stopped it.
       if (site.file === undefined) return { why: site.why ?? "unplaced" };
+      if (site.byName && (hooked ??= runsOnRead(to, to.names))) return { why: "dynamic" };
       /*
        * `concrete` is only ever set by a checker's answer, and since #353 an
        * `own` call the class does not declare is put to one too -- a
@@ -2110,6 +2308,11 @@ function textClosed(
          */
         if (site.declaredAs === undefined) return { why: "reaches-the-file" };
         if (to.names.includes(site.declaredAs)) return { why: "reaches-the-file" };
+        if (cannotBeTheHead(to, site.declaredAs)) {
+          elsewhere.push({ name: site.declaredAs, line: site.line });
+          sites += 1;
+          continue;
+        }
         /*
          * And the head's file has to actually declare a routine by that name
          * (#329's measurement). `measure:wrong-routine` put every placed name
@@ -2134,7 +2337,7 @@ function textClosed(
     }
   }
   if (reached.length === 0) {
-    return { evidence: { routine: from.routine, line: bodies[0]!.line, sites } };
+    return { evidence: { routine: from.routine, line: bodies[0]!.line, sites, ...(elsewhere.length > 0 ? { elsewhere } : {}) } };
   }
   /*
    * An arrow drawn at a **type** is a different mistake and not this one
@@ -2206,10 +2409,12 @@ export function callsIntoType(
   const answerable = (one: CallsNotClosed | undefined) => one === "receiver" || one === "abstract-receiver";
   const stopped = (one: CallsNotClosed): void => { if (!why || (!answerable(why) && answerable(one))) why = one; };
   let sites = 0;
+  let hooked: boolean | undefined;
   for (const body of bodies) {
     for (const site of body.sites) {
       sites += 1;
       if (site.file === undefined) { stopped(site.why ?? "unplaced"); continue; }
+      if (site.byName && (hooked ??= runsOnRead(to, to.names))) { stopped("dynamic"); continue; }
       if (site.concrete === false) { stopped("abstract-receiver"); continue; }
       if (site.overridden) { stopped("overridden"); continue; }
       const landed = site.file === to.file ? to
@@ -2264,6 +2469,90 @@ function typeSpans(source: string, language: Language, type: string): Array<[num
     if (isType || impl) spans.push([lineOf(source, node.startIndex), lineOf(source, node.startIndex + node.text.length)]);
   });
   return spans;
+}
+
+/**
+ * Whether a call that came to rest in the head's file, on `landed`, cannot be
+ * the head -- one more call placed somewhere else, and no reason to stop
+ * (#430).
+ *
+ * Landing in the head's file used to end the question whatever it landed on.
+ * But django's `resolve` calling `URLResolver.resolve` is not calling
+ * `url_name`, an attribute nothing calls, and httpx's `Request(...)` is not
+ * calling `Response.iter_text`. Three shapes cannot be the head:
+ *
+ *   the head is data        neither a routine nor a type: nothing calls it
+ *   it landed on a class    making one runs that class's own code and what
+ *                           it inherits here, never another class's routine
+ *   the head is a type      and it landed on a routine written outside it,
+ *                           or on a class that does not derive from it
+ *
+ * A routine landing on another routine is none of these: that is the near
+ * miss (#329), and it keeps its own red. What landed has to be declared here
+ * as a routine or as a type and nothing else, and must not be the head under
+ * another name (`fetch = get`, `export { get as fetch }`, `{ error: log }`).
+ */
+function cannotBeTheHead(to: CallSide & { names: string[] }, landed: string): boolean {
+  const { source, language } = to;
+  const landedRoutine = isRoutine(source, landed, language);
+  const landedType = isTypeName(source, landed, language);
+  if (landedRoutine === landedType) return false;
+  return to.names.every((head) => {
+    if (aliases(source, head, landed)) return false;
+    const headRoutine = isRoutine(source, head, language);
+    const headType = isTypeName(source, head, language);
+    if (headRoutine) return landedType && !runWhenMade(to, landed, head);
+    if (headType) return !writtenInside(source, language, head, landed) && !(landedType && lineageOf(to, landed).has(head));
+    return true;
+  });
+}
+
+/**
+ * Whether making a `type` can run `routine` without a call to it being
+ * written: it is written inside the type's own code -- a constructor, a
+ * `__post_init__`, a validator, a Rust `Drop` -- or held by the type or by
+ * one of its bases declared in this file, or by a trait, whose method any
+ * implementor may be running. A base declared in another file cannot hold a
+ * routine of this one without importing it back.
+ */
+function runWhenMade(to: CallSide, type: string, routine: string): boolean {
+  if (writtenInside(to.source, to.language, type, routine)) return true;
+  const lineage = lineageOf(to, type);
+  return holdersOfRoutine(to.source, to.language, routine)
+    .some((one) => one.dispatched || (one.name !== undefined && lineage.has(one.name)));
+}
+
+/** Whether `name` is written anywhere in a type's own code in this file. */
+function writtenInside(source: string, language: Language, type: string, name: string): boolean {
+  const lines = source.split("\n");
+  const word = new RegExp(`\\b${escapeName(name)}\\b`);
+  return typeSpans(source, language, type)
+    .some(([first, last]) => word.test(lines.slice(first - 1, last).join("\n")));
+}
+
+/** A type and every base it names that this file declares, followed up the chain. */
+function lineageOf(side: CallSide, type: string): Set<string> {
+  const seen = new Set<string>();
+  const pending = [type];
+  while (pending.length > 0) {
+    const next = pending.pop()!;
+    if (seen.has(next)) continue;
+    seen.add(next);
+    const read = declaredBases(side.source, next, side.language);
+    if ("bases" in read) pending.push(...read.bases.map((base) => base.name));
+  }
+  return seen;
+}
+
+/** Whether this source binds `head` to `landed` under another name. */
+function aliases(source: string, head: string, landed: string): boolean {
+  const h = escapeName(head);
+  const l = escapeName(landed);
+  return new RegExp(
+    `\\b${h}\\s*(?::[^=;\\n]*)?=\\s*[\\w.:]*\\b${l}\\b`
+    + `|\\b${l}\\s+as\\s+${h}\\b`
+    + `|\\b${h}\\s*:\\s*[\\w.:]*\\b${l}\\b`,
+  ).test(source);
 }
 
 /**
@@ -2519,6 +2808,13 @@ export interface CallSitePlaced {
    * plain base class rather than an interface.
    */
   overridden?: boolean;
+  /**
+   * A Python `getattr`, `setattr`, `vars`, `globals` or `locals` whose result
+   * goes nowhere it could be run (#431), placed outside the repository like
+   * any library call. It can still run an attribute hook, so a head that is
+   * one keeps it a doubt -- `runsOnRead`, asked where the head is known.
+   */
+  byName?: true;
 }
 
 /** Every call site in one routine, placed or refused. */
@@ -3196,6 +3492,7 @@ export function callSitesIn(side: CallSide, only?: string): CallSitesReading {
     const scope = boundByRoutine(node);
     holders ??= holdersIn(tree.rootNode);
     const holder = holders.get(node.id);
+    const quiet = side.language === "python" ? quietReads(node, bindings) : undefined;
     each(node, (inner) => {
       /*
        * A macro's arguments are loose tokens rather than a tree, so a call
@@ -3216,6 +3513,10 @@ export function callSitesIn(side: CallSide, only?: string): CallSitesReading {
       const callee = calleeOf(inner) ?? constructedBy(inner) ?? renderedBy(inner);
       if (!callee) return;
       const where = placeOf(callee, side, bindings, scope, holder);
+      if ("why" in where && where.why === "dynamic" && quiet?.has(inner.id)) {
+        body.sites.push({ ...siteOf(callee, side.source, inner, { file: EXTERNAL_RECEIVER }), byName: true });
+        return;
+      }
       /*
        * A local holding one of several functions, every one written down
        * (#417): one site for each it can hold, and none for a function

@@ -47,7 +47,10 @@ const FILES: Record<string, string> = {
     "pub fn helper() -> u8 {\n    1\n}\n\npub fn unrelated() -> u8 {\n    2\n}\n\n"
     + "pub fn double(x: u8) -> u8 {\n    x * 2\n}\n\n"
     + "pub fn ping(n: u8) -> u8 {\n    if n == 0 {\n        return 0;\n    }\n    ok!(pong(n - 1))\n}\n\n"
-    + "pub fn pong(n: u8) -> u8 {\n    ping(n)\n}\n",
+    + "pub fn pong(n: u8) -> u8 {\n    ping(n)\n}\n\n"
+    + "pub fn vtable() -> u8 {\n    3\n}\n\n"
+    + "pub struct Counter;\n\nimpl Counter {\n    pub fn bump(&self) -> u8 {\n        1\n    }\n\n"
+    + "    pub fn push(&self) -> u8 {\n        2\n    }\n}\n",
   "src/transport.rs":
     "pub trait Transport {\n    fn handle(&self) -> u8;\n}\n\npub struct Http;\n\n"
     + "impl Transport for Http {\n    fn handle(&self) -> u8 {\n        1\n    }\n}\n\n"
@@ -60,11 +63,13 @@ const FILES: Record<string, string> = {
     + "pub struct E;\n\nimpl From<std::num::ParseIntError> for E {\n    fn from(_: std::num::ParseIntError) -> E {\n        E\n    }\n}\n\n"
     + "pub struct Guard;\n\nimpl Drop for Guard {\n    fn drop(&mut self) {}\n}\n\n"
     + "pub struct Report;\n\nimpl std::fmt::Display for Report {\n"
-    + "    fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {\n        f.write_str(\"report\")\n    }\n}\n",
+    + "    fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {\n        f.write_str(\"report\")\n    }\n}\n\n"
+    + "#[derive(PartialEq, Eq, PartialOrd)]\npub struct Key(pub u8);\n\n"
+    + "impl Ord for Key {\n    fn cmp(&self, other: &Self) -> std::cmp::Ordering {\n        self.0.cmp(&other.0)\n    }\n}\n",
   "src/callers.rs": [
-    "use crate::helpers::{double, helper};",
+    "use crate::helpers::{double, helper, Counter};",
     "use crate::transport::Transport;",
-    "use crate::values::{Guard, Report, E, V};",
+    "use crate::values::{Guard, Key, Report, E, V};",
     "",
     "pub fn wrapped() -> u8 {\n    ok!(helper())\n}",
     "pub fn send<T: Transport>(t: &T) -> u8 {\n    ok!(t.handle())\n}",
@@ -84,6 +89,17 @@ const FILES: Record<string, string> = {
     "pub fn switched() -> u8 {\n    #[cfg(feature = \"extra\")]\n    {\n        return helper();\n    }\n    ok!(2)\n}",
     "#[cfg(not(feature = \"extra\"))]\npub fn gated() -> u8 {\n    ok!(2)\n}",
     "#[cfg(feature = \"extra\")]\npub fn gated() -> u8 {\n    ok!(helper())\n}",
+    // #434: a local named like a function, and a library trait's method nothing outside the crate can run.
+    "pub fn shadow() -> u8 {\n    let vtable = 4;\n    ok!(helper()) + vtable\n}",
+    "pub fn hold(_r: Report) -> u8 {\n    1\n}",
+    "pub fn hold_any<T>(_t: T) -> u8 {\n    1\n}",
+    "pub fn keep_report() -> u8 {\n    let r = Report;\n    ok!(hold(r))\n}",
+    "pub fn keep_any<T>(t: T) -> u8 {\n    ok!(hold_any(t))\n}",
+    "pub fn shown(r: &Report) -> String {\n    ok!(r.to_string())\n}",
+    "pub fn sorted(mut v: Vec<Key>) -> Vec<Key> {\n    ok!(v.sort());\n    v\n}",
+    // #434: calls rustc lists, inside a macro.
+    "pub fn bumped(c: &Counter) -> u8 {\n    ok!(c.bump())\n}",
+    "pub fn pushed(v: &mut Vec<u8>) -> u8 {\n    ok!(v.push(1));\n    1\n}",
     "",
   ].join("\n\n"),
   "src/main.rs":
@@ -103,6 +119,10 @@ const WRONG: Array<[string, string]> = [
   [`${C}later`, `${H}unrelated`],
   [`${C}with_closure`, `${H}unrelated`],
   [`${T}run`, `${H}unrelated`],
+  // #434: `vtable` is only a local's name here, and nothing the body calls is a library that could format.
+  [`${C}shadow`, `${H}vtable`],
+  [`${C}keep_report`, `${VAL}fmt`],
+  [`${C}keep_any`, `${VAL}fmt`],
 ];
 
 /** Arrows that are right, each a way the call happens without the list naming the head plainly. */
@@ -137,7 +157,18 @@ const RIGHT: Array<[string, string, string]> = [
   ["a trait's default method", `${T}run`, `${H}helper`],
   // The text sees `pong` call `ping` and not the call back, which is inside a macro: not "backwards".
   ["a call inside a macro to a routine that calls back", `${H}ping`, `${H}pong`],
+  // #434: a library runs a trait's method on what it is handed.
+  ["formatting through `to_string`", `${C}shown`, `${VAL}fmt`],
+  ["a library sort comparing what it is handed", `${C}sorted`, `${VAL}cmp`],
 ];
+
+/**
+ * Right arrows whose call is inside a macro, which rustc lists under the head's
+ * own path (#434), and one whose list holds only a same-named call on another
+ * type (`Vec::push`), which must not be taken for it.
+ */
+const LISTED: Array<[string, string]> = [[`${C}wrapped`, `${H}helper`], [`${C}bumped`, `${H}bump`]];
+const SAME_NAME_ELSEWHERE: [string, string] = [`${C}pushed`, `${H}push`];
 
 /** In the binary target, which `cargo rustc --lib` never compiles. */
 const IN_A_BINARY: [string, string] = ["src/main.rs#run", `${H}unrelated`];
@@ -245,6 +276,16 @@ describe.skipIf(!HAS_CARGO)("Rust @calls, read through the compiler's own call l
     const expected = new Set(WRONG.map(([from, to]) => `${from} -> ${to}`));
     expect([...redOf(withCompiler)].filter((one) => !expected.has(one))).toEqual([]);
   });
+
+  it("confirms a call inside a macro from rustc's list, and nothing that only shares its name (#434)", async () => {
+    const listed = await check(LISTED);
+    expect(listed.report.claims.callsConfirmed).toBe(LISTED.length);
+    const textAlone = await check(LISTED, { compiler: false });
+    expect(textAlone.report.claims.callsConfirmed).toBe(0);
+    const elsewhere = await check([SAME_NAME_ELSEWHERE]);
+    expect(elsewhere.report.claims.callsConfirmed).toBe(0);
+    expect(redOf(elsewhere).size).toBe(0);
+  }, 180_000);
 });
 
 describe.skipIf(!HAS_CARGO)("the compiler's list is never read stale or waited on past the budget", () => {
