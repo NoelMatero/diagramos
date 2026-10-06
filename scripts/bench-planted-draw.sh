@@ -10,14 +10,20 @@
 #   sh scripts/bench-planted-draw.sh 0
 #
 # Needs a built CLI (`npm run build:cli`) and the pinned clones in .corpus.
-# BENCH_SET=holdout draws a row of bench-holdout/scopes.json instead, from the
-# holdout's clones (`npm run bench:libraries -- --set=holdout` fetches them).
+# BENCH_SET=holdout (or holdout-b, ...) draws a row of bench-<set>/scopes.json
+# instead, from that set's clones (`npm run bench:libraries -- --set=<set>`
+# fetches them).
 set -eu
 REPO=$(cd "$(dirname "$0")/.." && pwd)
-if [ "${BENCH_SET:-main}" = holdout ]; then
-  BENCH=bench-holdout
-  CORPUS=${CORPUS:-$HOME/.board-ai-holdout/corpus}
-  WORK_NAME=bench-holdout
+case "${BENCH_SET:-main}" in
+  main) ;;
+  holdout|holdout-[a-z]) ;;
+  *) echo "BENCH_SET=$BENCH_SET: the sets are main, holdout, and holdout-<letter>" >&2; exit 2 ;;
+esac
+if [ "${BENCH_SET:-main}" != main ]; then
+  BENCH=bench-$BENCH_SET
+  CORPUS=${CORPUS:-$HOME/.board-ai-$BENCH_SET/corpus}
+  WORK_NAME=bench-$BENCH_SET
 else
   BENCH=bench
   CORPUS=${CORPUS:-/Users/noelmatero/board-ai/.corpus}

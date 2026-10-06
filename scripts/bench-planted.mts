@@ -49,7 +49,7 @@ import { liveRefereePool, refereedCheckLive, type LiveRefereePool } from "../src
 import { initEngine } from "../src/engine/parse";
 import { waitForQuiet } from "./lib/bench-busy";
 import { librariesLine, useLibraries } from "./lib/bench-libraries";
-import { BENCH_DIR, HOLDOUT } from "./lib/bench-set";
+import { BENCH_DIR, HOLDOUT, SET } from "./lib/bench-set";
 import { plantedBoard, plantedKeys, type Key, type KeyClaim } from "./lib/planted-keys";
 import { UNDECIDED_BUCKETS, type Bucket } from "./lib/undecided-buckets";
 
@@ -378,7 +378,8 @@ console.log();
 console.log("#296 · PLANTED MISTAKES, AND WHAT THE CHECKER SAID");
 console.log(`  ${librariesLine()}`);
 if (HOLDOUT) {
-  console.log("  set: HOLDOUT -- projects nobody tunes on. Read the score, never the arrows: only safety failures are listed.");
+  console.log(`  set: ${SET} -- projects nobody tunes on.`
+    + " Read the score, never the arrows: only safety failures are listed.");
 }
 console.log(`  ${boards} boards, ${claimsScored} claims scored, `
   + `${undecidableCount} left out as undecidable, in ${((Date.now() - started) / 1000).toFixed(0)}s`);

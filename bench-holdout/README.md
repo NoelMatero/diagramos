@@ -25,6 +25,14 @@ The scripts keep to this on their own: with `--set=holdout`, `bench:planted`
 prints the score tables and the safety failures and nothing else — no arrow
 list under `--details`, no undecided-by-reason table, no worklist.
 
+## More sets
+
+A second or third holdout is a folder beside this one, `bench-holdout-b/`,
+`bench-holdout-c/`, with the same three files, run with `--set=holdout-b`
+and cloned into `~/.board-ai-holdout-b/`. Each is another sample of code
+nobody tuned on; `tests/bench-holdout.test.ts` fails if a project appears in
+two sets or in the main one. The rule above holds for all of them.
+
 ## Running it
 
 ```
