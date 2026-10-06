@@ -31,6 +31,7 @@ import { appendFileSync, existsSync, mkdirSync, readdirSync, readFileSync, renam
 import path from "node:path";
 
 import { waitForQuiet } from "./lib/bench-busy";
+import { BENCH_DIR } from "./lib/bench-set";
 
 const REPO = path.resolve(path.dirname(new URL(import.meta.url).pathname), "..");
 const BENCH = path.join(REPO, "scripts/bench-planted.mts");
@@ -48,7 +49,7 @@ const cap = Number(own("cap") ?? 900) * 1000;
 const flags = args.filter((one) => one !== folder && !/^--(projects|cap)=/.test(one) && one !== "--details"
   && !one.startsWith("--project="));
 
-const all = readdirSync(path.join(REPO, "bench/boards")).sort();
+const all = readdirSync(path.join(REPO, BENCH_DIR, "boards")).sort();
 const wanted = own("projects")?.split(",") ?? all;
 const unknown = wanted.filter((one) => !all.includes(one));
 if (unknown.length > 0) {

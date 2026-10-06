@@ -49,6 +49,7 @@ import { liveRefereePool, refereedCheckLive, type LiveRefereePool } from "../src
 import { initEngine } from "../src/engine/parse";
 import { waitForQuiet } from "./lib/bench-busy";
 import { librariesLine, useLibraries } from "./lib/bench-libraries";
+import { BENCH_DIR, HOLDOUT } from "./lib/bench-set";
 import { plantedBoard, plantedKeys, type Key, type KeyClaim } from "./lib/planted-keys";
 import { UNDECIDED_BUCKETS, type Bucket } from "./lib/undecided-buckets";
 
@@ -67,6 +68,18 @@ const wantSource = flag("source");
 const details = argv.includes("--details");
 /** Start at once even while another bench, measure script or vitest is running (#403). */
 const noWait = argv.includes("--no-wait");
+/**
+ * The holdout set is read for its score and nothing else (bench-holdout/README.md).
+ * Its arrows are never printed, except the two kinds that are safety failures
+ * -- a correct arrow called wrong, a wrong one confirmed -- which have to be
+ * read to tell a broken key from a broken checker. The per-reason tables and
+ * the worklist are left out too: they are a list of what to fix next, drawn
+ * from code the checker is not to be fixed against.
+ */
+const safetyOnly = (outcome: Outcome, truth: string) =>
+  (outcome === "red" && truth === "true") || (outcome === "green" && truth === "false");
+/** Prints a reason-by-reason line: on the main set only. */
+const listed = HOLDOUT ? (..._: unknown[]) => undefined : console.log;
 
 /**
  * One workspace and one cache per project, for the whole run (#311).
@@ -268,7 +281,7 @@ await initEngine();
 
 const loaded = plantedKeys(REPO).filter((k) => !wantProject || k.project === wantProject);
 if (loaded.length === 0) {
-  console.log("No answer keys under bench/boards. Run scripts/bench-planted-key.mts first.");
+  console.log(`No answer keys under ${BENCH_DIR}/boards. Run scripts/bench-planted-key.mts first.`);
   process.exit(0);
 }
 
@@ -349,12 +362,13 @@ for (const key of loaded) {
           + `\n      checker: ${detail}\n      tooling: ${claim.why}`);
       }
     }
-    if (details && key.project !== printedProject) {
+    const shown = details && (!HOLDOUT || safetyOnly(outcome, claim.truth));
+    if (shown && key.project !== printedProject) {
       // Where each project starts, so a saved run can be compared arrow for arrow.
       console.log(`  == ${key.project}`);
       printedProject = key.project;
     }
-    if (details) console.log(`    ${outcome.padEnd(9)} ${claim.truth.padEnd(6)} ${claim.source.padEnd(10)} `
+    if (shown) console.log(`    ${outcome.padEnd(9)} ${claim.truth.padEnd(6)} ${claim.source.padEnd(10)} `
       + `${claim.language.padEnd(6)} [${reason}] @${claim.word} ${claim.from} -> ${claim.to} | ${detail}`
       + ` | ${lastAsked.ms.toFixed(0)}ms | gate: ${lastAsked.gate || "-"}`);
   }
@@ -363,6 +377,9 @@ for (const key of loaded) {
 console.log();
 console.log("#296 · PLANTED MISTAKES, AND WHAT THE CHECKER SAID");
 console.log(`  ${librariesLine()}`);
+if (HOLDOUT) {
+  console.log("  set: HOLDOUT -- projects nobody tunes on. Read the score, never the arrows: only safety failures are listed.");
+}
 console.log(`  ${boards} boards, ${claimsScored} claims scored, `
   + `${undecidableCount} left out as undecidable, in ${((Date.now() - started) / 1000).toFixed(0)}s`);
 console.log();
@@ -435,20 +452,20 @@ if (accounted + greens !== plantedTotal) {
   console.log();
 }
 
-console.log(`  CAUGHT, BY VERDICT -- the ${sumRed(plantedByWord)} planted mistakes that went red`);
-console.log("    which check produced the accusation. read with the table below, which is the rest of them.");
-console.log(`    ${"caught".padStart(7)}  verdict`);
+listed(`  CAUGHT, BY VERDICT -- the ${sumRed(plantedByWord)} planted mistakes that went red`);
+listed("    which check produced the accusation. read with the table below, which is the rest of them.");
+listed(`    ${"caught".padStart(7)}  verdict`);
 for (const [verdict, row] of [...caughtBy.entries()].sort((a, b) => b[1].total - a[1].total)) {
-  console.log(`    ${String(row.total).padStart(7)}  ${verdict}`);
-  console.log(`             words: ${top(row.byWord)}`);
-  console.log(`             languages: ${top(row.byLanguage)}`);
+  listed(`    ${String(row.total).padStart(7)}  ${verdict}`);
+  listed(`             words: ${top(row.byWord)}`);
+  listed(`             languages: ${top(row.byLanguage)}`);
 }
-console.log();
+listed();
 
-console.log(`  UNDECIDED CLAIMS, BY REASON -- ${undecidedTotal(splitFalse)} wrong, ${undecidedTotal(splitTrue)} true`);
-console.log("    what stands between this claim and a verdict. now = a reader stopped short of a fact that is");
-console.log("    in the code; work = it needs a type, an index or a measurement; never = the text does not say.");
-console.log(`    ${"wrong".padStart(7)}${"true".padStart(6)}${"bucket".padStart(8)}${"cost".padStart(6)}  reason`);
+listed(`  UNDECIDED CLAIMS, BY REASON -- ${undecidedTotal(splitFalse)} wrong, ${undecidedTotal(splitTrue)} true`);
+listed("    what stands between this claim and a verdict. now = a reader stopped short of a fact that is");
+listed("    in the code; work = it needs a type, an index or a measurement; never = the text does not say.");
+listed(`    ${"wrong".padStart(7)}${"true".padStart(6)}${"bucket".padStart(8)}${"cost".padStart(6)}  reason`);
 const reasons = [...new Set([...splitFalse.keys(), ...splitTrue.keys()])]
   .sort((a, b) => (splitFalse.get(b)?.total ?? 0) + (splitTrue.get(b)?.total ?? 0)
     - (splitFalse.get(a)?.total ?? 0) - (splitTrue.get(a)?.total ?? 0));
@@ -466,18 +483,18 @@ for (const reason of reasons) {
     for (const [name, n] of row.byWord) words.set(name, (words.get(name) ?? 0) + n);
     for (const [name, n] of row.byLanguage) languages.set(name, (languages.get(name) ?? 0) + n);
   }
-  console.log(`    ${String(wrong).padStart(7)}${String(yes).padStart(6)}`
+  listed(`    ${String(wrong).padStart(7)}${String(yes).padStart(6)}`
     + `${(label?.bucket ?? "?").padStart(8)}${String(label?.cost ?? "").padStart(6)}  ${reason}`);
-  console.log(`             words: ${top(words)}`);
-  console.log(`             languages: ${top(languages)}`);
-  console.log(`             ${label ? label.why : "NOT LABELLED -- add it to scripts/lib/undecided-buckets.ts"}`);
+  listed(`             words: ${top(words)}`);
+  listed(`             languages: ${top(languages)}`);
+  listed(`             ${label ? label.why : "NOT LABELLED -- add it to scripts/lib/undecided-buckets.ts"}`);
 }
-console.log();
+listed();
 
 if (unlabelled.length > 0) {
-  console.log(`  UNLABELLED REASONS -- ${unlabelled.length}. Counted as not decidable, which is the safe way to be wrong.`);
-  for (const reason of unlabelled) console.log(`    ${reason}`);
-  console.log();
+  listed(`  UNLABELLED REASONS -- ${unlabelled.length}. Counted as not decidable, which is the safe way to be wrong.`);
+  for (const reason of unlabelled) listed(`    ${reason}`);
+  listed();
 }
 
 /** Every undecided claim, by bucket, with the true claims kept apart. */
@@ -507,8 +524,8 @@ console.log(`    out of reach: ${bucketTotal("never")} undecidable (${buckets.ne
 console.log("    Held fixed while that rises: reds on true claims, and greens on wrong claims.");
 console.log();
 
-console.log("  WORKLIST -- fixable reasons, most claims per unit of work first");
-console.log(`    ${"claims".padStart(7)}${"cost".padStart(6)}${"per".padStart(7)}  reason`);
+listed("  WORKLIST -- fixable reasons, most claims per unit of work first");
+listed(`    ${"claims".padStart(7)}${"cost".padStart(6)}${"per".padStart(7)}  reason`);
 const work = reasons
   .map((reason) => {
     const label = labelOf(reason);
@@ -518,10 +535,10 @@ const work = reasons
   .filter((row) => row.label && row.label.bucket !== "never")
   .sort((a, b) => b.claims / b.label!.cost - a.claims / a.label!.cost);
 for (const { reason, label, claims } of work) {
-  console.log(`    ${String(claims).padStart(7)}${String(label!.cost).padStart(6)}`
+  listed(`    ${String(claims).padStart(7)}${String(label!.cost).padStart(6)}`
     + `${(claims / label!.cost).toFixed(1).padStart(7)}  ${reason}`);
 }
-console.log();
+listed();
 
 /*
  * The last project's servers, which nothing else will close. A live language

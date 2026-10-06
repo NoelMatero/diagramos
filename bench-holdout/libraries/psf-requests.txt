@@ -1,0 +1,8 @@
+# psf-requests: its dependencies and extras, resolved as of its pinned commit (2026-09-21), the way the main set's unlocked projects were:
+#   uv pip compile --all-extras --python-version 3.14 --exclude-newer 2026-09-21T20:22:33Z pyproject.toml
+certifi==2026.7.22
+chardet==7.6.0
+charset-normalizer==3.5.1
+idna==3.20
+pysocks==1.7.1
+urllib3==2.8.0

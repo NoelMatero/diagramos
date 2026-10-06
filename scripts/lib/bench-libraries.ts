@@ -25,12 +25,24 @@
 import { existsSync, readFileSync } from "node:fs";
 import path from "node:path";
 
-export const CORPUS = process.env.CORPUS ?? "/Users/noelmatero/board-ai/.corpus";
+import { BENCH_DIR, CORPUS, HOLDOUT, type HoldoutProject } from "./bench-set";
+
+export { CORPUS };
 export const LIBRARIES = process.env.BENCH_LIBRARIES ?? path.join(path.dirname(CORPUS), ".corpus-libs");
 
+const REPO = path.resolve(path.dirname(new URL(import.meta.url).pathname), "../..");
+/** The holdout's projects, with their pins and install commands; empty for the main set. */
+export const HOLDOUT_PROJECTS: HoldoutProject[] = HOLDOUT
+  ? JSON.parse(readFileSync(path.join(REPO, BENCH_DIR, "projects.json"), "utf8")) as HoldoutProject[]
+  : [];
+
 /** The projects whose libraries are installed, by how. The rest need none, or have them in `.corpus` already. */
-export const PYTHON_PROJECTS = ["django-django", "encode-httpx", "pallets-flask", "pydantic-pydantic", "python-poetry-poetry"];
-export const NODE_PROJECTS = ["TanStack-query"];
+export const PYTHON_PROJECTS = HOLDOUT
+  ? HOLDOUT_PROJECTS.filter((one) => one.language === "python").map((one) => one.project)
+  : ["django-django", "encode-httpx", "pallets-flask", "pydantic-pydantic", "python-poetry-poetry"];
+export const NODE_PROJECTS = HOLDOUT
+  ? HOLDOUT_PROJECTS.filter((one) => one.install).map((one) => one.project)
+  : ["TanStack-query"];
 
 export interface Installed { pins: string; python: string; projects: string[] }
 

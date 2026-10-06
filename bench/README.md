@@ -33,6 +33,16 @@ What one arrow costs, asked twice:
 npm run probe:check-cost                   # cold, and through a held cache
 ```
 
+## The holdout set
+
+`bench-holdout/` is the same test on fourteen projects nobody tunes on, to
+see whether a score earned here holds on code the checker has never seen.
+Its rule is in its README: read its score, never its arrows.
+
+```
+npm run bench:planted -- --set=holdout
+```
+
 ## Keeping a run, and comparing two (#403)
 
 A run worth keeping goes into a folder, one process per project:
