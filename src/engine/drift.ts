@@ -3084,6 +3084,19 @@ function oneLine(label: string): string {
 }
 
 /**
+ * Where a refuted routine's calls went, said of the head's file: none of them
+ * there, or the ones that were landed on something the head cannot be (#430).
+ */
+function landedBeside(elsewhere: ReadonlyArray<{ name: string; line: number }> | undefined, toPath: string, head: readonly string[]): string {
+  if (!elsewhere || elsewhere.length === 0) return `none reaching ${toPath}`;
+  const names = [...new Set(elsewhere.map((one) => one.name))];
+  const lines = [...new Set(elsewhere.map((one) => one.line))].slice(0, 3);
+  return `and the ${elsewhere.length === 1 ? "one" : "ones"} reaching ${toPath} `
+    + `${elsewhere.length === 1 ? "lands" : "land"} on ${list(names)}, which ${names.length === 1 ? "is" : "are"} `
+    + `not ${head.join(" or ")} (line${lines.length === 1 ? "" : "s"} ${lines.join(", ")})`;
+}
+
+/**
  * Whether an arrow's `via` names the hops the code was found taking (#375).
  *
  * The one marker for a summary drawn on purpose, whatever the word. An arrow
@@ -5162,6 +5175,13 @@ export function checkDrift(
       const tallyOf = edge.claim ? withheldTallyOf(claims, edge.claim) : undefined;
       const tallyBefore = tallyOf ? { ...tallyOf } : undefined;
       const garbledBefore = garbledClaims.length;
+      /*
+       * A `calls-refuted` resting on calls that landed in the far file beside
+       * the head (#430), held until the end's own kind is asked: "the far end
+       * is a value, point the arrow at the routine" says what to fix, where
+       * "never calls it" only says that something is wrong.
+       */
+      let besideTheHead: (() => void) | undefined;
 
       /*
        * `@takes` / `@returns`: does the head's signature name the tail's type?
@@ -6141,12 +6161,11 @@ export function checkDrift(
                   oneLevelUp(throughAChain.via, throughAChain.hops.length));
                 continue;
               }
-              edgesChecked += 1;
               const wasClaimed = baselineGraph?.edges.some(
                 (was) => was.from === edge.from && was.to === edge.to && was.claim === "calls",
               );
               const fresh = baselineGraph !== undefined && !wasClaimed;
-              recordEdge(edge, fromNode, toNode, { kind: "finding", finding: {
+              const refute = () => { edgesChecked += 1; recordEdge(edge, fromNode, toNode, { kind: "finding", finding: {
                 from: fromPath,
                 to: toPath,
                 fromLabel: fromNode.label,
@@ -6159,8 +6178,8 @@ export function checkDrift(
                   + `this arrow says ${oneLine(fromNode.label) || fromPath} calls `
                   + `${oneLine(toNode.label) || toPath}, and every call `
                   + `${verdict.evidence.routine} makes was checked -- ${verdict.evidence.sites} of `
-                  + `them, none reaching ${toPath}. ${fromPath} line ${verdict.evidence.line} is `
-                  + `where ${verdict.evidence.routine} is declared.`,
+                  + `them, ${landedBeside(verdict.evidence.elsewhere, toPath, toEnd.symbols)}. `
+                  + `${fromPath} line ${verdict.evidence.line} is where ${verdict.evidence.routine} is declared.`,
               }, rests: {
                 written: !verdict.evidence.implicit,
                 unwritten: verdict.evidence.implicit?.outside
@@ -6174,8 +6193,9 @@ export function checkDrift(
                     declaredIn(workspace.read(toFile), languageOf(toFile) ?? "python", toPath, verdict.evidence.implicit!.name),
                   ),
                 } : {}),
-              } });
-              continue;
+              } }); };
+              if (verdict.evidence.elsewhere) besideTheHead = refute;
+              else { refute(); continue; }
             }
             /*
              * `absent` is silent here. That is the point of the word: not
@@ -6584,6 +6604,7 @@ export function checkDrift(
         )
         : undefined;
       if (!lacking && unsettled) claims.endsUnsettled += 1;
+      if (!lacking && besideTheHead) { besideTheHead(); continue; }
       if (lacking && edge.claim) {
         if (tallyOf && tallyBefore) {
           for (const key of Object.keys(tallyOf)) delete tallyOf[key];
