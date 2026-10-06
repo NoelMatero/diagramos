@@ -66,7 +66,17 @@ export type CompiledCall =
    * when the call was written through a trait -- `T` there, `Http` in
    * `<Http as Transport>::handle`.
    */
-  | { kind: "named"; name: string; through?: string }
+  | {
+    kind: "named"; name: string; through?: string;
+    /**
+     * Where the function lives, for a call not written through a trait:
+     * `de::Deserializer::<R>::eat_char` -> `de`, `Deserializer`, `eat_char`.
+     * An `<impl Error>` segment is read as `Error`, and generic arguments
+     * are dropped. Absent where nothing can be said, which no reader here
+     * takes as "inside the crate" (#434).
+     */
+    path?: string[];
+  }
   /** A call whose target is a value: a function pointer, a closure passed in, `dyn Fn`. */
   | { kind: "opaque"; wrote: string };
 
@@ -89,6 +99,23 @@ export interface CompiledBody {
    * shows is looked for here before the list is trusted at all.
    */
   words: Set<string>;
+  /**
+   * `words`, less the names locals are given (`debug vtable => _5;`): what the
+   * body's statements and declarations mention (#434). anyhow's
+   * `construct_from_context` holds a local `vtable` beside the crate's `fn
+   * vtable`, and the local's name alone made "never" impossible. A function
+   * held in a local still shows here: its type, `fn() {double}`, is written on
+   * the local's declaration and on every call that hands it on.
+   */
+  mentions?: Set<string>;
+  /**
+   * Every call the body makes is to a function declared in this crate, and
+   * it drops nothing (#434). Then no library code runs on its behalf, and a
+   * library trait's method -- `Display::fmt`, serde's `deserialize_enum` --
+   * cannot run without its name in the list. Set once the whole crate is
+   * read; absent is "not known", which is never taken as yes.
+   */
+  onlyHere?: boolean;
   /**
    * Every type the body creates a value of, by its last path segment (#362):
    * the head of every aggregate rustc writes -- `Widget { .. }`, `Tagged(..)`,
@@ -141,7 +168,13 @@ export interface CompiledPlaces {
  * target's `main.rs`, a module switched off by a feature -- and the second kind
  * must be no answer, never a routine that calls nothing.
  */
-export function readCompiledCrate(mir: string, depInfo: string, places: CompiledPlaces): CompiledCrate {
+export function readCompiledCrate(
+  mir: string,
+  depInfo: string,
+  places: CompiledPlaces,
+  /** A repo-relative file's text, for the `impl` headers `markOnlyHere` reads; without it no bare `Type::m` is this crate's. */
+  read?: (file: string) => string | undefined,
+): CompiledCrate {
   const toRepo = (written: string): string | undefined => {
     const relative = path.relative(places.repo, path.resolve(places.workspace, written));
     if (relative.startsWith("..") || path.isAbsolute(relative)) return undefined;
@@ -184,7 +217,106 @@ export function readCompiledCrate(mir: string, depInfo: string, places: Compiled
     add(byName, segments[segments.length - 1]!, body);
   }
   const root = toRepo(places.root) ?? places.root;
+  markOnlyHere(bodies, inherentOwners(byImpl, read));
   return { files, root, byImpl, byName };
+}
+
+/**
+ * Sets `onlyHere` on every body (#434): no drop, and every call matched to a
+ * function this dump holds a body for.
+ *
+ * rustc writes an item of this crate without the crate's name and anybody
+ * else's with it -- `core::result::Result` -- except that a name unique
+ * among every crate it read is written bare, whoever declared it:
+ * `Option::<T>::unwrap`, `hold(..)`, `Counter::bump(..)`. So a call is this
+ * crate's when it is
+ *
+ *   under a module          `de::Deserializer::<R>::eat_char` against a body
+ *                           `de::<impl at src/de.rs:..>::eat_char`
+ *   a bare name             `hold(..)`, and the crate has a body printed
+ *                           `hold` -- unique, so it is that one
+ *   a bare type's method    `Counter::bump(..)`, and the crate has an inherent
+ *                           `impl Counter` holding `bump` -- unique, and only
+ *                           the crate declaring a type can write one
+ *
+ * Nothing else: a call through a trait may run a library's blanket
+ * implementation. Either way the body stays "not known", the quiet side.
+ */
+function markOnlyHere(bodies: readonly CompiledBody[], owners: ReadonlyMap<string, Set<string>>): void {
+  const modulesOf = new Map<string, Set<string>>();
+  for (const body of bodies) {
+    const segments = segmentsOf(body.path);
+    const at = segments.findIndex((segment) => segment.startsWith("<impl at "));
+    if (at >= 0 && segments.length !== at + 2) continue;
+    const modules = at >= 0 ? segments.slice(0, at) : segments.slice(0, -1);
+    // A bare free function is keyed under no module; a bare impl's methods come from `owners`.
+    if (modules.length === 0 && at >= 0) continue;
+    const name = segments[segments.length - 1]!;
+    modulesOf.set(name, (modulesOf.get(name) ?? new Set()).add(modules.join("::")));
+  }
+  const here = (call: CompiledCall): boolean => {
+    if (call.kind !== "named" || call.through !== undefined || !call.path) return false;
+    const path = call.path;
+    if (path.length === 1) return modulesOf.get(call.name)?.has("") ?? false;
+    if (path.length === 2 && owners.get(path[0]!)?.has(call.name)) return true;
+    const known = modulesOf.get(call.name);
+    if (!known) return false;
+    // A free function under its modules, or a method under its modules and its type.
+    return [1, 2].some((after) => {
+      const modules = path.slice(0, path.length - after);
+      return modules.length > 0 && known.has(modules.join("::"));
+    });
+  };
+  for (const body of bodies) body.onlyHere = body.drops === 0 && body.calls.every(here);
+}
+
+/**
+ * The type each inherent `impl` of the crate is for, with the methods the
+ * dump holds for it: `Counter` -> `bump`, `push`. Read off the source at the
+ * span rustc gives the impl, `impl Counter` at `src/helpers.rs:30:1: 30:13`.
+ * A trait's `impl .. for ..` is left out.
+ */
+function inherentOwners(
+  byImpl: ReadonlyMap<string, CompiledBody[]>,
+  read: ((file: string) => string | undefined) | undefined,
+): Map<string, Set<string>> {
+  const owners = new Map<string, Set<string>>();
+  if (!read) return owners;
+  const texts = new Map<string, string[] | undefined>();
+  for (const [key, bodies] of byImpl) {
+    const span = bodies[0] && segmentsOf(bodies[0].path).find((segment) => segment.startsWith("<impl at "))
+      ?.match(/^<impl at .+:(\d+):(\d+): (\d+):(\d+)>$/);
+    if (!span) continue;
+    const file = key.slice(0, key.lastIndexOf(":"));
+    if (!texts.has(file)) texts.set(file, read(file)?.split("\n"));
+    const lines = texts.get(file);
+    const [startLine, startCol, endLine, endCol] = span.slice(1).map(Number) as [number, number, number, number];
+    if (!lines || startLine !== endLine) continue;
+    const header = lines[startLine - 1]?.slice(startCol - 1, endCol - 1) ?? "";
+    if (!/^impl\b/.test(header)) continue;
+    let rest = header.slice(4).trimStart();
+    if (rest.startsWith("<")) {
+      const close = matching(rest, 0);
+      if (close < 0) continue;
+      rest = rest.slice(close + 1).trim();
+    }
+    const written = rest;
+    if (!written || /\sfor\s/.test(` ${stripGenerics(written)} `)) continue;
+    const owner = baseTypeOf(written);
+    if (!/^[A-Za-z_]\w*$/.test(owner)) continue;
+    for (const body of bodies) {
+      const name = segmentsOf(body.path).pop()!;
+      owners.set(owner, (owners.get(owner) ?? new Set()).add(name));
+    }
+  }
+  return owners;
+}
+
+/** A callee's path as `CompiledCall.path` holds it: `<impl Error>` read as `Error`, generic arguments dropped. */
+function pathOf(callee: string): string[] {
+  return segmentsOf(callee)
+    .filter((segment) => !segment.startsWith("<") || segment.startsWith("<impl "))
+    .map((segment) => (segment.startsWith("<impl ") ? baseTypeOf(segment.slice(6, -1)) : stripGenerics(segment).trim()));
 }
 
 /**
@@ -224,6 +356,7 @@ function bodiesIn(mir: string): CompiledBody[] {
       calls: [],
       drops: 0,
       words: new Set(),
+      mentions: new Set(),
       made: new Set(),
       built: new Set(),
     };
@@ -247,6 +380,7 @@ function bodiesIn(mir: string): CompiledBody[] {
       owner.calls.push(...body.calls);
       owner.drops += body.drops;
       for (const word of body.words) owner.words.add(word);
+      for (const word of body.mentions ?? body.words) (owner.mentions ??= new Set()).add(word);
       for (const type of body.made) owner.made.add(type);
       for (const type of body.built) owner.built.add(type);
     }
@@ -324,6 +458,9 @@ export function baseTypeOf(written: string): string {
 
 function readBodyLine(line: string, body: CompiledBody, locals: Map<string, string>): void {
   for (const word of line.match(/[A-Za-z_][A-Za-z0-9_]*/g) ?? []) body.words.add(word);
+  if (!/^\s+debug /.test(line)) {
+    for (const word of line.match(/[A-Za-z_][A-Za-z0-9_]*/g) ?? []) (body.mentions ??= new Set()).add(word);
+  }
   const local = line.match(LOCAL);
   if (local) { locals.set(local[1]!, local[2]!); return; }
   const terminator = line.match(TERMINATOR);
@@ -392,7 +529,7 @@ function callOf(written: string): CompiledCall | undefined {
   }
   const name = segmentsOf(stripGenerics(callee)).pop();
   if (!name || !/^[A-Za-z_]\w*$/.test(name)) return { kind: "opaque", wrote: written };
-  return { kind: "named", name };
+  return { kind: "named", name, path: pathOf(callee) };
 }
 
 /** The callee in `callee(args)`, split at the argument list. */
@@ -748,10 +885,18 @@ export function compiledRefutes(
   }
   for (const body of bodies) {
     if (body.calls.some((call) => call.kind === "named" && names.has(call.name))) return { why: "same-name" };
-    if ([...names].some((name) => body.words.has(name))) return { why: "same-name" };
+    if ([...names].some((name) => (body.mentions ?? body.words).has(name))) return { why: "same-name" };
   }
   const unwritten = traitImplsOf(head.source, names).filter((one) => !head.ownTrait?.(one.trait));
   for (const body of bodies) {
+    /*
+     * Nothing outside the crate runs for this body, so nothing runs a
+     * library trait's method on its behalf (#434): every call it makes is
+     * in the list, and none is the head. anyhow's `construct_from_adhoc`
+     * builds a `MessageError` and hands it to `Error::construct`; it was
+     * "might be formatted", and nothing it calls formats.
+     */
+    if (body.onlyHere) continue;
     for (const one of unwritten) {
       // A generic tail hands values of any type to library code that runs their traits' methods.
       if (one.blanket || generics.size > 0) return { why: "called-implicitly" };
@@ -760,6 +905,61 @@ export function compiledRefutes(
     }
   }
   return { sites: bodies.reduce((sum, body) => sum + body.calls.length, 0) };
+}
+
+/**
+ * The name of a head routine the list calls by its own path, or `undefined`
+ * (#434) -- a confirmation, never a refutation.
+ *
+ * clap writes `ok!(self.parse_long_arg(..))` and serde_json
+ * `tri!(self.parse_decimal(..))`: calls inside a macro, which the text can
+ * only doubt, and which rustc lists as `parser::parser::Parser::<'_>::
+ * parse_long_arg(..)`. A name alone is not enough -- `Vec::push` and the
+ * crate's own `push` are both `push` -- so the path has to be the head's:
+ * the modules rustc gives the head's own body, then the type its `impl`
+ * names, then the routine (a free function: its body's path as printed).
+ *
+ * Or the bare `Type::m` rustc writes when the type's name is unique among
+ * every crate it read -- then it can only be the type the head's `impl` is
+ * for, since only the crate declaring a type writes an inherent `impl` of it.
+ *
+ * Only an inherent `impl` or a free function. A trait method is called as
+ * `<X as Trait>::m`, which may run a library's blanket implementation.
+ */
+export function ownCallIn(
+  crate: CompiledCrate,
+  bodies: readonly CompiledBody[],
+  head: { file: string; source: string; names: readonly string[] },
+): string | undefined {
+  if (!crate.files.has(head.file)) return undefined;
+  const tree = parseSource(head.source, "rust");
+  if (!tree) return undefined;
+  for (const name of head.names) {
+    const paths = new Set<string>();
+    for (const declaration of declarationsNamed(tree.rootNode, name)) {
+      const body = bodyOf(crate, head.file, head.source, declaration, name);
+      if (!body) continue;
+      const holder = [...declaration.ancestors].reverse()
+        .find((up) => up.type === "impl_item" || up.type === "trait_item");
+      const segments = segmentsOf(body.path);
+      if (!holder) {
+        paths.add(segments.map((segment) => stripGenerics(segment).trim()).join("::"));
+        continue;
+      }
+      if (holder.type !== "impl_item" || holder.childForFieldName("trait")) continue;
+      const at = segments.findIndex((segment) => segment.startsWith("<impl at "));
+      const owner = baseTypeOf(holder.childForFieldName("type")?.text ?? "");
+      if (at < 0 || !/^[A-Za-z_]\w*$/.test(owner)) continue;
+      if (at > 0) paths.add([...segments.slice(0, at), owner, name].join("::"));
+      // rustc writes a type bare when its name is unique among every crate it read: only this one.
+      paths.add(`${owner}::${name}`);
+    }
+    if (paths.size === 0) continue;
+    const called = bodies.some((body) => body.calls.some((call) => call.kind === "named"
+      && call.through === undefined && call.name === name && call.path !== undefined && paths.has(call.path.join("::"))));
+    if (called) return name;
+  }
+  return undefined;
 }
 
 /** One of the head's routines that is a method of a trait implementation. */

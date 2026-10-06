@@ -66,7 +66,9 @@
  *   macros                 the call site is generated, not written   -> `macro`
  */
 import { providedByLanguage } from "./builtins";
-import { compiledBodiesOf, compiledRefutes, traitImplsOf, type CompiledBody, type CompiledCrate } from "./compiled-calls";
+import {
+  compiledBodiesOf, compiledRefutes, ownCallIn, traitImplsOf, type CompiledBody, type CompiledCrate,
+} from "./compiled-calls";
 import { declaredBases } from "./conforms";
 import { mayAccuse } from "./licence";
 import { declaresMember, holdersIn } from "./overrides";
@@ -1824,6 +1826,13 @@ export function callsBetween(
    */
   const compiled = forward.why ? compiledBodiesFor(from, to.names) : undefined;
   if (forward.why && !compiled) return { verdict: "withheld", why: forward.why };
+  /*
+   * And the compiler's list may show the call the text could only doubt
+   * (#434): `ok!(self.parse_long_arg(..))`. Its path has to be the head's
+   * own, not just its name -- see `ownCallIn`.
+   */
+  const listed = compiled ? listedCall(from, to, compiled) : undefined;
+  if (listed) return { verdict: "confirmed", evidence: listed };
 
   if (!mayAccuse("calls", from.language) || !mayAccuse("calls", to.language)) {
     return { verdict: "withheld", why: "unlicensed" };
@@ -1916,7 +1925,7 @@ function closedBodyRefutes(
    * a scope's end runs `drop`. Each of those went red on a correct arrow.
    */
   const closedByText = (): typeof text => {
-    const unwritten = (from.language === "rust" ? calledImplicitly(to) : undefined)
+    const unwritten = (from.language === "rust" ? calledImplicitly(from, to, known) : undefined)
       ?? (handsOnHead(from, to) ? "named" : undefined);
     if (unwritten) return { why: unwritten };
     const implicit = "evidence" in text ? runByTheLanguage(from, to) ?? handedOutside(from, to) : undefined;
@@ -1974,9 +1983,21 @@ export interface CompiledTail {
  * alias hiding the error type. A trait the repository declares is only ever
  * called by name.
  */
-function calledImplicitly(to: CallSide & { names: string[] }): "called-implicitly" | undefined {
+function calledImplicitly(
+  from: CallSide & { routine: string },
+  to: CallSide & { names: string[] },
+  known?: CompiledTail,
+): "called-implicitly" | undefined {
   const names = new Set(to.names);
-  return traitImplsOf(to.source, names).some((one) => !traitDeclaredHere(to, one.trait)) ? "called-implicitly" : undefined;
+  if (!traitImplsOf(to.source, names).some((one) => !traitDeclaredHere(to, one.trait))) return undefined;
+  /*
+   * Unless the compiler's list says it never happens (#434): every call the
+   * body makes is to this crate, it drops nothing, and none is the head --
+   * so no library runs anything for it. `compiledRefutes` holds that rule;
+   * this is the text-closed reading asking it too.
+   */
+  const compiled = known ?? compiledBodiesFor(from, to.names);
+  return compiled && !("why" in compiledVerdict(compiled, to)) ? undefined : "called-implicitly";
 }
 
 /**
@@ -2218,6 +2239,30 @@ export function compiledBodiesFor(
     }
   }
   return { bodies: reading.bodies, generics: reading.generics, unbuilt: reading.unbuilt };
+}
+
+/**
+ * The head's call in the compiler's list, as evidence: the first line of the
+ * tail's routine that writes the name, which for a call inside a macro is
+ * the macro's line (#434).
+ */
+function listedCall(
+  from: CallSide & { routine: string },
+  to: CallSide & { names: string[] },
+  compiled: CompiledTail,
+): CallsEvidence | undefined {
+  const crate = from.compiled?.();
+  const name = crate ? ownCallIn(crate, compiled.bodies, to) : undefined;
+  if (!name) return undefined;
+  const pattern = new RegExp(`(?<![\\w$])${escapeName(name)}(?![\\w$])`);
+  for (const routine of routinesNamed(from.source, from.routine, "rust").routines) {
+    const at = routine.text.search(pattern);
+    if (at < 0) continue;
+    const line = lineOf(from.source, routine.startIndex + at);
+    return { name, inside: from.routine, line, wrote: from.source.split("\n")[line - 1]!.trim() };
+  }
+  const first = routinesNamed(from.source, from.routine, "rust").routines[0];
+  return { name, inside: from.routine, line: first ? lineOf(from.source, first.startIndex) : 1, wrote: `${name}(..), in rustc's call list` };
 }
 
 /** `closedBodyRefutes` as it was before #357: the text reading alone. */
