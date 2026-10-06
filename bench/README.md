@@ -218,6 +218,10 @@ npx tsx scripts/bench-planted-rejudge.mts --word=calls --why="the from end is a 
 used exactly the line above: an `@calls` arrow out of a class had been called
 false outright, and is now read through the class's own routines.
 
+`--claim=<id>` (repeat it for more) narrows it to exact claims, by the `id`
+the key stores. #428 corrected four answers that way: the corrected reading
+moves other claims too, and those were listed in the PR rather than written.
+
 `--project` runs one project at a time. #374 re-asked every `@calls` and
 `@accesses` claim that way, project by project, because one language server
 dying (regex's, on `@builds`, on unchanged main too) ends the whole run:

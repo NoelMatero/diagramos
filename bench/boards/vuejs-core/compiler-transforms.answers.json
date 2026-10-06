@@ -80,8 +80,8 @@
       "toLabel": "transformBind",
       "language": "ts",
       "source": "drawn",
-      "truth": "false",
-      "why": "the routine's calls were read and none is it"
+      "truth": "undecidable",
+      "why": "a call of directiveTransform, read out of a table is here, and transformBind is stored as a value at packages/compiler-core/src/compile.ts:59"
     },
     {
       "id": "calls|packages/compiler-core/src/transforms/transformElement.ts#buildProps|packages/compiler-core/src/transforms/vModel.ts#transformModel|",
@@ -92,8 +92,8 @@
       "toLabel": "transformModel",
       "language": "ts",
       "source": "drawn",
-      "truth": "false",
-      "why": "the routine's calls were read and none is it"
+      "truth": "undecidable",
+      "why": "a call of directiveTransform, read out of a table is here, and transformModel is stored as a value at packages/compiler-core/src/compile.ts:60"
     },
     {
       "id": "builds|packages/compiler-core/src/transforms/transformElement.ts#transformElement|packages/compiler-core/src/ast.ts#createVNodeCall|",
