@@ -1275,7 +1275,7 @@ describe("state: what the diagram claims about time", () => {
     const board = await stateBoard(
       [
         { id: "a", label: "A", ref: "src/a.ts" },
-        { id: "browser", label: "Browser", ref: "src/b.ts", state: "external" },
+        { id: "browser", label: "Browser", state: "external" },
       ],
       { edges: [{ from: "a", to: "browser" }] },
     );
@@ -1283,6 +1283,26 @@ describe("state: what the diagram claims about time", () => {
     expect(report.edgesChecked).toBe(0);
     expect(report.edgesSkipped).toBe(1);
     expect(report.edges).toHaveLength(0);
+  });
+
+  /*
+   * This one was skipped too until #435: a ref recording which file an
+   * outside thing corresponds to. A file is never a door, so the arrow is
+   * now read as code -- and it may only confirm, since "Browser" may stand
+   * for more than `src/b.ts` shows.
+   */
+  it("reads an arrow onto an external node anchored at a file here, and never calls it wrong", async () => {
+    const board = await stateBoard(
+      [
+        { id: "a", label: "A", ref: "src/a.ts" },
+        { id: "browser", label: "Browser", ref: "src/b.ts", state: "external" },
+      ],
+      { edges: [{ from: "a", to: "browser", claim: "needs" }] },
+    );
+    const report = checkDrift(board, fakeWorkspace({ "src/a.ts": "export const a = 1;", "src/b.ts": "export const b = 2;" }));
+    expect(report.edgesSkipped).toBe(0);
+    expect(report.edges).toHaveLength(0);
+    expect(report.unconfirmedEdges.map((arrow) => arrow.reason)).toEqual(["end-marked-external"]);
   });
 });
 
@@ -1993,8 +2013,9 @@ describe("saying what was not looked at", () => {
       ],
       [
         "an end marked external",
+        // No ref: one at a file here is read since #435.
         () => boardOf(
-          [{ id: "a", label: "A", ref: "src/a.ts" }, { id: "b", label: "B", ref: "src/b.ts", state: "external" }],
+          [{ id: "a", label: "A", ref: "src/a.ts" }, { id: "b", label: "B", state: "external" }],
           [{ from: "a", to: "b" }],
         ),
         { "src/a.ts": "x", "src/b.ts": "y" },
