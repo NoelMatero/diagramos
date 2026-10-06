@@ -1,0 +1,2453 @@
+{
+  "type": "excalidraw",
+  "version": 2,
+  "source": "diagramos",
+  "elements": [
+    {
+      "id": "hono-router-architecture-title",
+      "type": "text",
+      "x": 0,
+      "y": -115,
+      "width": 316.8,
+      "height": 30,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a0",
+      "roundness": null,
+      "seed": 185007493,
+      "version": 1,
+      "versionNonce": 998590863,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "hono-router-architecture",
+        "role": "title"
+      },
+      "text": "Hono Router Architecture",
+      "fontSize": 24,
+      "fontFamily": 5,
+      "textAlign": "left",
+      "verticalAlign": "middle",
+      "containerId": null,
+      "originalText": "Hono Router Architecture",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "hono-router-architecture-node-0",
+      "type": "rectangle",
+      "x": 1420,
+      "y": 420,
+      "width": 280,
+      "height": 180,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a1",
+      "roundness": null,
+      "seed": 1518610028,
+      "version": 1,
+      "versionNonce": 1073547192,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "hono-router-architecture-node-0-label"
+        },
+        {
+          "id": "hono-router-architecture-edge-0",
+          "type": "arrow"
+        },
+        {
+          "id": "hono-router-architecture-edge-1",
+          "type": "arrow"
+        },
+        {
+          "id": "hono-router-architecture-edge-2",
+          "type": "arrow"
+        },
+        {
+          "id": "hono-router-architecture-edge-3",
+          "type": "arrow"
+        },
+        {
+          "id": "hono-router-architecture-edge-4",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "hono-router-architecture",
+        "node": "router_interface",
+        "ref": "src/router.ts#Router"
+      }
+    },
+    {
+      "id": "hono-router-architecture-node-1",
+      "type": "rectangle",
+      "x": 20,
+      "y": 60,
+      "width": 300,
+      "height": 180,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a2",
+      "roundness": null,
+      "seed": 2124430213,
+      "version": 1,
+      "versionNonce": 901899151,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "hono-router-architecture-node-1-label"
+        },
+        {
+          "id": "hono-router-architecture-edge-0",
+          "type": "arrow"
+        },
+        {
+          "id": "hono-router-architecture-edge-5",
+          "type": "arrow"
+        },
+        {
+          "id": "hono-router-architecture-edge-6",
+          "type": "arrow"
+        },
+        {
+          "id": "hono-router-architecture-edge-7",
+          "type": "arrow"
+        },
+        {
+          "id": "hono-router-architecture-edge-8",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "hono-router-architecture",
+        "node": "smart_router",
+        "ref": "src/router/smart-router/router.ts#SmartRouter"
+      }
+    },
+    {
+      "id": "hono-router-architecture-node-2",
+      "type": "rectangle",
+      "x": 720,
+      "y": 820,
+      "width": 280,
+      "height": 120,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a3",
+      "roundness": null,
+      "seed": 1907632426,
+      "version": 1,
+      "versionNonce": 1379599614,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "hono-router-architecture-node-2-label"
+        },
+        {
+          "id": "hono-router-architecture-edge-1",
+          "type": "arrow"
+        },
+        {
+          "id": "hono-router-architecture-edge-5",
+          "type": "arrow"
+        },
+        {
+          "id": "hono-router-architecture-edge-9",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "hono-router-architecture",
+        "node": "trie_router",
+        "ref": "src/router/trie-router/router.ts#TrieRouter"
+      }
+    },
+    {
+      "id": "hono-router-architecture-node-3",
+      "type": "rectangle",
+      "x": 720,
+      "y": 40,
+      "width": 280,
+      "height": 120,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a4",
+      "roundness": null,
+      "seed": 521967739,
+      "version": 1,
+      "versionNonce": 694568949,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "hono-router-architecture-node-3-label"
+        },
+        {
+          "id": "hono-router-architecture-edge-2",
+          "type": "arrow"
+        },
+        {
+          "id": "hono-router-architecture-edge-6",
+          "type": "arrow"
+        },
+        {
+          "id": "hono-router-architecture-edge-10",
+          "type": "arrow"
+        },
+        {
+          "id": "hono-router-architecture-edge-11",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "hono-router-architecture",
+        "node": "regexp_router",
+        "ref": "src/router/reg-exp-router/router.ts#RegExpRouter"
+      }
+    },
+    {
+      "id": "hono-router-architecture-node-4",
+      "type": "rectangle",
+      "x": 700,
+      "y": 620,
+      "width": 280,
+      "height": 120,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a5",
+      "roundness": null,
+      "seed": 1087534832,
+      "version": 1,
+      "versionNonce": 598820428,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "hono-router-architecture-node-4-label"
+        },
+        {
+          "id": "hono-router-architecture-edge-3",
+          "type": "arrow"
+        },
+        {
+          "id": "hono-router-architecture-edge-7",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "hono-router-architecture",
+        "node": "pattern_router",
+        "ref": "src/router/pattern-router/router.ts#PatternRouter"
+      }
+    },
+    {
+      "id": "hono-router-architecture-node-5",
+      "type": "rectangle",
+      "x": 700,
+      "y": 280,
+      "width": 300,
+      "height": 140,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a6",
+      "roundness": null,
+      "seed": 977905529,
+      "version": 1,
+      "versionNonce": 1424674627,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "hono-router-architecture-node-5-label"
+        },
+        {
+          "id": "hono-router-architecture-edge-4",
+          "type": "arrow"
+        },
+        {
+          "id": "hono-router-architecture-edge-8",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "hono-router-architecture",
+        "node": "linear_router",
+        "ref": "src/router/linear-router/router.ts#LinearRouter"
+      }
+    },
+    {
+      "id": "hono-router-architecture-node-6",
+      "type": "rectangle",
+      "x": 2160,
+      "y": 200,
+      "width": 300,
+      "height": 120,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a7",
+      "roundness": null,
+      "seed": 621361166,
+      "version": 1,
+      "versionNonce": 20671922,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "hono-router-architecture-node-6-label"
+        },
+        {
+          "id": "hono-router-architecture-edge-9",
+          "type": "arrow"
+        },
+        {
+          "id": "hono-router-architecture-edge-12",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "hono-router-architecture",
+        "node": "node",
+        "ref": "src/router/trie-router/node.ts#Node"
+      }
+    },
+    {
+      "id": "hono-router-architecture-node-7",
+      "type": "rectangle",
+      "x": 1440,
+      "y": 200,
+      "width": 320,
+      "height": 100,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a8",
+      "roundness": null,
+      "seed": 1637841439,
+      "version": 1,
+      "versionNonce": 1481889977,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "hono-router-architecture-node-7-label"
+        },
+        {
+          "id": "hono-router-architecture-edge-10",
+          "type": "arrow"
+        },
+        {
+          "id": "hono-router-architecture-edge-12",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "hono-router-architecture",
+        "node": "trie",
+        "ref": "src/router/reg-exp-router/trie.ts#Trie"
+      }
+    },
+    {
+      "id": "hono-router-architecture-node-8",
+      "type": "rectangle",
+      "x": 1420,
+      "y": 20,
+      "width": 340,
+      "height": 100,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a9",
+      "roundness": null,
+      "seed": 342620212,
+      "version": 1,
+      "versionNonce": 1105344000,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "hono-router-architecture-node-8-label"
+        },
+        {
+          "id": "hono-router-architecture-edge-11",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "hono-router-architecture",
+        "node": "matcher",
+        "ref": "src/router/reg-exp-router/matcher.ts#Matcher"
+      }
+    },
+    {
+      "id": "hono-router-architecture-edge-0",
+      "type": "arrow",
+      "x": 312,
+      "y": 152,
+      "width": 1115.1999999999998,
+      "height": 353.6,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aA",
+      "roundness": null,
+      "seed": 1031665635,
+      "version": 1,
+      "versionNonce": 1563687037,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "hono-router-architecture-edge-0-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "hono-router-architecture",
+        "edge": {
+          "from": "smart_router",
+          "to": "router_interface",
+          "claim": "conforms"
+        }
+      },
+      "points": [
+        [
+          0.5,
+          0
+        ],
+        [
+          80,
+          0
+        ],
+        [
+          80,
+          353.6
+        ],
+        [
+          380.79999999999984,
+          353.6
+        ],
+        [
+          747.9999999999998,
+          353.6
+        ],
+        [
+          931.5999999999999,
+          353.6
+        ],
+        [
+          1114.6999999999998,
+          353.6
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "hono-router-architecture-node-1",
+        "focus": 0.022222222222222268,
+        "gap": 8
+      },
+      "endBinding": {
+        "elementId": "hono-router-architecture-node-0",
+        "focus": 0.04888888888888877,
+        "gap": 7.199999999999818
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "hono-router-architecture-edge-1",
+      "type": "arrow",
+      "x": 990.9333333333334,
+      "y": 858.4,
+      "width": 436.2666666666664,
+      "height": 292.79999999999995,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aB",
+      "roundness": null,
+      "seed": 1009171058,
+      "version": 1,
+      "versionNonce": 1286223398,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "hono-router-architecture-edge-1-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "hono-router-architecture",
+        "edge": {
+          "from": "trie_router",
+          "to": "router_interface",
+          "claim": "conforms"
+        }
+      },
+      "points": [
+        [
+          0.5,
+          0
+        ],
+        [
+          352.2666666666664,
+          0
+        ],
+        [
+          352.2666666666664,
+          -12.266666666666765
+        ],
+        [
+          352.2666666666664,
+          -292.79999999999995
+        ],
+        [
+          435.7666666666664,
+          -292.79999999999995
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "hono-router-architecture-node-2",
+        "focus": -0.3599999999999999,
+        "gap": 9.066666666666606
+      },
+      "endBinding": {
+        "elementId": "hono-router-architecture-node-0",
+        "focus": -0.6177777777777774,
+        "gap": 7.199999999999818
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "hono-router-architecture-edge-2",
+      "type": "arrow",
+      "x": 992.6,
+      "y": 122,
+      "width": 434.5999999999998,
+      "height": 323.6,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aC",
+      "roundness": null,
+      "seed": 771697677,
+      "version": 1,
+      "versionNonce": 453980151,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "hono-router-architecture-edge-2-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "hono-router-architecture",
+        "edge": {
+          "from": "regexp_router",
+          "to": "router_interface",
+          "claim": "conforms"
+        }
+      },
+      "points": [
+        [
+          0.5,
+          0
+        ],
+        [
+          36.999999999999886,
+          0
+        ],
+        [
+          36.999999999999886,
+          176.8
+        ],
+        [
+          202.29999999999984,
+          176.8
+        ],
+        [
+          350.5999999999998,
+          176.8
+        ],
+        [
+          350.5999999999998,
+          323.6
+        ],
+        [
+          434.0999999999998,
+          323.6
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "hono-router-architecture-node-3",
+        "focus": 0.3666666666666669,
+        "gap": 7.399999999999977
+      },
+      "endBinding": {
+        "elementId": "hono-router-architecture-node-0",
+        "focus": 0.715555555555555,
+        "gap": 7.199999999999818
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "hono-router-architecture-edge-3",
+      "type": "arrow",
+      "x": 987.6,
+      "y": 678.4,
+      "width": 439.5999999999998,
+      "height": 142.79999999999995,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aD",
+      "roundness": null,
+      "seed": 1154241716,
+      "version": 1,
+      "versionNonce": 1771295616,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "hono-router-architecture-edge-3-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "hono-router-architecture",
+        "edge": {
+          "from": "pattern_router",
+          "to": "router_interface",
+          "claim": "conforms"
+        }
+      },
+      "points": [
+        [
+          0.5,
+          0
+        ],
+        [
+          72.80000000000007,
+          0
+        ],
+        [
+          145.60000000000002,
+          0
+        ],
+        [
+          291.19999999999993,
+          0
+        ],
+        [
+          331.5999999999998,
+          0
+        ],
+        [
+          331.5999999999998,
+          -142.79999999999995
+        ],
+        [
+          439.0999999999998,
+          -142.79999999999995
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "hono-router-architecture-node-4",
+        "focus": -0.026666666666666814,
+        "gap": 7.600000000000023
+      },
+      "endBinding": {
+        "elementId": "hono-router-architecture-node-0",
+        "focus": -0.28444444444444494,
+        "gap": 7.199999999999818
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "hono-router-architecture-edge-4",
+      "type": "arrow",
+      "x": 997.6,
+      "y": 355.6,
+      "width": 429.5999999999998,
+      "height": 120,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aE",
+      "roundness": null,
+      "seed": 274663143,
+      "version": 1,
+      "versionNonce": 1613504897,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "hono-router-architecture-edge-4-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "hono-router-architecture",
+        "edge": {
+          "from": "linear_router",
+          "to": "router_interface",
+          "claim": "conforms"
+        }
+      },
+      "points": [
+        [
+          0.5,
+          0
+        ],
+        [
+          68.69999999999993,
+          0
+        ],
+        [
+          137.39999999999998,
+          0
+        ],
+        [
+          274.79999999999984,
+          0
+        ],
+        [
+          321.5999999999998,
+          0
+        ],
+        [
+          321.5999999999998,
+          120
+        ],
+        [
+          429.0999999999998,
+          120
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "hono-router-architecture-node-5",
+        "focus": 0.08000000000000004,
+        "gap": 2.3999999999999773
+      },
+      "endBinding": {
+        "elementId": "hono-router-architecture-node-0",
+        "focus": 0.38222222222222246,
+        "gap": 7.199999999999818
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "hono-router-architecture-edge-5",
+      "type": "arrow",
+      "x": 312,
+      "y": 212,
+      "width": 398.9333333333334,
+      "height": 666.4,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aF",
+      "roundness": null,
+      "seed": 1870383446,
+      "version": 1,
+      "versionNonce": 581371450,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "hono-router-architecture-edge-5-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "hono-router-architecture",
+        "edge": {
+          "from": "smart_router",
+          "to": "trie_router",
+          "claim": "calls"
+        }
+      },
+      "points": [
+        [
+          0.5,
+          0
+        ],
+        [
+          32,
+          0
+        ],
+        [
+          32,
+          500.66666666666674
+        ],
+        [
+          32,
+          666.4
+        ],
+        [
+          398.4333333333334,
+          666.4
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "hono-router-architecture-node-1",
+        "focus": 0.6888888888888888,
+        "gap": 8
+      },
+      "endBinding": {
+        "elementId": "hono-router-architecture-node-2",
+        "focus": 0.026666666666666814,
+        "gap": 9.066666666666606
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "hono-router-architecture-edge-6",
+      "type": "arrow",
+      "x": 312,
+      "y": 92,
+      "width": 400.6,
+      "height": 0,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aG",
+      "roundness": null,
+      "seed": 401537633,
+      "version": 1,
+      "versionNonce": 247049259,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "hono-router-architecture-edge-6-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "hono-router-architecture",
+        "edge": {
+          "from": "smart_router",
+          "to": "regexp_router",
+          "claim": "calls"
+        }
+      },
+      "points": [
+        [
+          0.5,
+          0
+        ],
+        [
+          200.29999999999995,
+          0
+        ],
+        [
+          400.1,
+          0
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "hono-router-architecture-node-1",
+        "focus": -0.6444444444444444,
+        "gap": 8
+      },
+      "endBinding": {
+        "elementId": "hono-router-architecture-node-3",
+        "focus": 0.13333333333333242,
+        "gap": 7.399999999999977
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "hono-router-architecture-edge-7",
+      "type": "arrow",
+      "x": 312,
+      "y": 182,
+      "width": 395.6,
+      "height": 496.4,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aH",
+      "roundness": null,
+      "seed": 1786539960,
+      "version": 1,
+      "versionNonce": 714183444,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "hono-router-architecture-edge-7-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "hono-router-architecture",
+        "edge": {
+          "from": "smart_router",
+          "to": "pattern_router",
+          "claim": "calls"
+        }
+      },
+      "points": [
+        [
+          0.5,
+          0
+        ],
+        [
+          56,
+          0
+        ],
+        [
+          56,
+          390
+        ],
+        [
+          56,
+          496.4
+        ],
+        [
+          395.1,
+          496.4
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "hono-router-architecture-node-1",
+        "focus": 0.3555555555555555,
+        "gap": 8
+      },
+      "endBinding": {
+        "elementId": "hono-router-architecture-node-4",
+        "focus": 0.026666666666667498,
+        "gap": 7.600000000000023
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "hono-router-architecture-edge-8",
+      "type": "arrow",
+      "x": 312,
+      "y": 122,
+      "width": 385.6,
+      "height": 233.60000000000002,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aI",
+      "roundness": null,
+      "seed": 1333589243,
+      "version": 1,
+      "versionNonce": 1360520565,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "hono-router-architecture-edge-8-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "hono-router-architecture",
+        "edge": {
+          "from": "smart_router",
+          "to": "linear_router",
+          "claim": "calls"
+        }
+      },
+      "points": [
+        [
+          0.5,
+          0
+        ],
+        [
+          104,
+          0
+        ],
+        [
+          104,
+          205.60000000000002
+        ],
+        [
+          104,
+          233.60000000000002
+        ],
+        [
+          385.1,
+          233.60000000000002
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "hono-router-architecture-node-1",
+        "focus": -0.31111111111111106,
+        "gap": 8
+      },
+      "endBinding": {
+        "elementId": "hono-router-architecture-node-5",
+        "focus": -0.07999999999999943,
+        "gap": 2.3999999999999773
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "hono-router-architecture-edge-9",
+      "type": "arrow",
+      "x": 990.9333333333334,
+      "y": 898.4,
+      "width": 1161.8666666666663,
+      "height": 649.1999999999999,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aJ",
+      "roundness": null,
+      "seed": 571770282,
+      "version": 1,
+      "versionNonce": 2045551230,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "hono-router-architecture-edge-9-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "hono-router-architecture",
+        "edge": {
+          "from": "trie_router",
+          "to": "node",
+          "claim": "builds"
+        }
+      },
+      "points": [
+        [
+          0.5,
+          0
+        ],
+        [
+          38.666666666666515,
+          0
+        ],
+        [
+          38.666666666666515,
+          32.799999999999955
+        ],
+        [
+          889.1333333333332,
+          32.799999999999955
+        ],
+        [
+          1053.8666666666663,
+          32.799999999999955
+        ],
+        [
+          1053.8666666666663,
+          -616.4
+        ],
+        [
+          1161.3666666666663,
+          -616.4
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "hono-router-architecture-node-2",
+        "focus": 0.30666666666666625,
+        "gap": 9.066666666666606
+      },
+      "endBinding": {
+        "elementId": "hono-router-architecture-node-6",
+        "focus": -0.36666666666666675,
+        "gap": 7.200000000000273
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "hono-router-architecture-edge-10",
+      "type": "arrow",
+      "x": 992.6,
+      "y": 92,
+      "width": 444.5999999999998,
+      "height": 150,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aK",
+      "roundness": null,
+      "seed": 321522956,
+      "version": 1,
+      "versionNonce": 313685720,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "hono-router-architecture-edge-10-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "hono-router-architecture",
+        "edge": {
+          "from": "regexp_router",
+          "to": "trie",
+          "claim": "builds"
+        }
+      },
+      "points": [
+        [
+          0.5,
+          0
+        ],
+        [
+          60.999999999999886,
+          0
+        ],
+        [
+          60.999999999999886,
+          150
+        ],
+        [
+          147.29999999999984,
+          150
+        ],
+        [
+          295.9499999999997,
+          150
+        ],
+        [
+          370.27499999999975,
+          150
+        ],
+        [
+          444.0999999999998,
+          150
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "hono-router-architecture-node-3",
+        "focus": -0.13333333333333308,
+        "gap": 7.399999999999977
+      },
+      "endBinding": {
+        "elementId": "hono-router-architecture-node-7",
+        "focus": 0.15999999999999948,
+        "gap": 2.800000000000182
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "hono-router-architecture-edge-11",
+      "type": "arrow",
+      "x": 992.6,
+      "y": 62,
+      "width": 434.5999999999998,
+      "height": 0,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aL",
+      "roundness": null,
+      "seed": 461412133,
+      "version": 1,
+      "versionNonce": 142140847,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "hono-router-architecture-edge-11-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "hono-router-architecture",
+        "edge": {
+          "from": "regexp_router",
+          "to": "matcher",
+          "claim": "builds"
+        }
+      },
+      "points": [
+        [
+          0.5,
+          0
+        ],
+        [
+          217.29999999999984,
+          0
+        ],
+        [
+          434.0999999999998,
+          0
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "hono-router-architecture-node-3",
+        "focus": -0.633333333333333,
+        "gap": 7.399999999999977
+      },
+      "endBinding": {
+        "elementId": "hono-router-architecture-node-8",
+        "focus": 0.16000000000000025,
+        "gap": 7.199999999999818
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "hono-router-architecture-edge-12",
+      "type": "arrow",
+      "x": 1757.1999999999998,
+      "y": 242,
+      "width": 395.5999999999999,
+      "height": 0,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aM",
+      "roundness": null,
+      "seed": 1454779978,
+      "version": 1,
+      "versionNonce": 1303733918,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "hono-router-architecture-edge-12-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "hono-router-architecture",
+        "edge": {
+          "from": "trie",
+          "to": "node",
+          "claim": "builds"
+        }
+      },
+      "points": [
+        [
+          0.5,
+          0
+        ],
+        [
+          197.79999999999995,
+          0
+        ],
+        [
+          395.0999999999999,
+          0
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "hono-router-architecture-node-7",
+        "focus": -0.15999999999999948,
+        "gap": 2.800000000000182
+      },
+      "endBinding": {
+        "elementId": "hono-router-architecture-node-6",
+        "focus": 0.30000000000000004,
+        "gap": 7.200000000000273
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "hono-router-architecture-node-0-label",
+      "type": "text",
+      "x": 1455.5,
+      "y": 460,
+      "width": 209.00000000000003,
+      "height": 100,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aN",
+      "roundness": null,
+      "seed": 942313225,
+      "version": 1,
+      "versionNonce": 1293559955,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "hono-router-architecture"
+      },
+      "text": "Router<T>\nadd(method, path,\nhandler)\nmatch(method, path)",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "hono-router-architecture-node-0",
+      "originalText": "Router<T>\nadd(method, path, handler)\nmatch(method, path)",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "hono-router-architecture-node-1-label",
+      "type": "text",
+      "x": 54.499999999999986,
+      "y": 100,
+      "width": 231.00000000000003,
+      "height": 100,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aO",
+      "roundness": null,
+      "seed": 1931953644,
+      "version": 1,
+      "versionNonce": 147299896,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "hono-router-architecture"
+      },
+      "text": "SmartRouter<T>\nstores routes\npicks router on first\nmatch()",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "hono-router-architecture-node-1",
+      "originalText": "SmartRouter<T>\nstores routes\npicks router on first match()",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "hono-router-architecture-node-2-label",
+      "type": "text",
+      "x": 750,
+      "y": 842.5,
+      "width": 220.00000000000003,
+      "height": 75,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aP",
+      "roundness": null,
+      "seed": 371774683,
+      "version": 1,
+      "versionNonce": 556909781,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "hono-router-architecture"
+      },
+      "text": "TrieRouter<T>\nadd: Node.insert()\nmatch: Node.search()",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "hono-router-architecture-node-2",
+      "originalText": "TrieRouter<T>\nadd: Node.insert()\nmatch: Node.search()",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "hono-router-architecture-node-3-label",
+      "type": "text",
+      "x": 744.5,
+      "y": 50,
+      "width": 231.00000000000003,
+      "height": 100,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aQ",
+      "roundness": null,
+      "seed": 1222698022,
+      "version": 1,
+      "versionNonce": 773919242,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "hono-router-architecture"
+      },
+      "text": "RegExpRouter<T>\nadd: stores in routes\nmap\nmatch: uses Matcher",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "hono-router-architecture-node-3",
+      "originalText": "RegExpRouter<T>\nadd: stores in routes map\nmatch: uses Matcher",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "hono-router-architecture-node-4-label",
+      "type": "text",
+      "x": 708,
+      "y": 642.5,
+      "width": 264,
+      "height": 75,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aR",
+      "roundness": null,
+      "seed": 881129933,
+      "version": 1,
+      "versionNonce": 213942967,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "hono-router-architecture"
+      },
+      "text": "PatternRouter<T>\nadd: creates RegExp\nmatch: iterates patterns",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "hono-router-architecture-node-4",
+      "originalText": "PatternRouter<T>\nadd: creates RegExp\nmatch: iterates patterns",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "hono-router-architecture-node-5-label",
+      "type": "text",
+      "x": 707,
+      "y": 300,
+      "width": 286,
+      "height": 100,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aS",
+      "roundness": null,
+      "seed": 2026139648,
+      "version": 1,
+      "versionNonce": 959772892,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "hono-router-architecture"
+      },
+      "text": "LinearRouter<T>\nadd: stores [method, path,\nhandler]\nmatch: linear search",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "hono-router-architecture-node-5",
+      "originalText": "LinearRouter<T>\nadd: stores [method, path, handler]\nmatch: linear search",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "hono-router-architecture-node-6-label",
+      "type": "text",
+      "x": 2200,
+      "y": 210,
+      "width": 220.00000000000003,
+      "height": 100,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aT",
+      "roundness": null,
+      "seed": 2059055791,
+      "version": 1,
+      "versionNonce": 1221369097,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "hono-router-architecture"
+      },
+      "text": "Node<T>\ninsert(method, path,\nhandler)\nsearch(method, path)",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "hono-router-architecture-node-6",
+      "originalText": "Node<T>\ninsert(method, path, handler)\nsearch(method, path)",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "hono-router-architecture-node-7-label",
+      "type": "text",
+      "x": 1479,
+      "y": 212.5,
+      "width": 242.00000000000003,
+      "height": 75,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aU",
+      "roundness": null,
+      "seed": 2008802730,
+      "version": 1,
+      "versionNonce": 1349042814,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "hono-router-architecture"
+      },
+      "text": "Trie\ninsert(path, isStatic)\nbuildRegExp()",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "hono-router-architecture-node-7",
+      "originalText": "Trie\ninsert(path, isStatic)\nbuildRegExp()",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "hono-router-architecture-node-8-label",
+      "type": "text",
+      "x": 1463.5,
+      "y": 32.5,
+      "width": 253.00000000000003,
+      "height": 75,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aV",
+      "roundness": null,
+      "seed": 251088641,
+      "version": 1,
+      "versionNonce": 1780795211,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "hono-router-architecture"
+      },
+      "text": "Matcher<T>\n[RegExp, HandlerData[],\nStaticMap]",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "hono-router-architecture-node-8",
+      "originalText": "Matcher<T>\n[RegExp, HandlerData[], StaticMap]",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "hono-router-architecture-edge-0-label",
+      "type": "text",
+      "x": 653.1999999999998,
+      "y": 495.6,
+      "width": 79.2,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aW",
+      "roundness": null,
+      "seed": 503549822,
+      "version": 1,
+      "versionNonce": 2107011874,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "hono-router-architecture"
+      },
+      "text": "@conforms",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "hono-router-architecture-edge-0",
+      "originalText": "@conforms",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "hono-router-architecture-edge-1-label",
+      "type": "text",
+      "x": 1303.6,
+      "y": 836.1333333333332,
+      "width": 79.2,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aX",
+      "roundness": null,
+      "seed": 1994968083,
+      "version": 1,
+      "versionNonce": 188976493,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "hono-router-architecture"
+      },
+      "text": "@conforms",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "hono-router-architecture-edge-1",
+      "originalText": "@conforms",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "hono-router-architecture-edge-2-label",
+      "type": "text",
+      "x": 1155.3,
+      "y": 288.8,
+      "width": 79.2,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aY",
+      "roundness": null,
+      "seed": 1729359044,
+      "version": 1,
+      "versionNonce": 1261184720,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "hono-router-architecture"
+      },
+      "text": "@conforms",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "hono-router-architecture-edge-2",
+      "originalText": "@conforms",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "hono-router-architecture-edge-3-label",
+      "type": "text",
+      "x": 1239.2,
+      "y": 668.4,
+      "width": 79.2,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aZ",
+      "roundness": null,
+      "seed": 1282459521,
+      "version": 1,
+      "versionNonce": 811432139,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "hono-router-architecture"
+      },
+      "text": "@conforms",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "hono-router-architecture-edge-3",
+      "originalText": "@conforms",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "hono-router-architecture-edge-4-label",
+      "type": "text",
+      "x": 1232.8,
+      "y": 345.6,
+      "width": 79.2,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aa",
+      "roundness": null,
+      "seed": 1923945570,
+      "version": 1,
+      "versionNonce": 1542829654,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "hono-router-architecture"
+      },
+      "text": "@conforms",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "hono-router-architecture-edge-4",
+      "originalText": "@conforms",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "hono-router-architecture-edge-5-label",
+      "type": "text",
+      "x": 291.2,
+      "y": 702.6666666666667,
+      "width": 105.60000000000001,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "ab",
+      "roundness": null,
+      "seed": 1079851015,
+      "version": 1,
+      "versionNonce": 1721850401,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "hono-router-architecture"
+      },
+      "text": "tries @calls",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "hono-router-architecture-edge-5",
+      "originalText": "tries @calls",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "hono-router-architecture-edge-6-label",
+      "type": "text",
+      "x": 459.49999999999994,
+      "y": 82,
+      "width": 105.60000000000001,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "ac",
+      "roundness": null,
+      "seed": 61058488,
+      "version": 1,
+      "versionNonce": 1129852180,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "hono-router-architecture"
+      },
+      "text": "tries @calls",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "hono-router-architecture-edge-6",
+      "originalText": "tries @calls",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "hono-router-architecture-edge-7-label",
+      "type": "text",
+      "x": 315.2,
+      "y": 562,
+      "width": 105.60000000000001,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "ad",
+      "roundness": null,
+      "seed": 525025541,
+      "version": 1,
+      "versionNonce": 586910735,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "hono-router-architecture"
+      },
+      "text": "tries @calls",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "hono-router-architecture-edge-7",
+      "originalText": "tries @calls",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "hono-router-architecture-edge-8-label",
+      "type": "text",
+      "x": 363.2,
+      "y": 317.6,
+      "width": 105.60000000000001,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "ae",
+      "roundness": null,
+      "seed": 106585254,
+      "version": 1,
+      "versionNonce": 1952039818,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "hono-router-architecture"
+      },
+      "text": "tries @calls",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "hono-router-architecture-edge-8",
+      "originalText": "tries @calls",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "hono-router-architecture-edge-9-label",
+      "type": "text",
+      "x": 1827.2666666666667,
+      "y": 921.1999999999999,
+      "width": 105.60000000000001,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "af",
+      "roundness": null,
+      "seed": 1403145563,
+      "version": 1,
+      "versionNonce": 1735030357,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "hono-router-architecture"
+      },
+      "text": "trie @builds",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "hono-router-architecture-edge-9",
+      "originalText": "trie @builds",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "hono-router-architecture-edge-10-label",
+      "type": "text",
+      "x": 1065.1,
+      "y": 232,
+      "width": 149.60000000000002,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "ag",
+      "roundness": null,
+      "seed": 115193513,
+      "version": 1,
+      "versionNonce": 1071395251,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "hono-router-architecture"
+      },
+      "text": "path trie @builds",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "hono-router-architecture-edge-10",
+      "originalText": "path trie @builds",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "hono-router-architecture-edge-11-label",
+      "type": "text",
+      "x": 1143.8999999999999,
+      "y": 52,
+      "width": 132,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "ah",
+      "roundness": null,
+      "seed": 1631362060,
+      "version": 1,
+      "versionNonce": 2045350872,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "hono-router-architecture"
+      },
+      "text": "matcher @builds",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "hono-router-architecture-edge-11",
+      "originalText": "matcher @builds",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "hono-router-architecture-edge-12-label",
+      "type": "text",
+      "x": 1902.1999999999998,
+      "y": 232,
+      "width": 105.60000000000001,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "ai",
+      "roundness": null,
+      "seed": 730040699,
+      "version": 1,
+      "versionNonce": 796109557,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "hono-router-architecture"
+      },
+      "text": "trie @builds",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "hono-router-architecture-edge-12",
+      "originalText": "trie @builds",
+      "autoResize": true,
+      "lineHeight": 1.25
+    }
+  ],
+  "appState": {
+    "gridSize": null,
+    "viewBackgroundColor": "#ffffff"
+  },
+  "files": {},
+  "diagramos": {
+    "version": "0.2.0-rc.6",
+    "schema": 1
+  }
+}

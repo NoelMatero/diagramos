@@ -1,0 +1,1691 @@
+{
+  "type": "excalidraw",
+  "version": 2,
+  "source": "diagramos",
+  "elements": [
+    {
+      "id": "aiohttp-web-request-routing-title",
+      "type": "text",
+      "x": 0,
+      "y": -115,
+      "width": 356.40000000000003,
+      "height": 30,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a0",
+      "roundness": null,
+      "seed": 221195366,
+      "version": 1,
+      "versionNonce": 1927491402,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "aiohttp-web-request-routing",
+        "role": "title",
+        "direction": "DOWN"
+      },
+      "text": "aiohttp Web Request Routing",
+      "fontSize": 24,
+      "fontFamily": 5,
+      "textAlign": "left",
+      "verticalAlign": "middle",
+      "containerId": null,
+      "originalText": "aiohttp Web Request Routing",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "aiohttp-web-request-routing-node-0",
+      "type": "rectangle",
+      "x": 340,
+      "y": 20,
+      "width": 220,
+      "height": 80,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a1",
+      "roundness": null,
+      "seed": 1145828297,
+      "version": 1,
+      "versionNonce": 991514963,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "aiohttp-web-request-routing-node-0-label"
+        },
+        {
+          "id": "aiohttp-web-request-routing-edge-0",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "aiohttp-web-request-routing",
+        "node": "rh",
+        "ref": "aiohttp/web_protocol.py#RequestHandler"
+      }
+    },
+    {
+      "id": "aiohttp-web-request-routing-node-1",
+      "type": "rectangle",
+      "x": 80,
+      "y": 20,
+      "width": 180,
+      "height": 80,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a2",
+      "roundness": null,
+      "seed": 140113280,
+      "version": 1,
+      "versionNonce": 1100357980,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "aiohttp-web-request-routing-node-1-label"
+        },
+        {
+          "id": "aiohttp-web-request-routing-edge-1",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "aiohttp-web-request-routing",
+        "node": "app",
+        "ref": "aiohttp/web_app.py#Application"
+      }
+    },
+    {
+      "id": "aiohttp-web-request-routing-node-2",
+      "type": "rectangle",
+      "x": 340,
+      "y": 400,
+      "width": 160,
+      "height": 80,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a3",
+      "roundness": null,
+      "seed": 1764187503,
+      "version": 1,
+      "versionNonce": 1150282441,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "aiohttp-web-request-routing-node-2-label"
+        },
+        {
+          "id": "aiohttp-web-request-routing-edge-0",
+          "type": "arrow"
+        },
+        {
+          "id": "aiohttp-web-request-routing-edge-1",
+          "type": "arrow"
+        },
+        {
+          "id": "aiohttp-web-request-routing-edge-2",
+          "type": "arrow"
+        },
+        {
+          "id": "aiohttp-web-request-routing-edge-7",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "aiohttp-web-request-routing",
+        "node": "app_handle",
+        "ref": "aiohttp/web_app.py#Application._handle"
+      }
+    },
+    {
+      "id": "aiohttp-web-request-routing-node-3",
+      "type": "rectangle",
+      "x": 40,
+      "y": 400,
+      "width": 200,
+      "height": 80,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a4",
+      "roundness": null,
+      "seed": 1629212958,
+      "version": 1,
+      "versionNonce": 688259394,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "aiohttp-web-request-routing-node-3-label"
+        },
+        {
+          "id": "aiohttp-web-request-routing-edge-3",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "aiohttp-web-request-routing",
+        "node": "dispatcher",
+        "ref": "aiohttp/web_urldispatcher.py#UrlDispatcher"
+      }
+    },
+    {
+      "id": "aiohttp-web-request-routing-node-4",
+      "type": "rectangle",
+      "x": 200,
+      "y": 780,
+      "width": 160,
+      "height": 80,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a5",
+      "roundness": null,
+      "seed": 879531285,
+      "version": 1,
+      "versionNonce": 377155103,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "aiohttp-web-request-routing-node-4-label"
+        },
+        {
+          "id": "aiohttp-web-request-routing-edge-2",
+          "type": "arrow"
+        },
+        {
+          "id": "aiohttp-web-request-routing-edge-3",
+          "type": "arrow"
+        },
+        {
+          "id": "aiohttp-web-request-routing-edge-4",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "aiohttp-web-request-routing",
+        "node": "dispatcher_resolve",
+        "ref": "aiohttp/web_urldispatcher.py#UrlDispatcher.resolve"
+      }
+    },
+    {
+      "id": "aiohttp-web-request-routing-node-5",
+      "type": "rectangle",
+      "x": 200,
+      "y": 1160,
+      "width": 160,
+      "height": 80,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a6",
+      "roundness": null,
+      "seed": 954544764,
+      "version": 1,
+      "versionNonce": 856386824,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "aiohttp-web-request-routing-node-5-label"
+        },
+        {
+          "id": "aiohttp-web-request-routing-edge-4",
+          "type": "arrow"
+        },
+        {
+          "id": "aiohttp-web-request-routing-edge-5",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "aiohttp-web-request-routing",
+        "node": "resource",
+        "ref": "aiohttp/web_urldispatcher.py#AbstractResource"
+      }
+    },
+    {
+      "id": "aiohttp-web-request-routing-node-6",
+      "type": "rectangle",
+      "x": 140,
+      "y": 1540,
+      "width": 260,
+      "height": 80,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a7",
+      "roundness": null,
+      "seed": 370803275,
+      "version": 1,
+      "versionNonce": 822586565,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "aiohttp-web-request-routing-node-6-label"
+        },
+        {
+          "id": "aiohttp-web-request-routing-edge-5",
+          "type": "arrow"
+        },
+        {
+          "id": "aiohttp-web-request-routing-edge-6",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "aiohttp-web-request-routing",
+        "node": "matchinfo",
+        "ref": "aiohttp/web_urldispatcher.py#UrlMappingMatchInfo"
+      }
+    },
+    {
+      "id": "aiohttp-web-request-routing-node-7",
+      "type": "rectangle",
+      "x": 340,
+      "y": 1920,
+      "width": 160,
+      "height": 80,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a8",
+      "roundness": null,
+      "seed": 2085897786,
+      "version": 1,
+      "versionNonce": 940155790,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "aiohttp-web-request-routing-node-7-label"
+        },
+        {
+          "id": "aiohttp-web-request-routing-edge-6",
+          "type": "arrow"
+        },
+        {
+          "id": "aiohttp-web-request-routing-edge-7",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "aiohttp-web-request-routing",
+        "node": "route",
+        "ref": "aiohttp/web_urldispatcher.py#AbstractRoute"
+      }
+    },
+    {
+      "id": "aiohttp-web-request-routing-edge-0",
+      "type": "arrow",
+      "x": 446.73333333333335,
+      "y": 92,
+      "width": 0,
+      "height": 300.8,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a9",
+      "roundness": null,
+      "seed": 2074441662,
+      "version": 1,
+      "versionNonce": 636633698,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "aiohttp-web-request-routing-edge-0-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "aiohttp-web-request-routing",
+        "edge": {
+          "from": "rh",
+          "to": "app_handle",
+          "claim": "calls"
+        }
+      },
+      "points": [
+        [
+          0,
+          0.5
+        ],
+        [
+          0,
+          150.4
+        ],
+        [
+          0,
+          300.3
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "aiohttp-web-request-routing-node-0",
+        "focus": 0.029696969696969035,
+        "gap": 8
+      },
+      "endBinding": {
+        "elementId": "aiohttp-web-request-routing-node-2",
+        "focus": 0.33416666666666744,
+        "gap": 7.199999999999989
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "aiohttp-web-request-routing-edge-1",
+      "type": "arrow",
+      "x": 166.73333333333335,
+      "y": 92,
+      "width": 226.6666666666667,
+      "height": 300.8,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aA",
+      "roundness": null,
+      "seed": 103509263,
+      "version": 1,
+      "versionNonce": 1840987369,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "aiohttp-web-request-routing-edge-1-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "aiohttp-web-request-routing",
+        "edge": {
+          "from": "app",
+          "to": "app_handle",
+          "claim": "calls"
+        }
+      },
+      "points": [
+        [
+          -0.5,
+          0.5
+        ],
+        [
+          -2.842170943040401e-14,
+          192.8
+        ],
+        [
+          70.93333333333331,
+          192.8
+        ],
+        [
+          226.66666666666669,
+          192.8
+        ],
+        [
+          227.16666666666663,
+          300.3
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "aiohttp-web-request-routing-node-1",
+        "focus": 0.03629629629629582,
+        "gap": 8
+      },
+      "endBinding": {
+        "elementId": "aiohttp-web-request-routing-node-2",
+        "focus": -0.33249999999999996,
+        "gap": 7.199999999999989
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "aiohttp-web-request-routing-edge-2",
+      "type": "arrow",
+      "x": 393.4,
+      "y": 472.8,
+      "width": 90.00000000000006,
+      "height": 300.7999999999999,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aB",
+      "roundness": null,
+      "seed": 627021856,
+      "version": 1,
+      "versionNonce": 1048732284,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "aiohttp-web-request-routing-edge-2-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "aiohttp-web-request-routing",
+        "edge": {
+          "from": "app_handle",
+          "to": "dispatcher_resolve",
+          "claim": "calls"
+        }
+      },
+      "points": [
+        [
+          0.5,
+          0.5
+        ],
+        [
+          5.684341886080802e-14,
+          32
+        ],
+        [
+          -90,
+          32
+        ],
+        [
+          -90,
+          105.39999999999992
+        ],
+        [
+          -90,
+          203.09999999999985
+        ],
+        [
+          -90,
+          251.94999999999987
+        ],
+        [
+          -90.49999999999994,
+          300.2999999999999
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "aiohttp-web-request-routing-node-2",
+        "focus": 0.33249999999999996,
+        "gap": 7.199999999999989
+      },
+      "endBinding": {
+        "elementId": "aiohttp-web-request-routing-node-4",
+        "focus": 0.29250000000000054,
+        "gap": 6.400000000000091
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "aiohttp-web-request-routing-edge-3",
+      "type": "arrow",
+      "x": 145.20000000000005,
+      "y": 472.8,
+      "width": 104.86666666666667,
+      "height": 300.7999999999999,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aC",
+      "roundness": null,
+      "seed": 187807977,
+      "version": 1,
+      "versionNonce": 177155315,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "aiohttp-web-request-routing-edge-3-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "aiohttp-web-request-routing",
+        "edge": {
+          "from": "dispatcher",
+          "to": "dispatcher_resolve",
+          "claim": "calls"
+        }
+      },
+      "points": [
+        [
+          0,
+          0.5
+        ],
+        [
+          -2.842170943040401e-14,
+          192.7999999999999
+        ],
+        [
+          10.03333333333336,
+          192.7999999999999
+        ],
+        [
+          104.86666666666665,
+          192.7999999999999
+        ],
+        [
+          104.86666666666665,
+          300.2999999999999
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "aiohttp-web-request-routing-node-3",
+        "focus": -0.052000000000000775,
+        "gap": 7.199999999999989
+      },
+      "endBinding": {
+        "elementId": "aiohttp-web-request-routing-node-4",
+        "focus": -0.37416666666666626,
+        "gap": 6.400000000000091
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "aiohttp-web-request-routing-edge-4",
+      "type": "arrow",
+      "x": 276.73333333333335,
+      "y": 853.5999999999999,
+      "width": 0,
+      "height": 300.79999999999995,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aD",
+      "roundness": null,
+      "seed": 1552438106,
+      "version": 1,
+      "versionNonce": 1848822318,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "aiohttp-web-request-routing-edge-4-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "aiohttp-web-request-routing",
+        "edge": {
+          "from": "dispatcher_resolve",
+          "to": "resource",
+          "claim": "calls"
+        }
+      },
+      "points": [
+        [
+          0,
+          0.5
+        ],
+        [
+          0,
+          150.39999999999998
+        ],
+        [
+          0,
+          300.29999999999995
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "aiohttp-web-request-routing-node-4",
+        "focus": 0.040833333333333145,
+        "gap": 6.400000000000091
+      },
+      "endBinding": {
+        "elementId": "aiohttp-web-request-routing-node-5",
+        "focus": -0.04083333333333371,
+        "gap": 5.600000000000136
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "aiohttp-web-request-routing-edge-5",
+      "type": "arrow",
+      "x": 276.73333333333335,
+      "y": 1234.3999999999999,
+      "width": 0,
+      "height": 300.79999999999995,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aE",
+      "roundness": null,
+      "seed": 816031979,
+      "version": 1,
+      "versionNonce": 1513291493,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "aiohttp-web-request-routing-edge-5-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "aiohttp-web-request-routing",
+        "edge": {
+          "from": "resource",
+          "to": "matchinfo",
+          "claim": "returns"
+        }
+      },
+      "points": [
+        [
+          0,
+          0.5
+        ],
+        [
+          0,
+          150.39999999999986
+        ],
+        [
+          0,
+          300.29999999999995
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "aiohttp-web-request-routing-node-5",
+        "focus": 0.04083333333333371,
+        "gap": 5.600000000000136
+      },
+      "endBinding": {
+        "elementId": "aiohttp-web-request-routing-node-6",
+        "focus": 0.051794871794872105,
+        "gap": 4.800000000000182
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "aiohttp-web-request-routing-edge-6",
+      "type": "arrow",
+      "x": 276.73333333333335,
+      "y": 1615.1999999999998,
+      "width": 116.66666666666669,
+      "height": 300.79999999999995,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aF",
+      "roundness": null,
+      "seed": 2142207260,
+      "version": 1,
+      "versionNonce": 1422198824,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "aiohttp-web-request-routing-edge-6-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "aiohttp-web-request-routing",
+        "edge": {
+          "from": "matchinfo",
+          "to": "route",
+          "claim": "holds"
+        }
+      },
+      "points": [
+        [
+          -0.5,
+          0.5
+        ],
+        [
+          0,
+          192.79999999999995
+        ],
+        [
+          15.933333333333337,
+          192.79999999999995
+        ],
+        [
+          116.66666666666669,
+          192.79999999999995
+        ],
+        [
+          117.16666666666663,
+          300.29999999999995
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "aiohttp-web-request-routing-node-6",
+        "focus": -0.051794871794872105,
+        "gap": 4.800000000000182
+      },
+      "endBinding": {
+        "elementId": "aiohttp-web-request-routing-node-7",
+        "focus": -0.33249999999999996,
+        "gap": 4.000000000000227
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "aiohttp-web-request-routing-edge-7",
+      "type": "arrow",
+      "x": 446.73333333333335,
+      "y": 1915.9999999999998,
+      "width": 0,
+      "height": 1443.1999999999998,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aG",
+      "roundness": null,
+      "seed": 345968437,
+      "version": 1,
+      "versionNonce": 1710279103,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "aiohttp-web-request-routing-edge-7-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "aiohttp-web-request-routing",
+        "edge": {
+          "from": "route",
+          "to": "app_handle",
+          "claim": "calls"
+        }
+      },
+      "points": [
+        [
+          0,
+          -0.5
+        ],
+        [
+          0,
+          -721.5999999999999
+        ],
+        [
+          0,
+          -1442.6999999999998
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "aiohttp-web-request-routing-node-7",
+        "focus": 0.33416666666666456,
+        "gap": 4.000000000000227
+      },
+      "endBinding": {
+        "elementId": "aiohttp-web-request-routing-node-2",
+        "focus": -0.33416666666666744,
+        "gap": 7.2000000000000455
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "aiohttp-web-request-routing-node-0-label",
+      "type": "text",
+      "x": 373,
+      "y": 47.5,
+      "width": 154,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aH",
+      "roundness": null,
+      "seed": 660564112,
+      "version": 1,
+      "versionNonce": 533849196,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "aiohttp-web-request-routing"
+      },
+      "text": "RequestHandler",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "aiohttp-web-request-routing-node-0",
+      "originalText": "RequestHandler",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "aiohttp-web-request-routing-node-1-label",
+      "type": "text",
+      "x": 109.5,
+      "y": 47.5,
+      "width": 121.00000000000001,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aI",
+      "roundness": null,
+      "seed": 1869067613,
+      "version": 1,
+      "versionNonce": 1497989575,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "aiohttp-web-request-routing"
+      },
+      "text": "Application",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "aiohttp-web-request-routing-node-1",
+      "originalText": "Application",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "aiohttp-web-request-routing-node-2-label",
+      "type": "text",
+      "x": 370.5,
+      "y": 427.5,
+      "width": 99.00000000000001,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aJ",
+      "roundness": null,
+      "seed": 1532100922,
+      "version": 1,
+      "versionNonce": 1098318990,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "aiohttp-web-request-routing"
+      },
+      "text": "_handle()",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "aiohttp-web-request-routing-node-2",
+      "originalText": "_handle()",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "aiohttp-web-request-routing-node-3-label",
+      "type": "text",
+      "x": 68.5,
+      "y": 427.5,
+      "width": 143,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aK",
+      "roundness": null,
+      "seed": 1857922047,
+      "version": 1,
+      "versionNonce": 516958489,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "aiohttp-web-request-routing"
+      },
+      "text": "UrlDispatcher",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "aiohttp-web-request-routing-node-3",
+      "originalText": "UrlDispatcher",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "aiohttp-web-request-routing-node-4-label",
+      "type": "text",
+      "x": 230.5,
+      "y": 807.5,
+      "width": 99.00000000000001,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aL",
+      "roundness": null,
+      "seed": 451263164,
+      "version": 1,
+      "versionNonce": 187147848,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "aiohttp-web-request-routing"
+      },
+      "text": "resolve()",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "aiohttp-web-request-routing-node-4",
+      "originalText": "resolve()",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "aiohttp-web-request-routing-node-5-label",
+      "type": "text",
+      "x": 236,
+      "y": 1187.5,
+      "width": 88,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aM",
+      "roundness": null,
+      "seed": 576855065,
+      "version": 1,
+      "versionNonce": 325817699,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "aiohttp-web-request-routing"
+      },
+      "text": "Resource",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "aiohttp-web-request-routing-node-5",
+      "originalText": "Resource",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "aiohttp-web-request-routing-node-6-label",
+      "type": "text",
+      "x": 165.5,
+      "y": 1567.5,
+      "width": 209.00000000000003,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aN",
+      "roundness": null,
+      "seed": 1802434038,
+      "version": 1,
+      "versionNonce": 536677210,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "aiohttp-web-request-routing"
+      },
+      "text": "UrlMappingMatchInfo",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "aiohttp-web-request-routing-node-6",
+      "originalText": "UrlMappingMatchInfo",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "aiohttp-web-request-routing-node-7-label",
+      "type": "text",
+      "x": 392.5,
+      "y": 1947.5,
+      "width": 55.00000000000001,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aO",
+      "roundness": null,
+      "seed": 2099812651,
+      "version": 1,
+      "versionNonce": 259652901,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "aiohttp-web-request-routing"
+      },
+      "text": "Route",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "aiohttp-web-request-routing-node-7",
+      "originalText": "Route",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "aiohttp-web-request-routing-edge-0-label",
+      "type": "text",
+      "x": 380.73333333333335,
+      "y": 222.4,
+      "width": 132,
+      "height": 40,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aP",
+      "roundness": null,
+      "seed": 1795531935,
+      "version": 1,
+      "versionNonce": 606650425,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "aiohttp-web-request-routing"
+      },
+      "text": "_handle_request\n@calls",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "aiohttp-web-request-routing-edge-0",
+      "originalText": "_handle_request @calls",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "aiohttp-web-request-routing-edge-1-label",
+      "type": "text",
+      "x": 176.06666666666666,
+      "y": 274.8,
+      "width": 123.20000000000002,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aQ",
+      "roundness": null,
+      "seed": 1085181402,
+      "version": 1,
+      "versionNonce": 375447982,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "aiohttp-web-request-routing"
+      },
+      "text": "handler @calls",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "aiohttp-web-request-routing-edge-1",
+      "originalText": "handler @calls",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "aiohttp-web-request-routing-edge-2-label",
+      "type": "text",
+      "x": 241.79999999999995,
+      "y": 568.1999999999999,
+      "width": 123.20000000000002,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aR",
+      "roundness": null,
+      "seed": 1822020349,
+      "version": 1,
+      "versionNonce": 389279463,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "aiohttp-web-request-routing"
+      },
+      "text": "resolve @calls",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "aiohttp-web-request-routing-edge-2",
+      "originalText": "resolve @calls",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "aiohttp-web-request-routing-edge-3-label",
+      "type": "text",
+      "x": 93.6333333333334,
+      "y": 655.5999999999999,
+      "width": 123.20000000000002,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aS",
+      "roundness": null,
+      "seed": 1884410544,
+      "version": 1,
+      "versionNonce": 732555276,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "aiohttp-web-request-routing"
+      },
+      "text": "resolve @calls",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "aiohttp-web-request-routing-edge-3",
+      "originalText": "resolve @calls",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "aiohttp-web-request-routing-edge-4-label",
+      "type": "text",
+      "x": 201.93333333333334,
+      "y": 983.9999999999999,
+      "width": 149.60000000000002,
+      "height": 40,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aT",
+      "roundness": null,
+      "seed": 1839364939,
+      "version": 1,
+      "versionNonce": 2094933957,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "aiohttp-web-request-routing"
+      },
+      "text": "iterate & resolve\n@calls",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "aiohttp-web-request-routing-edge-4",
+      "originalText": "iterate & resolve @calls",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "aiohttp-web-request-routing-edge-5-label",
+      "type": "text",
+      "x": 193.13333333333333,
+      "y": 1364.7999999999997,
+      "width": 167.20000000000002,
+      "height": 40,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aU",
+      "roundness": null,
+      "seed": 1355411350,
+      "version": 1,
+      "versionNonce": 1961289850,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "aiohttp-web-request-routing"
+      },
+      "text": "UrlMappingMatchInfo\n@returns",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "aiohttp-web-request-routing-edge-5",
+      "originalText": "UrlMappingMatchInfo @returns",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "aiohttp-web-request-routing-edge-6-label",
+      "type": "text",
+      "x": 239.86666666666667,
+      "y": 1797.9999999999998,
+      "width": 105.60000000000001,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aV",
+      "roundness": null,
+      "seed": 393297209,
+      "version": 1,
+      "versionNonce": 276278787,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "aiohttp-web-request-routing"
+      },
+      "text": "route @holds",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "aiohttp-web-request-routing-edge-6",
+      "originalText": "route @holds",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "aiohttp-web-request-routing-edge-7-label",
+      "type": "text",
+      "x": 376.33333333333337,
+      "y": 1174.3999999999999,
+      "width": 140.8,
+      "height": 40,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aW",
+      "roundness": null,
+      "seed": 2112235868,
+      "version": 1,
+      "versionNonce": 1154939496,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "aiohttp-web-request-routing"
+      },
+      "text": "handler callback\n@calls",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "aiohttp-web-request-routing-edge-7",
+      "originalText": "handler callback @calls",
+      "autoResize": true,
+      "lineHeight": 1.25
+    }
+  ],
+  "appState": {
+    "gridSize": null,
+    "viewBackgroundColor": "#ffffff"
+  },
+  "files": {},
+  "diagramos": {
+    "version": "0.2.0-rc.6",
+    "schema": 1
+  }
+}

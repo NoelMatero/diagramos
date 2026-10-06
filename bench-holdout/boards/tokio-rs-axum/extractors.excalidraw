@@ -1,0 +1,2072 @@
+{
+  "type": "excalidraw",
+  "version": 2,
+  "source": "diagramos",
+  "elements": [
+    {
+      "id": "axum-extractors-request-decomposition-title",
+      "type": "text",
+      "x": 0,
+      "y": -115,
+      "width": 501.6,
+      "height": 30,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a0",
+      "roundness": null,
+      "seed": 1341577476,
+      "version": 1,
+      "versionNonce": 359852560,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "axum-extractors-request-decomposition",
+        "role": "title"
+      },
+      "text": "Axum Extractors: Request Decomposition",
+      "fontSize": 24,
+      "fontFamily": 5,
+      "textAlign": "left",
+      "verticalAlign": "middle",
+      "containerId": null,
+      "originalText": "Axum Extractors: Request Decomposition",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "axum-extractors-request-decomposition-node-0",
+      "type": "rectangle",
+      "x": 1280,
+      "y": 40,
+      "width": 160,
+      "height": 100,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "dotted",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a1",
+      "roundness": null,
+      "seed": 2042546035,
+      "version": 1,
+      "versionNonce": 572331853,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "axum-extractors-request-decomposition-node-0-label"
+        },
+        {
+          "id": "axum-extractors-request-decomposition-edge-0",
+          "type": "arrow"
+        },
+        {
+          "id": "axum-extractors-request-decomposition-edge-1",
+          "type": "arrow"
+        },
+        {
+          "id": "axum-extractors-request-decomposition-edge-3",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "axum-extractors-request-decomposition",
+        "node": "request",
+        "state": "external"
+      }
+    },
+    {
+      "id": "axum-extractors-request-decomposition-node-1",
+      "type": "rectangle",
+      "x": 1860,
+      "y": 460,
+      "width": 160,
+      "height": 100,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "dotted",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a2",
+      "roundness": null,
+      "seed": 946438594,
+      "version": 1,
+      "versionNonce": 1133922614,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "axum-extractors-request-decomposition-node-1-label"
+        },
+        {
+          "id": "axum-extractors-request-decomposition-edge-0",
+          "type": "arrow"
+        },
+        {
+          "id": "axum-extractors-request-decomposition-edge-2",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "axum-extractors-request-decomposition",
+        "node": "parts",
+        "state": "external"
+      }
+    },
+    {
+      "id": "axum-extractors-request-decomposition-node-2",
+      "type": "rectangle",
+      "x": 1860,
+      "y": 20,
+      "width": 160,
+      "height": 80,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "dotted",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a3",
+      "roundness": null,
+      "seed": 369756381,
+      "version": 1,
+      "versionNonce": 718468167,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "axum-extractors-request-decomposition-node-2-label"
+        },
+        {
+          "id": "axum-extractors-request-decomposition-edge-1",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "axum-extractors-request-decomposition",
+        "node": "body",
+        "state": "external"
+      }
+    },
+    {
+      "id": "axum-extractors-request-decomposition-node-3",
+      "type": "rectangle",
+      "x": 620,
+      "y": 480,
+      "width": 240,
+      "height": 100,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "dotted",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a4",
+      "roundness": null,
+      "seed": 1187100484,
+      "version": 1,
+      "versionNonce": 1774317136,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "axum-extractors-request-decomposition-node-3-label"
+        },
+        {
+          "id": "axum-extractors-request-decomposition-edge-2",
+          "type": "arrow"
+        },
+        {
+          "id": "axum-extractors-request-decomposition-edge-4",
+          "type": "arrow"
+        },
+        {
+          "id": "axum-extractors-request-decomposition-edge-5",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "axum-extractors-request-decomposition",
+        "node": "from_request_parts",
+        "state": "external"
+      }
+    },
+    {
+      "id": "axum-extractors-request-decomposition-node-4",
+      "type": "rectangle",
+      "x": 660,
+      "y": 60,
+      "width": 180,
+      "height": 80,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "dotted",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a5",
+      "roundness": null,
+      "seed": 1295989303,
+      "version": 1,
+      "versionNonce": 2120426385,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "axum-extractors-request-decomposition-node-4-label"
+        },
+        {
+          "id": "axum-extractors-request-decomposition-edge-3",
+          "type": "arrow"
+        },
+        {
+          "id": "axum-extractors-request-decomposition-edge-6",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "axum-extractors-request-decomposition",
+        "node": "from_request",
+        "state": "external"
+      }
+    },
+    {
+      "id": "axum-extractors-request-decomposition-node-5",
+      "type": "rectangle",
+      "x": 20,
+      "y": 480,
+      "width": 160,
+      "height": 100,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a6",
+      "roundness": null,
+      "seed": 692306662,
+      "version": 1,
+      "versionNonce": 659299018,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "axum-extractors-request-decomposition-node-5-label"
+        },
+        {
+          "id": "axum-extractors-request-decomposition-edge-4",
+          "type": "arrow"
+        },
+        {
+          "id": "axum-extractors-request-decomposition-edge-7",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "axum-extractors-request-decomposition",
+        "node": "path",
+        "ref": "axum/src/extract/path/mod.rs#Path"
+      }
+    },
+    {
+      "id": "axum-extractors-request-decomposition-node-6",
+      "type": "rectangle",
+      "x": 20,
+      "y": 300,
+      "width": 160,
+      "height": 100,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a7",
+      "roundness": null,
+      "seed": 19614769,
+      "version": 1,
+      "versionNonce": 1948206267,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "axum-extractors-request-decomposition-node-6-label"
+        },
+        {
+          "id": "axum-extractors-request-decomposition-edge-5",
+          "type": "arrow"
+        },
+        {
+          "id": "axum-extractors-request-decomposition-edge-8",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "axum-extractors-request-decomposition",
+        "node": "query",
+        "ref": "axum/src/extract/query.rs#Query"
+      }
+    },
+    {
+      "id": "axum-extractors-request-decomposition-node-7",
+      "type": "rectangle",
+      "x": 20,
+      "y": 120,
+      "width": 160,
+      "height": 100,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a8",
+      "roundness": null,
+      "seed": 745682696,
+      "version": 1,
+      "versionNonce": 909519972,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "axum-extractors-request-decomposition-node-7-label"
+        },
+        {
+          "id": "axum-extractors-request-decomposition-edge-6",
+          "type": "arrow"
+        },
+        {
+          "id": "axum-extractors-request-decomposition-edge-9",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "axum-extractors-request-decomposition",
+        "node": "json",
+        "ref": "axum/src/json.rs#Json"
+      }
+    },
+    {
+      "id": "axum-extractors-request-decomposition-node-8",
+      "type": "rectangle",
+      "x": 620,
+      "y": 220,
+      "width": 160,
+      "height": 120,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a9",
+      "roundness": null,
+      "seed": 951666379,
+      "version": 1,
+      "versionNonce": 834699845,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "axum-extractors-request-decomposition-node-8-label"
+        },
+        {
+          "id": "axum-extractors-request-decomposition-edge-7",
+          "type": "arrow"
+        },
+        {
+          "id": "axum-extractors-request-decomposition-edge-8",
+          "type": "arrow"
+        },
+        {
+          "id": "axum-extractors-request-decomposition-edge-9",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "axum-extractors-request-decomposition",
+        "node": "rejection",
+        "ref": "axum/src/extract/rejection.rs"
+      }
+    },
+    {
+      "id": "axum-extractors-request-decomposition-edge-0",
+      "type": "arrow",
+      "x": 1448.8,
+      "y": 108.80000000000004,
+      "width": 412,
+      "height": 380.1333333333333,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aA",
+      "roundness": null,
+      "seed": 725473604,
+      "version": 1,
+      "versionNonce": 422278224,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "axum-extractors-request-decomposition-edge-0-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "axum-extractors-request-decomposition",
+        "edge": {
+          "from": "request",
+          "to": "parts",
+          "claim": "holds"
+        }
+      },
+      "points": [
+        [
+          0.5,
+          0
+        ],
+        [
+          304,
+          -2.842170943040401e-14
+        ],
+        [
+          304,
+          92.06666666666669
+        ],
+        [
+          304,
+          380.1333333333333
+        ],
+        [
+          411.5,
+          380.1333333333333
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "axum-extractors-request-decomposition-node-0",
+        "focus": 0.3760000000000016,
+        "gap": 8.799999999999955
+      },
+      "endBinding": {
+        "elementId": "axum-extractors-request-decomposition-node-1",
+        "focus": 0.42133333333333156,
+        "gap": 1
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "axum-extractors-request-decomposition-edge-1",
+      "type": "arrow",
+      "x": 1448.8,
+      "y": 75.46666666666671,
+      "width": 412,
+      "height": 23.46666666666671,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aB",
+      "roundness": null,
+      "seed": 2055613149,
+      "version": 1,
+      "versionNonce": 1513912903,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "axum-extractors-request-decomposition-edge-1-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "axum-extractors-request-decomposition",
+        "edge": {
+          "from": "request",
+          "to": "body",
+          "claim": "holds"
+        }
+      },
+      "points": [
+        [
+          0.5,
+          0
+        ],
+        [
+          32,
+          -1.4210854715202004e-14
+        ],
+        [
+          32,
+          -23.46666666666671
+        ],
+        [
+          194.26666666666665,
+          -23.46666666666671
+        ],
+        [
+          248.70000000000005,
+          -23.46666666666671
+        ],
+        [
+          303.13333333333344,
+          -23.46666666666671
+        ],
+        [
+          411.5,
+          -23.46666666666671
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "axum-extractors-request-decomposition-node-0",
+        "focus": -0.29066666666666613,
+        "gap": 8.799999999999955
+      },
+      "endBinding": {
+        "elementId": "axum-extractors-request-decomposition-node-2",
+        "focus": 0.2,
+        "gap": 1
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "axum-extractors-request-decomposition-edge-2",
+      "type": "arrow",
+      "x": 868,
+      "y": 522.2666666666668,
+      "width": 992.8,
+      "height": 0,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aC",
+      "roundness": null,
+      "seed": 484811714,
+      "version": 1,
+      "versionNonce": 1929367350,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "axum-extractors-request-decomposition-edge-2-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "axum-extractors-request-decomposition",
+        "edge": {
+          "from": "from_request_parts",
+          "to": "parts",
+          "claim": "takes"
+        }
+      },
+      "points": [
+        [
+          0.5,
+          0
+        ],
+        [
+          496.4000000000001,
+          0
+        ],
+        [
+          992.3,
+          0
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "axum-extractors-request-decomposition-node-3",
+        "focus": -0.15466666666666518,
+        "gap": 8
+      },
+      "endBinding": {
+        "elementId": "axum-extractors-request-decomposition-node-1",
+        "focus": -0.2453333333333349,
+        "gap": 1
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "axum-extractors-request-decomposition-edge-3",
+      "type": "arrow",
+      "x": 838,
+      "y": 92.13333333333338,
+      "width": 450.79999999999995,
+      "height": 0,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aD",
+      "roundness": null,
+      "seed": 1580919155,
+      "version": 1,
+      "versionNonce": 1367776589,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "axum-extractors-request-decomposition-edge-3-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "axum-extractors-request-decomposition",
+        "edge": {
+          "from": "from_request",
+          "to": "request",
+          "claim": "takes"
+        }
+      },
+      "points": [
+        [
+          0.5,
+          0
+        ],
+        [
+          225.4000000000001,
+          0
+        ],
+        [
+          450.29999999999995,
+          0
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "axum-extractors-request-decomposition-node-4",
+        "focus": -0.19666666666666582,
+        "gap": 2
+      },
+      "endBinding": {
+        "elementId": "axum-extractors-request-decomposition-node-0",
+        "focus": -0.04266666666666773,
+        "gap": 8.799999999999955
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "axum-extractors-request-decomposition-edge-4",
+      "type": "arrow",
+      "x": 172,
+      "y": 538.9333333333334,
+      "width": 456,
+      "height": 0,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aE",
+      "roundness": null,
+      "seed": 284055816,
+      "version": 1,
+      "versionNonce": 1704964708,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "axum-extractors-request-decomposition-edge-4-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "axum-extractors-request-decomposition",
+        "edge": {
+          "from": "path",
+          "to": "from_request_parts",
+          "claim": "conforms"
+        }
+      },
+      "points": [
+        [
+          0.5,
+          0
+        ],
+        [
+          228,
+          0
+        ],
+        [
+          455.5,
+          0
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "axum-extractors-request-decomposition-node-5",
+        "focus": 0.17866666666666844,
+        "gap": 8
+      },
+      "endBinding": {
+        "elementId": "axum-extractors-request-decomposition-node-3",
+        "focus": -0.17866666666666806,
+        "gap": 8
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "axum-extractors-request-decomposition-edge-5",
+      "type": "arrow",
+      "x": 172,
+      "y": 358.9333333333334,
+      "width": 456,
+      "height": 146.66666666666669,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aF",
+      "roundness": null,
+      "seed": 1705471537,
+      "version": 1,
+      "versionNonce": 596167355,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "axum-extractors-request-decomposition-edge-5-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "axum-extractors-request-decomposition",
+        "edge": {
+          "from": "query",
+          "to": "from_request_parts",
+          "claim": "conforms"
+        }
+      },
+      "points": [
+        [
+          0.5,
+          0
+        ],
+        [
+          75.33333333333334,
+          0
+        ],
+        [
+          150.66666666666669,
+          0
+        ],
+        [
+          301.33333333333337,
+          0
+        ],
+        [
+          348,
+          0
+        ],
+        [
+          348,
+          146.66666666666669
+        ],
+        [
+          455.5,
+          146.66666666666669
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "axum-extractors-request-decomposition-node-6",
+        "focus": 0.17866666666666767,
+        "gap": 8
+      },
+      "endBinding": {
+        "elementId": "axum-extractors-request-decomposition-node-3",
+        "focus": 0.48799999999999855,
+        "gap": 8
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "axum-extractors-request-decomposition-edge-6",
+      "type": "arrow",
+      "x": 172,
+      "y": 145.60000000000002,
+      "width": 486,
+      "height": 53.46666666666664,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aG",
+      "roundness": null,
+      "seed": 230679782,
+      "version": 1,
+      "versionNonce": 1454743754,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "axum-extractors-request-decomposition-edge-6-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "axum-extractors-request-decomposition",
+        "edge": {
+          "from": "json",
+          "to": "from_request",
+          "claim": "conforms"
+        }
+      },
+      "points": [
+        [
+          0.5,
+          0
+        ],
+        [
+          32,
+          0
+        ],
+        [
+          32,
+          -53.46666666666664
+        ],
+        [
+          216.2666666666667,
+          -53.46666666666664
+        ],
+        [
+          351.1333333333333,
+          -53.46666666666664
+        ],
+        [
+          418.5666666666666,
+          -53.46666666666664
+        ],
+        [
+          485.5,
+          -53.46666666666664
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "axum-extractors-request-decomposition-node-7",
+        "focus": -0.4879999999999995,
+        "gap": 8
+      },
+      "endBinding": {
+        "elementId": "axum-extractors-request-decomposition-node-4",
+        "focus": 0.19666666666666582,
+        "gap": 2
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "axum-extractors-request-decomposition-edge-7",
+      "type": "arrow",
+      "x": 172,
+      "y": 505.6000000000001,
+      "width": 456,
+      "height": 203.4666666666667,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aH",
+      "roundness": null,
+      "seed": 834362423,
+      "version": 1,
+      "versionNonce": 768387473,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "axum-extractors-request-decomposition-edge-7-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "axum-extractors-request-decomposition",
+        "edge": {
+          "from": "path",
+          "to": "rejection",
+          "claim": "returns"
+        }
+      },
+      "points": [
+        [
+          0.5,
+          0
+        ],
+        [
+          56,
+          0
+        ],
+        [
+          56,
+          -203.4666666666667
+        ],
+        [
+          126.26666666666665,
+          -203.4666666666667
+        ],
+        [
+          208.7,
+          -203.4666666666667
+        ],
+        [
+          291.1333333333333,
+          -203.4666666666667
+        ],
+        [
+          455.5,
+          -203.4666666666667
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "axum-extractors-request-decomposition-node-5",
+        "focus": -0.48799999999999805,
+        "gap": 8
+      },
+      "endBinding": {
+        "elementId": "axum-extractors-request-decomposition-node-8",
+        "focus": -0.36888888888888877,
+        "gap": 8
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "axum-extractors-request-decomposition-edge-8",
+      "type": "arrow",
+      "x": 172,
+      "y": 325.6000000000001,
+      "width": 456,
+      "height": 80.26666666666671,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aI",
+      "roundness": null,
+      "seed": 1073780988,
+      "version": 1,
+      "versionNonce": 1663944840,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "axum-extractors-request-decomposition-edge-8-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "axum-extractors-request-decomposition",
+        "edge": {
+          "from": "query",
+          "to": "rejection",
+          "claim": "returns"
+        }
+      },
+      "points": [
+        [
+          0.5,
+          0
+        ],
+        [
+          32,
+          0
+        ],
+        [
+          32,
+          -80.26666666666671
+        ],
+        [
+          201.26666666666665,
+          -80.26666666666671
+        ],
+        [
+          348,
+          -80.26666666666671
+        ],
+        [
+          348,
+          -53.4666666666667
+        ],
+        [
+          455.5,
+          -53.4666666666667
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "axum-extractors-request-decomposition-node-6",
+        "focus": -0.48799999999999805,
+        "gap": 8
+      },
+      "endBinding": {
+        "elementId": "axum-extractors-request-decomposition-node-8",
+        "focus": 0.1311111111111112,
+        "gap": 8
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "axum-extractors-request-decomposition-edge-9",
+      "type": "arrow",
+      "x": 172,
+      "y": 178.93333333333337,
+      "width": 456,
+      "height": 63.200000000000045,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aJ",
+      "roundness": null,
+      "seed": 998767509,
+      "version": 1,
+      "versionNonce": 1184713119,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "axum-extractors-request-decomposition-edge-9-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "axum-extractors-request-decomposition",
+        "edge": {
+          "from": "json",
+          "to": "rejection",
+          "claim": "returns"
+        }
+      },
+      "points": [
+        [
+          0.5,
+          0
+        ],
+        [
+          64.9,
+          -2.842170943040401e-14
+        ],
+        [
+          129.8,
+          -2.842170943040401e-14
+        ],
+        [
+          259.6,
+          -2.842170943040401e-14
+        ],
+        [
+          372,
+          -2.842170943040401e-14
+        ],
+        [
+          372,
+          63.20000000000002
+        ],
+        [
+          455.5,
+          63.20000000000002
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "axum-extractors-request-decomposition-node-7",
+        "focus": 0.17866666666666767,
+        "gap": 8
+      },
+      "endBinding": {
+        "elementId": "axum-extractors-request-decomposition-node-8",
+        "focus": 0.6311111111111111,
+        "gap": 8
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "axum-extractors-request-decomposition-node-0-label",
+      "type": "text",
+      "x": 1321.5,
+      "y": 77.5,
+      "width": 77,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aK",
+      "roundness": null,
+      "seed": 1807665486,
+      "version": 1,
+      "versionNonce": 1070056946,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "axum-extractors-request-decomposition"
+      },
+      "text": "Request",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "axum-extractors-request-decomposition-node-0",
+      "originalText": "Request",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "axum-extractors-request-decomposition-node-1-label",
+      "type": "text",
+      "x": 1912.5,
+      "y": 497.5,
+      "width": 55.00000000000001,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aL",
+      "roundness": null,
+      "seed": 1844030371,
+      "version": 1,
+      "versionNonce": 1455470909,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "axum-extractors-request-decomposition"
+      },
+      "text": "Parts",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "axum-extractors-request-decomposition-node-1",
+      "originalText": "Parts",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "axum-extractors-request-decomposition-node-2-label",
+      "type": "text",
+      "x": 1918,
+      "y": 47.5,
+      "width": 44,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aM",
+      "roundness": null,
+      "seed": 1603510036,
+      "version": 1,
+      "versionNonce": 868791904,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "axum-extractors-request-decomposition"
+      },
+      "text": "Body",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "axum-extractors-request-decomposition-node-2",
+      "originalText": "Body",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "axum-extractors-request-decomposition-node-3-label",
+      "type": "text",
+      "x": 652,
+      "y": 517.5,
+      "width": 176,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aN",
+      "roundness": null,
+      "seed": 1436037457,
+      "version": 1,
+      "versionNonce": 999002459,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "axum-extractors-request-decomposition"
+      },
+      "text": "FromRequestParts",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "axum-extractors-request-decomposition-node-3",
+      "originalText": "FromRequestParts",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "axum-extractors-request-decomposition-node-4-label",
+      "type": "text",
+      "x": 689.5,
+      "y": 87.5,
+      "width": 121.00000000000001,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aO",
+      "roundness": null,
+      "seed": 953257778,
+      "version": 1,
+      "versionNonce": 1578097894,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "axum-extractors-request-decomposition"
+      },
+      "text": "FromRequest",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "axum-extractors-request-decomposition-node-4",
+      "originalText": "FromRequest",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "axum-extractors-request-decomposition-node-5-label",
+      "type": "text",
+      "x": 61.5,
+      "y": 517.5,
+      "width": 77,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aP",
+      "roundness": null,
+      "seed": 1490020439,
+      "version": 1,
+      "versionNonce": 2044208689,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "axum-extractors-request-decomposition"
+      },
+      "text": "Path<T>",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "axum-extractors-request-decomposition-node-5",
+      "originalText": "Path<T>",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "axum-extractors-request-decomposition-node-6-label",
+      "type": "text",
+      "x": 56,
+      "y": 337.5,
+      "width": 88,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aQ",
+      "roundness": null,
+      "seed": 1557298440,
+      "version": 1,
+      "versionNonce": 1573150308,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "axum-extractors-request-decomposition"
+      },
+      "text": "Query<T>",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "axum-extractors-request-decomposition-node-6",
+      "originalText": "Query<T>",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "axum-extractors-request-decomposition-node-7-label",
+      "type": "text",
+      "x": 61.5,
+      "y": 157.5,
+      "width": 77,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aR",
+      "roundness": null,
+      "seed": 800424405,
+      "version": 1,
+      "versionNonce": 336297695,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "axum-extractors-request-decomposition"
+      },
+      "text": "Json<T>",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "axum-extractors-request-decomposition-node-7",
+      "originalText": "Json<T>",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "axum-extractors-request-decomposition-node-8-label",
+      "type": "text",
+      "x": 650.5,
+      "y": 267.5,
+      "width": 99.00000000000001,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aS",
+      "roundness": null,
+      "seed": 32511606,
+      "version": 1,
+      "versionNonce": 222508250,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "axum-extractors-request-decomposition"
+      },
+      "text": "Rejection",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "axum-extractors-request-decomposition-node-8",
+      "originalText": "Rejection",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "axum-extractors-request-decomposition-edge-0-label",
+      "type": "text",
+      "x": 1686.8,
+      "y": 190.86666666666673,
+      "width": 132,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aT",
+      "roundness": null,
+      "seed": 555959121,
+      "version": 1,
+      "versionNonce": 662234971,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "axum-extractors-request-decomposition"
+      },
+      "text": "contains @holds",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "axum-extractors-request-decomposition-edge-0",
+      "originalText": "contains @holds",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "axum-extractors-request-decomposition-edge-1-label",
+      "type": "text",
+      "x": 1577.0666666666666,
+      "y": 42,
+      "width": 132,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aU",
+      "roundness": null,
+      "seed": 723431700,
+      "version": 1,
+      "versionNonce": 532024416,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "axum-extractors-request-decomposition"
+      },
+      "text": "contains @holds",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "axum-extractors-request-decomposition-edge-1",
+      "originalText": "contains @holds",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "axum-extractors-request-decomposition-edge-2-label",
+      "type": "text",
+      "x": 1294,
+      "y": 512.2666666666668,
+      "width": 140.8,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aV",
+      "roundness": null,
+      "seed": 963952035,
+      "version": 1,
+      "versionNonce": 1118703421,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "axum-extractors-request-decomposition"
+      },
+      "text": "parameter @takes",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "axum-extractors-request-decomposition-edge-2",
+      "originalText": "parameter @takes",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "axum-extractors-request-decomposition-edge-3-label",
+      "type": "text",
+      "x": 993.0000000000001,
+      "y": 82.13333333333338,
+      "width": 140.8,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aW",
+      "roundness": null,
+      "seed": 927587150,
+      "version": 1,
+      "versionNonce": 733289458,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "axum-extractors-request-decomposition"
+      },
+      "text": "parameter @takes",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "axum-extractors-request-decomposition-edge-3",
+      "originalText": "parameter @takes",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "axum-extractors-request-decomposition-edge-4-label",
+      "type": "text",
+      "x": 312,
+      "y": 528.9333333333334,
+      "width": 176,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aX",
+      "roundness": null,
+      "seed": 2067829717,
+      "version": 1,
+      "versionNonce": 2147013855,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "axum-extractors-request-decomposition"
+      },
+      "text": "implements @conforms",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "axum-extractors-request-decomposition-edge-4",
+      "originalText": "implements @conforms",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "axum-extractors-request-decomposition-edge-5-label",
+      "type": "text",
+      "x": 385.33333333333337,
+      "y": 348.9333333333334,
+      "width": 176,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aY",
+      "roundness": null,
+      "seed": 677220104,
+      "version": 1,
+      "versionNonce": 1236382820,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "axum-extractors-request-decomposition"
+      },
+      "text": "implements @conforms",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "axum-extractors-request-decomposition-edge-5",
+      "originalText": "implements @conforms",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "axum-extractors-request-decomposition-edge-6-label",
+      "type": "text",
+      "x": 300.2666666666667,
+      "y": 82.13333333333338,
+      "width": 176,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aZ",
+      "roundness": null,
+      "seed": 609942103,
+      "version": 1,
+      "versionNonce": 1707441201,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "axum-extractors-request-decomposition"
+      },
+      "text": "implements @conforms",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "axum-extractors-request-decomposition-edge-6",
+      "originalText": "implements @conforms",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "axum-extractors-request-decomposition-edge-7-label",
+      "type": "text",
+      "x": 223.46666666666664,
+      "y": 292.1333333333334,
+      "width": 149.60000000000002,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aa",
+      "roundness": null,
+      "seed": 73179442,
+      "version": 1,
+      "versionNonce": 1241330406,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "axum-extractors-request-decomposition"
+      },
+      "text": "or error @returns",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "axum-extractors-request-decomposition-edge-7",
+      "originalText": "or error @returns",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "axum-extractors-request-decomposition-edge-8-label",
+      "type": "text",
+      "x": 298.46666666666664,
+      "y": 235.33333333333337,
+      "width": 149.60000000000002,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "ab",
+      "roundness": null,
+      "seed": 74337945,
+      "version": 1,
+      "versionNonce": 1822364899,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "axum-extractors-request-decomposition"
+      },
+      "text": "or error @returns",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "axum-extractors-request-decomposition-edge-8",
+      "originalText": "or error @returns",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "axum-extractors-request-decomposition-edge-9-label",
+      "type": "text",
+      "x": 356.8,
+      "y": 168.93333333333334,
+      "width": 149.60000000000002,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "ac",
+      "roundness": null,
+      "seed": 2096229692,
+      "version": 1,
+      "versionNonce": 1683695048,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "axum-extractors-request-decomposition"
+      },
+      "text": "or error @returns",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "axum-extractors-request-decomposition-edge-9",
+      "originalText": "or error @returns",
+      "autoResize": true,
+      "lineHeight": 1.25
+    }
+  ],
+  "appState": {
+    "gridSize": null,
+    "viewBackgroundColor": "#ffffff"
+  },
+  "files": {},
+  "diagramos": {
+    "version": "0.2.0-rc.6",
+    "schema": 1
+  }
+}

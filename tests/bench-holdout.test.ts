@@ -54,7 +54,8 @@ describe("the holdout's lists agree", () => {
   it("can install every project's libraries", () => {
     for (const one of projects) {
       if (one.language === "python") expect(existsSync(path.join(HOLDOUT, "libraries", `${one.project}.txt`)), one.project).toBe(true);
-      if (one.language === "ts") expect(one.install?.length, one.project).toBeGreaterThan(0);
+      // A TypeScript project with no dependencies (zod) has no install command at all.
+      if (one.install) expect(one.install.length, one.project).toBeGreaterThan(0);
     }
   });
 

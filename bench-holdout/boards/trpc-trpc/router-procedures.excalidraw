@@ -1,0 +1,2288 @@
+{
+  "type": "excalidraw",
+  "version": 2,
+  "source": "diagramos",
+  "elements": [
+    {
+      "id": "trpc-router-procedure-building-flow-title",
+      "type": "text",
+      "x": 0,
+      "y": -115,
+      "width": 488.40000000000003,
+      "height": 30,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a0",
+      "roundness": null,
+      "seed": 443386080,
+      "version": 1,
+      "versionNonce": 1874082620,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "trpc-router-procedure-building-flow",
+        "role": "title",
+        "direction": "DOWN"
+      },
+      "text": "tRPC Router & Procedure Building Flow",
+      "fontSize": 24,
+      "fontFamily": 5,
+      "textAlign": "left",
+      "verticalAlign": "middle",
+      "containerId": null,
+      "originalText": "tRPC Router & Procedure Building Flow",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "trpc-router-procedure-building-flow-node-0",
+      "type": "rectangle",
+      "x": 700,
+      "y": 20,
+      "width": 160,
+      "height": 80,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a1",
+      "roundness": null,
+      "seed": 253059759,
+      "version": 1,
+      "versionNonce": 1401924873,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "trpc-router-procedure-building-flow-node-0-label"
+        },
+        {
+          "id": "trpc-router-procedure-building-flow-edge-0",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "trpc-router-procedure-building-flow",
+        "node": "initTRPC",
+        "ref": "packages/server/src/unstable-core-do-not-import/initTRPC.ts#initTRPC"
+      }
+    },
+    {
+      "id": "trpc-router-procedure-building-flow-node-1",
+      "type": "rectangle",
+      "x": 640,
+      "y": 400,
+      "width": 280,
+      "height": 80,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a2",
+      "roundness": null,
+      "seed": 860415838,
+      "version": 1,
+      "versionNonce": 856482434,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "trpc-router-procedure-building-flow-node-1-label"
+        },
+        {
+          "id": "trpc-router-procedure-building-flow-edge-0",
+          "type": "arrow"
+        },
+        {
+          "id": "trpc-router-procedure-building-flow-edge-1",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "trpc-router-procedure-building-flow",
+        "node": "TRPCBuilder",
+        "ref": "packages/server/src/unstable-core-do-not-import/initTRPC.ts#TRPCBuilder"
+      }
+    },
+    {
+      "id": "trpc-router-procedure-building-flow-node-2",
+      "type": "rectangle",
+      "x": 660,
+      "y": 780,
+      "width": 220,
+      "height": 80,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a3",
+      "roundness": null,
+      "seed": 377031177,
+      "version": 1,
+      "versionNonce": 1118161299,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "trpc-router-procedure-building-flow-node-2-label"
+        },
+        {
+          "id": "trpc-router-procedure-building-flow-edge-1",
+          "type": "arrow"
+        },
+        {
+          "id": "trpc-router-procedure-building-flow-edge-2",
+          "type": "arrow"
+        },
+        {
+          "id": "trpc-router-procedure-building-flow-edge-6",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "trpc-router-procedure-building-flow",
+        "node": "TRPCRootObject",
+        "ref": "packages/server/src/unstable-core-do-not-import/initTRPC.ts#TRPCRootObject"
+      }
+    },
+    {
+      "id": "trpc-router-procedure-building-flow-node-3",
+      "type": "rectangle",
+      "x": 40,
+      "y": 780,
+      "width": 220,
+      "height": 80,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a4",
+      "roundness": null,
+      "seed": 776469184,
+      "version": 1,
+      "versionNonce": 609669788,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "trpc-router-procedure-building-flow-node-3-label"
+        },
+        {
+          "id": "trpc-router-procedure-building-flow-edge-3",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "trpc-router-procedure-building-flow",
+        "node": "createBuilder",
+        "ref": "packages/server/src/unstable-core-do-not-import/procedureBuilder.ts#createBuilder"
+      }
+    },
+    {
+      "id": "trpc-router-procedure-building-flow-node-4",
+      "type": "rectangle",
+      "x": 200,
+      "y": 1160,
+      "width": 240,
+      "height": 80,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a5",
+      "roundness": null,
+      "seed": 965479307,
+      "version": 1,
+      "versionNonce": 1074125829,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "trpc-router-procedure-building-flow-node-4-label"
+        },
+        {
+          "id": "trpc-router-procedure-building-flow-edge-2",
+          "type": "arrow"
+        },
+        {
+          "id": "trpc-router-procedure-building-flow-edge-3",
+          "type": "arrow"
+        },
+        {
+          "id": "trpc-router-procedure-building-flow-edge-4",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "trpc-router-procedure-building-flow",
+        "node": "ProcedureBuilder",
+        "ref": "packages/server/src/unstable-core-do-not-import/procedureBuilder.ts#ProcedureBuilder"
+      }
+    },
+    {
+      "id": "trpc-router-procedure-building-flow-node-5",
+      "type": "rectangle",
+      "x": 200,
+      "y": 1540,
+      "width": 240,
+      "height": 80,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a6",
+      "roundness": null,
+      "seed": 1275523962,
+      "version": 1,
+      "versionNonce": 642344654,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "trpc-router-procedure-building-flow-node-5-label"
+        },
+        {
+          "id": "trpc-router-procedure-building-flow-edge-4",
+          "type": "arrow"
+        },
+        {
+          "id": "trpc-router-procedure-building-flow-edge-5",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "trpc-router-procedure-building-flow",
+        "node": "createResolver",
+        "ref": "packages/server/src/unstable-core-do-not-import/procedureBuilder.ts#createResolver"
+      }
+    },
+    {
+      "id": "trpc-router-procedure-building-flow-node-6",
+      "type": "rectangle",
+      "x": 240,
+      "y": 1920,
+      "width": 380,
+      "height": 100,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a7",
+      "roundness": null,
+      "seed": 1898767957,
+      "version": 1,
+      "versionNonce": 587117663,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "trpc-router-procedure-building-flow-node-6-label"
+        },
+        {
+          "id": "trpc-router-procedure-building-flow-edge-5",
+          "type": "arrow"
+        },
+        {
+          "id": "trpc-router-procedure-building-flow-edge-10",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "trpc-router-procedure-building-flow",
+        "node": "Procedure",
+        "ref": "packages/server/src/unstable-core-do-not-import/procedure.ts#Procedure"
+      }
+    },
+    {
+      "id": "trpc-router-procedure-building-flow-node-7",
+      "type": "rectangle",
+      "x": 660,
+      "y": 1160,
+      "width": 280,
+      "height": 80,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a8",
+      "roundness": null,
+      "seed": 144170940,
+      "version": 1,
+      "versionNonce": 983033160,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "trpc-router-procedure-building-flow-node-7-label"
+        },
+        {
+          "id": "trpc-router-procedure-building-flow-edge-6",
+          "type": "arrow"
+        },
+        {
+          "id": "trpc-router-procedure-building-flow-edge-7",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "trpc-router-procedure-building-flow",
+        "node": "createRouterFactory",
+        "ref": "packages/server/src/unstable-core-do-not-import/router.ts#createRouterFactory"
+      }
+    },
+    {
+      "id": "trpc-router-procedure-building-flow-node-8",
+      "type": "rectangle",
+      "x": 720,
+      "y": 1540,
+      "width": 160,
+      "height": 80,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a9",
+      "roundness": null,
+      "seed": 2052132855,
+      "version": 1,
+      "versionNonce": 1810501969,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "trpc-router-procedure-building-flow-node-8-label"
+        },
+        {
+          "id": "trpc-router-procedure-building-flow-edge-7",
+          "type": "arrow"
+        },
+        {
+          "id": "trpc-router-procedure-building-flow-edge-8",
+          "type": "arrow"
+        },
+        {
+          "id": "trpc-router-procedure-building-flow-edge-10",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "trpc-router-procedure-building-flow",
+        "node": "Router",
+        "ref": "packages/server/src/unstable-core-do-not-import/router.ts#Router"
+      }
+    },
+    {
+      "id": "trpc-router-procedure-building-flow-node-9",
+      "type": "rectangle",
+      "x": 700,
+      "y": 1920,
+      "width": 280,
+      "height": 80,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aA",
+      "roundness": null,
+      "seed": 1172153766,
+      "version": 1,
+      "versionNonce": 1879420554,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "trpc-router-procedure-building-flow-node-9-label"
+        },
+        {
+          "id": "trpc-router-procedure-building-flow-edge-8",
+          "type": "arrow"
+        },
+        {
+          "id": "trpc-router-procedure-building-flow-edge-9",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "trpc-router-procedure-building-flow",
+        "node": "createCallerFactory",
+        "ref": "packages/server/src/unstable-core-do-not-import/router.ts#createCallerFactory"
+      }
+    },
+    {
+      "id": "trpc-router-procedure-building-flow-node-10",
+      "type": "rectangle",
+      "x": 740,
+      "y": 2320,
+      "width": 180,
+      "height": 80,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aB",
+      "roundness": null,
+      "seed": 814667216,
+      "version": 1,
+      "versionNonce": 267276460,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "trpc-router-procedure-building-flow-node-10-label"
+        },
+        {
+          "id": "trpc-router-procedure-building-flow-edge-9",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "trpc-router-procedure-building-flow",
+        "node": "RouterCaller",
+        "ref": "packages/server/src/unstable-core-do-not-import/router.ts#RouterCaller"
+      }
+    },
+    {
+      "id": "trpc-router-procedure-building-flow-edge-0",
+      "type": "arrow",
+      "x": 771.5333333333333,
+      "y": 92,
+      "width": 0,
+      "height": 300.8,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aC",
+      "roundness": null,
+      "seed": 343693472,
+      "version": 2,
+      "versionNonce": 684026876,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "trpc-router-procedure-building-flow-edge-0-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "trpc-router-procedure-building-flow",
+        "edge": {
+          "from": "initTRPC",
+          "to": "TRPCBuilder",
+          "claim": "returns"
+        }
+      },
+      "points": [
+        [
+          0,
+          0.5
+        ],
+        [
+          0,
+          150.4
+        ],
+        [
+          0,
+          300.3
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "trpc-router-procedure-building-flow-node-0",
+        "focus": 0.10583333333333363,
+        "gap": 8
+      },
+      "endBinding": {
+        "elementId": "trpc-router-procedure-building-flow-node-1",
+        "focus": -0.06047619047619139,
+        "gap": 7.199999999999989
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "trpc-router-procedure-building-flow-edge-1",
+      "type": "arrow",
+      "x": 771.5333333333333,
+      "y": 472.8,
+      "width": 0,
+      "height": 300.7999999999999,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aD",
+      "roundness": null,
+      "seed": 2051963241,
+      "version": 2,
+      "versionNonce": 1959933555,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "trpc-router-procedure-building-flow-edge-1-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "trpc-router-procedure-building-flow",
+        "edge": {
+          "from": "TRPCBuilder",
+          "to": "TRPCRootObject",
+          "claim": "returns"
+        }
+      },
+      "points": [
+        [
+          0,
+          0.5
+        ],
+        [
+          0,
+          150.39999999999992
+        ],
+        [
+          0,
+          300.2999999999999
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "trpc-router-procedure-building-flow-node-1",
+        "focus": 0.06047619047619139,
+        "gap": 7.199999999999989
+      },
+      "endBinding": {
+        "elementId": "trpc-router-procedure-building-flow-node-2",
+        "focus": 0.013939393939392631,
+        "gap": 6.400000000000091
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "trpc-router-procedure-building-flow-edge-2",
+      "type": "arrow",
+      "x": 734.8666666666667,
+      "y": 853.5999999999999,
+      "width": 373.66666666666663,
+      "height": 300.79999999999995,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aE",
+      "roundness": null,
+      "seed": 1791113278,
+      "version": 1,
+      "versionNonce": 271928290,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "trpc-router-procedure-building-flow-edge-2-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "trpc-router-procedure-building-flow",
+        "edge": {
+          "from": "TRPCRootObject",
+          "to": "ProcedureBuilder",
+          "claim": "accesses"
+        }
+      },
+      "points": [
+        [
+          0,
+          0.5
+        ],
+        [
+          0,
+          32
+        ],
+        [
+          -305.2333333333333,
+          32
+        ],
+        [
+          -373.66666666666663,
+          32
+        ],
+        [
+          -373.66666666666663,
+          300.29999999999995
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "trpc-router-procedure-building-flow-node-2",
+        "focus": 0.31939393939393923,
+        "gap": 6.400000000000091
+      },
+      "endBinding": {
+        "elementId": "trpc-router-procedure-building-flow-node-4",
+        "focus": 0.34333333333333377,
+        "gap": 5.600000000000136
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "trpc-router-procedure-building-flow-edge-3",
+      "type": "arrow",
+      "x": 159,
+      "y": 853.5999999999999,
+      "width": 122.20000000000005,
+      "height": 300.79999999999995,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aF",
+      "roundness": null,
+      "seed": 1967664527,
+      "version": 2,
+      "versionNonce": 1476281961,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "trpc-router-procedure-building-flow-edge-3-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "trpc-router-procedure-building-flow",
+        "edge": {
+          "from": "createBuilder",
+          "to": "ProcedureBuilder",
+          "claim": "returns"
+        }
+      },
+      "points": [
+        [
+          0,
+          0.5
+        ],
+        [
+          0,
+          192.79999999999995
+        ],
+        [
+          18.700000000000045,
+          192.79999999999995
+        ],
+        [
+          122.20000000000005,
+          192.79999999999995
+        ],
+        [
+          122.20000000000005,
+          300.29999999999995
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "trpc-router-procedure-building-flow-node-3",
+        "focus": -0.08181818181818175,
+        "gap": 6.400000000000091
+      },
+      "endBinding": {
+        "elementId": "trpc-router-procedure-building-flow-node-4",
+        "focus": -0.3233333333333332,
+        "gap": 5.600000000000136
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "trpc-router-procedure-building-flow-edge-4",
+      "type": "arrow",
+      "x": 321.20000000000005,
+      "y": 1234.3999999999999,
+      "width": 0,
+      "height": 300.79999999999995,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aG",
+      "roundness": null,
+      "seed": 1858878876,
+      "version": 2,
+      "versionNonce": 1057493416,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "trpc-router-procedure-building-flow-edge-4-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "trpc-router-procedure-building-flow",
+        "edge": {
+          "from": "ProcedureBuilder",
+          "to": "createResolver",
+          "claim": "calls"
+        }
+      },
+      "points": [
+        [
+          0,
+          0.5
+        ],
+        [
+          0,
+          150.39999999999986
+        ],
+        [
+          0,
+          300.29999999999995
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "trpc-router-procedure-building-flow-node-4",
+        "focus": -0.010000000000000567,
+        "gap": 5.600000000000136
+      },
+      "endBinding": {
+        "elementId": "trpc-router-procedure-building-flow-node-5",
+        "focus": 0.010000000000000567,
+        "gap": 4.800000000000182
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "trpc-router-procedure-building-flow-edge-5",
+      "type": "arrow",
+      "x": 321.20000000000005,
+      "y": 1615.1999999999998,
+      "width": 40.333333333333314,
+      "height": 300.79999999999995,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aH",
+      "roundness": null,
+      "seed": 62640053,
+      "version": 2,
+      "versionNonce": 1345573695,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "trpc-router-procedure-building-flow-edge-5-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "trpc-router-procedure-building-flow",
+        "edge": {
+          "from": "createResolver",
+          "to": "Procedure",
+          "claim": "returns"
+        }
+      },
+      "points": [
+        [
+          0,
+          0.5
+        ],
+        [
+          0,
+          42.64166666666665
+        ],
+        [
+          0,
+          85.2833333333333
+        ],
+        [
+          0,
+          170.5666666666666
+        ],
+        [
+          0,
+          192.79999999999995
+        ],
+        [
+          40.333333333333314,
+          192.79999999999995
+        ],
+        [
+          40.333333333333314,
+          300.29999999999995
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "trpc-router-procedure-building-flow-node-5",
+        "focus": -0.010000000000000567,
+        "gap": 4.800000000000182
+      },
+      "endBinding": {
+        "elementId": "trpc-router-procedure-building-flow-node-6",
+        "focus": -0.3603508771929823,
+        "gap": 4.000000000000227
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "trpc-router-procedure-building-flow-edge-6",
+      "type": "arrow",
+      "x": 808.2,
+      "y": 853.5999999999999,
+      "width": 0,
+      "height": 300.79999999999995,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aI",
+      "roundness": null,
+      "seed": 1269109722,
+      "version": 2,
+      "versionNonce": 1484116910,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "trpc-router-procedure-building-flow-edge-6-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "trpc-router-procedure-building-flow",
+        "edge": {
+          "from": "TRPCRootObject",
+          "to": "createRouterFactory",
+          "claim": "accesses"
+        }
+      },
+      "points": [
+        [
+          0,
+          0.5
+        ],
+        [
+          0,
+          150.39999999999998
+        ],
+        [
+          0,
+          300.29999999999995
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "trpc-router-procedure-building-flow-node-2",
+        "focus": -0.34727272727272757,
+        "gap": 6.400000000000091
+      },
+      "endBinding": {
+        "elementId": "trpc-router-procedure-building-flow-node-7",
+        "focus": 0.05857142857142889,
+        "gap": 5.600000000000136
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "trpc-router-procedure-building-flow-edge-7",
+      "type": "arrow",
+      "x": 808.2,
+      "y": 1234.3999999999999,
+      "width": 0,
+      "height": 300.79999999999995,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aJ",
+      "roundness": null,
+      "seed": 532703595,
+      "version": 2,
+      "versionNonce": 1148586085,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "trpc-router-procedure-building-flow-edge-7-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "trpc-router-procedure-building-flow",
+        "edge": {
+          "from": "createRouterFactory",
+          "to": "Router",
+          "claim": "returns"
+        }
+      },
+      "points": [
+        [
+          0,
+          0.5
+        ],
+        [
+          0,
+          150.39999999999986
+        ],
+        [
+          0,
+          300.29999999999995
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "trpc-router-procedure-building-flow-node-7",
+        "focus": -0.05857142857142889,
+        "gap": 5.600000000000136
+      },
+      "endBinding": {
+        "elementId": "trpc-router-procedure-building-flow-node-8",
+        "focus": 0.1025,
+        "gap": 4.800000000000182
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "trpc-router-procedure-building-flow-edge-8",
+      "type": "arrow",
+      "x": 834.8666666666667,
+      "y": 1615.1999999999998,
+      "width": 0,
+      "height": 310.79999999999995,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aK",
+      "roundness": null,
+      "seed": 1495412008,
+      "version": 2,
+      "versionNonce": 502352132,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "trpc-router-procedure-building-flow-edge-8-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "trpc-router-procedure-building-flow",
+        "edge": {
+          "from": "Router",
+          "to": "createCallerFactory",
+          "claim": "accesses"
+        }
+      },
+      "points": [
+        [
+          0,
+          0.5
+        ],
+        [
+          0,
+          155.4000000000001
+        ],
+        [
+          0,
+          310.29999999999995
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "trpc-router-procedure-building-flow-node-8",
+        "focus": -0.4358333333333325,
+        "gap": 4.800000000000182
+      },
+      "endBinding": {
+        "elementId": "trpc-router-procedure-building-flow-node-9",
+        "focus": -0.03666666666666592,
+        "gap": 5.999999999999773
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "trpc-router-procedure-building-flow-edge-9",
+      "type": "arrow",
+      "x": 834.8666666666667,
+      "y": 2005.9999999999998,
+      "width": 0,
+      "height": 310.8000000000004,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aL",
+      "roundness": null,
+      "seed": 1748135633,
+      "version": 2,
+      "versionNonce": 73032155,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "trpc-router-procedure-building-flow-edge-9-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "trpc-router-procedure-building-flow",
+        "edge": {
+          "from": "createCallerFactory",
+          "to": "RouterCaller",
+          "claim": "returns"
+        }
+      },
+      "points": [
+        [
+          0,
+          0.5
+        ],
+        [
+          0,
+          155.40000000000032
+        ],
+        [
+          0,
+          310.3000000000004
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "trpc-router-procedure-building-flow-node-9",
+        "focus": 0.036666666666666674,
+        "gap": 5.999999999999773
+      },
+      "endBinding": {
+        "elementId": "trpc-router-procedure-building-flow-node-10",
+        "focus": 0.05407407407407374,
+        "gap": 3.199999999999818
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "trpc-router-procedure-building-flow-edge-10",
+      "type": "arrow",
+      "x": 781.5333333333334,
+      "y": 1615.1999999999998,
+      "width": 293.33333333333337,
+      "height": 300.79999999999995,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aM",
+      "roundness": null,
+      "seed": 1618319605,
+      "version": 2,
+      "versionNonce": 103940991,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "trpc-router-procedure-building-flow-edge-10-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "trpc-router-procedure-building-flow",
+        "edge": {
+          "from": "Router",
+          "to": "Procedure",
+          "claim": "holds"
+        }
+      },
+      "points": [
+        [
+          0,
+          0.5
+        ],
+        [
+          -1.1368683772161603e-13,
+          32
+        ],
+        [
+          -265.0666666666667,
+          32
+        ],
+        [
+          -293.33333333333337,
+          32
+        ],
+        [
+          -293.33333333333337,
+          300.29999999999995
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "trpc-router-procedure-building-flow-node-8",
+        "focus": 0.23083333333332912,
+        "gap": 4.800000000000182
+      },
+      "endBinding": {
+        "elementId": "trpc-router-procedure-building-flow-node-6",
+        "focus": 0.30631578947368465,
+        "gap": 4.000000000000227
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "trpc-router-procedure-building-flow-node-0-label",
+      "type": "text",
+      "x": 736,
+      "y": 47.5,
+      "width": 88,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aN",
+      "roundness": null,
+      "seed": 48862202,
+      "version": 1,
+      "versionNonce": 218894414,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "trpc-router-procedure-building-flow"
+      },
+      "text": "initTRPC",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "trpc-router-procedure-building-flow-node-0",
+      "originalText": "initTRPC",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "trpc-router-procedure-building-flow-node-1-label",
+      "type": "text",
+      "x": 670,
+      "y": 427.5,
+      "width": 220.00000000000003,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aO",
+      "roundness": null,
+      "seed": 441339583,
+      "version": 1,
+      "versionNonce": 1938669273,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "trpc-router-procedure-building-flow"
+      },
+      "text": "TRPCBuilder.create()",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "trpc-router-procedure-building-flow-node-1",
+      "originalText": "TRPCBuilder.create()",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "trpc-router-procedure-building-flow-node-2-label",
+      "type": "text",
+      "x": 693,
+      "y": 807.5,
+      "width": 154,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aP",
+      "roundness": null,
+      "seed": 1500776016,
+      "version": 1,
+      "versionNonce": 1891215916,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "trpc-router-procedure-building-flow"
+      },
+      "text": "TRPCRootObject",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "trpc-router-procedure-building-flow-node-2",
+      "originalText": "TRPCRootObject",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "trpc-router-procedure-building-flow-node-3-label",
+      "type": "text",
+      "x": 67.5,
+      "y": 807.5,
+      "width": 165,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aQ",
+      "roundness": null,
+      "seed": 1899984925,
+      "version": 1,
+      "versionNonce": 1207335815,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "trpc-router-procedure-building-flow"
+      },
+      "text": "createBuilder()",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "trpc-router-procedure-building-flow-node-3",
+      "originalText": "createBuilder()",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "trpc-router-procedure-building-flow-node-4-label",
+      "type": "text",
+      "x": 232,
+      "y": 1187.5,
+      "width": 176,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aR",
+      "roundness": null,
+      "seed": 158150326,
+      "version": 1,
+      "versionNonce": 2112021274,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "trpc-router-procedure-building-flow"
+      },
+      "text": "ProcedureBuilder",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "trpc-router-procedure-building-flow-node-4",
+      "originalText": "ProcedureBuilder",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "trpc-router-procedure-building-flow-node-5-label",
+      "type": "text",
+      "x": 232,
+      "y": 1567.5,
+      "width": 176,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aS",
+      "roundness": null,
+      "seed": 1674956523,
+      "version": 1,
+      "versionNonce": 1915015397,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "trpc-router-procedure-building-flow"
+      },
+      "text": "createResolver()",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "trpc-router-procedure-building-flow-node-5",
+      "originalText": "createResolver()",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "trpc-router-procedure-building-flow-node-6-label",
+      "type": "text",
+      "x": 270.5,
+      "y": 1945,
+      "width": 319,
+      "height": 50,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aT",
+      "roundness": null,
+      "seed": 263866748,
+      "version": 1,
+      "versionNonce": 1686020616,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "trpc-router-procedure-building-flow"
+      },
+      "text": "Procedure\n(query/mutation/subscription)",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "trpc-router-procedure-building-flow-node-6",
+      "originalText": "Procedure (query/mutation/subscription)",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "trpc-router-procedure-building-flow-node-7-label",
+      "type": "text",
+      "x": 684.5,
+      "y": 1187.5,
+      "width": 231.00000000000003,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aU",
+      "roundness": null,
+      "seed": 1133974745,
+      "version": 1,
+      "versionNonce": 432955939,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "trpc-router-procedure-building-flow"
+      },
+      "text": "createRouterFactory()",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "trpc-router-procedure-building-flow-node-7",
+      "originalText": "createRouterFactory()",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "trpc-router-procedure-building-flow-node-8-label",
+      "type": "text",
+      "x": 767,
+      "y": 1567.5,
+      "width": 66,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aV",
+      "roundness": null,
+      "seed": 1624470898,
+      "version": 1,
+      "versionNonce": 143955750,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "trpc-router-procedure-building-flow"
+      },
+      "text": "Router",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "trpc-router-procedure-building-flow-node-8",
+      "originalText": "Router",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "trpc-router-procedure-building-flow-node-9-label",
+      "type": "text",
+      "x": 724.5,
+      "y": 1947.5,
+      "width": 231.00000000000003,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aW",
+      "roundness": null,
+      "seed": 507469975,
+      "version": 1,
+      "versionNonce": 1969283185,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "trpc-router-procedure-building-flow"
+      },
+      "text": "createCallerFactory()",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "trpc-router-procedure-building-flow-node-9",
+      "originalText": "createCallerFactory()",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "trpc-router-procedure-building-flow-node-10-label",
+      "type": "text",
+      "x": 764,
+      "y": 2347.5,
+      "width": 132,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aX",
+      "roundness": null,
+      "seed": 329186093,
+      "version": 1,
+      "versionNonce": 1973644695,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "trpc-router-procedure-building-flow"
+      },
+      "text": "RouterCaller",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "trpc-router-procedure-building-flow-node-10",
+      "originalText": "RouterCaller",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "trpc-router-procedure-building-flow-edge-0-label",
+      "type": "text",
+      "x": 736.3333333333333,
+      "y": 232.4,
+      "width": 70.4,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aY",
+      "roundness": null,
+      "seed": 667717501,
+      "version": 1,
+      "versionNonce": 1209183335,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "trpc-router-procedure-building-flow"
+      },
+      "text": "@returns",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "trpc-router-procedure-building-flow-edge-0",
+      "originalText": "@returns",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "trpc-router-procedure-building-flow-edge-1-label",
+      "type": "text",
+      "x": 736.3333333333333,
+      "y": 613.1999999999999,
+      "width": 70.4,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aZ",
+      "roundness": null,
+      "seed": 730107696,
+      "version": 1,
+      "versionNonce": 1552459148,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "trpc-router-procedure-building-flow"
+      },
+      "text": "@returns",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "trpc-router-procedure-building-flow-edge-1",
+      "originalText": "@returns",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "trpc-router-procedure-building-flow-edge-2-label",
+      "type": "text",
+      "x": 346.03333333333336,
+      "y": 875.5999999999999,
+      "width": 167.20000000000002,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aa",
+      "roundness": null,
+      "seed": 641229087,
+      "version": 1,
+      "versionNonce": 1426554297,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "trpc-router-procedure-building-flow"
+      },
+      "text": "procedure @accesses",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "trpc-router-procedure-building-flow-edge-2",
+      "originalText": "procedure @accesses",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "trpc-router-procedure-building-flow-edge-3-label",
+      "type": "text",
+      "x": 142.50000000000006,
+      "y": 1036.3999999999999,
+      "width": 70.4,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "ab",
+      "roundness": null,
+      "seed": 2078362202,
+      "version": 1,
+      "versionNonce": 1195351854,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "trpc-router-procedure-building-flow"
+      },
+      "text": "@returns",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "trpc-router-procedure-building-flow-edge-3",
+      "originalText": "@returns",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "trpc-router-procedure-building-flow-edge-4-label",
+      "type": "text",
+      "x": 237.60000000000002,
+      "y": 1364.7999999999997,
+      "width": 167.20000000000002,
+      "height": 40,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "ac",
+      "roundness": null,
+      "seed": 1386478009,
+      "version": 1,
+      "versionNonce": 1096182659,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "trpc-router-procedure-building-flow"
+      },
+      "text": "query/mutation/subs\ncription @calls",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "trpc-router-procedure-building-flow-edge-4",
+      "originalText": "query/mutation/subscription @calls",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "trpc-router-procedure-building-flow-edge-5-label",
+      "type": "text",
+      "x": 286.00000000000006,
+      "y": 1775.7666666666664,
+      "width": 70.4,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "ad",
+      "roundness": null,
+      "seed": 957933020,
+      "version": 1,
+      "versionNonce": 1974843368,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "trpc-router-procedure-building-flow"
+      },
+      "text": "@returns",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "trpc-router-procedure-building-flow-edge-5",
+      "originalText": "@returns",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "trpc-router-procedure-building-flow-edge-6-label",
+      "type": "text",
+      "x": 737.8000000000001,
+      "y": 993.9999999999999,
+      "width": 140.8,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "ae",
+      "roundness": null,
+      "seed": 685062091,
+      "version": 1,
+      "versionNonce": 767354181,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "trpc-router-procedure-building-flow"
+      },
+      "text": "router @accesses",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "trpc-router-procedure-building-flow-edge-6",
+      "originalText": "router @accesses",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "trpc-router-procedure-building-flow-edge-7-label",
+      "type": "text",
+      "x": 773,
+      "y": 1374.7999999999997,
+      "width": 70.4,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "af",
+      "roundness": null,
+      "seed": 201108502,
+      "version": 1,
+      "versionNonce": 633710074,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "trpc-router-procedure-building-flow"
+      },
+      "text": "@returns",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "trpc-router-procedure-building-flow-edge-7",
+      "originalText": "@returns",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "trpc-router-procedure-building-flow-edge-8-label",
+      "type": "text",
+      "x": 782.0666666666667,
+      "y": 1750.6,
+      "width": 105.60000000000001,
+      "height": 40,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "ag",
+      "roundness": null,
+      "seed": 1477781493,
+      "version": 1,
+      "versionNonce": 1449140351,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "trpc-router-procedure-building-flow"
+      },
+      "text": "createCaller\n@accesses",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "trpc-router-procedure-building-flow-edge-8",
+      "originalText": "createCaller @accesses",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "trpc-router-procedure-building-flow-edge-9-label",
+      "type": "text",
+      "x": 799.6666666666666,
+      "y": 2151.4,
+      "width": 70.4,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "ah",
+      "roundness": null,
+      "seed": 1725895336,
+      "version": 1,
+      "versionNonce": 1045336452,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "trpc-router-procedure-building-flow"
+      },
+      "text": "@returns",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "trpc-router-procedure-building-flow-edge-9",
+      "originalText": "@returns",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "trpc-router-procedure-building-flow-edge-10-label",
+      "type": "text",
+      "x": 450.4666666666667,
+      "y": 1637.1999999999998,
+      "width": 132,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "ai",
+      "roundness": null,
+      "seed": 812852380,
+      "version": 1,
+      "versionNonce": 415610536,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "trpc-router-procedure-building-flow"
+      },
+      "text": "contains @holds",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "trpc-router-procedure-building-flow-edge-10",
+      "originalText": "contains @holds",
+      "autoResize": true,
+      "lineHeight": 1.25
+    }
+  ],
+  "appState": {
+    "gridSize": null,
+    "viewBackgroundColor": "#ffffff"
+  },
+  "files": {},
+  "diagramos": {
+    "version": "0.2.0-rc.6",
+    "schema": 1
+  }
+}

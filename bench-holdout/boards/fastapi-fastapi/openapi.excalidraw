@@ -1,0 +1,2128 @@
+{
+  "type": "excalidraw",
+  "version": 2,
+  "source": "diagramos",
+  "elements": [
+    {
+      "id": "fastapi-openapi-schema-generation-title",
+      "type": "text",
+      "x": 0,
+      "y": -115,
+      "width": 435.6,
+      "height": 30,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a0",
+      "roundness": null,
+      "seed": 1517345305,
+      "version": 1,
+      "versionNonce": 1386262371,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "fastapi-openapi-schema-generation",
+        "role": "title"
+      },
+      "text": "FastAPI OpenAPI Schema Generation",
+      "fontSize": 24,
+      "fontFamily": 5,
+      "textAlign": "left",
+      "verticalAlign": "middle",
+      "containerId": null,
+      "originalText": "FastAPI OpenAPI Schema Generation",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "fastapi-openapi-schema-generation-node-0",
+      "type": "rectangle",
+      "x": 20,
+      "y": 500,
+      "width": 200,
+      "height": 120,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a1",
+      "roundness": null,
+      "seed": 1033760704,
+      "version": 1,
+      "versionNonce": 1218937244,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "fastapi-openapi-schema-generation-node-0-label"
+        },
+        {
+          "id": "fastapi-openapi-schema-generation-edge-0",
+          "type": "arrow"
+        },
+        {
+          "id": "fastapi-openapi-schema-generation-edge-5",
+          "type": "arrow"
+        },
+        {
+          "id": "fastapi-openapi-schema-generation-edge-9",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "fastapi-openapi-schema-generation",
+        "node": "get_openapi",
+        "ref": "fastapi/openapi/utils.py#get_openapi"
+      }
+    },
+    {
+      "id": "fastapi-openapi-schema-generation-node-1",
+      "type": "rectangle",
+      "x": 560,
+      "y": 540,
+      "width": 320,
+      "height": 100,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a2",
+      "roundness": null,
+      "seed": 634322697,
+      "version": 1,
+      "versionNonce": 1727428755,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "fastapi-openapi-schema-generation-node-1-label"
+        },
+        {
+          "id": "fastapi-openapi-schema-generation-edge-0",
+          "type": "arrow"
+        },
+        {
+          "id": "fastapi-openapi-schema-generation-edge-1",
+          "type": "arrow"
+        },
+        {
+          "id": "fastapi-openapi-schema-generation-edge-3",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "fastapi-openapi-schema-generation",
+        "node": "get_fields_from_routes",
+        "ref": "fastapi/openapi/utils.py#get_fields_from_routes"
+      }
+    },
+    {
+      "id": "fastapi-openapi-schema-generation-node-2",
+      "type": "rectangle",
+      "x": 1240,
+      "y": 500,
+      "width": 380,
+      "height": 80,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a3",
+      "roundness": null,
+      "seed": 1117707358,
+      "version": 1,
+      "versionNonce": 1465749890,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "fastapi-openapi-schema-generation-node-2-label"
+        },
+        {
+          "id": "fastapi-openapi-schema-generation-edge-1",
+          "type": "arrow"
+        },
+        {
+          "id": "fastapi-openapi-schema-generation-edge-2",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "fastapi-openapi-schema-generation",
+        "node": "get_flat_models",
+        "ref": "fastapi/_compat/v2.py#get_flat_models_from_fields"
+      }
+    },
+    {
+      "id": "fastapi-openapi-schema-generation-node-3",
+      "type": "rectangle",
+      "x": 1980,
+      "y": 500,
+      "width": 280,
+      "height": 80,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a4",
+      "roundness": null,
+      "seed": 510351279,
+      "version": 1,
+      "versionNonce": 2011192329,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "fastapi-openapi-schema-generation-node-3-label"
+        },
+        {
+          "id": "fastapi-openapi-schema-generation-edge-2",
+          "type": "arrow"
+        },
+        {
+          "id": "fastapi-openapi-schema-generation-edge-4",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "fastapi-openapi-schema-generation",
+        "node": "get_model_name_map",
+        "ref": "fastapi/_compat/v2.py#get_model_name_map"
+      }
+    },
+    {
+      "id": "fastapi-openapi-schema-generation-node-4",
+      "type": "rectangle",
+      "x": 2600,
+      "y": 540,
+      "width": 240,
+      "height": 100,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a5",
+      "roundness": null,
+      "seed": 401462460,
+      "version": 1,
+      "versionNonce": 1592300616,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "fastapi-openapi-schema-generation-node-4-label"
+        },
+        {
+          "id": "fastapi-openapi-schema-generation-edge-3",
+          "type": "arrow"
+        },
+        {
+          "id": "fastapi-openapi-schema-generation-edge-4",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "fastapi-openapi-schema-generation",
+        "node": "get_definitions",
+        "ref": "fastapi/_compat/v2.py#get_definitions"
+      }
+    },
+    {
+      "id": "fastapi-openapi-schema-generation-node-5",
+      "type": "rectangle",
+      "x": 600,
+      "y": 280,
+      "width": 260,
+      "height": 120,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a6",
+      "roundness": null,
+      "seed": 8575829,
+      "version": 1,
+      "versionNonce": 1196385119,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "fastapi-openapi-schema-generation-node-5-label"
+        },
+        {
+          "id": "fastapi-openapi-schema-generation-edge-5",
+          "type": "arrow"
+        },
+        {
+          "id": "fastapi-openapi-schema-generation-edge-6",
+          "type": "arrow"
+        },
+        {
+          "id": "fastapi-openapi-schema-generation-edge-7",
+          "type": "arrow"
+        },
+        {
+          "id": "fastapi-openapi-schema-generation-edge-8",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "fastapi-openapi-schema-generation",
+        "node": "get_openapi_path",
+        "ref": "fastapi/openapi/utils.py#get_openapi_path"
+      }
+    },
+    {
+      "id": "fastapi-openapi-schema-generation-node-6",
+      "type": "rectangle",
+      "x": 1200,
+      "y": 340,
+      "width": 380,
+      "height": 80,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a7",
+      "roundness": null,
+      "seed": 1532815482,
+      "version": 1,
+      "versionNonce": 1251612110,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "fastapi-openapi-schema-generation-node-6-label"
+        },
+        {
+          "id": "fastapi-openapi-schema-generation-edge-6",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "fastapi-openapi-schema-generation",
+        "node": "get_dependency_data",
+        "ref": "fastapi/openapi/utils.py#_get_openapi_dependency_data"
+      }
+    },
+    {
+      "id": "fastapi-openapi-schema-generation-node-7",
+      "type": "rectangle",
+      "x": 1200,
+      "y": 180,
+      "width": 400,
+      "height": 80,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a8",
+      "roundness": null,
+      "seed": 1222770827,
+      "version": 1,
+      "versionNonce": 1683393285,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "fastapi-openapi-schema-generation-node-7-label"
+        },
+        {
+          "id": "fastapi-openapi-schema-generation-edge-7",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "fastapi-openapi-schema-generation",
+        "node": "get_operation_metadata",
+        "ref": "fastapi/openapi/utils.py#get_openapi_operation_metadata"
+      }
+    },
+    {
+      "id": "fastapi-openapi-schema-generation-node-8",
+      "type": "rectangle",
+      "x": 1200,
+      "y": 20,
+      "width": 440,
+      "height": 80,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a9",
+      "roundness": null,
+      "seed": 1759117768,
+      "version": 1,
+      "versionNonce": 269847332,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "fastapi-openapi-schema-generation-node-8-label"
+        },
+        {
+          "id": "fastapi-openapi-schema-generation-edge-8",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "fastapi-openapi-schema-generation",
+        "node": "get_operation_params",
+        "ref": "fastapi/openapi/utils.py#_get_openapi_operation_parameters"
+      }
+    },
+    {
+      "id": "fastapi-openapi-schema-generation-node-9",
+      "type": "rectangle",
+      "x": 560,
+      "y": 120,
+      "width": 160,
+      "height": 80,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aA",
+      "roundness": null,
+      "seed": 290822385,
+      "version": 1,
+      "versionNonce": 225061755,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "fastapi-openapi-schema-generation-node-9-label"
+        },
+        {
+          "id": "fastapi-openapi-schema-generation-edge-9",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "fastapi-openapi-schema-generation",
+        "node": "openapi_model",
+        "ref": "fastapi/openapi/models.py#OpenAPI"
+      }
+    },
+    {
+      "id": "fastapi-openapi-schema-generation-edge-0",
+      "type": "arrow",
+      "x": 212,
+      "y": 595.3333333333334,
+      "width": 341.6,
+      "height": 0,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aB",
+      "roundness": null,
+      "seed": 1989751607,
+      "version": 1,
+      "versionNonce": 386277009,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "fastapi-openapi-schema-generation-edge-0-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "fastapi-openapi-schema-generation",
+        "edge": {
+          "from": "get_openapi",
+          "to": "get_fields_from_routes",
+          "claim": "calls"
+        }
+      },
+      "points": [
+        [
+          0.5,
+          0
+        ],
+        [
+          170.8,
+          0
+        ],
+        [
+          341.1,
+          0
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "fastapi-openapi-schema-generation-node-0",
+        "focus": 0.588888888888889,
+        "gap": 8
+      },
+      "endBinding": {
+        "elementId": "fastapi-openapi-schema-generation-node-1",
+        "focus": -0.1066666666666677,
+        "gap": 6.399999999999977
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "fastapi-openapi-schema-generation-edge-1",
+      "type": "arrow",
+      "x": 873.6,
+      "y": 578.6666666666667,
+      "width": 362.80000000000007,
+      "height": 46.66666666666674,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aC",
+      "roundness": null,
+      "seed": 1386068966,
+      "version": 1,
+      "versionNonce": 1072633290,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "fastapi-openapi-schema-generation-edge-1-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "fastapi-openapi-schema-generation",
+        "edge": {
+          "from": "get_fields_from_routes",
+          "to": "get_flat_models",
+          "claim": "feeds"
+        }
+      },
+      "points": [
+        [
+          0.5,
+          0
+        ],
+        [
+          32,
+          0
+        ],
+        [
+          32,
+          -46.66666666666674
+        ],
+        [
+          158.06666666666672,
+          -46.66666666666674
+        ],
+        [
+          260.4333333333333,
+          -46.66666666666674
+        ],
+        [
+          311.6166666666667,
+          -46.66666666666674
+        ],
+        [
+          362.30000000000007,
+          -46.66666666666674
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "fastapi-openapi-schema-generation-node-1",
+        "focus": -0.2266666666666643,
+        "gap": 6.399999999999977
+      },
+      "endBinding": {
+        "elementId": "fastapi-openapi-schema-generation-node-2",
+        "focus": 0.19999999999999998,
+        "gap": 3.599999999999909
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "fastapi-openapi-schema-generation-edge-2",
+      "type": "arrow",
+      "x": 1616.4,
+      "y": 532,
+      "width": 362.79999999999995,
+      "height": 0,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aD",
+      "roundness": null,
+      "seed": 713377073,
+      "version": 1,
+      "versionNonce": 214056891,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "fastapi-openapi-schema-generation-edge-2-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "fastapi-openapi-schema-generation",
+        "edge": {
+          "from": "get_flat_models",
+          "to": "get_model_name_map",
+          "claim": "feeds"
+        }
+      },
+      "points": [
+        [
+          0.5,
+          0
+        ],
+        [
+          181.4000000000001,
+          0
+        ],
+        [
+          362.29999999999995,
+          0
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "fastapi-openapi-schema-generation-node-2",
+        "focus": -0.19999999999999998,
+        "gap": 3.599999999999909
+      },
+      "endBinding": {
+        "elementId": "fastapi-openapi-schema-generation-node-3",
+        "focus": 0.2,
+        "gap": 1
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "fastapi-openapi-schema-generation-edge-3",
+      "type": "arrow",
+      "x": 873.6,
+      "y": 612,
+      "width": 1718.4,
+      "height": 0,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aE",
+      "roundness": null,
+      "seed": 1439445000,
+      "version": 1,
+      "versionNonce": 1322854244,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "fastapi-openapi-schema-generation-edge-3-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "fastapi-openapi-schema-generation",
+        "edge": {
+          "from": "get_fields_from_routes",
+          "to": "get_definitions",
+          "claim": "feeds"
+        }
+      },
+      "points": [
+        [
+          0.5,
+          0
+        ],
+        [
+          859.2000000000002,
+          0
+        ],
+        [
+          1717.9,
+          0
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "fastapi-openapi-schema-generation-node-1",
+        "focus": 0.4399999999999999,
+        "gap": 6.399999999999977
+      },
+      "endBinding": {
+        "elementId": "fastapi-openapi-schema-generation-node-4",
+        "focus": -0.4400000000000013,
+        "gap": 8
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "fastapi-openapi-schema-generation-edge-4",
+      "type": "arrow",
+      "x": 2259.2,
+      "y": 532,
+      "width": 332.8000000000002,
+      "height": 46.66666666666674,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aF",
+      "roundness": null,
+      "seed": 588824691,
+      "version": 1,
+      "versionNonce": 985666125,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "fastapi-openapi-schema-generation-edge-4-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "fastapi-openapi-schema-generation",
+        "edge": {
+          "from": "get_model_name_map",
+          "to": "get_definitions",
+          "claim": "feeds"
+        }
+      },
+      "points": [
+        [
+          0.5,
+          0
+        ],
+        [
+          47.433333333333394,
+          0
+        ],
+        [
+          94.86666666666679,
+          0
+        ],
+        [
+          189.73333333333358,
+          0
+        ],
+        [
+          224.80000000000018,
+          0
+        ],
+        [
+          224.80000000000018,
+          46.66666666666674
+        ],
+        [
+          332.3000000000002,
+          46.66666666666674
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "fastapi-openapi-schema-generation-node-3",
+        "focus": -0.2,
+        "gap": 1
+      },
+      "endBinding": {
+        "elementId": "fastapi-openapi-schema-generation-node-4",
+        "focus": 0.22666666666666513,
+        "gap": 8
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "fastapi-openapi-schema-generation-edge-5",
+      "type": "arrow",
+      "x": 212,
+      "y": 565.3333333333334,
+      "width": 386.6,
+      "height": 223.33333333333337,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aG",
+      "roundness": null,
+      "seed": 1640200898,
+      "version": 1,
+      "versionNonce": 1547256886,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "fastapi-openapi-schema-generation-edge-5-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "fastapi-openapi-schema-generation",
+        "edge": {
+          "from": "get_openapi",
+          "to": "get_openapi_path",
+          "claim": "calls"
+        }
+      },
+      "points": [
+        [
+          0.5,
+          0
+        ],
+        [
+          56,
+          0
+        ],
+        [
+          56,
+          -223.33333333333337
+        ],
+        [
+          81.63333333333333,
+          -223.33333333333337
+        ],
+        [
+          157.875,
+          -223.33333333333337
+        ],
+        [
+          234.11666666666667,
+          -223.33333333333337
+        ],
+        [
+          386.1,
+          -223.33333333333337
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "fastapi-openapi-schema-generation-node-0",
+        "focus": 0.08888888888888903,
+        "gap": 8
+      },
+      "endBinding": {
+        "elementId": "fastapi-openapi-schema-generation-node-5",
+        "focus": -0.03333333333333286,
+        "gap": 1.3999999999999773
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "fastapi-openapi-schema-generation-edge-6",
+      "type": "arrow",
+      "x": 858.6,
+      "y": 372,
+      "width": 347.80000000000007,
+      "height": 0,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aH",
+      "roundness": null,
+      "seed": 1063518685,
+      "version": 1,
+      "versionNonce": 1131802439,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "fastapi-openapi-schema-generation-edge-6-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "fastapi-openapi-schema-generation",
+        "edge": {
+          "from": "get_openapi_path",
+          "to": "get_dependency_data",
+          "claim": "calls"
+        }
+      },
+      "points": [
+        [
+          0.5,
+          0
+        ],
+        [
+          173.89999999999998,
+          0
+        ],
+        [
+          347.30000000000007,
+          0
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "fastapi-openapi-schema-generation-node-5",
+        "focus": 0.5333333333333337,
+        "gap": 1.3999999999999773
+      },
+      "endBinding": {
+        "elementId": "fastapi-openapi-schema-generation-node-6",
+        "focus": 0.19999999999999998,
+        "gap": 6.400000000000091
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "fastapi-openapi-schema-generation-edge-7",
+      "type": "arrow",
+      "x": 858.6,
+      "y": 342,
+      "width": 347.80000000000007,
+      "height": 130,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aI",
+      "roundness": null,
+      "seed": 1880862788,
+      "version": 1,
+      "versionNonce": 40167760,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "fastapi-openapi-schema-generation-edge-7-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "fastapi-openapi-schema-generation",
+        "edge": {
+          "from": "get_openapi_path",
+          "to": "get_operation_metadata",
+          "claim": "calls"
+        }
+      },
+      "points": [
+        [
+          0.5,
+          0
+        ],
+        [
+          71,
+          0
+        ],
+        [
+          71,
+          -130
+        ],
+        [
+          108.89999999999998,
+          -130
+        ],
+        [
+          168.6249999999999,
+          -130
+        ],
+        [
+          228.35000000000002,
+          -130
+        ],
+        [
+          347.30000000000007,
+          -130
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "fastapi-openapi-schema-generation-node-5",
+        "focus": 0.03333333333333358,
+        "gap": 1.3999999999999773
+      },
+      "endBinding": {
+        "elementId": "fastapi-openapi-schema-generation-node-7",
+        "focus": 0.2,
+        "gap": 6.400000000000091
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "fastapi-openapi-schema-generation-edge-8",
+      "type": "arrow",
+      "x": 858.6,
+      "y": 312,
+      "width": 347.80000000000007,
+      "height": 260,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aJ",
+      "roundness": null,
+      "seed": 891329263,
+      "version": 1,
+      "versionNonce": 1575729993,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "fastapi-openapi-schema-generation-edge-8-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "fastapi-openapi-schema-generation",
+        "edge": {
+          "from": "get_openapi_path",
+          "to": "get_operation_params",
+          "claim": "calls"
+        }
+      },
+      "points": [
+        [
+          0.5,
+          0
+        ],
+        [
+          47,
+          0
+        ],
+        [
+          47,
+          -256.90000000000003
+        ],
+        [
+          47,
+          -260
+        ],
+        [
+          347.30000000000007,
+          -260
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "fastapi-openapi-schema-generation-node-5",
+        "focus": -0.4666666666666665,
+        "gap": 1.3999999999999773
+      },
+      "endBinding": {
+        "elementId": "fastapi-openapi-schema-generation-node-8",
+        "focus": 0.19999999999999998,
+        "gap": 6.400000000000091
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "fastapi-openapi-schema-generation-edge-9",
+      "type": "arrow",
+      "x": 212,
+      "y": 535.3333333333334,
+      "width": 341.6,
+      "height": 373.33333333333337,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aK",
+      "roundness": null,
+      "seed": 756354718,
+      "version": 1,
+      "versionNonce": 1113706946,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "fastapi-openapi-schema-generation-edge-9-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "fastapi-openapi-schema-generation",
+        "edge": {
+          "from": "get_openapi",
+          "to": "openapi_model",
+          "claim": "builds"
+        }
+      },
+      "points": [
+        [
+          0.5,
+          0
+        ],
+        [
+          32,
+          0
+        ],
+        [
+          32,
+          -325.4666666666667
+        ],
+        [
+          32,
+          -373.33333333333337
+        ],
+        [
+          341.1,
+          -373.33333333333337
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "fastapi-openapi-schema-generation-node-0",
+        "focus": -0.4111111111111109,
+        "gap": 8
+      },
+      "endBinding": {
+        "elementId": "fastapi-openapi-schema-generation-node-9",
+        "focus": -0.05,
+        "gap": 6.399999999999977
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "fastapi-openapi-schema-generation-node-0-label",
+      "type": "text",
+      "x": 48.5,
+      "y": 547.5,
+      "width": 143,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aL",
+      "roundness": null,
+      "seed": 608027933,
+      "version": 1,
+      "versionNonce": 239710855,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "fastapi-openapi-schema-generation"
+      },
+      "text": "get_openapi()",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "fastapi-openapi-schema-generation-node-0",
+      "originalText": "get_openapi()",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "fastapi-openapi-schema-generation-node-1-label",
+      "type": "text",
+      "x": 588,
+      "y": 577.5,
+      "width": 264,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aM",
+      "roundness": null,
+      "seed": 208819024,
+      "version": 1,
+      "versionNonce": 923590956,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "fastapi-openapi-schema-generation"
+      },
+      "text": "get_fields_from_routes()",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "fastapi-openapi-schema-generation-node-1",
+      "originalText": "get_fields_from_routes()",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "fastapi-openapi-schema-generation-node-2-label",
+      "type": "text",
+      "x": 1270.5,
+      "y": 527.5,
+      "width": 319,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aN",
+      "roundness": null,
+      "seed": 1296866239,
+      "version": 1,
+      "versionNonce": 971044313,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "fastapi-openapi-schema-generation"
+      },
+      "text": "get_flat_models_from_fields()",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "fastapi-openapi-schema-generation-node-2",
+      "originalText": "get_flat_models_from_fields()",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "fastapi-openapi-schema-generation-node-3-label",
+      "type": "text",
+      "x": 2010,
+      "y": 527.5,
+      "width": 220.00000000000003,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aO",
+      "roundness": null,
+      "seed": 904388858,
+      "version": 1,
+      "versionNonce": 1398753102,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "fastapi-openapi-schema-generation"
+      },
+      "text": "get_model_name_map()",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "fastapi-openapi-schema-generation-node-3",
+      "originalText": "get_model_name_map()",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "fastapi-openapi-schema-generation-node-4-label",
+      "type": "text",
+      "x": 2626.5,
+      "y": 577.5,
+      "width": 187.00000000000003,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aP",
+      "roundness": null,
+      "seed": 1989501401,
+      "version": 1,
+      "versionNonce": 1612814627,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "fastapi-openapi-schema-generation"
+      },
+      "text": "get_definitions()",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "fastapi-openapi-schema-generation-node-4",
+      "originalText": "get_definitions()",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "fastapi-openapi-schema-generation-node-5-label",
+      "type": "text",
+      "x": 631,
+      "y": 327.5,
+      "width": 198.00000000000003,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aQ",
+      "roundness": null,
+      "seed": 1119393404,
+      "version": 1,
+      "versionNonce": 718395656,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "fastapi-openapi-schema-generation"
+      },
+      "text": "get_openapi_path()",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "fastapi-openapi-schema-generation-node-5",
+      "originalText": "get_openapi_path()",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "fastapi-openapi-schema-generation-node-6-label",
+      "type": "text",
+      "x": 1225,
+      "y": 367.5,
+      "width": 330,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aR",
+      "roundness": null,
+      "seed": 382999531,
+      "version": 1,
+      "versionNonce": 947390437,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "fastapi-openapi-schema-generation"
+      },
+      "text": "_get_openapi_dependency_data()",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "fastapi-openapi-schema-generation-node-6",
+      "originalText": "_get_openapi_dependency_data()",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "fastapi-openapi-schema-generation-node-7-label",
+      "type": "text",
+      "x": 1224,
+      "y": 207.5,
+      "width": 352,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aS",
+      "roundness": null,
+      "seed": 1013676982,
+      "version": 1,
+      "versionNonce": 1144396314,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "fastapi-openapi-schema-generation"
+      },
+      "text": "get_openapi_operation_metadata()",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "fastapi-openapi-schema-generation-node-7",
+      "originalText": "get_openapi_operation_metadata()",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "fastapi-openapi-schema-generation-node-8-label",
+      "type": "text",
+      "x": 1227.5,
+      "y": 47.5,
+      "width": 385.00000000000006,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aT",
+      "roundness": null,
+      "seed": 1270357781,
+      "version": 1,
+      "versionNonce": 1113926687,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "fastapi-openapi-schema-generation"
+      },
+      "text": "_get_openapi_operation_parameters()",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "fastapi-openapi-schema-generation-node-8",
+      "originalText": "_get_openapi_operation_parameters()",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "fastapi-openapi-schema-generation-node-9-label",
+      "type": "text",
+      "x": 601.5,
+      "y": 147.5,
+      "width": 77,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aU",
+      "roundness": null,
+      "seed": 1902454088,
+      "version": 1,
+      "versionNonce": 52325796,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "fastapi-openapi-schema-generation"
+      },
+      "text": "OpenAPI",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "fastapi-openapi-schema-generation-node-9",
+      "originalText": "OpenAPI",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "fastapi-openapi-schema-generation-edge-0-label",
+      "type": "text",
+      "x": 356.40000000000003,
+      "y": 585.3333333333334,
+      "width": 52.800000000000004,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aV",
+      "roundness": null,
+      "seed": 1838399538,
+      "version": 1,
+      "versionNonce": 1807941606,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "fastapi-openapi-schema-generation"
+      },
+      "text": "@calls",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "fastapi-openapi-schema-generation-edge-0",
+      "originalText": "@calls",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "fastapi-openapi-schema-generation-edge-1-label",
+      "type": "text",
+      "x": 1005.2666666666668,
+      "y": 522,
+      "width": 52.800000000000004,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aW",
+      "roundness": null,
+      "seed": 227678551,
+      "version": 1,
+      "versionNonce": 126568753,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "fastapi-openapi-schema-generation"
+      },
+      "text": "@feeds",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "fastapi-openapi-schema-generation-edge-1",
+      "originalText": "@feeds",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "fastapi-openapi-schema-generation-edge-2-label",
+      "type": "text",
+      "x": 1771.4,
+      "y": 522,
+      "width": 52.800000000000004,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aX",
+      "roundness": null,
+      "seed": 294956552,
+      "version": 1,
+      "versionNonce": 1802994020,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "fastapi-openapi-schema-generation"
+      },
+      "text": "@feeds",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "fastapi-openapi-schema-generation-edge-2",
+      "originalText": "@feeds",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "fastapi-openapi-schema-generation-edge-3-label",
+      "type": "text",
+      "x": 1706.4,
+      "y": 602,
+      "width": 52.800000000000004,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aY",
+      "roundness": null,
+      "seed": 1685566165,
+      "version": 1,
+      "versionNonce": 566141407,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "fastapi-openapi-schema-generation"
+      },
+      "text": "@feeds",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "fastapi-openapi-schema-generation-edge-3",
+      "originalText": "@feeds",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "fastapi-openapi-schema-generation-edge-4-label",
+      "type": "text",
+      "x": 2422.5333333333333,
+      "y": 522,
+      "width": 52.800000000000004,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aZ",
+      "roundness": null,
+      "seed": 545323598,
+      "version": 1,
+      "versionNonce": 1299900658,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "fastapi-openapi-schema-generation"
+      },
+      "text": "@feeds",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "fastapi-openapi-schema-generation-edge-4",
+      "originalText": "@feeds",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "fastapi-openapi-schema-generation-edge-5-label",
+      "type": "text",
+      "x": 267.23333333333335,
+      "y": 332,
+      "width": 52.800000000000004,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aa",
+      "roundness": null,
+      "seed": 581688483,
+      "version": 1,
+      "versionNonce": 1685314621,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "fastapi-openapi-schema-generation"
+      },
+      "text": "@calls",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "fastapi-openapi-schema-generation-edge-5",
+      "originalText": "@calls",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "fastapi-openapi-schema-generation-edge-6-label",
+      "type": "text",
+      "x": 1006.1,
+      "y": 362,
+      "width": 52.800000000000004,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "ab",
+      "roundness": null,
+      "seed": 341168148,
+      "version": 1,
+      "versionNonce": 1098635616,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "fastapi-openapi-schema-generation"
+      },
+      "text": "@calls",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "fastapi-openapi-schema-generation-edge-6",
+      "originalText": "@calls",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "fastapi-openapi-schema-generation-edge-7-label",
+      "type": "text",
+      "x": 941.1,
+      "y": 202,
+      "width": 52.800000000000004,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "ac",
+      "roundness": null,
+      "seed": 173695569,
+      "version": 1,
+      "versionNonce": 1228846171,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "fastapi-openapi-schema-generation"
+      },
+      "text": "@calls",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "fastapi-openapi-schema-generation-edge-7",
+      "originalText": "@calls",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "fastapi-openapi-schema-generation-edge-8-label",
+      "type": "text",
+      "x": 879.2,
+      "y": 45.099999999999966,
+      "width": 52.800000000000004,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "ad",
+      "roundness": null,
+      "seed": 647320250,
+      "version": 1,
+      "versionNonce": 1013993742,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "fastapi-openapi-schema-generation"
+      },
+      "text": "@calls",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "fastapi-openapi-schema-generation-edge-8",
+      "originalText": "@calls",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "fastapi-openapi-schema-generation-edge-9-label",
+      "type": "text",
+      "x": 213.2,
+      "y": 199.86666666666667,
+      "width": 61.60000000000001,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "ae",
+      "roundness": null,
+      "seed": 973141375,
+      "version": 1,
+      "versionNonce": 432633241,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "fastapi-openapi-schema-generation"
+      },
+      "text": "@builds",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "fastapi-openapi-schema-generation-edge-9",
+      "originalText": "@builds",
+      "autoResize": true,
+      "lineHeight": 1.25
+    }
+  ],
+  "appState": {
+    "gridSize": null,
+    "viewBackgroundColor": "#ffffff"
+  },
+  "files": {},
+  "diagramos": {
+    "version": "0.2.0-rc.6",
+    "schema": 1
+  }
+}

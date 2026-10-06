@@ -1,0 +1,1749 @@
+{
+  "type": "excalidraw",
+  "version": 2,
+  "source": "diagramos",
+  "elements": [
+    {
+      "id": "progress-task-tracking-and-display-refre-title",
+      "type": "text",
+      "x": 0,
+      "y": -115,
+      "width": 554.4000000000001,
+      "height": 30,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a0",
+      "roundness": null,
+      "seed": 1526052510,
+      "version": 1,
+      "versionNonce": 2064271810,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "progress-task-tracking-and-display-refre",
+        "role": "title"
+      },
+      "text": "Progress Task Tracking and Display Refresh",
+      "fontSize": 24,
+      "fontFamily": 5,
+      "textAlign": "left",
+      "verticalAlign": "middle",
+      "containerId": null,
+      "originalText": "Progress Task Tracking and Display Refresh",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "progress-task-tracking-and-display-refre-node-0",
+      "type": "rectangle",
+      "x": 660,
+      "y": 20,
+      "width": 160,
+      "height": 140,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a1",
+      "roundness": {
+        "type": 3
+      },
+      "seed": 1206443649,
+      "version": 1,
+      "versionNonce": 241806795,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "progress-task-tracking-and-display-refre-node-0-label"
+        },
+        {
+          "id": "progress-task-tracking-and-display-refre-edge-0",
+          "type": "arrow"
+        },
+        {
+          "id": "progress-task-tracking-and-display-refre-edge-1",
+          "type": "arrow"
+        },
+        {
+          "id": "progress-task-tracking-and-display-refre-edge-3",
+          "type": "arrow"
+        },
+        {
+          "id": "progress-task-tracking-and-display-refre-edge-4",
+          "type": "arrow"
+        },
+        {
+          "id": "progress-task-tracking-and-display-refre-edge-5",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "progress-task-tracking-and-display-refre",
+        "node": "progress",
+        "ref": "rich/progress.py#Progress"
+      }
+    },
+    {
+      "id": "progress-task-tracking-and-display-refre-node-1",
+      "type": "rectangle",
+      "x": 1340,
+      "y": 180,
+      "width": 160,
+      "height": 100,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a2",
+      "roundness": {
+        "type": 3
+      },
+      "seed": 402385624,
+      "version": 1,
+      "versionNonce": 708940980,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "progress-task-tracking-and-display-refre-node-1-label"
+        },
+        {
+          "id": "progress-task-tracking-and-display-refre-edge-0",
+          "type": "arrow"
+        },
+        {
+          "id": "progress-task-tracking-and-display-refre-edge-1",
+          "type": "arrow"
+        },
+        {
+          "id": "progress-task-tracking-and-display-refre-edge-2",
+          "type": "arrow"
+        },
+        {
+          "id": "progress-task-tracking-and-display-refre-edge-8",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "progress-task-tracking-and-display-refre",
+        "node": "task",
+        "ref": "rich/progress.py#Task"
+      }
+    },
+    {
+      "id": "progress-task-tracking-and-display-refre-node-2",
+      "type": "rectangle",
+      "x": 1960,
+      "y": 180,
+      "width": 220,
+      "height": 100,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a3",
+      "roundness": {
+        "type": 3
+      },
+      "seed": 1077665159,
+      "version": 1,
+      "versionNonce": 840950433,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "progress-task-tracking-and-display-refre-node-2-label"
+        },
+        {
+          "id": "progress-task-tracking-and-display-refre-edge-2",
+          "type": "arrow"
+        },
+        {
+          "id": "progress-task-tracking-and-display-refre-edge-8",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "progress-task-tracking-and-display-refre",
+        "node": "sample",
+        "ref": "rich/progress.py#ProgressSample"
+      }
+    },
+    {
+      "id": "progress-task-tracking-and-display-refre-node-3",
+      "type": "rectangle",
+      "x": 20,
+      "y": 40,
+      "width": 160,
+      "height": 80,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a4",
+      "roundness": {
+        "type": 3
+      },
+      "seed": 1889581302,
+      "version": 1,
+      "versionNonce": 1297286234,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "progress-task-tracking-and-display-refre-node-3-label"
+        },
+        {
+          "id": "progress-task-tracking-and-display-refre-edge-3",
+          "type": "arrow"
+        },
+        {
+          "id": "progress-task-tracking-and-display-refre-edge-4",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "progress-task-tracking-and-display-refre",
+        "node": "live",
+        "ref": "rich/live.py#Live"
+      }
+    },
+    {
+      "id": "progress-task-tracking-and-display-refre-node-4",
+      "type": "rectangle",
+      "x": 1320,
+      "y": 20,
+      "width": 220,
+      "height": 80,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a5",
+      "roundness": {
+        "type": 3
+      },
+      "seed": 129873965,
+      "version": 1,
+      "versionNonce": 1107752087,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "progress-task-tracking-and-display-refre-node-4-label"
+        },
+        {
+          "id": "progress-task-tracking-and-display-refre-edge-5",
+          "type": "arrow"
+        },
+        {
+          "id": "progress-task-tracking-and-display-refre-edge-6",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "progress-task-tracking-and-display-refre",
+        "node": "column",
+        "ref": "rich/progress.py#ProgressColumn"
+      }
+    },
+    {
+      "id": "progress-task-tracking-and-display-refre-node-5",
+      "type": "rectangle",
+      "x": 1980,
+      "y": 20,
+      "width": 160,
+      "height": 80,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a6",
+      "roundness": {
+        "type": 3
+      },
+      "seed": 1214913108,
+      "version": 1,
+      "versionNonce": 339726752,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "progress-task-tracking-and-display-refre-node-5-label"
+        },
+        {
+          "id": "progress-task-tracking-and-display-refre-edge-6",
+          "type": "arrow"
+        },
+        {
+          "id": "progress-task-tracking-and-display-refre-edge-7",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "progress-task-tracking-and-display-refre",
+        "node": "table",
+        "ref": "rich/table.py#Table"
+      }
+    },
+    {
+      "id": "progress-task-tracking-and-display-refre-node-6",
+      "type": "rectangle",
+      "x": 2500,
+      "y": 20,
+      "width": 160,
+      "height": 80,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a7",
+      "roundness": {
+        "type": 3
+      },
+      "seed": 1793090947,
+      "version": 1,
+      "versionNonce": 1533360029,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "progress-task-tracking-and-display-refre-node-6-label"
+        },
+        {
+          "id": "progress-task-tracking-and-display-refre-edge-7",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "progress-task-tracking-and-display-refre",
+        "node": "console",
+        "ref": "rich/console.py#Console"
+      }
+    },
+    {
+      "id": "progress-task-tracking-and-display-refre-edge-0",
+      "type": "arrow",
+      "x": 814.4,
+      "y": 122,
+      "width": 530.0000000000001,
+      "height": 116.66666666666666,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a8",
+      "roundness": null,
+      "seed": 710507382,
+      "version": 1,
+      "versionNonce": 724382682,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "progress-task-tracking-and-display-refre-edge-0-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "progress-task-tracking-and-display-refre",
+        "edge": {
+          "from": "progress",
+          "to": "task",
+          "claim": "builds"
+        }
+      },
+      "points": [
+        [
+          0.5,
+          0
+        ],
+        [
+          32,
+          0
+        ],
+        [
+          32,
+          108.33333333333331
+        ],
+        [
+          215.0000000000001,
+          108.33333333333331
+        ],
+        [
+          392.0000000000001,
+          108.33333333333331
+        ],
+        [
+          392.0000000000001,
+          116.66666666666666
+        ],
+        [
+          529.5000000000001,
+          116.66666666666666
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "progress-task-tracking-and-display-refre-node-0",
+        "focus": 0.457142857142857,
+        "gap": 5.600000000000023
+      },
+      "endBinding": {
+        "elementId": "progress-task-tracking-and-display-refre-node-1",
+        "focus": -0.17333333333333234,
+        "gap": 4.400000000000091
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "progress-task-tracking-and-display-refre-edge-1",
+      "type": "arrow",
+      "x": 814.4,
+      "y": 87,
+      "width": 530.0000000000001,
+      "height": 118.33333333333331,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a9",
+      "roundness": null,
+      "seed": 2046074887,
+      "version": 1,
+      "versionNonce": 268046881,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "progress-task-tracking-and-display-refre-edge-1-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "progress-task-tracking-and-display-refre",
+        "edge": {
+          "from": "progress",
+          "to": "task",
+          "claim": "holds"
+        }
+      },
+      "points": [
+        [
+          0.5,
+          0
+        ],
+        [
+          56,
+          0
+        ],
+        [
+          56,
+          118.33333333333331
+        ],
+        [
+          205.83333333333337,
+          118.33333333333331
+        ],
+        [
+          367.91666666666663,
+          118.33333333333331
+        ],
+        [
+          448.95833333333337,
+          118.33333333333331
+        ],
+        [
+          529.5000000000001,
+          118.33333333333331
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "progress-task-tracking-and-display-refre-node-0",
+        "focus": -0.042857142857142976,
+        "gap": 5.600000000000023
+      },
+      "endBinding": {
+        "elementId": "progress-task-tracking-and-display-refre-node-1",
+        "focus": 0.4933333333333338,
+        "gap": 4.400000000000091
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "progress-task-tracking-and-display-refre-edge-2",
+      "type": "arrow",
+      "x": 1504.4,
+      "y": 238.66666666666666,
+      "width": 450.79999999999995,
+      "height": 0,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aA",
+      "roundness": null,
+      "seed": 1370795352,
+      "version": 1,
+      "versionNonce": 136037428,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "progress-task-tracking-and-display-refre-edge-2-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "progress-task-tracking-and-display-refre",
+        "edge": {
+          "from": "task",
+          "to": "sample",
+          "claim": "holds"
+        }
+      },
+      "points": [
+        [
+          0.5,
+          0
+        ],
+        [
+          225.4000000000001,
+          0
+        ],
+        [
+          450.29999999999995,
+          0
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "progress-task-tracking-and-display-refre-node-1",
+        "focus": 0.17333333333333234,
+        "gap": 4.400000000000091
+      },
+      "endBinding": {
+        "elementId": "progress-task-tracking-and-display-refre-node-2",
+        "focus": -0.17333333333332931,
+        "gap": 4.7999999999999545
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "progress-task-tracking-and-display-refre-edge-3",
+      "type": "arrow",
+      "x": 654.4,
+      "y": 110.33333333333333,
+      "width": 482.4,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aB",
+      "roundness": null,
+      "seed": 27369729,
+      "version": 1,
+      "versionNonce": 1816386891,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "progress-task-tracking-and-display-refre-edge-3-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "progress-task-tracking-and-display-refre",
+        "edge": {
+          "from": "progress",
+          "to": "live",
+          "claim": "calls"
+        }
+      },
+      "points": [
+        [
+          -0.5,
+          0
+        ],
+        [
+          -108,
+          0
+        ],
+        [
+          -108,
+          -20
+        ],
+        [
+          -231.2,
+          -20
+        ],
+        [
+          -356.79999999999995,
+          -20
+        ],
+        [
+          -419.59999999999997,
+          -20
+        ],
+        [
+          -481.9,
+          -20
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "progress-task-tracking-and-display-refre-node-0",
+        "focus": -0.29047619047618994,
+        "gap": 5.600000000000023
+      },
+      "endBinding": {
+        "elementId": "progress-task-tracking-and-display-refre-node-3",
+        "focus": 0.25833333333333297,
+        "gap": 8
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "progress-task-tracking-and-display-refre-edge-4",
+      "type": "arrow",
+      "x": 172,
+      "y": 63.666666666666664,
+      "width": 482.4,
+      "height": 0,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aC",
+      "roundness": null,
+      "seed": 1996778642,
+      "version": 1,
+      "versionNonce": 1747107782,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "progress-task-tracking-and-display-refre-edge-4-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "progress-task-tracking-and-display-refre",
+        "edge": {
+          "from": "live",
+          "to": "progress",
+          "claim": "calls"
+        }
+      },
+      "points": [
+        [
+          0.5,
+          0
+        ],
+        [
+          241.2,
+          0
+        ],
+        [
+          481.9,
+          0
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "progress-task-tracking-and-display-refre-node-3",
+        "focus": -0.4083333333333332,
+        "gap": 8
+      },
+      "endBinding": {
+        "elementId": "progress-task-tracking-and-display-refre-node-0",
+        "focus": 0.3761904761904761,
+        "gap": 5.600000000000023
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "progress-task-tracking-and-display-refre-edge-5",
+      "type": "arrow",
+      "x": 814.4,
+      "y": 52,
+      "width": 500.0000000000001,
+      "height": 0,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aD",
+      "roundness": null,
+      "seed": 614017027,
+      "version": 1,
+      "versionNonce": 960456477,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "progress-task-tracking-and-display-refre-edge-5-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "progress-task-tracking-and-display-refre",
+        "edge": {
+          "from": "progress",
+          "to": "column",
+          "claim": "calls"
+        }
+      },
+      "points": [
+        [
+          0.5,
+          0
+        ],
+        [
+          250.0000000000001,
+          0
+        ],
+        [
+          499.5000000000001,
+          0
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "progress-task-tracking-and-display-refre-node-0",
+        "focus": -0.542857142857143,
+        "gap": 5.600000000000023
+      },
+      "endBinding": {
+        "elementId": "progress-task-tracking-and-display-refre-node-4",
+        "focus": 0.2,
+        "gap": 5.599999999999909
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "progress-task-tracking-and-display-refre-edge-6",
+      "type": "arrow",
+      "x": 1534.4,
+      "y": 52,
+      "width": 450.79999999999995,
+      "height": 0,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aE",
+      "roundness": null,
+      "seed": 35839188,
+      "version": 1,
+      "versionNonce": 1914306848,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "progress-task-tracking-and-display-refre-edge-6-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "progress-task-tracking-and-display-refre",
+        "edge": {
+          "from": "column",
+          "to": "table"
+        }
+      },
+      "points": [
+        [
+          0.5,
+          0
+        ],
+        [
+          225.4000000000001,
+          0
+        ],
+        [
+          450.29999999999995,
+          0
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "progress-task-tracking-and-display-refre-node-4",
+        "focus": -0.2,
+        "gap": 5.599999999999909
+      },
+      "endBinding": {
+        "elementId": "progress-task-tracking-and-display-refre-node-5",
+        "focus": 0.2,
+        "gap": 5.2000000000000455
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "progress-task-tracking-and-display-refre-edge-7",
+      "type": "arrow",
+      "x": 2145.2,
+      "y": 52,
+      "width": 362.8000000000002,
+      "height": 0,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aF",
+      "roundness": null,
+      "seed": 1098283693,
+      "version": 1,
+      "versionNonce": 534848535,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "progress-task-tracking-and-display-refre-edge-7-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "progress-task-tracking-and-display-refre",
+        "edge": {
+          "from": "table",
+          "to": "console"
+        }
+      },
+      "points": [
+        [
+          0.5,
+          0
+        ],
+        [
+          181.4000000000001,
+          0
+        ],
+        [
+          362.3000000000002,
+          0
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "progress-task-tracking-and-display-refre-node-5",
+        "focus": -0.2,
+        "gap": 5.199999999999818
+      },
+      "endBinding": {
+        "elementId": "progress-task-tracking-and-display-refre-node-6",
+        "focus": 0.2,
+        "gap": 8
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "progress-task-tracking-and-display-refre-edge-8",
+      "type": "arrow",
+      "x": 1504.4,
+      "y": 205.33333333333331,
+      "width": 450.79999999999995,
+      "height": 0,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aG",
+      "roundness": null,
+      "seed": 1759568686,
+      "version": 1,
+      "versionNonce": 1509719378,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "progress-task-tracking-and-display-refre-edge-8-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "progress-task-tracking-and-display-refre",
+        "edge": {
+          "from": "task",
+          "to": "sample",
+          "claim": "accesses"
+        }
+      },
+      "points": [
+        [
+          0.5,
+          0
+        ],
+        [
+          225.4000000000001,
+          0
+        ],
+        [
+          450.29999999999995,
+          0
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "progress-task-tracking-and-display-refre-node-1",
+        "focus": -0.4933333333333338,
+        "gap": 4.400000000000091
+      },
+      "endBinding": {
+        "elementId": "progress-task-tracking-and-display-refre-node-2",
+        "focus": 0.493333333333335,
+        "gap": 4.7999999999999545
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "progress-task-tracking-and-display-refre-node-0-label",
+      "type": "text",
+      "x": 696,
+      "y": 77.5,
+      "width": 88,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aH",
+      "roundness": null,
+      "seed": 1048465112,
+      "version": 1,
+      "versionNonce": 1233453236,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "progress-task-tracking-and-display-refre"
+      },
+      "text": "Progress",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "progress-task-tracking-and-display-refre-node-0",
+      "originalText": "Progress",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "progress-task-tracking-and-display-refre-node-1-label",
+      "type": "text",
+      "x": 1398,
+      "y": 217.5,
+      "width": 44,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aI",
+      "roundness": null,
+      "seed": 929242533,
+      "version": 1,
+      "versionNonce": 1846714671,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "progress-task-tracking-and-display-refre"
+      },
+      "text": "Task",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "progress-task-tracking-and-display-refre-node-1",
+      "originalText": "Task",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "progress-task-tracking-and-display-refre-node-2-label",
+      "type": "text",
+      "x": 1993,
+      "y": 217.5,
+      "width": 154,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aJ",
+      "roundness": null,
+      "seed": 100698882,
+      "version": 1,
+      "versionNonce": 294147702,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "progress-task-tracking-and-display-refre"
+      },
+      "text": "ProgressSample",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "progress-task-tracking-and-display-refre-node-2",
+      "originalText": "ProgressSample",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "progress-task-tracking-and-display-refre-node-3-label",
+      "type": "text",
+      "x": 78,
+      "y": 67.5,
+      "width": 44,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aK",
+      "roundness": null,
+      "seed": 1062608295,
+      "version": 1,
+      "versionNonce": 678588481,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "progress-task-tracking-and-display-refre"
+      },
+      "text": "Live",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "progress-task-tracking-and-display-refre-node-3",
+      "originalText": "Live",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "progress-task-tracking-and-display-refre-node-4-label",
+      "type": "text",
+      "x": 1353,
+      "y": 47.5,
+      "width": 154,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aL",
+      "roundness": null,
+      "seed": 1196258020,
+      "version": 1,
+      "versionNonce": 1057397616,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "progress-task-tracking-and-display-refre"
+      },
+      "text": "ProgressColumn",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "progress-task-tracking-and-display-refre-node-4",
+      "originalText": "ProgressColumn",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "progress-task-tracking-and-display-refre-node-5-label",
+      "type": "text",
+      "x": 2032.5,
+      "y": 47.5,
+      "width": 55.00000000000001,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aM",
+      "roundness": null,
+      "seed": 1023506849,
+      "version": 1,
+      "versionNonce": 2082426219,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "progress-task-tracking-and-display-refre"
+      },
+      "text": "Table",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "progress-task-tracking-and-display-refre-node-5",
+      "originalText": "Table",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "progress-task-tracking-and-display-refre-node-6-label",
+      "type": "text",
+      "x": 2541.5,
+      "y": 47.5,
+      "width": 77,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aN",
+      "roundness": null,
+      "seed": 708016926,
+      "version": 1,
+      "versionNonce": 960929602,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "progress-task-tracking-and-display-refre"
+      },
+      "text": "Console",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "progress-task-tracking-and-display-refre-node-6",
+      "originalText": "Console",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "progress-task-tracking-and-display-refre-edge-0-label",
+      "type": "text",
+      "x": 950.2,
+      "y": 220.33333333333331,
+      "width": 158.4,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aO",
+      "roundness": null,
+      "seed": 1010093095,
+      "version": 1,
+      "versionNonce": 989799361,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "progress-task-tracking-and-display-refre"
+      },
+      "text": "add_task() @builds",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "progress-task-tracking-and-display-refre-edge-0",
+      "originalText": "add_task() @builds",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "progress-task-tracking-and-display-refre-edge-1-label",
+      "type": "text",
+      "x": 963.0333333333333,
+      "y": 195.33333333333331,
+      "width": 114.4,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aP",
+      "roundness": null,
+      "seed": 48183682,
+      "version": 1,
+      "versionNonce": 605358582,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "progress-task-tracking-and-display-refre"
+      },
+      "text": "_tasks @holds",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "progress-task-tracking-and-display-refre-edge-1",
+      "originalText": "_tasks @holds",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "progress-task-tracking-and-display-refre-edge-2-label",
+      "type": "text",
+      "x": 1659.4,
+      "y": 228.66666666666666,
+      "width": 140.8,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aQ",
+      "roundness": null,
+      "seed": 876727333,
+      "version": 1,
+      "versionNonce": 10441903,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "progress-task-tracking-and-display-refre"
+      },
+      "text": "_progress @holds",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "progress-task-tracking-and-display-refre-edge-2",
+      "originalText": "_progress @holds",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "progress-task-tracking-and-display-refre-edge-3-label",
+      "type": "text",
+      "x": 352.79999999999995,
+      "y": 80.33333333333333,
+      "width": 140.8,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aR",
+      "roundness": null,
+      "seed": 995949912,
+      "version": 1,
+      "versionNonce": 1544664116,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "progress-task-tracking-and-display-refre"
+      },
+      "text": "refresh() @calls",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "progress-task-tracking-and-display-refre-edge-3",
+      "originalText": "refresh() @calls",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "progress-task-tracking-and-display-refre-edge-4-label",
+      "type": "text",
+      "x": 312,
+      "y": 53.666666666666664,
+      "width": 202.4,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aS",
+      "roundness": null,
+      "seed": 702804659,
+      "version": 1,
+      "versionNonce": 707169677,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "progress-task-tracking-and-display-refre"
+      },
+      "text": "get_renderable() @calls",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "progress-task-tracking-and-display-refre-edge-4",
+      "originalText": "get_renderable() @calls",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "progress-task-tracking-and-display-refre-edge-5-label",
+      "type": "text",
+      "x": 954.4000000000001,
+      "y": 42,
+      "width": 220.00000000000003,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aT",
+      "roundness": null,
+      "seed": 655501726,
+      "version": 1,
+      "versionNonce": 1272140482,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "progress-task-tracking-and-display-refre"
+      },
+      "text": "make_tasks_table() @calls",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "progress-task-tracking-and-display-refre-edge-5",
+      "originalText": "make_tasks_table() @calls",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "progress-task-tracking-and-display-refre-edge-6-label",
+      "type": "text",
+      "x": 1733.4,
+      "y": 42,
+      "width": 52.800000000000004,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aU",
+      "roundness": null,
+      "seed": 970991649,
+      "version": 1,
+      "versionNonce": 246153451,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "progress-task-tracking-and-display-refre"
+      },
+      "text": "format",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "progress-task-tracking-and-display-refre-edge-6",
+      "originalText": "format",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "progress-task-tracking-and-display-refre-edge-7-label",
+      "type": "text",
+      "x": 2300.2,
+      "y": 42,
+      "width": 52.800000000000004,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aV",
+      "roundness": null,
+      "seed": 1143742820,
+      "version": 1,
+      "versionNonce": 1368608496,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "progress-task-tracking-and-display-refre"
+      },
+      "text": "render",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "progress-task-tracking-and-display-refre-edge-7",
+      "originalText": "render",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "progress-task-tracking-and-display-refre-edge-8-label",
+      "type": "text",
+      "x": 1663.8000000000002,
+      "y": 195.33333333333331,
+      "width": 132,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aW",
+      "roundness": null,
+      "seed": 1205139791,
+      "version": 1,
+      "versionNonce": 153708073,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "progress-task-tracking-and-display-refre"
+      },
+      "text": "speed @accesses",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "progress-task-tracking-and-display-refre-edge-8",
+      "originalText": "speed @accesses",
+      "autoResize": true,
+      "lineHeight": 1.25
+    }
+  ],
+  "appState": {
+    "gridSize": null,
+    "viewBackgroundColor": "#ffffff"
+  },
+  "files": {},
+  "diagramos": {
+    "version": "0.2.0-rc.6",
+    "schema": 1
+  }
+}

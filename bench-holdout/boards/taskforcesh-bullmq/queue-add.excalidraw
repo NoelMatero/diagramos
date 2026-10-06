@@ -1,0 +1,1956 @@
+{
+  "type": "excalidraw",
+  "version": 2,
+  "source": "diagramos",
+  "elements": [
+    {
+      "id": "queue-add-job-creation-redis-persistence-title",
+      "type": "text",
+      "x": 0,
+      "y": -115,
+      "width": 567.6,
+      "height": 30,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a0",
+      "roundness": null,
+      "seed": 1049470684,
+      "version": 1,
+      "versionNonce": 209816296,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "queue-add-job-creation-redis-persistence",
+        "role": "title",
+        "direction": "DOWN"
+      },
+      "text": "Queue.add: Job Creation & Redis Persistence",
+      "fontSize": 24,
+      "fontFamily": 5,
+      "textAlign": "left",
+      "verticalAlign": "middle",
+      "containerId": null,
+      "originalText": "Queue.add: Job Creation & Redis Persistence",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "queue-add-job-creation-redis-persistence-node-0",
+      "type": "rectangle",
+      "x": 120,
+      "y": 20,
+      "width": 160,
+      "height": 80,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a1",
+      "roundness": null,
+      "seed": 1063812747,
+      "version": 1,
+      "versionNonce": 2047796485,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "queue-add-job-creation-redis-persistence-node-0-label"
+        },
+        {
+          "id": "queue-add-job-creation-redis-persistence-edge-0",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "queue-add-job-creation-redis-persistence",
+        "node": "queue_add",
+        "ref": "src/classes/queue.ts#add"
+      }
+    },
+    {
+      "id": "queue-add-job-creation-redis-persistence-node-1",
+      "type": "rectangle",
+      "x": 120,
+      "y": 400,
+      "width": 180,
+      "height": 80,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a2",
+      "roundness": null,
+      "seed": 1373857402,
+      "version": 1,
+      "versionNonce": 1616015310,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "queue-add-job-creation-redis-persistence-node-1-label"
+        },
+        {
+          "id": "queue-add-job-creation-redis-persistence-edge-0",
+          "type": "arrow"
+        },
+        {
+          "id": "queue-add-job-creation-redis-persistence-edge-1",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "queue-add-job-creation-redis-persistence",
+        "node": "queue_addjob",
+        "ref": "src/classes/queue.ts#addJob"
+      }
+    },
+    {
+      "id": "queue-add-job-creation-redis-persistence-node-2",
+      "type": "rectangle",
+      "x": 120,
+      "y": 780,
+      "width": 160,
+      "height": 80,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a3",
+      "roundness": null,
+      "seed": 1997101397,
+      "version": 1,
+      "versionNonce": 1560788319,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "queue-add-job-creation-redis-persistence-node-2-label"
+        },
+        {
+          "id": "queue-add-job-creation-redis-persistence-edge-1",
+          "type": "arrow"
+        },
+        {
+          "id": "queue-add-job-creation-redis-persistence-edge-2",
+          "type": "arrow"
+        },
+        {
+          "id": "queue-add-job-creation-redis-persistence-edge-3",
+          "type": "arrow"
+        },
+        {
+          "id": "queue-add-job-creation-redis-persistence-edge-4",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "queue-add-job-creation-redis-persistence",
+        "node": "job_create",
+        "ref": "src/classes/job.ts#create"
+      }
+    },
+    {
+      "id": "queue-add-job-creation-redis-persistence-node-3",
+      "type": "rectangle",
+      "x": 740,
+      "y": 1160,
+      "width": 240,
+      "height": 80,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a4",
+      "roundness": null,
+      "seed": 242504380,
+      "version": 1,
+      "versionNonce": 1956703816,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "queue-add-job-creation-redis-persistence-node-3-label"
+        },
+        {
+          "id": "queue-add-job-creation-redis-persistence-edge-2",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "queue-add-job-creation-redis-persistence",
+        "node": "job_instance",
+        "ref": "src/classes/job.ts"
+      }
+    },
+    {
+      "id": "queue-add-job-creation-redis-persistence-node-4",
+      "type": "rectangle",
+      "x": 80,
+      "y": 1160,
+      "width": 180,
+      "height": 80,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a5",
+      "roundness": null,
+      "seed": 351393199,
+      "version": 1,
+      "versionNonce": 228111881,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "queue-add-job-creation-redis-persistence-node-4-label"
+        },
+        {
+          "id": "queue-add-job-creation-redis-persistence-edge-3",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "queue-add-job-creation-redis-persistence",
+        "node": "job_asjson",
+        "ref": "src/classes/job.ts#asJSON"
+      }
+    },
+    {
+      "id": "queue-add-job-creation-redis-persistence-node-5",
+      "type": "rectangle",
+      "x": 340,
+      "y": 1160,
+      "width": 320,
+      "height": 80,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a6",
+      "roundness": null,
+      "seed": 958749278,
+      "version": 1,
+      "versionNonce": 1830153090,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "queue-add-job-creation-redis-persistence-node-5-label"
+        },
+        {
+          "id": "queue-add-job-creation-redis-persistence-edge-4",
+          "type": "arrow"
+        },
+        {
+          "id": "queue-add-job-creation-redis-persistence-edge-5",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "queue-add-job-creation-redis-persistence",
+        "node": "backend_addjob",
+        "ref": "src/classes/redis-queue-backend.ts#addJob"
+      }
+    },
+    {
+      "id": "queue-add-job-creation-redis-persistence-node-6",
+      "type": "rectangle",
+      "x": 360,
+      "y": 1540,
+      "width": 260,
+      "height": 80,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a7",
+      "roundness": null,
+      "seed": 475364617,
+      "version": 1,
+      "versionNonce": 2091831955,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "queue-add-job-creation-redis-persistence-node-6-label"
+        },
+        {
+          "id": "queue-add-job-creation-redis-persistence-edge-5",
+          "type": "arrow"
+        },
+        {
+          "id": "queue-add-job-creation-redis-persistence-edge-6",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "queue-add-job-creation-redis-persistence",
+        "node": "backend_addjobtrans",
+        "ref": "src/classes/redis-queue-backend.ts#addJobToTransaction",
+        "claim": {
+          "handles": true,
+          "cases": [
+            "standard",
+            "delayed",
+            "prioritized",
+            "parent"
+          ],
+          "of": "job options"
+        }
+      }
+    },
+    {
+      "id": "queue-add-job-creation-redis-persistence-node-7",
+      "type": "rectangle",
+      "x": 400,
+      "y": 1920,
+      "width": 180,
+      "height": 80,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a8",
+      "roundness": null,
+      "seed": 874802624,
+      "version": 1,
+      "versionNonce": 1583340444,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "queue-add-job-creation-redis-persistence-node-7-label"
+        },
+        {
+          "id": "queue-add-job-creation-redis-persistence-edge-6",
+          "type": "arrow"
+        },
+        {
+          "id": "queue-add-job-creation-redis-persistence-edge-7",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "queue-add-job-creation-redis-persistence",
+        "node": "backend_execcommand",
+        "ref": "src/classes/redis-queue-backend.ts#execCommand"
+      }
+    },
+    {
+      "id": "queue-add-job-creation-redis-persistence-node-8",
+      "type": "ellipse",
+      "x": 340,
+      "y": 2300,
+      "width": 300,
+      "height": 160,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "dotted",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a9",
+      "roundness": null,
+      "seed": 749642547,
+      "version": 1,
+      "versionNonce": 255485709,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "queue-add-job-creation-redis-persistence-node-8-label"
+        },
+        {
+          "id": "queue-add-job-creation-redis-persistence-edge-7",
+          "type": "arrow"
+        },
+        {
+          "id": "queue-add-job-creation-redis-persistence-edge-8",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "queue-add-job-creation-redis-persistence",
+        "node": "redis_script",
+        "state": "external"
+      }
+    },
+    {
+      "id": "queue-add-job-creation-redis-persistence-node-9",
+      "type": "ellipse",
+      "x": 340,
+      "y": 2760,
+      "width": 320,
+      "height": 120,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "dotted",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aA",
+      "roundness": null,
+      "seed": 1483042434,
+      "version": 1,
+      "versionNonce": 1180334326,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "queue-add-job-creation-redis-persistence-node-9-label"
+        },
+        {
+          "id": "queue-add-job-creation-redis-persistence-edge-8",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "queue-add-job-creation-redis-persistence",
+        "node": "redis_keys",
+        "state": "external"
+      }
+    },
+    {
+      "id": "queue-add-job-creation-redis-persistence-edge-0",
+      "type": "arrow",
+      "x": 202.8,
+      "y": 92,
+      "width": 0,
+      "height": 300.8,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aB",
+      "roundness": null,
+      "seed": 582879004,
+      "version": 1,
+      "versionNonce": 78136872,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "queue-add-job-creation-redis-persistence-edge-0-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "queue-add-job-creation-redis-persistence",
+        "edge": {
+          "from": "queue_add",
+          "to": "queue_addjob",
+          "claim": "calls"
+        }
+      },
+      "points": [
+        [
+          0,
+          0.5
+        ],
+        [
+          0,
+          150.4
+        ],
+        [
+          0,
+          300.3
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "queue-add-job-creation-redis-persistence-node-0",
+        "focus": -0.0350000000000001,
+        "gap": 8
+      },
+      "endBinding": {
+        "elementId": "queue-add-job-creation-redis-persistence-node-1",
+        "focus": -0.08000000000000011,
+        "gap": 7.199999999999989
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "queue-add-job-creation-redis-persistence-edge-1",
+      "type": "arrow",
+      "x": 202.8,
+      "y": 472.8,
+      "width": 0,
+      "height": 300.7999999999999,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aC",
+      "roundness": null,
+      "seed": 934123829,
+      "version": 1,
+      "versionNonce": 366217151,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "queue-add-job-creation-redis-persistence-edge-1-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "queue-add-job-creation-redis-persistence",
+        "edge": {
+          "from": "queue_addjob",
+          "to": "job_create",
+          "claim": "calls"
+        }
+      },
+      "points": [
+        [
+          0,
+          0.5
+        ],
+        [
+          0,
+          150.39999999999992
+        ],
+        [
+          0,
+          300.2999999999999
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "queue-add-job-creation-redis-persistence-node-1",
+        "focus": 0.07999999999999986,
+        "gap": 7.199999999999989
+      },
+      "endBinding": {
+        "elementId": "queue-add-job-creation-redis-persistence-node-2",
+        "focus": 0.034999999999999996,
+        "gap": 6.400000000000091
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "queue-add-job-creation-redis-persistence-edge-2",
+      "type": "arrow",
+      "x": 242.8,
+      "y": 853.5999999999999,
+      "width": 610,
+      "height": 300.79999999999995,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aD",
+      "roundness": null,
+      "seed": 2140593498,
+      "version": 1,
+      "versionNonce": 504760366,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "queue-add-job-creation-redis-persistence-edge-2-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "queue-add-job-creation-redis-persistence",
+        "edge": {
+          "from": "job_create",
+          "to": "job_instance",
+          "claim": "builds"
+        }
+      },
+      "points": [
+        [
+          0,
+          0.5
+        ],
+        [
+          0,
+          32
+        ],
+        [
+          423.40000000000003,
+          32
+        ],
+        [
+          610,
+          32
+        ],
+        [
+          610,
+          300.29999999999995
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "queue-add-job-creation-redis-persistence-node-2",
+        "focus": -0.5349999999999999,
+        "gap": 6.400000000000091
+      },
+      "endBinding": {
+        "elementId": "queue-add-job-creation-redis-persistence-node-3",
+        "focus": -0.060000000000000574,
+        "gap": 5.600000000000136
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "queue-add-job-creation-redis-persistence-edge-3",
+      "type": "arrow",
+      "x": 162.8,
+      "y": 853.5999999999999,
+      "width": 0,
+      "height": 300.79999999999995,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aE",
+      "roundness": null,
+      "seed": 1404187371,
+      "version": 1,
+      "versionNonce": 169229541,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "queue-add-job-creation-redis-persistence-edge-3-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "queue-add-job-creation-redis-persistence",
+        "edge": {
+          "from": "job_create",
+          "to": "job_asjson",
+          "claim": "calls"
+        }
+      },
+      "points": [
+        [
+          0,
+          0.5
+        ],
+        [
+          0,
+          150.39999999999998
+        ],
+        [
+          0,
+          300.29999999999995
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "queue-add-job-creation-redis-persistence-node-2",
+        "focus": 0.4650000000000001,
+        "gap": 6.400000000000091
+      },
+      "endBinding": {
+        "elementId": "queue-add-job-creation-redis-persistence-node-4",
+        "focus": -0.08000000000000008,
+        "gap": 5.600000000000136
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "queue-add-job-creation-redis-persistence-edge-4",
+      "type": "arrow",
+      "x": 202.8,
+      "y": 853.5999999999999,
+      "width": 290.00000000000006,
+      "height": 300.79999999999995,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aF",
+      "roundness": null,
+      "seed": 1215177248,
+      "version": 1,
+      "versionNonce": 1852153980,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "queue-add-job-creation-redis-persistence-edge-4-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "queue-add-job-creation-redis-persistence",
+        "edge": {
+          "from": "job_create",
+          "to": "backend_addjob",
+          "claim": "calls"
+        }
+      },
+      "points": [
+        [
+          -0.5,
+          0.5
+        ],
+        [
+          0,
+          56
+        ],
+        [
+          239.39999999999998,
+          56
+        ],
+        [
+          290.00000000000006,
+          56
+        ],
+        [
+          290.5,
+          300.29999999999995
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "queue-add-job-creation-redis-persistence-node-2",
+        "focus": -0.034999999999999996,
+        "gap": 6.400000000000091
+      },
+      "endBinding": {
+        "elementId": "queue-add-job-creation-redis-persistence-node-5",
+        "focus": -0.044999999999999866,
+        "gap": 5.600000000000136
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "queue-add-job-creation-redis-persistence-edge-5",
+      "type": "arrow",
+      "x": 492.8,
+      "y": 1234.3999999999999,
+      "width": 0,
+      "height": 300.79999999999995,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aG",
+      "roundness": null,
+      "seed": 775963369,
+      "version": 1,
+      "versionNonce": 980577011,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "queue-add-job-creation-redis-persistence-edge-5-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "queue-add-job-creation-redis-persistence",
+        "edge": {
+          "from": "backend_addjob",
+          "to": "backend_addjobtrans",
+          "claim": "calls"
+        }
+      },
+      "points": [
+        [
+          0,
+          0.5
+        ],
+        [
+          0,
+          150.39999999999986
+        ],
+        [
+          0,
+          300.29999999999995
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "queue-add-job-creation-redis-persistence-node-5",
+        "focus": 0.044999999999999866,
+        "gap": 5.600000000000136
+      },
+      "endBinding": {
+        "elementId": "queue-add-job-creation-redis-persistence-node-6",
+        "focus": 0.02153846153846155,
+        "gap": 4.800000000000182
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "queue-add-job-creation-redis-persistence-edge-6",
+      "type": "arrow",
+      "x": 492.8,
+      "y": 1615.1999999999998,
+      "width": 0,
+      "height": 300.79999999999995,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aH",
+      "roundness": null,
+      "seed": 515113406,
+      "version": 1,
+      "versionNonce": 1440055394,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "queue-add-job-creation-redis-persistence-edge-6-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "queue-add-job-creation-redis-persistence",
+        "edge": {
+          "from": "backend_addjobtrans",
+          "to": "backend_execcommand",
+          "claim": "calls"
+        }
+      },
+      "points": [
+        [
+          0,
+          0.5
+        ],
+        [
+          0,
+          150.4000000000001
+        ],
+        [
+          0,
+          300.29999999999995
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "queue-add-job-creation-redis-persistence-node-6",
+        "focus": -0.02153846153846155,
+        "gap": 4.800000000000182
+      },
+      "endBinding": {
+        "elementId": "queue-add-job-creation-redis-persistence-node-7",
+        "focus": 0.031111111111110614,
+        "gap": 4.000000000000227
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "queue-add-job-creation-redis-persistence-edge-7",
+      "type": "arrow",
+      "x": 492.8,
+      "y": 1995.9999999999998,
+      "width": 0,
+      "height": 300.8000000000004,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aI",
+      "roundness": null,
+      "seed": 691664655,
+      "version": 1,
+      "versionNonce": 496925417,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "queue-add-job-creation-redis-persistence-edge-7-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "queue-add-job-creation-redis-persistence",
+        "edge": {
+          "from": "backend_execcommand",
+          "to": "redis_script",
+          "claim": "calls"
+        }
+      },
+      "points": [
+        [
+          0,
+          0.5
+        ],
+        [
+          0,
+          150.40000000000032
+        ],
+        [
+          0,
+          300.3000000000004
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "queue-add-job-creation-redis-persistence-node-7",
+        "focus": -0.031111111111111547,
+        "gap": 4.000000000000227
+      },
+      "endBinding": {
+        "elementId": "queue-add-job-creation-redis-persistence-node-8",
+        "focus": 0.01866666666666674,
+        "gap": 3.2137814773468905
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "queue-add-job-creation-redis-persistence-edge-8",
+      "type": "arrow",
+      "x": 492.8,
+      "y": 2456.8,
+      "width": 0,
+      "height": 300.8000000000002,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aJ",
+      "roundness": null,
+      "seed": 702406628,
+      "version": 1,
+      "versionNonce": 1751265904,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "queue-add-job-creation-redis-persistence-edge-8-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "queue-add-job-creation-redis-persistence",
+        "edge": {
+          "from": "redis_script",
+          "to": "redis_keys",
+          "claim": "calls"
+        }
+      },
+      "points": [
+        [
+          0,
+          0.5
+        ],
+        [
+          0,
+          150.4000000000001
+        ],
+        [
+          0,
+          300.3000000000002
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "queue-add-job-creation-redis-persistence-node-8",
+        "focus": -0.01866666666666674,
+        "gap": 3.1859012641657634
+      },
+      "endBinding": {
+        "elementId": "queue-add-job-creation-redis-persistence-node-9",
+        "focus": -0.04499999999999957,
+        "gap": 2.460431795039621
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "queue-add-job-creation-redis-persistence-node-0-label",
+      "type": "text",
+      "x": 150.5,
+      "y": 47.5,
+      "width": 99.00000000000001,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aK",
+      "roundness": null,
+      "seed": 516819382,
+      "version": 1,
+      "versionNonce": 626762778,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "queue-add-job-creation-redis-persistence"
+      },
+      "text": "Queue#add",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "queue-add-job-creation-redis-persistence-node-0",
+      "originalText": "Queue#add",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "queue-add-job-creation-redis-persistence-node-1-label",
+      "type": "text",
+      "x": 144,
+      "y": 427.5,
+      "width": 132,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aL",
+      "roundness": null,
+      "seed": 2033625579,
+      "version": 1,
+      "versionNonce": 429756901,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "queue-add-job-creation-redis-persistence"
+      },
+      "text": "Queue#addJob",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "queue-add-job-creation-redis-persistence-node-1",
+      "originalText": "Queue#addJob",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "queue-add-job-creation-redis-persistence-node-2-label",
+      "type": "text",
+      "x": 145,
+      "y": 807.5,
+      "width": 110.00000000000001,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aM",
+      "roundness": null,
+      "seed": 622535804,
+      "version": 1,
+      "versionNonce": 200762120,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "queue-add-job-creation-redis-persistence"
+      },
+      "text": "Job.create",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "queue-add-job-creation-redis-persistence-node-2",
+      "originalText": "Job.create",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "queue-add-job-creation-redis-persistence-node-3-label",
+      "type": "text",
+      "x": 772,
+      "y": 1187.5,
+      "width": 176,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aN",
+      "roundness": null,
+      "seed": 1492643801,
+      "version": 1,
+      "versionNonce": 1095181091,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "queue-add-job-creation-redis-persistence"
+      },
+      "text": "new Job instance",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "queue-add-job-creation-redis-persistence-node-3",
+      "originalText": "new Job instance",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "queue-add-job-creation-redis-persistence-node-4-label",
+      "type": "text",
+      "x": 104,
+      "y": 1187.5,
+      "width": 132,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aO",
+      "roundness": null,
+      "seed": 407531258,
+      "version": 1,
+      "versionNonce": 881119566,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "queue-add-job-creation-redis-persistence"
+      },
+      "text": "job.asJSON()",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "queue-add-job-creation-redis-persistence-node-4",
+      "originalText": "job.asJSON()",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "queue-add-job-creation-redis-persistence-node-5-label",
+      "type": "text",
+      "x": 368,
+      "y": 1187.5,
+      "width": 264,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aP",
+      "roundness": null,
+      "seed": 800008639,
+      "version": 1,
+      "versionNonce": 453410777,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "queue-add-job-creation-redis-persistence"
+      },
+      "text": "RedisQueueBackend#addJob",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "queue-add-job-creation-redis-persistence-node-5",
+      "originalText": "RedisQueueBackend#addJob",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "queue-add-job-creation-redis-persistence-node-6-label",
+      "type": "text",
+      "x": 385.5,
+      "y": 1567.5,
+      "width": 209.00000000000003,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aQ",
+      "roundness": null,
+      "seed": 1859445072,
+      "version": 1,
+      "versionNonce": 405957420,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "queue-add-job-creation-redis-persistence"
+      },
+      "text": "addJobToTransaction",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "queue-add-job-creation-redis-persistence-node-6",
+      "originalText": "addJobToTransaction",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "queue-add-job-creation-redis-persistence-node-7-label",
+      "type": "text",
+      "x": 429.5,
+      "y": 1947.5,
+      "width": 121.00000000000001,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aR",
+      "roundness": null,
+      "seed": 111170333,
+      "version": 1,
+      "versionNonce": 1869560967,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "queue-add-job-creation-redis-persistence"
+      },
+      "text": "execCommand",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "queue-add-job-creation-redis-persistence-node-7",
+      "originalText": "execCommand",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "queue-add-job-creation-redis-persistence-node-8-label",
+      "type": "text",
+      "x": 401.93398282201787,
+      "y": 2342.431457505076,
+      "width": 176,
+      "height": 75,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aS",
+      "roundness": null,
+      "seed": 1712263822,
+      "version": 1,
+      "versionNonce": 1567778098,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "queue-add-job-creation-redis-persistence"
+      },
+      "text": "Lua Script\n(addStandardJob,\netc.)",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "queue-add-job-creation-redis-persistence-node-8",
+      "originalText": "Lua Script (addStandardJob, etc.)",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "queue-add-job-creation-redis-persistence-node-9-label",
+      "type": "text",
+      "x": 406.3629150101524,
+      "y": 2795.0735931288073,
+      "width": 187.00000000000003,
+      "height": 50,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aT",
+      "roundness": null,
+      "seed": 1457759459,
+      "version": 1,
+      "versionNonce": 1480806269,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "queue-add-job-creation-redis-persistence"
+      },
+      "text": "Redis: job hash &\nlists",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "queue-add-job-creation-redis-persistence-node-9",
+      "originalText": "Redis: job hash & lists",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "queue-add-job-creation-redis-persistence-edge-0-label",
+      "type": "text",
+      "x": 132.4,
+      "y": 232.4,
+      "width": 140.8,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aU",
+      "roundness": null,
+      "seed": 163280697,
+      "version": 1,
+      "versionNonce": 2068904963,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "queue-add-job-creation-redis-persistence"
+      },
+      "text": "telemetry @calls",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "queue-add-job-creation-redis-persistence-edge-0",
+      "originalText": "telemetry @calls",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "queue-add-job-creation-redis-persistence-edge-1-label",
+      "type": "text",
+      "x": 176.4,
+      "y": 613.1999999999999,
+      "width": 52.800000000000004,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aV",
+      "roundness": null,
+      "seed": 1882219356,
+      "version": 1,
+      "versionNonce": 800082024,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "queue-add-job-creation-redis-persistence"
+      },
+      "text": "@calls",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "queue-add-job-creation-redis-persistence-edge-1",
+      "originalText": "@calls",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "queue-add-job-creation-redis-persistence-edge-2-label",
+      "type": "text",
+      "x": 635.4000000000001,
+      "y": 875.5999999999999,
+      "width": 61.60000000000001,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aW",
+      "roundness": null,
+      "seed": 1609348427,
+      "version": 1,
+      "versionNonce": 1740076485,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "queue-add-job-creation-redis-persistence"
+      },
+      "text": "@builds",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "queue-add-job-creation-redis-persistence-edge-2",
+      "originalText": "@builds",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "queue-add-job-creation-redis-persistence-edge-3-label",
+      "type": "text",
+      "x": 92.4,
+      "y": 993.9999999999999,
+      "width": 140.8,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aX",
+      "roundness": null,
+      "seed": 1125394838,
+      "version": 1,
+      "versionNonce": 1606432378,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "queue-add-job-creation-redis-persistence"
+      },
+      "text": "serialize @calls",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "queue-add-job-creation-redis-persistence-edge-3",
+      "originalText": "serialize @calls",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "queue-add-job-creation-redis-persistence-edge-4-label",
+      "type": "text",
+      "x": 380.59999999999997,
+      "y": 899.5999999999999,
+      "width": 123.20000000000002,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aY",
+      "roundness": null,
+      "seed": 1592003837,
+      "version": 1,
+      "versionNonce": 34421991,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "queue-add-job-creation-redis-persistence"
+      },
+      "text": "jobData @calls",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "queue-add-job-creation-redis-persistence-edge-4",
+      "originalText": "jobData @calls",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "queue-add-job-creation-redis-persistence-edge-5-label",
+      "type": "text",
+      "x": 466.40000000000003,
+      "y": 1374.7999999999997,
+      "width": 52.800000000000004,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aZ",
+      "roundness": null,
+      "seed": 1654394032,
+      "version": 1,
+      "versionNonce": 377697804,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "queue-add-job-creation-redis-persistence"
+      },
+      "text": "@calls",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "queue-add-job-creation-redis-persistence-edge-5",
+      "originalText": "@calls",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "queue-add-job-creation-redis-persistence-edge-6-label",
+      "type": "text",
+      "x": 413.6,
+      "y": 1755.6,
+      "width": 158.4,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aa",
+      "roundness": null,
+      "seed": 1565515423,
+      "version": 1,
+      "versionNonce": 251792953,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "queue-add-job-creation-redis-persistence"
+      },
+      "text": "script name @calls",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "queue-add-job-creation-redis-persistence-edge-6",
+      "originalText": "script name @calls",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "queue-add-job-creation-redis-persistence-edge-7-label",
+      "type": "text",
+      "x": 418,
+      "y": 2136.4,
+      "width": 149.60000000000002,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "ab",
+      "roundness": null,
+      "seed": 855164890,
+      "version": 1,
+      "versionNonce": 20590510,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "queue-add-job-creation-redis-persistence"
+      },
+      "text": "runCommand @calls",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "queue-add-job-creation-redis-persistence-edge-7",
+      "originalText": "runCommand @calls",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "queue-add-job-creation-redis-persistence-edge-8-label",
+      "type": "text",
+      "x": 404.8,
+      "y": 2597.2000000000003,
+      "width": 176,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "ac",
+      "roundness": null,
+      "seed": 459310577,
+      "version": 1,
+      "versionNonce": 1553810043,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "queue-add-job-creation-redis-persistence"
+      },
+      "text": "atomic update @calls",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "queue-add-job-creation-redis-persistence-edge-8",
+      "originalText": "atomic update @calls",
+      "autoResize": true,
+      "lineHeight": 1.25
+    }
+  ],
+  "appState": {
+    "gridSize": null,
+    "viewBackgroundColor": "#ffffff"
+  },
+  "files": {},
+  "diagramos": {
+    "version": "0.2.0-rc.6",
+    "schema": 1
+  }
+}

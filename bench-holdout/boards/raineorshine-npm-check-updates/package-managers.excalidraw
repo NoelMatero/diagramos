@@ -1,0 +1,2423 @@
+{
+  "type": "excalidraw",
+  "version": 2,
+  "source": "diagramos",
+  "elements": [
+    {
+      "id": "package-manager-selection-and-version-re-title",
+      "type": "text",
+      "x": 0,
+      "y": -115,
+      "width": 633.6,
+      "height": 30,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a0",
+      "roundness": null,
+      "seed": 287206991,
+      "version": 1,
+      "versionNonce": 1741460777,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "package-manager-selection-and-version-re",
+        "role": "title",
+        "direction": "DOWN"
+      },
+      "text": "Package Manager Selection and Version Resolution",
+      "fontSize": 24,
+      "fontFamily": 5,
+      "textAlign": "left",
+      "verticalAlign": "middle",
+      "containerId": null,
+      "originalText": "Package Manager Selection and Version Resolution",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "package-manager-selection-and-version-re-node-0",
+      "type": "rectangle",
+      "x": 60,
+      "y": 20,
+      "width": 320,
+      "height": 80,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a1",
+      "roundness": null,
+      "seed": 1172926418,
+      "version": 1,
+      "versionNonce": 1986867718,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "package-manager-selection-and-version-re-node-0-label"
+        },
+        {
+          "id": "package-manager-selection-and-version-re-edge-0",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "package-manager-selection-and-version-re",
+        "node": "pm_index",
+        "ref": "src/package-managers/index.ts#default"
+      }
+    },
+    {
+      "id": "package-manager-selection-and-version-re-node-1",
+      "type": "rectangle",
+      "x": 60,
+      "y": 400,
+      "width": 320,
+      "height": 80,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a2",
+      "roundness": null,
+      "seed": 1513190979,
+      "version": 1,
+      "versionNonce": 775862109,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "package-manager-selection-and-version-re-node-1-label"
+        },
+        {
+          "id": "package-manager-selection-and-version-re-edge-0",
+          "type": "arrow"
+        },
+        {
+          "id": "package-manager-selection-and-version-re-edge-1",
+          "type": "arrow"
+        },
+        {
+          "id": "package-manager-selection-and-version-re-edge-2",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "package-manager-selection-and-version-re",
+        "node": "pm_interface",
+        "ref": "src/types/PackageManager.ts#PackageManager"
+      }
+    },
+    {
+      "id": "package-manager-selection-and-version-re-node-2",
+      "type": "rectangle",
+      "x": 100,
+      "y": 780,
+      "width": 160,
+      "height": 80,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a3",
+      "roundness": null,
+      "seed": 2060224532,
+      "version": 1,
+      "versionNonce": 241140064,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "package-manager-selection-and-version-re-node-2-label"
+        },
+        {
+          "id": "package-manager-selection-and-version-re-edge-1",
+          "type": "arrow"
+        },
+        {
+          "id": "package-manager-selection-and-version-re-edge-3",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "package-manager-selection-and-version-re",
+        "node": "npm_latest",
+        "ref": "src/package-managers/npm.ts#latest"
+      }
+    },
+    {
+      "id": "package-manager-selection-and-version-re-node-3",
+      "type": "rectangle",
+      "x": 100,
+      "y": 1160,
+      "width": 160,
+      "height": 80,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a4",
+      "roundness": null,
+      "seed": 1997560813,
+      "version": 1,
+      "versionNonce": 1050904919,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "package-manager-selection-and-version-re-node-3-label"
+        },
+        {
+          "id": "package-manager-selection-and-version-re-edge-3",
+          "type": "arrow"
+        },
+        {
+          "id": "package-manager-selection-and-version-re-edge-4",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "package-manager-selection-and-version-re",
+        "node": "npm_distTag",
+        "ref": "src/package-managers/npm.ts#distTag"
+      }
+    },
+    {
+      "id": "package-manager-selection-and-version-re-node-4",
+      "type": "rectangle",
+      "x": 120,
+      "y": 1540,
+      "width": 160,
+      "height": 80,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a5",
+      "roundness": null,
+      "seed": 587409078,
+      "version": 1,
+      "versionNonce": 1157122842,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "package-manager-selection-and-version-re-node-4-label"
+        },
+        {
+          "id": "package-manager-selection-and-version-re-edge-2",
+          "type": "arrow"
+        },
+        {
+          "id": "package-manager-selection-and-version-re-edge-4",
+          "type": "arrow"
+        },
+        {
+          "id": "package-manager-selection-and-version-re-edge-5",
+          "type": "arrow"
+        },
+        {
+          "id": "package-manager-selection-and-version-re-edge-11",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "package-manager-selection-and-version-re",
+        "node": "npm_greatest",
+        "ref": "src/package-managers/npm.ts#greatest"
+      }
+    },
+    {
+      "id": "package-manager-selection-and-version-re-node-5",
+      "type": "rectangle",
+      "x": 380,
+      "y": 1920,
+      "width": 220,
+      "height": 80,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a6",
+      "roundness": null,
+      "seed": 756291655,
+      "version": 1,
+      "versionNonce": 83349345,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "package-manager-selection-and-version-re-node-5-label"
+        },
+        {
+          "id": "package-manager-selection-and-version-re-edge-5",
+          "type": "arrow"
+        },
+        {
+          "id": "package-manager-selection-and-version-re-edge-6",
+          "type": "arrow"
+        },
+        {
+          "id": "package-manager-selection-and-version-re-edge-8",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "package-manager-selection-and-version-re",
+        "node": "fetch_versions",
+        "ref": "src/package-managers/npm.ts#fetchVersions"
+      }
+    },
+    {
+      "id": "package-manager-selection-and-version-re-node-6",
+      "type": "rectangle",
+      "x": 700,
+      "y": 2300,
+      "width": 320,
+      "height": 80,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a7",
+      "roundness": null,
+      "seed": 1289273752,
+      "version": 1,
+      "versionNonce": 1034811764,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "package-manager-selection-and-version-re-node-6-label"
+        },
+        {
+          "id": "package-manager-selection-and-version-re-edge-6",
+          "type": "arrow"
+        },
+        {
+          "id": "package-manager-selection-and-version-re-edge-7",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "package-manager-selection-and-version-re",
+        "node": "fetch_packument",
+        "ref": "src/package-managers/npm.ts#fetchUpgradedPackument"
+      }
+    },
+    {
+      "id": "package-manager-selection-and-version-re-node-7",
+      "type": "rectangle",
+      "x": 300,
+      "y": 2300,
+      "width": 320,
+      "height": 80,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a8",
+      "roundness": null,
+      "seed": 1627400769,
+      "version": 1,
+      "versionNonce": 843974027,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "package-manager-selection-and-version-re-node-7-label"
+        },
+        {
+          "id": "package-manager-selection-and-version-re-edge-8",
+          "type": "arrow"
+        },
+        {
+          "id": "package-manager-selection-and-version-re-edge-9",
+          "type": "arrow"
+        },
+        {
+          "id": "package-manager-selection-and-version-re-edge-10",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "package-manager-selection-and-version-re",
+        "node": "find_target",
+        "ref": "src/package-managers/npm.ts#findTargetAndFallback"
+      }
+    },
+    {
+      "id": "package-manager-selection-and-version-re-node-8",
+      "type": "rectangle",
+      "x": 420,
+      "y": 2680,
+      "width": 240,
+      "height": 80,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a9",
+      "roundness": null,
+      "seed": 1797530250,
+      "version": 1,
+      "versionNonce": 494992350,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "package-manager-selection-and-version-re-node-8-label"
+        },
+        {
+          "id": "package-manager-selection-and-version-re-edge-9",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "package-manager-selection-and-version-re",
+        "node": "filters",
+        "ref": "src/package-managers/filters.ts#filterPredicate"
+      }
+    },
+    {
+      "id": "package-manager-selection-and-version-re-node-9",
+      "type": "rectangle",
+      "x": 100,
+      "y": 2680,
+      "width": 240,
+      "height": 80,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aA",
+      "roundness": null,
+      "seed": 1817018587,
+      "version": 1,
+      "versionNonce": 1022134485,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "package-manager-selection-and-version-re-node-9-label"
+        },
+        {
+          "id": "package-manager-selection-and-version-re-edge-10",
+          "type": "arrow"
+        },
+        {
+          "id": "package-manager-selection-and-version-re-edge-11",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "package-manager-selection-and-version-re",
+        "node": "to_result",
+        "ref": "src/package-managers/npm.ts#toVersionResult"
+      }
+    },
+    {
+      "id": "package-manager-selection-and-version-re-node-10",
+      "type": "rectangle",
+      "x": 780,
+      "y": 2680,
+      "width": 180,
+      "height": 80,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "dotted",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aB",
+      "roundness": null,
+      "seed": 1819793483,
+      "version": 1,
+      "versionNonce": 650088133,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "package-manager-selection-and-version-re-node-10-label"
+        },
+        {
+          "id": "package-manager-selection-and-version-re-edge-7",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "package-manager-selection-and-version-re",
+        "node": "npm_registry",
+        "state": "external"
+      }
+    },
+    {
+      "id": "package-manager-selection-and-version-re-edge-0",
+      "type": "arrow",
+      "x": 224.93333333333334,
+      "y": 92,
+      "width": 0,
+      "height": 300.8,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aC",
+      "roundness": null,
+      "seed": 912404325,
+      "version": 1,
+      "versionNonce": 471151087,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "package-manager-selection-and-version-re-edge-0-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "package-manager-selection-and-version-re",
+        "edge": {
+          "from": "pm_index",
+          "to": "pm_interface",
+          "claim": "conforms"
+        }
+      },
+      "points": [
+        [
+          0,
+          0.5
+        ],
+        [
+          0,
+          150.4
+        ],
+        [
+          0,
+          300.3
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "package-manager-selection-and-version-re-node-0",
+        "focus": -0.030833333333333355,
+        "gap": 8
+      },
+      "endBinding": {
+        "elementId": "package-manager-selection-and-version-re-node-1",
+        "focus": 0.030833333333333376,
+        "gap": 7.199999999999989
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "package-manager-selection-and-version-re-edge-1",
+      "type": "arrow",
+      "x": 171.60000000000002,
+      "y": 472.8,
+      "width": 0,
+      "height": 300.7999999999999,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aD",
+      "roundness": null,
+      "seed": 1753210700,
+      "version": 1,
+      "versionNonce": 1706707736,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "package-manager-selection-and-version-re-edge-1-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "package-manager-selection-and-version-re",
+        "edge": {
+          "from": "pm_interface",
+          "to": "npm_latest",
+          "claim": "calls"
+        }
+      },
+      "points": [
+        [
+          0,
+          0.5
+        ],
+        [
+          0,
+          150.39999999999992
+        ],
+        [
+          0,
+          300.2999999999999
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "package-manager-selection-and-version-re-node-1",
+        "focus": 0.3024999999999998,
+        "gap": 7.199999999999989
+      },
+      "endBinding": {
+        "elementId": "package-manager-selection-and-version-re-node-2",
+        "focus": -0.10499999999999998,
+        "gap": 6.400000000000091
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "package-manager-selection-and-version-re-edge-2",
+      "type": "arrow",
+      "x": 278.2666666666667,
+      "y": 472.8,
+      "width": 66.66666666666669,
+      "height": 1062.3999999999999,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aE",
+      "roundness": null,
+      "seed": 1500803035,
+      "version": 1,
+      "versionNonce": 288802261,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "package-manager-selection-and-version-re-edge-2-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "package-manager-selection-and-version-re",
+        "edge": {
+          "from": "pm_interface",
+          "to": "npm_greatest",
+          "claim": "calls"
+        }
+      },
+      "points": [
+        [
+          0,
+          0.5
+        ],
+        [
+          0,
+          32
+        ],
+        [
+          13.333333333333314,
+          32
+        ],
+        [
+          13.333333333333314,
+          557.8666666666666
+        ],
+        [
+          13.333333333333314,
+          954.3999999999999
+        ],
+        [
+          -53.33333333333337,
+          954.3999999999999
+        ],
+        [
+          -53.33333333333337,
+          1061.8999999999999
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "package-manager-selection-and-version-re-node-1",
+        "focus": -0.3641666666666668,
+        "gap": 7.199999999999932
+      },
+      "endBinding": {
+        "elementId": "package-manager-selection-and-version-re-node-4",
+        "focus": 0.3116666666666668,
+        "gap": 4.800000000000182
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "package-manager-selection-and-version-re-edge-3",
+      "type": "arrow",
+      "x": 171.60000000000002,
+      "y": 853.5999999999999,
+      "width": 0,
+      "height": 300.79999999999995,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aF",
+      "roundness": null,
+      "seed": 1481314698,
+      "version": 1,
+      "versionNonce": 1909143774,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "package-manager-selection-and-version-re-edge-3-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "package-manager-selection-and-version-re",
+        "edge": {
+          "from": "npm_latest",
+          "to": "npm_distTag",
+          "claim": "calls"
+        }
+      },
+      "points": [
+        [
+          0,
+          0.5
+        ],
+        [
+          0,
+          150.39999999999998
+        ],
+        [
+          0,
+          300.29999999999995
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "package-manager-selection-and-version-re-node-2",
+        "focus": 0.10499999999999998,
+        "gap": 6.400000000000091
+      },
+      "endBinding": {
+        "elementId": "package-manager-selection-and-version-re-node-3",
+        "focus": -0.10499999999999998,
+        "gap": 5.600000000000136
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "package-manager-selection-and-version-re-edge-4",
+      "type": "arrow",
+      "x": 171.60000000000002,
+      "y": 1234.3999999999999,
+      "width": 0,
+      "height": 300.79999999999995,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aG",
+      "roundness": null,
+      "seed": 551690969,
+      "version": 1,
+      "versionNonce": 1995795491,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "package-manager-selection-and-version-re-edge-4-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "package-manager-selection-and-version-re",
+        "edge": {
+          "from": "npm_distTag",
+          "to": "npm_greatest",
+          "claim": "calls"
+        }
+      },
+      "points": [
+        [
+          0,
+          0.5
+        ],
+        [
+          0,
+          150.39999999999986
+        ],
+        [
+          0,
+          300.29999999999995
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "package-manager-selection-and-version-re-node-3",
+        "focus": 0.10499999999999998,
+        "gap": 5.600000000000136
+      },
+      "endBinding": {
+        "elementId": "package-manager-selection-and-version-re-node-4",
+        "focus": -0.355,
+        "gap": 4.800000000000182
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "package-manager-selection-and-version-re-edge-5",
+      "type": "arrow",
+      "x": 224.93333333333334,
+      "y": 1615.1999999999998,
+      "width": 272.4666666666667,
+      "height": 300.79999999999995,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aH",
+      "roundness": null,
+      "seed": 1280661968,
+      "version": 1,
+      "versionNonce": 1232084140,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "package-manager-selection-and-version-re-edge-5-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "package-manager-selection-and-version-re",
+        "edge": {
+          "from": "npm_greatest",
+          "to": "fetch_versions",
+          "claim": "calls"
+        }
+      },
+      "points": [
+        [
+          0,
+          0.5
+        ],
+        [
+          0,
+          32
+        ],
+        [
+          254.63333333333333,
+          32
+        ],
+        [
+          272.4666666666667,
+          32
+        ],
+        [
+          272.4666666666667,
+          300.29999999999995
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "package-manager-selection-and-version-re-node-4",
+        "focus": -0.3116666666666668,
+        "gap": 4.800000000000182
+      },
+      "endBinding": {
+        "elementId": "package-manager-selection-and-version-re-node-5",
+        "focus": 0.06727272727272637,
+        "gap": 4.000000000000227
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "package-manager-selection-and-version-re-edge-6",
+      "type": "arrow",
+      "x": 534.0666666666667,
+      "y": 1995.9999999999998,
+      "width": 326.66666666666663,
+      "height": 300.8000000000004,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aI",
+      "roundness": null,
+      "seed": 425815551,
+      "version": 1,
+      "versionNonce": 1051141913,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "package-manager-selection-and-version-re-edge-6-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "package-manager-selection-and-version-re",
+        "edge": {
+          "from": "fetch_versions",
+          "to": "fetch_packument",
+          "claim": "calls"
+        }
+      },
+      "points": [
+        [
+          0.5,
+          0.5
+        ],
+        [
+          0,
+          32
+        ],
+        [
+          281.73333333333346,
+          32
+        ],
+        [
+          326.6666666666665,
+          32
+        ],
+        [
+          326.16666666666663,
+          300.3000000000004
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "package-manager-selection-and-version-re-node-5",
+        "focus": -0.40060606060606097,
+        "gap": 4.000000000000227
+      },
+      "endBinding": {
+        "elementId": "package-manager-selection-and-version-re-node-6",
+        "focus": 0.00458333333333418,
+        "gap": 3.199999999999818
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "package-manager-selection-and-version-re-edge-7",
+      "type": "arrow",
+      "x": 860.7333333333333,
+      "y": 2376.8,
+      "width": 0,
+      "height": 300.8000000000002,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aJ",
+      "roundness": null,
+      "seed": 195043438,
+      "version": 1,
+      "versionNonce": 591792786,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "package-manager-selection-and-version-re-edge-7-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "package-manager-selection-and-version-re",
+        "edge": {
+          "from": "fetch_packument",
+          "to": "npm_registry",
+          "claim": "depends"
+        }
+      },
+      "points": [
+        [
+          0,
+          0.5
+        ],
+        [
+          0,
+          150.4000000000001
+        ],
+        [
+          0,
+          300.3000000000002
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "package-manager-selection-and-version-re-node-6",
+        "focus": -0.00458333333333418,
+        "gap": 3.199999999999818
+      },
+      "endBinding": {
+        "elementId": "package-manager-selection-and-version-re-node-10",
+        "focus": -0.10296296296296321,
+        "gap": 2.399999999999636
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "package-manager-selection-and-version-re-edge-8",
+      "type": "arrow",
+      "x": 460.73333333333335,
+      "y": 1995.9999999999998,
+      "width": 0,
+      "height": 300.8000000000004,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aK",
+      "roundness": null,
+      "seed": 1681345261,
+      "version": 1,
+      "versionNonce": 317572695,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "package-manager-selection-and-version-re-edge-8-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "package-manager-selection-and-version-re",
+        "edge": {
+          "from": "fetch_versions",
+          "to": "find_target",
+          "claim": "feeds"
+        }
+      },
+      "points": [
+        [
+          0,
+          0.5
+        ],
+        [
+          0,
+          150.40000000000032
+        ],
+        [
+          0,
+          300.3000000000004
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "package-manager-selection-and-version-re-node-5",
+        "focus": 0.2660606060606058,
+        "gap": 4.000000000000227
+      },
+      "endBinding": {
+        "elementId": "package-manager-selection-and-version-re-node-7",
+        "focus": 0.004583333333333847,
+        "gap": 3.199999999999818
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "package-manager-selection-and-version-re-edge-9",
+      "type": "arrow",
+      "x": 514.0666666666667,
+      "y": 2376.8,
+      "width": 17.533333333333303,
+      "height": 300.8000000000002,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aL",
+      "roundness": null,
+      "seed": 1744008980,
+      "version": 1,
+      "versionNonce": 1655291488,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "package-manager-selection-and-version-re-edge-9-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "package-manager-selection-and-version-re",
+        "edge": {
+          "from": "find_target",
+          "to": "filters",
+          "claim": "calls"
+        }
+      },
+      "points": [
+        [
+          0,
+          0.5
+        ],
+        [
+          0,
+          32
+        ],
+        [
+          17.533333333333303,
+          32
+        ],
+        [
+          17.533333333333303,
+          141.6333333333332
+        ],
+        [
+          17.533333333333303,
+          181.42500000000018
+        ],
+        [
+          17.533333333333303,
+          221.2166666666667
+        ],
+        [
+          17.533333333333303,
+          300.3000000000002
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "package-manager-selection-and-version-re-node-7",
+        "focus": -0.33791666666666725,
+        "gap": 3.199999999999818
+      },
+      "endBinding": {
+        "elementId": "package-manager-selection-and-version-re-node-8",
+        "focus": -0.07000000000000028,
+        "gap": 2.399999999999636
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "package-manager-selection-and-version-re-edge-10",
+      "type": "arrow",
+      "x": 407.40000000000003,
+      "y": 2376.8,
+      "width": 155.8,
+      "height": 300.8000000000002,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aM",
+      "roundness": null,
+      "seed": 563388650,
+      "version": 1,
+      "versionNonce": 165901246,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "package-manager-selection-and-version-re-edge-10-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "package-manager-selection-and-version-re",
+        "edge": {
+          "from": "find_target",
+          "to": "to_result",
+          "claim": "feeds"
+        }
+      },
+      "points": [
+        [
+          0,
+          0.5
+        ],
+        [
+          0,
+          192.80000000000018
+        ],
+        [
+          -35.49999999999994,
+          192.80000000000018
+        ],
+        [
+          -155.8,
+          192.80000000000018
+        ],
+        [
+          -155.8,
+          300.3000000000002
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "package-manager-selection-and-version-re-node-7",
+        "focus": 0.32874999999999993,
+        "gap": 3.199999999999818
+      },
+      "endBinding": {
+        "elementId": "package-manager-selection-and-version-re-node-9",
+        "focus": 0.26333333333333364,
+        "gap": 2.399999999999636
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "package-manager-selection-and-version-re-edge-11",
+      "type": "arrow",
+      "x": 171.60000000000002,
+      "y": 1615.1999999999998,
+      "width": 0,
+      "height": 1062.4000000000005,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aN",
+      "roundness": null,
+      "seed": 158419515,
+      "version": 1,
+      "versionNonce": 969339829,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "package-manager-selection-and-version-re-edge-11-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "package-manager-selection-and-version-re",
+        "edge": {
+          "from": "npm_greatest",
+          "to": "to_result",
+          "claim": "calls"
+        }
+      },
+      "points": [
+        [
+          0,
+          0.5
+        ],
+        [
+          0,
+          531.2000000000003
+        ],
+        [
+          0,
+          1061.9000000000005
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "package-manager-selection-and-version-re-node-4",
+        "focus": 0.355,
+        "gap": 4.800000000000182
+      },
+      "endBinding": {
+        "elementId": "package-manager-selection-and-version-re-node-9",
+        "focus": -0.4033333333333328,
+        "gap": 2.399999999999636
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "package-manager-selection-and-version-re-node-0-label",
+      "type": "text",
+      "x": 88,
+      "y": 47.5,
+      "width": 264,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aO",
+      "roundness": null,
+      "seed": 331748723,
+      "version": 1,
+      "versionNonce": 463266125,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "package-manager-selection-and-version-re"
+      },
+      "text": "Package Manager Registry",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "package-manager-selection-and-version-re-node-0",
+      "originalText": "Package Manager Registry",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "package-manager-selection-and-version-re-node-1-label",
+      "type": "text",
+      "x": 88,
+      "y": 427.5,
+      "width": 264,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aP",
+      "roundness": null,
+      "seed": 1942796638,
+      "version": 1,
+      "versionNonce": 1116764290,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "package-manager-selection-and-version-re"
+      },
+      "text": "PackageManager Interface",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "package-manager-selection-and-version-re-node-1",
+      "originalText": "PackageManager Interface",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "package-manager-selection-and-version-re-node-2-label",
+      "type": "text",
+      "x": 136,
+      "y": 807.5,
+      "width": 88,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aQ",
+      "roundness": null,
+      "seed": 585362913,
+      "version": 1,
+      "versionNonce": 1314193067,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "package-manager-selection-and-version-re"
+      },
+      "text": "latest()",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "package-manager-selection-and-version-re-node-2",
+      "originalText": "latest()",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "package-manager-selection-and-version-re-node-3-label",
+      "type": "text",
+      "x": 130.5,
+      "y": 1187.5,
+      "width": 99.00000000000001,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aR",
+      "roundness": null,
+      "seed": 241977380,
+      "version": 1,
+      "versionNonce": 1531105456,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "package-manager-selection-and-version-re"
+      },
+      "text": "distTag()",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "package-manager-selection-and-version-re-node-3",
+      "originalText": "distTag()",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "package-manager-selection-and-version-re-node-4-label",
+      "type": "text",
+      "x": 145,
+      "y": 1567.5,
+      "width": 110.00000000000001,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aS",
+      "roundness": null,
+      "seed": 1735190503,
+      "version": 1,
+      "versionNonce": 1795511425,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "package-manager-selection-and-version-re"
+      },
+      "text": "greatest()",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "package-manager-selection-and-version-re-node-4",
+      "originalText": "greatest()",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "package-manager-selection-and-version-re-node-5-label",
+      "type": "text",
+      "x": 407.5,
+      "y": 1947.5,
+      "width": 165,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aT",
+      "roundness": null,
+      "seed": 2142587714,
+      "version": 1,
+      "versionNonce": 2145680822,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "package-manager-selection-and-version-re"
+      },
+      "text": "fetchVersions()",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "package-manager-selection-and-version-re-node-5",
+      "originalText": "fetchVersions()",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "package-manager-selection-and-version-re-node-6-label",
+      "type": "text",
+      "x": 728,
+      "y": 2327.5,
+      "width": 264,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aU",
+      "roundness": null,
+      "seed": 269388773,
+      "version": 1,
+      "versionNonce": 1181405039,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "package-manager-selection-and-version-re"
+      },
+      "text": "fetchUpgradedPackument()",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "package-manager-selection-and-version-re-node-6",
+      "originalText": "fetchUpgradedPackument()",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "package-manager-selection-and-version-re-node-7-label",
+      "type": "text",
+      "x": 333.5,
+      "y": 2327.5,
+      "width": 253.00000000000003,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aV",
+      "roundness": null,
+      "seed": 1145514776,
+      "version": 1,
+      "versionNonce": 1082002932,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "package-manager-selection-and-version-re"
+      },
+      "text": "findTargetAndFallback()",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "package-manager-selection-and-version-re-node-7",
+      "originalText": "findTargetAndFallback()",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "package-manager-selection-and-version-re-node-8-label",
+      "type": "text",
+      "x": 446.5,
+      "y": 2707.5,
+      "width": 187.00000000000003,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aW",
+      "roundness": null,
+      "seed": 1540722747,
+      "version": 1,
+      "versionNonce": 1839277493,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "package-manager-selection-and-version-re"
+      },
+      "text": "filterPredicate()",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "package-manager-selection-and-version-re-node-8",
+      "originalText": "filterPredicate()",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "package-manager-selection-and-version-re-node-9-label",
+      "type": "text",
+      "x": 126.49999999999999,
+      "y": 2707.5,
+      "width": 187.00000000000003,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aX",
+      "roundness": null,
+      "seed": 1848699014,
+      "version": 1,
+      "versionNonce": 610602730,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "package-manager-selection-and-version-re"
+      },
+      "text": "toVersionResult()",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "package-manager-selection-and-version-re-node-9",
+      "originalText": "toVersionResult()",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "package-manager-selection-and-version-re-node-10-label",
+      "type": "text",
+      "x": 804,
+      "y": 2707.5,
+      "width": 132,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aY",
+      "roundness": null,
+      "seed": 70130678,
+      "version": 1,
+      "versionNonce": 350608730,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "package-manager-selection-and-version-re"
+      },
+      "text": "npm Registry",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "package-manager-selection-and-version-re-node-10",
+      "originalText": "npm Registry",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "package-manager-selection-and-version-re-edge-0-label",
+      "type": "text",
+      "x": 150.13333333333333,
+      "y": 232.4,
+      "width": 149.60000000000002,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aZ",
+      "roundness": null,
+      "seed": 86964684,
+      "version": 1,
+      "versionNonce": 224461464,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "package-manager-selection-and-version-re"
+      },
+      "text": "exports @conforms",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "package-manager-selection-and-version-re-edge-0",
+      "originalText": "exports @conforms",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "package-manager-selection-and-version-re-edge-1-label",
+      "type": "text",
+      "x": 96.80000000000001,
+      "y": 613.1999999999999,
+      "width": 149.60000000000002,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aa",
+      "roundness": null,
+      "seed": 858364777,
+      "version": 1,
+      "versionNonce": 1976089715,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "package-manager-selection-and-version-re"
+      },
+      "text": "GetVersion @calls",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "package-manager-selection-and-version-re-edge-1",
+      "originalText": "GetVersion @calls",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "package-manager-selection-and-version-re-edge-2-label",
+      "type": "text",
+      "x": 216.8,
+      "y": 1020.6666666666665,
+      "width": 149.60000000000002,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "ab",
+      "roundness": null,
+      "seed": 78143366,
+      "version": 1,
+      "versionNonce": 41247722,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "package-manager-selection-and-version-re"
+      },
+      "text": "GetVersion @calls",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "package-manager-selection-and-version-re-edge-2",
+      "originalText": "GetVersion @calls",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "package-manager-selection-and-version-re-edge-3-label",
+      "type": "text",
+      "x": 145.20000000000002,
+      "y": 993.9999999999999,
+      "width": 52.800000000000004,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "ac",
+      "roundness": null,
+      "seed": 1917650747,
+      "version": 1,
+      "versionNonce": 1269922485,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "package-manager-selection-and-version-re"
+      },
+      "text": "@calls",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "package-manager-selection-and-version-re-edge-3",
+      "originalText": "@calls",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "package-manager-selection-and-version-re-edge-4-label",
+      "type": "text",
+      "x": 145.20000000000002,
+      "y": 1374.7999999999997,
+      "width": 52.800000000000004,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "ad",
+      "roundness": null,
+      "seed": 1045890912,
+      "version": 1,
+      "versionNonce": 2017877692,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "package-manager-selection-and-version-re"
+      },
+      "text": "@calls",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "package-manager-selection-and-version-re-edge-4",
+      "originalText": "@calls",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "package-manager-selection-and-version-re-edge-5-label",
+      "type": "text",
+      "x": 453.1666666666667,
+      "y": 1637.1999999999998,
+      "width": 52.800000000000004,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "ae",
+      "roundness": null,
+      "seed": 1964072749,
+      "version": 1,
+      "versionNonce": 1555487127,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "package-manager-selection-and-version-re"
+      },
+      "text": "@calls",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "package-manager-selection-and-version-re-edge-5",
+      "originalText": "@calls",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "package-manager-selection-and-version-re-edge-6-label",
+      "type": "text",
+      "x": 789.4000000000002,
+      "y": 2017.9999999999998,
+      "width": 52.800000000000004,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "af",
+      "roundness": null,
+      "seed": 1136519690,
+      "version": 1,
+      "versionNonce": 395709022,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "package-manager-selection-and-version-re"
+      },
+      "text": "@calls",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "package-manager-selection-and-version-re-edge-6",
+      "originalText": "@calls",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "package-manager-selection-and-version-re-edge-7-label",
+      "type": "text",
+      "x": 777.1333333333333,
+      "y": 2517.2000000000003,
+      "width": 167.20000000000002,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "ag",
+      "roundness": null,
+      "seed": 400538639,
+      "version": 1,
+      "versionNonce": 1284741609,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "package-manager-selection-and-version-re"
+      },
+      "text": "HTTP fetch @depends",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "package-manager-selection-and-version-re-edge-7",
+      "originalText": "HTTP fetch @depends",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "package-manager-selection-and-version-re-edge-8-label",
+      "type": "text",
+      "x": 394.73333333333335,
+      "y": 2136.4,
+      "width": 132,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "ah",
+      "roundness": null,
+      "seed": 618905380,
+      "version": 1,
+      "versionNonce": 961750448,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "package-manager-selection-and-version-re"
+      },
+      "text": "versions @feeds",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "package-manager-selection-and-version-re-edge-8",
+      "originalText": "versions @feeds",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "package-manager-selection-and-version-re-edge-9-label",
+      "type": "text",
+      "x": 505.20000000000005,
+      "y": 2508.4333333333334,
+      "width": 52.800000000000004,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "ai",
+      "roundness": null,
+      "seed": 962290913,
+      "version": 1,
+      "versionNonce": 744838059,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "package-manager-selection-and-version-re"
+      },
+      "text": "@calls",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "package-manager-selection-and-version-re-edge-9",
+      "originalText": "@calls",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "package-manager-selection-and-version-re-edge-10-label",
+      "type": "text",
+      "x": 310.30000000000007,
+      "y": 2549.6000000000004,
+      "width": 123.20000000000002,
+      "height": 40,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aj",
+      "roundness": null,
+      "seed": 1086670363,
+      "version": 1,
+      "versionNonce": 524020501,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "package-manager-selection-and-version-re"
+      },
+      "text": "target version\n@feeds",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "package-manager-selection-and-version-re-edge-10",
+      "originalText": "target version @feeds",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "package-manager-selection-and-version-re-edge-11-label",
+      "type": "text",
+      "x": 145.20000000000002,
+      "y": 2136.4,
+      "width": 52.800000000000004,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "ak",
+      "roundness": null,
+      "seed": 2056958822,
+      "version": 1,
+      "versionNonce": 858305610,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "package-manager-selection-and-version-re"
+      },
+      "text": "@calls",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "package-manager-selection-and-version-re-edge-11",
+      "originalText": "@calls",
+      "autoResize": true,
+      "lineHeight": 1.25
+    }
+  ],
+  "appState": {
+    "gridSize": null,
+    "viewBackgroundColor": "#ffffff"
+  },
+  "files": {},
+  "diagramos": {
+    "version": "0.2.0-rc.6",
+    "schema": 1
+  }
+}
