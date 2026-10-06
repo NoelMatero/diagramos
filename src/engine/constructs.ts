@@ -548,8 +548,12 @@ function namesTheHead(
   routines: Node[], source: string, language: Language, wanted: Set<string>, handedInCounts = false,
   /** The head's own file, for what a value of it runs unwritten (#432). Absent, every handed-in value does. */
   head?: { source: string; language: Language },
+  /** Where the routine's calls were placed, for a value handed to code outside the repository (#432). */
+  placed?: CallSide,
 ): boolean {
   const spelt = new Set(wanted);
+  let outside: Set<number> | undefined;
+  const outsideCalls = () => outside ??= placedOutside(placed);
   for (const [local, binding] of bindingsIn(source, language)?.imported ?? []) {
     if (binding.name !== undefined && wanted.has(binding.name)) spelt.add(local);
   }
@@ -568,7 +572,7 @@ function namesTheHead(
      * Module)` was never asked whether it calls Module.
      */
     const handedIn = handedInTypes(routine, language)
-      .filter((span) => !handedInCounts || !runsUnwritten(routine, span.name, wanted, head));
+      .filter((span) => !handedInCounts || !runsUnwritten(routine, span.name, wanted, head, outsideCalls));
     each(routine, (node) => {
       if (named || node.childCount !== 0 || !node.isNamed) return;
       if (own && node.id === own.id) return;
@@ -640,6 +644,11 @@ const UNWRITTEN: Record<"iterate" | "format" | "hash" | "truth" | "with" | "awai
   await: /^(__await__|then)$/,
   operator: /^(__(?!(init|new|init_subclass|class_getitem|set_name|post_init)__)\w+__|toString|valueOf|\[Symbol\.toPrimitive\])$/,
 };
+/*
+ * The language's own routines whose use of an argument is known, so a value
+ * handed to one runs exactly that and no more: `set.add` hashes, it does not
+ * format. Any other call placed outside the repository may run anything.
+ */
 const ITERATES = /^(list|tuple|set|frozenset|sorted|sum|min|max|any|all|enumerate|zip|iter|next|len|dict|map|filter|reversed|Array\.from|Promise\.all)$/;
 const FORMATS = /^(str|repr|format|print|String|JSON\.stringify|console\.\w+)$/;
 const HASHES = /(^hash|\.(add|discard))$/;
@@ -652,24 +661,34 @@ const HASHES = /(^hash|\.(add|discard))$/;
  * use runs. A class with a base may inherit one, and a Rust type runs any
  * trait it implements (`Drop` at the end of the routine alone), so both
  * count whatever the use.
+ *
+ * A value handed to any other code outside the repository is #412's rule:
+ * a library cannot name your methods, so if it runs one it may run any.
+ * `logging.info("%s", r)` runs `__str__`, `copy.deepcopy(r)` runs
+ * `__deepcopy__`, and no list of library routines says which do. Whether a
+ * call lands there is `outside`'s: the placements `@calls`' own closed
+ * reading made, a compiler's among them. A call nobody placed has already
+ * left that reading open, so no red rests on it.
  */
 function runsUnwritten(
   routine: Node, name: string | undefined, wanted: Set<string>, head: { source: string; language: Language } | undefined,
+  outside: () => Set<number>,
 ): boolean {
   if (!name || !head) return true;
   const declared = unwrittenMethods(head.source, head.language, wanted);
   if (declared === "any") return true;
   if (declared.length === 0) return false;
-  const runs = (use: Use) => declared.some((method) => UNWRITTEN[use].test(method));
+  const runs = (use: Use) => declared.some((method) => use === "library"
+    ? Object.values(UNWRITTEN).some((one) => one.test(method))
+    : UNWRITTEN[use].test(method));
   let found = false;
-  const visit = (node: Node, use: Use | undefined, callee?: string): void => {
+  const visit = (node: Node, use: Use | undefined, callee?: Called): void => {
     if (found) return;
     if (node.childCount === 0) {
       if (use && node.isNamed && node.text === name && runs(use)) found = true;
       return;
     }
-    const call = /^call(_expression)?$/.test(node.type) || node.type === "new_expression"
-      ? node.childForFieldName("function")?.text.replace(/\s+/g, "") ?? "" : undefined;
+    const call = calledBy(node, outside);
     for (let at = 0; at < node.childCount; at += 1) {
       const child = node.child(at)!;
       visit(child, useOf(node, node.fieldNameForChild(at), use, callee), call ?? callee);
@@ -679,12 +698,39 @@ function runsUnwritten(
   return found;
 }
 
-type Use = keyof typeof UNWRITTEN;
+/** `library` is a call placed outside the repository: any of the others. */
+type Use = keyof typeof UNWRITTEN | "library";
+
+/** A call's callee as written, and whether it was placed outside the repository. */
+type Called = { text: string; outside: boolean };
+
+function calledBy(node: Node, outside: () => Set<number>): Called | undefined {
+  if (!/^call(_expression)?$/.test(node.type) && node.type !== "new_expression") return undefined;
+  const callee = node.childForFieldName("function") ?? node.childForFieldName("constructor");
+  if (!callee) return { text: "", outside: false };
+  // A site is placed by its member's name, or by the bare name.
+  const at = callee.childForFieldName("attribute") ?? callee.childForFieldName("property") ?? callee;
+  return { text: callee.text.replace(/\s+/g, ""), outside: outside().has(at.startIndex) };
+}
+
+/** Where a side's calls were placed outside the repository, by the start of the name each is placed by. */
+function placedOutside(side: CallSide | undefined): Set<number> {
+  const starts = new Set<number>();
+  const reading = side ? callSitesIn(side) : undefined;
+  if (!reading?.read) return starts;
+  for (const body of reading.bodies) {
+    for (const site of body.sites) if (site.file === EXTERNAL_RECEIVER && site.nameAt) starts.add(site.nameAt.start);
+  }
+  return starts;
+}
 
 /** What a node's child at `field` is used for, given what the node itself is used for. */
-function useOf(node: Node, field: string | null, use: Use | undefined, callee: string | undefined): Use | undefined {
+function useOf(node: Node, field: string | null, use: Use | undefined, callee: Called | undefined): Use | undefined {
   switch (node.type) {
-    case "parenthesized_expression": case "expression_list": return use;
+    // A cast hands on the same value.
+    case "parenthesized_expression": case "expression_list": case "as_expression": case "type_assertion":
+    case "satisfies_expression": case "non_null_expression":
+      return use;
     case "for_statement": case "for_in_clause": case "for_in_statement":
       return field === "right" || field === "iterable" ? "iterate" : undefined;
     case "list_splat": case "dictionary_splat": case "spread_element": case "yield": return "iterate";
@@ -701,11 +747,13 @@ function useOf(node: Node, field: string | null, use: Use | undefined, callee: s
     // A container something walks: its items may be hashed, compared or formatted (`set([r])`, `sorted([r])`).
     case "list": case "tuple": case "array": case "dictionary": case "object": case "list_comprehension":
     case "generator_expression": case "set_comprehension": case "dictionary_comprehension":
-      return use ? "operator" : undefined;
+      return use === "library" ? use : use ? "operator" : undefined;
     case "pair": return field === "key" ? "hash" : undefined;
+    case "keyword_argument": return field === "value" ? use : undefined;
     case "argument_list": case "arguments": {
-      const called = callee ?? "";
-      return ITERATES.test(called) ? "iterate" : FORMATS.test(called) ? "format" : HASHES.test(called) ? "hash" : undefined;
+      const called = callee?.text ?? "";
+      return ITERATES.test(called) ? "iterate" : FORMATS.test(called) ? "format" : HASHES.test(called) ? "hash"
+        : callee?.outside ? "library" : undefined;
     }
     default: return undefined;
   }
@@ -992,6 +1040,13 @@ export interface ConstructsNames {
    * class with a parent nobody placed may be a kind of the head.
    */
   ancestors?: (file: string, at: { start: number; end: number }) => Array<{ file: string; line: number }> | undefined;
+  /**
+   * The side `@calls` placed the tail's calls with, when it asks (#374):
+   * the same placements its closed reading rests on, compilers included, so
+   * a call it put outside the repository is one a handed-in value may be
+   * run by (#432). Absent, `side`'s are used.
+   */
+  calls?: CallSide;
 }
 
 /**
@@ -1177,7 +1232,8 @@ function pythonAbsence(
   if (!reverse || reverse.language !== "python" || !names?.head) return undefined;
   if (!mayAccuse("builds", "python", "absence") || !onlyCalledClasses(reverse.source, targets)) return undefined;
   const { routines } = routinesNamed(source, routine, "python");
-  if (routines.length === 0 || namesTheHead(routines, source, "python", new Set(targets), handedInCounts, reverse)) return undefined;
+  if (routines.length === 0) return undefined;
+  if (namesTheHead(routines, source, "python", new Set(targets), handedInCounts, reverse, names.calls ?? names.side)) return undefined;
 
   /*
    * A call to the tail is a construction only when the tail is a class. When
@@ -1477,7 +1533,7 @@ export function constructions(
    */
   const byText = reverse !== undefined && mayAccuse("builds", language, "absence")
     && onlyNewCreates(reverse.source, language, reverse.language, targets)
-    && !namesTheHead(routines, source, language, wanted, forCalls, reverse)
+    && !namesTheHead(routines, source, language, wanted, forCalls, reverse, names?.calls ?? names?.side)
     && !(language === "rust" && macroDeclares(source, routine));
   if (byText && language === "rust" && names && !names.side.compiled?.()) {
     return { verdict: "absent", awaitsCompiler: true };
