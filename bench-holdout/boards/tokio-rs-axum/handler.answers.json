@@ -1,0 +1,111 @@
+{
+  "board": "bench-holdout/boards/tokio-rs-axum/handler.excalidraw",
+  "project": "tokio-rs-axum",
+  "topic": "handler",
+  "language": "rust",
+  "scope": "axum/src/handler",
+  "pin": "9f1226db15",
+  "tool": "rust-analyzer 0.0.0 (7cb789d982 2026-02-01)",
+  "claims": [
+    {
+      "id": "builds|axum/src/handler/mod.rs#impl_handler|axum/src/handler/mod.rs#Handler|",
+      "word": "builds",
+      "from": "axum/src/handler/mod.rs#impl_handler",
+      "to": "axum/src/handler/mod.rs#Handler",
+      "fromLabel": "impl_handler! macro",
+      "toLabel": "Handler trait",
+      "language": "rust",
+      "source": "drawn",
+      "truth": "undecidable",
+      "why": "the tool could not place Handler here"
+    },
+    {
+      "id": "builds|axum/src/handler/mod.rs#with_state|axum/src/handler/service.rs#HandlerService|",
+      "word": "builds",
+      "from": "axum/src/handler/mod.rs#with_state",
+      "to": "axum/src/handler/service.rs#HandlerService",
+      "fromLabel": "Handler::with_state()",
+      "toLabel": "HandlerService struct",
+      "language": "rust",
+      "source": "drawn",
+      "truth": "undecidable",
+      "why": "it is named here but not plainly constructed"
+    },
+    {
+      "id": "needs|axum/src/handler/mod.rs#with_state|axum/src/handler/service.rs#HandlerService|",
+      "word": "needs",
+      "from": "axum/src/handler/mod.rs#with_state",
+      "to": "axum/src/handler/service.rs#HandlerService",
+      "fromLabel": "Handler::with_state()",
+      "toLabel": "HandlerService struct",
+      "language": "rust",
+      "source": "labelled",
+      "truth": "true",
+      "why": "it imports it (self::..HandlerService)"
+    },
+    {
+      "id": "calls|axum/src/handler/mod.rs#with_state|axum/src/handler/service.rs#HandlerService|",
+      "word": "calls",
+      "from": "axum/src/handler/mod.rs#with_state",
+      "to": "axum/src/handler/service.rs#HandlerService",
+      "fromLabel": "Handler::with_state()",
+      "toLabel": "HandlerService struct",
+      "language": "rust",
+      "source": "labelled",
+      "truth": "true",
+      "why": "it calls its routine new"
+    },
+    {
+      "id": "needs|axum/src/handler/service.rs#HandlerService|axum/src/handler/mod.rs#with_state|",
+      "word": "needs",
+      "from": "axum/src/handler/service.rs#HandlerService",
+      "to": "axum/src/handler/mod.rs#with_state",
+      "fromLabel": "HandlerService struct",
+      "toLabel": "Handler::with_state()",
+      "language": "rust",
+      "source": "reverse",
+      "parent": "needs|axum/src/handler/mod.rs#with_state|axum/src/handler/service.rs#HandlerService|",
+      "truth": "true",
+      "why": "it imports it (super::..Handler)"
+    },
+    {
+      "id": "needs|axum/src/handler/mod.rs#with_state|axum/src/handler/mod.rs|",
+      "word": "needs",
+      "from": "axum/src/handler/mod.rs#with_state",
+      "to": "axum/src/handler/mod.rs",
+      "fromLabel": "Handler::with_state()",
+      "toLabel": "HandlerService struct",
+      "language": "rust",
+      "source": "retarget",
+      "parent": "needs|axum/src/handler/mod.rs#with_state|axum/src/handler/service.rs#HandlerService|",
+      "truth": "undecidable",
+      "why": "both ends are the same file"
+    },
+    {
+      "id": "calls|axum/src/handler/service.rs#HandlerService|axum/src/handler/mod.rs#with_state|",
+      "word": "calls",
+      "from": "axum/src/handler/service.rs#HandlerService",
+      "to": "axum/src/handler/mod.rs#with_state",
+      "fromLabel": "HandlerService struct",
+      "toLabel": "Handler::with_state()",
+      "language": "rust",
+      "source": "reverse",
+      "parent": "calls|axum/src/handler/mod.rs#with_state|axum/src/handler/service.rs#HandlerService|",
+      "truth": "false",
+      "why": "every routine of the type was read and none calls it"
+    },
+    {
+      "id": "calls|axum/src/handler/mod.rs#with_state|axum/src/handler/service.rs#state|",
+      "word": "calls",
+      "from": "axum/src/handler/mod.rs#with_state",
+      "to": "axum/src/handler/service.rs#state",
+      "fromLabel": "Handler::with_state()",
+      "toLabel": "HandlerService struct",
+      "language": "rust",
+      "source": "retarget",
+      "parent": "calls|axum/src/handler/mod.rs#with_state|axum/src/handler/service.rs#HandlerService|",
+      "truth": "false",
+      "why": "the to end is a value or field, and only something that runs can be called"
+    }
+  ]
+}
