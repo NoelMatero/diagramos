@@ -188,13 +188,17 @@ async function load(): Promise<void> {
   const dir = wasmDirectory();
   if (!dir) return;
   let runtime: { Parser: { init(o: unknown): Promise<void>; new (): Parser };
-                 Language: { load(p: string): Promise<unknown> } };
+                 Language: { load(p: string): Promise<unknown> };
+                 Tree: { prototype: { delete(this: { 0: number }): void } } };
   try {
     runtime = require_(path.join(dir, "tree-sitter.js"));
     await runtime.Parser.init({ locateFile: () => path.join(dir, "tree-sitter.wasm") });
   } catch {
     return; // No runtime is no support, which is silence.
   }
+  // `Tree.delete` reads nothing but the address, so a tree can be freed after its object is gone.
+  const free = runtime.Tree.prototype.delete;
+  freeTree = (address) => free.call({ 0: address });
   for (const [language, grammar] of Object.entries(GRAMMARS) as Array<[Language, string]>) {
     const file = path.join(dir, `tree-sitter-${grammar}.wasm`);
     if (!existsSync(file)) continue;
@@ -241,11 +245,36 @@ export function parseSource(source: string, language: Language): Tree | undefine
   if (trees.size > CACHE_LIMIT) {
     const oldest = trees.keys().next();
     if (!oldest.done) {
-      trees.get(oldest.value)?.delete();
+      const evicted = trees.get(oldest.value);
       trees.delete(oldest.value);
+      if (evicted) release(evicted);
     }
   }
   return tree;
+}
+
+/*
+ * A tree the cache lets go of is freed once nothing holds it, not on the spot.
+ *
+ * The oldest tree in the cache can be the one a caller is still reading.
+ * `callSitesIn` walks a file's tree while the calls it places parse other
+ * files, and `readRustDependencies` holds its tree while it reads the crate's
+ * modules; past CACHE_LIMIT other files, eviction freed the tree under them.
+ * The walk then read freed WebAssembly memory -- "memory access out of bounds",
+ * or a `rootNode` of null -- and the run died: on typeorm every time, on Rocket
+ * and just, and on tracing once enough had been read before it.
+ *
+ * Every node holds its tree, so a tree nothing can reach is a tree nobody is
+ * reading, and that is the only moment freeing it is safe. The cache still
+ * holds CACHE_LIMIT trees; what changes is that an evicted tree still in use
+ * lives until its reader is done with it.
+ */
+let freeTree: ((address: number) => void) | undefined;
+const released = new FinalizationRegistry<number>((address) => freeTree?.(address));
+
+function release(tree: Tree): void {
+  const address = (tree as unknown as { 0: number })[0];
+  if (address) released.register(tree, address);
 }
 
 /**
