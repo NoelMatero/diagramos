@@ -1,0 +1,2187 @@
+{
+  "type": "excalidraw",
+  "version": 2,
+  "source": "diagramos",
+  "elements": [
+    {
+      "id": "oclif-run-and-execute-flow-title",
+      "type": "text",
+      "x": 0,
+      "y": -115,
+      "width": 343.20000000000005,
+      "height": 30,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a0",
+      "roundness": null,
+      "seed": 1187905615,
+      "version": 1,
+      "versionNonce": 1798269737,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "oclif-run-and-execute-flow",
+        "role": "title"
+      },
+      "text": "oclif run and execute flow",
+      "fontSize": 24,
+      "fontFamily": 5,
+      "textAlign": "left",
+      "verticalAlign": "middle",
+      "containerId": null,
+      "originalText": "oclif run and execute flow",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "oclif-run-and-execute-flow-node-0",
+      "type": "rectangle",
+      "x": 20,
+      "y": 60,
+      "width": 160,
+      "height": 80,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a1",
+      "roundness": null,
+      "seed": 1229735378,
+      "version": 1,
+      "versionNonce": 1258558470,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "oclif-run-and-execute-flow-node-0-label"
+        },
+        {
+          "id": "oclif-run-and-execute-flow-edge-0",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "oclif-run-and-execute-flow",
+        "node": "execute_node",
+        "ref": "src/execute.ts#execute"
+      }
+    },
+    {
+      "id": "oclif-run-and-execute-flow-node-1",
+      "type": "rectangle",
+      "x": 500,
+      "y": 20,
+      "width": 160,
+      "height": 140,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a2",
+      "roundness": null,
+      "seed": 1569999939,
+      "version": 1,
+      "versionNonce": 47552861,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "oclif-run-and-execute-flow-node-1-label"
+        },
+        {
+          "id": "oclif-run-and-execute-flow-edge-0",
+          "type": "arrow"
+        },
+        {
+          "id": "oclif-run-and-execute-flow-edge-1",
+          "type": "arrow"
+        },
+        {
+          "id": "oclif-run-and-execute-flow-edge-5",
+          "type": "arrow"
+        },
+        {
+          "id": "oclif-run-and-execute-flow-edge-6",
+          "type": "arrow"
+        },
+        {
+          "id": "oclif-run-and-execute-flow-edge-8",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "oclif-run-and-execute-flow",
+        "node": "run_node",
+        "ref": "src/main.ts#run"
+      }
+    },
+    {
+      "id": "oclif-run-and-execute-flow-node-2",
+      "type": "rectangle",
+      "x": 1700,
+      "y": 340,
+      "width": 220,
+      "height": 80,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a3",
+      "roundness": null,
+      "seed": 2117033492,
+      "version": 1,
+      "versionNonce": 1660314464,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "oclif-run-and-execute-flow-node-2-label"
+        },
+        {
+          "id": "oclif-run-and-execute-flow-edge-2",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "oclif-run-and-execute-flow",
+        "node": "config_class",
+        "ref": "src/config/config.ts#Config"
+      }
+    },
+    {
+      "id": "oclif-run-and-execute-flow-node-3",
+      "type": "rectangle",
+      "x": 1120,
+      "y": 340,
+      "width": 200,
+      "height": 100,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a4",
+      "roundness": {
+        "type": 3
+      },
+      "seed": 2054369773,
+      "version": 1,
+      "versionNonce": 322595671,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "oclif-run-and-execute-flow-node-3-label"
+        },
+        {
+          "id": "oclif-run-and-execute-flow-edge-1",
+          "type": "arrow"
+        },
+        {
+          "id": "oclif-run-and-execute-flow-edge-2",
+          "type": "arrow"
+        },
+        {
+          "id": "oclif-run-and-execute-flow-edge-3",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "oclif-run-and-execute-flow",
+        "node": "config_load_static",
+        "ref": "src/config/config.ts#Config.load"
+      }
+    },
+    {
+      "id": "oclif-run-and-execute-flow-node-4",
+      "type": "rectangle",
+      "x": 1720,
+      "y": 500,
+      "width": 200,
+      "height": 80,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a5",
+      "roundness": {
+        "type": 3
+      },
+      "seed": 644218038,
+      "version": 1,
+      "versionNonce": 428813594,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "oclif-run-and-execute-flow-node-4-label"
+        },
+        {
+          "id": "oclif-run-and-execute-flow-edge-3",
+          "type": "arrow"
+        },
+        {
+          "id": "oclif-run-and-execute-flow-edge-4",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "oclif-run-and-execute-flow",
+        "node": "config_load_instance"
+      }
+    },
+    {
+      "id": "oclif-run-and-execute-flow-node-5",
+      "type": "rectangle",
+      "x": 2260,
+      "y": 500,
+      "width": 320,
+      "height": 80,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a6",
+      "roundness": null,
+      "seed": 813100615,
+      "version": 1,
+      "versionNonce": 1502523745,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "oclif-run-and-execute-flow-node-5-label"
+        },
+        {
+          "id": "oclif-run-and-execute-flow-edge-4",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "oclif-run-and-execute-flow",
+        "node": "load_plugins",
+        "ref": "src/config/config.ts#Config.loadPluginsAndCommands"
+      }
+    },
+    {
+      "id": "oclif-run-and-execute-flow-node-6",
+      "type": "rectangle",
+      "x": 1100,
+      "y": 20,
+      "width": 220,
+      "height": 80,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a7",
+      "roundness": null,
+      "seed": 1346082712,
+      "version": 1,
+      "versionNonce": 306502516,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "oclif-run-and-execute-flow-node-6-label"
+        },
+        {
+          "id": "oclif-run-and-execute-flow-edge-5",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "oclif-run-and-execute-flow",
+        "node": "normalize_argv",
+        "ref": "src/help/util.ts#normalizeArgv"
+      }
+    },
+    {
+      "id": "oclif-run-and-execute-flow-node-7",
+      "type": "rectangle",
+      "x": 1120,
+      "y": 660,
+      "width": 200,
+      "height": 80,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a8",
+      "roundness": null,
+      "seed": 1684209729,
+      "version": 1,
+      "versionNonce": 115664779,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "oclif-run-and-execute-flow-node-7-label"
+        },
+        {
+          "id": "oclif-run-and-execute-flow-edge-6",
+          "type": "arrow"
+        },
+        {
+          "id": "oclif-run-and-execute-flow-edge-7",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "oclif-run-and-execute-flow",
+        "node": "find_command",
+        "ref": "src/config/config.ts#Config.findCommand"
+      }
+    },
+    {
+      "id": "oclif-run-and-execute-flow-node-8",
+      "type": "rectangle",
+      "x": 1120,
+      "y": 180,
+      "width": 180,
+      "height": 80,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a9",
+      "roundness": null,
+      "seed": 1854339210,
+      "version": 1,
+      "versionNonce": 1914166750,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "oclif-run-and-execute-flow-node-8-label"
+        },
+        {
+          "id": "oclif-run-and-execute-flow-edge-8",
+          "type": "arrow"
+        },
+        {
+          "id": "oclif-run-and-execute-flow-edge-9",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "oclif-run-and-execute-flow",
+        "node": "run_command",
+        "ref": "src/config/config.ts#Config.runCommand"
+      }
+    },
+    {
+      "id": "oclif-run-and-execute-flow-node-9",
+      "type": "rectangle",
+      "x": 1700,
+      "y": 660,
+      "width": 160,
+      "height": 80,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aA",
+      "roundness": null,
+      "seed": 1873827547,
+      "version": 1,
+      "versionNonce": 293825237,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "oclif-run-and-execute-flow-node-9-label"
+        },
+        {
+          "id": "oclif-run-and-execute-flow-edge-7",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "oclif-run-and-execute-flow",
+        "node": "command_class",
+        "ref": "src/command.ts#Command"
+      }
+    },
+    {
+      "id": "oclif-run-and-execute-flow-node-10",
+      "type": "rectangle",
+      "x": 1700,
+      "y": 180,
+      "width": 200,
+      "height": 80,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aB",
+      "roundness": null,
+      "seed": 1091484235,
+      "version": 1,
+      "versionNonce": 1346720965,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "oclif-run-and-execute-flow-node-10-label"
+        },
+        {
+          "id": "oclif-run-and-execute-flow-edge-9",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "oclif-run-and-execute-flow",
+        "node": "command_run",
+        "ref": "src/command.ts#Command.run"
+      }
+    },
+    {
+      "id": "oclif-run-and-execute-flow-edge-0",
+      "type": "arrow",
+      "x": 172,
+      "y": 94,
+      "width": 332.8,
+      "height": 0,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aC",
+      "roundness": null,
+      "seed": 969213285,
+      "version": 1,
+      "versionNonce": 1890325487,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "oclif-run-and-execute-flow-edge-0-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "oclif-run-and-execute-flow",
+        "edge": {
+          "from": "execute_node",
+          "to": "run_node",
+          "claim": "calls"
+        }
+      },
+      "points": [
+        [
+          0.5,
+          0
+        ],
+        [
+          166.39999999999998,
+          0
+        ],
+        [
+          332.3,
+          0
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "oclif-run-and-execute-flow-node-0",
+        "focus": -0.15,
+        "gap": 8
+      },
+      "endBinding": {
+        "elementId": "oclif-run-and-execute-flow-node-1",
+        "focus": -0.05714285714285703,
+        "gap": 4.800000000000011
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "oclif-run-and-execute-flow-edge-1",
+      "type": "arrow",
+      "x": 664.8,
+      "y": 108,
+      "width": 451.7333333333331,
+      "height": 280.6666666666667,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aD",
+      "roundness": null,
+      "seed": 1810019660,
+      "version": 1,
+      "versionNonce": 978398488,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "oclif-run-and-execute-flow-edge-1-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "oclif-run-and-execute-flow",
+        "edge": {
+          "from": "run_node",
+          "to": "config_load_static",
+          "claim": "calls"
+        }
+      },
+      "points": [
+        [
+          0.5,
+          0
+        ],
+        [
+          56,
+          0
+        ],
+        [
+          56,
+          280.6666666666667
+        ],
+        [
+          85.5333333333333,
+          280.6666666666667
+        ],
+        [
+          177.08333333333326,
+          280.6666666666667
+        ],
+        [
+          268.6333333333332,
+          280.6666666666667
+        ],
+        [
+          451.2333333333331,
+          280.6666666666667
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "oclif-run-and-execute-flow-node-1",
+        "focus": 0.25714285714285706,
+        "gap": 4.7999999999999545
+      },
+      "endBinding": {
+        "elementId": "oclif-run-and-execute-flow-node-3",
+        "focus": 0.02666666666666697,
+        "gap": 3.4666666666669244
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "oclif-run-and-execute-flow-edge-2",
+      "type": "arrow",
+      "x": 1316.533333333333,
+      "y": 372,
+      "width": 392.26666666666665,
+      "height": 0,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aE",
+      "roundness": null,
+      "seed": 1557611995,
+      "version": 1,
+      "versionNonce": 1707976661,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "oclif-run-and-execute-flow-edge-2-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "oclif-run-and-execute-flow",
+        "edge": {
+          "from": "config_load_static",
+          "to": "config_class",
+          "claim": "builds"
+        }
+      },
+      "points": [
+        [
+          0.5,
+          0
+        ],
+        [
+          196.13333333333344,
+          0
+        ],
+        [
+          391.76666666666665,
+          0
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "oclif-run-and-execute-flow-node-3",
+        "focus": -0.36000000000000004,
+        "gap": 3.4666666666669244
+      },
+      "endBinding": {
+        "elementId": "oclif-run-and-execute-flow-node-2",
+        "focus": 0.2,
+        "gap": 8.799999999999727
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "oclif-run-and-execute-flow-edge-3",
+      "type": "arrow",
+      "x": 1316.533333333333,
+      "y": 405.33333333333337,
+      "width": 402.26666666666665,
+      "height": 126.66666666666663,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aF",
+      "roundness": null,
+      "seed": 1538123658,
+      "version": 1,
+      "versionNonce": 1180834526,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "oclif-run-and-execute-flow-edge-3-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "oclif-run-and-execute-flow",
+        "edge": {
+          "from": "config_load_static",
+          "to": "config_load_instance",
+          "claim": "calls"
+        }
+      },
+      "points": [
+        [
+          0.5,
+          0
+        ],
+        [
+          38.66666666666674,
+          0
+        ],
+        [
+          38.66666666666674,
+          126.66666666666663
+        ],
+        [
+          137.79999999999995,
+          126.66666666666663
+        ],
+        [
+          203.91666666666674,
+          126.66666666666663
+        ],
+        [
+          270.0333333333333,
+          126.66666666666663
+        ],
+        [
+          401.76666666666665,
+          126.66666666666663
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "oclif-run-and-execute-flow-node-3",
+        "focus": 0.3066666666666672,
+        "gap": 3.4666666666669244
+      },
+      "endBinding": {
+        "elementId": "oclif-run-and-execute-flow-node-4",
+        "focus": 0.20000000000000004,
+        "gap": 1.2000000000002728
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "oclif-run-and-execute-flow-edge-4",
+      "type": "arrow",
+      "x": 1918.7999999999997,
+      "y": 532,
+      "width": 342.8000000000002,
+      "height": 0,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aG",
+      "roundness": null,
+      "seed": 608499929,
+      "version": 1,
+      "versionNonce": 1267486243,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "oclif-run-and-execute-flow-edge-4-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "oclif-run-and-execute-flow",
+        "edge": {
+          "from": "config_load_instance",
+          "to": "load_plugins",
+          "claim": "calls"
+        }
+      },
+      "points": [
+        [
+          0.5,
+          0
+        ],
+        [
+          171.4000000000001,
+          0
+        ],
+        [
+          342.3000000000002,
+          0
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "oclif-run-and-execute-flow-node-4",
+        "focus": -0.20000000000000004,
+        "gap": 1.2000000000002728
+      },
+      "endBinding": {
+        "elementId": "oclif-run-and-execute-flow-node-5",
+        "focus": 0.19999999999999998,
+        "gap": 1.599999999999909
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "oclif-run-and-execute-flow-edge-5",
+      "type": "arrow",
+      "x": 664.8,
+      "y": 52,
+      "width": 438.39999999999986,
+      "height": 0,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aH",
+      "roundness": null,
+      "seed": 1337470928,
+      "version": 1,
+      "versionNonce": 503774892,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "oclif-run-and-execute-flow-edge-5-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "oclif-run-and-execute-flow",
+        "edge": {
+          "from": "run_node",
+          "to": "normalize_argv",
+          "claim": "calls"
+        }
+      },
+      "points": [
+        [
+          0.5,
+          0
+        ],
+        [
+          219.19999999999993,
+          0
+        ],
+        [
+          437.89999999999986,
+          0
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "oclif-run-and-execute-flow-node-1",
+        "focus": -0.542857142857143,
+        "gap": 4.7999999999999545
+      },
+      "endBinding": {
+        "elementId": "oclif-run-and-execute-flow-node-6",
+        "focus": 0.2,
+        "gap": 3.199999999999818
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "oclif-run-and-execute-flow-edge-6",
+      "type": "arrow",
+      "x": 664.8,
+      "y": 136,
+      "width": 448.39999999999986,
+      "height": 556,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aI",
+      "roundness": null,
+      "seed": 482624511,
+      "version": 1,
+      "versionNonce": 322832665,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "oclif-run-and-execute-flow-edge-6-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "oclif-run-and-execute-flow",
+        "edge": {
+          "from": "run_node",
+          "to": "find_command",
+          "claim": "calls"
+        }
+      },
+      "points": [
+        [
+          0.5,
+          0
+        ],
+        [
+          32,
+          0
+        ],
+        [
+          32,
+          470.19999999999993
+        ],
+        [
+          32,
+          556
+        ],
+        [
+          447.89999999999986,
+          556
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "oclif-run-and-execute-flow-node-1",
+        "focus": 0.657142857142857,
+        "gap": 4.7999999999999545
+      },
+      "endBinding": {
+        "elementId": "oclif-run-and-execute-flow-node-7",
+        "focus": 0.20000000000000004,
+        "gap": 6.800000000000182
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "oclif-run-and-execute-flow-edge-7",
+      "type": "arrow",
+      "x": 1313.1999999999998,
+      "y": 692,
+      "width": 395.5999999999999,
+      "height": 0,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aJ",
+      "roundness": null,
+      "seed": 251852398,
+      "version": 1,
+      "versionNonce": 2010967186,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "oclif-run-and-execute-flow-edge-7-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "oclif-run-and-execute-flow",
+        "edge": {
+          "from": "find_command",
+          "to": "command_class",
+          "claim": "returns"
+        }
+      },
+      "points": [
+        [
+          0.5,
+          0
+        ],
+        [
+          197.79999999999995,
+          0
+        ],
+        [
+          395.0999999999999,
+          0
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "oclif-run-and-execute-flow-node-7",
+        "focus": -0.20000000000000004,
+        "gap": 6.800000000000182
+      },
+      "endBinding": {
+        "elementId": "oclif-run-and-execute-flow-node-9",
+        "focus": 0.2,
+        "gap": 8.799999999999727
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "oclif-run-and-execute-flow-edge-8",
+      "type": "arrow",
+      "x": 664.8,
+      "y": 80,
+      "width": 458.39999999999986,
+      "height": 132,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aK",
+      "roundness": null,
+      "seed": 1738154221,
+      "version": 1,
+      "versionNonce": 1736747095,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "oclif-run-and-execute-flow-edge-8-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "oclif-run-and-execute-flow",
+        "edge": {
+          "from": "run_node",
+          "to": "run_command",
+          "claim": "calls"
+        }
+      },
+      "points": [
+        [
+          0.5,
+          0
+        ],
+        [
+          80,
+          0
+        ],
+        [
+          80,
+          132
+        ],
+        [
+          163.19999999999993,
+          132
+        ],
+        [
+          237,
+          132
+        ],
+        [
+          310.79999999999995,
+          132
+        ],
+        [
+          457.89999999999986,
+          132
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "oclif-run-and-execute-flow-node-1",
+        "focus": -0.142857142857143,
+        "gap": 4.7999999999999545
+      },
+      "endBinding": {
+        "elementId": "oclif-run-and-execute-flow-node-8",
+        "focus": 0.19999999999999998,
+        "gap": 3.199999999999818
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "oclif-run-and-execute-flow-edge-9",
+      "type": "arrow",
+      "x": 1303.1999999999998,
+      "y": 212,
+      "width": 405.5999999999999,
+      "height": 0,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aL",
+      "roundness": null,
+      "seed": 1800817940,
+      "version": 1,
+      "versionNonce": 926982240,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "oclif-run-and-execute-flow-edge-9-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "oclif-run-and-execute-flow",
+        "edge": {
+          "from": "run_command",
+          "to": "command_run",
+          "claim": "calls"
+        }
+      },
+      "points": [
+        [
+          0.5,
+          0
+        ],
+        [
+          202.79999999999995,
+          0
+        ],
+        [
+          405.0999999999999,
+          0
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "oclif-run-and-execute-flow-node-8",
+        "focus": -0.19999999999999998,
+        "gap": 3.199999999999818
+      },
+      "endBinding": {
+        "elementId": "oclif-run-and-execute-flow-node-10",
+        "focus": 0.20000000000000004,
+        "gap": 8.799999999999727
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "oclif-run-and-execute-flow-node-0-label",
+      "type": "text",
+      "x": 50.49999999999999,
+      "y": 87.5,
+      "width": 99.00000000000001,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aM",
+      "roundness": null,
+      "seed": 1231174515,
+      "version": 1,
+      "versionNonce": 7123789,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "oclif-run-and-execute-flow"
+      },
+      "text": "execute()",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "oclif-run-and-execute-flow-node-0",
+      "originalText": "execute()",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "oclif-run-and-execute-flow-node-1-label",
+      "type": "text",
+      "x": 552.5,
+      "y": 77.5,
+      "width": 55.00000000000001,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aN",
+      "roundness": null,
+      "seed": 694738782,
+      "version": 1,
+      "versionNonce": 660621954,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "oclif-run-and-execute-flow"
+      },
+      "text": "run()",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "oclif-run-and-execute-flow-node-1",
+      "originalText": "run()",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "oclif-run-and-execute-flow-node-2-label",
+      "type": "text",
+      "x": 1733,
+      "y": 367.5,
+      "width": 154,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aO",
+      "roundness": null,
+      "seed": 1484788705,
+      "version": 1,
+      "versionNonce": 858050731,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "oclif-run-and-execute-flow"
+      },
+      "text": "Config (class)",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "oclif-run-and-execute-flow-node-2",
+      "originalText": "Config (class)",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "oclif-run-and-execute-flow-node-3-label",
+      "type": "text",
+      "x": 1148.5,
+      "y": 377.5,
+      "width": 143,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aP",
+      "roundness": null,
+      "seed": 1141403172,
+      "version": 1,
+      "versionNonce": 1074963120,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "oclif-run-and-execute-flow"
+      },
+      "text": "Config.load()",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "oclif-run-and-execute-flow-node-3",
+      "originalText": "Config.load()",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "oclif-run-and-execute-flow-node-4-label",
+      "type": "text",
+      "x": 1748.5,
+      "y": 527.5,
+      "width": 143,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aQ",
+      "roundness": null,
+      "seed": 487132647,
+      "version": 1,
+      "versionNonce": 1339369089,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "oclif-run-and-execute-flow"
+      },
+      "text": "config.load()",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "oclif-run-and-execute-flow-node-4",
+      "originalText": "config.load()",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "oclif-run-and-execute-flow-node-5-label",
+      "type": "text",
+      "x": 2288,
+      "y": 527.5,
+      "width": 264,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aR",
+      "roundness": null,
+      "seed": 894529858,
+      "version": 1,
+      "versionNonce": 1689538486,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "oclif-run-and-execute-flow"
+      },
+      "text": "loadPluginsAndCommands()",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "oclif-run-and-execute-flow-node-5",
+      "originalText": "loadPluginsAndCommands()",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "oclif-run-and-execute-flow-node-6-label",
+      "type": "text",
+      "x": 1127.5,
+      "y": 47.5,
+      "width": 165,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aS",
+      "roundness": null,
+      "seed": 1168814565,
+      "version": 1,
+      "versionNonce": 725262703,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "oclif-run-and-execute-flow"
+      },
+      "text": "normalizeArgv()",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "oclif-run-and-execute-flow-node-6",
+      "originalText": "normalizeArgv()",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "oclif-run-and-execute-flow-node-7-label",
+      "type": "text",
+      "x": 1148.5,
+      "y": 687.5,
+      "width": 143,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aT",
+      "roundness": null,
+      "seed": 2044940568,
+      "version": 1,
+      "versionNonce": 625860596,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "oclif-run-and-execute-flow"
+      },
+      "text": "findCommand()",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "oclif-run-and-execute-flow-node-7",
+      "originalText": "findCommand()",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "oclif-run-and-execute-flow-node-8-label",
+      "type": "text",
+      "x": 1144,
+      "y": 207.5,
+      "width": 132,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aU",
+      "roundness": null,
+      "seed": 292664891,
+      "version": 1,
+      "versionNonce": 1383135157,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "oclif-run-and-execute-flow"
+      },
+      "text": "runCommand()",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "oclif-run-and-execute-flow-node-8",
+      "originalText": "runCommand()",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "oclif-run-and-execute-flow-node-9-label",
+      "type": "text",
+      "x": 1741.5,
+      "y": 687.5,
+      "width": 77,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aV",
+      "roundness": null,
+      "seed": 600641158,
+      "version": 1,
+      "versionNonce": 154460394,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "oclif-run-and-execute-flow"
+      },
+      "text": "Command",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "oclif-run-and-execute-flow-node-9",
+      "originalText": "Command",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "oclif-run-and-execute-flow-node-10-label",
+      "type": "text",
+      "x": 1728.5,
+      "y": 207.5,
+      "width": 143,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aW",
+      "roundness": null,
+      "seed": 1761471990,
+      "version": 1,
+      "versionNonce": 1208841050,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "oclif-run-and-execute-flow"
+      },
+      "text": "command.run()",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "oclif-run-and-execute-flow-node-10",
+      "originalText": "command.run()",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "oclif-run-and-execute-flow-edge-0-label",
+      "type": "text",
+      "x": 312,
+      "y": 84,
+      "width": 52.800000000000004,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aX",
+      "roundness": null,
+      "seed": 986390476,
+      "version": 1,
+      "versionNonce": 1915802776,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "oclif-run-and-execute-flow"
+      },
+      "text": "@calls",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "oclif-run-and-execute-flow-edge-0",
+      "originalText": "@calls",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "oclif-run-and-execute-flow-edge-1-label",
+      "type": "text",
+      "x": 723.9333333333333,
+      "y": 378.6666666666667,
+      "width": 52.800000000000004,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aY",
+      "roundness": null,
+      "seed": 1757790569,
+      "version": 1,
+      "versionNonce": 1519947379,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "oclif-run-and-execute-flow"
+      },
+      "text": "@calls",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "oclif-run-and-execute-flow-edge-1",
+      "originalText": "@calls",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "oclif-run-and-execute-flow-edge-2-label",
+      "type": "text",
+      "x": 1481.8666666666666,
+      "y": 362,
+      "width": 61.60000000000001,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aZ",
+      "roundness": null,
+      "seed": 977569158,
+      "version": 1,
+      "versionNonce": 1732589034,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "oclif-run-and-execute-flow"
+      },
+      "text": "@builds",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "oclif-run-and-execute-flow-edge-2",
+      "originalText": "@builds",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "oclif-run-and-execute-flow-edge-3-label",
+      "type": "text",
+      "x": 1427.933333333333,
+      "y": 522,
+      "width": 52.800000000000004,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aa",
+      "roundness": null,
+      "seed": 669592891,
+      "version": 1,
+      "versionNonce": 813780149,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "oclif-run-and-execute-flow"
+      },
+      "text": "@calls",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "oclif-run-and-execute-flow-edge-3",
+      "originalText": "@calls",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "oclif-run-and-execute-flow-edge-4-label",
+      "type": "text",
+      "x": 2063.7999999999997,
+      "y": 522,
+      "width": 52.800000000000004,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "ab",
+      "roundness": null,
+      "seed": 1945316704,
+      "version": 1,
+      "versionNonce": 1561735356,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "oclif-run-and-execute-flow"
+      },
+      "text": "@calls",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "oclif-run-and-execute-flow-edge-4",
+      "originalText": "@calls",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "oclif-run-and-execute-flow-edge-5-label",
+      "type": "text",
+      "x": 835.5999999999999,
+      "y": 42,
+      "width": 96.80000000000001,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "ac",
+      "roundness": null,
+      "seed": 716014893,
+      "version": 1,
+      "versionNonce": 1099344791,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "oclif-run-and-execute-flow"
+      },
+      "text": "argv @calls",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "oclif-run-and-execute-flow-edge-5",
+      "originalText": "argv @calls",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "oclif-run-and-execute-flow-edge-6-label",
+      "type": "text",
+      "x": 657.1999999999999,
+      "y": 596.1999999999999,
+      "width": 79.2,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "ad",
+      "roundness": null,
+      "seed": 2035945482,
+      "version": 1,
+      "versionNonce": 2087050334,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "oclif-run-and-execute-flow"
+      },
+      "text": "id @calls",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "oclif-run-and-execute-flow-edge-6",
+      "originalText": "id @calls",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "oclif-run-and-execute-flow-edge-7-label",
+      "type": "text",
+      "x": 1458.1999999999998,
+      "y": 682,
+      "width": 105.60000000000001,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "ae",
+      "roundness": null,
+      "seed": 1299964431,
+      "version": 1,
+      "versionNonce": 828599273,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "oclif-run-and-execute-flow"
+      },
+      "text": "cmd @returns",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "oclif-run-and-execute-flow-edge-7",
+      "originalText": "cmd @returns",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "oclif-run-and-execute-flow-edge-8-label",
+      "type": "text",
+      "x": 748.7999999999998,
+      "y": 202,
+      "width": 158.4,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "af",
+      "roundness": null,
+      "seed": 1518331172,
+      "version": 1,
+      "versionNonce": 505608112,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "oclif-run-and-execute-flow"
+      },
+      "text": "id,argv,cmd @calls",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "oclif-run-and-execute-flow-edge-8",
+      "originalText": "id,argv,cmd @calls",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "oclif-run-and-execute-flow-edge-9-label",
+      "type": "text",
+      "x": 1457.5999999999997,
+      "y": 202,
+      "width": 96.80000000000001,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "ag",
+      "roundness": null,
+      "seed": 1861716705,
+      "version": 1,
+      "versionNonce": 288695723,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "oclif-run-and-execute-flow"
+      },
+      "text": "argv @calls",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "oclif-run-and-execute-flow-edge-9",
+      "originalText": "argv @calls",
+      "autoResize": true,
+      "lineHeight": 1.25
+    }
+  ],
+  "appState": {
+    "gridSize": null,
+    "viewBackgroundColor": "#ffffff"
+  },
+  "files": {},
+  "diagramos": {
+    "version": "0.2.0-rc.6",
+    "schema": 1
+  }
+}

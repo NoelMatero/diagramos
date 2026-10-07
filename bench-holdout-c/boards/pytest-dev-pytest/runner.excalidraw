@@ -1,0 +1,2769 @@
+{
+  "type": "excalidraw",
+  "version": 2,
+  "source": "diagramos",
+  "elements": [
+    {
+      "id": "test-item-execution-and-reporting-flow-title",
+      "type": "text",
+      "x": 0,
+      "y": -115,
+      "width": 501.6,
+      "height": 30,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a0",
+      "roundness": null,
+      "seed": 841597628,
+      "version": 1,
+      "versionNonce": 725630536,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "test-item-execution-and-reporting-flow",
+        "role": "title"
+      },
+      "text": "Test Item Execution and Reporting Flow",
+      "fontSize": 24,
+      "fontFamily": 5,
+      "textAlign": "left",
+      "verticalAlign": "middle",
+      "containerId": null,
+      "originalText": "Test Item Execution and Reporting Flow",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "test-item-execution-and-reporting-flow-node-0",
+      "type": "rectangle",
+      "x": 2140,
+      "y": 20,
+      "width": 160,
+      "height": 100,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a1",
+      "roundness": null,
+      "seed": 2082151659,
+      "version": 1,
+      "versionNonce": 658414309,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "test-item-execution-and-reporting-flow-node-0-label"
+        },
+        {
+          "id": "test-item-execution-and-reporting-flow-edge-0",
+          "type": "arrow"
+        },
+        {
+          "id": "test-item-execution-and-reporting-flow-edge-8",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "test-item-execution-and-reporting-flow",
+        "node": "item",
+        "ref": "src/_pytest/nodes.py#Item"
+      }
+    },
+    {
+      "id": "test-item-execution-and-reporting-flow-node-1",
+      "type": "rectangle",
+      "x": 20,
+      "y": 580,
+      "width": 220,
+      "height": 120,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a2",
+      "roundness": null,
+      "seed": 671074138,
+      "version": 1,
+      "versionNonce": 993945134,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "test-item-execution-and-reporting-flow-node-1-label"
+        },
+        {
+          "id": "test-item-execution-and-reporting-flow-edge-0",
+          "type": "arrow"
+        },
+        {
+          "id": "test-item-execution-and-reporting-flow-edge-1",
+          "type": "arrow"
+        },
+        {
+          "id": "test-item-execution-and-reporting-flow-edge-2",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "test-item-execution-and-reporting-flow",
+        "node": "protocol",
+        "ref": "src/_pytest/runner.py#runtestprotocol"
+      }
+    },
+    {
+      "id": "test-item-execution-and-reporting-flow-node-2",
+      "type": "rectangle",
+      "x": 2140,
+      "y": 520,
+      "width": 160,
+      "height": 120,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a3",
+      "roundness": null,
+      "seed": 1612088117,
+      "version": 1,
+      "versionNonce": 855401919,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "test-item-execution-and-reporting-flow-node-2-label"
+        },
+        {
+          "id": "test-item-execution-and-reporting-flow-edge-1",
+          "type": "arrow"
+        },
+        {
+          "id": "test-item-execution-and-reporting-flow-edge-7",
+          "type": "arrow"
+        },
+        {
+          "id": "test-item-execution-and-reporting-flow-edge-9",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "test-item-execution-and-reporting-flow",
+        "node": "setupstate",
+        "ref": "src/_pytest/runner.py#SetupState"
+      }
+    },
+    {
+      "id": "test-item-execution-and-reporting-flow-node-3",
+      "type": "rectangle",
+      "x": 560,
+      "y": 440,
+      "width": 220,
+      "height": 180,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a4",
+      "roundness": null,
+      "seed": 1260843292,
+      "version": 1,
+      "versionNonce": 567321640,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "test-item-execution-and-reporting-flow-node-3-label"
+        },
+        {
+          "id": "test-item-execution-and-reporting-flow-edge-2",
+          "type": "arrow"
+        },
+        {
+          "id": "test-item-execution-and-reporting-flow-edge-3",
+          "type": "arrow"
+        },
+        {
+          "id": "test-item-execution-and-reporting-flow-edge-4",
+          "type": "arrow"
+        },
+        {
+          "id": "test-item-execution-and-reporting-flow-edge-5",
+          "type": "arrow"
+        },
+        {
+          "id": "test-item-execution-and-reporting-flow-edge-6",
+          "type": "arrow"
+        },
+        {
+          "id": "test-item-execution-and-reporting-flow-edge-10",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "test-item-execution-and-reporting-flow",
+        "node": "call_and_report",
+        "ref": "src/_pytest/runner.py#call_and_report"
+      }
+    },
+    {
+      "id": "test-item-execution-and-reporting-flow-node-4",
+      "type": "rectangle",
+      "x": 1360,
+      "y": 540,
+      "width": 280,
+      "height": 80,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a5",
+      "roundness": null,
+      "seed": 1369628943,
+      "version": 1,
+      "versionNonce": 986110185,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "test-item-execution-and-reporting-flow-node-4-label"
+        },
+        {
+          "id": "test-item-execution-and-reporting-flow-edge-3",
+          "type": "arrow"
+        },
+        {
+          "id": "test-item-execution-and-reporting-flow-edge-7",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "test-item-execution-and-reporting-flow",
+        "node": "runtest_setup",
+        "ref": "src/_pytest/runner.py#pytest_runtest_setup"
+      }
+    },
+    {
+      "id": "test-item-execution-and-reporting-flow-node-5",
+      "type": "rectangle",
+      "x": 1360,
+      "y": 60,
+      "width": 260,
+      "height": 80,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a6",
+      "roundness": null,
+      "seed": 1193077694,
+      "version": 1,
+      "versionNonce": 1929240162,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "test-item-execution-and-reporting-flow-node-5-label"
+        },
+        {
+          "id": "test-item-execution-and-reporting-flow-edge-4",
+          "type": "arrow"
+        },
+        {
+          "id": "test-item-execution-and-reporting-flow-edge-8",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "test-item-execution-and-reporting-flow",
+        "node": "runtest_call",
+        "ref": "src/_pytest/runner.py#pytest_runtest_call"
+      }
+    },
+    {
+      "id": "test-item-execution-and-reporting-flow-node-6",
+      "type": "rectangle",
+      "x": 1340,
+      "y": 380,
+      "width": 320,
+      "height": 80,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a7",
+      "roundness": null,
+      "seed": 1453927657,
+      "version": 1,
+      "versionNonce": 1469761779,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "test-item-execution-and-reporting-flow-node-6-label"
+        },
+        {
+          "id": "test-item-execution-and-reporting-flow-edge-5",
+          "type": "arrow"
+        },
+        {
+          "id": "test-item-execution-and-reporting-flow-edge-9",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "test-item-execution-and-reporting-flow",
+        "node": "runtest_teardown",
+        "ref": "src/_pytest/runner.py#pytest_runtest_teardown"
+      }
+    },
+    {
+      "id": "test-item-execution-and-reporting-flow-node-7",
+      "type": "rectangle",
+      "x": 2860,
+      "y": 280,
+      "width": 160,
+      "height": 100,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a8",
+      "roundness": null,
+      "seed": 1893141536,
+      "version": 1,
+      "versionNonce": 193855100,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "test-item-execution-and-reporting-flow-node-7-label"
+        },
+        {
+          "id": "test-item-execution-and-reporting-flow-edge-6",
+          "type": "arrow"
+        },
+        {
+          "id": "test-item-execution-and-reporting-flow-edge-13",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "test-item-execution-and-reporting-flow",
+        "node": "callinfo",
+        "ref": "src/_pytest/runner.py#CallInfo"
+      }
+    },
+    {
+      "id": "test-item-execution-and-reporting-flow-node-8",
+      "type": "rectangle",
+      "x": 1320,
+      "y": 220,
+      "width": 340,
+      "height": 80,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a9",
+      "roundness": null,
+      "seed": 1769782291,
+      "version": 1,
+      "versionNonce": 1780899181,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "test-item-execution-and-reporting-flow-node-8-label"
+        },
+        {
+          "id": "test-item-execution-and-reporting-flow-edge-10",
+          "type": "arrow"
+        },
+        {
+          "id": "test-item-execution-and-reporting-flow-edge-11",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "test-item-execution-and-reporting-flow",
+        "node": "makereport",
+        "ref": "src/_pytest/runner.py#pytest_runtest_makereport"
+      }
+    },
+    {
+      "id": "test-item-execution-and-reporting-flow-node-9",
+      "type": "rectangle",
+      "x": 2860,
+      "y": 120,
+      "width": 160,
+      "height": 80,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aA",
+      "roundness": null,
+      "seed": 353897698,
+      "version": 1,
+      "versionNonce": 173729750,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "test-item-execution-and-reporting-flow-node-9-label"
+        },
+        {
+          "id": "test-item-execution-and-reporting-flow-edge-12",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "test-item-execution-and-reporting-flow",
+        "node": "testreport",
+        "ref": "src/_pytest/reports.py#TestReport"
+      }
+    },
+    {
+      "id": "test-item-execution-and-reporting-flow-node-10",
+      "type": "rectangle",
+      "x": 2140,
+      "y": 200,
+      "width": 380,
+      "height": 100,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aB",
+      "roundness": null,
+      "seed": 772875492,
+      "version": 1,
+      "versionNonce": 85447024,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "test-item-execution-and-reporting-flow-node-10-label"
+        },
+        {
+          "id": "test-item-execution-and-reporting-flow-edge-11",
+          "type": "arrow"
+        },
+        {
+          "id": "test-item-execution-and-reporting-flow-edge-12",
+          "type": "arrow"
+        },
+        {
+          "id": "test-item-execution-and-reporting-flow-edge-13",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "test-item-execution-and-reporting-flow",
+        "node": "from_item_and_call",
+        "ref": "src/_pytest/reports.py#TestReport.from_item_and_call"
+      }
+    },
+    {
+      "id": "test-item-execution-and-reporting-flow-edge-0",
+      "type": "arrow",
+      "x": 232,
+      "y": 607.3333333333334,
+      "width": 1910.4,
+      "height": 595.3333333333334,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aC",
+      "roundness": null,
+      "seed": 2032555004,
+      "version": 1,
+      "versionNonce": 1502816648,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "test-item-execution-and-reporting-flow-edge-0-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "test-item-execution-and-reporting-flow",
+        "edge": {
+          "from": "protocol",
+          "to": "item",
+          "claim": "takes"
+        }
+      },
+      "points": [
+        [
+          0.5,
+          0
+        ],
+        [
+          32,
+          0
+        ],
+        [
+          32,
+          -595.3333333333334
+        ],
+        [
+          681.3666666666669,
+          -595.3333333333334
+        ],
+        [
+          1802.4,
+          -595.3333333333334
+        ],
+        [
+          1802.4,
+          -547.6666666666666
+        ],
+        [
+          1909.9,
+          -547.6666666666666
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "test-item-execution-and-reporting-flow-node-1",
+        "focus": -0.5444444444444444,
+        "gap": 8
+      },
+      "endBinding": {
+        "elementId": "test-item-execution-and-reporting-flow-node-0",
+        "focus": 0.20666666666666594,
+        "gap": 2.400000000000091
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "test-item-execution-and-reporting-flow-edge-1",
+      "type": "arrow",
+      "x": 232,
+      "y": 667.3333333333334,
+      "width": 1910.4,
+      "height": 50,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aD",
+      "roundness": null,
+      "seed": 1957541525,
+      "version": 1,
+      "versionNonce": 1023584927,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "test-item-execution-and-reporting-flow-edge-1-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "test-item-execution-and-reporting-flow",
+        "edge": {
+          "from": "protocol",
+          "to": "setupstate",
+          "claim": "accesses"
+        }
+      },
+      "points": [
+        [
+          0.5,
+          0
+        ],
+        [
+          245.05,
+          0
+        ],
+        [
+          490.1,
+          0
+        ],
+        [
+          980.2,
+          0
+        ],
+        [
+          1802.4,
+          0
+        ],
+        [
+          1802.4,
+          -50
+        ],
+        [
+          1909.9,
+          -50
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "test-item-execution-and-reporting-flow-node-1",
+        "focus": 0.4555555555555557,
+        "gap": 8
+      },
+      "endBinding": {
+        "elementId": "test-item-execution-and-reporting-flow-node-2",
+        "focus": -0.6222222222222229,
+        "gap": 2.400000000000091
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "test-item-execution-and-reporting-flow-edge-2",
+      "type": "arrow",
+      "x": 232,
+      "y": 637.3333333333334,
+      "width": 332.79999999999995,
+      "height": 110,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aE",
+      "roundness": null,
+      "seed": 1016424378,
+      "version": 1,
+      "versionNonce": 1586585614,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "test-item-execution-and-reporting-flow-edge-2-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "test-item-execution-and-reporting-flow",
+        "edge": {
+          "from": "protocol",
+          "to": "call_and_report",
+          "claim": "calls"
+        },
+        "via": [
+          "setup phase",
+          "call phase",
+          "teardown phase"
+        ]
+      },
+      "points": [
+        [
+          0.5,
+          0
+        ],
+        [
+          56,
+          0
+        ],
+        [
+          56,
+          -110
+        ],
+        [
+          111.39999999999998,
+          -110
+        ],
+        [
+          166.75,
+          -110
+        ],
+        [
+          222.09999999999997,
+          -110
+        ],
+        [
+          332.29999999999995,
+          -110
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "test-item-execution-and-reporting-flow-node-1",
+        "focus": -0.04444444444444428,
+        "gap": 8
+      },
+      "endBinding": {
+        "elementId": "test-item-execution-and-reporting-flow-node-3",
+        "focus": 0.029629629629629346,
+        "gap": 4.7999999999999545
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "test-item-execution-and-reporting-flow-edge-3",
+      "type": "arrow",
+      "x": 784.8,
+      "y": 587.3333333333334,
+      "width": 565.2,
+      "height": 0,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aF",
+      "roundness": null,
+      "seed": 1448813515,
+      "version": 1,
+      "versionNonce": 1469016389,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "test-item-execution-and-reporting-flow-edge-3-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "test-item-execution-and-reporting-flow",
+        "edge": {
+          "from": "call_and_report",
+          "to": "runtest_setup",
+          "claim": "calls"
+        }
+      },
+      "points": [
+        [
+          0.5,
+          0
+        ],
+        [
+          282.60000000000014,
+          0
+        ],
+        [
+          564.7,
+          0
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "test-item-execution-and-reporting-flow-node-3",
+        "focus": 0.6370370370370371,
+        "gap": 4.7999999999999545
+      },
+      "endBinding": {
+        "elementId": "test-item-execution-and-reporting-flow-node-4",
+        "focus": -0.1833333333333339,
+        "gap": 10
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "test-item-execution-and-reporting-flow-edge-4",
+      "type": "arrow",
+      "x": 784.8,
+      "y": 467.33333333333337,
+      "width": 575.2,
+      "height": 374.33333333333337,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aG",
+      "roundness": null,
+      "seed": 1218123520,
+      "version": 1,
+      "versionNonce": 1746787804,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "test-item-execution-and-reporting-flow-edge-4-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "test-item-execution-and-reporting-flow",
+        "edge": {
+          "from": "call_and_report",
+          "to": "runtest_call",
+          "claim": "calls"
+        }
+      },
+      "points": [
+        [
+          0.5,
+          0
+        ],
+        [
+          32,
+          0
+        ],
+        [
+          32,
+          -374.33333333333337
+        ],
+        [
+          100.4333333333334,
+          -374.33333333333337
+        ],
+        [
+          219.1250000000001,
+          -374.33333333333337
+        ],
+        [
+          337.81666666666683,
+          -374.33333333333337
+        ],
+        [
+          574.7,
+          -374.33333333333337
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "test-item-execution-and-reporting-flow-node-3",
+        "focus": -0.6962962962962963,
+        "gap": 4.7999999999999545
+      },
+      "endBinding": {
+        "elementId": "test-item-execution-and-reporting-flow-node-5",
+        "focus": 0.17500000000000002,
+        "gap": 1
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "test-item-execution-and-reporting-flow-edge-5",
+      "type": "arrow",
+      "x": 784.8,
+      "y": 557.3333333333334,
+      "width": 545.2,
+      "height": 130,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aH",
+      "roundness": null,
+      "seed": 76354889,
+      "version": 1,
+      "versionNonce": 1637944787,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "test-item-execution-and-reporting-flow-edge-5-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "test-item-execution-and-reporting-flow",
+        "edge": {
+          "from": "call_and_report",
+          "to": "runtest_teardown",
+          "claim": "calls"
+        }
+      },
+      "points": [
+        [
+          0.5,
+          0
+        ],
+        [
+          104,
+          0
+        ],
+        [
+          104,
+          -130
+        ],
+        [
+          207.60000000000002,
+          -130
+        ],
+        [
+          292,
+          -130
+        ],
+        [
+          376.4000000000001,
+          -130
+        ],
+        [
+          544.7,
+          -130
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "test-item-execution-and-reporting-flow-node-3",
+        "focus": 0.30370370370370375,
+        "gap": 4.7999999999999545
+      },
+      "endBinding": {
+        "elementId": "test-item-execution-and-reporting-flow-node-6",
+        "focus": -0.18333333333333426,
+        "gap": 10
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "test-item-execution-and-reporting-flow-edge-6",
+      "type": "arrow",
+      "x": 784.8,
+      "y": 527.3333333333334,
+      "width": 2079.2,
+      "height": 181,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aI",
+      "roundness": null,
+      "seed": 559739550,
+      "version": 1,
+      "versionNonce": 1334689218,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "test-item-execution-and-reporting-flow-edge-6-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "test-item-execution-and-reporting-flow",
+        "edge": {
+          "from": "call_and_report",
+          "to": "callinfo",
+          "claim": "builds"
+        }
+      },
+      "points": [
+        [
+          0.5,
+          0
+        ],
+        [
+          80,
+          0
+        ],
+        [
+          80,
+          -181
+        ],
+        [
+          949.0999999999999,
+          -181
+        ],
+        [
+          1514.1499999999999,
+          -181
+        ],
+        [
+          1796.675,
+          -181
+        ],
+        [
+          2078.7,
+          -181
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "test-item-execution-and-reporting-flow-node-3",
+        "focus": -0.029629629629629346,
+        "gap": 4.7999999999999545
+      },
+      "endBinding": {
+        "elementId": "test-item-execution-and-reporting-flow-node-7",
+        "focus": -0.3266666666666661,
+        "gap": 4
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "test-item-execution-and-reporting-flow-edge-7",
+      "type": "arrow",
+      "x": 1630,
+      "y": 587.3333333333334,
+      "width": 512.4000000000001,
+      "height": 0,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aJ",
+      "roundness": null,
+      "seed": 694714095,
+      "version": 1,
+      "versionNonce": 1796712265,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "test-item-execution-and-reporting-flow-edge-7-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "test-item-execution-and-reporting-flow",
+        "edge": {
+          "from": "runtest_setup",
+          "to": "setupstate",
+          "claim": "calls"
+        }
+      },
+      "points": [
+        [
+          0.5,
+          0
+        ],
+        [
+          256.20000000000005,
+          0
+        ],
+        [
+          511.9000000000001,
+          0
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "test-item-execution-and-reporting-flow-node-4",
+        "focus": 0.1833333333333339,
+        "gap": 10
+      },
+      "endBinding": {
+        "elementId": "test-item-execution-and-reporting-flow-node-2",
+        "focus": -0.12222222222222286,
+        "gap": 2.400000000000091
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "test-item-execution-and-reporting-flow-edge-8",
+      "type": "arrow",
+      "x": 1620,
+      "y": 93,
+      "width": 522.4000000000001,
+      "height": 2.842170943040401e-14,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aK",
+      "roundness": null,
+      "seed": 1684247620,
+      "version": 1,
+      "versionNonce": 261150032,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "test-item-execution-and-reporting-flow-edge-8-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "test-item-execution-and-reporting-flow",
+        "edge": {
+          "from": "runtest_call",
+          "to": "item",
+          "claim": "calls"
+        }
+      },
+      "points": [
+        [
+          0.5,
+          0.5
+        ],
+        [
+          261.20000000000005,
+          1.4210854715202004e-14
+        ],
+        [
+          521.9000000000001,
+          -0.4999999999999716
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "test-item-execution-and-reporting-flow-node-5",
+        "focus": -0.17499999999999838,
+        "gap": 1
+      },
+      "endBinding": {
+        "elementId": "test-item-execution-and-reporting-flow-node-0",
+        "focus": -0.4600000000000017,
+        "gap": 2.400000000000091
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "test-item-execution-and-reporting-flow-edge-9",
+      "type": "arrow",
+      "x": 1650,
+      "y": 427.33333333333337,
+      "width": 492.4000000000001,
+      "height": 130,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aL",
+      "roundness": null,
+      "seed": 866903517,
+      "version": 1,
+      "versionNonce": 1352784711,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "test-item-execution-and-reporting-flow-edge-9-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "test-item-execution-and-reporting-flow",
+        "edge": {
+          "from": "runtest_teardown",
+          "to": "setupstate",
+          "claim": "calls"
+        }
+      },
+      "points": [
+        [
+          0.5,
+          0
+        ],
+        [
+          155.5999999999999,
+          0
+        ],
+        [
+          233.4000000000001,
+          0
+        ],
+        [
+          311.20000000000005,
+          0
+        ],
+        [
+          384.4000000000001,
+          0
+        ],
+        [
+          384.4000000000001,
+          130
+        ],
+        [
+          491.9000000000001,
+          130
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "test-item-execution-and-reporting-flow-node-6",
+        "focus": 0.18333333333333426,
+        "gap": 10
+      },
+      "endBinding": {
+        "elementId": "test-item-execution-and-reporting-flow-node-2",
+        "focus": 0.37777777777777716,
+        "gap": 2.400000000000091
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "test-item-execution-and-reporting-flow-edge-10",
+      "type": "arrow",
+      "x": 784.8,
+      "y": 497.33333333333337,
+      "width": 535.2,
+      "height": 241,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aM",
+      "roundness": null,
+      "seed": 687389305,
+      "version": 1,
+      "versionNonce": 310753347,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "test-item-execution-and-reporting-flow-edge-10-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "test-item-execution-and-reporting-flow",
+        "edge": {
+          "from": "call_and_report",
+          "to": "makereport",
+          "claim": "calls"
+        }
+      },
+      "points": [
+        [
+          0.5,
+          0
+        ],
+        [
+          56,
+          0
+        ],
+        [
+          56,
+          -241
+        ],
+        [
+          147.10000000000002,
+          -241
+        ],
+        [
+          244.125,
+          -241
+        ],
+        [
+          341.1500000000001,
+          -241
+        ],
+        [
+          534.7,
+          -241
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "test-item-execution-and-reporting-flow-node-3",
+        "focus": -0.3629629629629631,
+        "gap": 4.7999999999999545
+      },
+      "endBinding": {
+        "elementId": "test-item-execution-and-reporting-flow-node-8",
+        "focus": 0.09166666666666617,
+        "gap": 1
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "test-item-execution-and-reporting-flow-edge-11",
+      "type": "arrow",
+      "x": 1660,
+      "y": 256.33333333333337,
+      "width": 482.4000000000001,
+      "height": 0,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aN",
+      "roundness": null,
+      "seed": 797018608,
+      "version": 1,
+      "versionNonce": 1632382796,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "test-item-execution-and-reporting-flow-edge-11-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "test-item-execution-and-reporting-flow",
+        "edge": {
+          "from": "makereport",
+          "to": "from_item_and_call",
+          "claim": "calls"
+        }
+      },
+      "points": [
+        [
+          0.5,
+          0
+        ],
+        [
+          241.20000000000005,
+          0
+        ],
+        [
+          481.9000000000001,
+          0
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "test-item-execution-and-reporting-flow-node-8",
+        "focus": -0.09166666666666617,
+        "gap": 1
+      },
+      "endBinding": {
+        "elementId": "test-item-execution-and-reporting-flow-node-10",
+        "focus": -0.12666666666666643,
+        "gap": 2.400000000000091
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "test-item-execution-and-reporting-flow-edge-12",
+      "type": "arrow",
+      "x": 2522.4,
+      "y": 239.66666666666669,
+      "width": 341.5999999999999,
+      "height": 79.99999999999994,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aO",
+      "roundness": null,
+      "seed": 1347325215,
+      "version": 1,
+      "versionNonce": 367968697,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "test-item-execution-and-reporting-flow-edge-12-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "test-item-execution-and-reporting-flow",
+        "edge": {
+          "from": "from_item_and_call",
+          "to": "testreport",
+          "claim": "builds"
+        }
+      },
+      "points": [
+        [
+          0.5,
+          0
+        ],
+        [
+          32,
+          0
+        ],
+        [
+          32,
+          -79.99999999999994
+        ],
+        [
+          130.80000000000018,
+          -79.99999999999994
+        ],
+        [
+          183.50000000000045,
+          -79.99999999999994
+        ],
+        [
+          236.20000000000027,
+          -79.99999999999994
+        ],
+        [
+          341.0999999999999,
+          -79.99999999999994
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "test-item-execution-and-reporting-flow-node-10",
+        "focus": -0.2066666666666677,
+        "gap": 2.400000000000091
+      },
+      "endBinding": {
+        "elementId": "test-item-execution-and-reporting-flow-node-9",
+        "focus": 0.008333333333331439,
+        "gap": 4
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "test-item-execution-and-reporting-flow-edge-13",
+      "type": "arrow",
+      "x": 2522.4,
+      "y": 273,
+      "width": 341.5999999999999,
+      "height": 40.00000000000006,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aP",
+      "roundness": null,
+      "seed": 330844942,
+      "version": 2,
+      "versionNonce": 1054234290,
+      "isDeleted": true,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "test-item-execution-and-reporting-flow-edge-13-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "test-item-execution-and-reporting-flow",
+        "edge": {
+          "from": "from_item_and_call",
+          "to": "callinfo",
+          "claim": "takes"
+        }
+      },
+      "points": [
+        [
+          0.5,
+          0
+        ],
+        [
+          47.70000000000027,
+          0
+        ],
+        [
+          95.40000000000009,
+          0
+        ],
+        [
+          190.80000000000018,
+          0
+        ],
+        [
+          233.5999999999999,
+          0
+        ],
+        [
+          233.5999999999999,
+          40.00000000000006
+        ],
+        [
+          341.0999999999999,
+          40.00000000000006
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "test-item-execution-and-reporting-flow-node-10",
+        "focus": 0.46000000000000046,
+        "gap": 2.400000000000091
+      },
+      "endBinding": {
+        "elementId": "test-item-execution-and-reporting-flow-node-7",
+        "focus": 0.339999999999998,
+        "gap": 4
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "test-item-execution-and-reporting-flow-node-0-label",
+      "type": "text",
+      "x": 2198,
+      "y": 57.5,
+      "width": 44,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aQ",
+      "roundness": null,
+      "seed": 2095432598,
+      "version": 1,
+      "versionNonce": 1689625722,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "test-item-execution-and-reporting-flow"
+      },
+      "text": "Item",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "test-item-execution-and-reporting-flow-node-0",
+      "originalText": "Item",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "test-item-execution-and-reporting-flow-node-1-label",
+      "type": "text",
+      "x": 47.5,
+      "y": 627.5,
+      "width": 165,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aR",
+      "roundness": null,
+      "seed": 431902539,
+      "version": 1,
+      "versionNonce": 1823269829,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "test-item-execution-and-reporting-flow"
+      },
+      "text": "runtestprotocol",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "test-item-execution-and-reporting-flow-node-1",
+      "originalText": "runtestprotocol",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "test-item-execution-and-reporting-flow-node-2-label",
+      "type": "text",
+      "x": 2165,
+      "y": 567.5,
+      "width": 110.00000000000001,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aS",
+      "roundness": null,
+      "seed": 704773468,
+      "version": 1,
+      "versionNonce": 883275368,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "test-item-execution-and-reporting-flow"
+      },
+      "text": "SetupState",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "test-item-execution-and-reporting-flow-node-2",
+      "originalText": "SetupState",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "test-item-execution-and-reporting-flow-node-3-label",
+      "type": "text",
+      "x": 587.5,
+      "y": 517.5,
+      "width": 165,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aT",
+      "roundness": null,
+      "seed": 1133318457,
+      "version": 1,
+      "versionNonce": 4614659,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "test-item-execution-and-reporting-flow"
+      },
+      "text": "call_and_report",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "test-item-execution-and-reporting-flow-node-3",
+      "originalText": "call_and_report",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "test-item-execution-and-reporting-flow-node-4-label",
+      "type": "text",
+      "x": 1390,
+      "y": 567.5,
+      "width": 220.00000000000003,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aU",
+      "roundness": null,
+      "seed": 1825202650,
+      "version": 1,
+      "versionNonce": 103783854,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "test-item-execution-and-reporting-flow"
+      },
+      "text": "pytest_runtest_setup",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "test-item-execution-and-reporting-flow-node-4",
+      "originalText": "pytest_runtest_setup",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "test-item-execution-and-reporting-flow-node-5-label",
+      "type": "text",
+      "x": 1385.5,
+      "y": 87.5,
+      "width": 209.00000000000003,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aV",
+      "roundness": null,
+      "seed": 388069535,
+      "version": 1,
+      "versionNonce": 334986297,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "test-item-execution-and-reporting-flow"
+      },
+      "text": "pytest_runtest_call",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "test-item-execution-and-reporting-flow-node-5",
+      "originalText": "pytest_runtest_call",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "test-item-execution-and-reporting-flow-node-6-label",
+      "type": "text",
+      "x": 1373.5,
+      "y": 407.5,
+      "width": 253.00000000000003,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aW",
+      "roundness": null,
+      "seed": 476948144,
+      "version": 1,
+      "versionNonce": 460891148,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "test-item-execution-and-reporting-flow"
+      },
+      "text": "pytest_runtest_teardown",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "test-item-execution-and-reporting-flow-node-6",
+      "originalText": "pytest_runtest_teardown",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "test-item-execution-and-reporting-flow-node-7-label",
+      "type": "text",
+      "x": 2896,
+      "y": 317.5,
+      "width": 88,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aX",
+      "roundness": null,
+      "seed": 414557949,
+      "version": 1,
+      "versionNonce": 117615335,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "test-item-execution-and-reporting-flow"
+      },
+      "text": "CallInfo",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "test-item-execution-and-reporting-flow-node-7",
+      "originalText": "CallInfo",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "test-item-execution-and-reporting-flow-node-8-label",
+      "type": "text",
+      "x": 1352.5,
+      "y": 247.5,
+      "width": 275,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aY",
+      "roundness": null,
+      "seed": 1447955694,
+      "version": 1,
+      "versionNonce": 856774674,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "test-item-execution-and-reporting-flow"
+      },
+      "text": "pytest_runtest_makereport",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "test-item-execution-and-reporting-flow-node-8",
+      "originalText": "pytest_runtest_makereport",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "test-item-execution-and-reporting-flow-node-9-label",
+      "type": "text",
+      "x": 2885,
+      "y": 147.5,
+      "width": 110.00000000000001,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aZ",
+      "roundness": null,
+      "seed": 1520511043,
+      "version": 1,
+      "versionNonce": 1578364253,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "test-item-execution-and-reporting-flow"
+      },
+      "text": "TestReport",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "test-item-execution-and-reporting-flow-node-9",
+      "originalText": "TestReport",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "test-item-execution-and-reporting-flow-node-10-label",
+      "type": "text",
+      "x": 2170.5,
+      "y": 237.5,
+      "width": 319,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aa",
+      "roundness": null,
+      "seed": 298951409,
+      "version": 1,
+      "versionNonce": 1353574779,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "test-item-execution-and-reporting-flow"
+      },
+      "text": "TestReport.from_item_and_call",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "test-item-execution-and-reporting-flow-node-10",
+      "originalText": "TestReport.from_item_and_call",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "test-item-execution-and-reporting-flow-edge-0-label",
+      "type": "text",
+      "x": 886.9666666666669,
+      "y": 2,
+      "width": 52.800000000000004,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "ab",
+      "roundness": null,
+      "seed": 411971993,
+      "version": 1,
+      "versionNonce": 449932771,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "test-item-execution-and-reporting-flow"
+      },
+      "text": "@takes",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "test-item-execution-and-reporting-flow-edge-0",
+      "originalText": "@takes",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "test-item-execution-and-reporting-flow-edge-1-label",
+      "type": "text",
+      "x": 1084.6000000000001,
+      "y": 657.3333333333334,
+      "width": 255.20000000000002,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "ac",
+      "roundness": null,
+      "seed": 286380092,
+      "version": 1,
+      "versionNonce": 311262920,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "test-item-execution-and-reporting-flow"
+      },
+      "text": "session._setupstate @accesses",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "test-item-execution-and-reporting-flow-edge-1",
+      "originalText": "session._setupstate @accesses",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "test-item-execution-and-reporting-flow-edge-2-label",
+      "type": "text",
+      "x": 317,
+      "y": 517.3333333333334,
+      "width": 52.800000000000004,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "ad",
+      "roundness": null,
+      "seed": 1934929579,
+      "version": 1,
+      "versionNonce": 383767973,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "test-item-execution-and-reporting-flow"
+      },
+      "text": "@calls",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "test-item-execution-and-reporting-flow-edge-2",
+      "originalText": "@calls",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "test-item-execution-and-reporting-flow-edge-3-label",
+      "type": "text",
+      "x": 1041,
+      "y": 577.3333333333334,
+      "width": 52.800000000000004,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "ae",
+      "roundness": null,
+      "seed": 1637550966,
+      "version": 1,
+      "versionNonce": 660792282,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "test-item-execution-and-reporting-flow"
+      },
+      "text": "@calls",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "test-item-execution-and-reporting-flow-edge-3",
+      "originalText": "@calls",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "test-item-execution-and-reporting-flow-edge-4-label",
+      "type": "text",
+      "x": 858.8333333333334,
+      "y": 83,
+      "width": 52.800000000000004,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "af",
+      "roundness": null,
+      "seed": 1704184541,
+      "version": 1,
+      "versionNonce": 1622104647,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "test-item-execution-and-reporting-flow"
+      },
+      "text": "@calls",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "test-item-execution-and-reporting-flow-edge-4",
+      "originalText": "@calls",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "test-item-execution-and-reporting-flow-edge-5-label",
+      "type": "text",
+      "x": 966,
+      "y": 417.33333333333337,
+      "width": 52.800000000000004,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "ag",
+      "roundness": null,
+      "seed": 495681040,
+      "version": 1,
+      "versionNonce": 657964268,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "test-item-execution-and-reporting-flow"
+      },
+      "text": "@calls",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "test-item-execution-and-reporting-flow-edge-5",
+      "originalText": "@calls",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "test-item-execution-and-reporting-flow-edge-6-label",
+      "type": "text",
+      "x": 1703.1,
+      "y": 336.33333333333337,
+      "width": 61.60000000000001,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "ah",
+      "roundness": null,
+      "seed": 1693038975,
+      "version": 1,
+      "versionNonce": 641073561,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "test-item-execution-and-reporting-flow"
+      },
+      "text": "@builds",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "test-item-execution-and-reporting-flow-edge-6",
+      "originalText": "@builds",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "test-item-execution-and-reporting-flow-edge-7-label",
+      "type": "text",
+      "x": 1824.6000000000001,
+      "y": 577.3333333333334,
+      "width": 123.20000000000002,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "ai",
+      "roundness": null,
+      "seed": 1367217850,
+      "version": 1,
+      "versionNonce": 1222434062,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "test-item-execution-and-reporting-flow"
+      },
+      "text": "setup() @calls",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "test-item-execution-and-reporting-flow-edge-7",
+      "originalText": "setup() @calls",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "test-item-execution-and-reporting-flow-edge-8-label",
+      "type": "text",
+      "x": 1810.8,
+      "y": 83.00000000000001,
+      "width": 140.8,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aj",
+      "roundness": null,
+      "seed": 893593169,
+      "version": 1,
+      "versionNonce": 1437286491,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "test-item-execution-and-reporting-flow"
+      },
+      "text": "runtest() @calls",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "test-item-execution-and-reporting-flow-edge-8",
+      "originalText": "runtest() @calls",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "test-item-execution-and-reporting-flow-edge-9-label",
+      "type": "text",
+      "x": 1860,
+      "y": 417.33333333333337,
+      "width": 202.4,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "ak",
+      "roundness": null,
+      "seed": 1061065748,
+      "version": 1,
+      "versionNonce": 1307075936,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "test-item-execution-and-reporting-flow"
+      },
+      "text": "teardown_exact() @calls",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "test-item-execution-and-reporting-flow-edge-9",
+      "originalText": "teardown_exact() @calls",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "test-item-execution-and-reporting-flow-edge-10-label",
+      "type": "text",
+      "x": 905.5,
+      "y": 246.33333333333337,
+      "width": 52.800000000000004,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "al",
+      "roundness": null,
+      "seed": 1533209344,
+      "version": 1,
+      "versionNonce": 2024839644,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "test-item-execution-and-reporting-flow"
+      },
+      "text": "@calls",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "test-item-execution-and-reporting-flow-edge-10",
+      "originalText": "@calls",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "test-item-execution-and-reporting-flow-edge-11-label",
+      "type": "text",
+      "x": 1874.8,
+      "y": 246.33333333333337,
+      "width": 52.800000000000004,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "am",
+      "roundness": null,
+      "seed": 388199629,
+      "version": 1,
+      "versionNonce": 1279009719,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "test-item-execution-and-reporting-flow"
+      },
+      "text": "@calls",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "test-item-execution-and-reporting-flow-edge-11",
+      "originalText": "@calls",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "test-item-execution-and-reporting-flow-edge-12-label",
+      "type": "text",
+      "x": 2622.4,
+      "y": 149.66666666666674,
+      "width": 61.60000000000001,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "an",
+      "roundness": null,
+      "seed": 1515872426,
+      "version": 1,
+      "versionNonce": 266625918,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "test-item-execution-and-reporting-flow"
+      },
+      "text": "@builds",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "test-item-execution-and-reporting-flow-edge-12",
+      "originalText": "@builds",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "test-item-execution-and-reporting-flow-edge-13-label",
+      "type": "text",
+      "x": 2686.8,
+      "y": 263,
+      "width": 52.800000000000004,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "ao",
+      "roundness": null,
+      "seed": 1566125487,
+      "version": 2,
+      "versionNonce": 138952201,
+      "isDeleted": true,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "test-item-execution-and-reporting-flow"
+      },
+      "text": "@takes",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "test-item-execution-and-reporting-flow-edge-13",
+      "originalText": "@takes",
+      "autoResize": true,
+      "lineHeight": 1.25
+    }
+  ],
+  "appState": {
+    "gridSize": null,
+    "viewBackgroundColor": "#ffffff"
+  },
+  "files": {},
+  "diagramos": {
+    "version": "0.2.0-rc.6",
+    "schema": 1
+  }
+}

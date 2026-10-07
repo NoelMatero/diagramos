@@ -1,0 +1,1762 @@
+{
+  "type": "excalidraw",
+  "version": 2,
+  "source": "diagramos",
+  "elements": [
+    {
+      "id": "pytest-fixture-lookup-setup-and-teardown-title",
+      "type": "text",
+      "x": 0,
+      "y": -115,
+      "width": 620.4000000000001,
+      "height": 30,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a0",
+      "roundness": null,
+      "seed": 660208748,
+      "version": 1,
+      "versionNonce": 882698680,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "pytest-fixture-lookup-setup-and-teardown",
+        "role": "title",
+        "direction": "DOWN"
+      },
+      "text": "Pytest Fixture Lookup, Setup, and Teardown Flow",
+      "fontSize": 24,
+      "fontFamily": 5,
+      "textAlign": "left",
+      "verticalAlign": "middle",
+      "containerId": null,
+      "originalText": "Pytest Fixture Lookup, Setup, and Teardown Flow",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "pytest-fixture-lookup-setup-and-teardown-node-0",
+      "type": "rectangle",
+      "x": 80,
+      "y": 20,
+      "width": 400,
+      "height": 100,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a1",
+      "roundness": null,
+      "seed": 1086501147,
+      "version": 1,
+      "versionNonce": 455826453,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "pytest-fixture-lookup-setup-and-teardown-node-0-label"
+        },
+        {
+          "id": "pytest-fixture-lookup-setup-and-teardown-edge-0",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "pytest-fixture-lookup-setup-and-teardown",
+        "node": "getval",
+        "ref": "src/_pytest/fixtures.py#FixtureRequest.getfixturevalue"
+      }
+    },
+    {
+      "id": "pytest-fixture-lookup-setup-and-teardown-node-1",
+      "type": "rectangle",
+      "x": 120,
+      "y": 420,
+      "width": 320,
+      "height": 100,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a2",
+      "roundness": null,
+      "seed": 324682186,
+      "version": 1,
+      "versionNonce": 1140857118,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "pytest-fixture-lookup-setup-and-teardown-node-1-label"
+        },
+        {
+          "id": "pytest-fixture-lookup-setup-and-teardown-edge-0",
+          "type": "arrow"
+        },
+        {
+          "id": "pytest-fixture-lookup-setup-and-teardown-edge-1",
+          "type": "arrow"
+        },
+        {
+          "id": "pytest-fixture-lookup-setup-and-teardown-edge-3",
+          "type": "arrow"
+        },
+        {
+          "id": "pytest-fixture-lookup-setup-and-teardown-edge-4",
+          "type": "arrow"
+        },
+        {
+          "id": "pytest-fixture-lookup-setup-and-teardown-edge-5",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "pytest-fixture-lookup-setup-and-teardown",
+        "node": "get_active",
+        "ref": "src/_pytest/fixtures.py#FixtureRequest._get_active_fixturedef"
+      }
+    },
+    {
+      "id": "pytest-fixture-lookup-setup-and-teardown-node-2",
+      "type": "rectangle",
+      "x": 780,
+      "y": 820,
+      "width": 400,
+      "height": 100,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a3",
+      "roundness": null,
+      "seed": 1478797989,
+      "version": 1,
+      "versionNonce": 2126747695,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "pytest-fixture-lookup-setup-and-teardown-node-2-label"
+        },
+        {
+          "id": "pytest-fixture-lookup-setup-and-teardown-edge-1",
+          "type": "arrow"
+        },
+        {
+          "id": "pytest-fixture-lookup-setup-and-teardown-edge-2",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "pytest-fixture-lookup-setup-and-teardown",
+        "node": "fm_getfd",
+        "ref": "src/_pytest/fixtures.py#FixtureManager.getfixturedefs"
+      }
+    },
+    {
+      "id": "pytest-fixture-lookup-setup-and-teardown-node-3",
+      "type": "rectangle",
+      "x": 800,
+      "y": 1220,
+      "width": 340,
+      "height": 100,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a4",
+      "roundness": null,
+      "seed": 1338908812,
+      "version": 1,
+      "versionNonce": 150808920,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "pytest-fixture-lookup-setup-and-teardown-node-3-label"
+        },
+        {
+          "id": "pytest-fixture-lookup-setup-and-teardown-edge-2",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "pytest-fixture-lookup-setup-and-teardown",
+        "node": "traverse",
+        "ref": "src/_pytest/fixtures.py#traverse_fixture_closure"
+      }
+    },
+    {
+      "id": "pytest-fixture-lookup-setup-and-teardown-node-4",
+      "type": "rectangle",
+      "x": 440,
+      "y": 820,
+      "width": 260,
+      "height": 100,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a5",
+      "roundness": null,
+      "seed": 1416563519,
+      "version": 1,
+      "versionNonce": 1964407897,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "pytest-fixture-lookup-setup-and-teardown-node-4-label"
+        },
+        {
+          "id": "pytest-fixture-lookup-setup-and-teardown-edge-3",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "pytest-fixture-lookup-setup-and-teardown",
+        "node": "fixturedef",
+        "ref": "src/_pytest/fixtures.py#FixtureDef"
+      }
+    },
+    {
+      "id": "pytest-fixture-lookup-setup-and-teardown-node-5",
+      "type": "rectangle",
+      "x": 20,
+      "y": 820,
+      "width": 340,
+      "height": 80,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a6",
+      "roundness": null,
+      "seed": 1886648494,
+      "version": 1,
+      "versionNonce": 1183274450,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "pytest-fixture-lookup-setup-and-teardown-node-5-label"
+        },
+        {
+          "id": "pytest-fixture-lookup-setup-and-teardown-edge-4",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "pytest-fixture-lookup-setup-and-teardown",
+        "node": "subreq",
+        "ref": "src/_pytest/fixtures.py#SubRequest"
+      }
+    },
+    {
+      "id": "pytest-fixture-lookup-setup-and-teardown-node-6",
+      "type": "rectangle",
+      "x": 1280,
+      "y": 820,
+      "width": 280,
+      "height": 100,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a7",
+      "roundness": null,
+      "seed": 137285913,
+      "version": 1,
+      "versionNonce": 1420592227,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "pytest-fixture-lookup-setup-and-teardown-node-6-label"
+        },
+        {
+          "id": "pytest-fixture-lookup-setup-and-teardown-edge-5",
+          "type": "arrow"
+        },
+        {
+          "id": "pytest-fixture-lookup-setup-and-teardown-edge-6",
+          "type": "arrow"
+        },
+        {
+          "id": "pytest-fixture-lookup-setup-and-teardown-edge-7",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "pytest-fixture-lookup-setup-and-teardown",
+        "node": "execute",
+        "ref": "src/_pytest/fixtures.py#FixtureDef.execute"
+      }
+    },
+    {
+      "id": "pytest-fixture-lookup-setup-and-teardown-node-7",
+      "type": "rectangle",
+      "x": 1620,
+      "y": 1220,
+      "width": 300,
+      "height": 100,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a8",
+      "roundness": null,
+      "seed": 866256912,
+      "version": 1,
+      "versionNonce": 1823668972,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "pytest-fixture-lookup-setup-and-teardown-node-7-label"
+        },
+        {
+          "id": "pytest-fixture-lookup-setup-and-teardown-edge-6",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "pytest-fixture-lookup-setup-and-teardown",
+        "node": "setup_hook",
+        "ref": "src/_pytest/fixtures.py#pytest_fixture_setup"
+      }
+    },
+    {
+      "id": "pytest-fixture-lookup-setup-and-teardown-node-8",
+      "type": "rectangle",
+      "x": 1220,
+      "y": 1220,
+      "width": 320,
+      "height": 100,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a9",
+      "roundness": null,
+      "seed": 741096835,
+      "version": 1,
+      "versionNonce": 634011549,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "pytest-fixture-lookup-setup-and-teardown-node-8-label"
+        },
+        {
+          "id": "pytest-fixture-lookup-setup-and-teardown-edge-7",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "pytest-fixture-lookup-setup-and-teardown",
+        "node": "finish",
+        "ref": "src/_pytest/fixtures.py#FixtureDef.finish"
+      }
+    },
+    {
+      "id": "pytest-fixture-lookup-setup-and-teardown-edge-0",
+      "type": "arrow",
+      "x": 278,
+      "y": 112,
+      "width": 0,
+      "height": 300.8,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aA",
+      "roundness": null,
+      "seed": 275372716,
+      "version": 1,
+      "versionNonce": 1910748152,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "pytest-fixture-lookup-setup-and-teardown-edge-0-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "pytest-fixture-lookup-setup-and-teardown",
+        "edge": {
+          "from": "getval",
+          "to": "get_active",
+          "claim": "calls"
+        }
+      },
+      "points": [
+        [
+          0,
+          0.5
+        ],
+        [
+          0,
+          150.39999999999998
+        ],
+        [
+          0,
+          300.3
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "pytest-fixture-lookup-setup-and-teardown-node-0",
+        "focus": 0.01,
+        "gap": 8
+      },
+      "endBinding": {
+        "elementId": "pytest-fixture-lookup-setup-and-teardown-node-1",
+        "focus": -0.0125,
+        "gap": 7.199999999999989
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "pytest-fixture-lookup-setup-and-teardown-edge-1",
+      "type": "arrow",
+      "x": 310,
+      "y": 512.8,
+      "width": 662,
+      "height": 300.79999999999995,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aB",
+      "roundness": null,
+      "seed": 839719365,
+      "version": 1,
+      "versionNonce": 1739203279,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "pytest-fixture-lookup-setup-and-teardown-edge-1-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "pytest-fixture-lookup-setup-and-teardown",
+        "edge": {
+          "from": "get_active",
+          "to": "fm_getfd",
+          "claim": "calls"
+        }
+      },
+      "points": [
+        [
+          0,
+          0.5
+        ],
+        [
+          0,
+          56
+        ],
+        [
+          425.4,
+          56
+        ],
+        [
+          662,
+          56
+        ],
+        [
+          662,
+          300.29999999999995
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "pytest-fixture-lookup-setup-and-teardown-node-1",
+        "focus": -0.1875,
+        "gap": 7.2000000000000455
+      },
+      "endBinding": {
+        "elementId": "pytest-fixture-lookup-setup-and-teardown-node-2",
+        "focus": -0.04,
+        "gap": 6.400000000000091
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "pytest-fixture-lookup-setup-and-teardown-edge-2",
+      "type": "arrow",
+      "x": 972,
+      "y": 913.5999999999999,
+      "width": 0,
+      "height": 300.79999999999995,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aC",
+      "roundness": null,
+      "seed": 1831183210,
+      "version": 1,
+      "versionNonce": 2133484350,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "pytest-fixture-lookup-setup-and-teardown-edge-2-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "pytest-fixture-lookup-setup-and-teardown",
+        "edge": {
+          "from": "fm_getfd",
+          "to": "traverse",
+          "claim": "calls"
+        }
+      },
+      "points": [
+        [
+          0,
+          0.5
+        ],
+        [
+          0,
+          150.4000000000001
+        ],
+        [
+          0,
+          300.29999999999995
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "pytest-fixture-lookup-setup-and-teardown-node-2",
+        "focus": 0.04,
+        "gap": 6.400000000000091
+      },
+      "endBinding": {
+        "elementId": "pytest-fixture-lookup-setup-and-teardown-node-3",
+        "focus": 0.011764705882352814,
+        "gap": 5.600000000000136
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "pytest-fixture-lookup-setup-and-teardown-edge-3",
+      "type": "arrow",
+      "x": 246,
+      "y": 512.8,
+      "width": 316,
+      "height": 300.79999999999995,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aD",
+      "roundness": null,
+      "seed": 1426214075,
+      "version": 1,
+      "versionNonce": 789439285,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "pytest-fixture-lookup-setup-and-teardown-edge-3-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "pytest-fixture-lookup-setup-and-teardown",
+        "edge": {
+          "from": "get_active",
+          "to": "fixturedef"
+        }
+      },
+      "points": [
+        [
+          0,
+          0.5
+        ],
+        [
+          0,
+          80
+        ],
+        [
+          228.39999999999998,
+          80
+        ],
+        [
+          316,
+          80
+        ],
+        [
+          316,
+          300.29999999999995
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "pytest-fixture-lookup-setup-and-teardown-node-1",
+        "focus": 0.21250000000000002,
+        "gap": 7.2000000000000455
+      },
+      "endBinding": {
+        "elementId": "pytest-fixture-lookup-setup-and-teardown-node-4",
+        "focus": -0.06153846153846158,
+        "gap": 6.400000000000091
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "pytest-fixture-lookup-setup-and-teardown-edge-4",
+      "type": "arrow",
+      "x": 182,
+      "y": 512.8,
+      "width": 0,
+      "height": 300.79999999999995,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aE",
+      "roundness": null,
+      "seed": 1950204464,
+      "version": 1,
+      "versionNonce": 1477701260,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "pytest-fixture-lookup-setup-and-teardown-edge-4-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "pytest-fixture-lookup-setup-and-teardown",
+        "edge": {
+          "from": "get_active",
+          "to": "subreq",
+          "claim": "builds"
+        }
+      },
+      "points": [
+        [
+          0,
+          0.5
+        ],
+        [
+          0,
+          150.39999999999998
+        ],
+        [
+          0,
+          300.29999999999995
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "pytest-fixture-lookup-setup-and-teardown-node-1",
+        "focus": 0.6125,
+        "gap": 7.2000000000000455
+      },
+      "endBinding": {
+        "elementId": "pytest-fixture-lookup-setup-and-teardown-node-5",
+        "focus": -0.04705882352941174,
+        "gap": 6.400000000000091
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "pytest-fixture-lookup-setup-and-teardown-edge-5",
+      "type": "arrow",
+      "x": 374,
+      "y": 512.8,
+      "width": 1054.6666666666667,
+      "height": 300.79999999999995,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aF",
+      "roundness": null,
+      "seed": 476998841,
+      "version": 1,
+      "versionNonce": 1795781763,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "pytest-fixture-lookup-setup-and-teardown-edge-5-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "pytest-fixture-lookup-setup-and-teardown",
+        "edge": {
+          "from": "get_active",
+          "to": "execute",
+          "claim": "calls"
+        }
+      },
+      "points": [
+        [
+          0.5,
+          0.5
+        ],
+        [
+          0,
+          32
+        ],
+        [
+          645.7333333333332,
+          32
+        ],
+        [
+          1054.6666666666665,
+          32
+        ],
+        [
+          1054.1666666666667,
+          300.29999999999995
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "pytest-fixture-lookup-setup-and-teardown-node-1",
+        "focus": -0.5875,
+        "gap": 7.2000000000000455
+      },
+      "endBinding": {
+        "elementId": "pytest-fixture-lookup-setup-and-teardown-node-6",
+        "focus": 0.061904761904762344,
+        "gap": 6.400000000000091
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "pytest-fixture-lookup-setup-and-teardown-edge-6",
+      "type": "arrow",
+      "x": 1475.3333333333335,
+      "y": 913.5999999999999,
+      "width": 296.6666666666665,
+      "height": 300.79999999999995,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aG",
+      "roundness": null,
+      "seed": 544911950,
+      "version": 1,
+      "versionNonce": 1134006514,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "pytest-fixture-lookup-setup-and-teardown-edge-6-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "pytest-fixture-lookup-setup-and-teardown",
+        "edge": {
+          "from": "execute",
+          "to": "setup_hook",
+          "claim": "calls"
+        }
+      },
+      "points": [
+        [
+          0,
+          0.5
+        ],
+        [
+          0,
+          32
+        ],
+        [
+          266.7333333333331,
+          32
+        ],
+        [
+          296.6666666666665,
+          32
+        ],
+        [
+          296.6666666666665,
+          300.29999999999995
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "pytest-fixture-lookup-setup-and-teardown-node-6",
+        "focus": -0.39523809523809633,
+        "gap": 6.400000000000091
+      },
+      "endBinding": {
+        "elementId": "pytest-fixture-lookup-setup-and-teardown-node-7",
+        "focus": 0.013333333333333485,
+        "gap": 5.600000000000136
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "pytest-fixture-lookup-setup-and-teardown-edge-7",
+      "type": "arrow",
+      "x": 1382,
+      "y": 913.5999999999999,
+      "width": 0,
+      "height": 300.79999999999995,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aH",
+      "roundness": null,
+      "seed": 353027423,
+      "version": 1,
+      "versionNonce": 171710457,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "pytest-fixture-lookup-setup-and-teardown-edge-7-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "pytest-fixture-lookup-setup-and-teardown",
+        "edge": {
+          "from": "execute",
+          "to": "finish",
+          "claim": "calls"
+        }
+      },
+      "points": [
+        [
+          0,
+          0.5
+        ],
+        [
+          0,
+          150.4000000000001
+        ],
+        [
+          0,
+          300.29999999999995
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "pytest-fixture-lookup-setup-and-teardown-node-6",
+        "focus": 0.27142857142857135,
+        "gap": 6.400000000000091
+      },
+      "endBinding": {
+        "elementId": "pytest-fixture-lookup-setup-and-teardown-node-8",
+        "focus": 0.0125,
+        "gap": 5.600000000000136
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "pytest-fixture-lookup-setup-and-teardown-node-0-label",
+      "type": "text",
+      "x": 104,
+      "y": 45,
+      "width": 352,
+      "height": 50,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aI",
+      "roundness": null,
+      "seed": 111104326,
+      "version": 1,
+      "versionNonce": 1047371946,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "pytest-fixture-lookup-setup-and-teardown"
+      },
+      "text": "FixtureRequest.getfixturevalue()\nget fixture by name",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "pytest-fixture-lookup-setup-and-teardown-node-0",
+      "originalText": "FixtureRequest.getfixturevalue()\nget fixture by name",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "pytest-fixture-lookup-setup-and-teardown-node-1-label",
+      "type": "text",
+      "x": 148,
+      "y": 445,
+      "width": 264,
+      "height": 50,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aJ",
+      "roundness": null,
+      "seed": 1869283579,
+      "version": 1,
+      "versionNonce": 349489525,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "pytest-fixture-lookup-setup-and-teardown"
+      },
+      "text": "_get_active_fixturedef()\nfind & setup fixture",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "pytest-fixture-lookup-setup-and-teardown-node-1",
+      "originalText": "_get_active_fixturedef()\nfind & setup fixture",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "pytest-fixture-lookup-setup-and-teardown-node-2-label",
+      "type": "text",
+      "x": 809.5,
+      "y": 845,
+      "width": 341,
+      "height": 50,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aK",
+      "roundness": null,
+      "seed": 623121292,
+      "version": 1,
+      "versionNonce": 1598730840,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "pytest-fixture-lookup-setup-and-teardown"
+      },
+      "text": "FixtureManager.getfixturedefs()\nlookup visible defs",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "pytest-fixture-lookup-setup-and-teardown-node-2",
+      "originalText": "FixtureManager.getfixturedefs()\nlookup visible defs",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "pytest-fixture-lookup-setup-and-teardown-node-3-label",
+      "type": "text",
+      "x": 827,
+      "y": 1245,
+      "width": 286,
+      "height": 50,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aL",
+      "roundness": null,
+      "seed": 1254436393,
+      "version": 1,
+      "versionNonce": 624775219,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "pytest-fixture-lookup-setup-and-teardown"
+      },
+      "text": "traverse_fixture_closure()\nresolve dependencies",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "pytest-fixture-lookup-setup-and-teardown-node-3",
+      "originalText": "traverse_fixture_closure()\nresolve dependencies",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "pytest-fixture-lookup-setup-and-teardown-node-4-label",
+      "type": "text",
+      "x": 471,
+      "y": 845,
+      "width": 198.00000000000003,
+      "height": 50,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aM",
+      "roundness": null,
+      "seed": 728878282,
+      "version": 1,
+      "versionNonce": 823126558,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "pytest-fixture-lookup-setup-and-teardown"
+      },
+      "text": "FixtureDef\nfixture definition",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "pytest-fixture-lookup-setup-and-teardown-node-4",
+      "originalText": "FixtureDef\nfixture definition",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "pytest-fixture-lookup-setup-and-teardown-node-5-label",
+      "type": "text",
+      "x": 113,
+      "y": 835,
+      "width": 154,
+      "height": 50,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aN",
+      "roundness": null,
+      "seed": 857957071,
+      "version": 1,
+      "versionNonce": 1972992681,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "pytest-fixture-lookup-setup-and-teardown"
+      },
+      "text": "SubRequest\nscoped request",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "pytest-fixture-lookup-setup-and-teardown-node-5",
+      "originalText": "SubRequest\nscoped request",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "pytest-fixture-lookup-setup-and-teardown-node-6-label",
+      "type": "text",
+      "x": 1310,
+      "y": 845,
+      "width": 220.00000000000003,
+      "height": 50,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aO",
+      "roundness": null,
+      "seed": 29243680,
+      "version": 1,
+      "versionNonce": 662295932,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "pytest-fixture-lookup-setup-and-teardown"
+      },
+      "text": "FixtureDef.execute()\nsetup & cache",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "pytest-fixture-lookup-setup-and-teardown-node-6",
+      "originalText": "FixtureDef.execute()\nsetup & cache",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "pytest-fixture-lookup-setup-and-teardown-node-7-label",
+      "type": "text",
+      "x": 1649,
+      "y": 1245,
+      "width": 242.00000000000003,
+      "height": 50,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aP",
+      "roundness": null,
+      "seed": 1908682989,
+      "version": 1,
+      "versionNonce": 1740363863,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "pytest-fixture-lookup-setup-and-teardown"
+      },
+      "text": "pytest_fixture_setup()\ncall fixture function",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "pytest-fixture-lookup-setup-and-teardown-node-7",
+      "originalText": "pytest_fixture_setup()\ncall fixture function",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "pytest-fixture-lookup-setup-and-teardown-node-8-label",
+      "type": "text",
+      "x": 1275.5,
+      "y": 1245,
+      "width": 209.00000000000003,
+      "height": 50,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aQ",
+      "roundness": null,
+      "seed": 308319006,
+      "version": 1,
+      "versionNonce": 943941442,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "pytest-fixture-lookup-setup-and-teardown"
+      },
+      "text": "FixtureDef.finish()\nrun finalizers",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "pytest-fixture-lookup-setup-and-teardown-node-8",
+      "originalText": "FixtureDef.finish()\nrun finalizers",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "pytest-fixture-lookup-setup-and-teardown-edge-0-label",
+      "type": "text",
+      "x": 251.6,
+      "y": 252.39999999999998,
+      "width": 52.800000000000004,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aR",
+      "roundness": null,
+      "seed": 341994697,
+      "version": 1,
+      "versionNonce": 1316605011,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "pytest-fixture-lookup-setup-and-teardown"
+      },
+      "text": "@calls",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "pytest-fixture-lookup-setup-and-teardown-edge-0",
+      "originalText": "@calls",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "pytest-fixture-lookup-setup-and-teardown-edge-1-label",
+      "type": "text",
+      "x": 709,
+      "y": 558.8,
+      "width": 52.800000000000004,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aS",
+      "roundness": null,
+      "seed": 735625900,
+      "version": 1,
+      "versionNonce": 561703928,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "pytest-fixture-lookup-setup-and-teardown"
+      },
+      "text": "@calls",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "pytest-fixture-lookup-setup-and-teardown-edge-1",
+      "originalText": "@calls",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "pytest-fixture-lookup-setup-and-teardown-edge-2-label",
+      "type": "text",
+      "x": 945.6,
+      "y": 1054,
+      "width": 52.800000000000004,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aT",
+      "roundness": null,
+      "seed": 2126132379,
+      "version": 1,
+      "versionNonce": 667901589,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "pytest-fixture-lookup-setup-and-teardown"
+      },
+      "text": "@calls",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "pytest-fixture-lookup-setup-and-teardown-edge-2",
+      "originalText": "@calls",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "pytest-fixture-lookup-setup-and-teardown-edge-3-label",
+      "type": "text",
+      "x": 439.2,
+      "y": 582.8,
+      "width": 70.4,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aU",
+      "roundness": null,
+      "seed": 948937190,
+      "version": 1,
+      "versionNonce": 1002186698,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "pytest-fixture-lookup-setup-and-teardown"
+      },
+      "text": "looks up",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "pytest-fixture-lookup-setup-and-teardown-edge-3",
+      "originalText": "looks up",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "pytest-fixture-lookup-setup-and-teardown-edge-4-label",
+      "type": "text",
+      "x": 151.2,
+      "y": 653.1999999999999,
+      "width": 61.60000000000001,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aV",
+      "roundness": null,
+      "seed": 2053047693,
+      "version": 1,
+      "versionNonce": 1441961079,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "pytest-fixture-lookup-setup-and-teardown"
+      },
+      "text": "@builds",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "pytest-fixture-lookup-setup-and-teardown-edge-4",
+      "originalText": "@builds",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "pytest-fixture-lookup-setup-and-teardown-edge-5-label",
+      "type": "text",
+      "x": 993.3333333333333,
+      "y": 534.8,
+      "width": 52.800000000000004,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aW",
+      "roundness": null,
+      "seed": 829915072,
+      "version": 1,
+      "versionNonce": 673526172,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "pytest-fixture-lookup-setup-and-teardown"
+      },
+      "text": "@calls",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "pytest-fixture-lookup-setup-and-teardown-edge-5",
+      "originalText": "@calls",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "pytest-fixture-lookup-setup-and-teardown-edge-6-label",
+      "type": "text",
+      "x": 1715.6666666666665,
+      "y": 935.5999999999999,
+      "width": 52.800000000000004,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aX",
+      "roundness": null,
+      "seed": 768910959,
+      "version": 1,
+      "versionNonce": 1633277385,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "pytest-fixture-lookup-setup-and-teardown"
+      },
+      "text": "@calls",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "pytest-fixture-lookup-setup-and-teardown-edge-6",
+      "originalText": "@calls",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "pytest-fixture-lookup-setup-and-teardown-edge-7-label",
+      "type": "text",
+      "x": 1355.6,
+      "y": 1054,
+      "width": 52.800000000000004,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aY",
+      "roundness": null,
+      "seed": 1263936362,
+      "version": 1,
+      "versionNonce": 1166271294,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "pytest-fixture-lookup-setup-and-teardown"
+      },
+      "text": "@calls",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "pytest-fixture-lookup-setup-and-teardown-edge-7",
+      "originalText": "@calls",
+      "autoResize": true,
+      "lineHeight": 1.25
+    }
+  ],
+  "appState": {
+    "gridSize": null,
+    "viewBackgroundColor": "#ffffff"
+  },
+  "files": {},
+  "diagramos": {
+    "version": "0.2.0-rc.6",
+    "schema": 1
+  }
+}
