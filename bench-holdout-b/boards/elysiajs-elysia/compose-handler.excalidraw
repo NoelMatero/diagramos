@@ -1,0 +1,1906 @@
+{
+  "type": "excalidraw",
+  "version": 2,
+  "source": "diagramos",
+  "elements": [
+    {
+      "id": "handler-compilation-compose-hooks-parsin-title",
+      "type": "text",
+      "x": 0,
+      "y": -115,
+      "width": 752.4000000000001,
+      "height": 30,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a0",
+      "roundness": null,
+      "seed": 63761275,
+      "version": 1,
+      "versionNonce": 720957685,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "handler-compilation-compose-hooks-parsin",
+        "role": "title",
+        "direction": "DOWN"
+      },
+      "text": "Handler Compilation: Compose, Hooks, Parsing & Validation",
+      "fontSize": 24,
+      "fontFamily": 5,
+      "textAlign": "left",
+      "verticalAlign": "middle",
+      "containerId": null,
+      "originalText": "Handler Compilation: Compose, Hooks, Parsing & Validation",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "handler-compilation-compose-hooks-parsin-node-0",
+      "type": "rectangle",
+      "x": 60,
+      "y": 20,
+      "width": 240,
+      "height": 80,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a1",
+      "roundness": null,
+      "seed": 1125688926,
+      "version": 1,
+      "versionNonce": 387354498,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "handler-compilation-compose-hooks-parsin-node-0-label"
+        },
+        {
+          "id": "handler-compilation-compose-hooks-parsin-edge-0",
+          "type": "arrow"
+        },
+        {
+          "id": "handler-compilation-compose-hooks-parsin-edge-1",
+          "type": "arrow"
+        },
+        {
+          "id": "handler-compilation-compose-hooks-parsin-edge-2",
+          "type": "arrow"
+        },
+        {
+          "id": "handler-compilation-compose-hooks-parsin-edge-3",
+          "type": "arrow"
+        },
+        {
+          "id": "handler-compilation-compose-hooks-parsin-edge-4",
+          "type": "arrow"
+        },
+        {
+          "id": "handler-compilation-compose-hooks-parsin-edge-5",
+          "type": "arrow"
+        },
+        {
+          "id": "handler-compilation-compose-hooks-parsin-edge-8",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "handler-compilation-compose-hooks-parsin",
+        "node": "compose",
+        "ref": "src/compose.ts#composeHandler"
+      }
+    },
+    {
+      "id": "handler-compilation-compose-hooks-parsin-node-1",
+      "type": "rectangle",
+      "x": 260,
+      "y": 440,
+      "width": 180,
+      "height": 80,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a2",
+      "roundness": null,
+      "seed": 518332847,
+      "version": 1,
+      "versionNonce": 932796937,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "handler-compilation-compose-hooks-parsin-node-1-label"
+        },
+        {
+          "id": "handler-compilation-compose-hooks-parsin-edge-3",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "handler-compilation-compose-hooks-parsin",
+        "node": "report",
+        "ref": "src/compose.ts#createReport"
+      }
+    },
+    {
+      "id": "handler-compilation-compose-hooks-parsin-node-2",
+      "type": "rectangle",
+      "x": 1620,
+      "y": 440,
+      "width": 320,
+      "height": 80,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a3",
+      "roundness": null,
+      "seed": 1041742272,
+      "version": 1,
+      "versionNonce": 140541852,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "handler-compilation-compose-hooks-parsin-node-2-label"
+        },
+        {
+          "id": "handler-compilation-compose-hooks-parsin-edge-4",
+          "type": "arrow"
+        },
+        {
+          "id": "handler-compilation-compose-hooks-parsin-edge-6",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "handler-compilation-compose-hooks-parsin",
+        "node": "validation",
+        "ref": "src/compose.ts#composeValidationFactory"
+      }
+    },
+    {
+      "id": "handler-compilation-compose-hooks-parsin-node-3",
+      "type": "rectangle",
+      "x": 760,
+      "y": 440,
+      "width": 220,
+      "height": 80,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a4",
+      "roundness": null,
+      "seed": 642304265,
+      "version": 1,
+      "versionNonce": 649033363,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "handler-compilation-compose-hooks-parsin-node-3-label"
+        },
+        {
+          "id": "handler-compilation-compose-hooks-parsin-edge-5",
+          "type": "arrow"
+        },
+        {
+          "id": "handler-compilation-compose-hooks-parsin-edge-7",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "handler-compilation-compose-hooks-parsin",
+        "node": "cleaner",
+        "ref": "src/compose.ts#composeCleaner"
+      }
+    },
+    {
+      "id": "handler-compilation-compose-hooks-parsin-node-4",
+      "type": "rectangle",
+      "x": 520,
+      "y": 440,
+      "width": 160,
+      "height": 80,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a5",
+      "roundness": null,
+      "seed": 1540797050,
+      "version": 1,
+      "versionNonce": 173216718,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "handler-compilation-compose-hooks-parsin-node-4-label"
+        },
+        {
+          "id": "handler-compilation-compose-hooks-parsin-edge-0",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "handler-compilation-compose-hooks-parsin",
+        "node": "adapter",
+        "ref": "src/adapter"
+      }
+    },
+    {
+      "id": "handler-compilation-compose-hooks-parsin-node-5",
+      "type": "rectangle",
+      "x": 20,
+      "y": 440,
+      "width": 160,
+      "height": 80,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a6",
+      "roundness": null,
+      "seed": 1230752395,
+      "version": 1,
+      "versionNonce": 604997893,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "handler-compilation-compose-hooks-parsin-node-5-label"
+        },
+        {
+          "id": "handler-compilation-compose-hooks-parsin-edge-1",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "handler-compilation-compose-hooks-parsin",
+        "node": "validator",
+        "ref": "src/schema.ts"
+      }
+    },
+    {
+      "id": "handler-compilation-compose-hooks-parsin-node-6",
+      "type": "rectangle",
+      "x": 1060,
+      "y": 440,
+      "width": 160,
+      "height": 80,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a7",
+      "roundness": null,
+      "seed": 409444028,
+      "version": 1,
+      "versionNonce": 513905224,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "handler-compilation-compose-hooks-parsin-node-6-label"
+        },
+        {
+          "id": "handler-compilation-compose-hooks-parsin-edge-2",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "handler-compilation-compose-hooks-parsin",
+        "node": "hooks",
+        "ref": "src/index.ts"
+      }
+    },
+    {
+      "id": "handler-compilation-compose-hooks-parsin-node-7",
+      "type": "rectangle",
+      "x": 800,
+      "y": 820,
+      "width": 160,
+      "height": 80,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a8",
+      "roundness": null,
+      "seed": 16557397,
+      "version": 1,
+      "versionNonce": 117989727,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "handler-compilation-compose-hooks-parsin-node-7-label"
+        },
+        {
+          "id": "handler-compilation-compose-hooks-parsin-edge-6",
+          "type": "arrow"
+        },
+        {
+          "id": "handler-compilation-compose-hooks-parsin-edge-7",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "handler-compilation-compose-hooks-parsin",
+        "node": "context",
+        "ref": "src/context.ts"
+      }
+    },
+    {
+      "id": "handler-compilation-compose-hooks-parsin-node-8",
+      "type": "rectangle",
+      "x": 1300,
+      "y": 440,
+      "width": 240,
+      "height": 80,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "dashed",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a9",
+      "roundness": null,
+      "seed": 1437426854,
+      "version": 1,
+      "versionNonce": 1410292618,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "handler-compilation-compose-hooks-parsin-node-8-label"
+        },
+        {
+          "id": "handler-compilation-compose-hooks-parsin-edge-8",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "handler-compilation-compose-hooks-parsin",
+        "node": "handler",
+        "state": "planned"
+      }
+    },
+    {
+      "id": "handler-compilation-compose-hooks-parsin-edge-0",
+      "type": "arrow",
+      "x": 152,
+      "y": 92,
+      "width": 440,
+      "height": 344.8,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aA",
+      "roundness": null,
+      "seed": 1639157137,
+      "version": 1,
+      "versionNonce": 178164635,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "handler-compilation-compose-hooks-parsin-edge-0-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "handler-compilation-compose-hooks-parsin",
+        "edge": {
+          "from": "compose",
+          "to": "adapter",
+          "claim": "needs"
+        }
+      },
+      "points": [
+        [
+          0,
+          0.5
+        ],
+        [
+          0,
+          128
+        ],
+        [
+          264.4,
+          128
+        ],
+        [
+          440,
+          128
+        ],
+        [
+          440,
+          344.3
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "handler-compilation-compose-hooks-parsin-node-0",
+        "focus": 0.2333333333333333,
+        "gap": 8
+      },
+      "endBinding": {
+        "elementId": "handler-compilation-compose-hooks-parsin-node-4",
+        "focus": -0.1,
+        "gap": 3.1999999999999886
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "handler-compilation-compose-hooks-parsin-edge-1",
+      "type": "arrow",
+      "x": 92,
+      "y": 92,
+      "width": 0,
+      "height": 344.8,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aB",
+      "roundness": null,
+      "seed": 961976040,
+      "version": 1,
+      "versionNonce": 565804740,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "handler-compilation-compose-hooks-parsin-edge-1-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "handler-compilation-compose-hooks-parsin",
+        "edge": {
+          "from": "compose",
+          "to": "validator",
+          "claim": "needs"
+        }
+      },
+      "points": [
+        [
+          0,
+          0.5
+        ],
+        [
+          0,
+          172.39999999999998
+        ],
+        [
+          0,
+          344.3
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "handler-compilation-compose-hooks-parsin-node-0",
+        "focus": 0.7333333333333334,
+        "gap": 8
+      },
+      "endBinding": {
+        "elementId": "handler-compilation-compose-hooks-parsin-node-5",
+        "focus": -0.1,
+        "gap": 3.1999999999999886
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "handler-compilation-compose-hooks-parsin-edge-2",
+      "type": "arrow",
+      "x": 212,
+      "y": 92,
+      "width": 920,
+      "height": 344.8,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aC",
+      "roundness": null,
+      "seed": 1512282647,
+      "version": 1,
+      "versionNonce": 1034380529,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "handler-compilation-compose-hooks-parsin-edge-2-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "handler-compilation-compose-hooks-parsin",
+        "edge": {
+          "from": "compose",
+          "to": "hooks",
+          "claim": "needs"
+        }
+      },
+      "points": [
+        [
+          0,
+          0.5
+        ],
+        [
+          0,
+          80
+        ],
+        [
+          552.4,
+          80
+        ],
+        [
+          920,
+          80
+        ],
+        [
+          920,
+          344.3
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "handler-compilation-compose-hooks-parsin-node-0",
+        "focus": -0.26666666666666666,
+        "gap": 8
+      },
+      "endBinding": {
+        "elementId": "handler-compilation-compose-hooks-parsin-node-6",
+        "focus": -0.1,
+        "gap": 3.1999999999999886
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "handler-compilation-compose-hooks-parsin-edge-3",
+      "type": "arrow",
+      "x": 122,
+      "y": 92,
+      "width": 220,
+      "height": 344.8,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aD",
+      "roundness": null,
+      "seed": 1569518406,
+      "version": 1,
+      "versionNonce": 377726634,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "handler-compilation-compose-hooks-parsin-edge-3-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "handler-compilation-compose-hooks-parsin",
+        "edge": {
+          "from": "compose",
+          "to": "report",
+          "claim": "calls"
+        }
+      },
+      "points": [
+        [
+          0,
+          0.5
+        ],
+        [
+          0,
+          152
+        ],
+        [
+          130.39999999999998,
+          152
+        ],
+        [
+          220,
+          152
+        ],
+        [
+          220,
+          344.3
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "handler-compilation-compose-hooks-parsin-node-0",
+        "focus": 0.4833333333333334,
+        "gap": 8
+      },
+      "endBinding": {
+        "elementId": "handler-compilation-compose-hooks-parsin-node-1",
+        "focus": -0.08888888888888884,
+        "gap": 3.1999999999999886
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "handler-compilation-compose-hooks-parsin-edge-4",
+      "type": "arrow",
+      "x": 272,
+      "y": 92,
+      "width": 1500,
+      "height": 344.8,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aE",
+      "roundness": null,
+      "seed": 1010507197,
+      "version": 1,
+      "versionNonce": 374649767,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "handler-compilation-compose-hooks-parsin-edge-4-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "handler-compilation-compose-hooks-parsin",
+        "edge": {
+          "from": "compose",
+          "to": "validation",
+          "claim": "calls"
+        }
+      },
+      "points": [
+        [
+          0,
+          0.5
+        ],
+        [
+          0,
+          32
+        ],
+        [
+          890.4000000000001,
+          32
+        ],
+        [
+          1500,
+          32
+        ],
+        [
+          1500,
+          344.3
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "handler-compilation-compose-hooks-parsin-node-0",
+        "focus": -0.7666666666666667,
+        "gap": 8
+      },
+      "endBinding": {
+        "elementId": "handler-compilation-compose-hooks-parsin-node-2",
+        "focus": -0.049999999999999996,
+        "gap": 3.1999999999999886
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "handler-compilation-compose-hooks-parsin-edge-5",
+      "type": "arrow",
+      "x": 182,
+      "y": 92,
+      "width": 680,
+      "height": 344.8,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aF",
+      "roundness": null,
+      "seed": 1403393828,
+      "version": 1,
+      "versionNonce": 1430498736,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "handler-compilation-compose-hooks-parsin-edge-5-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "handler-compilation-compose-hooks-parsin",
+        "edge": {
+          "from": "compose",
+          "to": "cleaner",
+          "claim": "calls"
+        }
+      },
+      "points": [
+        [
+          0.5,
+          0.5
+        ],
+        [
+          0,
+          104
+        ],
+        [
+          408.4000000000001,
+          104
+        ],
+        [
+          679.9999999999999,
+          104
+        ],
+        [
+          679.5,
+          344.3
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "handler-compilation-compose-hooks-parsin-node-0",
+        "focus": -0.01666666666666666,
+        "gap": 8
+      },
+      "endBinding": {
+        "elementId": "handler-compilation-compose-hooks-parsin-node-3",
+        "focus": -0.07272727272727281,
+        "gap": 3.1999999999999886
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "handler-compilation-compose-hooks-parsin-edge-6",
+      "type": "arrow",
+      "x": 1772,
+      "y": 516.8,
+      "width": 856.6666666666667,
+      "height": 300.79999999999995,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aG",
+      "roundness": null,
+      "seed": 111355731,
+      "version": 1,
+      "versionNonce": 653074093,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "handler-compilation-compose-hooks-parsin-edge-6-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "handler-compilation-compose-hooks-parsin",
+        "edge": {
+          "from": "validation",
+          "to": "context",
+          "claim": "feeds"
+        }
+      },
+      "points": [
+        [
+          0,
+          0.5
+        ],
+        [
+          0,
+          192.79999999999995
+        ],
+        [
+          -385.9333333333334,
+          192.79999999999995
+        ],
+        [
+          -856.6666666666667,
+          192.79999999999995
+        ],
+        [
+          -856.6666666666667,
+          300.29999999999995
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "handler-compilation-compose-hooks-parsin-node-2",
+        "focus": 0.049999999999999996,
+        "gap": 3.2000000000000455
+      },
+      "endBinding": {
+        "elementId": "handler-compilation-compose-hooks-parsin-node-7",
+        "focus": 0.44166666666666404,
+        "gap": 2.400000000000091
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "handler-compilation-compose-hooks-parsin-edge-7",
+      "type": "arrow",
+      "x": 862,
+      "y": 516.8,
+      "width": 0,
+      "height": 300.79999999999995,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aH",
+      "roundness": null,
+      "seed": 1781970466,
+      "version": 1,
+      "versionNonce": 852350230,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "handler-compilation-compose-hooks-parsin-edge-7-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "handler-compilation-compose-hooks-parsin",
+        "edge": {
+          "from": "cleaner",
+          "to": "context",
+          "claim": "feeds"
+        }
+      },
+      "points": [
+        [
+          0,
+          0.5
+        ],
+        [
+          0,
+          150.39999999999998
+        ],
+        [
+          0,
+          300.29999999999995
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "handler-compilation-compose-hooks-parsin-node-3",
+        "focus": 0.07272727272727281,
+        "gap": 3.2000000000000455
+      },
+      "endBinding": {
+        "elementId": "handler-compilation-compose-hooks-parsin-node-7",
+        "focus": -0.225,
+        "gap": 2.400000000000091
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "handler-compilation-compose-hooks-parsin-edge-8",
+      "type": "arrow",
+      "x": 242,
+      "y": 92,
+      "width": 1170,
+      "height": 344.8,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aI",
+      "roundness": null,
+      "seed": 1942984745,
+      "version": 1,
+      "versionNonce": 1084370483,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "handler-compilation-compose-hooks-parsin-edge-8-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "handler-compilation-compose-hooks-parsin",
+        "edge": {
+          "from": "compose",
+          "to": "handler",
+          "claim": "builds"
+        }
+      },
+      "points": [
+        [
+          0,
+          0.5
+        ],
+        [
+          0,
+          56
+        ],
+        [
+          701.4,
+          56
+        ],
+        [
+          1170,
+          56
+        ],
+        [
+          1170,
+          344.3
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "handler-compilation-compose-hooks-parsin-node-0",
+        "focus": -0.5166666666666667,
+        "gap": 8
+      },
+      "endBinding": {
+        "elementId": "handler-compilation-compose-hooks-parsin-node-8",
+        "focus": -0.06666666666666672,
+        "gap": 3.1999999999999886
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "handler-compilation-compose-hooks-parsin-node-0-label",
+      "type": "text",
+      "x": 103,
+      "y": 47.5,
+      "width": 154,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aJ",
+      "roundness": null,
+      "seed": 1470633407,
+      "version": 1,
+      "versionNonce": 132252633,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "handler-compilation-compose-hooks-parsin"
+      },
+      "text": "composeHandler",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "handler-compilation-compose-hooks-parsin-node-0",
+      "originalText": "composeHandler",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "handler-compilation-compose-hooks-parsin-node-1-label",
+      "type": "text",
+      "x": 284,
+      "y": 467.5,
+      "width": 132,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aK",
+      "roundness": null,
+      "seed": 1078156026,
+      "version": 1,
+      "versionNonce": 559961422,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "handler-compilation-compose-hooks-parsin"
+      },
+      "text": "createReport",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "handler-compilation-compose-hooks-parsin-node-1",
+      "originalText": "createReport",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "handler-compilation-compose-hooks-parsin-node-2-label",
+      "type": "text",
+      "x": 1648,
+      "y": 467.5,
+      "width": 264,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aL",
+      "roundness": null,
+      "seed": 781795101,
+      "version": 1,
+      "versionNonce": 1548402823,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "handler-compilation-compose-hooks-parsin"
+      },
+      "text": "composeValidationFactory",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "handler-compilation-compose-hooks-parsin-node-2",
+      "originalText": "composeValidationFactory",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "handler-compilation-compose-hooks-parsin-node-3-label",
+      "type": "text",
+      "x": 793,
+      "y": 467.5,
+      "width": 154,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aM",
+      "roundness": null,
+      "seed": 382586192,
+      "version": 1,
+      "versionNonce": 84799276,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "handler-compilation-compose-hooks-parsin"
+      },
+      "text": "composeCleaner",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "handler-compilation-compose-hooks-parsin-node-3",
+      "originalText": "composeCleaner",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "handler-compilation-compose-hooks-parsin-node-4-label",
+      "type": "text",
+      "x": 561.5,
+      "y": 467.5,
+      "width": 77,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aN",
+      "roundness": null,
+      "seed": 556766699,
+      "version": 1,
+      "versionNonce": 108598757,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "handler-compilation-compose-hooks-parsin"
+      },
+      "text": "Adapter",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "handler-compilation-compose-hooks-parsin-node-4",
+      "originalText": "Adapter",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "handler-compilation-compose-hooks-parsin-node-5-label",
+      "type": "text",
+      "x": 50.49999999999999,
+      "y": 467.5,
+      "width": 99.00000000000001,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aO",
+      "roundness": null,
+      "seed": 1187444150,
+      "version": 1,
+      "versionNonce": 305604634,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "handler-compilation-compose-hooks-parsin"
+      },
+      "text": "Validator",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "handler-compilation-compose-hooks-parsin-node-5",
+      "originalText": "Validator",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "handler-compilation-compose-hooks-parsin-node-6-label",
+      "type": "text",
+      "x": 1112.5,
+      "y": 467.5,
+      "width": 55.00000000000001,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aP",
+      "roundness": null,
+      "seed": 15784921,
+      "version": 1,
+      "versionNonce": 774022947,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "handler-compilation-compose-hooks-parsin"
+      },
+      "text": "Hooks",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "handler-compilation-compose-hooks-parsin-node-6",
+      "originalText": "Hooks",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "handler-compilation-compose-hooks-parsin-node-7-label",
+      "type": "text",
+      "x": 841.5,
+      "y": 847.5,
+      "width": 77,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aQ",
+      "roundness": null,
+      "seed": 1293160572,
+      "version": 1,
+      "versionNonce": 2027087624,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "handler-compilation-compose-hooks-parsin"
+      },
+      "text": "Context",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "handler-compilation-compose-hooks-parsin-node-7",
+      "originalText": "Context",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "handler-compilation-compose-hooks-parsin-node-8-label",
+      "type": "text",
+      "x": 1326.5,
+      "y": 467.5,
+      "width": 187.00000000000003,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aR",
+      "roundness": null,
+      "seed": 1536763799,
+      "version": 1,
+      "versionNonce": 162866545,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "handler-compilation-compose-hooks-parsin"
+      },
+      "text": "Generated Handler",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "handler-compilation-compose-hooks-parsin-node-8",
+      "originalText": "Generated Handler",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "handler-compilation-compose-hooks-parsin-edge-0-label",
+      "type": "text",
+      "x": 390,
+      "y": 210,
+      "width": 52.800000000000004,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aS",
+      "roundness": null,
+      "seed": 654195944,
+      "version": 1,
+      "versionNonce": 1084477636,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "handler-compilation-compose-hooks-parsin"
+      },
+      "text": "@needs",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "handler-compilation-compose-hooks-parsin-edge-0",
+      "originalText": "@needs",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "handler-compilation-compose-hooks-parsin-edge-1-label",
+      "type": "text",
+      "x": 65.6,
+      "y": 254.39999999999998,
+      "width": 52.800000000000004,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aT",
+      "roundness": null,
+      "seed": 1488843573,
+      "version": 1,
+      "versionNonce": 579974591,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "handler-compilation-compose-hooks-parsin"
+      },
+      "text": "@needs",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "handler-compilation-compose-hooks-parsin-edge-1",
+      "originalText": "@needs",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "handler-compilation-compose-hooks-parsin-edge-2-label",
+      "type": "text",
+      "x": 738,
+      "y": 162,
+      "width": 52.800000000000004,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aU",
+      "roundness": null,
+      "seed": 897545490,
+      "version": 1,
+      "versionNonce": 1137779014,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "handler-compilation-compose-hooks-parsin"
+      },
+      "text": "@needs",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "handler-compilation-compose-hooks-parsin-edge-2",
+      "originalText": "@needs",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "handler-compilation-compose-hooks-parsin-edge-3-label",
+      "type": "text",
+      "x": 225.99999999999997,
+      "y": 234,
+      "width": 52.800000000000004,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aV",
+      "roundness": null,
+      "seed": 771138487,
+      "version": 1,
+      "versionNonce": 1058945041,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "handler-compilation-compose-hooks-parsin"
+      },
+      "text": "@calls",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "handler-compilation-compose-hooks-parsin-edge-3",
+      "originalText": "@calls",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "handler-compilation-compose-hooks-parsin-edge-4-label",
+      "type": "text",
+      "x": 1136,
+      "y": 114,
+      "width": 52.800000000000004,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aW",
+      "roundness": null,
+      "seed": 1071427700,
+      "version": 1,
+      "versionNonce": 1724872000,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "handler-compilation-compose-hooks-parsin"
+      },
+      "text": "@calls",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "handler-compilation-compose-hooks-parsin-edge-4",
+      "originalText": "@calls",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "handler-compilation-compose-hooks-parsin-edge-5-label",
+      "type": "text",
+      "x": 564.0000000000001,
+      "y": 186,
+      "width": 52.800000000000004,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aX",
+      "roundness": null,
+      "seed": 401533617,
+      "version": 1,
+      "versionNonce": 1242679355,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "handler-compilation-compose-hooks-parsin"
+      },
+      "text": "@calls",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "handler-compilation-compose-hooks-parsin-edge-5",
+      "originalText": "@calls",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "handler-compilation-compose-hooks-parsin-edge-6-label",
+      "type": "text",
+      "x": 1311.2666666666667,
+      "y": 699.5999999999999,
+      "width": 149.60000000000002,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aY",
+      "roundness": null,
+      "seed": 307127470,
+      "version": 1,
+      "versionNonce": 291461586,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "handler-compilation-compose-hooks-parsin"
+      },
+      "text": "validate() @feeds",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "handler-compilation-compose-hooks-parsin-edge-6",
+      "originalText": "validate() @feeds",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "handler-compilation-compose-hooks-parsin-edge-7-label",
+      "type": "text",
+      "x": 800.4,
+      "y": 657.1999999999999,
+      "width": 123.20000000000002,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aZ",
+      "roundness": null,
+      "seed": 1508029187,
+      "version": 1,
+      "versionNonce": 470104093,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "handler-compilation-compose-hooks-parsin"
+      },
+      "text": "clean() @feeds",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "handler-compilation-compose-hooks-parsin-edge-7",
+      "originalText": "clean() @feeds",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "handler-compilation-compose-hooks-parsin-edge-8-label",
+      "type": "text",
+      "x": 912.6,
+      "y": 138,
+      "width": 61.60000000000001,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aa",
+      "roundness": null,
+      "seed": 1596720240,
+      "version": 1,
+      "versionNonce": 1789593292,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "handler-compilation-compose-hooks-parsin"
+      },
+      "text": "@builds",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "handler-compilation-compose-hooks-parsin-edge-8",
+      "originalText": "@builds",
+      "autoResize": true,
+      "lineHeight": 1.25
+    }
+  ],
+  "appState": {
+    "gridSize": null,
+    "viewBackgroundColor": "#ffffff"
+  },
+  "files": {},
+  "diagramos": {
+    "version": "0.2.0-rc.6",
+    "schema": 1
+  }
+}

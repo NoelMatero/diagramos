@@ -1,0 +1,2547 @@
+{
+  "type": "excalidraw",
+  "version": 2,
+  "source": "diagramos",
+  "elements": [
+    {
+      "id": "map-and-set-plugin-drafting-flow-title",
+      "type": "text",
+      "x": 0,
+      "y": -115,
+      "width": 422.40000000000003,
+      "height": 30,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a0",
+      "roundness": null,
+      "seed": 1362939017,
+      "version": 1,
+      "versionNonce": 1154545939,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "map-and-set-plugin-drafting-flow",
+        "role": "title"
+      },
+      "text": "Map and Set Plugin Drafting Flow",
+      "fontSize": 24,
+      "fontFamily": 5,
+      "textAlign": "left",
+      "verticalAlign": "middle",
+      "containerId": null,
+      "originalText": "Map and Set Plugin Drafting Flow",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "map-and-set-plugin-drafting-flow-node-0",
+      "type": "rectangle",
+      "x": 80,
+      "y": 20,
+      "width": 160,
+      "height": 80,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a1",
+      "roundness": null,
+      "seed": 1536061552,
+      "version": 1,
+      "versionNonce": 966462156,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "map-and-set-plugin-drafting-flow-node-0-label"
+        },
+        {
+          "id": "map-and-set-plugin-drafting-flow-edge-0",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "map-and-set-plugin-drafting-flow",
+        "node": "proxymap",
+        "ref": "src/plugins/mapset.ts#proxyMap_"
+      }
+    },
+    {
+      "id": "map-and-set-plugin-drafting-flow-node-1",
+      "type": "rectangle",
+      "x": 620,
+      "y": 20,
+      "width": 160,
+      "height": 100,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a2",
+      "roundness": null,
+      "seed": 1426432249,
+      "version": 1,
+      "versionNonce": 1792316355,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "map-and-set-plugin-drafting-flow-node-1-label"
+        },
+        {
+          "id": "map-and-set-plugin-drafting-flow-edge-0",
+          "type": "arrow"
+        },
+        {
+          "id": "map-and-set-plugin-drafting-flow-edge-1",
+          "type": "arrow"
+        },
+        {
+          "id": "map-and-set-plugin-drafting-flow-edge-9",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "map-and-set-plugin-drafting-flow",
+        "node": "draftmap",
+        "ref": "src/plugins/mapset.ts#DraftMap"
+      }
+    },
+    {
+      "id": "map-and-set-plugin-drafting-flow-node-2",
+      "type": "rectangle",
+      "x": 1240,
+      "y": 20,
+      "width": 160,
+      "height": 100,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a3",
+      "roundness": null,
+      "seed": 1069887886,
+      "version": 1,
+      "versionNonce": 388313650,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "map-and-set-plugin-drafting-flow-node-2-label"
+        },
+        {
+          "id": "map-and-set-plugin-drafting-flow-edge-1",
+          "type": "arrow"
+        },
+        {
+          "id": "map-and-set-plugin-drafting-flow-edge-4",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "map-and-set-plugin-drafting-flow",
+        "node": "mapstate",
+        "ref": "src/plugins/mapset.ts#MapState"
+      }
+    },
+    {
+      "id": "map-and-set-plugin-drafting-flow-node-3",
+      "type": "rectangle",
+      "x": 580,
+      "y": 200,
+      "width": 220,
+      "height": 80,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a4",
+      "roundness": null,
+      "seed": 2086368159,
+      "version": 1,
+      "versionNonce": 1849531705,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "map-and-set-plugin-drafting-flow-node-3-label"
+        },
+        {
+          "id": "map-and-set-plugin-drafting-flow-edge-3",
+          "type": "arrow"
+        },
+        {
+          "id": "map-and-set-plugin-drafting-flow-edge-4",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "map-and-set-plugin-drafting-flow",
+        "node": "preparemapcopy",
+        "ref": "src/plugins/mapset.ts#prepareMapCopy"
+      }
+    },
+    {
+      "id": "map-and-set-plugin-drafting-flow-node-4",
+      "type": "rectangle",
+      "x": 20,
+      "y": 200,
+      "width": 220,
+      "height": 100,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a5",
+      "roundness": null,
+      "seed": 1967136748,
+      "version": 1,
+      "versionNonce": 1441188920,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "map-and-set-plugin-drafting-flow-node-4-label"
+        },
+        {
+          "id": "map-and-set-plugin-drafting-flow-edge-2",
+          "type": "arrow"
+        },
+        {
+          "id": "map-and-set-plugin-drafting-flow-edge-3",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "map-and-set-plugin-drafting-flow",
+        "node": "draftmap_get",
+        "ref": "src/plugins/mapset.ts#DraftMap"
+      }
+    },
+    {
+      "id": "map-and-set-plugin-drafting-flow-node-5",
+      "type": "rectangle",
+      "x": 80,
+      "y": 380,
+      "width": 160,
+      "height": 80,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a6",
+      "roundness": null,
+      "seed": 425473285,
+      "version": 1,
+      "versionNonce": 1269540879,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "map-and-set-plugin-drafting-flow-node-5-label"
+        },
+        {
+          "id": "map-and-set-plugin-drafting-flow-edge-5",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "map-and-set-plugin-drafting-flow",
+        "node": "proxyset",
+        "ref": "src/plugins/mapset.ts#proxySet_"
+      }
+    },
+    {
+      "id": "map-and-set-plugin-drafting-flow-node-6",
+      "type": "rectangle",
+      "x": 620,
+      "y": 360,
+      "width": 160,
+      "height": 100,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a7",
+      "roundness": null,
+      "seed": 208675498,
+      "version": 1,
+      "versionNonce": 1747241342,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "map-and-set-plugin-drafting-flow-node-6-label"
+        },
+        {
+          "id": "map-and-set-plugin-drafting-flow-edge-5",
+          "type": "arrow"
+        },
+        {
+          "id": "map-and-set-plugin-drafting-flow-edge-6",
+          "type": "arrow"
+        },
+        {
+          "id": "map-and-set-plugin-drafting-flow-edge-10",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "map-and-set-plugin-drafting-flow",
+        "node": "draftset",
+        "ref": "src/plugins/mapset.ts#DraftSet"
+      }
+    },
+    {
+      "id": "map-and-set-plugin-drafting-flow-node-7",
+      "type": "rectangle",
+      "x": 1240,
+      "y": 520,
+      "width": 160,
+      "height": 120,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a8",
+      "roundness": null,
+      "seed": 970494459,
+      "version": 1,
+      "versionNonce": 1062210677,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "map-and-set-plugin-drafting-flow-node-7-label"
+        },
+        {
+          "id": "map-and-set-plugin-drafting-flow-edge-6",
+          "type": "arrow"
+        },
+        {
+          "id": "map-and-set-plugin-drafting-flow-edge-8",
+          "type": "arrow"
+        },
+        {
+          "id": "map-and-set-plugin-drafting-flow-edge-11",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "map-and-set-plugin-drafting-flow",
+        "node": "setstate",
+        "ref": "src/plugins/mapset.ts#SetState"
+      }
+    },
+    {
+      "id": "map-and-set-plugin-drafting-flow-node-8",
+      "type": "rectangle",
+      "x": 20,
+      "y": 760,
+      "width": 220,
+      "height": 100,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a9",
+      "roundness": null,
+      "seed": 1423445176,
+      "version": 1,
+      "versionNonce": 415873556,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "map-and-set-plugin-drafting-flow-node-8-label"
+        },
+        {
+          "id": "map-and-set-plugin-drafting-flow-edge-7",
+          "type": "arrow"
+        },
+        {
+          "id": "map-and-set-plugin-drafting-flow-edge-8",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "map-and-set-plugin-drafting-flow",
+        "node": "preparesetcopy",
+        "ref": "src/plugins/mapset.ts#prepareSetCopy"
+      }
+    },
+    {
+      "id": "map-and-set-plugin-drafting-flow-node-9",
+      "type": "rectangle",
+      "x": 580,
+      "y": 700,
+      "width": 180,
+      "height": 100,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aA",
+      "roundness": null,
+      "seed": 38442849,
+      "version": 2,
+      "versionNonce": 2096223019,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "map-and-set-plugin-drafting-flow-node-9-label"
+        },
+        {
+          "id": "map-and-set-plugin-drafting-flow-edge-2",
+          "type": "arrow"
+        },
+        {
+          "id": "map-and-set-plugin-drafting-flow-edge-7",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "map-and-set-plugin-drafting-flow",
+        "node": "createproxy",
+        "ref": "src/core/proxy.ts#createProxy"
+      }
+    },
+    {
+      "id": "map-and-set-plugin-drafting-flow-node-10",
+      "type": "rectangle",
+      "x": 1240,
+      "y": 260,
+      "width": 180,
+      "height": 100,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aB",
+      "roundness": null,
+      "seed": 369904773,
+      "version": 2,
+      "versionNonce": 350267023,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "map-and-set-plugin-drafting-flow-node-10-label"
+        },
+        {
+          "id": "map-and-set-plugin-drafting-flow-edge-9",
+          "type": "arrow"
+        },
+        {
+          "id": "map-and-set-plugin-drafting-flow-edge-10",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "map-and-set-plugin-drafting-flow",
+        "node": "markchanged",
+        "ref": "src/core/proxy.ts#markChanged"
+      }
+    },
+    {
+      "id": "map-and-set-plugin-drafting-flow-node-11",
+      "type": "rectangle",
+      "x": 580,
+      "y": 540,
+      "width": 220,
+      "height": 80,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aC",
+      "roundness": null,
+      "seed": 1911568236,
+      "version": 1,
+      "versionNonce": 521915064,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "map-and-set-plugin-drafting-flow-node-11-label"
+        },
+        {
+          "id": "map-and-set-plugin-drafting-flow-edge-11",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "map-and-set-plugin-drafting-flow",
+        "node": "fixsetcontents",
+        "ref": "src/plugins/mapset.ts#fixSetContents"
+      }
+    },
+    {
+      "id": "map-and-set-plugin-drafting-flow-edge-0",
+      "type": "arrow",
+      "x": 232,
+      "y": 62,
+      "width": 381.6,
+      "height": 0,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aD",
+      "roundness": null,
+      "seed": 184527463,
+      "version": 1,
+      "versionNonce": 1796047873,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "map-and-set-plugin-drafting-flow-edge-0-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "map-and-set-plugin-drafting-flow",
+        "edge": {
+          "from": "proxymap",
+          "to": "draftmap",
+          "claim": "builds"
+        }
+      },
+      "points": [
+        [
+          0.5,
+          0
+        ],
+        [
+          190.8,
+          0
+        ],
+        [
+          381.1,
+          0
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "map-and-set-plugin-drafting-flow-node-0",
+        "focus": 0.05,
+        "gap": 8
+      },
+      "endBinding": {
+        "elementId": "map-and-set-plugin-drafting-flow-node-1",
+        "focus": 0.15999999999999956,
+        "gap": 6.399999999999977
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "map-and-set-plugin-drafting-flow-edge-1",
+      "type": "arrow",
+      "x": 773.6,
+      "y": 45.33333333333333,
+      "width": 458.4,
+      "height": 0,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aE",
+      "roundness": null,
+      "seed": 1780247766,
+      "version": 1,
+      "versionNonce": 763914426,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "map-and-set-plugin-drafting-flow-edge-1-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "map-and-set-plugin-drafting-flow",
+        "edge": {
+          "from": "draftmap",
+          "to": "mapstate",
+          "claim": "holds"
+        }
+      },
+      "points": [
+        [
+          0.5,
+          0
+        ],
+        [
+          229.19999999999993,
+          0
+        ],
+        [
+          457.9,
+          0
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "map-and-set-plugin-drafting-flow-node-1",
+        "focus": -0.4933333333333337,
+        "gap": 6.399999999999977
+      },
+      "endBinding": {
+        "elementId": "map-and-set-plugin-drafting-flow-node-2",
+        "focus": 0.4933333333333337,
+        "gap": 8
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "map-and-set-plugin-drafting-flow-edge-2",
+      "type": "arrow",
+      "x": 232,
+      "y": 265.33333333333337,
+      "width": 341.6,
+      "height": 476.66666666666674,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aF",
+      "roundness": null,
+      "seed": 311401953,
+      "version": 1,
+      "versionNonce": 429592235,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "map-and-set-plugin-drafting-flow-edge-2-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "map-and-set-plugin-drafting-flow",
+        "edge": {
+          "from": "draftmap_get",
+          "to": "createproxy",
+          "claim": "calls"
+        }
+      },
+      "points": [
+        [
+          0.5,
+          0
+        ],
+        [
+          32,
+          0
+        ],
+        [
+          32,
+          377.1333333333333
+        ],
+        [
+          32,
+          476.66666666666674
+        ],
+        [
+          341.1,
+          476.66666666666674
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "map-and-set-plugin-drafting-flow-node-4",
+        "focus": 0.30666666666666753,
+        "gap": 8
+      },
+      "endBinding": {
+        "elementId": "map-and-set-plugin-drafting-flow-node-9",
+        "focus": 0.15999999999999734,
+        "gap": 6.399999999999977
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "map-and-set-plugin-drafting-flow-edge-3",
+      "type": "arrow",
+      "x": 232,
+      "y": 232,
+      "width": 341.6,
+      "height": 0,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aG",
+      "roundness": null,
+      "seed": 1696404280,
+      "version": 1,
+      "versionNonce": 896726420,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "map-and-set-plugin-drafting-flow-edge-3-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "map-and-set-plugin-drafting-flow",
+        "edge": {
+          "from": "draftmap_get",
+          "to": "preparemapcopy",
+          "claim": "calls"
+        }
+      },
+      "points": [
+        [
+          0.5,
+          0
+        ],
+        [
+          170.8,
+          0
+        ],
+        [
+          341.1,
+          0
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "map-and-set-plugin-drafting-flow-node-4",
+        "focus": -0.35999999999999993,
+        "gap": 8
+      },
+      "endBinding": {
+        "elementId": "map-and-set-plugin-drafting-flow-node-3",
+        "focus": 0.2,
+        "gap": 6.399999999999977
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "map-and-set-plugin-drafting-flow-edge-4",
+      "type": "arrow",
+      "x": 793.6,
+      "y": 232,
+      "width": 438.4,
+      "height": 153.33333333333334,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aH",
+      "roundness": null,
+      "seed": 941529955,
+      "version": 1,
+      "versionNonce": 1746230013,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "map-and-set-plugin-drafting-flow-edge-4-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "map-and-set-plugin-drafting-flow",
+        "edge": {
+          "from": "preparemapcopy",
+          "to": "mapstate"
+        }
+      },
+      "points": [
+        [
+          0.5,
+          0
+        ],
+        [
+          147.93333333333328,
+          0
+        ],
+        [
+          221.89999999999998,
+          0
+        ],
+        [
+          295.8666666666667,
+          0
+        ],
+        [
+          330.4,
+          0
+        ],
+        [
+          330.4,
+          -153.33333333333334
+        ],
+        [
+          437.9,
+          -153.33333333333334
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "map-and-set-plugin-drafting-flow-node-3",
+        "focus": -0.2,
+        "gap": 6.399999999999977
+      },
+      "endBinding": {
+        "elementId": "map-and-set-plugin-drafting-flow-node-2",
+        "focus": -0.17333333333333226,
+        "gap": 8
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "map-and-set-plugin-drafting-flow-edge-5",
+      "type": "arrow",
+      "x": 232,
+      "y": 418.6666666666667,
+      "width": 381.6,
+      "height": 0,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aI",
+      "roundness": null,
+      "seed": 919035378,
+      "version": 1,
+      "versionNonce": 1468766374,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "map-and-set-plugin-drafting-flow-edge-5-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "map-and-set-plugin-drafting-flow",
+        "edge": {
+          "from": "proxyset",
+          "to": "draftset",
+          "claim": "builds"
+        }
+      },
+      "points": [
+        [
+          0.5,
+          0
+        ],
+        [
+          190.8,
+          0
+        ],
+        [
+          381.1,
+          0
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "map-and-set-plugin-drafting-flow-node-5",
+        "focus": -0.033333333333332,
+        "gap": 8
+      },
+      "endBinding": {
+        "elementId": "map-and-set-plugin-drafting-flow-node-6",
+        "focus": -0.1733333333333335,
+        "gap": 6.399999999999977
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "map-and-set-plugin-drafting-flow-edge-6",
+      "type": "arrow",
+      "x": 773.6,
+      "y": 435.33333333333337,
+      "width": 458.4,
+      "height": 123.33333333333337,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aJ",
+      "roundness": null,
+      "seed": 681561997,
+      "version": 1,
+      "versionNonce": 636523127,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "map-and-set-plugin-drafting-flow-edge-6-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "map-and-set-plugin-drafting-flow",
+        "edge": {
+          "from": "draftset",
+          "to": "setstate",
+          "claim": "holds"
+        }
+      },
+      "points": [
+        [
+          0.5,
+          0
+        ],
+        [
+          52,
+          0
+        ],
+        [
+          52,
+          23.46666666666664
+        ],
+        [
+          267.4,
+          23.46666666666664
+        ],
+        [
+          350.4,
+          23.46666666666664
+        ],
+        [
+          350.4,
+          123.33333333333337
+        ],
+        [
+          457.9,
+          123.33333333333337
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "map-and-set-plugin-drafting-flow-node-6",
+        "focus": 0.5066666666666668,
+        "gap": 6.399999999999977
+      },
+      "endBinding": {
+        "elementId": "map-and-set-plugin-drafting-flow-node-7",
+        "focus": 0.3555555555555543,
+        "gap": 8
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "map-and-set-plugin-drafting-flow-edge-7",
+      "type": "arrow",
+      "x": 232,
+      "y": 798.8000000000001,
+      "width": 341.6,
+      "height": 23.466666666666697,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aK",
+      "roundness": null,
+      "seed": 1064106036,
+      "version": 1,
+      "versionNonce": 1953838592,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "map-and-set-plugin-drafting-flow-edge-7-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "map-and-set-plugin-drafting-flow",
+        "edge": {
+          "from": "preparesetcopy",
+          "to": "createproxy",
+          "claim": "calls"
+        }
+      },
+      "points": [
+        [
+          0.5,
+          0
+        ],
+        [
+          91.26666666666665,
+          0
+        ],
+        [
+          136.89999999999998,
+          0
+        ],
+        [
+          182.53333333333336,
+          0
+        ],
+        [
+          233.60000000000002,
+          0
+        ],
+        [
+          233.60000000000002,
+          -23.466666666666697
+        ],
+        [
+          341.1,
+          -23.466666666666697
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "map-and-set-plugin-drafting-flow-node-8",
+        "focus": -0.22399999999999806,
+        "gap": 8
+      },
+      "endBinding": {
+        "elementId": "map-and-set-plugin-drafting-flow-node-9",
+        "focus": -0.506666666666667,
+        "gap": 6.399999999999977
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "map-and-set-plugin-drafting-flow-edge-8",
+      "type": "arrow",
+      "x": 232,
+      "y": 832.1333333333333,
+      "width": 1000,
+      "height": 270,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aL",
+      "roundness": null,
+      "seed": 211843615,
+      "version": 1,
+      "versionNonce": 182900921,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "map-and-set-plugin-drafting-flow-edge-8-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "map-and-set-plugin-drafting-flow",
+        "edge": {
+          "from": "preparesetcopy",
+          "to": "setstate"
+        }
+      },
+      "points": [
+        [
+          0.5,
+          0
+        ],
+        [
+          32,
+          0
+        ],
+        [
+          32,
+          56.53333333333342
+        ],
+        [
+          606.7333333333332,
+          56.53333333333342
+        ],
+        [
+          892,
+          56.53333333333342
+        ],
+        [
+          892,
+          -213.46666666666658
+        ],
+        [
+          999.5,
+          -213.46666666666658
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "map-and-set-plugin-drafting-flow-node-8",
+        "focus": 0.4426666666666666,
+        "gap": 8
+      },
+      "endBinding": {
+        "elementId": "map-and-set-plugin-drafting-flow-node-7",
+        "focus": -0.6444444444444457,
+        "gap": 8
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "map-and-set-plugin-drafting-flow-edge-9",
+      "type": "arrow",
+      "x": 773.6,
+      "y": 78.66666666666666,
+      "width": 458.4,
+      "height": 210.13333333333335,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aM",
+      "roundness": null,
+      "seed": 1342846990,
+      "version": 1,
+      "versionNonce": 869166514,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "map-and-set-plugin-drafting-flow-edge-9-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "map-and-set-plugin-drafting-flow",
+        "edge": {
+          "from": "draftmap",
+          "to": "markchanged",
+          "claim": "calls"
+        }
+      },
+      "points": [
+        [
+          0.5,
+          0
+        ],
+        [
+          52,
+          0
+        ],
+        [
+          52,
+          210.13333333333335
+        ],
+        [
+          124.13333333333333,
+          210.13333333333335
+        ],
+        [
+          207.70000000000005,
+          210.13333333333335
+        ],
+        [
+          291.26666666666677,
+          210.13333333333335
+        ],
+        [
+          457.9,
+          210.13333333333335
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "map-and-set-plugin-drafting-flow-node-1",
+        "focus": 0.17333333333333326,
+        "gap": 6.399999999999977
+      },
+      "endBinding": {
+        "elementId": "map-and-set-plugin-drafting-flow-node-10",
+        "focus": 0.4240000000000006,
+        "gap": 8
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "map-and-set-plugin-drafting-flow-edge-10",
+      "type": "arrow",
+      "x": 773.6,
+      "y": 402,
+      "width": 458.4,
+      "height": 79.86666666666667,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aN",
+      "roundness": null,
+      "seed": 1312394136,
+      "version": 1,
+      "versionNonce": 1762391924,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "map-and-set-plugin-drafting-flow-edge-10-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "map-and-set-plugin-drafting-flow",
+        "edge": {
+          "from": "draftset",
+          "to": "markchanged",
+          "claim": "calls"
+        }
+      },
+      "points": [
+        [
+          0.5,
+          0
+        ],
+        [
+          67.28333333333342,
+          0
+        ],
+        [
+          134.56666666666672,
+          0
+        ],
+        [
+          269.1333333333333,
+          0
+        ],
+        [
+          350.4,
+          0
+        ],
+        [
+          350.4,
+          -79.86666666666667
+        ],
+        [
+          457.9,
+          -79.86666666666667
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "map-and-set-plugin-drafting-flow-node-6",
+        "focus": -0.15999999999999956,
+        "gap": 6.399999999999977
+      },
+      "endBinding": {
+        "elementId": "map-and-set-plugin-drafting-flow-node-10",
+        "focus": -0.2426666666666659,
+        "gap": 8
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "map-and-set-plugin-drafting-flow-edge-11",
+      "type": "arrow",
+      "x": 793.6,
+      "y": 588.6666666666667,
+      "width": 438.4,
+      "height": 0,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aO",
+      "roundness": null,
+      "seed": 1650521153,
+      "version": 1,
+      "versionNonce": 1571554187,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "map-and-set-plugin-drafting-flow-edge-11-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "map-and-set-plugin-drafting-flow",
+        "edge": {
+          "from": "fixsetcontents",
+          "to": "setstate"
+        }
+      },
+      "points": [
+        [
+          0.5,
+          0
+        ],
+        [
+          219.19999999999993,
+          0
+        ],
+        [
+          437.9,
+          0
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "map-and-set-plugin-drafting-flow-node-11",
+        "focus": 0.216666666666669,
+        "gap": 6.399999999999977
+      },
+      "endBinding": {
+        "elementId": "map-and-set-plugin-drafting-flow-node-7",
+        "focus": -0.1444444444444457,
+        "gap": 8
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "map-and-set-plugin-drafting-flow-node-0-label",
+      "type": "text",
+      "x": 110.5,
+      "y": 47.5,
+      "width": 99.00000000000001,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aP",
+      "roundness": null,
+      "seed": 1788159821,
+      "version": 1,
+      "versionNonce": 674767671,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "map-and-set-plugin-drafting-flow"
+      },
+      "text": "proxyMap_",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "map-and-set-plugin-drafting-flow-node-0",
+      "originalText": "proxyMap_",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "map-and-set-plugin-drafting-flow-node-1-label",
+      "type": "text",
+      "x": 656,
+      "y": 57.5,
+      "width": 88,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aQ",
+      "roundness": null,
+      "seed": 785685888,
+      "version": 1,
+      "versionNonce": 1420597596,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "map-and-set-plugin-drafting-flow"
+      },
+      "text": "DraftMap",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "map-and-set-plugin-drafting-flow-node-1",
+      "originalText": "DraftMap",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "map-and-set-plugin-drafting-flow-node-2-label",
+      "type": "text",
+      "x": 1276,
+      "y": 57.5,
+      "width": 88,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aR",
+      "roundness": null,
+      "seed": 818602031,
+      "version": 1,
+      "versionNonce": 1682193801,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "map-and-set-plugin-drafting-flow"
+      },
+      "text": "MapState",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "map-and-set-plugin-drafting-flow-node-2",
+      "originalText": "MapState",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "map-and-set-plugin-drafting-flow-node-3-label",
+      "type": "text",
+      "x": 613,
+      "y": 227.5,
+      "width": 154,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aS",
+      "roundness": null,
+      "seed": 768348970,
+      "version": 1,
+      "versionNonce": 1809867518,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "map-and-set-plugin-drafting-flow"
+      },
+      "text": "prepareMapCopy",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "map-and-set-plugin-drafting-flow-node-3",
+      "originalText": "prepareMapCopy",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "map-and-set-plugin-drafting-flow-node-4-label",
+      "type": "text",
+      "x": 53,
+      "y": 237.5,
+      "width": 154,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aT",
+      "roundness": null,
+      "seed": 1849343113,
+      "version": 1,
+      "versionNonce": 1754384659,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "map-and-set-plugin-drafting-flow"
+      },
+      "text": "DraftMap.get()",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "map-and-set-plugin-drafting-flow-node-4",
+      "originalText": "DraftMap.get()",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "map-and-set-plugin-drafting-flow-node-5-label",
+      "type": "text",
+      "x": 110.5,
+      "y": 407.5,
+      "width": 99.00000000000001,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aU",
+      "roundness": null,
+      "seed": 691499884,
+      "version": 1,
+      "versionNonce": 608124600,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "map-and-set-plugin-drafting-flow"
+      },
+      "text": "proxySet_",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "map-and-set-plugin-drafting-flow-node-5",
+      "originalText": "proxySet_",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "map-and-set-plugin-drafting-flow-node-6-label",
+      "type": "text",
+      "x": 656,
+      "y": 397.5,
+      "width": 88,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aV",
+      "roundness": null,
+      "seed": 1278804571,
+      "version": 1,
+      "versionNonce": 1017734485,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "map-and-set-plugin-drafting-flow"
+      },
+      "text": "DraftSet",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "map-and-set-plugin-drafting-flow-node-6",
+      "originalText": "DraftSet",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "map-and-set-plugin-drafting-flow-node-7-label",
+      "type": "text",
+      "x": 1276,
+      "y": 567.5,
+      "width": 88,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aW",
+      "roundness": null,
+      "seed": 2129727910,
+      "version": 1,
+      "versionNonce": 1234743946,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "map-and-set-plugin-drafting-flow"
+      },
+      "text": "SetState",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "map-and-set-plugin-drafting-flow-node-7",
+      "originalText": "SetState",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "map-and-set-plugin-drafting-flow-node-8-label",
+      "type": "text",
+      "x": 53,
+      "y": 797.5,
+      "width": 154,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aX",
+      "roundness": null,
+      "seed": 400684549,
+      "version": 1,
+      "versionNonce": 2017098511,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "map-and-set-plugin-drafting-flow"
+      },
+      "text": "prepareSetCopy",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "map-and-set-plugin-drafting-flow-node-8",
+      "originalText": "prepareSetCopy",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "map-and-set-plugin-drafting-flow-node-9-label",
+      "type": "text",
+      "x": 609.5,
+      "y": 737.5,
+      "width": 121.00000000000001,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aY",
+      "roundness": null,
+      "seed": 2084201144,
+      "version": 1,
+      "versionNonce": 412556308,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "map-and-set-plugin-drafting-flow"
+      },
+      "text": "createProxy",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "map-and-set-plugin-drafting-flow-node-9",
+      "originalText": "createProxy",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "map-and-set-plugin-drafting-flow-node-10-label",
+      "type": "text",
+      "x": 1269.5,
+      "y": 297.5,
+      "width": 121.00000000000001,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aZ",
+      "roundness": null,
+      "seed": 615173868,
+      "version": 1,
+      "versionNonce": 2060994872,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "map-and-set-plugin-drafting-flow"
+      },
+      "text": "markChanged",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "map-and-set-plugin-drafting-flow-node-10",
+      "originalText": "markChanged",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "map-and-set-plugin-drafting-flow-node-11-label",
+      "type": "text",
+      "x": 613,
+      "y": 567.5,
+      "width": 154,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aa",
+      "roundness": null,
+      "seed": 1773017097,
+      "version": 1,
+      "versionNonce": 1059771283,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "map-and-set-plugin-drafting-flow"
+      },
+      "text": "fixSetContents",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "map-and-set-plugin-drafting-flow-node-11",
+      "originalText": "fixSetContents",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "map-and-set-plugin-drafting-flow-edge-0-label",
+      "type": "text",
+      "x": 392,
+      "y": 52,
+      "width": 61.60000000000001,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "ab",
+      "roundness": null,
+      "seed": 2923490,
+      "version": 1,
+      "versionNonce": 465044694,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "map-and-set-plugin-drafting-flow"
+      },
+      "text": "@builds",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "map-and-set-plugin-drafting-flow-edge-0",
+      "originalText": "@builds",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "map-and-set-plugin-drafting-flow-edge-1-label",
+      "type": "text",
+      "x": 923.5999999999999,
+      "y": 35.33333333333333,
+      "width": 158.4,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "ac",
+      "roundness": null,
+      "seed": 1306312583,
+      "version": 1,
+      "versionNonce": 644065441,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "map-and-set-plugin-drafting-flow"
+      },
+      "text": "DRAFT_STATE @holds",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "map-and-set-plugin-drafting-flow-edge-1",
+      "originalText": "DRAFT_STATE @holds",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "map-and-set-plugin-drafting-flow-edge-2-label",
+      "type": "text",
+      "x": 237.6,
+      "y": 632.4666666666667,
+      "width": 52.800000000000004,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "ad",
+      "roundness": null,
+      "seed": 287520056,
+      "version": 1,
+      "versionNonce": 52067220,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "map-and-set-plugin-drafting-flow"
+      },
+      "text": "@calls",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "map-and-set-plugin-drafting-flow-edge-2",
+      "originalText": "@calls",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "map-and-set-plugin-drafting-flow-edge-3-label",
+      "type": "text",
+      "x": 376.40000000000003,
+      "y": 222,
+      "width": 52.800000000000004,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "ae",
+      "roundness": null,
+      "seed": 751487109,
+      "version": 1,
+      "versionNonce": 1656609423,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "map-and-set-plugin-drafting-flow"
+      },
+      "text": "@calls",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "map-and-set-plugin-drafting-flow-edge-3",
+      "originalText": "@calls",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "map-and-set-plugin-drafting-flow-edge-4-label",
+      "type": "text",
+      "x": 1054.2666666666667,
+      "y": 222,
+      "width": 70.4,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "af",
+      "roundness": null,
+      "seed": 730011390,
+      "version": 1,
+      "versionNonce": 1029226914,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "map-and-set-plugin-drafting-flow"
+      },
+      "text": "modifies",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "map-and-set-plugin-drafting-flow-edge-4",
+      "originalText": "modifies",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "map-and-set-plugin-drafting-flow-edge-5-label",
+      "type": "text",
+      "x": 392,
+      "y": 408.6666666666667,
+      "width": 61.60000000000001,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "ag",
+      "roundness": null,
+      "seed": 73946003,
+      "version": 1,
+      "versionNonce": 1258675181,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "map-and-set-plugin-drafting-flow"
+      },
+      "text": "@builds",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "map-and-set-plugin-drafting-flow-edge-5",
+      "originalText": "@builds",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "map-and-set-plugin-drafting-flow-edge-6-label",
+      "type": "text",
+      "x": 961.8,
+      "y": 448.8,
+      "width": 158.4,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "ah",
+      "roundness": null,
+      "seed": 1955820612,
+      "version": 1,
+      "versionNonce": 183399760,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "map-and-set-plugin-drafting-flow"
+      },
+      "text": "DRAFT_STATE @holds",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "map-and-set-plugin-drafting-flow-edge-6",
+      "originalText": "DRAFT_STATE @holds",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "map-and-set-plugin-drafting-flow-edge-7-label",
+      "type": "text",
+      "x": 388.1333333333334,
+      "y": 788.8000000000001,
+      "width": 52.800000000000004,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "ai",
+      "roundness": null,
+      "seed": 1508921089,
+      "version": 1,
+      "versionNonce": 1881130827,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "map-and-set-plugin-drafting-flow"
+      },
+      "text": "@calls",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "map-and-set-plugin-drafting-flow-edge-7",
+      "originalText": "@calls",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "map-and-set-plugin-drafting-flow-edge-8-label",
+      "type": "text",
+      "x": 803.5333333333332,
+      "y": 878.6666666666667,
+      "width": 70.4,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aj",
+      "roundness": null,
+      "seed": 1119151530,
+      "version": 1,
+      "versionNonce": 1449378430,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "map-and-set-plugin-drafting-flow"
+      },
+      "text": "modifies",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "map-and-set-plugin-drafting-flow-edge-8",
+      "originalText": "modifies",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "map-and-set-plugin-drafting-flow-edge-9-label",
+      "type": "text",
+      "x": 871.3333333333334,
+      "y": 278.8,
+      "width": 52.800000000000004,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "ak",
+      "roundness": null,
+      "seed": 1169404591,
+      "version": 1,
+      "versionNonce": 1321704713,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "map-and-set-plugin-drafting-flow"
+      },
+      "text": "@calls",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "map-and-set-plugin-drafting-flow-edge-9",
+      "originalText": "@calls",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "map-and-set-plugin-drafting-flow-edge-10-label",
+      "type": "text",
+      "x": 1016.3333333333334,
+      "y": 392,
+      "width": 52.800000000000004,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "al",
+      "roundness": null,
+      "seed": 1545143781,
+      "version": 1,
+      "versionNonce": 2062081391,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "map-and-set-plugin-drafting-flow"
+      },
+      "text": "@calls",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "map-and-set-plugin-drafting-flow-edge-10",
+      "originalText": "@calls",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "map-and-set-plugin-drafting-flow-edge-11-label",
+      "type": "text",
+      "x": 977.5999999999999,
+      "y": 578.6666666666667,
+      "width": 70.4,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "am",
+      "roundness": null,
+      "seed": 273786136,
+      "version": 1,
+      "versionNonce": 1962679284,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "map-and-set-plugin-drafting-flow"
+      },
+      "text": "accesses",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "map-and-set-plugin-drafting-flow-edge-11",
+      "originalText": "accesses",
+      "autoResize": true,
+      "lineHeight": 1.25
+    }
+  ],
+  "appState": {
+    "gridSize": null,
+    "viewBackgroundColor": "#ffffff"
+  },
+  "files": {},
+  "diagramos": {
+    "version": "0.2.0-rc.6",
+    "schema": 1
+  }
+}

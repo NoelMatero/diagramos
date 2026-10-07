@@ -1,0 +1,108 @@
+{
+  "board": "bench-holdout-b/boards/drizzle-team-drizzle-orm/sql-template.excalidraw",
+  "project": "drizzle-team-drizzle-orm",
+  "topic": "sql-template",
+  "language": "ts",
+  "scope": "drizzle-orm/src/sql",
+  "pin": "15454dbe49",
+  "tool": "typescript 5.9.3",
+  "claims": [
+    {
+      "id": "builds|drizzle-orm/src/sql/sql.ts#sql|drizzle-orm/src/sql/sql.ts#SQLChunk|",
+      "word": "builds",
+      "from": "drizzle-orm/src/sql/sql.ts#sql",
+      "to": "drizzle-orm/src/sql/sql.ts#SQLChunk",
+      "fromLabel": "sql template tag",
+      "toLabel": "queryChunks[]",
+      "language": "ts",
+      "source": "drawn",
+      "truth": "false",
+      "why": "the from end is a value or field, and only a routine or a type makes values"
+    },
+    {
+      "id": "builds|drizzle-orm/src/sql/sql.ts#sql|drizzle-orm/src/sql/sql.ts#StringChunk|",
+      "word": "builds",
+      "from": "drizzle-orm/src/sql/sql.ts#sql",
+      "to": "drizzle-orm/src/sql/sql.ts#StringChunk",
+      "fromLabel": "sql template tag",
+      "toLabel": "StringChunk",
+      "language": "ts",
+      "source": "drawn",
+      "truth": "false",
+      "why": "the from end is a value or field, and only a routine or a type makes values"
+    },
+    {
+      "id": "takes|drizzle-orm/src/sql/sql.ts#SQLChunk|drizzle-orm/src/sql/sql.ts#SQL|",
+      "word": "takes",
+      "from": "drizzle-orm/src/sql/sql.ts#SQLChunk",
+      "to": "drizzle-orm/src/sql/sql.ts#SQL",
+      "fromLabel": "queryChunks[]",
+      "toLabel": "SQL class",
+      "language": "ts",
+      "source": "drawn",
+      "truth": "false",
+      "why": "the to end is a type, and only something that runs has a signature"
+    },
+    {
+      "id": "calls|drizzle-orm/src/sql/sql.ts#SQL|drizzle-orm/src/sql/sql.ts#SQL.toQuery|",
+      "word": "calls",
+      "from": "drizzle-orm/src/sql/sql.ts#SQL",
+      "to": "drizzle-orm/src/sql/sql.ts#SQL.toQuery",
+      "fromLabel": "SQL class",
+      "toLabel": "toQuery()",
+      "language": "ts",
+      "source": "drawn",
+      "truth": "undecidable",
+      "why": "an end names nothing the tool declares"
+    },
+    {
+      "id": "calls|drizzle-orm/src/sql/sql.ts#SQL.toQuery|drizzle-orm/src/sql/sql.ts#SQL.buildQueryFromSourceParams|",
+      "word": "calls",
+      "from": "drizzle-orm/src/sql/sql.ts#SQL.toQuery",
+      "to": "drizzle-orm/src/sql/sql.ts#SQL.buildQueryFromSourceParams",
+      "fromLabel": "toQuery()",
+      "toLabel": "buildQueryFromSourceParams()",
+      "language": "ts",
+      "source": "drawn",
+      "truth": "undecidable",
+      "why": "an end names nothing the tool declares"
+    },
+    {
+      "id": "accesses|drizzle-orm/src/sql/sql.ts#SQL.buildQueryFromSourceParams|drizzle-orm/src/sql/sql.ts#Param|mapToDriverValue",
+      "word": "accesses",
+      "from": "drizzle-orm/src/sql/sql.ts#SQL.buildQueryFromSourceParams",
+      "to": "drizzle-orm/src/sql/sql.ts#Param",
+      "member": "mapToDriverValue",
+      "fromLabel": "buildQueryFromSourceParams()",
+      "toLabel": "Param encoder",
+      "language": "ts",
+      "source": "drawn",
+      "truth": "undecidable",
+      "why": "an end names nothing the tool declares"
+    },
+    {
+      "id": "calls|drizzle-orm/src/sql/sql.ts#SQL.buildQueryFromSourceParams|drizzle-orm/src/sql/sql.ts#mergeQueries|",
+      "word": "calls",
+      "from": "drizzle-orm/src/sql/sql.ts#SQL.buildQueryFromSourceParams",
+      "to": "drizzle-orm/src/sql/sql.ts#mergeQueries",
+      "fromLabel": "buildQueryFromSourceParams()",
+      "toLabel": "mergeQueries()",
+      "language": "ts",
+      "source": "drawn",
+      "truth": "undecidable",
+      "why": "an end names nothing the tool declares"
+    },
+    {
+      "id": "builds|drizzle-orm/src/sql/sql.ts#mergeQueries|drizzle-orm/src/sql/sql.ts#Query|",
+      "word": "builds",
+      "from": "drizzle-orm/src/sql/sql.ts#mergeQueries",
+      "to": "drizzle-orm/src/sql/sql.ts#Query",
+      "fromLabel": "mergeQueries()",
+      "toLabel": "Query {sql, params}",
+      "language": "ts",
+      "source": "drawn",
+      "truth": "undecidable",
+      "why": "a literal here is written against a type that could be it"
+    }
+  ]
+}

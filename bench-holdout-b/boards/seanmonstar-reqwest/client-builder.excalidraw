@@ -1,0 +1,1695 @@
+{
+  "type": "excalidraw",
+  "version": 2,
+  "source": "diagramos",
+  "elements": [
+    {
+      "id": "clientbuilder-connector-tls-proxies-redi-title",
+      "type": "text",
+      "x": 0,
+      "y": -115,
+      "width": 805.2,
+      "height": 30,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a0",
+      "roundness": null,
+      "seed": 1928270367,
+      "version": 1,
+      "versionNonce": 413147321,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "clientbuilder-connector-tls-proxies-redi",
+        "role": "title"
+      },
+      "text": "ClientBuilder: Connector, TLS, Proxies, Redirect Policy Setup",
+      "fontSize": 24,
+      "fontFamily": 5,
+      "textAlign": "left",
+      "verticalAlign": "middle",
+      "containerId": null,
+      "originalText": "ClientBuilder: Connector, TLS, Proxies, Redirect Policy Setup",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "clientbuilder-connector-tls-proxies-redi-node-0",
+      "type": "rectangle",
+      "x": 20,
+      "y": 40,
+      "width": 200,
+      "height": 80,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a1",
+      "roundness": null,
+      "seed": 1601080034,
+      "version": 1,
+      "versionNonce": 277037526,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "clientbuilder-connector-tls-proxies-redi-node-0-label"
+        },
+        {
+          "id": "clientbuilder-connector-tls-proxies-redi-edge-0",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "clientbuilder-connector-tls-proxies-redi",
+        "node": "builder",
+        "ref": "src/async_impl/client.rs#ClientBuilder"
+      }
+    },
+    {
+      "id": "clientbuilder-connector-tls-proxies-redi-node-1",
+      "type": "rectangle",
+      "x": 660,
+      "y": 20,
+      "width": 160,
+      "height": 120,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a2",
+      "roundness": null,
+      "seed": 869480979,
+      "version": 1,
+      "versionNonce": 1884206957,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "clientbuilder-connector-tls-proxies-redi-node-1-label"
+        },
+        {
+          "id": "clientbuilder-connector-tls-proxies-redi-edge-0",
+          "type": "arrow"
+        },
+        {
+          "id": "clientbuilder-connector-tls-proxies-redi-edge-1",
+          "type": "arrow"
+        },
+        {
+          "id": "clientbuilder-connector-tls-proxies-redi-edge-2",
+          "type": "arrow"
+        },
+        {
+          "id": "clientbuilder-connector-tls-proxies-redi-edge-3",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "clientbuilder-connector-tls-proxies-redi",
+        "node": "config",
+        "ref": "src/async_impl/client.rs#Config"
+      }
+    },
+    {
+      "id": "clientbuilder-connector-tls-proxies-redi-node-2",
+      "type": "rectangle",
+      "x": 1300,
+      "y": 340,
+      "width": 160,
+      "height": 80,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a3",
+      "roundness": null,
+      "seed": 480069604,
+      "version": 1,
+      "versionNonce": 196274800,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "clientbuilder-connector-tls-proxies-redi-node-2-label"
+        },
+        {
+          "id": "clientbuilder-connector-tls-proxies-redi-edge-1",
+          "type": "arrow"
+        },
+        {
+          "id": "clientbuilder-connector-tls-proxies-redi-edge-4",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "clientbuilder-connector-tls-proxies-redi",
+        "node": "tls",
+        "ref": "src/tls.rs#TlsBackend"
+      }
+    },
+    {
+      "id": "clientbuilder-connector-tls-proxies-redi-node-3",
+      "type": "rectangle",
+      "x": 1280,
+      "y": 180,
+      "width": 180,
+      "height": 80,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a4",
+      "roundness": null,
+      "seed": 405056125,
+      "version": 1,
+      "versionNonce": 583347559,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "clientbuilder-connector-tls-proxies-redi-node-3-label"
+        },
+        {
+          "id": "clientbuilder-connector-tls-proxies-redi-edge-2",
+          "type": "arrow"
+        },
+        {
+          "id": "clientbuilder-connector-tls-proxies-redi-edge-5",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "clientbuilder-connector-tls-proxies-redi",
+        "node": "proxies",
+        "ref": "src/proxy.rs#Matcher"
+      }
+    },
+    {
+      "id": "clientbuilder-connector-tls-proxies-redi-node-4",
+      "type": "rectangle",
+      "x": 1300,
+      "y": 20,
+      "width": 160,
+      "height": 80,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a5",
+      "roundness": null,
+      "seed": 1388524806,
+      "version": 1,
+      "versionNonce": 1991474282,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "clientbuilder-connector-tls-proxies-redi-node-4-label"
+        },
+        {
+          "id": "clientbuilder-connector-tls-proxies-redi-edge-3",
+          "type": "arrow"
+        },
+        {
+          "id": "clientbuilder-connector-tls-proxies-redi-edge-7",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "clientbuilder-connector-tls-proxies-redi",
+        "node": "policy",
+        "ref": "src/redirect.rs#Policy"
+      }
+    },
+    {
+      "id": "clientbuilder-connector-tls-proxies-redi-node-5",
+      "type": "rectangle",
+      "x": 1840,
+      "y": 180,
+      "width": 240,
+      "height": 100,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a6",
+      "roundness": null,
+      "seed": 547381719,
+      "version": 1,
+      "versionNonce": 117926577,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "clientbuilder-connector-tls-proxies-redi-node-5-label"
+        },
+        {
+          "id": "clientbuilder-connector-tls-proxies-redi-edge-4",
+          "type": "arrow"
+        },
+        {
+          "id": "clientbuilder-connector-tls-proxies-redi-edge-5",
+          "type": "arrow"
+        },
+        {
+          "id": "clientbuilder-connector-tls-proxies-redi-edge-6",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "clientbuilder-connector-tls-proxies-redi",
+        "node": "connector_builder",
+        "ref": "src/connect.rs#ConnectorBuilder"
+      }
+    },
+    {
+      "id": "clientbuilder-connector-tls-proxies-redi-node-6",
+      "type": "rectangle",
+      "x": 2500,
+      "y": 180,
+      "width": 160,
+      "height": 80,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a7",
+      "roundness": null,
+      "seed": 2144558760,
+      "version": 1,
+      "versionNonce": 115488132,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "clientbuilder-connector-tls-proxies-redi-node-6-label"
+        },
+        {
+          "id": "clientbuilder-connector-tls-proxies-redi-edge-6",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "clientbuilder-connector-tls-proxies-redi",
+        "node": "connector",
+        "ref": "src/connect.rs#Connector"
+      }
+    },
+    {
+      "id": "clientbuilder-connector-tls-proxies-redi-node-7",
+      "type": "rectangle",
+      "x": 1840,
+      "y": 20,
+      "width": 260,
+      "height": 80,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a8",
+      "roundness": null,
+      "seed": 249798737,
+      "version": 1,
+      "versionNonce": 1833651803,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "clientbuilder-connector-tls-proxies-redi-node-7-label"
+        },
+        {
+          "id": "clientbuilder-connector-tls-proxies-redi-edge-7",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "clientbuilder-connector-tls-proxies-redi",
+        "node": "tower_policy",
+        "ref": "src/redirect.rs#TowerRedirectPolicy"
+      }
+    },
+    {
+      "id": "clientbuilder-connector-tls-proxies-redi-edge-0",
+      "type": "arrow",
+      "x": 212,
+      "y": 82,
+      "width": 438.4,
+      "height": 0,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a9",
+      "roundness": null,
+      "seed": 1637151093,
+      "version": 1,
+      "versionNonce": 1250579711,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "clientbuilder-connector-tls-proxies-redi-edge-0-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "clientbuilder-connector-tls-proxies-redi",
+        "edge": {
+          "from": "builder",
+          "to": "config",
+          "claim": "needs"
+        }
+      },
+      "points": [
+        [
+          0.5,
+          0
+        ],
+        [
+          219.2,
+          0
+        ],
+        [
+          437.9,
+          0
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "clientbuilder-connector-tls-proxies-redi-node-0",
+        "focus": 0.05000000000000001,
+        "gap": 8
+      },
+      "endBinding": {
+        "elementId": "clientbuilder-connector-tls-proxies-redi-node-1",
+        "focus": -0.033333333333333034,
+        "gap": 9.600000000000023
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "clientbuilder-connector-tls-proxies-redi-edge-1",
+      "type": "arrow",
+      "x": 810.4,
+      "y": 112,
+      "width": 483.6,
+      "height": 260,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aA",
+      "roundness": null,
+      "seed": 967929948,
+      "version": 1,
+      "versionNonce": 1708638056,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "clientbuilder-connector-tls-proxies-redi-edge-1-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "clientbuilder-connector-tls-proxies-redi",
+        "edge": {
+          "from": "config",
+          "to": "tls",
+          "claim": "holds"
+        }
+      },
+      "points": [
+        [
+          0.5,
+          0
+        ],
+        [
+          32,
+          0
+        ],
+        [
+          32,
+          260
+        ],
+        [
+          111.80000000000007,
+          260
+        ],
+        [
+          297.69999999999993,
+          260
+        ],
+        [
+          390.65,
+          260
+        ],
+        [
+          483.1,
+          260
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "clientbuilder-connector-tls-proxies-redi-node-1",
+        "focus": 0.5333333333333331,
+        "gap": 9.600000000000023
+      },
+      "endBinding": {
+        "elementId": "clientbuilder-connector-tls-proxies-redi-node-2",
+        "focus": 0.2,
+        "gap": 6
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "clientbuilder-connector-tls-proxies-redi-edge-2",
+      "type": "arrow",
+      "x": 810.4,
+      "y": 82,
+      "width": 473.6,
+      "height": 130,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aB",
+      "roundness": null,
+      "seed": 1789238315,
+      "version": 1,
+      "versionNonce": 1799730725,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "clientbuilder-connector-tls-proxies-redi-edge-2-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "clientbuilder-connector-tls-proxies-redi",
+        "edge": {
+          "from": "config",
+          "to": "proxies",
+          "claim": "holds"
+        }
+      },
+      "points": [
+        [
+          0.5,
+          0
+        ],
+        [
+          56,
+          0
+        ],
+        [
+          56,
+          130
+        ],
+        [
+          171.80000000000007,
+          130
+        ],
+        [
+          322.69999999999993,
+          130
+        ],
+        [
+          398.15,
+          130
+        ],
+        [
+          473.1,
+          130
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "clientbuilder-connector-tls-proxies-redi-node-1",
+        "focus": 0.033333333333333034,
+        "gap": 9.600000000000023
+      },
+      "endBinding": {
+        "elementId": "clientbuilder-connector-tls-proxies-redi-node-3",
+        "focus": 0.19999999999999998,
+        "gap": 4
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "clientbuilder-connector-tls-proxies-redi-edge-3",
+      "type": "arrow",
+      "x": 810.4,
+      "y": 52,
+      "width": 483.6,
+      "height": 0,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aC",
+      "roundness": null,
+      "seed": 696033946,
+      "version": 1,
+      "versionNonce": 1112723310,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "clientbuilder-connector-tls-proxies-redi-edge-3-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "clientbuilder-connector-tls-proxies-redi",
+        "edge": {
+          "from": "config",
+          "to": "policy",
+          "claim": "holds"
+        }
+      },
+      "points": [
+        [
+          0.5,
+          0
+        ],
+        [
+          241.80000000000007,
+          0
+        ],
+        [
+          483.1,
+          0
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "clientbuilder-connector-tls-proxies-redi-node-1",
+        "focus": -0.466666666666667,
+        "gap": 9.600000000000023
+      },
+      "endBinding": {
+        "elementId": "clientbuilder-connector-tls-proxies-redi-node-4",
+        "focus": 0.2,
+        "gap": 6
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "clientbuilder-connector-tls-proxies-redi-edge-4",
+      "type": "arrow",
+      "x": 1454,
+      "y": 372,
+      "width": 384.66666666666674,
+      "height": 126.66666666666666,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aD",
+      "roundness": null,
+      "seed": 1903448105,
+      "version": 1,
+      "versionNonce": 183490099,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "clientbuilder-connector-tls-proxies-redi-edge-4-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "clientbuilder-connector-tls-proxies-redi",
+        "edge": {
+          "from": "tls",
+          "to": "connector_builder"
+        }
+      },
+      "points": [
+        [
+          0.5,
+          0
+        ],
+        [
+          63.91666666666674,
+          0
+        ],
+        [
+          127.83333333333348,
+          0
+        ],
+        [
+          255.66666666666674,
+          0
+        ],
+        [
+          270,
+          0
+        ],
+        [
+          270,
+          -126.66666666666666
+        ],
+        [
+          384.16666666666674,
+          -126.66666666666666
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "clientbuilder-connector-tls-proxies-redi-node-2",
+        "focus": -0.2,
+        "gap": 6
+      },
+      "endBinding": {
+        "elementId": "clientbuilder-connector-tls-proxies-redi-node-5",
+        "focus": -0.3066666666666664,
+        "gap": 1.3333333333332575
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "clientbuilder-connector-tls-proxies-redi-edge-5",
+      "type": "arrow",
+      "x": 1464,
+      "y": 212,
+      "width": 374.66666666666674,
+      "height": 0,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aE",
+      "roundness": null,
+      "seed": 1558651488,
+      "version": 1,
+      "versionNonce": 354475964,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "clientbuilder-connector-tls-proxies-redi-edge-5-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "clientbuilder-connector-tls-proxies-redi",
+        "edge": {
+          "from": "proxies",
+          "to": "connector_builder"
+        }
+      },
+      "points": [
+        [
+          0.5,
+          0
+        ],
+        [
+          187.33333333333348,
+          0
+        ],
+        [
+          374.16666666666674,
+          0
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "clientbuilder-connector-tls-proxies-redi-node-3",
+        "focus": -0.19999999999999998,
+        "gap": 4
+      },
+      "endBinding": {
+        "elementId": "clientbuilder-connector-tls-proxies-redi-node-5",
+        "focus": 0.3600000000000003,
+        "gap": 1.3333333333332575
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "clientbuilder-connector-tls-proxies-redi-edge-6",
+      "type": "arrow",
+      "x": 2078.666666666667,
+      "y": 228.66666666666669,
+      "width": 425.33333333333303,
+      "height": 0,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aF",
+      "roundness": null,
+      "seed": 1035242063,
+      "version": 1,
+      "versionNonce": 404400425,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "clientbuilder-connector-tls-proxies-redi-edge-6-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "clientbuilder-connector-tls-proxies-redi",
+        "edge": {
+          "from": "connector_builder",
+          "to": "connector",
+          "claim": "builds"
+        }
+      },
+      "points": [
+        [
+          0.5,
+          0
+        ],
+        [
+          212.66666666666652,
+          0
+        ],
+        [
+          424.83333333333303,
+          0
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "clientbuilder-connector-tls-proxies-redi-node-5",
+        "focus": -0.026666666666666936,
+        "gap": 1.3333333333330302
+      },
+      "endBinding": {
+        "elementId": "clientbuilder-connector-tls-proxies-redi-node-6",
+        "focus": -0.2166666666666684,
+        "gap": 4
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "clientbuilder-connector-tls-proxies-redi-edge-7",
+      "type": "arrow",
+      "x": 1454,
+      "y": 52,
+      "width": 378,
+      "height": 0,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aG",
+      "roundness": null,
+      "seed": 1642598142,
+      "version": 1,
+      "versionNonce": 1581984162,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "clientbuilder-connector-tls-proxies-redi-edge-7-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "clientbuilder-connector-tls-proxies-redi",
+        "edge": {
+          "from": "policy",
+          "to": "tower_policy"
+        }
+      },
+      "points": [
+        [
+          0.5,
+          0
+        ],
+        [
+          189,
+          0
+        ],
+        [
+          377.5,
+          0
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "clientbuilder-connector-tls-proxies-redi-node-4",
+        "focus": -0.2,
+        "gap": 6
+      },
+      "endBinding": {
+        "elementId": "clientbuilder-connector-tls-proxies-redi-node-7",
+        "focus": 0.2,
+        "gap": 8
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "clientbuilder-connector-tls-proxies-redi-node-0-label",
+      "type": "text",
+      "x": 48.5,
+      "y": 67.5,
+      "width": 143,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aH",
+      "roundness": null,
+      "seed": 1918088771,
+      "version": 1,
+      "versionNonce": 740915037,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "clientbuilder-connector-tls-proxies-redi"
+      },
+      "text": "ClientBuilder",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "clientbuilder-connector-tls-proxies-redi-node-0",
+      "originalText": "ClientBuilder",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "clientbuilder-connector-tls-proxies-redi-node-1-label",
+      "type": "text",
+      "x": 707,
+      "y": 67.5,
+      "width": 66,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aI",
+      "roundness": null,
+      "seed": 1845533422,
+      "version": 1,
+      "versionNonce": 19325458,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "clientbuilder-connector-tls-proxies-redi"
+      },
+      "text": "Config",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "clientbuilder-connector-tls-proxies-redi-node-1",
+      "originalText": "Config",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "clientbuilder-connector-tls-proxies-redi-node-2-label",
+      "type": "text",
+      "x": 1325,
+      "y": 367.5,
+      "width": 110.00000000000001,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aJ",
+      "roundness": null,
+      "seed": 1826926065,
+      "version": 1,
+      "versionNonce": 799554171,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "clientbuilder-connector-tls-proxies-redi"
+      },
+      "text": "TlsBackend",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "clientbuilder-connector-tls-proxies-redi-node-2",
+      "originalText": "TlsBackend",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "clientbuilder-connector-tls-proxies-redi-node-3-label",
+      "type": "text",
+      "x": 1304,
+      "y": 207.5,
+      "width": 132,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aK",
+      "roundness": null,
+      "seed": 1450171316,
+      "version": 1,
+      "versionNonce": 771840128,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "clientbuilder-connector-tls-proxies-redi"
+      },
+      "text": "ProxyMatcher",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "clientbuilder-connector-tls-proxies-redi-node-3",
+      "originalText": "ProxyMatcher",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "clientbuilder-connector-tls-proxies-redi-node-4-label",
+      "type": "text",
+      "x": 1347,
+      "y": 47.5,
+      "width": 66,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aL",
+      "roundness": null,
+      "seed": 1376674039,
+      "version": 1,
+      "versionNonce": 183538769,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "clientbuilder-connector-tls-proxies-redi"
+      },
+      "text": "Policy",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "clientbuilder-connector-tls-proxies-redi-node-4",
+      "originalText": "Policy",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "clientbuilder-connector-tls-proxies-redi-node-5-label",
+      "type": "text",
+      "x": 1872,
+      "y": 217.5,
+      "width": 176,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aM",
+      "roundness": null,
+      "seed": 712925266,
+      "version": 1,
+      "versionNonce": 1289997190,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "clientbuilder-connector-tls-proxies-redi"
+      },
+      "text": "ConnectorBuilder",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "clientbuilder-connector-tls-proxies-redi-node-5",
+      "originalText": "ConnectorBuilder",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "clientbuilder-connector-tls-proxies-redi-node-6-label",
+      "type": "text",
+      "x": 2530.5,
+      "y": 207.5,
+      "width": 99.00000000000001,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aN",
+      "roundness": null,
+      "seed": 1622199669,
+      "version": 1,
+      "versionNonce": 1667606783,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "clientbuilder-connector-tls-proxies-redi"
+      },
+      "text": "Connector",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "clientbuilder-connector-tls-proxies-redi-node-6",
+      "originalText": "Connector",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "clientbuilder-connector-tls-proxies-redi-node-7-label",
+      "type": "text",
+      "x": 1865.5,
+      "y": 47.5,
+      "width": 209.00000000000003,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aO",
+      "roundness": null,
+      "seed": 1870313512,
+      "version": 1,
+      "versionNonce": 1263802884,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "clientbuilder-connector-tls-proxies-redi"
+      },
+      "text": "TowerRedirectPolicy",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "clientbuilder-connector-tls-proxies-redi-node-7",
+      "originalText": "TowerRedirectPolicy",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "clientbuilder-connector-tls-proxies-redi-edge-0-label",
+      "type": "text",
+      "x": 352,
+      "y": 72,
+      "width": 158.4,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aP",
+      "roundness": null,
+      "seed": 1758705948,
+      "version": 1,
+      "versionNonce": 1489992744,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "clientbuilder-connector-tls-proxies-redi"
+      },
+      "text": "read config @needs",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "clientbuilder-connector-tls-proxies-redi-edge-0",
+      "originalText": "read config @needs",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "clientbuilder-connector-tls-proxies-redi-edge-1-label",
+      "type": "text",
+      "x": 878.2,
+      "y": 362,
+      "width": 88,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aQ",
+      "roundness": null,
+      "seed": 437220857,
+      "version": 1,
+      "versionNonce": 424600259,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "clientbuilder-connector-tls-proxies-redi"
+      },
+      "text": "tls @holds",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "clientbuilder-connector-tls-proxies-redi-edge-1",
+      "originalText": "tls @holds",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "clientbuilder-connector-tls-proxies-redi-edge-2-label",
+      "type": "text",
+      "x": 920.6,
+      "y": 202,
+      "width": 123.20000000000002,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aR",
+      "roundness": null,
+      "seed": 336609622,
+      "version": 1,
+      "versionNonce": 945811002,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "clientbuilder-connector-tls-proxies-redi"
+      },
+      "text": "proxies @holds",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "clientbuilder-connector-tls-proxies-redi-edge-2",
+      "originalText": "proxies @holds",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "clientbuilder-connector-tls-proxies-redi-edge-3-label",
+      "type": "text",
+      "x": 955.4000000000001,
+      "y": 42,
+      "width": 193.60000000000002,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aS",
+      "roundness": null,
+      "seed": 1962429707,
+      "version": 1,
+      "versionNonce": 1265694853,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "clientbuilder-connector-tls-proxies-redi"
+      },
+      "text": "redirect_policy @holds",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "clientbuilder-connector-tls-proxies-redi-edge-3",
+      "originalText": "redirect_policy @holds",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "clientbuilder-connector-tls-proxies-redi-edge-4-label",
+      "type": "text",
+      "x": 1665.6666666666667,
+      "y": 362,
+      "width": 88,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aT",
+      "roundness": null,
+      "seed": 434830448,
+      "version": 1,
+      "versionNonce": 1699442380,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "clientbuilder-connector-tls-proxies-redi"
+      },
+      "text": "configures",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "clientbuilder-connector-tls-proxies-redi-edge-4",
+      "originalText": "configures",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "clientbuilder-connector-tls-proxies-redi-edge-5-label",
+      "type": "text",
+      "x": 1607.3333333333335,
+      "y": 202,
+      "width": 88,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aU",
+      "roundness": null,
+      "seed": 1019113661,
+      "version": 1,
+      "versionNonce": 1695571111,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "clientbuilder-connector-tls-proxies-redi"
+      },
+      "text": "configures",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "clientbuilder-connector-tls-proxies-redi-edge-5",
+      "originalText": "configures",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "clientbuilder-connector-tls-proxies-redi-edge-6-label",
+      "type": "text",
+      "x": 2225.3333333333335,
+      "y": 218.66666666666669,
+      "width": 132,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aV",
+      "roundness": null,
+      "seed": 127762074,
+      "version": 1,
+      "versionNonce": 1879909230,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "clientbuilder-connector-tls-proxies-redi"
+      },
+      "text": "build() @builds",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "clientbuilder-connector-tls-proxies-redi-edge-6",
+      "originalText": "build() @builds",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "clientbuilder-connector-tls-proxies-redi-edge-7-label",
+      "type": "text",
+      "x": 1607.8,
+      "y": 42,
+      "width": 70.4,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aW",
+      "roundness": null,
+      "seed": 1283391327,
+      "version": 1,
+      "versionNonce": 1446209017,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "clientbuilder-connector-tls-proxies-redi"
+      },
+      "text": "wraps in",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "clientbuilder-connector-tls-proxies-redi-edge-7",
+      "originalText": "wraps in",
+      "autoResize": true,
+      "lineHeight": 1.25
+    }
+  ],
+  "appState": {
+    "gridSize": null,
+    "viewBackgroundColor": "#ffffff"
+  },
+  "files": {},
+  "diagramos": {
+    "version": "0.2.0-rc.6",
+    "schema": 1
+  }
+}

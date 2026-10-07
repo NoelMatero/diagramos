@@ -1,0 +1,2352 @@
+{
+  "type": "excalidraw",
+  "version": 2,
+  "source": "diagramos",
+  "elements": [
+    {
+      "id": "modelserializer-validation-persistence-a-title",
+      "type": "text",
+      "x": 0,
+      "y": -115,
+      "width": 792.0000000000001,
+      "height": 30,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a0",
+      "roundness": null,
+      "seed": 802716836,
+      "version": 1,
+      "versionNonce": 2023323184,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "modelserializer-validation-persistence-a",
+        "role": "title",
+        "direction": "DOWN"
+      },
+      "text": "ModelSerializer: Validation, Persistence, and Representation",
+      "fontSize": 24,
+      "fontFamily": 5,
+      "textAlign": "left",
+      "verticalAlign": "middle",
+      "containerId": null,
+      "originalText": "ModelSerializer: Validation, Persistence, and Representation",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "modelserializer-validation-persistence-a-node-0",
+      "type": "rectangle",
+      "x": 320,
+      "y": 20,
+      "width": 220,
+      "height": 80,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "#e8f4f8",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a1",
+      "roundness": null,
+      "seed": 1660884883,
+      "version": 1,
+      "versionNonce": 844916717,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "modelserializer-validation-persistence-a-node-0-label"
+        },
+        {
+          "id": "modelserializer-validation-persistence-a-edge-0",
+          "type": "arrow"
+        },
+        {
+          "id": "modelserializer-validation-persistence-a-edge-5",
+          "type": "arrow"
+        },
+        {
+          "id": "modelserializer-validation-persistence-a-edge-8",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "modelserializer-validation-persistence-a",
+        "node": "model_serializer",
+        "ref": "rest_framework/serializers.py#ModelSerializer"
+      }
+    },
+    {
+      "id": "modelserializer-validation-persistence-a-node-1",
+      "type": "rectangle",
+      "x": 1000,
+      "y": 400,
+      "width": 160,
+      "height": 80,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a2",
+      "roundness": null,
+      "seed": 245000290,
+      "version": 1,
+      "versionNonce": 1385230934,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "modelserializer-validation-persistence-a-node-1-label"
+        },
+        {
+          "id": "modelserializer-validation-persistence-a-edge-0",
+          "type": "arrow"
+        },
+        {
+          "id": "modelserializer-validation-persistence-a-edge-1",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "modelserializer-validation-persistence-a",
+        "node": "is_valid",
+        "ref": "rest_framework/serializers.py#BaseSerializer.is_valid"
+      }
+    },
+    {
+      "id": "modelserializer-validation-persistence-a-node-2",
+      "type": "rectangle",
+      "x": 960,
+      "y": 780,
+      "width": 240,
+      "height": 80,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a3",
+      "roundness": null,
+      "seed": 1196460029,
+      "version": 1,
+      "versionNonce": 1691540967,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "modelserializer-validation-persistence-a-node-2-label"
+        },
+        {
+          "id": "modelserializer-validation-persistence-a-edge-1",
+          "type": "arrow"
+        },
+        {
+          "id": "modelserializer-validation-persistence-a-edge-2",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "modelserializer-validation-persistence-a",
+        "node": "run_validation",
+        "ref": "rest_framework/serializers.py#Serializer.run_validation"
+      }
+    },
+    {
+      "id": "modelserializer-validation-persistence-a-node-3",
+      "type": "rectangle",
+      "x": 960,
+      "y": 1160,
+      "width": 260,
+      "height": 80,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "#fff9e6",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a4",
+      "roundness": null,
+      "seed": 1271473508,
+      "version": 1,
+      "versionNonce": 1304468208,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "modelserializer-validation-persistence-a-node-3-label"
+        },
+        {
+          "id": "modelserializer-validation-persistence-a-edge-2",
+          "type": "arrow"
+        },
+        {
+          "id": "modelserializer-validation-persistence-a-edge-3",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "modelserializer-validation-persistence-a",
+        "node": "to_internal_value_ser",
+        "ref": "rest_framework/serializers.py#Serializer.to_internal_value"
+      }
+    },
+    {
+      "id": "modelserializer-validation-persistence-a-node-4",
+      "type": "rectangle",
+      "x": 20,
+      "y": 20,
+      "width": 160,
+      "height": 80,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "#f0e6ff",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a5",
+      "roundness": null,
+      "seed": 1338785623,
+      "version": 1,
+      "versionNonce": 1226119985,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "modelserializer-validation-persistence-a-node-4-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "modelserializer-validation-persistence-a",
+        "node": "field_class",
+        "ref": "rest_framework/fields.py#Field"
+      }
+    },
+    {
+      "id": "modelserializer-validation-persistence-a-node-5",
+      "type": "rectangle",
+      "x": 940,
+      "y": 1540,
+      "width": 300,
+      "height": 80,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a6",
+      "roundness": null,
+      "seed": 32445062,
+      "version": 1,
+      "versionNonce": 952184042,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "modelserializer-validation-persistence-a-node-5-label"
+        },
+        {
+          "id": "modelserializer-validation-persistence-a-edge-3",
+          "type": "arrow"
+        },
+        {
+          "id": "modelserializer-validation-persistence-a-edge-4",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "modelserializer-validation-persistence-a",
+        "node": "field_run_validation",
+        "ref": "rest_framework/fields.py#Field.run_validation"
+      }
+    },
+    {
+      "id": "modelserializer-validation-persistence-a-node-6",
+      "type": "rectangle",
+      "x": 920,
+      "y": 1920,
+      "width": 340,
+      "height": 80,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "#ffe6e6",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a7",
+      "roundness": null,
+      "seed": 1041202641,
+      "version": 1,
+      "versionNonce": 794361563,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "modelserializer-validation-persistence-a-node-6-label"
+        },
+        {
+          "id": "modelserializer-validation-persistence-a-edge-4",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "modelserializer-validation-persistence-a",
+        "node": "field_to_internal",
+        "ref": "rest_framework/fields.py#Field.to_internal_value"
+      }
+    },
+    {
+      "id": "modelserializer-validation-persistence-a-node-7",
+      "type": "rectangle",
+      "x": 680,
+      "y": 400,
+      "width": 160,
+      "height": 80,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a8",
+      "roundness": null,
+      "seed": 788479016,
+      "version": 1,
+      "versionNonce": 1223681540,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "modelserializer-validation-persistence-a-node-7-label"
+        },
+        {
+          "id": "modelserializer-validation-persistence-a-edge-5",
+          "type": "arrow"
+        },
+        {
+          "id": "modelserializer-validation-persistence-a-edge-6",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "modelserializer-validation-persistence-a",
+        "node": "save",
+        "ref": "rest_framework/serializers.py#BaseSerializer.save"
+      }
+    },
+    {
+      "id": "modelserializer-validation-persistence-a-node-8",
+      "type": "rectangle",
+      "x": 620,
+      "y": 780,
+      "width": 260,
+      "height": 80,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "#e6f9e6",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a9",
+      "roundness": null,
+      "seed": 1973254251,
+      "version": 1,
+      "versionNonce": 1869915493,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "modelserializer-validation-persistence-a-node-8-label"
+        },
+        {
+          "id": "modelserializer-validation-persistence-a-edge-6",
+          "type": "arrow"
+        },
+        {
+          "id": "modelserializer-validation-persistence-a-edge-7",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "modelserializer-validation-persistence-a",
+        "node": "create_update",
+        "ref": "rest_framework/serializers.py#ModelSerializer.create"
+      }
+    },
+    {
+      "id": "modelserializer-validation-persistence-a-node-9",
+      "type": "rectangle",
+      "x": 240,
+      "y": 400,
+      "width": 260,
+      "height": 80,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "#fff9e6",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aA",
+      "roundness": null,
+      "seed": 562176730,
+      "version": 1,
+      "versionNonce": 57962670,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "modelserializer-validation-persistence-a-node-9-label"
+        },
+        {
+          "id": "modelserializer-validation-persistence-a-edge-8",
+          "type": "arrow"
+        },
+        {
+          "id": "modelserializer-validation-persistence-a-edge-9",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "modelserializer-validation-persistence-a",
+        "node": "to_representation",
+        "ref": "rest_framework/serializers.py#Serializer.to_representation"
+      }
+    },
+    {
+      "id": "modelserializer-validation-persistence-a-node-10",
+      "type": "rectangle",
+      "x": 200,
+      "y": 780,
+      "width": 340,
+      "height": 80,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "#ffe6e6",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aB",
+      "roundness": null,
+      "seed": 1205887868,
+      "version": 1,
+      "versionNonce": 1215926280,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "modelserializer-validation-persistence-a-node-10-label"
+        },
+        {
+          "id": "modelserializer-validation-persistence-a-edge-9",
+          "type": "arrow"
+        },
+        {
+          "id": "modelserializer-validation-persistence-a-edge-10",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "modelserializer-validation-persistence-a",
+        "node": "field_to_repr",
+        "ref": "rest_framework/fields.py#Field.to_representation"
+      }
+    },
+    {
+      "id": "modelserializer-validation-persistence-a-node-11",
+      "type": "rectangle",
+      "x": 320,
+      "y": 1160,
+      "width": 180,
+      "height": 80,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "dotted",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aC",
+      "roundness": null,
+      "seed": 1130874389,
+      "version": 1,
+      "versionNonce": 736694559,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "modelserializer-validation-persistence-a-node-11-label"
+        },
+        {
+          "id": "modelserializer-validation-persistence-a-edge-7",
+          "type": "arrow"
+        },
+        {
+          "id": "modelserializer-validation-persistence-a-edge-10",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "modelserializer-validation-persistence-a",
+        "node": "django_model",
+        "state": "external"
+      }
+    },
+    {
+      "id": "modelserializer-validation-persistence-a-edge-0",
+      "type": "arrow",
+      "x": 488,
+      "y": 92,
+      "width": 600,
+      "height": 300.8,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aD",
+      "roundness": null,
+      "seed": 1323705956,
+      "version": 1,
+      "versionNonce": 879308272,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "modelserializer-validation-persistence-a-edge-0-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "modelserializer-validation-persistence-a",
+        "edge": {
+          "from": "model_serializer",
+          "to": "is_valid",
+          "claim": "calls"
+        }
+      },
+      "points": [
+        [
+          0,
+          0.5
+        ],
+        [
+          0,
+          32
+        ],
+        [
+          418.4,
+          32
+        ],
+        [
+          600,
+          32
+        ],
+        [
+          600,
+          300.3
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "modelserializer-validation-persistence-a-node-0",
+        "focus": -0.5272727272727272,
+        "gap": 8
+      },
+      "endBinding": {
+        "elementId": "modelserializer-validation-persistence-a-node-1",
+        "focus": 0.1,
+        "gap": 7.199999999999989
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "modelserializer-validation-persistence-a-edge-1",
+      "type": "arrow",
+      "x": 1088,
+      "y": 472.8,
+      "width": 0,
+      "height": 300.7999999999999,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aE",
+      "roundness": null,
+      "seed": 1248692477,
+      "version": 1,
+      "versionNonce": 1266381031,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "modelserializer-validation-persistence-a-edge-1-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "modelserializer-validation-persistence-a",
+        "edge": {
+          "from": "is_valid",
+          "to": "run_validation",
+          "claim": "calls"
+        }
+      },
+      "points": [
+        [
+          0,
+          0.5
+        ],
+        [
+          0,
+          150.39999999999992
+        ],
+        [
+          0,
+          300.2999999999999
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "modelserializer-validation-persistence-a-node-1",
+        "focus": -0.1,
+        "gap": 7.199999999999989
+      },
+      "endBinding": {
+        "elementId": "modelserializer-validation-persistence-a-node-2",
+        "focus": 0.06666666666666657,
+        "gap": 6.400000000000091
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "modelserializer-validation-persistence-a-edge-2",
+      "type": "arrow",
+      "x": 1088,
+      "y": 853.5999999999999,
+      "width": 0,
+      "height": 300.79999999999995,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aF",
+      "roundness": null,
+      "seed": 297232738,
+      "version": 1,
+      "versionNonce": 960070998,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "modelserializer-validation-persistence-a-edge-2-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "modelserializer-validation-persistence-a",
+        "edge": {
+          "from": "run_validation",
+          "to": "to_internal_value_ser",
+          "claim": "calls"
+        }
+      },
+      "points": [
+        [
+          0,
+          0.5
+        ],
+        [
+          0,
+          150.39999999999998
+        ],
+        [
+          0,
+          300.29999999999995
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "modelserializer-validation-persistence-a-node-2",
+        "focus": -0.06666666666666657,
+        "gap": 6.400000000000091
+      },
+      "endBinding": {
+        "elementId": "modelserializer-validation-persistence-a-node-3",
+        "focus": -0.015384615384615196,
+        "gap": 5.600000000000136
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "modelserializer-validation-persistence-a-edge-3",
+      "type": "arrow",
+      "x": 1088,
+      "y": 1234.3999999999999,
+      "width": 0,
+      "height": 300.79999999999995,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aG",
+      "roundness": null,
+      "seed": 1713117331,
+      "version": 1,
+      "versionNonce": 419756781,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "modelserializer-validation-persistence-a-edge-3-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "modelserializer-validation-persistence-a",
+        "edge": {
+          "from": "to_internal_value_ser",
+          "to": "field_run_validation",
+          "claim": "calls"
+        }
+      },
+      "points": [
+        [
+          0,
+          0.5
+        ],
+        [
+          0,
+          150.39999999999986
+        ],
+        [
+          0,
+          300.29999999999995
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "modelserializer-validation-persistence-a-node-3",
+        "focus": 0.015384615384615196,
+        "gap": 5.600000000000136
+      },
+      "endBinding": {
+        "elementId": "modelserializer-validation-persistence-a-node-5",
+        "focus": -0.013333333333333284,
+        "gap": 4.800000000000182
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "modelserializer-validation-persistence-a-edge-4",
+      "type": "arrow",
+      "x": 1088,
+      "y": 1615.1999999999998,
+      "width": 0,
+      "height": 300.79999999999995,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aH",
+      "roundness": null,
+      "seed": 840711464,
+      "version": 1,
+      "versionNonce": 798521604,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "modelserializer-validation-persistence-a-edge-4-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "modelserializer-validation-persistence-a",
+        "edge": {
+          "from": "field_run_validation",
+          "to": "field_to_internal",
+          "claim": "calls"
+        }
+      },
+      "points": [
+        [
+          0,
+          0.5
+        ],
+        [
+          0,
+          150.4000000000001
+        ],
+        [
+          0,
+          300.29999999999995
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "modelserializer-validation-persistence-a-node-5",
+        "focus": 0.013333333333333284,
+        "gap": 4.800000000000182
+      },
+      "endBinding": {
+        "elementId": "modelserializer-validation-persistence-a-node-6",
+        "focus": -0.011764705882352977,
+        "gap": 4.000000000000227
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "modelserializer-validation-persistence-a-edge-5",
+      "type": "arrow",
+      "x": 433,
+      "y": 92,
+      "width": 325,
+      "height": 300.8,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aI",
+      "roundness": null,
+      "seed": 1093435089,
+      "version": 1,
+      "versionNonce": 369201627,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "modelserializer-validation-persistence-a-edge-5-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "modelserializer-validation-persistence-a",
+        "edge": {
+          "from": "model_serializer",
+          "to": "save",
+          "claim": "calls"
+        }
+      },
+      "points": [
+        [
+          0,
+          0.5
+        ],
+        [
+          0,
+          56
+        ],
+        [
+          256.9,
+          56
+        ],
+        [
+          325,
+          56
+        ],
+        [
+          325,
+          300.3
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "modelserializer-validation-persistence-a-node-0",
+        "focus": -0.027272727272727275,
+        "gap": 8
+      },
+      "endBinding": {
+        "elementId": "modelserializer-validation-persistence-a-node-7",
+        "focus": -0.02499999999999943,
+        "gap": 7.199999999999989
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "modelserializer-validation-persistence-a-edge-6",
+      "type": "arrow",
+      "x": 758,
+      "y": 472.8,
+      "width": 0,
+      "height": 300.7999999999999,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aJ",
+      "roundness": null,
+      "seed": 84677510,
+      "version": 1,
+      "versionNonce": 527024106,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "modelserializer-validation-persistence-a-edge-6-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "modelserializer-validation-persistence-a",
+        "edge": {
+          "from": "save",
+          "to": "create_update",
+          "claim": "calls"
+        }
+      },
+      "points": [
+        [
+          0,
+          0.5
+        ],
+        [
+          0,
+          150.39999999999992
+        ],
+        [
+          0,
+          300.2999999999999
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "modelserializer-validation-persistence-a-node-7",
+        "focus": 0.025,
+        "gap": 7.199999999999989
+      },
+      "endBinding": {
+        "elementId": "modelserializer-validation-persistence-a-node-8",
+        "focus": 0.06153846153846152,
+        "gap": 6.400000000000091
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "modelserializer-validation-persistence-a-edge-7",
+      "type": "arrow",
+      "x": 758,
+      "y": 853.5999999999999,
+      "width": 320,
+      "height": 300.79999999999995,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aK",
+      "roundness": null,
+      "seed": 1391018071,
+      "version": 1,
+      "versionNonce": 800960049,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "modelserializer-validation-persistence-a-edge-7-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "modelserializer-validation-persistence-a",
+        "edge": {
+          "from": "create_update",
+          "to": "django_model",
+          "claim": "builds"
+        }
+      },
+      "points": [
+        [
+          0,
+          0.5
+        ],
+        [
+          0,
+          192.79999999999995
+        ],
+        [
+          -117.60000000000002,
+          192.79999999999995
+        ],
+        [
+          -320,
+          192.79999999999995
+        ],
+        [
+          -320,
+          300.29999999999995
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "modelserializer-validation-persistence-a-node-8",
+        "focus": -0.06153846153846152,
+        "gap": 6.400000000000091
+      },
+      "endBinding": {
+        "elementId": "modelserializer-validation-persistence-a-node-11",
+        "focus": 0.3111111111111107,
+        "gap": 5.600000000000136
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "modelserializer-validation-persistence-a-edge-8",
+      "type": "arrow",
+      "x": 378,
+      "y": 92,
+      "width": 0,
+      "height": 300.8,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aL",
+      "roundness": null,
+      "seed": 1204178332,
+      "version": 1,
+      "versionNonce": 1353662888,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "modelserializer-validation-persistence-a-edge-8-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "modelserializer-validation-persistence-a",
+        "edge": {
+          "from": "model_serializer",
+          "to": "to_representation",
+          "claim": "calls"
+        }
+      },
+      "points": [
+        [
+          0,
+          0.5
+        ],
+        [
+          0,
+          150.4
+        ],
+        [
+          0,
+          300.3
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "modelserializer-validation-persistence-a-node-0",
+        "focus": 0.4727272727272727,
+        "gap": 8
+      },
+      "endBinding": {
+        "elementId": "modelserializer-validation-persistence-a-node-9",
+        "focus": 0.06153846153846152,
+        "gap": 7.199999999999989
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "modelserializer-validation-persistence-a-edge-9",
+      "type": "arrow",
+      "x": 378,
+      "y": 472.8,
+      "width": 0,
+      "height": 300.7999999999999,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aM",
+      "roundness": null,
+      "seed": 1555423157,
+      "version": 1,
+      "versionNonce": 1641743167,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "modelserializer-validation-persistence-a-edge-9-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "modelserializer-validation-persistence-a",
+        "edge": {
+          "from": "to_representation",
+          "to": "field_to_repr",
+          "claim": "calls"
+        }
+      },
+      "points": [
+        [
+          0,
+          0.5
+        ],
+        [
+          0,
+          150.39999999999992
+        ],
+        [
+          0,
+          300.2999999999999
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "modelserializer-validation-persistence-a-node-9",
+        "focus": -0.06153846153846152,
+        "gap": 7.199999999999989
+      },
+      "endBinding": {
+        "elementId": "modelserializer-validation-persistence-a-node-10",
+        "focus": 0.04705882352941174,
+        "gap": 6.400000000000091
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "modelserializer-validation-persistence-a-edge-10",
+      "type": "arrow",
+      "x": 378,
+      "y": 853.5999999999999,
+      "width": 0,
+      "height": 300.79999999999995,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aN",
+      "roundness": null,
+      "seed": 1317955537,
+      "version": 1,
+      "versionNonce": 656628955,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "modelserializer-validation-persistence-a-edge-10-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "modelserializer-validation-persistence-a",
+        "edge": {
+          "from": "field_to_repr",
+          "to": "django_model",
+          "claim": "accesses"
+        }
+      },
+      "points": [
+        [
+          0,
+          0.5
+        ],
+        [
+          0,
+          150.39999999999998
+        ],
+        [
+          0,
+          300.29999999999995
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "modelserializer-validation-persistence-a-node-10",
+        "focus": -0.04705882352941174,
+        "gap": 6.400000000000091
+      },
+      "endBinding": {
+        "elementId": "modelserializer-validation-persistence-a-node-11",
+        "focus": -0.35555555555555535,
+        "gap": 5.600000000000136
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "modelserializer-validation-persistence-a-node-0-label",
+      "type": "text",
+      "x": 347.5,
+      "y": 47.5,
+      "width": 165,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aO",
+      "roundness": null,
+      "seed": 769756270,
+      "version": 1,
+      "versionNonce": 272830098,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "modelserializer-validation-persistence-a"
+      },
+      "text": "ModelSerializer",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "modelserializer-validation-persistence-a-node-0",
+      "originalText": "ModelSerializer",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "modelserializer-validation-persistence-a-node-1-label",
+      "type": "text",
+      "x": 1025,
+      "y": 427.5,
+      "width": 110.00000000000001,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aP",
+      "roundness": null,
+      "seed": 842311619,
+      "version": 1,
+      "versionNonce": 994419677,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "modelserializer-validation-persistence-a"
+      },
+      "text": "is_valid()",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "modelserializer-validation-persistence-a-node-1",
+      "originalText": "is_valid()",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "modelserializer-validation-persistence-a-node-2-label",
+      "type": "text",
+      "x": 992,
+      "y": 807.5,
+      "width": 176,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aQ",
+      "roundness": null,
+      "seed": 374394164,
+      "version": 1,
+      "versionNonce": 1025344768,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "modelserializer-validation-persistence-a"
+      },
+      "text": "run_validation()",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "modelserializer-validation-persistence-a-node-2",
+      "originalText": "run_validation()",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "modelserializer-validation-persistence-a-node-3-label",
+      "type": "text",
+      "x": 985.5,
+      "y": 1187.5,
+      "width": 209.00000000000003,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aR",
+      "roundness": null,
+      "seed": 751148913,
+      "version": 1,
+      "versionNonce": 1053058811,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "modelserializer-validation-persistence-a"
+      },
+      "text": "to_internal_value()",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "modelserializer-validation-persistence-a-node-3",
+      "originalText": "to_internal_value()",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "modelserializer-validation-persistence-a-node-4-label",
+      "type": "text",
+      "x": 72.5,
+      "y": 47.5,
+      "width": 55.00000000000001,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aS",
+      "roundness": null,
+      "seed": 1784631762,
+      "version": 1,
+      "versionNonce": 1543501830,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "modelserializer-validation-persistence-a"
+      },
+      "text": "Field",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "modelserializer-validation-persistence-a-node-4",
+      "originalText": "Field",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "modelserializer-validation-persistence-a-node-5-label",
+      "type": "text",
+      "x": 969,
+      "y": 1567.5,
+      "width": 242.00000000000003,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aT",
+      "roundness": null,
+      "seed": 300896887,
+      "version": 1,
+      "versionNonce": 437043409,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "modelserializer-validation-persistence-a"
+      },
+      "text": "Field.run_validation()",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "modelserializer-validation-persistence-a-node-5",
+      "originalText": "Field.run_validation()",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "modelserializer-validation-persistence-a-node-6-label",
+      "type": "text",
+      "x": 952.5,
+      "y": 1947.5,
+      "width": 275,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aU",
+      "roundness": null,
+      "seed": 794536360,
+      "version": 1,
+      "versionNonce": 1517307524,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "modelserializer-validation-persistence-a"
+      },
+      "text": "Field.to_internal_value()",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "modelserializer-validation-persistence-a-node-6",
+      "originalText": "Field.to_internal_value()",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "modelserializer-validation-persistence-a-node-7-label",
+      "type": "text",
+      "x": 727,
+      "y": 427.5,
+      "width": 66,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aV",
+      "roundness": null,
+      "seed": 546422517,
+      "version": 1,
+      "versionNonce": 1921111423,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "modelserializer-validation-persistence-a"
+      },
+      "text": "save()",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "modelserializer-validation-persistence-a-node-7",
+      "originalText": "save()",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "modelserializer-validation-persistence-a-node-8-label",
+      "type": "text",
+      "x": 645.5,
+      "y": 807.5,
+      "width": 209.00000000000003,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aW",
+      "roundness": null,
+      "seed": 1417233174,
+      "version": 1,
+      "versionNonce": 1105681146,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "modelserializer-validation-persistence-a"
+      },
+      "text": "create() / update()",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "modelserializer-validation-persistence-a-node-8",
+      "originalText": "create() / update()",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "modelserializer-validation-persistence-a-node-9-label",
+      "type": "text",
+      "x": 265.5,
+      "y": 427.5,
+      "width": 209.00000000000003,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aX",
+      "roundness": null,
+      "seed": 1901186763,
+      "version": 1,
+      "versionNonce": 1239325253,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "modelserializer-validation-persistence-a"
+      },
+      "text": "to_representation()",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "modelserializer-validation-persistence-a-node-9",
+      "originalText": "to_representation()",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "modelserializer-validation-persistence-a-node-10-label",
+      "type": "text",
+      "x": 232.5,
+      "y": 807.5,
+      "width": 275,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aY",
+      "roundness": null,
+      "seed": 1442563353,
+      "version": 1,
+      "versionNonce": 1313906787,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "modelserializer-validation-persistence-a"
+      },
+      "text": "Field.to_representation()",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "modelserializer-validation-persistence-a-node-10",
+      "originalText": "Field.to_representation()",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "modelserializer-validation-persistence-a-node-11-label",
+      "type": "text",
+      "x": 344,
+      "y": 1187.5,
+      "width": 132,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aZ",
+      "roundness": null,
+      "seed": 1316971452,
+      "version": 1,
+      "versionNonce": 1175236936,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "modelserializer-validation-persistence-a"
+      },
+      "text": "Django Model",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "modelserializer-validation-persistence-a-node-11",
+      "originalText": "Django Model",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "modelserializer-validation-persistence-a-edge-0-label",
+      "type": "text",
+      "x": 880,
+      "y": 114,
+      "width": 52.800000000000004,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aa",
+      "roundness": null,
+      "seed": 83007601,
+      "version": 1,
+      "versionNonce": 227566075,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "modelserializer-validation-persistence-a"
+      },
+      "text": "@calls",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "modelserializer-validation-persistence-a-edge-0",
+      "originalText": "@calls",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "modelserializer-validation-persistence-a-edge-1-label",
+      "type": "text",
+      "x": 1061.6,
+      "y": 613.1999999999999,
+      "width": 52.800000000000004,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "ab",
+      "roundness": null,
+      "seed": 1853736500,
+      "version": 1,
+      "versionNonce": 199852032,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "modelserializer-validation-persistence-a"
+      },
+      "text": "@calls",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "modelserializer-validation-persistence-a-edge-1",
+      "originalText": "@calls",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "modelserializer-validation-persistence-a-edge-2-label",
+      "type": "text",
+      "x": 1013.2,
+      "y": 993.9999999999999,
+      "width": 149.60000000000002,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "ac",
+      "roundness": null,
+      "seed": 174170307,
+      "version": 1,
+      "versionNonce": 168926941,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "modelserializer-validation-persistence-a"
+      },
+      "text": "input path @calls",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "modelserializer-validation-persistence-a-edge-2",
+      "originalText": "input path @calls",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "modelserializer-validation-persistence-a-edge-3-label",
+      "type": "text",
+      "x": 1013.2,
+      "y": 1374.7999999999997,
+      "width": 149.60000000000002,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "ad",
+      "roundness": null,
+      "seed": 101614958,
+      "version": 1,
+      "versionNonce": 1594821010,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "modelserializer-validation-persistence-a"
+      },
+      "text": "each field @calls",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "modelserializer-validation-persistence-a-edge-3",
+      "originalText": "each field @calls",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "modelserializer-validation-persistence-a-edge-4-label",
+      "type": "text",
+      "x": 1061.6,
+      "y": 1755.6,
+      "width": 52.800000000000004,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "ae",
+      "roundness": null,
+      "seed": 2025764853,
+      "version": 1,
+      "versionNonce": 1095618687,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "modelserializer-validation-persistence-a"
+      },
+      "text": "@calls",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "modelserializer-validation-persistence-a-edge-4",
+      "originalText": "@calls",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "modelserializer-validation-persistence-a-edge-5-label",
+      "type": "text",
+      "x": 663.5,
+      "y": 138,
+      "width": 52.800000000000004,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "af",
+      "roundness": null,
+      "seed": 126395048,
+      "version": 1,
+      "versionNonce": 691814788,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "modelserializer-validation-persistence-a"
+      },
+      "text": "@calls",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "modelserializer-validation-persistence-a-edge-5",
+      "originalText": "@calls",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "modelserializer-validation-persistence-a-edge-6-label",
+      "type": "text",
+      "x": 731.6,
+      "y": 613.1999999999999,
+      "width": 52.800000000000004,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "ag",
+      "roundness": null,
+      "seed": 1780239223,
+      "version": 1,
+      "versionNonce": 1759034321,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "modelserializer-validation-persistence-a"
+      },
+      "text": "@calls",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "modelserializer-validation-persistence-a-edge-6",
+      "originalText": "@calls",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "modelserializer-validation-persistence-a-edge-7-label",
+      "type": "text",
+      "x": 574.4,
+      "y": 1036.3999999999999,
+      "width": 132,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "ah",
+      "roundness": null,
+      "seed": 1116490450,
+      "version": 1,
+      "versionNonce": 718009094,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "modelserializer-validation-persistence-a"
+      },
+      "text": "via ORM @builds",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "modelserializer-validation-persistence-a-edge-7",
+      "originalText": "via ORM @builds",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "modelserializer-validation-persistence-a-edge-8-label",
+      "type": "text",
+      "x": 307.6,
+      "y": 232.4,
+      "width": 140.8,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "ai",
+      "roundness": null,
+      "seed": 1934461369,
+      "version": 1,
+      "versionNonce": 742660995,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "modelserializer-validation-persistence-a"
+      },
+      "text": "via .data @calls",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "modelserializer-validation-persistence-a-edge-8",
+      "originalText": "via .data @calls",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "modelserializer-validation-persistence-a-edge-9-label",
+      "type": "text",
+      "x": 303.2,
+      "y": 613.1999999999999,
+      "width": 149.60000000000002,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aj",
+      "roundness": null,
+      "seed": 1505916380,
+      "version": 1,
+      "versionNonce": 1621321704,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "modelserializer-validation-persistence-a"
+      },
+      "text": "each field @calls",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "modelserializer-validation-persistence-a-edge-9",
+      "originalText": "each field @calls",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "modelserializer-validation-persistence-a-edge-10-label",
+      "type": "text",
+      "x": 290,
+      "y": 993.9999999999999,
+      "width": 176,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "ak",
+      "roundness": null,
+      "seed": 1620263848,
+      "version": 1,
+      "versionNonce": 1425519748,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "modelserializer-validation-persistence-a"
+      },
+      "text": "reads from @accesses",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "modelserializer-validation-persistence-a-edge-10",
+      "originalText": "reads from @accesses",
+      "autoResize": true,
+      "lineHeight": 1.25
+    }
+  ],
+  "appState": {
+    "gridSize": null,
+    "viewBackgroundColor": "#ffffff"
+  },
+  "files": {},
+  "diagramos": {
+    "version": "0.2.0-rc.6",
+    "schema": 1
+  }
+}
