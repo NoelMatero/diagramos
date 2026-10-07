@@ -18,7 +18,7 @@ import { reaches } from "../src/engine/body";
 import type { CallSide } from "../src/engine/calls";
 import { createDiagram } from "../src/engine/diagram";
 import { checkDrift, checkSymbolEdge, type Workspace } from "../src/engine/drift";
-import { initEngine, languageOf, parseSource, type Language } from "../src/engine/parse";
+import { each, initEngine, languageOf, parseSource, type Language } from "../src/engine/parse";
 import { reachBetween } from "../src/engine/reach";
 import { installExcalifontMeasurer } from "./helpers/excalifont";
 
@@ -290,6 +290,19 @@ describe("the answer does not depend on what else has been read", () => {
     const after = reaches(source, "alpha", ["beta"], "ts");
     expect(after).toBe(before);
     expect(after).toBe(true);
+  });
+
+  it("keeps a tree readable while it is still being walked, however many files the walk reads", () => {
+    // `callSitesIn`'s shape: walk one file's tree, and parse other files from inside the walk.
+    const tree = parseSource(source, "ts")!;
+    const declared: string[] = [];
+    each(tree.rootNode, (node) => {
+      if (node.type !== "function_declaration") return;
+      for (const other of others) parseSource(other, "ts");
+      declared.push(node.childForFieldName("name")!.text);
+    });
+    expect(declared).toEqual(["alpha", "beta"]);
+    expect(tree.rootNode.type).toBe("program");
   });
 });
 
